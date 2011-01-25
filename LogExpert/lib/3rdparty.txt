@@ -1,0 +1,18 @@
+LogExpert uses following 3rd party libraries:
+
+Bugzproxy:
+http://sourceforge.net/projects/bugzproxy/
+Released under "GNU Library or Lesser General Public License (LGPL)"
+
+XML RPC:
+http://www.xml-rpc.net/
+Released under "MIT X11 license"
+
+
+MDI Tab Control:
+http://www.codeproject.com/KB/tabs/MDITabControl.aspx
+Released under "Code Project Open License (CPOL)"
+
+The source code for MDI Tab Control is included in a separate project because I made some additions 
+to the original code.
+
