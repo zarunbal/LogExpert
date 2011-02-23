@@ -35,6 +35,7 @@ namespace CsvColumnizer
     public char escapeChar;
     public bool hasFieldNames;
     public char commentChar;
+    public int minColumns;
 
     public void InitDefaults()
     {
@@ -43,6 +44,7 @@ namespace CsvColumnizer
       this.quoteChar = '"';
       this.commentChar = '#';
       this.hasFieldNames = true;
+      this.minColumns = 0;
     }
 
   }
@@ -60,6 +62,10 @@ namespace CsvColumnizer
 
     private string firstLine;
 
+    // if CSV is detected to be 'invalid' the columnizer will behave like a default columnizer
+    private bool isValidCsv;
+
+
     #region ILogLineColumnizer Member
 
     public string GetName()
@@ -74,23 +80,37 @@ namespace CsvColumnizer
 
     public int GetColumnCount()
     {
-      return this.columnList.Count;
+      return this.isValidCsv ? this.columnList.Count : 1;
     }
 
     public string[] GetColumnNames()
     {
-      int i = 0;
       string[] names = new string[GetColumnCount()];
-      foreach (CsvColumn column in this.columnList)
+      if (this.isValidCsv)
       {
-        names[i++] = column.Name;
+        int i = 0;
+        foreach (CsvColumn column in this.columnList)
+        {
+          names[i++] = column.Name;
+        }
+      } 
+      else
+      {
+        names[0] = "Text";
       }
       return names;
     }
 
     public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
     {
-      return SplitCsvLine(line);
+      if (this.isValidCsv)
+      {
+        return SplitCsvLine(line);
+      }
+      else
+      {
+        return new string[] { line };
+      }
     }
 
     public bool IsTimeshiftImplemented()
@@ -124,18 +144,21 @@ namespace CsvColumnizer
 
     public void Selected(ILogLineColumnizerCallback callback)
     {
-      this.columnList.Clear();
-      string line = this.config.hasFieldNames ? this.firstLine : callback.GetLogLine(0);
-      int i = 1;
-      if (line != null)
+      if (this.isValidCsv) // see PreProcessLine()
       {
-        string[] fields = SplitCsvLine(line);
-        foreach (string field in fields)
+        this.columnList.Clear();
+        string line = this.config.hasFieldNames ? this.firstLine : callback.GetLogLine(0);
+        int i = 1;
+        if (line != null)
         {
-          if (this.config.hasFieldNames)
-            this.columnList.Add(new CsvColumn(field));
-          else
-            this.columnList.Add(new CsvColumn("Column " + (i++)));
+          string[] fields = SplitCsvLine(line);
+          foreach (string field in fields)
+          {
+            if (this.config.hasFieldNames)
+              this.columnList.Add(new CsvColumn(field));
+            else
+              this.columnList.Add(new CsvColumn("Column " + (i++)));
+          }
         }
       }
     }
@@ -230,10 +253,23 @@ namespace CsvColumnizer
       if (realLineNum == 0)
       {
         this.firstLine = logLine;   // store for later field names and field count retrieval
+        if (this.config.minColumns > 0)
+        {
+          string[] headers = SplitCsvLine(logLine);
+          if (headers.Length < this.config.minColumns)
+          {
+            // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
+            this.isValidCsv = false;
+            return logLine;
+          }
+        }
+        this.isValidCsv = true;
       }
 
       if (this.config.hasFieldNames && realLineNum == 0)
-        return null;                // hide from LogExpert
+      {
+        return null; // hide from LogExpert
+      }
 
       if (this.config.commentChar != ' ' && logLine.StartsWith("" + this.config.commentChar))
       {

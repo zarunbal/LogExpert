@@ -30,7 +30,9 @@ namespace UnitTests
       options.MaxDayTry = 0;
       options.FormatPattern = "*$J(.)";
       LinkedList<string> files = CreateTestfilesWithoutDate();
-      LogfileReader reader = new LogfileReader(files.Last.Value, Encoding.Default, true, 40, 50, options);
+      EncodingOptions encodingOptions = new EncodingOptions();
+      encodingOptions.Encoding = Encoding.Default;
+      LogfileReader reader = new LogfileReader(files.Last.Value, encodingOptions, true, 40, 50, options);
       reader.ReadFiles();
 
       IList<ILogFileInfo> lil = reader.GetLogFileInfoList();

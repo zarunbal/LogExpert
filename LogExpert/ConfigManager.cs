@@ -175,6 +175,7 @@ namespace LogExpert
     public int pollingInterval = 250;
     public bool isAutoHideFilterList = false;
     public MultifileOptions multifileOptions;
+    public String defaultEncoding;
   }
 
   [FlagsAttribute]

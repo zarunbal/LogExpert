@@ -28,6 +28,7 @@ namespace CsvColumnizer
       this.commentCharTextBox.Text = "" + this.config.commentChar;
       this.fieldNamesCheckBox.Checked = this.config.hasFieldNames;
       this.escapeCharTextBox.Enabled = this.escapeCheckBox.Checked;
+      this.minColumnsNumericUpDown.Value = this.config.minColumns;
     }
 
     private void retrieveValues()
@@ -37,6 +38,7 @@ namespace CsvColumnizer
       this.config.escapeChar = this.escapeCheckBox.Checked ? this.escapeCharTextBox.Text[0] : '\0';
       this.config.commentChar = this.commentCharTextBox.Text[0];
       this.config.hasFieldNames = this.fieldNamesCheckBox.Checked;
+      this.config.minColumns = (int) this.minColumnsNumericUpDown.Value;
     }
 
     private void okButton_Click(object sender, EventArgs e)

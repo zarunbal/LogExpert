@@ -133,6 +133,7 @@
       <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\OverlayEventArgs.cs" />
+    <Compile Include="EncodingOptions.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="FilterCancelHandler.cs" />
     <Compile Include="FilterStarter.cs" />
@@ -389,6 +390,7 @@
     </Compile>
     <Compile Include="Range.cs" />
     <Compile Include="RangeFinder.cs" />
+    <Compile Include="ReloadMemento.cs" />
     <Compile Include="Resources\Resource1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
