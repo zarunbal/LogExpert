@@ -32,7 +32,8 @@ namespace LogExpert
     bool isLineCountDirty = true;
     bool isMultiFile = false;
     Regex nameRegex = new Regex(".*(\\d+)");
-    private Encoding encoding;
+    private EncodingOptions encodingOptions;
+    private Encoding currentEncoding;
     private bool isXmlMode = false;
     private IXmlLogConfiguration xmlLogConfig;
     private IPreProcessColumnizer preProcessColumnizer = null;
@@ -43,13 +44,13 @@ namespace LogExpert
     Object monitor = new Object();
 
 
-    public LogfileReader(string fileName, Encoding encoding, bool multiFile, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
+    public LogfileReader(string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
     {
       Init();
       if (fileName == null)
         return;
       this.fileName = fileName;
-      this.Encoding = encoding;
+      this.EncodingOptions = encodingOptions;
       this.isMultiFile = multiFile;
       this.MAX_BUFFERS = bufferCount;
       this.MAX_LINES_PER_BUFFER = linesPerBuffer;
@@ -77,13 +78,13 @@ namespace LogExpert
     }
 
 
-    public LogfileReader(string[] fileNames, Encoding encoding, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
+    public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
     {
       Init();
 
       if (fileNames == null || fileNames.Length < 1)
         return;
-      this.Encoding = encoding;
+      this.EncodingOptions = encodingOptions;
       this.isMultiFile = true;
       this.MAX_BUFFERS = bufferCount;
       this.MAX_LINES_PER_BUFFER = linesPerBuffer;
@@ -104,13 +105,13 @@ namespace LogExpert
     }
 
 
-    public LogfileReader(ILogFileInfo logFileInfo, Encoding encoding, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
+    public LogfileReader(ILogFileInfo logFileInfo, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultifileOptions mutlifileOptions)
     {
       Init();
       if (fileName == null)
         return;
       this.fileName = logFileInfo.FileName;
-      this.Encoding = encoding;
+      this.EncodingOptions = encodingOptions;
       this.isMultiFile = false;
       this.MAX_BUFFERS = bufferCount;
       this.MAX_LINES_PER_BUFFER = linesPerBuffer;
@@ -494,6 +495,7 @@ namespace LogExpert
       try
       {
         fileStream = logFileInfo.OpenStream();
+        bool canSeek = fileStream.CanSeek;
       }
       catch (IOException fe)
       {
@@ -506,7 +508,7 @@ namespace LogExpert
       }
       try
       {
-        reader = GetLogStreamReader(fileStream, this.Encoding);
+        reader = GetLogStreamReader(fileStream, this.EncodingOptions);
         reader.Position = filePos;
         this.fileLength = logFileInfo.Length;
         String line;
@@ -600,7 +602,7 @@ namespace LogExpert
         Monitor.Exit(logBuffer);
         this.isLineCountDirty = true;
         this.currFileSize = reader.Position;
-        this.Encoding = reader.Encoding; // Reader may have detected another encoding
+        this.currentEncoding = reader.Encoding; // Reader may have detected another encoding
         if (!this.shouldStop)
         {
           OnLoadFile(new LoadFileEventArgs(logFileInfo.FileName, filePos, true, this.fileLength, false));
@@ -881,7 +883,7 @@ namespace LogExpert
       }
       try
       {
-        ILogStreamReader reader = GetLogStreamReader(fileStream, this.Encoding);
+        ILogStreamReader reader = GetLogStreamReader(fileStream, this.EncodingOptions);
         string line;
         long filePos = logBuffer.StartPos;
         reader.Position = logBuffer.StartPos;
@@ -1282,7 +1284,10 @@ namespace LogExpert
           if (!IsMultiFile)
           {
             
-            ReloadBufferList();
+            // ReloadBufferList();  // removed because reloading is triggered by owning LogWindow
+            // Trigger "new file" handling (reload)
+            OnLoadFile(new LoadFileEventArgs(this.fileName, 0, true, this.fileLength, true));
+
             if (this.isDeleted)
             {
               args.FileSize = newSize;
@@ -1403,25 +1408,21 @@ namespace LogExpert
       get { return this.isMultiFile; }
     }
 
+    /// <summary>
+    /// Explicit change the encoding.
+    /// </summary>
+    /// <param name="encoding"></param>
     public void ChangeEncoding(Encoding encoding)
     {
-      //if (this.encoding.IsSingleByte != encoding.IsSingleByte ||
-      //    this.encoding.GetPreamble().Length != encoding.GetPreamble().Length)
-      //{
-      //  this.encoding = encoding;
-      //  ReloadBufferList();
-      //}
-      //else
-      //{
-        this.Encoding = encoding;
-        ResetBufferCache();
-        ClearLru();
-      //}
+      this.currentEncoding = encoding;
+      this.EncodingOptions.Encoding = encoding;
+      ResetBufferCache();
+      ClearLru();
     }
 
     public Encoding CurrentEncoding
     {
-      get { return this.Encoding; }
+      get { return this.currentEncoding; }
     }
 
     public long FileSize
@@ -1442,15 +1443,15 @@ namespace LogExpert
     }
 
 
-    private ILogStreamReader GetLogStreamReader(Stream stream, Encoding encoding)
+    private ILogStreamReader GetLogStreamReader(Stream stream, EncodingOptions encodingOptions)
     {
       if (IsXmlMode)
       {
-        return new XmlBlockSplitter(new XmlLogReader(new PositionAwareStreamReader(stream, encoding)), XmlLogConfig);
+        return new XmlBlockSplitter(new XmlLogReader(new PositionAwareStreamReader(stream, encodingOptions)), XmlLogConfig);
       }
       else
       {
-        return new PositionAwareStreamReader(stream, encoding);
+        return new PositionAwareStreamReader(stream, encodingOptions);
       }
     }
 
@@ -1460,19 +1461,15 @@ namespace LogExpert
       set { this.preProcessColumnizer = value; }
     }
 
-    public Encoding Encoding
+    public EncodingOptions EncodingOptions
     {
-      get { return encoding; }
+      get { return encodingOptions; }
       set
       {
-        if (value == null)
         {
-          Logger.logWarn("Encoding is null");
-          encoding = Encoding.Default;
-        }
-        else
-        {
-          encoding = value;
+          encodingOptions = new EncodingOptions();
+          encodingOptions.DefaultEncoding = value.DefaultEncoding;
+          encodingOptions.Encoding = value.Encoding;
         }
       }
     }

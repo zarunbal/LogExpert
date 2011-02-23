@@ -130,7 +130,7 @@ namespace LogExpert
     string sessionFileName = null;    // unused?
     private string forcedPersistenceFileName = null;
     private string givenFileName = null;      // file name of given file used for loading (maybe logfile or lxp)
-    Encoding encoding;
+    private EncodingOptions encodingOptions;
     private MultifileOptions multifileOptions;
 
     readonly TimeSpreadCalculator timeSpreadCalc;
@@ -152,6 +152,8 @@ namespace LogExpert
 
     private Font font;
     private Font fontBold;
+
+    private ReloadMemento reloadMemento;
 
     public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading)
     {
@@ -288,16 +290,17 @@ namespace LogExpert
     }
 
 
-    public void LoadFile(string fileName, Encoding encoding)
+    public void LoadFile(string fileName, EncodingOptions encodingOptions)
     {
 #if DEBUG
       //MessageBox.Show("Pause vor LoadFile()");
 #endif
-      setEncoding(encoding);
-
+      
       if (fileName != null)
       {
         this.fileName = fileName;
+        this.EncodingOptions = encodingOptions;
+
         if (this.logFileReader != null)
         {
           this.logFileReader.stopMonitoring();
@@ -313,16 +316,14 @@ namespace LogExpert
           SetDefaultHighlightGroup();
         }
 
-        setEncoding(encoding);
-
         // this may be set after loading persistence data
         if (this.fileNames != null && this.IsMultiFile)
         {
-          LoadFilesAsMulti(this.fileNames, encoding);
+          LoadFilesAsMulti(this.fileNames, this.EncodingOptions);
           return;
         }
 
-        this.logFileReader = new LogfileReader(fileName, this.encoding, this.IsMultiFile, 
+        this.logFileReader = new LogfileReader(fileName, this.EncodingOptions, this.IsMultiFile, 
                                                this.Preferences.bufferCount, this.Preferences.linesPerBuffer, 
                                                this.multifileOptions);
         if (this.CurrentColumnizer is ILogLineXmlColumnizer)
@@ -372,26 +373,6 @@ namespace LogExpert
       }
     }
 
-    private void setEncoding(Encoding encoding)
-    {
-      if (encoding != null)         // given in fx args (from guiStateArgs)
-      {
-        this.encoding = encoding;
-      }
-      else
-      {
-        if (this.encoding == null)  // set by persistence load
-        {
-          this.encoding = encoding;
-        }
-        if (this.encoding == null)
-        {
-          this.encoding = Encoding.Default;
-          this.guiStateArgs.CurrentEncoding = this.encoding;
-        }
-      }
-    }
-
 
     private bool LoadPersistenceOptions()
     {
@@ -432,7 +413,10 @@ namespace LogExpert
         ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
         this.bookmarkSplitContainer.SplitterDistance = persistenceData.bookmarkListPosition;
         this.bookmarkSplitContainer.Panel2Collapsed = !persistenceData.bookmarkListVisible;
-        PreselectColumnizer(persistenceData.columnizerName);
+        if (reloadMemento == null)
+        {
+          PreselectColumnizer(persistenceData.columnizerName);
+        }
         this.FollowTailChanged(persistenceData.followTail, false);
         if (persistenceData.tabName != null)
         {
@@ -451,7 +435,7 @@ namespace LogExpert
           this.fileNames = null;
         }
         this.bookmarkWindow.ShowBookmarkCommentColumn = persistenceData.showBookmarkCommentColumn;
-        setEncoding(persistenceData.encoding);
+        SetExplicitEncoding(persistenceData.encoding);
         return true;
       }
       catch (Exception ex)
@@ -461,8 +445,7 @@ namespace LogExpert
       }
     }
 
-
-    public void LoadFilesAsMulti(string[] fileNames, Encoding encoding)
+    public void LoadFilesAsMulti(string[] fileNames, EncodingOptions encodingOptions)
     {
       Logger.logInfo("Loading given files as MultiFile:");
       foreach (string name in fileNames)
@@ -474,7 +457,8 @@ namespace LogExpert
         this.logFileReader.stopMonitoring();
         UnRegisterLogFileReaderEvents();
       }
-      this.logFileReader = new LogfileReader(fileNames, encoding, this.Preferences.bufferCount, 
+      this.EncodingOptions = encodingOptions;
+      this.logFileReader = new LogfileReader(fileNames, this.EncodingOptions, this.Preferences.bufferCount, 
                                              this.Preferences.linesPerBuffer, this.multifileOptions);
       RegisterLogFileReaderEvents();
       EnterLoadFileStatus();
@@ -530,7 +514,8 @@ namespace LogExpert
         if (persistenceData.lineCount > this.logFileReader.LineCount)
         {
           // outdated persistence data (logfile rollover)
-          MessageBox.Show(this, "Persistence data for " + this.fileName + " is outdated. It was discarded.", "Log Expert");
+          // MessageBox.Show(this, "Persistence data for " + this.fileName + " is outdated. It was discarded.", "Log Expert");
+          Logger.logInfo("Persistence data for " + this.fileName + " is outdated. It was discarded.");
           LoadPersistenceOptions();
           return;
         }
@@ -678,7 +663,7 @@ namespace LogExpert
       }
       persistenceData.showBookmarkCommentColumn = this.bookmarkWindow.ShowBookmarkCommentColumn;
       persistenceData.filterSaveListVisible = !this.highlightSplitContainer.Panel2Collapsed;
-      persistenceData.encoding = this.encoding;
+      persistenceData.encoding = this.logFileReader.CurrentEncoding;
       return persistenceData;
     }
 
@@ -756,25 +741,35 @@ namespace LogExpert
       Logger.logInfo("Finished loading.");
       this.isLoading = false;
       this.isDeadFile = false;
-      if (this.waitingForClose)
-      {
-        this.isLoading = false;
-      }
-      else
+      if (!this.waitingForClose)
       {
         this.Invoke(new MethodInvoker(LoadingFinished));
         this.Invoke(new MethodInvoker(LoadPersistenceData));
         this.Invoke(new MethodInvoker(SetGuiAfterLoading));
+        this.loadingFinishedEvent.Set();
+        this.externaLoadingFinishedEvent.Set();
+        this.timeSpreadCalc.SetLineCount(this.dataGridView.RowCount);
+        if (this.loadingFinishedFx != null)
+        {
+          this.loadingFinishedFx(this);
+        }
+
+        if (this.reloadMemento != null)
+        {
+          if (this.reloadMemento.currentLine < this.dataGridView.RowCount && this.reloadMemento.currentLine >= 0)
+            this.dataGridView.CurrentCell = this.dataGridView.Rows[this.reloadMemento.currentLine].Cells[0];
+          if (this.reloadMemento.firstDisplayedLine < this.dataGridView.RowCount && this.reloadMemento.firstDisplayedLine >= 0)
+            this.dataGridView.FirstDisplayedScrollingRowIndex = this.reloadMemento.firstDisplayedLine;
+        }
+        if (this.filterTailCheckBox.Checked)
+        {
+          Logger.logInfo("Refreshing filter view because of reload.");
+          FilterSearch();
+        }
+
+        HandleChangedFilterList();
       }
-      this.loadingFinishedEvent.Set();
-      this.externaLoadingFinishedEvent.Set();
-      this.timeSpreadCalc.SetLineCount(this.dataGridView.RowCount);
-      if (this.loadingFinishedFx != null)
-      {
-        this.loadingFinishedFx(this);
-      }
-      //this.bookmarkWindow.ResizeColumns();
-      HandleChangedFilterList();
+      this.reloadMemento = null;
     }
 
     void logFileReader_FileNotFound(object sender, EventArgs e)
@@ -837,7 +832,7 @@ namespace LogExpert
           this.Text = Util.GetNameFromPath(fileName);
       }
       this.ShowBookmarkBubbles = this.Preferences.showBubbles;
-      if (this.forcedColumnizer == null)
+      //if (this.forcedColumnizer == null)
       {
         ILogLineColumnizer columnizer;
         if (this.forcedColumnizerForLoading != null)
@@ -850,10 +845,14 @@ namespace LogExpert
           columnizer = FindColumnizer();
           if (columnizer != null)
           {
-            columnizer = Util.CloneColumnizer(columnizer);
+            if (this.reloadMemento == null)
+            {
+              columnizer = Util.CloneColumnizer(columnizer);
+            }
           }
           else
           {
+            // Default Columnizers
             columnizer = Util.CloneColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
           }
         }
@@ -1020,7 +1019,7 @@ namespace LogExpert
           externaLoadingFinishedEvent.Reset();
           Thread reloadFinishedThread = new Thread(new ThreadStart(ReloadFinishedThreadFx));
           reloadFinishedThread.Start();
-          LoadFile(this.fileName, this.guiStateArgs.CurrentEncoding != null ? this.guiStateArgs.CurrentEncoding : null);
+          LoadFile(this.fileName, this.EncodingOptions);
 
           ClearBookmarkList();
           SavePersistenceData(false);
@@ -1448,7 +1447,7 @@ namespace LogExpert
     {
       this.forcedColumnizerForLoading = Util.CloneColumnizer(columnizer);
     }
-
+    
     public void PreselectColumnizer(string columnizerName)
     {
       ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
@@ -3736,7 +3735,7 @@ namespace LogExpert
         try
         {
           this.columnizerCallback.LineNum = e.RowIndex;
-          cols = this.currentColumnizer.SplitLine(this.columnizerCallback, line);
+          cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
         }
         catch (Exception)
         {
@@ -3953,7 +3952,7 @@ namespace LogExpert
     public void SetTimeshiftValue(string value)
     {
       this.guiStateArgs.TimeshiftText = value;
-      if (this.currentColumnizer.IsTimeshiftImplemented())
+      if (this.CurrentColumnizer.IsTimeshiftImplemented())
       {
         try
         {
@@ -3968,15 +3967,15 @@ namespace LogExpert
               }
               TimeSpan timeSpan = TimeSpan.Parse(text);
               int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
-              this.currentColumnizer.SetTimeOffset(diff);
+              this.CurrentColumnizer.SetTimeOffset(diff);
             }
             catch (Exception)
             {
-              this.currentColumnizer.SetTimeOffset(0);
+              this.CurrentColumnizer.SetTimeOffset(0);
             }
           }
           else
-            this.currentColumnizer.SetTimeOffset(0);
+            this.CurrentColumnizer.SetTimeOffset(0);
           this.dataGridView.Refresh();
           this.filterGridView.Refresh();
           if (this.CurrentColumnizer.IsTimeshiftImplemented())
@@ -4738,9 +4737,23 @@ namespace LogExpert
     }
 
 
+    /// <summary>
+    /// Set an Encoding which shall be used when loading a file. Used before a file is loaded.
+    /// </summary>
+    /// <param name="encoding"></param>
+    private void SetExplicitEncoding(Encoding encoding)
+    {
+      this.EncodingOptions.Encoding = encoding;
+    }
+
+    /// <summary>
+    /// Change the file encoding. May force a reload if byte count ot preamble lenght differs from previous used encoding.
+    /// </summary>
+    /// <param name="encoding"></param>
     public void ChangeEncoding(Encoding encoding)
     {
       this.logFileReader.ChangeEncoding(encoding);
+      this.encodingOptions.Encoding = encoding;
       if (this.guiStateArgs.CurrentEncoding.IsSingleByte != encoding.IsSingleByte ||
           this.guiStateArgs.CurrentEncoding.GetPreamble().Length != encoding.GetPreamble().Length)
       {
@@ -4752,7 +4765,6 @@ namespace LogExpert
         SendGuiStateUpdate();
       }
       this.guiStateArgs.CurrentEncoding = this.logFileReader.CurrentEncoding;
-      this.encoding = this.logFileReader.CurrentEncoding;
     }
 
 
@@ -4760,26 +4772,28 @@ namespace LogExpert
     {
       SavePersistenceData(false);
 
-      int currentLine = this.dataGridView.CurrentCellAddress.Y;
-      int firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;      
+      this.reloadMemento = new ReloadMemento();
+      this.reloadMemento.currentLine = this.dataGridView.CurrentCellAddress.Y;
+      this.reloadMemento.firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
+      this.forcedColumnizerForLoading = this.CurrentColumnizer;
       if (this.fileNames == null || !this.IsMultiFile)
       {
-        LoadFile(this.fileName, this.logFileReader.CurrentEncoding);
+        LoadFile(this.fileName, this.EncodingOptions);
       }
       else
       {
-        LoadFilesAsMulti(this.fileNames, this.logFileReader.CurrentEncoding);
+        LoadFilesAsMulti(this.fileNames, this.EncodingOptions);
       }
-      if (currentLine < this.dataGridView.RowCount && currentLine >= 0)
-        this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLine].Cells[0];
-      if (firstDisplayedLine < this.dataGridView.RowCount && firstDisplayedLine >= 0)
-        this.dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
+      //if (currentLine < this.dataGridView.RowCount && currentLine >= 0)
+      //  this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLine].Cells[0];
+      //if (firstDisplayedLine < this.dataGridView.RowCount && firstDisplayedLine >= 0)
+      //  this.dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
 
-      if (this.filterTailCheckBox.Checked)
-      {
-        Logger.logInfo("Refreshing filter view because of reload.");
-        FilterSearch();
-      }
+      //if (this.filterTailCheckBox.Checked)
+      //{
+      //  Logger.logInfo("Refreshing filter view because of reload.");
+      //  FilterSearch();
+      //}
     }
 
 
@@ -4826,7 +4840,7 @@ namespace LogExpert
         this.timeSpreadCalc.TimeMode = this.Preferences.timeSpreadTimeMode;
         this.timeSpreadingControl1.ForeColor = this.Preferences.timeSpreadColor;
         this.timeSpreadingControl1.ReverseAlpha = this.Preferences.reverseAlpha;
-        if (this.currentColumnizer.IsTimeshiftImplemented())
+        if (this.CurrentColumnizer.IsTimeshiftImplemented())
         {
           this.timeSpreadingControl1.Invoke(new MethodInvoker(this.timeSpreadingControl1.Refresh));
           ShowTimeSpread(this.Preferences.showTimeSpread);
@@ -4885,7 +4899,7 @@ namespace LogExpert
         foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
         {
           LogExpertCallback callback = new LogExpertCallback(this);
-          ContextMenuPluginEventArgs evArgs = new ContextMenuPluginEventArgs(entry, lines, this.currentColumnizer, callback);
+          ContextMenuPluginEventArgs evArgs = new ContextMenuPluginEventArgs(entry, lines, this.CurrentColumnizer, callback);
           EventHandler ev = new EventHandler(HandlePluginContextMenu);
           //MenuItem item = this.dataGridView.ContextMenu.MenuItems.Add(entry.GetMenuText(line, this.CurrentColumnizer, callback), ev);
           string menuText = entry.GetMenuText(lines, this.CurrentColumnizer, callback);
@@ -4908,7 +4922,7 @@ namespace LogExpert
 
       this.markCurrentFilterRangeToolStripMenuItem.Enabled = this.filterRangeComboBox.Text != null && this.filterRangeComboBox.Text.Length > 0;
 
-      if (this.currentColumnizer.IsTimeshiftImplemented())
+      if (this.CurrentColumnizer.IsTimeshiftImplemented())
       {
         IList<WindowFileEntry> list = this.parentLogTabWin.GetListOfOpenFiles();
         this.syncTimestampsToToolStripMenuItem.Enabled = true;
@@ -6881,6 +6895,12 @@ namespace LogExpert
     public bool IsTimeSynced
     {
       get { return this.timeSyncList != null; }
+    }
+
+    protected EncodingOptions EncodingOptions
+    {
+      get { return encodingOptions; }
+      set { encodingOptions = value; }
     }
 
     public delegate void SyncModeChangedEventHandler(object sender, SyncModeEventArgs e);

@@ -40,12 +40,16 @@
       this.commentCharTextBox = new System.Windows.Forms.TextBox();
       this.label4 = new System.Windows.Forms.Label();
       this.fieldNamesCheckBox = new System.Windows.Forms.CheckBox();
+      this.minColumnsNumericUpDown = new System.Windows.Forms.NumericUpDown();
+      this.label5 = new System.Windows.Forms.Label();
+      this.label6 = new System.Windows.Forms.Label();
+      ((System.ComponentModel.ISupportInitialize)(this.minColumnsNumericUpDown)).BeginInit();
       this.SuspendLayout();
       // 
       // okButton
       // 
       this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(130, 172);
+      this.okButton.Location = new System.Drawing.Point(148, 202);
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
       this.okButton.TabIndex = 0;
@@ -56,7 +60,7 @@
       // cancelButton
       // 
       this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(211, 172);
+      this.cancelButton.Location = new System.Drawing.Point(229, 202);
       this.cancelButton.Name = "cancelButton";
       this.cancelButton.Size = new System.Drawing.Size(75, 23);
       this.cancelButton.TabIndex = 1;
@@ -142,19 +146,52 @@
       // fieldNamesCheckBox
       // 
       this.fieldNamesCheckBox.AutoSize = true;
-      this.fieldNamesCheckBox.Location = new System.Drawing.Point(15, 131);
+      this.fieldNamesCheckBox.Location = new System.Drawing.Point(15, 161);
       this.fieldNamesCheckBox.Name = "fieldNamesCheckBox";
       this.fieldNamesCheckBox.Size = new System.Drawing.Size(163, 17);
       this.fieldNamesCheckBox.TabIndex = 11;
       this.fieldNamesCheckBox.Text = "First line contains field names";
       this.fieldNamesCheckBox.UseVisualStyleBackColor = true;
       // 
+      // minColumnsNumericUpDown
+      // 
+      this.minColumnsNumericUpDown.Location = new System.Drawing.Point(95, 120);
+      this.minColumnsNumericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+      this.minColumnsNumericUpDown.Name = "minColumnsNumericUpDown";
+      this.minColumnsNumericUpDown.Size = new System.Drawing.Size(48, 20);
+      this.minColumnsNumericUpDown.TabIndex = 12;
+      // 
+      // label5
+      // 
+      this.label5.AutoSize = true;
+      this.label5.Location = new System.Drawing.Point(12, 122);
+      this.label5.Name = "label5";
+      this.label5.Size = new System.Drawing.Size(66, 13);
+      this.label5.TabIndex = 13;
+      this.label5.Text = "Min columns";
+      // 
+      // label6
+      // 
+      this.label6.AutoSize = true;
+      this.label6.Location = new System.Drawing.Point(149, 122);
+      this.label6.Name = "label6";
+      this.label6.Size = new System.Drawing.Size(119, 13);
+      this.label6.TabIndex = 14;
+      this.label6.Text = "(0 = no minimum check)";
+      // 
       // CsvColumnizerConfigDlg
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(304, 210);
+      this.ClientSize = new System.Drawing.Size(316, 237);
       this.ControlBox = false;
+      this.Controls.Add(this.label6);
+      this.Controls.Add(this.label5);
+      this.Controls.Add(this.minColumnsNumericUpDown);
       this.Controls.Add(this.fieldNamesCheckBox);
       this.Controls.Add(this.label4);
       this.Controls.Add(this.commentCharTextBox);
@@ -173,6 +210,7 @@
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "CSV Columnizer Configuration";
+      ((System.ComponentModel.ISupportInitialize)(this.minColumnsNumericUpDown)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -192,5 +230,8 @@
     private System.Windows.Forms.TextBox commentCharTextBox;
     private System.Windows.Forms.Label label4;
     private System.Windows.Forms.CheckBox fieldNamesCheckBox;
+    private System.Windows.Forms.NumericUpDown minColumnsNumericUpDown;
+    private System.Windows.Forms.Label label5;
+    private System.Windows.Forms.Label label6;
   }
 }

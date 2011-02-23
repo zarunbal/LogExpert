@@ -28,9 +28,12 @@
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
       this.tabControl1 = new System.Windows.Forms.TabControl();
       this.tabPage1 = new System.Windows.Forms.TabPage();
+      this.label15 = new System.Windows.Forms.Label();
+      this.encodingComboBox = new System.Windows.Forms.ComboBox();
       this.groupBox6 = new System.Windows.Forms.GroupBox();
       this.columnWidthUpDown = new System.Windows.Forms.NumericUpDown();
       this.columnSizeCheckBox = new System.Windows.Forms.CheckBox();
@@ -87,13 +90,16 @@
       this.maskPrioCheckBox = new System.Windows.Forms.CheckBox();
       this.deleteButton = new System.Windows.Forms.Button();
       this.columnizerDataGridView = new System.Windows.Forms.DataGridView();
-      this.fileMaskColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.columnizerColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
       this.highlightMask = new System.Windows.Forms.TabPage();
       this.highlightMaskGridView = new System.Windows.Forms.DataGridView();
-      this.fileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.highlightGroup = new System.Windows.Forms.DataGridViewComboBoxColumn();
       this.multiFilePage = new System.Windows.Forms.TabPage();
+      this.groupBox3 = new System.Windows.Forms.GroupBox();
+      this.label14 = new System.Windows.Forms.Label();
+      this.label13 = new System.Windows.Forms.Label();
+      this.multifileDays = new System.Windows.Forms.NumericUpDown();
+      this.multifilePattern = new System.Windows.Forms.TextBox();
       this.label8 = new System.Windows.Forms.Label();
       this.label7 = new System.Windows.Forms.Label();
       this.groupBox7 = new System.Windows.Forms.GroupBox();
@@ -129,13 +135,11 @@
       this.cancelButton = new System.Windows.Forms.Button();
       this.okButton = new System.Windows.Forms.Button();
       this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+      this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
       this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-      this.groupBox3 = new System.Windows.Forms.GroupBox();
-      this.multifilePattern = new System.Windows.Forms.TextBox();
-      this.multifileDays = new System.Windows.Forms.NumericUpDown();
-      this.label13 = new System.Windows.Forms.Label();
-      this.label14 = new System.Windows.Forms.Label();
+      this.fileMaskColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+      this.fileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.tabControl1.SuspendLayout();
       this.tabPage1.SuspendLayout();
       this.groupBox6.SuspendLayout();
@@ -154,6 +158,8 @@
       this.highlightMask.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.highlightMaskGridView)).BeginInit();
       this.multiFilePage.SuspendLayout();
+      this.groupBox3.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.multifileDays)).BeginInit();
       this.groupBox7.SuspendLayout();
       this.pluginsPage.SuspendLayout();
       this.groupBox12.SuspendLayout();
@@ -167,8 +173,6 @@
       this.groupBox14.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.linesPerBlockUpDown)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.blockCountUpDown)).BeginInit();
-      this.groupBox3.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.multifileDays)).BeginInit();
       this.SuspendLayout();
       // 
       // tabControl1
@@ -190,6 +194,8 @@
       // 
       // tabPage1
       // 
+      this.tabPage1.Controls.Add(this.label15);
+      this.tabPage1.Controls.Add(this.encodingComboBox);
       this.tabPage1.Controls.Add(this.groupBox6);
       this.tabPage1.Controls.Add(this.groupBox2);
       this.tabPage1.Controls.Add(this.groupBox1);
@@ -200,6 +206,25 @@
       this.tabPage1.TabIndex = 0;
       this.tabPage1.Text = "View settings";
       this.tabPage1.UseVisualStyleBackColor = true;
+      // 
+      // label15
+      // 
+      this.label15.AutoSize = true;
+      this.label15.Location = new System.Drawing.Point(308, 22);
+      this.label15.Name = "label15";
+      this.label15.Size = new System.Drawing.Size(88, 13);
+      this.label15.TabIndex = 9;
+      this.label15.Text = "Default encoding";
+      // 
+      // encodingComboBox
+      // 
+      this.encodingComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.encodingComboBox.FormattingEnabled = true;
+      this.encodingComboBox.Location = new System.Drawing.Point(459, 19);
+      this.encodingComboBox.Name = "encodingComboBox";
+      this.encodingComboBox.Size = new System.Drawing.Size(102, 21);
+      this.encodingComboBox.TabIndex = 8;
+      this.toolTip1.SetToolTip(this.encodingComboBox, "Encoding to be used when no BOM header and no persistence data is available.");
       // 
       // groupBox6
       // 
@@ -809,12 +834,6 @@
       this.columnizerDataGridView.TabIndex = 2;
       this.columnizerDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.columnizerDataGridView_RowsAdded);
       // 
-      // fileMaskColumn
-      // 
-      this.fileMaskColumn.HeaderText = "File name mask (RegEx)";
-      this.fileMaskColumn.MinimumWidth = 40;
-      this.fileMaskColumn.Name = "fileMaskColumn";
-      // 
       // columnizerColumn
       // 
       this.columnizerColumn.HeaderText = "Columnizer";
@@ -845,12 +864,6 @@
       this.highlightMaskGridView.Size = new System.Drawing.Size(619, 272);
       this.highlightMaskGridView.TabIndex = 0;
       // 
-      // fileName
-      // 
-      this.fileName.HeaderText = "File name mask (RegEx)";
-      this.fileName.MinimumWidth = 40;
-      this.fileName.Name = "fileName";
-      // 
       // highlightGroup
       // 
       this.highlightGroup.HeaderText = "Highlight group";
@@ -870,6 +883,63 @@
       this.multiFilePage.TabIndex = 4;
       this.multiFilePage.Text = "MultiFile";
       this.multiFilePage.UseVisualStyleBackColor = true;
+      // 
+      // groupBox3
+      // 
+      this.groupBox3.Controls.Add(this.label14);
+      this.groupBox3.Controls.Add(this.label13);
+      this.groupBox3.Controls.Add(this.multifileDays);
+      this.groupBox3.Controls.Add(this.multifilePattern);
+      this.groupBox3.Location = new System.Drawing.Point(243, 18);
+      this.groupBox3.Name = "groupBox3";
+      this.groupBox3.Size = new System.Drawing.Size(291, 100);
+      this.groupBox3.TabIndex = 3;
+      this.groupBox3.TabStop = false;
+      this.groupBox3.Text = "Default filename pattern";
+      // 
+      // label14
+      // 
+      this.label14.AutoSize = true;
+      this.label14.Location = new System.Drawing.Point(7, 49);
+      this.label14.Name = "label14";
+      this.label14.Size = new System.Drawing.Size(55, 13);
+      this.label14.TabIndex = 3;
+      this.label14.Text = "Max days:";
+      // 
+      // label13
+      // 
+      this.label13.AutoSize = true;
+      this.label13.Location = new System.Drawing.Point(7, 24);
+      this.label13.Name = "label13";
+      this.label13.Size = new System.Drawing.Size(44, 13);
+      this.label13.TabIndex = 2;
+      this.label13.Text = "Pattern:";
+      // 
+      // multifileDays
+      // 
+      this.multifileDays.Location = new System.Drawing.Point(68, 47);
+      this.multifileDays.Maximum = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+      this.multifileDays.Name = "multifileDays";
+      this.helpProvider1.SetShowHelp(this.multifileDays, false);
+      this.multifileDays.Size = new System.Drawing.Size(61, 20);
+      this.multifileDays.TabIndex = 1;
+      this.multifileDays.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      // 
+      // multifilePattern
+      // 
+      this.multifilePattern.Location = new System.Drawing.Point(68, 21);
+      this.multifilePattern.Name = "multifilePattern";
+      this.multifilePattern.Size = new System.Drawing.Size(187, 20);
+      this.multifilePattern.TabIndex = 0;
+      this.multifilePattern.TextChanged += new System.EventHandler(this.multifilePattern_TextChanged);
       // 
       // label8
       // 
@@ -1296,62 +1366,17 @@
       this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
       this.dataGridViewTextBoxColumn2.Width = 259;
       // 
-      // groupBox3
+      // fileMaskColumn
       // 
-      this.groupBox3.Controls.Add(this.label14);
-      this.groupBox3.Controls.Add(this.label13);
-      this.groupBox3.Controls.Add(this.multifileDays);
-      this.groupBox3.Controls.Add(this.multifilePattern);
-      this.groupBox3.Location = new System.Drawing.Point(243, 18);
-      this.groupBox3.Name = "groupBox3";
-      this.groupBox3.Size = new System.Drawing.Size(291, 100);
-      this.groupBox3.TabIndex = 3;
-      this.groupBox3.TabStop = false;
-      this.groupBox3.Text = "Default filename pattern";
+      this.fileMaskColumn.HeaderText = "File name mask (RegEx)";
+      this.fileMaskColumn.MinimumWidth = 40;
+      this.fileMaskColumn.Name = "fileMaskColumn";
       // 
-      // multifilePattern
+      // fileName
       // 
-      this.multifilePattern.Location = new System.Drawing.Point(68, 21);
-      this.multifilePattern.Name = "multifilePattern";
-      this.multifilePattern.Size = new System.Drawing.Size(187, 20);
-      this.multifilePattern.TabIndex = 0;
-      this.multifilePattern.TextChanged += new System.EventHandler(this.multifilePattern_TextChanged);
-      // 
-      // multifileDays
-      // 
-      this.multifileDays.Location = new System.Drawing.Point(68, 47);
-      this.multifileDays.Maximum = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-      this.multifileDays.Name = "multifileDays";
-      this.helpProvider1.SetShowHelp(this.multifileDays, false);
-      this.multifileDays.Size = new System.Drawing.Size(61, 20);
-      this.multifileDays.TabIndex = 1;
-      this.multifileDays.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-      // 
-      // label13
-      // 
-      this.label13.AutoSize = true;
-      this.label13.Location = new System.Drawing.Point(7, 24);
-      this.label13.Name = "label13";
-      this.label13.Size = new System.Drawing.Size(44, 13);
-      this.label13.TabIndex = 2;
-      this.label13.Text = "Pattern:";
-      // 
-      // label14
-      // 
-      this.label14.AutoSize = true;
-      this.label14.Location = new System.Drawing.Point(7, 49);
-      this.label14.Name = "label14";
-      this.label14.Size = new System.Drawing.Size(55, 13);
-      this.label14.TabIndex = 3;
-      this.label14.Text = "Max days:";
+      this.fileName.HeaderText = "File name mask (RegEx)";
+      this.fileName.MinimumWidth = 40;
+      this.fileName.Name = "fileName";
       // 
       // SettingsDialog
       // 
@@ -1376,6 +1401,7 @@
       this.Load += new System.EventHandler(this.SettingsDialog_Load);
       this.tabControl1.ResumeLayout(false);
       this.tabPage1.ResumeLayout(false);
+      this.tabPage1.PerformLayout();
       this.groupBox6.ResumeLayout(false);
       this.groupBox6.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.columnWidthUpDown)).EndInit();
@@ -1400,6 +1426,9 @@
       this.highlightMask.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.highlightMaskGridView)).EndInit();
       this.multiFilePage.ResumeLayout(false);
+      this.groupBox3.ResumeLayout(false);
+      this.groupBox3.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.multifileDays)).EndInit();
       this.groupBox7.ResumeLayout(false);
       this.groupBox7.PerformLayout();
       this.pluginsPage.ResumeLayout(false);
@@ -1418,9 +1447,6 @@
       this.groupBox14.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.linesPerBlockUpDown)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.blockCountUpDown)).EndInit();
-      this.groupBox3.ResumeLayout(false);
-      this.groupBox3.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.multifileDays)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -1534,5 +1560,8 @@
     private System.Windows.Forms.Label label13;
     private System.Windows.Forms.NumericUpDown multifileDays;
     private System.Windows.Forms.TextBox multifilePattern;
+    private System.Windows.Forms.Label label15;
+    private System.Windows.Forms.ComboBox encodingComboBox;
+    private System.Windows.Forms.ToolTip toolTip1;
   }
 }

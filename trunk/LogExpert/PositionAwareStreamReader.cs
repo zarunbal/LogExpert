@@ -6,6 +6,12 @@ using System.IO;
 
 namespace LogExpert
 {
+  /// <summary>
+  /// This class is responsible for reading line from the log file. It also decodes characters with the appropriate charset encoding.
+  /// PositionAwareStreamReader tries a BOM detection to determine correct file offsets when directly seeking into the file (on re-loading flushed buffers).
+  /// UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be determined.
+  /// Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
+  /// </summary>
   class PositionAwareStreamReader : ILogStreamReader
   {
     const int MAX_LINE_LEN = 20000;
@@ -18,22 +24,37 @@ namespace LogExpert
     private char[] charBuffer = new char[MAX_LINE_LEN];
     private int charBufferPos = 0;
     private int preambleLength = 0;
+    private Encoding detectedEncoding;
 
 
-    public PositionAwareStreamReader(Stream stream, Encoding encoding)
+    public PositionAwareStreamReader(Stream stream, EncodingOptions encodingOptions)
     {
       this.stream = new BufferedStream(stream);
-      this.reader = new StreamReader(this.stream, encoding, true);
-      ResetReader();
-      pos = 0;
-      if (encoding is System.Text.UTF8Encoding)
+      this.preambleLength = DetectPreambleLengthAndEncoding();
+
+      Encoding usedEncoding;
+      if (this.detectedEncoding != null && encodingOptions.Encoding == null)
+      {
+        usedEncoding = this.detectedEncoding;
+      } 
+      else if (encodingOptions.Encoding != null)
+      {
+        usedEncoding = encodingOptions.Encoding;
+      }
+      else
+      {
+        usedEncoding = encodingOptions.DefaultEncoding != null ? encodingOptions.DefaultEncoding : Encoding.Default;
+      }
+
+      if (usedEncoding is System.Text.UTF8Encoding)
         posInc_precomputed = 0;
-      else if (encoding is System.Text.UnicodeEncoding)
+      else if (usedEncoding is System.Text.UnicodeEncoding)
         posInc_precomputed = 2;
       else
         posInc_precomputed = 1;
-      Position = 0;
-      this.preambleLength = DetectPreambleLength();
+
+      this.reader = new StreamReader(this.stream, usedEncoding, true);
+      ResetReader();
       Position = 0;
     }
 
@@ -209,7 +230,7 @@ namespace LogExpert
     /// Determines the actual number of preamble bytes in the file.
     /// </summary>
     /// <returns></returns>
-    private int DetectPreambleLength()
+    private int DetectPreambleLengthAndEncoding()
     {
       /*
       UTF-8:                                EF BB BF 
@@ -219,17 +240,26 @@ namespace LogExpert
       UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00 
       */
 
+      detectedEncoding = null;
       byte [] readPreamble = new byte[4];
       int readLen = this.stream.Read(readPreamble, 0, 4);
       if (readLen < 2)
         return 0;
-      byte[][] preambles = new byte[4][] { UTF8Encoding.UTF8.GetPreamble(),
-                                         UTF8Encoding.Unicode.GetPreamble(),
-                                         UTF8Encoding.BigEndianUnicode.GetPreamble(),
-                                         UTF8Encoding.UTF32.GetPreamble()
+      Encoding[] encodings = new Encoding[]
+                               {
+                                 Encoding.UTF8,
+                                 Encoding.Unicode,
+                                 Encoding.BigEndianUnicode,
+                                 Encoding.UTF32
+                               };
+      byte[][] preambles = new byte[4][] { Encoding.UTF8.GetPreamble(),
+                                           Encoding.Unicode.GetPreamble(),
+                                           Encoding.BigEndianUnicode.GetPreamble(),
+                                           Encoding.UTF32.GetPreamble()
                                        };
-      foreach (byte [] preamble in preambles)
+      foreach (Encoding encoding in encodings)
       {
+        byte[] preamble = encoding.GetPreamble();
         bool fail = false;
         for (int i = 0; i < readLen && i < preamble.Length; ++i)
         {
@@ -241,6 +271,7 @@ namespace LogExpert
         }
         if (!fail)
         {
+          detectedEncoding = encoding;
           return preamble.Length;
         }
       }

@@ -317,7 +317,8 @@ namespace LogExpert
         return win;
       }
 
-      Encoding encoding = null;
+      EncodingOptions encodingOptions = new EncodingOptions();
+      FillDefaultEncodingFromSettings(encodingOptions);
       LogWindow logWindow = new LogWindow(this, logFileName, isTempFile, loadingFinishedFx, forcePersistenceLoading);
 
       logWindow.GivenFileName = givenFileName;
@@ -329,7 +330,7 @@ namespace LogExpert
 
       if (isTempFile) {
         logWindow.TempTitleName = title;
-        encoding = new UnicodeEncoding(false, false);
+        encodingOptions.Encoding = new UnicodeEncoding(false, false);
       }
       AddLogWindow(logWindow, title);
       if (!isTempFile)
@@ -370,8 +371,24 @@ namespace LogExpert
 
       // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
       LoadFileDelegate loadFileFx = new LoadFileDelegate(logWindow.LoadFile);
-      loadFileFx.BeginInvoke(logFileName, encoding, null, null);
+      loadFileFx.BeginInvoke(logFileName, encodingOptions, null, null);
       return logWindow;
+    }
+
+    private void FillDefaultEncodingFromSettings(EncodingOptions encodingOptions)
+    {
+      if (ConfigManager.Settings.preferences.defaultEncoding != null)
+      {
+        try
+        {
+          encodingOptions.DefaultEncoding = Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
+        }
+        catch (ArgumentException)
+        {
+          Logger.logWarn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
+          encodingOptions.DefaultEncoding = null;
+        }
+      }
     }
 
     public LogWindow AddMultiFileTab(string [] fileNames)
@@ -386,8 +403,8 @@ namespace LogExpert
       return logWindow;
     }
 
-    delegate void LoadFileDelegate(string fileName, Encoding encoding);
-    delegate void LoadMultiFilesDelegate(string [] fileName, Encoding encoding);
+    delegate void LoadFileDelegate(string fileName, EncodingOptions encodingOptions);
+    delegate void LoadMultiFilesDelegate(string [] fileName, EncodingOptions encodingOptions);
 
     delegate void AddFileTabsDelegate(string[] fileNames);
 
@@ -1662,12 +1679,20 @@ namespace LogExpert
         this.CurrentLogWindow.ChangeEncoding(Encoding.Unicode);
     }
 
+    private void iSO88591ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (this.CurrentLogWindow != null)
+        this.CurrentLogWindow.ChangeEncoding(Encoding.GetEncoding("iso-8859-1"));
+    }
+
+
     private void RefreshEncodingMenuBar(Encoding encoding)
     {
       this.aSCIIToolStripMenuItem.Checked = false;
       this.aNSIToolStripMenuItem.Checked = false;
       this.uTF8ToolStripMenuItem.Checked = false;
       this.uTF16ToolStripMenuItem.Checked = false;
+      this.iSO88591ToolStripMenuItem.Checked = false;
       if (encoding == null)
         return;
       if (encoding is System.Text.ASCIIEncoding)
@@ -1686,6 +1711,11 @@ namespace LogExpert
       {
         this.uTF16ToolStripMenuItem.Checked = true;
       }
+      else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
+      {
+        this.iSO88591ToolStripMenuItem.Checked = true;
+      }
+      this.aNSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
     }
 
     private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2625,6 +2655,7 @@ namespace LogExpert
     {
       ToggleMultiFile();
     }
+
 
     //private void openSftpToolStripMenuItem_Click(object sender, EventArgs e)
     //{

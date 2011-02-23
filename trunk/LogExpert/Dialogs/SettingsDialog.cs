@@ -121,6 +121,8 @@ namespace LogExpert.Dialogs
       FillHighlightMaskList();
       FillToolListbox();
       FillMultifileSettings();
+      FillEncodingList();
+      this.encodingComboBox.SelectedItem = Encoding.GetEncoding(this.preferences.defaultEncoding);
     }
 
  
@@ -194,6 +196,7 @@ namespace LogExpert.Dialogs
       this.preferences.linesPerBuffer = (int)this.linesPerBlockUpDown.Value;
       this.preferences.pollingInterval = (int)this.pollingIntervalUpDown.Value;
       this.preferences.multiThreadFilter = this.multiThreadCheckBox.Checked;
+      this.preferences.defaultEncoding =  (this.encodingComboBox.SelectedItem as Encoding).HeaderName;
 
       SavePluginSettings();
       SaveHighlightMaskList();
@@ -785,5 +788,23 @@ namespace LogExpert.Dialogs
       string pattern = this.multifilePattern.Text;
       this.multifileDays.Enabled = pattern.Contains("$D");
     }
+
+    private void FillEncodingList()
+    {
+      //this.encodingComboBox.Items.Add(Encoding.ASCII.BodyName);
+      //this.encodingComboBox.Items.Add(Encoding.Default.BodyName);
+      //this.encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1").BodyName);
+      //this.encodingComboBox.Items.Add(Encoding.UTF8.BodyName);
+      //this.encodingComboBox.Items.Add(Encoding.Unicode.BodyName);
+
+      this.encodingComboBox.Items.Add(Encoding.ASCII);
+      this.encodingComboBox.Items.Add(Encoding.Default);
+      this.encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+      this.encodingComboBox.Items.Add(Encoding.UTF8);
+      this.encodingComboBox.Items.Add(Encoding.Unicode);
+
+      this.encodingComboBox.ValueMember = "HeaderName";
+    }
+
   }
 }

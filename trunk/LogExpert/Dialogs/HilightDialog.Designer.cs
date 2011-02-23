@@ -324,7 +324,6 @@
       this.foregroundColorBox.FormattingEnabled = true;
       this.foregroundColorBox.Items.AddRange(new object[] {
             System.Drawing.Color.Black,
-            System.Drawing.Color.Black,
             System.Drawing.Color.White,
             System.Drawing.Color.Gray,
             System.Drawing.Color.DarkGray,
@@ -354,7 +353,6 @@
       this.backgroundColorBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.backgroundColorBox.FormattingEnabled = true;
       this.backgroundColorBox.Items.AddRange(new object[] {
-            System.Drawing.Color.Black,
             System.Drawing.Color.Black,
             System.Drawing.Color.White,
             System.Drawing.Color.Gray,
