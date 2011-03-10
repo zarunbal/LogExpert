@@ -311,6 +311,13 @@ namespace LogExpert
           if (!this.IsTempFile)
           {
             ILogLineColumnizer columnizer = FindColumnizer();
+            if (columnizer != null)
+            {
+              if (this.reloadMemento == null)
+              {
+                columnizer = Util.CloneColumnizer(columnizer);
+              }
+            }
             PreSelectColumnizer(columnizer);
           }
           SetDefaultHighlightGroup();
@@ -1927,6 +1934,15 @@ namespace LogExpert
     }
 
 
+    /// <summary>
+    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
+    /// background colors.
+    /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the 
+    /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+    /// </summary>
+    /// <param name="matchList">List of all highlight matches for the current cell</param>
+    /// <param name="groundEntry">The entry that is used as the default.</param>
+    /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
     private IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList, HilightMatchEntry groundEntry)
     {
       // Fill an area with lenth of whole text with a default hilight entry
@@ -1936,13 +1952,21 @@ namespace LogExpert
         entryArray[i] = groundEntry.HilightEntry;
       }
 
-      // "overpaint" with all matching enries
+      // "overpaint" with all matching word match enries
+      // Non-word-mode matches will not overpaint because they use the groundEntry
       foreach (HilightMatchEntry me in matchList)
       {
         int endPos = me.StartPos + me.Length;
         for (int i = me.StartPos; i < endPos; ++i)
         {
-          entryArray[i] = me.HilightEntry;
+          if (me.HilightEntry.IsWordMatch)
+          {
+            entryArray[i] = me.HilightEntry;
+          }
+          else
+          {
+            //entryArray[i].ForegroundColor = me.HilightEntry.ForegroundColor;
+          }
         }
       }
 
@@ -2557,44 +2581,60 @@ namespace LogExpert
 
     private void SelectLine(int line, bool triggerSyncCall)
     {
-      this.shouldCallTimeSync = triggerSyncCall;
-      bool wasCancelled = this.shouldCancel;
-      this.shouldCancel = false;
-      this.isSearching = false;
-      StatusLineText("");
-      this.guiStateArgs.MenuEnabled = true;
-      if (wasCancelled)
-        return;
-      if (line == -1)
+      try
       {
-        MessageBox.Show(this, "Not found:", "Search result");
-        return;
+        this.shouldCallTimeSync = triggerSyncCall;
+        bool wasCancelled = this.shouldCancel;
+        this.shouldCancel = false;
+        this.isSearching = false;
+        StatusLineText("");
+        this.guiStateArgs.MenuEnabled = true;
+        if (wasCancelled)
+          return;
+        if (line == -1)
+        {
+          MessageBox.Show(this, "Not found:", "Search result");   // Hmm... is that experimental code from early days?  
+          return;
+        }
+        this.dataGridView.Rows[line].Selected = true;
+        this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
+        this.dataGridView.Focus();
+        this.bookmarkWindow.SelectBookmark(line);
       }
-      this.dataGridView.Rows[line].Selected = true;
-      this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-      this.dataGridView.Focus();
-      this.bookmarkWindow.SelectBookmark(line);
+      catch (IndexOutOfRangeException e)
+      {
+        // Occures sometimes (but cannot reproduce)
+        Logger.logError("Error while selecting line: " + e.ToString());
+      }
     }
 
     private void SelectLine_NoScroll(int line, bool triggerSyncCall)
     {
-      this.shouldCallTimeSync = triggerSyncCall;
-      bool wasCancelled = this.shouldCancel;
-      this.shouldCancel = false;
-      this.isSearching = false;
-      StatusLineText("");
-      this.guiStateArgs.MenuEnabled = true;
-      if (wasCancelled)
-        return;
-      if (line == -1)
+      try
       {
-        MessageBox.Show(this, "Not found:", "Search result");
-        return;
+        this.shouldCallTimeSync = triggerSyncCall;
+        bool wasCancelled = this.shouldCancel;
+        this.shouldCancel = false;
+        this.isSearching = false;
+        StatusLineText("");
+        this.guiStateArgs.MenuEnabled = true;
+        if (wasCancelled)
+          return;
+        if (line == -1)
+        {
+          MessageBox.Show(this, "Not found:", "Search result");  // Hmm... is that experimental code from early days?  
+          return;
+        }
+        this.dataGridView.Rows[line].Selected = true;
+        //this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
+        this.dataGridView.Focus();
+        this.bookmarkWindow.SelectBookmark(line);
       }
-      this.dataGridView.Rows[line].Selected = true;
-      //this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-      this.dataGridView.Focus();
-      this.bookmarkWindow.SelectBookmark(line);
+      catch (IndexOutOfRangeException e)
+      {
+        // Occures sometimes (but cannot reproduce)
+        Logger.logError("Error while selecting line: " + e.ToString());
+      }
     }
 
 
@@ -2606,23 +2646,35 @@ namespace LogExpert
 
     public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
     {
-      SelectLine_NoScroll(line, triggerSyncCall);
-
-      //if (!this.dataGridView.CurrentRow.Displayed)
-      if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
-          line > this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
+      try
       {
-        this.dataGridView.FirstDisplayedScrollingRowIndex = line;
-        for (int i = 0; i < 8 && this.dataGridView.FirstDisplayedScrollingRowIndex > 0 && line < this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false); ++i)
+        SelectLine_NoScroll(line, triggerSyncCall);
+
+        //if (!this.dataGridView.CurrentRow.Displayed)
+        if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
+            line > this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
         {
-          this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex - 1;
+          this.dataGridView.FirstDisplayedScrollingRowIndex = line;
+          for (int i = 0;
+               i < 8 && this.dataGridView.FirstDisplayedScrollingRowIndex > 0 &&
+               line < this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false);
+               ++i)
+          {
+            this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex - 1;
+          }
+          if (line >= this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
+          {
+            this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex + 1;
+          }
         }
-        if (line >= this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
-        {
-          this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex + 1;
-        }
+        this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
       }
-      this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
+      catch (Exception e)
+      {
+        // In rare situations there seems to be an invalid argument exceptions (or something like this). Concrete location isn't visible in stack
+        // trace because use of Invoke(). So catch it, and log (better than crashing the app).
+        Logger.logError(e.ToString());
+      }
     }
 
 
