@@ -1804,6 +1804,9 @@ namespace LogExpert
       }
     }
 
+    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
+    extern static bool DestroyIcon(IntPtr handle);
+
     private void SetToolIcon(ToolEntry entry, ToolStripItem item)
     {
       Icon icon = Win32.LoadIconFromExe(entry.iconFile, entry.iconIndex);
@@ -1818,6 +1821,7 @@ namespace LogExpert
         {
           item.DisplayStyle = ToolStripItemDisplayStyle.Image;
         }
+        DestroyIcon(icon.Handle);
         icon.Dispose();
       }
       if (entry.cmd != null && entry.cmd.Length > 0)
@@ -1969,8 +1973,9 @@ namespace LogExpert
               return columnizer;
             }
           }
-          catch (ArgumentException)
+          catch (ArgumentException e)
           {
+            Logger.logError("RegEx-error while finding columnizer: " + e.Message);
             // occurs on invalid regex patterns
           }
         }

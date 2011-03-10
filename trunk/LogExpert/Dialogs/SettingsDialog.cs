@@ -6,9 +6,11 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace LogExpert.Dialogs
 {
+
   public partial class SettingsDialog : Form
   {
     class ColumnizerEntry
@@ -39,6 +41,8 @@ namespace LogExpert.Dialogs
     ToolEntry selectedTool = null;
     Image emptyImage = new Bitmap(16, 16);
 
+    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
+    extern static bool DestroyIcon(IntPtr handle);
 
 
     public SettingsDialog(Preferences prefs, LogTabWindow logTabWin)
@@ -123,6 +127,7 @@ namespace LogExpert.Dialogs
       FillMultifileSettings();
       FillEncodingList();
       this.encodingComboBox.SelectedItem = Encoding.GetEncoding(this.preferences.defaultEncoding);
+      this.maskPrioCheckBox.Checked = this.preferences.maskPrio;
     }
 
  
@@ -750,7 +755,6 @@ namespace LogExpert.Dialogs
       }
     }
 
-
     private void DisplayCurrentIcon()
     {
       if (this.selectedTool != null)
@@ -760,6 +764,7 @@ namespace LogExpert.Dialogs
         {
           Image image = icon.ToBitmap();
           this.iconButton.Image = image;
+          DestroyIcon(icon.Handle);
           icon.Dispose();
         }
         else
