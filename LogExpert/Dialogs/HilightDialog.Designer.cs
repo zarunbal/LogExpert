@@ -322,24 +322,6 @@
       this.foregroundColorBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
       this.foregroundColorBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.foregroundColorBox.FormattingEnabled = true;
-      this.foregroundColorBox.Items.AddRange(new object[] {
-            System.Drawing.Color.Black,
-            System.Drawing.Color.White,
-            System.Drawing.Color.Gray,
-            System.Drawing.Color.DarkGray,
-            System.Drawing.Color.Blue,
-            System.Drawing.Color.LightBlue,
-            System.Drawing.Color.DarkBlue,
-            System.Drawing.Color.Green,
-            System.Drawing.Color.LightGreen,
-            System.Drawing.Color.DarkGreen,
-            System.Drawing.Color.Olive,
-            System.Drawing.Color.Red,
-            System.Drawing.Color.Pink,
-            System.Drawing.Color.Purple,
-            System.Drawing.Color.IndianRed,
-            System.Drawing.Color.DarkCyan,
-            System.Drawing.Color.Yellow});
       this.foregroundColorBox.Location = new System.Drawing.Point(5, 41);
       this.foregroundColorBox.Name = "foregroundColorBox";
       this.foregroundColorBox.Size = new System.Drawing.Size(121, 21);
@@ -352,24 +334,6 @@
       this.backgroundColorBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
       this.backgroundColorBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.backgroundColorBox.FormattingEnabled = true;
-      this.backgroundColorBox.Items.AddRange(new object[] {
-            System.Drawing.Color.Black,
-            System.Drawing.Color.White,
-            System.Drawing.Color.Gray,
-            System.Drawing.Color.DarkGray,
-            System.Drawing.Color.Blue,
-            System.Drawing.Color.LightBlue,
-            System.Drawing.Color.DarkBlue,
-            System.Drawing.Color.Green,
-            System.Drawing.Color.LightGreen,
-            System.Drawing.Color.DarkGreen,
-            System.Drawing.Color.Olive,
-            System.Drawing.Color.Red,
-            System.Drawing.Color.Pink,
-            System.Drawing.Color.Purple,
-            System.Drawing.Color.IndianRed,
-            System.Drawing.Color.DarkCyan,
-            System.Drawing.Color.Yellow});
       this.backgroundColorBox.Location = new System.Drawing.Point(6, 91);
       this.backgroundColorBox.Name = "backgroundColorBox";
       this.backgroundColorBox.Size = new System.Drawing.Size(121, 21);

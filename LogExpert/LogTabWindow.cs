@@ -437,6 +437,7 @@ namespace LogExpert
       logWindow.Dock = DockStyle.Fill;
 
       MdiTabControl.TabPage tabPage = this.tabControl1.TabPages.Add(logWindow);
+      tabPage.TooltipText = logWindow.FileName;
 
       logWindow.Location = new Point(30, 30);
       Size size = tabPage.Size;

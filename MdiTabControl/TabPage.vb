@@ -387,6 +387,16 @@ Public Class TabPage
     End Set
   End Property
 
+  Public Property TooltipText() As String
+    Get
+      Return MenuItem.ToolTipText
+    End Get
+    Set(ByVal Value As String)
+      MenuItem.ToolTipText = Value
+    End Set
+  End Property
+
+
   Friend Property HotTrack() As Boolean
     Get
       Return m_HotTrack
