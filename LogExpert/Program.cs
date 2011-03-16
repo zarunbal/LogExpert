@@ -114,7 +114,7 @@ namespace LogExpert
             }
             else
             {
-              proxy.NewWindow(args);
+              proxy.NewWindowOrLockedWindow(args);
             }
             break;
           }

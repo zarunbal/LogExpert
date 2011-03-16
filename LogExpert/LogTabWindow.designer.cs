@@ -88,6 +88,8 @@ namespace LogExpert
       this.cellSelectModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.alwaysOnTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.hideLineColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripSeparator19 = new System.Windows.Forms.ToolStripSeparator();
+      this.lockInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dumpLogBufferInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dumpBufferDiagnosticToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -561,10 +563,13 @@ namespace LogExpert
             this.toolStripSeparator6,
             this.cellSelectModeToolStripMenuItem,
             this.alwaysOnTopToolStripMenuItem,
-            this.hideLineColumnToolStripMenuItem});
+            this.hideLineColumnToolStripMenuItem,
+            this.toolStripSeparator19,
+            this.lockInstanceToolStripMenuItem});
       this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
       this.optionToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
       this.optionToolStripMenuItem.Text = "Options";
+      this.optionToolStripMenuItem.DropDownOpening += new System.EventHandler(this.optionToolStripMenuItem_DropDownOpening);
       // 
       // columnizerToolStripMenuItem
       // 
@@ -617,6 +622,19 @@ namespace LogExpert
       this.hideLineColumnToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
       this.hideLineColumnToolStripMenuItem.Text = "Hide line column";
       this.hideLineColumnToolStripMenuItem.Click += new System.EventHandler(this.hideLineColumnToolStripMenuItem_Click);
+      // 
+      // toolStripSeparator19
+      // 
+      this.toolStripSeparator19.Name = "toolStripSeparator19";
+      this.toolStripSeparator19.Size = new System.Drawing.Size(199, 6);
+      // 
+      // lockInstanceToolStripMenuItem
+      // 
+      this.lockInstanceToolStripMenuItem.Name = "lockInstanceToolStripMenuItem";
+      this.lockInstanceToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+      this.lockInstanceToolStripMenuItem.Text = "Lock instance";
+      this.lockInstanceToolStripMenuItem.ToolTipText = "When enabled all new launched LogExpert instances will redirect to this window";
+      this.lockInstanceToolStripMenuItem.Click += new System.EventHandler(this.lockInstanceToolStripMenuItem_Click);
       // 
       // debugToolStripMenuItem
       // 
@@ -808,8 +826,8 @@ namespace LogExpert
       // 
       this.toolStripContainer1.TopToolStripPanel.BackColor = System.Drawing.SystemColors.ControlLight;
       this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.menuStrip1);
-      this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.externalToolsToolStrip);
       this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip4);
+      this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.externalToolsToolStrip);
       // 
       // tabControl1
       // 
@@ -995,9 +1013,9 @@ namespace LogExpert
       // 
       this.externalToolsToolStrip.BackColor = System.Drawing.SystemColors.ControlLight;
       this.externalToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-      this.externalToolsToolStrip.Location = new System.Drawing.Point(390, 24);
+      this.externalToolsToolStrip.Location = new System.Drawing.Point(388, 24);
       this.externalToolsToolStrip.Name = "externalToolsToolStrip";
-      this.externalToolsToolStrip.Size = new System.Drawing.Size(43, 25);
+      this.externalToolsToolStrip.Size = new System.Drawing.Size(111, 25);
       this.externalToolsToolStrip.TabIndex = 8;
       this.externalToolsToolStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.externalToolsToolStrip_ItemClicked);
       // 
@@ -1246,6 +1264,8 @@ namespace LogExpert
     private ToolStripMenuItem multifileMaskToolStripMenuItem;
     private ToolStripMenuItem multiFileEnabledStripMenuItem;
     private ToolStripMenuItem iSO88591ToolStripMenuItem;
+    private ToolStripSeparator toolStripSeparator19;
+    private ToolStripMenuItem lockInstanceToolStripMenuItem;
 
 
   }
