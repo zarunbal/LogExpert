@@ -1419,7 +1419,7 @@ namespace LogExpert
       callback.LineNum = lineNum;
       foreach (HilightEntry entry in matchingList)
       {
-        if (entry.IsActionEntry)
+        if (entry.IsActionEntry && entry.ActionEntry.pluginName != null)
         {
           IKeywordAction plugin = PluginRegistry.GetInstance().FindKeywordActionPluginByName(entry.ActionEntry.pluginName);
           if (plugin != null)
