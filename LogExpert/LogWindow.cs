@@ -42,6 +42,7 @@ namespace LogExpert
     Object tempHilightEntryListLock = new Object();
     //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
     HilightGroup currentHighlightGroup = new HilightGroup();
+    private Object currentHighlightGroupLock = new Object();
     FilterParams filterParams = new FilterParams();
     SearchParams currentSearchParams = null;
     List<int> filterResultList = new List<int>();
@@ -2081,7 +2082,7 @@ namespace LogExpert
         }
       }
 
-      lock (this.currentHighlightGroup)
+      lock (this.currentHighlightGroupLock)
       {
         foreach (HilightEntry entry in this.currentHighlightGroup.HilightEntryList)
         {
@@ -2136,7 +2137,7 @@ namespace LogExpert
       IList<HilightEntry> resultList = new List<HilightEntry>();
       if (line != null)
       {
-        lock (this.currentHighlightGroup)
+        lock (this.currentHighlightGroupLock)
         {
           foreach (HilightEntry entry in this.currentHighlightGroup.HilightEntryList)
           {
@@ -2155,7 +2156,7 @@ namespace LogExpert
       IList<HilightMatchEntry> resultList = new List<HilightMatchEntry>();
       if (line != null)
       {
-        lock (this.currentHighlightGroup)
+        lock (this.currentHighlightGroupLock)
         {
           GetHighlightEntryMatches(line, this.currentHighlightGroup.HilightEntryList, resultList);
         }
@@ -6354,7 +6355,7 @@ namespace LogExpert
     {
       lock (this.tempHilightEntryListLock)
       {
-        lock (this.currentHighlightGroup)
+        lock (this.currentHighlightGroupLock)
         {
           this.currentHighlightGroup.HilightEntryList.AddRange(this.tempHilightEntryList);
           RemoveTempHighlights();
@@ -6715,19 +6716,22 @@ namespace LogExpert
     public void SetCurrentHighlightGroup(string groupName)
     {
       this.guiStateArgs.HighlightGroupName = groupName;
-      this.currentHighlightGroup = this.parentLogTabWin.FindHighlightGroup(groupName);
-      if (this.currentHighlightGroup == null)
+      lock (this.currentHighlightGroupLock)
       {
-        if (this.parentLogTabWin.HilightGroupList.Count > 0)
+        this.currentHighlightGroup = this.parentLogTabWin.FindHighlightGroup(groupName);
+        if (this.currentHighlightGroup == null)
         {
-          this.currentHighlightGroup = this.parentLogTabWin.HilightGroupList[0];
+          if (this.parentLogTabWin.HilightGroupList.Count > 0)
+          {
+            this.currentHighlightGroup = this.parentLogTabWin.HilightGroupList[0];
+          }
+          else
+          {
+            this.currentHighlightGroup = new HilightGroup();
+          }
         }
-        else
-        {
-          this.currentHighlightGroup = new HilightGroup();
-        }
+        this.guiStateArgs.HighlightGroupName = this.currentHighlightGroup.GroupName;
       }
-      this.guiStateArgs.HighlightGroupName = this.currentHighlightGroup.GroupName;
       SendGuiStateUpdate();
       this.BeginInvoke(new MethodInvoker(RefreshAllGrids));
     }
