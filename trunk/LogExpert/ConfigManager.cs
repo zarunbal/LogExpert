@@ -367,6 +367,10 @@ namespace LogExpert
         {
           settings.preferences.multifileOptions = new MultifileOptions();
         }
+        if (settings.preferences.defaultEncoding == null)
+        {
+          settings.preferences.defaultEncoding = Encoding.Default.HeaderName;
+        }
 
         ConvertSettings(settings, Assembly.GetExecutingAssembly().GetName().Version.Build);
 

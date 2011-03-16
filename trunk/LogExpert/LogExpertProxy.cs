@@ -58,6 +58,23 @@ namespace LogExpert
       }
     }
 
+    public void NewWindowOrLockedWindow(string[] fileNames)
+    {
+      foreach (LogTabWindow logWin in this.windowList)
+      {
+        if (LogTabWindow.StaticData.CurrentLockedMainWindow == logWin)
+        {
+          logWin.Invoke(new MethodInvoker(logWin.SetForeground));
+          logWin.LoadFiles(fileNames);
+          return;
+        }
+      }
+      // No locked window was found --> create a new one
+      NewWindow(fileNames);
+    }
+
+
+
     public void NewWindowWorker(string[] fileNames)
     {
       Logger.logInfo("Creating new LogTabWindow");

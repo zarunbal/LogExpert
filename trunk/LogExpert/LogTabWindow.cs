@@ -33,6 +33,19 @@ namespace LogExpert
       public int syncMode; // 0 = off, 1 = timeSynced
     }
 
+    // Data shared over all LogTabWindow instances
+    internal class StaticLogTabWindowData
+    {
+      private LogTabWindow currentLockedMainWindow;
+
+      public LogTabWindow CurrentLockedMainWindow
+      {
+        get { return currentLockedMainWindow; }
+        set { currentLockedMainWindow = value; }
+      }
+    }
+
+
     private const int MAX_HISTORY = 30;
     private const int MAX_COLUMNIZER_HISTORY = 40;
     private const int MAX_COLOR_HISTORY = 40;
@@ -93,6 +106,8 @@ namespace LogExpert
     readonly EventWaitHandle statusLineEventHandle = new AutoResetEvent(false);
     readonly EventWaitHandle statusLineEventWakeupHandle = new ManualResetEvent(false);
     Thread statusLineThread;
+
+    private static StaticLogTabWindowData staticData = new StaticLogTabWindowData();
 
 
     public LogTabWindow(string [] fileNames, int instanceNumber, bool showInstanceNumbers)
@@ -2456,6 +2471,12 @@ namespace LogExpert
       set { this.logExpertProxy = value; }
     }
 
+    internal static StaticLogTabWindowData StaticData
+    {
+      get { return staticData; }
+      set { staticData = value; }
+    }
+
 
     public void NotifySettingsChanged(Object cookie, SettingsFlags flags)
     {
@@ -2662,23 +2683,23 @@ namespace LogExpert
       ToggleMultiFile();
     }
 
+    private void lockInstanceToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (this.lockInstanceToolStripMenuItem.Checked)
+      {
+        StaticData.CurrentLockedMainWindow = null;
+      }
+      else
+      {
+        StaticData.CurrentLockedMainWindow = this;
+      }
+    }
 
-    //private void openSftpToolStripMenuItem_Click(object sender, EventArgs e)
-    //{
-    //  JSch jsch = new JSch();
-    //  Session session = jsch.getSession("hagen", "localhost");
-    //  UserInfo userInfo = new MyUserInfo("test1");
-    //  session.setUserInfo(userInfo);
-    //  session.connect();
-    //  Channel channel = session.openChannel("sftp");
-    //  channel.connect();
-    //  ChannelSftp sftpChannel = (ChannelSftp)channel;
-
-    //  ILogFileInfo fileInfo = new SftpLogFileInfo(sftpChannel, "/workspaces/test/dlltest/Debug/lanoffline.log");
-      
-    //}
-
-   
+    private void optionToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+    {
+      this.lockInstanceToolStripMenuItem.Enabled = !ConfigManager.Settings.preferences.allowOnlyOneInstance;
+      this.lockInstanceToolStripMenuItem.Checked = StaticData.CurrentLockedMainWindow == this;
+    }
 
 
   }

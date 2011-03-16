@@ -201,7 +201,9 @@ namespace LogExpert.Dialogs
       this.preferences.linesPerBuffer = (int)this.linesPerBlockUpDown.Value;
       this.preferences.pollingInterval = (int)this.pollingIntervalUpDown.Value;
       this.preferences.multiThreadFilter = this.multiThreadCheckBox.Checked;
-      this.preferences.defaultEncoding =  (this.encodingComboBox.SelectedItem as Encoding).HeaderName;
+      this.preferences.defaultEncoding = this.encodingComboBox.SelectedItem != null
+                                           ? (this.encodingComboBox.SelectedItem as Encoding).HeaderName
+                                           : Encoding.Default.HeaderName;
 
       SavePluginSettings();
       SaveHighlightMaskList();
