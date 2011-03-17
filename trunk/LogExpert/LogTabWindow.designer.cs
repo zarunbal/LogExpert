@@ -139,6 +139,7 @@ namespace LogExpert
       this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dateTimeDragControl = new LogExpert.Dialogs.DateTimeDragControl();
+      this.newFromClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.statusStrip1.SuspendLayout();
       this.menuStrip1.SuspendLayout();
       this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -229,6 +230,7 @@ namespace LogExpert
             this.openToolStripMenuItem,
             this.closeFileToolStripMenuItem,
             this.reloadToolStripMenuItem,
+            this.newFromClipboardToolStripMenuItem,
             this.toolStripSeparator8,
             this.multiFileToolStripMenuItem,
             this.toolStripSeparator7,
@@ -241,6 +243,7 @@ namespace LogExpert
       this.toolStripMenuItem1.Name = "toolStripMenuItem1";
       this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
       this.toolStripMenuItem1.Text = "File";
+      this.toolStripMenuItem1.DropDownOpening += new System.EventHandler(this.toolStripMenuItem1_DropDownOpening);
       // 
       // openToolStripMenuItem
       // 
@@ -1013,7 +1016,7 @@ namespace LogExpert
       // 
       this.externalToolsToolStrip.BackColor = System.Drawing.SystemColors.ControlLight;
       this.externalToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-      this.externalToolsToolStrip.Location = new System.Drawing.Point(388, 24);
+      this.externalToolsToolStrip.Location = new System.Drawing.Point(391, 24);
       this.externalToolsToolStrip.Name = "externalToolsToolStrip";
       this.externalToolsToolStrip.Size = new System.Drawing.Size(111, 25);
       this.externalToolsToolStrip.TabIndex = 8;
@@ -1117,6 +1120,15 @@ namespace LogExpert
       this.dateTimeDragControl.TabIndex = 14;
       this.dateTimeDragControl.ValueDragged += new LogExpert.Dialogs.DateTimeDragControl.ValueDraggedEventHandler(this.dateTimeDragControl_ValueDragged);
       this.dateTimeDragControl.ValueChanged += new LogExpert.Dialogs.DateTimeDragControl.ValueChangedEventHandler(this.dateTimeDragControl_ValueChanged);
+      // 
+      // newFromClipboardToolStripMenuItem
+      // 
+      this.newFromClipboardToolStripMenuItem.Name = "newFromClipboardToolStripMenuItem";
+      this.newFromClipboardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+      this.newFromClipboardToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+      this.newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
+      this.newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
+      this.newFromClipboardToolStripMenuItem.Click += new System.EventHandler(this.newFromClipboardToolStripMenuItem_Click);
       // 
       // LogTabWindow
       // 
@@ -1266,6 +1278,7 @@ namespace LogExpert
     private ToolStripMenuItem iSO88591ToolStripMenuItem;
     private ToolStripSeparator toolStripSeparator19;
     private ToolStripMenuItem lockInstanceToolStripMenuItem;
+    private ToolStripMenuItem newFromClipboardToolStripMenuItem;
 
 
   }
