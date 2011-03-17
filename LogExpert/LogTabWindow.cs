@@ -858,7 +858,7 @@ namespace LogExpert
         s += format; s+= " , ";
       }
       s = s.Substring(0, s.Length - 3);
-      Logger.logInfo(s);
+      Logger.logDebug(s);
 #endif
 
       if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -2675,7 +2675,6 @@ namespace LogExpert
       {
         this.currentLogWindow.ChangeMultifileMask();
       }
-
     }
 
     private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -2699,6 +2698,43 @@ namespace LogExpert
     {
       this.lockInstanceToolStripMenuItem.Enabled = !ConfigManager.Settings.preferences.allowOnlyOneInstance;
       this.lockInstanceToolStripMenuItem.Checked = StaticData.CurrentLockedMainWindow == this;
+    }
+
+    private void toolStripMenuItem1_DropDownOpening(object sender, EventArgs e)
+    {
+      this.newFromClipboardToolStripMenuItem.Enabled = Clipboard.ContainsText();
+    }
+
+    private void newFromClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      PasteFromClipboard();
+    }
+
+    /// <summary>
+    /// Creates a temp file with the text content of the clipboard and opens the temp file in a new tab.
+    /// </summary>
+    internal void PasteFromClipboard()
+    {
+      if (Clipboard.ContainsText())
+      {
+        string text = Clipboard.GetText();
+        string fileName = Path.GetTempFileName();
+        FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+        StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode);
+        writer.Write(text);
+        writer.Close();
+        string title = "Clipboard";
+        LogWindow logWindow = AddTempFileTab(fileName, title);
+        LogWindowData data = logWindow.Tag as LogWindowData;
+        if (data != null)
+        {
+          DateTime now = DateTime.Now;
+          ToolTip tip = new ToolTip(this.components);
+          tip.SetToolTip(data.tabPage, "Pasted on " + now.ToString());
+          tip.AutomaticDelay = 10;
+          tip.AutoPopDelay = 5000;
+        }
+      }
     }
 
 
