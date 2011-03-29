@@ -19,6 +19,7 @@ namespace LogExpert
     void proxy_LastWindowClosed(object sender, EventArgs e)
     {
       ExitThread();
+      Application.Exit();
     }
   }
 }

@@ -17,17 +17,28 @@ namespace LogExpert
       this.argLine = argTemplate;
     }
 
-    public string BuildArgs(string logLine, int lineNum, string fileName, Form parent)
+    public string BuildArgs(string logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
     {
-      FileInfo fileInfo = new FileInfo(fileName);
       StringBuilder builder = new StringBuilder(this.argLine);
       builder.Replace("%L", "" + lineNum);
-      builder.Replace("%P", fileInfo.DirectoryName);
-      builder.Replace("%N", fileInfo.Name);
-      builder.Replace("%F", fileInfo.FullName);
-      builder.Replace("%E", fileInfo.Extension);
-      string stripped = Util.StripExtension(fileInfo.Name);
+      builder.Replace("%P", logFileInfo.DirectoryName);
+      builder.Replace("%N", logFileInfo.FileName);
+      builder.Replace("%F", logFileInfo.FullName);
+      builder.Replace("%E", Util.GetExtension(logFileInfo.FileName));
+      string stripped = Util.StripExtension(logFileInfo.FileName);
       builder.Replace("%M", stripped);
+
+      builder.Replace("%URI", logFileInfo.Uri.AbsoluteUri);
+      string user = logFileInfo.Uri.UserInfo;
+      if (user.Contains(":"))
+      {
+        user = user.Substring(0, user.IndexOf(':'));
+      }
+      builder.Replace("%S", user);
+      builder.Replace("%R", logFileInfo.Uri.PathAndQuery);
+      builder.Replace("%H", logFileInfo.Uri.Host);
+      builder.Replace("%T", logFileInfo.Uri.Port.ToString());
+
       int sPos = 0;
       string reg;
       string replace;

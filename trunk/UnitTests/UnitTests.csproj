@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BufferShiftTest.cs" />
+    <Compile Include="LocalFileSystemTest.cs" />
     <Compile Include="RolloverHandlerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -71,6 +72,10 @@
     <Compile Include="RolloverHandlerTestBase.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
+      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
+      <Name>ColumnizerLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogExpert\LogExpert.csproj">
       <Project>{F0C0D370-F416-44ED-939A-B4827D15AC14}</Project>
       <Name>LogExpert</Name>

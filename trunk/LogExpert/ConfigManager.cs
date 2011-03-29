@@ -69,6 +69,7 @@ namespace LogExpert
     public List<HilightGroup> hilightGroupList = new List<HilightGroup>();
     public Rectangle appBoundsFullscreen;
     public int versionBuild;
+    public IList<string> uriHistoryList = new List<string>();
   }
 
   [Serializable]

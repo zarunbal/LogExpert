@@ -63,6 +63,7 @@ namespace LogExpert
     EventWaitHandle filterUpdateEvent = new ManualResetEvent(false);
 
     DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
+    DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
 
     IList<BackgroundProcessCancelHandler> cancelHandlerList = new List<BackgroundProcessCancelHandler>();
 
@@ -84,9 +85,11 @@ namespace LogExpert
     delegate void SetBookmarkFx(int lineNum, string comment);
     delegate void UpdateBookmarkViewFx();
     delegate void FunctionWith1IntParam(int arg);
+    delegate void FunctionWith1BoolParam(bool arg);
     delegate void PatternStatisticFx(PatternArgs patternArgs);
     delegate void ActionPluginExecuteFx(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
     delegate void HighlightEventFx(HighlightEventArgs e);
+    delegate void PositionAfterReloadFx(ReloadMemento reloadMemento);
     public delegate void LoadingFinishedFx(LogWindow newWin);    // used for filterTab restore
     public delegate void FilterRestoreFx(LogWindow newWin, PersistenceData persistenceData);
     public delegate void RestoreFiltersFx(PersistenceData persistenceData);
@@ -109,6 +112,7 @@ namespace LogExpert
     private bool forcePersistenceLoading = false;
     bool noSelectionUpdates = false;
     bool shouldCallTimeSync = false;
+    bool isLoadError = false;
 
     int lineHeight = 0;
     int reloadOverloadCounter = 0;
@@ -124,7 +128,7 @@ namespace LogExpert
     readonly EventWaitHandle timeshiftSyncTimerEvent = new ManualResetEvent(false);
     int timeshiftSyncLine = 0;
 
-    string fileName;
+    string fileNameField;
     string [] fileNames;
     readonly LogTabWindow parentLogTabWin;
     string tempTitleName = "";
@@ -132,7 +136,7 @@ namespace LogExpert
     private string forcedPersistenceFileName = null;
     private string givenFileName = null;      // file name of given file used for loading (maybe logfile or lxp)
     private EncodingOptions encodingOptions;
-    private MultifileOptions multifileOptions;
+    private MultifileOptions multifileOptions = new MultifileOptions();
 
     readonly TimeSpreadCalculator timeSpreadCalc;
     PatternWindow patternWindow;
@@ -155,6 +159,7 @@ namespace LogExpert
     private Font fontBold;
 
     private ReloadMemento reloadMemento;
+    private ColumnCache columnCache = new ColumnCache();
 
     public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading)
     {
@@ -169,7 +174,7 @@ namespace LogExpert
       columnizerCallback = new ColumnizerCallback(this);
 
 
-      this.fileName = fileName;
+      this.fileNameField = fileName;
       this.ForcePersistenceLoading = forcePersistenceLoading;
 
       this.dataGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(dataGridView_CellValueNeeded);
@@ -265,6 +270,7 @@ namespace LogExpert
       this.ResumeLayout();
 
       this.statusLineTrigger.Signal += new DelayedTrigger.SignalEventHandler(statusLineTrigger_Signal);
+      this.selectionChangedTrigger.Signal += new DelayedTrigger.SignalEventHandler(selectionChangedTrigger_Signal);
 
       PreferencesChanged(this.parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
     }
@@ -299,7 +305,7 @@ namespace LogExpert
       
       if (fileName != null)
       {
-        this.fileName = fileName;
+        this.fileNameField = fileName;
         this.EncodingOptions = encodingOptions;
 
         if (this.logFileReader != null)
@@ -330,10 +336,21 @@ namespace LogExpert
           LoadFilesAsMulti(this.fileNames, this.EncodingOptions);
           return;
         }
+        this.columnCache = new ColumnCache();
+        try
+        {
+          this.logFileReader = new LogfileReader(fileName, this.EncodingOptions, this.IsMultiFile,
+                                                 this.Preferences.bufferCount, this.Preferences.linesPerBuffer,
+                                                 this.multifileOptions);
+        }
+        catch (LogFileException lfe)
+        {
+          MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
+          this.BeginInvoke(new FunctionWith1BoolParam(Close), new object[] {true});
+          this.isLoadError = true;
+          return;
+        }
 
-        this.logFileReader = new LogfileReader(fileName, this.EncodingOptions, this.IsMultiFile, 
-                                               this.Preferences.bufferCount, this.Preferences.linesPerBuffer, 
-                                               this.multifileOptions);
         if (this.CurrentColumnizer is ILogLineXmlColumnizer)
         {
           this.logFileReader.IsXmlMode = true;
@@ -396,7 +413,7 @@ namespace LogExpert
       {
         PersistenceData persistenceData;
         if (this.ForcedPersistenceFileName == null)
-          persistenceData = Persister.LoadPersistenceDataOptionsOnly(this.fileName, this.Preferences);
+          persistenceData = Persister.LoadPersistenceDataOptionsOnly(this.FileName, this.Preferences);
         else
           persistenceData = Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(this.ForcedPersistenceFileName);
 
@@ -466,18 +483,19 @@ namespace LogExpert
         UnRegisterLogFileReaderEvents();
       }
       this.EncodingOptions = encodingOptions;
+      this.columnCache = new ColumnCache();
       this.logFileReader = new LogfileReader(fileNames, this.EncodingOptions, this.Preferences.bufferCount, 
                                              this.Preferences.linesPerBuffer, this.multifileOptions);
       RegisterLogFileReaderEvents();
       EnterLoadFileStatus();
       this.logFileReader.startMonitoring();
-      this.fileName = fileNames[fileNames.Length - 1];
+      this.fileNameField = fileNames[fileNames.Length - 1];
       this.fileNames = fileNames;
       this.IsMultiFile = true;
       //if (this.isTempFile)
       //  this.Text = this.tempTitleName;
       //else
-      //  this.Text = Util.GetNameFromPath(this.fileName);
+      //  this.Text = Util.GetNameFromPath(this.FileName);
     }
 
 
@@ -515,15 +533,15 @@ namespace LogExpert
       {
         PersistenceData persistenceData;
         if (this.ForcedPersistenceFileName == null)
-          persistenceData = Persister.LoadPersistenceData(this.fileName, this.Preferences);
+          persistenceData = Persister.LoadPersistenceData(this.FileName, this.Preferences);
         else
           persistenceData = Persister.LoadPersistenceDataFromFixedFile(this.ForcedPersistenceFileName);
 
         if (persistenceData.lineCount > this.logFileReader.LineCount)
         {
           // outdated persistence data (logfile rollover)
-          // MessageBox.Show(this, "Persistence data for " + this.fileName + " is outdated. It was discarded.", "Log Expert");
-          Logger.logInfo("Persistence data for " + this.fileName + " is outdated. It was discarded.");
+          // MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
+          Logger.logInfo("Persistence data for " + this.FileName + " is outdated. It was discarded.");
           LoadPersistenceOptions();
           return;
         }
@@ -603,14 +621,14 @@ namespace LogExpert
           return null;
       }
 
-      if (this.isTempFile)
+      if (this.isTempFile || this.isLoadError)
         return null;
 
       try
       {
         PersistenceData persistenceData = GetPersistenceData();
         if (this.ForcedPersistenceFileName == null)
-          return Persister.SavePersistenceData(this.fileName, persistenceData, this.Preferences);
+          return Persister.SavePersistenceData(this.FileName, persistenceData, this.Preferences);
         else
           return Persister.SavePersistenceDataWithFixedName(this.ForcedPersistenceFileName, persistenceData);
       }
@@ -756,7 +774,7 @@ namespace LogExpert
         this.Invoke(new MethodInvoker(SetGuiAfterLoading));
         this.loadingFinishedEvent.Set();
         this.externaLoadingFinishedEvent.Set();
-        this.timeSpreadCalc.SetLineCount(this.dataGridView.RowCount);
+        this.timeSpreadCalc.SetLineCount(this.logFileReader.LineCount);
         if (this.loadingFinishedFx != null)
         {
           this.loadingFinishedFx(this);
@@ -764,10 +782,7 @@ namespace LogExpert
 
         if (this.reloadMemento != null)
         {
-          if (this.reloadMemento.currentLine < this.dataGridView.RowCount && this.reloadMemento.currentLine >= 0)
-            this.dataGridView.CurrentCell = this.dataGridView.Rows[this.reloadMemento.currentLine].Cells[0];
-          if (this.reloadMemento.firstDisplayedLine < this.dataGridView.RowCount && this.reloadMemento.firstDisplayedLine >= 0)
-            this.dataGridView.FirstDisplayedScrollingRowIndex = this.reloadMemento.firstDisplayedLine;
+          this.Invoke(new PositionAfterReloadFx(this.PositionAfterReload), new object[] {this.reloadMemento});
         }
         if (this.filterTailCheckBox.Checked)
         {
@@ -784,6 +799,8 @@ namespace LogExpert
     {
       if (!this.IsDisposed && !this.Disposing)
       {
+        Logger.logInfo("Handling file not found event.");
+        this.isDeadFile = true;
         this.BeginInvoke(new MethodInvoker(LogfileDead));
       }
     }
@@ -793,9 +810,18 @@ namespace LogExpert
       this.BeginInvoke(new MethodInvoker(LogfileRespawned));
     }
 
+    void PositionAfterReload(ReloadMemento reloadMemento)
+    {
+      if (this.reloadMemento.currentLine < this.dataGridView.RowCount && this.reloadMemento.currentLine >= 0)
+        this.dataGridView.CurrentCell = this.dataGridView.Rows[this.reloadMemento.currentLine].Cells[0];
+      if (this.reloadMemento.firstDisplayedLine < this.dataGridView.RowCount && this.reloadMemento.firstDisplayedLine >= 0)
+        this.dataGridView.FirstDisplayedScrollingRowIndex = this.reloadMemento.firstDisplayedLine;
+    }
+
+
     void LogfileDead()
     {
-      //Logger.logInfo("LogfileDead(): Stopping logfile monitoring because file not found.");
+      Logger.logInfo("File not found.");
       this.isDeadFile = true;
 
       //this.logFileReader.FileSizeChanged -= this.FileSizeChangedHandler;
@@ -837,7 +863,7 @@ namespace LogExpert
         if (this.isTempFile)
           this.Text = this.tempTitleName;
         else
-          this.Text = Util.GetNameFromPath(fileName);
+          this.Text = Util.GetNameFromPath(this.FileName);
       }
       this.ShowBookmarkBubbles = this.Preferences.showBubbles;
       //if (this.forcedColumnizer == null)
@@ -903,12 +929,12 @@ namespace LogExpert
         columnizer = this.parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(this.FileName));
         if (columnizer == null)
         {
-          columnizer = this.parentLogTabWin.GetColumnizerHistoryEntry(this.fileName);
+          columnizer = this.parentLogTabWin.GetColumnizerHistoryEntry(this.FileName);
         }
       }
       else
       {
-        columnizer = this.parentLogTabWin.GetColumnizerHistoryEntry(this.fileName);
+        columnizer = this.parentLogTabWin.GetColumnizerHistoryEntry(this.FileName);
         if (columnizer == null)
         {
           columnizer = this.parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(this.FileName));
@@ -946,6 +972,7 @@ namespace LogExpert
       StopTimestampSyncThread();
       StopLogEventWorkerThread();
       this.statusLineTrigger.Stop();
+      this.selectionChangedTrigger.Stop();
       //StopFilterUpdateWorkerThread();
       this.shouldCancel = true;
       if (this.logFileReader != null)
@@ -960,14 +987,14 @@ namespace LogExpert
       }
       if (this.IsTempFile)
       {
-        Logger.logInfo("Deleting temp file " + this.fileName);
+        Logger.logInfo("Deleting temp file " + this.FileName);
         try
         {
-          File.Delete(this.fileName);
+          File.Delete(this.FileName);
         }
         catch (IOException e)
         {
-          Logger.logError("Error while deleting temp file " + this.fileName + ": " + e.ToString());
+          Logger.logError("Error while deleting temp file " + this.FileName + ": " + e.ToString());
         }
       }
       if (this.FilterPipe != null)
@@ -1027,7 +1054,7 @@ namespace LogExpert
           externaLoadingFinishedEvent.Reset();
           Thread reloadFinishedThread = new Thread(new ThreadStart(ReloadFinishedThreadFx));
           reloadFinishedThread.Start();
-          LoadFile(this.fileName, this.EncodingOptions);
+          LoadFile(this.FileName, this.EncodingOptions);
 
           ClearBookmarkList();
           SavePersistenceData(false);
@@ -1664,6 +1691,23 @@ namespace LogExpert
       }
     }
 
+    internal string[] GetColumnsForLine(int lineNumber)
+    {
+      return this.columnCache.GetColumnsForLine(this.logFileReader, lineNumber, this.CurrentColumnizer, this.columnizerCallback);
+
+      //string line = this.logFileReader.GetLogLine(lineNumber);
+      //if (line != null)
+      //{
+      //  string[] cols;
+      //  this.columnizerCallback.LineNum = lineNumber;
+      //  cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
+      //  return cols;
+      //}
+      //else
+      //{
+      //  return null;
+      //}
+    }
 
     public string GetCellValue(int rowIndex, int columnIndex)
     {
@@ -1676,33 +1720,30 @@ namespace LogExpert
         return "";
       }
 
-      string line = this.logFileReader.GetLogLine(rowIndex);
-      if (line != null)
+      try
       {
-        string[] cols;
-        try
+        string[] cols = GetColumnsForLine(rowIndex);
+        if (cols != null)
         {
-          this.columnizerCallback.LineNum = rowIndex;
-          cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
-        }
-        catch (Exception)
-        {
-          return "";
-        }
-        if (columnIndex <= cols.Length + 1)
-        {
-          string value = cols[columnIndex - 2];
-          if (value != null)
-            value = value.Replace("\t", "  ");
-          return value;
-        }
-        else
-        {
-          if (columnIndex == 2)
-            return line.Replace("\t", "  ");
+          if (columnIndex <= cols.Length + 1)
+          {
+            string value = cols[columnIndex - 2];
+            if (value != null)
+              value = value.Replace("\t", "  ");
+            return value;
+          }
           else
-            return "";
+          {
+            if (columnIndex == 2)
+              return cols[cols.Length - 1].Replace("\t", "  ");
+            else
+              return "";
+          }
         }
+      }
+      catch (Exception)
+      {
+        return "";
       }
       return "";
     }
@@ -1721,7 +1762,7 @@ namespace LogExpert
         e.Handled = false;
         return;
       }
-      string line = this.logFileReader.GetLogLine(rowIndex);
+      string line = this.logFileReader.GetLogLineWithWait(rowIndex);
       if (line != null)
       {
         HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
@@ -3003,7 +3044,7 @@ namespace LogExpert
         ParamParser paramParser = new ParamParser(comment);
         try
         {
-          comment = paramParser.ReplaceParams(line, lineNum, this.fileName);
+          comment = paramParser.ReplaceParams(line, lineNum, this.FileName);
         }
         catch (ArgumentException)
         {
@@ -3233,9 +3274,12 @@ namespace LogExpert
           pipe.RecreateTempFile();
         }
       }
-      for (int i = 0; i < this.dataGridView.RowCount; ++i )
+      if (this.filterPipeList.Count > 0)
       {
-        ProcessFilterPipes(i);
+        for (int i = 0; i < this.dataGridView.RowCount; ++i)
+        {
+          ProcessFilterPipes(i);
+        }
       }
     }
 
@@ -3675,7 +3719,7 @@ namespace LogExpert
         return;
       }
       int lineNum = this.filterResultList[e.RowIndex];
-      string line = this.logFileReader.GetLogLine(lineNum);
+      string line = this.logFileReader.GetLogLineWithWait(lineNum);
       if (line != null)
       {
         HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
@@ -3770,46 +3814,7 @@ namespace LogExpert
       }
 
       int lineNum = this.filterResultList[e.RowIndex];
-      if (e.ColumnIndex == 1)
-      {
-        e.Value = "" + (lineNum + 1);
-        return;
-      }
-      if (e.ColumnIndex == 0)   // marker column
-      {
-        e.Value = " ";
-        return;
-      }
-
-      string line = this.logFileReader.GetLogLine(lineNum);
-      if (line != null)
-      {
-        string[] cols;
-        try
-        {
-          this.columnizerCallback.LineNum = e.RowIndex;
-          cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
-        }
-        catch (Exception)
-        {
-          e.Value = "";
-          return;
-        }
-        if (e.ColumnIndex <= cols.Length + 1)
-        {
-          string value = cols[e.ColumnIndex - 2];
-          if (value != null)
-            value = value.Replace("\t", "  ");
-          e.Value = value;
-        }
-        else
-        {
-          if (e.ColumnIndex == 2)
-            e.Value = line.Replace("\t", "  ");
-          else
-            e.Value = "";
-        }
-      }
+      e.Value = GetCellValue(lineNum, e.ColumnIndex);
     }
 
 
@@ -4210,7 +4215,12 @@ namespace LogExpert
       {
         return;
       }
+      this.selectionChangedTrigger.Trigger();
+    }
 
+    void selectionChangedTrigger_Signal(object sender, EventArgs e)
+    {
+      Logger.logDebug("Selection changed trigger");
       int selCount = this.dataGridView.SelectedRows.Count;
       if (selCount > 1)
       {
@@ -4309,7 +4319,7 @@ namespace LogExpert
 
     public string FileName
     {
-      get { return this.fileName; }
+      get { return this.fileNameField; }
     }
 
     public string SessionFileName
@@ -4511,7 +4521,7 @@ namespace LogExpert
         if (this.IsTempFile)
           title = this.TempTitleName + namePrefix + ++this.filterPipeNameCounter;
         else
-          title = Util.GetNameFromPath(this.fileName) + namePrefix + ++this.filterPipeNameCounter;
+          title = Util.GetNameFromPath(this.FileName) + namePrefix + ++this.filterPipeNameCounter;
 
         WritePipeToTab(pipe, this.filterResultList, title, null);
       }
@@ -4749,7 +4759,7 @@ namespace LogExpert
         writer.Write(text);
 
         writer.Close();
-        string title = Util.GetNameFromPath(this.fileName) + "->Clip";
+        string title = Util.GetNameFromPath(this.FileName) + "->Clip";
         this.parentLogTabWin.AddTempFileTab(fileName, title);
       }
     }
@@ -4831,7 +4841,7 @@ namespace LogExpert
       this.forcedColumnizerForLoading = this.CurrentColumnizer;
       if (this.fileNames == null || !this.IsMultiFile)
       {
-        LoadFile(this.fileName, this.EncodingOptions);
+        LoadFile(this.FileName, this.EncodingOptions);
       }
       else
       {
@@ -5341,6 +5351,16 @@ namespace LogExpert
       }
       return null;
     }
+
+    public ILogFileInfo GetCurrentFileInfo()
+    {
+      if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
+      {
+        return this.logFileReader.GetLogFileInfoForLine(this.dataGridView.CurrentRow.Index);
+      }
+      return null;
+    }
+
 
     /// <summary>
     /// zero-based
@@ -6738,7 +6758,7 @@ namespace LogExpert
 
     private void SetDefaultHighlightGroup()
     {
-      HilightGroup group = this.parentLogTabWin.FindHighlightGroupByFileMask(this.fileName);
+      HilightGroup group = this.parentLogTabWin.FindHighlightGroupByFileMask(this.FileName);
       if (group != null)
       {
         SetCurrentHighlightGroup(group.GroupName);
@@ -6860,7 +6880,7 @@ namespace LogExpert
 
     public void AddToTimeSync(LogWindow master)
     {
-      Logger.logInfo("Syncing window for " + Util.GetNameFromPath(this.fileName) + " to " + Util.GetNameFromPath(master.fileName));
+      Logger.logInfo("Syncing window for " + Util.GetNameFromPath(this.FileName) + " to " + Util.GetNameFromPath(master.FileName));
       lock (this.timeSyncListLock)
       {
         if (this.IsTimeSynced && master.TimeSyncList != this.timeSyncList)  // already synced but master has different sync list
@@ -6880,7 +6900,7 @@ namespace LogExpert
       {
         if (this.TimeSyncList != null)
         {
-          Logger.logInfo("De-Syncing window for " + Util.GetNameFromPath(this.fileName));
+          Logger.logInfo("De-Syncing window for " + Util.GetNameFromPath(this.FileName));
           this.timeSyncList.WindowRemoved -= timeSyncList_WindowRemoved;
           this.TimeSyncList.RemoveWindow(this);
           this.timeSyncList = null;

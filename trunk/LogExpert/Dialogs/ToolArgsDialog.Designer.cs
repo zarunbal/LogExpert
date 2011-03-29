@@ -41,7 +41,7 @@
       // okButton
       // 
       this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(429, 247);
+      this.okButton.Location = new System.Drawing.Point(429, 292);
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
       this.okButton.TabIndex = 1;
@@ -96,7 +96,7 @@
       // button2
       // 
       this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.button2.Location = new System.Drawing.Point(429, 216);
+      this.button2.Location = new System.Drawing.Point(429, 261);
       this.button2.Name = "button2";
       this.button2.Size = new System.Drawing.Size(75, 23);
       this.button2.TabIndex = 13;
@@ -118,7 +118,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.button2;
-      this.ClientSize = new System.Drawing.Size(516, 282);
+      this.ClientSize = new System.Drawing.Size(516, 327);
       this.Controls.Add(this.testResultLabel);
       this.Controls.Add(this.button2);
       this.Controls.Add(this.helpLabel);

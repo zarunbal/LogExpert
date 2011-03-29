@@ -8,19 +8,20 @@ namespace LogExpert
 {
   public class LogFileInfo : ILogFileInfo
   {
-    const int RETRY_COUNT = 20;
+    const int RETRY_COUNT = 5;
     const int RETRY_SLEEP = 250;
     //FileStream fStream;
     FileInfo fInfo;
-    string fileName;
-    long oldLength;
+    private Uri fileUri;
+    long originalLength;
+    private long lastLength;
 
 
     public LogFileInfo(string fileName)
     {
-      this.fileName = fileName;
-      this.fInfo = new FileInfo(this.fileName);
-      this.oldLength = Length;
+      this.fInfo = new FileInfo(fileName);
+      this.fileUri = new Uri(fileName);
+      this.originalLength = lastLength = Length;
       //this.oldLength = 0;
     }
 
@@ -38,7 +39,7 @@ namespace LogExpert
       {
         try
         {
-          return new FileStream(this.fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+          return new FileStream(this.fInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         }
         catch (IOException fe)
         {
@@ -59,22 +60,33 @@ namespace LogExpert
       }
     }
 
-
-    //public void CloseFile()
-    //{
-    //  if (this.fStream != null)
-    //    this.fStream.Close();
-    //}
-
-    //public FileStream FileStream
-    //{
-    //  get { return this.fStream; }
-    //}
+       
+    public string FullName
+    {
+      get { return this.fInfo.FullName; }
+    }
 
     public string FileName
     {
-      get { return this.fileName; }
+      get { return this.fInfo.Name; }
     }
+
+
+    public string DirectoryName
+    {
+      get { return this.fInfo.DirectoryName; }
+    }
+
+    public char DirectorySeparatorChar
+    {
+      get { return Path.DirectorySeparatorChar; }
+    }
+
+    public Uri Uri
+    {
+      get { return this.fileUri; }
+    }
+
 
 
     public long Length
@@ -103,14 +115,65 @@ namespace LogExpert
       }
     }
 
-    public long OldLength
+    public long OriginalLength
     {
-      get { return this.oldLength; }
+      get { return this.originalLength; }
     }
+
+    public bool FileExists 
+    {
+      get { return this.Length > -1; }
+    }
+
+    public int PollInterval
+    {
+      get { return ConfigManager.Settings.preferences.pollingInterval; }
+    }
+
+    public bool FileHasChanged()
+    {
+      if (this.LengthWithoutRetry != this.lastLength)
+      {
+        this.lastLength = this.LengthWithoutRetry;
+        return true;
+      }
+      return false;
+    }
+
 
     public override string ToString() 
     {
-      return this.fileName + ", OldLen: " + OldLength + ", Len: " + Length;
+      return this.fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
     }
+
+    private static string GetNameFromPath(string fileName)
+    {
+      int i = fileName.LastIndexOf('\\');
+      if (i < 0)
+        i = -1;
+      return fileName.Substring(i + 1);
+    }
+
+    public long LengthWithoutRetry
+    {
+      get
+      {
+        if (fInfo == null)
+        {
+          return -1;
+        }
+        try
+        {
+          this.fInfo.Refresh();
+          return this.fInfo.Length;
+        }
+        catch (IOException e)
+        {
+          return -1;
+        }
+      }
+    }
+
+
   }
 }

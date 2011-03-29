@@ -32,8 +32,7 @@ namespace LogExpert.Dialogs
                                   "YY[YY] = year\n"+
                                   "all other chars will be used as given"
                                   ;
-      FileInfo fileInfo = new FileInfo(fileName);
-      this.fileNameLabel.Text = fileInfo.Name;
+      this.fileNameLabel.Text = fileName;
     }
 
     public string FileNamePattern

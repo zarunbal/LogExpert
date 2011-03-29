@@ -9,11 +9,12 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
+using ColumnizerLib;
 
 
 namespace LogExpert
 {
-  public class Logger
+  public class Logger : ILogExpertLogger
   {
     delegate void LogCallback(string msg, Level level, DateTime dateTime, string callerInfo, int threadId);
 
@@ -125,7 +126,6 @@ namespace LogExpert
 
     protected void logCallback(string msg, Level level, DateTime dateTime, string callerInfo, int threadId)
     {
-      string[] levelText = new string[] { "DEBUG", "INFO", "WARN", "ERROR" };
       if (level >= this.LogLevel)
       {
         String caller = String.Format("{0,-45}", callerInfo);
@@ -134,7 +134,8 @@ namespace LogExpert
           caller = caller.Substring(caller.Length - 45);
         }
         String threadIdStr = String.Format("{0,4}", threadId);
-        string output = dateTime.ToString("dd.MM.yyyy HH:mm:ss.fff [") + threadIdStr + "] [" + level.ToString() + "] [" + caller + "] " + msg;
+        String levelStr = String.Format("{0,5}", level.ToString());
+        string output = dateTime.ToString("dd.MM.yyyy HH:mm:ss.fff [") + threadIdStr + "] [" + levelStr + "] [" + caller + "] " + msg;
 
         WriteToLogfile(output);
       }
@@ -183,5 +184,29 @@ namespace LogExpert
       createLogFile();
     }
 
+
+    #region ILogExpertLogger Member
+
+    public void LogInfo(string msg)
+    {
+      GetLogger().log(msg, Level.INFO);
+    }
+
+    public void LogDebug(string msg)
+    {
+      GetLogger().log(msg, Level.DEBUG);
+    }
+
+    public void LogWarn(string msg)
+    {
+      GetLogger().log(msg, Level.WARN);
+    }
+
+    public void LogError(string msg)
+    {
+      GetLogger().log(msg, Level.ERROR);
+    }
+
+    #endregion
   }
 }

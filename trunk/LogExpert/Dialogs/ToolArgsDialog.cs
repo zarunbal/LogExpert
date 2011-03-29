@@ -36,7 +36,11 @@ namespace LogExpert.Dialogs
         "%F = Full name (incl. path) of log file\n" +
         "%E = Extension of log file name (e.g. 'txt')\n" +
         "%M = Name of log file without extension\n" +
-        "?\"<name>\" = variable parameter 'name'\n"+
+        "%S = User (from URI)\n" +
+        "%R = Path (from URI)\n" +
+        "%H = Host (from URI)\n" +
+        "%T = Port (from URI)\n" +
+        "?\"<name>\" = variable parameter 'name'\n" +
         "?\"<name>\"(def1,def2,...) = variable parameter with predefined values\n" +
         "\n" +
         "{<regex>}{<replace>}:\n" +
@@ -60,11 +64,11 @@ namespace LogExpert.Dialogs
       if (this.logTabWin.CurrentLogWindow != null)
       {
         string line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
-        string fileName = this.logTabWin.CurrentLogWindow.GetCurrentFileName();
-        if (line != null && fileName != null)
+        ILogFileInfo info = this.logTabWin.CurrentLogWindow.GetCurrentFileInfo();
+        if (line != null && info != null)
         {
           ArgParser parser = new ArgParser(this.argsTextBox.Text);
-          string args = parser.BuildArgs(line, this.logTabWin.CurrentLogWindow.GetRealLineNum() + 1, fileName, this);
+          string args = parser.BuildArgs(line, this.logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info, this);
           this.testResultLabel.Text = args;
         }
       }

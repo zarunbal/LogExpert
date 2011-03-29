@@ -76,7 +76,7 @@ namespace LogExpert
       }
     }
 
-    private string CreateFile(DirectoryInfo dInfo, string fileName)
+    protected string CreateFile(DirectoryInfo dInfo, string fileName)
     {
       int lineCount = 10;
       string fullName = dInfo == null ? fileName : dInfo.FullName + Path.DirectorySeparatorChar + fileName;

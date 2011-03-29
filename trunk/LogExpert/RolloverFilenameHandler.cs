@@ -15,7 +15,7 @@ namespace LogExpert
   public class RolloverFilenameHandler
   {
     private RolloverFilenameBuilder filenameBuilder;
-    private FileInfo fInfo;
+    private ILogFileInfo logFileInfo;
     private MultifileOptions options;
 
     /// <summary>
@@ -23,12 +23,12 @@ namespace LogExpert
     /// </summary>
     /// <param name="filePath">The complete path of the logfile</param>
     /// <param name="options">Multifile option (e.g. format pattern)</param>
-    public RolloverFilenameHandler(string filePath, MultifileOptions options)
+    public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultifileOptions options)
     {
       this.options = options;
-      this.fInfo = new FileInfo(filePath);
+      this.logFileInfo = logFileInfo;
       this.filenameBuilder = new RolloverFilenameBuilder(this.options.FormatPattern);
-      this.filenameBuilder.SetFileName(this.fInfo.Name);
+      this.filenameBuilder.SetFileName(logFileInfo.FileName);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace LogExpert
     {
       LinkedList<string> fileList = new LinkedList<string>();
       string fileName = filenameBuilder.BuildFileName();
-      string filePath = this.fInfo.DirectoryName + Path.DirectorySeparatorChar + fileName;
+      string filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
       fileList.AddFirst(filePath);
       bool found = true;
       while (found)
@@ -53,8 +53,8 @@ namespace LogExpert
         {
           this.filenameBuilder.Index = this.filenameBuilder.Index + 1;
           fileName = filenameBuilder.BuildFileName();
-          filePath = this.fInfo.DirectoryName + Path.DirectorySeparatorChar + fileName;
-          if (File.Exists(filePath))
+          filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
+          if (FileExists(filePath))
           {
             fileList.AddFirst(filePath);
             found = true;
@@ -70,8 +70,8 @@ namespace LogExpert
           {
             this.filenameBuilder.DecrementDate();
             fileName = filenameBuilder.BuildFileName();
-            filePath = this.fInfo.DirectoryName + Path.DirectorySeparatorChar + fileName;
-            if (File.Exists(filePath))
+            filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
+            if (FileExists(filePath))
             {
               fileList.AddFirst(filePath);
               found = true;
@@ -87,6 +87,13 @@ namespace LogExpert
       return fileList;
     }
 
+    private bool FileExists(string filePath)
+    {
+      IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(filePath);
+      ILogFileInfo info = fs.GetLogfileInfo(filePath);
+      return info.FileExists;
+
+    }
 
   }
 }
