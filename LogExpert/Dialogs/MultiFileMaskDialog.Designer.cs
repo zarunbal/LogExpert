@@ -111,7 +111,7 @@
       this.Settings.Controls.Add(this.fileNamePatternTextBox);
       this.Settings.Location = new System.Drawing.Point(15, 39);
       this.Settings.Name = "Settings";
-      this.Settings.Size = new System.Drawing.Size(277, 88);
+      this.Settings.Size = new System.Drawing.Size(402, 88);
       this.Settings.TabIndex = 6;
       this.Settings.TabStop = false;
       // 
@@ -119,14 +119,14 @@
       // 
       this.syntaxHelpLabel.Location = new System.Drawing.Point(15, 140);
       this.syntaxHelpLabel.Name = "syntaxHelpLabel";
-      this.syntaxHelpLabel.Size = new System.Drawing.Size(277, 194);
+      this.syntaxHelpLabel.Size = new System.Drawing.Size(402, 194);
       this.syntaxHelpLabel.TabIndex = 7;
       this.syntaxHelpLabel.Text = "label4";
       // 
       // buttonOK
       // 
       this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.buttonOK.Location = new System.Drawing.Point(136, 350);
+      this.buttonOK.Location = new System.Drawing.Point(261, 347);
       this.buttonOK.Name = "buttonOK";
       this.buttonOK.Size = new System.Drawing.Size(75, 23);
       this.buttonOK.TabIndex = 8;
@@ -137,7 +137,7 @@
       // buttonCancel
       // 
       this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.buttonCancel.Location = new System.Drawing.Point(217, 350);
+      this.buttonCancel.Location = new System.Drawing.Point(342, 347);
       this.buttonCancel.Name = "buttonCancel";
       this.buttonCancel.Size = new System.Drawing.Size(75, 23);
       this.buttonCancel.TabIndex = 9;
@@ -150,7 +150,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.buttonCancel;
-      this.ClientSize = new System.Drawing.Size(313, 382);
+      this.ClientSize = new System.Drawing.Size(434, 382);
       this.Controls.Add(this.buttonCancel);
       this.Controls.Add(this.buttonOK);
       this.Controls.Add(this.syntaxHelpLabel);
@@ -160,6 +160,7 @@
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.MinimizeBox = false;
+      this.MinimumSize = new System.Drawing.Size(329, 420);
       this.Name = "MultiFileMaskDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "MultiFile settings";

@@ -42,7 +42,7 @@ namespace UnitTests
       foreach (LogFileInfo li in lil)
       {
         string fileName = enumerator.Current;
-        Assert.AreEqual(fileName, li.FileName);
+        Assert.AreEqual(fileName, li.FullName);
         enumerator.MoveNext();
       }
       int oldCount = lil.Count;
@@ -68,7 +68,7 @@ namespace UnitTests
       foreach (LogFileInfo li in lil)
       {
         string fileName = enumerator.Current;
-        Assert.AreEqual(fileName, li.FileName);
+        Assert.AreEqual(fileName, li.FullName);
         enumerator.MoveNext();
       }
 
@@ -81,7 +81,7 @@ namespace UnitTests
       int startLine = 0;
       foreach (LogBuffer logBuffer in logBuffers)
       {
-        Assert.AreEqual(logBuffer.FileInfo.FileName, enumerator.Current);
+        Assert.AreEqual(logBuffer.FileInfo.FullName, enumerator.Current);
         Assert.AreEqual(startLine, logBuffer.StartLine);
         startLine += 10;
         enumerator.MoveNext();

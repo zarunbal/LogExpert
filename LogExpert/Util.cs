@@ -15,6 +15,10 @@ namespace LogExpert
     {
       int i = fileName.LastIndexOf('\\');
       if (i < 0)
+      {
+        i = fileName.LastIndexOf('/');
+      }
+      if (i < 0)
         i = -1;
       return fileName.Substring(i + 1);
     }
@@ -26,6 +30,20 @@ namespace LogExpert
         i = fileName.Length - 1;
       return fileName.Substring(0, i);
     }
+
+    public static string GetExtension(string fileName)
+    {
+      int i = fileName.LastIndexOf('.');
+      if (i < 0 || i >= fileName.Length - 1)
+      {
+        return "";
+      }
+      else
+      {
+        return fileName.Substring(i + 1);
+      }
+    }
+
 
     public static string GetFileSizeAsText(long size)
     {

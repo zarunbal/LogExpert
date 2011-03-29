@@ -564,6 +564,13 @@ namespace LogExpert
         }
         if (persistenceData.fileName != null && persistenceData.fileName.Length > 0)
         {
+          IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(persistenceData.fileName);
+          if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
+          {
+             return persistenceData.fileName;
+          }
+          // On relative paths the URI check (and therefore the file system plugin check) will fail.
+          // So fs == null and fs == LocalFileSystem are handled here like normal files.
           if (Path.IsPathRooted(persistenceData.fileName))
           {
             return persistenceData.fileName;
@@ -848,29 +855,6 @@ namespace LogExpert
     }
 
 
-    private void LogWindow_DragDrop(object sender, DragEventArgs e)
-    {
-#if DEBUG
-      string[] formats = e.Data.GetFormats();
-      string s = "Dropped formats:  ";
-      foreach (string format in formats)
-      {
-        s += format; s+= " , ";
-      }
-      s = s.Substring(0, s.Length - 3);
-      Logger.logDebug(s);
-#endif
-
-      if (e.Data.GetDataPresent(DataFormats.FileDrop))
-      {
-        object o = e.Data.GetData(DataFormats.FileDrop);
-        if (o is string[])
-        {
-          LoadFiles(((string[])o), (e.KeyState & 4) == 4);  // (shift pressed?)
-          e.Effect = DragDropEffects.Copy;
-        }
-      }
-    }
 
     private void LoadFiles(string[] names, bool invertLogic)
     {
@@ -937,7 +921,6 @@ namespace LogExpert
 
     private void LogWindow_DragOver(object sender, DragEventArgs e)
     {
-
       if (!e.Data.GetDataPresent(DataFormats.FileDrop))
       {
         e.Effect = DragDropEffects.None;
@@ -946,6 +929,32 @@ namespace LogExpert
       else
       {
         e.Effect = DragDropEffects.Copy;
+      }
+    }
+
+    private void LogWindow_DragDrop(object sender, DragEventArgs e)
+    {
+#if DEBUG
+      string[] formats = e.Data.GetFormats();
+      string s = "Dropped formats:  ";
+      foreach (string format in formats)
+      {
+        s += format; s += " , ";
+      }
+      s = s.Substring(0, s.Length - 3);
+      Logger.logDebug(s);
+#endif
+
+      object test = e.Data.GetData(DataFormats.StringFormat);
+
+      if (e.Data.GetDataPresent(DataFormats.FileDrop))
+      {
+        object o = e.Data.GetData(DataFormats.FileDrop);
+        if (o is string[])
+        {
+          LoadFiles(((string[])o), (e.KeyState & 4) == 4);  // (shift pressed?)
+          e.Effect = DragDropEffects.Copy;
+        }
       }
     }
 
@@ -1906,11 +1915,11 @@ namespace LogExpert
       if (this.CurrentLogWindow != null)
       {
         string line = this.CurrentLogWindow.GetCurrentLine();
-        string fileName = this.CurrentLogWindow.GetCurrentFileName();
-        if (line != null && fileName != null)
+        ILogFileInfo info = this.CurrentLogWindow.GetCurrentFileInfo();
+        if (line != null && info != null)
         {
           ArgParser parser = new ArgParser(toolEntry.args);
-          string argLine = parser.BuildArgs(line, this.CurrentLogWindow.GetRealLineNum() + 1, fileName, this);
+          string argLine = parser.BuildArgs(line, this.CurrentLogWindow.GetRealLineNum() + 1, info, this);
           if (argLine != null)
           {
             StartTool(toolEntry.cmd, argLine, toolEntry.sysout, toolEntry.columnizerName, toolEntry.workingDir);
@@ -2733,6 +2742,22 @@ namespace LogExpert
           tip.SetToolTip(data.tabPage, "Pasted on " + now.ToString());
           tip.AutomaticDelay = 10;
           tip.AutoPopDelay = 5000;
+        }
+      }
+    }
+
+    private void openURIToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      OpenUriDialog dlg = new OpenUriDialog();
+      dlg.UriHistory = ConfigManager.Settings.uriHistoryList;
+
+      if (DialogResult.OK == dlg.ShowDialog())
+      {
+        if (dlg.Uri.Trim().Length > 0)
+        {
+          ConfigManager.Settings.uriHistoryList = dlg.UriHistory;
+          ConfigManager.Save(SettingsFlags.FileHistory);
+          LoadFiles(new string[] {dlg.Uri}, false);
         }
       }
     }

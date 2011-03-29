@@ -512,6 +512,14 @@ namespace LogExpert.Dialogs
           (entry as ILogExpertPluginConfigurator).StartConfig();
         }
       }
+      foreach (IFileSystemPlugin entry in PluginRegistry.GetInstance().RegisteredFileSystemPlugins)
+      {
+        this.pluginListBox.Items.Add(entry);
+        if (entry is ILogExpertPluginConfigurator)
+        {
+          (entry as ILogExpertPluginConfigurator).StartConfig();
+        }
+      }
 
       this.configPluginButton.Enabled = false;
     }

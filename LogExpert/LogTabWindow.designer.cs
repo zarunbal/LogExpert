@@ -42,8 +42,10 @@ namespace LogExpert
       this.menuStrip1 = new System.Windows.Forms.MenuStrip();
       this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
       this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.openURIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.closeFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.newFromClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
       this.multiFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.multiFileEnabledStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -139,7 +141,6 @@ namespace LogExpert
       this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dateTimeDragControl = new LogExpert.Dialogs.DateTimeDragControl();
-      this.newFromClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.statusStrip1.SuspendLayout();
       this.menuStrip1.SuspendLayout();
       this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -228,6 +229,7 @@ namespace LogExpert
       // 
       this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
+            this.openURIToolStripMenuItem,
             this.closeFileToolStripMenuItem,
             this.reloadToolStripMenuItem,
             this.newFromClipboardToolStripMenuItem,
@@ -249,15 +251,24 @@ namespace LogExpert
       // 
       this.openToolStripMenuItem.Name = "openToolStripMenuItem";
       this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-      this.openToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.openToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.openToolStripMenuItem.Text = "Open...";
       this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+      // 
+      // openURIToolStripMenuItem
+      // 
+      this.openURIToolStripMenuItem.Name = "openURIToolStripMenuItem";
+      this.openURIToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
+      this.openURIToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+      this.openURIToolStripMenuItem.Text = "Open URL...";
+      this.openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
+      this.openURIToolStripMenuItem.Click += new System.EventHandler(this.openURIToolStripMenuItem_Click);
       // 
       // closeFileToolStripMenuItem
       // 
       this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
       this.closeFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-      this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.closeFileToolStripMenuItem.Text = "Close File";
       this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.closeFileToolStripMenuItem_Click);
       // 
@@ -265,14 +276,23 @@ namespace LogExpert
       // 
       this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
       this.reloadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-      this.reloadToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.reloadToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.reloadToolStripMenuItem.Text = "Reload";
       this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
+      // 
+      // newFromClipboardToolStripMenuItem
+      // 
+      this.newFromClipboardToolStripMenuItem.Name = "newFromClipboardToolStripMenuItem";
+      this.newFromClipboardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+      this.newFromClipboardToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+      this.newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
+      this.newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
+      this.newFromClipboardToolStripMenuItem.Click += new System.EventHandler(this.newFromClipboardToolStripMenuItem_Click);
       // 
       // toolStripSeparator8
       // 
       this.toolStripSeparator8.Name = "toolStripSeparator8";
-      this.toolStripSeparator8.Size = new System.Drawing.Size(175, 6);
+      this.toolStripSeparator8.Size = new System.Drawing.Size(242, 6);
       // 
       // multiFileToolStripMenuItem
       // 
@@ -281,7 +301,7 @@ namespace LogExpert
             this.multiFileEnabledStripMenuItem,
             this.multifileMaskToolStripMenuItem});
       this.multiFileToolStripMenuItem.Name = "multiFileToolStripMenuItem";
-      this.multiFileToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.multiFileToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.multiFileToolStripMenuItem.Text = "MultiFile";
       this.multiFileToolStripMenuItem.ToolTipText = "Treat multiple files as one large file (e.g. data.log, data.log.1, data.log.2,..." +
           ")";
@@ -305,12 +325,12 @@ namespace LogExpert
       // toolStripSeparator7
       // 
       this.toolStripSeparator7.Name = "toolStripSeparator7";
-      this.toolStripSeparator7.Size = new System.Drawing.Size(175, 6);
+      this.toolStripSeparator7.Size = new System.Drawing.Size(242, 6);
       // 
       // loadProjectToolStripMenuItem
       // 
       this.loadProjectToolStripMenuItem.Name = "loadProjectToolStripMenuItem";
-      this.loadProjectToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.loadProjectToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.loadProjectToolStripMenuItem.Text = "Load session...";
       this.loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
       this.loadProjectToolStripMenuItem.Click += new System.EventHandler(this.loadProjectToolStripMenuItem_Click);
@@ -318,7 +338,7 @@ namespace LogExpert
       // saveProjectToolStripMenuItem
       // 
       this.saveProjectToolStripMenuItem.Name = "saveProjectToolStripMenuItem";
-      this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.saveProjectToolStripMenuItem.Text = "Save session...";
       this.saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
       this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.saveProjectToolStripMenuItem_Click);
@@ -326,7 +346,7 @@ namespace LogExpert
       // exportBookmarksToolStripMenuItem
       // 
       this.exportBookmarksToolStripMenuItem.Name = "exportBookmarksToolStripMenuItem";
-      this.exportBookmarksToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.exportBookmarksToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.exportBookmarksToolStripMenuItem.Text = "Export bookmarks...";
       this.exportBookmarksToolStripMenuItem.ToolTipText = "Write a list of bookmarks and their comments to a CSV file";
       this.exportBookmarksToolStripMenuItem.Click += new System.EventHandler(this.exportBookmarksToolStripMenuItem_Click);
@@ -334,18 +354,18 @@ namespace LogExpert
       // toolStripSeparator14
       // 
       this.toolStripSeparator14.Name = "toolStripSeparator14";
-      this.toolStripSeparator14.Size = new System.Drawing.Size(175, 6);
+      this.toolStripSeparator14.Size = new System.Drawing.Size(242, 6);
       // 
       // lastUsedToolStripMenuItem
       // 
       this.lastUsedToolStripMenuItem.Name = "lastUsedToolStripMenuItem";
-      this.lastUsedToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.lastUsedToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.lastUsedToolStripMenuItem.Text = "Last used";
       // 
       // exitToolStripMenuItem
       // 
       this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-      this.exitToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+      this.exitToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
       this.exitToolStripMenuItem.Text = "Exit";
       this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
       // 
@@ -1016,7 +1036,7 @@ namespace LogExpert
       // 
       this.externalToolsToolStrip.BackColor = System.Drawing.SystemColors.ControlLight;
       this.externalToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-      this.externalToolsToolStrip.Location = new System.Drawing.Point(391, 24);
+      this.externalToolsToolStrip.Location = new System.Drawing.Point(388, 24);
       this.externalToolsToolStrip.Name = "externalToolsToolStrip";
       this.externalToolsToolStrip.Size = new System.Drawing.Size(111, 25);
       this.externalToolsToolStrip.TabIndex = 8;
@@ -1120,15 +1140,6 @@ namespace LogExpert
       this.dateTimeDragControl.TabIndex = 14;
       this.dateTimeDragControl.ValueDragged += new LogExpert.Dialogs.DateTimeDragControl.ValueDraggedEventHandler(this.dateTimeDragControl_ValueDragged);
       this.dateTimeDragControl.ValueChanged += new LogExpert.Dialogs.DateTimeDragControl.ValueChangedEventHandler(this.dateTimeDragControl_ValueChanged);
-      // 
-      // newFromClipboardToolStripMenuItem
-      // 
-      this.newFromClipboardToolStripMenuItem.Name = "newFromClipboardToolStripMenuItem";
-      this.newFromClipboardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-      this.newFromClipboardToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
-      this.newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
-      this.newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
-      this.newFromClipboardToolStripMenuItem.Click += new System.EventHandler(this.newFromClipboardToolStripMenuItem_Click);
       // 
       // LogTabWindow
       // 
@@ -1279,6 +1290,7 @@ namespace LogExpert
     private ToolStripSeparator toolStripSeparator19;
     private ToolStripMenuItem lockInstanceToolStripMenuItem;
     private ToolStripMenuItem newFromClipboardToolStripMenuItem;
+    private ToolStripMenuItem openURIToolStripMenuItem;
 
 
   }

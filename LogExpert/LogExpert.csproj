@@ -91,6 +91,7 @@
     <Compile Include="BookmarkOverlay.cs" />
     <Compile Include="BugSender.cs" />
     <Compile Include="CellContent.cs" />
+    <Compile Include="ColumnCache.cs" />
     <Compile Include="ConfigChangedEventArgs.cs" />
     <Compile Include="ContextMenuPluginEventArgs.cs" />
     <Compile Include="CurrentHighlightGroupChangedEventArgs.cs" />
@@ -132,8 +133,15 @@
     <Compile Include="Dialogs\MultiFileMaskDialog.Designer.cs">
       <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\OpenUriDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\OpenUriDialog.Designer.cs">
+      <DependentUpon>OpenUriDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\OverlayEventArgs.cs" />
     <Compile Include="EncodingOptions.cs" />
+    <Compile Include="FileSystemCallback.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="FilterCancelHandler.cs" />
     <Compile Include="FilterStarter.cs" />
@@ -143,10 +151,11 @@
     <Compile Include="HilightGroup.cs" />
     <Compile Include="ILogExpertClient.cs" />
     <Compile Include="ILogExpertProxy.cs" />
-    <Compile Include="ILogFileInfo.cs" />
     <Compile Include="ILogStreamReader.cs" />
+    <Compile Include="LocalFileSystem.cs" />
     <Compile Include="LogBufferCacheEntry.cs" />
     <Compile Include="LogExpertApplicationContext.cs" />
+    <Compile Include="LogFileException.cs" />
     <Compile Include="MultifileOptions.cs" />
     <Compile Include="ObjectClone.cs" />
     <Compile Include="ParamParser.cs" />
@@ -501,6 +510,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\MultiFileMaskDialog.resx">
       <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\OpenUriDialog.resx">
+      <DependentUpon>OpenUriDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TimeSpreadigControl.resx">
