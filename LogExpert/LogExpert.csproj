@@ -550,6 +550,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy $(ProjectDir)\..\HelpSmith\LogExpert.chm $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>copy $(ProjectDir)\..\HelpSmith\LogExpert.chm $(TargetDir)
+copy $(ProjectDir)\..\SftpBin\*.dll $(SolutionDir)\$(OutDir)\plugins
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
