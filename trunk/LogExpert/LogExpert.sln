@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "..\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MdiTabControl", "..\MdiTabControl\MdiTabControl.vbproj", "{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystem", "..\..\SftpFileSystem\SftpFileSystem.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
-EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -172,21 +170,6 @@ Global
 		{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}.Release|Win32.ActiveCfg = Release|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
