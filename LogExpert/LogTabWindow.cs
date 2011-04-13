@@ -413,7 +413,9 @@ namespace LogExpert
       LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length-1], false, null, false);
       AddLogWindow(logWindow, fileNames[fileNames.Length - 1]);
       this.multiFileToolStripMenuItem.Checked = true;
-      this.BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), new object[] { fileNames, Encoding.Default });
+      EncodingOptions encodingOptions = new EncodingOptions();
+      FillDefaultEncodingFromSettings(encodingOptions);
+      this.BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), new object[] { fileNames, encodingOptions });
       AddToFileHistory(fileNames[0]);
       return logWindow;
     }
