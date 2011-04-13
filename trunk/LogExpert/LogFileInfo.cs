@@ -17,11 +17,11 @@ namespace LogExpert
     private long lastLength;
 
 
-    public LogFileInfo(string fileName)
+    public LogFileInfo(Uri fileUri)
     {
-      this.fInfo = new FileInfo(fileName);
-      this.fileUri = new Uri(fileName);
-      this.originalLength = lastLength = Length;
+      this.fInfo = new FileInfo(fileUri.AbsolutePath);
+      this.fileUri = fileUri;
+      this.originalLength = lastLength = LengthWithoutRetry;
       //this.oldLength = 0;
     }
 
@@ -122,7 +122,11 @@ namespace LogExpert
 
     public bool FileExists 
     {
-      get { return this.Length > -1; }
+      get 
+      { 
+        this.fInfo.Refresh(); 
+        return this.fInfo.Exists; 
+      }
     }
 
     public int PollInterval

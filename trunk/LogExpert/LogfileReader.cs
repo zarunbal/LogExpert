@@ -41,7 +41,6 @@ namespace LogExpert
     IList<ILogFileInfo> logFileInfoList = new List<ILogFileInfo>();
     private bool isLineCountDirty = true;
     private bool isMultiFile = false;
-    Regex nameRegex = new Regex(".*(\\d+)");
     private EncodingOptions encodingOptions;
     private Encoding currentEncoding;
     private bool isXmlMode = false;
