@@ -21,7 +21,7 @@ namespace LogExpert
       options.MaxDayTry = 3;
       LinkedList<string> files = CreateTestfilesWithDate();
       string firstFile = files.Last.Value;
-      ILogFileInfo info = new LogFileInfo(firstFile);
+      ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
       RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
       LinkedList<string> fileList = handler.GetNameList();
       Assert.AreEqual(files, fileList);
@@ -36,7 +36,7 @@ namespace LogExpert
       options.MaxDayTry = 66;
       LinkedList<string> files = CreateTestfilesWithoutDate();
       string firstFile = files.Last.Value;
-      ILogFileInfo info = new LogFileInfo(firstFile);
+      ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
       RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
       LinkedList<string> fileList = handler.GetNameList();
       Assert.AreEqual(files, fileList);
