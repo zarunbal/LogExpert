@@ -3353,6 +3353,8 @@ namespace LogExpert
 
     private void FilterSearch(string text)
     {
+      FireCancelHandlers();   // make sure that there's no other filter running (maybe from filter restore)
+
       this.filterComboBox.Text = text;
       this.filterParams.searchText = text;
       this.filterParams.lowerSearchText = text.ToLower();
@@ -5619,7 +5621,7 @@ namespace LogExpert
         if (ctl is DataGridView)
         {
           this.freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Freeze left columns until here (" +
-              gridView.Columns[this.selectedCol].HeaderText + ")";
+                                                                  gridView.Columns[this.selectedCol].HeaderText + ")";
         }
       }
       DataGridViewColumn col = gridView.Columns[this.selectedCol];
@@ -5629,19 +5631,48 @@ namespace LogExpert
       if (gridView.Columns.Count - 1 > this.selectedCol)
       {
 //        DataGridViewColumn colRight = gridView.Columns[this.selectedCol + 1];
-        DataGridViewColumn colRight = gridView.Columns.GetNextColumn(col, DataGridViewElementStates.None, DataGridViewElementStates.None);
+        DataGridViewColumn colRight = gridView.Columns.GetNextColumn(col, DataGridViewElementStates.None,
+                                                                     DataGridViewElementStates.None);
         this.moveRightToolStripMenuItem.Enabled = (colRight != null && colRight.Frozen == col.Frozen);
       }
       if (this.selectedCol > 0)
       {
         //DataGridViewColumn colLeft = gridView.Columns[this.selectedCol - 1];
-        DataGridViewColumn colLeft = gridView.Columns.GetPreviousColumn(col, DataGridViewElementStates.None, DataGridViewElementStates.None);
+        DataGridViewColumn colLeft = gridView.Columns.GetPreviousColumn(col, DataGridViewElementStates.None,
+                                                                        DataGridViewElementStates.None);
 
         this.moveLeftToolStripMenuItem.Enabled = (colLeft != null && colLeft.Frozen == col.Frozen);
       }
       DataGridViewColumn colLast = gridView.Columns[gridView.Columns.Count - 1];
       this.moveToLastColumnToolStripMenuItem.Enabled = (colLast != null && colLast.Frozen == col.Frozen);
+
+      // Fill context menu with column names 
+      //
+      EventHandler ev = new EventHandler(HandleColumnItemContextMenu);
+      allColumnsToolStripMenuItem.DropDownItems.Clear();
+      foreach (DataGridViewColumn column in gridView.Columns)
+      {
+        if (column.HeaderText.Length > 0)
+        {
+          ToolStripMenuItem item = allColumnsToolStripMenuItem.DropDownItems.Add(column.HeaderText, null, ev) as ToolStripMenuItem;
+          item.Tag = column;
+          item.Enabled = !column.Frozen;
+        }
+      }
+
+
     }
+
+    private void HandleColumnItemContextMenu(object sender, EventArgs args)
+    {
+      if (sender is ToolStripItem)
+      {
+        DataGridViewColumn column = ((sender as ToolStripItem).Tag as DataGridViewColumn);
+        column.Visible = true;
+        column.DataGridView.FirstDisplayedScrollingColumnIndex = column.Index;
+      }
+    }
+
 
     private void freezeLeftColumnsUntilHereToolStripMenuItem_Click(object sender, EventArgs e)
     {
@@ -5711,6 +5742,24 @@ namespace LogExpert
         col.DisplayIndex = col.DisplayIndex + 1;
       }
     }
+
+    private void hideColumnToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
+      DataGridViewColumn col = gridView.Columns[this.selectedCol];
+      col.Visible = false;
+    }
+
+    private void restoreColumnsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
+      foreach (DataGridViewColumn col in gridView.Columns)
+      {
+        col.Visible = true;
+      }
+    }
+
+
 
 
     void timeSpreadingControl1_LineSelected(object sender, SelectLineEventArgs e)
@@ -7087,6 +7136,7 @@ namespace LogExpert
         }
       }
     }
+
 
   }
 }

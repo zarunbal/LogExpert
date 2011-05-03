@@ -1613,7 +1613,7 @@ namespace LogExpert
       try
       {
         this.bufferListLock.AcquireReaderLock(10000);
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(2);
         this.bufferListLockInfo = "Read lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
@@ -1622,7 +1622,7 @@ namespace LogExpert
       catch (ApplicationException)
       {
         Logger.logWarn("Reader lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
         this.bufferListLock.AcquireReaderLock(Timeout.Infinite);
@@ -1640,7 +1640,7 @@ namespace LogExpert
       try
       {
         this.bufferListLock.AcquireWriterLock(10000);
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(1);
         this.bufferListLockInfo = "Write lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
@@ -1650,7 +1650,7 @@ namespace LogExpert
       catch (ApplicationException)
       {
         Logger.logWarn("Writer lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
         this.bufferListLock.AcquireWriterLock(Timeout.Infinite);
@@ -1667,7 +1667,7 @@ namespace LogExpert
       try
       {
         LockCookie cookie = this.bufferListLock.UpgradeToWriterLock(10000);
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(2);
         this.bufferListLockInfo += ", upgraded to writer from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
@@ -1677,7 +1677,7 @@ namespace LogExpert
       catch (ApplicationException)
       {
         Logger.logWarn("Writer lock update wait for bufferList timed out. Now trying infinite.");
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
         return this.bufferListLock.UpgradeToWriterLock(Timeout.Infinite);
@@ -1687,7 +1687,7 @@ namespace LogExpert
     private void DowngradeBufferListLockFromWriter(ref LockCookie cookie)
     {
       this.bufferListLock.DowngradeFromWriterLock(ref cookie);
-#if DEBUG
+#if DEBUG && TRACE_LOCKS
       StackTrace st = new StackTrace(true);
       StackFrame callerFrame = st.GetFrame(2);
       this.bufferListLockInfo += ", downgraded to reader from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
