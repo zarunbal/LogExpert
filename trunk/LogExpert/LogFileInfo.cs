@@ -19,7 +19,7 @@ namespace LogExpert
 
     public LogFileInfo(Uri fileUri)
     {
-      this.fInfo = new FileInfo(fileUri.AbsolutePath);
+      this.fInfo = new FileInfo(fileUri.LocalPath);
       this.fileUri = fileUri;
       this.originalLength = lastLength = LengthWithoutRetry;
       //this.oldLength = 0;
