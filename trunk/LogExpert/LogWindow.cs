@@ -1009,7 +1009,6 @@ namespace LogExpert
     {
       e.Handled = true;
       AutoResizeColumns(this.dataGridView);
-      //this.dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
     }
 
 
@@ -1682,12 +1681,25 @@ namespace LogExpert
 
     private void AutoResizeColumns(DataGridView gridView)
     {
-      gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-      if (gridView.Columns.Count > 1 && this.Preferences.setLastColumnWidth &&
-          gridView.Columns[gridView.Columns.Count - 1].Width < this.Preferences.lastColumnWidth
-         )
+      try
       {
-        gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
+        gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+        if (gridView.Columns.Count > 1 && this.Preferences.setLastColumnWidth &&
+            gridView.Columns[gridView.Columns.Count - 1].Width < this.Preferences.lastColumnWidth
+          )
+        {
+          // It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
+          //gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
+          gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = this.Preferences.lastColumnWidth;
+        }
+      }
+      catch (NullReferenceException e)
+      {
+        // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+        // There are some rare situations with null ref exceptions when resizing columns and on filter finished
+        // So catch them here. Better than crashing.
+        Logger.logError("Error while resizing columns: " + e.Message);
+        Logger.logError(e.StackTrace);
       }
     }
 
@@ -3696,18 +3708,29 @@ namespace LogExpert
 
     private void ResetStatusAfterFilter()
     {
-      //StatusLineText("");
-      this.isSearching = false;
-      this.progressEventArgs.Value = this.progressEventArgs.MaxValue;
-      this.progressEventArgs.Visible = false;
-      SendProgressBarUpdate();
-      this.filterGridView.RowCount = this.filterResultList.Count;
-      //this.filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-      AutoResizeColumns(this.filterGridView);
-      this.filterCountLabel.Text = "" + this.filterResultList.Count;
-      if (filterGridView.RowCount > 0)
-        filterGridView.Focus();
-      this.filterSearchButton.Enabled = true;
+      try
+      {
+        //StatusLineText("");
+        this.isSearching = false;
+        this.progressEventArgs.Value = this.progressEventArgs.MaxValue;
+        this.progressEventArgs.Visible = false;
+        SendProgressBarUpdate();
+        this.filterGridView.RowCount = this.filterResultList.Count;
+        //this.filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+        AutoResizeColumns(this.filterGridView);
+        this.filterCountLabel.Text = "" + this.filterResultList.Count;
+        if (filterGridView.RowCount > 0)
+          filterGridView.Focus();
+        this.filterSearchButton.Enabled = true;
+      }
+      catch (NullReferenceException e)
+      {
+        // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+        // There are some rare situations with null ref exceptions when resizing columns and on filter finished
+        // So catch them here. Better than crashing.
+        Logger.logError("Error: " + e.Message);
+        Logger.logError(e.StackTrace);
+      }
     }
 
 
@@ -3912,7 +3935,6 @@ namespace LogExpert
     private void filterGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
     {
       e.Handled = true;
-      //this.filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
       AutoResizeColumnsFx fx = AutoResizeColumns;
       this.BeginInvoke(fx, new object[] {this.filterGridView});
     }
@@ -4877,18 +4899,10 @@ namespace LogExpert
         this.lineHeight = font.Height + 4;
         this.dataGridView.RowTemplate.Height = font.Height + 4;
 
-        this.bookmarkWindow.SetFont(newPreferences.fontName, newPreferences.fontSize);
-
         this.ShowBookmarkBubbles = this.Preferences.showBubbles;
 
-        if (this.dataGridView.RowCount > 0)
-          this.dataGridView.UpdateRowHeightInfo(0, true);
-        this.dataGridView.Invalidate();
-        this.dataGridView.Refresh();
-
-        if (this.filterGridView.RowCount > 0)
-          this.filterGridView.UpdateRowHeightInfo(0, true);
-        this.filterGridView.Refresh();
+        ApplyDataGridViewPrefs(this.dataGridView, newPreferences);
+        ApplyDataGridViewPrefs(this.filterGridView, newPreferences);
 
         if (this.Preferences.timestampControl)
         {
@@ -4921,6 +4935,33 @@ namespace LogExpert
       {
         UpdateFilterHistoryFromSettings();
       }
+
+      this.bookmarkWindow.PreferencesChanged(newPreferences, isLoadTime, flags);
+    }
+
+    private void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
+    {
+      if (dataGridView.Columns.Count > 1)
+      {
+        if (prefs.setLastColumnWidth)
+        {
+          dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
+        }
+        else
+        {
+          // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+          dataGridView.FirstDisplayedScrollingColumnIndex = 0;
+
+          dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
+        }
+      }
+      if (dataGridView.RowCount > 0)
+      {
+        dataGridView.UpdateRowHeightInfo(0, true);
+      }
+      dataGridView.Invalidate();
+      dataGridView.Refresh();
+      AutoResizeColumns(dataGridView);
     }
 
 

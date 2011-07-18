@@ -447,5 +447,17 @@ namespace LogExpert.Dialogs
       set { this.commentColumnCheckBox.Checked = value; ShowCommentColumn(value); }
     }
 
+    public void PreferencesChanged(Preferences newPreferences, bool isLoadTime, SettingsFlags flags)
+    {
+      if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
+      {
+        SetFont(newPreferences.fontName, newPreferences.fontSize);
+        if (this.bookmarkDataGridView.Columns.Count > 1 && newPreferences.setLastColumnWidth)
+        {
+          this.bookmarkDataGridView.Columns[this.bookmarkDataGridView.Columns.Count - 1].MinimumWidth =
+            newPreferences.lastColumnWidth;
+        }
+      }
+    }
   }
 }
