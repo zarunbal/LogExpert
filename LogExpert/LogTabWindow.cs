@@ -923,6 +923,17 @@ namespace LogExpert
 
     private void LogWindow_DragOver(object sender, DragEventArgs e)
     {
+      var list = e.Data.GetData(e.Data.GetFormats()[0]) as IEnumerable<ListViewItem>;
+      var data = e.Data.GetData("Shell IDList Array");
+      StreamReader r = new StreamReader(data as Stream);
+      string line = r.ReadToEnd();
+
+      string [] formats = e.Data.GetFormats();
+      bool yeah = e.Data.GetDataPresent(formats[0], true);
+      object obj = e.Data.GetData(formats[0], true);
+      object obj1 = e.Data.GetData(formats[1]);
+      object obj2 = e.Data.GetData(formats[2]);
+
       if (!e.Data.GetDataPresent(DataFormats.FileDrop))
       {
         e.Effect = DragDropEffects.None;
