@@ -1176,7 +1176,8 @@ namespace LogExpert
       }
       this.toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
       this.highlightGroupsComboBox.Text = e.HighlightGroupName;
-      
+      this.columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
+
       skipEvents = false;
     }
 
@@ -1825,6 +1826,11 @@ namespace LogExpert
       {
         FillToolLauncherBar();
       }
+      if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
+      {
+        FillHighlightComboBox();
+      }
+
     }
 
     private void SetTabIcons(Preferences preferences)
@@ -2772,6 +2778,14 @@ namespace LogExpert
           ConfigManager.Save(SettingsFlags.FileHistory);
           LoadFiles(new string[] {dlg.Uri}, false);
         }
+      }
+    }
+
+    private void columnFinderToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (this.currentLogWindow != null && !skipEvents)
+      {
+        this.currentLogWindow.ToggleColumnFinder(this.columnFinderToolStripMenuItem.Checked, true);
       }
     }
 

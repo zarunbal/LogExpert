@@ -136,6 +136,9 @@
       this.okButton = new System.Windows.Forms.Button();
       this.helpProvider1 = new System.Windows.Forms.HelpProvider();
       this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+      this.columnFinderCheckBox = new System.Windows.Forms.CheckBox();
+      this.exportButton = new System.Windows.Forms.Button();
+      this.importButton = new System.Windows.Forms.Button();
       this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.fileMaskColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -328,6 +331,7 @@
       // groupBox2
       // 
       this.groupBox2.Controls.Add(this.followTailCheckBox);
+      this.groupBox2.Controls.Add(this.columnFinderCheckBox);
       this.groupBox2.Controls.Add(this.syncFilterCheckBox);
       this.groupBox2.Controls.Add(this.filterTailCheckBox);
       this.groupBox2.Location = new System.Drawing.Point(7, 111);
@@ -1352,6 +1356,36 @@
       // 
       this.helpProvider1.HelpNamespace = "LogExpert.chm";
       // 
+      // columnFinderCheckBox
+      // 
+      this.columnFinderCheckBox.AutoSize = true;
+      this.columnFinderCheckBox.Location = new System.Drawing.Point(6, 91);
+      this.columnFinderCheckBox.Name = "columnFinderCheckBox";
+      this.columnFinderCheckBox.Size = new System.Drawing.Size(119, 17);
+      this.columnFinderCheckBox.TabIndex = 5;
+      this.columnFinderCheckBox.Text = "Show column finder";
+      this.columnFinderCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // exportButton
+      // 
+      this.exportButton.Location = new System.Drawing.Point(13, 331);
+      this.exportButton.Name = "exportButton";
+      this.exportButton.Size = new System.Drawing.Size(75, 23);
+      this.exportButton.TabIndex = 2;
+      this.exportButton.Text = "Export...";
+      this.exportButton.UseVisualStyleBackColor = true;
+      this.exportButton.Click += new System.EventHandler(this.exportButton_Click);
+      // 
+      // importButton
+      // 
+      this.importButton.Location = new System.Drawing.Point(95, 331);
+      this.importButton.Name = "importButton";
+      this.importButton.Size = new System.Drawing.Size(75, 23);
+      this.importButton.TabIndex = 3;
+      this.importButton.Text = "Import...";
+      this.importButton.UseVisualStyleBackColor = true;
+      this.importButton.Click += new System.EventHandler(this.importButton_Click);
+      // 
       // dataGridViewTextBoxColumn1
       // 
       this.dataGridViewTextBoxColumn1.HeaderText = "File name mask (RegEx)";
@@ -1385,6 +1419,8 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
       this.ClientSize = new System.Drawing.Size(637, 366);
+      this.Controls.Add(this.importButton);
+      this.Controls.Add(this.exportButton);
       this.Controls.Add(this.okButton);
       this.Controls.Add(this.cancelButton);
       this.Controls.Add(this.tabControl1);
@@ -1563,5 +1599,8 @@
     private System.Windows.Forms.Label label15;
     private System.Windows.Forms.ComboBox encodingComboBox;
     private System.Windows.Forms.ToolTip toolTip1;
+    private System.Windows.Forms.CheckBox columnFinderCheckBox;
+    private System.Windows.Forms.Button exportButton;
+    private System.Windows.Forms.Button importButton;
   }
 }

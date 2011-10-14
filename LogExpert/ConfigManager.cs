@@ -48,7 +48,7 @@ namespace LogExpert
   [Serializable]
   public class Settings
   {
-    public List<HilightEntry> hilightEntryList = new List<HilightEntry>();
+    public List<HilightEntry> hilightEntryList = new List<HilightEntry>();  // legacy. is automatically converted to highlight groups on settings load
     public SearchParams searchParams = new SearchParams();
     public RegexHistory regexHistory = new RegexHistory();
     public FilterParams filterParams = new FilterParams();
@@ -66,7 +66,7 @@ namespace LogExpert
     public List<string> lastOpenFilesList = new List<string>();
     public List<ColorEntry> fileColors = new List<ColorEntry>();
     public List<FilterParams> filterList = new List<FilterParams>();
-    public List<HilightGroup> hilightGroupList = new List<HilightGroup>();
+    public List<HilightGroup> hilightGroupList = new List<HilightGroup>();  // should be in Preferences but is here for mistake. Maybe I migrate it some day.
     public Rectangle appBoundsFullscreen;
     public int versionBuild;
     public IList<string> uriHistoryList = new List<string>();
@@ -177,6 +177,7 @@ namespace LogExpert
     public bool isAutoHideFilterList = false;
     public MultifileOptions multifileOptions;
     public String defaultEncoding;
+    public bool showColumnFinder;
   }
 
   [FlagsAttribute]
@@ -197,8 +198,18 @@ namespace LogExpert
           FilterHistory,
 
     Settings = All & ~WindowPosition & ~FileHistory,
+  }
 
-
+  [FlagsAttribute]
+  public enum ExportImportFlags : long
+  {
+    None = 0,
+    HighlightSettings = 1,
+    ColumnizerMasks = 2,
+    HighlightMasks = 4,
+    ToolEntries = 8,
+    Other = 16,
+    All = HighlightSettings | ColumnizerMasks | HighlightMasks | ToolEntries | Other
   }
 
 
@@ -234,6 +245,18 @@ namespace LogExpert
       Instance.Save(Settings, flags);
     }
 
+    public static void Export(Stream fs)
+    {
+      Instance.Save(fs, Settings, SettingsFlags.None);
+    }
+
+    public static void Import(Stream fs, ExportImportFlags flags)
+    {
+      Instance.settings = Instance.Import(Instance.settings, fs, flags);
+      Save(SettingsFlags.All);
+    }
+
+
     public static string ConfigDir
     {
       get 
@@ -255,23 +278,41 @@ namespace LogExpert
 
     private Settings Load()
     {
+      Logger.logInfo("Loading settings");
+      string dir = ConfigDir;
+      if (!Directory.Exists(dir))
+      {
+        Directory.CreateDirectory(dir);
+      }
+      if (!File.Exists(dir + "\\settings.dat"))
+      {
+        return LoadOrCreateNew(null);
+      }
+      else
+      {
+        Stream fs = File.OpenRead(dir + "\\settings.dat");
+        try
+        {
+          return LoadOrCreateNew(fs);
+        }
+        finally
+        {
+          fs.Close();
+        }
+      }
+    }
+
+    private Settings LoadOrCreateNew(Stream fs)
+    {
       lock (this.loadSaveLock)
       {
-        Logger.logInfo("Loading settings");
         Settings settings;
-        string dir = ConfigDir;
-        if (!Directory.Exists(dir))
-        {
-          Directory.CreateDirectory(dir);
-        }
-
-        if (!File.Exists(dir + "\\settings.dat"))
+        if (fs == null)
         {
           settings = new Settings();
         }
         else
         {
-          Stream fs = File.OpenRead(dir + "\\settings.dat");
           BinaryFormatter formatter = new BinaryFormatter();
           try
           {
@@ -280,11 +321,7 @@ namespace LogExpert
           catch (SerializationException)
           {
             //Logger.logError("Error while deserializing config data: " + e.Message); 
-            return new Settings();
-          }
-          finally
-          {
-            fs.Close();
+            settings = new Settings();
           }
         }
         if (settings.preferences == null)
@@ -391,15 +428,21 @@ namespace LogExpert
           {
             Directory.CreateDirectory(dir);
           }
-          settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
-          BinaryFormatter formatter = new BinaryFormatter();
           Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write);
-          formatter.Serialize(fs, settings);
+          Save(fs, settings, flags);
           fs.Close();
         }
         OnConfigChanged(flags);
       }
     }
+
+    private void Save(Stream fs, Settings settings, SettingsFlags flags)
+    {
+      settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
+      BinaryFormatter formatter = new BinaryFormatter();
+      formatter.Serialize(fs, settings);
+    }
+
 
     /// <summary>
     /// Convert settings loaded from previous versions.
@@ -461,6 +504,54 @@ namespace LogExpert
         Logger.logInfo("Fire config changed event");
         handler(this, new ConfigChangedEventArgs(flags));
       }
+    }
+
+
+    /// <summary>
+    /// Imports all or some of the settings/prefs stored in the inpute stream.
+    /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
+    /// </summary>
+    /// <param name="fs"></param>
+    /// <param name="flags">Flags to indicate which parts shall be imported</param>
+    private Settings Import(Settings currentSettings, Stream fs, ExportImportFlags flags)
+    {
+      Settings importSettings = LoadOrCreateNew(fs);
+      Settings ownSettings = ObjectClone.Clone<Settings>(currentSettings);
+      Settings newSettings;
+
+      // at first check for 'Other' as this are the most options.
+      if ((flags & ExportImportFlags.Other) == ExportImportFlags.Other)
+      {
+        newSettings = ownSettings;
+        newSettings.preferences = ObjectClone.Clone<Preferences>(importSettings.preferences);
+        newSettings.preferences.columnizerMaskList = ownSettings.preferences.columnizerMaskList;
+        newSettings.preferences.highlightMaskList = ownSettings.preferences.highlightMaskList;
+        newSettings.hilightGroupList = ownSettings.hilightGroupList;
+        newSettings.preferences.toolEntries = ownSettings.preferences.toolEntries;
+      }
+      else
+      {
+        newSettings = ownSettings;
+      }
+
+      if ((flags & ExportImportFlags.ColumnizerMasks) == ExportImportFlags.ColumnizerMasks)
+      {
+        newSettings.preferences.columnizerMaskList = importSettings.preferences.columnizerMaskList;
+      }
+      if ((flags & ExportImportFlags.HighlightMasks) == ExportImportFlags.HighlightMasks)
+      {
+        newSettings.preferences.highlightMaskList = importSettings.preferences.highlightMaskList;
+      }
+      if ((flags & ExportImportFlags.HighlightSettings) == ExportImportFlags.HighlightSettings)
+      {
+        newSettings.hilightGroupList = importSettings.hilightGroupList;
+      }
+      if ((flags & ExportImportFlags.ToolEntries) == ExportImportFlags.ToolEntries)
+      {
+        newSettings.preferences.toolEntries = importSettings.preferences.toolEntries;
+      }
+
+      return newSettings;
     }
 
 

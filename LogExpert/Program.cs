@@ -80,8 +80,8 @@ namespace LogExpert
         LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
 
         // first instance
-        WindowsIdentity wi = WindowsIdentity.GetCurrent();
-        IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + wi.User);
+        //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+        IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + Process.GetCurrentProcess().SessionId);
         ChannelServices.RegisterChannel(ipcChannel, false);
         RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
                                                                    "LogExpertProxy",
@@ -105,9 +105,9 @@ namespace LogExpert
           try
           {
             // another instance already exists
-            WindowsIdentity wi = WindowsIdentity.GetCurrent();
+            //WindowsIdentity wi = WindowsIdentity.GetCurrent();
             LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy),
-                                                                  "ipc://LogExpert" + wi.User + "/LogExpertProxy");
+                                                                  "ipc://LogExpert" + Process.GetCurrentProcess().SessionId + "/LogExpertProxy");
             if (settings.preferences.allowOnlyOneInstance)
             {
               proxy.LoadFiles(args);
