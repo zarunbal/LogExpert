@@ -65,6 +65,11 @@ namespace LogExpert.Dialogs
 
     private void SettingsDialog_Load(object sender, EventArgs e)
     {
+      FillDialog();
+    }
+
+    private void FillDialog()
+    {
       if (this.preferences == null)
         this.preferences = new Preferences();
       if (this.preferences.fontName == null)
@@ -128,9 +133,8 @@ namespace LogExpert.Dialogs
       FillEncodingList();
       this.encodingComboBox.SelectedItem = Encoding.GetEncoding(this.preferences.defaultEncoding);
       this.maskPrioCheckBox.Checked = this.preferences.maskPrio;
+      this.columnFinderCheckBox.Checked = this.preferences.showColumnFinder;
     }
-
- 
 
 
     private string NotNull(string text)
@@ -204,7 +208,7 @@ namespace LogExpert.Dialogs
       this.preferences.defaultEncoding = this.encodingComboBox.SelectedItem != null
                                            ? (this.encodingComboBox.SelectedItem as Encoding).HeaderName
                                            : Encoding.Default.HeaderName;
-
+      this.preferences.showColumnFinder = this.columnFinderCheckBox.Checked;
       SavePluginSettings();
       SaveHighlightMaskList();
       GetToolListBoxData();
@@ -496,6 +500,7 @@ namespace LogExpert.Dialogs
 
     private void FillPluginList()
     {
+      this.pluginListBox.Items.Clear();
       foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
       {
         this.pluginListBox.Items.Add(entry);
@@ -806,6 +811,8 @@ namespace LogExpert.Dialogs
 
     private void FillEncodingList()
     {
+      this.encodingComboBox.Items.Clear();
+
       //this.encodingComboBox.Items.Add(Encoding.ASCII.BodyName);
       //this.encodingComboBox.Items.Add(Encoding.Default.BodyName);
       //this.encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1").BodyName);
@@ -819,6 +826,36 @@ namespace LogExpert.Dialogs
       this.encodingComboBox.Items.Add(Encoding.Unicode);
 
       this.encodingComboBox.ValueMember = "HeaderName";
+    }
+
+    private void exportButton_Click(object sender, EventArgs e)
+    {
+      SaveFileDialog dlg = new SaveFileDialog();
+      dlg.Title = "Export Settings to file";
+      dlg.DefaultExt = "dat";
+      dlg.AddExtension = true;
+      dlg.Filter = "Settings (*.dat)|*.dat|All files (*.*)|*.*";
+      DialogResult result = dlg.ShowDialog();
+      if (result == DialogResult.OK)
+      {
+        Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
+        ConfigManager.Export(fs);
+        fs.Close();
+      }
+    }
+
+    private void importButton_Click(object sender, EventArgs e)
+    {
+      ImportSettingsDialog dlg = new ImportSettingsDialog();
+      if (dlg.ShowDialog() == DialogResult.OK)
+      {
+        Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read);
+        ConfigManager.Import(fs, dlg.ImportFlags);
+        fs.Close();
+        this.preferences = ConfigManager.Settings.preferences;
+        FillDialog();
+        MessageBox.Show(this, "Settings imported", "LogExpert");
+      }
     }
 
   }

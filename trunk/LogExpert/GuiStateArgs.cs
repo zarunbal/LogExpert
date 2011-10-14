@@ -126,9 +126,17 @@ namespace LogExpert
       set { this.highlightGroupName = value; }
     }
 
+    public bool ColumnFinderVisible
+    {
+      get { return columnFinderVisible; }
+      set { columnFinderVisible = value; }
+    }
+
     private bool showHiddenLines = true;
 
     private string highlightGroupName;
+
+    private bool columnFinderVisible;
 
 
 

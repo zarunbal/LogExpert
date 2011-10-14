@@ -140,6 +140,7 @@ namespace LogExpert
       this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
       this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.columnFinderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dateTimeDragControl = new LogExpert.Dialogs.DateTimeDragControl();
       this.statusStrip1.SuspendLayout();
       this.menuStrip1.SuspendLayout();
@@ -376,6 +377,7 @@ namespace LogExpert
             this.searchToolStripMenuItem,
             this.filterToolStripMenuItem,
             this.bookmarksToolStripMenuItem,
+            this.columnFinderToolStripMenuItem,
             this.toolStripSeparator2,
             this.encodingToolStripMenuItem,
             this.toolStripSeparator4,
@@ -1036,7 +1038,7 @@ namespace LogExpert
       // 
       this.externalToolsToolStrip.BackColor = System.Drawing.SystemColors.ControlLight;
       this.externalToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-      this.externalToolsToolStrip.Location = new System.Drawing.Point(388, 24);
+      this.externalToolsToolStrip.Location = new System.Drawing.Point(389, 24);
       this.externalToolsToolStrip.Name = "externalToolsToolStrip";
       this.externalToolsToolStrip.Size = new System.Drawing.Size(111, 25);
       this.externalToolsToolStrip.TabIndex = 8;
@@ -1123,6 +1125,15 @@ namespace LogExpert
       this.findInExplorerToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
       this.findInExplorerToolStripMenuItem.Text = "Find in Explorer";
       this.findInExplorerToolStripMenuItem.Click += new System.EventHandler(this.findInExplorerToolStripMenuItem_Click);
+      // 
+      // columnFinderToolStripMenuItem
+      // 
+      this.columnFinderToolStripMenuItem.CheckOnClick = true;
+      this.columnFinderToolStripMenuItem.Name = "columnFinderToolStripMenuItem";
+      this.columnFinderToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
+      this.columnFinderToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+      this.columnFinderToolStripMenuItem.Text = "Column finder";
+      this.columnFinderToolStripMenuItem.Click += new System.EventHandler(this.columnFinderToolStripMenuItem_Click);
       // 
       // dateTimeDragControl
       // 
@@ -1291,6 +1302,7 @@ namespace LogExpert
     private ToolStripMenuItem lockInstanceToolStripMenuItem;
     private ToolStripMenuItem newFromClipboardToolStripMenuItem;
     private ToolStripMenuItem openURIToolStripMenuItem;
+    private ToolStripMenuItem columnFinderToolStripMenuItem;
 
 
   }

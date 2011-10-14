@@ -194,6 +194,7 @@ namespace LogExpert
       this.tableLayoutPanel1.ColumnStyles[1].Width = 20;
       this.tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
       this.tableLayoutPanel1.ColumnStyles[0].Width = 100;
+      //this.tableLayoutPanel1.SetColumnSpan(this.columnFinderPanel, 2);
 
       this.bookmarkWindow = new BookmarkWindow(this);
       this.bookmarkWindow.BookmarkCommentChanged += new BookmarkWindow.BookmarkCommentChangedEventHandler(bookmarkWindow_BookmarkCommentChanged);
@@ -1625,6 +1626,13 @@ namespace LogExpert
       {
         FreeFromTimeSync();
       }
+
+      this.columnComboBox.Items.Clear();
+      foreach (String columnName in columnizer.GetColumnNames())
+      {
+        this.columnComboBox.Items.Add(columnName);
+      }
+      this.columnComboBox.SelectedIndex = 0;
 
     }
 
@@ -4924,6 +4932,7 @@ namespace LogExpert
           this.timeSpreadingControl1.Invoke(new MethodInvoker(this.timeSpreadingControl1.Refresh));
           ShowTimeSpread(this.Preferences.showTimeSpread);
         }
+        ToggleColumnFinder(this.Preferences.showColumnFinder, false);
       }
 
       if ((flags & SettingsFlags.FilterList) == SettingsFlags.FilterList)
@@ -7177,7 +7186,94 @@ namespace LogExpert
         }
       }
     }
+  
+    internal void ToggleColumnFinder(bool show, bool setFocus)
+    {
+      this.guiStateArgs.ColumnFinderVisible = show;
+      if (show)
+      {
+        this.columnComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+        this.columnComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+        this.columnComboBox.AutoCompleteCustomSource = new AutoCompleteStringCollection(); 
+        this.columnComboBox.AutoCompleteCustomSource.AddRange(this.CurrentColumnizer.GetColumnNames());
+        if (setFocus)
+        {
+          this.columnComboBox.Focus();
+        }
+      }
+      else
+      {
+        this.dataGridView.Focus();
+      }
+      this.tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
+    }
 
+    private void columnComboBox_SelectionChangeCommitted(object sender, EventArgs e)
+    {
+      SelectColumn();
+    }
+
+    private void columnComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+    }
+
+    private void columnComboBox_SelectedValueChanged(object sender, EventArgs e)
+    {
+    }
+
+
+    private DataGridViewColumn GetColumnByName(DataGridView dataGridView, string name)
+    {
+      foreach (DataGridViewColumn col in dataGridView.Columns)
+      {
+        if (col.HeaderText.Equals(name))
+        {
+          return col;
+        }
+      }
+      return null;
+    }
+
+    private void SelectColumn()
+    {
+      string colName = this.columnComboBox.SelectedItem as string;
+      DataGridViewColumn col = GetColumnByName(this.dataGridView, colName);
+      if (col != null && !col.Frozen)
+      {
+        this.dataGridView.FirstDisplayedScrollingColumnIndex = col.Index;
+        int currentLine = this.dataGridView.CurrentCellAddress.Y;
+        if (currentLine >= 0)
+        {
+          this.dataGridView.CurrentCell =
+            this.dataGridView.Rows[this.dataGridView.CurrentCellAddress.Y].Cells[col.Index];
+        }
+      }
+    }
+
+    private void columnComboBox_KeyPress(object sender, KeyPressEventArgs e)
+    {
+    }
+
+    private void columnComboBox_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.Enter)
+      {
+        SelectColumn();
+        this.dataGridView.Focus();
+      }
+    }
+
+    private void columnComboBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+    {
+      if (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt)
+      {
+        this.columnComboBox.DroppedDown = true;
+      }
+      if (e.KeyCode == Keys.Enter)
+      {
+        e.IsInputKey = true;
+      }
+    }
 
   }
 }
