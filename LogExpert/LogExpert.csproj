@@ -163,7 +163,6 @@
     <Compile Include="LogExpertApplicationContext.cs" />
     <Compile Include="LogFileException.cs" />
     <Compile Include="MultifileOptions.cs" />
-    <Compile Include="NamePatternBuilder.cs" />
     <Compile Include="ObjectClone.cs" />
     <Compile Include="ParamParser.cs" />
     <Compile Include="Persister.cs" />
