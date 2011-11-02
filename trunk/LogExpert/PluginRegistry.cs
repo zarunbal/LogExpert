@@ -137,6 +137,11 @@ namespace LogExpert
           {
             // nothing... could be a DLL which is needed by any plugin
           }
+          catch (FileLoadException e)
+          {
+            // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
+            Logger.logError(e.Message);
+          }
         }
       }
       Logger.logInfo("Plugin loading complete.");

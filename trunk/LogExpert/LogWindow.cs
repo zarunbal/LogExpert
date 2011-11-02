@@ -6530,11 +6530,14 @@ namespace LogExpert
 
 		private void copyToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
+      if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
 				DataGridViewTextBoxEditingControl ctl =
 					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
-				Clipboard.SetText(ctl.SelectedText);
+        if (!Util.IsNull(ctl.SelectedText))
+        {
+          Clipboard.SetText(ctl.SelectedText);
+        }
 			}
 		}
 
