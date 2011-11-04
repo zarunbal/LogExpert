@@ -610,34 +610,37 @@ namespace LogExpert
 			else
 			{
 				LockCookie cookie = this.lruCacheDictLock.UpgradeToWriterLock(Timeout.Infinite);
-				cacheEntry = new LogBufferCacheEntry();
-				cacheEntry.LogBuffer = logBuffer;
-				try
-				{
-					this.lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
-				}
-				catch (ArgumentException e)
-				{
+        if (!this.lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry))  // #536: re-test, because multiple threads may have been waiting for writer lock
+        {
+          cacheEntry = new LogBufferCacheEntry();
+          cacheEntry.LogBuffer = logBuffer;
+          try
+          {
+            this.lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
+          }
+          catch (ArgumentException e)
+          {
 #if DEBUG
-					// there seems to be a bug with double added key
-					Logger.logError("Error in LRU cache: " + e.Message);
-					Logger.logInfo("Added buffer:");
-					DumpBufferInfos(logBuffer);
-					LogBufferCacheEntry exisingEntry;
-					if (this.lruCacheDict.TryGetValue(logBuffer.StartLine, out exisingEntry))
-					{
-						Logger.logInfo("Existing buffer: ");
-						DumpBufferInfos(exisingEntry.LogBuffer);
-					}
-					else
-					{
-						Logger.logWarn("Ooops? Cannot find the already existing entry in LRU.");
-					}
+            // there seems to be a bug with double added key
+            Logger.logError("Error in LRU cache: " + e.Message);
+            Logger.logInfo("Added buffer:");
+            DumpBufferInfos(logBuffer);
+            LogBufferCacheEntry exisingEntry;
+            if (this.lruCacheDict.TryGetValue(logBuffer.StartLine, out exisingEntry))
+            {
+              Logger.logInfo("Existing buffer: ");
+              DumpBufferInfos(exisingEntry.LogBuffer);
+            }
+            else
+            {
+              Logger.logWarn("Ooops? Cannot find the already existing entry in LRU.");
+            }
 #endif
-					this.lruCacheDictLock.ReleaseLock();
-					throw e;
-				}
-				this.lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
+            this.lruCacheDictLock.ReleaseLock();
+            throw e;
+          }
+        }
+			  this.lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
 			}
 			this.lruCacheDictLock.ReleaseReaderLock();
 		}
@@ -1215,7 +1218,7 @@ namespace LogExpert
 			}
 			if (this.garbageCollectorThread != null)
 			{
-				if (monitorThread.IsAlive) // if thread has not finished, abort it
+        if (this.garbageCollectorThread.IsAlive) // if thread has not finished, abort it
 				{
 					this.garbageCollectorThread.Interrupt();
 					this.garbageCollectorThread.Abort();
@@ -1227,6 +1230,18 @@ namespace LogExpert
 			this.garbageCollectorThread = null; // preventive call
 			CloseFiles();
 		}
+
+    /// <summary>
+    /// calls stopMonitoring() in a background thread and returns to the caller immediately. 
+    /// This is useful for a fast responding GUI (e.g. when closing a file tab)
+    /// </summary>
+    public void StopMonitoringAsync()
+    {
+      Thread stopperThread = new Thread(new ThreadStart(this.stopMonitoring));
+      stopperThread.IsBackground = true;
+      stopperThread.Start();
+    }
+
 
 		/// <summary>
 		/// Deletes all buffer lines and disposes their content. Use only when the LogfileReader
