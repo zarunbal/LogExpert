@@ -81,6 +81,7 @@ namespace LogExpert
       GetLogger().log(msg, Level.INFO);
     }
 
+    [Conditional("DEBUG")]
     public static void logDebug(string msg)
     {
 #if DEBUG

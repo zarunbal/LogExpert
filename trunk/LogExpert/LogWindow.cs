@@ -314,7 +314,7 @@ namespace LogExpert
 
 				if (this.logFileReader != null)
 				{
-					this.logFileReader.stopMonitoring();
+					this.logFileReader.StopMonitoringAsync();
 					UnRegisterLogFileReaderEvents();
 				}
 				if (!LoadPersistenceOptions())
@@ -971,7 +971,6 @@ namespace LogExpert
 
 		public void CloseLogWindow()
 		{
-
 			StopTimespreadThread();
 			StopTimestampSyncThread();
 			StopLogEventWorkerThread();
@@ -981,9 +980,9 @@ namespace LogExpert
 			this.shouldCancel = true;
 			if (this.logFileReader != null)
 			{
-				this.logFileReader.stopMonitoring();
-				UnRegisterLogFileReaderEvents();
-				//this.logFileReader.DeleteAllContent();
+        UnRegisterLogFileReaderEvents();
+			  this.logFileReader.StopMonitoringAsync();
+			  //this.logFileReader.DeleteAllContent();
 			}
 			if (this.isLoading)
 			{
@@ -1471,7 +1470,8 @@ namespace LogExpert
 			{
 				lock (this.currentColumnizerLock)
 				{
-					currentColumnizer = value;
+					this.currentColumnizer = value;
+          Logger.logDebug("Setting columnizer " + this.currentColumnizer != null ? this.currentColumnizer.GetName() : "<none>");
 				}
 			}
 		}
