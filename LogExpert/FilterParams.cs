@@ -55,7 +55,9 @@ namespace LogExpert
     {
       FilterParams newParams = CreateCopy();
       newParams.Init();
-      newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
+      // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
+      // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
+      newParams.currentColumnizer = this.currentColumnizer;
       return newParams;
     }
 
