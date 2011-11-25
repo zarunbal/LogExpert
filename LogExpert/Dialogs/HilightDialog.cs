@@ -29,8 +29,7 @@ namespace LogExpert.Dialogs
       this.applyButton.Image = null;
     }
 
-
-    void HilightDialog_Load(object sender, EventArgs e)
+    private void HilightDialog_Load(object sender, EventArgs e)
     {
       this.foregroundColorBox.SelectedIndex = 1;
       this.backgroundColorBox.SelectedIndex = 2;
@@ -38,10 +37,20 @@ namespace LogExpert.Dialogs
       this.applyButton.Image = null;
       this.bookmarkCommentButton.Enabled = false;
       this.pluginButton.Enabled = false;
+
+      ReEvaluateHilightButtonStates();
+    }
+
+    private void HilightDialog_Shown(object sender, EventArgs e)
+    {
+      InitData();
     }
 
     private void okButton_Click(object sender, EventArgs e)
     {
+      // Apply pending changes if closing the form.
+      if (IsDirty)
+        applyButton_Click(applyButton, new EventArgs()); // cannot call 'this.applyButton.PerformClick();' because it prohibits the OK button to terminate the dialog
     }
 
     private void AddButton_Click(object sender, EventArgs e)
@@ -53,6 +62,7 @@ namespace LogExpert.Dialogs
     {
       if (this.searchStringTextBox.Text.Length > 0)
       {
+        // Create a new entry
         HilightEntry entry = new HilightEntry(this.searchStringTextBox.Text,
           this.foregroundColorBox.SelectedColor,
           this.backgroundColorBox.SelectedColor,
@@ -67,7 +77,10 @@ namespace LogExpert.Dialogs
         entry.IsBold = this.boldCheckBox.Checked;
         entry.NoBackground = this.noBackgroundCheckBox.Checked;
         this.hilightListBox.Items.Add(entry);
+
+        // Select the newly created item
         this.currentGroup.HilightEntryList.Add(entry);
+        this.hilightListBox.SelectedItem = entry;
       }
     }
 
@@ -75,13 +88,22 @@ namespace LogExpert.Dialogs
     {
       if (this.hilightListBox.SelectedIndex >= 0)
       {
-        this.currentGroup.HilightEntryList.RemoveAt(this.hilightListBox.SelectedIndex);
-        this.hilightListBox.Items.RemoveAt(this.hilightListBox.SelectedIndex);
+        int removeIndex = this.hilightListBox.SelectedIndex;
+        this.currentGroup.HilightEntryList.RemoveAt(removeIndex);
+        this.hilightListBox.Items.RemoveAt(removeIndex);
+
+        // Select previous (or first if none before)
+        int nextSelectIndex = removeIndex;
+        if (nextSelectIndex >= this.hilightListBox.Items.Count)
+          nextSelectIndex--; // if last item was removed, go one up
+        if (nextSelectIndex >= 0)
+          this.hilightListBox.SelectedIndex = nextSelectIndex; // if still some item, select it
+
+        ReEvaluateHilightButtonStates();
       }
     }
 
-
-    void hilightListBox_DrawItem(object sender, DrawItemEventArgs e)
+    private void hilightListBox_DrawItem(object sender, DrawItemEventArgs e)
     {
       e.DrawBackground();
       if (e.Index >= 0)
@@ -101,35 +123,37 @@ namespace LogExpert.Dialogs
       }
     }
 
-
     private void InitData()
     {
+      const string def = "[Default]";
       if (this.HilightGroupList == null || this.HilightGroupList.Count == 0)
       {
         this.HilightGroupList.Add(new HilightGroup());
-        this.HilightGroupList[0].GroupName = "[Default]";
+        this.HilightGroupList[0].GroupName = def;
         this.HilightGroupList[0].HilightEntryList = new List<HilightEntry>();
       }
       FillGroupComboBox();
-      this.currentGroup = this.HilightGroupList[0];
-      this.groupComboBox.SelectedIndex = 0;
-      if (PreSelectedGroupName != null)
+
+      this.currentGroup = null;
+      string groupToSelect = this.PreSelectedGroupName;
+      if (string.IsNullOrEmpty(groupToSelect))
+        groupToSelect = def;
+
+      foreach (HilightGroup group in this.HilightGroupList)
       {
-        foreach (HilightGroup group in this.HilightGroupList)
+        if (group.GroupName.Equals(groupToSelect))
         {
-          if (group.GroupName.Equals(this.PreSelectedGroupName))
-          {
-            this.currentGroup = group;
-            this.groupComboBox.SelectedValue = group;
-            this.groupComboBox.SelectedIndex = this.HilightGroupList.IndexOf(group);
-            break;
-          }
+          this.currentGroup = group;
+          this.groupComboBox.SelectedValue = group;
+          this.groupComboBox.SelectedIndex = this.HilightGroupList.IndexOf(group);
+          break;
         }
       }
 
+      ReEvaluateGroupButtonStates();
+
       FillHilightListBox();
     }
-
 
     private void FillHilightListBox()
     {
@@ -164,8 +188,7 @@ namespace LogExpert.Dialogs
       set { this.preSelectedGroupName = value; }
     }
 
-
-    private void editButton_Click(object sender, EventArgs e)
+    private void applyButton_Click(object sender, EventArgs e)
     {
       SaveEntry();
     }
@@ -198,7 +221,6 @@ namespace LogExpert.Dialogs
       this.hilightListBox.Refresh();
     }
 
-
     private void StartEditEntry()
     {
       HilightEntry entry = (HilightEntry)this.hilightListBox.SelectedItem;
@@ -225,6 +247,13 @@ namespace LogExpert.Dialogs
       }
       this.applyButton.Enabled = false;
       this.applyButton.Image = null;
+
+      ReEvaluateHilightButtonStates();
+    }
+
+    private bool IsDirty
+    {
+      get { return this.applyButton.Image == this.applyButtonImage; }
     }
 
     private void Dirty()
@@ -235,8 +264,9 @@ namespace LogExpert.Dialogs
         this.applyButton.Enabled = true;
         this.applyButton.Image = this.applyButtonImage;
       }
-    }
 
+      this.addButton.Enabled = (this.searchStringTextBox.Text.Length > 0);
+    }
 
     private void hilightListBox_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -249,9 +279,9 @@ namespace LogExpert.Dialogs
       if (index > 0)
       {
         object item = this.hilightListBox.SelectedItem;
-        this.hilightListBox.Items.RemoveAt(index);
+        this.hilightListBox.Items.RemoveAt(index); // will also clear the selection
         this.hilightListBox.Items.Insert(index - 1, item);
-        this.hilightListBox.SelectedIndex = index - 1;
+        this.hilightListBox.SelectedIndex = index - 1; // restore the selection
         this.currentGroup.HilightEntryList.Reverse(index - 1, 2);
       }
     }
@@ -310,6 +340,9 @@ namespace LogExpert.Dialogs
         this.currentGroup = null;
         this.hilightListBox.Items.Clear();
       }
+
+      ReEvaluateHilightButtonStates();
+      ReEvaluateGroupButtonStates();
     }
 
     private void FillGroupComboBox()
@@ -319,9 +352,21 @@ namespace LogExpert.Dialogs
       {
         this.groupComboBox.Items.Add(group);
       }
+      ReEvaluateGroupButtonStates();
     }
 
+    private void ReEvaluateHilightButtonStates()
+    {
+      // Refresh button states based on the selection in the combobox
+      bool atLeastOneSelected = (this.hilightListBox.SelectedItem != null);
+      bool moreThanOne = (this.hilightListBox.Items.Count > 1);
+      bool firstSelected = atLeastOneSelected && (this.hilightListBox.SelectedIndex == 0);
+      bool lastSelected = atLeastOneSelected && (this.hilightListBox.SelectedIndex == this.hilightListBox.Items.Count - 1);
 
+      this.deleteButton.Enabled = atLeastOneSelected;
+      this.moveUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+      this.moveDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+    }
 
     private void regexCheckBox_MouseUp(object sender, MouseEventArgs e)
     {
@@ -407,6 +452,20 @@ namespace LogExpert.Dialogs
       }
     }
 
+    private void ReEvaluateGroupButtonStates()
+    {
+      // Refresh button states based on the selection in the combobox
+      bool atLeastOneSelected = (this.groupComboBox.SelectedItem != null);
+      bool moreThanOne = (this.groupComboBox.Items.Count > 1);
+      bool firstSelected = atLeastOneSelected && (this.groupComboBox.SelectedIndex == 0);
+      bool lastSelected = atLeastOneSelected && (this.groupComboBox.SelectedIndex == this.groupComboBox.Items.Count - 1);
+
+      this.delGroupButton.Enabled = atLeastOneSelected;
+      this.copyGroupButton.Enabled = atLeastOneSelected;
+      this.groupUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+      this.groupDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+    }
+
     private void delGroupButton_Click(object sender, EventArgs e)
     {
       // the last group cannot be deleted
@@ -427,8 +486,19 @@ namespace LogExpert.Dialogs
 
     private void newGroupButton_Click(object sender, EventArgs e)
     {
-      HilightGroup newGroup = new HilightGroup();
-      newGroup.GroupName = "new group";
+      // Propose a unique name
+      const string baseName = "New group";
+      string name = baseName;
+      bool uniqueName = false;
+      int i = 1;
+      while (!uniqueName) 
+      {
+        uniqueName = (this.HilightGroupList.FindIndex(delegate (HilightGroup g) { return g.GroupName == name; }) < 0);
+        if (!uniqueName)
+          name = string.Format("{0} #{1}", baseName, i++);
+      }
+
+      HilightGroup newGroup = new HilightGroup() { GroupName = name };
       this.HilightGroupList.Add(newGroup);
       FillGroupComboBox();
       SelectGroup(this.HilightGroupList.Count - 1);
@@ -444,10 +514,6 @@ namespace LogExpert.Dialogs
         FillGroupComboBox();
         SelectGroup(this.HilightGroupList.Count - 1);
       }
-    }
-
-    private void groupComboBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
     }
 
     private void groupComboBox_DrawItem(object sender, DrawItemEventArgs e)
@@ -473,11 +539,6 @@ namespace LogExpert.Dialogs
     private void groupComboBox_SelectionChangeCommitted(object sender, EventArgs e)
     {
       SelectGroup(this.groupComboBox.SelectedIndex);
-    }
-
-    private void HilightDialog_Shown(object sender, EventArgs e)
-    {
-      InitData();
     }
 
     private void groupUpButton_Click(object sender, EventArgs e)
@@ -510,11 +571,6 @@ namespace LogExpert.Dialogs
       this.noBackgroundCheckBox.Enabled = this.wordMatchCheckBox.Checked;
     }
 
-    private void HilightDialog_Load_1(object sender, EventArgs e)
-    {
-
-    }
-
     private void boldCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       Dirty();
@@ -526,8 +582,5 @@ namespace LogExpert.Dialogs
       this.customBackColorButton.Enabled = !this.noBackgroundCheckBox.Checked;
       Dirty();
     }
-
-
-
   }
 }
