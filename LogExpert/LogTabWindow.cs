@@ -135,9 +135,9 @@ namespace LogExpert
 			this.ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
 			this.offLedBrush = new SolidBrush(Color.FromArgb(255, 160, 160, 160));
 			this.dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-			this.tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250));
-			this.tailLedBrush[1] = new SolidBrush(Color.FromArgb(255, 160, 160, 160));
-			this.tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
+			this.tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
+      this.tailLedBrush[1] = new SolidBrush(Color.FromArgb(255, 160, 160, 160)); // Don't follow tail: gray
+			this.tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
 			this.syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
 			CreateIcons();
 			tabStringFormat.LineAlignment = StringAlignment.Center;
