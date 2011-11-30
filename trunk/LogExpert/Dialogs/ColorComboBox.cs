@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.ComponentModel;
 
 namespace LogExpert.Dialogs
 {
@@ -16,13 +17,30 @@ namespace LogExpert.Dialogs
     {
       this.DrawMode = DrawMode.OwnerDrawFixed;
       this.DrawItem += new DrawItemEventHandler(ColorComboBox_DrawItem);
-      // add color presets
+    }
+
+    // Redefine property so that it does not appear in the designer (and user cannot modify it)
+    [Browsable(false),
+    DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public new ComboBox.ObjectCollection Items
+    {
+      get { return base.Items; }
+    }
+
+    protected override void OnCreateControl()
+    {
+      base.OnCreateControl();
+
+      // Add color presets when the actual window is created (instead than in the ctr) to avoid confusion
+      // with the designer that calls the Items property after calling the constructor.
+      this.Items.Clear();
       if (!this.DesignMode)
       {
         this.Items.Add(this.customColor);
         this.Items.Add(System.Drawing.Color.Black);
         this.Items.Add(System.Drawing.Color.White);
         this.Items.Add(System.Drawing.Color.Gray);
+        this.Items.Add(System.Drawing.Color.LightGray);
         this.Items.Add(System.Drawing.Color.DarkGray);
         this.Items.Add(System.Drawing.Color.Blue);
         this.Items.Add(System.Drawing.Color.LightBlue);
@@ -37,10 +55,11 @@ namespace LogExpert.Dialogs
         this.Items.Add(System.Drawing.Color.IndianRed);
         this.Items.Add(System.Drawing.Color.DarkCyan);
         this.Items.Add(System.Drawing.Color.Yellow);
+        this.Items.Add(System.Drawing.Color.LightYellow);
       }
     }
 
-    void ColorComboBox_DrawItem(object sender, DrawItemEventArgs e)
+    private void ColorComboBox_DrawItem(object sender, DrawItemEventArgs e)
     {
       e.DrawBackground();
       if (e.Index >= 0)
@@ -73,13 +92,18 @@ namespace LogExpert.Dialogs
     public Color CustomColor
     {
       get { return this.customColor; }
-      set { this.customColor = value; this.Items.RemoveAt(0); this.Items.Insert(0, this.customColor); }
+      set
+      {
+        this.customColor = value; 
+        if (this.Items.Count > 0)
+          this.Items.RemoveAt(0); 
+        this.Items.Insert(0, this.customColor);
+      }
     }
 
     public Color SelectedColor
     {
       get { return (Color)(this.SelectedIndex != -1 ? this.Items[this.SelectedIndex] : null); }
     }
-
   }
 }
