@@ -1,0 +1,35 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer>
+      <setting name="UsedSolutionBuilderID">0</setting>
+    </integer>
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="1690" scrollPosition="0|28" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="2286" scrollPosition="0|8" />
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="2083" scrollPosition="0|11" />
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="742" scrollPosition="0|0" />
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="128" scrollPosition="0|0" />
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="1123" scrollPosition="0|8" />
+      <File id="830F448B-AFA1-46D1-8756-B09BCBF93424/f:PipeExample.cs" caret="1904" scrollPosition="0|26" />
+    </RecentEdits>
+  </RecentFiles>
+  <UnitTestRunner>
+    <CustomStartDirectory>
+    </CustomStartDirectory>
+    <UseShadowCopy>True</UseShadowCopy>
+    <UseCustomFolder>False</UseCustomFolder>
+    <EnableUnitTesting>True</EnableUnitTesting>
+    <Providers />
+  </UnitTestRunner>
+</Configuration>
