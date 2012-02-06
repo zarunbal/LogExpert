@@ -71,10 +71,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="MdiTabControl, Version=1.0.4042.37739, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\MdiTabControl.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -82,16 +78,25 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.5.0.15095, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
     <Compile Include="BackgroundProcessCancelHandler.cs" />
     <Compile Include="Bookmark.cs" />
+    <Compile Include="BookmarkCollection.cs" />
+    <Compile Include="BookmarkDataProvider.cs" />
+    <Compile Include="BookmarkEventArgs.cs" />
     <Compile Include="BookmarkExporter.cs" />
     <Compile Include="BookmarkOverlay.cs" />
+    <Compile Include="BookmarkView.cs" />
     <Compile Include="BugSender.cs" />
     <Compile Include="CellContent.cs" />
     <Compile Include="ColumnCache.cs" />
+    <Compile Include="ColumnizerEventArgs.cs" />
     <Compile Include="ConfigChangedEventArgs.cs" />
     <Compile Include="ContextMenuPluginEventArgs.cs" />
     <Compile Include="CurrentHighlightGroupChangedEventArgs.cs" />
@@ -146,8 +151,15 @@
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\OverlayEventArgs.cs" />
+    <Compile Include="Dialogs\TabRenameDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TabRenameDlg.Designer.cs">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="EncodingOptions.cs" />
     <Compile Include="FileSystemCallback.cs" />
+    <Compile Include="FileViewContext.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="FilterCancelHandler.cs" />
     <Compile Include="FilterStarter.cs" />
@@ -155,15 +167,21 @@
     <Compile Include="FilterListChangedEventArgs.cs" />
     <Compile Include="HighlightResults.cs" />
     <Compile Include="HilightGroup.cs" />
+    <Compile Include="IBookmarkData.cs" />
+    <Compile Include="IBookmarkView.cs" />
     <Compile Include="ILogExpertClient.cs" />
     <Compile Include="ILogExpertProxy.cs" />
     <Compile Include="ILogStreamReader.cs" />
+    <Compile Include="ILogPaintContext.cs" />
+    <Compile Include="ILogView.cs" />
+    <Compile Include="ISharedToolWindow.cs" />
     <Compile Include="LocalFileSystem.cs" />
     <Compile Include="LogBufferCacheEntry.cs" />
     <Compile Include="LogExpertApplicationContext.cs" />
     <Compile Include="LogFileException.cs" />
     <Compile Include="MultifileOptions.cs" />
     <Compile Include="ObjectClone.cs" />
+    <Compile Include="PaintHelper.cs" />
     <Compile Include="ParamParser.cs" />
     <Compile Include="Persister.cs" />
     <Compile Include="ClfColumnizer.cs" />
@@ -526,6 +544,9 @@
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TabRenameDlg.resx">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TimeSpreadigControl.resx">
       <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -549,6 +570,10 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
       <Name>ColumnizerLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MdiTabControl\MdiTabControl.vbproj">
+      <Project>{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}</Project>
+      <Name>MdiTabControl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

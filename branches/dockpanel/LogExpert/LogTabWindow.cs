@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
 {
@@ -26,7 +27,7 @@ namespace LogExpert
 		{
 			public int diffSum;
 			public bool dirty;
-			public MdiTabControl.TabPage tabPage;
+			// public MdiTabControl.TabPage tabPage;
 			public Color color = Color.FromKnownColor(KnownColor.Gray);
 			public int tailState = 0; // tailState: 0,1,2 = on/off/off by Trigger
 			public ToolTip toolTip;
@@ -68,7 +69,7 @@ namespace LogExpert
 		delegate void StatusLineEventFx(StatusLineEventArgs e);
 		delegate void ProgressBarEventFx(ProgressEventArgs e);
 		delegate void GuiStateUpdateWorkerDelegate(GuiStateArgs e);
-		delegate void SetTabIconDelegate(MdiTabControl.TabPage tabPage, Icon icon);
+		delegate void SetTabIconDelegate(LogWindow logWindow, Icon icon);
 		delegate void HandleTabDoubleClick(object sender);
 
 		//bool waitingForClose = false;
@@ -109,6 +110,8 @@ namespace LogExpert
 
 		private static StaticLogTabWindowData staticData = new StaticLogTabWindowData();
 
+	  private BookmarkWindow bookmarkWindow;
+
 
 		public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
 		{
@@ -126,17 +129,18 @@ namespace LogExpert
 			for (int i = 0; i < leds.Length; ++i)
 			{
 				this.leds[i] = led;
-				led.Offset(0, led.Height + 1);
+				led.Offset(0, led.Height + 0);
 			}
+		  int grayAlpha = 50;
 			this.ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 220, 0, 0));
 			this.ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
 			this.ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
 			this.ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
 			this.ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-			this.offLedBrush = new SolidBrush(Color.FromArgb(255, 160, 160, 160));
+      this.offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
 			this.dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
 			this.tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
-      this.tailLedBrush[1] = new SolidBrush(Color.FromArgb(255, 160, 160, 160)); // Don't follow tail: gray
+      this.tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
 			this.tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
 			this.syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
 			CreateIcons();
@@ -166,9 +170,25 @@ namespace LogExpert
 			this.deadIcon = System.Drawing.Icon.FromHandle(bmp.GetHicon());
 			bmp.Dispose();
 			this.Closing += LogTabWindow_Closing;
+
+		  InitBookmarkWindow();
 		}
 
-		void LogTabWindow_Load(object sender, EventArgs e)
+	  private void InitBookmarkWindow()
+	  {
+	    this.bookmarkWindow = new BookmarkWindow();
+	    this.bookmarkWindow.HideOnClose = true;
+	    this.bookmarkWindow.ShowHint = DockState.DockBottom;
+	    this.bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, SettingsFlags.All);
+	  }
+
+    private void DestroyBookmarkWindow()
+    {
+      this.bookmarkWindow.HideOnClose = false;
+      this.bookmarkWindow.Close();
+    }
+
+	  void LogTabWindow_Load(object sender, EventArgs e)
 		{
 			ApplySettings(ConfigManager.Settings, SettingsFlags.All);
 			if (ConfigManager.Settings.isMaximized)
@@ -240,6 +260,7 @@ namespace LogExpert
 				{
 					RemoveAndDisposeLogWindow(logWindow, true);
 				}
+        DestroyBookmarkWindow();
 
 				ConfigManager.Instance.ConfigChanged -= ConfigChanged;
 
@@ -263,13 +284,16 @@ namespace LogExpert
 		private void SaveLastOpenFilesList()
 		{
 			ConfigManager.Settings.lastOpenFilesList.Clear();
-			foreach (MdiTabControl.TabPage tabPage in this.tabControl1.TabPages)
+			foreach (DockContent content in this.dockPanel.Contents)
 			{
-				LogWindow logWin = tabPage.Form as LogWindow;
-				if (!logWin.IsTempFile)
-				{
-					ConfigManager.Settings.lastOpenFilesList.Add(logWin.GivenFileName);
-				}
+        if (content is LogWindow)
+        {
+          LogWindow logWin = content as LogWindow;
+          if (!logWin.IsTempFile)
+          {
+            ConfigManager.Settings.lastOpenFilesList.Add(logWin.GivenFileName);
+          }
+        }
 			}
 		}
 
@@ -306,7 +330,7 @@ namespace LogExpert
 			if (pipe.FilterParams.searchText.Length > 0)
 			{
 				ToolTip tip = new ToolTip(this.components);
-				tip.SetToolTip(((LogWindowData)logWin.Tag).tabPage,
+				tip.SetToolTip(logWin,
 				  "Filter: \"" + pipe.FilterParams.searchText + "\"" +
 				  (pipe.FilterParams.isInvert ? " (Invert match)" : "") +
 				  (pipe.FilterParams.columnRestrict ? "\nColumn restrict" : "")
@@ -354,7 +378,7 @@ namespace LogExpert
 
 			LogWindowData data = logWindow.Tag as LogWindowData;
 			data.color = this.defaultTabColor;
-			setTabColor(data.tabPage, this.defaultTabColor);
+			setTabColor(logWindow, this.defaultTabColor);
 			//data.tabPage.BorderColor = this.defaultTabBorderColor;
 			if (!isTempFile)
 			{
@@ -363,21 +387,14 @@ namespace LogExpert
 					if (colorEntry.fileName.ToLower().Equals(logFileName.ToLower()))
 					{
 						data.color = colorEntry.color;
-						setTabColor(data.tabPage, colorEntry.color);
+						setTabColor(logWindow, colorEntry.color);
 						break;
 					}
 				}
 			}
 			if (!isTempFile)
 			{
-				ToolTip tip = new ToolTip(this.components);
-				tip.SetToolTip(data.tabPage, logFileName);
-				tip.AutomaticDelay = 40;
-				tip.AutoPopDelay = 5000;
-				//tip.InitialDelay = 40;
-				//tip.ReshowDelay = 40;
-				//tip.ShowAlways = true;
-				data.toolTip = tip;
+			  SetTooltipText(logWindow, logFileName);
 			}
 
 			if (givenFileName.EndsWith(".lxp"))
@@ -390,6 +407,11 @@ namespace LogExpert
 			loadFileFx.BeginInvoke(logFileName, encodingOptions, null, null);
 			return logWindow;
 		}
+
+    private void SetTooltipText(LogWindow logWindow, string logFileName)
+    {
+      logWindow.ToolTipText = logFileName;
+    }
 
 		private void FillDefaultEncodingFromSettings(EncodingOptions encodingOptions)
 		{
@@ -451,38 +473,46 @@ namespace LogExpert
 
 		private void AddLogWindow(LogWindow logWindow, string title)
 		{
-			//logWindow.Anchor = (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-			logWindow.Dock = DockStyle.Fill;
+      logWindow.CloseButton = true;
+		  logWindow.TabPageContextMenuStrip = this.tabContextMenuStrip;
+		  SetTooltipText(logWindow, title);
+		  logWindow.DockAreas = DockAreas.Document | DockAreas.Float;
+      logWindow.Show(this.dockPanel);
 
-			MdiTabControl.TabPage tabPage = this.tabControl1.TabPages.Add(logWindow);
-			tabPage.TooltipText = logWindow.FileName;
 
-			logWindow.Location = new Point(30, 30);
-			Size size = tabPage.Size;
-			logWindow.Size = size;
-			this.tabControl1.TabPages.set_IndexOf(tabPage, this.tabControl1.TabPages.Count - 1);
-			tabPage.Name = title;
-			tabPage.ContextMenuStrip = this.tabContextMenuStrip;
-			tabPage.MouseClick += tabPage_MouseClick;
-			tabPage.TabDoubleClick += tabPage_TabDoubleClick;
-			LogWindowData data = new LogWindowData();
-			data.diffSum = 0;
-			data.tabPage = tabPage;
-			logWindow.Tag = data;
-			lock (this.logWindowList)
-			{
-				this.logWindowList.Add(logWindow);
-			}
-			Icon icon = this.ledIcons[0, 0, 0, 0];
-			this.Invoke(new SetTabIconDelegate(SetTabIcon), new object[] { tabPage, icon });
-			logWindow.FileSizeChanged += FileSizeChanged;
-			logWindow.TailFollowed += TailFollowed;
-			logWindow.Disposed += logWindow_Disposed;
-			logWindow.FileNotFound += logWindow_FileNotFound;
-			logWindow.FileRespawned += logWindow_FileRespawned;
-			logWindow.FilterListChanged += logWindow_FilterListChanged;
-			logWindow.CurrentHighlightGroupChanged += logWindow_CurrentHighlightGroupChanged;
-			logWindow.SyncModeChanged += logWindow_SyncModeChanged;
+      //logWindow.Anchor = (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
+      //logWindow.Dock = DockStyle.Fill;
+
+      //MdiTabControl.TabPage tabPage = this.tabControl1.TabPages.Add(logWindow);
+      //tabPage.TooltipText = logWindow.FileName;
+
+      //logWindow.Location = new Point(30, 30);
+      //Size size = tabPage.Size;
+      //logWindow.Size = size;
+      //this.tabControl1.TabPages.set_IndexOf(tabPage, this.tabControl1.TabPages.Count - 1);
+      //tabPage.Name = title;
+      //tabPage.ContextMenuStrip = this.tabContextMenuStrip;
+      //tabPage.MouseClick += tabPage_MouseClick;
+      //tabPage.TabDoubleClick += tabPage_TabDoubleClick;
+
+      LogWindowData data = new LogWindowData();
+      data.diffSum = 0;
+      //data.tabPage = tabPage;
+      logWindow.Tag = data;
+      lock (this.logWindowList)
+      {
+        this.logWindowList.Add(logWindow);
+      }
+      //Icon icon = this.ledIcons[0, 0, 0, 0];
+      //this.Invoke(new SetTabIconDelegate(SetTabIcon), new object[] { tabPage, icon });
+      logWindow.FileSizeChanged += FileSizeChanged;
+      logWindow.TailFollowed += TailFollowed;
+      logWindow.Disposed += logWindow_Disposed;
+      logWindow.FileNotFound += logWindow_FileNotFound;
+      logWindow.FileRespawned += logWindow_FileRespawned;
+      logWindow.FilterListChanged += logWindow_FilterListChanged;
+      logWindow.CurrentHighlightGroupChanged += logWindow_CurrentHighlightGroupChanged;
+      logWindow.SyncModeChanged += logWindow_SyncModeChanged;
 
 			logWindow.Visible = true;
 		}
@@ -499,10 +529,10 @@ namespace LogExpert
 			logWindow.SyncModeChanged -= logWindow_SyncModeChanged;
 
 			LogWindowData data = logWindow.Tag as LogWindowData;
-			data.tabPage.MouseClick -= tabPage_MouseClick;
-			data.tabPage.TabDoubleClick -= tabPage_TabDoubleClick;
-			data.tabPage.ContextMenuStrip = null;
-			data.tabPage = null;
+      //data.tabPage.MouseClick -= tabPage_MouseClick;
+      //data.tabPage.TabDoubleClick -= tabPage_TabDoubleClick;
+      //data.tabPage.ContextMenuStrip = null;
+			//data.tabPage = null;
 		}
 
 
@@ -623,7 +653,7 @@ namespace LogExpert
 		void logWindow_Disposed(object sender, EventArgs e)
 		{
 			LogWindow logWindow = sender as LogWindow;
-			if (sender == this.currentLogWindow)
+			if (sender == this.CurrentLogWindow)
 			{
 				ChangeCurrentLogWindow(null);
 			}
@@ -644,7 +674,7 @@ namespace LogExpert
 
 		private void RemoveAndDisposeLogWindow(LogWindow logWindow, bool dontAsk)
 		{
-			if (this.currentLogWindow == logWindow)
+			if (this.CurrentLogWindow == logWindow)
 			{
 				ChangeCurrentLogWindow(null);
 			}
@@ -1067,7 +1097,7 @@ namespace LogExpert
 
 		public LogWindow CurrentLogWindow
 		{
-			get { return currentLogWindow; }
+			get { return this.currentLogWindow; }
 			set { ChangeCurrentLogWindow(value); }
 		}
 
@@ -1099,6 +1129,9 @@ namespace LogExpert
 				newLogWindow.StatusLineEvent += StatusLineEvent;
 				newLogWindow.ProgressBarUpdate += ProgressBarUpdate;
 				newLogWindow.GuiStateUpdate += GuiStateUpdate;
+        newLogWindow.ColumnizerChanged += ColumnizerChanged;
+        newLogWindow.BookmarkAdded += BookmarkAdded;
+        newLogWindow.BookmarkRemoved += BookmarkRemoved;
 				if (newLogWindow.IsTempFile)
 					this.Text = titleName + " - " + newLogWindow.TempTitleName;
 				else
@@ -1111,6 +1144,7 @@ namespace LogExpert
 				this.searchToolStripMenuItem.Enabled = true;
 				this.filterToolStripMenuItem.Enabled = true;
 				this.goToLineToolStripMenuItem.Enabled = true;
+			  ConnectToolWindows(newLogWindow);
 			}
 			else
 			{
@@ -1137,10 +1171,26 @@ namespace LogExpert
 				oldLogWindow.StatusLineEvent -= StatusLineEvent;
 				oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
 				oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
-			}
+        oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
+        oldLogWindow.BookmarkAdded += BookmarkAdded;
+        oldLogWindow.BookmarkRemoved += BookmarkRemoved;
+      }
 
 
 		}
+
+
+    private void ConnectToolWindows(LogWindow logWindow)
+    {
+      ConnectBookmarkWindow(logWindow);
+    }
+
+    private void ConnectBookmarkWindow(LogWindow logWindow)
+    {
+      FileViewContext ctx = new FileViewContext(logWindow, logWindow);
+      this.bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
+      this.bookmarkWindow.SetCurrentFile(ctx);
+    }
 
 		void GuiStateUpdate(object sender, GuiStateArgs e)
 		{
@@ -1181,6 +1231,25 @@ namespace LogExpert
 
 			skipEvents = false;
 		}
+
+    void ColumnizerChanged(object sender, ColumnizerEventArgs e)
+    {
+      if (this.bookmarkWindow != null)
+      {
+        this.bookmarkWindow.SetColumnizer(e.Columnizer);
+      }
+    }
+
+    void BookmarkAdded(object sender, EventArgs e)
+    {
+      this.bookmarkWindow.UpdateView();
+    }
+
+    void BookmarkRemoved(object sender, EventArgs e)
+    {
+      this.bookmarkWindow.UpdateView();
+    }
+
 
 		void ProgressBarUpdate(object sender, ProgressEventArgs e)
 		{
@@ -1280,7 +1349,7 @@ namespace LogExpert
 			{
 				if (this.CurrentLogWindow != null)
 				{
-					this.currentLogWindow.Close();
+					this.CurrentLogWindow.Close();
 				}
 			}
 			else if (e.KeyCode == Keys.Tab && e.Control)
@@ -1296,8 +1365,8 @@ namespace LogExpert
 
 		private void closeFileToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.currentLogWindow != null)
-				this.currentLogWindow.Close();
+			if (this.CurrentLogWindow != null)
+				this.CurrentLogWindow.Close();
 		}
 
 		private void cellSelectModeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1319,44 +1388,25 @@ namespace LogExpert
 
 		public void SwitchTab(bool shiftPressed)
 		{
-			int index = this.tabControl1.TabPages.SelectedIndex();
+		  int index = this.dockPanel.Contents.IndexOf(this.dockPanel.ActiveContent);
 			if (shiftPressed)
 			{
 				index--;
 				if (index < 0)
-					index = this.tabControl1.TabPages.Count - 1;
+          index = this.dockPanel.Contents.Count - 1;
 				if (index < 0)
 					return;
 			}
 			else
 			{
 				index++;
-				if (index >= this.tabControl1.TabPages.Count)
+        if (index >= this.dockPanel.Contents.Count)
 					index = 0;
 			}
-			this.tabControl1.TabPages[index].Select();
-
-			//int index = this.tabControl.SelectedIndex;
-			//if (shiftPressed)
-			//{
-			//  index--;
-			//  if (index < 0)
-			//  {
-			//    index = this.tabControl.TabCount - 1;
-			//    if (index < 0)
-			//      index = 0;
-			//  }
-			//  this.tabControl.SelectedIndex = index;
-			//}
-			//else
-			//{
-			//  index++;
-			//  if (index > this.tabControl.TabCount - 1)
-			//  {
-			//    index = 0;
-			//  }
-			//  this.tabControl.SelectedIndex = index;
-			//}
+      if (index < this.dockPanel.Contents.Count)
+      {
+        (this.dockPanel.Contents[index] as DockContent).Activate();
+      }
 		}
 
 		private void timeshiftMenuTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -1379,44 +1429,40 @@ namespace LogExpert
 
 
 
-		private void tabControl1_TabPageChanged(object sender, EventArgs e)
-		{
-			MdiTabControl.TabPage currentTab = (MdiTabControl.TabPage)this.tabControl1.TabPages.SelectedTab();
-			if (currentTab != null)
-			{
-				this.CurrentLogWindow = (LogWindow)currentTab.Form;
-				//currentTab.IsActiveTab = true;
-				//this.CurrentLogWindow = currentTab.LogWindow;
-				this.CurrentLogWindow.LogWindowActivated();
-			}
-
-		}
-
 		// tailState: 0,1,2 = on/off/off by Trigger
 		// syncMode: 0 = normal (no), 1 = time synced 
 		private Icon CreateLedIcon(int level, bool dirty, int tailState, int syncMode)
 		{
 			Rectangle iconRect = this.leds[0];
-			iconRect.Height = this.leds[this.leds.Length - 1].Bottom;
+		  iconRect.Height = 16; // (DockPanel's damn hardcoded height) // this.leds[this.leds.Length - 1].Bottom;
 			iconRect.Width = iconRect.Right + 6;
 			Bitmap bmp = new Bitmap(iconRect.Width, iconRect.Height);
 			Graphics gfx = Graphics.FromImage(bmp);
 
+		  int offsetFromTop = 4;
+
 			for (int i = 0; i < this.leds.Length; ++i)
 			{
 				Rectangle ledRect = this.leds[i];
+			  ledRect.Offset(0, offsetFromTop);
 				if (level >= this.leds.Length - i)
 					gfx.FillRectangle(this.ledBrushes[i], ledRect);
 				else
 					gfx.FillRectangle(this.offLedBrush, ledRect);
 			}
 
+		  int ledSize = 3;
+		  int ledGap = 1;
 			Rectangle lastLed = this.leds[this.leds.Length - 1];
-			Rectangle dirtyLed = new Rectangle(lastLed.Right + 2, lastLed.Bottom - 4, 4, 4);
+      Rectangle dirtyLed = new Rectangle(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
 			Rectangle tailLed = new Rectangle(dirtyLed.Location, dirtyLed.Size);
-			tailLed.Offset(0, -5);
-			Rectangle syncLed = new Rectangle(tailLed.Location, dirtyLed.Size);
-			syncLed.Offset(0, -5);
+      tailLed.Offset(0, -(ledSize + ledGap));
+      Rectangle syncLed = new Rectangle(tailLed.Location, dirtyLed.Size);
+      syncLed.Offset(0, -(ledSize + ledGap));
+
+      syncLed.Offset(0, offsetFromTop);
+      tailLed.Offset(0, offsetFromTop);
+      dirtyLed.Offset(0, offsetFromTop);
 
 			if (dirty)
 			{
@@ -1491,14 +1537,17 @@ namespace LogExpert
 						if (data.diffSum > DIFF_MAX)
 							data.diffSum = DIFF_MAX;
 					}
-					if (this.tabControl1.TabPages.SelectedTab() != null &&
-						this.tabControl1.TabPages.SelectedTab().Form != sender
-						|| data.tailState != 0)
+
+          //if (this.dockPanel.ActiveContent != null &&
+          //    this.dockPanel.ActiveContent != sender || data.tailState != 0)
+          if (this.CurrentLogWindow != null &&
+              this.CurrentLogWindow != sender || data.tailState != 0)
+
 					{
 						data.dirty = true;
 					}
 					Icon icon = GetIcon(diff, data);
-					this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+          this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { (LogWindow)sender, icon });
 				}
 			}
 		}
@@ -1513,7 +1562,7 @@ namespace LogExpert
 		private void FileNotFound(LogWindow logWin)
 		{
 			LogWindowData data = logWin.Tag as LogWindowData;
-			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, this.deadIcon });
+			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWin, this.deadIcon });
 			this.dateTimeDragControl.Visible = false;
 		}
 
@@ -1528,7 +1577,7 @@ namespace LogExpert
 		{
 			LogWindowData data = logWin.Tag as LogWindowData;
 			Icon icon = GetIcon(0, data);
-			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWin, icon });
 		}
 
 		void logWindow_FilterListChanged(object sender, FilterListChangedEventArgs e)
@@ -1563,22 +1612,22 @@ namespace LogExpert
 				data.diffSum = DIFF_MAX;
 			}
 			Icon icon = GetIcon(data.diffSum, data);
-			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWin, icon });
 		}
 
 
 		void TailFollowed(object sender, EventArgs e)
 		{
-			if (this.tabControl1.TabPages.SelectedTab() == null)
+			if (this.dockPanel.ActiveContent == null)
 				return;
 			if (sender.GetType().IsAssignableFrom(typeof(LogWindow)))
 			{
-				if (this.tabControl1.TabPages.SelectedTab().Form == sender)
+        if (this.dockPanel.ActiveContent == sender)
 				{
 					LogWindowData data = ((LogWindow)sender).Tag as LogWindowData;
 					data.dirty = false;
 					Icon icon = GetIcon(data.diffSum, data);
-					this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+          this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { (LogWindow)sender, icon });
 				}
 			}
 		}
@@ -1590,7 +1639,7 @@ namespace LogExpert
 				LogWindowData data = ((LogWindow)sender).Tag as LogWindowData;
 				data.syncMode = e.IsTimeSynced ? 1 : 0;
 				Icon icon = GetIcon(data.diffSum, data);
-				this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+        this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { (LogWindow)sender, icon });
 			}
 			else
 			{
@@ -1637,18 +1686,22 @@ namespace LogExpert
 								data.diffSum = 0;
 							}
 							Icon icon = GetIcon(data.diffSum, data);
-							this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+							this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWindow, icon });
 						}
 					}
 				}
 			}
 		}
 
-		private void SetTabIcon(MdiTabControl.TabPage tabPage, Icon icon)
+		private void SetTabIcon(LogWindow logWindow, Icon icon)
 		{
-			if (tabPage.Form != null)
+      if (logWindow != null)
 			{
-				tabPage.Icon = icon;
+        logWindow.Icon = icon;
+        if (logWindow.DockHandler.Pane != null)
+        {
+          logWindow.DockHandler.Pane.TabStripControl.Invalidate(false);
+        }
 			}
 		}
 
@@ -1760,9 +1813,9 @@ namespace LogExpert
 		{
 			if (this.CurrentLogWindow != null)
 			{
-				LogWindowData data = this.currentLogWindow.Tag as LogWindowData;
+				LogWindowData data = this.CurrentLogWindow.Tag as LogWindowData;
 				Icon icon = GetIcon(0, data);
-				this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+				this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { this.CurrentLogWindow, icon });
 				this.CurrentLogWindow.Reload();
 			}
 		}
@@ -1797,6 +1850,8 @@ namespace LogExpert
 					logWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
 				}
 			}
+		  this.bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
+
 			this.hilightGroupList = ConfigManager.Settings.hilightGroupList;
 			if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
 			{
@@ -1825,10 +1880,10 @@ namespace LogExpert
 			{
 				FillToolLauncherBar();
 			}
-            if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
-            {
-           	 FillHighlightComboBox();
-            }
+      if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
+      {
+     	  FillHighlightComboBox();
+      }
 		}
 
 		private void SetTabIcons(Preferences preferences)
@@ -1841,7 +1896,7 @@ namespace LogExpert
 				{
 					LogWindowData data = logWindow.Tag as LogWindowData;
 					Icon icon = GetIcon(data.diffSum, data);
-					this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+					this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWindow, icon });
 				}
 			}
 		}
@@ -2046,18 +2101,19 @@ namespace LogExpert
 
 		public void SelectTab(LogWindow logWindow)
 		{
-			if (logWindow.Tag != null)
-			{
-				((LogWindowData)logWindow.Tag).tabPage.Select();
-			}
+		  logWindow.Activate();
 		}
 
 		private void showBookmarkListToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.CurrentLogWindow != null)
-			{
-				this.CurrentLogWindow.ToggleBookmarkView();
-			}
+      if (this.bookmarkWindow.Visible)
+      {
+        this.bookmarkWindow.Hide();
+      }
+      else
+      {
+        this.bookmarkWindow.Show(this.dockPanel);
+      }
 		}
 
 		private void toolStripButtonOpen_Click(object sender, EventArgs e)
@@ -2109,6 +2165,7 @@ namespace LogExpert
 					logWin.ShowLineColumn(!ConfigManager.Settings.hideLineColumn);
 				}
 			}
+      this.bookmarkWindow.LineColumnVisible = ConfigManager.Settings.hideLineColumn;
 		}
 
 		// ==================================================================
@@ -2117,46 +2174,43 @@ namespace LogExpert
 
 		private void closeThisTabToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MdiTabControl.TabPage tabPage = this.tabContextMenuStrip.SourceControl as MdiTabControl.TabPage;
-			((Form)tabPage.Form).Close();
+      (this.dockPanel.ActiveContent as LogWindow).Close();
 		}
 
 		private void closeOtherTabsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MdiTabControl.TabPage tabPage = this.tabContextMenuStrip.SourceControl as MdiTabControl.TabPage;
-			Form thisForm = ((Form)tabPage.Form);
-			IList<Form> closeList = new List<Form>();
-			lock (this.logWindowList)
-			{
-				foreach (LogWindow logWin in this.logWindowList)
-				{
-					if (logWin != thisForm)
-					{
-						closeList.Add(logWin);
-					}
-				}
-			}
-			foreach (Form form in closeList)
-			{
-				form.Close();
-			}
-		}
+      IList<Form> closeList = new List<Form>();
+      lock (this.logWindowList)
+      {
+        foreach (DockContent content in this.dockPanel.Contents)
+        {
+          if (content != this.dockPanel.ActiveContent)
+          {
+            closeList.Add(content as Form);
+          }
+        }
+      }
+      foreach (Form form in closeList)
+      {
+        form.Close();
+      }
+    }
 
 		private void closeAllTabsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			IList<Form> closeList = new List<Form>();
-			lock (this.logWindowList)
-			{
-				foreach (LogWindow logWin in this.logWindowList)
-				{
-					closeList.Add(logWin);
-				}
-			}
-			foreach (Form form in closeList)
-			{
-				form.Close();
-			}
-		}
+      IList<Form> closeList = new List<Form>();
+      lock (this.logWindowList)
+      {
+        foreach (DockContent content in this.dockPanel.Contents)
+        {
+          closeList.Add(content as Form);
+        }
+      }
+      foreach (Form form in closeList)
+      {
+        form.Close();
+      }
+    }
 
 		void tabPage_MouseClick(object sender, MouseEventArgs e)
 		{
@@ -2181,8 +2235,7 @@ namespace LogExpert
 
 		private void tabColorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MdiTabControl.TabPage tabPage = this.tabContextMenuStrip.SourceControl as MdiTabControl.TabPage;
-			LogWindow logWindow = ((LogWindow)tabPage.Form);
+      LogWindow logWindow = this.dockPanel.ActiveContent as LogWindow;
 
 			LogWindowData data = logWindow.Tag as LogWindowData;
 			if (data == null)
@@ -2193,7 +2246,7 @@ namespace LogExpert
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				data.color = dlg.Color;
-				setTabColor(tabPage, data.color);
+				setTabColor(logWindow, data.color);
 
 			}
 			List<ColorEntry> delList = new List<ColorEntry>();
@@ -2215,20 +2268,14 @@ namespace LogExpert
 			}
 		}
 
-		private void setTabColor(MdiTabControl.TabPage tabPage, Color color)
+		private void setTabColor(LogWindow logWindow, Color color)
 		{
-			tabPage.BackLowColor = color;
-			tabPage.BackLowColorDisabled = Color.FromArgb(255,
-			  Math.Max(0, color.R - 50),
-			  Math.Max(0, color.G - 50),
-			  Math.Max(0, color.B - 50)
-			  );
-			//tabPage.BackHighColor = Color.FromArgb(255,
-			//  Math.Min(255, color.R + 70),
-			//  Math.Min(255, color.G + 70),
-			//  Math.Min(255, color.B + 70)
-			//  );
-			//tabPage.BackHighColorDisabled = Color.FromArgb(255, 190, 190, 190);
+      //tabPage.BackLowColor = color;
+      //tabPage.BackLowColorDisabled = Color.FromArgb(255,
+      //  Math.Max(0, color.R - 50),
+      //  Math.Max(0, color.G - 50),
+      //  Math.Max(0, color.B - 50)
+      //  );
 		}
 
 		public void SetForeground()
@@ -2268,7 +2315,7 @@ namespace LogExpert
 			if (this.Preferences.showTailState)
 			{
 				Icon icon = GetIcon(data.diffSum, data);
-				this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
+				this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { logWindow, icon });
 			}
 		}
 
@@ -2300,9 +2347,9 @@ namespace LogExpert
 
 				lock (this.logWindowList)
 				{
-					foreach (MdiTabControl.TabPage tabPage in this.tabControl1.TabPages)
+					foreach (DockContent content in this.dockPanel.Contents)
 					{
-						LogWindow logWindow = tabPage.Form as LogWindow;
+						LogWindow logWindow = content as LogWindow;
 						string persistenceFileName = logWindow.SavePersistenceData(true);
 						if (persistenceFileName != null)
 						{
@@ -2398,15 +2445,13 @@ namespace LogExpert
 
 		private void copyPathToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MdiTabControl.TabPage tabPage = this.tabContextMenuStrip.SourceControl as MdiTabControl.TabPage;
-			LogWindow logWindow = ((LogWindow)tabPage.Form);
+		  LogWindow logWindow = this.dockPanel.ActiveContent as LogWindow;
 			Clipboard.SetText(logWindow.Title);
 		}
 
 		private void findInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MdiTabControl.TabPage tabPage = this.tabContextMenuStrip.SourceControl as MdiTabControl.TabPage;
-			LogWindow logWindow = ((LogWindow)tabPage.Form);
+      LogWindow logWindow = this.dockPanel.ActiveContent as LogWindow;
 
 			Process explorer = new Process();
 			explorer.StartInfo.FileName = "explorer.exe";
@@ -2677,17 +2722,17 @@ namespace LogExpert
 		private void disableWordHighlightModeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			DebugOptions.disableWordHighlight = disableWordHighlightModeToolStripMenuItem.Checked;
-			if (this.currentLogWindow != null)
+			if (this.CurrentLogWindow != null)
 			{
-				this.currentLogWindow.RefreshAllGrids();
+				this.CurrentLogWindow.RefreshAllGrids();
 			}
 		}
 
 		private void multifileMaskToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.currentLogWindow != null)
+			if (this.CurrentLogWindow != null)
 			{
-				this.currentLogWindow.ChangeMultifileMask();
+				this.CurrentLogWindow.ChangeMultifileMask();
 			}
 		}
 
@@ -2743,10 +2788,7 @@ namespace LogExpert
 				if (data != null)
 				{
 					DateTime now = DateTime.Now;
-					ToolTip tip = new ToolTip(this.components);
-					tip.SetToolTip(data.tabPage, "Pasted on " + now.ToString());
-					tip.AutomaticDelay = 10;
-					tip.AutoPopDelay = 5000;
+				  SetTooltipText(logWindow, "Pasted on " + now.ToString());
 				}
 			}
 		}
@@ -2767,12 +2809,36 @@ namespace LogExpert
 			}
 		}
 
-        private void columnFinderToolStripMenuItem_Click(object sender, EventArgs e)
+    private void columnFinderToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (this.CurrentLogWindow != null && !skipEvents)
         {
-            if (this.currentLogWindow != null && !skipEvents)
-            {
-           		this.currentLogWindow.ToggleColumnFinder(this.columnFinderToolStripMenuItem.Checked, true);
-            }
+       		this.CurrentLogWindow.ToggleColumnFinder(this.columnFinderToolStripMenuItem.Checked, true);
         }
+    }
+
+    private void dockPanel_ActiveContentChanged(object sender, EventArgs e)
+    {
+      if (this.dockPanel.ActiveContent is LogWindow)
+      {
+        this.CurrentLogWindow = this.dockPanel.ActiveContent as LogWindow;
+        this.CurrentLogWindow.LogWindowActivated();
+      }
+    }
+
+    private void tabRenameToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (this.CurrentLogWindow != null)
+      {
+        TabRenameDlg dlg = new TabRenameDlg();
+        dlg.TabName = this.CurrentLogWindow.Text;
+        if (DialogResult.OK == dlg.ShowDialog())
+        {
+          this.CurrentLogWindow.Text = dlg.TabName;
+        }
+        dlg.Dispose();
+      }
+    }
+
 	}
 }
