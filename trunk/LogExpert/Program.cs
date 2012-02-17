@@ -64,70 +64,80 @@ namespace LogExpert
 			}
 			string[] args = argsList.ToArray();
 
-			Settings settings = ConfigManager.Settings;
-			bool isCreated = false;
-			Mutex mutex = new System.Threading.Mutex(false, "Local\\LogExpertInstanceMutex", out isCreated);
-			if (isCreated)
+			int pId = Process.GetCurrentProcess().SessionId;
+
+			try
 			{
-				// first application instance
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
-
-				// first instance
-                //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + Process.GetCurrentProcess().SessionId);
-				ChannelServices.RegisterChannel(ipcChannel, false);
-				RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
-																		   "LogExpertProxy",
-																		   WellKnownObjectMode.Singleton);
-				LogExpertProxy proxy = new LogExpertProxy(logWin);
-				RemotingServices.Marshal(proxy, "LogExpertProxy");
-
-				LogExpertApplicationContext context = new LogExpertApplicationContext(proxy, logWin);
-				Application.Run(context);
-
-				ChannelServices.UnregisterChannel(ipcChannel);
-			}
-			else
-			{
-				int counter = 3;
-				string errMsg = "";
-				IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + Process.GetCurrentProcess().Id, null);
-				ChannelServices.RegisterChannel(ipcChannel, false);
-				while (counter > 0)
+				Settings settings = ConfigManager.Settings;
+				bool isCreated = false;
+				Mutex mutex = new System.Threading.Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out isCreated);
+				if (isCreated)
 				{
-					try
+					// first application instance
+					Application.EnableVisualStyles();
+					Application.SetCompatibleTextRenderingDefault(false);
+					LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
+
+					// first instance
+					//WindowsIdentity wi = WindowsIdentity.GetCurrent();
+					IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
+					ChannelServices.RegisterChannel(ipcChannel, false);
+					RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
+																				"LogExpertProxy",
+																				WellKnownObjectMode.Singleton);
+					LogExpertProxy proxy = new LogExpertProxy(logWin);
+					RemotingServices.Marshal(proxy, "LogExpertProxy");
+
+					LogExpertApplicationContext context = new LogExpertApplicationContext(proxy, logWin);
+					Application.Run(context);
+
+					ChannelServices.UnregisterChannel(ipcChannel);
+				}
+				else
+				{
+					int counter = 3;
+					string errMsg = "";
+					IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
+					ChannelServices.RegisterChannel(ipcChannel, false);
+					while (counter > 0)
 					{
-						// another instance already exists
-						//WindowsIdentity wi = WindowsIdentity.GetCurrent();
-						LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy),
-                                                                  "ipc://LogExpert" + Process.GetCurrentProcess().SessionId + "/LogExpertProxy");
-						if (settings.preferences.allowOnlyOneInstance)
+						try
 						{
-							proxy.LoadFiles(args);
+							// another instance already exists
+							//WindowsIdentity wi = WindowsIdentity.GetCurrent();
+							LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy),
+																		"ipc://LogExpert" + pId + "/LogExpertProxy");
+							if (settings.preferences.allowOnlyOneInstance)
+							{
+								proxy.LoadFiles(args);
+							}
+							else
+							{
+								proxy.NewWindowOrLockedWindow(args);
+							}
+							break;
 						}
-						else
+						catch (RemotingException e)
 						{
-							proxy.NewWindowOrLockedWindow(args);
+							Logger.logError("IpcClientChannel error: " + e.Message);
+							errMsg = e.Message;
+							counter--;
+							Thread.Sleep(500);
 						}
-						break;
 					}
-					catch (RemotingException e)
+					if (counter == 0)
 					{
-						Logger.logError("IpcClientChannel error: " + e.Message);
-						errMsg = e.Message;
-						counter--;
-						Thread.Sleep(500);
+						Logger.logError("IpcClientChannel error, giving up: " + errMsg);
+						MessageBox.Show("Cannot open connection to first instance (" + errMsg + ")", "LogExpert");
 					}
 				}
-				if (counter == 0)
-				{
-					Logger.logError("IpcClientChannel error, giving up: " + errMsg);
-					MessageBox.Show("Cannot open connection to first instance (" + errMsg + ")", "LogExpert");
-				}
+				mutex.Close();
 			}
-			mutex.Close();
+			catch (Exception ex)
+			{
+				Logger.logError("Mutex error, giving up: " + ex.Message);
+				MessageBox.Show("Cannot open connection to first instance (" + ex.Message + ")", "LogExpert");
+			}
 		}
 
 		static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
