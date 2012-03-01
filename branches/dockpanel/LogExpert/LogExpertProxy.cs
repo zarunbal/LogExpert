@@ -82,6 +82,7 @@ namespace LogExpert
       logWin.LogExpertProxy = this;
       AddWindow(logWin);
       logWin.Show();
+      logWin.Activate();
     }
 
 

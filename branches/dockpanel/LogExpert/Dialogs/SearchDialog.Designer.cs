@@ -188,8 +188,6 @@
       // 
       // searchComboBox
       // 
-      this.searchComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-      this.searchComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.searchComboBox.FormattingEnabled = true;
       this.searchComboBox.Location = new System.Drawing.Point(13, 25);
       this.searchComboBox.Name = "searchComboBox";

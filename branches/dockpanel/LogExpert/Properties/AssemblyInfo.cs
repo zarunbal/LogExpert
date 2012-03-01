@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hagen Raab")]
 [assembly: AssemblyProduct("LogExpert")]
-[assembly: AssemblyCopyright("Copyright ©  2008-2011 Hagen Raab")]
+[assembly: AssemblyCopyright("Copyright ©  2008-2012 Hagen Raab")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

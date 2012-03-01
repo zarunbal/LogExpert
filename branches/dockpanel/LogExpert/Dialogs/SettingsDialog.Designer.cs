@@ -44,6 +44,7 @@
       this.askCloseTabsCheckBox = new System.Windows.Forms.CheckBox();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.followTailCheckBox = new System.Windows.Forms.CheckBox();
+      this.columnFinderCheckBox = new System.Windows.Forms.CheckBox();
       this.syncFilterCheckBox = new System.Windows.Forms.CheckBox();
       this.filterTailCheckBox = new System.Windows.Forms.CheckBox();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -127,6 +128,7 @@
       this.label12 = new System.Windows.Forms.Label();
       this.pollingIntervalUpDown = new System.Windows.Forms.NumericUpDown();
       this.groupBox14 = new System.Windows.Forms.GroupBox();
+      this.legacyReaderCheckBox = new System.Windows.Forms.CheckBox();
       this.label11 = new System.Windows.Forms.Label();
       this.label9 = new System.Windows.Forms.Label();
       this.linesPerBlockUpDown = new System.Windows.Forms.NumericUpDown();
@@ -136,7 +138,6 @@
       this.okButton = new System.Windows.Forms.Button();
       this.helpProvider1 = new System.Windows.Forms.HelpProvider();
       this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-      this.columnFinderCheckBox = new System.Windows.Forms.CheckBox();
       this.exportButton = new System.Windows.Forms.Button();
       this.importButton = new System.Windows.Forms.Button();
       this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -350,6 +351,16 @@
       this.followTailCheckBox.TabIndex = 3;
       this.followTailCheckBox.Text = "Follow tail enabled";
       this.followTailCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // columnFinderCheckBox
+      // 
+      this.columnFinderCheckBox.AutoSize = true;
+      this.columnFinderCheckBox.Location = new System.Drawing.Point(6, 91);
+      this.columnFinderCheckBox.Name = "columnFinderCheckBox";
+      this.columnFinderCheckBox.Size = new System.Drawing.Size(119, 17);
+      this.columnFinderCheckBox.TabIndex = 5;
+      this.columnFinderCheckBox.Text = "Show column finder";
+      this.columnFinderCheckBox.UseVisualStyleBackColor = true;
       // 
       // syncFilterCheckBox
       // 
@@ -1193,12 +1204,13 @@
       // 
       // groupBox15
       // 
+      this.groupBox15.Controls.Add(this.legacyReaderCheckBox);
       this.groupBox15.Controls.Add(this.multiThreadCheckBox);
       this.groupBox15.Controls.Add(this.label12);
       this.groupBox15.Controls.Add(this.pollingIntervalUpDown);
       this.groupBox15.Location = new System.Drawing.Point(272, 19);
       this.groupBox15.Name = "groupBox15";
-      this.groupBox15.Size = new System.Drawing.Size(200, 122);
+      this.groupBox15.Size = new System.Drawing.Size(200, 128);
       this.groupBox15.TabIndex = 8;
       this.groupBox15.TabStop = false;
       this.groupBox15.Text = "CPU and stuff";
@@ -1253,15 +1265,26 @@
       this.groupBox14.Controls.Add(this.label10);
       this.groupBox14.Location = new System.Drawing.Point(7, 19);
       this.groupBox14.Name = "groupBox14";
-      this.groupBox14.Size = new System.Drawing.Size(217, 122);
+      this.groupBox14.Size = new System.Drawing.Size(217, 128);
       this.groupBox14.TabIndex = 4;
       this.groupBox14.TabStop = false;
       this.groupBox14.Text = "Line buffer usage";
       // 
+      // legacyReaderCheckBox
+      // 
+      this.legacyReaderCheckBox.AutoSize = true;
+      this.legacyReaderCheckBox.Location = new System.Drawing.Point(9, 90);
+      this.legacyReaderCheckBox.Name = "legacyReaderCheckBox";
+      this.legacyReaderCheckBox.Size = new System.Drawing.Size(167, 17);
+      this.legacyReaderCheckBox.TabIndex = 9;
+      this.legacyReaderCheckBox.Text = "Use legacy file reader (slower)";
+      this.toolTip1.SetToolTip(this.legacyReaderCheckBox, "Slower but more compatible with strange linefeeds and encodings");
+      this.legacyReaderCheckBox.UseVisualStyleBackColor = true;
+      // 
       // label11
       // 
       this.label11.AutoSize = true;
-      this.label11.Location = new System.Drawing.Point(6, 99);
+      this.label11.Location = new System.Drawing.Point(6, 94);
       this.label11.Name = "label11";
       this.label11.Size = new System.Drawing.Size(197, 13);
       this.label11.TabIndex = 4;
@@ -1355,16 +1378,6 @@
       // helpProvider1
       // 
       this.helpProvider1.HelpNamespace = "LogExpert.chm";
-      // 
-      // columnFinderCheckBox
-      // 
-      this.columnFinderCheckBox.AutoSize = true;
-      this.columnFinderCheckBox.Location = new System.Drawing.Point(6, 91);
-      this.columnFinderCheckBox.Name = "columnFinderCheckBox";
-      this.columnFinderCheckBox.Size = new System.Drawing.Size(119, 17);
-      this.columnFinderCheckBox.TabIndex = 5;
-      this.columnFinderCheckBox.Text = "Show column finder";
-      this.columnFinderCheckBox.UseVisualStyleBackColor = true;
       // 
       // exportButton
       // 
@@ -1602,5 +1615,6 @@
     private System.Windows.Forms.CheckBox columnFinderCheckBox;
     private System.Windows.Forms.Button exportButton;
     private System.Windows.Forms.Button importButton;
+    private System.Windows.Forms.CheckBox legacyReaderCheckBox;
   }
 }

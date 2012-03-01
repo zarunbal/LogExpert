@@ -12,7 +12,7 @@ namespace LogExpert
   /// UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be determined.
   /// Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
   /// </summary>
-  class PositionAwareStreamReader : ILogStreamReader
+  public class PositionAwareStreamReader : ILogStreamReader
   {
     const int MAX_LINE_LEN = 20000;
     Stream stream;
@@ -25,10 +25,13 @@ namespace LogExpert
     private int charBufferPos = 0;
     private int preambleLength = 0;
     private Encoding detectedEncoding;
+    private bool useSystemReaderMethod;
+    private int newLineSequenceLength;
 
 
-    public PositionAwareStreamReader(Stream stream, EncodingOptions encodingOptions)
+    public PositionAwareStreamReader(Stream stream, EncodingOptions encodingOptions, bool useSystemReaderMethod)
     {
+      this.useSystemReaderMethod = useSystemReaderMethod;
       this.stream = new BufferedStream(stream);
       this.preambleLength = DetectPreambleLengthAndEncoding();
 
@@ -56,6 +59,42 @@ namespace LogExpert
       this.reader = new StreamReader(this.stream, usedEncoding, true);
       ResetReader();
       Position = 0;
+
+      if (this.useSystemReaderMethod)
+      {
+        this.newLineSequenceLength = guessNewLineSequenceLength();
+      }
+
+    }
+
+    private int guessNewLineSequenceLength()
+    {
+      long currentPos = Position;
+      int len = 0;
+      string line = this.reader.ReadLine();
+      if (line != null)
+      {
+        this.stream.Seek(this.Encoding.GetByteCount(line), SeekOrigin.Begin);
+        int b = this.stream.ReadByte();
+        if (b == 0x0d)
+        {
+          b = this.stream.ReadByte();
+          if (b == 0x0a)
+          {
+            len = 2;
+          }
+          else
+          {
+            len = 1;
+          }
+        }
+        else
+        {
+          len = 1;
+        }
+      }
+      Position = currentPos;
+      return len;
     }
 
     public void Close()
@@ -110,8 +149,31 @@ namespace LogExpert
       return readInt;
     }
 
-
     public unsafe string ReadLine()
+    {
+      return this.useSystemReaderMethod ? ReadLineNew() : ReadLineOld();
+    }
+
+    protected unsafe string ReadLineNew()
+    {
+      if (this.newLineSequenceLength == 0)
+      {
+        this.newLineSequenceLength = guessNewLineSequenceLength();
+      }
+      string line = this.reader.ReadLine();
+      if (line != null)
+      {
+        this.pos += this.Encoding.GetByteCount(line);
+        this.pos += this.newLineSequenceLength;
+        if (line.Length > MAX_LINE_LEN)
+        {
+          line = line.Remove(MAX_LINE_LEN);
+        }
+      }
+      return line;
+    }
+
+    protected unsafe string ReadLineOld()
     {
       string result;
       int readInt;

@@ -178,6 +178,7 @@ namespace LogExpert
     public MultifileOptions multifileOptions;
     public String defaultEncoding;
     public bool showColumnFinder;
+    public bool useLegacyReader;
   }
 
   [FlagsAttribute]

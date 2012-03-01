@@ -308,7 +308,16 @@ namespace LogExpert
       int currLine = gridView.CurrentCellAddress.Y;
       int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
 
-      gridView.Columns.Clear();
+      try
+      {
+        gridView.Columns.Clear();
+      }
+      catch (ArgumentOutOfRangeException ae)
+      {
+        // Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
+        // Don't know why.
+        Logger.logError(ae.Message);
+      }
 
       DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
       markerColumn.HeaderText = "";

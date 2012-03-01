@@ -65,6 +65,16 @@ namespace LogExpert
       OnBookmarkRemoved();
     }
 
+    internal void RemoveBookmarksForLines(List<int> lineNumList)
+    {
+      foreach (int lineNum in lineNumList)
+      {
+        this.bookmarkList.Remove(lineNum);
+      }
+      OnBookmarkRemoved();
+    }
+
+
     internal void AddBookmark(Bookmark bookmark)
     {
       this.bookmarkList.Add(bookmark.LineNum, bookmark);
@@ -73,8 +83,9 @@ namespace LogExpert
 
     internal void ClearAllBookmarks()
     {
+      Logger.logDebug("Removing all bookmarks");
       this.bookmarkList.Clear();
-      OnBookmarkRemoved();
+      OnAllBookmarksRemoved();
     }
 
     #region IBookmarkData Member
@@ -137,6 +148,16 @@ namespace LogExpert
       if (BookmarkRemoved != null)
       {
         BookmarkRemoved(this, new EventArgs());
+      }
+    }
+
+    public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
+    public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
+    protected void OnAllBookmarksRemoved()
+    {
+      if (AllBookmarksRemoved != null)
+      {
+        AllBookmarksRemoved(this, new EventArgs());
       }
     }
 

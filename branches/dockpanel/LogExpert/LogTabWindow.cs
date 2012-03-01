@@ -111,6 +111,7 @@ namespace LogExpert
 		private static StaticLogTabWindowData staticData = new StaticLogTabWindowData();
 
 	  private BookmarkWindow bookmarkWindow;
+	  private bool firstBookmarkWindowShow = true;
 
 
 		public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
@@ -171,8 +172,18 @@ namespace LogExpert
 			bmp.Dispose();
 			this.Closing += LogTabWindow_Closing;
 
-		  InitBookmarkWindow();
+		  InitToolWindows();
 		}
+
+    private void InitToolWindows()
+    {
+      InitBookmarkWindow();
+    }
+
+    private void DestroyToolWindows()
+    {
+      DestroyBookmarkWindow();
+    }
 
 	  private void InitBookmarkWindow()
 	  {
@@ -180,7 +191,14 @@ namespace LogExpert
 	    this.bookmarkWindow.HideOnClose = true;
 	    this.bookmarkWindow.ShowHint = DockState.DockBottom;
 	    this.bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, SettingsFlags.All);
+      this.bookmarkWindow.VisibleChanged += new EventHandler(bookmarkWindow_VisibleChanged);
+      this.firstBookmarkWindowShow = true;
 	  }
+
+    void bookmarkWindow_VisibleChanged(object sender, EventArgs e)
+    {
+      this.firstBookmarkWindowShow = false;
+    }
 
     private void DestroyBookmarkWindow()
     {
@@ -224,9 +242,9 @@ namespace LogExpert
 			{
 				LoadFiles(this.startupFileNames, false);
 			}
-			this.ledThread = new Thread(new ThreadStart(this.LedThreadProc));
-			this.ledThread.IsBackground = true;
-			this.ledThread.Start();
+      this.ledThread = new Thread(new ThreadStart(this.LedThreadProc));
+      this.ledThread.IsBackground = true;
+      this.ledThread.Start();
 
 			this.statusLineThread = new Thread(new ThreadStart(this.StatusLineThreadFunc));
 			this.statusLineThread.IsBackground = true;
@@ -344,7 +362,18 @@ namespace LogExpert
 		}
 
 
-		public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+    public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+    {
+      return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading, preProcessColumnizer, true);
+    }
+
+    public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+    {
+      return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading, preProcessColumnizer, false);
+    }
+
+
+	  public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel)
 		{
 			string logFileName = FindFilenameForSettings(givenFileName);
 			LogWindow win = FindWindowForFile(logFileName);
@@ -372,7 +401,7 @@ namespace LogExpert
 				logWindow.TempTitleName = title;
 				encodingOptions.Encoding = new UnicodeEncoding(false, false);
 			}
-			AddLogWindow(logWindow, title);
+      AddLogWindow(logWindow, title, doNotAddToDockPanel);
 			if (!isTempFile)
 				AddToFileHistory(givenFileName);
 
@@ -434,8 +463,9 @@ namespace LogExpert
 			if (fileNames.Length < 1)
 				return null;
 			LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, null, false);
-			AddLogWindow(logWindow, fileNames[fileNames.Length - 1]);
+			AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
 			this.multiFileToolStripMenuItem.Checked = true;
+      this.multiFileEnabledStripMenuItem.Checked = true;
 			EncodingOptions encodingOptions = new EncodingOptions();
 			FillDefaultEncodingFromSettings(encodingOptions);
 			this.BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), new object[] { fileNames, encodingOptions });
@@ -461,7 +491,7 @@ namespace LogExpert
 				{
 					if (fileName.EndsWith(".lxj"))
 					{
-						LoadProject(fileName);
+						LoadProject(fileName, false);
 					}
 					else
 					{
@@ -469,42 +499,28 @@ namespace LogExpert
 					}
 				}
 			}
+		  this.Activate();
 		}
 
-		private void AddLogWindow(LogWindow logWindow, string title)
+		private void AddLogWindow(LogWindow logWindow, string title, bool doNotAddToPanel)
 		{
       logWindow.CloseButton = true;
 		  logWindow.TabPageContextMenuStrip = this.tabContextMenuStrip;
 		  SetTooltipText(logWindow, title);
 		  logWindow.DockAreas = DockAreas.Document | DockAreas.Float;
-      logWindow.Show(this.dockPanel);
 
-
-      //logWindow.Anchor = (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-      //logWindow.Dock = DockStyle.Fill;
-
-      //MdiTabControl.TabPage tabPage = this.tabControl1.TabPages.Add(logWindow);
-      //tabPage.TooltipText = logWindow.FileName;
-
-      //logWindow.Location = new Point(30, 30);
-      //Size size = tabPage.Size;
-      //logWindow.Size = size;
-      //this.tabControl1.TabPages.set_IndexOf(tabPage, this.tabControl1.TabPages.Count - 1);
-      //tabPage.Name = title;
-      //tabPage.ContextMenuStrip = this.tabContextMenuStrip;
-      //tabPage.MouseClick += tabPage_MouseClick;
-      //tabPage.TabDoubleClick += tabPage_TabDoubleClick;
+      if (!doNotAddToPanel)
+      {
+        logWindow.Show(this.dockPanel);
+      }
 
       LogWindowData data = new LogWindowData();
       data.diffSum = 0;
-      //data.tabPage = tabPage;
       logWindow.Tag = data;
       lock (this.logWindowList)
       {
         this.logWindowList.Add(logWindow);
       }
-      //Icon icon = this.ledIcons[0, 0, 0, 0];
-      //this.Invoke(new SetTabIconDelegate(SetTabIcon), new object[] { tabPage, icon });
       logWindow.FileSizeChanged += FileSizeChanged;
       logWindow.TailFollowed += TailFollowed;
       logWindow.Disposed += logWindow_Disposed;
@@ -895,7 +911,7 @@ namespace LogExpert
 			{
 				if (names[0].EndsWith(".lxj"))
 				{
-					LoadProject(names[0]);
+					LoadProject(names[0], true);
 					return;
 				}
 				else
@@ -1124,6 +1140,17 @@ namespace LogExpert
 			this.currentLogWindow = newLogWindow;
 			string titleName = this.showInstanceNumbers ? "LogExpert #" + this.instanceNumber : "LogExpert";
 
+      if (oldLogWindow != null)
+      {
+        oldLogWindow.StatusLineEvent -= StatusLineEvent;
+        oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
+        oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
+        oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
+        oldLogWindow.BookmarkAdded += BookmarkAdded;
+        oldLogWindow.BookmarkRemoved += BookmarkRemoved;
+        DisconnectToolWindows(oldLogWindow);
+      }
+
 			if (newLogWindow != null)
 			{
 				newLogWindow.StatusLineEvent += StatusLineEvent;
@@ -1138,18 +1165,20 @@ namespace LogExpert
 					this.Text = titleName + " - " + newLogWindow.FileName;
 				this.multiFileToolStripMenuItem.Checked = this.CurrentLogWindow.IsMultiFile;
 				this.multiFileToolStripMenuItem.Enabled = true;
+			  this.multiFileEnabledStripMenuItem.Checked = this.CurrentLogWindow.IsMultiFile;
 				this.cellSelectModeToolStripMenuItem.Checked = true;
 				this.cellSelectModeToolStripMenuItem.Enabled = true;
 				this.closeFileToolStripMenuItem.Enabled = true;
 				this.searchToolStripMenuItem.Enabled = true;
 				this.filterToolStripMenuItem.Enabled = true;
 				this.goToLineToolStripMenuItem.Enabled = true;
-			  ConnectToolWindows(newLogWindow);
+        //ConnectToolWindows(newLogWindow);
 			}
 			else
 			{
 				this.Text = titleName;
 				this.multiFileToolStripMenuItem.Checked = false;
+        this.multiFileEnabledStripMenuItem.Checked = false;
 				this.followTailCheckBox.Checked = false;
 				this.menuStrip1.Enabled = true;
 				timeshiftToolStripMenuItem.Enabled = false;
@@ -1165,18 +1194,6 @@ namespace LogExpert
 				this.goToLineToolStripMenuItem.Enabled = false;
 				this.dateTimeDragControl.Visible = false;
 			}
-
-			if (oldLogWindow != null)
-			{
-				oldLogWindow.StatusLineEvent -= StatusLineEvent;
-				oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
-				oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
-        oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
-        oldLogWindow.BookmarkAdded += BookmarkAdded;
-        oldLogWindow.BookmarkRemoved += BookmarkRemoved;
-      }
-
-
 		}
 
 
@@ -1191,6 +1208,19 @@ namespace LogExpert
       this.bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
       this.bookmarkWindow.SetCurrentFile(ctx);
     }
+
+    private void DisconnectToolWindows(LogWindow logWindow)
+    {
+      DisconnectBookmarkWindow(logWindow);
+    }
+
+    private void DisconnectBookmarkWindow(LogWindow logWindow)
+    {
+      this.bookmarkWindow.SetBookmarkData(null);
+      this.bookmarkWindow.SetCurrentFile(null);
+    }
+
+
 
 		void GuiStateUpdate(object sender, GuiStateArgs e)
 		{
@@ -1209,6 +1239,7 @@ namespace LogExpert
 			this.timeshiftMenuTextBox.Enabled = e.TimeshiftEnabled;
 			this.multiFileToolStripMenuItem.Enabled = e.MultiFileEnabled;  // disabled for temp files
 			this.multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
+		  this.multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
 			this.cellSelectModeToolStripMenuItem.Checked = e.CellSelectMode;
 			RefreshEncodingMenuBar(e.CurrentEncoding);
 			if (e.TimeshiftPossible && ConfigManager.Settings.preferences.timestampControl)
@@ -2112,6 +2143,13 @@ namespace LogExpert
       }
       else
       {
+        // strange: on very first Show() now bookmarks are displayed. after a hide it will work.
+        if (this.firstBookmarkWindowShow)
+        {
+          this.bookmarkWindow.Show(this.dockPanel);
+          this.bookmarkWindow.Hide();
+        }
+
         this.bookmarkWindow.Show(this.dockPanel);
       }
 		}
@@ -2184,7 +2222,7 @@ namespace LogExpert
       {
         foreach (DockContent content in this.dockPanel.Contents)
         {
-          if (content != this.dockPanel.ActiveContent)
+          if (content != this.dockPanel.ActiveContent && content is LogWindow)
           {
             closeList.Add(content as Form);
           }
@@ -2198,40 +2236,27 @@ namespace LogExpert
 
 		private void closeAllTabsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-      IList<Form> closeList = new List<Form>();
-      lock (this.logWindowList)
-      {
-        foreach (DockContent content in this.dockPanel.Contents)
-        {
-          closeList.Add(content as Form);
-        }
-      }
-      foreach (Form form in closeList)
-      {
-        form.Close();
-      }
-    }
-
-		void tabPage_MouseClick(object sender, MouseEventArgs e)
-		{
-			MdiTabControl.TabPage tabPage = sender as MdiTabControl.TabPage;
-			if (e.Button == MouseButtons.Middle)
-			{
-				((Form)tabPage.Form).Close();
-			}
-			else
-			{
-				LogWindowData data = ((Form)tabPage.Form).Tag as LogWindowData;
-				ToolTip tip = new ToolTip(this.components);
-				if (data.toolTip != null)
-				{
-					tip.SetToolTip(tabPage, data.toolTip.GetToolTip(tabPage));
-					tip.AutomaticDelay = data.toolTip.AutomaticDelay;
-					tip.AutoPopDelay = data.toolTip.AutoPopDelay;
-					data.toolTip = tip;
-				}
-			}
+		  CloseAllTabs();
 		}
+
+	  private void CloseAllTabs()
+	  {
+	    IList<Form> closeList = new List<Form>();
+	    lock (this.logWindowList)
+	    {
+	      foreach (DockContent content in this.dockPanel.Contents)
+	      {
+	        if (content is LogWindow)
+	        {
+	          closeList.Add(content as Form);
+	        }
+	      }
+	    }
+	    foreach (Form form in closeList)
+	    {
+	      form.Close();
+	    }
+	  }
 
 		private void tabColorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -2350,15 +2375,19 @@ namespace LogExpert
 					foreach (DockContent content in this.dockPanel.Contents)
 					{
 						LogWindow logWindow = content as LogWindow;
-						string persistenceFileName = logWindow.SavePersistenceData(true);
-						if (persistenceFileName != null)
-						{
-							fileNames.Add(persistenceFileName);
-						}
+            if (logWindow != null)
+            {
+              string persistenceFileName = logWindow.SavePersistenceData(true);
+              if (persistenceFileName != null)
+              {
+                fileNames.Add(persistenceFileName);
+              }
+            }
 					}
 				}
 				ProjectData projectData = new ProjectData();
 				projectData.memberList = fileNames;
+			  projectData.tabLayoutXml = SaveLayout();
 				ProjectPersister.SaveProjectData(fileName, projectData);
 			}
 		}
@@ -2371,69 +2400,60 @@ namespace LogExpert
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				string projectFileName = dlg.FileName;
-				LoadProject(projectFileName);
+				LoadProject(projectFileName, true);
 			}
 		}
 
-		private void LoadProject(string projectFileName)
+		private void LoadProject(string projectFileName, bool restoreLayout)
 		{
 			ProjectData projectData = ProjectPersister.LoadProjectData(projectFileName);
-			if (projectData != null)
+		  bool hasLayoutData = projectData.tabLayoutXml != null;
+
+      if (hasLayoutData && restoreLayout && this.logWindowList.Count > 0)
+      {
+        ProjectLoadDlg dlg = new ProjectLoadDlg();
+        if (DialogResult.Cancel != dlg.ShowDialog())
+        {
+          switch (dlg.ProjectLoadResult)
+          {
+            case ProjectLoadDlgResult.IgnoreLayout:
+              hasLayoutData = false;
+              break;
+            case ProjectLoadDlgResult.CloseTabs:
+              CloseAllTabs();
+              break;
+            case ProjectLoadDlgResult.NewWindow:
+              LogExpertProxy.NewWindow(new string[]{projectFileName});
+              return;
+          }
+        }
+      }
+
+		  if (projectData != null)
 			{
 				foreach (string fileName in projectData.memberList)
 				{
-					AddFileTab(fileName, false, null, null, true, null);
+          if (hasLayoutData)
+          {
+            AddFileTabDeferred(fileName, false, null, null, true, null);
+          }
+          else
+          {
+            AddFileTab(fileName, false, null, null, true, null);
+          }
 				}
+
+        if (hasLayoutData && restoreLayout)
+        {
+          // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
+          DestroyToolWindows();
+          InitToolWindows();
+          RestoreLayout(projectData.tabLayoutXml);
+        }
+
 			}
 		}
 
-		void tabPage_TabDoubleClick(object sender, EventArgs e)
-		{
-			handleTabDoubleClick(sender);
-		}
-
-		private void handleTabDoubleClick(object sender)
-		{
-			MdiTabControl.TabPage tabPage = sender as MdiTabControl.TabPage;
-			TextBox textBox = new TextBox();
-			textBox.Text = (tabPage.Form as LogWindow).Text;
-			textBox.KeyPress += delegate(object keySender, KeyPressEventArgs keyEvent)
-			{
-				TextBox box = keySender as TextBox;
-				switch (keyEvent.KeyChar)
-				{
-					case (char)13:
-						(tabPage.Form as LogWindow).Text = box.Text;
-						box.Hide();
-						tabPage.Controls.Remove(box);
-						break;
-					case (char)27:
-						box.Hide();
-						tabPage.Controls.Remove(box);
-						break;
-				}
-			};
-			textBox.LostFocus += delegate(object keySender2, EventArgs keyEvent2)
-			{
-				TextBox box = keySender2 as TextBox;
-				box.Hide();
-				tabPage.Controls.Remove(box);
-			};
-			textBox.Parent = tabPage;
-			Size size = new Size(tabPage.Size.Width, tabPage.Size.Height);
-			size.Height = size.Height - 2;
-			size.Width = size.Width - (15 + 26);
-			textBox.Size = size;
-			//Point location = new Point(tabPage.Location.X, tabPage.Location.Y);
-			Point location = new Point(0, 0);
-			location.Offset(19, 1);
-			textBox.Location = location;
-			tabPage.Controls.Add(textBox);
-			textBox.Parent = tabPage;
-			textBox.BringToFront();
-			textBox.Show();
-			textBox.Focus();
-		}
 
 		private void toolStripButtonBubbles_Click(object sender, EventArgs e)
 		{
@@ -2823,6 +2843,7 @@ namespace LogExpert
       {
         this.CurrentLogWindow = this.dockPanel.ActiveContent as LogWindow;
         this.CurrentLogWindow.LogWindowActivated();
+        ConnectToolWindows(this.CurrentLogWindow);
       }
     }
 
@@ -2840,5 +2861,48 @@ namespace LogExpert
       }
     }
 
+    private string SaveLayout()
+    {
+      MemoryStream memStream = new MemoryStream(2000);
+      this.dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
+      memStream.Seek(0, SeekOrigin.Begin);
+      StreamReader r = new StreamReader(memStream);
+      string resultXml = r.ReadToEnd();
+      r.Close();
+      return resultXml;
+    }
+
+    private void RestoreLayout(string layoutXml)
+    {
+      MemoryStream memStream = new MemoryStream(2000);
+      StreamWriter w = new StreamWriter(memStream);
+      w.Write(layoutXml);
+      w.Flush();
+      memStream.Seek(0, SeekOrigin.Begin);
+      this.dockPanel.LoadFromXml(memStream, this.DeserializeDockContent, true);
+      w.Dispose();
+    }
+
+    private IDockContent DeserializeDockContent(string persistString)
+    {
+      if (persistString.Equals(WindowTypes.BookmarkWindow.ToString()))
+      {
+        return this.bookmarkWindow;
+      }
+      else if (persistString.StartsWith(WindowTypes.LogWindow.ToString()))
+      {
+        string fileName = persistString.Substring(WindowTypes.LogWindow.ToString().Length + 1);
+        LogWindow win = FindWindowForFile(fileName);
+        if (win != null)
+        {
+          return win;
+        }
+        else
+        {
+          Logger.logWarn("Layout data contains non-existing LogWindow for " + fileName);
+        }
+      }
+      return null;
+    }
 	}
 }
