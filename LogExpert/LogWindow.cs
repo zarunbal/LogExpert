@@ -145,8 +145,6 @@ namespace LogExpert
     PatternWindow patternWindow;
     PatternArgs patternArgs = new PatternArgs();
 
-    IBookmarkView bookmarkView;
-
     readonly LoadingFinishedFx loadingFinishedFx;
 
     Image advancedButtonImage;
@@ -272,6 +270,7 @@ namespace LogExpert
 
       bookmarkProvider.BookmarkAdded += new BookmarkDataProvider.BookmarkAddedEventHandler(bookmarkProvider_BookmarkAdded);
       bookmarkProvider.BookmarkRemoved += new BookmarkDataProvider.BookmarkRemovedEventHandler(bookmarkProvider_BookmarkRemoved);
+      bookmarkProvider.AllBookmarksRemoved += new BookmarkDataProvider.AllBookmarksRemovedEventHandler(bookmarkProvider_AllBookmarksRemoved);
 
       this.ResumeLayout();
 
@@ -280,6 +279,7 @@ namespace LogExpert
 
       PreferencesChanged(this.parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
     }
+
 
     ~LogWindow()
     {
@@ -307,6 +307,8 @@ namespace LogExpert
 #if DEBUG
       //MessageBox.Show("Pause vor LoadFile()");
 #endif
+
+      EnterLoadFileStatus();
 
       if (fileName != null)
       {
@@ -347,6 +349,7 @@ namespace LogExpert
           this.logFileReader = new LogfileReader(fileName, this.EncodingOptions, this.IsMultiFile,
                                this.Preferences.bufferCount, this.Preferences.linesPerBuffer,
                                this.multifileOptions);
+          this.logFileReader.UseNewReader = !this.Preferences.useLegacyReader;
         }
         catch (LogFileException lfe)
         {
@@ -374,7 +377,6 @@ namespace LogExpert
           this.logFileReader.PreProcessColumnizer = null;
         }
         RegisterLogFileReaderEvents();
-        EnterLoadFileStatus();
         Logger.logInfo("Loading logfile: " + fileName);
         this.logFileReader.startMonitoring();
       }
@@ -476,6 +478,9 @@ namespace LogExpert
     public void LoadFilesAsMulti(string[] fileNames, EncodingOptions encodingOptions)
     {
       Logger.logInfo("Loading given files as MultiFile:");
+
+      EnterLoadFileStatus();
+
       foreach (string name in fileNames)
       {
         Logger.logInfo("File: " + name);
@@ -489,8 +494,8 @@ namespace LogExpert
       this.columnCache = new ColumnCache();
       this.logFileReader = new LogfileReader(fileNames, this.EncodingOptions, this.Preferences.bufferCount,
                            this.Preferences.linesPerBuffer, this.multifileOptions);
+      this.logFileReader.UseNewReader = !this.Preferences.useLegacyReader;
       RegisterLogFileReaderEvents();
-      EnterLoadFileStatus();
       this.logFileReader.startMonitoring();
       this.fileNameField = fileNames[fileNames.Length - 1];
       this.fileNames = fileNames;
@@ -732,6 +737,8 @@ namespace LogExpert
 
     private void EnterLoadFileStatus()
     {
+      Logger.logDebug("EnterLoadFileStatus begin");
+
       if (this.InvokeRequired)
       {
         this.Invoke(new MethodInvoker(EnterLoadFileStatus));
@@ -754,6 +761,7 @@ namespace LogExpert
       ClearBookmarkList();
       this.dataGridView.ClearSelection();
       this.dataGridView.RowCount = 0;
+      Logger.logDebug("EnterLoadFileStatus end");
     }
 
 
@@ -1623,8 +1631,6 @@ namespace LogExpert
         this.patternWindow.SetColumnizer(columnizer);
       }
 
-  
-
       this.guiStateArgs.TimeshiftPossible = columnizer.IsTimeshiftImplemented();
       SendGuiStateUpdate();
 
@@ -1800,7 +1806,7 @@ namespace LogExpert
 
     void dataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
     {
-      e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
+       e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
     }
 
 
@@ -3225,7 +3231,7 @@ namespace LogExpert
     }
 
 
-    private void DeleteBookmarks(List<int> lineNumList)
+    public void DeleteBookmarks(List<int> lineNumList)
     {
       bool bookmarksPresent = false;
       foreach (int lineNum in lineNumList)
@@ -3245,10 +3251,7 @@ namespace LogExpert
           return;
         }
       }
-      foreach (int lineNum in lineNumList)
-      {
-        this.bookmarkProvider.RemoveBookmarkForLine(lineNum);
-      }
+      bookmarkProvider.RemoveBookmarksForLines(lineNumList);
       OnBookmarkRemoved();
     }
 
@@ -3380,7 +3383,6 @@ namespace LogExpert
     {
       FireCancelHandlers();   // make sure that there's no other filter running (maybe from filter restore)
 
-      this.filterComboBox.Text = text;
       this.filterParams.searchText = text;
       this.filterParams.lowerSearchText = text.ToLower();
       ConfigManager.Settings.filterHistoryList.Remove(text);
@@ -3394,6 +3396,7 @@ namespace LogExpert
       {
         this.filterComboBox.Items.Add(item);
       }
+      this.filterComboBox.Text = text;
 
       this.filterParams.isRangeSearch = this.rangeCheckBox.Checked;
       this.filterParams.rangeSearchText = this.filterRangeComboBox.Text;
@@ -3889,7 +3892,7 @@ namespace LogExpert
     private void ClearBookmarkList()
     {
       this.bookmarkProvider.ClearAllBookmarks();
-      OnBookmarkRemoved();
+      OnAllBookmarksRemoved();
     }
 
 
@@ -4518,6 +4521,16 @@ namespace LogExpert
       }
     }
 
+    public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
+    public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
+    protected void OnAllBookmarksRemoved()
+    {
+      if (AllBookmarksRemoved != null)
+      {
+        AllBookmarksRemoved(this, new EventArgs());
+      }
+    }
+
     public delegate void BookmarkTextChangedEventHandler(object sender, EventArgs e);
     public event BookmarkTextChangedEventHandler BookmarkTextChanged;
     protected void OnBookmarkTextChanged(Bookmark bookmark)
@@ -4923,6 +4936,7 @@ namespace LogExpert
       this.reloadMemento.currentLine = this.dataGridView.CurrentCellAddress.Y;
       this.reloadMemento.firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
       this.forcedColumnizerForLoading = this.CurrentColumnizer;
+
       if (this.fileNames == null || !this.IsMultiFile)
       {
         LoadFile(this.FileName, this.EncodingOptions);
@@ -7349,15 +7363,27 @@ namespace LogExpert
 
     void bookmarkProvider_BookmarkRemoved(object sender, EventArgs e)
     {
-      this.dataGridView.Refresh();
-      this.filterGridView.Refresh();
+      if (!this.isLoading)
+      {
+        this.dataGridView.Refresh();
+        this.filterGridView.Refresh();
+      }
     }
 
     void bookmarkProvider_BookmarkAdded(object sender, EventArgs e)
     {
-      this.dataGridView.Refresh();
-      this.filterGridView.Refresh();
+      if (!this.isLoading)
+      {
+        this.dataGridView.Refresh();
+        this.filterGridView.Refresh();
+      }
     }
+
+    void bookmarkProvider_AllBookmarksRemoved(object sender, EventArgs e)
+    {
+      // nothing
+    }
+
 
 
     #region ILogPaintContext Member
@@ -7403,5 +7429,11 @@ namespace LogExpert
     {
       get { return this.bookmarkProvider; }
     }
+
+    protected override string GetPersistString()
+    {
+      return "LogWindow#" + FileName;
+    }
+
   }
 }

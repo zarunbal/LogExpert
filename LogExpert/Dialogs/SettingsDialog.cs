@@ -134,6 +134,7 @@ namespace LogExpert.Dialogs
       this.encodingComboBox.SelectedItem = Encoding.GetEncoding(this.preferences.defaultEncoding);
       this.maskPrioCheckBox.Checked = this.preferences.maskPrio;
       this.columnFinderCheckBox.Checked = this.preferences.showColumnFinder;
+      this.legacyReaderCheckBox.Checked = this.preferences.useLegacyReader;
     }
 
 
@@ -209,6 +210,7 @@ namespace LogExpert.Dialogs
                                            ? (this.encodingComboBox.SelectedItem as Encoding).HeaderName
                                            : Encoding.Default.HeaderName;
       this.preferences.showColumnFinder = this.columnFinderCheckBox.Checked;
+      this.preferences.useLegacyReader = this.legacyReaderCheckBox.Checked;
       SavePluginSettings();
       SaveHighlightMaskList();
       GetToolListBoxData();

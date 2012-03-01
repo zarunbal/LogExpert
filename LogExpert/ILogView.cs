@@ -13,6 +13,7 @@ namespace LogExpert
     void SelectAndEnsureVisible(int line, bool triggerSyncCall);
     void RefreshLogView();
     ILogLineColumnizer CurrentColumnizer { get; }
+    void DeleteBookmarks(List<int> lineNumList);
     string FileName { get; }
   }
 }

@@ -30,7 +30,7 @@ namespace LogExpert
     //private DateTimeFormatInfo dateFormat;
     private String dateTimeFormat = null;
     private Regex regex;
-    private Regex regexCond;
+    //private Regex regexCond;
     private DateTime dateTime;
     private int index;
     private string currentFileName;

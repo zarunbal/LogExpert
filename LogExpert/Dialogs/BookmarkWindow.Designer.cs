@@ -133,9 +133,11 @@
       this.bookmarkDataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.bookmarkDataGridView_PreviewKeyDown);
       this.bookmarkDataGridView.Leave += new System.EventHandler(this.bookmarkGridView_Leave);
       this.bookmarkDataGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.boomarkDataGridView_ColumnDividerDoubleClick);
+      this.bookmarkDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.bookmarkDataGridView_RowsAdded);
       this.bookmarkDataGridView.CurrentCellChanged += new System.EventHandler(this.boomarkDataGridView_CurrentCellChanged);
       this.bookmarkDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.bookmarkDataGridView_CellToolTipTextNeeded);
       this.bookmarkDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.bookmarkGridView_KeyDown);
+      this.bookmarkDataGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.bookmarkDataGridView_RowsRemoved);
       // 
       // commentColumnCheckBox
       // 
@@ -169,6 +171,7 @@
                   | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight)
                   | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop)
                   | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
+      this.DoubleBuffered = true;
       this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -179,6 +182,7 @@
       this.ShowInTaskbar = false;
       this.Text = "Bookmarks";
       this.ClientSizeChanged += new System.EventHandler(this.BookmarkWindow_ClientSizeChanged);
+      this.SizeChanged += new System.EventHandler(this.BookmarkWindow_SizeChanged);
       this.contextMenuStrip1.ResumeLayout(false);
       this.splitContainer1.Panel1.ResumeLayout(false);
       this.splitContainer1.Panel2.ResumeLayout(false);

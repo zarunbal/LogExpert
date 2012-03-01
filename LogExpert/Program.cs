@@ -135,7 +135,7 @@ namespace LogExpert
 			//ShowUnhandledException(e.Exception);
 			Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
 			thread.IsBackground = true;
-			thread.ApartmentState = ApartmentState.STA;
+			thread.SetApartmentState(ApartmentState.STA);
 			thread.Start(e.Exception);
 			thread.Join();
 		}
@@ -146,7 +146,7 @@ namespace LogExpert
 			//ShowUnhandledException(exceptionObject);
 			Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
 			thread.IsBackground = true;
-			thread.ApartmentState = ApartmentState.STA;
+			thread.SetApartmentState(ApartmentState.STA);
 			thread.Start(exceptionObject);
 			thread.Join();
 		}

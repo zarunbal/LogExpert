@@ -169,15 +169,16 @@ namespace LogExpert
       // 
       // statusStrip1
       // 
+      this.statusStrip1.AutoSize = false;
       this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.linesLabel,
             this.sizeLabel,
             this.currentLineLabel,
             this.loadProgessBar,
             this.statusLabel});
-      this.statusStrip1.Location = new System.Drawing.Point(0, 501);
+      this.statusStrip1.Location = new System.Drawing.Point(0, 506);
       this.statusStrip1.Name = "statusStrip1";
-      this.statusStrip1.Size = new System.Drawing.Size(962, 28);
+      this.statusStrip1.Size = new System.Drawing.Size(962, 23);
       this.statusStrip1.SizingGrip = false;
       this.statusStrip1.TabIndex = 5;
       this.statusStrip1.Text = "statusStrip1";
@@ -190,7 +191,7 @@ namespace LogExpert
                   | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
       this.linesLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
       this.linesLabel.Name = "linesLabel";
-      this.linesLabel.Size = new System.Drawing.Size(90, 23);
+      this.linesLabel.Size = new System.Drawing.Size(90, 18);
       this.linesLabel.Text = "0";
       // 
       // sizeLabel
@@ -201,7 +202,7 @@ namespace LogExpert
                   | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
       this.sizeLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
       this.sizeLabel.Name = "sizeLabel";
-      this.sizeLabel.Size = new System.Drawing.Size(90, 23);
+      this.sizeLabel.Size = new System.Drawing.Size(90, 18);
       this.sizeLabel.Text = "0";
       // 
       // currentLineLabel
@@ -212,18 +213,18 @@ namespace LogExpert
                   | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
       this.currentLineLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
       this.currentLineLabel.Name = "currentLineLabel";
-      this.currentLineLabel.Size = new System.Drawing.Size(90, 23);
+      this.currentLineLabel.Size = new System.Drawing.Size(90, 18);
       this.currentLineLabel.Text = "L:";
       // 
       // loadProgessBar
       // 
       this.loadProgessBar.Name = "loadProgessBar";
-      this.loadProgessBar.Size = new System.Drawing.Size(50, 22);
+      this.loadProgessBar.Size = new System.Drawing.Size(50, 17);
       // 
       // statusLabel
       // 
       this.statusLabel.Name = "statusLabel";
-      this.statusLabel.Size = new System.Drawing.Size(39, 23);
+      this.statusLabel.Size = new System.Drawing.Size(39, 18);
       this.statusLabel.Text = "Ready";
       // 
       // menuStrip1
@@ -861,7 +862,7 @@ namespace LogExpert
       this.toolStripContainer1.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
       this.toolStripContainer1.ContentPanel.Controls.Add(this.dockPanel);
       this.toolStripContainer1.ContentPanel.Margin = new System.Windows.Forms.Padding(0);
-      this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(962, 455);
+      this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(962, 460);
       this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
       // 
       // toolStripContainer1.LeftToolStripPanel
@@ -876,7 +877,7 @@ namespace LogExpert
       // 
       this.toolStripContainer1.RightToolStripPanel.Enabled = false;
       this.toolStripContainer1.RightToolStripPanelVisible = false;
-      this.toolStripContainer1.Size = new System.Drawing.Size(962, 501);
+      this.toolStripContainer1.Size = new System.Drawing.Size(962, 506);
       this.toolStripContainer1.TabIndex = 13;
       this.toolStripContainer1.Text = "toolStripContainer1";
       // 
@@ -890,6 +891,7 @@ namespace LogExpert
       // dockPanel
       // 
       this.dockPanel.ActiveAutoHideContent = null;
+      this.dockPanel.BackColor = System.Drawing.SystemColors.Control;
       this.dockPanel.DefaultFloatWindowSize = new System.Drawing.Size(600, 400);
       this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
       this.dockPanel.DockBackColor = System.Drawing.SystemColors.Control;
@@ -898,7 +900,7 @@ namespace LogExpert
       this.dockPanel.Margin = new System.Windows.Forms.Padding(0);
       this.dockPanel.Name = "dockPanel";
       this.dockPanel.ShowDocumentIcon = true;
-      this.dockPanel.Size = new System.Drawing.Size(962, 455);
+      this.dockPanel.Size = new System.Drawing.Size(962, 460);
       dockPanelGradient1.EndColor = System.Drawing.SystemColors.ControlLight;
       dockPanelGradient1.StartColor = System.Drawing.SystemColors.ControlLight;
       autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
@@ -1111,7 +1113,7 @@ namespace LogExpert
       this.externalToolsToolStrip.BackColor = System.Drawing.SystemColors.ControlLight;
       this.externalToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
       this.externalToolsToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-      this.externalToolsToolStrip.Location = new System.Drawing.Point(374, 23);
+      this.externalToolsToolStrip.Location = new System.Drawing.Point(378, 23);
       this.externalToolsToolStrip.Name = "externalToolsToolStrip";
       this.externalToolsToolStrip.Size = new System.Drawing.Size(1, 0);
       this.externalToolsToolStrip.TabIndex = 8;
@@ -1221,8 +1223,8 @@ namespace LogExpert
       this.dateTimeDragControl.DragOrientation = LogExpert.Dialogs.DateTimeDragControl.DragOrientations.Vertical;
       this.dateTimeDragControl.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.dateTimeDragControl.HoverColor = System.Drawing.Color.LightGray;
-      this.dateTimeDragControl.Location = new System.Drawing.Point(611, 507);
-      this.dateTimeDragControl.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+      this.dateTimeDragControl.Location = new System.Drawing.Point(611, 508);
+      this.dateTimeDragControl.Margin = new System.Windows.Forms.Padding(0);
       this.dateTimeDragControl.MaxDateTime = new System.DateTime(9999, 12, 31, 23, 59, 59, 999);
       this.dateTimeDragControl.MinDateTime = new System.DateTime(((long)(0)));
       this.dateTimeDragControl.Name = "dateTimeDragControl";

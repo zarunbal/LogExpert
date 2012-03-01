@@ -12,7 +12,7 @@
     <ManifestCertificateThumbprint>70AEA4DDBBA179A21FD54575FFD9F28DAC5C4654</ManifestCertificateThumbprint>
     <ManifestKeyFile>LogExpert_1_TemporaryKey.pfx</ManifestKeyFile>
     <GenerateManifests>true</GenerateManifests>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -33,7 +33,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>15</ApplicationRevision>
-    <ApplicationVersion>1.4.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
@@ -78,10 +78,6 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.5.0.15095, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
@@ -151,6 +147,12 @@
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\OverlayEventArgs.cs" />
+    <Compile Include="Dialogs\ProjectLoadDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ProjectLoadDlg.Designer.cs">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TabRenameDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -445,6 +447,7 @@
     <Compile Include="Util.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="WindowFileEntry.cs" />
+    <Compile Include="WindowTypes.cs" />
     <Compile Include="XmlBlockSplitter.cs" />
     <Compile Include="XmlLogReader.cs" />
   </ItemGroup>
@@ -470,6 +473,11 @@
     <None Include="LogExpert_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -483,6 +491,11 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Visual.C++.9.0.x86">
@@ -544,6 +557,9 @@
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ProjectLoadDlg.resx">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TabRenameDlg.resx">
       <DependentUpon>TabRenameDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -567,13 +583,13 @@
     <None Include="Resources\SearchIcon.gif" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\dockpanelsuite\trunk\WinFormsUI\WinFormsUI.csproj">
+      <Project>{C75532C4-765B-418E-B09B-46D36B2ABDB1}</Project>
+      <Name>WinFormsUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
       <Name>ColumnizerLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MdiTabControl\MdiTabControl.vbproj">
-      <Project>{7F98F809-CE14-43D5-B3DF-40D8F0B7A1AF}</Project>
-      <Name>MdiTabControl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -24,11 +24,6 @@ namespace LogExpert
 		private ReaderWriterLock lruCacheDictLock;
 		private ReaderWriterLock bufferListLock;
 		private ReaderWriterLock disposeLock;
-#if DEBUG
-		private string lruCacheDictLockInfo;
-		private string bufferListLockInfo;
-		private string disposeLockInfo;
-#endif
 
 		Thread monitorThread = null;
 		Thread garbageCollectorThread = null;
@@ -48,6 +43,7 @@ namespace LogExpert
 		private IPreProcessColumnizer preProcessColumnizer = null;
 		private bool contentDeleted = false;
 		private MultifileOptions mutlifileOptions;
+    private bool useNewReader;
 
 		private delegate string GetLogLineFx(int lineNum);
 
@@ -476,7 +472,7 @@ namespace LogExpert
 			}
 			try
 			{
-				reader = GetLogStreamReader(fileStream, this.EncodingOptions);
+				reader = GetLogStreamReader(fileStream, this.EncodingOptions, this.UseNewReader);
 				reader.Position = filePos;
 				this.fileLength = logFileInfo.Length;
 				String line;
@@ -857,7 +853,7 @@ namespace LogExpert
 				}
 				try
 				{
-					ILogStreamReader reader = GetLogStreamReader(fileStream, this.EncodingOptions);
+          ILogStreamReader reader = GetLogStreamReader(fileStream, this.EncodingOptions, this.UseNewReader);
 					string line;
 					long filePos = logBuffer.StartPos;
 					reader.Position = logBuffer.StartPos;
@@ -1559,15 +1555,15 @@ namespace LogExpert
 			set { this.xmlLogConfig = value; }
 		}
 
-		private ILogStreamReader GetLogStreamReader(Stream stream, EncodingOptions encodingOptions)
+		private ILogStreamReader GetLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useNewReader)
 		{
 			if (IsXmlMode)
 			{
-				return new XmlBlockSplitter(new XmlLogReader(new PositionAwareStreamReader(stream, encodingOptions)), XmlLogConfig);
+        return new XmlBlockSplitter(new XmlLogReader(new PositionAwareStreamReader(stream, encodingOptions, useNewReader)), XmlLogConfig);
 			}
 			else
 			{
-				return new PositionAwareStreamReader(stream, encodingOptions);
+        return new PositionAwareStreamReader(stream, encodingOptions, useNewReader);
 			}
 		}
 
@@ -1590,7 +1586,13 @@ namespace LogExpert
 			}
 		}
 
-		private bool ReadLine(ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)
+	  public bool UseNewReader
+	  {
+	    get { return useNewReader; }
+	    set { useNewReader = value; }
+	  }
+
+	  private bool ReadLine(ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)
 		{
 			string line = null;
 			try
