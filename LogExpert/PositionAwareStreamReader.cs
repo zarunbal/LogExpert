@@ -74,11 +74,14 @@ namespace LogExpert
       string line = this.reader.ReadLine();
       if (line != null)
       {
-        this.stream.Seek(this.Encoding.GetByteCount(line), SeekOrigin.Begin);
-        int b = this.stream.ReadByte();
+        this.stream.Seek(this.Encoding.GetByteCount(line) + this.preambleLength, SeekOrigin.Begin);
+        ResetReader();
+        int b = this.reader.Read();
+        // int b = this.stream.ReadByte();
         if (b == 0x0d)
         {
-          b = this.stream.ReadByte();
+          // b = this.stream.ReadByte();
+          b = this.reader.Read();
           if (b == 0x0a)
           {
             len = 2;
@@ -92,6 +95,7 @@ namespace LogExpert
         {
           len = 1;
         }
+        len *= this.Encoding.GetByteCount("\r");
       }
       Position = currentPos;
       return len;
