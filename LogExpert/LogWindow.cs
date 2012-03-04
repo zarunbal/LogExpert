@@ -4203,6 +4203,13 @@ namespace LogExpert
         gridView.InvalidateRow(gridView.CurrentCellAddress.Y);
     }
 
+    private void InvalidateCurrentRow()
+    {
+      InvalidateCurrentRow(this.dataGridView);
+      InvalidateCurrentRow(this.filterGridView);
+    }
+
+
     private void DisplayCurrentFileOnStatusline()
     {
       if (this.logFileReader.IsMultiFile)
@@ -7433,6 +7440,16 @@ namespace LogExpert
     protected override string GetPersistString()
     {
       return "LogWindow#" + FileName;
+    }
+
+    private void LogWindow_Leave(object sender, EventArgs e)
+    {
+      InvalidateCurrentRow();
+    }
+
+    private void LogWindow_Enter(object sender, EventArgs e)
+    {
+      InvalidateCurrentRow();
     }
 
   }

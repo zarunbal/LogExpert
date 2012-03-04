@@ -176,7 +176,7 @@ namespace LogExpert
       this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
       this.tableLayoutPanel1.ColumnCount = 2;
       this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-      this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
+      this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 163F));
       this.tableLayoutPanel1.Controls.Add(this.columnFinderPanel, 0, 0);
       this.tableLayoutPanel1.Controls.Add(this.dataGridView, 0, 1);
       this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl1, 1, 1);
@@ -437,7 +437,7 @@ namespace LogExpert
                   | System.Windows.Forms.AnchorStyles.Right)));
       this.timeSpreadingControl1.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.timeSpreadingControl1.ForeColor = System.Drawing.Color.Teal;
-      this.timeSpreadingControl1.Location = new System.Drawing.Point(994, 30);
+      this.timeSpreadingControl1.Location = new System.Drawing.Point(995, 30);
       this.timeSpreadingControl1.Margin = new System.Windows.Forms.Padding(2, 0, 1, 0);
       this.timeSpreadingControl1.Name = "timeSpreadingControl1";
       this.timeSpreadingControl1.ReverseAlpha = false;
@@ -1185,6 +1185,8 @@ namespace LogExpert
       this.ShowInTaskbar = false;
       this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
       this.SizeChanged += new System.EventHandler(this.LogWindow_SizeChanged);
+      this.Enter += new System.EventHandler(this.LogWindow_Enter);
+      this.Leave += new System.EventHandler(this.LogWindow_Leave);
       this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LogWindow_KeyDown);
       this.splitContainer1.Panel1.ResumeLayout(false);
       this.splitContainer1.Panel2.ResumeLayout(false);
