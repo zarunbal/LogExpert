@@ -25,11 +25,16 @@ namespace UnitTests
     [Test]
     public void compareReaderImplementations()
     {
-      string DataPath = "..\\..\\data\\";
+      compareReaderImplementations("50 MB.txt", Encoding.Default);
+      compareReaderImplementations("50 MB UTF16.txt", Encoding.Unicode);
+      compareReaderImplementations("50 MB UTF8.txt", Encoding.UTF8);
+    }
 
-      string fileName = "50 MB.txt";
+    private void compareReaderImplementations(string fileName, Encoding enc)
+    {
+      string DataPath = "..\\..\\data\\";
       EncodingOptions encOpts = new EncodingOptions();
-      encOpts.Encoding = Encoding.UTF8;
+      encOpts.Encoding = enc;
 
       Stream s1 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read);
       PositionAwareStreamReader r1 = new PositionAwareStreamReader(s1, encOpts, false);
@@ -45,9 +50,10 @@ namespace UnitTests
         {
           break;
         }
-        Assert.AreEqual(line1, line2);
-        Assert.AreEqual(r1.Position, r2.Position, "Zeile " + lineNum);
+        Assert.AreEqual(line1, line2, "File " + fileName);
+        Assert.AreEqual(r1.Position, r2.Position, "Zeile " + lineNum + ", File: " + fileName);
       }
     }
+
   }
 }
