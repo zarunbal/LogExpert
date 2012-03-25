@@ -634,7 +634,7 @@ namespace LogExpert
 			this.cellSelectModeToolStripMenuItem.Name = "cellSelectModeToolStripMenuItem";
 			this.cellSelectModeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
 			this.cellSelectModeToolStripMenuItem.Text = "Cell select mode";
-			this.cellSelectModeToolStripMenuItem.ToolTipText = "Switches between foll row selection and single cell selection mode";
+			this.cellSelectModeToolStripMenuItem.ToolTipText = "Switches between full row selection and single cell selection mode";
 			this.cellSelectModeToolStripMenuItem.Click += new System.EventHandler(this.cellSelectModeToolStripMenuItem_Click);
 			// 
 			// alwaysOnTopToolStripMenuItem
