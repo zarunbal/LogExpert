@@ -10,6 +10,7 @@ namespace LogExpert
   public class WindowFileEntry
   {
     private LogWindow logWindow;
+    private const int MAX_LEN = 40;
 
     public WindowFileEntry(LogWindow logWindow)
     {
@@ -21,9 +22,9 @@ namespace LogExpert
       get 
       {
         String title = this.LogWindow.Text;
-        if (title.Length > 40)
+        if (title.Length > MAX_LEN)
         {
-          title = "..." + title.Substring(title.Length - 50);
+          title = "..." + title.Substring(title.Length - MAX_LEN);
         }
         return title;
       }
