@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
@@ -147,7 +147,7 @@ namespace LogExpert
     public bool followTail = true;
     public bool filterTail = true;
     public bool filterSync = true;
-    public DateTimeDragControl.DragOrientations timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Horizonzal;
+    public DateTimeDragControl.DragOrientations timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Horizontal;
     public List<ToolEntry> toolEntries = new List<ToolEntry>();
     public List<ColumnizerMaskEntry> columnizerMaskList = new List<ColumnizerMaskEntry>();
     public bool maskPrio;

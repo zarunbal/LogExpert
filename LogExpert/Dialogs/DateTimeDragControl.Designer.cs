@@ -40,9 +40,7 @@
       this.Load += new System.EventHandler(this.DateTimeDragControl_Load);
       this.MouseLeave += new System.EventHandler(this.DateTimeDragControl_MouseLeave);
       this.Resize += new System.EventHandler(this.DateTimeDragControl_Resize);
-      this.MouseEnter += new System.EventHandler(this.DateTimeDragControl_MouseEnter);
       this.ResumeLayout(false);
-
     }
 
     #endregion
