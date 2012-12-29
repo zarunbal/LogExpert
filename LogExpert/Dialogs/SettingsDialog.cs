@@ -80,7 +80,7 @@ namespace LogExpert.Dialogs
       this.syncFilterCheckBox.Checked = this.preferences.filterSync;
       this.filterTailCheckBox.Checked = this.preferences.filterTail;
       this.followTailCheckBox.Checked = this.preferences.followTail;
-      this.horizRadioButton.Checked = this.preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizonzal;
+      this.horizRadioButton.Checked = this.preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizontal;
       this.verticalRadioButton.Checked = this.preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Vertical;
       this.verticalInvRadioButton.Checked = this.preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.InvertedVertical;
 
@@ -179,7 +179,7 @@ namespace LogExpert.Dialogs
       else if (this.verticalInvRadioButton.Checked)
         this.preferences.timestampControlDragOrientation = DateTimeDragControl.DragOrientations.InvertedVertical;
       else
-        this.preferences.timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Horizonzal;
+        this.preferences.timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Horizontal;
       SaveColumnizerList();
       this.preferences.maskPrio = this.maskPrioCheckBox.Checked;
       this.preferences.askForClose = this.askCloseTabsCheckBox.Checked;
