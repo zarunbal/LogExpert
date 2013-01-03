@@ -380,7 +380,7 @@ namespace LogExpert.Dialogs
         int s = step;
         if (i == 2) // the year is 4 chars instead of 3
           s = step + oneCharWidth;
-        else if (i == 5) { // seconds are 2 chars instead of 3
+        else if (i == 5) // seconds are 2 chars instead of 3
           s = step - oneCharWidth + 2;
 
         if (i == 3)
@@ -405,7 +405,7 @@ namespace LogExpert.Dialogs
         int s = step;
         if (i == 0) // the year is 5 chars instead of 3
           s = step + (2 * oneCharWidth);
-        else if (i == 2 || i == 5) { // day and seconds are 2 chars instead of 3
+        else if (i == 2 || i == 5) // day and seconds are 2 chars instead of 3
           s = step - oneCharWidth + 2;
 
         if (i == 3)
@@ -430,7 +430,7 @@ namespace LogExpert.Dialogs
         int s = step;
         if (i == 2) // the year is 4 chars instead of 3
           s = step + oneCharWidth;
-        else if (i == 5) { // seconds are 2 chars instead of 3
+        else if (i == 5) // seconds are 2 chars instead of 3
           s = step - oneCharWidth + 2;
 
         if (i == 3)
