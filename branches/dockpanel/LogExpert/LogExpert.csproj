@@ -78,6 +78,9 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>lib\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
@@ -583,10 +586,6 @@
     <None Include="Resources\SearchIcon.gif" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\dockpanelsuite\trunk\WinFormsUI\WinFormsUI.csproj">
-      <Project>{C75532C4-765B-418E-B09B-46D36B2ABDB1}</Project>
-      <Name>WinFormsUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
       <Name>ColumnizerLib</Name>
