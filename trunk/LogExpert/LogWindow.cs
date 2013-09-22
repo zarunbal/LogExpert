@@ -3031,7 +3031,6 @@ namespace LogExpert
 			}
 		}
 
-
 		public void ToggleBookmark()
 		{
 			DataGridView gridView;
@@ -3060,7 +3059,6 @@ namespace LogExpert
 			ToggleBookmark(lineNum);
 		}
 
-
 		public void ToggleBookmark(int lineNum)
 		{
 			if (this.bookmarkList.ContainsKey(lineNum))
@@ -3084,7 +3082,6 @@ namespace LogExpert
 			this.Invoke(new UpdateBookmarkViewFx(this.UpdateBookmarkView), new object[] { });
 			this.bookmarkWindow.SelectBookmark(lineNum);
 		}
-
 
 		public void SetBookmarkFromTrigger(int lineNum, string comment)
 		{
@@ -6459,7 +6456,9 @@ namespace LogExpert
 			dlg.Title = "Choose a file to save bookmarks into";
 			dlg.AddExtension = true;
 			dlg.DefaultExt = "csv";
-			dlg.Filter = "CSV file (*.csv)|*.csv";
+			dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
+      dlg.FilterIndex = 1;
+      dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				try
@@ -6473,8 +6472,50 @@ namespace LogExpert
 			}
 		}
 
+    public void ImportBookmarkList()
+    {
+      OpenFileDialog dlg = new OpenFileDialog();
+      dlg.Title = "Choose a file to load bookmarks from";
+      dlg.AddExtension = true;
+      dlg.DefaultExt = "csv";
+      dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
+      dlg.FilterIndex = 1;
+      dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
+      if (dlg.ShowDialog() == DialogResult.OK)
+      {
+        try
+        {
+          // add to the existing bookmarks
+          var newBookmarks = new SortedList<int, Bookmark>();
+          BookmarkExporter.ImportBookmarkList(this.FileName, dlg.FileName, newBookmarks);
 
-		public bool IsAdvancedOptionActive()
+          // Add (or replace) to existing bookmark list
+          foreach (var b in newBookmarks.Values)
+          {
+            if (!this.bookmarkList.ContainsKey(b.LineNum))
+            {
+              this.bookmarkList.Add(b.LineNum, b);
+            }
+            else
+            {
+              var existingBookmark = this.bookmarkList[b.LineNum];
+              existingBookmark.Text = b.Text; // replace existing bookmark for that line, preserving the overlay
+            }
+          }
+
+          // Refresh the lists
+          this.Invoke(new UpdateBookmarkViewFx(this.UpdateBookmarkView), new object[] { });
+          this.dataGridView.Refresh();
+          this.filterGridView.Refresh();
+        }
+        catch (IOException e)
+        {
+          MessageBox.Show("Error while importing bookmark list: " + e.Message, "LogExpert");
+        }
+      }
+    }
+
+    public bool IsAdvancedOptionActive()
 		{
 			return (this.rangeCheckBox.Checked ||
 			  this.fuzzyKnobControl.Value > 0 ||
@@ -6638,7 +6679,6 @@ namespace LogExpert
 				ToggleBookmark();
 			}
 		}
-
 
 		private void dataGridView_OverlayDoubleClicked(object sender, OverlayEventArgs e)
 		{

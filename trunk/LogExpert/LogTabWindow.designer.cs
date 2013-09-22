@@ -54,6 +54,7 @@ namespace LogExpert
 			this.loadProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exportBookmarksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.importBookmarksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			this.lastUsedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,7 +67,7 @@ namespace LogExpert
 			this.jumpToNextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpToPrevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.showBookmarkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.columnFinderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.columnFinderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.encodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aSCIIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,13 +90,13 @@ namespace LogExpert
 			this.hideLineColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator19 = new System.Windows.Forms.ToolStripSeparator();
 			this.lockInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.configureToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
-      this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.showHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-      this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.configureToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
+			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.showHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dumpLogBufferInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dumpBufferDiagnosticToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -206,7 +207,7 @@ namespace LogExpert
 			// statusLabel
 			// 
 			this.statusLabel.Name = "statusLabel";
-      this.statusLabel.Size = new System.Drawing.Size(39, 19);
+			this.statusLabel.Size = new System.Drawing.Size(39, 19);
 			this.statusLabel.Text = "Ready";
 			// 
 			// menuStrip1
@@ -240,11 +241,12 @@ namespace LogExpert
             this.loadProjectToolStripMenuItem,
             this.saveProjectToolStripMenuItem,
             this.exportBookmarksToolStripMenuItem,
+            this.importBookmarksToolStripMenuItem,
             this.toolStripSeparator14,
             this.lastUsedToolStripMenuItem,
             this.exitToolStripMenuItem});
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-      this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
 			this.toolStripMenuItem1.Text = "File";
 			this.toolStripMenuItem1.DropDownOpening += new System.EventHandler(this.toolStripMenuItem1_DropDownOpening);
 			// 
@@ -253,7 +255,7 @@ namespace LogExpert
 			this.openToolStripMenuItem.Image = global::LogExpert.Properties.Resources.folder_blue;
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
 			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-      this.openToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.openToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.openToolStripMenuItem.Text = "Open...";
 			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
 			// 
@@ -261,7 +263,7 @@ namespace LogExpert
 			// 
 			this.openURIToolStripMenuItem.Name = "openURIToolStripMenuItem";
 			this.openURIToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
-      this.openURIToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.openURIToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.openURIToolStripMenuItem.Text = "Open URL...";
 			this.openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
 			this.openURIToolStripMenuItem.Click += new System.EventHandler(this.openURIToolStripMenuItem_Click);
@@ -270,7 +272,7 @@ namespace LogExpert
 			// 
 			this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
 			this.closeFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-      this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.closeFileToolStripMenuItem.Text = "Close File";
 			this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.closeFileToolStripMenuItem_Click);
 			// 
@@ -278,7 +280,7 @@ namespace LogExpert
 			// 
 			this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
 			this.reloadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-      this.reloadToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.reloadToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.reloadToolStripMenuItem.Text = "Reload";
 			this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
 			// 
@@ -352,7 +354,15 @@ namespace LogExpert
 			this.exportBookmarksToolStripMenuItem.Text = "Export bookmarks...";
 			this.exportBookmarksToolStripMenuItem.ToolTipText = "Write a list of bookmarks and their comments to a CSV file";
 			this.exportBookmarksToolStripMenuItem.Click += new System.EventHandler(this.exportBookmarksToolStripMenuItem_Click);
-			// 
+            // 
+            // importBookmarksToolStripMenuItem
+            // 
+            this.importBookmarksToolStripMenuItem.Name = "importBookmarksToolStripMenuItem";
+            this.importBookmarksToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+            this.importBookmarksToolStripMenuItem.Text = "Import bookmarks...";
+            this.importBookmarksToolStripMenuItem.ToolTipText = "Read a list of bookmarks and their comments from a CSV file";
+            this.importBookmarksToolStripMenuItem.Click += new System.EventHandler(this.importBookmarksToolStripMenuItem_Click);
+            // 
 			// toolStripSeparator14
 			// 
 			this.toolStripSeparator14.Name = "toolStripSeparator14";
@@ -1279,6 +1289,7 @@ namespace LogExpert
 		private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
 		private ToolStripMenuItem findInExplorerToolStripMenuItem;
 		private ToolStripMenuItem exportBookmarksToolStripMenuItem;
+		private ToolStripMenuItem importBookmarksToolStripMenuItem;
 		private ToolStripSeparator toolStripSeparator17;
 		private ToolStripComboBox highlightGroupsComboBox;
 		private ToolStripMenuItem debugToolStripMenuItem;
