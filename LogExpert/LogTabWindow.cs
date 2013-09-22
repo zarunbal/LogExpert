@@ -1090,6 +1090,9 @@ namespace LogExpert
 
 		private void ChangeCurrentLogWindow(LogWindow newLogWindow)
 		{
+			if (newLogWindow == this.currentLogWindow)
+				return; // do nothing if wishing to set the same window
+
 			LogWindow oldLogWindow = this.currentLogWindow;
 			this.currentLogWindow = newLogWindow;
 			string titleName = this.showInstanceNumbers ? "LogExpert #" + this.instanceNumber : "LogExpert";
@@ -1138,17 +1141,14 @@ namespace LogExpert
 				oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
 				oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
 			}
-
-
 		}
 
-		void GuiStateUpdate(object sender, GuiStateArgs e)
+		private void GuiStateUpdate(object sender, GuiStateArgs e)
 		{
 			this.BeginInvoke(new GuiStateUpdateWorkerDelegate(GuiStateUpdateWorker), new object[] { e });
 		}
 
-
-		void GuiStateUpdateWorker(GuiStateArgs e)
+		private void GuiStateUpdateWorker(GuiStateArgs e)
 		{
 			skipEvents = true;
 			this.followTailCheckBox.Checked = e.FollowTail;
@@ -1182,12 +1182,12 @@ namespace LogExpert
 			skipEvents = false;
 		}
 
-		void ProgressBarUpdate(object sender, ProgressEventArgs e)
+		private void ProgressBarUpdate(object sender, ProgressEventArgs e)
 		{
 			this.Invoke(new ProgressBarEventFx(ProgressBarUpdateWorker), new object[] { e });
 		}
 
-		void ProgressBarUpdateWorker(ProgressEventArgs e)
+		private void ProgressBarUpdateWorker(ProgressEventArgs e)
 		{
 			if (e.Value <= e.MaxValue && e.Value >= e.MinValue)
 			{
@@ -1199,7 +1199,7 @@ namespace LogExpert
 			}
 		}
 
-		void StatusLineEvent(object sender, StatusLineEventArgs e)
+		private void StatusLineEvent(object sender, StatusLineEventArgs e)
 		{
 			lock (this.statusLineLock)
 			{
@@ -1316,7 +1316,6 @@ namespace LogExpert
 			}
 		}
 
-
 		public void SwitchTab(bool shiftPressed)
 		{
 			int index = this.tabControl1.TabPages.SelectedIndex();
@@ -1389,7 +1388,6 @@ namespace LogExpert
 				//this.CurrentLogWindow = currentTab.LogWindow;
 				this.CurrentLogWindow.LogWindowActivated();
 			}
-
 		}
 
 		// tailState: 0,1,2 = on/off/off by Trigger
@@ -1472,7 +1470,7 @@ namespace LogExpert
 			}
 		}
 
-		void FileSizeChanged(object sender, LogEventArgs e)
+		private void FileSizeChanged(object sender, LogEventArgs e)
 		{
 			if (sender.GetType().IsAssignableFrom(typeof(LogWindow)))
 			{
@@ -1503,8 +1501,7 @@ namespace LogExpert
 			}
 		}
 
-
-		void logWindow_FileNotFound(object sender, EventArgs e)
+		private void logWindow_FileNotFound(object sender, EventArgs e)
 		{
 			this.Invoke(new FileNotFoundDelegate(FileNotFound), new object[] { sender });
 		}
@@ -1518,7 +1515,7 @@ namespace LogExpert
 		}
 
 
-		void logWindow_FileRespawned(object sender, EventArgs e)
+		private void logWindow_FileRespawned(object sender, EventArgs e)
 		{
 			this.Invoke(new FileRespawnedDelegate(FileRespawned), new object[] { sender });
 		}
@@ -1531,7 +1528,7 @@ namespace LogExpert
 			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
 		}
 
-		void logWindow_FilterListChanged(object sender, FilterListChangedEventArgs e)
+		private void logWindow_FilterListChanged(object sender, FilterListChangedEventArgs e)
 		{
 			lock (this.logWindowList)
 			{
@@ -1546,14 +1543,12 @@ namespace LogExpert
 			ConfigManager.Save(SettingsFlags.FilterList);
 		}
 
-
-		void logWindow_CurrentHighlightGroupChanged(object sender, CurrentHighlightGroupChangedEventArgs e)
+		private void logWindow_CurrentHighlightGroupChanged(object sender, CurrentHighlightGroupChangedEventArgs e)
 		{
 			OnHighlightSettingsChanged();
 			ConfigManager.Settings.hilightGroupList = this.HilightGroupList;
 			ConfigManager.Save(SettingsFlags.HighlightSettings);
 		}
-
 
 		private void ShowLedPeak(LogWindow logWin)
 		{
@@ -1566,8 +1561,7 @@ namespace LogExpert
 			this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] { data.tabPage, icon });
 		}
 
-
-		void TailFollowed(object sender, EventArgs e)
+		private void TailFollowed(object sender, EventArgs e)
 		{
 			if (this.tabControl1.TabPages.SelectedTab() == null)
 				return;
@@ -1583,7 +1577,7 @@ namespace LogExpert
 			}
 		}
 
-		void logWindow_SyncModeChanged(object sender, SyncModeEventArgs e)
+		private void logWindow_SyncModeChanged(object sender, SyncModeEventArgs e)
 		{
 			if (!this.Disposing)
 			{
@@ -1723,7 +1717,6 @@ namespace LogExpert
 				this.CurrentLogWindow.ChangeEncoding(Encoding.GetEncoding("iso-8859-1"));
 		}
 
-
 		private void RefreshEncodingMenuBar(Encoding encoding)
 		{
 			this.aSCIIToolStripMenuItem.Checked = false;
@@ -1784,7 +1777,6 @@ namespace LogExpert
 			}
 		}
 
-
 		private void NotifyWindowsForChangedPrefs(SettingsFlags flags)
 		{
 			Logger.logInfo("The preferences have changed");
@@ -1803,7 +1795,6 @@ namespace LogExpert
 				OnHighlightSettingsChanged();
 			}
 		}
-
 
 		private void ApplySettings(Settings settings, SettingsFlags flags)
 		{
@@ -2340,7 +2331,7 @@ namespace LogExpert
 			}
 		}
 
-		void tabPage_TabDoubleClick(object sender, EventArgs e)
+		private void tabPage_TabDoubleClick(object sender, EventArgs e)
 		{
 			handleTabDoubleClick(sender);
 		}
@@ -2423,7 +2414,15 @@ namespace LogExpert
 			}
 		}
 
-		public delegate void HighlightSettingsChangedEventHandler(object sender, EventArgs e);
+    private void importBookmarksToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (this.CurrentLogWindow != null)
+      {
+        this.CurrentLogWindow.ImportBookmarkList();
+      }
+    }
+
+    public delegate void HighlightSettingsChangedEventHandler(object sender, EventArgs e);
 		public event HighlightSettingsChangedEventHandler HighlightSettingsChanged;
 		protected void OnHighlightSettingsChanged()
 		{

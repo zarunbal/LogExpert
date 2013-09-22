@@ -238,7 +238,6 @@ namespace LogExpert.Dialogs
 
     public void UpdateView()
     {
-      this.bookmarkDataGridView.RowCount = 0;
       this.bookmarkDataGridView.RowCount = this.BookmarkList.Count;
       this.bookmarkDataGridView.Refresh();
     }
@@ -249,18 +248,25 @@ namespace LogExpert.Dialogs
       set { this.logWindow.BookmarkList = value; }
     }
 
-    private void deleteBookmarkssToolStripMenuItem_Click(object sender, EventArgs e)
+    private void deleteBookmarksToolStripMenuItem_Click(object sender, EventArgs e)
     {
       DeleteSelectedBookmarks();
     }
 
     private void bookmarkTextBox_TextChanged(object sender, EventArgs e)
     {
+      if (!bookmarkTextBox.Enabled)
+        return; // ignore all changes done while the control is disabled
+
       int rowIndex = this.bookmarkDataGridView.CurrentCellAddress.Y;
       if (rowIndex == -1)
       {
         return;
       }
+
+      if (this.BookmarkList.Count <= rowIndex)
+        return;
+
       Bookmark bookmark = this.BookmarkList.Values[rowIndex];
       bookmark.Text = this.bookmarkTextBox.Text;
       OnBookmarkCommentChanged();
@@ -284,24 +290,29 @@ namespace LogExpert.Dialogs
       this.bookmarkDataGridView.Refresh();
     }
 
-    private void boomarkDataGridView_CurrentCellChanged(object sender, EventArgs e)
+    private void bookmarkDataGridView_SelectionChanged(object sender, System.EventArgs e)
     {
-      int rowIndex = this.bookmarkDataGridView.CurrentCellAddress.Y;
-      CurrentRowChanged(rowIndex);
+      if (this.bookmarkDataGridView.SelectedRows.Count != 1
+        || this.bookmarkDataGridView.SelectedRows[0].Index >= this.BookmarkList.Count)
+        CurrentRowChanged(-1);
+      else
+        CurrentRowChanged(this.bookmarkDataGridView.SelectedRows[0].Index);
     }
-
 
     private void CurrentRowChanged(int rowIndex)
     {
-      if (rowIndex == -1)
+      if (rowIndex == -1) // multiple selection or no selection at all
       {
+        this.bookmarkTextBox.Enabled = false; // disable the control first so that changes made to it won't propagate to the bookmark item
         this.bookmarkTextBox.Text = "";
-        return;
       }
-      Bookmark bookmark = this.BookmarkList.Values[rowIndex];
-      this.bookmarkTextBox.Text = bookmark.Text;
+      else
+      {
+        Bookmark bookmark = this.BookmarkList.Values[rowIndex];
+        this.bookmarkTextBox.Text = bookmark.Text;
+        this.bookmarkTextBox.Enabled = true;
+      }
     }
-
 
     public void SelectBookmark(int lineNum)
     {
@@ -325,7 +336,6 @@ namespace LogExpert.Dialogs
       }
     }
 
-
     public delegate void BookmarkCommentChangedEventHandler(object sender, EventArgs e);
     public event BookmarkCommentChangedEventHandler BookmarkCommentChanged;
     protected void OnBookmarkCommentChanged()
@@ -335,12 +345,6 @@ namespace LogExpert.Dialogs
       {
         handler(this, new EventArgs());
       }
-    }
-
-
-    private void bookmarkDataGridView_RowEnter(object sender, DataGridViewCellEventArgs e)
-    {
-      
     }
 
     private void bookmarkDataGridView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -365,14 +369,14 @@ namespace LogExpert.Dialogs
       }
     }
 
-
     private void bookmarkDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
     {
+      // Toggle bookmark when double-clicking on the first column
       if (e.ColumnIndex == 0 && e.RowIndex >= 0 && this.bookmarkDataGridView.CurrentRow != null)
       {
         int index = this.bookmarkDataGridView.CurrentRow.Index;
         int lineNum = this.BookmarkList.Values[this.bookmarkDataGridView.CurrentRow.Index].LineNum;
-        this.logWindow.ToggleBookmark(lineNum);
+        this.logWindow.ToggleBookmark(lineNum); // we don't ask for confirmation if the bookmark has an associated comment...
         //this.BookmarkList.Remove(lineNum);
         //this.bookmarkDataGridView.RowCount = this.bookmarkDataGridView.RowCount - 1;
         //this.bookmarkDataGridView.Refresh();

@@ -58,7 +58,7 @@
       this.deleteBookmarkssToolStripMenuItem.Name = "deleteBookmarkssToolStripMenuItem";
       this.deleteBookmarkssToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
       this.deleteBookmarkssToolStripMenuItem.Text = "Delete bookmarks(s)";
-      this.deleteBookmarkssToolStripMenuItem.Click += new System.EventHandler(this.deleteBookmarkssToolStripMenuItem_Click);
+      this.deleteBookmarkssToolStripMenuItem.Click += new System.EventHandler(this.deleteBookmarksToolStripMenuItem_Click);
       // 
       // removeCommentsToolStripMenuItem
       // 
@@ -150,13 +150,12 @@
       this.bookmarkDataGridView.TabIndex = 0;
       this.bookmarkDataGridView.VirtualMode = true;
       this.bookmarkDataGridView.Enter += new System.EventHandler(this.bookmarkGridView_Enter);
-      this.bookmarkDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_RowEnter);
       this.bookmarkDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_CellDoubleClick);
       this.bookmarkDataGridView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.boomarkDataGridView_MouseDoubleClick);
       this.bookmarkDataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.bookmarkDataGridView_PreviewKeyDown);
       this.bookmarkDataGridView.Leave += new System.EventHandler(this.bookmarkGridView_Leave);
       this.bookmarkDataGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.boomarkDataGridView_ColumnDividerDoubleClick);
-      this.bookmarkDataGridView.CurrentCellChanged += new System.EventHandler(this.boomarkDataGridView_CurrentCellChanged);
+      this.bookmarkDataGridView.SelectionChanged += new System.EventHandler(this.bookmarkDataGridView_SelectionChanged);
       this.bookmarkDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.bookmarkDataGridView_CellToolTipTextNeeded);
       this.bookmarkDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.bookmarkGridView_KeyDown);
       // 
