@@ -212,7 +212,6 @@ namespace LogExpert
       this.helpToolTip.SetToolTip(this.columnComboBox, "Select column to scroll to");
       this.columnComboBox.SelectionChangeCommitted += new System.EventHandler(this.columnComboBox_SelectionChangeCommitted);
       this.columnComboBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.columnComboBox_PreviewKeyDown);
-      this.columnComboBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.columnComboBox_KeyPress);
       this.columnComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.columnComboBox_KeyDown);
       // 
       // label3
@@ -268,7 +267,6 @@ namespace LogExpert
       this.dataGridView.VirtualMode = true;
       this.dataGridView.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView_Scroll);
       this.dataGridView.OverlayDoubleClicked += new LogExpert.Dialogs.BufferedDataGridView.OverlayDoubleClickedEventHandler(this.dataGridView_OverlayDoubleClicked);
-      this.dataGridView.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_CellMouseClick);
       this.dataGridView.Enter += new System.EventHandler(this.dataGridView_Enter);
       this.dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellDoubleClick);
       this.dataGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.dataGridView_RowHeightInfoNeeded);
@@ -276,14 +274,12 @@ namespace LogExpert
       this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
       this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
       this.dataGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridView_CellContextMenuStripNeeded);
-      this.dataGridView.RowHeightInfoPushed += new System.Windows.Forms.DataGridViewRowHeightInfoPushedEventHandler(this.dataGridView_RowHeightInfoPushed);
       this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
       this.dataGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView_CellValuePushed);
       this.dataGridView.Paint += new System.Windows.Forms.PaintEventHandler(this.dataGridView_Paint);
       this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
       this.dataGridView.Resize += new System.EventHandler(this.dataGridView_Resize);
       this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
-      this.dataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellContentClick);
       // 
       // dataGridContextMenuStrip
       // 
@@ -1124,7 +1120,6 @@ namespace LogExpert
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem});
       this.editModeContextMenuStrip.Name = "editModeContextMenuStrip";
       this.editModeContextMenuStrip.Size = new System.Drawing.Size(346, 114);
-      this.editModeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.editModeContextMenuStrip_Opening);
       // 
       // copyToolStripMenuItem1
       // 
