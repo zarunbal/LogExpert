@@ -41,7 +41,7 @@
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
       this.okButton.TabIndex = 1;
-      this.okButton.Text = "&OK";
+      this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
       // 
       // cancelButton
@@ -65,6 +65,7 @@
       // 
       // BookmarkCommentDlg
       // 
+      this.AcceptButton = this.okButton;
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
