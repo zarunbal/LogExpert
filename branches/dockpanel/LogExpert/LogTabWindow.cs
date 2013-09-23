@@ -1117,7 +1117,6 @@ namespace LogExpert
 			set { ChangeCurrentLogWindow(value); }
 		}
 
-
 		public SearchParams SearchParams
 		{
 			get { return this.searchParams; }
@@ -1133,9 +1132,11 @@ namespace LogExpert
 			get { return this.hilightGroupList; }
 		}
 
-
 		private void ChangeCurrentLogWindow(LogWindow newLogWindow)
 		{
+			if (newLogWindow == this.currentLogWindow)
+				return; // do nothing if wishing to set the same window
+
 			LogWindow oldLogWindow = this.currentLogWindow;
 			this.currentLogWindow = newLogWindow;
 			string titleName = this.showInstanceNumbers ? "LogExpert #" + this.instanceNumber : "LogExpert";
@@ -1146,8 +1147,9 @@ namespace LogExpert
         oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
         oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
         oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
-        oldLogWindow.BookmarkAdded += BookmarkAdded;
-        oldLogWindow.BookmarkRemoved += BookmarkRemoved;
+        oldLogWindow.BookmarkAdded -= BookmarkAdded;
+        oldLogWindow.BookmarkRemoved -= BookmarkRemoved;
+        oldLogWindow.BookmarkTextChanged -= BookmarkTextChanged;
         DisconnectToolWindows(oldLogWindow);
       }
 
@@ -1156,9 +1158,10 @@ namespace LogExpert
 				newLogWindow.StatusLineEvent += StatusLineEvent;
 				newLogWindow.ProgressBarUpdate += ProgressBarUpdate;
 				newLogWindow.GuiStateUpdate += GuiStateUpdate;
-        newLogWindow.ColumnizerChanged += ColumnizerChanged;
-        newLogWindow.BookmarkAdded += BookmarkAdded;
-        newLogWindow.BookmarkRemoved += BookmarkRemoved;
+				newLogWindow.ColumnizerChanged += ColumnizerChanged;
+				newLogWindow.BookmarkAdded += BookmarkAdded;
+				newLogWindow.BookmarkRemoved += BookmarkRemoved;
+				newLogWindow.BookmarkTextChanged += BookmarkTextChanged;
 				if (newLogWindow.IsTempFile)
 					this.Text = titleName + " - " + newLogWindow.TempTitleName;
 				else
@@ -1178,7 +1181,7 @@ namespace LogExpert
 			{
 				this.Text = titleName;
 				this.multiFileToolStripMenuItem.Checked = false;
-        this.multiFileEnabledStripMenuItem.Checked = false;
+				this.multiFileEnabledStripMenuItem.Checked = false;
 				this.followTailCheckBox.Checked = false;
 				this.menuStrip1.Enabled = true;
 				timeshiftToolStripMenuItem.Enabled = false;
@@ -1195,7 +1198,6 @@ namespace LogExpert
 				this.dateTimeDragControl.Visible = false;
 			}
 		}
-
 
     private void ConnectToolWindows(LogWindow logWindow)
     {
@@ -1220,15 +1222,12 @@ namespace LogExpert
       this.bookmarkWindow.SetCurrentFile(null);
     }
 
-
-
-		void GuiStateUpdate(object sender, GuiStateArgs e)
+    private void GuiStateUpdate(object sender, GuiStateArgs e)
 		{
 			this.BeginInvoke(new GuiStateUpdateWorkerDelegate(GuiStateUpdateWorker), new object[] { e });
 		}
 
-
-		void GuiStateUpdateWorker(GuiStateArgs e)
+    private void GuiStateUpdateWorker(GuiStateArgs e)
 		{
 			skipEvents = true;
 			this.followTailCheckBox.Checked = e.FollowTail;
@@ -1263,7 +1262,7 @@ namespace LogExpert
 			skipEvents = false;
 		}
 
-    void ColumnizerChanged(object sender, ColumnizerEventArgs e)
+    private void ColumnizerChanged(object sender, ColumnizerEventArgs e)
     {
       if (this.bookmarkWindow != null)
       {
@@ -1271,23 +1270,27 @@ namespace LogExpert
       }
     }
 
-    void BookmarkAdded(object sender, EventArgs e)
+    private void BookmarkAdded(object sender, EventArgs e)
     {
       this.bookmarkWindow.UpdateView();
     }
 
-    void BookmarkRemoved(object sender, EventArgs e)
+    private void BookmarkTextChanged(object sender, BookmarkEventArgs e)
+    {
+      this.bookmarkWindow.BookmarkTextChanged(e.Bookmark);
+    }
+
+    private void BookmarkRemoved(object sender, EventArgs e)
     {
       this.bookmarkWindow.UpdateView();
     }
 
-
-		void ProgressBarUpdate(object sender, ProgressEventArgs e)
+    private void ProgressBarUpdate(object sender, ProgressEventArgs e)
 		{
 			this.Invoke(new ProgressBarEventFx(ProgressBarUpdateWorker), new object[] { e });
 		}
 
-		void ProgressBarUpdateWorker(ProgressEventArgs e)
+    private void ProgressBarUpdateWorker(ProgressEventArgs e)
 		{
 			if (e.Value <= e.MaxValue && e.Value >= e.MinValue)
 			{
@@ -1299,7 +1302,7 @@ namespace LogExpert
 			}
 		}
 
-		void StatusLineEvent(object sender, StatusLineEventArgs e)
+    private void StatusLineEvent(object sender, StatusLineEventArgs e)
 		{
 			lock (this.statusLineLock)
 			{
@@ -2488,7 +2491,13 @@ namespace LogExpert
 			}
 		}
 
-		public delegate void HighlightSettingsChangedEventHandler(object sender, EventArgs e);
+    private void importBookmarksToolStripMenuItem_Click(object sender, EventArgs e) {
+      if (this.CurrentLogWindow != null) {
+        this.CurrentLogWindow.ImportBookmarkList();
+      }
+    }
+
+    public delegate void HighlightSettingsChangedEventHandler(object sender, EventArgs e);
 		public event HighlightSettingsChangedEventHandler HighlightSettingsChanged;
 		protected void OnHighlightSettingsChanged()
 		{
