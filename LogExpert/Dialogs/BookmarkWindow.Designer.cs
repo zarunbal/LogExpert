@@ -1,7 +1,5 @@
-﻿namespace LogExpert.Dialogs
-{
-  partial class BookmarkWindow
-  {
+﻿namespace LogExpert.Dialogs {
+  partial class BookmarkWindow {
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -11,10 +9,8 @@
     /// Clean up any resources being used.
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-      if (disposing && (components != null))
-      {
+    protected override void Dispose(bool disposing) {
+      if (disposing && (components != null)) {
         components.Dispose();
       }
       base.Dispose(disposing);
@@ -26,8 +22,7 @@
     /// Required method for Designer support - do not modify
     /// the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
-    {
+    private void InitializeComponent() {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BookmarkWindow));
       this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -58,7 +53,7 @@
       this.deleteBookmarkssToolStripMenuItem.Name = "deleteBookmarkssToolStripMenuItem";
       this.deleteBookmarkssToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
       this.deleteBookmarkssToolStripMenuItem.Text = "Delete bookmarks(s)";
-      this.deleteBookmarkssToolStripMenuItem.Click += new System.EventHandler(this.deleteBookmarkssToolStripMenuItem_Click);
+      this.deleteBookmarkssToolStripMenuItem.Click += new System.EventHandler(this.deleteBookmarksToolStripMenuItem_Click);
       // 
       // removeCommentsToolStripMenuItem
       // 
@@ -127,14 +122,13 @@
       this.bookmarkDataGridView.TabIndex = 0;
       this.bookmarkDataGridView.VirtualMode = true;
       this.bookmarkDataGridView.Enter += new System.EventHandler(this.bookmarkGridView_Enter);
-      this.bookmarkDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_RowEnter);
       this.bookmarkDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_CellDoubleClick);
       this.bookmarkDataGridView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.boomarkDataGridView_MouseDoubleClick);
       this.bookmarkDataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.bookmarkDataGridView_PreviewKeyDown);
       this.bookmarkDataGridView.Leave += new System.EventHandler(this.bookmarkGridView_Leave);
       this.bookmarkDataGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.boomarkDataGridView_ColumnDividerDoubleClick);
       this.bookmarkDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.bookmarkDataGridView_RowsAdded);
-      this.bookmarkDataGridView.CurrentCellChanged += new System.EventHandler(this.boomarkDataGridView_CurrentCellChanged);
+      this.bookmarkDataGridView.SelectionChanged += new System.EventHandler(bookmarkDataGridView_SelectionChanged);
       this.bookmarkDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.bookmarkDataGridView_CellToolTipTextNeeded);
       this.bookmarkDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.bookmarkGridView_KeyDown);
       this.bookmarkDataGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.bookmarkDataGridView_RowsRemoved);
@@ -190,7 +184,6 @@
       this.splitContainer1.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.bookmarkDataGridView)).EndInit();
       this.ResumeLayout(false);
-
     }
 
     #endregion

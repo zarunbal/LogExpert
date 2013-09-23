@@ -3,21 +3,15 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-
-
-namespace LogExpert
-{
-  class BookmarkExporter
-  {
+namespace LogExpert {
+  class BookmarkExporter {
     private const string replacementForNewLine = @"\n";
 
-    public static void ExportBookmarkList(SortedList<int, Bookmark> bookmarkList, string logfileName, string fileName)
-    {
+    public static void ExportBookmarkList(SortedList<int, Bookmark> bookmarkList, string logfileName, string fileName) {
       FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
       StreamWriter writer = new StreamWriter(fs);
       writer.WriteLine("Log file name;Line number;Comment");
-      foreach (Bookmark bookmark in bookmarkList.Values)
-      {
+      foreach (Bookmark bookmark in bookmarkList.Values) {
         string line = logfileName + ";" + bookmark.LineNum + ";" + bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n", replacementForNewLine);
         writer.WriteLine(line);
       }
