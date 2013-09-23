@@ -177,7 +177,6 @@ namespace LogExpert
       //Thread.CurrentThread.Name = "LogWindowThread";
       columnizerCallback = new ColumnizerCallback(this);
 
-
       this.fileNameField = fileName;
       this.ForcePersistenceLoading = forcePersistenceLoading;
 
@@ -1152,7 +1151,6 @@ namespace LogExpert
       //LoadPersistenceData();
     }
 
-
     private void FileSizeChangedHandler(object sender, LogEventArgs e)
     {
       //OnFileSizeChanged(e);  // now done in UpdateGrid()
@@ -1474,7 +1472,6 @@ namespace LogExpert
       ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
       PreSelectColumnizer(Util.CloneColumnizer(columnizer));
     }
-
 
     private void PreSelectColumnizer(ILogLineColumnizer columnizer)
     {
@@ -2119,7 +2116,6 @@ namespace LogExpert
     {
       return FindHilightEntry(line, true);
     }
-
 
     /**
      * Returns the first HilightEntry that matches the given line
@@ -3192,7 +3188,6 @@ namespace LogExpert
       OnBookmarkRemoved();
     }
 
-
     /**
      * Shift bookmarks after a logfile rollover
      */
@@ -3295,7 +3290,6 @@ namespace LogExpert
       this.fuzzyKnobControl.Value = 0;
       this.filterRangeComboBox.Text = "";
     }
-
 
     private void FilterSearch()
     {
@@ -4452,7 +4446,7 @@ namespace LogExpert
       }
     }
 
-    public delegate void BookmarkTextChangedEventHandler(object sender, EventArgs e);
+    public delegate void BookmarkTextChangedEventHandler(object sender, BookmarkEventArgs e);
     public event BookmarkTextChangedEventHandler BookmarkTextChanged;
     protected void OnBookmarkTextChanged(Bookmark bookmark)
     {
@@ -4640,7 +4634,6 @@ namespace LogExpert
       pipe.CloseFile();
       this.Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), new object[] { pipe, title, null });
     }
-
 
     private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
     {
@@ -6237,7 +6230,6 @@ namespace LogExpert
       this.filterGridView.Refresh();
     }
 
-
     private void ChangeRowHeight(bool decrease)
     {
       int rowNum = this.dataGridView.CurrentCellAddress.Y;
@@ -6344,7 +6336,9 @@ namespace LogExpert
       dlg.Title = "Choose a file to save bookmarks into";
       dlg.AddExtension = true;
       dlg.DefaultExt = "csv";
-      dlg.Filter = "CSV file (*.csv)|*.csv";
+      dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
+      dlg.FilterIndex = 1;
+      dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
       if (dlg.ShowDialog() == DialogResult.OK)
       {
         try
@@ -6354,6 +6348,47 @@ namespace LogExpert
         catch (IOException e)
         {
           MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
+        }
+      }
+    }
+
+    public void ImportBookmarkList() {
+      OpenFileDialog dlg = new OpenFileDialog();
+      dlg.Title = "Choose a file to load bookmarks from";
+      dlg.AddExtension = true;
+      dlg.DefaultExt = "csv";
+      dlg.DefaultExt = "csv";
+      dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
+      dlg.FilterIndex = 1;
+      dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
+      if (dlg.ShowDialog() == DialogResult.OK) {
+        try {
+          // add to the existing bookmarks
+          var newBookmarks = new SortedList<int, Bookmark>();
+          BookmarkExporter.ImportBookmarkList(this.FileName, dlg.FileName, newBookmarks);
+
+          // Add (or replace) to existing bookmark list
+          bool bookmarkAdded = false;
+          foreach (var b in newBookmarks.Values) {
+            if (!this.bookmarkProvider.BookmarkList.ContainsKey(b.LineNum)) {
+              this.bookmarkProvider.BookmarkList.Add(b.LineNum, b);
+              bookmarkAdded = true; // refresh the list only once at the end
+            }
+            else {
+              var existingBookmark = this.bookmarkProvider.BookmarkList[b.LineNum];
+              existingBookmark.Text = b.Text; // replace existing bookmark for that line, preserving the overlay
+              OnBookmarkTextChanged(b);
+            }
+          }
+
+          // Refresh the lists
+          if (bookmarkAdded)
+            OnBookmarkAdded();
+          this.dataGridView.Refresh();
+          this.filterGridView.Refresh();
+        }
+        catch (IOException e) {
+          MessageBox.Show("Error while importing bookmark list: " + e.Message, "LogExpert");
         }
       }
     }
@@ -6500,7 +6535,6 @@ namespace LogExpert
     {
       this.shouldCallTimeSync = true;
     }
-
 
     private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
     {
@@ -7255,6 +7289,5 @@ namespace LogExpert
     {
       InvalidateCurrentRow();
     }
-
   }
 }
