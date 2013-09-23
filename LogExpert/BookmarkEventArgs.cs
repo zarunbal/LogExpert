@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LogExpert
 {
-  class BookmarkEventArgs : EventArgs
+  public class BookmarkEventArgs : EventArgs
   {
     private Bookmark bookmark;
 
