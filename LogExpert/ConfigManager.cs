@@ -257,6 +257,13 @@ namespace LogExpert
       Save(SettingsFlags.All);
     }
 
+    public static void Import(FileInfo fileInfo, ExportImportFlags flags)
+    {
+      Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
+      ConfigManager.Import(fs, flags);
+      fs.Close();
+    }
+
 
     public static string ConfigDir
     {

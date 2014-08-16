@@ -11,6 +11,7 @@ using System.Security;
 using System.Reflection;
 using System.Security.Principal;
 using LogExpert.Dialogs;
+using ITDM;
 
 namespace LogExpert
 {
@@ -46,8 +47,17 @@ namespace LogExpert
 					 " started.");
 			Logger.logInfo("============================================================================");
 
+		  CmdLine cmdLine = new CmdLine();
+		  CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
+		  cmdLine.RegisterParameter(configFile);
+		  string[] remainingArgs = cmdLine.Parse(orgArgs);
+
 			List<string> argsList = new List<string>();
-			foreach (string fileArg in orgArgs)
+
+      // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
+      // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
+      // TODO: possibly should be moved to LocalFileSystem plugin
+      foreach (string fileArg in remainingArgs)
 			{
 				try
 				{
@@ -59,10 +69,22 @@ namespace LogExpert
 				}
 				catch (Exception)
 				{
-					MessageBox.Show("File name " + fileArg + " is not a valid file name!", "LogExpert Error");
+          argsList.Add(fileArg);
 				}
 			}
 			string[] args = argsList.ToArray();
+      if (configFile.Exists)
+      {
+        FileInfo cfgFileInfo = new FileInfo(configFile.Value);
+        if (cfgFileInfo.Exists)
+        {
+          ConfigManager.Import(cfgFileInfo, ExportImportFlags.All);
+        }
+        else
+        {
+          MessageBox.Show("Config file not found", "LogExpert");
+        }
+      }
 
 			int pId = Process.GetCurrentProcess().SessionId;
 
