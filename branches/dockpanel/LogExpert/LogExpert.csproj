@@ -94,6 +94,7 @@
     <Compile Include="BookmarkView.cs" />
     <Compile Include="BugSender.cs" />
     <Compile Include="CellContent.cs" />
+    <Compile Include="CmdLine.cs" />
     <Compile Include="ColumnCache.cs" />
     <Compile Include="ColumnizerEventArgs.cs" />
     <Compile Include="ConfigChangedEventArgs.cs" />
