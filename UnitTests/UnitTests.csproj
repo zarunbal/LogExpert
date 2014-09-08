@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BufferShiftTest.cs" />
+    <Compile Include="ReaderTest.cs" />
     <Compile Include="LocalFileSystemTest.cs" />
     <Compile Include="RolloverHandlerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

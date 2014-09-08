@@ -137,8 +137,5 @@ namespace LogExpert
     private string highlightGroupName;
 
     private bool columnFinderVisible;
-
-
-
   }
 }

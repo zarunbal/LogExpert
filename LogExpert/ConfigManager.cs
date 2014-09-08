@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
@@ -178,6 +178,7 @@ namespace LogExpert
     public MultifileOptions multifileOptions;
     public String defaultEncoding;
     public bool showColumnFinder;
+    public bool useLegacyReader;
   }
 
   [FlagsAttribute]
@@ -254,6 +255,13 @@ namespace LogExpert
     {
       Instance.settings = Instance.Import(Instance.settings, fs, flags);
       Save(SettingsFlags.All);
+    }
+
+    public static void Import(FileInfo fileInfo, ExportImportFlags flags)
+    {
+      Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
+      ConfigManager.Import(fs, flags);
+      fs.Close();
     }
 
 
