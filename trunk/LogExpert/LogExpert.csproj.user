@@ -23,5 +23,7 @@
     </ReferencePath>
     <EnableSecurityDebugging>false</EnableSecurityDebugging>
     <ProjectView>ProjectFiles</ProjectView>
+    <ErrorReportUrlHistory>
+    </ErrorReportUrlHistory>
   </PropertyGroup>
 </Project>

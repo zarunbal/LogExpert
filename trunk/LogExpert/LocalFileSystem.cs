@@ -16,7 +16,7 @@ namespace LogExpert
         Uri uri = new Uri(uriString);
         return (uri.IsFile);
       }
-      catch (Exception e)
+      catch (Exception)
       {
         return false;
       }

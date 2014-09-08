@@ -1,7 +1,5 @@
-﻿namespace LogExpert.Dialogs
-{
-  partial class BookmarkWindow
-  {
+﻿namespace LogExpert.Dialogs {
+  partial class BookmarkWindow {
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -11,10 +9,8 @@
     /// Clean up any resources being used.
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-      if (disposing && (components != null))
-      {
+    protected override void Dispose(bool disposing) {
+      if (disposing && (components != null)) {
         components.Dispose();
       }
       base.Dispose(disposing);
@@ -26,8 +22,7 @@
     /// Required method for Designer support - do not modify
     /// the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
-    {
+    private void InitializeComponent() {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BookmarkWindow));
       this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -35,9 +30,9 @@
       this.removeCommentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.bookmarkTextBox = new System.Windows.Forms.TextBox();
       this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+      this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
       this.commentColumnCheckBox = new System.Windows.Forms.CheckBox();
       this.label1 = new System.Windows.Forms.Label();
-      this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
       this.contextMenuStrip1.SuspendLayout();
       this.splitContainer1.Panel1.SuspendLayout();
       this.splitContainer1.Panel2.SuspendLayout();
@@ -76,7 +71,7 @@
       this.bookmarkTextBox.Multiline = true;
       this.bookmarkTextBox.Name = "bookmarkTextBox";
       this.bookmarkTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.bookmarkTextBox.Size = new System.Drawing.Size(158, 114);
+      this.bookmarkTextBox.Size = new System.Drawing.Size(194, 114);
       this.bookmarkTextBox.TabIndex = 0;
       this.bookmarkTextBox.TextChanged += new System.EventHandler(this.bookmarkTextBox_TextChanged);
       // 
@@ -97,8 +92,46 @@
       this.splitContainer1.Panel2.Controls.Add(this.label1);
       this.splitContainer1.Panel2.Controls.Add(this.bookmarkTextBox);
       this.splitContainer1.Size = new System.Drawing.Size(717, 158);
-      this.splitContainer1.SplitterDistance = 553;
+      this.splitContainer1.SplitterDistance = 517;
       this.splitContainer1.TabIndex = 7;
+      // 
+      // bookmarkDataGridView
+      // 
+      this.bookmarkDataGridView.AllowUserToAddRows = false;
+      this.bookmarkDataGridView.AllowUserToDeleteRows = false;
+      this.bookmarkDataGridView.AllowUserToOrderColumns = true;
+      this.bookmarkDataGridView.AllowUserToResizeRows = false;
+      this.bookmarkDataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
+      this.bookmarkDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+      this.bookmarkDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+      this.bookmarkDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      this.bookmarkDataGridView.ContextMenuStrip = this.contextMenuStrip1;
+      this.bookmarkDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.bookmarkDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+      this.bookmarkDataGridView.EditModeMenuStrip = null;
+      this.bookmarkDataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+      this.bookmarkDataGridView.Location = new System.Drawing.Point(0, 0);
+      this.bookmarkDataGridView.Margin = new System.Windows.Forms.Padding(0);
+      this.bookmarkDataGridView.MustDrawFocus = false;
+      this.bookmarkDataGridView.Name = "bookmarkDataGridView";
+      this.bookmarkDataGridView.PaintWithOverlays = false;
+      this.bookmarkDataGridView.ReadOnly = true;
+      this.bookmarkDataGridView.RowHeadersVisible = false;
+      this.bookmarkDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+      this.bookmarkDataGridView.Size = new System.Drawing.Size(517, 158);
+      this.bookmarkDataGridView.TabIndex = 0;
+      this.bookmarkDataGridView.VirtualMode = true;
+      this.bookmarkDataGridView.Enter += new System.EventHandler(this.bookmarkGridView_Enter);
+      this.bookmarkDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_CellDoubleClick);
+      this.bookmarkDataGridView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.boomarkDataGridView_MouseDoubleClick);
+      this.bookmarkDataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.bookmarkDataGridView_PreviewKeyDown);
+      this.bookmarkDataGridView.Leave += new System.EventHandler(this.bookmarkGridView_Leave);
+      this.bookmarkDataGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.boomarkDataGridView_ColumnDividerDoubleClick);
+      this.bookmarkDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.bookmarkDataGridView_RowsAdded);
+      this.bookmarkDataGridView.SelectionChanged += new System.EventHandler(bookmarkDataGridView_SelectionChanged);
+      this.bookmarkDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.bookmarkDataGridView_CellToolTipTextNeeded);
+      this.bookmarkDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.bookmarkGridView_KeyDown);
+      this.bookmarkDataGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.bookmarkDataGridView_RowsRemoved);
       // 
       // commentColumnCheckBox
       // 
@@ -121,44 +154,6 @@
       this.label1.TabIndex = 7;
       this.label1.Text = "Bookmark comment:";
       // 
-      // bookmarkDataGridView
-      // 
-      this.bookmarkDataGridView.AllowUserToAddRows = false;
-      this.bookmarkDataGridView.AllowUserToDeleteRows = false;
-      this.bookmarkDataGridView.AllowUserToOrderColumns = true;
-      this.bookmarkDataGridView.AllowUserToResizeRows = false;
-      this.bookmarkDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                  | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
-      this.bookmarkDataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
-      this.bookmarkDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-      this.bookmarkDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-      this.bookmarkDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.bookmarkDataGridView.ContextMenuStrip = this.contextMenuStrip1;
-      this.bookmarkDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-      this.bookmarkDataGridView.EditModeMenuStrip = null;
-      this.bookmarkDataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
-      this.bookmarkDataGridView.Location = new System.Drawing.Point(0, 0);
-      this.bookmarkDataGridView.Margin = new System.Windows.Forms.Padding(0);
-      this.bookmarkDataGridView.MustDrawFocus = false;
-      this.bookmarkDataGridView.Name = "bookmarkDataGridView";
-      this.bookmarkDataGridView.PaintWithOverlays = false;
-      this.bookmarkDataGridView.ReadOnly = true;
-      this.bookmarkDataGridView.RowHeadersVisible = false;
-      this.bookmarkDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.bookmarkDataGridView.Size = new System.Drawing.Size(553, 158);
-      this.bookmarkDataGridView.TabIndex = 0;
-      this.bookmarkDataGridView.VirtualMode = true;
-      this.bookmarkDataGridView.Enter += new System.EventHandler(this.bookmarkGridView_Enter);
-      this.bookmarkDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.bookmarkDataGridView_CellDoubleClick);
-      this.bookmarkDataGridView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.boomarkDataGridView_MouseDoubleClick);
-      this.bookmarkDataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.bookmarkDataGridView_PreviewKeyDown);
-      this.bookmarkDataGridView.Leave += new System.EventHandler(this.bookmarkGridView_Leave);
-      this.bookmarkDataGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.boomarkDataGridView_ColumnDividerDoubleClick);
-      this.bookmarkDataGridView.SelectionChanged += new System.EventHandler(this.bookmarkDataGridView_SelectionChanged);
-      this.bookmarkDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.bookmarkDataGridView_CellToolTipTextNeeded);
-      this.bookmarkDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.bookmarkGridView_KeyDown);
-      // 
       // BookmarkWindow
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -166,11 +161,22 @@
       this.ClientSize = new System.Drawing.Size(717, 158);
       this.ControlBox = false;
       this.Controls.Add(this.splitContainer1);
+      this.DockAreas = ((WeifenLuo.WinFormsUI.Docking.DockAreas)(((((WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft)
+                  | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight)
+                  | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop)
+                  | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
+      this.DoubleBuffered = true;
+      this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
+      this.MinimizeBox = false;
       this.Name = "BookmarkWindow";
+      this.ShowIcon = false;
+      this.ShowInTaskbar = false;
       this.Text = "Bookmarks";
+      this.ClientSizeChanged += new System.EventHandler(this.BookmarkWindow_ClientSizeChanged);
+      this.SizeChanged += new System.EventHandler(this.BookmarkWindow_SizeChanged);
       this.contextMenuStrip1.ResumeLayout(false);
       this.splitContainer1.Panel1.ResumeLayout(false);
       this.splitContainer1.Panel2.ResumeLayout(false);
@@ -178,7 +184,6 @@
       this.splitContainer1.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.bookmarkDataGridView)).EndInit();
       this.ResumeLayout(false);
-
     }
 
     #endregion
