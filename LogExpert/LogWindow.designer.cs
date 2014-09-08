@@ -32,8 +32,8 @@ namespace LogExpert
       this.components = new System.ComponentModel.Container();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWindow));
       this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-      this.bookmarkSplitContainer = new System.Windows.Forms.SplitContainer();
       this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
       this.columnFinderPanel = new System.Windows.Forms.Panel();
       this.columnComboBox = new System.Windows.Forms.ComboBox();
@@ -58,7 +58,6 @@ namespace LogExpert
       this.markCurrentFilterRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.pluginSeparator = new System.Windows.Forms.ToolStripSeparator();
       this.timeSpreadingControl1 = new LogExpert.Dialogs.TimeSpreadingControl();
-      this.toolwinTabControl = new MdiTabControl.TabControl();
       this.advancedBackPanel = new System.Windows.Forms.Panel();
       this.advancedFilterSplitContainer = new System.Windows.Forms.SplitContainer();
       this.panel2 = new System.Windows.Forms.Panel();
@@ -126,9 +125,6 @@ namespace LogExpert
       this.splitContainer1.Panel1.SuspendLayout();
       this.splitContainer1.Panel2.SuspendLayout();
       this.splitContainer1.SuspendLayout();
-      this.bookmarkSplitContainer.Panel1.SuspendLayout();
-      this.bookmarkSplitContainer.Panel2.SuspendLayout();
-      this.bookmarkSplitContainer.SuspendLayout();
       this.tableLayoutPanel1.SuspendLayout();
       this.columnFinderPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
@@ -162,7 +158,7 @@ namespace LogExpert
       // 
       // splitContainer1.Panel1
       // 
-      this.splitContainer1.Panel1.Controls.Add(this.bookmarkSplitContainer);
+      this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
       this.splitContainer1.Panel1MinSize = 50;
       // 
       // splitContainer1.Panel2
@@ -175,49 +171,24 @@ namespace LogExpert
       this.splitContainer1.TabIndex = 9;
       this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
       // 
-      // bookmarkSplitContainer
-      // 
-      this.bookmarkSplitContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.bookmarkSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.bookmarkSplitContainer.Location = new System.Drawing.Point(0, 0);
-      this.bookmarkSplitContainer.Margin = new System.Windows.Forms.Padding(0);
-      this.bookmarkSplitContainer.Name = "bookmarkSplitContainer";
-      this.bookmarkSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-      // 
-      // bookmarkSplitContainer.Panel1
-      // 
-      this.bookmarkSplitContainer.Panel1.Controls.Add(this.tableLayoutPanel1);
-      this.bookmarkSplitContainer.Panel1MinSize = 50;
-      // 
-      // bookmarkSplitContainer.Panel2
-      // 
-      this.bookmarkSplitContainer.Panel2.Controls.Add(this.toolwinTabControl);
-      this.bookmarkSplitContainer.Panel2MinSize = 50;
-      this.bookmarkSplitContainer.Size = new System.Drawing.Size(1014, 364);
-      this.bookmarkSplitContainer.SplitterDistance = 248;
-      this.bookmarkSplitContainer.SplitterWidth = 2;
-      this.bookmarkSplitContainer.TabIndex = 1;
-      // 
       // tableLayoutPanel1
       // 
-      this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                  | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
       this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
       this.tableLayoutPanel1.ColumnCount = 2;
       this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-      this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 454F));
+      this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 163F));
       this.tableLayoutPanel1.Controls.Add(this.columnFinderPanel, 0, 0);
       this.tableLayoutPanel1.Controls.Add(this.dataGridView, 0, 1);
-      this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl1, 1, 0);
+      this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl1, 1, 1);
+      this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.tableLayoutPanel1.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.tableLayoutPanel1.Location = new System.Drawing.Point(0, -1);
+      this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
       this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
       this.tableLayoutPanel1.Name = "tableLayoutPanel1";
       this.tableLayoutPanel1.RowCount = 2;
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-      this.tableLayoutPanel1.Size = new System.Drawing.Size(1012, 244);
+      this.tableLayoutPanel1.Size = new System.Drawing.Size(1012, 362);
       this.tableLayoutPanel1.TabIndex = 2;
       // 
       // columnFinderPanel
@@ -241,7 +212,6 @@ namespace LogExpert
       this.helpToolTip.SetToolTip(this.columnComboBox, "Select column to scroll to");
       this.columnComboBox.SelectionChangeCommitted += new System.EventHandler(this.columnComboBox_SelectionChangeCommitted);
       this.columnComboBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.columnComboBox_PreviewKeyDown);
-      this.columnComboBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.columnComboBox_KeyPress);
       this.columnComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.columnComboBox_KeyDown);
       // 
       // label3
@@ -292,12 +262,11 @@ namespace LogExpert
       this.dataGridView.ShowCellToolTips = false;
       this.dataGridView.ShowEditingIcon = false;
       this.dataGridView.ShowRowErrors = false;
-      this.dataGridView.Size = new System.Drawing.Size(847, 213);
+      this.dataGridView.Size = new System.Drawing.Size(847, 331);
       this.dataGridView.TabIndex = 0;
       this.dataGridView.VirtualMode = true;
       this.dataGridView.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView_Scroll);
       this.dataGridView.OverlayDoubleClicked += new LogExpert.Dialogs.BufferedDataGridView.OverlayDoubleClickedEventHandler(this.dataGridView_OverlayDoubleClicked);
-      this.dataGridView.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_CellMouseClick);
       this.dataGridView.Enter += new System.EventHandler(this.dataGridView_Enter);
       this.dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellDoubleClick);
       this.dataGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.dataGridView_RowHeightInfoNeeded);
@@ -305,14 +274,12 @@ namespace LogExpert
       this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
       this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
       this.dataGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridView_CellContextMenuStripNeeded);
-      this.dataGridView.RowHeightInfoPushed += new System.Windows.Forms.DataGridViewRowHeightInfoPushedEventHandler(this.dataGridView_RowHeightInfoPushed);
       this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
       this.dataGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView_CellValuePushed);
       this.dataGridView.Paint += new System.Windows.Forms.PaintEventHandler(this.dataGridView_Paint);
       this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
       this.dataGridView.Resize += new System.EventHandler(this.dataGridView_Resize);
       this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
-      this.dataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellContentClick);
       // 
       // dataGridContextMenuStrip
       // 
@@ -466,37 +433,12 @@ namespace LogExpert
                   | System.Windows.Forms.AnchorStyles.Right)));
       this.timeSpreadingControl1.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.timeSpreadingControl1.ForeColor = System.Drawing.Color.Teal;
-      this.timeSpreadingControl1.Location = new System.Drawing.Point(1286, 1);
+      this.timeSpreadingControl1.Location = new System.Drawing.Point(995, 30);
       this.timeSpreadingControl1.Margin = new System.Windows.Forms.Padding(2, 0, 1, 0);
       this.timeSpreadingControl1.Name = "timeSpreadingControl1";
       this.timeSpreadingControl1.ReverseAlpha = false;
-      this.timeSpreadingControl1.Size = new System.Drawing.Size(16, 28);
+      this.timeSpreadingControl1.Size = new System.Drawing.Size(16, 331);
       this.timeSpreadingControl1.TabIndex = 1;
-      // 
-      // toolwinTabControl
-      // 
-      this.toolwinTabControl.Alignment = MdiTabControl.TabControl.TabAlignment.Top;
-      this.toolwinTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.toolwinTabControl.Location = new System.Drawing.Point(0, 0);
-      this.toolwinTabControl.MenuRenderer = null;
-      this.toolwinTabControl.Name = "toolwinTabControl";
-      this.toolwinTabControl.Size = new System.Drawing.Size(1012, 112);
-      this.toolwinTabControl.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-      this.toolwinTabControl.TabBorderEnhanceWeight = MdiTabControl.TabControl.Weight.Medium;
-      this.toolwinTabControl.TabCloseButtonImage = null;
-      this.toolwinTabControl.TabCloseButtonImageDisabled = null;
-      this.toolwinTabControl.TabCloseButtonImageHot = null;
-      this.toolwinTabControl.TabCloseButtonSize = new System.Drawing.Size(13, 13);
-      this.toolwinTabControl.TabCloseButtonVisible = false;
-      this.toolwinTabControl.TabHeight = 20;
-      this.toolwinTabControl.TabIconSize = new System.Drawing.Size(0, 0);
-      this.toolwinTabControl.TabIndex = 2;
-      this.toolwinTabControl.TabOffset = 2;
-      this.toolwinTabControl.TabPadLeft = 2;
-      this.toolwinTabControl.TabPadRight = 2;
-      this.toolwinTabControl.TabsDirection = MdiTabControl.TabControl.FlowDirection.LeftToRight;
-      this.toolwinTabControl.TabTop = 1;
-      this.toolwinTabControl.TopSeparator = false;
       // 
       // advancedBackPanel
       // 
@@ -1178,7 +1120,6 @@ namespace LogExpert
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem});
       this.editModeContextMenuStrip.Name = "editModeContextMenuStrip";
       this.editModeContextMenuStrip.Size = new System.Drawing.Size(346, 114);
-      this.editModeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.editModeContextMenuStrip_Opening);
       // 
       // copyToolStripMenuItem1
       // 
@@ -1228,22 +1169,23 @@ namespace LogExpert
       this.ClientSize = new System.Drawing.Size(1014, 656);
       this.ControlBox = false;
       this.Controls.Add(this.splitContainer1);
-      this.DoubleBuffered = true;
+      this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.Margin = new System.Windows.Forms.Padding(0);
       this.MaximizeBox = false;
       this.MinimizeBox = false;
       this.Name = "LogWindow";
       this.ShowIcon = false;
       this.ShowInTaskbar = false;
+      this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
       this.SizeChanged += new System.EventHandler(this.LogWindow_SizeChanged);
+      this.Enter += new System.EventHandler(this.LogWindow_Enter);
+      this.Leave += new System.EventHandler(this.LogWindow_Leave);
       this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LogWindow_KeyDown);
       this.splitContainer1.Panel1.ResumeLayout(false);
       this.splitContainer1.Panel2.ResumeLayout(false);
       this.splitContainer1.ResumeLayout(false);
-      this.bookmarkSplitContainer.Panel1.ResumeLayout(false);
-      this.bookmarkSplitContainer.Panel2.ResumeLayout(false);
-      this.bookmarkSplitContainer.ResumeLayout(false);
       this.tableLayoutPanel1.ResumeLayout(false);
       this.columnFinderPanel.ResumeLayout(false);
       this.columnFinderPanel.PerformLayout();
@@ -1306,8 +1248,7 @@ namespace LogExpert
 		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem locateLineInOriginalFileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toggleBoomarkToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem markEditModeToolStripMenuItem;
-		private System.Windows.Forms.SplitContainer bookmarkSplitContainer;
+    private System.Windows.Forms.ToolStripMenuItem markEditModeToolStripMenuItem;
 		//private BufferedDataGridView boomarkDataGridView;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
@@ -1322,8 +1263,7 @@ namespace LogExpert
 		private System.Windows.Forms.ToolStripMenuItem moveLeftToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveRightToolStripMenuItem;
 		private TimeSpreadingControl timeSpreadingControl1;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private MdiTabControl.TabControl toolwinTabControl;
+    private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.ToolStripSeparator pluginSeparator;
 		private System.Windows.Forms.ToolStripMenuItem bookmarkCommentToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;

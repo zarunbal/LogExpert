@@ -171,7 +171,7 @@ namespace LogExpert
           this.fInfo.Refresh();
           return this.fInfo.Length;
         }
-        catch (IOException e)
+        catch (IOException)
         {
           return -1;
         }

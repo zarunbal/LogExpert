@@ -12,7 +12,7 @@
     <ManifestCertificateThumbprint>70AEA4DDBBA179A21FD54575FFD9F28DAC5C4654</ManifestCertificateThumbprint>
     <ManifestKeyFile>LogExpert_1_TemporaryKey.pfx</ManifestKeyFile>
     <GenerateManifests>true</GenerateManifests>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -33,7 +33,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>15</ApplicationRevision>
-    <ApplicationVersion>1.4.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
@@ -71,10 +71,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="MdiTabControl, Version=1.0.4042.37739, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\MdiTabControl.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -82,16 +78,25 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>lib\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
     <Compile Include="BackgroundProcessCancelHandler.cs" />
     <Compile Include="Bookmark.cs" />
+    <Compile Include="BookmarkCollection.cs" />
+    <Compile Include="BookmarkDataProvider.cs" />
+    <Compile Include="BookmarkEventArgs.cs" />
     <Compile Include="BookmarkExporter.cs" />
     <Compile Include="BookmarkOverlay.cs" />
+    <Compile Include="BookmarkView.cs" />
     <Compile Include="BugSender.cs" />
     <Compile Include="CellContent.cs" />
+    <Compile Include="CmdLine.cs" />
     <Compile Include="ColumnCache.cs" />
+    <Compile Include="ColumnizerEventArgs.cs" />
     <Compile Include="ConfigChangedEventArgs.cs" />
     <Compile Include="ContextMenuPluginEventArgs.cs" />
     <Compile Include="CurrentHighlightGroupChangedEventArgs.cs" />
@@ -146,8 +151,21 @@
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\OverlayEventArgs.cs" />
+    <Compile Include="Dialogs\ProjectLoadDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ProjectLoadDlg.Designer.cs">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TabRenameDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TabRenameDlg.Designer.cs">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="EncodingOptions.cs" />
     <Compile Include="FileSystemCallback.cs" />
+    <Compile Include="FileViewContext.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="FilterCancelHandler.cs" />
     <Compile Include="FilterStarter.cs" />
@@ -155,15 +173,21 @@
     <Compile Include="FilterListChangedEventArgs.cs" />
     <Compile Include="HighlightResults.cs" />
     <Compile Include="HilightGroup.cs" />
+    <Compile Include="IBookmarkData.cs" />
+    <Compile Include="IBookmarkView.cs" />
     <Compile Include="ILogExpertClient.cs" />
     <Compile Include="ILogExpertProxy.cs" />
     <Compile Include="ILogStreamReader.cs" />
+    <Compile Include="ILogPaintContext.cs" />
+    <Compile Include="ILogView.cs" />
+    <Compile Include="ISharedToolWindow.cs" />
     <Compile Include="LocalFileSystem.cs" />
     <Compile Include="LogBufferCacheEntry.cs" />
     <Compile Include="LogExpertApplicationContext.cs" />
     <Compile Include="LogFileException.cs" />
     <Compile Include="MultifileOptions.cs" />
     <Compile Include="ObjectClone.cs" />
+    <Compile Include="PaintHelper.cs" />
     <Compile Include="ParamParser.cs" />
     <Compile Include="Persister.cs" />
     <Compile Include="ClfColumnizer.cs" />
@@ -427,6 +451,7 @@
     <Compile Include="Util.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="WindowFileEntry.cs" />
+    <Compile Include="WindowTypes.cs" />
     <Compile Include="XmlBlockSplitter.cs" />
     <Compile Include="XmlLogReader.cs" />
   </ItemGroup>
@@ -452,6 +477,11 @@
     <None Include="LogExpert_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -465,6 +495,11 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Visual.C++.9.0.x86">
@@ -525,6 +560,12 @@
     <EmbeddedResource Include="Dialogs\OpenUriDialog.resx">
       <DependentUpon>OpenUriDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ProjectLoadDlg.resx">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TabRenameDlg.resx">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TimeSpreadigControl.resx">
       <DependentUpon>TimeSpreadigControl.cs</DependentUpon>

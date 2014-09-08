@@ -3,11 +3,9 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-
-
 namespace LogExpert
 {
-  class BookmarkExporter
+  internal class BookmarkExporter
   {
     private const string replacementForNewLine = @"\n";
 
@@ -18,7 +16,9 @@ namespace LogExpert
       writer.WriteLine("Log file name;Line number;Comment");
       foreach (Bookmark bookmark in bookmarkList.Values)
       {
-        string line = logfileName + ";" + bookmark.LineNum + ";" + bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n", replacementForNewLine);
+        string line = logfileName + ";" + bookmark.LineNum + ";" +
+                      bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",
+                                                                                                         replacementForNewLine);
         writer.WriteLine(line);
       }
       writer.Close();
@@ -35,9 +35,9 @@ namespace LogExpert
             reader.ReadLine(); // skip "Log file name;Line number;Comment"
 
           while (!reader.EndOfStream)
-		      {
+          {
             try
-			      {
+            {
               string line = reader.ReadLine();
               line = line.Replace(replacementForNewLine, "\r\n").Replace("\\\r\n", replacementForNewLine);
 
@@ -51,17 +51,17 @@ namespace LogExpert
 
               int lineNum;
               if (int.TryParse(lineStr, out lineNum))
-			        {
+              {
                 var bookmark = new Bookmark(lineNum, comment);
                 bookmarkList.Add(lineNum, bookmark);
               }
               else
-			        {
+              {
                 //!!!log error: skipping a line entry
               }
             }
             catch
-		        {
+            {
               //!!!
             }
           }

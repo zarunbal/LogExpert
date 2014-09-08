@@ -19,10 +19,11 @@ namespace LogExpert.Dialogs
       //this.labelCompanyName.Text = AssemblyCompany;
       this.textBoxDescription.Text = AssemblyDescription +
         "\r\n\r\nCredits:\r\n\r\n" +
-        "MdiTabControl (c) by Eduardo Oliveira\r\n" +
-        "Test: Mathias Dräger\r\n" +
+        "DockPanel control (c) 2007 Weifen Luo \r\n" +
+        "Early bird test: Mathias Dräger\r\n" +
         "\r\n" +
         "LogExpert uses modules from:\r\n" +
+        "http://sourceforge.net/projects/dockpanelsuite/\r\n" +
         "http://sourceforge.net/projects/bugzproxy/\r\n" +
         "http://www.xml-rpc.net/";
       string link = "http://www.log-expert.de/";
