@@ -1,0 +1,608 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F0C0D370-F416-44ED-939A-B4827D15AC14}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LogExpert</RootNamespace>
+    <AssemblyName>LogExpert</AssemblyName>
+    <ManifestCertificateThumbprint>70AEA4DDBBA179A21FD54575FFD9F28DAC5C4654</ManifestCertificateThumbprint>
+    <ManifestKeyFile>LogExpert_1_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <ApplicationIcon>Resources\logexpert.ico</ApplicationIcon>
+    <TargetZone>Custom</TargetZone>
+    <PublishUrl>c:\work\LogExpert\publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Accessibility" />
+    <Reference Include="bugzproxy, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\bugzproxy.dll</HintPath>
+    </Reference>
+    <Reference Include="CookComputing.XmlRpcV2, Version=2.4.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\CookComputing.XmlRpcV2.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>lib\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArgParser.cs" />
+    <Compile Include="BackgroundProcessCancelHandler.cs" />
+    <Compile Include="Bookmark.cs" />
+    <Compile Include="BookmarkCollection.cs" />
+    <Compile Include="BookmarkDataProvider.cs" />
+    <Compile Include="BookmarkEventArgs.cs" />
+    <Compile Include="BookmarkExporter.cs" />
+    <Compile Include="BookmarkOverlay.cs" />
+    <Compile Include="BookmarkView.cs" />
+    <Compile Include="BugSender.cs" />
+    <Compile Include="CellContent.cs" />
+    <Compile Include="CmdLine.cs" />
+    <Compile Include="ColumnCache.cs" />
+    <Compile Include="ColumnizerEventArgs.cs" />
+    <Compile Include="ConfigChangedEventArgs.cs" />
+    <Compile Include="ContextMenuPluginEventArgs.cs" />
+    <Compile Include="CurrentHighlightGroupChangedEventArgs.cs" />
+    <Compile Include="DebugOptions.cs" />
+    <Compile Include="DelayedTrigger.cs" />
+    <Compile Include="Dialogs\BookmarkCommentDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BookmarkCommentDlg.Designer.cs">
+      <DependentUpon>BookmarkCommentDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\BugzillaDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BugzillaDialog.Designer.cs">
+      <DependentUpon>BugzillaDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ChooseIconDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ChooseIconDlg.Designer.cs">
+      <DependentUpon>ChooseIconDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ExceptionWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ExceptionWindow.Designer.cs">
+      <DependentUpon>ExceptionWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ImportSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ImportSettingsDialog.Designer.cs">
+      <DependentUpon>ImportSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\KeywordActionDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\KeywordActionDlg.Designer.cs">
+      <DependentUpon>KeywordActionDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\MultiFileMaskDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\MultiFileMaskDialog.Designer.cs">
+      <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\OpenUriDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\OpenUriDialog.Designer.cs">
+      <DependentUpon>OpenUriDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\OverlayEventArgs.cs" />
+    <Compile Include="Dialogs\ProjectLoadDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ProjectLoadDlg.Designer.cs">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TabRenameDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TabRenameDlg.Designer.cs">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EncodingOptions.cs" />
+    <Compile Include="FileSystemCallback.cs" />
+    <Compile Include="FileViewContext.cs" />
+    <Compile Include="Filter.cs" />
+    <Compile Include="FilterCancelHandler.cs" />
+    <Compile Include="FilterStarter.cs" />
+    <Compile Include="HighlightEventArgs.cs" />
+    <Compile Include="FilterListChangedEventArgs.cs" />
+    <Compile Include="HighlightResults.cs" />
+    <Compile Include="HilightGroup.cs" />
+    <Compile Include="IBookmarkData.cs" />
+    <Compile Include="IBookmarkView.cs" />
+    <Compile Include="ILogExpertClient.cs" />
+    <Compile Include="ILogExpertProxy.cs" />
+    <Compile Include="ILogStreamReader.cs" />
+    <Compile Include="ILogPaintContext.cs" />
+    <Compile Include="ILogView.cs" />
+    <Compile Include="ISharedToolWindow.cs" />
+    <Compile Include="LocalFileSystem.cs" />
+    <Compile Include="LogBufferCacheEntry.cs" />
+    <Compile Include="LogExpertApplicationContext.cs" />
+    <Compile Include="LogFileException.cs" />
+    <Compile Include="MultifileOptions.cs" />
+    <Compile Include="ObjectClone.cs" />
+    <Compile Include="PaintHelper.cs" />
+    <Compile Include="ParamParser.cs" />
+    <Compile Include="Persister.cs" />
+    <Compile Include="ClfColumnizer.cs" />
+    <Compile Include="ConfigManager.cs" />
+    <Compile Include="Dialogs\BookmarkWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BookmarkWindow.Designer.cs">
+      <DependentUpon>BookmarkWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DateTimeDragControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DateTimeDragControl.Designer.cs">
+      <DependentUpon>DateTimeDragControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\FilterColumnChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FilterColumnChooser.Designer.cs">
+      <DependentUpon>FilterColumnChooser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SelectLineEventArgs.cs" />
+    <Compile Include="Dialogs\TimeSpreadigControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TimeSpreadigControl.Designer.cs">
+      <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\MultiLoadRequestDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\MultiLoadRequestDialog.Designer.cs">
+      <DependentUpon>MultiLoadRequestDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ParamRequesterDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ParamRequesterDialog.Designer.cs">
+      <DependentUpon>ParamRequesterDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ToolArgsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ToolArgsDialog.Designer.cs">
+      <DependentUpon>ToolArgsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterPipe.cs" />
+    <Compile Include="GuiStateArgs.cs" />
+    <Compile Include="KnobControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="KnobControl.Designer.cs">
+      <DependentUpon>KnobControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogExpertProxy.cs" />
+    <Compile Include="LogTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LogTabPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LogTabWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogTabWindow.designer.cs">
+      <DependentUpon>LogTabWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Logger.cs">
+    </Compile>
+    <Compile Include="DefaultLogfileColumnizer.cs" />
+    <Compile Include="Dialogs\AboutBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\AboutBox.Designer.cs">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\BufferedDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BufferedDataGridView.Designer.cs">
+      <DependentUpon>BufferedDataGridView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ColorComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FilterSelectorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FilterSelectorForm.Designer.cs">
+      <DependentUpon>FilterSelectorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\GotoLineDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\GotoLineDialog.Designer.cs">
+      <DependentUpon>GotoLineDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\HilightDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\HilightDialog.Designer.cs">
+      <DependentUpon>HilightDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RegexHelperDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\RegexHelperDialog.Designer.cs">
+      <DependentUpon>RegexHelperDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SearchDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SearchDialog.Designer.cs">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SearchProgressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SearchProgressDialog.Designer.cs">
+      <DependentUpon>SearchProgressDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterParams.cs" />
+    <Compile Include="HilightEntry.cs" />
+    <Compile Include="LoadFileEventArgs.cs" />
+    <Compile Include="LogBuffer.cs" />
+    <Compile Include="LogEventData.cs" />
+    <Compile Include="LogFileInfo.cs" />
+    <Compile Include="LogfileReader.cs" />
+    <Compile Include="LogWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogWindow.designer.cs">
+      <DependentUpon>LogWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PatternArgs.cs" />
+    <Compile Include="PatternBlock.cs" />
+    <Compile Include="PatternWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PatternWindow.Designer.cs">
+      <DependentUpon>PatternWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PluginRegistry.cs" />
+    <Compile Include="PositionAwareStreamReader.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ProgressEventArgs.cs" />
+    <Compile Include="ProjectPersister.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Dialogs\DateTimeDragControl.resx">
+      <DependentUpon>DateTimeDragControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\MultiLoadRequestDialog.resx">
+      <DependentUpon>MultiLoadRequestDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ParamRequesterDialog.resx">
+      <DependentUpon>ParamRequesterDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ToolArgsDialog.resx">
+      <DependentUpon>ToolArgsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KnobControl.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>KnobControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogTabWindow.resx">
+      <DependentUpon>LogTabWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\AboutBox.resx">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\FilterSelectorForm.resx">
+      <DependentUpon>FilterSelectorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\GotoLineDialog.resx">
+      <DependentUpon>GotoLineDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\HilightDialog.resx">
+      <DependentUpon>HilightDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\RegexHelperDialog.resx">
+      <DependentUpon>RegexHelperDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SearchDialog.resx">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SearchProgressDialog.resx">
+      <DependentUpon>SearchProgressDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogWindow.resx">
+      <DependentUpon>LogWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Resource1.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Range.cs" />
+    <Compile Include="RangeFinder.cs" />
+    <Compile Include="ReloadMemento.cs" />
+    <Compile Include="Resources\Resource1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource1.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RolloverFilenameBuilder.cs" />
+    <Compile Include="RolloverFilenameHandler.cs" />
+    <Compile Include="RowHeightEntry.cs" />
+    <Compile Include="SearchParams.cs" />
+    <Compile Include="StatusEventArgs.cs" />
+    <Compile Include="SyncModeEventArgs.cs" />
+    <Compile Include="SysoutPipe.cs" />
+    <Compile Include="SystemInfo.cs" />
+    <Compile Include="TimeSpreadCalculator.cs" />
+    <Compile Include="TimestampColumnizer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TimeSyncList.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Win32.cs" />
+    <Compile Include="WindowFileEntry.cs" />
+    <Compile Include="WindowTypes.cs" />
+    <Compile Include="XmlBlockSplitter.cs" />
+    <Compile Include="XmlLogReader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search-folder-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search-icon-blue.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LogExpert_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Visual.C++.9.0.x86">
+      <Visible>False</Visible>
+      <ProductName>Visual C++-Laufzeitbibliotheken %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LogExpert_1_TemporaryKey.pfx" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Resources\LogExpert.bmp" />
+    <None Include="Resources\Icon1.ico" />
+    <None Include="Resources\AdvancedIcon.bmp" />
+    <None Include="Resources\AdvancedIcon2.gif" />
+    <None Include="Resources\ArrowDown.gif" />
+    <None Include="Resources\ArrowUp.gif" />
+    <Content Include="Resources\bubble.ico" />
+    <Content Include="Resources\check-blue.gif" />
+    <None Include="Resources\LogExpert-Icon.gif" />
+    <None Include="Resources\Icon2.ico" />
+    <EmbeddedResource Include="Dialogs\BookmarkCommentDlg.resx">
+      <DependentUpon>BookmarkCommentDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\BookmarkWindow.resx">
+      <DependentUpon>BookmarkWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\BugzillaDialog.resx">
+      <DependentUpon>BugzillaDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ChooseIconDlg.resx">
+      <DependentUpon>ChooseIconDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ExceptionWindow.resx">
+      <DependentUpon>ExceptionWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\FilterColumnChooser.resx">
+      <DependentUpon>FilterColumnChooser.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ImportSettingsDialog.resx">
+      <DependentUpon>ImportSettingsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\KeywordActionDlg.resx">
+      <DependentUpon>KeywordActionDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\MultiFileMaskDialog.resx">
+      <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\OpenUriDialog.resx">
+      <DependentUpon>OpenUriDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ProjectLoadDlg.resx">
+      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TabRenameDlg.resx">
+      <DependentUpon>TabRenameDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TimeSpreadigControl.resx">
+      <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PatternWindow.resx">
+      <DependentUpon>PatternWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\delete-page-red.gif" />
+    <Content Include="Resources\LogExpert-Logo.png" />
+    <None Include="Resources\LogLover.gif" />
+    <None Include="Resources\logexpert.ico" />
+    <Content Include="Resources\Log_Icon.png" />
+    <Content Include="Resources\Log_Icon_small.png" />
+    <EmbeddedResource Include="Resources\PanelOpen.gif" />
+    <EmbeddedResource Include="Resources\PanelClose.gif" />
+    <Content Include="Resources\Pro_Filter.bmp" />
+    <None Include="Resources\SearchIcon.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
+      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
+      <Name>ColumnizerLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>copy $(ProjectDir)\..\HelpSmith\LogExpert.chm $(TargetDir)
+copy $(ProjectDir)\..\SftpBin\*.dll $(SolutionDir)\$(OutDir)\plugins
+</PostBuildEvent>
+  </PropertyGroup>
+</Project>
