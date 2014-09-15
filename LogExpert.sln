@@ -1,23 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvColumnizer", "..\CsvColumnizer\CsvColumnizer.csproj", "{2563526E-4566-40CB-AA27-587B904FD25B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvColumnizer", "CsvColumnizer\CsvColumnizer.csproj", "{2563526E-4566-40CB-AA27-587B904FD25B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColumnizerLib", "..\ColumnizerLib\ColumnizerLib.csproj", "{E72C2BB1-34DE-4D66-A830-9647C3837833}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColumnizerLib", "ColumnizerLib\ColumnizerLib.csproj", "{E72C2BB1-34DE-4D66-A830-9647C3837833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Log4jXmlColumnizer", "..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj", "{C41A517B-7502-4B17-9119-55D5716FAD65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Log4jXmlColumnizer", "Log4jXmlColumnizer\Log4jXmlColumnizer.csproj", "{C41A517B-7502-4B17-9119-55D5716FAD65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultPlugins", "..\DefaultPlugins\DefaultPlugins.csproj", "{00ED9F5D-742B-441C-B48B-16940B070B77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultPlugins", "DefaultPlugins\DefaultPlugins.csproj", "{00ED9F5D-742B-441C-B48B-16940B070B77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlassfishColumnizer", "..\GlassfishColumnizer\GlassfishColumnizer.csproj", "{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlassfishColumnizer", "GlassfishColumnizer\GlassfishColumnizer.csproj", "{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "..\UnitTests\UnitTests.csproj", "{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "..\FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "..\..\..\..\dockpanelsuite\trunk\WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
