@@ -40,10 +40,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ColumnizerLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ColumnizerLib\bin\Debug\ColumnizerLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -53,6 +49,12 @@
     <Compile Include="FlashIconPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32Stuff.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
+      <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
+      <Name>ColumnizerLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
