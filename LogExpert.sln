@@ -20,9 +20,38 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 10
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS26
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = LogExpert\\LogExpert.csproj
+		SccProjectName1 = LogExpert
+		SccLocalPath1 = LogExpert
+		SccProjectUniqueName2 = CsvColumnizer\\CsvColumnizer.csproj
+		SccProjectName2 = CsvColumnizer
+		SccLocalPath2 = CsvColumnizer
+		SccProjectUniqueName3 = ColumnizerLib\\ColumnizerLib.csproj
+		SccProjectName3 = ColumnizerLib
+		SccLocalPath3 = ColumnizerLib
+		SccProjectUniqueName4 = Log4jXmlColumnizer\\Log4jXmlColumnizer.csproj
+		SccProjectName4 = Log4jXmlColumnizer
+		SccLocalPath4 = Log4jXmlColumnizer
+		SccProjectUniqueName5 = DefaultPlugins\\DefaultPlugins.csproj
+		SccProjectName5 = DefaultPlugins
+		SccLocalPath5 = DefaultPlugins
+		SccProjectUniqueName6 = GlassfishColumnizer\\GlassfishColumnizer.csproj
+		SccProjectName6 = GlassfishColumnizer
+		SccLocalPath6 = GlassfishColumnizer
+		SccProjectUniqueName7 = UnitTests\\UnitTests.csproj
+		SccProjectName7 = UnitTests
+		SccLocalPath7 = UnitTests
+		SccProjectUniqueName8 = FlashIconHighlighter\\FlashIconHighlighter.csproj
+		SccProjectName8 = FlashIconHighlighter
+		SccLocalPath8 = FlashIconHighlighter
+		SccProjectUniqueName9 = WinFormsUI\\WinFormsUI.csproj
+		SccProjectName9 = WinFormsUI
+		SccLocalPath9 = WinFormsUI
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,5 +202,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
