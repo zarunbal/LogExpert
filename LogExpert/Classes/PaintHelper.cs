@@ -7,14 +7,8 @@ using LogExpert.Dialogs;
 
 namespace LogExpert
 {
-	public class PaintHelper
+	public static class PaintHelper
 	{
-		#region Fields
-		
-		private Color bookmarkColor = Color.FromArgb(165, 200, 225); 
-		
-		#endregion
-		
 		#region Properties
 		
 		private static Preferences Preferences
@@ -225,31 +219,32 @@ namespace LogExpert
 			Rectangle rect = new Rectangle();
 
 			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
+				|| advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.X++;
 			}
 
 			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
+				|| advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Y++;
 			}
 
 			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
+				|| advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Width++;
 			}
 
 			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
+				|| advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Height++;
 			}
-
-			//rect.Width += this.owningColumn.DividerWidth;
-			//rect.Height += this.owningRow.DividerHeight;
 
 			return rect;
 		}
@@ -263,7 +258,7 @@ namespace LogExpert
 			PaintHighlightedCell(logPaintCtx, e, gridView, noBackgroundFill, groundEntry);
 		}
 		
-		private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
+		public static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
 			object value = e.Value != null ? e.Value : "";
 			IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as string);
