@@ -1428,7 +1428,7 @@ namespace LogExpert
 						//Bookmarked line is not visible with the current filter, search for another
 						bookmarkIndex = currentBookMarkCount.GetNextIndex(bookmarkIndex, isForward, out wrapped);
 
-						if (wrapped && 
+						if (wrapped &&
 							((isForward && bookmarkIndex >= startIndex) ||
 							(!isForward && bookmarkIndex <= startIndex)))
 						{
@@ -4285,97 +4285,7 @@ namespace LogExpert
 
 		private void PaintCell(DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
-			PaintHighlightedCell(e, gridView, noBackgroundFill, groundEntry);
-		}
-
-		private void PaintHighlightedCell(DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
-		{
-			object value = e.Value != null ? e.Value : "";
-			IList<HilightMatchEntry> matchList = FindHilightMatches(value as string);
-			// too many entries per line seem to cause problems with the GDI 
-			while (matchList.Count > 50)
-			{
-				matchList.RemoveAt(50);
-			}
-
-			var hme = new HilightMatchEntry();
-			hme.StartPos = 0;
-			hme.Length = (value as string).Length;
-			hme.HilightEntry = new HilightEntry((value as string),
-				groundEntry != null ? groundEntry.ForegroundColor : Color.FromKnownColor(KnownColor.Black),
-				groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
-				false);
-			matchList = MergeHighlightMatchEntries(matchList, hme);
-
-			int leftPad = e.CellStyle.Padding.Left;
-			RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
-			Rectangle borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
-			Rectangle valBounds = e.CellBounds;
-			valBounds.Offset(borderWidths.X, borderWidths.Y);
-			valBounds.Width -= borderWidths.Right;
-			valBounds.Height -= borderWidths.Bottom;
-			if (e.CellStyle.Padding != Padding.Empty)
-			{
-				valBounds.Offset(e.CellStyle.Padding.Left, e.CellStyle.Padding.Top);
-				valBounds.Width -= e.CellStyle.Padding.Horizontal;
-				valBounds.Height -= e.CellStyle.Padding.Vertical;
-			}
-
-			TextFormatFlags flags =
-								   TextFormatFlags.Left |
-								   TextFormatFlags.SingleLine |
-								   TextFormatFlags.NoPrefix |
-								   TextFormatFlags.PreserveGraphicsClipping |
-								   TextFormatFlags.NoPadding |
-								   TextFormatFlags.VerticalCenter |
-								   TextFormatFlags.TextBoxControl
-			;
-
-			//          | TextFormatFlags.VerticalCenter
-			//          | TextFormatFlags.TextBoxControl
-			//          TextFormatFlags.SingleLine
-
-			//TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-
-			Point wordPos = valBounds.Location;
-			Size proposedSize = new Size(valBounds.Width, valBounds.Height);
-
-			Rectangle r = gridView.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
-			e.Graphics.SetClip(e.CellBounds);
-
-			foreach (HilightMatchEntry matchEntry in matchList)
-			{
-				Font font = matchEntry != null && matchEntry.HilightEntry.IsBold ? this._fontBold : this._font;
-				Brush bgBrush = matchEntry.HilightEntry.BackgroundColor != Color.Empty ? new SolidBrush(matchEntry.HilightEntry.BackgroundColor) : null;
-				string matchWord = (value as string).Substring(matchEntry.StartPos, matchEntry.Length);
-				Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
-				wordSize.Height = e.CellBounds.Height;
-				Rectangle wordRect = new Rectangle(wordPos, wordSize);
-
-				Color foreColor = matchEntry.HilightEntry.ForegroundColor;
-				if ((e.State & DataGridViewElementStates.Selected) != DataGridViewElementStates.Selected)
-				{
-					if (!noBackgroundFill && bgBrush != null && !matchEntry.HilightEntry.NoBackground)
-					{
-						e.Graphics.FillRectangle(bgBrush, wordRect);
-					}
-				}
-				else
-				{
-					if (foreColor.Equals(Color.Black))
-					{
-						foreColor = Color.White;
-					}
-				}
-				TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
-					foreColor, flags);
-
-				wordPos.Offset(wordSize.Width, 0);
-				if (bgBrush != null)
-				{
-					bgBrush.Dispose();
-				}
-			}
+			PaintHelper.PaintHighlightedCell(this, e, gridView, noBackgroundFill, groundEntry);
 		}
 
 		/// <summary>
