@@ -102,7 +102,7 @@
     <Compile Include="Functionality\Bookmark\BookmarkView.cs" />
     <Compile Include="Classes\BugSender.cs" />
     <Compile Include="Entities\CellContent.cs" />
-    <Compile Include="CmdLine.cs" />
+    <Compile Include="Classes\CmdLine.cs" />
     <Compile Include="Functionality\ColumnCache.cs" />
     <Compile Include="Classes\Args\ColumnizerEventArgs.cs" />
     <Compile Include="Classes\Args\ConfigChangedEventArgs.cs" />
