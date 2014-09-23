@@ -4,18 +4,13 @@ using System.Text;
 
 namespace LogExpert.Dialogs
 {
-  public class SelectLineEventArgs : EventArgs
-  {
-    int line;
+	public class SelectLineEventArgs : EventArgs
+	{
+		public int Line { get; private set; }
 
-    public int Line
-    {
-      get { return line; }
-    }
-
-    public SelectLineEventArgs(int line)
-    {
-      this.line = line;
-    }
-  }
+		public SelectLineEventArgs(int line)
+		{
+			this.Line = line;
+		}
+	}
 }
