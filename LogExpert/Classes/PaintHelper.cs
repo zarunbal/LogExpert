@@ -7,10 +7,16 @@ using LogExpert.Dialogs;
 
 namespace LogExpert
 {
-	class PaintHelper
+	public class PaintHelper
 	{
-		private Color bookmarkColor = Color.FromArgb(165, 200, 225);
-
+		#region Fields
+		
+		private Color bookmarkColor = Color.FromArgb(165, 200, 225); 
+		
+		#endregion
+		
+		#region Properties
+		
 		private static Preferences Preferences
 		{
 			get
@@ -18,7 +24,11 @@ namespace LogExpert
 				return ConfigManager.Settings.preferences;
 			}
 		}
+		
+		#endregion
 
+		#region Public Methods
+		
 		public static void CellPainting(ILogPaintContext logPaintCtx, DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
 		{
 			if (rowIndex < 0 || e.ColumnIndex < 0)
@@ -67,7 +77,7 @@ namespace LogExpert
 					e.CellStyle.BackColor = bgColor;
 					e.PaintBackground(e.ClipBounds, false);
 				}
-
+				
 				if (DebugOptions.disableWordHighlight)
 				{
 					e.PaintContent(e.CellBounds);
@@ -76,7 +86,7 @@ namespace LogExpert
 				{
 					PaintCell(logPaintCtx, e, gridView, false, entry);
 				}
-
+				
 				if (e.ColumnIndex == 0)
 				{
 					Bookmark bookmark = logPaintCtx.GetBookmarkForLine(rowIndex);
@@ -100,17 +110,125 @@ namespace LogExpert
 						}
 					}
 				}
-
+				
 				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
 				e.Handled = true;
 			}
 		}
+		
+		public static void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
+		{
+			int rowCount = gridView.RowCount;
+			int currLine = gridView.CurrentCellAddress.Y;
+			int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
+			
+			try
+			{
+				gridView.Columns.Clear();
+			}
+			catch (ArgumentOutOfRangeException ae)
+			{
+				// Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
+				// Don't know why.
+				Logger.logError(ae.Message);
+			}
+			
+			DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
+			markerColumn.HeaderText = "";
+			markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+			markerColumn.Resizable = DataGridViewTriState.False;
+			markerColumn.DividerWidth = 1;
+			markerColumn.ReadOnly = true;
+			// markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+			gridView.Columns.Add(markerColumn);
+			
+			DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
+			lineNumberColumn.HeaderText = "Line";
+			lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+			lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
+			lineNumberColumn.DividerWidth = 1;
+			lineNumberColumn.ReadOnly = true;
+			// lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+			gridView.Columns.Add(lineNumberColumn);
+			
+			foreach (string colName in columnizer.GetColumnNames())
+			{
+				DataGridViewColumn titleColumn = new LogTextColumn();
+				titleColumn.HeaderText = colName;
+				titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+				titleColumn.Resizable = DataGridViewTriState.NotSet;
+				titleColumn.DividerWidth = 1;
+				//titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+				gridView.Columns.Add(titleColumn);
+			}
+			
+			gridView.RowCount = rowCount;
+			if (currLine != -1)
+				gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
+			if (currFirstLine != -1)
+				gridView.FirstDisplayedScrollingRowIndex = currFirstLine;
+			//gridView.Refresh();
+			//AutoResizeColumns(gridView);
+		}
+		
+		public static void AutoResizeColumns(DataGridView gridView)
+		{
+			try
+			{
+				gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+				if (gridView.Columns.Count > 1 && Preferences.setLastColumnWidth &&
+					gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.lastColumnWidth
+				)
+				{
+					// It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
+					//gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
+					gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = Preferences.lastColumnWidth;
+				}
+			}
+			catch (NullReferenceException e)
+			{
+				// See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+				// There are some rare situations with null ref exceptions when resizing columns and on filter finished
+				// So catch them here. Better than crashing.
+				Logger.logError("Error while resizing columns: " + e.Message);
+				Logger.logError(e.StackTrace);
+			}
+		}
+		
+		public static void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
+		{
+			if (dataGridView.Columns.Count > 1)
+			{
+				if (prefs.setLastColumnWidth)
+				{
+					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
+				}
+				else
+				{
+					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+					dataGridView.FirstDisplayedScrollingColumnIndex = 0;
+				
+					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
+				}
+			}
+			if (dataGridView.RowCount > 0)
+			{
+				dataGridView.UpdateRowHeightInfo(0, true);
+			}
+			dataGridView.Invalidate();
+			dataGridView.Refresh();
+			AutoResizeColumns(dataGridView);
+		}
 
+		#endregion
+		
+		#region Private Methods
+		
 		private static void PaintCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
 			PaintHighlightedCell(logPaintCtx, e, gridView, noBackgroundFill, groundEntry);
 		}
-
+		
 		private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
 			object value = e.Value != null ? e.Value : "";
@@ -120,7 +238,7 @@ namespace LogExpert
 			{
 				matchList.RemoveAt(50);
 			}
-
+			
 			var hme = new HilightMatchEntry();
 			hme.StartPos = 0;
 			hme.Length = (value as string).Length;
@@ -129,7 +247,7 @@ namespace LogExpert
 				groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
 				false);
 			matchList = MergeHighlightMatchEntries(matchList, hme);
-
+			
 			int leftPad = e.CellStyle.Padding.Left;
 			RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
 			Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
@@ -143,7 +261,7 @@ namespace LogExpert
 				valBounds.Width -= e.CellStyle.Padding.Horizontal;
 				valBounds.Height -= e.CellStyle.Padding.Vertical;
 			}
-
+								   
 			TextFormatFlags flags =
 								   TextFormatFlags.Left |
 								   TextFormatFlags.SingleLine |
@@ -153,19 +271,19 @@ namespace LogExpert
 								   TextFormatFlags.VerticalCenter |
 								   TextFormatFlags.TextBoxControl
 			;
-
+			
 			//          | TextFormatFlags.VerticalCenter
 			//          | TextFormatFlags.TextBoxControl
 			//          TextFormatFlags.SingleLine
-
+			
 			//TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-
+			
 			Point wordPos = valBounds.Location;
 			Size proposedSize = new Size(valBounds.Width, valBounds.Height);
-
+			
 			Rectangle r = gridView.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
 			e.Graphics.SetClip(e.CellBounds);
-
+			
 			foreach (HilightMatchEntry matchEntry in matchList)
 			{
 				Font font = matchEntry != null && matchEntry.HilightEntry.IsBold ? logPaintCtx.BoldFont : logPaintCtx.NormalFont;
@@ -174,7 +292,7 @@ namespace LogExpert
 				Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
 				wordSize.Height = e.CellBounds.Height;
 				Rectangle wordRect = new Rectangle(wordPos, wordSize);
-
+				
 				Color foreColor = matchEntry.HilightEntry.ForegroundColor;
 				if ((e.State & DataGridViewElementStates.Selected) != DataGridViewElementStates.Selected)
 				{
@@ -192,7 +310,7 @@ namespace LogExpert
 				}
 				TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
 					foreColor, flags);
-
+				
 				wordPos.Offset(wordSize.Width, 0);
 				if (bgBrush != null)
 				{
@@ -200,41 +318,41 @@ namespace LogExpert
 				}
 			}
 		}
-
+		
 		protected static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
 		{
 			Rectangle rect = new Rectangle();
-
+			
 			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.X++;
 			}
-
+			
 			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Y++;
 			}
-
+			
 			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Width++;
 			}
-
+			
 			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Height++;
 			}
-
+			
 			//rect.Width += this.owningColumn.DividerWidth;
 			//rect.Height += this.owningRow.DividerHeight;
-
+		
 			return rect;
 		}
-
+		
 		/// <summary>
 		/// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
 		/// background colors.
@@ -252,7 +370,7 @@ namespace LogExpert
 			{
 				entryArray[i] = groundEntry.HilightEntry;
 			}
-
+			
 			// "overpaint" with all matching word match enries
 			// Non-word-mode matches will not overpaint because they use the groundEntry
 			foreach (HilightMatchEntry me in matchList)
@@ -270,7 +388,7 @@ namespace LogExpert
 					}
 				}
 			}
-
+			
 			// collect areas with same hilight entry and build new highlight match entries for it
 			IList<HilightMatchEntry> mergedList = new List<HilightMatchEntry>();
 			if (entryArray.Length > 0)
@@ -300,108 +418,6 @@ namespace LogExpert
 			return mergedList;
 		}
 
-		public static void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
-		{
-			int rowCount = gridView.RowCount;
-			int currLine = gridView.CurrentCellAddress.Y;
-			int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
-
-			try
-			{
-				gridView.Columns.Clear();
-			}
-			catch (ArgumentOutOfRangeException ae)
-			{
-				// Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
-				// Don't know why.
-				Logger.logError(ae.Message);
-			}
-
-			DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
-			markerColumn.HeaderText = "";
-			markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-			markerColumn.Resizable = DataGridViewTriState.False;
-			markerColumn.DividerWidth = 1;
-			markerColumn.ReadOnly = true;
-			// markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-			gridView.Columns.Add(markerColumn);
-
-			DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
-			lineNumberColumn.HeaderText = "Line";
-			lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-			lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
-			lineNumberColumn.DividerWidth = 1;
-			lineNumberColumn.ReadOnly = true;
-			// lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-			gridView.Columns.Add(lineNumberColumn);
-
-			foreach (string colName in columnizer.GetColumnNames())
-			{
-				DataGridViewColumn titleColumn = new LogTextColumn();
-				titleColumn.HeaderText = colName;
-				titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-				titleColumn.Resizable = DataGridViewTriState.NotSet;
-				titleColumn.DividerWidth = 1;
-				//titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-				gridView.Columns.Add(titleColumn);
-			}
-
-			gridView.RowCount = rowCount;
-			if (currLine != -1)
-				gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
-			if (currFirstLine != -1)
-				gridView.FirstDisplayedScrollingRowIndex = currFirstLine;
-			//gridView.Refresh();
-			//AutoResizeColumns(gridView);
-		}
-
-		public static void AutoResizeColumns(DataGridView gridView)
-		{
-			try
-			{
-				gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-				if (gridView.Columns.Count > 1 && Preferences.setLastColumnWidth &&
-					gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.lastColumnWidth
-				)
-				{
-					// It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
-					//gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
-					gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = Preferences.lastColumnWidth;
-				}
-			}
-			catch (NullReferenceException e)
-			{
-				// See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
-				// There are some rare situations with null ref exceptions when resizing columns and on filter finished
-				// So catch them here. Better than crashing.
-				Logger.logError("Error while resizing columns: " + e.Message);
-				Logger.logError(e.StackTrace);
-			}
-		}
-
-		public static void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
-		{
-			if (dataGridView.Columns.Count > 1)
-			{
-				if (prefs.setLastColumnWidth)
-				{
-					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
-				}
-				else
-				{
-					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
-					dataGridView.FirstDisplayedScrollingColumnIndex = 0;
-
-					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
-				}
-			}
-			if (dataGridView.RowCount > 0)
-			{
-				dataGridView.UpdateRowHeightInfo(0, true);
-			}
-			dataGridView.Invalidate();
-			dataGridView.Refresh();
-			AutoResizeColumns(dataGridView);
-		}
+		#endregion
 	}
 }
