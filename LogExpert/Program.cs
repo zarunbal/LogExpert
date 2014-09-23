@@ -11,7 +11,6 @@ using System.Security;
 using System.Reflection;
 using System.Security.Principal;
 using LogExpert.Dialogs;
-using ITDM;
 
 namespace LogExpert
 {
@@ -42,22 +41,13 @@ namespace LogExpert
 
 			Logger.logInfo("============================================================================");
 			Logger.logInfo("LogExpert " + Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
-					 Assembly.GetExecutingAssembly().GetName().Version.Minor + "/" +
-					 Assembly.GetExecutingAssembly().GetName().Version.Build.ToString() +
-					 " started.");
+						   Assembly.GetExecutingAssembly().GetName().Version.Minor + "/" +
+						   Assembly.GetExecutingAssembly().GetName().Version.Build.ToString() +
+						   " started.");
 			Logger.logInfo("============================================================================");
 
-		  CmdLine cmdLine = new CmdLine();
-		  CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
-		  cmdLine.RegisterParameter(configFile);
-		  string[] remainingArgs = cmdLine.Parse(orgArgs);
-
 			List<string> argsList = new List<string>();
-
-      // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
-      // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
-      // TODO: possibly should be moved to LocalFileSystem plugin
-      foreach (string fileArg in remainingArgs)
+			foreach (string fileArg in orgArgs)
 			{
 				try
 				{
@@ -69,22 +59,10 @@ namespace LogExpert
 				}
 				catch (Exception)
 				{
-          argsList.Add(fileArg);
+					MessageBox.Show("File name " + fileArg + " is not a valid file name!", "LogExpert Error");
 				}
 			}
 			string[] args = argsList.ToArray();
-      if (configFile.Exists)
-      {
-        FileInfo cfgFileInfo = new FileInfo(configFile.Value);
-        if (cfgFileInfo.Exists)
-        {
-          ConfigManager.Import(cfgFileInfo, ExportImportFlags.All);
-        }
-        else
-        {
-          MessageBox.Show("Config file not found", "LogExpert");
-        }
-      }
 
 			int pId = Process.GetCurrentProcess().SessionId;
 
@@ -105,8 +83,8 @@ namespace LogExpert
 					IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
 					ChannelServices.RegisterChannel(ipcChannel, false);
 					RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
-																				"LogExpertProxy",
-																				WellKnownObjectMode.Singleton);
+						"LogExpertProxy",
+						WellKnownObjectMode.Singleton);
 					LogExpertProxy proxy = new LogExpertProxy(logWin);
 					RemotingServices.Marshal(proxy, "LogExpertProxy");
 
@@ -128,7 +106,7 @@ namespace LogExpert
 							// another instance already exists
 							//WindowsIdentity wi = WindowsIdentity.GetCurrent();
 							LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy),
-																		"ipc://LogExpert" + pId + "/LogExpertProxy");
+								"ipc://LogExpert" + pId + "/LogExpertProxy");
 							if (settings.preferences.allowOnlyOneInstance)
 							{
 								proxy.LoadFiles(args);
