@@ -220,6 +220,40 @@ namespace LogExpert
 			AutoResizeColumns(dataGridView);
 		}
 
+		public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
+		{
+			Rectangle rect = new Rectangle();
+
+			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
+			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			{
+				rect.X++;
+			}
+
+			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
+			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			{
+				rect.Y++;
+			}
+
+			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
+			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			{
+				rect.Width++;
+			}
+
+			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
+			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			{
+				rect.Height++;
+			}
+
+			//rect.Width += this.owningColumn.DividerWidth;
+			//rect.Height += this.owningRow.DividerHeight;
+
+			return rect;
+		}
+
 		#endregion
 		
 		#region Private Methods
@@ -317,40 +351,6 @@ namespace LogExpert
 					bgBrush.Dispose();
 				}
 			}
-		}
-		
-		protected static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
-		{
-			Rectangle rect = new Rectangle();
-			
-			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.X++;
-			}
-			
-			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Y++;
-			}
-			
-			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Width++;
-			}
-			
-			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Height++;
-			}
-			
-			//rect.Width += this.owningColumn.DividerWidth;
-			//rect.Height += this.owningRow.DividerHeight;
-		
-			return rect;
 		}
 		
 		/// <summary>

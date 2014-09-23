@@ -4309,7 +4309,7 @@ namespace LogExpert
 
 			int leftPad = e.CellStyle.Padding.Left;
 			RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
-			Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
+			Rectangle borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
 			Rectangle valBounds = e.CellBounds;
 			valBounds.Offset(borderWidths.X, borderWidths.Y);
 			valBounds.Width -= borderWidths.Right;
@@ -6890,40 +6890,6 @@ namespace LogExpert
 			//{
 			//  return null;
 			//}
-		}
-
-		private Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
-		{
-			Rectangle rect = new Rectangle();
-
-			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.X++;
-			}
-
-			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Y++;
-			}
-
-			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Width++;
-			}
-
-			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-			{
-				rect.Height++;
-			}
-
-			//rect.Width += this.owningColumn.DividerWidth;
-			//rect.Height += this.owningRow.DividerHeight;
-
-			return rect;
 		}
 
 		protected override string GetPersistString()
