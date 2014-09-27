@@ -37,7 +37,6 @@ namespace LogExpert
 				e.Graphics.SetClip(e.CellBounds);
 				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
 				{
-					Color backColor = e.CellStyle.SelectionBackColor;
 					Brush brush;
 					if (gridView.Focused)
 					{
@@ -116,7 +115,6 @@ namespace LogExpert
 				e.Graphics.SetClip(e.CellBounds);
 				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
 				{
-					Color backColor = e.CellStyle.SelectionBackColor;
 					Brush brush;
 					if (gridView.Focused)
 					{
@@ -351,8 +349,6 @@ namespace LogExpert
 				false);
 			matchList = MergeHighlightMatchEntries(matchList, hme);
 			
-			int leftPad = e.CellStyle.Padding.Left;
-			RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
 			Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
 			Rectangle valBounds = e.CellBounds;
 			valBounds.Offset(borderWidths.X, borderWidths.Y);
@@ -384,7 +380,6 @@ namespace LogExpert
 			Point wordPos = valBounds.Location;
 			Size proposedSize = new Size(valBounds.Width, valBounds.Height);
 			
-			Rectangle r = gridView.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
 			e.Graphics.SetClip(e.CellBounds);
 			
 			foreach (HilightMatchEntry matchEntry in matchList)

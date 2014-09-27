@@ -1484,9 +1484,6 @@ namespace LogExpert
 				this._fontBold = new Font(this.NormalFont, FontStyle.Bold);
 				this._fontMonospaced = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
 
-				int lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
-				float lineSpacingPixel = NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);
-
 				this.dataGridView.DefaultCellStyle.Font = NormalFont;
 				this.filterGridView.DefaultCellStyle.Font = NormalFont;
 				this._lineHeight = NormalFont.Height + 4;
@@ -2823,7 +2820,6 @@ namespace LogExpert
 			frozen = !frozen;
 			this._freezeStateMap[ctl] = frozen;
 
-			DataGridViewColumn senderCol = sender as DataGridViewColumn;
 			if (ctl is DataGridView)
 			{
 				DataGridView gridView = ctl as DataGridView;
@@ -3517,7 +3513,6 @@ namespace LogExpert
 				FilterParams persistFilterParams = data.filterParams;
 				ReInitFilterParams(persistFilterParams);
 				List<int> filterResultList = new List<int>();
-				List<int> lastFilterResultList = new List<int>();
 				List<int> filterHitList = new List<int>();
 				Filter(persistFilterParams, filterResultList, _lastFilterLinesList, filterHitList);
 				FilterPipe pipe = new FilterPipe(persistFilterParams.CreateCopy(), this);
@@ -5042,13 +5037,11 @@ namespace LogExpert
 
 		private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
 		{
-			int count;
 			lock (this._filterResultList)
 			{
 				filterHitList.Add(lineNum);
 				IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
 				filterResultLines.AddRange(filterResult);
-				count = filterResultLines.Count;
 				lastFilterLinesList.AddRange(filterResult);
 				if (lastFilterLinesList.Count > SPREAD_MAX * 2)
 				{
@@ -5606,7 +5599,6 @@ namespace LogExpert
 					{
 						continue;
 					}
-					long startTime = Environment.TickCount;
 					if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
 					{
 						IList<int> filterResult = GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
@@ -5628,7 +5620,6 @@ namespace LogExpert
 						}
 						pipe.CloseFile();
 					}
-					long endTime = Environment.TickCount;
 				}
 			}
 			foreach (FilterPipe pipe in deleteList)
@@ -5781,7 +5772,6 @@ namespace LogExpert
 			foreach (DataGridViewColumn col in dict.Values)
 			{
 				col.Frozen = this._freezeStateMap.ContainsKey(gridView) && this._freezeStateMap[gridView];
-				bool sel = col.HeaderCell.Selected;
 				if (col.Index == this._selectedCol)
 				{
 					break;
