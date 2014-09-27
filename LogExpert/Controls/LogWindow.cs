@@ -2110,6 +2110,8 @@ namespace LogExpert
 			FreeFromTimeSync();
 		}
 
+		#region LogFileReader Events
+
 		private void LogFileReader_LoadingStarted(object sender, LoadFileEventArgs e)
 		{
 			this.Invoke(new LoadingStartedFx(LoadingStarted), new object[] { e });
@@ -2164,12 +2166,6 @@ namespace LogExpert
 			this.BeginInvoke(new MethodInvoker(LogfileRespawned));
 		}
 
-		private void DataGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
-		{
-			e.Handled = true;
-			AutoResizeColumns(this.dataGridView);
-		}
-
 		/**
 		 * Event handler for the Load event from LogfileReader
 		 */
@@ -2196,6 +2192,8 @@ namespace LogExpert
 			UpdateProgressCallback callback = new UpdateProgressCallback(UpdateProgress);
 			this.BeginInvoke(callback, new object[] { e });
 		}
+
+		#endregion
 
 		private void UpdateProgress(LoadFileEventArgs e)
 		{
@@ -2236,6 +2234,14 @@ namespace LogExpert
 			{
 				Logger.logError("LoadingStarted(): " + ex + "\n" + ex.StackTrace);
 			}
+		}
+
+		#region DataGridView Events
+
+		private void DataGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
+		{
+			e.Handled = true;
+			AutoResizeColumns(this.dataGridView);
 		}
 
 		private void DataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
@@ -2308,21 +2314,6 @@ namespace LogExpert
 			StatusLineText("");
 		}
 
-		private void EditControl_UpdateEditColumnDisplay(object sender, KeyEventArgs e)
-		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
-		}
-
-		private void EditControl_KeyPress(object sender, KeyPressEventArgs e)
-		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
-		}
-
-		private void EditControl_Click(object sender, EventArgs e)
-		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
-		}
-
 		private void DataGridView_Paint(object sender, PaintEventArgs e)
 		{
 			if (this.ShowBookmarkBubbles)
@@ -2331,10 +2322,111 @@ namespace LogExpert
 			}
 		}
 
-		private void FilterSearchButton_Click(object sender, EventArgs e)
+		private void DataGridView_Scroll(object sender, ScrollEventArgs e)
 		{
-			FilterSearch();
+			if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
+			{
+				if (this.dataGridView.DisplayedRowCount(false) +
+					this.dataGridView.FirstDisplayedScrollingRowIndex >=
+					this.dataGridView.RowCount
+				)
+				{
+					//this.guiStateArgs.FollowTail = true;
+					if (!this._guiStateArgs.FollowTail)
+						FollowTailChanged(true, false);
+					OnTailFollowed(new EventArgs());
+				}
+				else
+				{
+					//this.guiStateArgs.FollowTail = false;
+					if (this._guiStateArgs.FollowTail)
+						FollowTailChanged(false, false);
+				}
+				SendGuiStateUpdate();
+			}
 		}
+
+		private void DataGridView_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
+			{
+				this.filterGridView.Focus();
+				e.Handled = true;
+			}
+			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.Control)
+			{
+				//this.parentLogTabWin.SwitchTab(e.Shift);
+			}
+			this._shouldCallTimeSync = true;
+		}
+
+		private void DataGridView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+		{
+			if ((e.KeyCode == Keys.Tab) && e.Control)
+			{
+				e.IsInputKey = true;
+			}
+		}
+
+		private void DataGridView_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+		{
+			if (this.dataGridView.CurrentCell != null)
+				this.dataGridView.BeginEdit(false);
+		}
+		private void DataGridView_InvalidateCurrentRow(object sender, EventArgs e)
+		{
+			InvalidateCurrentRow(this.dataGridView);
+		}
+
+
+		private void DataGridView_Resize(object sender, EventArgs e)
+		{
+			if (this._logFileReader != null && this.dataGridView.RowCount > 0 &&
+				this._guiStateArgs.FollowTail)
+			{
+				this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.RowCount - 1;
+			}
+		}
+
+		private void DataGridView_SelectionChanged(object sender, EventArgs e)
+		{
+			UpdateSelectionDisplay();
+		}
+
+		private void DataGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
+		{
+			if (e.RowIndex > 0 && e.RowIndex < this.dataGridView.RowCount &&
+				!this.dataGridView.Rows[e.RowIndex].Selected)
+			{
+				SelectLine(e.RowIndex, false);
+			}
+			if (e.ContextMenuStrip == this.columnContextMenuStrip)
+			{
+				this._selectedCol = e.ColumnIndex;
+			}
+		}
+
+		private void DataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+		{
+			this._shouldCallTimeSync = true;
+		}
+
+		private void DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+		{
+			if (e.ColumnIndex == 0)
+			{
+				ToggleBookmark();
+			}
+		}
+
+		private void DataGridView_OverlayDoubleClicked(object sender, OverlayEventArgs e)
+		{
+			BookmarkComment(e.BookmarkOverlay.Bookmark);
+		}
+
+		#endregion
+
+		#region FilterGridView Events
 
 		private void FilterGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
@@ -2373,14 +2465,6 @@ namespace LogExpert
 			e.Height = this._lineHeight;
 		}
 
-		private void FilterComboBox_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyCode == Keys.Enter)
-			{
-				FilterSearch();
-			}
-		}
-
 		private void FilterGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
 		{
 			e.Handled = true;
@@ -2403,36 +2487,6 @@ namespace LogExpert
 			}
 		}
 
-		private void RangeCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			this.filterRangeComboBox.Enabled = this.rangeCheckBox.Checked;
-			CheckForFilterDirty();
-		}
-
-		private void DataGridView_Scroll(object sender, ScrollEventArgs e)
-		{
-			if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
-			{
-				if (this.dataGridView.DisplayedRowCount(false) +
-					this.dataGridView.FirstDisplayedScrollingRowIndex >=
-					this.dataGridView.RowCount
-				)
-				{
-					//this.guiStateArgs.FollowTail = true;
-					if (!this._guiStateArgs.FollowTail)
-						FollowTailChanged(true, false);
-					OnTailFollowed(new EventArgs());
-				}
-				else
-				{
-					//this.guiStateArgs.FollowTail = false;
-					if (this._guiStateArgs.FollowTail)
-						FollowTailChanged(false, false);
-				}
-				SendGuiStateUpdate();
-			}
-		}
-
 		private void FilterGridView_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Enter)
@@ -2451,62 +2505,63 @@ namespace LogExpert
 			}
 		}
 
-		private void DataGridView_KeyDown(object sender, KeyEventArgs e)
+		private void FilterGridView_InvalidateCurrentRow(object sender, EventArgs e)
 		{
-			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
-			{
-				this.filterGridView.Focus();
-				e.Handled = true;
-			}
-			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.Control)
-			{
-				//this.parentLogTabWin.SwitchTab(e.Shift);
-			}
-			this._shouldCallTimeSync = true;
+			InvalidateCurrentRow(this.filterGridView);
 		}
 
-		private void DataGridView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+		private void FilterGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
 		{
-			if ((e.KeyCode == Keys.Tab) && e.Control)
+			if (e.ContextMenuStrip == this.columnContextMenuStrip)
 			{
-				e.IsInputKey = true;
+				this._selectedCol = e.ColumnIndex;
 			}
 		}
 
-		private void DataGridView_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+		#endregion
+
+		#region EditControl Events
+
+		private void EditControl_UpdateEditColumnDisplay(object sender, KeyEventArgs e)
 		{
-			if (this.dataGridView.CurrentCell != null)
-				this.dataGridView.BeginEdit(false);
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+		}
+
+		private void EditControl_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+		}
+
+		private void EditControl_Click(object sender, EventArgs e)
+		{
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+		} 
+
+		#endregion
+
+		private void FilterSearchButton_Click(object sender, EventArgs e)
+		{
+			FilterSearch();
+		}
+
+		private void FilterComboBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				FilterSearch();
+			}
+		}
+
+		private void RangeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			this.filterRangeComboBox.Enabled = this.rangeCheckBox.Checked;
+			CheckForFilterDirty();
 		}
 
 		private void SyncFilterCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			if (this.syncFilterCheckBox.Checked)
 				SyncFilterGridPos();
-		}
-
-		private void DataGridView_InvalidateCurrentRow(object sender, EventArgs e)
-		{
-			InvalidateCurrentRow(this.dataGridView);
-		}
-
-		private void FilterGridView_InvalidateCurrentRow(object sender, EventArgs e)
-		{
-			InvalidateCurrentRow(this.filterGridView);
-		}
-
-		private void DataGridView_Resize(object sender, EventArgs e)
-		{
-			if (this._logFileReader != null && this.dataGridView.RowCount > 0 &&
-				this._guiStateArgs.FollowTail)
-			{
-				this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.RowCount - 1;
-			}
-		}
-
-		private void DataGridView_SelectionChanged(object sender, EventArgs e)
-		{
-			UpdateSelectionDisplay();
 		}
 
 		private void SelectionChangedTrigger_Signal(object sender, EventArgs e)
@@ -2747,27 +2802,6 @@ namespace LogExpert
 				//CheckForFilterDirty(); //!!!GBro: Indicate to redo the search if search columns were changed
 				this.filterSearchButton.Image = this._searchButtonImage;
 				this.saveFilterButton.Enabled = false;
-			}
-		}
-
-		private void DataGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
-		{
-			if (e.RowIndex > 0 && e.RowIndex < this.dataGridView.RowCount &&
-				!this.dataGridView.Rows[e.RowIndex].Selected)
-			{
-				SelectLine(e.RowIndex, false);
-			}
-			if (e.ContextMenuStrip == this.columnContextMenuStrip)
-			{
-				this._selectedCol = e.ColumnIndex;
-			}
-		}
-
-		private void FilterGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
-		{
-			if (e.ContextMenuStrip == this.columnContextMenuStrip)
-			{
-				this._selectedCol = e.ColumnIndex;
 			}
 		}
 
@@ -3042,24 +3076,6 @@ namespace LogExpert
 					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
 				AddBookmarkComment(ctl.SelectedText);
 			}
-		}
-
-		private void DataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
-		{
-			this._shouldCallTimeSync = true;
-		}
-
-		private void DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-		{
-			if (e.ColumnIndex == 0)
-			{
-				ToggleBookmark();
-			}
-		}
-
-		private void DataGridView_OverlayDoubleClicked(object sender, OverlayEventArgs e)
-		{
-			BookmarkComment(e.BookmarkOverlay.Bookmark);
 		}
 
 		private void FilterRegexCheckBox_MouseUp(object sender, MouseEventArgs e)
