@@ -30,6 +30,7 @@ namespace LogExpert
 		#endregion
 
 		#region Fields
+
 		private List<int> _lineHashList = new List<int>();
 
 		private Color _bookmarkColor = Color.FromArgb(165, 200, 225);
@@ -52,7 +53,6 @@ namespace LogExpert
 		private Object _bookmarkLock = new Object();
 
 		private readonly IList<FilterPipe> _filterPipeList = new List<FilterPipe>();
-		private FilterPipe _filterPipe = null;
 		private int _filterPipeNameCounter = 0;
 		private readonly Dictionary<Control, bool> _freezeStateMap = new Dictionary<Control, bool>();
 		private SortedList<int, RowHeightEntry> _rowHeightList = new SortedList<int, RowHeightEntry>();
@@ -140,7 +140,6 @@ namespace LogExpert
 		private bool _isTimestampDisplaySyncing = false;
 		private bool _shouldTimestampDisplaySyncingCancel = false;
 		private bool _isDeadFile = false;
-		private bool _forcePersistenceLoading = false;
 		private bool _noSelectionUpdates = false;
 		private bool _shouldCallTimeSync = false;
 		private bool _isLoadError = false;
@@ -162,10 +161,6 @@ namespace LogExpert
 		private string _fileNameField;
 		private string[] _fileNames;
 		private readonly LogTabWindow _parentLogTabWin;
-		private string _tempTitleName = "";
-		private string _sessionFileName = null;    // unused?
-		private string _forcedPersistenceFileName = null;
-		private string _givenFileName = null;      // file name of given file used for loading (maybe logfile or lxp)
 		private MultifileOptions _multifileOptions = new MultifileOptions();
 
 		private readonly TimeSpreadCalculator _timeSpreadCalc;
@@ -196,6 +191,8 @@ namespace LogExpert
 
 		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading)
 		{
+			BookmarkColor = Color.FromArgb(165, 200, 225);
+			TempTitleName = "";
 			this.SuspendLayout();
 
 			InitializeComponent();
@@ -302,17 +299,7 @@ namespace LogExpert
 
 		#region Properties
 
-		public Color BookmarkColor
-		{
-			get
-			{
-				return _bookmarkColor;
-			}
-			set
-			{
-				_bookmarkColor = value;
-			}
-		}
+		public Color BookmarkColor { get; set; }
 
 		public ILogLineColumnizer CurrentColumnizer
 		{
@@ -338,18 +325,10 @@ namespace LogExpert
 			}
 		}
 
-		public string SessionFileName
-		{
-			get
-			{
-				return this._sessionFileName;
-			}
-			set
-			{
-				this._sessionFileName = value;
-			}
-		}
+		// unused?
+		public string SessionFileName { get; set; }
 
+		//TODO Zarunbal: think about to return directly _guiStateArgs
 		public bool IsMultiFile
 		{
 			get
@@ -370,17 +349,7 @@ namespace LogExpert
 			}
 		}
 
-		public string TempTitleName
-		{
-			get
-			{
-				return _tempTitleName;
-			}
-			set
-			{
-				_tempTitleName = value;
-			}
-		}
+		public string TempTitleName { get; set; }
 
 		public string Title
 		{
@@ -399,29 +368,9 @@ namespace LogExpert
 
 		public ColumnizerCallback ColumnizerCallbackObject { get; private set; }
 
-		public bool ForcePersistenceLoading
-		{
-			get
-			{
-				return this._forcePersistenceLoading;
-			}
-			set
-			{
-				this._forcePersistenceLoading = value;
-			}
-		}
+		public bool ForcePersistenceLoading { get; set; }
 
-		public string ForcedPersistenceFileName
-		{
-			get
-			{
-				return this._forcedPersistenceFileName;
-			}
-			set
-			{
-				this._forcedPersistenceFileName = value;
-			}
-		}
+		public string ForcedPersistenceFileName { get; set; }
 
 		public Preferences Preferences
 		{
@@ -430,18 +379,8 @@ namespace LogExpert
 				return ConfigManager.Settings.preferences;
 			}
 		}
-
-		public string GivenFileName
-		{
-			get
-			{
-				return this._givenFileName;
-			}
-			set
-			{
-				this._givenFileName = value;
-			}
-		}
+		// file name of given file used for loading (maybe logfile or lxp)
+		public string GivenFileName { get; set; }
 
 		public TimeSyncList TimeSyncList
 		{
@@ -461,17 +400,7 @@ namespace LogExpert
 
 		protected EncodingOptions EncodingOptions { get; set; }
 
-		internal FilterPipe FilterPipe
-		{
-			get
-			{
-				return _filterPipe;
-			}
-			set
-			{
-				_filterPipe = value;
-			}
-		}
+		internal FilterPipe FilterPipe { get; set; }
 
 		#endregion
 
@@ -1353,7 +1282,7 @@ namespace LogExpert
 
 						if (wrapped &&
 							((isForward && bookmarkIndex >= startIndex) ||
-							(!isForward && bookmarkIndex <= startIndex)))
+							 (!isForward && bookmarkIndex <= startIndex)))
 						{
 							//We checked already this index, break out of the loop
 							break;
@@ -2392,7 +2321,6 @@ namespace LogExpert
 		{
 			InvalidateCurrentRow(this.dataGridView);
 		}
-
 
 		private void DataGridView_Resize(object sender, EventArgs e)
 		{
@@ -3695,7 +3623,7 @@ namespace LogExpert
 			{
 				if (this._isTempFile)
 				{
-					this.Text = this._tempTitleName;
+					this.Text = TempTitleName;
 				}
 				else
 				{
@@ -4601,7 +4529,7 @@ namespace LogExpert
 		{
 			SelectLine(line, triggerSyncCall, true);
 		}
- 
+
 		private void SelectLine(int line, bool triggerSyncCall, bool shouldScroll)
 		{
 			try
@@ -4625,7 +4553,7 @@ namespace LogExpert
 				if (shouldScroll)
 				{
 					this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-					this.dataGridView.Focus(); 
+					this.dataGridView.Focus();
 				}
 			}
 			catch (IndexOutOfRangeException e)
@@ -6302,7 +6230,6 @@ namespace LogExpert
 						return i;
 					}
 				}
-
 			}
 			return -1;
 		}
