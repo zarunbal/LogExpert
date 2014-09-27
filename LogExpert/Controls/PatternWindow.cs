@@ -218,7 +218,7 @@ namespace LogExpert
 			{
 				DataGridView gridView = (DataGridView)sender;
 				int rowIndex = GetLineForHitGrid(e.RowIndex);
-				this.logWindow.CellPainting(gridView, rowIndex, e);
+				PaintHelper.CellPainting(logWindow,gridView, rowIndex, e); //TODO Zarunbal: check if it works!
 			}
 		}
 
@@ -292,7 +292,7 @@ namespace LogExpert
 				return;
 			DataGridView gridView = (DataGridView)sender;
 			int rowIndex = GetLineForContentGrid(e.RowIndex);
-			this.logWindow.CellPainting(gridView, rowIndex, e);
+			PaintHelper.CellPainting(logWindow, gridView, rowIndex, e);
 		}
 
 		private void contentDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
