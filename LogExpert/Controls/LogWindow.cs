@@ -1129,7 +1129,7 @@ namespace LogExpert
 		{
 			try
 			{
-				SelectLine_NoScroll(line, triggerSyncCall);
+				SelectLine(line, triggerSyncCall, false);
 
 				if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
 					line > this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
@@ -4599,6 +4599,11 @@ namespace LogExpert
 
 		private void SelectLine(int line, bool triggerSyncCall)
 		{
+			SelectLine(line, triggerSyncCall, true);
+		}
+ 
+		private void SelectLine(int line, bool triggerSyncCall, bool shouldScroll)
+		{
 			try
 			{
 				this._shouldCallTimeSync = triggerSyncCall;
@@ -4617,36 +4622,11 @@ namespace LogExpert
 					return;
 				}
 				this.dataGridView.Rows[line].Selected = true;
-				this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-				this.dataGridView.Focus();
-			}
-			catch (IndexOutOfRangeException e)
-			{
-				// Occures sometimes (but cannot reproduce)
-				Logger.logError("Error while selecting line: " + e.ToString());
-			}
-		}
-
-		private void SelectLine_NoScroll(int line, bool triggerSyncCall)
-		{
-			try
-			{
-				this._shouldCallTimeSync = triggerSyncCall;
-				bool wasCancelled = this._shouldCancel;
-				this._shouldCancel = false;
-				this._isSearching = false;
-				StatusLineText("");
-				this._guiStateArgs.MenuEnabled = true;
-				if (wasCancelled)
+				if (shouldScroll)
 				{
-					return;
+					this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
+					this.dataGridView.Focus(); 
 				}
-				if (line == -1)
-				{
-					MessageBox.Show(this, "Not found:", "Search result");  // Hmm... is that experimental code from early days?  
-					return;
-				}
-				this.dataGridView.Rows[line].Selected = true;
 			}
 			catch (IndexOutOfRangeException e)
 			{
