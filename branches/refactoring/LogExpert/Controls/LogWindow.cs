@@ -2338,87 +2338,21 @@ namespace LogExpert
 
 		private void FilterGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
-			DataGridView gridView = (DataGridView)sender;
-
 			if (e.RowIndex < 0 || e.ColumnIndex < 0 || this._filterResultList.Count <= e.RowIndex)
 			{
 				e.Handled = false;
 				return;
 			}
+
 			int lineNum = this._filterResultList[e.RowIndex];
 			string line = this._logFileReader.GetLogLineWithWait(lineNum);
+
 			if (line != null)
 			{
+				DataGridView gridView = (DataGridView)sender;
 				HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
-				e.Graphics.SetClip(e.CellBounds);
-				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
-				{
-					Color backColor = e.CellStyle.SelectionBackColor;
-					Brush brush;
-					if (gridView.Focused)
-					{
-						brush = new SolidBrush(e.CellStyle.SelectionBackColor);
-					}
-					else
-					{
-						Color color = Color.FromArgb(255, 170, 170, 170);
-						brush = new SolidBrush(color);
-					}
-					e.Graphics.FillRectangle(brush, e.CellBounds);
-					brush.Dispose();
-				}
-				else
-				{
-					Color bgColor = Color.White;
-					// paint direct filter hits with different bg color
-					//if (this.filterParams.SpreadEnabled && this.filterHitList.Contains(lineNum))
-					//{
-					//  bgColor = Color.FromArgb(255, 220, 220, 220);
-					//}
-					if (entry != null)
-					{
-						bgColor = entry.BackgroundColor;
-					}
-					e.CellStyle.BackColor = bgColor;
-					e.PaintBackground(e.ClipBounds, false);
-				}
 
-				if (DebugOptions.disableWordHighlight)
-				{
-					e.PaintContent(e.CellBounds);
-				}
-				else
-				{
-					PaintCell(e, this.filterGridView, false, entry);
-				}
-
-				if (e.ColumnIndex == 0)
-				{
-					if (this._bookmarkProvider.IsBookmarkAtLine(lineNum))
-					{
-						Rectangle r = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
-						r = e.CellBounds;
-						r.Inflate(-2, -2);
-						Brush brush = new SolidBrush(this.BookmarkColor);
-						e.Graphics.FillRectangle(brush, r);
-						brush.Dispose();
-						Bookmark bookmark = this._bookmarkProvider.GetBookmarkForLine(lineNum);
-						if (bookmark.Text.Length > 0)
-						{
-							StringFormat format = new StringFormat();
-							format.LineAlignment = StringAlignment.Center;
-							format.Alignment = StringAlignment.Center;
-							Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
-							Font font = new Font("Verdana", this.Preferences.fontSize, FontStyle.Bold);
-							e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
-							font.Dispose();
-							brush2.Dispose();
-						}
-					}
-				}
-
-				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
-				e.Handled = true;
+				PaintHelper.CellPaintFilter(this, gridView, e, lineNum, line, entry);
 			}
 		}
 
@@ -4193,11 +4127,6 @@ namespace LogExpert
 				Logger.logError("Error while resizing columns: " + e.Message);
 				Logger.logError(e.StackTrace);
 			}
-		}
-
-		private void PaintCell(DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
-		{
-			PaintHelper.PaintHighlightedCell(this, e, gridView, noBackgroundFill, groundEntry);
 		}
 
 		/// <summary>

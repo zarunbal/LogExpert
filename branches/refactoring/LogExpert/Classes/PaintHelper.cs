@@ -20,7 +20,7 @@ namespace LogExpert
 		}
 		
 		#endregion
-
+		
 		#region Public Methods
 		
 		public static void CellPainting(ILogPaintContext logPaintCtx, DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
@@ -108,6 +108,80 @@ namespace LogExpert
 				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
 				e.Handled = true;
 			}
+		}
+
+		public static void CellPaintFilter(ILogPaintContext logPaintCtx, DataGridView gridView, DataGridViewCellPaintingEventArgs e, int lineNum, string line, HilightEntry entry)
+		{
+			
+				e.Graphics.SetClip(e.CellBounds);
+				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+				{
+					Color backColor = e.CellStyle.SelectionBackColor;
+					Brush brush;
+					if (gridView.Focused)
+					{
+						brush = new SolidBrush(e.CellStyle.SelectionBackColor);
+					}
+					else
+					{
+						Color color = Color.FromArgb(255, 170, 170, 170);
+						brush = new SolidBrush(color);
+					}
+					e.Graphics.FillRectangle(brush, e.CellBounds);
+					brush.Dispose();
+				}
+				else
+				{
+					Color bgColor = Color.White;
+					// paint direct filter hits with different bg color
+					//if (this.filterParams.SpreadEnabled && this.filterHitList.Contains(lineNum))
+					//{
+					//  bgColor = Color.FromArgb(255, 220, 220, 220);
+					//}
+					if (entry != null)
+					{
+						bgColor = entry.BackgroundColor;
+					}
+					e.CellStyle.BackColor = bgColor;
+					e.PaintBackground(e.ClipBounds, false);
+				}
+				
+				if (DebugOptions.disableWordHighlight)
+				{
+					e.PaintContent(e.CellBounds);
+				}
+				else
+				{
+					PaintCell(logPaintCtx, e, gridView, false, entry);
+				}
+				
+				if (e.ColumnIndex == 0)
+				{
+					Bookmark bookmark = logPaintCtx.GetBookmarkForLine(lineNum);
+					if (bookmark != null)
+					{
+						Rectangle r = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
+						r = e.CellBounds;
+						r.Inflate(-2, -2);
+						Brush brush = new SolidBrush(logPaintCtx.BookmarkColor);
+						e.Graphics.FillRectangle(brush, r);
+						brush.Dispose();
+						if (bookmark.Text.Length > 0)
+						{
+							StringFormat format = new StringFormat();
+							format.LineAlignment = StringAlignment.Center;
+							format.Alignment = StringAlignment.Center;
+							Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
+							Font font = logPaintCtx.NormalFont; //TODO Zarunbal: Check if settings normal font is the right
+							e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
+							font.Dispose();
+							brush2.Dispose();
+						}
+					}
+				}
+				
+				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
+				e.Handled = true;
 		}
 		
 		public static void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
@@ -201,7 +275,7 @@ namespace LogExpert
 				{
 					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
 					dataGridView.FirstDisplayedScrollingColumnIndex = 0;
-				
+					
 					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
 				}
 			}
@@ -213,42 +287,42 @@ namespace LogExpert
 			dataGridView.Refresh();
 			AutoResizeColumns(dataGridView);
 		}
-
+		
 		public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
 		{
 			Rectangle rect = new Rectangle();
-
+			
 			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
-				|| advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+				advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.X++;
 			}
-
+			
 			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
-				|| advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+				advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Y++;
 			}
-
+			
 			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
-				|| advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+				advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Width++;
 			}
-
+			
 			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble 
-				|| advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+				advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Height++;
 			}
-
+			
 			return rect;
 		}
-
+		
 		#endregion
 		
 		#region Private Methods
@@ -290,7 +364,7 @@ namespace LogExpert
 				valBounds.Width -= e.CellStyle.Padding.Horizontal;
 				valBounds.Height -= e.CellStyle.Padding.Vertical;
 			}
-								   
+			
 			TextFormatFlags flags =
 								   TextFormatFlags.Left |
 								   TextFormatFlags.SingleLine |
@@ -412,7 +486,7 @@ namespace LogExpert
 			}
 			return mergedList;
 		}
-
+	
 		#endregion
 	}
 }
