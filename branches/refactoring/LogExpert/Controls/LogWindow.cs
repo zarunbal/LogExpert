@@ -178,7 +178,7 @@ namespace LogExpert
 		private TimeSyncList _timeSyncList = null;
 		private Object _timeSyncListLock = new Object();
 
-		private Font _font;
+		private Font _normalFont;
 		private Font _fontBold;
 		private Font _fontMonospaced;
 
@@ -1480,17 +1480,17 @@ namespace LogExpert
 		{
 			if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
 			{
-				this._font = new Font(new FontFamily(newPreferences.fontName), newPreferences.fontSize);
-				this._fontBold = new Font(this._font, FontStyle.Bold);
+				_normalFont = new Font(new FontFamily(newPreferences.fontName), newPreferences.fontSize);
+				this._fontBold = new Font(this.NormalFont, FontStyle.Bold);
 				this._fontMonospaced = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
 
-				int lineSpacing = _font.FontFamily.GetLineSpacing(FontStyle.Regular);
-				float lineSpacingPixel = _font.Size * lineSpacing / _font.FontFamily.GetEmHeight(FontStyle.Regular);
+				int lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
+				float lineSpacingPixel = NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);
 
-				this.dataGridView.DefaultCellStyle.Font = _font;
-				this.filterGridView.DefaultCellStyle.Font = _font;
-				this._lineHeight = _font.Height + 4;
-				this.dataGridView.RowTemplate.Height = _font.Height + 4;
+				this.dataGridView.DefaultCellStyle.Font = NormalFont;
+				this.filterGridView.DefaultCellStyle.Font = NormalFont;
+				this._lineHeight = NormalFont.Height + 4;
+				this.dataGridView.RowTemplate.Height = NormalFont.Height + 4;
 
 				this.ShowBookmarkBubbles = this.Preferences.showBubbles;
 
@@ -6730,7 +6730,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._font;
+				return this._normalFont;
 			}
 		}
 
