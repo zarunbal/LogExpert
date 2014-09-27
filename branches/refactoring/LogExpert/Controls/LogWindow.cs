@@ -998,94 +998,6 @@ namespace LogExpert
 			return "";
 		}
 
-		public void CellPainting(DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
-		{
-			if (rowIndex < 0 || e.ColumnIndex < 0)
-			{
-				e.Handled = false;
-				return;
-			}
-			string line = this._logFileReader.GetLogLineWithWait(rowIndex);
-			if (line != null)
-			{
-				HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
-				e.Graphics.SetClip(e.CellBounds);
-				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
-				{
-					Color backColor = e.CellStyle.SelectionBackColor;
-					Brush brush;
-					if (gridView.Focused)
-					{
-						brush = new SolidBrush(e.CellStyle.SelectionBackColor);
-					}
-					else
-					{
-						Color color = Color.FromArgb(255, 170, 170, 170);
-						brush = new SolidBrush(color);
-					}
-					e.Graphics.FillRectangle(brush, e.CellBounds);
-					brush.Dispose();
-				}
-				else
-				{
-					Color bgColor = Color.White;
-					if (!DebugOptions.disableWordHighlight)
-					{
-						if (entry != null)
-						{
-							bgColor = entry.BackgroundColor;
-						}
-					}
-					else
-					{
-						if (entry != null)
-						{
-							bgColor = entry.BackgroundColor;
-						}
-					}
-					e.CellStyle.BackColor = bgColor;
-					e.PaintBackground(e.ClipBounds, false);
-				}
-
-				if (DebugOptions.disableWordHighlight)
-				{
-					e.PaintContent(e.CellBounds);
-				}
-				else
-				{
-					PaintCell(e, gridView, false, entry);
-				}
-
-				if (e.ColumnIndex == 0)
-				{
-					if (this._bookmarkProvider.IsBookmarkAtLine(rowIndex))
-					{
-						Rectangle r; // = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
-						r = e.CellBounds;
-						r.Inflate(-2, -2);
-						Brush brush = new SolidBrush(this.BookmarkColor);
-						e.Graphics.FillRectangle(brush, r);
-						brush.Dispose();
-						Bookmark bookmark = this._bookmarkProvider.GetBookmarkForLine(rowIndex);
-						if (bookmark.Text.Length > 0)
-						{
-							StringFormat format = new StringFormat();
-							format.LineAlignment = StringAlignment.Center;
-							format.Alignment = StringAlignment.Center;
-							Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
-							Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
-							e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
-							font.Dispose();
-							brush2.Dispose();
-						}
-					}
-				}
-
-				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
-				e.Handled = true;
-			}
-		}
-
 		/**
 		 * Returns the first HilightEntry that matches the given line
 		 */
@@ -2334,7 +2246,7 @@ namespace LogExpert
 		private void DataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
 			DataGridView gridView = (DataGridView)sender;
-			CellPainting(gridView, e.RowIndex, e);
+			PaintHelper.CellPainting(this, gridView, e.RowIndex, e);
 		}
 
 		private void DataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
