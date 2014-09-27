@@ -2258,7 +2258,9 @@ namespace LogExpert
 		private void DataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
 		{
 			if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+			{
 				return;
+			}
 			string line = this._logFileReader.GetLogLine(e.RowIndex);
 			int offset = this.CurrentColumnizer.GetTimeOffset();
 			this.CurrentColumnizer.SetTimeOffset(0);
@@ -2266,7 +2268,9 @@ namespace LogExpert
 			string[] cols = this.CurrentColumnizer.SplitLine(this.ColumnizerCallbackObject, line);
 			this.CurrentColumnizer.SetTimeOffset(offset);
 			if (cols.Length <= e.ColumnIndex - 2)
+			{
 				return;
+			}
 
 			string oldValue = cols[e.ColumnIndex - 2];
 			string newValue = (string)e.Value;
@@ -2561,7 +2565,9 @@ namespace LogExpert
 		private void SyncFilterCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			if (this.syncFilterCheckBox.Checked)
+			{
 				SyncFilterGridPos();
+			}
 		}
 
 		private void SelectionChangedTrigger_Signal(object sender, EventArgs e)
@@ -2621,7 +2627,9 @@ namespace LogExpert
 		private void SetTimestampLimits()
 		{
 			if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+			{
 				return;
+			}
 
 			int line = 0;
 			this._guiStateArgs.MinTimestamp = GetTimestampForLineForward(ref line, true);
@@ -2634,9 +2642,13 @@ namespace LogExpert
 		{
 			int lineNum = -1;
 			if (this.dataGridView.CurrentRow != null)
+			{
 				lineNum = this.dataGridView.CurrentRow.Index;
+			}
 			if (lineNum == -1)
+			{
 				return;
+			}
 			int refLineNum = lineNum;
 
 			this.copyToTabToolStripMenuItem.Enabled = this.dataGridView.SelectedCells.Count > 0;
