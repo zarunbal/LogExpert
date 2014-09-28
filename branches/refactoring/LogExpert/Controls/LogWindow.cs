@@ -33,8 +33,6 @@ namespace LogExpert
 
 		private List<int> _lineHashList = new List<int>();
 
-		private Color _bookmarkColor = Color.FromArgb(165, 200, 225);
-
 		private LogfileReader _logFileReader;
 		private ILogLineColumnizer _currentColumnizer;
 		private readonly Object _currentColumnizerLock = new Object();
@@ -709,14 +707,18 @@ namespace LogExpert
 				if (this.dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
 				{
 					for (int i = 0; i < newColumns.Length; i++)
+					{
 						if (this.dataGridView.Columns[i].HeaderText != newColumns[i])
 						{
 							colChanged = true;
 							break; // one change is sufficient
 						}
+					}
 				}
 				else
+				{
 					colChanged = true;
+				}
 
 				if (colChanged)
 				{
@@ -725,9 +727,9 @@ namespace LogExpert
 				}
 			}
 
-			Type oldColType = this._filterParams.currentColumnizer != null ? this._filterParams.currentColumnizer.GetType() : null;
+			Type oldColType = _filterParams.currentColumnizer != null ? this._filterParams.currentColumnizer.GetType() : null;
 			Type newColType = columnizer != null ? columnizer.GetType() : null;
-			if (oldColType != newColType && this._filterParams.columnRestrict && this._filterParams.isFilterTail)
+			if (oldColType != newColType && _filterParams.columnRestrict && this._filterParams.isFilterTail)
 			{
 				this._filterParams.columnList.Clear();
 			}
@@ -737,23 +739,24 @@ namespace LogExpert
 				this._freezeStateMap.Clear();
 				if (this._logFileReader != null)
 				{
-					if (this.CurrentColumnizer is IPreProcessColumnizer)
+					IPreProcessColumnizer preprocessColumnizer = CurrentColumnizer as IPreProcessColumnizer;
+					if (preprocessColumnizer != null)
 					{
-						this._logFileReader.PreProcessColumnizer = (IPreProcessColumnizer)this.CurrentColumnizer;
+						_logFileReader.PreProcessColumnizer = preprocessColumnizer;
 					}
 					else
 					{
-						this._logFileReader.PreProcessColumnizer = null;
+						_logFileReader.PreProcessColumnizer = null;
 					}
 				}
 				// always reload when choosing XML columnizers
-				if (this._logFileReader != null && this.CurrentColumnizer is ILogLineXmlColumnizer)
+				if (_logFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
 				{
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
 					mustReload = true;
 				}
 				// Reload when choosing no XML columnizer but previous columnizer was XML
-				if (this._logFileReader != null && !(this.CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
+				if (_logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
 				{
 					this._logFileReader.IsXmlMode = false;
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -761,8 +764,9 @@ namespace LogExpert
 				}
 				// Reload when previous columnizer was PreProcess and current is not, and vice versa.
 				// When the current columnizer is a preProcess columnizer, reload in every case.
-				if (((this.CurrentColumnizer is IPreProcessColumnizer) != oldColumnizerIsPreProcess) ||
-					(this.CurrentColumnizer is IPreProcessColumnizer)
+				bool isCurrentColumnizerIPreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer;
+				if ((isCurrentColumnizerIPreProcessColumnizer != oldColumnizerIsPreProcess) ||
+					isCurrentColumnizerIPreProcessColumnizer
 				)
 				{
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -771,35 +775,38 @@ namespace LogExpert
 			}
 			else
 			{
-				this.CurrentColumnizer = columnizer;
+				CurrentColumnizer = columnizer;
 			}
 
-			if (oldColumnizer is IInitColumnizer)
+			IInitColumnizer initColumnizer = oldColumnizer as IInitColumnizer;
+
+			if (initColumnizer != null)
 			{
-				(oldColumnizer as IInitColumnizer).DeSelected(new ColumnizerCallback(this));
+				initColumnizer.DeSelected(new ColumnizerCallback(this));
 			}
-			if (columnizer is IInitColumnizer)
+			initColumnizer = columnizer as IInitColumnizer;
+			if (initColumnizer != null)
 			{
-				(columnizer as IInitColumnizer).Selected(new ColumnizerCallback(this));
+				initColumnizer.Selected(new ColumnizerCallback(this));
 			}
 
-			SetColumnizer(columnizer, this.dataGridView);
-			SetColumnizer(columnizer, this.filterGridView);
-			if (this._patternWindow != null)
+			SetColumnizer(columnizer, dataGridView);
+			SetColumnizer(columnizer, filterGridView);
+			if (_patternWindow != null)
 			{
-				this._patternWindow.SetColumnizer(columnizer);
+				_patternWindow.SetColumnizer(columnizer);
 			}
 
-			this._guiStateArgs.TimeshiftPossible = columnizer.IsTimeshiftImplemented();
+			_guiStateArgs.TimeshiftPossible = columnizer.IsTimeshiftImplemented();
 			SendGuiStateUpdate();
 
-			if (this._logFileReader != null)
+			if (_logFileReader != null)
 			{
-				this.dataGridView.RowCount = this._logFileReader.LineCount;
+				dataGridView.RowCount = _logFileReader.LineCount;
 			}
-			if (this._filterResultList != null)
+			if (_filterResultList != null)
 			{
-				this.filterGridView.RowCount = this._filterResultList.Count;
+				filterGridView.RowCount = _filterResultList.Count;
 			}
 			if (mustReload)
 			{
@@ -807,22 +814,22 @@ namespace LogExpert
 			}
 			else
 			{
-				if (this.CurrentColumnizer.IsTimeshiftImplemented())
+				if (CurrentColumnizer.IsTimeshiftImplemented())
 				{
 					SetTimestampLimits();
 					SyncTimestampDisplay();
 				}
 				Settings settings = ConfigManager.Settings;
 				ShowLineColumn(!settings.hideLineColumn);
-				ShowTimeSpread(this.Preferences.showTimeSpread && columnizer.IsTimeshiftImplemented());
+				ShowTimeSpread(Preferences.showTimeSpread && columnizer.IsTimeshiftImplemented());
 			}
 
-			if (!columnizer.IsTimeshiftImplemented() && this.IsTimeSynced)
+			if (!columnizer.IsTimeshiftImplemented() && IsTimeSynced)
 			{
 				FreeFromTimeSync();
 			}
 
-			this.columnComboBox.Items.Clear();
+			columnComboBox.Items.Clear();
 			foreach (String columnName in columnizer.GetColumnNames())
 			{
 				this.columnComboBox.Items.Add(columnName);
