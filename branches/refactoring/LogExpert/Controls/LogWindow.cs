@@ -6155,21 +6155,6 @@ namespace LogExpert
 			}
 		}
 
-		private int FindSimilarLine1(int srcLine, int startLine)
-		{
-			int value = this._lineHashList[srcLine];
-
-			int num = this._lineHashList.Count;
-			for (int i = startLine; i < num; ++i)
-			{
-				if (Math.Abs(this._lineHashList[i] - value) < 3)
-				{
-					return i;
-				}
-			}
-			return -1;
-		}
-
 		private void ResetCache(int num)
 		{
 			//this.similarCache = new int[num, num];
