@@ -6,9 +6,9 @@ namespace LogExpert
 {
 	internal class ColumnCache
 	{
-		private string[] cachedColumns = null;
-		private ILogLineColumnizer lastColumnizer;
-		private int lastLineNumber = -1;
+		private string[] _cachedColumns = null;
+		private ILogLineColumnizer _lastColumnizer;
+		private int _lastLineNumber = -1;
 
 		internal ColumnCache()
 		{
@@ -16,22 +16,22 @@ namespace LogExpert
 
 		internal string[] GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, LogExpert.LogWindow.ColumnizerCallback columnizerCallback)
 		{
-			if (this.lastColumnizer != columnizer || this.lastLineNumber != lineNumber && this.cachedColumns != null)
+			if (this._lastColumnizer != columnizer || this._lastLineNumber != lineNumber && this._cachedColumns != null)
 			{
-				this.lastColumnizer = columnizer;
-				this.lastLineNumber = lineNumber;
+				this._lastColumnizer = columnizer;
+				this._lastLineNumber = lineNumber;
 				string line = logFileReader.GetLogLineWithWait(lineNumber);
 				if (line != null)
 				{
 					columnizerCallback.LineNum = lineNumber;
-					this.cachedColumns = columnizer.SplitLine(columnizerCallback, line);
+					this._cachedColumns = columnizer.SplitLine(columnizerCallback, line);
 				}
 				else
 				{
-					this.cachedColumns = null;
+					this._cachedColumns = null;
 				}
 			}
-			return this.cachedColumns;
+			return this._cachedColumns;
 		}
 	}
 }
