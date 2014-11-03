@@ -141,7 +141,13 @@ namespace LogExpert
 		
 		public Bookmark GetBookmarkForLine(int lineNum)
 		{
-			return this.BookmarkList[lineNum];
+			Bookmark output = null;
+			if (!BookmarkList.TryGetValue(lineNum, out output))
+			{
+				return null;
+			}
+
+			return output;
 		}
 		
 		public BookmarkCollection Bookmarks
