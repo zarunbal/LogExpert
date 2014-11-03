@@ -4,11 +4,6 @@ using System.Text;
 
 namespace LogExpert
 {
-	public class QualityInfo
-	{
-		public int quality;
-	}
-
 	public class PatternBlock
 	{
 		public int startLine;
