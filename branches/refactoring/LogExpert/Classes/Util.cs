@@ -54,26 +54,28 @@ namespace LogExpert
 				return "" + String.Format("{0:0.00}", ((double)size / 1048576.0)) + " MB";
 		}
 
+		#region DamerauLevenshteinDistance
+		
 		public static bool TestFilterCondition(FilterParams filterParams, string line, ILogLineColumnizerCallback columnizerCallback)
 		{
 			if (filterParams.lastLine.Equals(line))
 				return filterParams.lastResult;
-
+			
 			bool match = TestFilterMatch(filterParams, line, columnizerCallback);
 			filterParams.lastLine = line;
-
+			
 			if (filterParams.isRangeSearch)
 			{
 				if (!filterParams.isInRange)
 				{
-					if (match) 
+					if (match)
 					{
 						filterParams.isInRange = true;
 					}
 				}
 				else
 				{
-					if (!match) 
+					if (!match)
 					{
 						match = true;
 					}
@@ -84,11 +86,11 @@ namespace LogExpert
 				}
 			}
 			if (filterParams.isInvert)
-				match = ! match;
+				match = !match;
 			filterParams.lastResult = match;
 			return match;
 		}
-
+		
 		private static bool TestFilterMatch(FilterParams filterParams, string line, ILogLineColumnizerCallback columnizerCallback)
 		{
 			string lowerSearchText;
@@ -106,10 +108,10 @@ namespace LogExpert
 				searchText = filterParams.searchText;
 				rex = filterParams.rex;
 			}
-
+			
 			if (searchText == null || lowerSearchText == null || searchText.Length == 0)
 				return false;
-
+			
 			if (filterParams.columnRestrict)
 			{
 				string[] columns = filterParams.currentColumnizer.SplitLine(columnizerCallback, line);
@@ -149,8 +151,7 @@ namespace LogExpert
 				return TestMatchSub(filterParams, line, lowerSearchText, searchText, rex, false);
 			}
 		}
-
-		// 
+		
 		private static bool TestMatchSub(FilterParams filterParams, string line, string lowerSearchText, string searchText, Regex rex, bool exactMatch)
 		{
 			if (filterParams.isRegex)
@@ -196,7 +197,7 @@ namespace LogExpert
 						}
 					}
 				}
-
+				
 				if (filterParams.fuzzyValue > 0)
 				{
 					int range = line.Length - searchText.Length;
@@ -220,14 +221,14 @@ namespace LogExpert
 			}
 			return false;
 		}
-
+		
 		public static int DamerauLevenshteinDistance(string src, string dest)
 		{
 			int[,] d = new int[src.Length + 1, dest.Length + 1];
 			int i, j, cost;
 			char[] str1 = src.ToCharArray();
 			char[] str2 = dest.ToCharArray();
-
+			
 			for (i = 0; i <= str1.Length; i++)
 			{
 				d[i, 0] = i;
@@ -244,12 +245,12 @@ namespace LogExpert
 						cost = 0;
 					else
 						cost = 1;
-
+					
 					d[i, j] =
 						Math.Min(d[i - 1, j] + 1, // Deletion
 							Math.Min(d[i, j - 1] + 1, // Insertion
 								d[i - 1, j - 1] + cost));     // Substitution
-
+					
 					if ((i > 1) && (j > 1) && (str1[i - 1] == str2[j - 2]) && (str1[i - 2] == str2[j - 1]))
 					{
 						d[i, j] = Math.Min(d[i, j], d[i - 2, j - 2] + cost);
@@ -258,7 +259,11 @@ namespace LogExpert
 			}
 			return d[str1.Length, str2.Length];
 		}
-
+		
+		#endregion
+		
+		#region YetiLevenshtein
+		
 		public static unsafe int YetiLevenshtein(string s1, string s2)
 		{
 			fixed (char* p1 = s1)
@@ -267,7 +272,7 @@ namespace LogExpert
 					return YetiLevenshtein(p1, s1.Length, p2, s2.Length, 0); // substitutionCost = 1
 				}
 		}
-
+		
 		public static unsafe int YetiLevenshtein(string s1, string s2, int substitionCost)
 		{
 			int xc = substitionCost - 1;
@@ -275,14 +280,14 @@ namespace LogExpert
 			{
 				throw new ArgumentException("", "substitionCost");
 			}
-
+			
 			fixed (char* p1 = s1)
 				fixed (char* p2 = s2)
 				{
 					return YetiLevenshtein(p1, s1.Length, p2, s2.Length, xc);
 				}
 		}
-
+		
 		/// <summary>
 		/// Cetin Sert, David Necas
 		/// http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&view=markup
@@ -299,7 +304,7 @@ namespace LogExpert
 			//int *row;  /* we only need to keep one row of costs */
 			int* end;
 			int half;
-
+			
 			/* strip common prefix */
 			while (l1 > 0 && l2 > 0 && *s1 == *s2)
 			{
@@ -308,20 +313,20 @@ namespace LogExpert
 				s1++;
 				s2++;
 			}
-
+			
 			/* strip common suffix */
 			while (l1 > 0 && l2 > 0 && s1[l1 - 1] == s2[l2 - 1])
 			{
 				l1--;
 				l2--;
 			}
-
+			
 			/* catch trivial cases */
 			if (l1 == 0)
 				return l2;
 			if (l2 == 0)
 				return l1;
-
+			
 			/* make the inner cycle (i.e. string2) the longer one */
 			if (l1 > l2)
 			{
@@ -332,7 +337,7 @@ namespace LogExpert
 				s1 = s2;
 				s2 = sx;
 			}
-
+			
 			//check len1 == 1 separately
 			if (l1 == 1)
 			{
@@ -344,11 +349,11 @@ namespace LogExpert
 					//return l2 - (memchr(s2, *s1, l2) != NULL);
 					return l2 - memchrRPLC(s2, *s1, l2);
 			}
-
+			
 			l1++;
 			l2++;
 			half = l1 >> 1;
-
+			
 			/* initalize first row */
 			//row = (int*)malloc(l2*sizeof(int));
 			int* row = stackalloc int[l2];
@@ -358,7 +363,7 @@ namespace LogExpert
 			end = row + l2 - 1;
 			for (i = 0; i < l2 - (xcost > 0 ? 0 : half); i++)
 				row[i] = i;
-
+			
 			/* go through the matrix and compute the costs.  yes, this is an extremely
 			 * obfuscated version, but also extremely memory-conservative and
 			 * relatively fast.
@@ -404,7 +409,7 @@ namespace LogExpert
 					{
 						int offset = i - (l1 - half);
 						int c3;
-
+						
 						char2p = s2 + offset;
 						p = row + offset;
 						c3 = *(p++) + ((char1 != *(char2p++)) ? 1 : 0);
@@ -448,11 +453,11 @@ namespace LogExpert
 					}
 				}
 			}
-
+			
 			i = *end;
 			return i;
 		}
-
+		
 		static unsafe int memchrRPLC(char* buffer, char c, int count)
 		{
 			char* p = buffer;
@@ -464,7 +469,9 @@ namespace LogExpert
 			}
 			return 0;
 		}
-
+		
+		#endregion
+		
 		public static ILogLineColumnizer FindColumnizerByName(string name, IList<ILogLineColumnizer> list)
 		{
 			foreach (ILogLineColumnizer columnizer in list)
@@ -474,7 +481,7 @@ namespace LogExpert
 			}
 			return null;
 		}
-
+		
 		public static ILogLineColumnizer CloneColumnizer(ILogLineColumnizer columnizer)
 		{
 			if (columnizer == null)
@@ -491,7 +498,7 @@ namespace LogExpert
 			}
 			return null;
 		}
-
+		
 		/// <summary>
 		/// Returns true, if the given string is null or empty
 		/// </summary>
@@ -501,7 +508,7 @@ namespace LogExpert
 		{
 			return toTest == null || toTest.Length == 0;
 		}
-
+		
 		/// <summary>
 		/// Returns true, if the given string is null or empty or contains only spaces
 		/// </summary>
@@ -511,7 +518,7 @@ namespace LogExpert
 		{
 			return toTest == null || toTest.Trim().Length == 0;
 		}
-
+		
 		[Conditional("DEBUG")]
 		public static void AssertTrue(bool condition, string msg)
 		{
@@ -521,7 +528,7 @@ namespace LogExpert
 				throw new Exception(msg);
 			}
 		}
-
+		
 		public string GetWordFromPos(int xPos, string text, Graphics g, Font font)
 		{
 			string[] words = text.Split(new char[] { ' ', '.', ':', ';' });
