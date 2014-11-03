@@ -47,14 +47,14 @@ namespace LogExpert
 			while (lineNum >= 0)
 			{
 				this.callback.LineNum = lineNum;
-				if (Util.TestFilterCondition(this.filterParams, line, this.callback))
+				if (Classes.DamerauLevenshtein.TestFilterCondition(this.filterParams, line, this.callback))
 				{
 					foundStartLine = true;
 					break;
 				}
 				lineNum--;
 				line = this.callback.GetLogLine(lineNum);
-				if (lineNum < 0 || Util.TestFilterCondition(tmpParam, line, this.callback)) // do not crash on Ctrl+R when there is not start line found
+				if (lineNum < 0 || Classes.DamerauLevenshtein.TestFilterCondition(tmpParam, line, this.callback)) // do not crash on Ctrl+R when there is not start line found
 				{
 					// lower range bound found --> we are not in between a valid range
 					break;
@@ -73,7 +73,7 @@ namespace LogExpert
 			{
 				line = this.callback.GetLogLine(lineNum);
 				this.callback.LineNum = lineNum;
-				if (!Util.TestFilterCondition(this.filterParams, line, this.callback))
+				if (!Classes.DamerauLevenshtein.TestFilterCondition(this.filterParams, line, this.callback))
 				{
 					break;
 				}

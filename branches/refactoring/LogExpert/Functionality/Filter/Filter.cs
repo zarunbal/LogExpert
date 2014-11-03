@@ -67,7 +67,7 @@ namespace LogExpert
 						return count;
 					}
 					this.callback.LineNum = lineNum;
-					if (Util.TestFilterCondition(filterParams, line, callback))
+					if (Classes.DamerauLevenshtein.TestFilterCondition(filterParams, line, callback))
 					{
 						AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
 					}

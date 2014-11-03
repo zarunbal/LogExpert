@@ -91,6 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\ArgParser.cs" />
+    <Compile Include="Classes\DamerauLevenshtein.cs" />
+    <Compile Include="Classes\YetiLevenshtein.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interfaces\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
