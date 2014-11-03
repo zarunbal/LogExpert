@@ -70,12 +70,6 @@ namespace LogExpert
 		private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 		private readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false); // used for external wait fx WaitForLoadFinished()
 		
-		#region Delegates
-		
-		public delegate void LoadingFinishedFx(LogWindow newWin);    // used for filterTab restore
-		
-		#endregion
-		
 		private bool _waitingForClose = false;
 		private bool _isLoading = false;
 		private bool _isSearching = false;
@@ -114,8 +108,6 @@ namespace LogExpert
 		private PatternWindow _patternWindow;
 		private PatternArgs _patternArgs = new PatternArgs();
 		
-		private readonly LoadingFinishedFx _loadingFinishedFx;
-		
 		private Image _advancedButtonImage;
 		private Image _searchButtonImage;
 		
@@ -136,7 +128,7 @@ namespace LogExpert
 		
 		#region cTor
 		
-		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading)
+		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading)
 		{
 			BookmarkColor = Color.FromArgb(165, 200, 225);
 			TempTitleName = "";
@@ -148,7 +140,6 @@ namespace LogExpert
 			
 			this._parentLogTabWin = parent;
 			this._isTempFile = isTempFile;
-			this._loadingFinishedFx = loadingFinishedFx;
 			ColumnizerCallbackObject = new ColumnizerCallback(this);
 			
 			this._fileNameField = fileName;
@@ -2008,10 +1999,6 @@ namespace LogExpert
 				this._loadingFinishedEvent.Set();
 				this._externaLoadingFinishedEvent.Set();
 				this._timeSpreadCalc.SetLineCount(this._logFileReader.LineCount);
-				if (this._loadingFinishedFx != null)
-				{
-					this._loadingFinishedFx(this);
-				}
 				
 				if (this._reloadMemento != null)
 				{
@@ -5459,7 +5446,7 @@ namespace LogExpert
 				{
 					preProcessColumnizer = this.CurrentColumnizer;
 				}
-				LogWindow newWin = this._parentLogTabWin.AddFilterTab(pipe, title, new LoadingFinishedFx(LoadingFinishedFunc), preProcessColumnizer);
+				LogWindow newWin = this._parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
 				newWin.FilterPipe = pipe;
 				pipe.OwnLogWindow = newWin;
 				if (persistenceData != null)
@@ -5864,12 +5851,6 @@ namespace LogExpert
 			this._patternWindow.MaxDiff = this._patternArgs.maxDiffInBlock;
 			this._patternWindow.MaxMisses = this._patternArgs.maxMisses;
 			this._patternWindow.Weight = this._patternArgs.minWeight;
-		}
-		
-		private void UpdateBookmarkGui()
-		{
-			this.dataGridView.Refresh();
-			this.filterGridView.Refresh();
 		}
 		
 		private void ChangeRowHeight(bool decrease)
