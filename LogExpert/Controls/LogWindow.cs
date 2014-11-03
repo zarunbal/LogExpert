@@ -3946,7 +3946,7 @@ namespace LogExpert
 					if (this.filterTailCheckBox.Checked)
 					{
 						callback.LineNum = i;
-						if (Util.TestFilterCondition(this._filterParams, line, callback))
+						if (Classes.DamerauLevenshtein.TestFilterCondition(this._filterParams, line, callback))
 						{
 							filterLineAdded = true;
 							AddFilterLine(i, false, this._filterParams, this._filterResultList, this._lastFilterLinesList, this._filterHitList);
@@ -4966,7 +4966,7 @@ namespace LogExpert
 						break;
 					}
 					callback.LineNum = lineNum;
-					if (Util.TestFilterCondition(filterParams, line, callback))
+					if (Classes.DamerauLevenshtein.TestFilterCondition(filterParams, line, callback))
 					{
 						AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
 					}
@@ -5606,7 +5606,7 @@ namespace LogExpert
 					{
 						continue;
 					}
-					if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
+					if (Classes.DamerauLevenshtein.TestFilterCondition(pipe.FilterParams, searchLine, callback))
 					{
 						IList<int> filterResult = GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
 						pipe.OpenFile();
@@ -6193,7 +6193,7 @@ namespace LogExpert
 						continue;
 					}
 					msg = msg.ToLower(culture);
-					int distance = Util.YetiLevenshtein(msgToFind, msg);
+					int distance = Classes.YetiLevenshtein.Distance(msgToFind, msg);
 					if (distance < threshold)
 					{
 						return i;
