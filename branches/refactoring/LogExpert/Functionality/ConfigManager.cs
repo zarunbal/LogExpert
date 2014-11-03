@@ -87,7 +87,7 @@ namespace LogExpert
 
 		public override string ToString()
 		{
-			return Util.IsNull(this.name) ? this.cmd : this.name;
+			return string.IsNullOrEmpty(this.name) ? this.cmd : this.name;
 		}
 
 		public ToolEntry Clone()
@@ -458,9 +458,9 @@ namespace LogExpert
 				{
 					// set favourite to true only when name is empty, because there are always version released without this conversion fx
 					// remove empty tool entries (there were always 3 entries before, which can be empty if not used)
-					if (Util.IsNull(tool.name))
+					if (string.IsNullOrEmpty(tool.name))
 					{
-						if (!Util.IsNull(tool.cmd))
+						if (!string.IsNullOrEmpty(tool.cmd))
 						{
 							tool.name = tool.cmd;
 							tool.isFavourite = true;
@@ -471,7 +471,7 @@ namespace LogExpert
 					{
 						newList.Add(tool);
 					}
-					if (Util.IsNull(tool.iconFile))
+					if (string.IsNullOrEmpty(tool.iconFile))
 					{
 						tool.iconFile = tool.cmd;
 						tool.iconIndex = 0;

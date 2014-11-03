@@ -222,7 +222,7 @@ namespace LogExpert
 			return false;
 		}
 		
-		public static int DamerauLevenshteinDistance(string src, string dest)
+		private static int DamerauLevenshteinDistance(string src, string dest)
 		{
 			int[,] d = new int[src.Length + 1, dest.Length + 1];
 			int i, j, cost;
@@ -267,10 +267,10 @@ namespace LogExpert
 		public static unsafe int YetiLevenshtein(string s1, string s2)
 		{
 			fixed (char* p1 = s1)
-				fixed (char* p2 = s2)
-				{
-					return YetiLevenshtein(p1, s1.Length, p2, s2.Length, 0); // substitutionCost = 1
-				}
+			fixed (char* p2 = s2)
+			{
+				return YetiLevenshtein(p1, s1.Length, p2, s2.Length, 0); // substitutionCost = 1
+			}
 		}
 		
 		public static unsafe int YetiLevenshtein(string s1, string s2, int substitionCost)
@@ -497,16 +497,6 @@ namespace LogExpert
 				return (ILogLineColumnizer)o;
 			}
 			return null;
-		}
-		
-		/// <summary>
-		/// Returns true, if the given string is null or empty
-		/// </summary>
-		/// <param name="?"></param>
-		/// <returns></returns>
-		public static bool IsNull(string toTest)
-		{
-			return toTest == null || toTest.Length == 0;
 		}
 		
 		/// <summary>
