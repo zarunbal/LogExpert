@@ -4982,11 +4982,6 @@ namespace LogExpert
 			}
 		}
 		
-		private void UpdateFilterCountLabel(int count)
-		{
-			this.filterCountLabel.Text = "" + this._filterResultList.Count;
-		}
-		
 		private void TriggerFilterLineGuiUpdate()
 		{
 			this.Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
@@ -5496,16 +5491,6 @@ namespace LogExpert
 				Logger.logWarn("FilterRestore(): Columnizer " + persistenceData.columnizerName + " not found");
 			}
 			newWin.BeginInvoke(new Action<PersistenceData>(newWin.RestoreFilters), new object[] { persistenceData });
-		}
-		
-		private void LoadingFinishedFunc(LogWindow newWin)
-		{
-			//if (newWin.forcedColumnizerForLoading != null)
-			//{
-			//  SetColumnizerFx fx = new SetColumnizerFx(newWin.ForceColumnizer);
-			//  newWin.Invoke(fx, new object[] { newWin.forcedColumnizerForLoading });
-			//  newWin.forcedColumnizerForLoading = null;
-			//}
 		}
 		
 		private void ProcessFilterPipes(int lineNum)
