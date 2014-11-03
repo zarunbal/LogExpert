@@ -53,19 +53,9 @@ namespace LogExpert
 				else
 				{
 					Color bgColor = Color.White;
-					if (!DebugOptions.disableWordHighlight)
+					if (entry != null)
 					{
-						if (entry != null)
-						{
-							bgColor = entry.BackgroundColor;
-						}
-					}
-					else
-					{
-						if (entry != null)
-						{
-							bgColor = entry.BackgroundColor;
-						}
+						bgColor = entry.BackgroundColor;
 					}
 					e.CellStyle.BackColor = bgColor;
 					e.PaintBackground(e.ClipBounds, false);
