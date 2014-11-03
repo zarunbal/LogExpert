@@ -2977,7 +2977,7 @@ namespace LogExpert
 			{
 				DataGridViewTextBoxEditingControl ctl =
 					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
-				if (!Util.IsNull(ctl.SelectedText))
+				if (!string.IsNullOrEmpty(ctl.SelectedText))
 				{
 					Clipboard.SetText(ctl.SelectedText);
 				}
@@ -5948,7 +5948,6 @@ namespace LogExpert
 			SendProgressBarUpdate();
 
 			PrepareDict();
-			ResetCache(num);
 
 			Dictionary<int, int> processedLinesDict = new Dictionary<int, int>();
 			List<PatternBlock> blockList = new List<PatternBlock>();
@@ -6153,18 +6152,6 @@ namespace LogExpert
 					_lineHashList.Add(value);
 				}
 			}
-		}
-
-		private void ResetCache(int num)
-		{
-			//this.similarCache = new int[num, num];
-			//for (int i = 0; i < num; ++i)
-			//{
-			//  for (int j = 0; j < num; j++)
-			//  {
-			//    this.similarCache[i, j] = -1;
-			//  }
-			//}
 		}
 
 		private int FindSimilarLine(int srcLine, int startLine, Dictionary<int, int> processedLinesDict)

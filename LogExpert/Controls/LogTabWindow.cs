@@ -2014,7 +2014,7 @@ namespace LogExpert
 				return;
 			Process process = new Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo(cmd, args);
-			if (!Util.IsNull(workingDir))
+			if (!string.IsNullOrEmpty(workingDir))
 			{
 				startInfo.WorkingDirectory = workingDir;
 			}
