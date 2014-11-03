@@ -104,8 +104,6 @@ namespace LogExpert
 
 		private delegate void FunctionWith1BoolParam(bool arg);
 
-		private delegate void PatternStatisticFx(PatternArgs patternArgs, ILogWindowSearch logWindow);
-
 		private delegate void ActionPluginExecuteFx(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
 
 		private delegate void HighlightEventFx(HighlightEventArgs e);
@@ -1828,7 +1826,7 @@ namespace LogExpert
 
 		public void PatternStatistic(PatternArgs patternArgs)
 		{
-			PatternStatisticFx fx = new PatternStatisticFx(_fuzzyBlockDetection.TestStatistic);
+			Action<PatternArgs, Interfaces.ILogWindowSearch> fx = new Action<PatternArgs, Interfaces.ILogWindowSearch>(_fuzzyBlockDetection.TestStatistic);
 			fx.BeginInvoke(patternArgs, this, null, null);
 		}
 
