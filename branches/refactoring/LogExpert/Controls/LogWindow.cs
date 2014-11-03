@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LogExpert.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,7 +18,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
 {
-	public partial class LogWindow : DockContent, ILogPaintContext, ILogView
+	public partial class LogWindow : DockContent, ILogPaintContext, ILogView, ILogWindowSearch
 	{
 		#region Const
 
@@ -31,7 +32,7 @@ namespace LogExpert
 
 		#region Fields
 
-		private List<int> _lineHashList = new List<int>();
+		private Classes.FuzzyBlockDetection _fuzzyBlockDetection = new Classes.FuzzyBlockDetection();
 
 		private LogfileReader _logFileReader;
 		private ILogLineColumnizer _currentColumnizer;
@@ -103,7 +104,7 @@ namespace LogExpert
 
 		private delegate void FunctionWith1BoolParam(bool arg);
 
-		private delegate void PatternStatisticFx(PatternArgs patternArgs);
+		private delegate void PatternStatisticFx(PatternArgs patternArgs, ILogWindowSearch logWindow);
 
 		private delegate void ActionPluginExecuteFx(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
 
@@ -298,22 +299,6 @@ namespace LogExpert
 		#region Properties
 
 		public Color BookmarkColor { get; set; }
-
-		public ILogLineColumnizer CurrentColumnizer
-		{
-			get
-			{
-				return this._currentColumnizer;
-			}
-			set
-			{
-				lock (this._currentColumnizerLock)
-				{
-					this._currentColumnizer = value;
-					Logger.logDebug("Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
-				}
-			}
-		}
 
 		public string FileName
 		{
@@ -1843,8 +1828,8 @@ namespace LogExpert
 
 		public void PatternStatistic(PatternArgs patternArgs)
 		{
-			PatternStatisticFx fx = new PatternStatisticFx(TestStatistic);
-			fx.BeginInvoke(patternArgs, null, null);
+			PatternStatisticFx fx = new PatternStatisticFx(_fuzzyBlockDetection.TestStatistic);
+			fx.BeginInvoke(patternArgs, this, null, null);
 		}
 
 		public void ExportBookmarkList()
@@ -5932,286 +5917,6 @@ namespace LogExpert
 			this._patternWindow.Weight = this._patternArgs.minWeight;
 		}
 
-		private void TestStatistic(PatternArgs patternArgs)
-		{
-			int beginLine = patternArgs.startLine;
-			Logger.logInfo("TestStatistics() called with start line " + beginLine);
-
-			this._patternArgs = patternArgs;
-
-			int num = beginLine + 1;
-
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = this.dataGridView.RowCount;
-			this._progressEventArgs.Value = beginLine;
-			this._progressEventArgs.Visible = true;
-			SendProgressBarUpdate();
-
-			PrepareDict();
-
-			Dictionary<int, int> processedLinesDict = new Dictionary<int, int>();
-			List<PatternBlock> blockList = new List<PatternBlock>();
-			int blockId = 0;
-			this._isSearching = true;
-			this._shouldCancel = false;
-			int searchLine = -1;
-			for (int i = beginLine; i < num && !this._shouldCancel; ++i)
-			{
-				if (processedLinesDict.ContainsKey(i))
-				{
-					continue;
-				}
-
-				PatternBlock block;
-				int maxBlockLen = patternArgs.endLine - patternArgs.startLine;
-				Logger.logDebug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
-				searchLine++;
-				UpdateProgressBar(searchLine);
-				while (!this._shouldCancel && (block = DetectBlock(i, searchLine, maxBlockLen, this._patternArgs.maxDiffInBlock, this._patternArgs.maxMisses, processedLinesDict)) != null)
-				{
-					Logger.logDebug("Found block: " + block);
-					if (block.weigth >= this._patternArgs.minWeight)
-					{
-						blockList.Add(block);
-						AddBlockTargetLinesToDict(processedLinesDict, block);
-						block.blockId = blockId;
-
-						searchLine = block.targetEnd + 1;
-					}
-					else
-					{
-						searchLine = block.targetStart + 1;
-					}
-					UpdateProgressBar(searchLine);
-				}
-				blockId++;
-			}
-			this._isSearching = false;
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = 0;
-			this._progressEventArgs.Value = 0;
-			this._progressEventArgs.Visible = false;
-			SendProgressBarUpdate();
-			this._patternWindow.SetBlockList(blockList, this._patternArgs);
-			Logger.logInfo("TestStatistics() ended");
-		}
-
-		private void AddBlockSrcLinesToDict(SortedDictionary<int, int> dict, PatternBlock block)
-		{
-			foreach (int lineNum in block.srcLines.Keys)
-			{
-				if (!dict.ContainsKey(lineNum))
-				{
-					dict.Add(lineNum, lineNum);
-				}
-			}
-		}
-
-		private void AddBlockTargetLinesToDict(Dictionary<int, int> dict, PatternBlock block)
-		{
-			foreach (int lineNum in block.targetLines.Keys)
-			{
-				if (!dict.ContainsKey(lineNum))
-				{
-					dict.Add(lineNum, lineNum);
-				}
-			}
-		}
-
-		private PatternBlock FindExistingBlock(PatternBlock block, List<PatternBlock> blockList)
-		{
-			foreach (PatternBlock searchBlock in blockList)
-			{
-				if ((block.startLine > searchBlock.startLine &&
-					 block.startLine < searchBlock.endLine ||
-					 block.endLine > searchBlock.startLine &&
-					 block.endLine < searchBlock.endLine) &&
-					(
-					 block.startLine != searchBlock.startLine &&
-					 block.endLine != searchBlock.endLine)
-				)
-				{
-					return searchBlock;
-				}
-			}
-			return null;
-		}
-
-		private PatternBlock DetectBlock(int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict)
-		{
-			int targetLine = FindSimilarLine(startNum, startLineToSearch, processedLinesDict);
-			if (targetLine == -1)
-			{
-				return null;
-			}
-
-			PatternBlock block = new PatternBlock();
-			block.startLine = startNum;
-			int srcLine = block.startLine;
-			block.targetStart = targetLine;
-			int srcMisses = 0;
-			block.srcLines.Add(srcLine, srcLine);
-			int len = 0;
-			QualityInfo qi = new QualityInfo();
-			qi.quality = block.weigth;
-			block.qualityInfoList[targetLine] = qi;
-
-			while (!this._shouldCancel)
-			{
-				srcLine++;
-				len++;
-				if (maxBlockLen > 0 && len > maxBlockLen)
-				{
-					break;
-				}
-				int nextTargetLine = FindSimilarLine(srcLine, targetLine + 1, processedLinesDict);
-				if (nextTargetLine > -1 && nextTargetLine - targetLine - 1 <= maxDiffInBlock)
-				{
-					block.weigth += maxDiffInBlock - (nextTargetLine - targetLine - 1) + 1;
-					block.endLine = srcLine;
-					block.srcLines.Add(srcLine, srcLine);
-					if (nextTargetLine - targetLine > 1)
-					{
-						int tempWeight = block.weigth;
-						for (int tl = targetLine + 1; tl < nextTargetLine; ++tl)
-						{
-							qi = new QualityInfo();
-							qi.quality = --tempWeight;
-							block.qualityInfoList[tl] = qi;
-						}
-					}
-					targetLine = nextTargetLine;
-					qi = new QualityInfo();
-					qi.quality = block.weigth;
-					block.qualityInfoList[targetLine] = qi;
-				}
-				else
-				{
-					srcMisses++;
-					block.weigth--;
-					targetLine++;
-					qi = new QualityInfo();
-					qi.quality = block.weigth;
-					block.qualityInfoList[targetLine] = qi;
-					if (srcMisses > maxMisses)
-					{
-						break;
-					}
-				}
-			}
-			block.targetEnd = targetLine;
-			qi = new QualityInfo();
-			qi.quality = block.weigth;
-			block.qualityInfoList[targetLine] = qi;
-			for (int k = block.targetStart; k <= block.targetEnd; ++k)
-			{
-				block.targetLines.Add(k, k);
-			}
-			return block;
-		}
-
-		private void PrepareDict()
-		{
-			this._lineHashList.Clear();
-			Regex regex = new Regex("\\d");
-			Regex regex2 = new Regex("\\S");
-
-			int num = this._logFileReader.LineCount;
-			for (int i = 0; i < num; ++i)
-			{
-				string msg = GetMsgForLine(i);
-				if (msg != null)
-				{
-					msg = msg.ToLower();
-					msg = regex.Replace(msg, "0");
-					msg = regex2.Replace(msg, " ");
-					char[] chars = msg.ToCharArray();
-					int value = 0;
-					int numOfE = 0;
-					int numOfA = 0;
-					int numOfI = 0;
-					for (int j = 0; j < chars.Length; ++j)
-					{
-						value += chars[j];
-						switch (chars[j])
-						{
-							case 'e':
-								numOfE++;
-								break;
-							case 'a':
-								numOfA++;
-								break;
-							case 'i':
-								numOfI++;
-								break;
-						}
-					}
-					value += numOfE * 30;
-					value += numOfA * 20;
-					value += numOfI * 10;
-					_lineHashList.Add(value);
-				}
-			}
-		}
-
-		private int FindSimilarLine(int srcLine, int startLine, Dictionary<int, int> processedLinesDict)
-		{
-			int threshold = this._patternArgs.fuzzy;
-
-			bool prepared = false;
-			Regex regex = null;
-			Regex regex2 = null;
-			string msgToFind = null;
-			CultureInfo culture = CultureInfo.CurrentCulture;
-
-			int num = this._logFileReader.LineCount;
-			for (int i = startLine; i < num; ++i)
-			{
-				if (processedLinesDict.ContainsKey(i))
-				{
-					continue;
-				}
-
-				if (!prepared)
-				{
-					msgToFind = GetMsgForLine(srcLine);
-					regex = new Regex("\\d");
-					regex2 = new Regex("\\W");
-					msgToFind = msgToFind.ToLower(culture);
-					msgToFind = regex.Replace(msgToFind, "0");
-					msgToFind = regex2.Replace(msgToFind, " ");
-					prepared = true;
-				}
-				string msg = GetMsgForLine(i);
-				if (msg != null)
-				{
-					msg = regex.Replace(msg, "0");
-					msg = regex2.Replace(msg, " ");
-					int lenDiff = Math.Abs(msg.Length - msgToFind.Length);
-					if (lenDiff > threshold)
-					{
-						continue;
-					}
-					msg = msg.ToLower(culture);
-					int distance = Classes.YetiLevenshtein.Distance(msgToFind, msg);
-					if (distance < threshold)
-					{
-						return i;
-					}
-				}
-			}
-			return -1;
-		}
-
-		private string GetMsgForLine(int i)
-		{
-			string line = this._logFileReader.GetLogLine(i);
-			ILogLineColumnizer columnizer = this.CurrentColumnizer;
-			ColumnizerCallback callback = new ColumnizerCallback(this);
-			string[] cols = columnizer.SplitLine(callback, line);
-			return cols[columnizer.GetColumnCount() - 1];
-		}
-
 		private void UpdateBookmarkGui()
 		{
 			this.dataGridView.Refresh();
@@ -6712,6 +6417,111 @@ namespace LogExpert
 		}
 
 		#endregion
+
+		#region ILogWindowSerach Members
+		public PatternArgs PatternArgs
+		{
+			get
+			{
+				return _patternArgs;
+			}
+			set
+			{
+				_patternArgs = value;
+			}
+		}
+
+		public ProgressEventArgs ProgressEventArgs
+		{
+			get
+			{
+				return _progressEventArgs;
+			}
+		}
+
+		public bool IsSearching
+		{
+			get
+			{
+				return _isSearching;
+			}
+			set
+			{
+				_isSearching = value;
+			}
+		}
+
+		public bool ShouldCancel
+		{
+			get
+			{
+				return _shouldCancel;
+			}
+			set
+			{
+				_shouldCancel = value;
+			}
+		}
+
+		void ILogWindowSearch.SendProgressBarUpdate()
+		{
+			SendProgressBarUpdate();
+		}
+
+		void ILogWindowSearch.UpdateProgressBar(int value)
+		{
+			UpdateProgressBar(value);
+		}
+
+		public PatternWindow PatternWindow
+		{
+			get
+			{
+				return _patternWindow;
+			}
+		}
+
+		public BufferedDataGridView DataGridView
+		{
+			get
+			{
+				return dataGridView;
+			}
+		}
+
+		public ILogLineColumnizer CurrentColumnizer
+		{
+			get
+			{
+				return this._currentColumnizer;
+			}
+			set
+			{
+				lock (this._currentColumnizerLock)
+				{
+					this._currentColumnizer = value;
+					Logger.logDebug("Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
+				}
+			}
+		}
+
+		public int LineCount
+		{
+			get
+			{
+				return _logFileReader.LineCount;
+			}
+		}
+
+		public LogWindow CurrentLogWindows
+		{
+			get
+			{
+				return this;
+			}
+		}
+		#endregion
+
 
 		#region ILogView Member
 

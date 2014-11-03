@@ -269,7 +269,7 @@ namespace LogExpert
 				QualityInfo qi;
 				if (this.currentBlock.qualityInfoList.TryGetValue(rowIndex, out qi))
 				{
-					e.Value = qi.quality;
+					e.Value = qi.Quality;
 				}
 				else
 				{

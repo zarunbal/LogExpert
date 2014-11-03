@@ -92,7 +92,9 @@
   <ItemGroup>
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\DamerauLevenshtein.cs" />
+    <Compile Include="Classes\FuzzyBlockDetection.cs" />
     <Compile Include="Classes\YetiLevenshtein.cs" />
+    <Compile Include="Entities\QualityInfo.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interfaces\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
@@ -174,6 +176,7 @@
       <DependentUpon>TabRenameDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Entities\EncodingOptions.cs" />
+    <Compile Include="Interfaces\ILogWindowSearch.cs" />
     <Compile Include="Plugins\FileSystemCallback.cs" />
     <Compile Include="Entities\FileViewContext.cs" />
     <Compile Include="Functionality\Filter\Filter.cs" />
