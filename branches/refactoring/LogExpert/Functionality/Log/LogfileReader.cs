@@ -214,22 +214,6 @@ namespace LogExpert
 			OnFileSizeChanged(args);
 		}
 
-		private void ReloadBufferList()
-		{
-			lock (this.monitor)
-			{
-				AcquireBufferListWriterLock();
-				this.bufferList.Clear();
-				ReleaseBufferListWriterLock();
-				ClearLru();
-				//CloseFiles();
-				ReadFiles();
-				// Trigger "new file" handling (reload)
-				if (currFileSize > 0)
-					OnLoadFile(new LoadFileEventArgs(this.fileName, 0, true, this.fileLength, true));
-			}
-		}
-
 		/// <summary>
 		/// Public for unit tests.
 		/// </summary>
@@ -1331,15 +1315,6 @@ namespace LogExpert
 				Logger.logDebug("File not FileNotFoundException catched. Already in deleted mode.");
 			}
 			#endif
-		}
-
-		private void LoaderThreadProc()
-		{
-			if (!this.isDeleted)
-			{
-				FireChangeEvent();
-			}
-			OnLoadingFinished();
 		}
 
 		private void FileChanged()

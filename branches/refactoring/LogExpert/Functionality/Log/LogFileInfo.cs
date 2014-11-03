@@ -167,14 +167,6 @@ namespace LogExpert
 			return this.fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
 		}
 
-		private static string GetNameFromPath(string fileName)
-		{
-			int i = fileName.LastIndexOf('\\');
-			if (i < 0)
-				i = -1;
-			return fileName.Substring(i + 1);
-		}
-
 		public long LengthWithoutRetry
 		{
 			get

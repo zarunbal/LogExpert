@@ -88,7 +88,7 @@ namespace LogExpert
 
 		Rectangle[] leds = new Rectangle[5];
 		Brush[] ledBrushes = new Brush[5];
-		Icon[,,,] ledIcons = new Icon[6, 2, 4, 2];
+		Icon[, , ,] ledIcons = new Icon[6, 2, 4, 2];
 		Icon deadIcon;
 		StringFormat tabStringFormat = new StringFormat();
 		Brush offLedBrush;
@@ -237,7 +237,7 @@ namespace LogExpert
 				{
 					if (name != null && name.Length > 0)
 					{
-						AddFileTab(name, false, null, null, false, null);
+						AddFileTab(name, false, null, false, null);
 					}
 				}
 			}
@@ -255,9 +255,9 @@ namespace LogExpert
 
 			FillHighlightComboBox();
 			FillToolLauncherBar();
-			#if !DEBUG
+#if !DEBUG
       debugToolStripMenuItem.Visible = false;
-			#endif
+#endif
 		}
 
 		void LogTabWindow_Closing(object sender, CancelEventArgs e)
@@ -340,12 +340,12 @@ namespace LogExpert
 
 		public LogWindow AddTempFileTab(string fileName, string title)
 		{
-			return AddFileTab(fileName, true, title, null, false, null);
+			return AddFileTab(fileName, true, title, false, null);
 		}
 
-		public LogWindow AddFilterTab(FilterPipe pipe, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, ILogLineColumnizer preProcessColumnizer)
+		public LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
 		{
-			LogWindow logWin = AddFileTab(pipe.FileName, true, title, loadingFinishedFx, false, preProcessColumnizer);
+			LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
 			if (pipe.FilterParams.searchText.Length > 0)
 			{
 				ToolTip tip = new ToolTip(this.components);
@@ -361,17 +361,17 @@ namespace LogExpert
 			return logWin;
 		}
 
-		public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+		public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
 		{
-			return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading, preProcessColumnizer, true);
+			return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, true);
 		}
 
-		public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+		public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
 		{
-			return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading, preProcessColumnizer, false);
+			return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, false);
 		}
 
-		public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel)
+		public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel)
 		{
 			string logFileName = FindFilenameForSettings(givenFileName);
 			LogWindow win = FindWindowForFile(logFileName);
@@ -385,7 +385,7 @@ namespace LogExpert
 
 			EncodingOptions encodingOptions = new EncodingOptions();
 			FillDefaultEncodingFromSettings(encodingOptions);
-			LogWindow logWindow = new LogWindow(this, logFileName, isTempFile, loadingFinishedFx, forcePersistenceLoading);
+			LogWindow logWindow = new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
 
 			logWindow.GivenFileName = givenFileName;
 
@@ -460,7 +460,7 @@ namespace LogExpert
 		{
 			if (fileNames.Length < 1)
 				return null;
-			LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, null, false);
+			LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, false);
 			AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
 			this.multiFileToolStripMenuItem.Checked = true;
 			this.multiFileEnabledStripMenuItem.Checked = true;
@@ -494,7 +494,7 @@ namespace LogExpert
 					}
 					else
 					{
-						AddFileTab(fileName, false, null, null, false, null);
+						AddFileTab(fileName, false, null, false, null);
 					}
 				}
 			}
@@ -650,7 +650,7 @@ namespace LogExpert
 		{
 			if (sender is ToolStripDropDown)
 			{
-				AddFileTab(((ToolStripDropDown)sender).Text, false, null, null, false, null);
+				AddFileTab(((ToolStripDropDown)sender).Text, false, null, false, null);
 			}
 		}
 
@@ -658,7 +658,7 @@ namespace LogExpert
 		{
 			if (e.ClickedItem.Text != null && e.ClickedItem.Text.Length > 0)
 			{
-				AddFileTab(e.ClickedItem.Text, false, null, null, false, null);
+				AddFileTab(e.ClickedItem.Text, false, null, false, null);
 			}
 		}
 
@@ -897,7 +897,7 @@ namespace LogExpert
 				}
 				else
 				{
-					AddFileTab(names[0], false, null, null, false, null);
+					AddFileTab(names[0], false, null, false, null);
 					return;
 				}
 			}
@@ -936,7 +936,7 @@ namespace LogExpert
 
 		private void LogTabWindow_DragEnter(object sender, DragEventArgs e)
 		{
-			#if DEBUG
+#if DEBUG
 			string[] formats = e.Data.GetFormats();
 			string s = "Dragging something over LogExpert. Formats:  ";
 			foreach (string format in formats)
@@ -946,7 +946,7 @@ namespace LogExpert
 			}
 			s = s.Substring(0, s.Length - 3);
 			Logger.logInfo(s);
-			#endif
+#endif
 		}
 
 		private void LogWindow_DragOver(object sender, DragEventArgs e)
@@ -975,7 +975,7 @@ namespace LogExpert
 
 		private void LogWindow_DragDrop(object sender, DragEventArgs e)
 		{
-			#if DEBUG
+#if DEBUG
 			string[] formats = e.Data.GetFormats();
 			string s = "Dropped formats:  ";
 			foreach (string format in formats)
@@ -985,7 +985,7 @@ namespace LogExpert
 			}
 			s = s.Substring(0, s.Length - 3);
 			Logger.logDebug(s);
-			#endif
+#endif
 
 			object test = e.Data.GetData(DataFormats.StringFormat);
 
@@ -2413,11 +2413,11 @@ namespace LogExpert
 				{
 					if (hasLayoutData)
 					{
-						AddFileTabDeferred(fileName, false, null, null, true, null);
+						AddFileTabDeferred(fileName, false, null, true, null);
 					}
 					else
 					{
-						AddFileTab(fileName, false, null, null, true, null);
+						AddFileTab(fileName, false, null, true, null);
 					}
 				}
 
@@ -2605,22 +2605,22 @@ namespace LogExpert
 
 		private void dumpLogBufferInfoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			#if DEBUG
+#if DEBUG
 			if (this.CurrentLogWindow != null)
 			{
 				this.CurrentLogWindow.DumpBufferInfo();
 			}
-			#endif
+#endif
 		}
 
 		private void dumpBufferDiagnosticToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			#if DEBUG
+#if DEBUG
 			if (this.CurrentLogWindow != null)
 			{
 				this.CurrentLogWindow.DumpBufferDiagnostic();
 			}
-			#endif
+#endif
 		}
 
 		private void runGC()
