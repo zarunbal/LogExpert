@@ -129,37 +129,37 @@ namespace LogExpert
 		{
 			BookmarkColor = Color.FromArgb(165, 200, 225);
 			TempTitleName = "";
-			this.SuspendLayout();
+			SuspendLayout();
 
 			InitializeComponent();
 
-			this.columnNamesLabel.Text = ""; // no filtering on columns by default
+			columnNamesLabel.Text = ""; // no filtering on columns by default
 
-			this._parentLogTabWin = parent;
+			_parentLogTabWin = parent;
 			IsTempFile = isTempFile;
 			ColumnizerCallbackObject = new ColumnizerCallback(this);
 
 			FileName = fileName;
-			this.ForcePersistenceLoading = forcePersistenceLoading;
+			ForcePersistenceLoading = forcePersistenceLoading;
 
-			this.dataGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(DataGridView_CellValueNeeded);
-			this.dataGridView.CellPainting += new DataGridViewCellPaintingEventHandler(DataGridView_CellPainting);
+			dataGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(DataGridView_CellValueNeeded);
+			dataGridView.CellPainting += new DataGridViewCellPaintingEventHandler(DataGridView_CellPainting);
 
-			this.filterGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(FilterGridView_CellValueNeeded);
-			this.filterGridView.CellPainting += new DataGridViewCellPaintingEventHandler(FilterGridView_CellPainting);
+			filterGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(FilterGridView_CellValueNeeded);
+			filterGridView.CellPainting += new DataGridViewCellPaintingEventHandler(FilterGridView_CellPainting);
 
-			this.Closing += new CancelEventHandler(LogWindow_Closing);
-			this.Disposed += new EventHandler(LogWindow_Disposed);
+			Closing += new CancelEventHandler(LogWindow_Closing);
+			Disposed += new EventHandler(LogWindow_Disposed);
 
-			this._timeSpreadCalc = new TimeSpreadCalculator(this);
-			this.timeSpreadingControl1.TimeSpreadCalc = this._timeSpreadCalc;
-			this.timeSpreadingControl1.LineSelected += new TimeSpreadingControl.LineSelectedEventHandler(TimeSpreadingControl1_LineSelected);
-			this.tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Absolute;
-			this.tableLayoutPanel1.ColumnStyles[1].Width = 20;
-			this.tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
-			this.tableLayoutPanel1.ColumnStyles[0].Width = 100;
+			_timeSpreadCalc = new TimeSpreadCalculator(this);
+			timeSpreadingControl1.TimeSpreadCalc = _timeSpreadCalc;
+			timeSpreadingControl1.LineSelected += new TimeSpreadingControl.LineSelectedEventHandler(TimeSpreadingControl1_LineSelected);
+			tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Absolute;
+			tableLayoutPanel1.ColumnStyles[1].Width = 20;
+			tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
+			tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
-			this._parentLogTabWin.HighlightSettingsChanged += Parent_HighlightSettingsChanged;
+			_parentLogTabWin.HighlightSettingsChanged += Parent_HighlightSettingsChanged;
 
 			SetColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
 
@@ -168,66 +168,66 @@ namespace LogExpert
 			_patternArgs.maxDiffInBlock = 5;
 			_patternArgs.fuzzy = 5;
 
-			this._filterParams = new FilterParams();
+			_filterParams = new FilterParams();
 			foreach (string item in ConfigManager.Settings.filterHistoryList)
 			{
-				this.filterComboBox.Items.Add(item);
+				filterComboBox.Items.Add(item);
 			}
-			this.filterRegexCheckBox.Checked = this._filterParams.isRegex;
-			this.filterCaseSensitiveCheckBox.Checked = this._filterParams.isCaseSensitive;
-			this.filterTailCheckBox.Checked = this._filterParams.isFilterTail;
+			filterRegexCheckBox.Checked = _filterParams.isRegex;
+			filterCaseSensitiveCheckBox.Checked = _filterParams.isCaseSensitive;
+			filterTailCheckBox.Checked = _filterParams.isFilterTail;
 
-			this.splitContainer1.Panel2Collapsed = true;
-			this.advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
+			splitContainer1.Panel2Collapsed = true;
+			advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
 
-			this._timeshiftSyncThread = new Thread(new ThreadStart(this.SyncTimestampDisplayWorker));
-			this._timeshiftSyncThread.IsBackground = true;
-			this._timeshiftSyncThread.Start();
+			_timeshiftSyncThread = new Thread(new ThreadStart(SyncTimestampDisplayWorker));
+			_timeshiftSyncThread.IsBackground = true;
+			_timeshiftSyncThread.Start();
 
-			this._logEventHandlerThread = new Thread(new ThreadStart(this.LogEventWorker));
-			this._logEventHandlerThread.IsBackground = true;
-			this._logEventHandlerThread.Start();
+			_logEventHandlerThread = new Thread(new ThreadStart(LogEventWorker));
+			_logEventHandlerThread.IsBackground = true;
+			_logEventHandlerThread.Start();
 
-			this._advancedButtonImage = this.advancedButton.Image;
-			this._searchButtonImage = this.filterSearchButton.Image;
-			this.filterSearchButton.Image = null;
+			_advancedButtonImage = advancedButton.Image;
+			_searchButtonImage = filterSearchButton.Image;
+			filterSearchButton.Image = null;
 
-			this.dataGridView.EditModeMenuStrip = this.editModeContextMenuStrip;
-			this.markEditModeToolStripMenuItem.Enabled = true;
+			dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
+			markEditModeToolStripMenuItem.Enabled = true;
 
-			this._panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
-			this._panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
+			_panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
+			_panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
 
 			Settings settings = ConfigManager.Settings;
 			if (settings.appBounds != null && settings.appBounds.Right > 0)
 			{
-				this.Bounds = settings.appBounds;
+				Bounds = settings.appBounds;
 			}
 
-			this._waitingForClose = false;
-			this.dataGridView.Enabled = false;
-			this.dataGridView.ColumnDividerDoubleClick += new DataGridViewColumnDividerDoubleClickEventHandler(DataGridView_ColumnDividerDoubleClick);
+			_waitingForClose = false;
+			dataGridView.Enabled = false;
+			dataGridView.ColumnDividerDoubleClick += new DataGridViewColumnDividerDoubleClickEventHandler(DataGridView_ColumnDividerDoubleClick);
 			ShowAdvancedFilterPanel(false);
-			this.filterKnobControl1.MinValue = 0;
-			this.filterKnobControl1.MaxValue = SPREAD_MAX;
-			this.filterKnobControl1.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
-			this.filterKnobControl2.MinValue = 0;
-			this.filterKnobControl2.MaxValue = SPREAD_MAX;
-			this.filterKnobControl2.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
-			this.fuzzyKnobControl.MinValue = 0;
-			this.fuzzyKnobControl.MaxValue = 10;
+			filterKnobControl1.MinValue = 0;
+			filterKnobControl1.MaxValue = SPREAD_MAX;
+			filterKnobControl1.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
+			filterKnobControl2.MinValue = 0;
+			filterKnobControl2.MaxValue = SPREAD_MAX;
+			filterKnobControl2.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
+			fuzzyKnobControl.MinValue = 0;
+			fuzzyKnobControl.MaxValue = 10;
 			AdjustHighlightSplitterWidth();
 			ToggleHighlightPanel(false); // hidden
 
 			_bookmarkProvider.BookmarkAdded += new BookmarkDataProvider.BookmarkAddedEventHandler(BookmarkProvider_BookmarkAdded);
 			_bookmarkProvider.BookmarkRemoved += new BookmarkDataProvider.BookmarkRemovedEventHandler(BookmarkProvider_BookmarkRemoved);
 
-			this.ResumeLayout();
+			ResumeLayout();
 
-			this._statusLineTrigger.Signal += new DelayedTrigger.SignalEventHandler(StatusLineTrigger_Signal);
-			this._selectionChangedTrigger.Signal += new DelayedTrigger.SignalEventHandler(SelectionChangedTrigger_Signal);
+			_statusLineTrigger.Signal += new DelayedTrigger.SignalEventHandler(StatusLineTrigger_Signal);
+			_selectionChangedTrigger.Signal += new DelayedTrigger.SignalEventHandler(SelectionChangedTrigger_Signal);
 
-			PreferencesChanged(this._parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
+			PreferencesChanged(_parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
 		}
 
 		#endregion
@@ -250,7 +250,7 @@ namespace LogExpert
 			}
 			set
 			{
-				this._guiStateArgs.IsMultiFileActive = this._isMultiFile = value;
+				_guiStateArgs.IsMultiFileActive = _isMultiFile = value;
 			}
 		}
 
@@ -296,7 +296,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.TimeSyncList != null;
+				return TimeSyncList != null;
 			}
 		}
 
@@ -315,21 +315,21 @@ namespace LogExpert
 			if (fileName != null)
 			{
 				FileName = fileName;
-				this.EncodingOptions = encodingOptions;
+				EncodingOptions = encodingOptions;
 
-				if (this._logFileReader != null)
+				if (_logFileReader != null)
 				{
-					this._logFileReader.StopMonitoringAsync();
+					_logFileReader.StopMonitoringAsync();
 					UnRegisterLogFileReaderEvents();
 				}
 				if (!LoadPersistenceOptions())
 				{
-					if (!this.IsTempFile)
+					if (!IsTempFile)
 					{
 						ILogLineColumnizer columnizer = FindColumnizer();
 						if (columnizer != null)
 						{
-							if (this._reloadMemento == null)
+							if (_reloadMemento == null)
 							{
 								columnizer = Util.CloneColumnizer(columnizer);
 							}
@@ -340,47 +340,47 @@ namespace LogExpert
 				}
 
 				// this may be set after loading persistence data
-				if (this._fileNames != null && this.IsMultiFile)
+				if (_fileNames != null && IsMultiFile)
 				{
-					LoadFilesAsMulti(this._fileNames, this.EncodingOptions);
+					LoadFilesAsMulti(_fileNames, EncodingOptions);
 					return;
 				}
-				this._columnCache = new ColumnCache();
+				_columnCache = new ColumnCache();
 				try
 				{
-					_logFileReader = new LogfileReader(fileName, this.EncodingOptions, this.IsMultiFile,
-						this.Preferences.bufferCount, this.Preferences.linesPerBuffer,
-						this._multifileOptions);
-					this._logFileReader.UseNewReader = !this.Preferences.useLegacyReader;
+					_logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
+						Preferences.bufferCount, Preferences.linesPerBuffer,
+						_multifileOptions);
+					_logFileReader.UseNewReader = !Preferences.useLegacyReader;
 				}
 				catch (LogFileException lfe)
 				{
 					MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
-					this.BeginInvoke(new Action<bool>(Close), new object[] { true });
-					this._isLoadError = true;
+					BeginInvoke(new Action<bool>(Close), new object[] { true });
+					_isLoadError = true;
 					return;
 				}
 
-				if (this.CurrentColumnizer is ILogLineXmlColumnizer)
+				if (CurrentColumnizer is ILogLineXmlColumnizer)
 				{
-					this._logFileReader.IsXmlMode = true;
-					this._logFileReader.XmlLogConfig = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
+					_logFileReader.IsXmlMode = true;
+					_logFileReader.XmlLogConfig = (CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
 				}
-				if (this._forcedColumnizerForLoading != null)
+				if (_forcedColumnizerForLoading != null)
 				{
-					this.CurrentColumnizer = this._forcedColumnizerForLoading;
+					CurrentColumnizer = _forcedColumnizerForLoading;
 				}
-				if (this.CurrentColumnizer is IPreProcessColumnizer)
+				if (CurrentColumnizer is IPreProcessColumnizer)
 				{
-					this._logFileReader.PreProcessColumnizer = (IPreProcessColumnizer)this.CurrentColumnizer;
+					_logFileReader.PreProcessColumnizer = (IPreProcessColumnizer)CurrentColumnizer;
 				}
 				else
 				{
-					this._logFileReader.PreProcessColumnizer = null;
+					_logFileReader.PreProcessColumnizer = null;
 				}
 				RegisterLogFileReaderEvents();
 				Logger.logInfo("Loading logfile: " + fileName);
-				this._logFileReader.startMonitoring();
+				_logFileReader.startMonitoring();
 			}
 		}
 
@@ -394,34 +394,34 @@ namespace LogExpert
 			{
 				Logger.logInfo("File: " + name);
 			}
-			if (this._logFileReader != null)
+			if (_logFileReader != null)
 			{
-				this._logFileReader.stopMonitoring();
+				_logFileReader.stopMonitoring();
 				UnRegisterLogFileReaderEvents();
 			}
-			this.EncodingOptions = encodingOptions;
-			this._columnCache = new ColumnCache();
-			this._logFileReader = new LogfileReader(fileNames, this.EncodingOptions, this.Preferences.bufferCount,
-				this.Preferences.linesPerBuffer, this._multifileOptions);
-			this._logFileReader.UseNewReader = !this.Preferences.useLegacyReader;
+			EncodingOptions = encodingOptions;
+			_columnCache = new ColumnCache();
+			_logFileReader = new LogfileReader(fileNames, EncodingOptions, Preferences.bufferCount,
+				Preferences.linesPerBuffer, _multifileOptions);
+			_logFileReader.UseNewReader = !Preferences.useLegacyReader;
 			RegisterLogFileReaderEvents();
-			this._logFileReader.startMonitoring();
+			_logFileReader.startMonitoring();
 			FileName = fileNames[fileNames.Length - 1];
-			this._fileNames = fileNames;
-			this.IsMultiFile = true;
+			_fileNames = fileNames;
+			IsMultiFile = true;
 		}
 
 		public string SavePersistenceData(bool force)
 		{
 			if (!force)
 			{
-				if (!this.Preferences.saveSessions)
+				if (!Preferences.saveSessions)
 				{
 					return null;
 				}
 			}
 
-			if (IsTempFile || this._isLoadError)
+			if (IsTempFile || _isLoadError)
 			{
 				return null;
 			}
@@ -429,13 +429,13 @@ namespace LogExpert
 			try
 			{
 				PersistenceData persistenceData = GetPersistenceData();
-				if (this.ForcedPersistenceFileName == null)
+				if (ForcedPersistenceFileName == null)
 				{
-					return Persister.SavePersistenceData(this.FileName, persistenceData, this.Preferences);
+					return Persister.SavePersistenceData(FileName, persistenceData, Preferences);
 				}
 				else
 				{
-					return Persister.SavePersistenceDataWithFixedName(this.ForcedPersistenceFileName, persistenceData);
+					return Persister.SavePersistenceDataWithFixedName(ForcedPersistenceFileName, persistenceData);
 				}
 			}
 			catch (IOException ex)
@@ -452,30 +452,30 @@ namespace LogExpert
 		public PersistenceData GetPersistenceData()
 		{
 			PersistenceData persistenceData = new PersistenceData();
-			persistenceData.bookmarkList = this._bookmarkProvider.BookmarkList;
-			persistenceData.rowHeightList = this._rowHeightList;
-			persistenceData.multiFile = this.IsMultiFile;
-			persistenceData.multiFilePattern = this._multifileOptions.FormatPattern;
-			persistenceData.multiFileMaxDays = this._multifileOptions.MaxDayTry;
-			persistenceData.currentLine = this.dataGridView.CurrentCellAddress.Y;
-			persistenceData.firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
-			persistenceData.filterVisible = !this.splitContainer1.Panel2Collapsed;
-			persistenceData.filterAdvanced = !this.advancedFilterSplitContainer.Panel1Collapsed;
-			persistenceData.filterPosition = this.splitContainer1.SplitterDistance;
-			persistenceData.followTail = this._guiStateArgs.FollowTail;
-			persistenceData.fileName = this.FileName;
-			persistenceData.tabName = this.Text;
-			persistenceData.sessionFileName = this.SessionFileName;
-			persistenceData.columnizerName = this.CurrentColumnizer.GetName();
-			persistenceData.lineCount = this._logFileReader.LineCount;
-			this._filterParams.isFilterTail = this.filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
-			if (this.Preferences.saveFilters)
+			persistenceData.bookmarkList = _bookmarkProvider.BookmarkList;
+			persistenceData.rowHeightList = _rowHeightList;
+			persistenceData.multiFile = IsMultiFile;
+			persistenceData.multiFilePattern = _multifileOptions.FormatPattern;
+			persistenceData.multiFileMaxDays = _multifileOptions.MaxDayTry;
+			persistenceData.currentLine = dataGridView.CurrentCellAddress.Y;
+			persistenceData.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
+			persistenceData.filterVisible = !splitContainer1.Panel2Collapsed;
+			persistenceData.filterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed;
+			persistenceData.filterPosition = splitContainer1.SplitterDistance;
+			persistenceData.followTail = _guiStateArgs.FollowTail;
+			persistenceData.fileName = FileName;
+			persistenceData.tabName = Text;
+			persistenceData.sessionFileName = SessionFileName;
+			persistenceData.columnizerName = CurrentColumnizer.GetName();
+			persistenceData.lineCount = _logFileReader.LineCount;
+			_filterParams.isFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
+			if (Preferences.saveFilters)
 			{
 				List<FilterParams> filterList = new List<FilterParams>();
-				filterList.Add(this._filterParams);
+				filterList.Add(_filterParams);
 				persistenceData.filterParamsList = filterList;
 
-				foreach (FilterPipe filterPipe in this._filterPipeList)
+				foreach (FilterPipe filterPipe in _filterPipeList)
 				{
 					FilterTabData data = new FilterTabData();
 					data.persistenceData = filterPipe.OwnLogWindow.GetPersistenceData();
@@ -483,29 +483,29 @@ namespace LogExpert
 					persistenceData.filterTabDataList.Add(data);
 				}
 			}
-			if (this._currentHighlightGroup != null)
+			if (_currentHighlightGroup != null)
 			{
-				persistenceData.highlightGroupName = this._currentHighlightGroup.GroupName;
+				persistenceData.highlightGroupName = _currentHighlightGroup.GroupName;
 			}
-			if (this._fileNames != null && this.IsMultiFile)
+			if (_fileNames != null && IsMultiFile)
 			{
-				persistenceData.multiFileNames.AddRange(this._fileNames);
+				persistenceData.multiFileNames.AddRange(_fileNames);
 			}
-			//persistenceData.showBookmarkCommentColumn = this.bookmarkWindow.ShowBookmarkCommentColumn;
-			persistenceData.filterSaveListVisible = !this.highlightSplitContainer.Panel2Collapsed;
-			persistenceData.encoding = this._logFileReader.CurrentEncoding;
+			//persistenceData.showBookmarkCommentColumn = bookmarkWindow.ShowBookmarkCommentColumn;
+			persistenceData.filterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
+			persistenceData.encoding = _logFileReader.CurrentEncoding;
 			return persistenceData;
 		}
 
 		public void Close(bool dontAsk)
 		{
-			this.Preferences.askForClose = !dontAsk;
+			Preferences.askForClose = !dontAsk;
 			Close();
 		}
 
 		public void WaitForLoadingFinished()
 		{
-			this._externaLoadingFinishedEvent.WaitOne();
+			_externaLoadingFinishedEvent.WaitOne();
 		}
 
 		public void CloseLogWindow()
@@ -513,46 +513,46 @@ namespace LogExpert
 			StopTimespreadThread();
 			StopTimestampSyncThread();
 			StopLogEventWorkerThread();
-			this._statusLineTrigger.Stop();
-			this._selectionChangedTrigger.Stop();
-			this._shouldCancel = true;
-			if (this._logFileReader != null)
+			_statusLineTrigger.Stop();
+			_selectionChangedTrigger.Stop();
+			_shouldCancel = true;
+			if (_logFileReader != null)
 			{
 				UnRegisterLogFileReaderEvents();
-				this._logFileReader.StopMonitoringAsync();
+				_logFileReader.StopMonitoringAsync();
 			}
-			if (this._isLoading)
+			if (_isLoading)
 			{
-				this._waitingForClose = true;
+				_waitingForClose = true;
 			}
-			if (this.IsTempFile)
+			if (IsTempFile)
 			{
-				Logger.logInfo("Deleting temp file " + this.FileName);
+				Logger.logInfo("Deleting temp file " + FileName);
 				try
 				{
-					File.Delete(this.FileName);
+					File.Delete(FileName);
 				}
 				catch (IOException e)
 				{
-					Logger.logError("Error while deleting temp file " + this.FileName + ": " + e.ToString());
+					Logger.logError("Error while deleting temp file " + FileName + ": " + e.ToString());
 				}
 			}
-			if (this.FilterPipe != null)
+			if (FilterPipe != null)
 			{
-				this.FilterPipe.CloseAndDisconnect();
+				FilterPipe.CloseAndDisconnect();
 			}
 			DisconnectFilterPipes();
 		}
 
 		public void ForceColumnizer(ILogLineColumnizer columnizer)
 		{
-			this._forcedColumnizer = Util.CloneColumnizer(columnizer);
-			SetColumnizer(this._forcedColumnizer);
+			_forcedColumnizer = Util.CloneColumnizer(columnizer);
+			SetColumnizer(_forcedColumnizer);
 		}
 
 		public void ForceColumnizerForLoading(ILogLineColumnizer columnizer)
 		{
-			this._forcedColumnizerForLoading = Util.CloneColumnizer(columnizer);
+			_forcedColumnizerForLoading = Util.CloneColumnizer(columnizer);
 		}
 
 		public void PreselectColumnizer(string columnizerName)
@@ -565,32 +565,32 @@ namespace LogExpert
 		{
 			if (columnizer != null)
 			{
-				this.CurrentColumnizer = this._forcedColumnizerForLoading = columnizer;
+				CurrentColumnizer = _forcedColumnizerForLoading = columnizer;
 			}
 			else
 			{
-				this.CurrentColumnizer = this._forcedColumnizerForLoading = PluginRegistry.GetInstance().RegisteredColumnizers[0];
+				CurrentColumnizer = _forcedColumnizerForLoading = PluginRegistry.GetInstance().RegisteredColumnizers[0];
 			}
 		}
 
 		public void ColumnizerConfigChanged()
 		{
-			SetColumnizerInternal(this.CurrentColumnizer);
+			SetColumnizerInternal(CurrentColumnizer);
 		}
 
 		private void SetColumnizer(ILogLineColumnizer columnizer)
 		{
 			int timeDiff = 0;
-			if (this.CurrentColumnizer != null && this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer != null && CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				timeDiff = this.CurrentColumnizer.GetTimeOffset();
+				timeDiff = CurrentColumnizer.GetTimeOffset();
 			}
 
 			SetColumnizerInternal(columnizer);
 
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				this.CurrentColumnizer.SetTimeOffset(timeDiff);
+				CurrentColumnizer.SetTimeOffset(timeDiff);
 			}
 		}
 
@@ -598,21 +598,21 @@ namespace LogExpert
 		{
 			Logger.logInfo("SetColumnizerInternal(): " + columnizer.GetName());
 
-			ILogLineColumnizer oldColumnizer = this.CurrentColumnizer;
-			bool oldColumnizerIsXmlType = this.CurrentColumnizer is ILogLineXmlColumnizer;
-			bool oldColumnizerIsPreProcess = this.CurrentColumnizer is IPreProcessColumnizer;
+			ILogLineColumnizer oldColumnizer = CurrentColumnizer;
+			bool oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;
+			bool oldColumnizerIsPreProcess = CurrentColumnizer is IPreProcessColumnizer;
 			bool mustReload = false;
 
 			// Check if the filtered columns disappeared, if so must refresh the UI
-			if (this._filterParams.columnRestrict)
+			if (_filterParams.columnRestrict)
 			{
 				string[] newColumns = columnizer != null ? columnizer.GetColumnNames() : new string[0];
 				bool colChanged = false;
-				if (this.dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
+				if (dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
 				{
 					for (int i = 0; i < newColumns.Length; i++)
 					{
-						if (this.dataGridView.Columns[i].HeaderText != newColumns[i])
+						if (dataGridView.Columns[i].HeaderText != newColumns[i])
 						{
 							colChanged = true;
 							break; // one change is sufficient
@@ -627,21 +627,21 @@ namespace LogExpert
 				if (colChanged)
 				{
 					// Update UI
-					this.columnNamesLabel.Text = CalculateColumnNames(this._filterParams);
+					columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 				}
 			}
 
-			Type oldColType = _filterParams.currentColumnizer != null ? this._filterParams.currentColumnizer.GetType() : null;
+			Type oldColType = _filterParams.currentColumnizer != null ? _filterParams.currentColumnizer.GetType() : null;
 			Type newColType = columnizer != null ? columnizer.GetType() : null;
-			if (oldColType != newColType && _filterParams.columnRestrict && this._filterParams.isFilterTail)
+			if (oldColType != newColType && _filterParams.columnRestrict && _filterParams.isFilterTail)
 			{
-				this._filterParams.columnList.Clear();
+				_filterParams.columnList.Clear();
 			}
-			if (this.CurrentColumnizer == null || !this.CurrentColumnizer.GetType().Equals(columnizer.GetType()))
+			if (CurrentColumnizer == null || !CurrentColumnizer.GetType().Equals(columnizer.GetType()))
 			{
-				this.CurrentColumnizer = columnizer;
-				this._freezeStateMap.Clear();
-				if (this._logFileReader != null)
+				CurrentColumnizer = columnizer;
+				_freezeStateMap.Clear();
+				if (_logFileReader != null)
 				{
 					IPreProcessColumnizer preprocessColumnizer = CurrentColumnizer as IPreProcessColumnizer;
 					if (preprocessColumnizer != null)
@@ -662,7 +662,7 @@ namespace LogExpert
 				// Reload when choosing no XML columnizer but previous columnizer was XML
 				if (_logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
 				{
-					this._logFileReader.IsXmlMode = false;
+					_logFileReader.IsXmlMode = false;
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
 					mustReload = true;
 				}
@@ -736,11 +736,11 @@ namespace LogExpert
 			columnComboBox.Items.Clear();
 			foreach (String columnName in columnizer.GetColumnNames())
 			{
-				this.columnComboBox.Items.Add(columnName);
+				columnComboBox.Items.Add(columnName);
 			}
-			this.columnComboBox.SelectedIndex = 0;
+			columnComboBox.SelectedIndex = 0;
 
-			OnColumnizerChanged(this.CurrentColumnizer);
+			OnColumnizerChanged(CurrentColumnizer);
 		}
 
 		public void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
@@ -757,7 +757,7 @@ namespace LogExpert
 			markerColumn.Resizable = DataGridViewTriState.False;
 			markerColumn.DividerWidth = 1;
 			markerColumn.ReadOnly = true;
-			markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+			markerColumn.HeaderCell.ContextMenuStrip = columnContextMenuStrip;
 			gridView.Columns.Add(markerColumn);
 
 			DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
@@ -766,7 +766,7 @@ namespace LogExpert
 			lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
 			lineNumberColumn.DividerWidth = 1;
 			lineNumberColumn.ReadOnly = true;
-			lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+			lineNumberColumn.HeaderCell.ContextMenuStrip = columnContextMenuStrip;
 			gridView.Columns.Add(lineNumberColumn);
 
 			foreach (string colName in columnizer.GetColumnNames())
@@ -776,11 +776,11 @@ namespace LogExpert
 				titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
 				titleColumn.Resizable = DataGridViewTriState.NotSet;
 				titleColumn.DividerWidth = 1;
-				titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+				titleColumn.HeaderCell.ContextMenuStrip = columnContextMenuStrip;
 				gridView.Columns.Add(titleColumn);
 			}
 
-			this.columnNamesLabel.Text = CalculateColumnNames(this._filterParams);
+			columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 
 			gridView.RowCount = rowCount;
 			if (currLine != -1)
@@ -845,9 +845,9 @@ namespace LogExpert
 		public HilightEntry FindHilightEntry(string line, bool noWordMatches)
 		{
 			// first check the temp entries
-			lock (this._tempHilightEntryListLock)
+			lock (_tempHilightEntryListLock)
 			{
-				foreach (HilightEntry entry in this._tempHilightEntryList)
+				foreach (HilightEntry entry in _tempHilightEntryList)
 				{
 					if (noWordMatches && entry.IsWordMatch)
 					{
@@ -860,9 +860,9 @@ namespace LogExpert
 				}
 			}
 
-			lock (this._currentHighlightGroupLock)
+			lock (_currentHighlightGroupLock)
 			{
-				foreach (HilightEntry entry in this._currentHighlightGroup.HilightEntryList)
+				foreach (HilightEntry entry in _currentHighlightGroup.HilightEntryList)
 				{
 					if (noWordMatches && entry.IsWordMatch)
 					{
@@ -882,13 +882,13 @@ namespace LogExpert
 			IList<HilightMatchEntry> resultList = new List<HilightMatchEntry>();
 			if (line != null)
 			{
-				lock (this._currentHighlightGroupLock)
+				lock (_currentHighlightGroupLock)
 				{
-					GetHighlightEntryMatches(line, this._currentHighlightGroup.HilightEntryList, resultList);
+					GetHighlightEntryMatches(line, _currentHighlightGroup.HilightEntryList, resultList);
 				}
-				lock (this._tempHilightEntryList)
+				lock (_tempHilightEntryList)
 				{
-					GetHighlightEntryMatches(line, this._tempHilightEntryList, resultList);
+					GetHighlightEntryMatches(line, _tempHilightEntryList, resultList);
 				}
 			}
 			return resultList;
@@ -898,42 +898,42 @@ namespace LogExpert
 		{
 			if (line >= 0)
 			{
-				if (line < this.dataGridView.RowCount)
+				if (line < dataGridView.RowCount)
 				{
 					SelectLine(line, false);
 				}
 				else
 				{
-					SelectLine(this.dataGridView.RowCount - 1, false);
+					SelectLine(dataGridView.RowCount - 1, false);
 				}
-				this.dataGridView.Focus();
+				dataGridView.Focus();
 			}
 		}
 
 		public void StartSearch()
 		{
-			this._guiStateArgs.MenuEnabled = false;
-			GuiStateUpdate(this, this._guiStateArgs);
-			SearchParams searchParams = this._parentLogTabWin.SearchParams;
+			_guiStateArgs.MenuEnabled = false;
+			GuiStateUpdate(this, _guiStateArgs);
+			SearchParams searchParams = _parentLogTabWin.SearchParams;
 			if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
 			{
-				searchParams.currentLine = this.dataGridView.CurrentCellAddress.Y + 1;
+				searchParams.currentLine = dataGridView.CurrentCellAddress.Y + 1;
 			}
 			else
 			{
-				searchParams.currentLine = this.dataGridView.CurrentCellAddress.Y - 1;
+				searchParams.currentLine = dataGridView.CurrentCellAddress.Y - 1;
 			}
 
-			this._currentSearchParams = searchParams;    // remember for async "not found" messages
+			_currentSearchParams = searchParams;    // remember for async "not found" messages
 
-			this._isSearching = true;
-			this._shouldCancel = false;
+			_isSearching = true;
+			_shouldCancel = false;
 			StatusLineText("Searching... Press ESC to cancel.");
 
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = this.dataGridView.RowCount;
-			this._progressEventArgs.Value = 0;
-			this._progressEventArgs.Visible = true;
+			_progressEventArgs.MinValue = 0;
+			_progressEventArgs.MaxValue = dataGridView.RowCount;
+			_progressEventArgs.Value = 0;
+			_progressEventArgs.Visible = true;
 			SendProgressBarUpdate();
 
 			Func<SearchParams, int> searchFx = new Func<SearchParams, int>(Search);
@@ -945,24 +945,24 @@ namespace LogExpert
 
 		public void FollowTailChanged(bool isChecked, bool byTrigger)
 		{
-			this._guiStateArgs.FollowTail = isChecked;
+			_guiStateArgs.FollowTail = isChecked;
 
-			if (this._guiStateArgs.FollowTail && _logFileReader != null)
+			if (_guiStateArgs.FollowTail && _logFileReader != null)
 			{
-				if (this.dataGridView.RowCount >= this._logFileReader.LineCount && this._logFileReader.LineCount > 0)
+				if (dataGridView.RowCount >= _logFileReader.LineCount && _logFileReader.LineCount > 0)
 				{
-					this.dataGridView.FirstDisplayedScrollingRowIndex = this._logFileReader.LineCount - 1;
+					dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
 				}
 			}
-			this.BeginInvoke(new MethodInvoker(this.dataGridView.Refresh));
-			//this.dataGridView.Refresh();
-			this._parentLogTabWin.FollowTailChanged(this, isChecked, byTrigger);
+			BeginInvoke(new MethodInvoker(dataGridView.Refresh));
+			//dataGridView.Refresh();
+			_parentLogTabWin.FollowTailChanged(this, isChecked, byTrigger);
 			SendGuiStateUpdate();
 		}
 
 		public void SelectLogLine(int line)
 		{
-			this.Invoke(new Action<int, bool>(this.SelectLine), new object[] { line, true });
+			Invoke(new Action<int, bool>(SelectLine), new object[] { line, true });
 		}
 
 		public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
@@ -971,23 +971,23 @@ namespace LogExpert
 			{
 				SelectLine(line, triggerSyncCall, false);
 
-				if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
-					line > this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
+				if (line < dataGridView.FirstDisplayedScrollingRowIndex ||
+					line > dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
 				{
-					this.dataGridView.FirstDisplayedScrollingRowIndex = line;
+					dataGridView.FirstDisplayedScrollingRowIndex = line;
 					for (int i = 0;
-						 i < 8 && this.dataGridView.FirstDisplayedScrollingRowIndex > 0 &&
-						 line < this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false);
+						 i < 8 && dataGridView.FirstDisplayedScrollingRowIndex > 0 &&
+						 line < dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false);
 						 ++i)
 					{
-						this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex - 1;
+						dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.FirstDisplayedScrollingRowIndex - 1;
 					}
-					if (line >= this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(false))
+					if (line >= dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
 					{
-						this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.FirstDisplayedScrollingRowIndex + 1;
+						dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.FirstDisplayedScrollingRowIndex + 1;
 					}
 				}
-				this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
+				dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
 			}
 			catch (Exception e)
 			{
@@ -1000,7 +1000,7 @@ namespace LogExpert
 		public void AddBookmarkOverlays()
 		{
 			const int OVERSCAN = 20;
-			int firstLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
+			int firstLine = dataGridView.FirstDisplayedScrollingRowIndex;
 			if (firstLine < 0)
 			{
 				return;
@@ -1014,35 +1014,35 @@ namespace LogExpert
 
 			int oversizeCount = OVERSCAN;
 
-			for (int i = firstLine; i < this.dataGridView.RowCount; ++i)
+			for (int i = firstLine; i < dataGridView.RowCount; ++i)
 			{
-				if (!this.dataGridView.Rows[i].Displayed && i > this.dataGridView.FirstDisplayedScrollingRowIndex)
+				if (!dataGridView.Rows[i].Displayed && i > dataGridView.FirstDisplayedScrollingRowIndex)
 				{
 					if (oversizeCount-- < 0)
 					{
 						break;
 					}
 				}
-				if (this._bookmarkProvider.IsBookmarkAtLine(i))
+				if (_bookmarkProvider.IsBookmarkAtLine(i))
 				{
-					Bookmark bookmark = this._bookmarkProvider.GetBookmarkForLine(i);
+					Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(i);
 					if (bookmark.Text.Length > 0)
 					{
 						BookmarkOverlay overlay = bookmark.Overlay;
 						overlay.Bookmark = bookmark;
 
 						Rectangle r;
-						if (this.dataGridView.Rows[i].Displayed)
+						if (dataGridView.Rows[i].Displayed)
 						{
-							r = this.dataGridView.GetCellDisplayRectangle(0, i, false);
+							r = dataGridView.GetCellDisplayRectangle(0, i, false);
 						}
 						else
 						{
-							r = this.dataGridView.GetCellDisplayRectangle(0, this.dataGridView.FirstDisplayedScrollingRowIndex, false);
+							r = dataGridView.GetCellDisplayRectangle(0, dataGridView.FirstDisplayedScrollingRowIndex, false);
 							int heightSum = 0;
-							if (this.dataGridView.FirstDisplayedScrollingRowIndex < i)
+							if (dataGridView.FirstDisplayedScrollingRowIndex < i)
 							{
-								for (int rn = this.dataGridView.FirstDisplayedScrollingRowIndex + 1; rn < i; ++rn)
+								for (int rn = dataGridView.FirstDisplayedScrollingRowIndex + 1; rn < i; ++rn)
 								{
 									heightSum += GetRowHeight(rn);
 								}
@@ -1050,7 +1050,7 @@ namespace LogExpert
 							}
 							else
 							{
-								for (int rn = this.dataGridView.FirstDisplayedScrollingRowIndex + 1; rn > i; --rn)
+								for (int rn = dataGridView.FirstDisplayedScrollingRowIndex + 1; rn > i; --rn)
 								{
 									heightSum += GetRowHeight(rn);
 								}
@@ -1059,11 +1059,11 @@ namespace LogExpert
 						}
 						if (Logger.IsDebug)
 						{
-							Logger.logDebug("AddBookmarkOverlay() r.Location=" + r.Location.X + ", width=" + r.Width + ", scroll_offset=" + this.dataGridView.HorizontalScrollingOffset);
+							Logger.logDebug("AddBookmarkOverlay() r.Location=" + r.Location.X + ", width=" + r.Width + ", scroll_offset=" + dataGridView.HorizontalScrollingOffset);
 						}
-						overlay.Position = r.Location - new Size(this.dataGridView.HorizontalScrollingOffset, 0);
+						overlay.Position = r.Location - new Size(dataGridView.HorizontalScrollingOffset, 0);
 						overlay.Position = overlay.Position + new Size(10, r.Height / 2);
-						this.dataGridView.AddOverlay(overlay);
+						dataGridView.AddOverlay(overlay);
 					}
 				}
 			}
@@ -1073,12 +1073,12 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._guiStateArgs.ShowBookmarkBubbles;
+				return _guiStateArgs.ShowBookmarkBubbles;
 			}
 			set
 			{
-				this._guiStateArgs.ShowBookmarkBubbles = this.dataGridView.PaintWithOverlays = value;
-				this.dataGridView.Refresh();
+				_guiStateArgs.ShowBookmarkBubbles = dataGridView.PaintWithOverlays = value;
+				dataGridView.Refresh();
 			}
 		}
 
@@ -1087,23 +1087,23 @@ namespace LogExpert
 			DataGridView gridView;
 			int lineNum;
 
-			if (this.filterGridView.Focused)
+			if (filterGridView.Focused)
 			{
-				gridView = this.filterGridView;
+				gridView = filterGridView;
 				if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
 				{
 					return;
 				}
-				lineNum = this._filterResultList[gridView.CurrentCellAddress.Y];
+				lineNum = _filterResultList[gridView.CurrentCellAddress.Y];
 			}
 			else
 			{
-				gridView = this.dataGridView;
+				gridView = dataGridView;
 				if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
 				{
 					return;
 				}
-				lineNum = this.dataGridView.CurrentCellAddress.Y;
+				lineNum = dataGridView.CurrentCellAddress.Y;
 			}
 
 			ToggleBookmark(lineNum);
@@ -1111,9 +1111,9 @@ namespace LogExpert
 
 		public void ToggleBookmark(int lineNum)
 		{
-			if (this._bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
-				Bookmark bookmark = this._bookmarkProvider.GetBookmarkForLine(lineNum);
+				Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
 				if (bookmark.Text != null && bookmark.Text.Length > 0)
 				{
 					if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
@@ -1121,22 +1121,22 @@ namespace LogExpert
 						return;
 					}
 				}
-				this._bookmarkProvider.RemoveBookmarkForLine(lineNum);
+				_bookmarkProvider.RemoveBookmarkForLine(lineNum);
 			}
 			else
 			{
-				this._bookmarkProvider.AddBookmark(new Bookmark(lineNum));
+				_bookmarkProvider.AddBookmark(new Bookmark(lineNum));
 			}
-			this.dataGridView.Refresh();
-			this.filterGridView.Refresh();
+			dataGridView.Refresh();
+			filterGridView.Refresh();
 			OnBookmarkAdded();
 		}
 
 		public void SetBookmarkFromTrigger(int lineNum, string comment)
 		{
-			lock (this._bookmarkLock)
+			lock (_bookmarkLock)
 			{
-				string line = this._logFileReader.GetLogLine(lineNum);
+				string line = _logFileReader.GetLogLine(lineNum);
 				if (line == null)
 				{
 					return;
@@ -1144,17 +1144,17 @@ namespace LogExpert
 				ParamParser paramParser = new ParamParser(comment);
 				try
 				{
-					comment = paramParser.ReplaceParams(line, lineNum, this.FileName);
+					comment = paramParser.ReplaceParams(line, lineNum, FileName);
 				}
 				catch (ArgumentException)
 				{
 					// occurs on invalid regex 
 				}
-				if (this._bookmarkProvider.IsBookmarkAtLine(lineNum))
+				if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
 				{
-					this._bookmarkProvider.RemoveBookmarkForLine(lineNum);
+					_bookmarkProvider.RemoveBookmarkForLine(lineNum);
 				}
-				this._bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
+				_bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
 				OnBookmarkAdded();
 			}
 		}
@@ -1166,11 +1166,11 @@ namespace LogExpert
 			{
 				int bookmarkIndex = 0;
 
-				bookmarkIndex = FindNextBookmarkIndex(this.dataGridView.CurrentCellAddress.Y, isForward);
+				bookmarkIndex = FindNextBookmarkIndex(dataGridView.CurrentCellAddress.Y, isForward);
 
 				bookmarkIndex = currentBookMarkCount.SanitizeIndex(bookmarkIndex);
 
-				if (this.filterGridView.Focused)
+				if (filterGridView.Focused)
 				{
 					int startIndex = bookmarkIndex;
 					bool wrapped = false;
@@ -1179,7 +1179,7 @@ namespace LogExpert
 					while (true)
 					{
 						int bookMarkedLine = _bookmarkProvider.Bookmarks[bookmarkIndex].LineNum;
-						if (this._filterResultList.Contains(bookMarkedLine))
+						if (_filterResultList.Contains(bookMarkedLine))
 						{
 							//Bookmarked Line is in the filtered list display it
 							int filterLine = _filterResultList.IndexOf(bookMarkedLine);
@@ -1215,7 +1215,7 @@ namespace LogExpert
 			{
 				if (lineNum != -1)
 				{
-					if (this._bookmarkProvider.IsBookmarkAtLine(lineNum) && this._bookmarkProvider.GetBookmarkForLine(lineNum).Text.Length > 0)
+					if (_bookmarkProvider.IsBookmarkAtLine(lineNum) && _bookmarkProvider.GetBookmarkForLine(lineNum).Text.Length > 0)
 					{
 						bookmarksPresent = true;
 					}
@@ -1234,16 +1234,16 @@ namespace LogExpert
 
 		public void LogWindowActivated()
 		{
-			if (this._guiStateArgs.FollowTail && !this._isDeadFile)
+			if (_guiStateArgs.FollowTail && !_isDeadFile)
 			{
 				OnTailFollowed(new EventArgs());
 			}
-			if (this.Preferences.timestampControl)
+			if (Preferences.timestampControl)
 			{
 				SetTimestampLimits();
 				SyncTimestampDisplay();
 			}
-			this.dataGridView.Focus();
+			dataGridView.Focus();
 
 			SendGuiStateUpdate();
 			SendStatusLineUpdate();
@@ -1254,52 +1254,52 @@ namespace LogExpert
 		{
 			if (isCellMode)
 			{
-				this.dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
+				dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
 			}
 			else
 			{
-				this.dataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+				dataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 			}
-			this._guiStateArgs.CellSelectMode = isCellMode;
+			_guiStateArgs.CellSelectMode = isCellMode;
 		}
 
 		public void TimeshiftEnabled(bool isEnabled, string shiftValue)
 		{
-			this._guiStateArgs.TimeshiftEnabled = isEnabled;
+			_guiStateArgs.TimeshiftEnabled = isEnabled;
 			SetTimestampLimits();
 			SetTimeshiftValue(shiftValue);
 		}
 
 		public void SetTimeshiftValue(string value)
 		{
-			this._guiStateArgs.TimeshiftText = value;
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			_guiStateArgs.TimeshiftText = value;
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
 				try
 				{
-					if (this._guiStateArgs.TimeshiftEnabled)
+					if (_guiStateArgs.TimeshiftEnabled)
 					{
 						try
 						{
-							string text = this._guiStateArgs.TimeshiftText;
+							string text = _guiStateArgs.TimeshiftText;
 							if (text.StartsWith("+"))
 							{
 								text = text.Substring(1);
 							}
 							TimeSpan timeSpan = TimeSpan.Parse(text);
 							int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
-							this.CurrentColumnizer.SetTimeOffset(diff);
+							CurrentColumnizer.SetTimeOffset(diff);
 						}
 						catch (Exception)
 						{
-							this.CurrentColumnizer.SetTimeOffset(0);
+							CurrentColumnizer.SetTimeOffset(0);
 						}
 					}
 					else
-						this.CurrentColumnizer.SetTimeOffset(0);
-					this.dataGridView.Refresh();
-					this.filterGridView.Refresh();
-					if (this.CurrentColumnizer.IsTimeshiftImplemented())
+						CurrentColumnizer.SetTimeOffset(0);
+					dataGridView.Refresh();
+					filterGridView.Refresh();
+					if (CurrentColumnizer.IsTimeshiftImplemented())
 					{
 						SetTimestampLimits();
 						SyncTimestampDisplay();
@@ -1314,10 +1314,10 @@ namespace LogExpert
 
 		public void CopyMarkedLinesToTab()
 		{
-			if (this.dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
+			if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
 			{
 				List<int> lineNumList = new List<int>();
-				foreach (DataGridViewRow row in this.dataGridView.SelectedRows)
+				foreach (DataGridViewRow row in dataGridView.SelectedRows)
 				{
 					if (row.Index != -1)
 					{
@@ -1329,7 +1329,7 @@ namespace LogExpert
 				// setting IsStopped to true prevents further filter processing
 				FilterPipe pipe = new FilterPipe(new FilterParams(), this);
 				pipe.IsStopped = true;
-				WritePipeToTab(pipe, lineNumList, this.Text + "->C", null);
+				WritePipeToTab(pipe, lineNumList, Text + "->C", null);
 			}
 			else
 			{
@@ -1337,13 +1337,13 @@ namespace LogExpert
 				FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
 				StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode);
 
-				DataObject data = this.dataGridView.GetClipboardContent();
+				DataObject data = dataGridView.GetClipboardContent();
 				string text = data.GetText(TextDataFormat.Text);
 				writer.Write(text);
 
 				writer.Close();
-				string title = Util.GetNameFromPath(this.FileName) + "->Clip";
-				this._parentLogTabWin.AddTempFileTab(fileName, title);
+				string title = Util.GetNameFromPath(FileName) + "->Clip";
+				_parentLogTabWin.AddTempFileTab(fileName, title);
 			}
 		}
 
@@ -1353,37 +1353,37 @@ namespace LogExpert
 		/// <param name="encoding"></param>
 		public void ChangeEncoding(Encoding encoding)
 		{
-			this._logFileReader.ChangeEncoding(encoding);
-			this.EncodingOptions.Encoding = encoding;
-			if (this._guiStateArgs.CurrentEncoding.IsSingleByte != encoding.IsSingleByte ||
-				this._guiStateArgs.CurrentEncoding.GetPreamble().Length != encoding.GetPreamble().Length)
+			_logFileReader.ChangeEncoding(encoding);
+			EncodingOptions.Encoding = encoding;
+			if (_guiStateArgs.CurrentEncoding.IsSingleByte != encoding.IsSingleByte ||
+				_guiStateArgs.CurrentEncoding.GetPreamble().Length != encoding.GetPreamble().Length)
 			{
 				Reload();
 			}
 			else
 			{
-				this.dataGridView.Refresh();
+				dataGridView.Refresh();
 				SendGuiStateUpdate();
 			}
-			this._guiStateArgs.CurrentEncoding = this._logFileReader.CurrentEncoding;
+			_guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
 		}
 
 		public void Reload()
 		{
 			SavePersistenceData(false);
 
-			this._reloadMemento = new ReloadMemento();
-			this._reloadMemento.currentLine = this.dataGridView.CurrentCellAddress.Y;
-			this._reloadMemento.firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
-			this._forcedColumnizerForLoading = this.CurrentColumnizer;
+			_reloadMemento = new ReloadMemento();
+			_reloadMemento.currentLine = dataGridView.CurrentCellAddress.Y;
+			_reloadMemento.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
+			_forcedColumnizerForLoading = CurrentColumnizer;
 
-			if (this._fileNames == null || !this.IsMultiFile)
+			if (_fileNames == null || !IsMultiFile)
 			{
-				LoadFile(this.FileName, this.EncodingOptions);
+				LoadFile(FileName, EncodingOptions);
 			}
 			else
 			{
-				LoadFilesAsMulti(this._fileNames, this.EncodingOptions);
+				LoadFilesAsMulti(_fileNames, EncodingOptions);
 			}
 		}
 
@@ -1392,39 +1392,39 @@ namespace LogExpert
 			if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
 			{
 				_normalFont = new Font(new FontFamily(newPreferences.fontName), newPreferences.fontSize);
-				this._fontBold = new Font(this.NormalFont, FontStyle.Bold);
-				this._fontMonospaced = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+				_fontBold = new Font(NormalFont, FontStyle.Bold);
+				_fontMonospaced = new Font("Courier New", Preferences.fontSize, FontStyle.Bold);
 
-				this.dataGridView.DefaultCellStyle.Font = NormalFont;
-				this.filterGridView.DefaultCellStyle.Font = NormalFont;
-				this._lineHeight = NormalFont.Height + 4;
-				this.dataGridView.RowTemplate.Height = NormalFont.Height + 4;
+				dataGridView.DefaultCellStyle.Font = NormalFont;
+				filterGridView.DefaultCellStyle.Font = NormalFont;
+				_lineHeight = NormalFont.Height + 4;
+				dataGridView.RowTemplate.Height = NormalFont.Height + 4;
 
-				this.ShowBookmarkBubbles = this.Preferences.showBubbles;
+				ShowBookmarkBubbles = Preferences.showBubbles;
 
-				ApplyDataGridViewPrefs(this.dataGridView, newPreferences);
-				ApplyDataGridViewPrefs(this.filterGridView, newPreferences);
+				ApplyDataGridViewPrefs(dataGridView, newPreferences);
+				ApplyDataGridViewPrefs(filterGridView, newPreferences);
 
-				if (this.Preferences.timestampControl)
+				if (Preferences.timestampControl)
 				{
 					SetTimestampLimits();
 					SyncTimestampDisplay();
 				}
 				if (isLoadTime)
 				{
-					this.filterTailCheckBox.Checked = this.Preferences.filterTail;
-					this.syncFilterCheckBox.Checked = this.Preferences.filterSync;
+					filterTailCheckBox.Checked = Preferences.filterTail;
+					syncFilterCheckBox.Checked = Preferences.filterSync;
 				}
 
-				this._timeSpreadCalc.TimeMode = this.Preferences.timeSpreadTimeMode;
-				this.timeSpreadingControl1.ForeColor = this.Preferences.timeSpreadColor;
-				this.timeSpreadingControl1.ReverseAlpha = this.Preferences.reverseAlpha;
-				if (this.CurrentColumnizer.IsTimeshiftImplemented())
+				_timeSpreadCalc.TimeMode = Preferences.timeSpreadTimeMode;
+				timeSpreadingControl1.ForeColor = Preferences.timeSpreadColor;
+				timeSpreadingControl1.ReverseAlpha = Preferences.reverseAlpha;
+				if (CurrentColumnizer.IsTimeshiftImplemented())
 				{
-					this.timeSpreadingControl1.Invoke(new MethodInvoker(this.timeSpreadingControl1.Refresh));
-					ShowTimeSpread(this.Preferences.showTimeSpread);
+					timeSpreadingControl1.Invoke(new MethodInvoker(timeSpreadingControl1.Refresh));
+					ShowTimeSpread(Preferences.showTimeSpread);
 				}
-				ToggleColumnFinder(this.Preferences.showColumnFinder, false);
+				ToggleColumnFinder(Preferences.showColumnFinder, false);
 			}
 
 			if ((flags & SettingsFlags.FilterList) == SettingsFlags.FilterList)
@@ -1440,9 +1440,9 @@ namespace LogExpert
 
 		public bool ScrollToTimestamp(DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
 		{
-			if (this.InvokeRequired)
+			if (InvokeRequired)
 			{
-				this.BeginInvoke(new Func<DateTime, bool, bool, bool>(this.ScrollToTimestampWorker), new object[] { timestamp, roundToSeconds, triggerSyncCall });
+				BeginInvoke(new Func<DateTime, bool, bool, bool>(ScrollToTimestampWorker), new object[] { timestamp, roundToSeconds, triggerSyncCall });
 				return true;
 			}
 			else
@@ -1454,13 +1454,13 @@ namespace LogExpert
 		public bool ScrollToTimestampWorker(DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
 		{
 			bool hasScrolled = false;
-			if (!this.CurrentColumnizer.IsTimeshiftImplemented() || this.dataGridView.RowCount == 0)
+			if (!CurrentColumnizer.IsTimeshiftImplemented() || dataGridView.RowCount == 0)
 			{
 				return false;
 			}
 
-			int currentLine = this.dataGridView.CurrentCellAddress.Y;
-			if (currentLine < 0 || currentLine >= this.dataGridView.RowCount)
+			int currentLine = dataGridView.CurrentCellAddress.Y;
+			if (currentLine < 0 || currentLine >= dataGridView.RowCount)
 			{
 				currentLine = 0;
 			}
@@ -1475,7 +1475,7 @@ namespace LogExpert
 
 		public int FindTimestampLine(int lineNum, DateTime timestamp, bool roundToSeconds)
 		{
-			int foundLine = FindTimestampLine_Internal(lineNum, 0, this.dataGridView.RowCount - 1, timestamp, roundToSeconds);
+			int foundLine = FindTimestampLine_Internal(lineNum, 0, dataGridView.RowCount - 1, timestamp, roundToSeconds);
 			if (foundLine >= 0)
 			{
 				// go backwards to the first occurence of the hit
@@ -1549,31 +1549,31 @@ namespace LogExpert
 		 */
 		public DateTime GetTimestampForLine(ref int lineNum, bool roundToSeconds)
 		{
-			lock (this._currentColumnizerLock)
+			lock (_currentColumnizerLock)
 			{
-				if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+				if (!CurrentColumnizer.IsTimeshiftImplemented())
 				{
 					return DateTime.MinValue;
 				}
 				Logger.logDebug("GetTimestampForLine(" + lineNum + ") enter");
 				DateTime timeStamp = DateTime.MinValue;
 				bool lookBack = false;
-				if (lineNum >= 0 && lineNum < this.dataGridView.RowCount)
+				if (lineNum >= 0 && lineNum < dataGridView.RowCount)
 				{
 					while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum >= 0)
 					{
-						if (this._isTimestampDisplaySyncing && this._shouldTimestampDisplaySyncingCancel)
+						if (_isTimestampDisplaySyncing && _shouldTimestampDisplaySyncingCancel)
 						{
 							return DateTime.MinValue;
 						}
 						lookBack = true;
-						string logLine = this._logFileReader.GetLogLine(lineNum);
+						string logLine = _logFileReader.GetLogLine(lineNum);
 						if (logLine == null)
 						{
 							return DateTime.MinValue;
 						}
-						this.ColumnizerCallbackObject.LineNum = lineNum;
-						timeStamp = this.CurrentColumnizer.GetTimestamp(this.ColumnizerCallbackObject, logLine);
+						ColumnizerCallbackObject.LineNum = lineNum;
+						timeStamp = CurrentColumnizer.GetTimestamp(ColumnizerCallbackObject, logLine);
 						if (roundToSeconds)
 						{
 							timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
@@ -1595,27 +1595,27 @@ namespace LogExpert
 		 */
 		public DateTime GetTimestampForLineForward(ref int lineNum, bool roundToSeconds)
 		{
-			lock (this._currentColumnizerLock)
+			lock (_currentColumnizerLock)
 			{
-				if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+				if (!CurrentColumnizer.IsTimeshiftImplemented())
 				{
 					return DateTime.MinValue;
 				}
 
 				DateTime timeStamp = DateTime.MinValue;
 				bool lookFwd = false;
-				if (lineNum >= 0 && lineNum < this.dataGridView.RowCount)
+				if (lineNum >= 0 && lineNum < dataGridView.RowCount)
 				{
-					while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < this.dataGridView.RowCount)
+					while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < dataGridView.RowCount)
 					{
 						lookFwd = true;
-						string logLine = this._logFileReader.GetLogLine(lineNum);
+						string logLine = _logFileReader.GetLogLine(lineNum);
 						if (logLine == null)
 						{
 							timeStamp = DateTime.MinValue;
 							break;
 						}
-						timeStamp = this.CurrentColumnizer.GetTimestamp(this.ColumnizerCallbackObject, logLine);
+						timeStamp = CurrentColumnizer.GetTimestamp(ColumnizerCallbackObject, logLine);
 						if (roundToSeconds)
 						{
 							timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
@@ -1631,65 +1631,65 @@ namespace LogExpert
 
 		public void AppFocusLost()
 		{
-			InvalidateCurrentRow(this.dataGridView);
+			InvalidateCurrentRow(dataGridView);
 		}
 
 		public void AppFocusGained()
 		{
-			InvalidateCurrentRow(this.dataGridView);
+			InvalidateCurrentRow(dataGridView);
 		}
 
 		public string GetCurrentLine()
 		{
-			if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
+			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return this._logFileReader.GetLogLine(this.dataGridView.CurrentRow.Index);
+				return _logFileReader.GetLogLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
 
 		public string GetLine(int lineNum)
 		{
-			if (lineNum < 0 || lineNum >= this._logFileReader.LineCount)
+			if (lineNum < 0 || lineNum >= _logFileReader.LineCount)
 			{
 				return null;
 			}
-			return this._logFileReader.GetLogLine(lineNum);
+			return _logFileReader.GetLogLine(lineNum);
 		}
 
 		public int GetCurrentLineNum()
 		{
-			if (this.dataGridView.CurrentRow == null)
+			if (dataGridView.CurrentRow == null)
 			{
 				return -1;
 			}
-			return this.dataGridView.CurrentRow.Index;
+			return dataGridView.CurrentRow.Index;
 		}
 
 		public int GetRealLineNum()
 		{
-			int lineNum = this.GetCurrentLineNum();
+			int lineNum = GetCurrentLineNum();
 			if (lineNum == -1)
 			{
 				return -1;
 			}
-			return this._logFileReader.GetRealLineNumForVirtualLineNum(lineNum);
+			return _logFileReader.GetRealLineNumForVirtualLineNum(lineNum);
 		}
 
 		public string GetCurrentFileName()
 		{
-			if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
+			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return this._logFileReader.GetLogFileNameForLine(this.dataGridView.CurrentRow.Index);
+				return _logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
 
 		public ILogFileInfo GetCurrentFileInfo()
 		{
-			if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
+			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return this._logFileReader.GetLogFileInfoForLine(this.dataGridView.CurrentRow.Index);
+				return _logFileReader.GetLogFileInfoForLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
@@ -1701,13 +1701,13 @@ namespace LogExpert
 		/// <returns></returns>
 		public string GetCurrentFileName(int lineNum)
 		{
-			return this._logFileReader.GetLogFileNameForLine(lineNum);
+			return _logFileReader.GetLogFileNameForLine(lineNum);
 		}
 
 		public void ShowLineColumn(bool show)
 		{
-			this.dataGridView.Columns[1].Visible = show;
-			this.filterGridView.Columns[1].Visible = show;
+			dataGridView.Columns[1].Visible = show;
+			filterGridView.Columns[1].Visible = show;
 		}
 
 		public void PatternStatistic()
@@ -1717,10 +1717,10 @@ namespace LogExpert
 
 		public void PatternStatisticSelectRange(PatternArgs patternArgs)
 		{
-			if (this.dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
+			if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
 			{
 				List<int> lineNumList = new List<int>();
-				foreach (DataGridViewRow row in this.dataGridView.SelectedRows)
+				foreach (DataGridViewRow row in dataGridView.SelectedRows)
 				{
 					if (row.Index != -1)
 					{
@@ -1733,15 +1733,15 @@ namespace LogExpert
 			}
 			else
 			{
-				if (this.dataGridView.CurrentCellAddress.Y != -1)
+				if (dataGridView.CurrentCellAddress.Y != -1)
 				{
-					patternArgs.startLine = this.dataGridView.CurrentCellAddress.Y;
+					patternArgs.startLine = dataGridView.CurrentCellAddress.Y;
 				}
 				else
 				{
 					patternArgs.startLine = 0;
 				}
-				patternArgs.endLine = this.dataGridView.RowCount - 1;
+				patternArgs.endLine = dataGridView.RowCount - 1;
 			}
 		}
 
@@ -1759,12 +1759,12 @@ namespace LogExpert
 			dlg.DefaultExt = "csv";
 			dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
 			dlg.FilterIndex = 1;
-			dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
+			dlg.FileName = Path.GetFileNameWithoutExtension(FileName);
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				try
 				{
-					BookmarkExporter.ExportBookmarkList(this._bookmarkProvider.BookmarkList, this.FileName, dlg.FileName);
+					BookmarkExporter.ExportBookmarkList(_bookmarkProvider.BookmarkList, FileName, dlg.FileName);
 				}
 				catch (IOException e)
 				{
@@ -1782,27 +1782,27 @@ namespace LogExpert
 			dlg.DefaultExt = "csv";
 			dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
 			dlg.FilterIndex = 1;
-			dlg.FileName = Path.GetFileNameWithoutExtension(this.FileName);
+			dlg.FileName = Path.GetFileNameWithoutExtension(FileName);
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				try
 				{
 					// add to the existing bookmarks
 					var newBookmarks = new SortedList<int, Bookmark>();
-					BookmarkExporter.ImportBookmarkList(this.FileName, dlg.FileName, newBookmarks);
+					BookmarkExporter.ImportBookmarkList(FileName, dlg.FileName, newBookmarks);
 
 					// Add (or replace) to existing bookmark list
 					bool bookmarkAdded = false;
 					foreach (var b in newBookmarks.Values)
 					{
-						if (!this._bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
+						if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
 						{
-							this._bookmarkProvider.BookmarkList.Add(b.LineNum, b);
+							_bookmarkProvider.BookmarkList.Add(b.LineNum, b);
 							bookmarkAdded = true; // refresh the list only once at the end
 						}
 						else
 						{
-							var existingBookmark = this._bookmarkProvider.BookmarkList[b.LineNum];
+							var existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
 							existingBookmark.Text = b.Text; // replace existing bookmark for that line, preserving the overlay
 							OnBookmarkTextChanged(b);
 						}
@@ -1813,8 +1813,8 @@ namespace LogExpert
 					{
 						OnBookmarkAdded();
 					}
-					this.dataGridView.Refresh();
-					this.filterGridView.Refresh();
+					dataGridView.Refresh();
+					filterGridView.Refresh();
 				}
 				catch (IOException e)
 				{
@@ -1825,57 +1825,57 @@ namespace LogExpert
 
 		public bool IsAdvancedOptionActive()
 		{
-			return (this.rangeCheckBox.Checked ||
-					this.fuzzyKnobControl.Value > 0 ||
-					this.filterKnobControl1.Value > 0 ||
-					this.filterKnobControl2.Value > 0 ||
-					this.invertFilterCheckBox.Checked ||
-					this.columnRestrictCheckBox.Checked);
+			return (rangeCheckBox.Checked ||
+					fuzzyKnobControl.Value > 0 ||
+					filterKnobControl1.Value > 0 ||
+					filterKnobControl2.Value > 0 ||
+					invertFilterCheckBox.Checked ||
+					columnRestrictCheckBox.Checked);
 		}
 
 		public void HandleChangedFilterList()
 		{
-			this.Invoke(new MethodInvoker(HandleChangedFilterListWorker));
+			Invoke(new MethodInvoker(HandleChangedFilterListWorker));
 		}
 
 		public void HandleChangedFilterListWorker()
 		{
-			int index = this.filterListBox.SelectedIndex;
-			this.filterListBox.Items.Clear();
+			int index = filterListBox.SelectedIndex;
+			filterListBox.Items.Clear();
 			foreach (FilterParams filterParam in ConfigManager.Settings.filterList)
 			{
-				this.filterListBox.Items.Add(filterParam);
+				filterListBox.Items.Add(filterParam);
 			}
-			this.filterListBox.Refresh();
-			if (index >= 0 && index < this.filterListBox.Items.Count)
+			filterListBox.Refresh();
+			if (index >= 0 && index < filterListBox.Items.Count)
 			{
-				this.filterListBox.SelectedIndex = index;
+				filterListBox.SelectedIndex = index;
 			}
-			this.filterOnLoadCheckBox.Checked = this.Preferences.isFilterOnLoad;
-			this.hideFilterListOnLoadCheckBox.Checked = this.Preferences.isAutoHideFilterList;
+			filterOnLoadCheckBox.Checked = Preferences.isFilterOnLoad;
+			hideFilterListOnLoadCheckBox.Checked = Preferences.isAutoHideFilterList;
 		}
 
 		public void SetCurrentHighlightGroup(string groupName)
 		{
-			this._guiStateArgs.HighlightGroupName = groupName;
-			lock (this._currentHighlightGroupLock)
+			_guiStateArgs.HighlightGroupName = groupName;
+			lock (_currentHighlightGroupLock)
 			{
-				this._currentHighlightGroup = this._parentLogTabWin.FindHighlightGroup(groupName);
-				if (this._currentHighlightGroup == null)
+				_currentHighlightGroup = _parentLogTabWin.FindHighlightGroup(groupName);
+				if (_currentHighlightGroup == null)
 				{
-					if (this._parentLogTabWin.HilightGroupList.Count > 0)
+					if (_parentLogTabWin.HilightGroupList.Count > 0)
 					{
-						this._currentHighlightGroup = this._parentLogTabWin.HilightGroupList[0];
+						_currentHighlightGroup = _parentLogTabWin.HilightGroupList[0];
 					}
 					else
 					{
-						this._currentHighlightGroup = new HilightGroup();
+						_currentHighlightGroup = new HilightGroup();
 					}
 				}
-				this._guiStateArgs.HighlightGroupName = this._currentHighlightGroup.GroupName;
+				_guiStateArgs.HighlightGroupName = _currentHighlightGroup.GroupName;
 			}
 			SendGuiStateUpdate();
-			this.BeginInvoke(new MethodInvoker(RefreshAllGrids));
+			BeginInvoke(new MethodInvoker(RefreshAllGrids));
 		}
 
 		public void SwitchMultiFile(bool enabled)
@@ -1888,7 +1888,7 @@ namespace LogExpert
 		{
 			if (other.IsTimeSynced)
 			{
-				if (this.IsTimeSynced)
+				if (IsTimeSynced)
 				{
 					other.FreeFromTimeSync();
 					AddSlaveToTimesync(other);
@@ -1906,30 +1906,30 @@ namespace LogExpert
 
 		public void AddToTimeSync(LogWindow master)
 		{
-			Logger.logInfo("Syncing window for " + Util.GetNameFromPath(this.FileName) + " to " + Util.GetNameFromPath(master.FileName));
-			lock (this._timeSyncListLock)
+			Logger.logInfo("Syncing window for " + Util.GetNameFromPath(FileName) + " to " + Util.GetNameFromPath(master.FileName));
+			lock (_timeSyncListLock)
 			{
-				if (this.IsTimeSynced && master.TimeSyncList != this.TimeSyncList)  // already synced but master has different sync list
+				if (IsTimeSynced && master.TimeSyncList != TimeSyncList)  // already synced but master has different sync list
 				{
 					FreeFromTimeSync();
 				}
-				this.TimeSyncList = master.TimeSyncList;
-				this.TimeSyncList.AddWindow(this);
-				this.ScrollToTimestamp(this.TimeSyncList.CurrentTimestamp, false, false);
+				TimeSyncList = master.TimeSyncList;
+				TimeSyncList.AddWindow(this);
+				ScrollToTimestamp(TimeSyncList.CurrentTimestamp, false, false);
 			}
 			OnSyncModeChanged();
 		}
 
 		public void FreeFromTimeSync()
 		{
-			lock (this._timeSyncListLock)
+			lock (_timeSyncListLock)
 			{
-				if (this.TimeSyncList != null)
+				if (TimeSyncList != null)
 				{
-					Logger.logInfo("De-Syncing window for " + Util.GetNameFromPath(this.FileName));
-					this.TimeSyncList.WindowRemoved -= TimeSyncList_WindowRemoved;
-					this.TimeSyncList.RemoveWindow(this);
-					this.TimeSyncList = null;
+					Logger.logInfo("De-Syncing window for " + Util.GetNameFromPath(FileName));
+					TimeSyncList.WindowRemoved -= TimeSyncList_WindowRemoved;
+					TimeSyncList.RemoveWindow(this);
+					TimeSyncList = null;
 				}
 			}
 			OnSyncModeChanged();
@@ -1939,7 +1939,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._bookmarkProvider;
+				return _bookmarkProvider;
 			}
 		}
 
@@ -1949,11 +1949,11 @@ namespace LogExpert
 
 		private void LogWindow_Disposed(object sender, EventArgs e)
 		{
-			this._waitingForClose = true;
-			this._parentLogTabWin.HighlightSettingsChanged -= Parent_HighlightSettingsChanged;
-			if (this._logFileReader != null)
+			_waitingForClose = true;
+			_parentLogTabWin.HighlightSettingsChanged -= Parent_HighlightSettingsChanged;
+			if (_logFileReader != null)
 			{
-				this._logFileReader.DeleteAllContent();
+				_logFileReader.DeleteAllContent();
 			}
 			FreeFromTimeSync();
 		}
@@ -1962,51 +1962,51 @@ namespace LogExpert
 
 		private void LogFileReader_LoadingStarted(object sender, LoadFileEventArgs e)
 		{
-			this.Invoke(new Action<LoadFileEventArgs>(LoadingStarted), new object[] { e });
+			Invoke(new Action<LoadFileEventArgs>(LoadingStarted), new object[] { e });
 		}
 
 		private void LogFileReader_FinishedLoading(object sender, EventArgs e)
 		{
 			Logger.logInfo("Finished loading.");
-			this._isLoading = false;
-			this._isDeadFile = false;
-			if (!this._waitingForClose)
+			_isLoading = false;
+			_isDeadFile = false;
+			if (!_waitingForClose)
 			{
-				this.Invoke(new MethodInvoker(LoadingFinished));
-				this.Invoke(new MethodInvoker(LoadPersistenceData));
-				this.Invoke(new MethodInvoker(SetGuiAfterLoading));
-				this._loadingFinishedEvent.Set();
-				this._externaLoadingFinishedEvent.Set();
-				this._timeSpreadCalc.SetLineCount(this._logFileReader.LineCount);
+				Invoke(new MethodInvoker(LoadingFinished));
+				Invoke(new MethodInvoker(LoadPersistenceData));
+				Invoke(new MethodInvoker(SetGuiAfterLoading));
+				_loadingFinishedEvent.Set();
+				_externaLoadingFinishedEvent.Set();
+				_timeSpreadCalc.SetLineCount(_logFileReader.LineCount);
 
-				if (this._reloadMemento != null)
+				if (_reloadMemento != null)
 				{
-					this.Invoke(new Action<ReloadMemento>(this.PositionAfterReload), new object[] { this._reloadMemento });
+					Invoke(new Action<ReloadMemento>(PositionAfterReload), new object[] { _reloadMemento });
 				}
-				if (this.filterTailCheckBox.Checked)
+				if (filterTailCheckBox.Checked)
 				{
 					Logger.logInfo("Refreshing filter view because of reload.");
-					this.Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
+					Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
 				}
 
 				HandleChangedFilterList();
 			}
-			this._reloadMemento = null;
+			_reloadMemento = null;
 		}
 
 		private void LogFileReader_FileNotFound(object sender, EventArgs e)
 		{
-			if (!this.IsDisposed && !this.Disposing)
+			if (!IsDisposed && !Disposing)
 			{
 				Logger.logInfo("Handling file not found event.");
-				this._isDeadFile = true;
-				this.BeginInvoke(new MethodInvoker(LogfileDead));
+				_isDeadFile = true;
+				BeginInvoke(new MethodInvoker(LogfileDead));
 			}
 		}
 
 		private void LogFileReader_Respawned(object sender, EventArgs e)
 		{
-			this.BeginInvoke(new MethodInvoker(LogfileRespawned));
+			BeginInvoke(new MethodInvoker(LogfileRespawned));
 		}
 
 		/**
@@ -2019,21 +2019,21 @@ namespace LogExpert
 				Logger.logInfo("File created anew.");
 
 				// File was new created (e.g. rollover)
-				this._isDeadFile = false;
+				_isDeadFile = false;
 				UnRegisterLogFileReaderEvents();
-				this.dataGridView.CurrentCellChanged -= new EventHandler(DataGridView_CurrentCellChanged);
+				dataGridView.CurrentCellChanged -= new EventHandler(DataGridView_CurrentCellChanged);
 				MethodInvoker invoker = new MethodInvoker(ReloadNewFile);
-				this.BeginInvoke(invoker);
+				BeginInvoke(invoker);
 				Logger.logDebug("Reloading invoked.");
 				return;
 			}
 
-			if (!this._isLoading)
+			if (!_isLoading)
 			{
 				return;
 			}
 			Action<LoadFileEventArgs> callback = new Action<LoadFileEventArgs>(UpdateProgress);
-			this.BeginInvoke(callback, new object[] { e });
+			BeginInvoke(callback, new object[] { e });
 		}
 
 		#endregion
@@ -2048,9 +2048,9 @@ namespace LogExpert
 					return;
 				}
 
-				this._statusEventArgs.FileSize = e.ReadPos;
-				this._progressEventArgs.MaxValue = (int)e.FileSize;
-				this._progressEventArgs.Value = (int)e.ReadPos;
+				_statusEventArgs.FileSize = e.ReadPos;
+				_progressEventArgs.MaxValue = (int)e.FileSize;
+				_progressEventArgs.Value = (int)e.ReadPos;
 				SendProgressBarUpdate();
 				SendStatusLineUpdate();
 			}
@@ -2064,11 +2064,11 @@ namespace LogExpert
 		{
 			try
 			{
-				this._statusEventArgs.FileSize = e.ReadPos;
-				this._statusEventArgs.StatusText = "Loading " + Util.GetNameFromPath(e.FileName);
-				this._progressEventArgs.Visible = true;
-				this._progressEventArgs.MaxValue = (int)e.FileSize;
-				this._progressEventArgs.Value = (int)e.ReadPos;
+				_statusEventArgs.FileSize = e.ReadPos;
+				_statusEventArgs.StatusText = "Loading " + Util.GetNameFromPath(e.FileName);
+				_progressEventArgs.Visible = true;
+				_progressEventArgs.MaxValue = (int)e.FileSize;
+				_progressEventArgs.Value = (int)e.ReadPos;
 				SendProgressBarUpdate();
 				SendStatusLineUpdate();
 			}
@@ -2083,7 +2083,7 @@ namespace LogExpert
 		private void DataGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
 		{
 			e.Handled = true;
-			AutoResizeColumns(this.dataGridView);
+			AutoResizeColumns(dataGridView);
 		}
 
 		private void DataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
@@ -2099,16 +2099,16 @@ namespace LogExpert
 
 		private void DataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
 		{
-			if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (!CurrentColumnizer.IsTimeshiftImplemented())
 			{
 				return;
 			}
-			string line = this._logFileReader.GetLogLine(e.RowIndex);
-			int offset = this.CurrentColumnizer.GetTimeOffset();
-			this.CurrentColumnizer.SetTimeOffset(0);
-			this.ColumnizerCallbackObject.LineNum = e.RowIndex;
-			string[] cols = this.CurrentColumnizer.SplitLine(this.ColumnizerCallbackObject, line);
-			this.CurrentColumnizer.SetTimeOffset(offset);
+			string line = _logFileReader.GetLogLine(e.RowIndex);
+			int offset = CurrentColumnizer.GetTimeOffset();
+			CurrentColumnizer.SetTimeOffset(0);
+			ColumnizerCallbackObject.LineNum = e.RowIndex;
+			string[] cols = CurrentColumnizer.SplitLine(ColumnizerCallbackObject, line);
+			CurrentColumnizer.SetTimeOffset(offset);
 			if (cols.Length <= e.ColumnIndex - 2)
 			{
 				return;
@@ -2116,9 +2116,9 @@ namespace LogExpert
 
 			string oldValue = cols[e.ColumnIndex - 2];
 			string newValue = (string)e.Value;
-			this.CurrentColumnizer.PushValue(this.ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
-			this.dataGridView.Refresh();
-			TimeSpan timeSpan = new TimeSpan(this.CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
+			CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
+			dataGridView.Refresh();
+			TimeSpan timeSpan = new TimeSpan(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
 			string span = timeSpan.ToString();
 			int index = span.LastIndexOf('.');
 			if (index > 0)
@@ -2136,16 +2136,16 @@ namespace LogExpert
 
 		private void DataGridView_CurrentCellChanged(object sender, EventArgs e)
 		{
-			if (this.dataGridView.CurrentRow != null)
+			if (dataGridView.CurrentRow != null)
 			{
-				this._statusEventArgs.CurrentLineNum = this.dataGridView.CurrentRow.Index + 1;
+				_statusEventArgs.CurrentLineNum = dataGridView.CurrentRow.Index + 1;
 				SendStatusLineUpdate();
-				if (this.syncFilterCheckBox.Checked)
+				if (syncFilterCheckBox.Checked)
 				{
 					SyncFilterGridPos();
 				}
 
-				if (this.CurrentColumnizer.IsTimeshiftImplemented() && this.Preferences.timestampControl)
+				if (CurrentColumnizer.IsTimeshiftImplemented() && Preferences.timestampControl)
 				{
 					SyncTimestampDisplay();
 				}
@@ -2159,7 +2159,7 @@ namespace LogExpert
 
 		private void DataGridView_Paint(object sender, PaintEventArgs e)
 		{
-			if (this.ShowBookmarkBubbles)
+			if (ShowBookmarkBubbles)
 			{
 				AddBookmarkOverlays();
 			}
@@ -2169,12 +2169,12 @@ namespace LogExpert
 		{
 			if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
 			{
-				if (this.dataGridView.DisplayedRowCount(false) +
-					this.dataGridView.FirstDisplayedScrollingRowIndex >=
-					this.dataGridView.RowCount
+				if (dataGridView.DisplayedRowCount(false) +
+					dataGridView.FirstDisplayedScrollingRowIndex >=
+					dataGridView.RowCount
 				)
 				{
-					if (!this._guiStateArgs.FollowTail)
+					if (!_guiStateArgs.FollowTail)
 					{
 						FollowTailChanged(true, false);
 					}
@@ -2182,7 +2182,7 @@ namespace LogExpert
 				}
 				else
 				{
-					if (this._guiStateArgs.FollowTail)
+					if (_guiStateArgs.FollowTail)
 					{
 						FollowTailChanged(false, false);
 					}
@@ -2195,14 +2195,14 @@ namespace LogExpert
 		{
 			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
 			{
-				this.filterGridView.Focus();
+				filterGridView.Focus();
 				e.Handled = true;
 			}
 			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.Control)
 			{
-				//this.parentLogTabWin.SwitchTab(e.Shift);
+				//parentLogTabWin.SwitchTab(e.Shift);
 			}
-			this._shouldCallTimeSync = true;
+			_shouldCallTimeSync = true;
 		}
 
 		private void DataGridView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -2215,23 +2215,23 @@ namespace LogExpert
 
 		private void DataGridView_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
 		{
-			if (this.dataGridView.CurrentCell != null)
+			if (dataGridView.CurrentCell != null)
 			{
-				this.dataGridView.BeginEdit(false);
+				dataGridView.BeginEdit(false);
 			}
 		}
 
 		private void DataGridView_InvalidateCurrentRow(object sender, EventArgs e)
 		{
-			InvalidateCurrentRow(this.dataGridView);
+			InvalidateCurrentRow(dataGridView);
 		}
 
 		private void DataGridView_Resize(object sender, EventArgs e)
 		{
-			if (this._logFileReader != null && this.dataGridView.RowCount > 0 &&
-				this._guiStateArgs.FollowTail)
+			if (_logFileReader != null && dataGridView.RowCount > 0 &&
+				_guiStateArgs.FollowTail)
 			{
-				this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.RowCount - 1;
+				dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
 			}
 		}
 
@@ -2242,20 +2242,20 @@ namespace LogExpert
 
 		private void DataGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
 		{
-			if (e.RowIndex > 0 && e.RowIndex < this.dataGridView.RowCount &&
-				!this.dataGridView.Rows[e.RowIndex].Selected)
+			if (e.RowIndex > 0 && e.RowIndex < dataGridView.RowCount &&
+				!dataGridView.Rows[e.RowIndex].Selected)
 			{
 				SelectLine(e.RowIndex, false);
 			}
-			if (e.ContextMenuStrip == this.columnContextMenuStrip)
+			if (e.ContextMenuStrip == columnContextMenuStrip)
 			{
-				this._selectedCol = e.ColumnIndex;
+				_selectedCol = e.ColumnIndex;
 			}
 		}
 
 		private void DataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
-			this._shouldCallTimeSync = true;
+			_shouldCallTimeSync = true;
 		}
 
 		private void DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -2277,14 +2277,14 @@ namespace LogExpert
 
 		private void FilterGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
-			if (e.RowIndex < 0 || e.ColumnIndex < 0 || this._filterResultList.Count <= e.RowIndex)
+			if (e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
 			{
 				e.Handled = false;
 				return;
 			}
 
-			int lineNum = this._filterResultList[e.RowIndex];
-			string line = this._logFileReader.GetLogLineWithWait(lineNum);
+			int lineNum = _filterResultList[e.RowIndex];
+			string line = _logFileReader.GetLogLineWithWait(lineNum);
 
 			if (line != null)
 			{
@@ -2297,26 +2297,26 @@ namespace LogExpert
 
 		private void FilterGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
 		{
-			if (e.RowIndex < 0 || e.ColumnIndex < 0 || this._filterResultList.Count <= e.RowIndex)
+			if (e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
 			{
 				e.Value = "";
 				return;
 			}
 
-			int lineNum = this._filterResultList[e.RowIndex];
+			int lineNum = _filterResultList[e.RowIndex];
 			e.Value = GetCellValue(lineNum, e.ColumnIndex);
 		}
 
 		private void FilterGridView_RowHeightInfoNeeded(object sender, DataGridViewRowHeightInfoNeededEventArgs e)
 		{
-			e.Height = this._lineHeight;
+			e.Height = _lineHeight;
 		}
 
 		private void FilterGridView_ColumnDividerDoubleClick(object sender, DataGridViewColumnDividerDoubleClickEventArgs e)
 		{
 			e.Handled = true;
 			Action<DataGridView> fx = AutoResizeColumns;
-			this.BeginInvoke(fx, new object[] { this.filterGridView });
+			BeginInvoke(fx, new object[] { filterGridView });
 		}
 
 		private void FilterGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -2327,9 +2327,9 @@ namespace LogExpert
 				return;
 			}
 
-			if (this.filterGridView.CurrentRow != null && e.RowIndex >= 0)
+			if (filterGridView.CurrentRow != null && e.RowIndex >= 0)
 			{
-				int lineNum = this._filterResultList[this.filterGridView.CurrentRow.Index];
+				int lineNum = _filterResultList[filterGridView.CurrentRow.Index];
 				SelectAndEnsureVisible(lineNum, true);
 			}
 		}
@@ -2338,30 +2338,30 @@ namespace LogExpert
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				if (this.filterGridView.CurrentCellAddress.Y >= 0 && this.filterGridView.CurrentCellAddress.Y < this._filterResultList.Count)
+				if (filterGridView.CurrentCellAddress.Y >= 0 && filterGridView.CurrentCellAddress.Y < _filterResultList.Count)
 				{
-					int lineNum = this._filterResultList[this.filterGridView.CurrentCellAddress.Y];
+					int lineNum = _filterResultList[filterGridView.CurrentCellAddress.Y];
 					SelectLine(lineNum, false);
 					e.Handled = true;
 				}
 			}
 			if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
 			{
-				this.dataGridView.Focus();
+				dataGridView.Focus();
 				e.Handled = true;
 			}
 		}
 
 		private void FilterGridView_InvalidateCurrentRow(object sender, EventArgs e)
 		{
-			InvalidateCurrentRow(this.filterGridView);
+			InvalidateCurrentRow(filterGridView);
 		}
 
 		private void FilterGridView_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
 		{
-			if (e.ContextMenuStrip == this.columnContextMenuStrip)
+			if (e.ContextMenuStrip == columnContextMenuStrip)
 			{
-				this._selectedCol = e.ColumnIndex;
+				_selectedCol = e.ColumnIndex;
 			}
 		}
 
@@ -2401,13 +2401,13 @@ namespace LogExpert
 
 		private void RangeCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			this.filterRangeComboBox.Enabled = this.rangeCheckBox.Checked;
+			filterRangeComboBox.Enabled = rangeCheckBox.Checked;
 			CheckForFilterDirty();
 		}
 
 		private void SyncFilterCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			if (this.syncFilterCheckBox.Checked)
+			if (syncFilterCheckBox.Checked)
 			{
 				SyncFilterGridPos();
 			}
@@ -2416,14 +2416,14 @@ namespace LogExpert
 		private void SelectionChangedTrigger_Signal(object sender, EventArgs e)
 		{
 			Logger.logDebug("Selection changed trigger");
-			int selCount = this.dataGridView.SelectedRows.Count;
+			int selCount = dataGridView.SelectedRows.Count;
 			if (selCount > 1)
 			{
 				StatusLineText(selCount + " selected lines");
 			}
 			else
 			{
-				if (this.IsMultiFile)
+				if (IsMultiFile)
 				{
 					MethodInvoker invoker = new MethodInvoker(DisplayCurrentFileOnStatusline);
 					invoker.BeginInvoke(null, null);
@@ -2449,13 +2449,13 @@ namespace LogExpert
 		{
 			if (sender.GetType() == typeof(FilterPipe))
 			{
-				lock (this._filterPipeList)
+				lock (_filterPipeList)
 				{
-					this._filterPipeList.Remove((FilterPipe)sender);
-					if (this._filterPipeList.Count == 0)
+					_filterPipeList.Remove((FilterPipe)sender);
+					if (_filterPipeList.Count == 0)
 					{
 						// reset naming counter to 0 if no more open filter tabs for this source window
-						this._filterPipeNameCounter = 0;
+						_filterPipeNameCounter = 0;
 					}
 				}
 			}
@@ -2463,30 +2463,30 @@ namespace LogExpert
 
 		private void AdvancedButton_Click(object sender, EventArgs e)
 		{
-			this._showAdvanced = !this._showAdvanced;
-			ShowAdvancedFilterPanel(this._showAdvanced);
+			_showAdvanced = !_showAdvanced;
+			ShowAdvancedFilterPanel(_showAdvanced);
 		}
 
 		private void SetTimestampLimits()
 		{
-			if (!this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (!CurrentColumnizer.IsTimeshiftImplemented())
 			{
 				return;
 			}
 
 			int line = 0;
-			this._guiStateArgs.MinTimestamp = GetTimestampForLineForward(ref line, true);
-			line = this.dataGridView.RowCount - 1;
-			this._guiStateArgs.MaxTimestamp = GetTimestampForLine(ref line, true);
+			_guiStateArgs.MinTimestamp = GetTimestampForLineForward(ref line, true);
+			line = dataGridView.RowCount - 1;
+			_guiStateArgs.MaxTimestamp = GetTimestampForLine(ref line, true);
 			SendGuiStateUpdate();
 		}
 
 		private void DataGridContextMenuStrip_Opening(object sender, CancelEventArgs e)
 		{
 			int lineNum = -1;
-			if (this.dataGridView.CurrentRow != null)
+			if (dataGridView.CurrentRow != null)
 			{
-				lineNum = this.dataGridView.CurrentRow.Index;
+				lineNum = dataGridView.CurrentRow.Index;
 			}
 			if (lineNum == -1)
 			{
@@ -2494,21 +2494,21 @@ namespace LogExpert
 			}
 			int refLineNum = lineNum;
 
-			this.copyToTabToolStripMenuItem.Enabled = this.dataGridView.SelectedCells.Count > 0;
-			this.scrollAllTabsToTimestampToolStripMenuItem.Enabled = this.CurrentColumnizer.IsTimeshiftImplemented() &&
+			copyToTabToolStripMenuItem.Enabled = dataGridView.SelectedCells.Count > 0;
+			scrollAllTabsToTimestampToolStripMenuItem.Enabled = CurrentColumnizer.IsTimeshiftImplemented() &&
 																	 GetTimestampForLine(ref refLineNum, false) != DateTime.MinValue;
-			this.locateLineInOriginalFileToolStripMenuItem.Enabled = this.IsTempFile &&
-																	 this.FilterPipe != null &&
-																	 this.FilterPipe.GetOriginalLineNum(lineNum) != -1;
-			this.markEditModeToolStripMenuItem.Enabled = !this.dataGridView.CurrentCell.ReadOnly;
+			locateLineInOriginalFileToolStripMenuItem.Enabled = IsTempFile &&
+																	 FilterPipe != null &&
+																	 FilterPipe.GetOriginalLineNum(lineNum) != -1;
+			markEditModeToolStripMenuItem.Enabled = !dataGridView.CurrentCell.ReadOnly;
 
 			// Remove all "old" plugin entries
-			int index = this.dataGridContextMenuStrip.Items.IndexOf(this.pluginSeparator);
+			int index = dataGridContextMenuStrip.Items.IndexOf(pluginSeparator);
 			if (index > 0)
 			{
-				for (int i = index + 1; i < this.dataGridContextMenuStrip.Items.Count; )
+				for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count; )
 				{
-					this.dataGridContextMenuStrip.Items.RemoveAt(i);
+					dataGridContextMenuStrip.Items.RemoveAt(i);
 				}
 			}
 
@@ -2520,9 +2520,9 @@ namespace LogExpert
 				foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
 				{
 					LogExpertCallback callback = new LogExpertCallback(this);
-					ContextMenuPluginEventArgs evArgs = new ContextMenuPluginEventArgs(entry, lines, this.CurrentColumnizer, callback);
+					ContextMenuPluginEventArgs evArgs = new ContextMenuPluginEventArgs(entry, lines, CurrentColumnizer, callback);
 					EventHandler ev = new EventHandler(HandlePluginContextMenu);
-					string menuText = entry.GetMenuText(lines, this.CurrentColumnizer, callback);
+					string menuText = entry.GetMenuText(lines, CurrentColumnizer, callback);
 					if (menuText != null)
 					{
 						bool disabled = menuText.StartsWith("_");
@@ -2530,34 +2530,34 @@ namespace LogExpert
 						{
 							menuText = menuText.Substring(1);
 						}
-						ToolStripItem item = this.dataGridContextMenuStrip.Items.Add(menuText, null, ev);
+						ToolStripItem item = dataGridContextMenuStrip.Items.Add(menuText, null, ev);
 						item.Tag = evArgs;
 						item.Enabled = !disabled;
 						isAdded = true;
 					}
 				}
 			}
-			this.pluginSeparator.Visible = isAdded;
+			pluginSeparator.Visible = isAdded;
 
 			// enable/disable Temp Highlight item
-			this.tempHighlightsToolStripMenuItem.Enabled = this._tempHilightEntryList.Count > 0;
+			tempHighlightsToolStripMenuItem.Enabled = _tempHilightEntryList.Count > 0;
 
-			this.markCurrentFilterRangeToolStripMenuItem.Enabled = this.filterRangeComboBox.Text != null && this.filterRangeComboBox.Text.Length > 0;
+			markCurrentFilterRangeToolStripMenuItem.Enabled = filterRangeComboBox.Text != null && filterRangeComboBox.Text.Length > 0;
 
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				IList<WindowFileEntry> list = this._parentLogTabWin.GetListOfOpenFiles();
-				this.syncTimestampsToToolStripMenuItem.Enabled = true;
-				this.syncTimestampsToToolStripMenuItem.DropDownItems.Clear();
+				IList<WindowFileEntry> list = _parentLogTabWin.GetListOfOpenFiles();
+				syncTimestampsToToolStripMenuItem.Enabled = true;
+				syncTimestampsToToolStripMenuItem.DropDownItems.Clear();
 				EventHandler ev = new EventHandler(HandleSyncContextMenu);
-				Font italicFont = new Font(syncTimestampsToToolStripMenuItem.Font.FontFamily, this.syncTimestampsToToolStripMenuItem.Font.Size, FontStyle.Italic);
+				Font italicFont = new Font(syncTimestampsToToolStripMenuItem.Font.FontFamily, syncTimestampsToToolStripMenuItem.Font.Size, FontStyle.Italic);
 				foreach (WindowFileEntry fileEntry in list)
 				{
 					if (fileEntry.LogWindow != this)
 					{
-						ToolStripMenuItem item = this.syncTimestampsToToolStripMenuItem.DropDownItems.Add(fileEntry.Title, null, ev) as ToolStripMenuItem;
+						ToolStripMenuItem item = syncTimestampsToToolStripMenuItem.DropDownItems.Add(fileEntry.Title, null, ev) as ToolStripMenuItem;
 						item.Tag = fileEntry;
-						item.Checked = this.TimeSyncList != null && this.TimeSyncList.Contains(fileEntry.LogWindow);
+						item.Checked = TimeSyncList != null && TimeSyncList.Contains(fileEntry.LogWindow);
 						if (fileEntry.LogWindow.TimeSyncList != null && !fileEntry.LogWindow.TimeSyncList.Contains(this))
 						{
 							item.Font = italicFont;
@@ -2569,9 +2569,9 @@ namespace LogExpert
 			}
 			else
 			{
-				this.syncTimestampsToToolStripMenuItem.Enabled = false;
+				syncTimestampsToToolStripMenuItem.Enabled = false;
 			}
-			this.freeThisWindowFromTimeSyncToolStripMenuItem.Enabled = this.TimeSyncList != null && this.TimeSyncList.Count > 1;
+			freeThisWindowFromTimeSyncToolStripMenuItem.Enabled = TimeSyncList != null && TimeSyncList.Count > 1;
 		}
 
 		private void Copy_Click(object sender, EventArgs e)
@@ -2581,10 +2581,10 @@ namespace LogExpert
 
 		private void ScrollAllTabsToTimestampToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				int currentLine = this.dataGridView.CurrentCellAddress.Y;
-				if (currentLine > 0 && currentLine < this.dataGridView.RowCount)
+				int currentLine = dataGridView.CurrentCellAddress.Y;
+				if (currentLine > 0 && currentLine < dataGridView.RowCount)
 				{
 					int lineNum = currentLine;
 					DateTime timeStamp = GetTimestampForLine(ref lineNum, false);
@@ -2592,20 +2592,20 @@ namespace LogExpert
 					{
 						return;
 					}
-					this._parentLogTabWin.ScrollAllTabsToTimestamp(timeStamp, this);
+					_parentLogTabWin.ScrollAllTabsToTimestamp(timeStamp, this);
 				}
 			}
 		}
 
 		private void LocateLineInOriginalFileToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.CurrentRow != null && this.FilterPipe != null)
+			if (dataGridView.CurrentRow != null && FilterPipe != null)
 			{
-				int lineNum = this.FilterPipe.GetOriginalLineNum(this.dataGridView.CurrentRow.Index);
+				int lineNum = FilterPipe.GetOriginalLineNum(dataGridView.CurrentRow.Index);
 				if (lineNum != -1)
 				{
-					this.FilterPipe.LogWindow.SelectLine(lineNum, false);
-					this._parentLogTabWin.SelectTab(this.FilterPipe.LogWindow);
+					FilterPipe.LogWindow.SelectLine(lineNum, false);
+					_parentLogTabWin.SelectTab(FilterPipe.LogWindow);
 				}
 			}
 		}
@@ -2627,79 +2627,79 @@ namespace LogExpert
 
 		private void BookmarkWindow_BookmarkCommentChanged(object sender, EventArgs e)
 		{
-			this.dataGridView.Refresh();
+			dataGridView.Refresh();
 		}
 
 		private void ColumnRestrictCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			this.columnButton.Enabled = this.columnRestrictCheckBox.Checked;
-			if (this.columnRestrictCheckBox.Checked) // disable when nothing to filter
+			columnButton.Enabled = columnRestrictCheckBox.Checked;
+			if (columnRestrictCheckBox.Checked) // disable when nothing to filter
 			{
-				this.columnNamesLabel.Visible = true;
-				this._filterParams.columnRestrict = true;
-				this.columnNamesLabel.Text = CalculateColumnNames(this._filterParams);
+				columnNamesLabel.Visible = true;
+				_filterParams.columnRestrict = true;
+				columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 			}
 			else
 			{
-				this.columnNamesLabel.Visible = false;
+				columnNamesLabel.Visible = false;
 			}
 			CheckForFilterDirty();
 		}
 
 		private void ColumnButton_Click(object sender, EventArgs e)
 		{
-			_filterParams.currentColumnizer = this._currentColumnizer;
-			FilterColumnChooser chooser = new FilterColumnChooser(this._filterParams);
+			_filterParams.currentColumnizer = _currentColumnizer;
+			FilterColumnChooser chooser = new FilterColumnChooser(_filterParams);
 			if (chooser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				columnNamesLabel.Text = CalculateColumnNames(this._filterParams);
+				columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 
-				this.filterSearchButton.Image = this._searchButtonImage;
-				this.saveFilterButton.Enabled = false;
+				filterSearchButton.Image = _searchButtonImage;
+				saveFilterButton.Enabled = false;
 			}
 		}
 
 		private void ColumnContextMenuStrip_Opening(object sender, CancelEventArgs e)
 		{
-			Control ctl = this.columnContextMenuStrip.SourceControl;
+			Control ctl = columnContextMenuStrip.SourceControl;
 			DataGridView gridView = ctl as DataGridView;
 			bool frozen = false;
 			if (_freezeStateMap.ContainsKey(ctl))
 			{
-				frozen = this._freezeStateMap[ctl];
+				frozen = _freezeStateMap[ctl];
 			}
-			this.freezeLeftColumnsUntilHereToolStripMenuItem.Checked = frozen;
+			freezeLeftColumnsUntilHereToolStripMenuItem.Checked = frozen;
 			if (frozen)
 			{
-				this.freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Frozen";
+				freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Frozen";
 			}
 			else
 			{
 				if (ctl is DataGridView)
 				{
-					this.freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Freeze left columns until here (" +
-																			gridView.Columns[this._selectedCol].HeaderText + ")";
+					freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Freeze left columns until here (" +
+																			gridView.Columns[_selectedCol].HeaderText + ")";
 				}
 			}
-			DataGridViewColumn col = gridView.Columns[this._selectedCol];
-			this.moveLeftToolStripMenuItem.Enabled = (col != null && col.DisplayIndex > 0);
-			this.moveRightToolStripMenuItem.Enabled = (col != null && col.DisplayIndex < gridView.Columns.Count - 1);
+			DataGridViewColumn col = gridView.Columns[_selectedCol];
+			moveLeftToolStripMenuItem.Enabled = (col != null && col.DisplayIndex > 0);
+			moveRightToolStripMenuItem.Enabled = (col != null && col.DisplayIndex < gridView.Columns.Count - 1);
 
-			if (gridView.Columns.Count - 1 > this._selectedCol)
+			if (gridView.Columns.Count - 1 > _selectedCol)
 			{
 				DataGridViewColumn colRight = gridView.Columns.GetNextColumn(col, DataGridViewElementStates.None,
 					DataGridViewElementStates.None);
-				this.moveRightToolStripMenuItem.Enabled = (colRight != null && colRight.Frozen == col.Frozen);
+				moveRightToolStripMenuItem.Enabled = (colRight != null && colRight.Frozen == col.Frozen);
 			}
-			if (this._selectedCol > 0)
+			if (_selectedCol > 0)
 			{
 				DataGridViewColumn colLeft = gridView.Columns.GetPreviousColumn(col, DataGridViewElementStates.None,
 					DataGridViewElementStates.None);
 
-				this.moveLeftToolStripMenuItem.Enabled = (colLeft != null && colLeft.Frozen == col.Frozen);
+				moveLeftToolStripMenuItem.Enabled = (colLeft != null && colLeft.Frozen == col.Frozen);
 			}
 			DataGridViewColumn colLast = gridView.Columns[gridView.Columns.Count - 1];
-			this.moveToLastColumnToolStripMenuItem.Enabled = (colLast != null && colLast.Frozen == col.Frozen);
+			moveToLastColumnToolStripMenuItem.Enabled = (colLast != null && colLast.Frozen == col.Frozen);
 
 			// Fill context menu with column names 
 			//
@@ -2718,14 +2718,14 @@ namespace LogExpert
 
 		private void FreezeLeftColumnsUntilHereToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Control ctl = this.columnContextMenuStrip.SourceControl;
+			Control ctl = columnContextMenuStrip.SourceControl;
 			bool frozen = false;
 			if (_freezeStateMap.ContainsKey(ctl))
 			{
-				frozen = this._freezeStateMap[ctl];
+				frozen = _freezeStateMap[ctl];
 			}
 			frozen = !frozen;
-			this._freezeStateMap[ctl] = frozen;
+			_freezeStateMap[ctl] = frozen;
 
 			if (ctl is DataGridView)
 			{
@@ -2736,8 +2736,8 @@ namespace LogExpert
 
 		private void MoveToLastColumnToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
-			DataGridViewColumn col = gridView.Columns[this._selectedCol];
+			DataGridView gridView = columnContextMenuStrip.SourceControl as DataGridView;
+			DataGridViewColumn col = gridView.Columns[_selectedCol];
 			if (col != null)
 			{
 				col.DisplayIndex = gridView.Columns.Count - 1;
@@ -2746,8 +2746,8 @@ namespace LogExpert
 
 		private void MoveLeftToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
-			DataGridViewColumn col = gridView.Columns[this._selectedCol];
+			DataGridView gridView = columnContextMenuStrip.SourceControl as DataGridView;
+			DataGridViewColumn col = gridView.Columns[_selectedCol];
 			if (col != null && col.DisplayIndex > 0)
 			{
 				col.DisplayIndex = col.DisplayIndex - 1;
@@ -2756,8 +2756,8 @@ namespace LogExpert
 
 		private void MoveRightToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
-			DataGridViewColumn col = gridView.Columns[this._selectedCol];
+			DataGridView gridView = columnContextMenuStrip.SourceControl as DataGridView;
+			DataGridViewColumn col = gridView.Columns[_selectedCol];
 			if (col != null && col.DisplayIndex < gridView.Columns.Count - 1)
 			{
 				col.DisplayIndex = col.DisplayIndex + 1;
@@ -2766,14 +2766,14 @@ namespace LogExpert
 
 		private void HideColumnToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
-			DataGridViewColumn col = gridView.Columns[this._selectedCol];
+			DataGridView gridView = columnContextMenuStrip.SourceControl as DataGridView;
+			DataGridViewColumn col = gridView.Columns[_selectedCol];
 			col.Visible = false;
 		}
 
 		private void RestoreColumnsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			DataGridView gridView = this.columnContextMenuStrip.SourceControl as DataGridView;
+			DataGridView gridView = columnContextMenuStrip.SourceControl as DataGridView;
 			foreach (DataGridViewColumn col in gridView.Columns)
 			{
 				col.Visible = true;
@@ -2787,21 +2787,21 @@ namespace LogExpert
 
 		private void SplitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
 		{
-			this.advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
+			advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
 		}
 
 		private void MarkFilterHitsInLogViewToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SearchParams p = new SearchParams();
-			p.searchText = this._filterParams.searchText;
-			p.isRegex = this._filterParams.isRegex;
-			p.isCaseSensitive = this._filterParams.isCaseSensitive;
+			p.searchText = _filterParams.searchText;
+			p.isRegex = _filterParams.isRegex;
+			p.isCaseSensitive = _filterParams.isCaseSensitive;
 			AddSearchHitHighlightEntry(p);
 		}
 
 		private void StatusLineTrigger_Signal(object sender, EventArgs e)
 		{
-			OnStatusLine(this._statusEventArgs);
+			OnStatusLine(_statusEventArgs);
 		}
 
 		private void ColumnComboBox_SelectionChangeCommitted(object sender, EventArgs e)
@@ -2814,7 +2814,7 @@ namespace LogExpert
 			if (e.KeyCode == Keys.Enter)
 			{
 				SelectColumn();
-				this.dataGridView.Focus();
+				dataGridView.Focus();
 			}
 		}
 
@@ -2822,7 +2822,7 @@ namespace LogExpert
 		{
 			if (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt)
 			{
-				this.columnComboBox.DroppedDown = true;
+				columnComboBox.DroppedDown = true;
 			}
 			if (e.KeyCode == Keys.Enter)
 			{
@@ -2832,19 +2832,19 @@ namespace LogExpert
 
 		private void BookmarkProvider_BookmarkRemoved(object sender, EventArgs e)
 		{
-			if (!this._isLoading)
+			if (!_isLoading)
 			{
-				this.dataGridView.Refresh();
-				this.filterGridView.Refresh();
+				dataGridView.Refresh();
+				filterGridView.Refresh();
 			}
 		}
 
 		private void BookmarkProvider_BookmarkAdded(object sender, EventArgs e)
 		{
-			if (!this._isLoading)
+			if (!_isLoading)
 			{
-				this.dataGridView.Refresh();
-				this.filterGridView.Refresh();
+				dataGridView.Refresh();
+				filterGridView.Refresh();
 			}
 		}
 
@@ -2855,28 +2855,28 @@ namespace LogExpert
 
 		private void HighlightSelectionInLogFileToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
+			if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
 				DataGridViewTextBoxEditingControl ctl =
-					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+					dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
 				HilightEntry he = new HilightEntry(ctl.SelectedText, Color.Red, Color.Yellow,
 					false, true, false, false, false, false, null, false);
-				lock (this._tempHilightEntryListLock)
+				lock (_tempHilightEntryListLock)
 				{
-					this._tempHilightEntryList.Add(he);
+					_tempHilightEntryList.Add(he);
 				}
-				this.dataGridView.CancelEdit();
-				this.dataGridView.EndEdit();
+				dataGridView.CancelEdit();
+				dataGridView.EndEdit();
 				RefreshAllGrids();
 			}
 		}
 
 		private void CopyToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
+			if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
 				DataGridViewTextBoxEditingControl ctl =
-					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+					dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
 				if (!string.IsNullOrEmpty(ctl.SelectedText))
 				{
 					Clipboard.SetText(ctl.SelectedText);
@@ -2891,11 +2891,11 @@ namespace LogExpert
 
 		private void MakePermanentToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			lock (this._tempHilightEntryListLock)
+			lock (_tempHilightEntryListLock)
 			{
-				lock (this._currentHighlightGroupLock)
+				lock (_currentHighlightGroupLock)
 				{
-					this._currentHighlightGroup.HilightEntryList.AddRange(this._tempHilightEntryList);
+					_currentHighlightGroup.HilightEntryList.AddRange(_tempHilightEntryList);
 					RemoveTempHighlights();
 					OnCurrentHighlightListChanged();
 				}
@@ -2909,11 +2909,11 @@ namespace LogExpert
 
 		private void FilterForSelectionToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
+			if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
 				DataGridViewTextBoxEditingControl ctl =
-					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
-				this.splitContainer1.Panel2Collapsed = false;
+					dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+				splitContainer1.Panel2Collapsed = false;
 				ResetFilterControls();
 				FilterSearch(ctl.SelectedText);
 			}
@@ -2921,10 +2921,10 @@ namespace LogExpert
 
 		private void SetSelectedTextAsBookmarkCommentToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (this.dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
+			if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
 				DataGridViewTextBoxEditingControl ctl =
-					this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+					dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
 				AddBookmarkComment(ctl.SelectedText);
 			}
 		}
@@ -2935,13 +2935,13 @@ namespace LogExpert
 			{
 				RegexHelperDialog dlg = new RegexHelperDialog();
 				dlg.Owner = this;
-				dlg.CaseSensitive = this.filterCaseSensitiveCheckBox.Checked;
-				dlg.Pattern = this.filterComboBox.Text;
+				dlg.CaseSensitive = filterCaseSensitiveCheckBox.Checked;
+				dlg.Pattern = filterComboBox.Text;
 				DialogResult res = dlg.ShowDialog();
 				if (res == DialogResult.OK)
 				{
-					this.filterCaseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-					this.filterComboBox.Text = dlg.Pattern;
+					filterCaseSensitiveCheckBox.Checked = dlg.CaseSensitive;
+					filterComboBox.Text = dlg.Pattern;
 				}
 			}
 		}
@@ -2955,7 +2955,7 @@ namespace LogExpert
 		/// <param name="e"></param>
 		private void HighlightThread_HighlightDoneEvent(object sender, HighlightEventArgs e)
 		{
-			this.BeginInvoke(new Action<HighlightEventArgs>(HighlightDoneEventWorker), new object[] { e });
+			BeginInvoke(new Action<HighlightEventArgs>(HighlightDoneEventWorker), new object[] { e });
 		}
 
 		/// <summary>
@@ -2964,24 +2964,24 @@ namespace LogExpert
 		/// <param name="e">The <see cref="LogExpert.HighlightEventArgs"/> instance containing the event data.</param>
 		private void HighlightDoneEventWorker(HighlightEventArgs e)
 		{
-			if (this.dataGridView.FirstDisplayedScrollingRowIndex > e.StartLine &&
-				this.dataGridView.FirstDisplayedScrollingRowIndex < e.StartLine + e.Count ||
-				this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(true) >
+			if (dataGridView.FirstDisplayedScrollingRowIndex > e.StartLine &&
+				dataGridView.FirstDisplayedScrollingRowIndex < e.StartLine + e.Count ||
+				dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(true) >
 				e.StartLine &&
-				this.dataGridView.FirstDisplayedScrollingRowIndex + this.dataGridView.DisplayedRowCount(true) < e.StartLine + e.Count)
+				dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(true) < e.StartLine + e.Count)
 			{
-				this.BeginInvoke(new MethodInvoker(this.RefreshAllGrids));
+				BeginInvoke(new MethodInvoker(RefreshAllGrids));
 			}
 		}
 
 		private void ToggleHighlightPanelButton_Click(object sender, EventArgs e)
 		{
-			ToggleHighlightPanel(this.highlightSplitContainer.Panel2Collapsed);
+			ToggleHighlightPanel(highlightSplitContainer.Panel2Collapsed);
 		}
 
 		private void SaveFilterButton_Click(object sender, EventArgs e)
 		{
-			FilterParams newParams = this._filterParams.CreateCopy();
+			FilterParams newParams = _filterParams.CreateCopy();
 			newParams.color = Color.FromKnownColor(KnownColor.Black);
 			ConfigManager.Settings.filterList.Add(newParams);
 			OnFilterListChanged(this);
@@ -2989,66 +2989,66 @@ namespace LogExpert
 
 		private void DeleteFilterButton_Click(object sender, EventArgs e)
 		{
-			int index = this.filterListBox.SelectedIndex;
+			int index = filterListBox.SelectedIndex;
 			if (index >= 0)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[index];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[index];
 				ConfigManager.Settings.filterList.Remove(filterParams);
 				OnFilterListChanged(this);
-				if (this.filterListBox.Items.Count > 0)
+				if (filterListBox.Items.Count > 0)
 				{
-					this.filterListBox.SelectedIndex = this.filterListBox.Items.Count - 1;
+					filterListBox.SelectedIndex = filterListBox.Items.Count - 1;
 				}
 			}
 		}
 
 		private void FilterUpButton_Click(object sender, EventArgs e)
 		{
-			int i = this.filterListBox.SelectedIndex;
+			int i = filterListBox.SelectedIndex;
 			if (i > 0)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
 				ConfigManager.Settings.filterList.RemoveAt(i);
 				i--;
 				ConfigManager.Settings.filterList.Insert(i, filterParams);
 				OnFilterListChanged(this);
-				this.filterListBox.SelectedIndex = i;
+				filterListBox.SelectedIndex = i;
 			}
 		}
 
 		private void FilterDownButton_Click(object sender, EventArgs e)
 		{
-			int i = this.filterListBox.SelectedIndex;
-			if (i < this.filterListBox.Items.Count - 1)
+			int i = filterListBox.SelectedIndex;
+			if (i < filterListBox.Items.Count - 1)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
 				ConfigManager.Settings.filterList.RemoveAt(i);
 				i++;
 				ConfigManager.Settings.filterList.Insert(i, filterParams);
 				OnFilterListChanged(this);
-				this.filterListBox.SelectedIndex = i;
+				filterListBox.SelectedIndex = i;
 			}
 		}
 
 		private void FilterListBox_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			if (this.filterListBox.SelectedIndex >= 0)
+			if (filterListBox.SelectedIndex >= 0)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[this.filterListBox.SelectedIndex];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[filterListBox.SelectedIndex];
 				FilterParams newParams = filterParams.CreateCopy();
 				//newParams.historyList = ConfigManager.Settings.filterHistoryList;
-				this._filterParams = newParams;
-				ReInitFilterParams(this._filterParams);
+				_filterParams = newParams;
+				ReInitFilterParams(_filterParams);
 				ApplyFilterParams();
 				CheckForAdvancedButtonDirty();
 				CheckForFilterDirty();
-				this.filterSearchButton.Image = this._searchButtonImage;
-				this.saveFilterButton.Enabled = false;
-				if (this.hideFilterListOnLoadCheckBox.Checked)
+				filterSearchButton.Image = _searchButtonImage;
+				saveFilterButton.Enabled = false;
+				if (hideFilterListOnLoadCheckBox.Checked)
 				{
 					ToggleHighlightPanel(false);
 				}
-				if (this.filterOnLoadCheckBox.Checked)
+				if (filterOnLoadCheckBox.Checked)
 				{
 					FilterSearch();
 				}
@@ -3060,10 +3060,10 @@ namespace LogExpert
 			e.DrawBackground();
 			if (e.Index >= 0)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[e.Index];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[e.Index];
 				Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
-				Brush brush = ((e.State & DrawItemState.Selected) == DrawItemState.Selected) ? new SolidBrush(this.filterListBox.BackColor) : new SolidBrush(filterParams.color);
+				Brush brush = ((e.State & DrawItemState.Selected) == DrawItemState.Selected) ? new SolidBrush(filterListBox.BackColor) : new SolidBrush(filterParams.color);
 
 				e.Graphics.DrawString(filterParams.searchText, e.Font, brush,
 					new PointF(rectangle.Left, rectangle.Top));
@@ -3075,10 +3075,10 @@ namespace LogExpert
 		// Color for filter list entry
 		private void ColorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			int i = this.filterListBox.SelectedIndex;
-			if (i < this.filterListBox.Items.Count && i >= 0)
+			int i = filterListBox.SelectedIndex;
+			if (i < filterListBox.Items.Count && i >= 0)
 			{
-				FilterParams filterParams = (FilterParams)this.filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
 				ColorDialog dlg = new ColorDialog();
 				dlg.CustomColors = new int[] { filterParams.color.ToArgb() };
 				dlg.Color = filterParams.color;
@@ -3097,8 +3097,8 @@ namespace LogExpert
 
 		private void FilterRegexCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			this.fuzzyKnobControl.Enabled = !this.filterRegexCheckBox.Checked;
-			this.fuzzyLabel.Enabled = !this.filterRegexCheckBox.Checked;
+			fuzzyKnobControl.Enabled = !filterRegexCheckBox.Checked;
+			fuzzyLabel.Enabled = !filterRegexCheckBox.Checked;
 			CheckForFilterDirty();
 		}
 
@@ -3109,7 +3109,7 @@ namespace LogExpert
 
 		private void Parent_HighlightSettingsChanged(object sender, EventArgs e)
 		{
-			string groupName = this._guiStateArgs.HighlightGroupName;
+			string groupName = _guiStateArgs.HighlightGroupName;
 			SetCurrentHighlightGroup(groupName);
 		}
 
@@ -3136,13 +3136,13 @@ namespace LogExpert
 		private void TimeSyncList_WindowRemoved(object sender, EventArgs e)
 		{
 			TimeSyncList syncList = sender as TimeSyncList;
-			lock (this._timeSyncListLock)
+			lock (_timeSyncListLock)
 			{
 				if (syncList.Count == 0 || syncList.Count == 1 && syncList.Contains(this))
 				{
-					if (syncList == this.TimeSyncList)
+					if (syncList == TimeSyncList)
 					{
-						this.TimeSyncList = null;
+						TimeSyncList = null;
 						OnSyncModeChanged();
 					}
 				}
@@ -3174,7 +3174,7 @@ namespace LogExpert
 			{
 				WindowFileEntry entry = (sender as ToolStripItem).Tag as WindowFileEntry;
 
-				if (this.TimeSyncList != null && this.TimeSyncList.Contains(entry.LogWindow))
+				if (TimeSyncList != null && TimeSyncList.Contains(entry.LogWindow))
 				{
 					FreeSlaveFromTimesync(entry.LogWindow);
 				}
@@ -3201,35 +3201,35 @@ namespace LogExpert
 
 		private void RegisterLogFileReaderEvents()
 		{
-			this._logFileReader.LoadFile += LogFileReader_LoadFile;
-			this._logFileReader.LoadingFinished += LogFileReader_FinishedLoading;
-			this._logFileReader.LoadingStarted += LogFileReader_LoadingStarted;
-			this._logFileReader.FileNotFound += LogFileReader_FileNotFound;
-			this._logFileReader.Respawned += LogFileReader_Respawned;
+			_logFileReader.LoadFile += LogFileReader_LoadFile;
+			_logFileReader.LoadingFinished += LogFileReader_FinishedLoading;
+			_logFileReader.LoadingStarted += LogFileReader_LoadingStarted;
+			_logFileReader.FileNotFound += LogFileReader_FileNotFound;
+			_logFileReader.Respawned += LogFileReader_Respawned;
 			// FileSizeChanged is not registered here because it's registered after loading has finished
 		}
 
 		private void UnRegisterLogFileReaderEvents()
 		{
-			if (this._logFileReader != null)
+			if (_logFileReader != null)
 			{
-				this._logFileReader.LoadFile -= LogFileReader_LoadFile;
-				this._logFileReader.LoadingFinished -= LogFileReader_FinishedLoading;
-				this._logFileReader.LoadingStarted -= LogFileReader_LoadingStarted;
-				this._logFileReader.FileNotFound -= LogFileReader_FileNotFound;
-				this._logFileReader.Respawned -= LogFileReader_Respawned;
-				this._logFileReader.FileSizeChanged -= this.FileSizeChangedHandler;
+				_logFileReader.LoadFile -= LogFileReader_LoadFile;
+				_logFileReader.LoadingFinished -= LogFileReader_FinishedLoading;
+				_logFileReader.LoadingStarted -= LogFileReader_LoadingStarted;
+				_logFileReader.FileNotFound -= LogFileReader_FileNotFound;
+				_logFileReader.Respawned -= LogFileReader_Respawned;
+				_logFileReader.FileSizeChanged -= FileSizeChangedHandler;
 			}
 		}
 
 		private bool LoadPersistenceOptions()
 		{
-			if (this.InvokeRequired)
+			if (InvokeRequired)
 			{
-				return (bool)this.Invoke(new Func<bool>(LoadPersistenceOptions));
+				return (bool)Invoke(new Func<bool>(LoadPersistenceOptions));
 			}
 
-			if (!this.Preferences.saveSessions && this.ForcedPersistenceFileName == null)
+			if (!Preferences.saveSessions && ForcedPersistenceFileName == null)
 			{
 				return false;
 			}
@@ -3237,54 +3237,54 @@ namespace LogExpert
 			try
 			{
 				PersistenceData persistenceData;
-				if (this.ForcedPersistenceFileName == null)
+				if (ForcedPersistenceFileName == null)
 				{
-					persistenceData = Persister.LoadPersistenceDataOptionsOnly(this.FileName, this.Preferences);
+					persistenceData = Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences);
 				}
 				else
 				{
-					persistenceData = Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(this.ForcedPersistenceFileName);
+					persistenceData = Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
 				}
 
 				if (persistenceData == null)
 				{
-					Logger.logInfo("No persistence data for " + this.FileName + " found.");
+					Logger.logInfo("No persistence data for " + FileName + " found.");
 					return false;
 				}
 
-				this.IsMultiFile = persistenceData.multiFile;
-				this._multifileOptions = new MultifileOptions();
-				this._multifileOptions.FormatPattern = persistenceData.multiFilePattern;
-				this._multifileOptions.MaxDayTry = persistenceData.multiFileMaxDays;
-				if (this._multifileOptions.FormatPattern == null || this._multifileOptions.FormatPattern.Length == 0)
+				IsMultiFile = persistenceData.multiFile;
+				_multifileOptions = new MultifileOptions();
+				_multifileOptions.FormatPattern = persistenceData.multiFilePattern;
+				_multifileOptions.MaxDayTry = persistenceData.multiFileMaxDays;
+				if (_multifileOptions.FormatPattern == null || _multifileOptions.FormatPattern.Length == 0)
 				{
-					this._multifileOptions = ObjectClone.Clone<MultifileOptions>(this.Preferences.multifileOptions);
+					_multifileOptions = ObjectClone.Clone<MultifileOptions>(Preferences.multifileOptions);
 				}
 
-				this.splitContainer1.SplitterDistance = persistenceData.filterPosition;
-				this.splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
+				splitContainer1.SplitterDistance = persistenceData.filterPosition;
+				splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
 				ToggleHighlightPanel(persistenceData.filterSaveListVisible);
 				ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
 				if (_reloadMemento == null)
 				{
 					PreselectColumnizer(persistenceData.columnizerName);
 				}
-				this.FollowTailChanged(persistenceData.followTail, false);
+				FollowTailChanged(persistenceData.followTail, false);
 				if (persistenceData.tabName != null)
 				{
-					this.Text = persistenceData.tabName;
+					Text = persistenceData.tabName;
 				}
 				AdjustHighlightSplitterWidth();
 				SetCurrentHighlightGroup(persistenceData.highlightGroupName);
 				if (persistenceData.multiFileNames.Count > 0)
 				{
 					Logger.logInfo("Detected MultiFile name list in persistence options");
-					this._fileNames = new string[persistenceData.multiFileNames.Count];
-					persistenceData.multiFileNames.CopyTo(this._fileNames);
+					_fileNames = new string[persistenceData.multiFileNames.Count];
+					persistenceData.multiFileNames.CopyTo(_fileNames);
 				}
 				else
 				{
-					this._fileNames = null;
+					_fileNames = null;
 				}
 				SetExplicitEncoding(persistenceData.encoding);
 				return true;
@@ -3298,21 +3298,21 @@ namespace LogExpert
 
 		private void SetDefaultsFromPrefs()
 		{
-			this.filterTailCheckBox.Checked = this.Preferences.filterTail;
-			this.syncFilterCheckBox.Checked = this.Preferences.filterSync;
-			this.FollowTailChanged(this.Preferences.followTail, false);
-			this._multifileOptions = ObjectClone.Clone<MultifileOptions>(this.Preferences.multifileOptions);
+			filterTailCheckBox.Checked = Preferences.filterTail;
+			syncFilterCheckBox.Checked = Preferences.filterSync;
+			FollowTailChanged(Preferences.followTail, false);
+			_multifileOptions = ObjectClone.Clone<MultifileOptions>(Preferences.multifileOptions);
 		}
 
 		private void LoadPersistenceData()
 		{
-			if (this.InvokeRequired)
+			if (InvokeRequired)
 			{
-				this.Invoke(new MethodInvoker(LoadPersistenceData));
+				Invoke(new MethodInvoker(LoadPersistenceData));
 				return;
 			}
 
-			if (!this.Preferences.saveSessions && !ForcePersistenceLoading && this.ForcedPersistenceFileName == null)
+			if (!Preferences.saveSessions && !ForcePersistenceLoading && ForcedPersistenceFileName == null)
 			{
 				SetDefaultsFromPrefs();
 				return;
@@ -3329,46 +3329,46 @@ namespace LogExpert
 			try
 			{
 				PersistenceData persistenceData;
-				if (this.ForcedPersistenceFileName == null)
+				if (ForcedPersistenceFileName == null)
 				{
-					persistenceData = Persister.LoadPersistenceData(this.FileName, this.Preferences);
+					persistenceData = Persister.LoadPersistenceData(FileName, Preferences);
 				}
 				else
 				{
-					persistenceData = Persister.LoadPersistenceDataFromFixedFile(this.ForcedPersistenceFileName);
+					persistenceData = Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 				}
 
-				if (persistenceData.lineCount > this._logFileReader.LineCount)
+				if (persistenceData.lineCount > _logFileReader.LineCount)
 				{
 					// outdated persistence data (logfile rollover)
-					// MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
-					Logger.logInfo("Persistence data for " + this.FileName + " is outdated. It was discarded.");
+					// MessageBox.Show(this, "Persistence data for " + FileName + " is outdated. It was discarded.", "Log Expert");
+					Logger.logInfo("Persistence data for " + FileName + " is outdated. It was discarded.");
 					LoadPersistenceOptions();
 					return;
 				}
-				this._bookmarkProvider.BookmarkList = persistenceData.bookmarkList;
-				this._rowHeightList = persistenceData.rowHeightList;
+				_bookmarkProvider.BookmarkList = persistenceData.bookmarkList;
+				_rowHeightList = persistenceData.rowHeightList;
 				try
 				{
-					if (persistenceData.currentLine >= 0 && persistenceData.currentLine < this.dataGridView.RowCount)
+					if (persistenceData.currentLine >= 0 && persistenceData.currentLine < dataGridView.RowCount)
 					{
 						SelectLine(persistenceData.currentLine, false);
 					}
 					else
 					{
-						if (this._logFileReader.LineCount > 0)
+						if (_logFileReader.LineCount > 0)
 						{
-							this.dataGridView.FirstDisplayedScrollingRowIndex = this._logFileReader.LineCount - 1;
-							SelectLine(this._logFileReader.LineCount - 1, false);
+							dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
+							SelectLine(_logFileReader.LineCount - 1, false);
 						}
 					}
-					if (persistenceData.firstDisplayedLine >= 0 && persistenceData.firstDisplayedLine < this.dataGridView.RowCount)
+					if (persistenceData.firstDisplayedLine >= 0 && persistenceData.firstDisplayedLine < dataGridView.RowCount)
 					{
-						this.dataGridView.FirstDisplayedScrollingRowIndex = persistenceData.firstDisplayedLine;
+						dataGridView.FirstDisplayedScrollingRowIndex = persistenceData.firstDisplayedLine;
 					}
 					if (persistenceData.followTail)
 					{
-						this.FollowTailChanged(persistenceData.followTail, false);
+						FollowTailChanged(persistenceData.followTail, false);
 					}
 				}
 				catch (ArgumentOutOfRangeException)
@@ -3376,7 +3376,7 @@ namespace LogExpert
 					// FirstDisplayedScrollingRowIndex errechnet manchmal falsche Scroll-Ranges???
 				}
 
-				if (this.Preferences.saveFilters)
+				if (Preferences.saveFilters)
 				{
 					RestoreFilters(persistenceData);
 				}
@@ -3392,22 +3392,22 @@ namespace LogExpert
 		{
 			if (persistenceData.filterParamsList.Count > 0)
 			{
-				this._filterParams = persistenceData.filterParamsList[0];
-				ReInitFilterParams(this._filterParams);
+				_filterParams = persistenceData.filterParamsList[0];
+				ReInitFilterParams(_filterParams);
 			}
 			ApplyFilterParams();  // re-loaded filter settingss
-			this.BeginInvoke(new MethodInvoker(FilterSearch));
+			BeginInvoke(new MethodInvoker(FilterSearch));
 			try
 			{
-				this.splitContainer1.SplitterDistance = persistenceData.filterPosition;
-				this.splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
+				splitContainer1.SplitterDistance = persistenceData.filterPosition;
+				splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
 			}
 			catch (InvalidOperationException e)
 			{
 				Logger.logError("Error setting splitter distance: " + e.Message);
 			}
 			ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
-			if (this._filterPipeList.Count == 0)     // don't restore if it's only a reload
+			if (_filterPipeList.Count == 0)     // don't restore if it's only a reload
 			{
 				RestoreFilterTabs(persistenceData);
 			}
@@ -3431,7 +3431,7 @@ namespace LogExpert
 		{
 			filterParams.searchText = filterParams.searchText;   // init "lowerSearchText"
 			filterParams.rangeSearchText = filterParams.rangeSearchText;   // init "lowerRangesearchText"
-			filterParams.currentColumnizer = this.CurrentColumnizer;
+			filterParams.currentColumnizer = CurrentColumnizer;
 			if (filterParams.isRegex)
 			{
 				try
@@ -3450,58 +3450,58 @@ namespace LogExpert
 		{
 			Logger.logDebug("EnterLoadFileStatus begin");
 
-			if (this.InvokeRequired)
+			if (InvokeRequired)
 			{
-				this.Invoke(new MethodInvoker(EnterLoadFileStatus));
+				Invoke(new MethodInvoker(EnterLoadFileStatus));
 				return;
 			}
-			this._statusEventArgs.StatusText = "Loading file...";
-			this._statusEventArgs.LineCount = 0;
-			this._statusEventArgs.FileSize = 0;
+			_statusEventArgs.StatusText = "Loading file...";
+			_statusEventArgs.LineCount = 0;
+			_statusEventArgs.FileSize = 0;
 			SendStatusLineUpdate();
 
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = 0;
-			this._progressEventArgs.Value = 0;
-			this._progressEventArgs.Visible = true;
+			_progressEventArgs.MinValue = 0;
+			_progressEventArgs.MaxValue = 0;
+			_progressEventArgs.Value = 0;
+			_progressEventArgs.Visible = true;
 			SendProgressBarUpdate();
 
-			this._isLoading = true;
-			this._shouldCancel = true;
+			_isLoading = true;
+			_shouldCancel = true;
 			ClearFilterList();
 			ClearBookmarkList();
-			this.dataGridView.ClearSelection();
-			this.dataGridView.RowCount = 0;
+			dataGridView.ClearSelection();
+			dataGridView.RowCount = 0;
 			Logger.logDebug("EnterLoadFileStatus end");
 		}
 
 		private void PositionAfterReload(ReloadMemento reloadMemento)
 		{
-			if (this._reloadMemento.currentLine < this.dataGridView.RowCount && this._reloadMemento.currentLine >= 0)
+			if (_reloadMemento.currentLine < dataGridView.RowCount && _reloadMemento.currentLine >= 0)
 			{
-				this.dataGridView.CurrentCell = this.dataGridView.Rows[this._reloadMemento.currentLine].Cells[0];
+				dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.currentLine].Cells[0];
 			}
-			if (this._reloadMemento.firstDisplayedLine < this.dataGridView.RowCount && this._reloadMemento.firstDisplayedLine >= 0)
+			if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount && _reloadMemento.firstDisplayedLine >= 0)
 			{
-				this.dataGridView.FirstDisplayedScrollingRowIndex = this._reloadMemento.firstDisplayedLine;
+				dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.firstDisplayedLine;
 			}
 		}
 
 		private void LogfileDead()
 		{
 			Logger.logInfo("File not found.");
-			this._isDeadFile = true;
+			_isDeadFile = true;
 
-			this.dataGridView.Enabled = false;
-			this.dataGridView.RowCount = 0;
-			this._progressEventArgs.Visible = false;
-			this._progressEventArgs.Value = this._progressEventArgs.MaxValue;
+			dataGridView.Enabled = false;
+			dataGridView.RowCount = 0;
+			_progressEventArgs.Visible = false;
+			_progressEventArgs.Value = _progressEventArgs.MaxValue;
 			SendProgressBarUpdate();
-			this._statusEventArgs.FileSize = 0;
-			this._statusEventArgs.LineCount = 0;
-			this._statusEventArgs.CurrentLineNum = 0;
+			_statusEventArgs.FileSize = 0;
+			_statusEventArgs.LineCount = 0;
+			_statusEventArgs.CurrentLineNum = 0;
 			SendStatusLineUpdate();
-			this._shouldCancel = true;
+			_shouldCancel = true;
 			ClearFilterList();
 			ClearBookmarkList();
 
@@ -3512,8 +3512,8 @@ namespace LogExpert
 		private void LogfileRespawned()
 		{
 			Logger.logInfo("LogfileDead(): Reloading file because it has been respawned.");
-			this._isDeadFile = false;
-			this.dataGridView.Enabled = true;
+			_isDeadFile = false;
+			dataGridView.Enabled = true;
 			StatusLineText("");
 			OnFileRespawned(new EventArgs());
 			Reload();
@@ -3521,31 +3521,31 @@ namespace LogExpert
 
 		private void SetGuiAfterLoading()
 		{
-			if (this.Text.Length == 0)
+			if (Text.Length == 0)
 			{
 				if (IsTempFile)
 				{
-					this.Text = TempTitleName;
+					Text = TempTitleName;
 				}
 				else
 				{
-					this.Text = Util.GetNameFromPath(this.FileName);
+					Text = Util.GetNameFromPath(FileName);
 				}
 			}
-			this.ShowBookmarkBubbles = this.Preferences.showBubbles;
+			ShowBookmarkBubbles = Preferences.showBubbles;
 
 			ILogLineColumnizer columnizer;
-			if (this._forcedColumnizerForLoading != null)
+			if (_forcedColumnizerForLoading != null)
 			{
-				columnizer = this._forcedColumnizerForLoading;
-				this._forcedColumnizerForLoading = null;
+				columnizer = _forcedColumnizerForLoading;
+				_forcedColumnizerForLoading = null;
 			}
 			else
 			{
 				columnizer = FindColumnizer();
 				if (columnizer != null)
 				{
-					if (this._reloadMemento == null)
+					if (_reloadMemento == null)
 					{
 						columnizer = Util.CloneColumnizer(columnizer);
 					}
@@ -3557,17 +3557,17 @@ namespace LogExpert
 				}
 			}
 
-			this.Invoke(new Action<ILogLineColumnizer>(this.SetColumnizer), new object[] { columnizer });
-			this.dataGridView.Enabled = true;
+			Invoke(new Action<ILogLineColumnizer>(SetColumnizer), new object[] { columnizer });
+			dataGridView.Enabled = true;
 			DisplayCurrentFileOnStatusline();
-			this._guiStateArgs.MultiFileEnabled = !this.IsTempFile;
-			this._guiStateArgs.MenuEnabled = true;
-			this._guiStateArgs.CurrentEncoding = this._logFileReader.CurrentEncoding;
+			_guiStateArgs.MultiFileEnabled = !IsTempFile;
+			_guiStateArgs.MenuEnabled = true;
+			_guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
 			SendGuiStateUpdate();
 
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				if (this.Preferences.timestampControl)
+				if (Preferences.timestampControl)
 				{
 					SetTimestampLimits();
 					SyncTimestampDisplay();
@@ -3575,27 +3575,27 @@ namespace LogExpert
 				Settings settings = ConfigManager.Settings;
 				ShowLineColumn(!settings.hideLineColumn);
 			}
-			ShowTimeSpread(this.Preferences.showTimeSpread && this.CurrentColumnizer.IsTimeshiftImplemented());
-			this.locateLineInOriginalFileToolStripMenuItem.Enabled = this.FilterPipe != null;
+			ShowTimeSpread(Preferences.showTimeSpread && CurrentColumnizer.IsTimeshiftImplemented());
+			locateLineInOriginalFileToolStripMenuItem.Enabled = FilterPipe != null;
 		}
 
 		private ILogLineColumnizer FindColumnizer()
 		{
 			ILogLineColumnizer columnizer = null;
-			if (this.Preferences.maskPrio)
+			if (Preferences.maskPrio)
 			{
-				columnizer = this._parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(this.FileName));
+				columnizer = _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName));
 				if (columnizer == null)
 				{
-					columnizer = this._parentLogTabWin.GetColumnizerHistoryEntry(this.FileName);
+					columnizer = _parentLogTabWin.GetColumnizerHistoryEntry(FileName);
 				}
 			}
 			else
 			{
-				columnizer = this._parentLogTabWin.GetColumnizerHistoryEntry(this.FileName);
+				columnizer = _parentLogTabWin.GetColumnizerHistoryEntry(FileName);
 				if (columnizer == null)
 				{
-					columnizer = this._parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(this.FileName));
+					columnizer = _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName));
 				}
 			}
 			return columnizer;
@@ -3603,7 +3603,7 @@ namespace LogExpert
 
 		private void LogWindow_Closing(object sender, CancelEventArgs e)
 		{
-			if (this.Preferences.askForClose)
+			if (Preferences.askForClose)
 			{
 				if (MessageBox.Show("Sure to close?", "LogExpert", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
 					DialogResult.No)
@@ -3619,11 +3619,11 @@ namespace LogExpert
 		private void ReloadNewFile()
 		{
 			// prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
-			lock (this._reloadLock)
+			lock (_reloadLock)
 			{
-				this._reloadOverloadCounter++;
-				Logger.logInfo("ReloadNewFile(): counter = " + this._reloadOverloadCounter);
-				if (this._reloadOverloadCounter <= 1)
+				_reloadOverloadCounter++;
+				Logger.logInfo("ReloadNewFile(): counter = " + _reloadOverloadCounter);
+				if (_reloadOverloadCounter <= 1)
 				{
 					SavePersistenceData(false);
 					_loadingFinishedEvent.Reset();
@@ -3631,7 +3631,7 @@ namespace LogExpert
 					Thread reloadFinishedThread = new Thread(new ThreadStart(ReloadFinishedThreadFx));
 					reloadFinishedThread.IsBackground = true;
 					reloadFinishedThread.Start();
-					LoadFile(this.FileName, this.EncodingOptions);
+					LoadFile(FileName, EncodingOptions);
 
 					ClearBookmarkList();
 					SavePersistenceData(false);
@@ -3640,16 +3640,16 @@ namespace LogExpert
 				{
 					Logger.logDebug("Preventing reload because of recursive calls.");
 				}
-				this._reloadOverloadCounter--;
+				_reloadOverloadCounter--;
 			}
 		}
 
 		private void ReloadFinishedThreadFx()
 		{
 			Logger.logInfo("Waiting for loading to be complete.");
-			this._loadingFinishedEvent.WaitOne();
+			_loadingFinishedEvent.WaitOne();
 			Logger.logInfo("Refreshing filter view because of reload.");
-			this.Invoke(new MethodInvoker(FilterSearch));
+			Invoke(new MethodInvoker(FilterSearch));
 			LoadFilterPipes();
 			OnFileReloadFinished();
 		}
@@ -3658,36 +3658,36 @@ namespace LogExpert
 		{
 			Logger.logInfo("File loading complete.");
 			StatusLineText("");
-			this._logFileReader.FileSizeChanged += this.FileSizeChangedHandler;
-			this._isLoading = false;
-			this._shouldCancel = false;
-			this.dataGridView.SuspendLayout();
-			this.dataGridView.RowCount = this._logFileReader.LineCount;
-			this.dataGridView.CurrentCellChanged += new EventHandler(DataGridView_CurrentCellChanged);
-			this.dataGridView.Enabled = true;
-			this.dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-			this.dataGridView.ResumeLayout();
-			this._progressEventArgs.Visible = false;
-			this._progressEventArgs.Value = this._progressEventArgs.MaxValue;
+			_logFileReader.FileSizeChanged += FileSizeChangedHandler;
+			_isLoading = false;
+			_shouldCancel = false;
+			dataGridView.SuspendLayout();
+			dataGridView.RowCount = _logFileReader.LineCount;
+			dataGridView.CurrentCellChanged += new EventHandler(DataGridView_CurrentCellChanged);
+			dataGridView.Enabled = true;
+			dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+			dataGridView.ResumeLayout();
+			_progressEventArgs.Visible = false;
+			_progressEventArgs.Value = _progressEventArgs.MaxValue;
 			SendProgressBarUpdate();
 
-			this._guiStateArgs.FollowTail = true;
+			_guiStateArgs.FollowTail = true;
 			SendGuiStateUpdate();
-			this._statusEventArgs.LineCount = this._logFileReader.LineCount;
-			this._statusEventArgs.FileSize = this._logFileReader.FileSize;
+			_statusEventArgs.LineCount = _logFileReader.LineCount;
+			_statusEventArgs.FileSize = _logFileReader.FileSize;
 			SendStatusLineUpdate();
 
-			PreferencesChanged(this._parentLogTabWin.Preferences, true, SettingsFlags.All);
+			PreferencesChanged(_parentLogTabWin.Preferences, true, SettingsFlags.All);
 		}
 
 		private void FileSizeChangedHandler(object sender, LogEventArgs e)
 		{
 			Logger.logInfo("Got FileSizeChanged event. prevLines:" + e.PrevLineCount + ", curr lines: " + e.LineCount);
 
-			lock (this._logEventArgsList)
+			lock (_logEventArgsList)
 			{
-				this._logEventArgsList.Add(e);
-				this._logEventArgsEvent.Set();
+				_logEventArgsList.Add(e);
+				_logEventArgsEvent.Set();
 			}
 		}
 
@@ -3697,22 +3697,22 @@ namespace LogExpert
 			while (true)
 			{
 				Logger.logDebug("Waiting for signal");
-				this._logEventArgsEvent.WaitOne();
+				_logEventArgsEvent.WaitOne();
 				Logger.logDebug("Wakeup signal received.");
 				while (true)
 				{
 					LogEventArgs e;
 					int lastLineCount = 0;
-					lock (this._logEventArgsList)
+					lock (_logEventArgsList)
 					{
-						Logger.logInfo("" + this._logEventArgsList.Count + " events in queue");
-						if (this._logEventArgsList.Count == 0)
+						Logger.logInfo("" + _logEventArgsList.Count + " events in queue");
+						if (_logEventArgsList.Count == 0)
 						{
-							this._logEventArgsEvent.Reset();
+							_logEventArgsEvent.Reset();
 							break;
 						}
-						e = this._logEventArgsList[0];
-						this._logEventArgsList.RemoveAt(0);
+						e = _logEventArgsList[0];
+						_logEventArgsList.RemoveAt(0);
 					}
 					if (e.IsRollover)
 					{
@@ -3729,85 +3729,85 @@ namespace LogExpert
 						}
 					}
 					Action<LogEventArgs> callback = new Action<LogEventArgs>(UpdateGrid);
-					this.Invoke(callback, new object[] { e });
+					Invoke(callback, new object[] { e });
 					CheckFilterAndHighlight(e);
-					this._timeSpreadCalc.SetLineCount(e.LineCount);
+					_timeSpreadCalc.SetLineCount(e.LineCount);
 				}
 			}
 		}
 
 		private void StopLogEventWorkerThread()
 		{
-			this._logEventArgsEvent.Set();
-			this._logEventHandlerThread.Abort();
-			this._logEventHandlerThread.Join();
+			_logEventArgsEvent.Set();
+			_logEventHandlerThread.Abort();
+			_logEventHandlerThread.Join();
 		}
 
 		private void UpdateGrid(LogEventArgs e)
 		{
-			int oldRowCount = this.dataGridView.RowCount;
-			int firstDisplayedLine = this.dataGridView.FirstDisplayedScrollingRowIndex;
+			int oldRowCount = dataGridView.RowCount;
+			int firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
 
 			try
 			{
-				if (this.dataGridView.RowCount > e.LineCount)
+				if (dataGridView.RowCount > e.LineCount)
 				{
-					int currentLineNum = this.dataGridView.CurrentCellAddress.Y;
-					this.dataGridView.RowCount = 0;
-					this.dataGridView.RowCount = e.LineCount;
-					if (!this._guiStateArgs.FollowTail)
+					int currentLineNum = dataGridView.CurrentCellAddress.Y;
+					dataGridView.RowCount = 0;
+					dataGridView.RowCount = e.LineCount;
+					if (!_guiStateArgs.FollowTail)
 					{
-						if (currentLineNum >= this.dataGridView.RowCount)
+						if (currentLineNum >= dataGridView.RowCount)
 						{
-							currentLineNum = this.dataGridView.RowCount - 1;
+							currentLineNum = dataGridView.RowCount - 1;
 						}
-						this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLineNum].Cells[0];
+						dataGridView.CurrentCell = dataGridView.Rows[currentLineNum].Cells[0];
 					}
 				}
 				else
 				{
-					this.dataGridView.RowCount = e.LineCount;
+					dataGridView.RowCount = e.LineCount;
 				}
-				Logger.logDebug("UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
+				Logger.logDebug("UpdateGrid(): new RowCount=" + dataGridView.RowCount);
 				if (e.IsRollover)
 				{
 					// Multifile rollover
 					// keep selection and view range, if no follow tail mode
-					if (!this._guiStateArgs.FollowTail)
+					if (!_guiStateArgs.FollowTail)
 					{
-						int currentLineNum = this.dataGridView.CurrentCellAddress.Y;
+						int currentLineNum = dataGridView.CurrentCellAddress.Y;
 						currentLineNum -= e.RolloverOffset;
 						if (currentLineNum < 0)
 						{
 							currentLineNum = 0;
 						}
-						Logger.logDebug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + this.dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
+						Logger.logDebug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
 						firstDisplayedLine -= e.RolloverOffset;
 						if (firstDisplayedLine < 0)
 						{
 							firstDisplayedLine = 0;
 						}
-						this.dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
-						this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLineNum].Cells[0];
-						this.dataGridView.Rows[currentLineNum].Selected = true;
+						dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
+						dataGridView.CurrentCell = dataGridView.Rows[currentLineNum].Cells[0];
+						dataGridView.Rows[currentLineNum].Selected = true;
 					}
 				}
-				this._statusEventArgs.LineCount = e.LineCount;
+				_statusEventArgs.LineCount = e.LineCount;
 				StatusLineFileSize(e.FileSize);
 
-				if (!this._isLoading)
+				if (!_isLoading)
 				{
 					if (oldRowCount == 0)
 					{
 						AdjustMinimumGridWith();
 					}
 				}
-				if (this._guiStateArgs.FollowTail && this.dataGridView.RowCount > 0)
+				if (_guiStateArgs.FollowTail && dataGridView.RowCount > 0)
 				{
-					this.dataGridView.FirstDisplayedScrollingRowIndex = this.dataGridView.RowCount - 1;
+					dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
 					OnTailFollowed(new EventArgs());
 				}
-				if (this.Preferences.timestampControl && !this._isLoading)
+				if (Preferences.timestampControl && !_isLoading)
 				{
 					SetTimestampLimits();
 				}
@@ -3825,7 +3825,7 @@ namespace LogExpert
 			bool setBookmark = false;
 			bool stopTail = false;
 			string bookmarkComment = null;
-			if (this.filterTailCheckBox.Checked || this._filterPipeList.Count > 0)
+			if (filterTailCheckBox.Checked || _filterPipeList.Count > 0)
 			{
 				int filterStart = e.PrevLineCount;
 				if (e.IsRollover)
@@ -3838,18 +3838,18 @@ namespace LogExpert
 				bool filterLineAdded = false;
 				for (int i = filterStart; i < e.LineCount; ++i)
 				{
-					string line = this._logFileReader.GetLogLine(i);
+					string line = _logFileReader.GetLogLine(i);
 					if (line == null)
 					{
 						return;
 					}
-					if (this.filterTailCheckBox.Checked)
+					if (filterTailCheckBox.Checked)
 					{
 						callback.LineNum = i;
-						if (Classes.DamerauLevenshtein.TestFilterCondition(this._filterParams, line, callback))
+						if (Classes.DamerauLevenshtein.TestFilterCondition(_filterParams, line, callback))
 						{
 							filterLineAdded = true;
-							AddFilterLine(i, false, this._filterParams, this._filterResultList, this._lastFilterLinesList, this._filterHitList);
+							AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList, _filterHitList);
 						}
 					}
 					ProcessFilterPipes(i);
@@ -3859,16 +3859,16 @@ namespace LogExpert
 					GetHilightActions(matchingList, out suppressLed, out stopTail, out setBookmark, out bookmarkComment);
 					if (setBookmark)
 					{
-						Action<int, string> fx = new Action<int, string>(this.SetBookmarkFromTrigger);
+						Action<int, string> fx = new Action<int, string>(SetBookmarkFromTrigger);
 						fx.BeginInvoke(i, bookmarkComment, null, null);
 					}
-					if (stopTail && this._guiStateArgs.FollowTail)
+					if (stopTail && _guiStateArgs.FollowTail)
 					{
-						bool wasFollow = this._guiStateArgs.FollowTail;
+						bool wasFollow = _guiStateArgs.FollowTail;
 						FollowTailChanged(false, true);
 						if (firstStopTail && wasFollow)
 						{
-							this.Invoke(new Action<int, bool>(this.SelectAndEnsureVisible), new object[] { i, false });
+							Invoke(new Action<int, bool>(SelectAndEnsureVisible), new object[] { i, false });
 							firstStopTail = false;
 						}
 					}
@@ -3893,7 +3893,7 @@ namespace LogExpert
 				}
 				for (int i = startLine; i < e.LineCount; ++i)
 				{
-					string line = this._logFileReader.GetLogLine(i);
+					string line = _logFileReader.GetLogLine(i);
 					if (line != null)
 					{
 						IList<HilightEntry> matchingList = FindMatchingHilightEntries(line);
@@ -3901,16 +3901,16 @@ namespace LogExpert
 						GetHilightActions(matchingList, out suppressLed, out stopTail, out setBookmark, out bookmarkComment);
 						if (setBookmark)
 						{
-							Action<int, string> fx = new Action<int, string>(this.SetBookmarkFromTrigger);
+							Action<int, string> fx = new Action<int, string>(SetBookmarkFromTrigger);
 							fx.BeginInvoke(i, bookmarkComment, null, null);
 						}
-						if (stopTail && this._guiStateArgs.FollowTail)
+						if (stopTail && _guiStateArgs.FollowTail)
 						{
-							bool wasFollow = this._guiStateArgs.FollowTail;
+							bool wasFollow = _guiStateArgs.FollowTail;
 							FollowTailChanged(false, true);
 							if (firstStopTail && wasFollow)
 							{
-								this.Invoke(new Action<int, bool>(this.SelectAndEnsureVisible), new object[] { i, false });
+								Invoke(new Action<int, bool>(SelectAndEnsureVisible), new object[] { i, false });
 								firstStopTail = false;
 							}
 						}
@@ -3939,7 +3939,7 @@ namespace LogExpert
 					if (plugin != null)
 					{
 						Action<string, string, ILogExpertCallback, ILogLineColumnizer> fx = new Action<string, string, ILogExpertCallback, ILogLineColumnizer>(plugin.Execute);
-						fx.BeginInvoke(entry.SearchText, entry.ActionEntry.actionParam, callback, this.CurrentColumnizer, null, null);
+						fx.BeginInvoke(entry.SearchText, entry.ActionEntry.actionParam, callback, CurrentColumnizer, null, null);
 					}
 				}
 			}
@@ -3950,13 +3950,13 @@ namespace LogExpert
 			try
 			{
 				gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-				if (gridView.Columns.Count > 1 && this.Preferences.setLastColumnWidth &&
-					gridView.Columns[gridView.Columns.Count - 1].Width < this.Preferences.lastColumnWidth
+				if (gridView.Columns.Count > 1 && Preferences.setLastColumnWidth &&
+					gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.lastColumnWidth
 				)
 				{
 					// It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
-					//gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
-					gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = this.Preferences.lastColumnWidth;
+					//gridView.Columns[gridView.Columns.Count - 1].Width = Preferences.lastColumnWidth;
+					gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = Preferences.lastColumnWidth;
 				}
 			}
 			catch (NullReferenceException e)
@@ -4080,9 +4080,9 @@ namespace LogExpert
 			IList<HilightEntry> resultList = new List<HilightEntry>();
 			if (line != null)
 			{
-				lock (this._currentHighlightGroupLock)
+				lock (_currentHighlightGroupLock)
 				{
-					foreach (HilightEntry entry in this._currentHighlightGroup.HilightEntryList)
+					foreach (HilightEntry entry in _currentHighlightGroup.HilightEntryList)
 					{
 						if (CheckHighlightEntryMatch(entry, line))
 						{
@@ -4151,84 +4151,84 @@ namespace LogExpert
 
 		private void StopTimespreadThread()
 		{
-			this._timeSpreadCalc.Stop();
+			_timeSpreadCalc.Stop();
 		}
 
 		private void StopTimestampSyncThread()
 		{
-			this._shouldTimestampDisplaySyncingCancel = true;
-			this._timeshiftSyncWakeupEvent.Set();
-			this._timeshiftSyncThread.Abort();
-			this._timeshiftSyncThread.Join();
+			_shouldTimestampDisplaySyncingCancel = true;
+			_timeshiftSyncWakeupEvent.Set();
+			_timeshiftSyncThread.Abort();
+			_timeshiftSyncThread.Join();
 		}
 
 		private void SyncTimestampDisplay()
 		{
-			if (this.CurrentColumnizer.IsTimeshiftImplemented())
+			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				if (this.dataGridView.CurrentRow != null)
+				if (dataGridView.CurrentRow != null)
 				{
-					SyncTimestampDisplay(this.dataGridView.CurrentRow.Index);
+					SyncTimestampDisplay(dataGridView.CurrentRow.Index);
 				}
 			}
 		}
 
 		private void SyncTimestampDisplay(int lineNum)
 		{
-			this._timeshiftSyncLine = lineNum;
-			this._timeshiftSyncTimerEvent.Set();
-			this._timeshiftSyncWakeupEvent.Set();
+			_timeshiftSyncLine = lineNum;
+			_timeshiftSyncTimerEvent.Set();
+			_timeshiftSyncWakeupEvent.Set();
 		}
 
 		private void SyncTimestampDisplayWorker()
 		{
 			const int WAIT_TIME = 500;
 			Thread.CurrentThread.Name = "SyncTimestampDisplayWorker";
-			this._shouldTimestampDisplaySyncingCancel = false;
-			this._isTimestampDisplaySyncing = true;
+			_shouldTimestampDisplaySyncingCancel = false;
+			_isTimestampDisplaySyncing = true;
 
-			while (!this._shouldTimestampDisplaySyncingCancel)
+			while (!_shouldTimestampDisplaySyncingCancel)
 			{
-				this._timeshiftSyncWakeupEvent.WaitOne();
-				if (this._shouldTimestampDisplaySyncingCancel)
+				_timeshiftSyncWakeupEvent.WaitOne();
+				if (_shouldTimestampDisplaySyncingCancel)
 				{
 					return;
 				}
-				this._timeshiftSyncWakeupEvent.Reset();
+				_timeshiftSyncWakeupEvent.Reset();
 
-				while (!this._shouldTimestampDisplaySyncingCancel)
+				while (!_shouldTimestampDisplaySyncingCancel)
 				{
-					bool signaled = this._timeshiftSyncTimerEvent.WaitOne(WAIT_TIME, true);
-					this._timeshiftSyncTimerEvent.Reset();
+					bool signaled = _timeshiftSyncTimerEvent.WaitOne(WAIT_TIME, true);
+					_timeshiftSyncTimerEvent.Reset();
 					if (!signaled)
 					{
 						break;
 					}
 				}
 				// timeout with no new Trigger -> update display
-				int lineNum = this._timeshiftSyncLine;
-				if (lineNum >= 0 && lineNum < this.dataGridView.RowCount)
+				int lineNum = _timeshiftSyncLine;
+				if (lineNum >= 0 && lineNum < dataGridView.RowCount)
 				{
 					int refLine = lineNum;
 					DateTime timeStamp = GetTimestampForLine(ref refLine, true);
-					if (!timeStamp.Equals(DateTime.MinValue) && !this._shouldTimestampDisplaySyncingCancel)
+					if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)
 					{
-						this._guiStateArgs.Timestamp = timeStamp;
+						_guiStateArgs.Timestamp = timeStamp;
 						SendGuiStateUpdate();
-						if (this._shouldCallTimeSync)
+						if (_shouldCallTimeSync)
 						{
 							refLine = lineNum;
 							DateTime exactTimeStamp = GetTimestampForLine(ref refLine, false);
 							SyncOtherWindows(exactTimeStamp);
-							this._shouldCallTimeSync = false;
+							_shouldCallTimeSync = false;
 						}
 					}
 				}
 				// show time difference between 2 selected lines
-				if (this.dataGridView.SelectedRows.Count == 2)
+				if (dataGridView.SelectedRows.Count == 2)
 				{
-					int row1 = this.dataGridView.SelectedRows[0].Index;
-					int row2 = this.dataGridView.SelectedRows[1].Index;
+					int row1 = dataGridView.SelectedRows[0].Index;
+					int row2 = dataGridView.SelectedRows[1].Index;
 					if (row1 > row2)
 					{
 						int tmp = row1;
@@ -4252,7 +4252,7 @@ namespace LogExpert
 				}
 				else
 				{
-					if (!this.IsMultiFile && this.dataGridView.SelectedRows.Count == 1)
+					if (!IsMultiFile && dataGridView.SelectedRows.Count == 1)
 					{
 						StatusLineText("");
 					}
@@ -4264,22 +4264,22 @@ namespace LogExpert
 		{
 			try
 			{
-				if (this._filterResultList.Count > 0)
+				if (_filterResultList.Count > 0)
 				{
-					int index = this._filterResultList.BinarySearch(this.dataGridView.CurrentRow.Index);
+					int index = _filterResultList.BinarySearch(dataGridView.CurrentRow.Index);
 					if (index < 0)
 					{
 						index = ~index;
 						if (index > 0)
 							--index;
 					}
-					if (this.filterGridView.Rows.Count > 0)	// exception no rows
+					if (filterGridView.Rows.Count > 0)	// exception no rows
 					{
-						this.filterGridView.CurrentCell = this.filterGridView.Rows[index].Cells[0];
+						filterGridView.CurrentCell = filterGridView.Rows[index].Cells[0];
 					}
 					else
 					{
-						this.filterGridView.CurrentCell = null;
+						filterGridView.CurrentCell = null;
 					}
 				}
 			}
@@ -4291,7 +4291,7 @@ namespace LogExpert
 
 		private void StatusLineFileSize(long size)
 		{
-			this._statusEventArgs.FileSize = size;
+			_statusEventArgs.FileSize = size;
 			SendStatusLineUpdate();
 		}
 
@@ -4310,7 +4310,7 @@ namespace LogExpert
 			{
 				if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
 				{
-					if (lineNum >= this._logFileReader.LineCount)
+					if (lineNum >= _logFileReader.LineCount)
 					{
 						if (hasWrapped)
 						{
@@ -4333,13 +4333,13 @@ namespace LogExpert
 							return -1;
 						}
 						count = 0;
-						lineNum = this._logFileReader.LineCount - 1;
+						lineNum = _logFileReader.LineCount - 1;
 						hasWrapped = true;
 						StatusLineError("Started from end of file");
 					}
 				}
 
-				string line = this._logFileReader.GetLogLine(lineNum);
+				string line = _logFileReader.GetLogLine(lineNum);
 				if (line == null)
 				{
 					return -1;
@@ -4379,7 +4379,7 @@ namespace LogExpert
 				{
 					lineNum--;
 				}
-				if (this._shouldCancel)
+				if (_shouldCancel)
 				{
 					return -1;
 				}
@@ -4387,8 +4387,8 @@ namespace LogExpert
 				{
 					try
 					{
-						if (!this.Disposing)
-							this.Invoke(progressFx, new object[] { count });
+						if (!Disposing)
+							Invoke(progressFx, new object[] { count });
 					}
 					catch (ObjectDisposedException)  // can occur when closing the app while searching
 					{
@@ -4399,21 +4399,21 @@ namespace LogExpert
 
 		private void SearchComplete(IAsyncResult result)
 		{
-			if (this.Disposing)
+			if (Disposing)
 				return;
 			try
 			{
-				this.Invoke(new MethodInvoker(ResetProgressBar));
+				Invoke(new MethodInvoker(ResetProgressBar));
 				AsyncResult ar = (AsyncResult)result;
 				Func<SearchParams, int> fx = (Func<SearchParams, int>)ar.AsyncDelegate;
 				int line = fx.EndInvoke(result);
-				this._guiStateArgs.MenuEnabled = true;
-				GuiStateUpdate(this, this._guiStateArgs);
+				_guiStateArgs.MenuEnabled = true;
+				GuiStateUpdate(this, _guiStateArgs);
 				if (line == -1)
 				{
 					return;
 				}
-				this.dataGridView.Invoke(new Action<int, bool>(SelectLine), new object[] { line, true });
+				dataGridView.Invoke(new Action<int, bool>(SelectLine), new object[] { line, true });
 			}
 			catch (Exception) // in the case the windows is already destroyed
 			{
@@ -4422,8 +4422,8 @@ namespace LogExpert
 
 		private void ResetProgressBar()
 		{
-			this._progressEventArgs.Value = this._progressEventArgs.MaxValue;
-			this._progressEventArgs.Visible = false;
+			_progressEventArgs.Value = _progressEventArgs.MaxValue;
+			_progressEventArgs.Visible = false;
 			SendProgressBarUpdate();
 		}
 
@@ -4436,12 +4436,12 @@ namespace LogExpert
 		{
 			try
 			{
-				this._shouldCallTimeSync = triggerSyncCall;
-				bool wasCancelled = this._shouldCancel;
-				this._shouldCancel = false;
-				this._isSearching = false;
+				_shouldCallTimeSync = triggerSyncCall;
+				bool wasCancelled = _shouldCancel;
+				_shouldCancel = false;
+				_isSearching = false;
 				StatusLineText("");
-				this._guiStateArgs.MenuEnabled = true;
+				_guiStateArgs.MenuEnabled = true;
 				if (wasCancelled)
 				{
 					return;
@@ -4451,11 +4451,11 @@ namespace LogExpert
 					MessageBox.Show(this, "Not found:", "Search result");   // Hmm... is that experimental code from early days?  
 					return;
 				}
-				this.dataGridView.Rows[line].Selected = true;
+				dataGridView.Rows[line].Selected = true;
 				if (shouldScroll)
 				{
-					this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-					this.dataGridView.Focus();
+					dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
+					dataGridView.Focus();
 				}
 			}
 			catch (IndexOutOfRangeException e)
@@ -4468,32 +4468,32 @@ namespace LogExpert
 		private void SelectAndScrollToLine(int line)
 		{
 			SelectLine(line, false);
-			this.dataGridView.FirstDisplayedScrollingRowIndex = line;
+			dataGridView.FirstDisplayedScrollingRowIndex = line;
 		}
 
 		public void LogWindow_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (this._isErrorShowing)
+			if (_isErrorShowing)
 			{
 				RemoveStatusLineError();
 			}
 			if (e.KeyCode == Keys.F3)
 			{
-				if (this._parentLogTabWin.SearchParams == null ||
-					this._parentLogTabWin.SearchParams.searchText == null ||
-					this._parentLogTabWin.SearchParams.searchText.Length == 0)
+				if (_parentLogTabWin.SearchParams == null ||
+					_parentLogTabWin.SearchParams.searchText == null ||
+					_parentLogTabWin.SearchParams.searchText.Length == 0)
 				{
 					return;
 				}
-				this._parentLogTabWin.SearchParams.isFindNext = true;
-				this._parentLogTabWin.SearchParams.isShiftF3Pressed = ((e.Modifiers & Keys.Shift) == Keys.Shift);
+				_parentLogTabWin.SearchParams.isFindNext = true;
+				_parentLogTabWin.SearchParams.isShiftF3Pressed = ((e.Modifiers & Keys.Shift) == Keys.Shift);
 				StartSearch();
 			}
 			if (e.KeyCode == Keys.Escape)
 			{
-				if (this._isSearching)
+				if (_isSearching)
 				{
-					this._shouldCancel = true;
+					_shouldCancel = true;
 				}
 				FireCancelHandlers();
 				RemoveAllSearchHighlightEntries();
@@ -4504,7 +4504,7 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt)
 			{
-				int newLine = this._logFileReader.GetNextMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
+				int newLine = _logFileReader.GetNextMultiFileLine(dataGridView.CurrentCellAddress.Y);
 				if (newLine != -1)
 				{
 					SelectLine(newLine, false);
@@ -4513,19 +4513,19 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Up && e.Modifiers == Keys.Alt)
 			{
-				int newLine = this._logFileReader.GetPrevMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
+				int newLine = _logFileReader.GetPrevMultiFileLine(dataGridView.CurrentCellAddress.Y);
 				if (newLine != -1)
 				{
 					SelectLine(newLine - 1, false);
 				}
 				e.Handled = true;
 			}
-			if (e.KeyCode == Keys.Enter && this.dataGridView.Focused)
+			if (e.KeyCode == Keys.Enter && dataGridView.Focused)
 			{
 				ChangeRowHeight(e.Shift);
 				e.Handled = true;
 			}
-			if (e.KeyCode == Keys.Back && this.dataGridView.Focused)
+			if (e.KeyCode == Keys.Back && dataGridView.Focused)
 			{
 				ChangeRowHeight(true);
 				e.Handled = true;
@@ -4548,19 +4548,19 @@ namespace LogExpert
 
 		private void StartEditMode()
 		{
-			if (!this.dataGridView.CurrentCell.ReadOnly)
+			if (!dataGridView.CurrentCell.ReadOnly)
 			{
-				this.dataGridView.BeginEdit(false);
-				if (this.dataGridView.EditingControl != null)
+				dataGridView.BeginEdit(false);
+				if (dataGridView.EditingControl != null)
 				{
-					if (this.dataGridView.EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
+					if (dataGridView.EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
 					{
-						DataGridViewTextBoxEditingControl editControl = this.dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+						DataGridViewTextBoxEditingControl editControl = dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
 						editControl.KeyDown += EditControl_UpdateEditColumnDisplay;
 						editControl.KeyPress += new KeyPressEventHandler(EditControl_KeyPress);
 						editControl.KeyUp += new KeyEventHandler(EditControl_UpdateEditColumnDisplay);
 						editControl.Click += new EventHandler(EditControl_Click);
-						this.dataGridView.CellEndEdit += new DataGridViewCellEventHandler(DataGridView_CellEndEdit);
+						dataGridView.CellEndEdit += new DataGridViewCellEventHandler(DataGridView_CellEndEdit);
 						editControl.SelectionStart = 0;
 					}
 				}
@@ -4570,7 +4570,7 @@ namespace LogExpert
 		private void UpdateEditColumnDisplay(DataGridViewTextBoxEditingControl editControl)
 		{
 			// prevents key events after edit mode has ended
-			if (this.dataGridView.EditingControl != null)
+			if (dataGridView.EditingControl != null)
 			{
 				int pos = editControl.SelectionStart + editControl.SelectionLength;
 				StatusLineText("   " + pos);
@@ -4580,11 +4580,11 @@ namespace LogExpert
 
 		private void SelectPrevHighlightLine()
 		{
-			int lineNum = this.dataGridView.CurrentCellAddress.Y;
+			int lineNum = dataGridView.CurrentCellAddress.Y;
 			while (lineNum > 0)
 			{
 				lineNum--;
-				string line = this._logFileReader.GetLogLine(lineNum);
+				string line = _logFileReader.GetLogLine(lineNum);
 				if (line != null)
 				{
 					HilightEntry entry = FindHilightEntry(line);
@@ -4599,8 +4599,8 @@ namespace LogExpert
 
 		private void SelectNextHighlightLine()
 		{
-			int lineNum = this.dataGridView.CurrentCellAddress.Y;
-			while (lineNum < this._logFileReader.LineCount)
+			int lineNum = dataGridView.CurrentCellAddress.Y;
+			while (lineNum < _logFileReader.LineCount)
 			{
 				lineNum++;
 				string line = _logFileReader.GetLogLine(lineNum);
@@ -4622,7 +4622,7 @@ namespace LogExpert
 
 			if (isForward)
 			{
-				return this._bookmarkProvider.FindNextBookmarkIndex(lineNum);
+				return _bookmarkProvider.FindNextBookmarkIndex(lineNum);
 			}
 			else
 			{
@@ -4635,14 +4635,14 @@ namespace LogExpert
 		 */
 		private void ShiftBookmarks(int offset)
 		{
-			this._bookmarkProvider.ShiftBookmarks(offset);
+			_bookmarkProvider.ShiftBookmarks(offset);
 			OnBookmarkRemoved();
 		}
 
 		private void ShiftRowHeightList(int offset)
 		{
 			SortedList<int, RowHeightEntry> newList = new SortedList<int, RowHeightEntry>();
-			foreach (RowHeightEntry entry in this._rowHeightList.Values)
+			foreach (RowHeightEntry entry in _rowHeightList.Values)
 			{
 				int line = entry.LineNum - offset;
 				if (line >= 0)
@@ -4651,14 +4651,14 @@ namespace LogExpert
 					newList.Add(line, entry);
 				}
 			}
-			this._rowHeightList = newList;
+			_rowHeightList = newList;
 		}
 
 		private void ShiftFilterPipes(int offset)
 		{
-			lock (this._filterPipeList)
+			lock (_filterPipeList)
 			{
-				foreach (FilterPipe pipe in this._filterPipeList)
+				foreach (FilterPipe pipe in _filterPipeList)
 				{
 					pipe.ShiftLineNums(offset);
 				}
@@ -4667,16 +4667,16 @@ namespace LogExpert
 
 		private void LoadFilterPipes()
 		{
-			lock (this._filterPipeList)
+			lock (_filterPipeList)
 			{
-				foreach (FilterPipe pipe in this._filterPipeList)
+				foreach (FilterPipe pipe in _filterPipeList)
 				{
 					pipe.RecreateTempFile();
 				}
 			}
-			if (this._filterPipeList.Count > 0)
+			if (_filterPipeList.Count > 0)
 			{
-				for (int i = 0; i < this.dataGridView.RowCount; ++i)
+				for (int i = 0; i < dataGridView.RowCount; ++i)
 				{
 					ProcessFilterPipes(i);
 				}
@@ -4685,9 +4685,9 @@ namespace LogExpert
 
 		private void DisconnectFilterPipes()
 		{
-			lock (this._filterPipeList)
+			lock (_filterPipeList)
 			{
-				foreach (FilterPipe pipe in this._filterPipeList)
+				foreach (FilterPipe pipe in _filterPipeList)
 				{
 					pipe.ClearLineList();
 				}
@@ -4700,96 +4700,96 @@ namespace LogExpert
 
 		private void ApplyFilterParams()
 		{
-			this.filterComboBox.Text = this._filterParams.searchText;
-			this.filterCaseSensitiveCheckBox.Checked = this._filterParams.isCaseSensitive;
-			this.filterRegexCheckBox.Checked = this._filterParams.isRegex;
-			this.filterTailCheckBox.Checked = this._filterParams.isFilterTail;
-			this.invertFilterCheckBox.Checked = this._filterParams.isInvert;
-			this.filterKnobControl1.Value = this._filterParams.spreadBefore;
-			this.filterKnobControl2.Value = this._filterParams.spreadBehind;
-			this.rangeCheckBox.Checked = this._filterParams.isRangeSearch;
-			this.columnRestrictCheckBox.Checked = this._filterParams.columnRestrict;
-			this.fuzzyKnobControl.Value = this._filterParams.fuzzyValue;
-			this.filterRangeComboBox.Text = this._filterParams.rangeSearchText;
+			filterComboBox.Text = _filterParams.searchText;
+			filterCaseSensitiveCheckBox.Checked = _filterParams.isCaseSensitive;
+			filterRegexCheckBox.Checked = _filterParams.isRegex;
+			filterTailCheckBox.Checked = _filterParams.isFilterTail;
+			invertFilterCheckBox.Checked = _filterParams.isInvert;
+			filterKnobControl1.Value = _filterParams.spreadBefore;
+			filterKnobControl2.Value = _filterParams.spreadBehind;
+			rangeCheckBox.Checked = _filterParams.isRangeSearch;
+			columnRestrictCheckBox.Checked = _filterParams.columnRestrict;
+			fuzzyKnobControl.Value = _filterParams.fuzzyValue;
+			filterRangeComboBox.Text = _filterParams.rangeSearchText;
 		}
 
 		private void ResetFilterControls()
 		{
-			this.filterComboBox.Text = "";
-			this.filterCaseSensitiveCheckBox.Checked = false;
-			this.filterRegexCheckBox.Checked = false;
-			this.invertFilterCheckBox.Checked = false;
-			this.filterKnobControl1.Value = 0;
-			this.filterKnobControl2.Value = 0;
-			this.rangeCheckBox.Checked = false;
-			this.columnRestrictCheckBox.Checked = false;
-			this.fuzzyKnobControl.Value = 0;
-			this.filterRangeComboBox.Text = "";
+			filterComboBox.Text = "";
+			filterCaseSensitiveCheckBox.Checked = false;
+			filterRegexCheckBox.Checked = false;
+			invertFilterCheckBox.Checked = false;
+			filterKnobControl1.Value = 0;
+			filterKnobControl2.Value = 0;
+			rangeCheckBox.Checked = false;
+			columnRestrictCheckBox.Checked = false;
+			fuzzyKnobControl.Value = 0;
+			filterRangeComboBox.Text = "";
 		}
 
 		private void FilterSearch()
 		{
-			if (this.filterComboBox.Text.Length == 0)
+			if (filterComboBox.Text.Length == 0)
 			{
-				this._filterParams.searchText = "";
-				this._filterParams.lowerSearchText = "";
-				this._filterParams.isRangeSearch = false;
+				_filterParams.searchText = "";
+				_filterParams.lowerSearchText = "";
+				_filterParams.isRangeSearch = false;
 				ClearFilterList();
-				this.filterSearchButton.Image = null;
+				filterSearchButton.Image = null;
 				ResetFilterControls();
-				this.saveFilterButton.Enabled = false;
+				saveFilterButton.Enabled = false;
 				return;
 			}
-			FilterSearch(this.filterComboBox.Text);
+			FilterSearch(filterComboBox.Text);
 		}
 
 		private void FilterSearch(string text)
 		{
 			FireCancelHandlers();   // make sure that there's no other filter running (maybe from filter restore)
 
-			this._filterParams.searchText = text;
-			this._filterParams.lowerSearchText = text.ToLower();
+			_filterParams.searchText = text;
+			_filterParams.lowerSearchText = text.ToLower();
 			ConfigManager.Settings.filterHistoryList.Remove(text);
 			ConfigManager.Settings.filterHistoryList.Insert(0, text);
 			if (ConfigManager.Settings.filterHistoryList.Count > MAX_HISTORY)
 			{
-				ConfigManager.Settings.filterHistoryList.RemoveAt(this.filterComboBox.Items.Count - 1);
+				ConfigManager.Settings.filterHistoryList.RemoveAt(filterComboBox.Items.Count - 1);
 			}
-			this.filterComboBox.Items.Clear();
+			filterComboBox.Items.Clear();
 			foreach (string item in ConfigManager.Settings.filterHistoryList)
 			{
-				this.filterComboBox.Items.Add(item);
+				filterComboBox.Items.Add(item);
 			}
-			this.filterComboBox.Text = text;
+			filterComboBox.Text = text;
 
-			this._filterParams.isRangeSearch = this.rangeCheckBox.Checked;
-			this._filterParams.rangeSearchText = this.filterRangeComboBox.Text;
-			if (this._filterParams.isRangeSearch)
+			_filterParams.isRangeSearch = rangeCheckBox.Checked;
+			_filterParams.rangeSearchText = filterRangeComboBox.Text;
+			if (_filterParams.isRangeSearch)
 			{
-				ConfigManager.Settings.filterRangeHistoryList.Remove(this.filterRangeComboBox.Text);
-				ConfigManager.Settings.filterRangeHistoryList.Insert(0, this.filterRangeComboBox.Text);
+				ConfigManager.Settings.filterRangeHistoryList.Remove(filterRangeComboBox.Text);
+				ConfigManager.Settings.filterRangeHistoryList.Insert(0, filterRangeComboBox.Text);
 				if (ConfigManager.Settings.filterRangeHistoryList.Count > MAX_HISTORY)
 				{
-					ConfigManager.Settings.filterRangeHistoryList.RemoveAt(this.filterRangeComboBox.Items.Count - 1);
+					ConfigManager.Settings.filterRangeHistoryList.RemoveAt(filterRangeComboBox.Items.Count - 1);
 				}
 
-				this.filterRangeComboBox.Items.Clear();
+				filterRangeComboBox.Items.Clear();
 				foreach (string item in ConfigManager.Settings.filterRangeHistoryList)
 				{
-					this.filterRangeComboBox.Items.Add(item);
+					filterRangeComboBox.Items.Add(item);
 				}
 			}
 			ConfigManager.Save(SettingsFlags.FilterHistory);
 
-			this._filterParams.isCaseSensitive = this.filterCaseSensitiveCheckBox.Checked;
-			this._filterParams.isRegex = this.filterRegexCheckBox.Checked;
-			this._filterParams.isFilterTail = this.filterTailCheckBox.Checked;
-			this._filterParams.isInvert = this.invertFilterCheckBox.Checked;
-			if (this._filterParams.isRegex)
+			_filterParams.isCaseSensitive = filterCaseSensitiveCheckBox.Checked;
+			_filterParams.isRegex = filterRegexCheckBox.Checked;
+			_filterParams.isFilterTail = filterTailCheckBox.Checked;
+			_filterParams.isInvert = invertFilterCheckBox.Checked;
+			if (_filterParams.isRegex)
 			{
 				try
 				{
-					this._filterParams.CreateRegex();
+					_filterParams.CreateRegex();
 				}
 				catch (ArgumentException)
 				{
@@ -4797,30 +4797,30 @@ namespace LogExpert
 					return;
 				}
 			}
-			this._filterParams.fuzzyValue = this.fuzzyKnobControl.Value;
-			this._filterParams.spreadBefore = this.filterKnobControl1.Value;
-			this._filterParams.spreadBehind = this.filterKnobControl2.Value;
-			this._filterParams.columnRestrict = this.columnRestrictCheckBox.Checked;
+			_filterParams.fuzzyValue = fuzzyKnobControl.Value;
+			_filterParams.spreadBefore = filterKnobControl1.Value;
+			_filterParams.spreadBehind = filterKnobControl2.Value;
+			_filterParams.columnRestrict = columnRestrictCheckBox.Checked;
 
-			//ConfigManager.SaveFilterParams(this.filterParams);
-			ConfigManager.Settings.filterParams = this._filterParams;  // wozu eigentlich? sinnlos seit MDI?
+			//ConfigManager.SaveFilterParams(filterParams);
+			ConfigManager.Settings.filterParams = _filterParams;  // wozu eigentlich? sinnlos seit MDI?
 
-			this._shouldCancel = false;
-			this._isSearching = true;
+			_shouldCancel = false;
+			_isSearching = true;
 			StatusLineText("Filtering... Press ESC to cancel");
-			this.filterSearchButton.Enabled = false;
+			filterSearchButton.Enabled = false;
 			ClearFilterList();
 
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = this.dataGridView.RowCount;
-			this._progressEventArgs.Value = 0;
-			this._progressEventArgs.Visible = true;
+			_progressEventArgs.MinValue = 0;
+			_progressEventArgs.MaxValue = dataGridView.RowCount;
+			_progressEventArgs.Value = 0;
+			_progressEventArgs.Visible = true;
 			SendProgressBarUpdate();
 
 			Settings settings = ConfigManager.Settings;
 			Action<FilterParams, List<int>, List<int>, List<int>> fx;
 			fx = settings.preferences.multiThreadFilter ? new Action<FilterParams, List<int>, List<int>, List<int>>(MultiThreadedFilter) : new Action<FilterParams, List<int>, List<int>, List<int>>(Filter);
-			fx.BeginInvoke(this._filterParams, this._filterResultList, this._lastFilterLinesList, this._filterHitList, FilterComplete, null);
+			fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
 			CheckForFilterDirty();
 		}
 
@@ -4828,14 +4828,14 @@ namespace LogExpert
 		{
 			ColumnizerCallback callback = new ColumnizerCallback(this);
 			FilterStarter fs = new FilterStarter(callback, Environment.ProcessorCount + 2);
-			fs.FilterHitList = this._filterHitList;
-			fs.FilterResultLines = this._filterResultList;
-			fs.LastFilterLinesList = this._lastFilterLinesList;
+			fs.FilterHitList = _filterHitList;
+			fs.FilterResultLines = _filterResultList;
+			fs.LastFilterLinesList = _lastFilterLinesList;
 			BackgroundProcessCancelHandler cancelHandler = new FilterCancelHandler(fs);
 			RegisterCancelHandler(cancelHandler);
 			long startTime = Environment.TickCount;
 
-			fs.DoFilter(filterParams, 0, this._logFileReader.LineCount, FilterProgressCallback);
+			fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback);
 
 			long endTime = Environment.TickCount;
 #if DEBUG
@@ -4860,7 +4860,7 @@ namespace LogExpert
 				ColumnizerCallback callback = new ColumnizerCallback(this);
 				while (true)
 				{
-					string line = this._logFileReader.GetLogLine(lineNum);
+					string line = _logFileReader.GetLogLine(lineNum);
 					if (line == null)
 					{
 						break;
@@ -4875,7 +4875,7 @@ namespace LogExpert
 					{
 						UpdateProgressBar(lineNum);
 					}
-					if (this._shouldCancel)
+					if (_shouldCancel)
 					{
 						break;
 					}
@@ -4931,7 +4931,7 @@ namespace LogExpert
 			// after spread
 			for (int i = 1; i <= filterParams.spreadBehind; ++i)
 			{
-				if (lineNum + i < this._logFileReader.LineCount)
+				if (lineNum + i < _logFileReader.LineCount)
 				{
 					if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
 					{
@@ -4944,7 +4944,7 @@ namespace LogExpert
 
 		private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
 		{
-			lock (this._filterResultList)
+			lock (_filterResultList)
 			{
 				filterHitList.Add(lineNum);
 				IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
@@ -4963,30 +4963,30 @@ namespace LogExpert
 
 		private void TriggerFilterLineGuiUpdate()
 		{
-			this.Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
+			Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
 		}
 
 		private void AddFilterLineGuiUpdate()
 		{
 			try
 			{
-				lock (this._filterResultList)
+				lock (_filterResultList)
 				{
-					this.filterCountLabel.Text = "" + this._filterResultList.Count;
-					if (this.filterGridView.RowCount > this._filterResultList.Count)
+					filterCountLabel.Text = "" + _filterResultList.Count;
+					if (filterGridView.RowCount > _filterResultList.Count)
 					{
-						this.filterGridView.RowCount = 0;  // helps to prevent hang ?
+						filterGridView.RowCount = 0;  // helps to prevent hang ?
 					}
-					this.filterGridView.RowCount = this._filterResultList.Count;
-					if (this.filterGridView.RowCount > 0)
+					filterGridView.RowCount = _filterResultList.Count;
+					if (filterGridView.RowCount > 0)
 					{
-						this.filterGridView.FirstDisplayedScrollingRowIndex = this.filterGridView.RowCount - 1;
+						filterGridView.FirstDisplayedScrollingRowIndex = filterGridView.RowCount - 1;
 					}
-					if (this.filterGridView.RowCount == 1)
+					if (filterGridView.RowCount == 1)
 					{
 						// after a file reload adjusted column sizes anew when the first line arrives
-						//this.filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-						AutoResizeColumns(this.filterGridView);
+						//filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+						AutoResizeColumns(filterGridView);
 					}
 				}
 			}
@@ -4998,20 +4998,20 @@ namespace LogExpert
 
 		private void UpdateProgressBar(int value)
 		{
-			this._progressEventArgs.Value = value;
-			if (value > this._progressEventArgs.MaxValue)
+			_progressEventArgs.Value = value;
+			if (value > _progressEventArgs.MaxValue)
 			{
 				// can occur if new lines will be added while filtering
-				this._progressEventArgs.MaxValue = value;
+				_progressEventArgs.MaxValue = value;
 			}
 			SendProgressBarUpdate();
 		}
 
 		private void FilterComplete(IAsyncResult result)
 		{
-			if (!this.IsDisposed && !this._waitingForClose && !this.Disposing)
+			if (!IsDisposed && !_waitingForClose && !Disposing)
 			{
-				this.Invoke(new MethodInvoker(ResetStatusAfterFilter));
+				Invoke(new MethodInvoker(ResetStatusAfterFilter));
 			}
 		}
 
@@ -5019,18 +5019,18 @@ namespace LogExpert
 		{
 			try
 			{
-				this._isSearching = false;
-				this._progressEventArgs.Value = this._progressEventArgs.MaxValue;
-				this._progressEventArgs.Visible = false;
+				_isSearching = false;
+				_progressEventArgs.Value = _progressEventArgs.MaxValue;
+				_progressEventArgs.Visible = false;
 				SendProgressBarUpdate();
-				this.filterGridView.RowCount = this._filterResultList.Count;
-				AutoResizeColumns(this.filterGridView);
-				this.filterCountLabel.Text = "" + this._filterResultList.Count;
+				filterGridView.RowCount = _filterResultList.Count;
+				AutoResizeColumns(filterGridView);
+				filterCountLabel.Text = "" + _filterResultList.Count;
 				if (filterGridView.RowCount > 0)
 				{
 					filterGridView.Focus();
 				}
-				this.filterSearchButton.Enabled = true;
+				filterSearchButton.Enabled = true;
 			}
 			catch (NullReferenceException e)
 			{
@@ -5046,15 +5046,15 @@ namespace LogExpert
 		{
 			try
 			{
-				lock (this._filterResultList)
+				lock (_filterResultList)
 				{
-					this.filterGridView.SuspendLayout();
-					this.filterGridView.RowCount = 0;
-					this.filterCountLabel.Text = "0";
-					this._filterResultList = new List<int>();
-					this._lastFilterLinesList = new List<int>();
-					this._filterHitList = new List<int>();
-					this.filterGridView.ResumeLayout();
+					filterGridView.SuspendLayout();
+					filterGridView.RowCount = 0;
+					filterCountLabel.Text = "0";
+					_filterResultList = new List<int>();
+					_lastFilterLinesList = new List<int>();
+					_filterHitList = new List<int>();
+					filterGridView.ResumeLayout();
 				}
 			}
 			catch (Exception ex)
@@ -5066,7 +5066,7 @@ namespace LogExpert
 
 		private void ClearBookmarkList()
 		{
-			this._bookmarkProvider.ClearAllBookmarks();
+			_bookmarkProvider.ClearAllBookmarks();
 			OnAllBookmarksRemoved();
 		}
 
@@ -5076,9 +5076,9 @@ namespace LogExpert
 		private void ShiftFilterLines(int offset)
 		{
 			List<int> newFilterList = new List<int>();
-			lock (this._filterResultList)
+			lock (_filterResultList)
 			{
-				foreach (int lineNum in this._filterResultList)
+				foreach (int lineNum in _filterResultList)
 				{
 					int line = lineNum - offset;
 					if (line >= 0)
@@ -5086,11 +5086,11 @@ namespace LogExpert
 						newFilterList.Add(line);
 					}
 				}
-				this._filterResultList = newFilterList;
+				_filterResultList = newFilterList;
 			}
 
 			newFilterList = new List<int>();
-			foreach (int lineNum in this._filterHitList)
+			foreach (int lineNum in _filterHitList)
 			{
 				int line = lineNum - offset;
 				if (line >= 0)
@@ -5098,71 +5098,71 @@ namespace LogExpert
 					newFilterList.Add(line);
 				}
 			}
-			this._filterHitList = newFilterList;
+			_filterHitList = newFilterList;
 
 			int count = SPREAD_MAX;
-			if (this._filterResultList.Count < SPREAD_MAX)
+			if (_filterResultList.Count < SPREAD_MAX)
 			{
-				count = this._filterResultList.Count;
+				count = _filterResultList.Count;
 			}
-			this._lastFilterLinesList = this._filterResultList.GetRange(this._filterResultList.Count - count, count);
+			_lastFilterLinesList = _filterResultList.GetRange(_filterResultList.Count - count, count);
 
 			TriggerFilterLineGuiUpdate();
 		}
 
 		private void CheckForFilterDirty()
 		{
-			if (IsFilterSearchDirty(this._filterParams))
+			if (IsFilterSearchDirty(_filterParams))
 			{
-				this.filterSearchButton.Image = this._searchButtonImage;
-				this.saveFilterButton.Enabled = false;
+				filterSearchButton.Image = _searchButtonImage;
+				saveFilterButton.Enabled = false;
 			}
 			else
 			{
-				this.filterSearchButton.Image = null;
-				this.saveFilterButton.Enabled = true;
+				filterSearchButton.Image = null;
+				saveFilterButton.Enabled = true;
 			}
 		}
 
 		private bool IsFilterSearchDirty(FilterParams filterParams)
 		{
-			if (!filterParams.searchText.Equals(this.filterComboBox.Text))
+			if (!filterParams.searchText.Equals(filterComboBox.Text))
 			{
 				return true;
 			}
-			if (filterParams.isRangeSearch != this.rangeCheckBox.Checked)
+			if (filterParams.isRangeSearch != rangeCheckBox.Checked)
 			{
 				return true;
 			}
-			if (filterParams.isRangeSearch && !filterParams.rangeSearchText.Equals(this.filterRangeComboBox.Text))
+			if (filterParams.isRangeSearch && !filterParams.rangeSearchText.Equals(filterRangeComboBox.Text))
 			{
 				return true;
 			}
-			if (filterParams.isRegex != this.filterRegexCheckBox.Checked)
+			if (filterParams.isRegex != filterRegexCheckBox.Checked)
 			{
 				return true;
 			}
-			if (filterParams.isInvert != this.invertFilterCheckBox.Checked)
+			if (filterParams.isInvert != invertFilterCheckBox.Checked)
 			{
 				return true;
 			}
-			if (filterParams.spreadBefore != this.filterKnobControl1.Value)
+			if (filterParams.spreadBefore != filterKnobControl1.Value)
 			{
 				return true;
 			}
-			if (filterParams.spreadBehind != this.filterKnobControl2.Value)
+			if (filterParams.spreadBehind != filterKnobControl2.Value)
 			{
 				return true;
 			}
-			if (filterParams.fuzzyValue != this.fuzzyKnobControl.Value)
+			if (filterParams.fuzzyValue != fuzzyKnobControl.Value)
 			{
 				return true;
 			}
-			if (filterParams.columnRestrict != this.columnRestrictCheckBox.Checked)
+			if (filterParams.columnRestrict != columnRestrictCheckBox.Checked)
 			{
 				return true;
 			}
-			if (filterParams.isCaseSensitive != this.filterCaseSensitiveCheckBox.Checked)
+			if (filterParams.isCaseSensitive != filterCaseSensitiveCheckBox.Checked)
 			{
 				return true;
 			}
@@ -5171,33 +5171,33 @@ namespace LogExpert
 
 		private void AdjustMinimumGridWith()
 		{
-			if (this.dataGridView.Columns.Count > 1)
+			if (dataGridView.Columns.Count > 1)
 			{
-				AutoResizeColumns(this.dataGridView);
+				AutoResizeColumns(dataGridView);
 
-				int width = this.dataGridView.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
-				int diff = this.dataGridView.Width - width;
+				int width = dataGridView.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
+				int diff = dataGridView.Width - width;
 				if (diff > 0)
 				{
-					diff -= this.dataGridView.RowHeadersWidth / 2;
-					this.dataGridView.Columns[this.dataGridView.Columns.Count - 1].Width =
-																						  this.dataGridView.Columns[this.dataGridView.Columns.Count - 1].Width + diff;
-					this.filterGridView.Columns[this.filterGridView.Columns.Count - 1].Width =
-																							  this.filterGridView.Columns[this.filterGridView.Columns.Count - 1].Width + diff;
+					diff -= dataGridView.RowHeadersWidth / 2;
+					dataGridView.Columns[dataGridView.Columns.Count - 1].Width =
+																						  dataGridView.Columns[dataGridView.Columns.Count - 1].Width + diff;
+					filterGridView.Columns[filterGridView.Columns.Count - 1].Width =
+																							  filterGridView.Columns[filterGridView.Columns.Count - 1].Width + diff;
 				}
 			}
 		}
 
 		public void ToggleFilterPanel()
 		{
-			this.splitContainer1.Panel2Collapsed = !this.splitContainer1.Panel2Collapsed;
-			if (!this.splitContainer1.Panel2Collapsed)
+			splitContainer1.Panel2Collapsed = !splitContainer1.Panel2Collapsed;
+			if (!splitContainer1.Panel2Collapsed)
 			{
-				this.filterComboBox.Focus();
+				filterComboBox.Focus();
 			}
 			else
 			{
-				this.dataGridView.Focus();
+				dataGridView.Focus();
 			}
 		}
 
@@ -5211,20 +5211,20 @@ namespace LogExpert
 
 		private void InvalidateCurrentRow()
 		{
-			InvalidateCurrentRow(this.dataGridView);
-			InvalidateCurrentRow(this.filterGridView);
+			InvalidateCurrentRow(dataGridView);
+			InvalidateCurrentRow(filterGridView);
 		}
 
 		private void DisplayCurrentFileOnStatusline()
 		{
-			if (this._logFileReader.IsMultiFile)
+			if (_logFileReader.IsMultiFile)
 			{
 				try
 				{
-					if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index > -1)
+					if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index > -1)
 					{
 						string fileName =
-							this._logFileReader.GetLogFileNameForLine(this.dataGridView.CurrentRow.Index);
+							_logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
 						if (fileName != null)
 						{
 							StatusLineText(Util.GetNameFromPath(fileName));
@@ -5234,7 +5234,7 @@ namespace LogExpert
 				catch (Exception)
 				{
 					// TODO: handle this concurrent situation better:
-					// this.dataGridView.CurrentRow may be null even if checked before.
+					// dataGridView.CurrentRow may be null even if checked before.
 					// This can happen when MultiFile shift deselects the current row because there 
 					// are less lines after rollover than before.
 					// access to dataGridView-Rows should be locked 
@@ -5244,122 +5244,122 @@ namespace LogExpert
 
 		private void UpdateSelectionDisplay()
 		{
-			if (this._noSelectionUpdates)
+			if (_noSelectionUpdates)
 			{
 				return;
 			}
-			this._selectionChangedTrigger.Trigger();
+			_selectionChangedTrigger.Trigger();
 		}
 
 		private void UpdateFilterHistoryFromSettings()
 		{
 			ConfigManager.Settings.filterHistoryList = ConfigManager.Settings.filterHistoryList;
-			this.filterComboBox.Items.Clear();
+			filterComboBox.Items.Clear();
 			foreach (string item in ConfigManager.Settings.filterHistoryList)
 			{
-				this.filterComboBox.Items.Add(item);
+				filterComboBox.Items.Add(item);
 			}
 
-			this.filterRangeComboBox.Items.Clear();
+			filterRangeComboBox.Items.Clear();
 			foreach (string item in ConfigManager.Settings.filterRangeHistoryList)
 			{
-				this.filterRangeComboBox.Items.Add(item);
+				filterRangeComboBox.Items.Add(item);
 			}
 		}
 
 		private void StatusLineText(string text)
 		{
-			this._statusEventArgs.StatusText = text;
+			_statusEventArgs.StatusText = text;
 			SendStatusLineUpdate();
 		}
 
 		private void StatusLineTextImmediate(string text)
 		{
-			this._statusEventArgs.StatusText = text;
-			this._statusLineTrigger.TriggerImmediate();
+			_statusEventArgs.StatusText = text;
+			_statusLineTrigger.TriggerImmediate();
 		}
 
 		private void StatusLineError(string text)
 		{
 			StatusLineText(text);
-			this._isErrorShowing = true;
+			_isErrorShowing = true;
 		}
 
 		private void RemoveStatusLineError()
 		{
 			StatusLineText("");
-			this._isErrorShowing = false;
+			_isErrorShowing = false;
 		}
 
 		private void SendGuiStateUpdate()
 		{
-			OnGuiState(this._guiStateArgs);
+			OnGuiState(_guiStateArgs);
 		}
 
 		private void SendProgressBarUpdate()
 		{
-			OnProgressBarUpdate(this._progressEventArgs);
+			OnProgressBarUpdate(_progressEventArgs);
 		}
 
 		private void SendStatusLineUpdate()
 		{
-			this._statusLineTrigger.Trigger();
+			_statusLineTrigger.Trigger();
 		}
 
 		private void ShowAdvancedFilterPanel(bool show)
 		{
 			if (show)
 			{
-				this.advancedButton.Text = "Hide advanced...";
-				this.advancedButton.Image = null;
+				advancedButton.Text = "Hide advanced...";
+				advancedButton.Image = null;
 			}
 			else
 			{
-				this.advancedButton.Text = "Show advanced...";
+				advancedButton.Text = "Show advanced...";
 				CheckForAdvancedButtonDirty();
 			}
 
-			this.advancedFilterSplitContainer.Panel1Collapsed = !show;
-			this.advancedFilterSplitContainer.SplitterDistance = 54;
-			this._showAdvanced = show;
+			advancedFilterSplitContainer.Panel1Collapsed = !show;
+			advancedFilterSplitContainer.SplitterDistance = 54;
+			_showAdvanced = show;
 		}
 
 		private void CheckForAdvancedButtonDirty()
 		{
-			if (this.IsAdvancedOptionActive() && !this._showAdvanced)
+			if (IsAdvancedOptionActive() && !_showAdvanced)
 			{
-				this.advancedButton.Image = this._advancedButtonImage;
+				advancedButton.Image = _advancedButtonImage;
 			}
 			else
 			{
-				this.advancedButton.Image = null;
+				advancedButton.Image = null;
 			}
 		}
 
 		private void FilterToTab()
 		{
-			this.filterSearchButton.Enabled = false;
+			filterSearchButton.Enabled = false;
 			MethodInvoker invoker = new MethodInvoker(WriteFilterToTab);
 			invoker.BeginInvoke(null, null);
 		}
 
 		private void WriteFilterToTab()
 		{
-			FilterPipe pipe = new FilterPipe(this._filterParams.CreateCopy(), this);
-			lock (this._filterResultList)
+			FilterPipe pipe = new FilterPipe(_filterParams.CreateCopy(), this);
+			lock (_filterResultList)
 			{
 				string namePrefix = "->F";
 				string title;
-				if (this.IsTempFile)
+				if (IsTempFile)
 				{
-					title = this.TempTitleName + namePrefix + ++this._filterPipeNameCounter;
+					title = TempTitleName + namePrefix + ++_filterPipeNameCounter;
 				}
 				else
 				{
-					title = Util.GetNameFromPath(this.FileName) + namePrefix + ++this._filterPipeNameCounter;
+					title = Util.GetNameFromPath(FileName) + namePrefix + ++_filterPipeNameCounter;
 				}
 
-				WritePipeToTab(pipe, this._filterResultList, title, null);
+				WritePipeToTab(pipe, _filterResultList, title, null);
 			}
 		}
 
@@ -5367,19 +5367,19 @@ namespace LogExpert
 		{
 			Logger.logInfo("WritePipeToTab(): " + lineNumberList.Count + " lines.");
 			StatusLineText("Writing to temp file... Press ESC to cancel.");
-			this._guiStateArgs.MenuEnabled = false;
+			_guiStateArgs.MenuEnabled = false;
 			SendGuiStateUpdate();
-			this._progressEventArgs.MinValue = 0;
-			this._progressEventArgs.MaxValue = lineNumberList.Count;
-			this._progressEventArgs.Value = 0;
-			this._progressEventArgs.Visible = true;
-			this.Invoke(new MethodInvoker(SendProgressBarUpdate));
-			this._isSearching = true;
-			this._shouldCancel = false;
+			_progressEventArgs.MinValue = 0;
+			_progressEventArgs.MaxValue = lineNumberList.Count;
+			_progressEventArgs.Value = 0;
+			_progressEventArgs.Visible = true;
+			Invoke(new MethodInvoker(SendProgressBarUpdate));
+			_isSearching = true;
+			_shouldCancel = false;
 
-			lock (this._filterPipeList)
+			lock (_filterPipeList)
 			{
-				this._filterPipeList.Add(pipe);
+				_filterPipeList.Add(pipe);
 			}
 			pipe.Closed += new FilterPipe.ClosedEventHandler(Pipe_Disconnected);
 			int count = 0;
@@ -5387,40 +5387,40 @@ namespace LogExpert
 			LogExpertCallback callback = new LogExpertCallback(this);
 			foreach (int i in lineNumberList)
 			{
-				if (this._shouldCancel)
+				if (_shouldCancel)
 				{
 					break;
 				}
-				string line = this._logFileReader.GetLogLine(i);
-				if (this.CurrentColumnizer is ILogLineXmlColumnizer)
+				string line = _logFileReader.GetLogLine(i);
+				if (CurrentColumnizer is ILogLineXmlColumnizer)
 				{
 					callback.LineNum = i;
-					line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
+					line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
 				}
 				pipe.WriteToPipe(line, i);
 				if (++count % PROGRESS_BAR_MODULO == 0)
 				{
-					this._progressEventArgs.Value = count;
-					this.Invoke(new MethodInvoker(SendProgressBarUpdate));
+					_progressEventArgs.Value = count;
+					Invoke(new MethodInvoker(SendProgressBarUpdate));
 				}
 			}
 			pipe.CloseFile();
 			Logger.logInfo("WritePipeToTab(): finished");
-			this.Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, name, persistenceData });
+			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, name, persistenceData });
 		}
 
 		private void WriteFilterToTabFinished(FilterPipe pipe, string name, PersistenceData persistenceData)
 		{
-			this._isSearching = false;
-			if (!this._shouldCancel)
+			_isSearching = false;
+			if (!_shouldCancel)
 			{
 				string title = name;
 				ILogLineColumnizer preProcessColumnizer = null;
-				if (!(this.CurrentColumnizer is ILogLineXmlColumnizer))
+				if (!(CurrentColumnizer is ILogLineXmlColumnizer))
 				{
-					preProcessColumnizer = this.CurrentColumnizer;
+					preProcessColumnizer = CurrentColumnizer;
 				}
-				LogWindow newWin = this._parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
+				LogWindow newWin = _parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
 				newWin.FilterPipe = pipe;
 				pipe.OwnLogWindow = newWin;
 				if (persistenceData != null)
@@ -5429,13 +5429,13 @@ namespace LogExpert
 					fx.BeginInvoke(newWin, persistenceData, null, null);
 				}
 			}
-			this._progressEventArgs.Value = _progressEventArgs.MaxValue;
-			this._progressEventArgs.Visible = false;
+			_progressEventArgs.Value = _progressEventArgs.MaxValue;
+			_progressEventArgs.Visible = false;
 			SendProgressBarUpdate();
-			this._guiStateArgs.MenuEnabled = true;
+			_guiStateArgs.MenuEnabled = true;
 			SendGuiStateUpdate();
 			StatusLineText("");
-			this.filterSearchButton.Enabled = true;
+			filterSearchButton.Enabled = true;
 		}
 
 		/// <summary>
@@ -5453,7 +5453,7 @@ namespace LogExpert
 				pipe.WriteToPipe(entry.logLine, entry.lineNum);
 			}
 			pipe.CloseFile();
-			this.Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
+			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
 		}
 
 		private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
@@ -5474,7 +5474,7 @@ namespace LogExpert
 
 		private void ProcessFilterPipes(int lineNum)
 		{
-			string searchLine = this._logFileReader.GetLogLine(lineNum);
+			string searchLine = _logFileReader.GetLogLine(lineNum);
 			if (searchLine == null)
 			{
 				return;
@@ -5483,9 +5483,9 @@ namespace LogExpert
 			ColumnizerCallback callback = new ColumnizerCallback(this);
 			callback.LineNum = lineNum;
 			IList<FilterPipe> deleteList = new List<FilterPipe>();
-			lock (this._filterPipeList)
+			lock (_filterPipeList)
 			{
-				foreach (FilterPipe pipe in this._filterPipeList)
+				foreach (FilterPipe pipe in _filterPipeList)
 				{
 					if (pipe.IsStopped)
 					{
@@ -5503,7 +5503,7 @@ namespace LogExpert
 								pipe.LastLinesHistoryList.RemoveAt(0);
 							}
 
-							string textLine = this._logFileReader.GetLogLine(line);
+							string textLine = _logFileReader.GetLogLine(line);
 							bool fileOk = pipe.WriteToPipe(textLine, line);
 							if (!fileOk)
 							{
@@ -5516,21 +5516,21 @@ namespace LogExpert
 			}
 			foreach (FilterPipe pipe in deleteList)
 			{
-				this._filterPipeList.Remove(pipe);
+				_filterPipeList.Remove(pipe);
 			}
 		}
 
 		private void CopyMarkedLinesToClipboard()
 		{
-			if (this._guiStateArgs.CellSelectMode)
+			if (_guiStateArgs.CellSelectMode)
 			{
-				DataObject data = this.dataGridView.GetClipboardContent();
+				DataObject data = dataGridView.GetClipboardContent();
 				Clipboard.SetDataObject(data);
 			}
 			else
 			{
 				List<int> lineNumList = new List<int>();
-				foreach (DataGridViewRow row in this.dataGridView.SelectedRows)
+				foreach (DataGridViewRow row in dataGridView.SelectedRows)
 				{
 					if (row.Index != -1)
 					{
@@ -5542,7 +5542,7 @@ namespace LogExpert
 				LogExpertCallback callback = new LogExpertCallback(this);
 				foreach (int lineNum in lineNumList)
 				{
-					string line = this._logFileReader.GetLogLine(lineNum);
+					string line = _logFileReader.GetLogLine(lineNum);
 					if (CurrentColumnizer is ILogLineXmlColumnizer)
 					{
 						callback.LineNum = lineNum;
@@ -5560,7 +5560,7 @@ namespace LogExpert
 		/// <param name="encoding"></param>
 		private void SetExplicitEncoding(Encoding encoding)
 		{
-			this.EncodingOptions.Encoding = encoding;
+			EncodingOptions.Encoding = encoding;
 		}
 
 		private void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
@@ -5590,10 +5590,10 @@ namespace LogExpert
 
 		private IList<int> GetSelectedContent()
 		{
-			if (this.dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
+			if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
 			{
 				List<int> lineNumList = new List<int>();
-				foreach (DataGridViewRow row in this.dataGridView.SelectedRows)
+				foreach (DataGridViewRow row in dataGridView.SelectedRows)
 				{
 					if (row.Index != -1)
 					{
@@ -5608,11 +5608,11 @@ namespace LogExpert
 
 		private void AdjustHighlightSplitterWidth()
 		{
-			//int size = this.editHighlightsSplitContainer.Panel2Collapsed ? 600 : 660;
-			//int distance = this.highlightSplitContainer.Width - size;
+			//int size = editHighlightsSplitContainer.Panel2Collapsed ? 600 : 660;
+			//int distance = highlightSplitContainer.Width - size;
 			//if (distance < 10)
 			//  distance = 10;
-			//this.highlightSplitContainer.SplitterDistance = distance;
+			//highlightSplitContainer.SplitterDistance = distance;
 		}
 
 		private void BookmarkComment(Bookmark bookmark)
@@ -5622,7 +5622,7 @@ namespace LogExpert
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				bookmark.Text = dlg.Comment;
-				this.dataGridView.Refresh();
+				dataGridView.Refresh();
 				OnBookmarkTextChanged(bookmark);
 			}
 		}
@@ -5640,13 +5640,13 @@ namespace LogExpert
 			{
 				foreach (int colIndex in filter.columnList)
 				{
-					if (colIndex < this.dataGridView.Columns.Count - 2)
+					if (colIndex < dataGridView.Columns.Count - 2)
 					{
 						if (names.Length > 0)
 						{
 							names += ", ";
 						}
-						names += this.dataGridView.Columns[2 + colIndex].HeaderText; // skip first two columns: marker + line number
+						names += dataGridView.Columns[2 + colIndex].HeaderText; // skip first two columns: marker + line number
 					}
 				}
 			}
@@ -5663,8 +5663,8 @@ namespace LogExpert
 			}
 			foreach (DataGridViewColumn col in dict.Values)
 			{
-				col.Frozen = this._freezeStateMap.ContainsKey(gridView) && this._freezeStateMap[gridView];
-				if (col.Index == this._selectedCol)
+				col.Frozen = _freezeStateMap.ContainsKey(gridView) && _freezeStateMap[gridView];
+				if (col.Index == _selectedCol)
 				{
 					break;
 				}
@@ -5675,30 +5675,30 @@ namespace LogExpert
 		{
 			if (show)
 			{
-				this.tableLayoutPanel1.ColumnStyles[1].Width = 16;
+				tableLayoutPanel1.ColumnStyles[1].Width = 16;
 			}
 			else
 			{
-				this.tableLayoutPanel1.ColumnStyles[1].Width = 0;
+				tableLayoutPanel1.ColumnStyles[1].Width = 0;
 			}
-			this._timeSpreadCalc.Enabled = show;
+			_timeSpreadCalc.Enabled = show;
 		}
 
 		private void AddTempFileTab(string fileName, string title)
 		{
-			this._parentLogTabWin.AddTempFileTab(fileName, title);
+			_parentLogTabWin.AddTempFileTab(fileName, title);
 		}
 
 #if DEBUG
 		internal void DumpBufferInfo()
 		{
-			int currentLineNum = this.dataGridView.CurrentCellAddress.Y;
-			this._logFileReader.LogBufferInfoForLine(currentLineNum);
+			int currentLineNum = dataGridView.CurrentCellAddress.Y;
+			_logFileReader.LogBufferInfoForLine(currentLineNum);
 		}
 
 		internal void DumpBufferDiagnostic()
 		{
-			this._logFileReader.LogBufferDiagnostic();
+			_logFileReader.LogBufferDiagnostic();
 		}
 
 #endif
@@ -5716,41 +5716,41 @@ namespace LogExpert
 				null,
 				true);
 			he.IsSearchHit = true;
-			lock (this._tempHilightEntryListLock)
+			lock (_tempHilightEntryListLock)
 			{
-				this._tempHilightEntryList.Add(he);
+				_tempHilightEntryList.Add(he);
 			}
 			RefreshAllGrids();
 		}
 
 		private void RemoveAllSearchHighlightEntries()
 		{
-			lock (this._tempHilightEntryListLock)
+			lock (_tempHilightEntryListLock)
 			{
 				List<HilightEntry> newList = new List<HilightEntry>();
-				foreach (HilightEntry he in this._tempHilightEntryList)
+				foreach (HilightEntry he in _tempHilightEntryList)
 				{
 					if (!he.IsSearchHit)
 					{
 						newList.Add(he);
 					}
 				}
-				this._tempHilightEntryList = newList;
+				_tempHilightEntryList = newList;
 			}
 			RefreshAllGrids();
 		}
 
 		internal void ChangeMultifileMask()
 		{
-			MultiFileMaskDialog dlg = new MultiFileMaskDialog(this, this.FileName);
+			MultiFileMaskDialog dlg = new MultiFileMaskDialog(this, FileName);
 			dlg.Owner = this;
-			dlg.MaxDays = this._multifileOptions.MaxDayTry;
-			dlg.FileNamePattern = this._multifileOptions.FormatPattern;
+			dlg.MaxDays = _multifileOptions.MaxDayTry;
+			dlg.FileNamePattern = _multifileOptions.FormatPattern;
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
-				this._multifileOptions.FormatPattern = dlg.FileNamePattern;
-				this._multifileOptions.MaxDayTry = dlg.MaxDays;
-				if (this.IsMultiFile)
+				_multifileOptions.FormatPattern = dlg.FileNamePattern;
+				_multifileOptions.MaxDayTry = dlg.MaxDays;
+				if (IsMultiFile)
 				{
 					Reload();
 				}
@@ -5759,23 +5759,23 @@ namespace LogExpert
 
 		internal void ToggleColumnFinder(bool show, bool setFocus)
 		{
-			this._guiStateArgs.ColumnFinderVisible = show;
+			_guiStateArgs.ColumnFinderVisible = show;
 			if (show)
 			{
-				this.columnComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
-				this.columnComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
-				this.columnComboBox.AutoCompleteCustomSource = new AutoCompleteStringCollection();
-				this.columnComboBox.AutoCompleteCustomSource.AddRange(this.CurrentColumnizer.GetColumnNames());
+				columnComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+				columnComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+				columnComboBox.AutoCompleteCustomSource = new AutoCompleteStringCollection();
+				columnComboBox.AutoCompleteCustomSource.AddRange(CurrentColumnizer.GetColumnNames());
 				if (setFocus)
 				{
-					this.columnComboBox.Focus();
+					columnComboBox.Focus();
 				}
 			}
 			else
 			{
-				this.dataGridView.Focus();
+				dataGridView.Focus();
 			}
-			this.tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
+			tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
 		}
 
 		private DataGridViewColumn GetColumnByName(DataGridView dataGridView, string name)
@@ -5792,178 +5792,178 @@ namespace LogExpert
 
 		private void SelectColumn()
 		{
-			string colName = this.columnComboBox.SelectedItem as string;
-			DataGridViewColumn col = GetColumnByName(this.dataGridView, colName);
+			string colName = columnComboBox.SelectedItem as string;
+			DataGridViewColumn col = GetColumnByName(dataGridView, colName);
 			if (col != null && !col.Frozen)
 			{
-				this.dataGridView.FirstDisplayedScrollingColumnIndex = col.Index;
-				int currentLine = this.dataGridView.CurrentCellAddress.Y;
+				dataGridView.FirstDisplayedScrollingColumnIndex = col.Index;
+				int currentLine = dataGridView.CurrentCellAddress.Y;
 				if (currentLine >= 0)
 				{
-					this.dataGridView.CurrentCell =
-						this.dataGridView.Rows[this.dataGridView.CurrentCellAddress.Y].Cells[col.Index];
+					dataGridView.CurrentCell =
+						dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
 				}
 			}
 		}
 
 		private void InitPatternWindow()
 		{
-			this._patternWindow = new PatternWindow(this);
-			this._patternWindow.SetColumnizer(this.CurrentColumnizer);
-			this._patternWindow.SetFont(this.Preferences.fontName, this.Preferences.fontSize);
-			this._patternWindow.Fuzzy = this._patternArgs.fuzzy;
-			this._patternWindow.MaxDiff = this._patternArgs.maxDiffInBlock;
-			this._patternWindow.MaxMisses = this._patternArgs.maxMisses;
-			this._patternWindow.Weight = this._patternArgs.minWeight;
+			_patternWindow = new PatternWindow(this);
+			_patternWindow.SetColumnizer(CurrentColumnizer);
+			_patternWindow.SetFont(Preferences.fontName, Preferences.fontSize);
+			_patternWindow.Fuzzy = _patternArgs.fuzzy;
+			_patternWindow.MaxDiff = _patternArgs.maxDiffInBlock;
+			_patternWindow.MaxMisses = _patternArgs.maxMisses;
+			_patternWindow.Weight = _patternArgs.minWeight;
 		}
 
 		private void ChangeRowHeight(bool decrease)
 		{
-			int rowNum = this.dataGridView.CurrentCellAddress.Y;
-			if (rowNum < 0 || rowNum >= this.dataGridView.RowCount)
+			int rowNum = dataGridView.CurrentCellAddress.Y;
+			if (rowNum < 0 || rowNum >= dataGridView.RowCount)
 			{
 				return;
 			}
 			if (decrease)
 			{
-				if (!this._rowHeightList.ContainsKey(rowNum))
+				if (!_rowHeightList.ContainsKey(rowNum))
 				{
 					return;
 				}
 				else
 				{
-					RowHeightEntry entry = this._rowHeightList[rowNum];
-					entry.Height = entry.Height - this._lineHeight;
-					if (entry.Height <= this._lineHeight)
+					RowHeightEntry entry = _rowHeightList[rowNum];
+					entry.Height = entry.Height - _lineHeight;
+					if (entry.Height <= _lineHeight)
 					{
-						this._rowHeightList.Remove(rowNum);
+						_rowHeightList.Remove(rowNum);
 					}
 				}
 			}
 			else
 			{
 				RowHeightEntry entry;
-				if (!this._rowHeightList.ContainsKey(rowNum))
+				if (!_rowHeightList.ContainsKey(rowNum))
 				{
 					entry = new RowHeightEntry();
 					entry.LineNum = rowNum;
-					entry.Height = this._lineHeight;
-					this._rowHeightList[rowNum] = entry;
+					entry.Height = _lineHeight;
+					_rowHeightList[rowNum] = entry;
 				}
 				else
 				{
-					entry = this._rowHeightList[rowNum];
+					entry = _rowHeightList[rowNum];
 				}
-				entry.Height = entry.Height + this._lineHeight;
+				entry.Height = entry.Height + _lineHeight;
 			}
-			this.dataGridView.UpdateRowHeightInfo(rowNum, false);
-			if (rowNum == this.dataGridView.RowCount - 1 && this._guiStateArgs.FollowTail)
+			dataGridView.UpdateRowHeightInfo(rowNum, false);
+			if (rowNum == dataGridView.RowCount - 1 && _guiStateArgs.FollowTail)
 			{
-				this.dataGridView.FirstDisplayedScrollingRowIndex = rowNum;
+				dataGridView.FirstDisplayedScrollingRowIndex = rowNum;
 			}
-			this.dataGridView.Refresh();
+			dataGridView.Refresh();
 		}
 
 		private int GetRowHeight(int rowNum)
 		{
-			if (this._rowHeightList.ContainsKey(rowNum))
+			if (_rowHeightList.ContainsKey(rowNum))
 			{
-				return this._rowHeightList[rowNum].Height;
+				return _rowHeightList[rowNum].Height;
 			}
 			else
 			{
-				return this._lineHeight;
+				return _lineHeight;
 			}
 		}
 
 		private void AddBookmarkAtLineSilently(int lineNum)
 		{
-			if (!this._bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
-				this._bookmarkProvider.AddBookmark(new Bookmark(lineNum));
+				_bookmarkProvider.AddBookmark(new Bookmark(lineNum));
 			}
 		}
 
 		private void AddBookmarkAndEditComment()
 		{
-			int lineNum = this.dataGridView.CurrentCellAddress.Y;
-			if (!this._bookmarkProvider.IsBookmarkAtLine(lineNum))
+			int lineNum = dataGridView.CurrentCellAddress.Y;
+			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
 				ToggleBookmark();
 			}
-			BookmarkComment(this._bookmarkProvider.GetBookmarkForLine(lineNum));
+			BookmarkComment(_bookmarkProvider.GetBookmarkForLine(lineNum));
 		}
 
 		private void AddBookmarkComment(string text)
 		{
-			int lineNum = this.dataGridView.CurrentCellAddress.Y;
+			int lineNum = dataGridView.CurrentCellAddress.Y;
 			Bookmark bookmark;
-			if (!this._bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
-				this._bookmarkProvider.AddBookmark(bookmark = new Bookmark(lineNum));
+				_bookmarkProvider.AddBookmark(bookmark = new Bookmark(lineNum));
 			}
 			else
 			{
-				bookmark = this._bookmarkProvider.GetBookmarkForLine(lineNum);
+				bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
 			}
 			bookmark.Text = bookmark.Text + text;
-			this.dataGridView.Refresh();
-			this.filterGridView.Refresh();
+			dataGridView.Refresh();
+			filterGridView.Refresh();
 			OnBookmarkTextChanged(bookmark);
 		}
 
 		private void MarkCurrentFilterRange()
 		{
-			this._filterParams.rangeSearchText = this.filterRangeComboBox.Text;
+			_filterParams.rangeSearchText = filterRangeComboBox.Text;
 			ColumnizerCallback callback = new ColumnizerCallback(this);
-			RangeFinder rangeFinder = new RangeFinder(this._filterParams, callback);
-			Range range = rangeFinder.FindRange(this.dataGridView.CurrentCellAddress.Y);
+			RangeFinder rangeFinder = new RangeFinder(_filterParams, callback);
+			Range range = rangeFinder.FindRange(dataGridView.CurrentCellAddress.Y);
 			if (range != null)
 			{
 				SetCellSelectionMode(false);
-				this._noSelectionUpdates = true;
+				_noSelectionUpdates = true;
 				for (int i = range.StartLine; i <= range.EndLine; ++i)
 				{
-					this.dataGridView.Rows[i].Selected = true;
+					dataGridView.Rows[i].Selected = true;
 				}
-				this._noSelectionUpdates = false;
+				_noSelectionUpdates = false;
 				UpdateSelectionDisplay();
 			}
 		}
 
 		private void RemoveTempHighlights()
 		{
-			lock (this._tempHilightEntryListLock)
+			lock (_tempHilightEntryListLock)
 			{
-				this._tempHilightEntryList.Clear();
+				_tempHilightEntryList.Clear();
 			}
 			RefreshAllGrids();
 		}
 
 		private void ToggleHighlightPanel(bool open)
 		{
-			this.highlightSplitContainer.Panel2Collapsed = !open;
-			this.toggleHighlightPanelButton.Image = (open ? this._panelCloseButtonImage : this._panelOpenButtonImage);
+			highlightSplitContainer.Panel2Collapsed = !open;
+			toggleHighlightPanelButton.Image = (open ? _panelCloseButtonImage : _panelOpenButtonImage);
 		}
 
 		private void SetBoomarksForSelectedFilterLines()
 		{
-			lock (this._filterResultList)
+			lock (_filterResultList)
 			{
-				foreach (DataGridViewRow row in this.filterGridView.SelectedRows)
+				foreach (DataGridViewRow row in filterGridView.SelectedRows)
 				{
-					int lineNum = this._filterResultList[row.Index];
+					int lineNum = _filterResultList[row.Index];
 					AddBookmarkAtLineSilently(lineNum);
 				}
 			}
-			this.dataGridView.Refresh();
-			this.filterGridView.Refresh();
+			dataGridView.Refresh();
+			filterGridView.Refresh();
 			OnBookmarkAdded();
 		}
 
 		private void SetDefaultHighlightGroup()
 		{
-			HilightGroup group = this._parentLogTabWin.FindHighlightGroupByFileMask(this.FileName);
+			HilightGroup group = _parentLogTabWin.FindHighlightGroupByFileMask(FileName);
 			if (group != null)
 			{
 				SetCurrentHighlightGroup(group.GroupName);
@@ -5976,32 +5976,32 @@ namespace LogExpert
 
 		private void HandleChangedFilterOnLoadSetting()
 		{
-			this._parentLogTabWin.Preferences.isFilterOnLoad = this.filterOnLoadCheckBox.Checked;
-			this._parentLogTabWin.Preferences.isAutoHideFilterList = this.hideFilterListOnLoadCheckBox.Checked;
+			_parentLogTabWin.Preferences.isFilterOnLoad = filterOnLoadCheckBox.Checked;
+			_parentLogTabWin.Preferences.isAutoHideFilterList = hideFilterListOnLoadCheckBox.Checked;
 			OnFilterListChanged(this);
 		}
 
 		private void RegisterCancelHandler(BackgroundProcessCancelHandler handler)
 		{
-			lock (this._cancelHandlerList)
+			lock (_cancelHandlerList)
 			{
-				this._cancelHandlerList.Add(handler);
+				_cancelHandlerList.Add(handler);
 			}
 		}
 
 		private void DeRegisterCancelHandler(BackgroundProcessCancelHandler handler)
 		{
-			lock (this._cancelHandlerList)
+			lock (_cancelHandlerList)
 			{
-				this._cancelHandlerList.Remove(handler);
+				_cancelHandlerList.Remove(handler);
 			}
 		}
 
 		private void FireCancelHandlers()
 		{
-			lock (this._cancelHandlerList)
+			lock (_cancelHandlerList)
 			{
-				foreach (BackgroundProcessCancelHandler handler in this._cancelHandlerList)
+				foreach (BackgroundProcessCancelHandler handler in _cancelHandlerList)
 				{
 					handler.EscapePressed();
 				}
@@ -6010,38 +6010,38 @@ namespace LogExpert
 
 		private void SyncOtherWindows(DateTime timestamp)
 		{
-			lock (this._timeSyncListLock)
+			lock (_timeSyncListLock)
 			{
-				if (this.TimeSyncList != null)
+				if (TimeSyncList != null)
 				{
-					this.TimeSyncList.NavigateToTimestamp(timestamp, this);
+					TimeSyncList.NavigateToTimestamp(timestamp, this);
 				}
 			}
 		}
 
 		private void AddSlaveToTimesync(LogWindow slave)
 		{
-			lock (this._timeSyncListLock)
+			lock (_timeSyncListLock)
 			{
-				if (this.TimeSyncList == null)
+				if (TimeSyncList == null)
 				{
 					if (slave.TimeSyncList == null)
 					{
-						this.TimeSyncList = new TimeSyncList();
-						this.TimeSyncList.AddWindow(this);
+						TimeSyncList = new TimeSyncList();
+						TimeSyncList.AddWindow(this);
 					}
 					else
 					{
-						this.TimeSyncList = slave.TimeSyncList;
+						TimeSyncList = slave.TimeSyncList;
 					}
-					int currentLineNum = this.dataGridView.CurrentCellAddress.Y;
+					int currentLineNum = dataGridView.CurrentCellAddress.Y;
 					int refLine = currentLineNum;
 					DateTime timeStamp = GetTimestampForLine(ref refLine, true);
-					if (!timeStamp.Equals(DateTime.MinValue) && !this._shouldTimestampDisplaySyncingCancel)
+					if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)
 					{
-						this.TimeSyncList.CurrentTimestamp = timeStamp;
+						TimeSyncList.CurrentTimestamp = timeStamp;
 					}
-					this.TimeSyncList.WindowRemoved += TimeSyncList_WindowRemoved;
+					TimeSyncList.WindowRemoved += TimeSyncList_WindowRemoved;
 				}
 			}
 			slave.AddToTimeSync(this);
@@ -6055,7 +6055,7 @@ namespace LogExpert
 
 		private string[] GetColumnsForLine(int lineNumber)
 		{
-			return this._columnCache.GetColumnsForLine(this._logFileReader, lineNumber, this.CurrentColumnizer, this.ColumnizerCallbackObject);
+			return _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 		}
 
 		protected override string GetPersistString()
@@ -6160,9 +6160,9 @@ namespace LogExpert
 
 		protected void OnFilterListChanged(LogWindow source)
 		{
-			if (this.FilterListChanged != null)
+			if (FilterListChanged != null)
 			{
-				this.FilterListChanged(this, new FilterListChangedEventArgs(source));
+				FilterListChanged(this, new FilterListChangedEventArgs(source));
 			}
 		}
 
@@ -6172,9 +6172,9 @@ namespace LogExpert
 
 		protected void OnCurrentHighlightListChanged()
 		{
-			if (this.CurrentHighlightGroupChanged != null)
+			if (CurrentHighlightGroupChanged != null)
 			{
-				this.CurrentHighlightGroupChanged(this, new CurrentHighlightGroupChangedEventArgs(this, this._currentHighlightGroup));
+				CurrentHighlightGroupChanged(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
 			}
 		}
 
@@ -6258,7 +6258,7 @@ namespace LogExpert
 		{
 			if (SyncModeChanged != null)
 			{
-				SyncModeChanged(this, new SyncModeEventArgs(this.IsTimeSynced));
+				SyncModeChanged(this, new SyncModeEventArgs(IsTimeSynced));
 			}
 		}
 
@@ -6268,8 +6268,8 @@ namespace LogExpert
 
 		internal void RefreshAllGrids()
 		{
-			this.dataGridView.Refresh();
-			this.filterGridView.Refresh();
+			dataGridView.Refresh();
+			filterGridView.Refresh();
 		}
 
 		#endregion
@@ -6278,19 +6278,19 @@ namespace LogExpert
 
 		public string GetLogLine(int lineNum)
 		{
-			return this._logFileReader.GetLogLine(lineNum);
+			return _logFileReader.GetLogLine(lineNum);
 		}
 
 		public Bookmark GetBookmarkForLine(int lineNum)
 		{
-			return this._bookmarkProvider.GetBookmarkForLine(lineNum);
+			return _bookmarkProvider.GetBookmarkForLine(lineNum);
 		}
 
 		public Font MonospacedFont
 		{
 			get
 			{
-				return this._fontMonospaced;
+				return _fontMonospaced;
 			}
 		}
 
@@ -6298,7 +6298,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._normalFont;
+				return _normalFont;
 			}
 		}
 
@@ -6306,7 +6306,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._fontBold;
+				return _fontBold;
 			}
 		}
 
@@ -6388,14 +6388,14 @@ namespace LogExpert
 		{
 			get
 			{
-				return this._currentColumnizer;
+				return _currentColumnizer;
 			}
 			set
 			{
-				lock (this._currentColumnizerLock)
+				lock (_currentColumnizerLock)
 				{
-					this._currentColumnizer = value;
-					Logger.logDebug("Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
+					_currentColumnizer = value;
+					Logger.logDebug("Setting columnizer " + _currentColumnizer != null ? _currentColumnizer.GetName() : "<none>");
 				}
 			}
 		}
@@ -6422,7 +6422,7 @@ namespace LogExpert
 
 		public void RefreshLogView()
 		{
-			this.RefreshAllGrids();
+			RefreshAllGrids();
 		}
 
 		#endregion
@@ -6439,13 +6439,13 @@ namespace LogExpert
 
 			public ColumnizerCallback(LogWindow logWindow)
 			{
-				this.logWindow = logWindow;
+				logWindow = logWindow;
 			}
 
 			private ColumnizerCallback(ColumnizerCallback original)
 			{
-				this.logWindow = original.logWindow;
-				this.LineNum = original.LineNum;
+				logWindow = original.logWindow;
+				LineNum = original.LineNum;
 			}
 
 			public ColumnizerCallback createCopy()
@@ -6460,17 +6460,17 @@ namespace LogExpert
 
 			public string GetFileName()
 			{
-				return this.logWindow.GetCurrentFileName(LineNum);
+				return logWindow.GetCurrentFileName(LineNum);
 			}
 
 			public string GetLogLine(int lineNum)
 			{
-				return this.logWindow.GetLine(lineNum);
+				return logWindow.GetLine(lineNum);
 			}
 
 			public int GetLineCount()
 			{
-				return this.logWindow._logFileReader.LineCount;
+				return logWindow._logFileReader.LineCount;
 			}
 		}
 
@@ -6485,17 +6485,17 @@ namespace LogExpert
 
 			public void AddTempFileTab(string fileName, string title)
 			{
-				this.logWindow.AddTempFileTab(fileName, title);
+				logWindow.AddTempFileTab(fileName, title);
 			}
 
 			public void AddPipedTab(IList<LineEntry> lineEntryList, string title)
 			{
-				this.logWindow.WritePipeTab(lineEntryList, title);
+				logWindow.WritePipeTab(lineEntryList, title);
 			}
 
 			public string GetTabTitle()
 			{
-				return this.logWindow.Text;
+				return logWindow.Text;
 			}
 
 			#endregion
