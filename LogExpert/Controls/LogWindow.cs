@@ -237,9 +237,6 @@ namespace LogExpert
 		
 		public string FileName { get; private set; }
 		
-		// unused?
-		public string SessionFileName { get; set; }
-		
 		//TODO Zarunbal: think about to return directly _guiStateArgs
 		public bool IsMultiFile
 		{
@@ -464,7 +461,6 @@ namespace LogExpert
 			persistenceData.followTail = _guiStateArgs.FollowTail;
 			persistenceData.fileName = FileName;
 			persistenceData.tabName = Text;
-			persistenceData.sessionFileName = SessionFileName;
 			persistenceData.columnizerName = CurrentColumnizer.GetName();
 			persistenceData.lineCount = _logFileReader.LineCount;
 			_filterParams.isFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
@@ -3607,22 +3603,7 @@ namespace LogExpert
 			}
 			return columnizer;
 		}
-		
-		private void LogWindow_Closing(object sender, CancelEventArgs e)
-		{
-			if (Preferences.askForClose)
-			{
-				if (MessageBox.Show("Sure to close?", "LogExpert", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
-					DialogResult.No)
-				{
-					e.Cancel = true;
-					return;
-				}
-			}
-			SavePersistenceData(false);
-			CloseLogWindow();
-		}
-		
+
 		private void ReloadNewFile()
 		{
 			// prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
@@ -6063,7 +6044,26 @@ namespace LogExpert
 		}
 		
 		#endregion
-		
+
+		#region Events
+
+		private void LogWindow_Closing(object sender, CancelEventArgs e)
+		{
+			if (Preferences.askForClose)
+			{
+				if (MessageBox.Show("Sure to close?", "LogExpert", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
+					DialogResult.No)
+				{
+					e.Cancel = true;
+					return;
+				}
+			}
+			SavePersistenceData(false);
+			CloseLogWindow();
+		}
+
+		#endregion
+
 		#region Events there delegates an methods
 		
 		public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);
