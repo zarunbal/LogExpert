@@ -31,7 +31,6 @@ namespace LogExpert
 		public bool followTail = true;
 		public string fileName = null;
 		public string tabName = null;
-		public string sessionFileName = null;
 		public string columnizerName;
 		public List<FilterParams> filterParamsList = new List<FilterParams>();
 		public List<FilterTabData> filterTabDataList = new List<FilterTabData>();
@@ -96,11 +95,7 @@ namespace LogExpert
 
 		public static string SavePersistenceData(String logFileName, PersistenceData persistenceData, Preferences preferences)
 		{
-			string fileName; 
-			if (persistenceData.sessionFileName != null)
-				fileName = persistenceData.sessionFileName;
-			else
-				fileName = BuildPersisterFileName(logFileName, preferences);
+			string fileName = BuildPersisterFileName(logFileName, preferences);
 			if (preferences.saveLocation == SessionSaveLocation.SameDir)
 			{
 				// make to log file in .lxp file relative
