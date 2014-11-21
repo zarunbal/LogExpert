@@ -83,7 +83,7 @@ namespace LogExpert.Dialogs
 				gfx.FillRectangle(bgBrush, rect);
 				bgBrush.Dispose();
 
-				List<TimeSpreadCalculator.SpreadEntry> list = TimeSpreadCalc.DiffList;
+				List<SpreadEntry> list = TimeSpreadCalc.DiffList;
 				int step;
 				if (list.Count >= this.displayHeight)
 				{
@@ -101,8 +101,8 @@ namespace LogExpert.Dialogs
 				{
 					for (int i = 0; i < list.Count; i += step)
 					{
-						TimeSpreadCalculator.SpreadEntry entry = list[i];
-						int color = ReverseAlpha ? entry.value : 255 - entry.value;
+						SpreadEntry entry = list[i];
+						int color = ReverseAlpha ? entry.Value : 255 - entry.Value;
 						if (color > 255)
 						{
 							color = 255;
@@ -166,10 +166,10 @@ namespace LogExpert.Dialogs
 		{
 			if (e.Button == MouseButtons.Left)
 			{
-				TimeSpreadCalculator.SpreadEntry entry = GetEntryForMouse(e);
+				SpreadEntry entry = GetEntryForMouse(e);
 				if (entry == null)
 					return;
-				OnLineSelected(new SelectLineEventArgs(entry.lineNum));
+				OnLineSelected(new SelectLineEventArgs(entry.LineNum));
 			}
 		}
 
@@ -194,17 +194,17 @@ namespace LogExpert.Dialogs
 				return;
 			}
 
-			TimeSpreadCalculator.SpreadEntry entry = GetEntryForMouse(e);
+			SpreadEntry entry = GetEntryForMouse(e);
 			if (entry == null)
 				return;
 			this.lastMouseY = e.Y;
-			string dts = entry.timestamp.ToString("dd.MM.yyyy HH:mm:ss");
-			this.toolTip.SetToolTip(this, "Line " + (entry.lineNum + 1) + "\n" + dts);
+			string dts = entry.Timestamp.ToString("dd.MM.yyyy HH:mm:ss");
+			this.toolTip.SetToolTip(this, "Line " + (entry.LineNum + 1) + "\n" + dts);
 		}
 
-		private TimeSpreadCalculator.SpreadEntry GetEntryForMouse(MouseEventArgs e)
+		private SpreadEntry GetEntryForMouse(MouseEventArgs e)
 		{
-			List<TimeSpreadCalculator.SpreadEntry> list = TimeSpreadCalc.DiffList;
+			List<SpreadEntry> list = TimeSpreadCalc.DiffList;
 			int y = e.Y - EDGE_OFFSET;
 			if (y < 0)
 			{
