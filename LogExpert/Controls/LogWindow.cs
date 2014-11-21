@@ -18,7 +18,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
 {
-	public partial class LogWindow : DockContent, ILogPaintContext, ILogView, ILogWindowSearch
+	public partial class LogWindow : Controls.BaseLogWindow, ILogPaintContext, ILogView, ILogWindowSearch
 	{
 		#region Const
 		
@@ -1433,7 +1433,9 @@ namespace LogExpert
 					}
 				}
 				if (lookFwd)
+				{
 					lineNum--;
+				}
 				return timeStamp;
 			}
 		}
@@ -3731,7 +3733,7 @@ namespace LogExpert
 			_logEventHandlerThread.Join();
 		}
 		
-		private void UpdateGrid(LogEventArgs e)
+		protected override void UpdateGrid(LogEventArgs e)
 		{
 			int oldRowCount = dataGridView.RowCount;
 			int firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
@@ -3806,7 +3808,7 @@ namespace LogExpert
 			}
 		}
 		
-		private void CheckFilterAndHighlight(LogEventArgs e)
+		protected override void CheckFilterAndHighlight(LogEventArgs e)
 		{
 			bool noLed = true;
 			bool suppressLed = false;
