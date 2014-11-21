@@ -64,11 +64,8 @@ namespace LogExpert
 				_enabled = value;
 				if (_enabled)
 				{
-					this._calcEvent.Set();
-					this._lineCountEvent.Set();
-				}
-				else
-				{
+					_calcEvent.Set();
+					_lineCountEvent.Set();
 				}
 			}
 		}
@@ -84,17 +81,21 @@ namespace LogExpert
 				_timeMode = value;
 				if (_enabled)
 				{
-					this._calcEvent.Set();
-					this._lineCountEvent.Set();
+					_calcEvent.Set();
+					_lineCountEvent.Set();
 				}
 			}
 		}
 		
 		public int Contrast
 		{
+			get
+			{
+				return _contrast;
+			}
 			set
 			{
-				this._contrast = value;
+				_contrast = value;
 				if (_contrast < 0)
 				{
 					_contrast = 0;
@@ -106,18 +107,13 @@ namespace LogExpert
 				
 				if (TimeMode)
 				{
-					CalcValuesViaTime(this._maxDiff, this._average);
+					CalcValuesViaTime(_maxDiff, _average);
 				}
 				else
 				{
-					CalcValuesViaLines(this._timePerLine);
+					CalcValuesViaLines(_timePerLine);
 				}
 				OnCalcDone();
-			}
-			
-			get
-			{
-				return this._contrast;
 			}
 		}
 		
@@ -171,7 +167,7 @@ namespace LogExpert
 		public TimeSpreadCalculator(LogWindow logWindow)
 		{
 			_logWindow = logWindow;
-			_callback = new LogWindow.ColumnizerCallback(this._logWindow);
+			_callback = new LogWindow.ColumnizerCallback(_logWindow);
 			_calcThread = new Thread(new ThreadStart(WorkerFx));
 			_calcThread.IsBackground = true;
 			_calcThread.Name = "TimeSpreadCalculator Worker";
@@ -183,9 +179,10 @@ namespace LogExpert
 		{
 			_shouldStop = true;
 			_lineCountEvent.Set();
-			_calcThread.Join(300);
-			_calcThread.Abort();
-			_calcThread.Join();
+			if (!_calcThread.Join(300))
+			{
+				_calcThread.Abort();
+			}
 		}
 		
 		public void SetLineCount(int count)
