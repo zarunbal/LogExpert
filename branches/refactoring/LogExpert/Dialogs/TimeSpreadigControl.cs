@@ -67,7 +67,7 @@ namespace LogExpert.Dialogs
 			}
 		}
 
-		void timeSpreadCalc_CalcDone(object sender, EventArgs e)
+		private void timeSpreadCalc_CalcDone()
 		{
 			Logger.logDebug("timeSpreadCalc_CalcDone()");
 			lock (this.monitor)
@@ -122,7 +122,7 @@ namespace LogExpert.Dialogs
 			this.BeginInvoke(new MethodInvoker(Refresh));
 		}
 
-		void timeSpreadCalc_StartCalc(object sender, EventArgs e)
+		void timeSpreadCalc_StartCalc()
 		{
 			lock (this.monitor)
 			{
@@ -154,7 +154,7 @@ namespace LogExpert.Dialogs
 			if (this.TimeSpreadCalc != null)
 			{
 				this.displayHeight = this.ClientRectangle.Height - EDGE_OFFSET * 3;
-				this.TimeSpreadCalc.SetDisplayHeight(this.displayHeight);
+				this.TimeSpreadCalc.DisplayHeight =this.displayHeight;
 			}
 		}
 
