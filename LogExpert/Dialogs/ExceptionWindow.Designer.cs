@@ -32,7 +32,6 @@
       this.stackTraceTextBox = new System.Windows.Forms.TextBox();
       this.label1 = new System.Windows.Forms.Label();
       this.okButton = new System.Windows.Forms.Button();
-      this.bugzillaButton = new System.Windows.Forms.Button();
       this.copyButton = new System.Windows.Forms.Button();
       this.SuspendLayout();
       // 
@@ -69,21 +68,10 @@
       this.okButton.Text = "Close";
       this.okButton.UseVisualStyleBackColor = true;
       // 
-      // bugzillaButton
-      // 
-      this.bugzillaButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.bugzillaButton.Location = new System.Drawing.Point(12, 265);
-      this.bugzillaButton.Name = "bugzillaButton";
-      this.bugzillaButton.Size = new System.Drawing.Size(116, 23);
-      this.bugzillaButton.TabIndex = 3;
-      this.bugzillaButton.Text = "Post to Bugzilla";
-      this.bugzillaButton.UseVisualStyleBackColor = true;
-      this.bugzillaButton.Click += new System.EventHandler(this.bugzillaButton_Click);
-      // 
       // copyButton
       // 
       this.copyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.copyButton.Location = new System.Drawing.Point(134, 265);
+      this.copyButton.Location = new System.Drawing.Point(16, 265);
       this.copyButton.Name = "copyButton";
       this.copyButton.Size = new System.Drawing.Size(117, 23);
       this.copyButton.TabIndex = 4;
@@ -98,7 +86,6 @@
       this.CancelButton = this.okButton;
       this.ClientSize = new System.Drawing.Size(464, 300);
       this.Controls.Add(this.copyButton);
-      this.Controls.Add(this.bugzillaButton);
       this.Controls.Add(this.okButton);
       this.Controls.Add(this.label1);
       this.Controls.Add(this.stackTraceTextBox);
@@ -118,7 +105,6 @@
     private System.Windows.Forms.TextBox stackTraceTextBox;
     private System.Windows.Forms.Label label1;
     private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Button bugzillaButton;
     private System.Windows.Forms.Button copyButton;
   }
 }

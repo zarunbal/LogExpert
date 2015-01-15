@@ -18,14 +18,14 @@ namespace LogExpert.Dialogs
       this.labelCopyright.Text = AssemblyCopyright;
       //this.labelCompanyName.Text = AssemblyCompany;
       this.textBoxDescription.Text = AssemblyDescription +
-        "\r\n\r\nCredits:\r\n\r\n" +
-        "DockPanel control (c) 2007 Weifen Luo \r\n" +
-        "Early bird test: Mathias Dräger\r\n" +
-        "\r\n" +
-        "LogExpert uses modules from:\r\n" +
-        "http://sourceforge.net/projects/dockpanelsuite/\r\n" +
-        "http://sourceforge.net/projects/bugzproxy/\r\n" +
-        "http://www.xml-rpc.net/";
+                                     "\r\n\r\nCredits:\r\n\r\n" +
+                                     "DockPanel control (c) 2007 Weifen Luo \r\n" +
+                                     "Early bird test: Mathias Dräger\r\n" +
+                                     "Contributors on CodePlex\r\n" +                                  
+                                     "\r\n" +
+                                     "LogExpert uses modules from:\r\n" +
+                                     "http://sourceforge.net/projects/dockpanelsuite/\r\n";
+
       string link = "http://www.log-expert.de/";
       this.linkLabel1.Links.Add(new LinkLabel.Link(0, link.Length, link));
 
