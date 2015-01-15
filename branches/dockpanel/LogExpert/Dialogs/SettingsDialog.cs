@@ -551,6 +551,13 @@ namespace LogExpert.Dialogs
           (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
         }
       }
+      foreach (IFileSystemPlugin entry in PluginRegistry.GetInstance().RegisteredFileSystemPlugins)
+      {
+        if (entry is ILogExpertPluginConfigurator)
+        {
+          (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
+        }
+      }
     }
 
 
