@@ -16,22 +16,22 @@ namespace LogExpert
 
 		internal string[] GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, LogExpert.LogWindow.ColumnizerCallback columnizerCallback)
 		{
-			if (this._lastColumnizer != columnizer || this._lastLineNumber != lineNumber && this._cachedColumns != null)
+			if (_lastColumnizer != columnizer || _lastLineNumber != lineNumber || _cachedColumns == null)
 			{
-				this._lastColumnizer = columnizer;
-				this._lastLineNumber = lineNumber;
+				_lastColumnizer = columnizer;
+				_lastLineNumber = lineNumber;
 				string line = logFileReader.GetLogLineWithWait(lineNumber);
 				if (line != null)
 				{
 					columnizerCallback.LineNum = lineNumber;
-					this._cachedColumns = columnizer.SplitLine(columnizerCallback, line);
+					_cachedColumns = columnizer.SplitLine(columnizerCallback, line);
 				}
 				else
 				{
-					this._cachedColumns = null;
+					_cachedColumns = null;
 				}
 			}
-			return this._cachedColumns;
+			return _cachedColumns;
 		}
 	}
 }

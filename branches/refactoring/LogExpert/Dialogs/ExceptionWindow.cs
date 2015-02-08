@@ -22,16 +22,6 @@ namespace LogExpert.Dialogs
 			this.stackTraceTextBox.Select(0, 0);
 		}
 
-		private void bugzillaButton_Click(object sender, EventArgs e)
-		{
-			BugzillaDialog bugzillaDlg = new BugzillaDialog(errorText, stackTrace);
-			//bugzillaDlg.Parent = this;
-			if (bugzillaDlg.ShowDialog() == DialogResult.OK)
-			{
-				this.Close();
-			}
-		}
-
 		private void copyButton_Click(object sender, EventArgs e)
 		{
 			CopyToClipboard();

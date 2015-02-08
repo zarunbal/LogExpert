@@ -23,9 +23,7 @@ namespace LogExpert.Dialogs
 										   "Early bird test: Mathias Dräger\r\n" +
 										   "\r\n" +
 										   "LogExpert uses modules from:\r\n" +
-										   "http://sourceforge.net/projects/dockpanelsuite/\r\n" +
-										   "http://sourceforge.net/projects/bugzproxy/\r\n" +
-										   "http://www.xml-rpc.net/";
+										   "http://sourceforge.net/projects/dockpanelsuite/\r\n";
 			string link = "http://www.log-expert.de/";
 			this.linkLabel1.Links.Add(new LinkLabel.Link(0, link.Length, link));
 		}
