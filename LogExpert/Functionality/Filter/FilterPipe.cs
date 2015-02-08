@@ -7,51 +7,89 @@ namespace LogExpert
 {
 	public class FilterPipe
 	{
-		IList<int> lastLinesHistoryList = new List<int>();
-		StreamWriter writer;
-		IList<int> lineMappingList = new List<int>();
-
+		#region Fields
+		
+		IList<int> _lastLinesHistoryList = new List<int>();
+		StreamWriter _writer;
+		IList<int> _lineMappingList = new List<int>(); 
+		
+		#endregion
+		
+		#region cTor
+		
+		public FilterPipe(FilterParams filterParams, LogWindow logWindow)
+		{
+			FilterParams = filterParams;
+			LogWindow = logWindow;
+			IsStopped = false;
+			FileName = Path.GetTempFileName();
+			
+			Logger.logInfo("Created temp file: " + FileName);
+		}
+		
+		#endregion
+		
+		#region Event
+		
+		public delegate void ClosedEventHandler(object sender, EventArgs e);
+		
+		public event ClosedEventHandler Closed;
+		
+		#endregion
+		
+		#region Properties
+		
 		// the parent LogWindow
 		// own window
 		public bool IsStopped { get; set; }
-
-		public FilterPipe(FilterParams filterParams, LogWindow logWindow)
-		{
-			this.FilterParams = filterParams;
-			this.LogWindow = logWindow;
-			this.IsStopped = false;
-			this.FileName = Path.GetTempFileName();
-
-			Logger.logInfo("Created temp file: " + this.FileName);
-		}
-
+		
 		public void OpenFile()
 		{
-			FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-			this.writer = new StreamWriter(fStream, new UnicodeEncoding(false, false));
+			FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+			_writer = new StreamWriter(fStream, new UnicodeEncoding(false, false));
 		}
-
-		public void CloseFile()
+		
+		public LogWindow LogWindow { get; private set; }
+		
+		public LogWindow OwnLogWindow { get; set; }
+		
+		public string FileName { get; private set; }
+		
+		public FilterParams FilterParams { get; private set; }
+		
+		public IList<int> LastLinesHistoryList
 		{
-			if (this.writer != null)
+			get
 			{
-				this.writer.Close();
-				this.writer = null;
+				return _lastLinesHistoryList;
 			}
 		}
-
+		
+		#endregion
+		
+		#region Public Methods
+		
+		public void CloseFile()
+		{
+			if (_writer != null)
+			{
+				_writer.Close();
+				_writer.Dispose();
+				_writer = null;
+			}
+		}
+		
 		public bool WriteToPipe(string textLine, int orgLineNum)
 		{
 			try
 			{
-				lock (this.FileName)
-				{
-					lock (this.lineMappingList)
+				lock (FileName)
+					lock (_lineMappingList)
 					{
 						try
 						{
-							this.writer.WriteLine(textLine);
-							this.lineMappingList.Add(orgLineNum);
+							_writer.WriteLine(textLine);
+							_lineMappingList.Add(orgLineNum);
 							return true;
 						}
 						catch (IOException e)
@@ -60,49 +98,36 @@ namespace LogExpert
 							return false;
 						}
 					}
-				}
 			}
-			catch (IOException) 
+			catch (IOException)
 			{
-				Logger.logError("writeToPipe(): file was closed: " + this.FileName);
+				Logger.logError("writeToPipe(): file was closed: " + FileName);
 				return false;
 			}
 		}
-
-		public string FileName { get; private set; }
-
-		public FilterParams FilterParams { get; private set; }
-
-		public IList<int> LastLinesHistoryList
-		{
-			get
-			{
-				return this.lastLinesHistoryList;
-			}
-		}
-
+		
 		public int GetOriginalLineNum(int lineNum)
 		{
-			lock (this.lineMappingList)
+			lock (_lineMappingList)
 			{
-				if (this.lineMappingList.Count > lineNum)
-					return this.lineMappingList[lineNum];
+				if (_lineMappingList.Count > lineNum)
+				{
+					return _lineMappingList[lineNum];
+				}
 				else
+				{
 					return -1;
+				}
 			}
 		}
-
-		public LogWindow LogWindow { get; private set; }
-
-		public LogWindow OwnLogWindow { get; set; }
-
+		
 		public void ShiftLineNums(int offset)
 		{
 			Logger.logDebug("FilterPipe.ShiftLineNums() offset=" + offset);
 			List<int> newList = new List<int>();
-			lock (this.lineMappingList)
+			lock (_lineMappingList)
 			{
-				foreach (int lineNum in this.lineMappingList)
+				foreach (int lineNum in _lineMappingList)
 				{
 					int line = lineNum - offset;
 					if (line >= 0)
@@ -114,60 +139,67 @@ namespace LogExpert
 						newList.Add(-1);
 					}
 				}
-				this.lineMappingList = newList;
+				_lineMappingList = newList;
 			}
 		}
-
+		
 		public void ClearLineNums()
 		{
 			Logger.logDebug("FilterPipe.ClearLineNums()");
-			lock (this.lineMappingList)
+			lock (_lineMappingList)
 			{
-				for (int i = 0; i < this.lineMappingList.Count; ++i)
+				for (int i = 0; i < _lineMappingList.Count; ++i)
 				{
-					this.lineMappingList[i] = -1;
+					_lineMappingList[i] = -1;
 				}
 			}
 		}
-
+		
 		public void ClearLineList()
 		{
-			lock (this.lineMappingList)
+			lock (_lineMappingList)
 			{
-				this.lineMappingList.Clear();
+				_lineMappingList.Clear();
 			}
 		}
-
+		
 		public void RecreateTempFile()
 		{
-			lock (this.lineMappingList)
+			lock (_lineMappingList)
 			{
-				this.lineMappingList = new List<int>();
+				_lineMappingList = new List<int>();
 			}
-			lock (this.FileName)
+			lock (FileName)
 			{
 				CloseFile();
 				// trunc file
-				FileStream fStream = new FileStream(this.FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read);
-				fStream.SetLength(0);
-				fStream.Close();
+				
+				using (FileStream fStream = new FileStream(FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read))
+				{
+					fStream.SetLength(0);
+					fStream.Close();
+				}
 			}
 		}
-
+		
 		public void CloseAndDisconnect()
 		{
 			ClearLineList();
 			OnClosed();
 		}
-
-		public delegate void ClosedEventHandler(object sender, EventArgs e);
-
-		public event ClosedEventHandler Closed;
-
+		
+		#endregion
+		
+		#region Private Methods
+		
 		private void OnClosed()
 		{
 			if (Closed != null)
+			{
 				Closed(this, new EventArgs());
+			}
 		}
+	
+		#endregion
 	}
 }
