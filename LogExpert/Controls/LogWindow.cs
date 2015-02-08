@@ -6037,7 +6037,9 @@ namespace LogExpert
 		
 		private string[] GetColumnsForLine(int lineNumber)
 		{
-			return _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+			string[] columns =  _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+
+			return	columns;
 		}
 		
 		protected override string GetPersistString()
@@ -6434,18 +6436,18 @@ namespace LogExpert
 		
 		public class ColumnizerCallback : ILogLineColumnizerCallback
 		{
-			protected LogWindow logWindow;
+			protected LogWindow _logWindow;
 			
 			public int LineNum { get; set; }
 			
 			public ColumnizerCallback(LogWindow logWindow)
 			{
-				logWindow = logWindow;
+				_logWindow = logWindow;
 			}
 			
 			private ColumnizerCallback(ColumnizerCallback original)
 			{
-				logWindow = original.logWindow;
+				_logWindow = original._logWindow;
 				LineNum = original.LineNum;
 			}
 			
@@ -6461,17 +6463,17 @@ namespace LogExpert
 			
 			public string GetFileName()
 			{
-				return logWindow.GetCurrentFileName(LineNum);
+				return _logWindow.GetCurrentFileName(LineNum);
 			}
 			
 			public string GetLogLine(int lineNum)
 			{
-				return logWindow.GetLine(lineNum);
+				return _logWindow.GetLine(lineNum);
 			}
 			
 			public int GetLineCount()
 			{
-				return logWindow._logFileReader.LineCount;
+				return _logWindow._logFileReader.LineCount;
 			}
 		}
 		
@@ -6486,17 +6488,17 @@ namespace LogExpert
 			
 			public void AddTempFileTab(string fileName, string title)
 			{
-				logWindow.AddTempFileTab(fileName, title);
+				_logWindow.AddTempFileTab(fileName, title);
 			}
 			
 			public void AddPipedTab(IList<LineEntry> lineEntryList, string title)
 			{
-				logWindow.WritePipeTab(lineEntryList, title);
+				_logWindow.WritePipeTab(lineEntryList, title);
 			}
 			
 			public string GetTabTitle()
 			{
-				return logWindow.Text;
+				return _logWindow.Text;
 			}
 		
 			#endregion
