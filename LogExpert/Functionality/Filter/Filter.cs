@@ -12,12 +12,12 @@ namespace LogExpert
 		private const int PROGRESS_BAR_MODULO = 1000;
 		private const int SPREAD_MAX = 50;
 
-		private LogExpert.LogWindow.ColumnizerCallback callback;
-		private bool shouldCancel = false;
+		private LogExpert.ColumnizerCallback _callback;
+		private bool _shouldCancel = false;
 
-		public Filter(LogExpert.LogWindow.ColumnizerCallback callback)
+		public Filter(LogExpert.ColumnizerCallback callback)
 		{
-			this.callback = callback;
+			this._callback = callback;
 			this.FilterResultLines = new List<int>();
 			this.LastFilterLinesList = new List<int>();
 			this.FilterHitList = new List<int>();
@@ -33,11 +33,11 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.shouldCancel;
+				return this._shouldCancel;
 			}
 			set
 			{
-				this.shouldCancel = value;
+				this._shouldCancel = value;
 			}
 		}
 
@@ -57,17 +57,17 @@ namespace LogExpert
 				filterParams.Reset();
 				while ((count++ < maxCount || filterParams.isInRange) && !this.ShouldCancel)
 				{
-					if (lineNum >= this.callback.GetLineCount())
+					if (lineNum >= this._callback.GetLineCount())
 					{
 						return count;
 					}
-					string line = this.callback.GetLogLine(lineNum);
+					string line = this._callback.GetLogLine(lineNum);
 					if (line == null)
 					{
 						return count;
 					}
-					this.callback.LineNum = lineNum;
-					if (Classes.DamerauLevenshtein.TestFilterCondition(filterParams, line, callback))
+					this._callback.LineNum = lineNum;
+					if (Classes.DamerauLevenshtein.TestFilterCondition(filterParams, line, _callback))
 					{
 						AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
 					}
@@ -138,7 +138,7 @@ namespace LogExpert
 			// after spread
 			for (int i = 1; i <= filterParams.spreadBehind; ++i)
 			{
-				if (lineNum + i < this.callback.GetLineCount())
+				if (lineNum + i < this._callback.GetLineCount())
 				{
 					if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
 						resultList.Add(lineNum + i);

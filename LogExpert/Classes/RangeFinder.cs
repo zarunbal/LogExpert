@@ -10,9 +10,9 @@ namespace LogExpert
 	class RangeFinder
 	{
 		FilterParams filterParams;
-		private LogExpert.LogWindow.ColumnizerCallback callback;
+		private LogExpert.ColumnizerCallback callback;
 
-		public RangeFinder(FilterParams filterParams, LogExpert.LogWindow.ColumnizerCallback callback)
+		public RangeFinder(FilterParams filterParams, LogExpert.ColumnizerCallback callback)
 		{
 			this.filterParams = filterParams.CreateCopy2();
 			this.callback = callback;

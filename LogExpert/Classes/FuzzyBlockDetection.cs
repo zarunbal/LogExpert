@@ -256,7 +256,7 @@ namespace LogExpert.Classes
 		{
 			string line = logWindow.GetLogLine(i);
 			ILogLineColumnizer columnizer = logWindow.CurrentColumnizer;
-			LogWindow.ColumnizerCallback callback = new LogWindow.ColumnizerCallback(logWindow.CurrentLogWindows);
+			ColumnizerCallback callback = new ColumnizerCallback(logWindow.CurrentLogWindows);
 			string[] cols = columnizer.SplitLine(callback, line);
 			return cols[columnizer.GetColumnCount() - 1];
 		}

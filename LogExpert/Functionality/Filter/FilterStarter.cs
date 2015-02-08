@@ -17,13 +17,13 @@ namespace LogExpert
 		private SortedDictionary<int, int> filterResultDict;
 		private SortedDictionary<int, int> lastFilterLinesDict;
 
-		private LogExpert.LogWindow.ColumnizerCallback callback;
+		private LogExpert.ColumnizerCallback callback;
 
 		private ProgressCallback progressCallback;
 		private int progressLineCount;
 		private bool shouldStop;
 
-		public FilterStarter(LogExpert.LogWindow.ColumnizerCallback callback, int minThreads)
+		public FilterStarter(LogExpert.ColumnizerCallback callback, int minThreads)
 		{
 			this.callback = callback;
 			this.FilterResultLines = new List<int>();
@@ -127,7 +127,7 @@ namespace LogExpert
 
 			// Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
 			FilterParams threadFilterParams = filterParams.CreateCopy2();
-			LogExpert.LogWindow.ColumnizerCallback threadColumnizerCallback = this.callback.createCopy();
+			LogExpert.ColumnizerCallback threadColumnizerCallback = this.callback.createCopy();
 
 			Filter filter = new Filter(threadColumnizerCallback);
 			lock (this.filterWorkerList)
