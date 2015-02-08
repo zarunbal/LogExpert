@@ -298,9 +298,9 @@ namespace LogExpert
 		protected EncodingOptions EncodingOptions { get; set; }
 		
 		internal FilterPipe FilterPipe { get; set; }
-
+		
 		public LogfileReader CurrentLogFileReader { get; private set; }
-
+		
 		#endregion
 		
 		#region Public Methods
@@ -1754,12 +1754,12 @@ namespace LogExpert
 				return _bookmarkProvider;
 			}
 		}
-
+		
 		public void AddTempFileTab(string fileName, string title)
 		{
 			_parentLogTabWin.AddTempFileTab(fileName, title);
 		}
-
+		
 		/// <summary>
 		/// Used to create a new tab and pipe the given content into it.
 		/// </summary>
@@ -1777,7 +1777,7 @@ namespace LogExpert
 			pipe.CloseFile();
 			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
 		}
-
+		
 		#endregion
 		
 		#region Events
@@ -2280,18 +2280,15 @@ namespace LogExpert
 			FilterToTab();
 		}
 		
-		private void Pipe_Disconnected(object sender, EventArgs e)
+		private void Pipe_Disconnected(FilterPipe sender)
 		{
-			if (sender.GetType() == typeof(FilterPipe))
+			lock (_filterPipeList)
 			{
-				lock (_filterPipeList)
+				_filterPipeList.Remove(sender);
+				if (_filterPipeList.Count == 0)
 				{
-					_filterPipeList.Remove((FilterPipe)sender);
-					if (_filterPipeList.Count == 0)
-					{
-						// reset naming counter to 0 if no more open filter tabs for this source window
-						_filterPipeNameCounter = 0;
-					}
+					// reset naming counter to 0 if no more open filter tabs for this source window
+					_filterPipeNameCounter = 0;
 				}
 			}
 		}
@@ -3033,7 +3030,7 @@ namespace LogExpert
 		#endregion
 		
 		#region Private Methods
-
+		
 		private void SetColumnizer(ILogLineColumnizer columnizer)
 		{
 			int timeDiff = 0;
@@ -3041,15 +3038,15 @@ namespace LogExpert
 			{
 				timeDiff = CurrentColumnizer.GetTimeOffset();
 			}
-
+			
 			SetColumnizerInternal(columnizer);
-
+			
 			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
 				CurrentColumnizer.SetTimeOffset(timeDiff);
 			}
 		}
-
+		
 		private void StartProgressBar(int maxValue, string statusMessage)
 		{
 			if (this.InvokeRequired)
@@ -3629,7 +3626,7 @@ namespace LogExpert
 			}
 			return columnizer;
 		}
-
+		
 		private void ReloadNewFile()
 		{
 			// prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
@@ -5444,8 +5441,6 @@ namespace LogExpert
 			filterSearchButton.Enabled = true;
 		}
 		
-
-		
 		private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
 		{
 			newWin.WaitForLoadingFinished();
@@ -5674,18 +5669,16 @@ namespace LogExpert
 			_timeSpreadCalc.Enabled = show;
 		}
 		
-
-		
 		#if DEBUG
 		internal void DumpBufferInfo()
 		{
-			int currentLineNum = dataGridView.CurrentCellAddress.Y;
-			_logFileReader.LogBufferInfoForLine(currentLineNum);
+		int currentLineNum = dataGridView.CurrentCellAddress.Y;
+		_logFileReader.LogBufferInfoForLine(currentLineNum);
 		}
 		
 		internal void DumpBufferDiagnostic()
 		{
-			_logFileReader.LogBufferDiagnostic();
+		_logFileReader.LogBufferDiagnostic();
 		}
 		
 		#endif
@@ -6042,9 +6035,9 @@ namespace LogExpert
 		
 		private string[] GetColumnsForLine(int lineNumber)
 		{
-			string[] columns =  _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
-
-			return	columns;
+			string[] columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+			
+			return columns;
 		}
 		
 		protected override string GetPersistString()
@@ -6053,9 +6046,9 @@ namespace LogExpert
 		}
 		
 		#endregion
-
+		
 		#region Events
-
+		
 		private void LogWindow_Closing(object sender, CancelEventArgs e)
 		{
 			if (Preferences.askForClose)
@@ -6070,9 +6063,9 @@ namespace LogExpert
 			SavePersistenceData(false);
 			CloseLogWindow();
 		}
-
+		
 		#endregion
-
+		
 		#region Events there delegates an methods
 		
 		public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);

@@ -30,8 +30,8 @@ namespace LogExpert
 		#endregion
 		
 		#region Event
-		
-		public delegate void ClosedEventHandler(object sender, EventArgs e);
+
+		public delegate void ClosedEventHandler(FilterPipe sender);
 		
 		public event ClosedEventHandler Closed;
 		
@@ -196,7 +196,7 @@ namespace LogExpert
 		{
 			if (Closed != null)
 			{
-				Closed(this, new EventArgs());
+				Closed(this);
 			}
 		}
 	
