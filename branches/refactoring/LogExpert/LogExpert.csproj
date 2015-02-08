@@ -28,6 +28,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <TargetFrameworkProfile />
+    <TargetFrameworkProfile />
     <PublishUrl>c:\work\LogExpert\publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -43,7 +44,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,8 +83,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\ArgParser.cs" />
+    <Compile Include="Classes\ColumnizerCallback.cs" />
     <Compile Include="Classes\DamerauLevenshtein.cs" />
     <Compile Include="Classes\FuzzyBlockDetection.cs" />
+    <Compile Include="Classes\LogExpertCallback.cs" />
     <Compile Include="Classes\YetiLevenshtein.cs" />
     <Compile Include="Controls\BaseLogWindow.cs">
       <SubType>Form</SubType>
@@ -602,6 +604,6 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>
-</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

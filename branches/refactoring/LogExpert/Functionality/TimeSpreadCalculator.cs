@@ -32,7 +32,7 @@ namespace LogExpert
 		private const int MAX_CONTRAST = 1300;
 		
 		private readonly LogWindow _logWindow;
-		private readonly LogWindow.ColumnizerCallback _callback;
+		private readonly ColumnizerCallback _callback;
 		
 		private readonly EventWaitHandle _calcEvent = new ManualResetEvent(false);
 		private readonly EventWaitHandle _lineCountEvent = new ManualResetEvent(false);
@@ -167,7 +167,7 @@ namespace LogExpert
 		public TimeSpreadCalculator(LogWindow logWindow)
 		{
 			_logWindow = logWindow;
-			_callback = new LogWindow.ColumnizerCallback(_logWindow);
+			_callback = new ColumnizerCallback(_logWindow);
 			_calcThread = new Thread(new ThreadStart(WorkerFx));
 			_calcThread.IsBackground = true;
 			_calcThread.Name = "TimeSpreadCalculator Worker";

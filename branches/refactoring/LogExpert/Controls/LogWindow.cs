@@ -34,7 +34,6 @@ namespace LogExpert
 		
 		private Classes.FuzzyBlockDetection _fuzzyBlockDetection = new Classes.FuzzyBlockDetection();
 		
-		private LogfileReader _logFileReader;
 		private ILogLineColumnizer _currentColumnizer;
 		private readonly Object _currentColumnizerLock = new Object();
 		private ILogLineColumnizer _forcedColumnizer;
@@ -299,7 +298,9 @@ namespace LogExpert
 		protected EncodingOptions EncodingOptions { get; set; }
 		
 		internal FilterPipe FilterPipe { get; set; }
-		
+
+		public LogfileReader CurrentLogFileReader { get; private set; }
+
 		#endregion
 		
 		#region Public Methods
@@ -313,9 +314,9 @@ namespace LogExpert
 				FileName = fileName;
 				EncodingOptions = encodingOptions;
 				
-				if (_logFileReader != null)
+				if (CurrentLogFileReader != null)
 				{
-					_logFileReader.StopMonitoringAsync();
+					CurrentLogFileReader.StopMonitoringAsync();
 					UnRegisterLogFileReaderEvents();
 				}
 				if (!LoadPersistenceOptions())
@@ -344,10 +345,10 @@ namespace LogExpert
 				_columnCache = new ColumnCache();
 				try
 				{
-					_logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
+					CurrentLogFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
 						Preferences.bufferCount, Preferences.linesPerBuffer,
 						_multifileOptions);
-					_logFileReader.UseNewReader = !Preferences.useLegacyReader;
+					CurrentLogFileReader.UseNewReader = !Preferences.useLegacyReader;
 				}
 				catch (LogFileException lfe)
 				{
@@ -359,8 +360,8 @@ namespace LogExpert
 				
 				if (CurrentColumnizer is ILogLineXmlColumnizer)
 				{
-					_logFileReader.IsXmlMode = true;
-					_logFileReader.XmlLogConfig = (CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
+					CurrentLogFileReader.IsXmlMode = true;
+					CurrentLogFileReader.XmlLogConfig = (CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
 				}
 				if (_forcedColumnizerForLoading != null)
 				{
@@ -368,15 +369,15 @@ namespace LogExpert
 				}
 				if (CurrentColumnizer is IPreProcessColumnizer)
 				{
-					_logFileReader.PreProcessColumnizer = (IPreProcessColumnizer)CurrentColumnizer;
+					CurrentLogFileReader.PreProcessColumnizer = (IPreProcessColumnizer)CurrentColumnizer;
 				}
 				else
 				{
-					_logFileReader.PreProcessColumnizer = null;
+					CurrentLogFileReader.PreProcessColumnizer = null;
 				}
 				RegisterLogFileReaderEvents();
 				Logger.logInfo("Loading logfile: " + fileName);
-				_logFileReader.startMonitoring();
+				CurrentLogFileReader.startMonitoring();
 			}
 		}
 		
@@ -390,18 +391,18 @@ namespace LogExpert
 			{
 				Logger.logInfo("File: " + name);
 			}
-			if (_logFileReader != null)
+			if (CurrentLogFileReader != null)
 			{
-				_logFileReader.stopMonitoring();
+				CurrentLogFileReader.stopMonitoring();
 				UnRegisterLogFileReaderEvents();
 			}
 			EncodingOptions = encodingOptions;
 			_columnCache = new ColumnCache();
-			_logFileReader = new LogfileReader(fileNames, EncodingOptions, Preferences.bufferCount,
+			CurrentLogFileReader = new LogfileReader(fileNames, EncodingOptions, Preferences.bufferCount,
 				Preferences.linesPerBuffer, _multifileOptions);
-			_logFileReader.UseNewReader = !Preferences.useLegacyReader;
+			CurrentLogFileReader.UseNewReader = !Preferences.useLegacyReader;
 			RegisterLogFileReaderEvents();
-			_logFileReader.startMonitoring();
+			CurrentLogFileReader.startMonitoring();
 			FileName = fileNames[fileNames.Length - 1];
 			_fileNames = fileNames;
 			IsMultiFile = true;
@@ -462,7 +463,7 @@ namespace LogExpert
 			persistenceData.fileName = FileName;
 			persistenceData.tabName = Text;
 			persistenceData.columnizerName = CurrentColumnizer.GetName();
-			persistenceData.lineCount = _logFileReader.LineCount;
+			persistenceData.lineCount = CurrentLogFileReader.LineCount;
 			_filterParams.isFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
 			if (Preferences.saveFilters)
 			{
@@ -488,7 +489,7 @@ namespace LogExpert
 			}
 			//persistenceData.showBookmarkCommentColumn = bookmarkWindow.ShowBookmarkCommentColumn;
 			persistenceData.filterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
-			persistenceData.encoding = _logFileReader.CurrentEncoding;
+			persistenceData.encoding = CurrentLogFileReader.CurrentEncoding;
 			return persistenceData;
 		}
 		
@@ -511,10 +512,10 @@ namespace LogExpert
 			_statusLineTrigger.Stop();
 			_selectionChangedTrigger.Stop();
 			_shouldCancel = true;
-			if (_logFileReader != null)
+			if (CurrentLogFileReader != null)
 			{
 				UnRegisterLogFileReaderEvents();
-				_logFileReader.StopMonitoringAsync();
+				CurrentLogFileReader.StopMonitoringAsync();
 			}
 			if (_isLoading)
 			{
@@ -756,11 +757,11 @@ namespace LogExpert
 		{
 			_guiStateArgs.FollowTail = isChecked;
 			
-			if (_guiStateArgs.FollowTail && _logFileReader != null)
+			if (_guiStateArgs.FollowTail && CurrentLogFileReader != null)
 			{
-				if (dataGridView.RowCount >= _logFileReader.LineCount && _logFileReader.LineCount > 0)
+				if (dataGridView.RowCount >= CurrentLogFileReader.LineCount && CurrentLogFileReader.LineCount > 0)
 				{
-					dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
+					dataGridView.FirstDisplayedScrollingRowIndex = CurrentLogFileReader.LineCount - 1;
 				}
 			}
 			BeginInvoke(new MethodInvoker(dataGridView.Refresh));
@@ -945,7 +946,7 @@ namespace LogExpert
 		{
 			lock (_bookmarkLock)
 			{
-				string line = _logFileReader.GetLogLine(lineNum);
+				string line = CurrentLogFileReader.GetLogLine(lineNum);
 				if (line == null)
 				{
 					return;
@@ -1162,7 +1163,7 @@ namespace LogExpert
 		/// <param name="encoding"></param>
 		public void ChangeEncoding(Encoding encoding)
 		{
-			_logFileReader.ChangeEncoding(encoding);
+			CurrentLogFileReader.ChangeEncoding(encoding);
 			EncodingOptions.Encoding = encoding;
 			if (_guiStateArgs.CurrentEncoding.IsSingleByte != encoding.IsSingleByte ||
 				_guiStateArgs.CurrentEncoding.GetPreamble().Length != encoding.GetPreamble().Length)
@@ -1174,7 +1175,7 @@ namespace LogExpert
 				dataGridView.Refresh();
 				SendGuiStateUpdate();
 			}
-			_guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
+			_guiStateArgs.CurrentEncoding = CurrentLogFileReader.CurrentEncoding;
 		}
 		
 		public void Reload()
@@ -1376,7 +1377,7 @@ namespace LogExpert
 							return DateTime.MinValue;
 						}
 						lookBack = true;
-						string logLine = _logFileReader.GetLogLine(lineNum);
+						string logLine = CurrentLogFileReader.GetLogLine(lineNum);
 						if (logLine == null)
 						{
 							return DateTime.MinValue;
@@ -1418,7 +1419,7 @@ namespace LogExpert
 					while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < dataGridView.RowCount)
 					{
 						lookFwd = true;
-						string logLine = _logFileReader.GetLogLine(lineNum);
+						string logLine = CurrentLogFileReader.GetLogLine(lineNum);
 						if (logLine == null)
 						{
 							timeStamp = DateTime.MinValue;
@@ -1454,18 +1455,18 @@ namespace LogExpert
 		{
 			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return _logFileReader.GetLogLine(dataGridView.CurrentRow.Index);
+				return CurrentLogFileReader.GetLogLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
 		
 		public string GetLine(int lineNum)
 		{
-			if (lineNum < 0 || lineNum >= _logFileReader.LineCount)
+			if (lineNum < 0 || lineNum >= CurrentLogFileReader.LineCount)
 			{
 				return null;
 			}
-			return _logFileReader.GetLogLine(lineNum);
+			return CurrentLogFileReader.GetLogLine(lineNum);
 		}
 		
 		public int GetCurrentLineNum()
@@ -1484,14 +1485,14 @@ namespace LogExpert
 			{
 				return -1;
 			}
-			return _logFileReader.GetRealLineNumForVirtualLineNum(lineNum);
+			return CurrentLogFileReader.GetRealLineNumForVirtualLineNum(lineNum);
 		}
 		
 		public string GetCurrentFileName()
 		{
 			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return _logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
+				return CurrentLogFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
@@ -1500,7 +1501,7 @@ namespace LogExpert
 		{
 			if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1)
 			{
-				return _logFileReader.GetLogFileInfoForLine(dataGridView.CurrentRow.Index);
+				return CurrentLogFileReader.GetLogFileInfoForLine(dataGridView.CurrentRow.Index);
 			}
 			return null;
 		}
@@ -1512,7 +1513,7 @@ namespace LogExpert
 		/// <returns></returns>
 		public string GetCurrentFileName(int lineNum)
 		{
-			return _logFileReader.GetLogFileNameForLine(lineNum);
+			return CurrentLogFileReader.GetLogFileNameForLine(lineNum);
 		}
 		
 		public void ShowLineColumn(bool show)
@@ -1753,7 +1754,30 @@ namespace LogExpert
 				return _bookmarkProvider;
 			}
 		}
-		
+
+		public void AddTempFileTab(string fileName, string title)
+		{
+			_parentLogTabWin.AddTempFileTab(fileName, title);
+		}
+
+		/// <summary>
+		/// Used to create a new tab and pipe the given content into it.
+		/// </summary>
+		/// <param name="lineEntryList"></param>
+		public void WritePipeTab(IList<LineEntry> lineEntryList, string title)
+		{
+			FilterPipe pipe = new FilterPipe(new FilterParams(), this);
+			pipe.IsStopped = true;
+			pipe.Closed += new FilterPipe.ClosedEventHandler(Pipe_Disconnected);
+			pipe.OpenFile();
+			foreach (LineEntry entry in lineEntryList)
+			{
+				pipe.WriteToPipe(entry.logLine, entry.lineNum);
+			}
+			pipe.CloseFile();
+			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
+		}
+
 		#endregion
 		
 		#region Events
@@ -1762,9 +1786,9 @@ namespace LogExpert
 		{
 			_waitingForClose = true;
 			_parentLogTabWin.HighlightSettingsChanged -= Parent_HighlightSettingsChanged;
-			if (_logFileReader != null)
+			if (CurrentLogFileReader != null)
 			{
-				_logFileReader.DeleteAllContent();
+				CurrentLogFileReader.DeleteAllContent();
 			}
 			FreeFromTimeSync();
 		}
@@ -1788,7 +1812,7 @@ namespace LogExpert
 				Invoke(new MethodInvoker(SetGuiAfterLoading));
 				_loadingFinishedEvent.Set();
 				_externaLoadingFinishedEvent.Set();
-				_timeSpreadCalc.SetLineCount(_logFileReader.LineCount);
+				_timeSpreadCalc.SetLineCount(CurrentLogFileReader.LineCount);
 				
 				if (_reloadMemento != null)
 				{
@@ -1914,7 +1938,7 @@ namespace LogExpert
 			{
 				return;
 			}
-			string line = _logFileReader.GetLogLine(e.RowIndex);
+			string line = CurrentLogFileReader.GetLogLine(e.RowIndex);
 			int offset = CurrentColumnizer.GetTimeOffset();
 			CurrentColumnizer.SetTimeOffset(0);
 			ColumnizerCallbackObject.LineNum = e.RowIndex;
@@ -2039,7 +2063,7 @@ namespace LogExpert
 		
 		private void DataGridView_Resize(object sender, EventArgs e)
 		{
-			if (_logFileReader != null && dataGridView.RowCount > 0 &&
+			if (CurrentLogFileReader != null && dataGridView.RowCount > 0 &&
 				_guiStateArgs.FollowTail)
 			{
 				dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
@@ -2095,7 +2119,7 @@ namespace LogExpert
 			}
 			
 			int lineNum = _filterResultList[e.RowIndex];
-			string line = _logFileReader.GetLogLineWithWait(lineNum);
+			string line = CurrentLogFileReader.GetLogLineWithWait(lineNum);
 			
 			if (line != null)
 			{
@@ -3102,28 +3126,28 @@ namespace LogExpert
 			{
 				CurrentColumnizer = columnizer;
 				_freezeStateMap.Clear();
-				if (_logFileReader != null)
+				if (CurrentLogFileReader != null)
 				{
 					IPreProcessColumnizer preprocessColumnizer = CurrentColumnizer as IPreProcessColumnizer;
 					if (preprocessColumnizer != null)
 					{
-						_logFileReader.PreProcessColumnizer = preprocessColumnizer;
+						CurrentLogFileReader.PreProcessColumnizer = preprocessColumnizer;
 					}
 					else
 					{
-						_logFileReader.PreProcessColumnizer = null;
+						CurrentLogFileReader.PreProcessColumnizer = null;
 					}
 				}
 				// always reload when choosing XML columnizers
-				if (_logFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
+				if (CurrentLogFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
 				{
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
 					mustReload = true;
 				}
 				// Reload when choosing no XML columnizer but previous columnizer was XML
-				if (_logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
+				if (CurrentLogFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
 				{
-					_logFileReader.IsXmlMode = false;
+					CurrentLogFileReader.IsXmlMode = false;
 					//forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
 					mustReload = true;
 				}
@@ -3165,9 +3189,9 @@ namespace LogExpert
 			_guiStateArgs.TimeshiftPossible = columnizer.IsTimeshiftImplemented();
 			SendGuiStateUpdate();
 			
-			if (_logFileReader != null)
+			if (CurrentLogFileReader != null)
 			{
-				dataGridView.RowCount = _logFileReader.LineCount;
+				dataGridView.RowCount = CurrentLogFileReader.LineCount;
 			}
 			if (_filterResultList != null)
 			{
@@ -3206,24 +3230,24 @@ namespace LogExpert
 		
 		private void RegisterLogFileReaderEvents()
 		{
-			_logFileReader.LoadFile += LogFileReader_LoadFile;
-			_logFileReader.LoadingFinished += LogFileReader_FinishedLoading;
-			_logFileReader.LoadingStarted += LogFileReader_LoadingStarted;
-			_logFileReader.FileNotFound += LogFileReader_FileNotFound;
-			_logFileReader.Respawned += LogFileReader_Respawned;
+			CurrentLogFileReader.LoadFile += LogFileReader_LoadFile;
+			CurrentLogFileReader.LoadingFinished += LogFileReader_FinishedLoading;
+			CurrentLogFileReader.LoadingStarted += LogFileReader_LoadingStarted;
+			CurrentLogFileReader.FileNotFound += LogFileReader_FileNotFound;
+			CurrentLogFileReader.Respawned += LogFileReader_Respawned;
 			// FileSizeChanged is not registered here because it's registered after loading has finished
 		}
 		
 		private void UnRegisterLogFileReaderEvents()
 		{
-			if (_logFileReader != null)
+			if (CurrentLogFileReader != null)
 			{
-				_logFileReader.LoadFile -= LogFileReader_LoadFile;
-				_logFileReader.LoadingFinished -= LogFileReader_FinishedLoading;
-				_logFileReader.LoadingStarted -= LogFileReader_LoadingStarted;
-				_logFileReader.FileNotFound -= LogFileReader_FileNotFound;
-				_logFileReader.Respawned -= LogFileReader_Respawned;
-				_logFileReader.FileSizeChanged -= FileSizeChangedHandler;
+				CurrentLogFileReader.LoadFile -= LogFileReader_LoadFile;
+				CurrentLogFileReader.LoadingFinished -= LogFileReader_FinishedLoading;
+				CurrentLogFileReader.LoadingStarted -= LogFileReader_LoadingStarted;
+				CurrentLogFileReader.FileNotFound -= LogFileReader_FileNotFound;
+				CurrentLogFileReader.Respawned -= LogFileReader_Respawned;
+				CurrentLogFileReader.FileSizeChanged -= FileSizeChangedHandler;
 			}
 		}
 		
@@ -3343,7 +3367,7 @@ namespace LogExpert
 					persistenceData = Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 				}
 				
-				if (persistenceData.lineCount > _logFileReader.LineCount)
+				if (persistenceData.lineCount > CurrentLogFileReader.LineCount)
 				{
 					// outdated persistence data (logfile rollover)
 					// MessageBox.Show(this, "Persistence data for " + FileName + " is outdated. It was discarded.", "Log Expert");
@@ -3361,10 +3385,10 @@ namespace LogExpert
 					}
 					else
 					{
-						if (_logFileReader.LineCount > 0)
+						if (CurrentLogFileReader.LineCount > 0)
 						{
-							dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
-							SelectLine(_logFileReader.LineCount - 1, false);
+							dataGridView.FirstDisplayedScrollingRowIndex = CurrentLogFileReader.LineCount - 1;
+							SelectLine(CurrentLogFileReader.LineCount - 1, false);
 						}
 					}
 					if (persistenceData.firstDisplayedLine >= 0 && persistenceData.firstDisplayedLine < dataGridView.RowCount)
@@ -3567,7 +3591,7 @@ namespace LogExpert
 			DisplayCurrentFileOnStatusline();
 			_guiStateArgs.MultiFileEnabled = !IsTempFile;
 			_guiStateArgs.MenuEnabled = true;
-			_guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
+			_guiStateArgs.CurrentEncoding = CurrentLogFileReader.CurrentEncoding;
 			SendGuiStateUpdate();
 			
 			if (CurrentColumnizer.IsTimeshiftImplemented())
@@ -3648,11 +3672,11 @@ namespace LogExpert
 		{
 			Logger.logInfo("File loading complete.");
 			StatusLineText("");
-			_logFileReader.FileSizeChanged += FileSizeChangedHandler;
+			CurrentLogFileReader.FileSizeChanged += FileSizeChangedHandler;
 			_isLoading = false;
 			_shouldCancel = false;
 			dataGridView.SuspendLayout();
-			dataGridView.RowCount = _logFileReader.LineCount;
+			dataGridView.RowCount = CurrentLogFileReader.LineCount;
 			dataGridView.CurrentCellChanged += new EventHandler(DataGridView_CurrentCellChanged);
 			dataGridView.Enabled = true;
 			dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
@@ -3663,8 +3687,8 @@ namespace LogExpert
 			
 			_guiStateArgs.FollowTail = true;
 			SendGuiStateUpdate();
-			_statusEventArgs.LineCount = _logFileReader.LineCount;
-			_statusEventArgs.FileSize = _logFileReader.FileSize;
+			_statusEventArgs.LineCount = CurrentLogFileReader.LineCount;
+			_statusEventArgs.FileSize = CurrentLogFileReader.FileSize;
 			SendStatusLineUpdate();
 			
 			PreferencesChanged(_parentLogTabWin.Preferences, true, SettingsFlags.All);
@@ -3828,7 +3852,7 @@ namespace LogExpert
 				bool filterLineAdded = false;
 				for (int i = filterStart; i < e.LineCount; ++i)
 				{
-					string line = _logFileReader.GetLogLine(i);
+					string line = CurrentLogFileReader.GetLogLine(i);
 					if (line == null)
 					{
 						return;
@@ -3883,7 +3907,7 @@ namespace LogExpert
 				}
 				for (int i = startLine; i < e.LineCount; ++i)
 				{
-					string line = _logFileReader.GetLogLine(i);
+					string line = CurrentLogFileReader.GetLogLine(i);
 					if (line != null)
 					{
 						IList<HilightEntry> matchingList = FindMatchingHilightEntries(line);
@@ -4300,7 +4324,7 @@ namespace LogExpert
 			{
 				if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
 				{
-					if (lineNum >= _logFileReader.LineCount)
+					if (lineNum >= CurrentLogFileReader.LineCount)
 					{
 						if (hasWrapped)
 						{
@@ -4323,13 +4347,13 @@ namespace LogExpert
 							return -1;
 						}
 						count = 0;
-						lineNum = _logFileReader.LineCount - 1;
+						lineNum = CurrentLogFileReader.LineCount - 1;
 						hasWrapped = true;
 						StatusLineError("Started from end of file");
 					}
 				}
 				
-				string line = _logFileReader.GetLogLine(lineNum);
+				string line = CurrentLogFileReader.GetLogLine(lineNum);
 				if (line == null)
 				{
 					return -1;
@@ -4494,7 +4518,7 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt)
 			{
-				int newLine = _logFileReader.GetNextMultiFileLine(dataGridView.CurrentCellAddress.Y);
+				int newLine = CurrentLogFileReader.GetNextMultiFileLine(dataGridView.CurrentCellAddress.Y);
 				if (newLine != -1)
 				{
 					SelectLine(newLine, false);
@@ -4503,7 +4527,7 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Up && e.Modifiers == Keys.Alt)
 			{
-				int newLine = _logFileReader.GetPrevMultiFileLine(dataGridView.CurrentCellAddress.Y);
+				int newLine = CurrentLogFileReader.GetPrevMultiFileLine(dataGridView.CurrentCellAddress.Y);
 				if (newLine != -1)
 				{
 					SelectLine(newLine - 1, false);
@@ -4574,7 +4598,7 @@ namespace LogExpert
 			while (lineNum > 0)
 			{
 				lineNum--;
-				string line = _logFileReader.GetLogLine(lineNum);
+				string line = CurrentLogFileReader.GetLogLine(lineNum);
 				if (line != null)
 				{
 					HilightEntry entry = FindHilightEntry(line);
@@ -4590,10 +4614,10 @@ namespace LogExpert
 		private void SelectNextHighlightLine()
 		{
 			int lineNum = dataGridView.CurrentCellAddress.Y;
-			while (lineNum < _logFileReader.LineCount)
+			while (lineNum < CurrentLogFileReader.LineCount)
 			{
 				lineNum++;
-				string line = _logFileReader.GetLogLine(lineNum);
+				string line = CurrentLogFileReader.GetLogLine(lineNum);
 				if (line != null)
 				{
 					HilightEntry entry = FindHilightEntry(line);
@@ -4820,7 +4844,7 @@ namespace LogExpert
 			RegisterCancelHandler(cancelHandler);
 			long startTime = Environment.TickCount;
 			
-			fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback);
+			fs.DoFilter(filterParams, 0, CurrentLogFileReader.LineCount, FilterProgressCallback);
 			
 			long endTime = Environment.TickCount;
 			#if DEBUG
@@ -4845,7 +4869,7 @@ namespace LogExpert
 				ColumnizerCallback callback = new ColumnizerCallback(this);
 				while (true)
 				{
-					string line = _logFileReader.GetLogLine(lineNum);
+					string line = CurrentLogFileReader.GetLogLine(lineNum);
 					if (line == null)
 					{
 						break;
@@ -4916,7 +4940,7 @@ namespace LogExpert
 			// after spread
 			for (int i = 1; i <= filterParams.spreadBehind; ++i)
 			{
-				if (lineNum + i < _logFileReader.LineCount)
+				if (lineNum + i < CurrentLogFileReader.LineCount)
 				{
 					if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
 					{
@@ -5202,14 +5226,14 @@ namespace LogExpert
 		
 		private void DisplayCurrentFileOnStatusline()
 		{
-			if (_logFileReader.IsMultiFile)
+			if (CurrentLogFileReader.IsMultiFile)
 			{
 				try
 				{
 					if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index > -1)
 					{
 						string fileName =
-							_logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
+							CurrentLogFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
 						if (fileName != null)
 						{
 							StatusLineText(Util.GetNameFromPath(fileName));
@@ -5373,7 +5397,7 @@ namespace LogExpert
 				{
 					break;
 				}
-				string line = _logFileReader.GetLogLine(i);
+				string line = CurrentLogFileReader.GetLogLine(i);
 				if (CurrentColumnizer is ILogLineXmlColumnizer)
 				{
 					callback.LineNum = i;
@@ -5420,23 +5444,7 @@ namespace LogExpert
 			filterSearchButton.Enabled = true;
 		}
 		
-		/// <summary>
-		/// Used to create a new tab and pipe the given content into it.
-		/// </summary>
-		/// <param name="lineEntryList"></param>
-		private void WritePipeTab(IList<LineEntry> lineEntryList, string title)
-		{
-			FilterPipe pipe = new FilterPipe(new FilterParams(), this);
-			pipe.IsStopped = true;
-			pipe.Closed += new FilterPipe.ClosedEventHandler(Pipe_Disconnected);
-			pipe.OpenFile();
-			foreach (LineEntry entry in lineEntryList)
-			{
-				pipe.WriteToPipe(entry.logLine, entry.lineNum);
-			}
-			pipe.CloseFile();
-			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
-		}
+
 		
 		private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
 		{
@@ -5456,7 +5464,7 @@ namespace LogExpert
 		
 		private void ProcessFilterPipes(int lineNum)
 		{
-			string searchLine = _logFileReader.GetLogLine(lineNum);
+			string searchLine = CurrentLogFileReader.GetLogLine(lineNum);
 			if (searchLine == null)
 			{
 				return;
@@ -5485,7 +5493,7 @@ namespace LogExpert
 								pipe.LastLinesHistoryList.RemoveAt(0);
 							}
 							
-							string textLine = _logFileReader.GetLogLine(line);
+							string textLine = CurrentLogFileReader.GetLogLine(line);
 							bool fileOk = pipe.WriteToPipe(textLine, line);
 							if (!fileOk)
 							{
@@ -5524,7 +5532,7 @@ namespace LogExpert
 				LogExpertCallback callback = new LogExpertCallback(this);
 				foreach (int lineNum in lineNumList)
 				{
-					string line = _logFileReader.GetLogLine(lineNum);
+					string line = CurrentLogFileReader.GetLogLine(lineNum);
 					if (CurrentColumnizer is ILogLineXmlColumnizer)
 					{
 						callback.LineNum = lineNum;
@@ -5666,10 +5674,7 @@ namespace LogExpert
 			_timeSpreadCalc.Enabled = show;
 		}
 		
-		private void AddTempFileTab(string fileName, string title)
-		{
-			_parentLogTabWin.AddTempFileTab(fileName, title);
-		}
+
 		
 		#if DEBUG
 		internal void DumpBufferInfo()
@@ -6037,7 +6042,7 @@ namespace LogExpert
 		
 		private string[] GetColumnsForLine(int lineNumber)
 		{
-			string[] columns =  _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+			string[] columns =  _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 
 			return	columns;
 		}
@@ -6281,7 +6286,7 @@ namespace LogExpert
 		
 		public string GetLogLine(int lineNum)
 		{
-			return _logFileReader.GetLogLine(lineNum);
+			return CurrentLogFileReader.GetLogLine(lineNum);
 		}
 		
 		public Bookmark GetBookmarkForLine(int lineNum)
@@ -6407,7 +6412,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return _logFileReader.LineCount;
+				return CurrentLogFileReader.LineCount;
 			}
 		}
 		
@@ -6433,49 +6438,6 @@ namespace LogExpert
 		#region Nested Classes
 		
 		// =================== ILogLineColumnizerCallback ============================
-		
-		public class ColumnizerCallback : ILogLineColumnizerCallback
-		{
-			protected LogWindow _logWindow;
-			
-			public int LineNum { get; set; }
-			
-			public ColumnizerCallback(LogWindow logWindow)
-			{
-				_logWindow = logWindow;
-			}
-			
-			private ColumnizerCallback(ColumnizerCallback original)
-			{
-				_logWindow = original._logWindow;
-				LineNum = original.LineNum;
-			}
-			
-			public ColumnizerCallback createCopy()
-			{
-				return new ColumnizerCallback(this);
-			}
-			
-			public int GetLineNum()
-			{
-				return LineNum;
-			}
-			
-			public string GetFileName()
-			{
-				return _logWindow.GetCurrentFileName(LineNum);
-			}
-			
-			public string GetLogLine(int lineNum)
-			{
-				return _logWindow.GetLine(lineNum);
-			}
-			
-			public int GetLineCount()
-			{
-				return _logWindow._logFileReader.LineCount;
-			}
-		}
 		
 		public class LogExpertCallback : ColumnizerCallback, ILogExpertCallback
 		{

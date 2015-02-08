@@ -14,7 +14,7 @@ namespace LogExpert
 		{
 		}
 
-		internal string[] GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, LogExpert.LogWindow.ColumnizerCallback columnizerCallback)
+		internal string[] GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, LogExpert.ColumnizerCallback columnizerCallback)
 		{
 			if (_lastColumnizer != columnizer || _lastLineNumber != lineNumber || _cachedColumns == null || columnizerCallback.LineNum != lineNumber)
 			{
