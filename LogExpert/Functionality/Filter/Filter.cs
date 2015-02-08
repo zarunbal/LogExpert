@@ -5,8 +5,6 @@ using System.Windows.Forms;
 
 namespace LogExpert
 {
-	delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
-
 	public class Filter
 	{
 		#region Fields
