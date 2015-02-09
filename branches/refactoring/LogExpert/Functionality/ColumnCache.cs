@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LogExpert
 {
-	internal class ColumnCache
+	public class ColumnCache
 	{
 		private string[] _cachedColumns = null;
 		private ILogLineColumnizer _lastColumnizer;

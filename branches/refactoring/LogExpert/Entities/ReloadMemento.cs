@@ -1,4 +1,4 @@
-﻿internal class ReloadMemento
+﻿public class ReloadMemento
 {
 	internal int currentLine;
 	internal int firstDisplayedLine;

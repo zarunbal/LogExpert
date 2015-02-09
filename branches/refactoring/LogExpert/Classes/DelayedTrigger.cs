@@ -9,7 +9,7 @@ namespace LogExpert
 	/// This class receives Trigger calls and sends an event as soons as no more input triggers calls
 	/// are received for a given time.
 	/// </summary>
-	class DelayedTrigger
+	public class DelayedTrigger
 	{
 		private int waitTime = 0;
 		private readonly EventWaitHandle wakeupEvent = new ManualResetEvent(false);
