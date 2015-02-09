@@ -1178,7 +1178,6 @@ namespace LogExpert
       this.ShowIcon = false;
       this.ShowInTaskbar = false;
       this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-      this.SizeChanged += new System.EventHandler(this.LogWindow_SizeChanged);
 	  this.Enter += new System.EventHandler(this.LogWindow_InvalidateCurrentRow);
       this.Leave += new System.EventHandler(this.LogWindow_InvalidateCurrentRow);
       this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LogWindow_KeyDown);

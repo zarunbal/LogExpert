@@ -30,8 +30,11 @@ namespace LogExpert
 			ref IntPtr iconsSmall,
 			UInt32 numIcons);
 
-		[DllImport("user32.dll")]
+		[DllImport("user32.dll", CharSet = CharSet.Auto)]
 		public static extern bool DestroyIcon(IntPtr hIcon);
+
+		[DllImport("User32.dll")]
+		public static extern Int32 SetForegroundWindow(IntPtr hWnd);
 
 		public static Icon LoadIconFromExe(String fileName, int index)
 		{

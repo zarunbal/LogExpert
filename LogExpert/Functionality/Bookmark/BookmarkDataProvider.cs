@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LogExpert
 {
-	internal class BookmarkDataProvider : IBookmarkData
+	public class BookmarkDataProvider : IBookmarkData
 	{
 		#region cTor
 		
