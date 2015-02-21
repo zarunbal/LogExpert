@@ -100,7 +100,9 @@ namespace LogExpert
 							foreach (Type type in types)
 							{
 								if (type.IsInterface)
+								{
 									continue;
+								}
 								if (type.Name.EndsWith("Columnizer"))
 								{
 									Type t = typeof(ILogLineColumnizer);
@@ -128,11 +130,17 @@ namespace LogExpert
 								else
 								{
 									if (TryAsContextMenu(type))
+									{
 										continue;
+									}
 									if (TryAsKeywordAction(type))
+									{
 										continue;
+									}
 									if (TryAsFileSystem(type))
+									{
 										continue;
+									}
 								}
 							}
 						}

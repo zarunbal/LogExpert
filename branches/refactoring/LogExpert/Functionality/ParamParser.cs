@@ -6,29 +6,33 @@ using System.Text.RegularExpressions;
 
 namespace LogExpert
 {
-	class ParamParser
+	public class ParamParser
 	{
-		string argLine;
+		private string argLine;
 
 		public ParamParser(string argTemplate)
 		{
-			this.argLine = argTemplate;
+			argLine = argTemplate;
 		}
 
 		public string ReplaceParams(string logLine, int lineNum, string fileName)
 		{
 			FileInfo fileInfo = new FileInfo(fileName);
 			StringBuilder builder = new StringBuilder(this.argLine);
-			builder.Replace("%L", "" + lineNum);
-			builder.Replace("%P", fileInfo.DirectoryName.Contains(" ") ? "\"" + fileInfo.DirectoryName + "\"" : fileInfo.DirectoryName);
-			builder.Replace("%N", fileInfo.Name.Contains(" ") ? "\"" + fileInfo.Name + "\"" : fileInfo.Name);
-			builder.Replace("%F", fileInfo.FullName.Contains(" ") ? "\"" + fileInfo.FullName + "\"" : fileInfo.FullName);
-			builder.Replace("%E", fileInfo.Extension.Contains(" ") ? "\"" + fileInfo.Extension + "\"" : fileInfo.Extension);
+
+			builder.Replace("%L", lineNum.ToString());
+			builder.Replace("%P", FormatPath(fileInfo.DirectoryName));
+			builder.Replace("%N", FormatPath(fileInfo.Name));
+			builder.Replace("%F", FormatPath(fileInfo.FullName));
+			builder.Replace("%E", FormatPath(fileInfo.FullName));
+
 			string stripped = StripExtension(fileInfo.Name);
-			builder.Replace("%M", stripped.Contains(" ") ? "\"" + stripped + "\"" : stripped);
+			builder.Replace("%M",FormatPath(stripped));
+			
 			int sPos = 0;
 			string reg;
 			string replace;
+			
 			do
 			{
 				reg = GetNextGroup(builder, ref sPos);
@@ -40,6 +44,7 @@ namespace LogExpert
 				}
 			}
 			while (replace != null);
+			
 			return builder.ToString();
 		}
 
@@ -47,12 +52,14 @@ namespace LogExpert
 		{
 			int count = 0;
 			int ePos;
+
 			while (sPos < builder.Length)
 			{
 				if (builder[sPos] == '{')
 				{
 					ePos = sPos + 1;
 					count = 1;
+
 					while (ePos < builder.Length)
 					{
 						if (builder[ePos] == '{')
@@ -77,12 +84,24 @@ namespace LogExpert
 			return null;
 		}
 
-		public static string StripExtension(string fileName)
+		private static string StripExtension(string fileName)
 		{
 			int i = fileName.LastIndexOf('.');
 			if (i < 0)
+			{
 				i = fileName.Length - 1;
+			}
 			return fileName.Substring(0, i);
 		}
+
+		private static string FormatPath(string path)
+		{
+			if (path.Contains(" "))
+			{
+				return string.Format("\"{0}\"", path);
+			}
+			return	path;
+		}
+
 	}
 }
