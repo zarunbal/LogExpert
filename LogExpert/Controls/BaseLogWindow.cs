@@ -417,6 +417,9 @@ namespace LogExpert.Controls
 
 		#endregion
 
+
+
+
 		protected void ShiftRowHeightList(int offset)
 		{
 			SortedList<int, RowHeightEntry> newList = new SortedList<int, RowHeightEntry>();
@@ -601,7 +604,7 @@ namespace LogExpert.Controls
 			int count = 0;
 			bool hasWrapped = false;
 			Regex regex = null;
-
+			string regexPattern = null;
 			while (true)
 			{
 				if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
@@ -644,7 +647,7 @@ namespace LogExpert.Controls
 
 				if (searchParams.isRegex)
 				{
-					if (regex == null)
+					if (regex == null && string.IsNullOrEmpty(regexPattern) && object.ReferenceEquals(searchParams.searchText, regexPattern))
 					{
 						regex = new Regex(searchParams.searchText, searchParams.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
 					}

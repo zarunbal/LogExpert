@@ -8,26 +8,26 @@ namespace LogExpert
 	/// </summary>
 	public class TimeSyncList
 	{
-		private IList<LogWindow> logWindowList = new List<LogWindow>();
+		private IList<LogWindow> _logWindowList = new List<LogWindow>();
 
 		public DateTime CurrentTimestamp { get; set; }
 
 		public void AddWindow(LogWindow logWindow)
 		{
-			lock (this.logWindowList)
+			lock (_logWindowList)
 			{
-				if (!this.logWindowList.Contains(logWindow))
+				if (!_logWindowList.Contains(logWindow))
 				{
-					this.logWindowList.Add(logWindow);
+					_logWindowList.Add(logWindow);
 				}
 			}
 		}
 
 		public void RemoveWindow(LogWindow logWindow)
 		{
-			lock (this.logWindowList)
+			lock (_logWindowList)
 			{
-				this.logWindowList.Remove(logWindow);
+				_logWindowList.Remove(logWindow);
 			}
 			OnWindowRemoved();
 		}
@@ -38,10 +38,10 @@ namespace LogExpert
 		/// <param name="timestamp"></param>
 		public void NavigateToTimestamp(DateTime timestamp, LogWindow sender)
 		{
-			this.CurrentTimestamp = timestamp;
-			lock (this.logWindowList)
+			CurrentTimestamp = timestamp;
+			lock (_logWindowList)
 			{
-				foreach (LogWindow logWindow in this.logWindowList)
+				foreach (LogWindow logWindow in _logWindowList)
 				{
 					if (sender != logWindow)
 					{
@@ -53,14 +53,14 @@ namespace LogExpert
 
 		public bool Contains(LogWindow logWindow)
 		{
-			return this.logWindowList.Contains(logWindow);
+			return _logWindowList.Contains(logWindow);
 		}
 
 		public int Count
 		{
 			get
 			{
-				return this.logWindowList.Count;
+				return _logWindowList.Count;
 			}
 		}
 

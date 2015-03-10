@@ -97,8 +97,5 @@ namespace LogExpert
 
 		[DllImport("user32.dll")]
 		public static extern long GetSystemMetrics(long index);
-
-		[DllImport("user32.dll")]
-		public static extern short GetKeyState(int vKey);
 	}
 }

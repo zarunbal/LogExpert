@@ -14,13 +14,13 @@ using LogExpert.Dialogs;
 
 namespace LogExpert
 {
-	static class Program
+	internal static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main(string[] orgArgs)
+		private static void Main(string[] orgArgs)
 		{
 			try
 			{
@@ -32,7 +32,7 @@ namespace LogExpert
 			}
 		}
 
-		static void Sub_Main(string[] orgArgs)
+		private static void Sub_Main(string[] orgArgs)
 		{
 			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 			Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
@@ -53,9 +53,13 @@ namespace LogExpert
 				{
 					FileInfo info = new FileInfo(fileArg);
 					if (info.Exists)
+					{
 						argsList.Add(info.FullName);
+					}
 					else
+					{
 						argsList.Add(fileArg);
+					}
 				}
 				catch (Exception)
 				{
@@ -140,7 +144,7 @@ namespace LogExpert
 			}
 		}
 
-		static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 		{
 			//ShowUnhandledException(e.Exception);
 			Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
@@ -150,7 +154,7 @@ namespace LogExpert
 			thread.Join();
 		}
 
-		static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			object exceptionObject = e.ExceptionObject;
 			//ShowUnhandledException(exceptionObject);

@@ -7,19 +7,19 @@ using System.Threading;
 
 namespace LogExpert
 {
-	class SysoutPipe
+	public class SysoutPipe
 	{
-		StreamWriter writer;
-		StreamReader sysout;
+		StreamWriter _writer;
+		StreamReader _sysout;
 
 		public SysoutPipe(StreamReader sysout)
 		{
-			this.sysout = sysout;
-			this.FileName = Path.GetTempFileName();
-			Logger.logInfo("sysoutPipe created temp file: " + this.FileName);
-			FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-			this.writer = new StreamWriter(fStream, Encoding.Unicode);
-			Thread thread = new Thread(new ThreadStart(this.ReaderThread));
+			_sysout = sysout;
+			FileName = Path.GetTempFileName();
+			Logger.logInfo("sysoutPipe created temp file: " + FileName);
+			FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+			_writer = new StreamWriter(fStream, Encoding.Unicode);
+			Thread thread = new Thread(ReaderThread);
 			thread.IsBackground = true;
 			thread.Start();
 		}
@@ -31,10 +31,12 @@ namespace LogExpert
 			{
 				try
 				{
-					int read = this.sysout.Read(buff, 0, 256);
+					int read = _sysout.Read(buff, 0, 256);
 					if (read == 0)
+					{
 						break;
-					writer.Write(buff, 0, read);
+					}
+					_writer.Write(buff, 0, read);
 				}
 				catch (IOException)
 				{
@@ -46,15 +48,15 @@ namespace LogExpert
 
 		public void ClosePipe()
 		{
-			this.writer.Close();
-			this.writer = null;
+			_writer.Close();
+			_writer = null;
 		}
 
 		public string FileName { get; private set; }
 
 		public void DataReceivedEventHandler(Object sender, DataReceivedEventArgs e)
 		{
-			this.writer.WriteLine(e.Data);
+			_writer.WriteLine(e.Data);
 		}
 
 		public void ProcessExitedEventHandler(object sender, System.EventArgs e)
@@ -62,8 +64,8 @@ namespace LogExpert
 			//ClosePipe();
 			if (sender.GetType() == typeof(Process))
 			{
-				((Process)sender).Exited -= this.ProcessExitedEventHandler;
-				((Process)sender).OutputDataReceived -= this.DataReceivedEventHandler;
+				((Process)sender).Exited -= ProcessExitedEventHandler;
+				((Process)sender).OutputDataReceived -= DataReceivedEventHandler;
 			}
 		}
 	}

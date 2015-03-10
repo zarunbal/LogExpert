@@ -16,8 +16,8 @@ namespace LogExpert
 		public ActionEntry Copy()
 		{
 			ActionEntry e = new ActionEntry();
-			e.pluginName = this.pluginName;
-			e.actionParam = this.actionParam;
+			e.pluginName = pluginName;
+			e.actionParam = actionParam;
 			return e;
 		}
 	}
@@ -48,40 +48,40 @@ namespace LogExpert
 			set
 			{
 				isCaseSensitive = value;
-				this.regex = null;
+				regex = null;
 			}
 		}
 
 		public HilightEntry(string searchText, Color fgColor, Color bgColor, bool isWordMatch)
 		{
-			this.searchText = searchText;
-			this.ForegroundColor = fgColor;
-			this.BackgroundColor = bgColor;
-			this.IsRegEx = false;
-			this.isCaseSensitive = false;
-			this.IsLedSwitch = false;
-			this.IsStopTail = false;
-			this.IsSetBookmark = false;
-			this.IsActionEntry = false;
-			this.ActionEntry = null;
-			this.IsWordMatch = isWordMatch;
+			SearchText = searchText;
+			ForegroundColor = fgColor;
+			BackgroundColor = bgColor;
+			IsRegEx = false;
+			isCaseSensitive = false;
+			IsLedSwitch = false;
+			IsStopTail = false;
+			IsSetBookmark = false;
+			IsActionEntry = false;
+			ActionEntry = null;
+			IsWordMatch = isWordMatch;
 		}
 
 		public HilightEntry(string searchText, Color fgColor, Color bgColor,
 			bool isRegEx, bool isCaseSensitive, bool isLedSwitch,
 			bool isStopTail, bool isSetBookmark, bool isActionEntry, ActionEntry actionEntry, bool isWordMatch)
 		{
-			this.searchText = searchText;
-			this.ForegroundColor = fgColor;
-			this.BackgroundColor = bgColor;
-			this.IsRegEx = isRegEx;
-			this.isCaseSensitive = isCaseSensitive;
-			this.IsLedSwitch = isLedSwitch;
-			this.IsStopTail = isStopTail;
-			this.IsSetBookmark = isSetBookmark;
-			this.IsActionEntry = isActionEntry;
-			this.ActionEntry = actionEntry;
-			this.IsWordMatch = isWordMatch;
+			SearchText = searchText;
+			ForegroundColor = fgColor;
+			BackgroundColor = bgColor;
+			IsRegEx = isRegEx;
+			IsCaseSensitive = isCaseSensitive;
+			IsLedSwitch = isLedSwitch;
+			IsStopTail = isStopTail;
+			IsSetBookmark = isSetBookmark;
+			IsActionEntry = isActionEntry;
+			ActionEntry = actionEntry;
+			IsWordMatch = isWordMatch;
 		}
 
 		public Color ForegroundColor { get; set; }
@@ -92,12 +92,12 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.searchText;
+				return searchText;
 			}
 			set
 			{
-				this.searchText = value;
-				this.regex = null;
+				searchText = value;
+				regex = null;
 			}
 		}
 
@@ -113,18 +113,18 @@ namespace LogExpert
 		{
 			get 
 			{
-				if (this.regex == null)
+				if (regex == null)
 				{
-					if (this.IsRegEx)
+					if (IsRegEx)
 					{
-						this.regex = new Regex(this.SearchText, this.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+						regex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
 					}
 					else
 					{
-						this.regex = new Regex(Regex.Escape(this.SearchText), this.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+						regex = new Regex(Regex.Escape(SearchText), IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
 					}
 				}
-				return this.regex; 
+				return regex; 
 			}
 		}
 
@@ -134,11 +134,11 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.isSearchHit;
+				return isSearchHit;
 			}
 			set
 			{
-				this.isSearchHit = value;
+				isSearchHit = value;
 			}
 		}
 
@@ -160,7 +160,7 @@ namespace LogExpert
 
 		public override String ToString()
 		{
-			return this.HilightEntry.SearchText + "/" + this.StartPos + "/" + this.Length;
+			return HilightEntry.SearchText + "/" + StartPos + "/" + Length;
 		}
 	}
 }

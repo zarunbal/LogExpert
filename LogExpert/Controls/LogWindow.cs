@@ -4876,8 +4876,6 @@ namespace LogExpert
 			OnGuiState(_guiStateArgs);
 		}
 
-
-
 		private void ShowAdvancedFilterPanel(bool show)
 		{
 			if (show)
@@ -5104,8 +5102,6 @@ namespace LogExpert
 				Clipboard.SetText(clipText.ToString());
 			}
 		}
-
-
 
 		private void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
 		{

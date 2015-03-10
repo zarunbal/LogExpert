@@ -20,13 +20,13 @@ namespace LogExpert
 		static Object lockObject = new Object();
 		static PluginRegistry instance = null;
 
-		private IList<IContextMenuEntry> registeredContextMenuPlugins = new List<IContextMenuEntry>();
-		private IList<IKeywordAction> registeredKeywordActions = new List<IKeywordAction>();
-		private IDictionary<string, IKeywordAction> registeredKeywordsDict = new Dictionary<string, IKeywordAction>();
-		private IList<ILogExpertPlugin> pluginList = new List<ILogExpertPlugin>();
-		private IList<IFileSystemPlugin> fileSystemPlugins = new List<IFileSystemPlugin>();
+		private IList<IContextMenuEntry> _registeredContextMenuPlugins = new List<IContextMenuEntry>();
+		private IList<IKeywordAction> _registeredKeywordActions = new List<IKeywordAction>();
+		private IDictionary<string, IKeywordAction> _registeredKeywordsDict = new Dictionary<string, IKeywordAction>();
+		private IList<ILogExpertPlugin> _pluginList = new List<ILogExpertPlugin>();
+		private IList<IFileSystemPlugin> _fileSystemPlugins = new List<IFileSystemPlugin>();
 
-		private IFileSystemCallback fileSystemCallback = new FileSystemCallback();
+		private IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
 
 		public IList<ILogLineColumnizer> RegisteredColumnizers { get; private set; }
 
@@ -34,7 +34,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.registeredContextMenuPlugins;
+				return _registeredContextMenuPlugins;
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.registeredKeywordActions;
+				return _registeredKeywordActions;
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.fileSystemPlugins;
+				return _fileSystemPlugins;
 			}
 		}
 
@@ -74,11 +74,11 @@ namespace LogExpert
 		internal void LoadPlugins()
 		{
 			Logger.logInfo("Loading plugins...");
-			this.RegisteredColumnizers = new List<ILogLineColumnizer>();
-			this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
-			this.RegisteredColumnizers.Add(new TimestampColumnizer());
-			this.RegisteredColumnizers.Add(new ClfColumnizer());
-			this.RegisteredFileSystemPlugins.Add(new LocalFileSystem());
+			RegisteredColumnizers = new List<ILogLineColumnizer>();
+			RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
+			RegisteredColumnizers.Add(new TimestampColumnizer());
+			RegisteredColumnizers.Add(new ClfColumnizer());
+			RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 
 			string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins";
 			AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -113,14 +113,14 @@ namespace LogExpert
 										if (cti != null)
 										{
 											object o = cti.Invoke(new object[] { });
-											this.RegisteredColumnizers.Add((ILogLineColumnizer)o);
+											RegisteredColumnizers.Add((ILogLineColumnizer)o);
 											if (o is IColumnizerConfigurator)
 											{
 												((IColumnizerConfigurator)o).LoadConfig(ConfigManager.ConfigDir);
 											}
 											if (o is ILogExpertPlugin)
 											{
-												this.pluginList.Add(o as ILogExpertPlugin);
+												_pluginList.Add(o as ILogExpertPlugin);
 												(o as ILogExpertPlugin).PluginLoaded();
 											}
 											Logger.logInfo("Added columnizer " + type.Name);
@@ -164,14 +164,14 @@ namespace LogExpert
 			IContextMenuEntry me = TryInstantiate<IContextMenuEntry>(type);
 			if (me != null)
 			{
-				this.RegisteredContextMenuPlugins.Add(me);
+				RegisteredContextMenuPlugins.Add(me);
 				if (me is ILogExpertPluginConfigurator)
 				{
 					((ILogExpertPluginConfigurator)me).LoadConfig(ConfigManager.ConfigDir);
 				}
 				if (me is ILogExpertPlugin)
 				{
-					this.pluginList.Add(me as ILogExpertPlugin);
+					_pluginList.Add(me as ILogExpertPlugin);
 					(me as ILogExpertPlugin).PluginLoaded();
 				}
 				Logger.logInfo("Added context menu plugin " + type.Name);
@@ -185,15 +185,15 @@ namespace LogExpert
 			IKeywordAction ka = TryInstantiate<IKeywordAction>(type);
 			if (ka != null)
 			{
-				this.RegisteredKeywordActions.Add(ka);
-				this.registeredKeywordsDict.Add(ka.GetName(), ka);
+				RegisteredKeywordActions.Add(ka);
+				_registeredKeywordsDict.Add(ka.GetName(), ka);
 				if (ka is ILogExpertPluginConfigurator)
 				{
 					((ILogExpertPluginConfigurator)ka).LoadConfig(ConfigManager.ConfigDir);
 				}
 				if (ka is ILogExpertPlugin)
 				{
-					this.pluginList.Add(ka as ILogExpertPlugin);
+					_pluginList.Add(ka as ILogExpertPlugin);
 					(ka as ILogExpertPlugin).PluginLoaded();
 				}
 				Logger.logInfo("Added keyword plugin " + type.Name);
@@ -205,21 +205,21 @@ namespace LogExpert
 		private bool TryAsFileSystem(Type type)
 		{
 			// file system plugins can have optional constructor with IFileSystemCallback argument
-			IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, this.fileSystemCallback);
+			IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, _fileSystemCallback);
 			if (fs == null)
 			{
 				fs = TryInstantiate<IFileSystemPlugin>(type);
 			}
 			if (fs != null)
 			{
-				this.RegisteredFileSystemPlugins.Add(fs);
+				RegisteredFileSystemPlugins.Add(fs);
 				if (fs is ILogExpertPluginConfigurator)
 				{
 					((ILogExpertPluginConfigurator)fs).LoadConfig(ConfigManager.ConfigDir);
 				}
 				if (fs is ILogExpertPlugin)
 				{
-					this.pluginList.Add(fs as ILogExpertPlugin);
+					_pluginList.Add(fs as ILogExpertPlugin);
 					(fs as ILogExpertPlugin).PluginLoaded();
 				}
 				Logger.logInfo("Added file system plugin " + type.Name);
@@ -270,13 +270,13 @@ namespace LogExpert
 		internal IKeywordAction FindKeywordActionPluginByName(string name)
 		{
 			IKeywordAction action = null;
-			this.registeredKeywordsDict.TryGetValue(name, out action);
+			_registeredKeywordsDict.TryGetValue(name, out action);
 			return action;
 		}
 
 		internal void CleanupPlugins()
 		{
-			foreach (ILogExpertPlugin plugin in this.pluginList)
+			foreach (ILogExpertPlugin plugin in _pluginList)
 			{
 				plugin.AppExiting();
 			}
@@ -286,7 +286,7 @@ namespace LogExpert
 		{
 			if (Logger.IsDebug)
 				Logger.logDebug("Trying to find file system plugin for uri " + uriString);
-			foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
+			foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
 			{
 				if (Logger.IsDebug)
 					Logger.logDebug("Checking " + fs.Text);
