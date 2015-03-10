@@ -11,7 +11,9 @@ namespace LogExpert.Classes
 		public static bool TestFilterCondition(FilterParams filterParams, string line, ILogLineColumnizerCallback columnizerCallback)
 		{
 			if (filterParams.lastLine.Equals(line))
+			{
 				return filterParams.lastResult;
+			}
 
 			bool match = TestFilterMatch(filterParams, line, columnizerCallback);
 			filterParams.lastLine = line;
@@ -38,7 +40,9 @@ namespace LogExpert.Classes
 				}
 			}
 			if (filterParams.isInvert)
+			{
 				match = !match;
+			}
 			filterParams.lastResult = match;
 			return match;
 		}
@@ -62,7 +66,9 @@ namespace LogExpert.Classes
 			}
 
 			if (searchText == null || lowerSearchText == null || searchText.Length == 0)
+			{
 				return false;
+			}
 
 			if (filterParams.columnRestrict)
 			{
@@ -80,7 +86,9 @@ namespace LogExpert.Classes
 								if (prevValue != null)
 								{
 									if (TestMatchSub(filterParams, prevValue, lowerSearchText, searchText, rex, filterParams.exactColumnMatch))
+									{
 										found = true;
+									}
 								}
 							}
 							else if (filterParams.emptyColumnHit)
@@ -92,7 +100,9 @@ namespace LogExpert.Classes
 						{
 							filterParams.lastNonEmptyCols[colIndex] = columns[colIndex];
 							if (TestMatchSub(filterParams, columns[colIndex], lowerSearchText, searchText, rex, filterParams.exactColumnMatch))
+							{
 								found = true;
+							}
 						}
 					}
 				}
@@ -159,8 +169,9 @@ namespace LogExpert.Classes
 						{
 							string src = line.Substring(i, searchText.Length);
 							if (!filterParams.isCaseSensitive)
+							{
 								src = src.ToLower();
-							string dest = filterParams.isCaseSensitive ? searchText : lowerSearchText;
+							}
 							int dist = Distance(src, searchText);
 							if ((float)(searchText.Length + 1) / (float)(dist + 1) >= 11F / (float)(filterParams.fuzzyValue + 1F))
 							{
@@ -194,9 +205,13 @@ namespace LogExpert.Classes
 				for (j = 1; j <= str2.Length; j++)
 				{
 					if (str1[i - 1] == str2[j - 1])
+					{
 						cost = 0;
+					}
 					else
+					{
 						cost = 1;
+					}
 
 					d[i, j] =
 						Math.Min(d[i - 1, j] + 1, // Deletion

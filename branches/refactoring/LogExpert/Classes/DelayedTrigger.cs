@@ -12,39 +12,39 @@ namespace LogExpert
 	public class DelayedTrigger
 	{
 		private int waitTime = 0;
-		private readonly EventWaitHandle wakeupEvent = new ManualResetEvent(false);
-		private readonly EventWaitHandle timerEvent = new ManualResetEvent(false);
-		private readonly Thread thread = null;
-		private bool shouldCancel = false;
+		private readonly EventWaitHandle _wakeupEvent = new ManualResetEvent(false);
+		private readonly EventWaitHandle _timerEvent = new ManualResetEvent(false);
+		private readonly Thread _thread = null;
+		private bool _shouldCancel = false;
 
 		public DelayedTrigger(int waitTimeMs)
 		{
-			this.waitTime = waitTimeMs;
-			this.thread = new Thread(new ThreadStart(worker));
-			this.thread.IsBackground = true;
-			this.thread.Start();
+			waitTime = waitTimeMs;
+			_thread = new Thread(new ThreadStart(Worker));
+			_thread.IsBackground = true;
+			_thread.Start();
 		}
 
-		private void worker()
+		private void Worker()
 		{
-			while (!this.shouldCancel)
+			while (!_shouldCancel)
 			{
-				this.wakeupEvent.WaitOne();
-				if (this.shouldCancel)
+				_wakeupEvent.WaitOne();
+				if (_shouldCancel)
 					return;
-				this.wakeupEvent.Reset();
+				_wakeupEvent.Reset();
 
-				while (!this.shouldCancel)
+				while (!_shouldCancel)
 				{
-					bool signaled = this.timerEvent.WaitOne(this.waitTime, true);
-					this.timerEvent.Reset();
+					bool signaled = _timerEvent.WaitOne(waitTime, true);
+					_timerEvent.Reset();
 					if (!signaled)
 					{
 						break;
 					}
 				}
 				// timeout with no new Trigger -> send event
-				if (!this.shouldCancel)
+				if (!_shouldCancel)
 				{
 					OnSignal();
 				}
@@ -53,8 +53,8 @@ namespace LogExpert
 
 		public void Trigger()
 		{
-			this.timerEvent.Set();
-			this.wakeupEvent.Set();
+			_timerEvent.Set();
+			_wakeupEvent.Set();
 		}
 
 		public void TriggerImmediate()
@@ -64,8 +64,8 @@ namespace LogExpert
 
 		public void Stop()
 		{
-			this.shouldCancel = true;
-			this.wakeupEvent.Set();
+			_shouldCancel = true;
+			_wakeupEvent.Set();
 		}
 
 		public delegate void SignalEventHandler(object sender, EventArgs e);

@@ -103,7 +103,6 @@
     <Compile Include="Entities\BookmarkOverlay.cs" />
     <Compile Include="Functionality\Bookmark\BookmarkView.cs" />
     <Compile Include="Entities\CellContent.cs" />
-    <Compile Include="Classes\CmdLine.cs" />
     <Compile Include="Functionality\ColumnCache.cs" />
     <Compile Include="Classes\Args\ColumnizerEventArgs.cs" />
     <Compile Include="Classes\Args\ConfigChangedEventArgs.cs" />

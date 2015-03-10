@@ -9,21 +9,21 @@ namespace LogExpert
 {
 	class XmlBlockSplitter : ILogStreamReader
 	{
-		private string stylesheet;
-		XslCompiledTransform xslt = new XslCompiledTransform();
-		private XmlLogReader reader;
-		XmlParserContext context;
-		XmlReaderSettings settings;
-		private IList<string> lineList = new List<string>();
-		private char[] newLineChar = new char[] { '\n' };
-		private string[] splitStrings = new string[] { "\r\n", "\n", "\r" };
+		private string _stylesheet;
+		XslCompiledTransform _xslt = new XslCompiledTransform();
+		private XmlLogReader _reader;
+		XmlParserContext _context;
+		XmlReaderSettings _settings;
+		private IList<string> _lineList = new List<string>();
+		private char[] _newLineChar = new char[] { '\n' };
+		private string[] _splitStrings = new string[] { "\r\n", "\n", "\r" };
 
 		public XmlBlockSplitter(XmlLogReader reader, IXmlLogConfiguration xmlLogConfig)
 		{
-			this.reader = reader;
-			this.reader.StartTag = xmlLogConfig.XmlStartTag;
-			this.reader.EndTag = xmlLogConfig.XmlEndTag;
-			this.Stylesheet = xmlLogConfig.Stylesheet;
+			_reader = reader;
+			_reader.StartTag = xmlLogConfig.XmlStartTag;
+			_reader.EndTag = xmlLogConfig.XmlEndTag;
+			Stylesheet = xmlLogConfig.Stylesheet;
 
 			// Create the XmlNamespaceManager.
 			NameTable nt = new NameTable();
@@ -33,36 +33,38 @@ namespace LogExpert
 				nsmgr.AddNamespace(xmlLogConfig.Namespace[0], xmlLogConfig.Namespace[1]);
 			}
 			// Create the XmlParserContext.
-			this.context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
-			this.settings = new XmlReaderSettings();
-			this.settings.ConformanceLevel = ConformanceLevel.Fragment;
+			_context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
+			_settings = new XmlReaderSettings();
+			_settings.ConformanceLevel = ConformanceLevel.Fragment;
 		}
 
 		#region ILogStreamReader Member
 
 		public int ReadChar()
 		{
-			return this.reader.ReadChar();
+			return _reader.ReadChar();
 		}
 
 		public string ReadLine()
 		{
-			if (this.lineList.Count == 0)
+			if (_lineList.Count == 0)
 			{
-				string block = this.reader.ReadLine();
+				string block = _reader.ReadLine();
 				if (block == null)
+				{
 					return null;
+				}
 				try
 				{
 					ParseXmlBlock(block);
 				}
 				catch (XmlException)
 				{
-					this.lineList.Add("[XML Parser error] " + block);
+					_lineList.Add("[XML Parser error] " + block);
 				}
 			}
-			string line = this.lineList[0];
-			this.lineList.RemoveAt(0);
+			string line = _lineList[0];
+			_lineList.RemoveAt(0);
 			return line;
 		}
 
@@ -70,11 +72,11 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.reader.Position;
+				return _reader.Position;
 			}
 			set
 			{
-				this.reader.Position = value;
+				_reader.Position = value;
 			}
 		}
 
@@ -82,7 +84,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.reader.Encoding;
+				return _reader.Encoding;
 			}
 		}
 
@@ -90,7 +92,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.lineList.Count == 0;
+				return _lineList.Count == 0;
 			}
 		}
 
@@ -98,20 +100,20 @@ namespace LogExpert
 		{
 			get
 			{
-				return this.stylesheet;
+				return _stylesheet;
 			}
 			set
 			{
-				this.stylesheet = value;
-				if (this.stylesheet != null)
+				_stylesheet = value;
+				if (_stylesheet != null)
 				{
 					XmlReader stylesheetReader = XmlReader.Create(new StringReader(Stylesheet));
-					this.xslt = new XslCompiledTransform();
-					this.xslt.Load(stylesheetReader);
+					_xslt = new XslCompiledTransform();
+					_xslt.Load(stylesheetReader);
 				}
 				else
 				{
-					this.xslt = null;
+					_xslt = null;
 				}
 			}
 		}
@@ -120,40 +122,40 @@ namespace LogExpert
 
 		private void ParseXmlBlock(string block)
 		{
-			if (this.stylesheet != null)
+			if (_stylesheet != null)
 			{
-				XmlReader xmlReader = XmlReader.Create(new StringReader(block), settings, context);
+				XmlReader xmlReader = XmlReader.Create(new StringReader(block), _settings, _context);
 
 				xmlReader.Read();
 				xmlReader.MoveToContent();
 				//xmlReader.MoveToContent();
 				StringWriter textWriter = new StringWriter();
 
-				this.xslt.Transform(xmlReader, null, textWriter);
+				_xslt.Transform(xmlReader, null, textWriter);
 				string message = textWriter.ToString();
 				SplitToLinesList(message);
 			}
 			else
 			{
 				SplitToLinesList(block);
-				//this.lineList.Add(block);   // TODO: make configurable, if block has to be splitted
+				//lineList.Add(block);   // TODO: make configurable, if block has to be splitted
 			}
 		}
 
 		private void SplitToLinesList(string message)
 		{
 			const int MAX_LEN = 3000;
-			string[] lines = message.Split(splitStrings, StringSplitOptions.None);
+			string[] lines = message.Split(_splitStrings, StringSplitOptions.None);
 			foreach (string theLine in lines)
 			{
-				string line = theLine.Trim(newLineChar);
+				string line = theLine.Trim(_newLineChar);
 				while (line.Length > MAX_LEN)
 				{
 					string part = line.Substring(0, MAX_LEN);
 					line = line.Substring(MAX_LEN);
-					this.lineList.Add(part);
+					_lineList.Add(part);
 				}
-				this.lineList.Add(line);
+				_lineList.Add(line);
 			}
 		}
 	}
