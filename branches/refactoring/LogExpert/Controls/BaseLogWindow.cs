@@ -13,52 +13,50 @@ namespace LogExpert.Controls
 	public abstract class BaseLogWindow : DockContent
 	{
 		#region Const
-
+		
 		private const int PROGRESS_BAR_MODULO = 1000;
-
+		
 		#endregion
-
+		
 		#region Fields
-		protected ILogLineColumnizer _forcedColumnizerForLoading;
 
+		protected ILogLineColumnizer _forcedColumnizerForLoading;
+		
 		protected ILogLineColumnizer _currentColumnizer;
 		protected readonly Object _currentColumnizerLock = new Object();
-
+		
 		private readonly Thread _logEventHandlerThread = null;
 		private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
 		private readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
 
 		protected readonly GuiStateArgs _guiStateArgs = new GuiStateArgs();
 
-
-		protected readonly BookmarkDataProvider _bookmarkProvider = new BookmarkDataProvider();
-
 		protected SortedList<int, RowHeightEntry> _rowHeightList = new SortedList<int, RowHeightEntry>();
 
 		protected readonly IList<FilterPipe> _filterPipeList = new List<FilterPipe>();
 
 		protected TimeSpreadCalculator _timeSpreadCalc;
-
+		
 		protected readonly StatusLineEventArgs _statusEventArgs = new StatusLineEventArgs();
 		protected readonly ProgressEventArgs _progressEventArgs = new ProgressEventArgs();
 
 		protected DelayedTrigger _statusLineTrigger = new DelayedTrigger(200);
-
+		
 		protected bool _shouldCancel = false;
 		protected bool _isLoading;
 		protected bool _isLoadError = false;
-
+		
 		protected MultifileOptions _multifileOptions = new MultifileOptions();
 		protected ReloadMemento _reloadMemento;
 		protected string[] _fileNames;
-
+		
 		protected LogTabWindow _parentLogTabWin;
 		protected ColumnCache _columnCache = new ColumnCache();
 
 		#endregion
 
 		#region cTor
-
+		
 		public BaseLogWindow()
 		{
 			_logEventHandlerThread = new Thread(new ThreadStart(LogEventWorker));
@@ -70,51 +68,15 @@ namespace LogExpert.Controls
 
 		#region Events
 
-		public delegate void ProgressBarEventHandler(object sender, ProgressEventArgs e);
+		public BookmarkDataProvider BookmarkProvider { get; private set; }
 
-		public event ProgressBarEventHandler ProgressBarUpdate;
-
+		public event Action<ProgressEventArgs> ProgressBarUpdate;
+		
 		protected void OnProgressBarUpdate(ProgressEventArgs e)
 		{
 			if (ProgressBarUpdate != null)
 			{
-				ProgressBarUpdate(this, e);
-			}
-		}
-
-		public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
-
-		public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
-
-		protected void OnAllBookmarksRemoved()
-		{
-			if (AllBookmarksRemoved != null)
-			{
-				AllBookmarksRemoved(this, new EventArgs());
-			}
-		}
-
-		public delegate void BookmarkRemovedEventHandler(object sender, EventArgs e);
-
-		public event BookmarkRemovedEventHandler BookmarkRemoved;
-
-		protected void OnBookmarkRemoved()
-		{
-			if (BookmarkRemoved != null)
-			{
-				BookmarkRemoved(this, new EventArgs());
-			}
-		}
-
-		public delegate void BookmarkAddedEventHandler(object sender, EventArgs e);
-
-		public event BookmarkAddedEventHandler BookmarkAdded;
-
-		protected void OnBookmarkAdded()
-		{
-			if (BookmarkAdded != null)
-			{
-				BookmarkAdded(this, new EventArgs());
+				ProgressBarUpdate(e);
 			}
 		}
 
@@ -127,7 +89,7 @@ namespace LogExpert.Controls
 		public string FileName { get; protected set; }
 
 		protected EncodingOptions EncodingOptions { get; set; }
-
+		
 		//TODO Zarunbal: think about to return directly _guiStateArgs
 		public bool IsMultiFile
 		{
@@ -144,7 +106,7 @@ namespace LogExpert.Controls
 		public bool IsTempFile { get; protected set; }
 
 		public string ForcedPersistenceFileName { get; set; }
-
+		
 		public Preferences Preferences
 		{
 			get
@@ -152,7 +114,7 @@ namespace LogExpert.Controls
 				return ConfigManager.Settings.preferences;
 			}
 		}
-
+		
 		public ILogLineColumnizer CurrentColumnizer
 		{
 			get
@@ -172,24 +134,24 @@ namespace LogExpert.Controls
 		#endregion
 
 		#region Public Methods
-
+		
 		public void PreselectColumnizer(string columnizerName)
 		{
 			ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
 			PreSelectColumnizer(Util.CloneColumnizer(columnizer));
 		}
-
+		
 		public void Close(bool dontAsk)
 		{
 			Preferences.askForClose = !dontAsk;
 			Close();
 		}
-
+		
 		public void LoadFile(string fileName, EncodingOptions encodingOptions)
 		{
 			LoadFileInternal(fileName, encodingOptions);
 		}
-
+		
 		public void LoadFilesAsMulti(string[] fileNames, EncodingOptions encodingOptions)
 		{
 			LoadFilesAsMultiInternal(fileNames, encodingOptions);
@@ -198,7 +160,7 @@ namespace LogExpert.Controls
 		#endregion
 
 		#region Methods
-
+		
 		private void LogEventWorker()
 		{
 			Thread.CurrentThread.Name = "LogEventWorker";
@@ -213,7 +175,7 @@ namespace LogExpert.Controls
 					int lastLineCount = 0;
 					lock (_logEventArgsList)
 					{
-						Logger.logInfo("" + _logEventArgsList.Count + " events in queue");
+						Logger.logInfo(string.Format("{0} events in queue", _logEventArgsList.Count));
 						if (_logEventArgsList.Count == 0)
 						{
 							_logEventArgsEvent.Reset();
@@ -224,7 +186,7 @@ namespace LogExpert.Controls
 					}
 					if (e.IsRollover)
 					{
-						ShiftBookmarks(e.RolloverOffset);
+						BookmarkProvider.ShiftBookmarks(e.RolloverOffset);
 						ShiftRowHeightList(e.RolloverOffset);
 						ShiftFilterPipes(e.RolloverOffset);
 						lastLineCount = 0;
@@ -244,36 +206,17 @@ namespace LogExpert.Controls
 			}
 		}
 
-		#region Bookmarks
-
-		///
-		///Shift bookmarks after a logfile rollover
-		///
-		private void ShiftBookmarks(int offset)
-		{
-			_bookmarkProvider.ShiftBookmarks(offset);
-			OnBookmarkRemoved();
-		}
-
-		protected void ClearBookmarkList()
-		{
-			_bookmarkProvider.ClearAllBookmarks();
-			OnAllBookmarksRemoved();
-		}
-
-		#endregion
-
 		#region Load File
-
+		
 		private void LoadFileInternal(string fileName, EncodingOptions encodingOptions)
 		{
 			EnterLoadFileStatus();
-
+			
 			if (fileName != null)
 			{
 				FileName = fileName;
 				EncodingOptions = encodingOptions;
-
+				
 				if (CurrentLogFileReader != null)
 				{
 					CurrentLogFileReader.StopMonitoringAsync();
@@ -295,7 +238,7 @@ namespace LogExpert.Controls
 					}
 					SetDefaultHighlightGroup();
 				}
-
+				
 				// this may be set after loading persistence data
 				if (_fileNames != null && IsMultiFile)
 				{
@@ -323,20 +266,20 @@ namespace LogExpert.Controls
 				}
 
 				ILogLineXmlColumnizer xmlColumnizer = CurrentColumnizer as ILogLineXmlColumnizer;
-
+				
 				if (xmlColumnizer != null)
 				{
 					CurrentLogFileReader.IsXmlMode = true;
 					CurrentLogFileReader.XmlLogConfig = xmlColumnizer.GetXmlLogConfiguration();
 				}
-
+				
 				if (_forcedColumnizerForLoading != null)
 				{
 					CurrentColumnizer = _forcedColumnizerForLoading;
 				}
 
 				IPreProcessColumnizer preProcessColumnizer = CurrentColumnizer as IPreProcessColumnizer;
-
+				
 				if (CurrentColumnizer is IPreProcessColumnizer)
 				{
 					CurrentLogFileReader.PreProcessColumnizer = preProcessColumnizer;
@@ -345,40 +288,40 @@ namespace LogExpert.Controls
 				{
 					CurrentLogFileReader.PreProcessColumnizer = null;
 				}
-
+				
 				RegisterLogFileReaderEvents();
 				Logger.logInfo("Loading logfile: " + fileName);
 				CurrentLogFileReader.startMonitoring();
 			}
 		}
-
+		
 		private void LoadFilesAsMultiInternal(string[] fileNames, EncodingOptions encodingOptions)
 		{
 			Logger.logInfo("Loading given files as MultiFile:");
 
 			EnterLoadFileStatus();
-
+			
 			foreach (string name in fileNames)
 			{
 				Logger.logInfo("File: " + name);
 			}
-
+			
 			if (CurrentLogFileReader != null)
 			{
 				CurrentLogFileReader.stopMonitoring();
 				UnRegisterLogFileReaderEvents();
 			}
-
+			
 			EncodingOptions = encodingOptions;
 			_columnCache = new ColumnCache();
-
+				
 			CurrentLogFileReader = new LogfileReader(
 				fileNames,
 				EncodingOptions,
 				Preferences.bufferCount,
 				Preferences.linesPerBuffer,
 				_multifileOptions);
-
+			
 			CurrentLogFileReader.UseNewReader = !Preferences.useLegacyReader;
 			RegisterLogFileReaderEvents();
 			CurrentLogFileReader.startMonitoring();
@@ -386,11 +329,11 @@ namespace LogExpert.Controls
 			_fileNames = fileNames;
 			IsMultiFile = true;
 		}
-
+		
 		protected virtual void EnterLoadFileStatus()
 		{
 			Logger.logDebug("EnterLoadFileStatus begin");
-
+			
 			if (InvokeRequired)
 			{
 				Invoke(new MethodInvoker(EnterLoadFileStatus));
@@ -400,26 +343,23 @@ namespace LogExpert.Controls
 			_statusEventArgs.LineCount = 0;
 			_statusEventArgs.FileSize = 0;
 			SendStatusLineUpdate();
-
+			
 			_progressEventArgs.MinValue = 0;
 			_progressEventArgs.MaxValue = 0;
 			_progressEventArgs.Value = 0;
 			_progressEventArgs.Visible = true;
 			SendProgressBarUpdate();
-
+			
 			_isLoading = true;
 			_shouldCancel = true;
 			ClearFilterList();
-			ClearBookmarkList();
-
+			BookmarkProvider.ClearAllBookmarks();
+		
 			Logger.logDebug("EnterLoadFileStatus end");
 		}
 
 		#endregion
-
-
-
-
+		
 		protected void ShiftRowHeightList(int offset)
 		{
 			SortedList<int, RowHeightEntry> newList = new SortedList<int, RowHeightEntry>();
@@ -434,7 +374,7 @@ namespace LogExpert.Controls
 			}
 			_rowHeightList = newList;
 		}
-
+		
 		protected void ShiftFilterPipes(int offset)
 		{
 			lock (_filterPipeList)
@@ -445,29 +385,29 @@ namespace LogExpert.Controls
 				}
 			}
 		}
-
+		
 		protected void SendStatusLineUpdate()
 		{
 			_statusLineTrigger.Trigger();
 		}
-
+		
 		protected void SendProgressBarUpdate()
 		{
 			OnProgressBarUpdate(_progressEventArgs);
 		}
-
+		
 		protected virtual bool LoadPersistenceOptions()
 		{
 			if (InvokeRequired)
 			{
 				return (bool)Invoke(new Func<bool>(LoadPersistenceOptions));
 			}
-
+			
 			if (!Preferences.saveSessions && ForcedPersistenceFileName == null)
 			{
 				return false;
 			}
-
+			
 			try
 			{
 				PersistenceData persistenceData;
@@ -479,15 +419,15 @@ namespace LogExpert.Controls
 				{
 					persistenceData = Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
 				}
-
+				
 				if (persistenceData == null)
 				{
 					Logger.logInfo("No persistence data for " + FileName + " found.");
 					return false;
 				}
 
-				LoadPersitenceOptions(persistenceData);
-
+				LoadPersistenceOptions(persistenceData);
+			
 				return true;
 			}
 			catch (Exception ex)
@@ -496,8 +436,8 @@ namespace LogExpert.Controls
 				return false;
 			}
 		}
-
-		protected virtual void LoadPersitenceOptions(PersistenceData persistenceData)
+		
+		protected virtual void LoadPersistenceOptions(PersistenceData persistenceData)
 		{
 			IsMultiFile = persistenceData.multiFile;
 			_multifileOptions = new MultifileOptions();
@@ -507,8 +447,7 @@ namespace LogExpert.Controls
 			{
 				_multifileOptions = ObjectClone.Clone<MultifileOptions>(Preferences.multifileOptions);
 			}
-
-
+			
 			if (_reloadMemento == null)
 			{
 				PreselectColumnizer(persistenceData.columnizerName);
@@ -531,7 +470,7 @@ namespace LogExpert.Controls
 			}
 			SetExplicitEncoding(persistenceData.encoding);
 		}
-
+		
 		protected void PreSelectColumnizer(ILogLineColumnizer columnizer)
 		{
 			if (columnizer != null)
@@ -543,7 +482,7 @@ namespace LogExpert.Controls
 				CurrentColumnizer = _forcedColumnizerForLoading = PluginRegistry.GetInstance().RegisteredColumnizers[0];
 			}
 		}
-
+		
 		/// <summary>
 		/// Set an Encoding which shall be used when loading a file. Used before a file is loaded.
 		/// </summary>
@@ -552,12 +491,12 @@ namespace LogExpert.Controls
 		{
 			EncodingOptions.Encoding = encoding;
 		}
-
+		
 		protected ILogLineColumnizer FindColumnizer()
 		{
 			ILogLineColumnizer columnizer = null;
 			string path = Util.GetNameFromPath(FileName);
-
+			
 			if (Preferences.maskPrio)
 			{
 				columnizer = _parentLogTabWin.FindColumnizerByFileMask(path);
@@ -576,7 +515,7 @@ namespace LogExpert.Controls
 			}
 			return columnizer;
 		}
-
+		
 		protected void SetDefaultHighlightGroup()
 		{
 			HilightGroup group = _parentLogTabWin.FindHighlightGroupByFileMask(FileName);
@@ -589,7 +528,7 @@ namespace LogExpert.Controls
 				SetCurrentHighlightGroup("[Default]");
 			}
 		}
-
+		
 		protected int Search(SearchParams searchParams)
 		{
 			if (searchParams.searchText == null)
@@ -639,12 +578,12 @@ namespace LogExpert.Controls
 				}
 
 				string line = CurrentLogFileReader.GetLogLine(lineNum);
-
+				
 				if (line == null)
 				{
 					return -1;
 				}
-
+				
 				if (searchParams.isRegex)
 				{
 					if (regex == null && string.IsNullOrEmpty(regexPattern) && object.ReferenceEquals(searchParams.searchText, regexPattern))
@@ -673,7 +612,7 @@ namespace LogExpert.Controls
 						}
 					}
 				}
-
+				
 				if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
 				{
 					lineNum++;
@@ -682,12 +621,12 @@ namespace LogExpert.Controls
 				{
 					lineNum--;
 				}
-
+				
 				if (_shouldCancel)
 				{
 					return -1;
 				}
-
+				
 				if (++count % PROGRESS_BAR_MODULO == 0)
 				{
 					try
@@ -723,18 +662,9 @@ namespace LogExpert.Controls
 		public abstract void SetCurrentHighlightGroup(string groupName);
 
 		protected abstract void UpdateProgressBar(int value);
-
+		
 		protected abstract void StatusLineError(string text);
-
-		#endregion
-
-		#region Event delegate and methods
-
-
-		#endregion
-
-		#region Events
-
+		
 		#endregion
 	}
 }

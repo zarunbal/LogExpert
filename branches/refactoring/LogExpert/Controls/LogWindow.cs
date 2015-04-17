@@ -197,8 +197,8 @@ namespace LogExpert
 			fuzzyKnobControl.MaxValue = 10;
 			ToggleHighlightPanel(false); // hidden
 
-			_bookmarkProvider.BookmarkAdded += new BookmarkDataProvider.BookmarkAddedEventHandler(BookmarkProvider_BookmarkAdded);
-			_bookmarkProvider.BookmarkRemoved += new BookmarkDataProvider.BookmarkRemovedEventHandler(BookmarkProvider_BookmarkRemoved);
+			BookmarkProvider.BookmarkAdded += BookmarkProvider_BookmarkAdded;
+			BookmarkProvider.BookmarkRemoved += BookmarkProvider_BookmarkRemoved;
 
 			ResumeLayout();
 
@@ -295,7 +295,7 @@ namespace LogExpert
 		public PersistenceData GetPersistenceData()
 		{
 			PersistenceData persistenceData = new PersistenceData();
-			persistenceData.bookmarkList = _bookmarkProvider.BookmarkList;
+			persistenceData.bookmarkList = BookmarkProvider.BookmarkList;
 			persistenceData.rowHeightList = _rowHeightList;
 			persistenceData.multiFile = IsMultiFile;
 			persistenceData.multiFilePattern = _multifileOptions.FormatPattern;
@@ -667,9 +667,9 @@ namespace LogExpert
 						break;
 					}
 				}
-				if (_bookmarkProvider.IsBookmarkAtLine(i))
+				if (BookmarkProvider.IsBookmarkAtLine(i))
 				{
-					Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(i);
+					Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(i);
 					if (bookmark.Text.Length > 0)
 					{
 						BookmarkOverlay overlay = bookmark.Overlay;
@@ -755,9 +755,9 @@ namespace LogExpert
 
 		public void ToggleBookmark(int lineNum)
 		{
-			if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (BookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
-				Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
+				Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(lineNum);
 				if (bookmark.Text != null && bookmark.Text.Length > 0)
 				{
 					if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
@@ -765,15 +765,14 @@ namespace LogExpert
 						return;
 					}
 				}
-				_bookmarkProvider.RemoveBookmarkForLine(lineNum);
+				BookmarkProvider.RemoveBookmarkForLine(lineNum);
 			}
 			else
 			{
-				_bookmarkProvider.AddBookmark(new Bookmark(lineNum));
+				BookmarkProvider.AddBookmark(new Bookmark(lineNum));
 			}
 			dataGridView.Refresh();
 			filterGridView.Refresh();
-			OnBookmarkAdded();
 		}
 
 		public void SetBookmarkFromTrigger(int lineNum, string comment)
@@ -794,18 +793,17 @@ namespace LogExpert
 				{
 					// occurs on invalid regex 
 				}
-				if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
+				if (BookmarkProvider.IsBookmarkAtLine(lineNum))
 				{
-					_bookmarkProvider.RemoveBookmarkForLine(lineNum);
+					BookmarkProvider.RemoveBookmarkForLine(lineNum);
 				}
-				_bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
-				OnBookmarkAdded();
+				BookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
 			}
 		}
 
 		public void JumpToNextBookmark(bool isForward)
 		{
-			int currentBookMarkCount = _bookmarkProvider.Bookmarks.Count;
+			int currentBookMarkCount = BookmarkProvider.Bookmarks.Count;
 			if (currentBookMarkCount > 0)
 			{
 				int bookmarkIndex = 0;
@@ -822,7 +820,7 @@ namespace LogExpert
 					//Search for a bookmarked and visible line
 					while (true)
 					{
-						int bookMarkedLine = _bookmarkProvider.Bookmarks[bookmarkIndex].LineNum;
+						int bookMarkedLine = BookmarkProvider.Bookmarks[bookmarkIndex].LineNum;
 						if (_filterResultList.Contains(bookMarkedLine))
 						{
 							//Bookmarked Line is in the filtered list display it
@@ -846,7 +844,7 @@ namespace LogExpert
 				}
 				else
 				{
-					int lineNum = _bookmarkProvider.Bookmarks[bookmarkIndex].LineNum;
+					int lineNum = BookmarkProvider.Bookmarks[bookmarkIndex].LineNum;
 					SelectLine(lineNum, false);
 				}
 			}
@@ -859,9 +857,10 @@ namespace LogExpert
 			{
 				if (lineNum != -1)
 				{
-					if (_bookmarkProvider.IsBookmarkAtLine(lineNum) && _bookmarkProvider.GetBookmarkForLine(lineNum).Text.Length > 0)
+					if (BookmarkProvider.IsBookmarkAtLine(lineNum) && BookmarkProvider.GetBookmarkForLine(lineNum).Text.Length > 0)
 					{
 						bookmarksPresent = true;
+						break;
 					}
 				}
 			}
@@ -872,8 +871,7 @@ namespace LogExpert
 					return;
 				}
 			}
-			_bookmarkProvider.RemoveBookmarksForLines(lineNumList);
-			OnBookmarkRemoved();
+			BookmarkProvider.RemoveBookmarksForLines(lineNumList);
 		}
 
 		public void LogWindowActivated()
@@ -1410,7 +1408,7 @@ namespace LogExpert
 			{
 				try
 				{
-					BookmarkExporter.ExportBookmarkList(_bookmarkProvider.BookmarkList, FileName, dlg.FileName);
+					BookmarkProvider.ExportBookmarkList(FileName, dlg.FileName);
 				}
 				catch (IOException e)
 				{
@@ -1425,40 +1423,16 @@ namespace LogExpert
 			dlg.Title = "Choose a file to load bookmarks from";
 			dlg.AddExtension = true;
 			dlg.DefaultExt = "csv";
-			dlg.DefaultExt = "csv";
 			dlg.Filter = "CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk";
 			dlg.FilterIndex = 1;
 			dlg.FileName = Path.GetFileNameWithoutExtension(FileName);
+
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				try
 				{
-					// add to the existing bookmarks
-					var newBookmarks = new SortedList<int, Bookmark>();
-					BookmarkExporter.ImportBookmarkList(FileName, dlg.FileName, newBookmarks);
+					BookmarkProvider.ImportBookmarkList(FileName, dlg.FileName);
 
-					// Add (or replace) to existing bookmark list
-					bool bookmarkAdded = false;
-					foreach (var b in newBookmarks.Values)
-					{
-						if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
-						{
-							_bookmarkProvider.BookmarkList.Add(b.LineNum, b);
-							bookmarkAdded = true; // refresh the list only once at the end
-						}
-						else
-						{
-							var existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
-							existingBookmark.Text = b.Text; // replace existing bookmark for that line, preserving the overlay
-							OnBookmarkTextChanged(b);
-						}
-					}
-
-					// Refresh the lists
-					if (bookmarkAdded)
-					{
-						OnBookmarkAdded();
-					}
 					dataGridView.Refresh();
 					filterGridView.Refresh();
 				}
@@ -1585,7 +1559,7 @@ namespace LogExpert
 		{
 			get
 			{
-				return _bookmarkProvider;
+				return BookmarkProvider;
 			}
 		}
 
@@ -2491,7 +2465,7 @@ namespace LogExpert
 			}
 		}
 
-		private void BookmarkProvider_BookmarkRemoved(object sender, EventArgs e)
+		private void BookmarkProvider_BookmarkRemoved()
 		{
 			if (!_isLoading)
 			{
@@ -2500,7 +2474,7 @@ namespace LogExpert
 			}
 		}
 
-		private void BookmarkProvider_BookmarkAdded(object sender, EventArgs e)
+		private void BookmarkProvider_BookmarkAdded()
 		{
 			if (!_isLoading)
 			{
@@ -3065,7 +3039,7 @@ namespace LogExpert
 			}
 		}
 
-		protected override void LoadPersitenceOptions(PersistenceData persistenceData)
+		protected override void LoadPersistenceOptions(PersistenceData persistenceData)
 		{
 			splitContainer1.SplitterDistance = persistenceData.filterPosition;
 			splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
@@ -3123,7 +3097,7 @@ namespace LogExpert
 					LoadPersistenceOptions();
 					return;
 				}
-				_bookmarkProvider.BookmarkList = persistenceData.bookmarkList;
+				BookmarkProvider.BookmarkList = persistenceData.bookmarkList;
 				_rowHeightList = persistenceData.rowHeightList;
 				try
 				{
@@ -3259,7 +3233,7 @@ namespace LogExpert
 			SendStatusLineUpdate();
 			_shouldCancel = true;
 			ClearFilterList();
-			ClearBookmarkList();
+			BookmarkProvider.ClearAllBookmarks();
 
 			StatusLineText("File not found");
 			OnFileNotFound(new EventArgs());
@@ -3352,7 +3326,7 @@ namespace LogExpert
 					reloadFinishedThread.Start();
 					LoadFile(FileName, EncodingOptions);
 
-					ClearBookmarkList();
+					BookmarkProvider.ClearAllBookmarks();
 					SavePersistenceData(false);
 				}
 				else
@@ -4239,11 +4213,11 @@ namespace LogExpert
 
 			if (isForward)
 			{
-				return _bookmarkProvider.FindNextBookmarkIndex(lineNum);
+				return BookmarkProvider.FindNextBookmarkIndex(lineNum);
 			}
 			else
 			{
-				return _bookmarkProvider.FindPrevBookmarkIndex(lineNum);
+				return BookmarkProvider.FindPrevBookmarkIndex(lineNum);
 			}
 		}
 
@@ -4252,8 +4226,7 @@ namespace LogExpert
 		 */
 		private void ShiftBookmarks(int offset)
 		{
-			_bookmarkProvider.ShiftBookmarks(offset);
-			OnBookmarkRemoved();
+			BookmarkProvider.ShiftBookmarks(offset);
 		}
 
 		private void LoadFilterPipes()
@@ -5152,9 +5125,8 @@ namespace LogExpert
 			dlg.Comment = bookmark.Text;
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
-				bookmark.Text = dlg.Comment;
+				BookmarkProvider.UpdateBookmarkText(bookmark, dlg.Comment);
 				dataGridView.Refresh();
-				OnBookmarkTextChanged(bookmark);
 			}
 		}
 
@@ -5403,38 +5375,42 @@ namespace LogExpert
 
 		private void AddBookmarkAtLineSilently(int lineNum)
 		{
-			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (!BookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
-				_bookmarkProvider.AddBookmark(new Bookmark(lineNum));
+				BookmarkProvider.AddBookmark(new Bookmark(lineNum));
 			}
 		}
 
 		private void AddBookmarkAndEditComment()
 		{
 			int lineNum = dataGridView.CurrentCellAddress.Y;
-			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
+			if (!BookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
 				ToggleBookmark();
 			}
-			BookmarkComment(_bookmarkProvider.GetBookmarkForLine(lineNum));
+			BookmarkComment(BookmarkProvider.GetBookmarkForLine(lineNum));
 		}
 
 		private void AddBookmarkComment(string text)
 		{
 			int lineNum = dataGridView.CurrentCellAddress.Y;
-			Bookmark bookmark;
-			if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
+
+			Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(lineNum);
+
+			if (bookmark == null)
 			{
-				_bookmarkProvider.AddBookmark(bookmark = new Bookmark(lineNum));
+				bookmark = new Bookmark(lineNum);
+				bookmark.Text = text;
 			}
 			else
 			{
-				bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
+				bookmark.Text += text;
 			}
-			bookmark.Text = bookmark.Text + text;
+
+			BookmarkProvider.AddOrUpdateBookmark(bookmark);
+
 			dataGridView.Refresh();
 			filterGridView.Refresh();
-			OnBookmarkTextChanged(bookmark);
 		}
 
 		private void MarkCurrentFilterRange()
@@ -5483,7 +5459,6 @@ namespace LogExpert
 			}
 			dataGridView.Refresh();
 			filterGridView.Refresh();
-			OnBookmarkAdded();
 		}
 
 		private void HandleChangedFilterOnLoadSetting()
@@ -5710,19 +5685,6 @@ namespace LogExpert
 			}
 		}
 
-
-		public delegate void BookmarkTextChangedEventHandler(object sender, BookmarkEventArgs e);
-
-		public event BookmarkTextChangedEventHandler BookmarkTextChanged;
-
-		protected void OnBookmarkTextChanged(Bookmark bookmark)
-		{
-			if (BookmarkTextChanged != null)
-			{
-				BookmarkTextChanged(this, new BookmarkEventArgs(bookmark));
-			}
-		}
-
 		public delegate void ColumnizerChangedEventHandler(object sender, ColumnizerEventArgs e);
 
 		public event ColumnizerChangedEventHandler ColumnizerChanged;
@@ -5768,7 +5730,7 @@ namespace LogExpert
 
 		public Bookmark GetBookmarkForLine(int lineNum)
 		{
-			return _bookmarkProvider.GetBookmarkForLine(lineNum);
+			return BookmarkProvider.GetBookmarkForLine(lineNum);
 		}
 
 		public Font MonospacedFont

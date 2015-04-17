@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace LogExpert
 {
 	public class BookmarkDataProvider : IBookmarkData
 	{
+		#region Fields
+		
+		private const string REPLACEMENT_FOR_NEW_LINE = @"\n";
+		
+		#endregion
+		
 		#region cTor
 		
 		internal BookmarkDataProvider()
@@ -15,7 +22,7 @@ namespace LogExpert
 		
 		internal BookmarkDataProvider(SortedList<int, Bookmark> bookmarkList)
 		{
-			this.BookmarkList = bookmarkList;
+			BookmarkList = bookmarkList;
 		}
 		
 		#endregion
@@ -28,17 +35,23 @@ namespace LogExpert
 		
 		#region Events
 		
-		public delegate void BookmarkAddedEventHandler(object sender, EventArgs e);
+		public event Action BookmarkAdded;
 		
-		public event BookmarkAddedEventHandler BookmarkAdded;
+		public event Action BookmarkRemoved;
 		
-		public delegate void BookmarkRemovedEventHandler(object sender, EventArgs e);
+		public event Action AllBookmarksRemoved;
 		
-		public event BookmarkRemovedEventHandler BookmarkRemoved;
+		public delegate void BookmarkTextChangedEventHandler(BookmarkEventArgs e);
 		
-		public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
+		public event BookmarkTextChangedEventHandler BookmarkTextChanged;
 		
-		public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
+		protected void OnBookmarkTextChanged(Bookmark bookmark)
+		{
+			if (BookmarkTextChanged != null)
+			{
+				BookmarkTextChanged(new BookmarkEventArgs(bookmark));
+			}
+		}
 		
 		#endregion
 		
@@ -47,7 +60,7 @@ namespace LogExpert
 		internal void ShiftBookmarks(int offset)
 		{
 			SortedList<int, Bookmark> newBookmarkList = new SortedList<int, Bookmark>();
-			foreach (Bookmark bookmark in this.BookmarkList.Values)
+			foreach (Bookmark bookmark in BookmarkList.Values)
 			{
 				int line = bookmark.LineNum - offset;
 				if (line >= 0)
@@ -56,26 +69,28 @@ namespace LogExpert
 					newBookmarkList.Add(line, bookmark);
 				}
 			}
-			this.BookmarkList = newBookmarkList;
+			BookmarkList = newBookmarkList;
+			
+			OnBookmarkRemoved();
 		}
 		
 		internal int FindPrevBookmarkIndex(int lineNum)
 		{
-			IList<Bookmark> values = this.BookmarkList.Values;
-			for (int i = this.BookmarkList.Count - 1; i >= 0; --i)
+			IList<Bookmark> values = BookmarkList.Values;
+			for (int i = BookmarkList.Count - 1; i >= 0; --i)
 			{
 				if (values[i].LineNum <= lineNum)
 				{
 					return i;
 				}
 			}
-			return this.BookmarkList.Count - 1;
+			return BookmarkList.Count - 1;
 		}
 		
 		internal int FindNextBookmarkIndex(int lineNum)
 		{
-			IList<Bookmark> values = this.BookmarkList.Values;
-			for (int i = 0; i < this.BookmarkList.Count; ++i)
+			IList<Bookmark> values = BookmarkList.Values;
+			for (int i = 0; i < BookmarkList.Count; ++i)
 			{
 				if (values[i].LineNum >= lineNum)
 				{
@@ -87,7 +102,7 @@ namespace LogExpert
 		
 		internal void RemoveBookmarkForLine(int lineNum)
 		{
-			this.BookmarkList.Remove(lineNum);
+			BookmarkList.Remove(lineNum);
 			OnBookmarkRemoved();
 		}
 		
@@ -95,21 +110,41 @@ namespace LogExpert
 		{
 			foreach (int lineNum in lineNumList)
 			{
-				this.BookmarkList.Remove(lineNum);
+				BookmarkList.Remove(lineNum);
 			}
 			OnBookmarkRemoved();
 		}
 		
 		internal void AddBookmark(Bookmark bookmark)
 		{
-			this.BookmarkList.Add(bookmark.LineNum, bookmark);
+			BookmarkList.Add(bookmark.LineNum, bookmark);
 			OnBookmarkAdded();
+		}
+		
+		internal void AddOrUpdateBookmark(Bookmark bookmark)
+		{
+			if (BookmarkList.ContainsKey(bookmark.LineNum))
+			{
+				AddBookmark(bookmark);
+			}
+			else
+			{
+				Bookmark existingBookmark = BookmarkList[bookmark.LineNum];
+				existingBookmark.Text = bookmark.Text; // replace existing bookmark for that line, preserving the overlay
+				OnBookmarkTextChanged(bookmark);
+			}
+		}
+		
+		internal void UpdateBookmarkText(Bookmark bookmark, string text)
+		{
+			bookmark.Text = text;
+			OnBookmarkTextChanged(bookmark);
 		}
 		
 		internal void ClearAllBookmarks()
 		{
 			Logger.logDebug("Removing all bookmarks");
-			this.BookmarkList.Clear();
+			BookmarkList.Clear();
 			OnAllBookmarksRemoved();
 		}
 		
@@ -131,12 +166,12 @@ namespace LogExpert
 		
 		public bool IsBookmarkAtLine(int lineNum)
 		{
-			return this.BookmarkList.ContainsKey(lineNum);
+			return BookmarkList.ContainsKey(lineNum);
 		}
 		
 		public int GetBookmarkIndexForLine(int lineNum)
 		{
-			return this.BookmarkList.IndexOfKey(lineNum);
+			return BookmarkList.IndexOfKey(lineNum);
 		}
 		
 		public Bookmark GetBookmarkForLine(int lineNum)
@@ -146,7 +181,7 @@ namespace LogExpert
 			{
 				return null;
 			}
-
+			
 			return output;
 		}
 		
@@ -154,7 +189,71 @@ namespace LogExpert
 		{
 			get
 			{
-				return new BookmarkCollection(this.BookmarkList);
+				return new BookmarkCollection(BookmarkList);
+			}
+		}
+		
+		public void ExportBookmarkList( string logfileName, string fileName)
+		{
+			using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+			using (StreamWriter writer = new StreamWriter(fs))
+			{
+				writer.WriteLine("Log file name;Line number;Comment");
+				foreach (Bookmark bookmark in BookmarkList.Values)
+				{
+					string text = bookmark.Text.Replace(REPLACEMENT_FOR_NEW_LINE, @"\" + REPLACEMENT_FOR_NEW_LINE).Replace("\r\n", REPLACEMENT_FOR_NEW_LINE);
+					string line = string.Format("{0};{1};{2}", logfileName, bookmark.LineNum, text);
+					
+					writer.WriteLine(line);
+				}
+				writer.Flush();
+				fs.Flush();
+				
+				writer.Close();
+				fs.Close();
+			}
+		}
+		
+		public void ImportBookmarkList(string logfileName, string fileName)
+		{
+			using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+			using (StreamReader reader = new StreamReader(fs))
+			{
+				if (!reader.EndOfStream)
+				{
+					reader.ReadLine(); // skip "Log file name;Line number;Comment"
+				}
+				
+				while (!reader.EndOfStream)
+				{
+					try
+					{
+						string line = reader.ReadLine();
+						line = line.Replace(REPLACEMENT_FOR_NEW_LINE, "\r\n").Replace("\\\r\n", REPLACEMENT_FOR_NEW_LINE);
+						
+						// Line is formatted: logfileName ";" bookmark.LineNum ";" bookmark.Text;
+						int firstSeparator = line.IndexOf(';');
+						int secondSeparator = line.IndexOf(';', firstSeparator + 1);
+						
+						string lineStr = line.Substring(firstSeparator + 1, secondSeparator - firstSeparator - 1);
+						string comment = line.Substring(secondSeparator + 1);
+						
+						int lineNum;
+						if (int.TryParse(lineStr, out lineNum))
+						{
+							Bookmark bookmark = new Bookmark(lineNum, comment);
+							AddOrUpdateBookmark(bookmark);
+						}
+						else
+						{
+							//!!!log error: skipping a line entry
+						}
+					}
+					catch
+					{
+						//!!!
+					}
+				}
 			}
 		}
 		
@@ -166,7 +265,7 @@ namespace LogExpert
 		{
 			if (BookmarkAdded != null)
 			{
-				BookmarkAdded(this, new EventArgs());
+				BookmarkAdded();
 			}
 		}
 		
@@ -174,7 +273,7 @@ namespace LogExpert
 		{
 			if (BookmarkRemoved != null)
 			{
-				BookmarkRemoved(this, new EventArgs());
+				BookmarkRemoved();
 			}
 		}
 		
@@ -182,10 +281,10 @@ namespace LogExpert
 		{
 			if (AllBookmarksRemoved != null)
 			{
-				AllBookmarksRemoved(this, new EventArgs());
+				AllBookmarksRemoved();
 			}
 		}
-
+	
 		#endregion
 	}
 }
