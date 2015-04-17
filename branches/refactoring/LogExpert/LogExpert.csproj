@@ -95,6 +95,8 @@
     <Compile Include="Entities\QualityInfo.cs" />
     <Compile Include="Entities\SpreadEntry.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
+    <Compile Include="Functionality\Hilight\ActionEntry.cs" />
+    <Compile Include="Functionality\Hilight\HilightMatchEntry.cs" />
     <Compile Include="Interfaces\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Functionality\Bookmark\BookmarkCollection.cs" />
@@ -321,7 +323,7 @@
       <DependentUpon>SearchProgressDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Functionality\Filter\FilterParams.cs" />
-    <Compile Include="Functionality\HilightEntry.cs" />
+    <Compile Include="Functionality\Hilight\HilightEntry.cs" />
     <Compile Include="Classes\Args\LoadFileEventArgs.cs" />
     <Compile Include="Functionality\Log\LogBuffer.cs" />
     <Compile Include="Entities\LogEventData.cs" />
