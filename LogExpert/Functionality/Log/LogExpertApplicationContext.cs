@@ -12,11 +12,11 @@ namespace LogExpert
 		public LogExpertApplicationContext(LogExpertProxy proxy, LogTabWindow firstLogWin)
 		{
 			this.proxy = proxy;
-			this.proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(proxy_LastWindowClosed);
+			this.proxy.LastWindowClosed += proxy_LastWindowClosed;
 			firstLogWin.Show();
 		}
 
-		void proxy_LastWindowClosed(object sender, EventArgs e)
+		void proxy_LastWindowClosed()
 		{
 			ExitThread();
 			Application.Exit();

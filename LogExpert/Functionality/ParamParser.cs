@@ -8,17 +8,17 @@ namespace LogExpert
 {
 	public class ParamParser
 	{
-		private string argLine;
+		private string _argLine;
 
 		public ParamParser(string argTemplate)
 		{
-			argLine = argTemplate;
+			_argLine = argTemplate;
 		}
 
 		public string ReplaceParams(string logLine, int lineNum, string fileName)
 		{
 			FileInfo fileInfo = new FileInfo(fileName);
-			StringBuilder builder = new StringBuilder(this.argLine);
+			StringBuilder builder = new StringBuilder(_argLine);
 
 			builder.Replace("%L", lineNum.ToString());
 			builder.Replace("%P", FormatPath(fileInfo.DirectoryName));
