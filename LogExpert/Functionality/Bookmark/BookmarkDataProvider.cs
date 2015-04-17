@@ -193,7 +193,7 @@ namespace LogExpert
 			}
 		}
 		
-		public void ExportBookmarkList( string logfileName, string fileName)
+		public void ExportBookmarkList(string logfileName, string fileName)
 		{
 			using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
 			using (StreamWriter writer = new StreamWriter(fs))
