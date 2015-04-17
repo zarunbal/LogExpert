@@ -102,7 +102,6 @@
     <Compile Include="Functionality\Bookmark\BookmarkCollection.cs" />
     <Compile Include="Functionality\Bookmark\BookmarkDataProvider.cs" />
     <Compile Include="Classes\Args\BookmarkEventArgs.cs" />
-    <Compile Include="Functionality\Bookmark\BookmarkExporter.cs" />
     <Compile Include="Entities\BookmarkOverlay.cs" />
     <Compile Include="Functionality\Bookmark\BookmarkView.cs" />
     <Compile Include="Entities\CellContent.cs" />

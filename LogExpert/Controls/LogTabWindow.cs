@@ -1023,9 +1023,9 @@ namespace LogExpert
 				oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
 				oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
 				oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
-				oldLogWindow.BookmarkAdded -= BookmarkAdded;
-				oldLogWindow.BookmarkRemoved -= BookmarkRemoved;
-				oldLogWindow.BookmarkTextChanged -= BookmarkTextChanged;
+				oldLogWindow.BookmarkProvider.BookmarkAdded -= BookmarkAdded;
+				oldLogWindow.BookmarkProvider.BookmarkRemoved-= BookmarkRemoved;
+				oldLogWindow.BookmarkProvider.BookmarkTextChanged -= BookmarkTextChanged;
 				DisconnectToolWindows();
 			}
 
@@ -1035,9 +1035,9 @@ namespace LogExpert
 				newLogWindow.ProgressBarUpdate += ProgressBarUpdate;
 				newLogWindow.GuiStateUpdate += GuiStateUpdate;
 				newLogWindow.ColumnizerChanged += ColumnizerChanged;
-				newLogWindow.BookmarkAdded += BookmarkAdded;
-				newLogWindow.BookmarkRemoved += BookmarkRemoved;
-				newLogWindow.BookmarkTextChanged += BookmarkTextChanged;
+				newLogWindow.BookmarkProvider.BookmarkAdded += BookmarkAdded;
+				newLogWindow.BookmarkProvider.BookmarkRemoved += BookmarkRemoved;
+				newLogWindow.BookmarkProvider.BookmarkTextChanged += BookmarkTextChanged;
 				if (newLogWindow.IsTempFile)
 				{
 					Text = titleName + " - " + newLogWindow.TempTitleName;
@@ -2079,22 +2079,22 @@ namespace LogExpert
 			}
 		}
 
-		private void BookmarkAdded(object sender, EventArgs e)
+		private void BookmarkAdded()
 		{
 			_bookmarkWindow.UpdateView();
 		}
 
-		private void BookmarkTextChanged(object sender, BookmarkEventArgs e)
+		private void BookmarkTextChanged( BookmarkEventArgs e)
 		{
 			_bookmarkWindow.BookmarkTextChanged(e.Bookmark);
 		}
 
-		private void BookmarkRemoved(object sender, EventArgs e)
+		private void BookmarkRemoved()
 		{
 			_bookmarkWindow.UpdateView();
 		}
 
-		private void ProgressBarUpdate(object sender, ProgressEventArgs e)
+		private void ProgressBarUpdate(ProgressEventArgs e)
 		{
 			Invoke(new ProgressBarEventFx(ProgressBarUpdateWorker), new object[] { e });
 		}
