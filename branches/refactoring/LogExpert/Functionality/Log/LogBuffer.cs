@@ -8,84 +8,44 @@ namespace LogExpert
 {
 	public class LogBuffer
 	{
+		#region Fields
+		
 		public int MAX_LINES = 500;
-
-		IList<string> logLines = new List<string>();
-		int startLine = 0;
-		int lineCount = 0;
-		long startPos = 0;
+		
+		IList<string> _logLines = new List<string>();
+		
 		long size = 0;
-		bool isDisposed = false;
-		private int droppedLinesCount = 0;
-		private int prevBuffersDroppedLinesSum = 0;    // sum over all preceeding log buffers
+		
 		#if DEBUG
-		private long disposeCount = 0;
-		IList<long> filePositions = new List<long>();   // file position for every line
-
-		#endif
-
-		//public LogBuffer() { }
-
+		IList<long> _filePositions = new List<long>();   // file position for every line
+		
+		#endif 
+		
+		#endregion
+		
+		#region cTor
+		
 		public LogBuffer(ILogFileInfo fileInfo, int maxLines)
 		{
-			this.FileInfo = fileInfo;
-			this.MAX_LINES = maxLines;
+			FileInfo = fileInfo;
+			MAX_LINES = maxLines;
 		}
-
-		public void AddLine(string line, long filePos)
-		{
-			this.logLines.Add(line);
-			#if DEBUG
-			this.filePositions.Add(filePos);
-			#endif
-			this.lineCount++;
-			isDisposed = false;
-		}
-
-		public void ClearLines()
-		{
-			this.logLines.Clear();
-			this.lineCount = 0;
-		}
-
-		public void DisposeContent()
-		{
-			this.logLines.Clear();
-			isDisposed = true;
-			#if DEBUG
-			disposeCount++;
-			#endif
-		}
-
-		public string GetLineOfBlock(int num)
-		{
-			if (num < this.logLines.Count && num >= 0)
-				return this.logLines[num];
-			else
-				return null;
-		}
-
-		public long StartPos
+		
+		#endregion
+		
+		#region Properties
+		
+		public long StartPos { get; set; }
+		
+		public long Size
 		{
 			set
 			{
-				this.startPos = value;
-			}
-			get
-			{
-				return this.startPos;
-			}
-		}
-
-		public long Size
-		{
-			set 
-			{
-				this.size = value;
+				size = value;
 				#if DEBUG
-				if (this.filePositions.Count > 0)
+				if (_filePositions.Count > 0)
 				{
-					if (this.size < this.filePositions[this.filePositions.Count - 1] - this.StartPos)
+					if (size < _filePositions[_filePositions.Count - 1] - StartPos)
 					{
 						Logger.logError("LogBuffer overall Size must be greater than last line file position!");
 					}
@@ -94,81 +54,83 @@ namespace LogExpert
 			}
 			get
 			{
-				return this.size;
+				return size;
 			}
 		}
-
-		public int StartLine
-		{
-			set
-			{
-				this.startLine = value;
-			}
-			get
-			{
-				return this.startLine;
-			}
-		}
-
-		public int LineCount
-		{
-			get
-			{
-				return this.lineCount;
-			}
-		}
-
-		public bool IsDisposed
-		{
-			get
-			{
-				return this.isDisposed;
-			}
-		}
-
+		
+		public int StartLine { get; set; }
+		
+		public int LineCount { get; private set; }
+		
+		public bool IsDisposed { get; private set; }
+		
 		public ILogFileInfo FileInfo { get; set; }
-
-		public int DroppedLinesCount
-		{
-			get
-			{
-				return this.droppedLinesCount;
-			}
-			set
-			{
-				this.droppedLinesCount = value;
-			}
-		}
-
+		
+		public int DroppedLinesCount { get; set; }
+		
+		public int PrevBuffersDroppedLinesSum { get; set; }
+		
 		#if DEBUG
-		public long DisposeCount
+		public long DisposeCount { get; set; }
+		
+		#endif
+		
+		#endregion
+		
+		#region Public Methods
+		
+		public void AddLine(string line, long filePos)
 		{
-			get
+			_logLines.Add(line);
+			#if DEBUG
+			_filePositions.Add(filePos);
+			#endif
+			LineCount++;
+			IsDisposed = false;
+		}
+		
+		public void ClearLines()
+		{
+			_logLines.Clear();
+			LineCount = 0;
+		}
+		
+		public void DisposeContent()
+		{
+			_logLines.Clear();
+			IsDisposed = true;
+			#if DEBUG
+			DisposeCount++;
+			#endif
+		}
+		
+		public string GetLineOfBlock(int num)
+		{
+			if (num < _logLines.Count && num >= 0)
 			{
-				return this.disposeCount;
+				return _logLines[num];
+			}
+			else
+			{
+				return null;
 			}
 		}
-
+		
+		#if DEBUG
+		
 		public long GetFilePosForLineOfBlock(int line)
 		{
-			if (line >= 0 && line < this.filePositions.Count)
-				return this.filePositions[line];
+			if (line >= 0 && line < _filePositions.Count)
+			{
+				return _filePositions[line];
+			}
 			else
+			{
 				return -1;
+			}
 		}
-
 		#endif
-
-		public int PrevBuffersDroppedLinesSum
-		{
-			get
-			{
-				return this.prevBuffersDroppedLinesSum;
-			}
-			set
-			{
-				this.prevBuffersDroppedLinesSum = value;
-			}
-		}
+	
+		#endregion
 	}
 }

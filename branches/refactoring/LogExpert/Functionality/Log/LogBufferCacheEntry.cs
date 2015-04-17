@@ -14,7 +14,7 @@ namespace LogExpert
 
 		public void Touch()
 		{
-			LastUseTimeStamp = (long)(Environment.TickCount & Int32.MaxValue);
+			LastUseTimeStamp = (Environment.TickCount & Int32.MaxValue);
 		}
 
 		internal LogBuffer LogBuffer { get; set; }
