@@ -19,27 +19,27 @@ namespace LogExpert.Controls
 		#endregion
 		
 		#region Fields
-
+		
 		protected ILogLineColumnizer _forcedColumnizerForLoading;
 		
 		protected ILogLineColumnizer _currentColumnizer;
 		protected readonly Object _currentColumnizerLock = new Object();
 		
 		private readonly Thread _logEventHandlerThread = null;
-		private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
-		private readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
-
+		protected readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
+		protected readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
+		
 		protected readonly GuiStateArgs _guiStateArgs = new GuiStateArgs();
-
+		
 		protected SortedList<int, RowHeightEntry> _rowHeightList = new SortedList<int, RowHeightEntry>();
-
+		
 		protected readonly IList<FilterPipe> _filterPipeList = new List<FilterPipe>();
-
+		
 		protected TimeSpreadCalculator _timeSpreadCalc;
 		
 		protected readonly StatusLineEventArgs _statusEventArgs = new StatusLineEventArgs();
 		protected readonly ProgressEventArgs _progressEventArgs = new ProgressEventArgs();
-
+		
 		protected DelayedTrigger _statusLineTrigger = new DelayedTrigger(200);
 		
 		protected bool _shouldCancel = false;
@@ -52,9 +52,9 @@ namespace LogExpert.Controls
 		
 		protected LogTabWindow _parentLogTabWin;
 		protected ColumnCache _columnCache = new ColumnCache();
-
+		
 		#endregion
-
+		
 		#region cTor
 		
 		public BaseLogWindow()
@@ -62,14 +62,16 @@ namespace LogExpert.Controls
 			_logEventHandlerThread = new Thread(new ThreadStart(LogEventWorker));
 			_logEventHandlerThread.IsBackground = true;
 			_logEventHandlerThread.Start();
+			
+			BookmarkProvider = new BookmarkDataProvider();
 		}
-
+		
 		#endregion
-
-		#region Events
-
+		
+		#region Events delegates
+		
 		public BookmarkDataProvider BookmarkProvider { get; private set; }
-
+		
 		public event Action<ProgressEventArgs> ProgressBarUpdate;
 		
 		protected void OnProgressBarUpdate(ProgressEventArgs e)
@@ -79,15 +81,15 @@ namespace LogExpert.Controls
 				ProgressBarUpdate(e);
 			}
 		}
-
+		
 		#endregion
-
+		
 		#region Properties
-
+		
 		public LogfileReader CurrentLogFileReader { get; protected set; }
-
+		
 		public string FileName { get; protected set; }
-
+		
 		protected EncodingOptions EncodingOptions { get; set; }
 		
 		//TODO Zarunbal: think about to return directly _guiStateArgs
@@ -102,9 +104,9 @@ namespace LogExpert.Controls
 				_guiStateArgs.IsMultiFileActive = value;
 			}
 		}
-
+		
 		public bool IsTempFile { get; protected set; }
-
+		
 		public string ForcedPersistenceFileName { get; set; }
 		
 		public Preferences Preferences
@@ -130,9 +132,9 @@ namespace LogExpert.Controls
 				}
 			}
 		}
-
+		
 		#endregion
-
+		
 		#region Public Methods
 		
 		public void PreselectColumnizer(string columnizerName)
@@ -156,9 +158,9 @@ namespace LogExpert.Controls
 		{
 			LoadFilesAsMultiInternal(fileNames, encodingOptions);
 		}
-
+		
 		#endregion
-
+		
 		#region Methods
 		
 		private void LogEventWorker()
@@ -199,11 +201,18 @@ namespace LogExpert.Controls
 						}
 					}
 					Action<LogEventArgs> callback = new Action<LogEventArgs>(UpdateGrid);
-					Invoke(callback, new object[] { e });
+					Invoke(callback, e);
 					CheckFilterAndHighlight(e);
 					_timeSpreadCalc.SetLineCount(e.LineCount);
 				}
 			}
+		}
+
+		protected void StopLogEventWorkerThread()
+		{
+			_logEventArgsEvent.Set();
+			_logEventHandlerThread.Abort();
+			_logEventHandlerThread.Join();
 		}
 
 		#region Load File
@@ -264,7 +273,7 @@ namespace LogExpert.Controls
 					_isLoadError = true;
 					return;
 				}
-
+				
 				ILogLineXmlColumnizer xmlColumnizer = CurrentColumnizer as ILogLineXmlColumnizer;
 				
 				if (xmlColumnizer != null)
@@ -277,7 +286,7 @@ namespace LogExpert.Controls
 				{
 					CurrentColumnizer = _forcedColumnizerForLoading;
 				}
-
+				
 				IPreProcessColumnizer preProcessColumnizer = CurrentColumnizer as IPreProcessColumnizer;
 				
 				if (CurrentColumnizer is IPreProcessColumnizer)
@@ -298,7 +307,7 @@ namespace LogExpert.Controls
 		private void LoadFilesAsMultiInternal(string[] fileNames, EncodingOptions encodingOptions)
 		{
 			Logger.logInfo("Loading given files as MultiFile:");
-
+			
 			EnterLoadFileStatus();
 			
 			foreach (string name in fileNames)
@@ -314,7 +323,7 @@ namespace LogExpert.Controls
 			
 			EncodingOptions = encodingOptions;
 			_columnCache = new ColumnCache();
-				
+			
 			CurrentLogFileReader = new LogfileReader(
 				fileNames,
 				EncodingOptions,
@@ -354,10 +363,10 @@ namespace LogExpert.Controls
 			_shouldCancel = true;
 			ClearFilterList();
 			BookmarkProvider.ClearAllBookmarks();
-		
+			
 			Logger.logDebug("EnterLoadFileStatus end");
 		}
-
+		
 		#endregion
 		
 		protected void ShiftRowHeightList(int offset)
@@ -425,9 +434,9 @@ namespace LogExpert.Controls
 					Logger.logInfo("No persistence data for " + FileName + " found.");
 					return false;
 				}
-
+				
 				LoadPersistenceOptions(persistenceData);
-			
+				
 				return true;
 			}
 			catch (Exception ex)
@@ -535,7 +544,7 @@ namespace LogExpert.Controls
 			{
 				return -1;
 			}
-
+			
 			Action<int> progressFx = new Action<int>(UpdateProgressBar);
 			
 			int lineNum = (searchParams.isFromTop && !searchParams.isFindNext) ? 0 : searchParams.currentLine;
@@ -576,7 +585,7 @@ namespace LogExpert.Controls
 						StatusLineError("Started from end of file");
 					}
 				}
-
+				
 				string line = CurrentLogFileReader.GetLogLine(lineNum);
 				
 				if (line == null)
@@ -642,29 +651,29 @@ namespace LogExpert.Controls
 				}
 			}
 		}
-
+		
 		#endregion
-
+		
 		#region Abstract methods
-
+		
 		protected abstract void UpdateGrid(LogEventArgs e);
-
+		
 		protected abstract void CheckFilterAndHighlight(LogEventArgs e);
-
+		
 		protected abstract void ClearFilterList();
-
+		
 		protected abstract void UnRegisterLogFileReaderEvents();
-
+		
 		protected abstract void RegisterLogFileReaderEvents();
-
+		
 		public abstract void FollowTailChanged(bool isChecked, bool byTrigger);
-
+		
 		public abstract void SetCurrentHighlightGroup(string groupName);
-
+		
 		protected abstract void UpdateProgressBar(int value);
 		
 		protected abstract void StatusLineError(string text);
-		
+	
 		#endregion
 	}
 }

@@ -6,46 +6,108 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 
 namespace LogExpert
 {
-	public class FilterTabData
-	{
-		public PersistenceData persistenceData;
-		public FilterParams filterParams;
-	}
-
-	public class PersistenceData
-	{
-		public SortedList<int, Bookmark> bookmarkList = new SortedList<int, Bookmark>();
-		public SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
-
-		public bool multiFile = false;
-		public int currentLine = -1;
-		public int firstDisplayedLine = -1;
-		public bool filterVisible = false;
-		public bool filterAdvanced = false;
-		public int filterPosition = 222;
-		public bool bookmarkListVisible = false;
-		public int bookmarkListPosition = 300;
-		public bool followTail = true;
-		public string fileName = null;
-		public string tabName = null;
-		public string columnizerName;
-		public List<FilterParams> filterParamsList = new List<FilterParams>();
-		public List<FilterTabData> filterTabDataList = new List<FilterTabData>();
-		public int lineCount;
-		public string highlightGroupName;
-		public List<string> multiFileNames = new List<string>();
-		public bool showBookmarkCommentColumn;
-		public bool filterSaveListVisible = false;
-		public Encoding encoding;
-		public string multiFilePattern;
-		public int multiFileMaxDays;
-	}
-
 	public class Persister
 	{
+		#region Const
+		
+		private const string PERSISTENCE_EXTENSION = ".lxp"; 
+		
+		#endregion
+		
+		#region Static Fields
+		
+		//TODO Zarunbal: think about this
+		private static Regex _directoryCharsRegex = new Regex(
+			string.Format("{0}|{1}|{2}",
+				Regex.Escape(Path.DirectorySeparatorChar.ToString()),
+				Regex.Escape(Path.AltDirectorySeparatorChar.ToString()),
+				Regex.Escape(Path.VolumeSeparatorChar.ToString())));
+		
+		#endregion
+		
+		#region Public Methods
+		
+		/// <summary>
+		/// Loads the persistence options out of the given persistence file name.
+		/// </summary>
+		/// <param name="fileName"></param>
+		/// <returns></returns>
+		public static PersistenceData LoadOptionsOnly(string fileName)
+		{
+			if (File.Exists(fileName))
+			{
+				PersistenceData persistenceData = new PersistenceData();
+				XmlDocument xmlDoc = new XmlDocument();
+				try
+				{
+					xmlDoc.Load(fileName);
+				}
+				catch (IOException)
+				{
+					return null;
+				}
+				XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
+				if (fileNode != null)
+				{
+					XmlElement fileElement = fileNode as XmlElement;
+					ReadOptions(fileElement, persistenceData);
+					persistenceData.fileName = fileElement.GetAttribute("fileName");
+					persistenceData.encoding = ReadEncoding(fileElement);
+				}
+				return persistenceData;
+			}
+			return null;
+		}
+		
+		public static string SavePersistenceData(String logFileName, PersistenceData persistenceData, Preferences preferences)
+		{
+			string fileName = BuildPersisterFileName(logFileName, preferences);
+			if (preferences.saveLocation == SessionSaveLocation.SameDir)
+			{
+				// make to log file in .lxp file relative
+				string filePart = Path.GetFileName(persistenceData.fileName);
+				persistenceData.fileName = filePart;
+			}
+			Save(fileName, persistenceData);
+			return fileName;
+		}
+		
+		public static string SavePersistenceDataWithFixedName(String persistenceFileName, PersistenceData persistenceData)
+		{
+			Save(persistenceFileName, persistenceData);
+			return persistenceFileName;
+		}
+		
+		public static PersistenceData LoadPersistenceData(string logFileName, Preferences preferences)
+		{
+			string fileName = BuildPersisterFileName(logFileName, preferences);
+			return Load(fileName);
+		}
+		
+		public static PersistenceData LoadPersistenceDataOptionsOnly(string logFileName, Preferences preferences)
+		{
+			string fileName = BuildPersisterFileName(logFileName, preferences);
+			return LoadOptionsOnly(fileName);
+		}
+		
+		public static PersistenceData LoadPersistenceDataOptionsOnlyFromFixedFile(string persistenceFile)
+		{
+			return LoadOptionsOnly(persistenceFile);
+		}
+		
+		public static PersistenceData LoadPersistenceDataFromFixedFile(string persistenceFile)
+		{
+			return Load(persistenceFile);
+		}
+		
+		#endregion
+		
+		#region Private Methods
+		
 		private static string BuildPersisterFileName(string logFileName, Preferences preferences)
 		{
 			string dir = null;
@@ -56,7 +118,7 @@ namespace LogExpert
 				default:
 					FileInfo fileInfo = new FileInfo(logFileName);
 					dir = fileInfo.DirectoryName;
-					file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
+					file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + PERSISTENCE_EXTENSION;
 					break;
 				case SessionSaveLocation.DocumentsDir:
 					dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
@@ -82,58 +144,14 @@ namespace LogExpert
 			}
 			return file;
 		}
-
+		
 		private static string BuildSessionFileNameFromPath(string logFileName)
 		{
-			string result = logFileName;
-			result = result.Replace(Path.DirectorySeparatorChar, '_');
-			result = result.Replace(Path.AltDirectorySeparatorChar, '_');
-			result = result.Replace(Path.VolumeSeparatorChar, '_');
-			result += ".lxp";
+			string result = _directoryCharsRegex.Replace(logFileName, "_");
+			result += PERSISTENCE_EXTENSION;
 			return result;
 		}
-
-		public static string SavePersistenceData(String logFileName, PersistenceData persistenceData, Preferences preferences)
-		{
-			string fileName = BuildPersisterFileName(logFileName, preferences);
-			if (preferences.saveLocation == SessionSaveLocation.SameDir)
-			{
-				// make to log file in .lxp file relative
-				string filePart = Path.GetFileName(persistenceData.fileName);
-				persistenceData.fileName = filePart;
-			}
-			Save(fileName, persistenceData);
-			return fileName;
-		}
-
-		public static string SavePersistenceDataWithFixedName(String persistenceFileName, PersistenceData persistenceData)
-		{
-			Save(persistenceFileName, persistenceData);
-			return persistenceFileName;
-		}
-
-		public static PersistenceData LoadPersistenceData(string logFileName, Preferences preferences)
-		{
-			string fileName = BuildPersisterFileName(logFileName, preferences);
-			return Load(fileName);
-		}
-
-		public static PersistenceData LoadPersistenceDataOptionsOnly(string logFileName, Preferences preferences)
-		{
-			string fileName = BuildPersisterFileName(logFileName, preferences);
-			return LoadOptionsOnly(fileName);
-		}
-
-		public static PersistenceData LoadPersistenceDataOptionsOnlyFromFixedFile(string persistenceFile)
-		{
-			return LoadOptionsOnly(persistenceFile);
-		}
-
-		public static PersistenceData LoadPersistenceDataFromFixedFile(string persistenceFile)
-		{
-			return Load(persistenceFile);
-		}
-
+		
 		private static void Save(String fileName, PersistenceData persistenceData)
 		{
 			XmlDocument xmlDoc = new XmlDocument();
@@ -154,7 +172,7 @@ namespace LogExpert
 				xmlDoc.Save(fileName);
 			}
 		}
-
+		
 		private static void WriteEncoding(XmlDocument xmlDoc, XmlElement rootElement, Encoding encoding)
 		{
 			if (encoding != null)
@@ -164,7 +182,7 @@ namespace LogExpert
 				encodingElement.SetAttribute("name", encoding.WebName);
 			}
 		}
-
+		
 		private static void WriteFilterTabs(XmlDocument xmlDoc, XmlElement rootElement, List<FilterTabData> dataList)
 		{
 			if (dataList.Count > 0)
@@ -189,7 +207,7 @@ namespace LogExpert
 				}
 			}
 		}
-
+		
 		private static List<FilterTabData> ReadFilterTabs(XmlElement startNode)
 		{
 			List<FilterTabData> dataList = new List<FilterTabData>();
@@ -213,7 +231,7 @@ namespace LogExpert
 			}
 			return dataList;
 		}
-
+		
 		private static void WriteFilter(XmlDocument xmlDoc, XmlElement rootElement, List<FilterParams> filterList)
 		{
 			XmlElement filtersElement = xmlDoc.CreateElement("filters");
@@ -222,7 +240,7 @@ namespace LogExpert
 			{
 				XmlElement filterElement = xmlDoc.CreateElement("filter");
 				XmlElement paramsElement = xmlDoc.CreateElement("params");
-
+				
 				BinaryFormatter formatter = new BinaryFormatter();
 				MemoryStream stream = new MemoryStream(200);
 				formatter.Serialize(stream, filterParams);
@@ -232,7 +250,7 @@ namespace LogExpert
 				filtersElement.AppendChild(filterElement);
 			}
 		}
-
+		
 		private static List<FilterParams> ReadFilter(XmlElement startNode)
 		{
 			List<FilterParams> filterList = new List<FilterParams>();
@@ -259,7 +277,7 @@ namespace LogExpert
 			}
 			return filterList;
 		}
-
+		
 		private static void WriteBookmarks(XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, Bookmark> bookmarkList)
 		{
 			XmlElement bookmarksElement = xmlDoc.CreateElement("bookmarks");
@@ -280,20 +298,27 @@ namespace LogExpert
 				bookmarksElement.AppendChild(bookmarkElement);
 			}
 		}
-
-		private static PersistenceData Load(String fileName)
+		
+		private static PersistenceData Load(string fileName)
 		{
-			XmlDocument xmlDoc = new XmlDocument();
-			xmlDoc.Load(fileName);
-			XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
-			PersistenceData persistenceData = new PersistenceData();
-			if (fileNode != null)
+			if (File.Exists(fileName))
 			{
-				persistenceData = ReadPersistenceDataFromNode(fileNode);
+				XmlDocument xmlDoc = new XmlDocument();
+				xmlDoc.Load(fileName);
+				XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
+				PersistenceData persistenceData = new PersistenceData();
+				if (fileNode != null)
+				{
+					persistenceData = ReadPersistenceDataFromNode(fileNode);
+				}
+				return persistenceData;
 			}
-			return persistenceData;
+			else
+			{
+				throw new FileNotFoundException("File not found", fileName);
+			}
 		}
-
+		
 		private static PersistenceData ReadPersistenceDataFromNode(XmlNode node)
 		{
 			PersistenceData persistenceData = new PersistenceData();
@@ -312,7 +337,7 @@ namespace LogExpert
 			persistenceData.encoding = ReadEncoding(fileElement);
 			return persistenceData;
 		}
-
+		
 		private static Encoding ReadEncoding(XmlElement fileElement)
 		{
 			XmlNode encodingNode = fileElement.SelectSingleNode("encoding");
@@ -336,35 +361,7 @@ namespace LogExpert
 			}
 			return null;
 		}
-
-		/// <summary>
-		/// Loads the persistence options out of the given persistence file name.
-		/// </summary>
-		/// <param name="fileName"></param>
-		/// <returns></returns>
-		public static PersistenceData LoadOptionsOnly(String fileName) 
-		{
-			PersistenceData persistenceData = new PersistenceData();
-			XmlDocument xmlDoc = new XmlDocument();
-			try
-			{
-				xmlDoc.Load(fileName);
-			}
-			catch (IOException)
-			{
-				return null;
-			}
-			XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
-			if (fileNode != null)
-			{
-				XmlElement fileElement = fileNode as XmlElement;
-				ReadOptions(fileElement, persistenceData);
-				persistenceData.fileName = fileElement.GetAttribute("fileName");
-				persistenceData.encoding = ReadEncoding(fileElement);
-			}
-			return persistenceData;
-		}
-
+		
 		private static SortedList<int, Bookmark> ReadBookmarks(XmlElement startNode)
 		{
 			SortedList<int, Bookmark> bookmarkList = new SortedList<int, Bookmark>();
@@ -417,9 +414,9 @@ namespace LogExpert
 			}
 			return bookmarkList;
 		}
-
+		
 		private static void WriteRowHeightList(XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, RowHeightEntry> rowHeightList)
-		{ 
+		{
 			XmlElement rowheightElement = xmlDoc.CreateElement("rowheights");
 			rootElement.AppendChild(rowheightElement);
 			foreach (RowHeightEntry entry in rowHeightList.Values)
@@ -430,7 +427,7 @@ namespace LogExpert
 				rowheightElement.AppendChild(entryElement);
 			}
 		}
-
+		
 		private static SortedList<int, RowHeightEntry> ReadRowHeightList(XmlElement startNode)
 		{
 			SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
@@ -460,12 +457,12 @@ namespace LogExpert
 			}
 			return rowHeightList;
 		}
-
+		
 		private static void WriteOptions(XmlDocument xmlDoc, XmlElement rootElement, PersistenceData persistenceData)
 		{
 			XmlElement optionsElement = xmlDoc.CreateElement("options");
 			rootElement.AppendChild(optionsElement);
-
+			
 			XmlElement element = xmlDoc.CreateElement("multifile");
 			element.SetAttribute("enabled", persistenceData.multiFile ? "1" : "0");
 			element.SetAttribute("pattern", persistenceData.multiFilePattern);
@@ -477,51 +474,51 @@ namespace LogExpert
 				element.AppendChild(entryElement);
 			}
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("currentline");
 			element.SetAttribute("line", "" + persistenceData.currentLine);
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("firstDisplayedLine");
 			element.SetAttribute("line", "" + persistenceData.firstDisplayedLine);
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("filter");
 			element.SetAttribute("visible", persistenceData.filterVisible ? "1" : "0");
 			element.SetAttribute("advanced", persistenceData.filterAdvanced ? "1" : "0");
 			element.SetAttribute("position", "" + persistenceData.filterPosition);
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("bookmarklist");
 			element.SetAttribute("visible", persistenceData.bookmarkListVisible ? "1" : "0");
 			element.SetAttribute("position", "" + persistenceData.bookmarkListPosition);
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("followTail");
 			element.SetAttribute("enabled", persistenceData.followTail ? "1" : "0");
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("tab");
 			element.SetAttribute("name", persistenceData.tabName);
 			rootElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("columnizer");
 			element.SetAttribute("name", persistenceData.columnizerName);
 			rootElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("highlightGroup");
 			element.SetAttribute("name", persistenceData.highlightGroupName);
 			rootElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("bookmarkCommentColumn");
 			element.SetAttribute("visible", persistenceData.showBookmarkCommentColumn ? "1" : "0");
 			optionsElement.AppendChild(element);
-
+			
 			element = xmlDoc.CreateElement("filterSaveList");
 			element.SetAttribute("visible", persistenceData.filterSaveListVisible ? "1" : "0");
 			optionsElement.AppendChild(element);
 		}
-
+		
 		private static void ReadOptions(XmlElement startNode, PersistenceData persistenceData)
 		{
 			XmlNode optionsNode = startNode.SelectSingleNode("options");
@@ -537,7 +534,7 @@ namespace LogExpert
 			{
 				persistenceData.multiFileMaxDays = 0;
 			}
-
+			
 			XmlNode multiFileNode = optionsNode.SelectSingleNode("multifile");
 			if (multiFileNode != null)
 			{
@@ -555,7 +552,7 @@ namespace LogExpert
 					persistenceData.multiFileNames.Add(fileName);
 				}
 			}
-
+			
 			value = GetOptionsAttribute(optionsNode, "currentline", "line");
 			if (value != null)
 			{
@@ -566,7 +563,7 @@ namespace LogExpert
 			{
 				persistenceData.firstDisplayedLine = Int32.Parse(value);
 			}
-
+			
 			value = GetOptionsAttribute(optionsNode, "filter", "visible");
 			persistenceData.filterVisible = value != null && value.Equals("1");
 			value = GetOptionsAttribute(optionsNode, "filter", "advanced");
@@ -576,7 +573,7 @@ namespace LogExpert
 			{
 				persistenceData.filterPosition = Int32.Parse(value);
 			}
-
+			
 			value = GetOptionsAttribute(optionsNode, "bookmarklist", "visible");
 			persistenceData.bookmarkListVisible = value != null && value.Equals("1");
 			value = GetOptionsAttribute(optionsNode, "bookmarklist", "position");
@@ -584,16 +581,16 @@ namespace LogExpert
 			{
 				persistenceData.bookmarkListPosition = Int32.Parse(value);
 			}
-
+			
 			value = GetOptionsAttribute(optionsNode, "followTail", "enabled");
 			persistenceData.followTail = value != null && value.Equals("1");
-
+			
 			value = GetOptionsAttribute(optionsNode, "bookmarkCommentColumn", "visible");
 			persistenceData.showBookmarkCommentColumn = value != null && value.Equals("1");
-
+			
 			value = GetOptionsAttribute(optionsNode, "filterSaveList", "visible");
 			persistenceData.filterSaveListVisible = value != null && value.Equals("1");
-
+			
 			XmlNode tabNode = startNode.SelectSingleNode("tab");
 			if (tabNode != null)
 			{
@@ -610,7 +607,7 @@ namespace LogExpert
 				persistenceData.highlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
 			}
 		}
-
+		
 		private static string GetOptionsAttribute(XmlNode optionsNode, string elementName, string attrName)
 		{
 			XmlNode node = optionsNode.SelectSingleNode(elementName);
@@ -626,5 +623,7 @@ namespace LogExpert
 				return null;
 			}
 		}
+	
+		#endregion
 	}
 }

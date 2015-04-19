@@ -49,10 +49,6 @@ namespace LogExpert
 		private int _filterPipeNameCounter = 0;
 		private readonly Dictionary<Control, bool> _freezeStateMap = new Dictionary<Control, bool>();
 
-		private readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
-		private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
-		private readonly Thread _logEventHandlerThread = null;
-
 		private EventWaitHandle _filterUpdateEvent = new ManualResetEvent(false);
 
 		private DelayedTrigger _selectionChangedTrigger = new DelayedTrigger(200);
@@ -163,16 +159,13 @@ namespace LogExpert
 			_timeshiftSyncThread.IsBackground = true;
 			_timeshiftSyncThread.Start();
 
-			_logEventHandlerThread = new Thread(new ThreadStart(LogEventWorker));
-			_logEventHandlerThread.IsBackground = true;
-			_logEventHandlerThread.Start();
-
 			_advancedButtonImage = advancedButton.Image;
 			_searchButtonImage = filterSearchButton.Image;
 			filterSearchButton.Image = null;
 
 			dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
 			markEditModeToolStripMenuItem.Enabled = true;
+
 
 			_panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
 			_panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
@@ -3382,58 +3375,6 @@ namespace LogExpert
 				_logEventArgsList.Add(e);
 				_logEventArgsEvent.Set();
 			}
-		}
-
-		private void LogEventWorker()
-		{
-			Thread.CurrentThread.Name = "LogEventWorker";
-			while (true)
-			{
-				Logger.logDebug("Waiting for signal");
-				_logEventArgsEvent.WaitOne();
-				Logger.logDebug("Wakeup signal received.");
-				while (true)
-				{
-					LogEventArgs e;
-					int lastLineCount = 0;
-					lock (_logEventArgsList)
-					{
-						Logger.logInfo("" + _logEventArgsList.Count + " events in queue");
-						if (_logEventArgsList.Count == 0)
-						{
-							_logEventArgsEvent.Reset();
-							break;
-						}
-						e = _logEventArgsList[0];
-						_logEventArgsList.RemoveAt(0);
-					}
-					if (e.IsRollover)
-					{
-						ShiftBookmarks(e.RolloverOffset);
-						ShiftRowHeightList(e.RolloverOffset);
-						ShiftFilterPipes(e.RolloverOffset);
-						lastLineCount = 0;
-					}
-					else
-					{
-						if (e.LineCount < lastLineCount)
-						{
-							Logger.logError("Line count of event is: " + e.LineCount + ", should be greater than last line count: " + lastLineCount);
-						}
-					}
-					Action<LogEventArgs> callback = new Action<LogEventArgs>(UpdateGrid);
-					Invoke(callback, new object[] { e });
-					CheckFilterAndHighlight(e);
-					_timeSpreadCalc.SetLineCount(e.LineCount);
-				}
-			}
-		}
-
-		private void StopLogEventWorkerThread()
-		{
-			_logEventArgsEvent.Set();
-			_logEventHandlerThread.Abort();
-			_logEventHandlerThread.Join();
 		}
 
 		protected override void UpdateGrid(LogEventArgs e)
