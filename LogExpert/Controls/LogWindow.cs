@@ -117,18 +117,18 @@ namespace LogExpert
 			FileName = fileName;
 			ForcePersistenceLoading = forcePersistenceLoading;
 
-			dataGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(DataGridView_CellValueNeeded);
-			dataGridView.CellPainting += new DataGridViewCellPaintingEventHandler(DataGridView_CellPainting);
+			dataGridView.CellValueNeeded += DataGridView_CellValueNeeded;
+			dataGridView.CellPainting += DataGridView_CellPainting;
 
-			filterGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(FilterGridView_CellValueNeeded);
-			filterGridView.CellPainting += new DataGridViewCellPaintingEventHandler(FilterGridView_CellPainting);
+			filterGridView.CellValueNeeded += FilterGridView_CellValueNeeded;
+			filterGridView.CellPainting += FilterGridView_CellPainting;
 
-			Closing += new CancelEventHandler(LogWindow_Closing);
-			Disposed += new EventHandler(LogWindow_Disposed);
+			Closing += LogWindow_Closing;
+			Disposed += LogWindow_Disposed;
 
 			_timeSpreadCalc = new TimeSpreadCalculator(this);
 			timeSpreadingControl1.TimeSpreadCalc = _timeSpreadCalc;
-			timeSpreadingControl1.LineSelected += new TimeSpreadingControl.LineSelectedEventHandler(TimeSpreadingControl1_LineSelected);
+			timeSpreadingControl1.LineSelected += TimeSpreadingControl1_LineSelected;
 			tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Absolute;
 			tableLayoutPanel1.ColumnStyles[1].Width = 20;
 			tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
@@ -155,7 +155,7 @@ namespace LogExpert
 			splitContainer1.Panel2Collapsed = true;
 			advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
 
-			_timeshiftSyncThread = new Thread(new ThreadStart(SyncTimestampDisplayWorker));
+			_timeshiftSyncThread = new Thread(SyncTimestampDisplayWorker);
 			_timeshiftSyncThread.IsBackground = true;
 			_timeshiftSyncThread.Start();
 
@@ -178,14 +178,14 @@ namespace LogExpert
 
 			_waitingForClose = false;
 			dataGridView.Enabled = false;
-			dataGridView.ColumnDividerDoubleClick += new DataGridViewColumnDividerDoubleClickEventHandler(DataGridView_ColumnDividerDoubleClick);
+			dataGridView.ColumnDividerDoubleClick += DataGridView_ColumnDividerDoubleClick;
 			ShowAdvancedFilterPanel(false);
 			filterKnobControl1.MinValue = 0;
 			filterKnobControl1.MaxValue = SPREAD_MAX;
-			filterKnobControl1.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
+			filterKnobControl1.ValueChanged += FilterKnobControl1_CheckForFilterDirty;
 			filterKnobControl2.MinValue = 0;
 			filterKnobControl2.MaxValue = SPREAD_MAX;
-			filterKnobControl2.ValueChanged += new KnobControl.ValueChangedEventHandler(FilterKnobControl1_CheckForFilterDirty);
+			filterKnobControl2.ValueChanged += FilterKnobControl1_CheckForFilterDirty;
 			fuzzyKnobControl.MinValue = 0;
 			fuzzyKnobControl.MaxValue = 10;
 			ToggleHighlightPanel(false); // hidden
@@ -195,8 +195,8 @@ namespace LogExpert
 
 			ResumeLayout();
 
-			_statusLineTrigger.Signal += new DelayedTrigger.SignalEventHandler(StatusLineTrigger_Signal);
-			_selectionChangedTrigger.Signal += new DelayedTrigger.SignalEventHandler(SelectionChangedTrigger_Signal);
+			_statusLineTrigger.Signal += StatusLineTrigger_Signal;
+			_selectionChangedTrigger.Signal += SelectionChangedTrigger_Signal;
 
 			PreferencesChanged(_parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
 		}
