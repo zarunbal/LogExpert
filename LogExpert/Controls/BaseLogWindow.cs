@@ -52,7 +52,10 @@ namespace LogExpert.Controls
 		
 		protected LogTabWindow _parentLogTabWin;
 		protected ColumnCache _columnCache = new ColumnCache();
-		
+
+		private readonly Action<LogEventArgs> _updateGridAction = new Action<LogEventArgs>(UpdateGrid);
+
+
 		#endregion
 		
 		#region cTor
@@ -163,6 +166,7 @@ namespace LogExpert.Controls
 		
 		#region Methods
 		
+
 		private void LogEventWorker()
 		{
 			Thread.CurrentThread.Name = "LogEventWorker";
@@ -197,11 +201,10 @@ namespace LogExpert.Controls
 					{
 						if (e.LineCount < lastLineCount)
 						{
-							Logger.logError("Line count of event is: " + e.LineCount + ", should be greater than last line count: " + lastLineCount);
+							Logger.logError(string.Format("Line count of event is: {0}, should be greater than last line count: {1}", e.LineCount, lastLineCount));
 						}
 					}
-					Action<LogEventArgs> callback = new Action<LogEventArgs>(UpdateGrid);
-					Invoke(callback, e);
+					Invoke(_updateGridAction, e);
 					CheckFilterAndHighlight(e);
 					_timeSpreadCalc.SetLineCount(e.LineCount);
 				}
