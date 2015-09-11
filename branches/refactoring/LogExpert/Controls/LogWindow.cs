@@ -34,7 +34,6 @@ namespace LogExpert
 
 		private Classes.FuzzyBlockDetection _fuzzyBlockDetection = new Classes.FuzzyBlockDetection();
 
-		private ILogLineColumnizer _forcedColumnizer;
 		private List<HilightEntry> _tempHilightEntryList = new List<HilightEntry>();
 		private readonly Object _tempHilightEntryListLock = new Object();
 		private HilightGroup _currentHighlightGroup = new HilightGroup();
@@ -65,7 +64,6 @@ namespace LogExpert
 		private bool _isErrorShowing = false;
 		private bool _isTimestampDisplaySyncing = false;
 		private bool _shouldTimestampDisplaySyncingCancel = false;
-		private bool _isDeadFile = false;
 		private bool _noSelectionUpdates = false;
 		private bool _shouldCallTimeSync = false;
 
@@ -95,6 +93,7 @@ namespace LogExpert
 		private Font _fontBold;
 		private Font _fontMonospaced;
 
+		private Action<int, bool> _selectLineAction;
 
 		#endregion
 
@@ -105,6 +104,7 @@ namespace LogExpert
 			BookmarkColor = Color.FromArgb(165, 200, 225);
 			TempTitleName = "";
 			SuspendLayout();
+			_selectLineAction = new Action<int, bool>(SelectLine);
 
 			InitializeComponent();
 
@@ -190,8 +190,8 @@ namespace LogExpert
 			fuzzyKnobControl.MaxValue = 10;
 			ToggleHighlightPanel(false); // hidden
 
-			BookmarkProvider.BookmarkAdded += BookmarkProvider_BookmarkAdded;
-			BookmarkProvider.BookmarkRemoved += BookmarkProvider_BookmarkRemoved;
+			BookmarkProvider.BookmarkAdded += BookmarkProvider_BookmarkChanged;
+			BookmarkProvider.BookmarkRemoved += BookmarkProvider_BookmarkChanged;
 
 			ResumeLayout();
 
@@ -243,66 +243,46 @@ namespace LogExpert
 
 		internal FilterPipe FilterPipe { get; set; }
 
+		public bool IsAdvancedOptionActive
+		{
+			get
+			{
+				return (rangeCheckBox.Checked ||
+						fuzzyKnobControl.Value > 0 ||
+						filterKnobControl1.Value > 0 ||
+						filterKnobControl2.Value > 0 ||
+						invertFilterCheckBox.Checked ||
+						columnRestrictCheckBox.Checked);
+			}
+		}
+
+		public bool ShowBookmarkBubbles
+		{
+			get
+			{
+				return _guiStateArgs.ShowBookmarkBubbles;
+			}
+			set
+			{
+				_guiStateArgs.ShowBookmarkBubbles = dataGridView.PaintWithOverlays = value;
+				dataGridView.Refresh();
+			}
+		}
+
 		#endregion
 
 		#region Public Methods
 
-		public string SavePersistenceData(bool force)
+		public override PersistenceData GetPersistenceData()
 		{
-			if (!force)
-			{
-				if (!Preferences.saveSessions)
-				{
-					return null;
-				}
-			}
+			PersistenceData persistenceData = base.GetPersistenceData();
 
-			if (IsTempFile || _isLoadError)
-			{
-				return null;
-			}
-
-			try
-			{
-				PersistenceData persistenceData = GetPersistenceData();
-				if (ForcedPersistenceFileName == null)
-				{
-					return Persister.SavePersistenceData(FileName, persistenceData, Preferences);
-				}
-				else
-				{
-					return Persister.SavePersistenceDataWithFixedName(ForcedPersistenceFileName, persistenceData);
-				}
-			}
-			catch (IOException ex)
-			{
-				Logger.logError("Error saving persistence: " + ex.Message);
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show("Unexpected error while saving persistence: " + e.Message);
-			}
-			return null;
-		}
-
-		public PersistenceData GetPersistenceData()
-		{
-			PersistenceData persistenceData = new PersistenceData();
-			persistenceData.bookmarkList = BookmarkProvider.BookmarkList;
-			persistenceData.rowHeightList = _rowHeightList;
-			persistenceData.multiFile = IsMultiFile;
-			persistenceData.multiFilePattern = _multifileOptions.FormatPattern;
-			persistenceData.multiFileMaxDays = _multifileOptions.MaxDayTry;
 			persistenceData.currentLine = dataGridView.CurrentCellAddress.Y;
 			persistenceData.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
 			persistenceData.filterVisible = !splitContainer1.Panel2Collapsed;
 			persistenceData.filterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed;
 			persistenceData.filterPosition = splitContainer1.SplitterDistance;
-			persistenceData.followTail = _guiStateArgs.FollowTail;
-			persistenceData.fileName = FileName;
 			persistenceData.tabName = Text;
-			persistenceData.columnizerName = CurrentColumnizer.GetName();
-			persistenceData.lineCount = CurrentLogFileReader.LineCount;
 			_filterParams.isFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
 			if (Preferences.saveFilters)
 			{
@@ -328,7 +308,6 @@ namespace LogExpert
 			}
 			//persistenceData.showBookmarkCommentColumn = bookmarkWindow.ShowBookmarkCommentColumn;
 			persistenceData.filterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
-			persistenceData.encoding = CurrentLogFileReader.CurrentEncoding;
 			return persistenceData;
 		}
 
@@ -371,12 +350,6 @@ namespace LogExpert
 				FilterPipe.CloseAndDisconnect();
 			}
 			DisconnectFilterPipes();
-		}
-
-		public void ForceColumnizer(ILogLineColumnizer columnizer)
-		{
-			_forcedColumnizer = Util.CloneColumnizer(columnizer);
-			SetColumnizer(_forcedColumnizer);
 		}
 
 		public void ForceColumnizerForLoading(ILogLineColumnizer columnizer)
@@ -599,7 +572,7 @@ namespace LogExpert
 
 		public void SelectLogLine(int line)
 		{
-			Invoke(new Action<int, bool>(SelectLine), new object[] { line, true });
+			Invoke(_selectLineAction, line, true);
 		}
 
 		public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
@@ -706,37 +679,21 @@ namespace LogExpert
 			}
 		}
 
-		public bool ShowBookmarkBubbles
-		{
-			get
-			{
-				return _guiStateArgs.ShowBookmarkBubbles;
-			}
-			set
-			{
-				_guiStateArgs.ShowBookmarkBubbles = dataGridView.PaintWithOverlays = value;
-				dataGridView.Refresh();
-			}
-		}
-
 		public void ToggleBookmark()
 		{
-			DataGridView gridView;
 			int lineNum;
 
 			if (filterGridView.Focused)
 			{
-				gridView = filterGridView;
-				if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
+				if (filterGridView.CurrentCellAddress == null || filterGridView.CurrentCellAddress.Y == -1)
 				{
 					return;
 				}
-				lineNum = _filterResultList[gridView.CurrentCellAddress.Y];
+				lineNum = _filterResultList[filterGridView.CurrentCellAddress.Y];
 			}
 			else
 			{
-				gridView = dataGridView;
-				if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
+				if (dataGridView.CurrentCellAddress == null || dataGridView.CurrentCellAddress.Y == -1)
 				{
 					return;
 				}
@@ -744,28 +701,6 @@ namespace LogExpert
 			}
 
 			ToggleBookmark(lineNum);
-		}
-
-		public void ToggleBookmark(int lineNum)
-		{
-			if (BookmarkProvider.IsBookmarkAtLine(lineNum))
-			{
-				Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(lineNum);
-				if (bookmark.Text != null && bookmark.Text.Length > 0)
-				{
-					if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
-					{
-						return;
-					}
-				}
-				BookmarkProvider.RemoveBookmarkForLine(lineNum);
-			}
-			else
-			{
-				BookmarkProvider.AddBookmark(new Bookmark(lineNum));
-			}
-			dataGridView.Refresh();
-			filterGridView.Refresh();
 		}
 
 		public void SetBookmarkFromTrigger(int lineNum, string comment)
@@ -932,8 +867,7 @@ namespace LogExpert
 					}
 					else
 						CurrentColumnizer.SetTimeOffset(0);
-					dataGridView.Refresh();
-					filterGridView.Refresh();
+					RefreshAllGrids();
 					if (CurrentColumnizer.IsTimeshiftImplemented())
 					{
 						SetTimestampLimits();
@@ -1426,24 +1360,13 @@ namespace LogExpert
 				{
 					BookmarkProvider.ImportBookmarkList(FileName, dlg.FileName);
 
-					dataGridView.Refresh();
-					filterGridView.Refresh();
+					RefreshAllGrids();
 				}
 				catch (IOException e)
 				{
-					MessageBox.Show("Error while importing bookmark list: " + e.Message, "LogExpert");
+					HandleError(e, string.Format("Error while importing bookmark list: {0}", e.Message));
 				}
 			}
-		}
-
-		public bool IsAdvancedOptionActive()
-		{
-			return (rangeCheckBox.Checked ||
-					fuzzyKnobControl.Value > 0 ||
-					filterKnobControl1.Value > 0 ||
-					filterKnobControl2.Value > 0 ||
-					invertFilterCheckBox.Checked ||
-					columnRestrictCheckBox.Checked);
 		}
 
 		public void HandleChangedFilterList()
@@ -1594,86 +1517,6 @@ namespace LogExpert
 			FreeFromTimeSync();
 		}
 
-		#region LogFileReader Events
-
-		private void LogFileReader_LoadingStarted(object sender, LoadFileEventArgs e)
-		{
-			Invoke(new Action<LoadFileEventArgs>(LoadingStarted), new object[] { e });
-		}
-
-		private void LogFileReader_FinishedLoading(object sender, EventArgs e)
-		{
-			Logger.logInfo("Finished loading.");
-			_isLoading = false;
-			_isDeadFile = false;
-			if (!_waitingForClose)
-			{
-				Invoke(new MethodInvoker(LoadingFinished));
-				Invoke(new MethodInvoker(LoadPersistenceData));
-				Invoke(new MethodInvoker(SetGuiAfterLoading));
-				_loadingFinishedEvent.Set();
-				_externaLoadingFinishedEvent.Set();
-				_timeSpreadCalc.SetLineCount(CurrentLogFileReader.LineCount);
-
-				if (_reloadMemento != null)
-				{
-					Invoke(new Action<ReloadMemento>(PositionAfterReload), new object[] { _reloadMemento });
-				}
-				if (filterTailCheckBox.Checked)
-				{
-					Logger.logInfo("Refreshing filter view because of reload.");
-					Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
-				}
-
-				HandleChangedFilterList();
-			}
-			_reloadMemento = null;
-		}
-
-		private void LogFileReader_FileNotFound(object sender, EventArgs e)
-		{
-			if (!IsDisposed && !Disposing)
-			{
-				Logger.logInfo("Handling file not found event.");
-				_isDeadFile = true;
-				BeginInvoke(new MethodInvoker(LogfileDead));
-			}
-		}
-
-		private void LogFileReader_Respawned(object sender, EventArgs e)
-		{
-			BeginInvoke(new MethodInvoker(LogfileRespawned));
-		}
-
-		/**
-		 * Event handler for the Load event from LogfileReader
-		 */
-		private void LogFileReader_LoadFile(object sender, LoadFileEventArgs e)
-		{
-			if (e.NewFile)
-			{
-				Logger.logInfo("File created anew.");
-
-				// File was new created (e.g. rollover)
-				_isDeadFile = false;
-				UnRegisterLogFileReaderEvents();
-				dataGridView.CurrentCellChanged -= new EventHandler(DataGridView_CurrentCellChanged);
-				MethodInvoker invoker = new MethodInvoker(ReloadNewFile);
-				BeginInvoke(invoker);
-				Logger.logDebug("Reloading invoked.");
-				return;
-			}
-
-			if (!_isLoading)
-			{
-				return;
-			}
-			Action<LoadFileEventArgs> callback = new Action<LoadFileEventArgs>(UpdateProgress);
-			BeginInvoke(callback, new object[] { e });
-		}
-
-		#endregion
-
 		private void UpdateProgress(LoadFileEventArgs e)
 		{
 			try
@@ -1693,24 +1536,6 @@ namespace LogExpert
 			catch (Exception ex)
 			{
 				Logger.logError("UpdateProgress(): \n" + ex + "\n" + ex.StackTrace);
-			}
-		}
-
-		private void LoadingStarted(LoadFileEventArgs e)
-		{
-			try
-			{
-				_statusEventArgs.FileSize = e.ReadPos;
-				_statusEventArgs.StatusText = "Loading " + Util.GetNameFromPath(e.FileName);
-				_progressEventArgs.Visible = true;
-				_progressEventArgs.MaxValue = (int)e.FileSize;
-				_progressEventArgs.Value = (int)e.ReadPos;
-				SendProgressBarUpdate();
-				SendStatusLineUpdate();
-			}
-			catch (Exception ex)
-			{
-				Logger.logError("LoadingStarted(): " + ex + "\n" + ex.StackTrace);
 			}
 		}
 
@@ -2458,21 +2283,11 @@ namespace LogExpert
 			}
 		}
 
-		private void BookmarkProvider_BookmarkRemoved()
+		private void BookmarkProvider_BookmarkChanged()
 		{
 			if (!_isLoading)
 			{
-				dataGridView.Refresh();
-				filterGridView.Refresh();
-			}
-		}
-
-		private void BookmarkProvider_BookmarkAdded()
-		{
-			if (!_isLoading)
-			{
-				dataGridView.Refresh();
-				filterGridView.Refresh();
+				RefreshAllGrids();
 			}
 		}
 
@@ -2751,11 +2566,6 @@ namespace LogExpert
 			HandleChangedFilterOnLoadSetting();
 		}
 
-		private void HideFilterListOnLoadCheckBox_MouseClick(object sender, MouseEventArgs e)
-		{
-			HandleChangedFilterOnLoadSetting();
-		}
-
 		private void FilterToTabToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			FilterToTab();
@@ -2827,7 +2637,66 @@ namespace LogExpert
 
 		#region Private Methods
 
-		private void SetColumnizer(ILogLineColumnizer columnizer)
+		protected override void LogFileLoadFile(LoadFileEventArgs e)
+		{
+			if (e.NewFile)
+			{
+				Logger.logInfo("File created anew.");
+
+				// File was new created (e.g. rollover)
+				_isDeadFile = false;
+				UnRegisterLogFileReaderEvents();
+				dataGridView.CurrentCellChanged -= DataGridView_CurrentCellChanged;
+				BeginInvoke(new Action(ReloadNewFile));
+				Logger.logDebug("Reloading invoked.");
+				return;
+			}
+
+			if (!_isLoading)
+			{
+				return;
+			}
+			BeginInvoke(new Action<LoadFileEventArgs>(UpdateProgress), e);
+			base.LogFileLoadFile(e);
+		}
+
+		protected override void LogFileLoadFinished()
+		{
+			if (InvokeRequired)
+			{
+				Invoke(new Action(() => LogFileLoadFinished()));
+				return;
+			}
+			Logger.logInfo("Finished loading.");
+			_isLoading = false;
+			_isDeadFile = false;
+			if (!_waitingForClose)
+			{
+				LoadingFinished();
+				LoadPersistenceData();
+				SetGuiAfterLoading();
+				_loadingFinishedEvent.Set();
+				_externaLoadingFinishedEvent.Set();
+				_timeSpreadCalc.SetLineCount(CurrentLogFileReader.LineCount);
+
+				if (_reloadMemento != null)
+				{
+					PositionAfterReload(_reloadMemento);
+				}
+				if (filterTailCheckBox.Checked)
+				{
+					Logger.logInfo("Refreshing filter view because of reload.");
+					FilterSearch();
+				}
+
+				HandleChangedFilterList();
+			}
+			_reloadMemento = null;
+
+			base.LogFileLoadFinished();
+		}
+
+		protected override void SetColumnizer(ILogLineColumnizer columnizer)
 		{
 			int timeDiff = 0;
 			if (CurrentColumnizer != null && CurrentColumnizer.IsTimeshiftImplemented())
@@ -3009,27 +2878,14 @@ namespace LogExpert
 			OnColumnizerChanged(CurrentColumnizer);
 		}
 
-		protected override void RegisterLogFileReaderEvents()
-		{
-			CurrentLogFileReader.LoadFile += LogFileReader_LoadFile;
-			CurrentLogFileReader.LoadingFinished += LogFileReader_FinishedLoading;
-			CurrentLogFileReader.LoadingStarted += LogFileReader_LoadingStarted;
-			CurrentLogFileReader.FileNotFound += LogFileReader_FileNotFound;
-			CurrentLogFileReader.Respawned += LogFileReader_Respawned;
-			// FileSizeChanged is not registered here because it's registered after loading has finished
-		}
 
 		protected override void UnRegisterLogFileReaderEvents()
 		{
 			if (CurrentLogFileReader != null)
 			{
-				CurrentLogFileReader.LoadFile -= LogFileReader_LoadFile;
-				CurrentLogFileReader.LoadingFinished -= LogFileReader_FinishedLoading;
-				CurrentLogFileReader.LoadingStarted -= LogFileReader_LoadingStarted;
-				CurrentLogFileReader.FileNotFound -= LogFileReader_FileNotFound;
-				CurrentLogFileReader.Respawned -= LogFileReader_Respawned;
 				CurrentLogFileReader.FileSizeChanged -= FileSizeChangedHandler;
 			}
+			base.UnRegisterLogFileReaderEvents();
 		}
 
 		protected override void LoadPersistenceOptions(PersistenceData persistenceData)
@@ -3210,35 +3066,25 @@ namespace LogExpert
 			}
 		}
 
-		private void LogfileDead()
+		protected override void LogfileDead()
 		{
-			Logger.logInfo("File not found.");
-			_isDeadFile = true;
-
 			dataGridView.Enabled = false;
 			dataGridView.RowCount = 0;
-			_progressEventArgs.Visible = false;
-			_progressEventArgs.Value = _progressEventArgs.MaxValue;
-			SendProgressBarUpdate();
-			_statusEventArgs.FileSize = 0;
-			_statusEventArgs.LineCount = 0;
-			_statusEventArgs.CurrentLineNum = 0;
-			SendStatusLineUpdate();
-			_shouldCancel = true;
+
+			base.LogfileDead();
+
 			ClearFilterList();
-			BookmarkProvider.ClearAllBookmarks();
 
 			StatusLineText("File not found");
-			OnFileNotFound(new EventArgs());
 		}
 
-		private void LogfileRespawned()
+		protected override void LogfileRespawned()
 		{
-			Logger.logInfo("LogfileDead(): Reloading file because it has been respawned.");
-			_isDeadFile = false;
+			base.LogfileRespawned();
+
 			dataGridView.Enabled = true;
 			StatusLineText("");
-			OnFileRespawned(new EventArgs());
+			OnFileRespawned();
 			Reload();
 		}
 
@@ -4810,7 +4656,7 @@ namespace LogExpert
 
 		private void CheckForAdvancedButtonDirty()
 		{
-			if (IsAdvancedOptionActive() && !_showAdvanced)
+			if (IsAdvancedOptionActive && !_showAdvanced)
 			{
 				advancedButton.Image = _advancedButtonImage;
 			}
@@ -5350,8 +5196,7 @@ namespace LogExpert
 
 			BookmarkProvider.AddOrUpdateBookmark(bookmark);
 
-			dataGridView.Refresh();
-			filterGridView.Refresh();
+			RefreshAllGrids();
 		}
 
 		private void MarkCurrentFilterRange()
@@ -5398,8 +5243,7 @@ namespace LogExpert
 					AddBookmarkAtLineSilently(lineNum);
 				}
 			}
-			dataGridView.Refresh();
-			filterGridView.Refresh();
+			RefreshAllGrids();
 		}
 
 		private void HandleChangedFilterOnLoadSetting()
@@ -5516,18 +5360,6 @@ namespace LogExpert
 
 		#region Events there delegates an methods
 
-		public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);
-
-		public event FileSizeChangedEventHandler FileSizeChanged;
-
-		private void OnFileSizeChanged(LogEventArgs e)
-		{
-			if (FileSizeChanged != null)
-			{
-				FileSizeChanged(this, e);
-			}
-		}
-
 		public delegate void StatusLineEventHandler(object sender, StatusLineEventArgs e);
 
 		public event StatusLineEventHandler StatusLineEvent;
@@ -5563,30 +5395,6 @@ namespace LogExpert
 			if (TailFollowed != null)
 			{
 				TailFollowed(this, e);
-			}
-		}
-
-		public delegate void FileNotFoundEventHandler(object sender, EventArgs e);
-
-		public event FileNotFoundEventHandler FileNotFound;
-
-		protected void OnFileNotFound(EventArgs e)
-		{
-			if (FileNotFound != null)
-			{
-				FileNotFound(this, e);
-			}
-		}
-
-		public delegate void FileRespawnedEventHandler(object sender, EventArgs e);
-
-		public event FileRespawnedEventHandler FileRespawned;
-
-		protected void OnFileRespawned(EventArgs e)
-		{
-			if (FileRespawned != null)
-			{
-				FileRespawned(this, e);
 			}
 		}
 
@@ -5654,7 +5462,7 @@ namespace LogExpert
 
 		#region Internals
 
-		internal void RefreshAllGrids()
+		internal override void RefreshAllGrids()
 		{
 			dataGridView.Refresh();
 			filterGridView.Refresh();
