@@ -1024,7 +1024,7 @@ namespace LogExpert
 				oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
 				oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
 				oldLogWindow.BookmarkProvider.BookmarkAdded -= BookmarkAdded;
-				oldLogWindow.BookmarkProvider.BookmarkRemoved-= BookmarkRemoved;
+				oldLogWindow.BookmarkProvider.BookmarkRemoved -= BookmarkRemoved;
 				oldLogWindow.BookmarkProvider.BookmarkTextChanged -= BookmarkTextChanged;
 				DisconnectToolWindows();
 			}
@@ -2084,7 +2084,7 @@ namespace LogExpert
 			_bookmarkWindow.UpdateView();
 		}
 
-		private void BookmarkTextChanged( BookmarkEventArgs e)
+		private void BookmarkTextChanged(BookmarkEventArgs e)
 		{
 			_bookmarkWindow.BookmarkTextChanged(e.Bookmark);
 		}
@@ -2205,14 +2205,14 @@ namespace LogExpert
 			TopMost = alwaysOnTopToolStripMenuItem.Checked;
 		}
 
-		private void logWindow_FileNotFound(object sender, EventArgs e)
+		private void logWindow_FileNotFound(object sender)
 		{
-			Invoke(new FileNotFoundDelegate(FileNotFound), new object[] { sender });
+			Invoke(new FileNotFoundDelegate(FileNotFound), sender);
 		}
 
-		private void logWindow_FileRespawned(object sender, EventArgs e)
+		private void logWindow_FileRespawned(object sender)
 		{
-			Invoke(new FileRespawnedDelegate(FileRespawned), new object[] { sender });
+			Invoke(new FileRespawnedDelegate(FileRespawned), sender);
 		}
 
 		private void logWindow_FilterListChanged(object sender, FilterListChangedEventArgs e)

@@ -800,7 +800,7 @@ namespace LogExpert
       this.hideFilterListOnLoadCheckBox.Text = "Auto hide";
       this.helpToolTip.SetToolTip(this.hideFilterListOnLoadCheckBox, "Hides the filter list after loading a filter");
       this.hideFilterListOnLoadCheckBox.UseVisualStyleBackColor = true;
-      this.hideFilterListOnLoadCheckBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.HideFilterListOnLoadCheckBox_MouseClick);
+	  this.hideFilterListOnLoadCheckBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.FilterOnLoadCheckBox_MouseClick);
       // 
       // filterDownButton
       // 
