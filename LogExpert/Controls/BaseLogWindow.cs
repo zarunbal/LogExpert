@@ -59,6 +59,12 @@ namespace LogExpert.Controls
 		private ILogLineColumnizer _forcedColumnizer;
 		protected bool _isDeadFile = false;
 
+		protected readonly Object _reloadLock = new Object();
+		private int _reloadOverloadCounter = 0;
+
+		protected readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
+		protected readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false); // used for external wait fx WaitForLoadFinished()
+
 
 		#endregion
 
@@ -69,6 +75,8 @@ namespace LogExpert.Controls
 			_logEventHandlerThread = new Thread(new ThreadStart(LogEventWorker));
 			_logEventHandlerThread.IsBackground = true;
 			_logEventHandlerThread.Start();
+
+
 
 			BookmarkProvider = new BookmarkDataProvider();
 
@@ -171,6 +179,8 @@ namespace LogExpert.Controls
 				}
 			}
 		}
+
+		public ColumnizerCallback ColumnizerCallbackObject { get; protected set; }
 
 		#endregion
 
@@ -871,6 +881,41 @@ namespace LogExpert.Controls
 			}
 		}
 
+		protected void ReloadNewFile()
+		{
+			// prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
+			lock (_reloadLock)
+			{
+				_reloadOverloadCounter++;
+				Logger.logInfo("ReloadNewFile(): counter = " + _reloadOverloadCounter);
+				if (_reloadOverloadCounter <= 1)
+				{
+					SavePersistenceData(false);
+					_loadingFinishedEvent.Reset();
+					_externaLoadingFinishedEvent.Reset();
+					Thread reloadFinishedThread = new Thread(new ThreadStart(ReloadFinishedThreadFx));
+					reloadFinishedThread.IsBackground = true;
+					reloadFinishedThread.Start();
+					LoadFile(FileName, EncodingOptions);
+
+					BookmarkProvider.ClearAllBookmarks();
+					SavePersistenceData(false);
+				}
+				else
+				{
+					Logger.logDebug("Preventing reload because of recursive calls.");
+				}
+				_reloadOverloadCounter--;
+			}
+		}
+
+		protected string[] GetColumnsForLine(int lineNumber)
+		{
+			string[] columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+
+			return columns;
+		}
+
 		#endregion
 
 		#region Abstract methods
@@ -892,6 +937,8 @@ namespace LogExpert.Controls
 		protected abstract void SetColumnizer(ILogLineColumnizer columnizer);
 
 		internal abstract void RefreshAllGrids();
+
+		protected abstract void ReloadFinishedThreadFx();
 
 		#endregion
 
