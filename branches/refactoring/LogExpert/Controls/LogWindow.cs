@@ -54,9 +54,6 @@ namespace LogExpert
 
 		private IList<BackgroundProcessCancelHandler> _cancelHandlerList = new List<BackgroundProcessCancelHandler>();
 
-		private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
-		private readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false); // used for external wait fx WaitForLoadFinished()
-
 		private bool _waitingForClose = false;
 		private bool _isSearching = false;
 
@@ -68,8 +65,6 @@ namespace LogExpert
 		private bool _shouldCallTimeSync = false;
 
 		private int _lineHeight = 0;
-		private int _reloadOverloadCounter = 0;
-		private readonly Object _reloadLock = new Object();
 		private int _selectedCol = 0;    // set by context menu event for column headers only
 
 
@@ -95,12 +90,18 @@ namespace LogExpert
 
 		private Action<int, bool> _selectLineAction;
 
+		private Action _filterSearch;
+
 		#endregion
 
 		#region cTor
 
-		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading)
+		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading):
+			base()
 		{
+
+			_filterSearch = new Action(FilterSearch);
+
 			BookmarkColor = Color.FromArgb(165, 200, 225);
 			TempTitleName = "";
 			SuspendLayout();
@@ -223,8 +224,6 @@ namespace LogExpert
 				}
 			}
 		}
-
-		public ColumnizerCallback ColumnizerCallbackObject { get; private set; }
 
 		public bool ForcePersistenceLoading { get; set; }
 
@@ -2649,24 +2648,17 @@ namespace LogExpert
 				dataGridView.CurrentCellChanged -= DataGridView_CurrentCellChanged;
 				BeginInvoke(new Action(ReloadNewFile));
 				Logger.logDebug("Reloading invoked.");
-				return;
+			}
+			else if (_isLoading)
+			{
+				BeginInvoke(new Action<LoadFileEventArgs>(UpdateProgress), e);
 			}
 
-			if (!_isLoading)
-			{
-				return;
-			}
-			BeginInvoke(new Action<LoadFileEventArgs>(UpdateProgress), e);
 			base.LogFileLoadFile(e);
 		}
 
 		protected override void LogFileLoadFinished()
 		{
-			if (InvokeRequired)
-			{
-				Invoke(new Action(() => LogFileLoadFinished()));
-				return;
-			}
 			Logger.logInfo("Finished loading.");
 			_isLoading = false;
 			_isDeadFile = false;
@@ -2878,7 +2870,6 @@ namespace LogExpert
 			OnColumnizerChanged(CurrentColumnizer);
 		}
 
-
 		protected override void UnRegisterLogFileReaderEvents()
 		{
 			if (CurrentLogFileReader != null)
@@ -2890,6 +2881,8 @@ namespace LogExpert
 
 		protected override void LoadPersistenceOptions(PersistenceData persistenceData)
 		{
+			base.LoadPersistenceOptions(persistenceData);
+
 			splitContainer1.SplitterDistance = persistenceData.filterPosition;
 			splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
 			ToggleHighlightPanel(persistenceData.filterSaveListVisible);
@@ -3148,40 +3141,12 @@ namespace LogExpert
 			locateLineInOriginalFileToolStripMenuItem.Enabled = FilterPipe != null;
 		}
 
-		private void ReloadNewFile()
-		{
-			// prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
-			lock (_reloadLock)
-			{
-				_reloadOverloadCounter++;
-				Logger.logInfo("ReloadNewFile(): counter = " + _reloadOverloadCounter);
-				if (_reloadOverloadCounter <= 1)
-				{
-					SavePersistenceData(false);
-					_loadingFinishedEvent.Reset();
-					_externaLoadingFinishedEvent.Reset();
-					Thread reloadFinishedThread = new Thread(new ThreadStart(ReloadFinishedThreadFx));
-					reloadFinishedThread.IsBackground = true;
-					reloadFinishedThread.Start();
-					LoadFile(FileName, EncodingOptions);
-
-					BookmarkProvider.ClearAllBookmarks();
-					SavePersistenceData(false);
-				}
-				else
-				{
-					Logger.logDebug("Preventing reload because of recursive calls.");
-				}
-				_reloadOverloadCounter--;
-			}
-		}
-
-		private void ReloadFinishedThreadFx()
+		protected override void ReloadFinishedThreadFx()
 		{
 			Logger.logInfo("Waiting for loading to be complete.");
 			_loadingFinishedEvent.WaitOne();
 			Logger.logInfo("Refreshing filter view because of reload.");
-			Invoke(new MethodInvoker(FilterSearch));
+			Invoke(_filterSearch);
 			LoadFilterPipes();
 			OnFileReloadFinished();
 		}
@@ -5323,13 +5288,6 @@ namespace LogExpert
 		private void FreeSlaveFromTimesync(LogWindow slave)
 		{
 			slave.FreeFromTimeSync();
-		}
-
-		private string[] GetColumnsForLine(int lineNumber)
-		{
-			string[] columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
-
-			return columns;
 		}
 
 		protected override string GetPersistString()
