@@ -96,7 +96,7 @@ namespace LogExpert
 
 		#region cTor
 
-		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading):
+		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading) :
 			base()
 		{
 
@@ -268,6 +268,30 @@ namespace LogExpert
 			}
 		}
 
+		protected override int CurrentDataGridLine
+		{
+			get
+			{
+				if (dataGridView.CurrentCellAddress == null)
+				{
+					return -1;
+				}
+				return dataGridView.CurrentCellAddress.Y;
+			}
+		}
+
+		protected override int CurrentFilterGridLine
+		{
+			get
+			{
+				if (filterGridView.CurrentCellAddress == null)
+				{
+					return -1;
+				}
+				return filterGridView.CurrentCellAddress.Y;
+			}
+		}
+
 		#endregion
 
 		#region Public Methods
@@ -276,7 +300,7 @@ namespace LogExpert
 		{
 			PersistenceData persistenceData = base.GetPersistenceData();
 
-			persistenceData.currentLine = dataGridView.CurrentCellAddress.Y;
+			persistenceData.currentLine = CurrentDataGridLine;
 			persistenceData.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
 			persistenceData.filterVisible = !splitContainer1.Panel2Collapsed;
 			persistenceData.filterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed;
@@ -531,11 +555,11 @@ namespace LogExpert
 			SearchParams searchParams = _parentLogTabWin.SearchParams;
 			if ((searchParams.isForward || searchParams.isFindNext) && !searchParams.isShiftF3Pressed)
 			{
-				searchParams.currentLine = dataGridView.CurrentCellAddress.Y + 1;
+				searchParams.currentLine = CurrentDataGridLine + 1;
 			}
 			else
 			{
-				searchParams.currentLine = dataGridView.CurrentCellAddress.Y - 1;
+				searchParams.currentLine = CurrentDataGridLine - 1;
 			}
 
 			_currentSearchParams = searchParams;    // remember for async "not found" messages
@@ -684,19 +708,19 @@ namespace LogExpert
 
 			if (filterGridView.Focused)
 			{
-				if (filterGridView.CurrentCellAddress == null || filterGridView.CurrentCellAddress.Y == -1)
+				if (CurrentFilterGridLine == -1)
 				{
 					return;
 				}
-				lineNum = _filterResultList[filterGridView.CurrentCellAddress.Y];
+				lineNum = _filterResultList[CurrentFilterGridLine];
 			}
 			else
 			{
-				if (dataGridView.CurrentCellAddress == null || dataGridView.CurrentCellAddress.Y == -1)
+				if (CurrentDataGridLine == -1)
 				{
 					return;
 				}
-				lineNum = dataGridView.CurrentCellAddress.Y;
+				lineNum = CurrentDataGridLine;
 			}
 
 			ToggleBookmark(lineNum);
@@ -735,7 +759,7 @@ namespace LogExpert
 			{
 				int bookmarkIndex = 0;
 
-				bookmarkIndex = FindNextBookmarkIndex(dataGridView.CurrentCellAddress.Y, isForward);
+				bookmarkIndex = FindNextBookmarkIndex(CurrentDataGridLine, isForward);
 
 				bookmarkIndex = currentBookMarkCount.SanitizeIndex(bookmarkIndex);
 
@@ -941,7 +965,7 @@ namespace LogExpert
 			SavePersistenceData(false);
 
 			_reloadMemento = new ReloadMemento();
-			_reloadMemento.currentLine = dataGridView.CurrentCellAddress.Y;
+			_reloadMemento.currentLine = CurrentDataGridLine;
 			_reloadMemento.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
 			_forcedColumnizerForLoading = CurrentColumnizer;
 
@@ -1027,7 +1051,7 @@ namespace LogExpert
 				return false;
 			}
 
-			int currentLine = dataGridView.CurrentCellAddress.Y;
+			int currentLine = CurrentDataGridLine;
 			if (currentLine < 0 || currentLine >= dataGridView.RowCount)
 			{
 				currentLine = 0;
@@ -1303,9 +1327,9 @@ namespace LogExpert
 			}
 			else
 			{
-				if (dataGridView.CurrentCellAddress.Y != -1)
+				if (CurrentDataGridLine != -1)
 				{
-					patternArgs.startLine = dataGridView.CurrentCellAddress.Y;
+					patternArgs.startLine = CurrentDataGridLine;
 				}
 				else
 				{
@@ -1798,9 +1822,9 @@ namespace LogExpert
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				if (filterGridView.CurrentCellAddress.Y >= 0 && filterGridView.CurrentCellAddress.Y < _filterResultList.Count)
+				if (CurrentFilterGridLine >= 0 && CurrentFilterGridLine < _filterResultList.Count)
 				{
-					int lineNum = _filterResultList[filterGridView.CurrentCellAddress.Y];
+					int lineNum = _filterResultList[CurrentFilterGridLine];
 					SelectLine(lineNum, false);
 					e.Handled = true;
 				}
@@ -2040,7 +2064,7 @@ namespace LogExpert
 		{
 			if (CurrentColumnizer.IsTimeshiftImplemented())
 			{
-				int currentLine = dataGridView.CurrentCellAddress.Y;
+				int currentLine = CurrentDataGridLine;
 				if (currentLine > 0 && currentLine < dataGridView.RowCount)
 				{
 					int lineNum = currentLine;
@@ -2365,9 +2389,9 @@ namespace LogExpert
 		{
 			if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl)
 			{
-				DataGridViewTextBoxEditingControl ctl =
-					dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
-				AddBookmarkComment(ctl.SelectedText);
+				DataGridViewTextBoxEditingControl ctl = dataGridView.EditingControl as DataGridViewTextBoxEditingControl;
+				int lineNum = CurrentDataGridLine;
+				AddBookmarkComment(ctl.SelectedText, lineNum);
 			}
 		}
 
@@ -3197,7 +3221,7 @@ namespace LogExpert
 			{
 				if (dataGridView.RowCount > e.LineCount)
 				{
-					int currentLineNum = dataGridView.CurrentCellAddress.Y;
+					int currentLineNum = CurrentDataGridLine;
 					dataGridView.RowCount = 0;
 					dataGridView.RowCount = e.LineCount;
 					if (!_guiStateArgs.FollowTail)
@@ -3220,13 +3244,13 @@ namespace LogExpert
 					// keep selection and view range, if no follow tail mode
 					if (!_guiStateArgs.FollowTail)
 					{
-						int currentLineNum = dataGridView.CurrentCellAddress.Y;
+						int currentLineNum = CurrentDataGridLine;
 						currentLineNum -= e.RolloverOffset;
 						if (currentLineNum < 0)
 						{
 							currentLineNum = 0;
 						}
-						Logger.logDebug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
+						Logger.logDebug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + CurrentDataGridLine + ", new currLineNum=" + currentLineNum);
 						firstDisplayedLine -= e.RolloverOffset;
 						if (firstDisplayedLine < 0)
 						{
@@ -3847,7 +3871,7 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt)
 			{
-				int newLine = CurrentLogFileReader.GetNextMultiFileLine(dataGridView.CurrentCellAddress.Y);
+				int newLine = CurrentLogFileReader.GetNextMultiFileLine(CurrentDataGridLine);
 				if (newLine != -1)
 				{
 					SelectLine(newLine, false);
@@ -3856,7 +3880,7 @@ namespace LogExpert
 			}
 			if (e.KeyCode == Keys.Up && e.Modifiers == Keys.Alt)
 			{
-				int newLine = CurrentLogFileReader.GetPrevMultiFileLine(dataGridView.CurrentCellAddress.Y);
+				int newLine = CurrentLogFileReader.GetPrevMultiFileLine(CurrentDataGridLine);
 				if (newLine != -1)
 				{
 					SelectLine(newLine - 1, false);
@@ -3923,7 +3947,7 @@ namespace LogExpert
 
 		private void SelectPrevHighlightLine()
 		{
-			int lineNum = dataGridView.CurrentCellAddress.Y;
+			int lineNum = CurrentDataGridLine;
 			while (lineNum > 0)
 			{
 				lineNum--;
@@ -3942,7 +3966,7 @@ namespace LogExpert
 
 		private void SelectNextHighlightLine()
 		{
-			int lineNum = dataGridView.CurrentCellAddress.Y;
+			int lineNum = CurrentDataGridLine;
 			while (lineNum < CurrentLogFileReader.LineCount)
 			{
 				lineNum++;
@@ -4942,7 +4966,7 @@ namespace LogExpert
 #if DEBUG
 		internal void DumpBufferInfo()
 		{
-			int currentLineNum = dataGridView.CurrentCellAddress.Y;
+			int currentLineNum = CurrentDataGridLine;
 			CurrentLogFileReader.LogBufferInfoForLine(currentLineNum);
 		}
 
@@ -5046,11 +5070,11 @@ namespace LogExpert
 			if (col != null && !col.Frozen)
 			{
 				dataGridView.FirstDisplayedScrollingColumnIndex = col.Index;
-				int currentLine = dataGridView.CurrentCellAddress.Y;
+				int currentLine = CurrentDataGridLine;
 				if (currentLine >= 0)
 				{
 					dataGridView.CurrentCell =
-						dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
+						dataGridView.Rows[CurrentDataGridLine].Cells[col.Index];
 				}
 			}
 		}
@@ -5068,7 +5092,7 @@ namespace LogExpert
 
 		private void ChangeRowHeight(bool decrease)
 		{
-			int rowNum = dataGridView.CurrentCellAddress.Y;
+			int rowNum = CurrentDataGridLine;
 			if (rowNum < 0 || rowNum >= dataGridView.RowCount)
 			{
 				return;
@@ -5135,7 +5159,7 @@ namespace LogExpert
 
 		private void AddBookmarkAndEditComment()
 		{
-			int lineNum = dataGridView.CurrentCellAddress.Y;
+			int lineNum = CurrentDataGridLine;
 			if (!BookmarkProvider.IsBookmarkAtLine(lineNum))
 			{
 				ToggleBookmark();
@@ -5143,33 +5167,12 @@ namespace LogExpert
 			BookmarkComment(BookmarkProvider.GetBookmarkForLine(lineNum));
 		}
 
-		private void AddBookmarkComment(string text)
-		{
-			int lineNum = dataGridView.CurrentCellAddress.Y;
-
-			Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(lineNum);
-
-			if (bookmark == null)
-			{
-				bookmark = new Bookmark(lineNum);
-				bookmark.Text = text;
-			}
-			else
-			{
-				bookmark.Text += text;
-			}
-
-			BookmarkProvider.AddOrUpdateBookmark(bookmark);
-
-			RefreshAllGrids();
-		}
-
 		private void MarkCurrentFilterRange()
 		{
 			_filterParams.rangeSearchText = filterRangeComboBox.Text;
 			ColumnizerCallback callback = new ColumnizerCallback(this);
 			RangeFinder rangeFinder = new RangeFinder(_filterParams, callback);
-			Range range = rangeFinder.FindRange(dataGridView.CurrentCellAddress.Y);
+			Range range = rangeFinder.FindRange(CurrentDataGridLine);
 			if (range != null)
 			{
 				SetCellSelectionMode(false);
@@ -5271,7 +5274,7 @@ namespace LogExpert
 					{
 						TimeSyncList = slave.TimeSyncList;
 					}
-					int currentLineNum = dataGridView.CurrentCellAddress.Y;
+					int currentLineNum = CurrentDataGridLine;
 					int refLine = currentLineNum;
 					DateTime timeStamp = GetTimestampForLine(ref refLine, true);
 					if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)

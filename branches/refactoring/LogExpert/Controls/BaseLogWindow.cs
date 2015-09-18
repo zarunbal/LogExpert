@@ -916,6 +916,25 @@ namespace LogExpert.Controls
 			return columns;
 		}
 
+		protected void AddBookmarkComment(string text, int lineNum)
+		{
+			Bookmark bookmark = BookmarkProvider.GetBookmarkForLine(lineNum);
+
+			if (bookmark == null)
+			{
+				bookmark = new Bookmark(lineNum);
+				bookmark.Text = text;
+			}
+			else
+			{
+				bookmark.Text += text;
+			}
+
+			BookmarkProvider.AddOrUpdateBookmark(bookmark);
+
+			RefreshAllGrids();
+		}
+
 		#endregion
 
 		#region Abstract methods
@@ -939,6 +958,10 @@ namespace LogExpert.Controls
 		internal abstract void RefreshAllGrids();
 
 		protected abstract void ReloadFinishedThreadFx();
+
+		protected abstract int CurrentDataGridLine{ get; }
+
+		protected abstract int CurrentFilterGridLine { get; }
 
 		#endregion
 
