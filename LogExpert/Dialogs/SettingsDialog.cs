@@ -126,6 +126,7 @@ namespace LogExpert.Dialogs
 			this.maskPrioCheckBox.Checked = this.Preferences.maskPrio;
 			this.columnFinderCheckBox.Checked = this.Preferences.showColumnFinder;
 			this.legacyReaderCheckBox.Checked = this.Preferences.useLegacyReader;
+			this.cbEnableColumnCache.Checked = this.Preferences.useColumnCache;
 		}
 
 		private string NotNull(string text)
@@ -199,6 +200,8 @@ namespace LogExpert.Dialogs
 											   : Encoding.Default.HeaderName;
 			this.Preferences.showColumnFinder = this.columnFinderCheckBox.Checked;
 			this.Preferences.useLegacyReader = this.legacyReaderCheckBox.Checked;
+			this.Preferences.useColumnCache = this.cbEnableColumnCache.Checked;
+
 			SavePluginSettings();
 			SaveHighlightMaskList();
 			GetToolListBoxData();
@@ -350,7 +353,7 @@ namespace LogExpert.Dialogs
 				{
 					int index = cell.Items.Add(logColumnizer.GetName());
 				}
-        
+		
 				row.Cells.Add(cell);
 				row.Cells[0].Value = maskEntry.mask;
 				ILogLineColumnizer columnizer = Util.FindColumnizerByName(maskEntry.columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
