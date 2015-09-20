@@ -298,10 +298,12 @@ namespace LogExpert
 		private void contentDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
 		{
 			if (this.currentBlock == null || contentDataGridView.CurrentRow == null)
+			{
 				return;
+			}
 			int rowIndex = GetLineForContentGrid(contentDataGridView.CurrentRow.Index);
 
-			this.logWindow.SelectLogLine(rowIndex);
+			logWindow.SelectLogLine(rowIndex);
 		}
 
 		private void recalcButton_Click(object sender, EventArgs e)

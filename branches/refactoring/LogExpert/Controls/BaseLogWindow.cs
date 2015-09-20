@@ -911,8 +911,21 @@ namespace LogExpert.Controls
 
 		protected string[] GetColumnsForLine(int lineNumber)
 		{
-			string[] columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
+			string[] columns = null;
 
+			if (Preferences.useColumnCache)
+			{
+				columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject); 
+			}
+			else
+			{
+				string line = CurrentLogFileReader.GetLogLineWithWait(lineNumber);
+				if (line != null)
+				{
+					ColumnizerCallbackObject.LineNum = lineNumber;
+					columns = CurrentColumnizer.SplitLine(ColumnizerCallbackObject, line);
+				}
+			}
 			return columns;
 		}
 

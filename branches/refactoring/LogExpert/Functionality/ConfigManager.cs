@@ -178,6 +178,7 @@ namespace LogExpert
 		public String defaultEncoding;
 		public bool showColumnFinder;
 		public bool useLegacyReader;
+		public bool useColumnCache = true;
 	}
 
 	[FlagsAttribute]
