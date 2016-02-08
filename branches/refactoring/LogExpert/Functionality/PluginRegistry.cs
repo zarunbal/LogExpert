@@ -273,7 +273,8 @@ namespace LogExpert
 				output = Assembly.LoadFrom(path);
 			}
 
-			path = Path.Combine(Application.StartupPath, "plugins", string.Format("{0}.dll", name.Name));
+			path = Path.Combine(Application.StartupPath, "plugins");
+			path = Path.Combine(path, string.Format("{0}.dll", name.Name));
 			//Check plugins folder
 			if (File.Exists(path))
 			{
