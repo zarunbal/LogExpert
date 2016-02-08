@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 EndProject
@@ -21,9 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "Fla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logexpert.UnitTests", "Logexpert.UnitTests\Logexpert.UnitTests.csproj", "{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 10
+		SccNumberOfProjects = 11
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs26
 		SccLocalPath0 = .
@@ -54,6 +56,9 @@ Global
 		SccProjectUniqueName9 = WinFormsUI\\WinFormsUI.csproj
 		SccProjectName9 = WinFormsUI
 		SccLocalPath9 = WinFormsUI
+		SccProjectUniqueName10 = Logexpert.UnitTests\\Logexpert.UnitTests.csproj
+		SccProjectName10 = Logexpert.UnitTests
+		SccLocalPath10 = Logexpert.UnitTests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +206,21 @@ Global
 		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Release|Win32.ActiveCfg = Release|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

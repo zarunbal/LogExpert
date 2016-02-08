@@ -24,6 +24,12 @@ namespace LogExpert
 		{
 			try
 			{
+#if DEBUG
+				if (!Debugger.IsAttached)
+				{
+					Debugger.Break();
+				} 
+#endif
 				Sub_Main(orgArgs);
 			}
 			catch (SecurityException se)
