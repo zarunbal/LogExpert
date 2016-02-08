@@ -45,7 +45,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         }
 
         private DockPaneStripBase m_tabStripControl;
-        internal DockPaneStripBase TabStripControl
+        public DockPaneStripBase TabStripControl
         {
             get { return m_tabStripControl; }
         }

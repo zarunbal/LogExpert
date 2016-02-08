@@ -22,7 +22,7 @@ namespace LogExpert
       if (end == -1)
         end = param.Length;
       string procName = param.Substring(start, end - start);
-      string parameters = param.Substring(end).Trim();
+      string parameters = param.Substring(end + 1).Trim();
       parameters = parameters.Replace("%F", callback.GetFileName());
       parameters = parameters.Replace("%K", keyword);
       parameters = parameters.Replace("%L", "" + callback.GetLineNum());

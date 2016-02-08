@@ -17,8 +17,8 @@ namespace LogExpert
 	/// </remarks>
 	class PluginRegistry
 	{
-		static Object lockObject = new Object();
-		static PluginRegistry instance = null;
+		private static Object lockObject = new Object();
+		private static PluginRegistry instance = null;
 
 		private IList<IContextMenuEntry> _registeredContextMenuPlugins = new List<IContextMenuEntry>();
 		private IList<IKeywordAction> _registeredKeywordActions = new List<IKeywordAction>();
@@ -262,9 +262,25 @@ namespace LogExpert
 
 		static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
 		{
-			string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins\\";
-			Assembly assembly = Assembly.LoadFrom(pluginDir + new AssemblyName(args.Name).Name + ".dll");
-			return assembly;
+			AssemblyName name = new AssemblyName(args.Name);
+
+			//TODO add check for exe files
+			string path = Path.Combine(Application.StartupPath, string.Format("{0}.dll", name.Name));
+			Assembly output = null;
+			//First check local folder
+			if (File.Exists(path))
+			{
+				output = Assembly.LoadFrom(path);
+			}
+
+			path = Path.Combine(Application.StartupPath, "plugins", string.Format("{0}.dll", name.Name));
+			//Check plugins folder
+			if (File.Exists(path))
+			{
+				output = Assembly.LoadFrom(path);
+			}
+
+			return output;
 		}
 
 		internal IKeywordAction FindKeywordActionPluginByName(string name)
