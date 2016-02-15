@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 EndProject
@@ -24,42 +24,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logexpert.UnitTests", "Logexpert.UnitTests\Logexpert.UnitTests.csproj", "{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 11
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs26
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = LogExpert\\LogExpert.csproj
-		SccProjectName1 = LogExpert
-		SccLocalPath1 = LogExpert
-		SccProjectUniqueName2 = CsvColumnizer\\CsvColumnizer.csproj
-		SccProjectName2 = CsvColumnizer
-		SccLocalPath2 = CsvColumnizer
-		SccProjectUniqueName3 = ColumnizerLib\\ColumnizerLib.csproj
-		SccProjectName3 = ColumnizerLib
-		SccLocalPath3 = ColumnizerLib
-		SccProjectUniqueName4 = Log4jXmlColumnizer\\Log4jXmlColumnizer.csproj
-		SccProjectName4 = Log4jXmlColumnizer
-		SccLocalPath4 = Log4jXmlColumnizer
-		SccProjectUniqueName5 = DefaultPlugins\\DefaultPlugins.csproj
-		SccProjectName5 = DefaultPlugins
-		SccLocalPath5 = DefaultPlugins
-		SccProjectUniqueName6 = GlassfishColumnizer\\GlassfishColumnizer.csproj
-		SccProjectName6 = GlassfishColumnizer
-		SccLocalPath6 = GlassfishColumnizer
-		SccProjectUniqueName7 = UnitTests\\UnitTests.csproj
-		SccProjectName7 = UnitTests
-		SccLocalPath7 = UnitTests
-		SccProjectUniqueName8 = FlashIconHighlighter\\FlashIconHighlighter.csproj
-		SccProjectName8 = FlashIconHighlighter
-		SccLocalPath8 = FlashIconHighlighter
-		SccProjectUniqueName9 = WinFormsUI\\WinFormsUI.csproj
-		SccProjectName9 = WinFormsUI
-		SccLocalPath9 = WinFormsUI
-		SccProjectUniqueName10 = Logexpert.UnitTests\\Logexpert.UnitTests.csproj
-		SccProjectName10 = Logexpert.UnitTests
-		SccLocalPath10 = Logexpert.UnitTests
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -173,7 +137,6 @@ Global
 		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
 		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
 		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -217,7 +180,6 @@ Global
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{00F56F13-4E4C-4D3E-975F-AE57E1941BF4}.Release|Win32.ActiveCfg = Release|Any CPU
