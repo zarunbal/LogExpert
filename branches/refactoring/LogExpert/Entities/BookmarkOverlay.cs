@@ -7,6 +7,7 @@ namespace LogExpert
 {
 	public class BookmarkOverlay
 	{
+		[System.Xml.Serialization.XmlIgnore]
 		public Bookmark Bookmark { get; set; }
 
 		public Point Position { get; set; }

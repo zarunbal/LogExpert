@@ -892,24 +892,24 @@ namespace LogExpert
 				{
 					return fileName;
 				}
-				if (persistenceData.fileName != null && persistenceData.fileName.Length > 0)
+				if (persistenceData.FileName != null && persistenceData.FileName.Length > 0)
 				{
-					IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(persistenceData.fileName);
+					IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(persistenceData.FileName);
 					if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
 					{
-						return persistenceData.fileName;
+						return persistenceData.FileName;
 					}
 					// On relative paths the URI check (and therefore the file system plugin check) will fail.
 					// So fs == null and fs == LocalFileSystem are handled here like normal files.
-					if (Path.IsPathRooted(persistenceData.fileName))
+					if (Path.IsPathRooted(persistenceData.FileName))
 					{
-						return persistenceData.fileName;
+						return persistenceData.FileName;
 					}
 					else
 					{
 						// handle relative paths in .lxp files
 						string dir = Path.GetDirectoryName(fileName);
-						return Path.Combine(dir, persistenceData.fileName);
+						return Path.Combine(dir, persistenceData.FileName);
 					}
 				}
 			}

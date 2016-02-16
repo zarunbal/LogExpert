@@ -17,7 +17,7 @@ namespace LogExpert.Controls
 
 		private const int PROGRESS_BAR_MODULO = 1000;
 
-		#endregion
+		#endregion Const
 
 		#region Fields
 
@@ -65,8 +65,7 @@ namespace LogExpert.Controls
 		protected readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 		protected readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false); // used for external wait fx WaitForLoadFinished()
 
-
-		#endregion
+		#endregion Fields
 
 		#region cTor
 
@@ -76,14 +75,12 @@ namespace LogExpert.Controls
 			_logEventHandlerThread.IsBackground = true;
 			_logEventHandlerThread.Start();
 
-
-
 			BookmarkProvider = new BookmarkDataProvider();
 
 			_updateGridAction = new Action<LogEventArgs>(UpdateGrid);
 		}
 
-		#endregion
+		#endregion cTor
 
 		#region Events delegates
 
@@ -129,7 +126,7 @@ namespace LogExpert.Controls
 			}
 		}
 
-		#endregion
+		#endregion Events delegates
 
 		#region Properties
 
@@ -182,7 +179,7 @@ namespace LogExpert.Controls
 
 		public ColumnizerCallback ColumnizerCallbackObject { get; protected set; }
 
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
 
@@ -249,16 +246,16 @@ namespace LogExpert.Controls
 		public virtual PersistenceData GetPersistenceData()
 		{
 			PersistenceData persistenceData = new PersistenceData();
-			persistenceData.bookmarkList = BookmarkProvider.BookmarkList;
-			persistenceData.rowHeightList = _rowHeightList;
-			persistenceData.multiFile = IsMultiFile;
-			persistenceData.multiFilePattern = _multifileOptions.FormatPattern;
-			persistenceData.multiFileMaxDays = _multifileOptions.MaxDayTry;
-			persistenceData.followTail = _guiStateArgs.FollowTail;
-			persistenceData.fileName = FileName;
-			persistenceData.columnizerName = CurrentColumnizer.GetName();
-			persistenceData.lineCount = CurrentLogFileReader.LineCount;
-			persistenceData.encoding = CurrentLogFileReader.CurrentEncoding;
+			persistenceData.BookmarkList = BookmarkProvider.BookmarkList.Select(a => a.Value).ToList();
+			persistenceData.RowHeightList = _rowHeightList.Select(a => a.Value).ToList();
+			persistenceData.MultiFile = IsMultiFile;
+			persistenceData.MultiFilePattern = _multifileOptions.FormatPattern;
+			persistenceData.MultiFileMaxDays = _multifileOptions.MaxDayTry;
+			persistenceData.FollowTail = _guiStateArgs.FollowTail;
+			persistenceData.FileName = FileName;
+			persistenceData.ColumnizerName = CurrentColumnizer.GetName();
+			persistenceData.LineCount = CurrentLogFileReader.LineCount;
+			persistenceData.Encoding = CurrentLogFileReader.CurrentEncoding;
 
 			return persistenceData;
 		}
@@ -290,7 +287,7 @@ namespace LogExpert.Controls
 			RefreshAllGrids();
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Methods
 
@@ -497,7 +494,7 @@ namespace LogExpert.Controls
 			Logger.logDebug("EnterLoadFileStatus end");
 		}
 
-		#endregion
+		#endregion Load File
 
 		protected void ShiftRowHeightList(int offset)
 		{
@@ -578,10 +575,10 @@ namespace LogExpert.Controls
 
 		protected virtual void LoadPersistenceOptions(PersistenceData persistenceData)
 		{
-			IsMultiFile = persistenceData.multiFile;
+			IsMultiFile = persistenceData.MultiFile;
 			_multifileOptions = new MultifileOptions();
-			_multifileOptions.FormatPattern = persistenceData.multiFilePattern;
-			_multifileOptions.MaxDayTry = persistenceData.multiFileMaxDays;
+			_multifileOptions.FormatPattern = persistenceData.MultiFilePattern;
+			_multifileOptions.MaxDayTry = persistenceData.MultiFileMaxDays;
 			if (_multifileOptions.FormatPattern == null || _multifileOptions.FormatPattern.Length == 0)
 			{
 				_multifileOptions = ObjectClone.Clone<MultifileOptions>(Preferences.multifileOptions);
@@ -589,25 +586,25 @@ namespace LogExpert.Controls
 
 			if (_reloadMemento == null)
 			{
-				PreselectColumnizer(persistenceData.columnizerName);
+				PreselectColumnizer(persistenceData.ColumnizerName);
 			}
-			FollowTailChanged(persistenceData.followTail, false);
-			if (persistenceData.tabName != null)
+			FollowTailChanged(persistenceData.FollowTail, false);
+			if (persistenceData.TabName != null)
 			{
-				Text = persistenceData.tabName;
+				Text = persistenceData.TabName;
 			}
-			SetCurrentHighlightGroup(persistenceData.highlightGroupName);
-			if (persistenceData.multiFileNames.Count > 0)
+			SetCurrentHighlightGroup(persistenceData.HighlightGroupName);
+			if (persistenceData.MultiFileNames.Count > 0)
 			{
 				Logger.logInfo("Detected MultiFile name list in persistence options");
-				_fileNames = new string[persistenceData.multiFileNames.Count];
-				persistenceData.multiFileNames.CopyTo(_fileNames);
+				_fileNames = new string[persistenceData.MultiFileNames.Count];
+				persistenceData.MultiFileNames.CopyTo(_fileNames);
 			}
 			else
 			{
 				_fileNames = null;
 			}
-			SetExplicitEncoding(persistenceData.encoding);
+			SetExplicitEncoding(persistenceData.Encoding);
 		}
 
 		protected void PreSelectColumnizer(ILogLineColumnizer columnizer)
@@ -787,13 +784,11 @@ namespace LogExpert.Controls
 			LogError(ex, message);
 
 			MessageBox.Show(message);
-
 		}
 
 		protected void LogError(Exception ex, string message)
 		{
 			Logger.logError(message);
-
 		}
 
 		protected virtual void RegisterLogFileReaderEvents()
@@ -855,12 +850,10 @@ namespace LogExpert.Controls
 
 		protected virtual void LogFileLoadFile(LoadFileEventArgs e)
 		{
-
 		}
 
 		protected virtual void LogFileLoadFinished()
 		{
-
 		}
 
 		protected virtual void LogFileLoadingStarted(LoadFileEventArgs e)
@@ -915,7 +908,7 @@ namespace LogExpert.Controls
 
 			if (Preferences.useColumnCache)
 			{
-				columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject); 
+				columns = _columnCache.GetColumnsForLine(CurrentLogFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 			}
 			else
 			{
@@ -948,7 +941,7 @@ namespace LogExpert.Controls
 			RefreshAllGrids();
 		}
 
-		#endregion
+		#endregion Methods
 
 		#region Abstract methods
 
@@ -972,11 +965,11 @@ namespace LogExpert.Controls
 
 		protected abstract void ReloadFinishedThreadFx();
 
-		protected abstract int CurrentDataGridLine{ get; }
+		protected abstract int CurrentDataGridLine { get; }
 
 		protected abstract int CurrentFilterGridLine { get; }
 
-		#endregion
+		#endregion Abstract methods
 
 		#region Events
 
@@ -995,7 +988,6 @@ namespace LogExpert.Controls
 			BeginInvoke(new Action<LoadFileEventArgs>(LogFileLoadFile), e);
 		}
 
-
 		private void CurrentLogFileReader_LoadingFinished(object sender, EventArgs e)
 		{
 			BeginInvoke(new Action(LogFileLoadFinished));
@@ -1003,9 +995,9 @@ namespace LogExpert.Controls
 
 		private void CurrentLogFileReader_LoadingStarted(object sender, LoadFileEventArgs e)
 		{
-			BeginInvoke(new Action<LoadFileEventArgs>(LogFileLoadingStarted),e);
+			BeginInvoke(new Action<LoadFileEventArgs>(LogFileLoadingStarted), e);
 		}
 
-		#endregion
+		#endregion Events
 	}
 }
