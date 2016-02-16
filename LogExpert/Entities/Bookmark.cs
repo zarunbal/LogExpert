@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace LogExpert
 {
 	public class Bookmark
 	{
+		public Bookmark()
+		{
+		}
+
 		public Bookmark(int lineNum)
 		{
 			LineNum = lineNum;

@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace LogExpert
 {
@@ -18,12 +19,16 @@ namespace LogExpert
 		public int spreadBefore;
 		public int spreadBehind;
 		public bool isInvert;
+
 		//public bool isFuzzy;
 		public int fuzzyValue = 0;
+
 		public bool isRangeSearch = false;
+
 		//public List<string> historyList = new List<string>();
 		//public List<string> rangeHistoryList = new List<string>();
 		public List<int> columnList = new List<int>();    // list of columns in which to search
+
 		public bool emptyColumnUsePrev;
 		public bool emptyColumnHit;
 		public bool columnRestrict = false;
@@ -32,23 +37,44 @@ namespace LogExpert
 
 		// transient members:
 		[NonSerialized]
+		[XmlIgnore]
 		public string lowerSearchText = "";
+
 		[NonSerialized]
+		[XmlIgnore]
 		public string lowerRangeSearchText = "";
+
 		[NonSerialized]
+		[XmlIgnore]
 		public Regex rex;
+
 		[NonSerialized]
+		[XmlIgnore]
 		public Regex rangeRex;
+
 		[NonSerialized]
+		[XmlIgnore]
 		public bool isInRange = false;    // false=looking for start, true=looking for end
+
 		[NonSerialized]
+		[XmlIgnore]
 		public string lastLine = "";
+
 		[NonSerialized]
+		[XmlIgnore]
 		public bool lastResult;
+
 		[NonSerialized]
+		[XmlIgnore]
 		public ILogLineColumnizer currentColumnizer;
+
 		[NonSerialized]
+		[XmlIgnore]
 		public Hashtable lastNonEmptyCols = new Hashtable();
+
+		public FilterParams()
+		{
+		}
 
 		public FilterParams CreateCopy2()
 		{

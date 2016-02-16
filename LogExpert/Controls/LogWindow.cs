@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using WeifenLuo.WinFormsUI.Docking;
+using System.Linq;
 
 namespace LogExpert
 {
@@ -300,37 +301,37 @@ namespace LogExpert
 		{
 			PersistenceData persistenceData = base.GetPersistenceData();
 
-			persistenceData.currentLine = CurrentDataGridLine;
-			persistenceData.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
-			persistenceData.filterVisible = !splitContainer1.Panel2Collapsed;
-			persistenceData.filterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed;
-			persistenceData.filterPosition = splitContainer1.SplitterDistance;
-			persistenceData.tabName = Text;
+			persistenceData.CurrentLine = CurrentDataGridLine;
+			persistenceData.FirstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
+			persistenceData.FilterVisible = !splitContainer1.Panel2Collapsed;
+			persistenceData.FilterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed;
+			persistenceData.FilterPosition = splitContainer1.SplitterDistance;
+			persistenceData.TabName = Text;
 			_filterParams.isFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
 			if (Preferences.saveFilters)
 			{
 				List<FilterParams> filterList = new List<FilterParams>();
 				filterList.Add(_filterParams);
-				persistenceData.filterParamsList = filterList;
+				persistenceData.FilterParamsList = filterList;
 
 				foreach (FilterPipe filterPipe in _filterPipeList)
 				{
 					FilterTabData data = new FilterTabData();
 					data.persistenceData = filterPipe.OwnLogWindow.GetPersistenceData();
 					data.filterParams = filterPipe.FilterParams;
-					persistenceData.filterTabDataList.Add(data);
+					persistenceData.FilterTabDataList.Add(data);
 				}
 			}
 			if (_currentHighlightGroup != null)
 			{
-				persistenceData.highlightGroupName = _currentHighlightGroup.GroupName;
+				persistenceData.HighlightGroupName = _currentHighlightGroup.GroupName;
 			}
 			if (_fileNames != null && IsMultiFile)
 			{
-				persistenceData.multiFileNames.AddRange(_fileNames);
+				persistenceData.MultiFileNames.AddRange(_fileNames);
 			}
 			//persistenceData.showBookmarkCommentColumn = bookmarkWindow.ShowBookmarkCommentColumn;
-			persistenceData.filterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
+			persistenceData.FilterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
 			return persistenceData;
 		}
 
@@ -2907,10 +2908,10 @@ namespace LogExpert
 		{
 			base.LoadPersistenceOptions(persistenceData);
 
-			splitContainer1.SplitterDistance = persistenceData.filterPosition;
-			splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
-			ToggleHighlightPanel(persistenceData.filterSaveListVisible);
-			ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
+			splitContainer1.SplitterDistance = persistenceData.FilterPosition;
+			splitContainer1.Panel2Collapsed = !persistenceData.FilterVisible;
+			ToggleHighlightPanel(persistenceData.FilterSaveListVisible);
+			ShowAdvancedFilterPanel(persistenceData.FilterAdvanced);
 		}
 
 		private void SetDefaultsFromPrefs()
@@ -2955,7 +2956,7 @@ namespace LogExpert
 					persistenceData = Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 				}
 
-				if (persistenceData.lineCount > CurrentLogFileReader.LineCount)
+				if (persistenceData.LineCount > CurrentLogFileReader.LineCount)
 				{
 					// outdated persistence data (logfile rollover)
 					// MessageBox.Show(this, "Persistence data for " + FileName + " is outdated. It was discarded.", "Log Expert");
@@ -2963,13 +2964,25 @@ namespace LogExpert
 					LoadPersistenceOptions();
 					return;
 				}
-				BookmarkProvider.BookmarkList = persistenceData.bookmarkList;
-				_rowHeightList = persistenceData.rowHeightList;
+				BookmarkProvider.BookmarkList = new SortedList<int, Bookmark>();
+
+				foreach (var item in persistenceData.BookmarkList)
+				{
+					BookmarkProvider.BookmarkList.Add(item.LineNum, item);
+				}
+
+				_rowHeightList = new SortedList<int, RowHeightEntry>();
+
+				foreach (var item in persistenceData.RowHeightList)
+				{
+					_rowHeightList.Add(item.LineNum, item);
+				}
+
 				try
 				{
-					if (persistenceData.currentLine >= 0 && persistenceData.currentLine < dataGridView.RowCount)
+					if (persistenceData.CurrentLine >= 0 && persistenceData.CurrentLine < dataGridView.RowCount)
 					{
-						SelectLine(persistenceData.currentLine, false);
+						SelectLine(persistenceData.CurrentLine, false);
 					}
 					else
 					{
@@ -2979,13 +2992,13 @@ namespace LogExpert
 							SelectLine(CurrentLogFileReader.LineCount - 1, false);
 						}
 					}
-					if (persistenceData.firstDisplayedLine >= 0 && persistenceData.firstDisplayedLine < dataGridView.RowCount)
+					if (persistenceData.FirstDisplayedLine >= 0 && persistenceData.FirstDisplayedLine < dataGridView.RowCount)
 					{
-						dataGridView.FirstDisplayedScrollingRowIndex = persistenceData.firstDisplayedLine;
+						dataGridView.FirstDisplayedScrollingRowIndex = persistenceData.FirstDisplayedLine;
 					}
-					if (persistenceData.followTail)
+					if (persistenceData.FollowTail)
 					{
-						FollowTailChanged(persistenceData.followTail, false);
+						FollowTailChanged(persistenceData.FollowTail, false);
 					}
 				}
 				catch (ArgumentOutOfRangeException)
@@ -3007,23 +3020,23 @@ namespace LogExpert
 
 		private void RestoreFilters(PersistenceData persistenceData)
 		{
-			if (persistenceData.filterParamsList.Count > 0)
+			if (persistenceData.FilterParamsList.Count > 0)
 			{
-				_filterParams = persistenceData.filterParamsList[0];
+				_filterParams = persistenceData.FilterParamsList[0];
 				ReInitFilterParams(_filterParams);
 			}
 			ApplyFilterParams();  // re-loaded filter settingss
 			BeginInvoke(new MethodInvoker(FilterSearch));
 			try
 			{
-				splitContainer1.SplitterDistance = persistenceData.filterPosition;
-				splitContainer1.Panel2Collapsed = !persistenceData.filterVisible;
+				splitContainer1.SplitterDistance = persistenceData.FilterPosition;
+				splitContainer1.Panel2Collapsed = !persistenceData.FilterVisible;
 			}
 			catch (InvalidOperationException e)
 			{
 				Logger.logError("Error setting splitter distance: " + e.Message);
 			}
-			ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
+			ShowAdvancedFilterPanel(persistenceData.FilterAdvanced);
 			if (_filterPipeList.Count == 0)     // don't restore if it's only a reload
 			{
 				RestoreFilterTabs(persistenceData);
@@ -3032,7 +3045,7 @@ namespace LogExpert
 
 		private void RestoreFilterTabs(PersistenceData persistenceData)
 		{
-			foreach (FilterTabData data in persistenceData.filterTabDataList)
+			foreach (FilterTabData data in persistenceData.FilterTabDataList)
 			{
 				FilterParams persistFilterParams = data.filterParams;
 				ReInitFilterParams(persistFilterParams);
@@ -3040,7 +3053,7 @@ namespace LogExpert
 				List<int> filterHitList = new List<int>();
 				Filter(persistFilterParams, filterResultList, _lastFilterLinesList, filterHitList);
 				FilterPipe pipe = new FilterPipe(persistFilterParams.CreateCopy(), this);
-				WritePipeToTab(pipe, filterResultList, data.persistenceData.tabName, data.persistenceData);
+				WritePipeToTab(pipe, filterResultList, data.persistenceData.TabName, data.persistenceData);
 			}
 		}
 
@@ -4757,7 +4770,7 @@ namespace LogExpert
 		private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
 		{
 			newWin.WaitForLoadingFinished();
-			ILogLineColumnizer columnizer = Util.FindColumnizerByName(persistenceData.columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
+			ILogLineColumnizer columnizer = Util.FindColumnizerByName(persistenceData.ColumnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
 			if (columnizer != null)
 			{
 				Action<ILogLineColumnizer> fx = new Action<ILogLineColumnizer>(newWin.ForceColumnizer);
@@ -4765,7 +4778,7 @@ namespace LogExpert
 			}
 			else
 			{
-				Logger.logWarn("FilterRestore(): Columnizer " + persistenceData.columnizerName + " not found");
+				Logger.logWarn("FilterRestore(): Columnizer " + persistenceData.ColumnizerName + " not found");
 			}
 			newWin.BeginInvoke(new Action<PersistenceData>(newWin.RestoreFilters), new object[] { persistenceData });
 		}

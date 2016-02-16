@@ -73,6 +73,7 @@
   <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -83,7 +84,9 @@
   <ItemGroup>
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\ColumnizerCallback.cs" />
+    <Compile Include="Classes\ConfigurationUtils.cs" />
     <Compile Include="Classes\DamerauLevenshtein.cs" />
+    <Compile Include="Classes\Environment2.cs" />
     <Compile Include="Classes\FuzzyBlockDetection.cs" />
     <Compile Include="Classes\LogExpertCallback.cs" />
     <Compile Include="Classes\YetiLevenshtein.cs" />
