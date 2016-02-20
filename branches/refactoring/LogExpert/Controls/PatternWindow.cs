@@ -179,7 +179,7 @@ namespace LogExpert
 			int colIndex = e.ColumnIndex;
 			if (colIndex == 1)
 			{
-				e.Value = currentList[e.RowIndex].weigth;
+				e.Value = currentList[e.RowIndex].Weigth;
 			}
 			else
 			{
@@ -233,14 +233,14 @@ namespace LogExpert
 		private int GetLineForHitGrid(int rowIndex)
 		{
 			int line;
-			line = currentList[rowIndex].targetStart;
+			line = currentList[rowIndex].TargetStart;
 			return line;
 		}
 
 		private int GetLineForContentGrid(int rowIndex)
 		{
 			int line;
-			line = currentBlock.targetStart + rowIndex;
+			line = currentBlock.TargetStart + rowIndex;
 			return line;
 		}
 
@@ -252,7 +252,7 @@ namespace LogExpert
 				return;
 			this.contentDataGridView.RowCount = 0;
 			this.currentBlock = this.currentList[patternHitsDataGridView.CurrentRow.Index];
-			this.contentDataGridView.RowCount = this.currentBlock.targetEnd - this.currentBlock.targetStart + 1;
+			this.contentDataGridView.RowCount = this.currentBlock.TargetEnd - this.currentBlock.TargetStart + 1;
 			this.contentDataGridView.Refresh();
 			this.contentDataGridView.CurrentCell = this.contentDataGridView.Rows[0].Cells[0];
 			this.blockLinesLabel.Text = "" + this.contentDataGridView.RowCount;
@@ -267,7 +267,7 @@ namespace LogExpert
 			if (colIndex == 1)
 			{
 				QualityInfo qi;
-				if (this.currentBlock.qualityInfoList.TryGetValue(rowIndex, out qi))
+				if (this.currentBlock.QualityInfoList.TryGetValue(rowIndex, out qi))
 				{
 					e.Value = qi.Quality;
 				}

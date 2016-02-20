@@ -1,5 +1,6 @@
 ﻿public class ReloadMemento
 {
-	internal int currentLine;
-	internal int firstDisplayedLine;
+	internal int CurrentLine { get; set; }
+
+	internal int FirstDisplayedLine { get; set; }
 }

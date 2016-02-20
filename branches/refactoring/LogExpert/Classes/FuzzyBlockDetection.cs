@@ -49,17 +49,17 @@ namespace LogExpert.Classes
 				while (!logWindow.ShouldCancel && (block = DetectBlock(i, searchLine, maxBlockLen, logWindow.PatternArgs.maxDiffInBlock, logWindow.PatternArgs.maxMisses, processedLinesDict, logWindow)) != null)
 				{
 					Logger.logDebug("Found block: " + block);
-					if (block.weigth >= logWindow.PatternArgs.minWeight)
+					if (block.Weigth >= logWindow.PatternArgs.minWeight)
 					{
 						blockList.Add(block);
 						AddBlockTargetLinesToDict(processedLinesDict, block);
-						block.blockId = blockId;
+						block.BlockId = blockId;
 
-						searchLine = block.targetEnd + 1;
+						searchLine = block.TargetEnd + 1;
 					}
 					else
 					{
-						searchLine = block.targetStart + 1;
+						searchLine = block.TargetStart + 1;
 					}
 					logWindow.UpdateProgressBar(searchLine);
 				}
@@ -77,7 +77,7 @@ namespace LogExpert.Classes
 
 		private void AddBlockTargetLinesToDict(Dictionary<int, int> dict, PatternBlock block)
 		{
-			foreach (int lineNum in block.targetLines.Keys)
+			foreach (int lineNum in block.TargetLines.Keys)
 			{
 				if (!dict.ContainsKey(lineNum))
 				{
@@ -95,15 +95,15 @@ namespace LogExpert.Classes
 			}
 
 			PatternBlock block = new PatternBlock();
-			block.startLine = startNum;
-			int srcLine = block.startLine;
-			block.targetStart = targetLine;
+			block.StartLine = startNum;
+			int srcLine = block.StartLine;
+			block.TargetStart = targetLine;
 			int srcMisses = 0;
-			block.srcLines.Add(srcLine, srcLine);
+			block.SrcLines.Add(srcLine, srcLine);
 			int len = 0;
 			QualityInfo qi = new QualityInfo();
-			qi.Quality = block.weigth;
-			block.qualityInfoList[targetLine] = qi;
+			qi.Quality = block.Weigth;
+			block.QualityInfoList[targetLine] = qi;
 
 			while (!logWindow.ShouldCancel)
 			{
@@ -116,45 +116,45 @@ namespace LogExpert.Classes
 				int nextTargetLine = FindSimilarLine(srcLine, targetLine + 1, processedLinesDict, logWindow);
 				if (nextTargetLine > -1 && nextTargetLine - targetLine - 1 <= maxDiffInBlock)
 				{
-					block.weigth += maxDiffInBlock - (nextTargetLine - targetLine - 1) + 1;
-					block.endLine = srcLine;
-					block.srcLines.Add(srcLine, srcLine);
+					block.Weigth += maxDiffInBlock - (nextTargetLine - targetLine - 1) + 1;
+					block.EndLine = srcLine;
+					block.SrcLines.Add(srcLine, srcLine);
 					if (nextTargetLine - targetLine > 1)
 					{
-						int tempWeight = block.weigth;
+						int tempWeight = block.Weigth;
 						for (int tl = targetLine + 1; tl < nextTargetLine; ++tl)
 						{
 							qi = new QualityInfo();
 							qi.Quality = --tempWeight;
-							block.qualityInfoList[tl] = qi;
+							block.QualityInfoList[tl] = qi;
 						}
 					}
 					targetLine = nextTargetLine;
 					qi = new QualityInfo();
-					qi.Quality = block.weigth;
-					block.qualityInfoList[targetLine] = qi;
+					qi.Quality = block.Weigth;
+					block.QualityInfoList[targetLine] = qi;
 				}
 				else
 				{
 					srcMisses++;
-					block.weigth--;
+					block.Weigth--;
 					targetLine++;
 					qi = new QualityInfo();
-					qi.Quality = block.weigth;
-					block.qualityInfoList[targetLine] = qi;
+					qi.Quality = block.Weigth;
+					block.QualityInfoList[targetLine] = qi;
 					if (srcMisses > maxMisses)
 					{
 						break;
 					}
 				}
 			}
-			block.targetEnd = targetLine;
+			block.TargetEnd = targetLine;
 			qi = new QualityInfo();
-			qi.Quality = block.weigth;
-			block.qualityInfoList[targetLine] = qi;
-			for (int k = block.targetStart; k <= block.targetEnd; ++k)
+			qi.Quality = block.Weigth;
+			block.QualityInfoList[targetLine] = qi;
+			for (int k = block.TargetStart; k <= block.TargetEnd; ++k)
 			{
-				block.targetLines.Add(k, k);
+				block.TargetLines.Add(k, k);
 			}
 			return block;
 		}
