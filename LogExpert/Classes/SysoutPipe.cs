@@ -40,8 +40,9 @@ namespace LogExpert
 					}
 					_writer.Write(buff, 0, read);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
+					_logger.Error(ex);
 					break;
 				}
 			}

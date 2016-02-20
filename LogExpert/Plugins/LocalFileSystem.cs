@@ -6,8 +6,10 @@ namespace LogExpert
 {
 	public class LocalFileSystem : IFileSystemPlugin
 	{
+		private static NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		#region IFileSystemPlugin Member
-		
+
 		public bool CanHandleUri(string uriString)
 		{
 			try
@@ -15,12 +17,13 @@ namespace LogExpert
 				Uri uri = new Uri(uriString);
 				return (uri.IsFile);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				_logger.Error(ex);
 				return false;
 			}
 		}
-		
+
 		public ILogFileInfo GetLogfileInfo(string uriString)
 		{
 			Uri uri = new Uri(uriString);
@@ -34,7 +37,7 @@ namespace LogExpert
 				throw new UriFormatException("Uri " + uriString + " is no file Uri");
 			}
 		}
-		
+
 		public string Text
 		{
 			get
@@ -42,7 +45,7 @@ namespace LogExpert
 				return "Local file system";
 			}
 		}
-		
+
 		public string Description
 		{
 			get
@@ -50,7 +53,7 @@ namespace LogExpert
 				return "Access files from normal file system.";
 			}
 		}
-	
-		#endregion
+
+		#endregion IFileSystemPlugin Member
 	}
 }

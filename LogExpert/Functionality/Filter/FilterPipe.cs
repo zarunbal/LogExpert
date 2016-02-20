@@ -95,14 +95,14 @@ namespace LogExpert
 						}
 						catch (IOException e)
 						{
-							_logger.Error("writeToPipe(): " + e.ToString());
+							_logger.Error(e, "writeToPipe(): ");
 							return false;
 						}
 					}
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
-				_logger.Error("writeToPipe(): file was closed: " + FileName);
+				_logger.Error(ex, "writeToPipe(): file was closed: " + FileName);
 				return false;
 			}
 		}

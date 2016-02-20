@@ -459,9 +459,9 @@ namespace LogExpert
 							return columnizer;
 						}
 					}
-					catch (ArgumentException e)
+					catch (ArgumentException ex)
 					{
-						_logger.Error("RegEx-error while finding columnizer: " + e.Message);
+						_logger.Error(ex, "RegEx-error while finding columnizer: ");
 						// occurs on invalid regex patterns
 					}
 				}
@@ -483,8 +483,9 @@ namespace LogExpert
 							return group;
 						}
 					}
-					catch (ArgumentException)
+					catch (ArgumentException ex)
 					{
+						_logger.Error(ex);
 						// occurs on invalid regex patterns
 					}
 				}
@@ -635,7 +636,7 @@ namespace LogExpert
 					}
 					catch (SecurityException e)
 					{
-						_logger.Warn("Insufficient rights for GetFolderPath(): " + e.Message);
+						_logger.Warn("e,Insufficient rights for GetFolderPath(): ");
 						// no initial directory if insufficient rights
 					}
 				}
@@ -773,9 +774,9 @@ namespace LogExpert
 				{
 					encodingOptions.DefaultEncoding = Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
 				}
-				catch (ArgumentException)
+				catch (ArgumentException ex)
 				{
-					_logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
+					_logger.Warn(ex, "Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
 					encodingOptions.DefaultEncoding = null;
 				}
 			}
@@ -1353,8 +1354,9 @@ namespace LogExpert
 				{
 					Thread.Sleep(200);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					_logger.Error(ex);
 					return;
 				}
 				lock (_logWindowList)
@@ -1554,7 +1556,7 @@ namespace LogExpert
 				}
 				catch (Win32Exception e)
 				{
-					_logger.Error(e.Message);
+					_logger.Error(e);
 					MessageBox.Show(e.Message);
 					return;
 				}
@@ -1573,7 +1575,7 @@ namespace LogExpert
 				}
 				catch (Exception e)
 				{
-					_logger.Error(e.Message);
+					_logger.Error(e);
 					MessageBox.Show(e.Message);
 				}
 			}
@@ -1821,8 +1823,9 @@ namespace LogExpert
 				SaveWindowPosition();
 				ConfigManager.Save(SettingsFlags.WindowPosition | SettingsFlags.FileHistory);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				_logger.Error(ex);
 				// ignore error (can occur then multipe instances are closed simultaneously or if the
 				// window was not constructed completely because of errors)
 			}

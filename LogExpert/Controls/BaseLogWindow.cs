@@ -174,7 +174,7 @@ namespace LogExpert.Controls
 				lock (_currentColumnizerLock)
 				{
 					_currentColumnizer = value;
-					_logger.Debug( "Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
+					_logger.Debug("Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
 				}
 			}
 		}
@@ -298,9 +298,9 @@ namespace LogExpert.Controls
 			Thread.CurrentThread.Name = "LogEventWorker";
 			while (true)
 			{
-				_logger.Debug( "Waiting for signal");
+				_logger.Debug("Waiting for signal");
 				_logEventArgsEvent.WaitOne();
-				_logger.Debug( "Wakeup signal received.");
+				_logger.Debug("Wakeup signal received.");
 				while (true)
 				{
 					LogEventArgs e;
@@ -470,7 +470,7 @@ namespace LogExpert.Controls
 
 		protected virtual void EnterLoadFileStatus()
 		{
-			_logger.Debug( "EnterLoadFileStatus begin");
+			_logger.Debug("EnterLoadFileStatus begin");
 
 			if (InvokeRequired)
 			{
@@ -493,7 +493,7 @@ namespace LogExpert.Controls
 			ClearFilterList();
 			BookmarkProvider.ClearAllBookmarks();
 
-			_logger.Debug( "EnterLoadFileStatus end");
+			_logger.Debug("EnterLoadFileStatus end");
 		}
 
 		#endregion Load File
@@ -790,7 +790,7 @@ namespace LogExpert.Controls
 
 		protected void LogError(Exception ex, string message)
 		{
-			_logger.Error(message);
+			_logger.Error(ex, message);
 		}
 
 		protected virtual void RegisterLogFileReaderEvents()
@@ -872,7 +872,7 @@ namespace LogExpert.Controls
 			}
 			catch (Exception ex)
 			{
-				_logger.Error(string.Format("LoadingStarted(): {0}\n{1}", ex, ex.StackTrace));
+				_logger.Error(ex, "LoadingStarted(): ");
 			}
 		}
 
@@ -898,7 +898,7 @@ namespace LogExpert.Controls
 				}
 				else
 				{
-					_logger.Debug( "Preventing reload because of recursive calls.");
+					_logger.Debug("Preventing reload because of recursive calls.");
 				}
 				_reloadOverloadCounter--;
 			}

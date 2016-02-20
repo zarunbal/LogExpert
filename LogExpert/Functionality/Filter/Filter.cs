@@ -89,7 +89,7 @@ namespace LogExpert
 			catch (Exception ex)
 			{
 				string message = string.Format("Exception while filtering. Please report to developer: \n\n{0}\n\n{1}", ex, ex.StackTrace);
-				_logger.Error(message);
+				_logger.Error(ex, message);
 				MessageBox.Show(null, message, "LogExpert");
 			}
 			return count;

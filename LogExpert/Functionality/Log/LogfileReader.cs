@@ -201,7 +201,7 @@ namespace LogExpert
 			}
 			catch (IOException e)
 			{
-				_logger.Warn(string.Format("IOException: {0}", e.Message));
+				_logger.Warn(e, "IOException:");
 				_fileLength = 0;
 				_isDeleted = true;
 				LineCount = 0;
@@ -220,7 +220,7 @@ namespace LogExpert
 		/// <returns></returns>
 		public int ShiftBuffers()
 		{
-			_logger.Info(string.Format("ShiftBuffers() begin for {0}{1}", this._fileName, this.IsMultiFile ? " (MultiFile)" : ""));
+			_logger.Info("ShiftBuffers() begin for {0} {1}", this._fileName, this.IsMultiFile ? " (MultiFile)" : "");
 			AcquireBufferListWriterLock();
 			int offset = 0;
 			_isLineCountDirty = true;
@@ -438,7 +438,7 @@ namespace LogExpert
 			}
 			catch (IOException fe)
 			{
-				_logger.Warn(string.Format("IOException: {0}", fe.ToString()));
+				_logger.Warn(fe, "IOException:");
 				_isDeleted = true;
 				LineCount = 0;
 				_currFileSize = 0;
@@ -551,7 +551,7 @@ namespace LogExpert
 			}
 			catch (IOException ioex)
 			{
-				_logger.Warn(string.Format("{0}: {1}", ioex.GetType().Name, ioex.Message));
+				_logger.Warn(ioex);
 			}
 			finally
 			{
@@ -590,6 +590,7 @@ namespace LogExpert
 					}
 					catch (ArgumentException e)
 					{
+						_logger.Error(e);
 #if DEBUG
 						// there seems to be a bug with double added key
 						_logger.Error(string.Format("Error in LRU cache: {0}", e.Message));
@@ -698,8 +699,9 @@ namespace LogExpert
 				{
 					Thread.Sleep(10000);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					_logger.Error(ex);
 				}
 				GarbageCollectLruCache();
 			}
@@ -1257,7 +1259,7 @@ namespace LogExpert
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e.Message);
+				_logger.Error(e);
 			}
 
 			while (!_shouldStop)
@@ -1275,7 +1277,7 @@ namespace LogExpert
 				}
 				catch (Exception e)
 				{
-					_logger.Error(e.Message);
+					_logger.Error(e);
 				}
 				if (_shouldStop)
 				{
@@ -1297,8 +1299,9 @@ namespace LogExpert
 						}
 					}
 				}
-				catch (FileNotFoundException)
+				catch (FileNotFoundException ex)
 				{
+					_logger.Error(ex);
 					MonitoredFileNotFound();
 				}
 			}
@@ -1388,7 +1391,7 @@ namespace LogExpert
 				catch (FileNotFoundException e)
 				{
 					// trying anew in next poll intervall. So let currFileSize untouched.
-					_logger.Warn(e.ToString());
+					_logger.Warn(e);
 					return;
 				}
 			}
@@ -1593,14 +1596,14 @@ namespace LogExpert
 			}
 			catch (IOException e)
 			{
-				_logger.Warn(e.Message);
+				_logger.Warn(e);
 			}
 			catch (NotSupportedException e)
 			{
 				// Bug#11: "Lesevorgänge werden vom Stream nicht unterstützt"
 				// Nicht reproduzierbar. Wahrscheinlich, wenn File in ungünstigem Moment (nach dem Öffnen)
 				// gelöscht wird (rolling). Wird hier als EOF behandelt.
-				_logger.Warn(e.Message);
+				_logger.Warn(e);
 			}
 			if (line == null)   // EOF or catched Exception
 			{
@@ -1627,8 +1630,9 @@ namespace LogExpert
 		bufferListLockInfo = "Read lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
 #endif
 			}
-			catch (ApplicationException)
+			catch (ApplicationException ex)
 			{
+				_logger.Error(ex);
 				_logger.Warn("Reader lock wait for bufferList timed out. Now trying infinite.");
 #if DEBUG && TRACE_LOCKS
 		_logger.logInfo(bufferListLockInfo);

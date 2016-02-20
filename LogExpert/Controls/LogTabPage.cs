@@ -7,17 +7,19 @@ using System.Threading;
 
 namespace LogExpert
 {
-	class LogTabPage : TabPage
+	internal class LogTabPage : TabPage
 	{
-		Thread ledThread;
-		bool shouldStop = false;
-		int diffSum = 0;
-		object diffSumLock = new Object();
-		bool dirty = false;
-		bool isActiveTab = false;
-		string title = "";
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-		const int DIFF_MAX = 100;
+		private Thread ledThread;
+		private bool shouldStop = false;
+		private int diffSum = 0;
+		private object diffSumLock = new Object();
+		private bool dirty = false;
+		private bool isActiveTab = false;
+		private string title = "";
+
+		private const int DIFF_MAX = 100;
 
 		public LogTabPage(LogWindow logWindow, String title)
 			: base("MMi" + (title == null ? Util.GetNameFromPath(logWindow.FileName) : title))
@@ -42,7 +44,7 @@ namespace LogExpert
 
 		public LogWindow LogWindow { get; private set; }
 
-		void FileSizeChanged(object sender, LogEventArgs e)
+		private void FileSizeChanged(object sender, LogEventArgs e)
 		{
 			int diff = e.LineCount - e.PrevLineCount;
 			if (diff < 0)
@@ -60,7 +62,7 @@ namespace LogExpert
 			Parent.Invalidate();
 		}
 
-		void TailFollowed(object sender, EventArgs e)
+		private void TailFollowed(object sender, EventArgs e)
 		{
 			if (this.IsActiveTab)
 			{
@@ -88,8 +90,9 @@ namespace LogExpert
 				{
 					Thread.Sleep(200);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					_logger.Error(ex);
 					return;
 				}
 				lock (this.diffSumLock)

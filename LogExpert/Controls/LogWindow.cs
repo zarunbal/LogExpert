@@ -365,7 +365,7 @@ namespace LogExpert
 				}
 				catch (IOException e)
 				{
-					_logger.Error("Error while deleting temp file " + FileName + ": " + e.ToString());
+					_logger.Error(e, "Error while deleting temp file " + FileName);
 				}
 			}
 			if (FilterPipe != null)
@@ -469,8 +469,9 @@ namespace LogExpert
 						}
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					_logger.Error(ex);
 					//nothing
 				}
 			}
@@ -627,7 +628,7 @@ namespace LogExpert
 			{
 				// In rare situations there seems to be an invalid argument exceptions (or something like this). Concrete location isn't visible in stack
 				// trace because use of Invoke(). So catch it, and log (better than crashing the app).
-				_logger.Error(e.ToString());
+				_logger.Error(e);
 			}
 		}
 
@@ -742,8 +743,9 @@ namespace LogExpert
 				{
 					comment = paramParser.ReplaceParams(line, lineNum, FileName);
 				}
-				catch (ArgumentException)
+				catch (ArgumentException ex)
 				{
+					_logger.Error(ex);
 					// occurs on invalid regex
 				}
 				if (BookmarkProvider.IsBookmarkAtLine(lineNum))
@@ -885,8 +887,9 @@ namespace LogExpert
 							int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
 							CurrentColumnizer.SetTimeOffset(diff);
 						}
-						catch (Exception)
+						catch (Exception ex)
 						{
+							_logger.Error(ex);
 							CurrentColumnizer.SetTimeOffset(0);
 						}
 					}
@@ -901,7 +904,7 @@ namespace LogExpert
 				}
 				catch (FormatException ex)
 				{
-					_logger.Error(ex.StackTrace);
+					_logger.Error(ex);
 				}
 			}
 		}
@@ -1366,6 +1369,7 @@ namespace LogExpert
 				}
 				catch (IOException e)
 				{
+					_logger.Error(e);
 					MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
 				}
 			}
@@ -1562,7 +1566,7 @@ namespace LogExpert
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("UpdateProgress(): \n" + ex + "\n" + ex.StackTrace);
+				_logger.Error(ex, "UpdateProgress():");
 			}
 		}
 
@@ -3004,8 +3008,9 @@ namespace LogExpert
 						FollowTailChanged(persistenceData.FollowTail, false);
 					}
 				}
-				catch (ArgumentOutOfRangeException)
+				catch (ArgumentOutOfRangeException exc)
 				{
+					_logger.Error(exc);
 					// FirstDisplayedScrollingRowIndex errechnet manchmal falsche Scroll-Ranges???
 				}
 
@@ -3017,7 +3022,7 @@ namespace LogExpert
 			catch (IOException ex)
 			{
 				SetDefaultsFromPrefs();
-				_logger.Error("Error loading bookmarks: " + ex.Message);
+				_logger.Error(ex, "Error loading bookmarks: ");
 			}
 		}
 
@@ -3037,7 +3042,7 @@ namespace LogExpert
 			}
 			catch (InvalidOperationException e)
 			{
-				_logger.Error("Error setting splitter distance: " + e.Message);
+				_logger.Error(e, "Error setting splitter distance:");
 			}
 			ShowAdvancedFilterPanel(persistenceData.FilterAdvanced);
 			if (_filterPipeList.Count == 0)     // don't restore if it's only a reload
@@ -3071,10 +3076,10 @@ namespace LogExpert
 				{
 					filterParams.CreateRegex();
 				}
-				catch (ArgumentException)
+				catch (ArgumentException ex)
 				{
+					_logger.Error(ex);
 					StatusLineError("Invalid regular expression");
-					return;
 				}
 			}
 		}
@@ -3299,7 +3304,7 @@ namespace LogExpert
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("Fehler bei UpdateGrid(): " + ex + "\n" + ex.StackTrace);
+				_logger.Error(ex, "Fehler bei UpdateGrid(): ");
 			}
 		}
 
@@ -3449,8 +3454,7 @@ namespace LogExpert
 				// See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
 				// There are some rare situations with null ref exceptions when resizing columns and on filter finished
 				// So catch them here. Better than crashing.
-				_logger.Error("Error while resizing columns: " + e.Message);
-				_logger.Error(e.StackTrace);
+				_logger.Error(e, "Error while resizing columns:");
 			}
 		}
 
@@ -3772,7 +3776,7 @@ namespace LogExpert
 			}
 			catch (Exception e)
 			{
-				_logger.Error("SyncFilterGridPos(): " + e.Message);
+				_logger.Error(e, "SyncFilterGridPos(): ");
 			}
 		}
 
@@ -3800,8 +3804,9 @@ namespace LogExpert
 				}
 				dataGridView.Invoke(new Action<int, bool>(SelectLine), new object[] { line, true });
 			}
-			catch (Exception) // in the case the windows is already destroyed
+			catch (Exception e) // in the case the windows is already destroyed
 			{
+				_logger.Error(e);
 			}
 		}
 
@@ -3846,7 +3851,7 @@ namespace LogExpert
 			catch (IndexOutOfRangeException e)
 			{
 				// Occures sometimes (but cannot reproduce)
-				_logger.Error("Error while selecting line: " + e.ToString());
+				_logger.Error(e, "Error while selecting line: ");
 			}
 		}
 
@@ -4150,8 +4155,9 @@ namespace LogExpert
 				{
 					_filterParams.CreateRegex();
 				}
-				catch (ArgumentException)
+				catch (ArgumentException ex)
 				{
+					_logger.Error(ex);
 					StatusLineError("Invalid regular expression");
 					return;
 				}
@@ -4237,7 +4243,7 @@ namespace LogExpert
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace);
+				_logger.Error(ex, "Exception while filtering. Please report to developer:");
 				MessageBox.Show(null, "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace, "LogExpert");
 			}
 			long endTime = Environment.TickCount;
@@ -4346,7 +4352,7 @@ namespace LogExpert
 			}
 			catch (Exception e)
 			{
-				_logger.Error("AddFilterLineGuiUpdate(): " + e.Message);
+				_logger.Error(e, "AddFilterLineGuiUpdate(): ");
 			}
 		}
 
@@ -4391,8 +4397,7 @@ namespace LogExpert
 				// See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
 				// There are some rare situations with null ref exceptions when resizing columns and on filter finished
 				// So catch them here. Better than crashing.
-				_logger.Error("Error: " + e.Message);
-				_logger.Error(e.StackTrace);
+				_logger.Error(e);
 			}
 		}
 
@@ -4413,8 +4418,8 @@ namespace LogExpert
 			}
 			catch (Exception ex)
 			{
+				_logger.Error(ex, "Wieder dieser sporadische Fehler: ");
 				MessageBox.Show(null, ex.StackTrace, "Wieder dieser sporadische Fehler:");
-				_logger.Error("Wieder dieser sporadische Fehler: " + ex + "\n" + ex.StackTrace);
 			}
 		}
 
@@ -4580,8 +4585,9 @@ namespace LogExpert
 						}
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					_logger.Error(ex);
 					// TODO: handle this concurrent situation better:
 					// dataGridView.CurrentRow may be null even if checked before.
 					// This can happen when MultiFile shift deselects the current row because there

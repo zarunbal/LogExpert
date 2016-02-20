@@ -7,13 +7,15 @@ using System.Xml.Xsl;
 
 namespace LogExpert
 {
-	class XmlBlockSplitter : ILogStreamReader
+	internal class XmlBlockSplitter : ILogStreamReader
 	{
+		private static NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		private string _stylesheet;
-		XslCompiledTransform _xslt = new XslCompiledTransform();
+		private XslCompiledTransform _xslt = new XslCompiledTransform();
 		private XmlLogReader _reader;
-		XmlParserContext _context;
-		XmlReaderSettings _settings;
+		private XmlParserContext _context;
+		private XmlReaderSettings _settings;
 		private IList<string> _lineList = new List<string>();
 		private char[] _newLineChar = new char[] { '\n' };
 		private string[] _splitStrings = new string[] { "\r\n", "\n", "\r" };
@@ -58,8 +60,10 @@ namespace LogExpert
 				{
 					ParseXmlBlock(block);
 				}
-				catch (XmlException)
+				catch (XmlException ex)
 				{
+					_logger.Error(ex);
+
 					_lineList.Add("[XML Parser error] " + block);
 				}
 			}
@@ -118,7 +122,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion ILogStreamReader Member
 
 		private void ParseXmlBlock(string block)
 		{

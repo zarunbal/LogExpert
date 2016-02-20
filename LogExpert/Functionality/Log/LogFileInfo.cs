@@ -86,9 +86,10 @@ namespace LogExpert
 					}
 					catch (IOException e)
 					{
+						_logger.Error(e);
 						if (--retry <= 0)
 						{
-							_logger.Warn( "LogFileInfo.Length: " + e.ToString());
+							_logger.Warn(e, "LogFileInfo.Length: ");
 							return -1;
 						}
 						Thread.Sleep(RETRY_SLEEP);
@@ -130,8 +131,9 @@ namespace LogExpert
 					_fInfo.Refresh();
 					return _fInfo.Length;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
+					_logger.Error(ex);
 					return -1;
 				}
 			}
@@ -168,8 +170,7 @@ namespace LogExpert
 				}
 				catch (IOException fe)
 				{
-					_logger.Debug( "LogFileInfo.OpenFile(): " + fe.ToString());
-					_logger.Debug( "Retry counter: " + retry);
+					_logger.Debug(fe, "LogFileInfo.OpenFile(): Retry counter {0}", retry);
 					if (--retry <= 0)
 					{
 						throw fe;
@@ -178,8 +179,7 @@ namespace LogExpert
 				}
 				catch (UnauthorizedAccessException uae)
 				{
-					_logger.Debug( "LogFileInfo.OpenFile(): " + uae.ToString());
-					_logger.Debug( "Retry counter: " + retry);
+					_logger.Debug(uae, "LogFileInfo.OpenFile(): Retry counter '{0}'", retry);
 					if (--retry <= 0)
 					{
 						throw new IOException("Error opening file", uae);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 //using System.Linq;
 using System.Text;
 using System.IO;
@@ -14,12 +15,15 @@ namespace LogExpert
 	/// </summary>
 	public class PositionAwareStreamReader : ILogStreamReader
 	{
-		const int MAX_LINE_LEN = 20000;
-		Stream stream;
-		StreamReader reader;
+		private static NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+		private const int MAX_LINE_LEN = 20000;
+		private Stream stream;
+		private StreamReader reader;
+
 		//StringBuilder builder;
-		int state;
-		long pos;
+		private int state;
+
+		private long pos;
 		private int posInc_precomputed;
 		private char[] charBuffer = new char[MAX_LINE_LEN];
 		private int charBufferPos = 0;
@@ -119,14 +123,14 @@ namespace LogExpert
 				/*
 				 * 1: Irgendwann mal auskommentiert (+this.Encoding.GetPreamble().Length)
 				 * 2: Stand bei 1.1 3207
-				 * 3: Stand nach Fehlermeldung von Piet wegen Unicode-Bugs. 
+				 * 3: Stand nach Fehlermeldung von Piet wegen Unicode-Bugs.
 				 *    Keihne Ahnung, ob das jetzt endgültig OK ist.
 				 * 4: 27.07.09: Preamble-Length wird jetzt im CT ermittelt, da Encoding.GetPreamble().Length
 				 *    immer eine fixe Länge liefert (unabhängig vom echtem Dateiinhalt)
 				 */
 				this.pos = value; //  +this.Encoding.GetPreamble().Length;      // 1
-				//this.stream.Seek(this.pos, SeekOrigin.Begin);     // 2
-				//this.stream.Seek(this.pos + this.Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
+								  //this.stream.Seek(this.pos, SeekOrigin.Begin);     // 2
+								  //this.stream.Seek(this.pos + this.Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
 				this.stream.Seek(this.pos + this.preambleLength, SeekOrigin.Begin);  // 4
 				ResetReader();
 			}
@@ -147,8 +151,9 @@ namespace LogExpert
 					this.pos += posInc;
 				}
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
+				_logger.Error(ex);
 				readInt = -1;
 			}
 			return readInt;
@@ -187,9 +192,9 @@ namespace LogExpert
 			{
 				char readChar = (char)readInt;
 
-				// state: 0: looking for \r or \n, 
+				// state: 0: looking for \r or \n,
 				//        1: looking for \n after \r
-				//        2: looking for 
+				//        2: looking for
 				switch (readChar)
 				{
 					case '\r':
@@ -198,27 +203,31 @@ namespace LogExpert
 							case 0:
 								state = 1;
 								break;
+
 							case 1:
 								result = GetLineAndResetBuilder();
 								return result;
 						}
 						break;
+
 					case '\n':
 						switch (state)
 						{
 							case 0:
-								// fall through
+							// fall through
 							case 1:
 								result = GetLineAndResetBuilder();
 								return result;
 						}
 						break;
+
 					default:
 						switch (state)
 						{
 							case 0:
 								appendToBuilder(readChar);
 								break;
+
 							case 1:
 								appendToBuilder(readChar);
 								state = 0;
@@ -294,11 +303,11 @@ namespace LogExpert
 		private int DetectPreambleLengthAndEncoding()
 		{
 			/*
-			UTF-8:                                EF BB BF 
-			UTF-16-Big-Endian-Bytereihenfolge:    FE FF 
-			UTF-16-Little-Endian-Bytereihenfolge: FF FE 
-			UTF-32-Big-Endian-Bytereihenfolge:    00 00 FE FF 
-			UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00 
+			UTF-8:                                EF BB BF
+			UTF-16-Big-Endian-Bytereihenfolge:    FE FF
+			UTF-16-Little-Endian-Bytereihenfolge: FF FE
+			UTF-32-Big-Endian-Bytereihenfolge:    00 00 FE FF
+			UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00
 			*/
 			detectedEncoding = null;
 			byte[] readPreamble = new byte[4];

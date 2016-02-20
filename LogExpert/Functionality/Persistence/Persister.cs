@@ -23,6 +23,8 @@ namespace LogExpert
 
 		#region Static Fields
 
+		private static NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		//TODO Zarunbal: think about this
 		private static readonly Regex _directoryCharsRegex = new Regex(
 			string.Format("{0}|{1}|{2}",
@@ -125,6 +127,7 @@ namespace LogExpert
 				}
 				catch (Exception e)
 				{
+					_logger.Error(e);
 					MessageBox.Show(e.Message, "LogExpert");
 				}
 			}
