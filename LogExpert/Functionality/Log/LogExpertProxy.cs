@@ -63,7 +63,7 @@ namespace LogExpert
 
 		public void LoadFiles(string[] fileNames)
 		{
-			Exten.Info(_logger, "Loading files into existing LogTabWindow");
+			_logger.Info("Loading files into existing LogTabWindow");
 			LogTabWindow logWin = _windowList[_windowList.Count - 1];
 			logWin.Invoke(new MethodInvoker(logWin.SetForeground));
 			logWin.LoadFiles(fileNames);
@@ -73,13 +73,13 @@ namespace LogExpert
 		{
 			if (_firstLogTabWindow.IsDisposed)
 			{
-				_logger.logWarn("first GUI thread window is disposed. Setting a new one.");
+				_logger.Warn("first GUI thread window is disposed. Setting a new one.");
 				// may occur if a window is closed because of unhandled exception.
 				// Determine a new 'firstWindow'. If no window is left, start a new one.
 				RemoveWindow(_firstLogTabWindow);
 				if (_windowList.Count == 0)
 				{
-					Exten.Info(_logger, "No windows left. New created window will be the new 'first' GUI window");
+					_logger.Info("No windows left. New created window will be the new 'first' GUI window");
 					LoadFiles(fileNames);
 				}
 				else
@@ -111,7 +111,7 @@ namespace LogExpert
 
 		public void NewWindowWorker(string[] fileNames)
 		{
-			Exten.Info(_logger, "Creating new LogTabWindow");
+			_logger.Info("Creating new LogTabWindow");
 			LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true);
 			logWin.LogExpertProxy = this;
 			AddWindow(logWin);
@@ -124,7 +124,7 @@ namespace LogExpert
 			RemoveWindow(logWin);
 			if (_windowList.Count == 0)
 			{
-				Exten.Info(_logger, "Last LogTabWindow was closed");
+				_logger.Info("Last LogTabWindow was closed");
 				PluginRegistry.GetInstance().CleanupPlugins();
 				OnLastWindowClosed();
 			}

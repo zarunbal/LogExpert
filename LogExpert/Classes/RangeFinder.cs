@@ -22,15 +22,15 @@ namespace LogExpert
 
 		public Range FindRange(int startLine)
 		{
-			Exten.Info(_logger, "Starting range search for " + this._filterParams.searchText + " ... " + this._filterParams.rangeSearchText);
+			_logger.Info( "Starting range search for " + this._filterParams.searchText + " ... " + this._filterParams.rangeSearchText);
 			if (_filterParams.rangeSearchText == null || _filterParams.rangeSearchText.Trim().Length == 0)
 			{
-				Exten.Info(_logger, "Range search text not set. Cancelling range search.");
+				_logger.Info( "Range search text not set. Cancelling range search.");
 				return null;
 			}
 			if (_filterParams.searchText == null || _filterParams.searchText.Trim().Length == 0)
 			{
-				Exten.Info(_logger, "Search text not set. Cancelling range search.");
+				_logger.Info( "Search text not set. Cancelling range search.");
 				return null;
 			}
 
@@ -64,7 +64,7 @@ namespace LogExpert
 			}
 			if (!foundStartLine)
 			{
-				Exten.Info(_logger, "Range start not found");
+				_logger.Info( "Range start not found");
 				return null;
 			}
 			range.StartLine = lineNum;

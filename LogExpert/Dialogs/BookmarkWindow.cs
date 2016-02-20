@@ -90,7 +90,7 @@ namespace LogExpert.Dialogs
 				}
 				catch (Exception ex)
 				{
-					_logger.logError(ex.StackTrace);
+					_logger.Error(ex.StackTrace);
 				}
 			}
 		}
@@ -448,7 +448,7 @@ namespace LogExpert.Dialogs
 		{
 			if (ctx != null)
 			{
-				_logger.logDebug("Current file changed to " + ctx.LogView.FileName);
+				_logger.Debug( "Current file changed to " + ctx.LogView.FileName);
 				lock (this.paintLock)
 				{
 					this.logView = ctx.LogView;
