@@ -29,7 +29,7 @@ namespace LogExpert
 		private const int PROGRESS_BAR_MODULO = 1000;
 		private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
 
-		#endregion
+		#endregion Const
 
 		#region Fields
 
@@ -68,7 +68,6 @@ namespace LogExpert
 		private int _lineHeight = 0;
 		private int _selectedCol = 0;    // set by context menu event for column headers only
 
-
 		private readonly Thread _timeshiftSyncThread = null;
 		private readonly EventWaitHandle _timeshiftSyncWakeupEvent = new ManualResetEvent(false);
 		private readonly EventWaitHandle _timeshiftSyncTimerEvent = new ManualResetEvent(false);
@@ -93,14 +92,13 @@ namespace LogExpert
 
 		private Action _filterSearch;
 
-		#endregion
+		#endregion Fields
 
 		#region cTor
 
 		public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading) :
 			base()
 		{
-
 			_filterSearch = new Action(FilterSearch);
 
 			BookmarkColor = Color.FromArgb(165, 200, 225);
@@ -168,7 +166,6 @@ namespace LogExpert
 			dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
 			markEditModeToolStripMenuItem.Enabled = true;
 
-
 			_panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
 			_panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
 
@@ -203,7 +200,7 @@ namespace LogExpert
 			PreferencesChanged(_parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
 		}
 
-		#endregion
+		#endregion cTor
 
 		#region Properties
 
@@ -293,7 +290,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
 
@@ -481,6 +478,7 @@ namespace LogExpert
 		/**
 		 * Returns the first HilightEntry that matches the given line
 		 */
+
 		public HilightEntry FindHilightEntry(string line, bool noWordMatches)
 		{
 			// first check the temp entries
@@ -743,7 +741,7 @@ namespace LogExpert
 				}
 				catch (ArgumentException)
 				{
-					// occurs on invalid regex 
+					// occurs on invalid regex
 				}
 				if (BookmarkProvider.IsBookmarkAtLine(lineNum))
 				{
@@ -966,8 +964,8 @@ namespace LogExpert
 			SavePersistenceData(false);
 
 			_reloadMemento = new ReloadMemento();
-			_reloadMemento.currentLine = CurrentDataGridLine;
-			_reloadMemento.firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
+			_reloadMemento.CurrentLine = CurrentDataGridLine;
+			_reloadMemento.FirstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
 			_forcedColumnizerForLoading = CurrentColumnizer;
 
 			if (_fileNames == null || !IsMultiFile)
@@ -1140,6 +1138,7 @@ namespace LogExpert
 		 * has no timestamp, the previous line will be checked until a
 		 * timestamp is found.
 		 */
+
 		public DateTime GetTimestampForLine(ref int lineNum, bool roundToSeconds)
 		{
 			lock (_currentColumnizerLock)
@@ -1186,6 +1185,7 @@ namespace LogExpert
 		 * has no timestamp, the next line will be checked until a
 		 * timestamp is found.
 		 */
+
 		public DateTime GetTimestampForLineForward(ref int lineNum, bool roundToSeconds)
 		{
 			lock (_currentColumnizerLock)
@@ -1526,7 +1526,7 @@ namespace LogExpert
 			Invoke(new Action<FilterPipe, string, PersistenceData>(WriteFilterToTabFinished), new object[] { pipe, title, null });
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Events
 
@@ -1756,7 +1756,7 @@ namespace LogExpert
 			BookmarkComment(e.BookmarkOverlay.Bookmark);
 		}
 
-		#endregion
+		#endregion DataGridView Events
 
 		#region FilterGridView Events
 
@@ -1850,7 +1850,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion FilterGridView Events
 
 		#region EditControl Events
 
@@ -1869,7 +1869,7 @@ namespace LogExpert
 			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
 		}
 
-		#endregion
+		#endregion EditControl Events
 
 		private void FilterSearchButton_Click(object sender, EventArgs e)
 		{
@@ -1988,7 +1988,7 @@ namespace LogExpert
 			int index = dataGridContextMenuStrip.Items.IndexOf(pluginSeparator);
 			if (index > 0)
 			{
-				for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count; )
+				for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count;)
 				{
 					dataGridContextMenuStrip.Items.RemoveAt(i);
 				}
@@ -2178,7 +2178,7 @@ namespace LogExpert
 			DataGridViewColumn colLast = gridView.Columns[gridView.Columns.Count - 1];
 			moveToLastColumnToolStripMenuItem.Enabled = (colLast != null && colLast.Frozen == col.Frozen);
 
-			// Fill context menu with column names 
+			// Fill context menu with column names
 			//
 			EventHandler ev = new EventHandler(HandleColumnItemContextMenu);
 			allColumnsToolStripMenuItem.DropDownItems.Clear();
@@ -2657,7 +2657,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion Events
 
 		#region Private Methods
 
@@ -3086,13 +3086,13 @@ namespace LogExpert
 
 		private void PositionAfterReload(ReloadMemento reloadMemento)
 		{
-			if (_reloadMemento.currentLine < dataGridView.RowCount && _reloadMemento.currentLine >= 0)
+			if (_reloadMemento.CurrentLine < dataGridView.RowCount && _reloadMemento.CurrentLine >= 0)
 			{
-				dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.currentLine].Cells[0];
+				dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.CurrentLine].Cells[0];
 			}
-			if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount && _reloadMemento.firstDisplayedLine >= 0)
+			if (_reloadMemento.FirstDisplayedLine < dataGridView.RowCount && _reloadMemento.FirstDisplayedLine >= 0)
 			{
-				dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.firstDisplayedLine;
+				dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.FirstDisplayedLine;
 			}
 		}
 
@@ -3452,9 +3452,9 @@ namespace LogExpert
 		}
 
 		/// <summary>
-		/// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
+		/// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
 		/// background colors.
-		/// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the 
+		/// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
 		/// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
 		/// </summary>
 		/// <param name="matchList">List of all highlight matches for the current cell</param>
@@ -3515,6 +3515,7 @@ namespace LogExpert
 		/**
 		 * Returns the first HilightEntry that matches the given line
 		 */
+
 		private HilightEntry FindHilightEntry(string line)
 		{
 			return FindHilightEntry(line, false);
@@ -3557,6 +3558,7 @@ namespace LogExpert
 		/**
 		 * Returns all HilightEntry entries which matches the given line
 		 */
+
 		private IList<HilightEntry> FindMatchingHilightEntries(string line)
 		{
 			IList<HilightEntry> resultList = new List<HilightEntry>();
@@ -3755,7 +3757,7 @@ namespace LogExpert
 						if (index > 0)
 							--index;
 					}
-					if (filterGridView.Rows.Count > 0)	// exception no rows
+					if (filterGridView.Rows.Count > 0)  // exception no rows
 					{
 						filterGridView.CurrentCell = filterGridView.Rows[index].Cells[0];
 					}
@@ -3828,7 +3830,7 @@ namespace LogExpert
 				}
 				if (line == -1)
 				{
-					MessageBox.Show(this, "Not found:", "Search result");   // Hmm... is that experimental code from early days?  
+					MessageBox.Show(this, "Not found:", "Search result");   // Hmm... is that experimental code from early days?
 					return;
 				}
 				dataGridView.Rows[line].Selected = true;
@@ -4013,6 +4015,7 @@ namespace LogExpert
 		/**
 		 * Shift bookmarks after a logfile rollover
 		 */
+
 		private void ShiftBookmarks(int offset)
 		{
 			BookmarkProvider.ShiftBookmarks(offset);
@@ -4242,9 +4245,9 @@ namespace LogExpert
 		}
 
 		/// <summary>
-		///  Returns a list with 'additional filter results'. This is the given line number 
+		///  Returns a list with 'additional filter results'. This is the given line number
 		///  and (if back spread and/or fore spread is enabled) some additional lines.
-		///  This function doesn't check the filter condition! 
+		///  This function doesn't check the filter condition!
 		/// </summary>
 		/// <param name="filterParams"></param>
 		/// <param name="lineNum"></param>
@@ -4415,6 +4418,7 @@ namespace LogExpert
 		/**
 		 * Shift filter list line entries after a logfile rollover
 		 */
+
 		private void ShiftFilterLines(int offset)
 		{
 			List<int> newFilterList = new List<int>();
@@ -4577,9 +4581,9 @@ namespace LogExpert
 				{
 					// TODO: handle this concurrent situation better:
 					// dataGridView.CurrentRow may be null even if checked before.
-					// This can happen when MultiFile shift deselects the current row because there 
+					// This can happen when MultiFile shift deselects the current row because there
 					// are less lines after rollover than before.
-					// access to dataGridView-Rows should be locked 
+					// access to dataGridView-Rows should be locked
 				}
 			}
 		}
@@ -4875,7 +4879,7 @@ namespace LogExpert
 				}
 				else
 				{
-					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions).
 					dataGridView.FirstDisplayedScrollingColumnIndex = 0;
 
 					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
@@ -5311,7 +5315,7 @@ namespace LogExpert
 			return "LogWindow#" + FileName;
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region Events
 
@@ -5330,7 +5334,7 @@ namespace LogExpert
 			CloseLogWindow();
 		}
 
-		#endregion
+		#endregion Events
 
 		#region Events there delegates an methods
 
@@ -5432,7 +5436,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion Events there delegates an methods
 
 		#region Internals
 
@@ -5442,7 +5446,7 @@ namespace LogExpert
 			filterGridView.Refresh();
 		}
 
-		#endregion
+		#endregion Internals
 
 		#region ILogPaintContext Member
 
@@ -5480,7 +5484,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion ILogPaintContext Member
 
 		#region ILogWindowSerach Members
 
@@ -5570,7 +5574,7 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion ILogWindowSerach Members
 
 		#region ILogView Member
 
@@ -5579,7 +5583,7 @@ namespace LogExpert
 			RefreshAllGrids();
 		}
 
-		#endregion
+		#endregion ILogView Member
 
 		#region Nested Classes
 
@@ -5609,9 +5613,9 @@ namespace LogExpert
 				return _logWindow.Text;
 			}
 
-			#endregion
+			#endregion ILogExpertCallback Member
 		}
 
-		#endregion
+		#endregion Nested Classes
 	}
 }

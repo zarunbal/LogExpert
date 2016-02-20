@@ -2,6 +2,6 @@ namespace LogExpert
 {
 	public class QualityInfo
 	{
-		public int Quality;
+		public int Quality { get; set; }
 	}
 }

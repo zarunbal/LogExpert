@@ -6,21 +6,46 @@ namespace LogExpert
 {
 	public class PatternBlock
 	{
-		public int startLine;
-		public int endLine;
-		public int targetStart;
-		public int targetEnd;
-		public int weigth;
-		public int blockId;
-		public SortedDictionary<int, int> srcLines = new SortedDictionary<int, int>();
-		public SortedDictionary<int, int> targetLines = new SortedDictionary<int, int>();
-		// key: line num
-		public Dictionary<int, QualityInfo> qualityInfoList = new Dictionary<int, QualityInfo>();
+		#region cTor
+
+		public PatternBlock()
+		{
+			QualityInfoList = new Dictionary<int, QualityInfo>();
+			SrcLines = new SortedDictionary<int, int>();
+			TargetLines = new SortedDictionary<int, int>();
+		}
+
+		#endregion cTor
+
+		#region Properties
+
+		public Dictionary<int, QualityInfo> QualityInfoList { get; set; }
+
+		public int StartLine { get; set; }
+
+		public int EndLine { get; set; }
+
+		public int TargetStart { get; set; }
+
+		public int TargetEnd { get; set; }
+
+		public int Weigth { get; set; }
+
+		public int BlockId { get; set; }
+
+		public SortedDictionary<int, int> SrcLines { get; set; }
+
+		public SortedDictionary<int, int> TargetLines { get; set; }
+
+		#endregion Properties
+
+		#region Overrides
 
 		public override string ToString()
 		{
-			return "srcStart=" + startLine + ", srcEnd=" + endLine + ", targetStart=" + targetStart +
-				   ", targetEnd=" + targetEnd + ", weight=" + weigth;
+			return string.Format("srcStart={0}, srcEnd={1}, targetStart={2}, targetEnd={3}, weight={4}", StartLine, EndLine, TargetStart, TargetEnd, Weigth);
 		}
+
+		#endregion Overrides
 	}
 }
