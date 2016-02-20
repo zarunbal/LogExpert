@@ -72,6 +72,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net40\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -89,6 +93,7 @@
     <Compile Include="Classes\Environment2.cs" />
     <Compile Include="Classes\FuzzyBlockDetection.cs" />
     <Compile Include="Classes\LogExpertCallback.cs" />
+    <Compile Include="Classes\LogExpertNlogWrapper.cs" />
     <Compile Include="Classes\YetiLevenshtein.cs" />
     <Compile Include="Controls\BaseLogWindow.cs">
       <SubType>Form</SubType>
@@ -429,6 +434,10 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -10,15 +10,17 @@ namespace LogExpert
 {
 	public partial class KnobControl : UserControl
 	{
-		int startMouseY = 0;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-		int oldValue = 0;
+		private int startMouseY = 0;
+
+		private int oldValue = 0;
 
 		public int MinValue { get; set; }
 
 		public int MaxValue { get; set; }
 
-		int value;
+		private int value;
 
 		public int Value
 		{
@@ -35,8 +37,8 @@ namespace LogExpert
 
 		private int dragSensitivity = 3;
 
-		StringFormat stringFormat = new StringFormat();
-		bool isShiftPressed = false;
+		private StringFormat stringFormat = new StringFormat();
+		private bool isShiftPressed = false;
 
 		public KnobControl()
 		{
@@ -113,7 +115,7 @@ namespace LogExpert
 			int sense = this.isShiftPressed ? this.DragSensitivity * 2 : this.DragSensitivity;
 
 			int diff = this.startMouseY - e.Y;
-			Logger.logDebug("KnobDiff: " + diff);
+			_logger.Debug("KnobDiff: " + diff);
 			int range = this.MaxValue - this.MinValue;
 			this.value = this.oldValue + diff / sense;
 			if (this.value < this.MinValue)

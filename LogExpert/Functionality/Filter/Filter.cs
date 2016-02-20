@@ -8,16 +8,17 @@ namespace LogExpert
 	public class Filter
 	{
 		#region Fields
-		
+
 		private const int PROGRESS_BAR_MODULO = 1000;
 		private const int SPREAD_MAX = 50;
-		
-		private readonly LogExpert.ColumnizerCallback _callback; 
-		
-		#endregion
-		
+
+		private readonly LogExpert.ColumnizerCallback _callback;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		#endregion Fields
+
 		#region cTor
-		
+
 		public Filter(LogExpert.ColumnizerCallback callback)
 		{
 			_callback = callback;
@@ -25,8 +26,8 @@ namespace LogExpert
 			LastFilterLinesList = new List<int>();
 			FilterHitList = new List<int>();
 		}
-		
-		#endregion
+
+		#endregion cTor
 
 		#region Properties
 
@@ -37,18 +38,18 @@ namespace LogExpert
 		public List<int> FilterHitList { get; private set; }
 
 		public bool ShouldCancel { get; set; }
-		
-		#endregion
-			
+
+		#endregion Properties
+
 		#region Public Methods
 
 		public int DoFilter(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
 		{
 			return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback);
 		}
-		
-		#endregion
-			
+
+		#endregion Public Methods
+
 		#region Private Methods
 
 		private int DoFilter(FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback)
@@ -56,7 +57,7 @@ namespace LogExpert
 			int lineNum = startLine;
 			int count = 0;
 			int callbackCounter = 0;
-					
+
 			try
 			{
 				filterParams.Reset();
@@ -88,12 +89,12 @@ namespace LogExpert
 			catch (Exception ex)
 			{
 				string message = string.Format("Exception while filtering. Please report to developer: \n\n{0}\n\n{1}", ex, ex.StackTrace);
-				Logger.logError(message);
+				_logger.Error(message);
 				MessageBox.Show(null, message, "LogExpert");
 			}
 			return count;
 		}
-			
+
 		private void AddFilterLine(int lineNum, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
 		{
 			filterHitList.Add(lineNum);
@@ -105,11 +106,11 @@ namespace LogExpert
 				lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
 			}
 		}
-		
+
 		/// <summary>
-		///  Returns a list with 'additional filter results'. This is the given line number 
+		///  Returns a list with 'additional filter results'. This is the given line number
 		///  and (if back spread and/or fore spread is enabled) some additional lines.
-		///  This function doesn't check the filter condition! 
+		///  This function doesn't check the filter condition!
 		/// </summary>
 		/// <param name="filterParams"></param>
 		/// <param name="lineNum"></param>
@@ -124,7 +125,7 @@ namespace LogExpert
 				resultList.Add(lineNum);
 				return resultList;
 			}
-					
+
 			// back spread
 			for (int i = filterParams.spreadBefore; i > 0; --i)
 			{
@@ -155,6 +156,6 @@ namespace LogExpert
 			return resultList;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

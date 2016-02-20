@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+
 //using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -15,7 +16,9 @@ namespace LogExpert
 {
 	public class Logger : ILogExpertLogger
 	{
-		delegate void LogCallback(string msg, Level level, DateTime dateTime, string callerInfo, int threadId);
+		private delegate void LogCallback(string msg, Level level, DateTime dateTime, string callerInfo, int threadId);
+
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 
 		public enum Level
 		{
@@ -25,15 +28,15 @@ namespace LogExpert
 			ERROR
 		};
 
-		const int MAX_SIZE = 1024 * 1024 * 3;
-		const int MAX_FILES = 9;
+		private const int MAX_SIZE = 1024 * 1024 * 3;
+		private const int MAX_FILES = 9;
 
 		private Level currLevel = Level.INFO;
 
-		String fileName;
-		FileInfo fileInfo;
-		StreamWriter writer;
-		Object lockObj = new Object();
+		private String fileName;
+		private FileInfo fileInfo;
+		private StreamWriter writer;
+		private Object lockObj = new Object();
 
 		private static Logger instance = null;
 
@@ -69,7 +72,7 @@ namespace LogExpert
 
 		private void createLogFile()
 		{
-			#if DEBUG
+#if DEBUG
 			string dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\LogExpert";
 			if (!Directory.Exists(dir))
 			{
@@ -78,7 +81,7 @@ namespace LogExpert
 			this.fileName = dir + "\\logfile.txt";
 			this.writer = new StreamWriter(new FileStream(this.fileName, FileMode.Append, FileAccess.Write, FileShare.Read | FileShare.Write));
 			this.fileInfo = new FileInfo(this.fileName);
-			#endif
+#endif
 		}
 
 		public static void logInfo(string msg)
@@ -89,9 +92,9 @@ namespace LogExpert
 		[Conditional("DEBUG")]
 		public static void logDebug(string msg)
 		{
-			#if DEBUG
+#if DEBUG
 			GetLogger().log(msg, Level.DEBUG);
-			#endif
+#endif
 		}
 
 		public static void logWarn(string msg)
@@ -115,7 +118,7 @@ namespace LogExpert
 		}
 
 		public static bool IsDebug
-		{ 
+		{
 			get
 			{
 				return GetLogger().LogLevel <= Level.DEBUG;
@@ -124,13 +127,13 @@ namespace LogExpert
 
 		protected void log(string msg, Level level)
 		{
-			#if DEBUG
+#if DEBUG
 			StackTrace st = new StackTrace();
 			StackFrame callerFrame = st.GetFrame(2);
 			string callerInfo = callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "()";
 			LogCallback callback = new LogCallback(logCallback);
 			callback.BeginInvoke(msg, level, DateTime.Now, callerInfo, Thread.CurrentThread.ManagedThreadId, null, null);
-			#endif
+#endif
 		}
 
 		protected void logCallback(string msg, Level level, DateTime dateTime, string callerInfo, int threadId)
@@ -150,7 +153,7 @@ namespace LogExpert
 			}
 		}
 
-		public delegate void WriteToLogfileFx(string text); 
+		public delegate void WriteToLogfileFx(string text);
 
 		private void WriteToLogfile(string text)
 		{
@@ -217,7 +220,7 @@ namespace LogExpert
 		{
 			GetLogger().log(msg, Level.ERROR);
 		}
-		
-		#endregion
+
+		#endregion ILogExpertLogger Member
 	}
 }

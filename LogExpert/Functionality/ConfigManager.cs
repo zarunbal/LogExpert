@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 //using System.Linq;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -219,6 +220,7 @@ namespace LogExpert
 		private static ConfigManager instance = null;
 		private Settings settings = null;
 		private Object loadSaveLock = new Object();
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 
 		private ConfigManager()
 		{
@@ -258,17 +260,17 @@ namespace LogExpert
 
 		public static string ConfigDir
 		{
-			get 
+			get
 			{
 				String tmp = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				String tmp2 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-				return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert"; 
+				return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
 			}
 		}
 
 		public static Settings Settings
 		{
-			get 
+			get
 			{
 				return Instance.settings;
 			}
@@ -276,7 +278,7 @@ namespace LogExpert
 
 		private Settings Load()
 		{
-			Logger.logInfo("Loading settings");
+			_logger.Info("Loading settings");
 			string dir = ConfigDir;
 			if (!Directory.Exists(dir))
 			{
@@ -318,7 +320,7 @@ namespace LogExpert
 					}
 					catch (SerializationException)
 					{
-						//Logger.logError("Error while deserializing config data: " + e.Message); 
+						//Logger.logError("Error while deserializing config data: " + e.Message);
 						settings = new Settings();
 					}
 				}
@@ -418,7 +420,7 @@ namespace LogExpert
 		{
 			lock (this.loadSaveLock)
 			{
-				Logger.logInfo("Saving settings");
+				_logger.Info("Saving settings");
 				lock (this)
 				{
 					string dir = ConfigDir;
@@ -500,7 +502,7 @@ namespace LogExpert
 			ConfigChangedEventHandler handler = ConfigChanged;
 			if (handler != null)
 			{
-				Logger.logInfo("Fire config changed event");
+				_logger.Info("Fire config changed event");
 				handler(this, new ConfigChangedEventArgs(flags));
 			}
 		}

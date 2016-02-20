@@ -10,15 +10,16 @@ namespace LogExpert.Dialogs
 {
 	public partial class TimeSpreadingControl : UserControl
 	{
-		int EDGE_OFFSET = (int)Win32.GetSystemMetrics(Win32.SM_CYVSCROLL);
+		private int EDGE_OFFSET = (int)Win32.GetSystemMetrics(Win32.SM_CYVSCROLL);
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-		TimeSpreadCalculator timeSpreadCalc;
-		Bitmap bmp = new Bitmap(1, 1);
-		Object monitor = new Object();
-		ToolTip toolTip;
-		int lastMouseY = 0;
-		int rectHeight = 1;
-		int displayHeight = 1;
+		private TimeSpreadCalculator timeSpreadCalc;
+		private Bitmap bmp = new Bitmap(1, 1);
+		private Object monitor = new Object();
+		private ToolTip toolTip;
+		private int lastMouseY = 0;
+		private int rectHeight = 1;
+		private int displayHeight = 1;
 
 		public bool ReverseAlpha { get; set; }
 
@@ -69,7 +70,7 @@ namespace LogExpert.Dialogs
 
 		private void timeSpreadCalc_CalcDone()
 		{
-			Logger.logDebug("timeSpreadCalc_CalcDone()");
+			_logger.logDebug("timeSpreadCalc_CalcDone()");
 			lock (this.monitor)
 			{
 				this.Invalidate();
@@ -122,7 +123,7 @@ namespace LogExpert.Dialogs
 			this.BeginInvoke(new MethodInvoker(Refresh));
 		}
 
-		void timeSpreadCalc_StartCalc()
+		private void timeSpreadCalc_StartCalc()
 		{
 			lock (this.monitor)
 			{
@@ -154,7 +155,7 @@ namespace LogExpert.Dialogs
 			if (this.TimeSpreadCalc != null)
 			{
 				this.displayHeight = this.ClientRectangle.Height - EDGE_OFFSET * 3;
-				this.TimeSpreadCalc.DisplayHeight =this.displayHeight;
+				this.TimeSpreadCalc.DisplayHeight = this.displayHeight;
 			}
 		}
 

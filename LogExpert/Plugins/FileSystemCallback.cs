@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 using ColumnizerLib;
+using LogExpert.Classes;
 
 namespace LogExpert
 {
-	class FileSystemCallback : IFileSystemCallback
+	internal class FileSystemCallback : IFileSystemCallback
 	{
+		private static readonly LogExpertNlogWrapper _logger = new LogExpertNlogWrapper();
+
 		#region IFileSystemCallback Member
-		
+
 		public ILogExpertLogger GetLogger()
 		{
-			return Logger.GetLogger();
+			return _logger;
 		}
-	
-		#endregion
+
+		#endregion IFileSystemCallback Member
 	}
 }

@@ -7,9 +7,11 @@ namespace LogExpert
 	/// <summary>
 	/// Delivers the range (from..to) that matches the current range filter settings starting from a given line.
 	/// </summary>
-	class RangeFinder
+	internal class RangeFinder
 	{
-		FilterParams _filterParams;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		private FilterParams _filterParams;
 		private LogExpert.ColumnizerCallback _callback;
 
 		public RangeFinder(FilterParams filterParams, LogExpert.ColumnizerCallback callback)
@@ -20,15 +22,15 @@ namespace LogExpert
 
 		public Range FindRange(int startLine)
 		{
-			Logger.logInfo("Starting range search for " + _filterParams.searchText + " ... " + _filterParams.rangeSearchText);
+			Exten.Info(_logger, "Starting range search for " + this._filterParams.searchText + " ... " + this._filterParams.rangeSearchText);
 			if (_filterParams.rangeSearchText == null || _filterParams.rangeSearchText.Trim().Length == 0)
 			{
-				Logger.logInfo("Range search text not set. Cancelling range search.");
+				Exten.Info(_logger, "Range search text not set. Cancelling range search.");
 				return null;
 			}
 			if (_filterParams.searchText == null || _filterParams.searchText.Trim().Length == 0)
 			{
-				Logger.logInfo("Search text not set. Cancelling range search.");
+				Exten.Info(_logger, "Search text not set. Cancelling range search.");
 				return null;
 			}
 
@@ -62,7 +64,7 @@ namespace LogExpert
 			}
 			if (!foundStartLine)
 			{
-				Logger.logInfo("Range start not found");
+				Exten.Info(_logger, "Range start not found");
 				return null;
 			}
 			range.StartLine = lineNum;
@@ -81,9 +83,9 @@ namespace LogExpert
 			}
 			lineNum--;
 			range.EndLine = lineNum;
-			#if DEBUG
-			Logger.logInfo("Range search finished. Found " + (range.EndLine - range.StartLine) + " lines");
-			#endif
+#if DEBUG
+			_logger.logInfo("Range search finished. Found " + (range.EndLine - range.StartLine) + " lines");
+#endif
 			return range;
 		}
 	}

@@ -9,17 +9,20 @@ namespace LogExpert
 	public class LogFileInfo : ILogFileInfo
 	{
 		#region Fields
-		
+
 		private const int RETRY_COUNT = 5;
 		private const int RETRY_SLEEP = 250;
+
 		//FileStream fStream;
 		private FileInfo _fInfo;
-		private long _lastLength; 
-		
-		#endregion
-		
+
+		private long _lastLength;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		#endregion Fields
+
 		#region cTor
-		
+
 		public LogFileInfo(Uri fileUri)
 		{
 			_fInfo = new FileInfo(fileUri.LocalPath);
@@ -27,10 +30,10 @@ namespace LogExpert
 			OriginalLength = _lastLength = LengthWithoutRetry;
 		}
 
-		#endregion
+		#endregion cTor
 
 		#region Properties
-		
+
 		public string FullName
 		{
 			get
@@ -38,7 +41,7 @@ namespace LogExpert
 				return _fInfo.FullName;
 			}
 		}
-		
+
 		public string FileName
 		{
 			get
@@ -46,7 +49,7 @@ namespace LogExpert
 				return _fInfo.Name;
 			}
 		}
-		
+
 		public string DirectoryName
 		{
 			get
@@ -54,7 +57,7 @@ namespace LogExpert
 				return _fInfo.DirectoryName;
 			}
 		}
-		
+
 		public char DirectorySeparatorChar
 		{
 			get
@@ -64,7 +67,7 @@ namespace LogExpert
 		}
 
 		public Uri Uri { get; private set; }
-		
+
 		public long Length
 		{
 			get
@@ -85,7 +88,7 @@ namespace LogExpert
 					{
 						if (--retry <= 0)
 						{
-							Logger.logWarn("LogFileInfo.Length: " + e.ToString());
+							_logger.logWarn("LogFileInfo.Length: " + e.ToString());
 							return -1;
 						}
 						Thread.Sleep(RETRY_SLEEP);
@@ -96,7 +99,7 @@ namespace LogExpert
 		}
 
 		public long OriginalLength { get; private set; }
-		
+
 		public bool FileExists
 		{
 			get
@@ -105,7 +108,7 @@ namespace LogExpert
 				return _fInfo.Exists;
 			}
 		}
-		
+
 		public int PollInterval
 		{
 			get
@@ -113,7 +116,7 @@ namespace LogExpert
 				return ConfigManager.Settings.preferences.pollingInterval;
 			}
 		}
-		
+
 		public long LengthWithoutRetry
 		{
 			get
@@ -134,19 +137,19 @@ namespace LogExpert
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
-		
+
 		public override string ToString()
 		{
 			return string.Format("{0}, OldLen: {1}, Len: {2}", _fInfo.FullName, OriginalLength, Length);
 		}
-		
-		#endregion
-		
+
+		#endregion Overrides
+
 		#region Public Methods
-		
+
 		/// <summary>
 		/// Creates a new FileStream for the file. The caller is responsible for closing.
 		/// If file opening fails it will be tried RETRY_COUNT times. This may be needed sometimes
@@ -165,8 +168,8 @@ namespace LogExpert
 				}
 				catch (IOException fe)
 				{
-					Logger.logDebug("LogFileInfo.OpenFile(): " + fe.ToString());
-					Logger.logDebug("Retry counter: " + retry);
+					_logger.logDebug("LogFileInfo.OpenFile(): " + fe.ToString());
+					_logger.logDebug("Retry counter: " + retry);
 					if (--retry <= 0)
 					{
 						throw fe;
@@ -175,8 +178,8 @@ namespace LogExpert
 				}
 				catch (UnauthorizedAccessException uae)
 				{
-					Logger.logDebug("LogFileInfo.OpenFile(): " + uae.ToString());
-					Logger.logDebug("Retry counter: " + retry);
+					_logger.logDebug("LogFileInfo.OpenFile(): " + uae.ToString());
+					_logger.logDebug("Retry counter: " + retry);
 					if (--retry <= 0)
 					{
 						throw new IOException("Error opening file", uae);
@@ -185,7 +188,7 @@ namespace LogExpert
 				}
 			}
 		}
-			
+
 		public bool FileHasChanged()
 		{
 			if (LengthWithoutRetry != _lastLength)
@@ -196,6 +199,6 @@ namespace LogExpert
 			return false;
 		}
 
-		#endregion
+		#endregion Public Methods
 	}
 }

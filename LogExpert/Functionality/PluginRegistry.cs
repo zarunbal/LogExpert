@@ -15,8 +15,10 @@ namespace LogExpert
 	/// It all has started with Columnizers only. So the different types of plugins have no common super interface. I didn't change it
 	/// to keep existing plugin API stable. In a future version this may change.
 	/// </remarks>
-	class PluginRegistry
+	internal class PluginRegistry
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		private static Object lockObject = new Object();
 		private static PluginRegistry instance = null;
 
@@ -73,7 +75,7 @@ namespace LogExpert
 
 		internal void LoadPlugins()
 		{
-			Logger.logInfo("Loading plugins...");
+			Exten.Info(_logger, "Loading plugins...");
 			RegisteredColumnizers = new List<ILogLineColumnizer>();
 			RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
 			RegisteredColumnizers.Add(new TimestampColumnizer());
@@ -123,7 +125,7 @@ namespace LogExpert
 												_pluginList.Add(o as ILogExpertPlugin);
 												(o as ILogExpertPlugin).PluginLoaded();
 											}
-											Logger.logInfo("Added columnizer " + type.Name);
+											Exten.Info(_logger, "Added columnizer " + type.Name);
 										}
 									}
 								}
@@ -152,11 +154,11 @@ namespace LogExpert
 					catch (FileLoadException e)
 					{
 						// can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
-						Logger.logError(e.Message);
+						_logger.logError(e.Message);
 					}
 				}
 			}
-			Logger.logInfo("Plugin loading complete.");
+			Exten.Info(_logger, "Plugin loading complete.");
 		}
 
 		private bool TryAsContextMenu(Type type)
@@ -174,7 +176,7 @@ namespace LogExpert
 					_pluginList.Add(me as ILogExpertPlugin);
 					(me as ILogExpertPlugin).PluginLoaded();
 				}
-				Logger.logInfo("Added context menu plugin " + type.Name);
+				Exten.Info(_logger, "Added context menu plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -196,7 +198,7 @@ namespace LogExpert
 					_pluginList.Add(ka as ILogExpertPlugin);
 					(ka as ILogExpertPlugin).PluginLoaded();
 				}
-				Logger.logInfo("Added keyword plugin " + type.Name);
+				Exten.Info(_logger, "Added keyword plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -222,7 +224,7 @@ namespace LogExpert
 					_pluginList.Add(fs as ILogExpertPlugin);
 					(fs as ILogExpertPlugin).PluginLoaded();
 				}
-				Logger.logInfo("Added file system plugin " + type.Name);
+				Exten.Info(_logger, "Added file system plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -260,7 +262,7 @@ namespace LogExpert
 			return default(T);
 		}
 
-		static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
+		private static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
 		{
 			AssemblyName name = new AssemblyName(args.Name);
 
@@ -302,19 +304,19 @@ namespace LogExpert
 		internal IFileSystemPlugin FindFileSystemForUri(string uriString)
 		{
 			if (Logger.IsDebug)
-				Logger.logDebug("Trying to find file system plugin for uri " + uriString);
+				_logger.logDebug("Trying to find file system plugin for uri " + uriString);
 			foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
 			{
 				if (Logger.IsDebug)
-					Logger.logDebug("Checking " + fs.Text);
+					_logger.logDebug("Checking " + fs.Text);
 				if (fs.CanHandleUri(uriString))
 				{
 					if (Logger.IsDebug)
-						Logger.logDebug("Found match " + fs.Text);
+						_logger.logDebug("Found match " + fs.Text);
 					return fs;
 				}
 			}
-			Logger.logError("No file system plugin found for uri " + uriString);
+			_logger.logError("No file system plugin found for uri " + uriString);
 			return null;
 		}
 	}

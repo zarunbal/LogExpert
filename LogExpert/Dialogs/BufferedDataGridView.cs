@@ -11,16 +11,18 @@ namespace LogExpert.Dialogs
 {
 	public partial class BufferedDataGridView : DataGridView
 	{
-		Point dragStartPoint;
-		Boolean isDrag = false;
-		BookmarkOverlay draggedOverlay;
-		Size oldOverlayOffset;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		private Point dragStartPoint;
+		private Boolean isDrag = false;
+		private BookmarkOverlay draggedOverlay;
+		private Size oldOverlayOffset;
 		private ContextMenuStrip editModeMenuStrip = null;
 		private bool paintWithOverlays = false;
 
 		//BufferedGraphics myBuffer;
 
-		SortedList<int, BookmarkOverlay> overlayList = new SortedList<int, BookmarkOverlay>();
+		private SortedList<int, BookmarkOverlay> overlayList = new SortedList<int, BookmarkOverlay>();
 
 		//UserControl ctl = new UserControl();
 
@@ -80,7 +82,7 @@ namespace LogExpert.Dialogs
 			}
 			catch (Exception ex)
 			{
-				Logger.logError(ex.ToString());
+				_logger.logError(ex.ToString());
 			}
 		}
 
@@ -141,7 +143,7 @@ namespace LogExpert.Dialogs
 
 					if (Logger.IsDebug)
 					{
-						Logger.logDebug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
+						_logger.logDebug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
 										myBuffer.Graphics.ClipBounds.Top + "," +
 										myBuffer.Graphics.ClipBounds.Width + "," +
 										myBuffer.Graphics.ClipBounds.Height);
@@ -171,7 +173,7 @@ namespace LogExpert.Dialogs
 			editControl.ContextMenuStrip = this.EditModeMenuStrip;
 		}
 
-		void Control_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+		private void Control_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
 		{
 			if ((e.KeyCode == Keys.C || e.KeyCode == Keys.Insert) && e.Control)
 			{
@@ -182,7 +184,7 @@ namespace LogExpert.Dialogs
 			}
 		}
 
-		void Control_KeyDown(object sender, KeyEventArgs e)
+		private void Control_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
 			{
@@ -310,7 +312,7 @@ namespace LogExpert.Dialogs
 			return null;
 		}
 
-		/*    
+		/*
 		public Graphics Buffer
 		{
 		get { return this.myBuffer.Graphics; }
@@ -359,7 +361,7 @@ namespace LogExpert.Dialogs
 	}
 
 	public class LogGridCell : DataGridViewTextBoxCell
-	{ 
+	{
 		public LogGridCell()
 			: base()
 		{
@@ -410,6 +412,7 @@ namespace LogExpert.Dialogs
 			}
 			return !dataGridViewWantsInputKey;
 		}
+
 		//#region IDataGridViewEditingControl Members
 		//public void ApplyCellStyleToEditingControl(DataGridViewCellStyle dataGridViewCellStyle)
 		//{
@@ -477,7 +480,7 @@ namespace LogExpert.Dialogs
 		//}
 		//public void PrepareEditingControlForEdit(bool selectAll)
 		//{
-		//  // nothing 
+		//  // nothing
 		//}
 		//public bool RepositionEditingControlOnValueChange
 		//{
