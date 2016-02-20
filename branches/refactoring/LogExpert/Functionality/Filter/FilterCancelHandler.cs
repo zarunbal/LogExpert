@@ -4,23 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-	class FilterCancelHandler : BackgroundProcessCancelHandler
+	internal class FilterCancelHandler : BackgroundProcessCancelHandler
 	{
-		FilterStarter filterStarter;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		public FilterStarter FilterStarter { get; set; }
 
 		public FilterCancelHandler(FilterStarter filterStarter)
 		{
-			this.filterStarter = filterStarter;
+			this.FilterStarter = filterStarter;
 		}
 
 		#region BackgroundProcessCancelHandler Member
 
 		public void EscapePressed()
 		{
-			Logger.logInfo("FilterCancelHandler called.");
-			this.filterStarter.CancelFilter();
+			_logger.Info("FilterCancelHandler called.");
+			this.FilterStarter.CancelFilter();
 		}
-		
-		#endregion
+
+		#endregion BackgroundProcessCancelHandler Member
 	}
 }

@@ -9,12 +9,14 @@ namespace LogExpert.Classes
 {
 	public class FuzzyBlockDetection
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		private readonly List<int> _lineHashList = new List<int>();
 
 		public void TestStatistic(PatternArgs patternArgs, ILogWindowSearch logWindow)
 		{
 			int beginLine = patternArgs.startLine;
-			Logger.logInfo("TestStatistics() called with start line " + beginLine);
+			_logger.Info("TestStatistics() called with start line " + beginLine);
 
 			logWindow.PatternArgs = patternArgs;
 
@@ -43,12 +45,12 @@ namespace LogExpert.Classes
 
 				PatternBlock block;
 				int maxBlockLen = patternArgs.endLine - patternArgs.startLine;
-				Logger.logDebug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
+				_logger.Debug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
 				searchLine++;
 				logWindow.UpdateProgressBar(searchLine);
 				while (!logWindow.ShouldCancel && (block = DetectBlock(i, searchLine, maxBlockLen, logWindow.PatternArgs.maxDiffInBlock, logWindow.PatternArgs.maxMisses, processedLinesDict, logWindow)) != null)
 				{
-					Logger.logDebug("Found block: " + block);
+					_logger.Debug("Found block: " + block);
 					if (block.Weigth >= logWindow.PatternArgs.minWeight)
 					{
 						blockList.Add(block);
@@ -72,7 +74,7 @@ namespace LogExpert.Classes
 			logWindow.ProgressEventArgs.Visible = false;
 			logWindow.SendProgressBarUpdate();
 			logWindow.PatternWindow.SetBlockList(blockList, logWindow.PatternArgs);
-			Logger.logInfo("TestStatistics() ended");
+			_logger.Info("TestStatistics() ended");
 		}
 
 		private void AddBlockTargetLinesToDict(Dictionary<int, int> dict, PatternBlock block)
@@ -187,9 +189,11 @@ namespace LogExpert.Classes
 							case 'e':
 								numOfE++;
 								break;
+
 							case 'a':
 								numOfA++;
 								break;
+
 							case 'i':
 								numOfI++;
 								break;

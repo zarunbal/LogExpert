@@ -10,72 +10,76 @@ namespace LogExpert
 	public class LogExpertProxy : MarshalByRefObject, ILogExpertProxy
 	{
 		#region Fields
-		
+
 		[NonSerialized]
-		List<LogTabWindow> _windowList = new List<LogTabWindow>();
+		private List<LogTabWindow> _windowList = new List<LogTabWindow>();
+
 		[NonSerialized]
-		LogTabWindow _firstLogTabWindow;
+		private LogTabWindow _firstLogTabWindow;
+
 		[NonSerialized]
-		int _logWindowIndex = 1; 
-		
-		#endregion
-		
+		private int _logWindowIndex = 1;
+
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		#endregion Fields
+
 		#region cTor
-		
+
 		public LogExpertProxy(LogTabWindow logTabWindow)
 		{
 			AddWindow(logTabWindow);
 			logTabWindow.LogExpertProxy = this;
 			_firstLogTabWindow = logTabWindow;
 		}
-		
-		#endregion
-		
+
+		#endregion cTor
+
 		#region Properties
-		
+
 		public int GetLogWindowCount()
 		{
 			return _windowList.Count;
 		}
-		
-		#endregion
-		
+
+		#endregion Properties
+
 		#region Event
-		
+
 		public event Action LastWindowClosed;
-		
-		#endregion
-		
+
+		#endregion Event
+
 		#region Overrides
-		
+
 		public override object InitializeLifetimeService()
 		{
 			return null;
 		}
-		
-		#endregion
-		
+
+		#endregion Overrides
+
 		#region Public Methods
-		
+
 		public void LoadFiles(string[] fileNames)
 		{
-			Logger.logInfo("Loading files into existing LogTabWindow");
+			Exten.Info(_logger, "Loading files into existing LogTabWindow");
 			LogTabWindow logWin = _windowList[_windowList.Count - 1];
 			logWin.Invoke(new MethodInvoker(logWin.SetForeground));
 			logWin.LoadFiles(fileNames);
 		}
-		
+
 		public void NewWindow(string[] fileNames)
 		{
 			if (_firstLogTabWindow.IsDisposed)
 			{
-				Logger.logWarn("first GUI thread window is disposed. Setting a new one.");
+				_logger.logWarn("first GUI thread window is disposed. Setting a new one.");
 				// may occur if a window is closed because of unhandled exception.
 				// Determine a new 'firstWindow'. If no window is left, start a new one.
 				RemoveWindow(_firstLogTabWindow);
 				if (_windowList.Count == 0)
 				{
-					Logger.logInfo("No windows left. New created window will be the new 'first' GUI window");
+					Exten.Info(_logger, "No windows left. New created window will be the new 'first' GUI window");
 					LoadFiles(fileNames);
 				}
 				else
@@ -89,7 +93,7 @@ namespace LogExpert
 				_firstLogTabWindow.Invoke(new Action<string[]>(NewWindowWorker), new object[] { fileNames });
 			}
 		}
-		
+
 		public void NewWindowOrLockedWindow(string[] fileNames)
 		{
 			foreach (LogTabWindow logWin in _windowList)
@@ -104,23 +108,23 @@ namespace LogExpert
 			// No locked window was found --> create a new one
 			NewWindow(fileNames);
 		}
-		
+
 		public void NewWindowWorker(string[] fileNames)
 		{
-			Logger.logInfo("Creating new LogTabWindow");
+			Exten.Info(_logger, "Creating new LogTabWindow");
 			LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true);
 			logWin.LogExpertProxy = this;
 			AddWindow(logWin);
 			logWin.Show();
 			logWin.Activate();
 		}
-		
+
 		public void WindowClosed(LogTabWindow logWin)
 		{
 			RemoveWindow(logWin);
 			if (_windowList.Count == 0)
 			{
-				Logger.logInfo("Last LogTabWindow was closed");
+				Exten.Info(_logger, "Last LogTabWindow was closed");
 				PluginRegistry.GetInstance().CleanupPlugins();
 				OnLastWindowClosed();
 			}
@@ -133,23 +137,23 @@ namespace LogExpert
 				}
 			}
 		}
-		
-		#endregion
-		
+
+		#endregion Public Methods
+
 		#region Private Methods
-		
+
 		private void AddWindow(LogTabWindow window)
 		{
-			Logger.logInfo("Adding window to list");
+			_logger.Info("Adding window to list");
 			_windowList.Add(window);
 		}
-		
+
 		private void RemoveWindow(LogTabWindow window)
 		{
-			Logger.logInfo("Removing window from list");
+			_logger.Info("Removing window from list");
 			_windowList.Remove(window);
 		}
-		
+
 		private void OnLastWindowClosed()
 		{
 			if (LastWindowClosed != null)
@@ -157,7 +161,7 @@ namespace LogExpert
 				LastWindowClosed();
 			}
 		}
-	
-		#endregion
+
+		#endregion Private Methods
 	}
 }

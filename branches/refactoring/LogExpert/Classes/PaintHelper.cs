@@ -9,8 +9,14 @@ namespace LogExpert
 {
 	public static class PaintHelper
 	{
+		#region Fields
+
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		#endregion Fields
+
 		#region Properties
-		
+
 		private static Preferences Preferences
 		{
 			get
@@ -18,11 +24,11 @@ namespace LogExpert
 				return ConfigManager.Settings.preferences;
 			}
 		}
-		
-		#endregion
-		
+
+		#endregion Properties
+
 		#region Public Methods
-		
+
 		public static void CellPainting(ILogPaintContext logPaintCtx, DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
 		{
 			if (rowIndex < 0 || e.ColumnIndex < 0)
@@ -60,7 +66,7 @@ namespace LogExpert
 					e.CellStyle.BackColor = bgColor;
 					e.PaintBackground(e.ClipBounds, false);
 				}
-				
+
 				if (DebugOptions.disableWordHighlight)
 				{
 					e.PaintContent(e.CellBounds);
@@ -69,7 +75,7 @@ namespace LogExpert
 				{
 					PaintCell(logPaintCtx, e, gridView, false, entry);
 				}
-				
+
 				if (e.ColumnIndex == 0)
 				{
 					Bookmark bookmark = logPaintCtx.GetBookmarkForLine(rowIndex);
@@ -93,7 +99,7 @@ namespace LogExpert
 						}
 					}
 				}
-				
+
 				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
 				e.Handled = true;
 			}
@@ -101,94 +107,93 @@ namespace LogExpert
 
 		public static void CellPaintFilter(ILogPaintContext logPaintCtx, DataGridView gridView, DataGridViewCellPaintingEventArgs e, int lineNum, string line, HilightEntry entry)
 		{
-			
-				e.Graphics.SetClip(e.CellBounds);
-				if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+			e.Graphics.SetClip(e.CellBounds);
+			if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+			{
+				Brush brush;
+				if (gridView.Focused)
 				{
-					Brush brush;
-					if (gridView.Focused)
-					{
-						brush = new SolidBrush(e.CellStyle.SelectionBackColor);
-					}
-					else
-					{
-						Color color = Color.FromArgb(255, 170, 170, 170);
-						brush = new SolidBrush(color);
-					}
-					e.Graphics.FillRectangle(brush, e.CellBounds);
+					brush = new SolidBrush(e.CellStyle.SelectionBackColor);
+				}
+				else
+				{
+					Color color = Color.FromArgb(255, 170, 170, 170);
+					brush = new SolidBrush(color);
+				}
+				e.Graphics.FillRectangle(brush, e.CellBounds);
+				brush.Dispose();
+			}
+			else
+			{
+				Color bgColor = Color.White;
+				// paint direct filter hits with different bg color
+				//if (this.filterParams.SpreadEnabled && this.filterHitList.Contains(lineNum))
+				//{
+				//  bgColor = Color.FromArgb(255, 220, 220, 220);
+				//}
+				if (entry != null)
+				{
+					bgColor = entry.BackgroundColor;
+				}
+				e.CellStyle.BackColor = bgColor;
+				e.PaintBackground(e.ClipBounds, false);
+			}
+
+			if (DebugOptions.disableWordHighlight)
+			{
+				e.PaintContent(e.CellBounds);
+			}
+			else
+			{
+				PaintCell(logPaintCtx, e, gridView, false, entry);
+			}
+
+			if (e.ColumnIndex == 0)
+			{
+				Bookmark bookmark = logPaintCtx.GetBookmarkForLine(lineNum);
+				if (bookmark != null)
+				{
+					Rectangle r = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
+					r = e.CellBounds;
+					r.Inflate(-2, -2);
+					Brush brush = new SolidBrush(logPaintCtx.BookmarkColor);
+					e.Graphics.FillRectangle(brush, r);
 					brush.Dispose();
-				}
-				else
-				{
-					Color bgColor = Color.White;
-					// paint direct filter hits with different bg color
-					//if (this.filterParams.SpreadEnabled && this.filterHitList.Contains(lineNum))
-					//{
-					//  bgColor = Color.FromArgb(255, 220, 220, 220);
-					//}
-					if (entry != null)
+					if (bookmark.Text.Length > 0)
 					{
-						bgColor = entry.BackgroundColor;
-					}
-					e.CellStyle.BackColor = bgColor;
-					e.PaintBackground(e.ClipBounds, false);
-				}
-				
-				if (DebugOptions.disableWordHighlight)
-				{
-					e.PaintContent(e.CellBounds);
-				}
-				else
-				{
-					PaintCell(logPaintCtx, e, gridView, false, entry);
-				}
-				
-				if (e.ColumnIndex == 0)
-				{
-					Bookmark bookmark = logPaintCtx.GetBookmarkForLine(lineNum);
-					if (bookmark != null)
-					{
-						Rectangle r = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
-						r = e.CellBounds;
-						r.Inflate(-2, -2);
-						Brush brush = new SolidBrush(logPaintCtx.BookmarkColor);
-						e.Graphics.FillRectangle(brush, r);
-						brush.Dispose();
-						if (bookmark.Text.Length > 0)
-						{
-							StringFormat format = new StringFormat();
-							format.LineAlignment = StringAlignment.Center;
-							format.Alignment = StringAlignment.Center;
-							Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
-							Font font = logPaintCtx.NormalFont; //TODO Zarunbal: Check if settings normal font is the right
-							e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
-							font.Dispose();
-							brush2.Dispose();
-						}
+						StringFormat format = new StringFormat();
+						format.LineAlignment = StringAlignment.Center;
+						format.Alignment = StringAlignment.Center;
+						Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
+						Font font = logPaintCtx.NormalFont; //TODO Zarunbal: Check if settings normal font is the right
+						e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
+						font.Dispose();
+						brush2.Dispose();
 					}
 				}
-				
-				e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
-				e.Handled = true;
+			}
+
+			e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
+			e.Handled = true;
 		}
-		
+
 		public static void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
 		{
 			int rowCount = gridView.RowCount;
 			int currLine = gridView.CurrentCellAddress.Y;
 			int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
-			
+
 			try
 			{
 				gridView.Columns.Clear();
 			}
 			catch (ArgumentOutOfRangeException ae)
 			{
-				// Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
+				// Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode.
 				// Don't know why.
-				Logger.logError(ae.Message);
+				_logger.logError(ae.Message);
 			}
-			
+
 			DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
 			markerColumn.HeaderText = "";
 			markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
@@ -197,7 +202,7 @@ namespace LogExpert
 			markerColumn.ReadOnly = true;
 			// markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
 			gridView.Columns.Add(markerColumn);
-			
+
 			DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
 			lineNumberColumn.HeaderText = "Line";
 			lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
@@ -206,7 +211,7 @@ namespace LogExpert
 			lineNumberColumn.ReadOnly = true;
 			// lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
 			gridView.Columns.Add(lineNumberColumn);
-			
+
 			foreach (string colName in columnizer.GetColumnNames())
 			{
 				DataGridViewColumn titleColumn = new LogTextColumn();
@@ -217,7 +222,7 @@ namespace LogExpert
 				//titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
 				gridView.Columns.Add(titleColumn);
 			}
-			
+
 			gridView.RowCount = rowCount;
 			if (currLine != -1)
 				gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
@@ -226,7 +231,7 @@ namespace LogExpert
 			//gridView.Refresh();
 			//AutoResizeColumns(gridView);
 		}
-		
+
 		public static void AutoResizeColumns(DataGridView gridView)
 		{
 			try
@@ -246,11 +251,11 @@ namespace LogExpert
 				// See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
 				// There are some rare situations with null ref exceptions when resizing columns and on filter finished
 				// So catch them here. Better than crashing.
-				Logger.logError("Error while resizing columns: " + e.Message);
-				Logger.logError(e.StackTrace);
+				_logger.logError("Error while resizing columns: " + e.Message);
+				_logger.logError(e.StackTrace);
 			}
 		}
-		
+
 		public static void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
 		{
 			if (dataGridView.Columns.Count > 1)
@@ -261,9 +266,9 @@ namespace LogExpert
 				}
 				else
 				{
-					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+					// Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions).
 					dataGridView.FirstDisplayedScrollingColumnIndex = 0;
-					
+
 					dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5;  // default
 				}
 			}
@@ -275,61 +280,61 @@ namespace LogExpert
 			dataGridView.Refresh();
 			AutoResizeColumns(dataGridView);
 		}
-		
+
 		public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
 		{
 			Rectangle rect = new Rectangle();
-			
+
 			rect.X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
 				advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.X++;
 			}
-			
+
 			rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
 				advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Y++;
 			}
-			
+
 			rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
 				advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Width++;
 			}
-			
+
 			rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
 			if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
 				advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
 			{
 				rect.Height++;
 			}
-			
+
 			return rect;
 		}
-		
-		#endregion
-		
+
+		#endregion Public Methods
+
 		#region Private Methods
-		
+
 		private static void PaintCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
 			PaintHighlightedCell(logPaintCtx, e, gridView, noBackgroundFill, groundEntry);
 		}
-		
+
 		public static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
 		{
 			object value = e.Value != null ? e.Value : "";
 			IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as string);
-			// too many entries per line seem to cause problems with the GDI 
+			// too many entries per line seem to cause problems with the GDI
 			while (matchList.Count > 50)
 			{
 				matchList.RemoveAt(50);
 			}
-			
+
 			var hme = new HilightMatchEntry();
 			hme.StartPos = 0;
 			hme.Length = (value as string).Length;
@@ -338,7 +343,7 @@ namespace LogExpert
 				groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
 				false);
 			matchList = MergeHighlightMatchEntries(matchList, hme);
-			
+
 			Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
 			Rectangle valBounds = e.CellBounds;
 			valBounds.Offset(borderWidths.X, borderWidths.Y);
@@ -350,7 +355,7 @@ namespace LogExpert
 				valBounds.Width -= e.CellStyle.Padding.Horizontal;
 				valBounds.Height -= e.CellStyle.Padding.Vertical;
 			}
-			
+
 			TextFormatFlags flags =
 								   TextFormatFlags.Left |
 								   TextFormatFlags.SingleLine |
@@ -360,18 +365,18 @@ namespace LogExpert
 								   TextFormatFlags.VerticalCenter |
 								   TextFormatFlags.TextBoxControl
 			;
-			
+
 			//          | TextFormatFlags.VerticalCenter
 			//          | TextFormatFlags.TextBoxControl
 			//          TextFormatFlags.SingleLine
-			
+
 			//TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-			
+
 			Point wordPos = valBounds.Location;
 			Size proposedSize = new Size(valBounds.Width, valBounds.Height);
-			
+
 			e.Graphics.SetClip(e.CellBounds);
-			
+
 			foreach (HilightMatchEntry matchEntry in matchList)
 			{
 				Font font = matchEntry != null && matchEntry.HilightEntry.IsBold ? logPaintCtx.BoldFont : logPaintCtx.NormalFont;
@@ -380,7 +385,7 @@ namespace LogExpert
 				Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
 				wordSize.Height = e.CellBounds.Height;
 				Rectangle wordRect = new Rectangle(wordPos, wordSize);
-				
+
 				Color foreColor = matchEntry.HilightEntry.ForegroundColor;
 				if ((e.State & DataGridViewElementStates.Selected) != DataGridViewElementStates.Selected)
 				{
@@ -398,7 +403,7 @@ namespace LogExpert
 				}
 				TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
 					foreColor, flags);
-				
+
 				wordPos.Offset(wordSize.Width, 0);
 				if (bgBrush != null)
 				{
@@ -406,11 +411,11 @@ namespace LogExpert
 				}
 			}
 		}
-		
+
 		/// <summary>
-		/// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
+		/// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
 		/// background colors.
-		/// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the 
+		/// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
 		/// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
 		/// </summary>
 		/// <param name="matchList">List of all highlight matches for the current cell</param>
@@ -424,7 +429,7 @@ namespace LogExpert
 			{
 				entryArray[i] = groundEntry.HilightEntry;
 			}
-			
+
 			// "overpaint" with all matching word match enries
 			// Non-word-mode matches will not overpaint because they use the groundEntry
 			foreach (HilightMatchEntry me in matchList)
@@ -442,7 +447,7 @@ namespace LogExpert
 					}
 				}
 			}
-			
+
 			// collect areas with same hilight entry and build new highlight match entries for it
 			IList<HilightMatchEntry> mergedList = new List<HilightMatchEntry>();
 			if (entryArray.Length > 0)
@@ -471,7 +476,7 @@ namespace LogExpert
 			}
 			return mergedList;
 		}
-	
-		#endregion
+
+		#endregion Private Methods
 	}
 }

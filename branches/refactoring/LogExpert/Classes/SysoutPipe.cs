@@ -9,14 +9,16 @@ namespace LogExpert
 {
 	public class SysoutPipe
 	{
-		StreamWriter _writer;
-		StreamReader _sysout;
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+		private StreamWriter _writer;
+		private StreamReader _sysout;
 
 		public SysoutPipe(StreamReader sysout)
 		{
 			_sysout = sysout;
 			FileName = Path.GetTempFileName();
-			Logger.logInfo("sysoutPipe created temp file: " + FileName);
+			Exten.Info(_logger, "sysoutPipe created temp file: " + this.FileName);
 			FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
 			_writer = new StreamWriter(fStream, Encoding.Unicode);
 			Thread thread = new Thread(ReaderThread);

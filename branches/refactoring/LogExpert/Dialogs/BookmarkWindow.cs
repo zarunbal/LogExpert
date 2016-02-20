@@ -8,6 +8,8 @@ namespace LogExpert.Dialogs
 {
 	public partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmarkView
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		private ILogPaintContext logPaintContext;
 		private ILogView logView;
 		private IBookmarkData bookmarkData;
@@ -61,7 +63,7 @@ namespace LogExpert.Dialogs
 			}
 		}
 
-		void boomarkDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+		private void boomarkDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
 			if (this.bookmarkData == null)
 				return;
@@ -88,12 +90,12 @@ namespace LogExpert.Dialogs
 				}
 				catch (Exception ex)
 				{
-					Logger.logError(ex.StackTrace);
+					_logger.logError(ex.StackTrace);
 				}
 			}
 		}
 
-		void boomarkDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
+		private void boomarkDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
 		{
 			if (this.bookmarkData == null)
 				return;
@@ -125,12 +127,12 @@ namespace LogExpert.Dialogs
 				Brush brush;
 				if (gridView.Focused)
 				{
-					//Logger.logDebug("CellPaint Focus");
+					//_logger.logDebug("CellPaint Focus");
 					brush = new SolidBrush(e.CellStyle.SelectionBackColor);
 				}
 				else
 				{
-					//Logger.logDebug("CellPaint No Focus");
+					//_logger.logDebug("CellPaint No Focus");
 					Color color = Color.FromArgb(255, 170, 170, 170);
 					brush = new SolidBrush(color);
 				}
@@ -446,7 +448,7 @@ namespace LogExpert.Dialogs
 		{
 			if (ctx != null)
 			{
-				Logger.logDebug("Current file changed to " + ctx.LogView.FileName);
+				_logger.logDebug("Current file changed to " + ctx.LogView.FileName);
 				lock (this.paintLock)
 				{
 					this.logView = ctx.LogView;
@@ -467,7 +469,7 @@ namespace LogExpert.Dialogs
 			// nothing to do
 		}
 
-		#endregion
+		#endregion ISharedToolWindow Member
 
 		public void SetBookmarkData(IBookmarkData bookmarkData)
 		{
@@ -548,7 +550,7 @@ namespace LogExpert.Dialogs
 			//{
 			//  // redraw the "no bookmarks" display
 			//  Invalidate();
-			//} 
+			//}
 		}
 	}
 }
