@@ -691,9 +691,10 @@ namespace LogExpert
 								r.Offset(0, -(r.Height + heightSum));
 							}
 						}
-						if (Logger.IsDebug)
+
+						if (_logger.IsDebugEnabled)
 						{
-							_logger.Debug( "AddBookmarkOverlay() r.Location=" + r.Location.X + ", width=" + r.Width + ", scroll_offset=" + this.dataGridView.HorizontalScrollingOffset);
+							_logger.Debug("AddBookmarkOverlay() r.Location=" + r.Location.X + ", width=" + r.Width + ", scroll_offset=" + this.dataGridView.HorizontalScrollingOffset);
 						}
 						overlay.Position = r.Location - new Size(dataGridView.HorizontalScrollingOffset, 0);
 						overlay.Position = overlay.Position + new Size(10, r.Height / 2);
@@ -1094,7 +1095,7 @@ namespace LogExpert
 
 		public int FindTimestampLine_Internal(int lineNum, int rangeStart, int rangeEnd, DateTime timestamp, bool roundToSeconds)
 		{
-			_logger.Debug( "FindTimestampLine_Internal(): timestamp=" + timestamp + ", lineNum=" + lineNum + ", rangeStart=" + rangeStart + ", rangeEnd=" + rangeEnd);
+			_logger.Debug("FindTimestampLine_Internal(): timestamp=" + timestamp + ", lineNum=" + lineNum + ", rangeStart=" + rangeStart + ", rangeEnd=" + rangeEnd);
 			int refLine = lineNum;
 			DateTime currentTimestamp = GetTimestampForLine(ref refLine, roundToSeconds);
 			if (currentTimestamp.CompareTo(timestamp) == 0)
@@ -1149,7 +1150,7 @@ namespace LogExpert
 				{
 					return DateTime.MinValue;
 				}
-				_logger.Debug( "GetTimestampForLine(" + lineNum + ") enter");
+				_logger.Debug("GetTimestampForLine(" + lineNum + ") enter");
 				DateTime timeStamp = DateTime.MinValue;
 				bool lookBack = false;
 				if (lineNum >= 0 && lineNum < dataGridView.RowCount)
@@ -1177,7 +1178,7 @@ namespace LogExpert
 				}
 				if (lookBack)
 					lineNum++;
-				_logger.Debug( "GetTimestampForLine() leave with lineNum=" + lineNum);
+				_logger.Debug("GetTimestampForLine() leave with lineNum=" + lineNum);
 				return timeStamp;
 			}
 		}
@@ -1902,7 +1903,7 @@ namespace LogExpert
 
 		private void SelectionChangedTrigger_Signal(object sender, EventArgs e)
 		{
-			_logger.Debug( "Selection changed trigger");
+			_logger.Debug("Selection changed trigger");
 			int selCount = dataGridView.SelectedRows.Count;
 			if (selCount > 1)
 			{
@@ -2674,7 +2675,7 @@ namespace LogExpert
 				UnRegisterLogFileReaderEvents();
 				dataGridView.CurrentCellChanged -= DataGridView_CurrentCellChanged;
 				BeginInvoke(new Action(ReloadNewFile));
-				_logger.Debug( "Reloading invoked.");
+				_logger.Debug("Reloading invoked.");
 			}
 			else if (_isLoading)
 			{
@@ -3252,7 +3253,7 @@ namespace LogExpert
 				{
 					dataGridView.RowCount = e.LineCount;
 				}
-				_logger.Debug( "UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
+				_logger.Debug("UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
 				if (e.IsRollover)
 				{
 					// Multifile rollover
@@ -3265,7 +3266,7 @@ namespace LogExpert
 						{
 							currentLineNum = 0;
 						}
-						_logger.Debug( "UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + this.CurrentDataGridLine + ", new currLineNum=" + currentLineNum);
+						_logger.Debug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset + ", currLineNum was " + this.CurrentDataGridLine + ", new currLineNum=" + currentLineNum);
 						firstDisplayedLine -= e.RolloverOffset;
 						if (firstDisplayedLine < 0)
 						{
@@ -3958,7 +3959,7 @@ namespace LogExpert
 			{
 				int pos = editControl.SelectionStart + editControl.SelectionLength;
 				StatusLineText("   " + pos);
-				_logger.Debug( "SelStart: " + editControl.SelectionStart + ", SelLen: " + editControl.SelectionLength);
+				_logger.Debug("SelStart: " + editControl.SelectionStart + ", SelLen: " + editControl.SelectionLength);
 			}
 		}
 
@@ -4192,7 +4193,7 @@ namespace LogExpert
 
 			long endTime = Environment.TickCount;
 #if DEBUG
-			_logger.logInfo("Multi threaded filter duration: " + ((endTime - startTime)) + " ms.");
+			_logger.Info("Multi threaded filter duration: " + ((endTime - startTime)) + " ms.");
 #endif
 			DeRegisterCancelHandler(cancelHandler);
 			StatusLineText("Filter duration: " + ((endTime - startTime)) + " ms.");
@@ -4241,7 +4242,7 @@ namespace LogExpert
 			}
 			long endTime = Environment.TickCount;
 #if DEBUG
-			_logger.logInfo("Single threaded filter duration: " + ((endTime - startTime)) + " ms.");
+			_logger.Info("Single threaded filter duration: " + ((endTime - startTime)) + " ms.");
 #endif
 			StatusLineText("Filter duration: " + ((endTime - startTime)) + " ms.");
 		}
@@ -4983,6 +4984,7 @@ namespace LogExpert
 		}
 
 #if DEBUG
+
 		internal void DumpBufferInfo()
 		{
 			int currentLineNum = CurrentDataGridLine;
@@ -4993,6 +4995,7 @@ namespace LogExpert
 		{
 			CurrentLogFileReader.LogBufferDiagnostic();
 		}
+
 #endif
 
 		private void AddSearchHitHighlightEntry(SearchParams para)

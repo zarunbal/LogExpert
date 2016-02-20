@@ -303,16 +303,13 @@ namespace LogExpert
 
 		internal IFileSystemPlugin FindFileSystemForUri(string uriString)
 		{
-			if (Logger.IsDebug)
-				_logger.Debug( "Trying to find file system plugin for uri " + uriString);
+			_logger.Debug(() => { return "Trying to find file system plugin for uri " + uriString; });
 			foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
 			{
-				if (Logger.IsDebug)
-					_logger.Debug( "Checking " + fs.Text);
+				_logger.Debug(() => { return "Checking " + fs.Text; });
 				if (fs.CanHandleUri(uriString))
 				{
-					if (Logger.IsDebug)
-						_logger.Debug( "Found match " + fs.Text);
+					_logger.Debug(() => { return "Found match " + fs.Text; });
 					return fs;
 				}
 			}
