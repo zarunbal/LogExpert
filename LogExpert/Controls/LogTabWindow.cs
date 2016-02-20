@@ -461,7 +461,7 @@ namespace LogExpert
 					}
 					catch (ArgumentException e)
 					{
-						_logger.Error( "RegEx-error while finding columnizer: " + e.Message);
+						_logger.Error("RegEx-error while finding columnizer: " + e.Message);
 						// occurs on invalid regex patterns
 					}
 				}
@@ -1554,7 +1554,7 @@ namespace LogExpert
 				}
 				catch (Win32Exception e)
 				{
-					_logger.Error( e.Message);
+					_logger.Error(e.Message);
 					MessageBox.Show(e.Message);
 					return;
 				}
@@ -1573,7 +1573,7 @@ namespace LogExpert
 				}
 				catch (Exception e)
 				{
-					_logger.Error( e.Message);
+					_logger.Error(e.Message);
 					MessageBox.Show(e.Message);
 				}
 			}
@@ -1969,11 +1969,11 @@ namespace LogExpert
 			string s = "Dragging something over LogExpert. Formats:  ";
 			foreach (string format in formats)
 			{
-			s += format;
-			s += " , ";
+				s += format;
+				s += " , ";
 			}
-		s = s.Substring(0, s.Length - 3);
-			_logger.logInfo(s);
+			s = s.Substring(0, s.Length - 3);
+			_logger.Info(s);
 #endif
 		}
 
@@ -2008,11 +2008,11 @@ namespace LogExpert
 			string s = "Dropped formats:  ";
 			foreach (string format in formats)
 			{
-			s += format;
-			s += " , ";
+				s += format;
+				s += " , ";
 			}
 			s = s.Substring(0, s.Length - 3);
-			_logger.logDebug(s);
+			_logger.Debug(s);
 #endif
 			object test = e.Data.GetData(DataFormats.StringFormat);
 
@@ -2674,7 +2674,7 @@ namespace LogExpert
 #if DEBUG
 			if (CurrentLogWindow != null)
 			{
-		CurrentLogWindow.DumpBufferInfo();
+				CurrentLogWindow.DumpBufferInfo();
 			}
 #endif
 		}
@@ -2684,7 +2684,7 @@ namespace LogExpert
 #if DEBUG
 			if (CurrentLogWindow != null)
 			{
-		CurrentLogWindow.DumpBufferDiagnostic();
+				CurrentLogWindow.DumpBufferDiagnostic();
 			}
 #endif
 		}
@@ -2736,32 +2736,6 @@ namespace LogExpert
 			}));
 			thread.IsBackground = true;
 			thread.Start();
-		}
-
-		private void warnToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Logger.GetLogger().LogLevel = Logger.Level.WARN;
-		}
-
-		private void infoToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Logger.GetLogger().LogLevel = Logger.Level.INFO;
-		}
-
-		private void debugToolStripMenuItem1_Click(object sender, EventArgs e)
-		{
-			Logger.GetLogger().LogLevel = Logger.Level.DEBUG;
-		}
-
-		private void loglevelToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-		}
-
-		private void loglevelToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
-		{
-			warnToolStripMenuItem.Checked = Logger.GetLogger().LogLevel == Logger.Level.WARN;
-			infoToolStripMenuItem.Checked = Logger.GetLogger().LogLevel == Logger.Level.INFO;
-			debugToolStripMenuItem1.Checked = Logger.GetLogger().LogLevel == Logger.Level.DEBUG;
 		}
 
 		private void disableWordHighlightModeToolStripMenuItem_Click(object sender, EventArgs e)

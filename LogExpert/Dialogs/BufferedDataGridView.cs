@@ -141,12 +141,12 @@ namespace LogExpert.Dialogs
 					myBuffer.Graphics.DrawLine(pen, overlay.Position, new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
 					myBuffer.Graphics.DrawString(overlay.Bookmark.Text, font, textBrush, textRect, format);
 
-					if (Logger.IsDebug)
+					if (_logger.IsDebugEnabled)
 					{
-						_logger.Debug( "ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
-										myBuffer.Graphics.ClipBounds.Top + "," +
-										myBuffer.Graphics.ClipBounds.Width + "," +
-										myBuffer.Graphics.ClipBounds.Height);
+						_logger.Debug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
+													myBuffer.Graphics.ClipBounds.Top + "," +
+													myBuffer.Graphics.ClipBounds.Width + "," +
+													myBuffer.Graphics.ClipBounds.Height);
 					}
 					Rectangle testRect = this.ClientRectangle;
 				}

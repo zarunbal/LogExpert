@@ -275,8 +275,6 @@
     <Compile Include="Controls\LogTabWindow.designer.cs">
       <DependentUpon>LogTabWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Logger.cs">
-    </Compile>
     <Compile Include="Plugins\DefaultLogfileColumnizer.cs" />
     <Compile Include="Dialogs\AboutBox.cs">
       <SubType>Form</SubType>

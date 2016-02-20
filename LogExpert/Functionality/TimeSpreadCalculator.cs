@@ -280,7 +280,7 @@ namespace LogExpert
 							}
 							int lineDiff = lineNum - oldLineNum;
 #if DEBUG
-							_logger.logDebug(string.Format("TimeSpreadCalculator.DoCalc_via_Time() test time {0} line diff={1}", searchTimeStamp.ToString("HH:mm:ss.fff"), lineDiff));
+							_logger.Debug( string.Format("TimeSpreadCalculator.DoCalc_via_Time() test time {0} line diff={1}", searchTimeStamp.ToString("HH:mm:ss.fff"), lineDiff));
 #endif
 							if (lineDiff >= 0)
 							{

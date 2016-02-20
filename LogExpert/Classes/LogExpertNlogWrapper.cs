@@ -36,7 +36,7 @@ namespace LogExpert
 {
 	public static partial class Exten
 	{
-		public static void Debug(this NLog.ILogger logger, string msg)
+		public static void Warn(this NLog.ILogger logger, string msg)
 		{
 		}
 	}
