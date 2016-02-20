@@ -16,17 +16,19 @@ namespace LogExpert.Dialogs
 	/// </summary>
 	public partial class DateTimeDragControl : UserControl
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		#region Data Members and Properties
-		
+
 		public enum DragOrientations
 		{
 			Horizontal,
 			Vertical,
 			InvertedVertical
 		}
-		
+
 		private DateTime minDateTime = DateTime.MinValue;
-		
+
 		public DateTime MinDateTime
 		{
 			get
@@ -38,9 +40,9 @@ namespace LogExpert.Dialogs
 				minDateTime = value;
 			}
 		}
-		
+
 		private DateTime maxDateTime = DateTime.MaxValue;
-		
+
 		public DateTime MaxDateTime
 		{
 			get
@@ -52,24 +54,24 @@ namespace LogExpert.Dialogs
 				maxDateTime = value;
 			}
 		}
-		
+
 		public DragOrientations dragOrientation = DragOrientations.Vertical;
-		
+
 		public DragOrientations DragOrientation
 		{
 			get
 			{
 				return dragOrientation;
 			}
-			set 
+			set
 			{
 				dragOrientation = value;
 				UpdateContextMenu();
 			}
 		}
-		
+
 		public Color HoverColor { get; set; }
-		
+
 		private enum Components
 		{
 			Year,
@@ -79,7 +81,7 @@ namespace LogExpert.Dialogs
 			Minutes,
 			Seconds
 		};
-		
+
 		private string dateSeparator = ".";
 		private Rectangle[] digitRects = new Rectangle[6];
 		private Components[] rectContents = new Components[6]; // for now, only the first three components may change position
@@ -90,16 +92,16 @@ namespace LogExpert.Dialogs
 		private ToolStripItem item1 = new ToolStripMenuItem();
 		private ToolStripItem item2 = new ToolStripMenuItem();
 		private ToolStripItem item3 = new ToolStripMenuItem();
-		
+
 		private int startMouseY = 0;
 		private int startMouseX = 0;
 		private int oldValue = 0;
 		private int addedValue = 0;
 		private const int NO_DIGIT_DRAGGED = -1;
 		private int draggedDigit = NO_DIGIT_DRAGGED;
-		
+
 		private DateTime dateTime = new DateTime();
-		
+
 		public DateTime DateTime
 		{
 			get
@@ -115,33 +117,33 @@ namespace LogExpert.Dialogs
 					this.dateTime = maxDateTime;
 			}
 		}
-		
-		#endregion
-		
+
+		#endregion Data Members and Properties
+
 		/// <summary>
 		/// Default Constructor
 		/// </summary>
 		public DateTimeDragControl()
 		{
 			InitializeComponent();
-			
+
 			this.digitsFormat.LineAlignment = StringAlignment.Center;
 			this.digitsFormat.Alignment = StringAlignment.Near;
 			this.digitsFormat.Trimming = StringTrimming.None;
 			this.digitsFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip | StringFormatFlags.NoWrap;
-			
+
 			this.draggedDigit = NO_DIGIT_DRAGGED;
 		}
-		
+
 		private void DateTimeDragControl_Load(object sender, EventArgs e)
 		{
 			InitDigiRects();
-			
+
 			BuildContextualMenu();
 		}
-		
+
 		#region Contextual Menu
-		
+
 		private void BuildContextualMenu()
 		{
 			this.ContextMenuStrip = new ContextMenuStrip();
@@ -157,17 +159,17 @@ namespace LogExpert.Dialogs
 			item3.Text = "Drag vertical inverted";
 
 			ContextMenuStrip.Opening += new CancelEventHandler(ContextMenuStrip_Opening);
-		
+
 			UpdateContextMenu();
 		}
-		
+
 		private void UpdateContextMenu()
 		{
 			item1.Enabled = this.DragOrientation != DragOrientations.Horizontal;
 			item2.Enabled = this.DragOrientation != DragOrientations.Vertical;
 			item3.Enabled = this.DragOrientation != DragOrientations.InvertedVertical;
 		}
-		
+
 		private void ContextMenuStrip_Opening(object sender, CancelEventArgs e)
 		{
 			if (this.Capture)
@@ -175,7 +177,7 @@ namespace LogExpert.Dialogs
 				e.Cancel = true;
 			}
 		}
-		
+
 		private void item1_Click(object sender, EventArgs e)
 		{
 			this.DragOrientation = DragOrientations.Horizontal;
@@ -183,7 +185,7 @@ namespace LogExpert.Dialogs
 			item2.Enabled = true;
 			item3.Enabled = true;
 		}
-		
+
 		private void item2_Click(object sender, EventArgs e)
 		{
 			this.DragOrientation = DragOrientations.Vertical;
@@ -191,7 +193,7 @@ namespace LogExpert.Dialogs
 			item2.Enabled = false;
 			item3.Enabled = true;
 		}
-		
+
 		private void item3_Click(object sender, EventArgs e)
 		{
 			this.DragOrientation = DragOrientations.InvertedVertical;
@@ -200,21 +202,21 @@ namespace LogExpert.Dialogs
 			item3.Enabled = false;
 		}
 
-		#endregion
-		
+		#endregion Contextual Menu
+
 		#region Rendering
-			
+
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			
+
 			// Show what digit is dragged
 			using (Brush hoverBrush = new SolidBrush(this.HoverColor))
 			{
 				if (this.draggedDigit != NO_DIGIT_DRAGGED)
 					e.Graphics.FillRectangle(hoverBrush, this.digitRects[this.draggedDigit]);
 			}
-			
+
 			// Display current value with user-defined date format and fixed time format ("HH:mm:ss")
 			using (Brush brush = new SolidBrush(Color.Black))
 			{
@@ -226,32 +228,32 @@ namespace LogExpert.Dialogs
 				DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[5], FormatDigitLeadingZeros(this.dateTime.Second, 2, ""));
 			}
 		}
-			
+
 		private static string FormatDigitLeadingZeros(int number, int length, string postSeparator)
 		{
 			return number.ToString("D" + length.ToString()) + postSeparator;
 		}
-			
+
 		private void DrawDigit(Graphics g, Brush brush, Rectangle clip, Rectangle r, string value)
 		{
 			g.DrawString(value, this.Font, brush, r, this.digitsFormat);
 			//using (Pen pen = new Pen(brush))
 			//  g.DrawRectangle(pen, r);
 		}
-			
+
 		private void DateTimeDragControl_Resize(object sender, EventArgs e)
 		{
 			InitDigiRects();
 		}
-		
-		#endregion
-		
+
+		#endregion Rendering
+
 		#region Mouse callbacks
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
-				
+
 			if (e.Button == MouseButtons.Left)
 			{
 				this.draggedDigit = DetermineDraggedDigit(e);
@@ -270,28 +272,28 @@ namespace LogExpert.Dialogs
 			}
 			this.Invalidate(); // repaint with the selected item (or none)
 		}
-				
+
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			if (!Capture)
 				return;
-			
+
 			base.OnMouseUp(e);
 
 			Capture = false;
 			this.draggedDigit = NO_DIGIT_DRAGGED;
 			this.Invalidate(); // repaint without the selected item
-		
+
 			OnValueChanged(new EventArgs());
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
-			
+
 			if (!Capture)
 				return;
-			
+
 			int diff;
 			if (this.DragOrientation == DragOrientations.Vertical)
 				diff = this.startMouseY - e.Y;
@@ -299,10 +301,10 @@ namespace LogExpert.Dialogs
 				diff = this.startMouseY + e.Y;
 			else
 				diff = e.X - this.startMouseX;
-			
+
 			int delta = diff / 5 - this.addedValue; // one unit per 5 pixels move
-					
-			if (delta != 0) 
+
+			if (delta != 0)
 			{
 				if (SetDraggedValue(delta))
 					this.addedValue += delta;
@@ -311,7 +313,7 @@ namespace LogExpert.Dialogs
 				OnValueDragged(new EventArgs());
 			}
 		}
-			
+
 		private void DateTimeDragControl_MouseLeave(object sender, EventArgs e)
 		{
 			if (!this.Capture)
@@ -320,21 +322,21 @@ namespace LogExpert.Dialogs
 				Refresh();
 			}
 		}
-		
-		#endregion
-		
+
+		#endregion Mouse callbacks
+
 		#region Private Methods
-				
+
 		// Returns the index of the rectangle (digitRects) under the mouse cursor
 		private int DetermineDraggedDigit(MouseEventArgs e)
 		{
 			for (int i = 0; i < this.digitRects.Length; ++i)
 				if (this.digitRects[i].Contains(e.Location))
 					return i;
-		
+
 			return NO_DIGIT_DRAGGED;
 		}
-			
+
 		// Return the value corresponding to current dragged digit
 		private int GetDraggedValue()
 		{
@@ -342,21 +344,27 @@ namespace LogExpert.Dialogs
 			{
 				case Components.Day:
 					return this.dateTime.Day;
+
 				case Components.Month:
 					return this.dateTime.Month;
+
 				case Components.Year:
 					return this.dateTime.Year;
+
 				case Components.Hours:
 					return this.dateTime.Hour;
+
 				case Components.Minutes:
 					return this.dateTime.Minute;
+
 				case Components.Seconds:
 					return this.dateTime.Second;
+
 				default:
 					return NO_DIGIT_DRAGGED;
 			}
 		}
-			
+
 		private bool SetDraggedValue(int delta)
 		{
 			bool changed = true;
@@ -367,27 +375,33 @@ namespace LogExpert.Dialogs
 					case Components.Day:
 						this.dateTime = this.dateTime.AddDays(delta);
 						break;
+
 					case Components.Month:
 						this.dateTime = this.dateTime.AddMonths(delta);
 						break;
+
 					case Components.Year:
 						this.dateTime = this.dateTime.AddYears(delta);
 						break;
+
 					case Components.Hours:
 						this.dateTime = this.dateTime.AddHours(delta);
 						break;
+
 					case Components.Minutes:
 						this.dateTime = this.dateTime.AddMinutes(delta);
 						break;
+
 					case Components.Seconds:
 						this.dateTime = this.dateTime.AddSeconds(delta);
 						break;
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{ // invalid value dragged
+				_logger.Error(ex);
 			}
-			
+
 			if (this.dateTime > this.MaxDateTime)
 			{
 				this.dateTime = this.MaxDateTime;
@@ -398,16 +412,16 @@ namespace LogExpert.Dialogs
 				this.dateTime = this.MinDateTime;
 				changed = false;
 			}
-		
+
 			return changed;
 		}
-					
+
 		private int IndexOf(Components component)
 		{
 			for (int i = 0; i < this.rectContents.Length; i++)
 				if (this.rectContents[i] == component)
 					return i;
-		
+
 			return -1;
 		}
 
@@ -415,7 +429,7 @@ namespace LogExpert.Dialogs
 		{
 			this.dateSeparator = ".";
 			this.rectContents = new Components[] { Components.Day, Components.Month, Components.Year, Components.Hours, Components.Minutes, Components.Seconds };
-			
+
 			Rectangle rect = this.ClientRectangle;
 			int oneCharWidth = (rect.Width / 19);
 			int step = (rect.Width - oneCharWidth) / 7; // separate the 19 characters into seven pieces: dd., MM., yyyy, " ", HH:, mm:, ss
@@ -427,7 +441,7 @@ namespace LogExpert.Dialogs
 					s = step + oneCharWidth;
 				else if (i == 5) // seconds are 2 chars instead of 3
 					s = step - oneCharWidth + 2;
-				
+
 				if (i == 3)
 					left += step; // skip space
 
@@ -440,7 +454,7 @@ namespace LogExpert.Dialogs
 		{
 			this.dateSeparator = "-";
 			this.rectContents = new Components[] { Components.Year, Components.Month, Components.Day, Components.Hours, Components.Minutes, Components.Seconds };
-			
+
 			Rectangle rect = this.ClientRectangle;
 			int oneCharWidth = (rect.Width / 19);
 			int step = (rect.Width - oneCharWidth) / 7; // separate the 19 characters into seven pieces: yyyy-, MM-, dd, " ", HH:, mm:, ss
@@ -452,7 +466,7 @@ namespace LogExpert.Dialogs
 					s = step + (2 * oneCharWidth);
 				else if (i == 2 || i == 5) // day and seconds are 2 chars instead of 3
 					s = step - oneCharWidth + 2;
-				
+
 				if (i == 3)
 					left += step; // skip space
 
@@ -465,7 +479,7 @@ namespace LogExpert.Dialogs
 		{
 			this.dateSeparator = "/";
 			this.rectContents = new Components[] { Components.Month, Components.Day, Components.Year, Components.Hours, Components.Minutes, Components.Seconds };
-			
+
 			Rectangle rect = this.ClientRectangle;
 			int oneCharWidth = (rect.Width / 19);
 			int step = (rect.Width - oneCharWidth) / 7; // separate the 19 characters into seven pieces: MM/, dd/, yyyy, " ", HH:, mm:, ss
@@ -477,7 +491,7 @@ namespace LogExpert.Dialogs
 					s = step + oneCharWidth;
 				else if (i == 5) // seconds are 2 chars instead of 3
 					s = step - oneCharWidth + 2;
-				
+
 				if (i == 3)
 					left += step; // skip space
 
@@ -490,7 +504,7 @@ namespace LogExpert.Dialogs
 		{
 			var culture = System.Threading.Thread.CurrentThread.CurrentUICulture;
 			var cultureName = (culture.Parent != null) ? culture.Parent.Name : "";
-			
+
 			if (cultureName == "fr")
 				InitFrenchRects();
 			else if (cultureName == "en")
@@ -503,12 +517,12 @@ namespace LogExpert.Dialogs
 			this.dayIndex = IndexOf(Components.Day);
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region Public Events
-		
+
 		public delegate void ValueChangedEventHandler(object sender, EventArgs e);
-				
+
 		public event ValueChangedEventHandler ValueChanged;
 
 		protected void OnValueChanged(EventArgs e)
@@ -516,17 +530,17 @@ namespace LogExpert.Dialogs
 			if (ValueChanged != null)
 				ValueChanged(this, e);
 		}
-		
+
 		public delegate void ValueDraggedEventHandler(object sender, EventArgs e);
-				
+
 		public event ValueDraggedEventHandler ValueDragged;
-		
+
 		protected void OnValueDragged(EventArgs e)
 		{
 			if (ValueDragged != null)
 				ValueDragged(this, e);
 		}
 
-		#endregion
+		#endregion Public Events
 	}
 }

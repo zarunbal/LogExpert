@@ -11,6 +11,7 @@ namespace LogExpert.Dialogs
 {
 	public partial class RegexHelperDialog : Form
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
 		private static int MAX_HISTORY = 30;
 		private bool caseSensitive = false;
 
@@ -20,7 +21,7 @@ namespace LogExpert.Dialogs
 			this.Load += new EventHandler(RegexHelperDialog_Load);
 		}
 
-		void RegexHelperDialog_Load(object sender, EventArgs e)
+		private void RegexHelperDialog_Load(object sender, EventArgs e)
 		{
 			LoadHistory();
 		}
@@ -37,8 +38,9 @@ namespace LogExpert.Dialogs
 					this.matchesTextBox.Text += match.Value + "\r\n";
 				}
 			}
-			catch (ArgumentException)
+			catch (ArgumentException ex)
 			{
+				_logger.Error(ex);
 				this.matchesTextBox.Text = "No valid regex pattern";
 			}
 		}

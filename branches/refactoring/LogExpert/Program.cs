@@ -36,6 +36,7 @@ namespace LogExpert
 			}
 			catch (SecurityException se)
 			{
+				_logger.Error(se);
 				MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
 			}
 		}
@@ -147,7 +148,7 @@ namespace LogExpert
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("Mutex error, giving up: " + ex.Message);
+				_logger.Error(ex, "Mutex error, giving up: ");
 				MessageBox.Show("Cannot open connection to first instance (" + ex.Message + ")", "LogExpert");
 			}
 		}

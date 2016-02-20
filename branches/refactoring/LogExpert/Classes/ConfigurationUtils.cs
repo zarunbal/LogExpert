@@ -10,6 +10,8 @@ namespace LogExpert.Classes
 {
 	public static class ConfigurationUtils
 	{
+		private static readonly NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		public static string Prefix { get; set; }
 
 		public static T Load<T>()
@@ -39,10 +41,9 @@ namespace LogExpert.Classes
 
 			string filename = string.Format("{0}.xml", type.Name);
 			return LoadInternal<T>(escape, filename);
-
 		}
 
-		private static T LoadInternal<T>(bool escape, string filename) 
+		private static T LoadInternal<T>(bool escape, string filename)
 			where T : new()
 		{
 			FileInfo file = new FileInfo(Path.Combine(Environment2.StartupPath, filename));
@@ -60,6 +61,7 @@ namespace LogExpert.Classes
 				}
 				catch (Exception ex)
 				{
+					_logger.Error(ex);
 					if (escape)
 					{
 						throw new Exception("Failed to create and read in config", ex);

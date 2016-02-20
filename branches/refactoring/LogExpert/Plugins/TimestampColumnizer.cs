@@ -10,9 +10,12 @@ namespace LogExpert
 	using System.Globalization;
 
 	public class TimestampColumnizer : ILogLineColumnizer
+
 	{
+		private static NLog.ILogger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 		#region FormatInfo helper class
-		
+
 		protected class FormatInfo
 		{
 			public FormatInfo(string dateFormat, string timeFormat, CultureInfo cultureInfo)
@@ -21,13 +24,13 @@ namespace LogExpert
 				this.TimeFormat = timeFormat;
 				this.CultureInfo = cultureInfo;
 			}
-			
+
 			public string DateFormat { get; private set; }
-			
+
 			public string TimeFormat { get; private set; }
-			
+
 			public CultureInfo CultureInfo { get; private set; }
-			
+
 			public string DateTimeFormat
 			{
 				get
@@ -36,11 +39,11 @@ namespace LogExpert
 				}
 			}
 		}
-		
-		#endregion
-		
+
+		#endregion FormatInfo helper class
+
 		#region ILogLineColumnizer implementation
-		
+
 		protected int timeOffset = 0;
 		protected FormatInfo formatInfo1 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
 		protected FormatInfo formatInfo2 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
@@ -59,22 +62,22 @@ namespace LogExpert
 		protected FormatInfo formatInfo15 = new FormatInfo("dd MMM yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
 		protected FormatInfo formatInfo16 = new FormatInfo("dd.MM.yy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
 		protected FormatInfo formatInfo17 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
-		
+
 		public bool IsTimeshiftImplemented()
 		{
 			return true;
 		}
-		
+
 		public void SetTimeOffset(int msecOffset)
 		{
 			this.timeOffset = msecOffset;
 		}
-		
+
 		public int GetTimeOffset()
 		{
 			return this.timeOffset;
 		}
-		
+
 		public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
 		{
 			string[] cols = SplitLine(callback, line);
@@ -89,18 +92,19 @@ namespace LogExpert
 			FormatInfo formatInfo = DetermineDateTimeFormatInfo(line);
 			if (formatInfo == null)
 				return DateTime.MinValue;
-			
+
 			try
 			{
 				DateTime dateTime = DateTime.ParseExact(cols[0] + " " + cols[1], formatInfo.DateTimeFormat, formatInfo.CultureInfo);
 				return dateTime;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				_logger.Error(ex);
 				return DateTime.MinValue;
 			}
 		}
-		
+
 		public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
 		{
 			if (column == 1)
@@ -116,36 +120,37 @@ namespace LogExpert
 					long mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
 					this.timeOffset = (int)(mSecsNew - mSecsOld);
 				}
-				catch (FormatException)
+				catch (FormatException ex)
 				{
+					_logger.Error(ex);
 				}
 			}
 		}
-		
+
 		public string GetName()
 		{
 			return "Timestamp Columnizer";
 		}
-		
+
 		public string GetDescription()
 		{
 			return "Splits every line into 3 fields: Date, Time and the rest of the log message";
 		}
-		
+
 		public int GetColumnCount()
 		{
 			return 3;
 		}
-		
+
 		public string[] GetColumnNames()
 		{
 			return new string[] { "Date", "Time", "Message" };
 		}
-		
+
 		public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
 		{ // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
-			// 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-			// 03.01.2008 14:48:00.066 <rest of line>
+		  // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+		  // 03.01.2008 14:48:00.066 <rest of line>
 			if (line.Length < 21)
 			{
 				return new string[] { "", "", line };
@@ -179,19 +184,20 @@ namespace LogExpert
 					cols[2] = line.Substring(endPos);                 // rest of line
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				_logger.Error(ex);
 				cols[0] = "n/a";
 				cols[1] = "n/a";
 				cols[2] = line;
 			}
 			return cols;
 		}
-		
-		#endregion
-		
+
+		#endregion ILogLineColumnizer implementation
+
 		#region internal stuff
-		
+
 		public string Text
 		{
 			get
@@ -199,7 +205,7 @@ namespace LogExpert
 				return GetName();
 			}
 		}
-		
+
 		protected FormatInfo DetermineDateTimeFormatInfo(string line)
 		{
 			// dirty hardcoded probing of date/time format (much faster than DateTime.ParseExact()
@@ -255,30 +261,30 @@ namespace LogExpert
 			{
 				return this.formatInfo16;
 			}
-			
+
 			return null;
 		}
-		
+
 		protected FormatInfo DetermineTimeFormatInfo(string field)
 		{
 			// dirty hardcoded probing of time format (much faster than DateTime.ParseExact()
 			if (field[2] == ':' && field[5] == ':')
 			{
-				if (field.Length > 8) 
+				if (field.Length > 8)
 				{
 					if (field[8] == '.')
 						return this.formatInfo1;
 					else if (field[8] == ',')
 						return this.formatInfo7;
 				}
-				else 
+				else
 				{
 					return this.formatInfo2;
 				}
 			}
 			return null;
 		}
-	
-		#endregion
+
+		#endregion internal stuff
 	}
 }
