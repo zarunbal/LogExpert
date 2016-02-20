@@ -82,7 +82,7 @@ namespace LogExpert.Dialogs
 			}
 			catch (Exception ex)
 			{
-				_logger.logError(ex.ToString());
+				_logger.Error(ex.ToString());
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace LogExpert.Dialogs
 
 					if (Logger.IsDebug)
 					{
-						_logger.logDebug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
+						_logger.Debug( "ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
 										myBuffer.Graphics.ClipBounds.Top + "," +
 										myBuffer.Graphics.ClipBounds.Width + "," +
 										myBuffer.Graphics.ClipBounds.Height);

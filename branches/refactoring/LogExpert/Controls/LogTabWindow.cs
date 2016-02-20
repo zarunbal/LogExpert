@@ -461,7 +461,7 @@ namespace LogExpert
 					}
 					catch (ArgumentException e)
 					{
-						_logger.logError("RegEx-error while finding columnizer: " + e.Message);
+						_logger.Error( "RegEx-error while finding columnizer: " + e.Message);
 						// occurs on invalid regex patterns
 					}
 				}
@@ -606,7 +606,7 @@ namespace LogExpert
 				}
 				else
 				{
-					_logger.logWarn("Layout data contains non-existing LogWindow for " + fileName);
+					_logger.Warn("Layout data contains non-existing LogWindow for " + fileName);
 				}
 			}
 			return null;
@@ -635,7 +635,7 @@ namespace LogExpert
 					}
 					catch (SecurityException e)
 					{
-						_logger.logWarn("Insufficient rights for GetFolderPath(): " + e.Message);
+						_logger.Warn("Insufficient rights for GetFolderPath(): " + e.Message);
 						// no initial directory if insufficient rights
 					}
 				}
@@ -775,7 +775,7 @@ namespace LogExpert
 				}
 				catch (ArgumentException)
 				{
-					_logger.logWarn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
+					_logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
 					encodingOptions.DefaultEncoding = null;
 				}
 			}
@@ -1441,7 +1441,7 @@ namespace LogExpert
 
 		private void NotifyWindowsForChangedPrefs(SettingsFlags flags)
 		{
-			Exten.Info(_logger, "The preferences have changed");
+			_logger.Info("The preferences have changed");
 			ApplySettings(ConfigManager.Settings, flags);
 
 			lock (_logWindowList)
@@ -1545,7 +1545,7 @@ namespace LogExpert
 					columnizer = PluginRegistry.GetInstance().RegisteredColumnizers[0];
 				}
 
-				Exten.Info(_logger, "Starting external tool with sysout redirection: " + cmd + " " + args);
+				_logger.Info("Starting external tool with sysout redirection: " + cmd + " " + args);
 				startInfo.UseShellExecute = false;
 				startInfo.RedirectStandardOutput = true;
 				try
@@ -1554,7 +1554,7 @@ namespace LogExpert
 				}
 				catch (Win32Exception e)
 				{
-					_logger.logError(e.Message);
+					_logger.Error( e.Message);
 					MessageBox.Show(e.Message);
 					return;
 				}
@@ -1565,7 +1565,7 @@ namespace LogExpert
 			}
 			else
 			{
-				Exten.Info(_logger, "Starting external tool: " + cmd + " " + args);
+				_logger.Info("Starting external tool: " + cmd + " " + args);
 				try
 				{
 					startInfo.UseShellExecute = false;
@@ -1573,7 +1573,7 @@ namespace LogExpert
 				}
 				catch (Exception e)
 				{
-					_logger.logError(e.Message);
+					_logger.Error( e.Message);
 					MessageBox.Show(e.Message);
 				}
 			}
@@ -1661,20 +1661,20 @@ namespace LogExpert
 
 		private void RunGC()
 		{
-			Exten.Info(_logger, "Running GC. Used mem before: " + GC.GetTotalMemory(false).ToString("N0"));
+			_logger.Info("Running GC. Used mem before: " + GC.GetTotalMemory(false).ToString("N0"));
 			GC.Collect();
-			Exten.Info(_logger, "GC done.    Used mem after:  " + GC.GetTotalMemory(true).ToString("N0"));
+			_logger.Info("GC done.    Used mem after:  " + GC.GetTotalMemory(true).ToString("N0"));
 		}
 
 		private void DumpGCInfo()
 		{
-			Exten.Info(_logger, "-------- GC info -----------");
-			Exten.Info(_logger, "Used mem: " + GC.GetTotalMemory(false).ToString("N0"));
+			_logger.Info("-------- GC info -----------");
+			_logger.Info("Used mem: " + GC.GetTotalMemory(false).ToString("N0"));
 			for (int i = 0; i < GC.MaxGeneration; ++i)
 			{
-				Exten.Info(_logger, "Generation " + i + " collect count: " + GC.CollectionCount(i));
+				_logger.Info("Generation " + i + " collect count: " + GC.CollectionCount(i));
 			}
-			Exten.Info(_logger, "----------------------------");
+			_logger.Info("----------------------------");
 		}
 
 		private void ThrowExceptionFx()
@@ -2267,7 +2267,7 @@ namespace LogExpert
 			}
 			else
 			{
-				_logger.logWarn("Received SyncModeChanged event while disposing. Event ignored.");
+				_logger.Warn("Received SyncModeChanged event while disposing. Event ignored.");
 			}
 		}
 

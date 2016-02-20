@@ -174,7 +174,7 @@ namespace LogExpert.Controls
 				lock (_currentColumnizerLock)
 				{
 					_currentColumnizer = value;
-					_logger.logDebug("Setting columnizer " + _currentColumnizer != null ? _currentColumnizer.GetName() : "<none>");
+					_logger.Debug( "Setting columnizer " + this._currentColumnizer != null ? this._currentColumnizer.GetName() : "<none>");
 				}
 			}
 		}
@@ -298,16 +298,16 @@ namespace LogExpert.Controls
 			Thread.CurrentThread.Name = "LogEventWorker";
 			while (true)
 			{
-				_logger.logDebug("Waiting for signal");
+				_logger.Debug( "Waiting for signal");
 				_logEventArgsEvent.WaitOne();
-				_logger.logDebug("Wakeup signal received.");
+				_logger.Debug( "Wakeup signal received.");
 				while (true)
 				{
 					LogEventArgs e;
 					int lastLineCount = 0;
 					lock (_logEventArgsList)
 					{
-						Exten.Info(_logger, string.Format("{0} events in queue", this._logEventArgsList.Count));
+						_logger.Info(string.Format("{0} events in queue", this._logEventArgsList.Count));
 						if (_logEventArgsList.Count == 0)
 						{
 							_logEventArgsEvent.Reset();
@@ -327,7 +327,7 @@ namespace LogExpert.Controls
 					{
 						if (e.LineCount < lastLineCount)
 						{
-							_logger.logError(string.Format("Line count of event is: {0}, should be greater than last line count: {1}", e.LineCount, lastLineCount));
+							_logger.Error(string.Format("Line count of event is: {0}, should be greater than last line count: {1}", e.LineCount, lastLineCount));
 						}
 					}
 					Invoke(_updateGridAction, e);
@@ -428,20 +428,20 @@ namespace LogExpert.Controls
 				}
 
 				RegisterLogFileReaderEvents();
-				Exten.Info(_logger, "Loading logfile: " + fileName);
+				_logger.Info("Loading logfile: " + fileName);
 				CurrentLogFileReader.startMonitoring();
 			}
 		}
 
 		private void LoadFilesAsMultiInternal(string[] fileNames, EncodingOptions encodingOptions)
 		{
-			Exten.Info(_logger, "Loading given files as MultiFile:");
+			_logger.Info("Loading given files as MultiFile:");
 
 			EnterLoadFileStatus();
 
 			foreach (string name in fileNames)
 			{
-				Exten.Info(_logger, "File: " + name);
+				_logger.Info("File: " + name);
 			}
 
 			if (CurrentLogFileReader != null)
@@ -470,7 +470,7 @@ namespace LogExpert.Controls
 
 		protected virtual void EnterLoadFileStatus()
 		{
-			_logger.logDebug("EnterLoadFileStatus begin");
+			_logger.Debug( "EnterLoadFileStatus begin");
 
 			if (InvokeRequired)
 			{
@@ -493,7 +493,7 @@ namespace LogExpert.Controls
 			ClearFilterList();
 			BookmarkProvider.ClearAllBookmarks();
 
-			_logger.logDebug("EnterLoadFileStatus end");
+			_logger.Debug( "EnterLoadFileStatus end");
 		}
 
 		#endregion Load File
@@ -560,7 +560,7 @@ namespace LogExpert.Controls
 
 				if (persistenceData == null)
 				{
-					Exten.Info(_logger, "No persistence data for " + this.FileName + " found.");
+					_logger.Info("No persistence data for " + this.FileName + " found.");
 					return false;
 				}
 
@@ -598,7 +598,7 @@ namespace LogExpert.Controls
 			SetCurrentHighlightGroup(persistenceData.HighlightGroupName);
 			if (persistenceData.MultiFileNames.Count > 0)
 			{
-				Exten.Info(_logger, "Detected MultiFile name list in persistence options");
+				_logger.Info("Detected MultiFile name list in persistence options");
 				_fileNames = new string[persistenceData.MultiFileNames.Count];
 				persistenceData.MultiFileNames.CopyTo(_fileNames);
 			}
@@ -790,7 +790,7 @@ namespace LogExpert.Controls
 
 		protected void LogError(Exception ex, string message)
 		{
-			_logger.logError(message);
+			_logger.Error(message);
 		}
 
 		protected virtual void RegisterLogFileReaderEvents()
@@ -818,7 +818,7 @@ namespace LogExpert.Controls
 		{
 			if (!IsDisposed && !Disposing)
 			{
-				Exten.Info(_logger, "Handling file not found event.");
+				_logger.Info("Handling file not found event.");
 				_isDeadFile = true;
 				BeginInvoke(new Action(LogfileDead));
 			}
@@ -826,7 +826,7 @@ namespace LogExpert.Controls
 
 		protected virtual void LogfileDead()
 		{
-			Exten.Info(_logger, "File not found.");
+			_logger.Info("File not found.");
 			_isDeadFile = true;
 
 			_progressEventArgs.Visible = false;
@@ -845,7 +845,7 @@ namespace LogExpert.Controls
 
 		protected virtual void LogfileRespawned()
 		{
-			Exten.Info(_logger, "LogfileDead(): Reloading file because it has been respawned.");
+			_logger.Info("LogfileDead(): Reloading file because it has been respawned.");
 			_isDeadFile = false;
 			OnFileRespawned();
 		}
@@ -872,7 +872,7 @@ namespace LogExpert.Controls
 			}
 			catch (Exception ex)
 			{
-				_logger.logError(string.Format("LoadingStarted(): {0}\n{1}", ex, ex.StackTrace));
+				_logger.Error(string.Format("LoadingStarted(): {0}\n{1}", ex, ex.StackTrace));
 			}
 		}
 
@@ -882,7 +882,7 @@ namespace LogExpert.Controls
 			lock (_reloadLock)
 			{
 				_reloadOverloadCounter++;
-				Exten.Info(_logger, "ReloadNewFile(): counter = " + this._reloadOverloadCounter);
+				_logger.Info("ReloadNewFile(): counter = " + this._reloadOverloadCounter);
 				if (_reloadOverloadCounter <= 1)
 				{
 					SavePersistenceData(false);
@@ -898,7 +898,7 @@ namespace LogExpert.Controls
 				}
 				else
 				{
-					_logger.logDebug("Preventing reload because of recursive calls.");
+					_logger.Debug( "Preventing reload because of recursive calls.");
 				}
 				_reloadOverloadCounter--;
 			}

@@ -75,7 +75,7 @@ namespace LogExpert
 
 		internal void LoadPlugins()
 		{
-			Exten.Info(_logger, "Loading plugins...");
+			_logger.Info("Loading plugins...");
 			RegisteredColumnizers = new List<ILogLineColumnizer>();
 			RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
 			RegisteredColumnizers.Add(new TimestampColumnizer());
@@ -125,7 +125,7 @@ namespace LogExpert
 												_pluginList.Add(o as ILogExpertPlugin);
 												(o as ILogExpertPlugin).PluginLoaded();
 											}
-											Exten.Info(_logger, "Added columnizer " + type.Name);
+											_logger.Info("Added columnizer " + type.Name);
 										}
 									}
 								}
@@ -154,11 +154,11 @@ namespace LogExpert
 					catch (FileLoadException e)
 					{
 						// can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
-						_logger.logError(e.Message);
+						_logger.Error(e.Message);
 					}
 				}
 			}
-			Exten.Info(_logger, "Plugin loading complete.");
+			_logger.Info("Plugin loading complete.");
 		}
 
 		private bool TryAsContextMenu(Type type)
@@ -176,7 +176,7 @@ namespace LogExpert
 					_pluginList.Add(me as ILogExpertPlugin);
 					(me as ILogExpertPlugin).PluginLoaded();
 				}
-				Exten.Info(_logger, "Added context menu plugin " + type.Name);
+				_logger.Info("Added context menu plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -198,7 +198,7 @@ namespace LogExpert
 					_pluginList.Add(ka as ILogExpertPlugin);
 					(ka as ILogExpertPlugin).PluginLoaded();
 				}
-				Exten.Info(_logger, "Added keyword plugin " + type.Name);
+				_logger.Info("Added keyword plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -224,7 +224,7 @@ namespace LogExpert
 					_pluginList.Add(fs as ILogExpertPlugin);
 					(fs as ILogExpertPlugin).PluginLoaded();
 				}
-				Exten.Info(_logger, "Added file system plugin " + type.Name);
+				_logger.Info("Added file system plugin " + type.Name);
 				return true;
 			}
 			return false;
@@ -304,19 +304,19 @@ namespace LogExpert
 		internal IFileSystemPlugin FindFileSystemForUri(string uriString)
 		{
 			if (Logger.IsDebug)
-				_logger.logDebug("Trying to find file system plugin for uri " + uriString);
+				_logger.Debug( "Trying to find file system plugin for uri " + uriString);
 			foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
 			{
 				if (Logger.IsDebug)
-					_logger.logDebug("Checking " + fs.Text);
+					_logger.Debug( "Checking " + fs.Text);
 				if (fs.CanHandleUri(uriString))
 				{
 					if (Logger.IsDebug)
-						_logger.logDebug("Found match " + fs.Text);
+						_logger.Debug( "Found match " + fs.Text);
 					return fs;
 				}
 			}
-			_logger.logError("No file system plugin found for uri " + uriString);
+			_logger.Error("No file system plugin found for uri " + uriString);
 			return null;
 		}
 	}

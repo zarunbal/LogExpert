@@ -70,7 +70,7 @@ namespace LogExpert.Dialogs
 
 		private void timeSpreadCalc_CalcDone()
 		{
-			_logger.logDebug("timeSpreadCalc_CalcDone()");
+			_logger.Debug( "timeSpreadCalc_CalcDone()");
 			lock (this.monitor)
 			{
 				this.Invalidate();
