@@ -466,11 +466,11 @@ namespace LogExpert
 						if (value != null)
 						{
 							value = value.Replace("\t", "  ");
-						}
 
-						if (value.Length >= 4680)
-						{
-							value = "ups line to long";
+							if (value.Length >= 4680)
+							{
+								value = string.Format("{0}.....", value.Substring(0, 4674));
+							}
 						}
 
 						return value;
