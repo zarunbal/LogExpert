@@ -1,18 +1,6 @@
 LogExpert uses following 3rd party libraries:
 
 
-Bugzproxy:
-----------
-http://sourceforge.net/projects/bugzproxy/
-Released under "GNU Library or Lesser General Public License (LGPL)"
-
-
-XML RPC:
---------
-http://www.xml-rpc.net/
-Released under "MIT X11 license"
-
-
 DockPanel Suite:
 ----------------
 http://sourceforge.net/projects/dockpanelsuite/

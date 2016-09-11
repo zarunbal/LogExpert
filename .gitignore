@@ -1,0 +1,11 @@
+*.suo
+obj/
+bin/
+packages/
+*.user
+AssemblyVersion.cs
+temp.txt
+*.lock.*.docx#
+*.userprefs
+.vs/
+*.scgdat

@@ -8,24 +8,19 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class SearchProgressDialog : Form
-  {
-    private bool shouldStop;
+	public partial class SearchProgressDialog : Form
+	{
+		public SearchProgressDialog()
+		{
+			InitializeComponent();
+			this.ShouldStop = false;
+		}
 
-    public SearchProgressDialog()
-    {
-      InitializeComponent();
-      this.shouldStop = false;
-    }
+		private void cancelButton_Click(object sender, EventArgs e)
+		{
+			this.ShouldStop = true;
+		}
 
-    private void cancelButton_Click(object sender, EventArgs e)
-    {
-      this.shouldStop = true;
-    }
-
-    public bool ShouldStop
-    {
-      get { return this.shouldStop; }
-    }
-  }
+		public bool ShouldStop { get; private set; }
+	}
 }
