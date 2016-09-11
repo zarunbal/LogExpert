@@ -8,11 +8,11 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class MultiLoadRequestDialog : Form
-  {
-    public MultiLoadRequestDialog()
-    {
-      InitializeComponent();
-    }
-  }
+	public partial class MultiLoadRequestDialog : Form
+	{
+		public MultiLoadRequestDialog()
+		{
+			InitializeComponent();
+		}
+	}
 }
