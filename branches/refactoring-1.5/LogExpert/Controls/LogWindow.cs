@@ -888,7 +888,7 @@ namespace LogExpert
 								text = text.Substring(1);
 							}
 							TimeSpan timeSpan = TimeSpan.Parse(text);
-							int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
+							int diff = (int) (timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
 							CurrentColumnizer.SetTimeOffset(diff);
 						}
 						catch (Exception)
@@ -1552,8 +1552,8 @@ namespace LogExpert
 				}
 
 				_statusEventArgs.FileSize = e.ReadPos;
-				_progressEventArgs.MaxValue = (int)e.FileSize;
-				_progressEventArgs.Value = (int)e.ReadPos;
+				_progressEventArgs.MaxValue = (int) e.FileSize;
+				_progressEventArgs.Value = (int) e.ReadPos;
 				SendProgressBarUpdate();
 				SendStatusLineUpdate();
 			}
@@ -1578,7 +1578,7 @@ namespace LogExpert
 
 		private void DataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
 		{
-			DataGridView gridView = (DataGridView)sender;
+			DataGridView gridView = (DataGridView) sender;
 			PaintHelper.CellPainting(this, gridView, e.RowIndex, e);
 		}
 
@@ -1600,7 +1600,7 @@ namespace LogExpert
 			}
 
 			string oldValue = cols[e.ColumnIndex - 2];
-			string newValue = (string)e.Value;
+			string newValue = (string) e.Value;
 			CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
 			dataGridView.Refresh();
 			TimeSpan timeSpan = new TimeSpan(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
@@ -1773,7 +1773,7 @@ namespace LogExpert
 
 			if (line != null)
 			{
-				DataGridView gridView = (DataGridView)sender;
+				DataGridView gridView = (DataGridView) sender;
 				HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
 
 				PaintHelper.CellPaintFilter(this, gridView, e, lineNum, line, entry);
@@ -1856,17 +1856,17 @@ namespace LogExpert
 
 		private void EditControl_UpdateEditColumnDisplay(object sender, KeyEventArgs e)
 		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl) sender);
 		}
 
 		private void EditControl_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl) sender);
 		}
 
 		private void EditControl_Click(object sender, EventArgs e)
 		{
-			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl)sender);
+			UpdateEditColumnDisplay((DataGridViewTextBoxEditingControl) sender);
 		}
 
 		#endregion EditControl Events
@@ -1988,7 +1988,7 @@ namespace LogExpert
 			int index = dataGridContextMenuStrip.Items.IndexOf(pluginSeparator);
 			if (index > 0)
 			{
-				for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count; )
+				for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count;)
 				{
 					dataGridContextMenuStrip.Items.RemoveAt(i);
 				}
@@ -2459,7 +2459,7 @@ namespace LogExpert
 			int index = filterListBox.SelectedIndex;
 			if (index >= 0)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[index];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[index];
 				ConfigManager.Settings.filterList.Remove(filterParams);
 				OnFilterListChanged(this);
 				if (filterListBox.Items.Count > 0)
@@ -2474,7 +2474,7 @@ namespace LogExpert
 			int i = filterListBox.SelectedIndex;
 			if (i > 0)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[i];
 				ConfigManager.Settings.filterList.RemoveAt(i);
 				i--;
 				ConfigManager.Settings.filterList.Insert(i, filterParams);
@@ -2488,7 +2488,7 @@ namespace LogExpert
 			int i = filterListBox.SelectedIndex;
 			if (i < filterListBox.Items.Count - 1)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[i];
 				ConfigManager.Settings.filterList.RemoveAt(i);
 				i++;
 				ConfigManager.Settings.filterList.Insert(i, filterParams);
@@ -2501,7 +2501,7 @@ namespace LogExpert
 		{
 			if (filterListBox.SelectedIndex >= 0)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[filterListBox.SelectedIndex];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[filterListBox.SelectedIndex];
 				FilterParams newParams = filterParams.CreateCopy();
 				//newParams.historyList = ConfigManager.Settings.filterHistoryList;
 				_filterParams = newParams;
@@ -2527,7 +2527,7 @@ namespace LogExpert
 			e.DrawBackground();
 			if (e.Index >= 0)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[e.Index];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[e.Index];
 				Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
 				Brush brush = ((e.State & DrawItemState.Selected) == DrawItemState.Selected) ? new SolidBrush(filterListBox.BackColor) : new SolidBrush(filterParams.color);
@@ -2545,7 +2545,7 @@ namespace LogExpert
 			int i = filterListBox.SelectedIndex;
 			if (i < filterListBox.Items.Count && i >= 0)
 			{
-				FilterParams filterParams = (FilterParams)filterListBox.Items[i];
+				FilterParams filterParams = (FilterParams) filterListBox.Items[i];
 				ColorDialog dlg = new ColorDialog();
 				dlg.CustomColors = new int[] { filterParams.color.ToArgb() };
 				dlg.Color = filterParams.color;
@@ -3774,8 +3774,8 @@ namespace LogExpert
 			try
 			{
 				Invoke(new MethodInvoker(ResetProgressBar));
-				AsyncResult ar = (AsyncResult)result;
-				Func<SearchParams, int> fx = (Func<SearchParams, int>)ar.AsyncDelegate;
+				AsyncResult ar = (AsyncResult) result;
+				Func<SearchParams, int> fx = (Func<SearchParams, int>) ar.AsyncDelegate;
 				int line = fx.EndInvoke(result);
 				_guiStateArgs.MenuEnabled = true;
 				GuiStateUpdate(this, _guiStateArgs);
