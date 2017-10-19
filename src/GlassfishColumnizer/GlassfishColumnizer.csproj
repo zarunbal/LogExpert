@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
-      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
+      <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
       <Name>ColumnizerLib</Name>
     </ProjectReference>
   </ItemGroup>
