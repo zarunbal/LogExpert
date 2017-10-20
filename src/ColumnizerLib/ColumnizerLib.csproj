@@ -51,6 +51,7 @@
     <Compile Include="IInitColumnizer.cs" />
     <Compile Include="ILogExpertLogger.cs" />
     <Compile Include="ILogFileInfo.cs" />
+    <Compile Include="ILogLine.cs" />
     <Compile Include="IPreProcessColumnizer.cs" />
     <Compile Include="IKeywordAction.cs" />
     <Compile Include="ILogExpertPlugin.cs" />
