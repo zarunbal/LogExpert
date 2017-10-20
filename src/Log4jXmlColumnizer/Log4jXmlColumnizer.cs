@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -139,6 +140,31 @@ namespace LogExpert
 
   public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
   {
+      private class Log4JLogLine : ILogLine
+      {
+          private static readonly int _maxLength = 20000 - 3;
+          private string _fullLine;
+          public string FullLine
+          {
+              get { return _fullLine; }
+              set
+              {
+                  _fullLine = value;
+                  if (_fullLine.Length > _maxLength)
+                  {
+                      DisplayLine = _fullLine.Substring(0, _maxLength) + "...";
+                  }
+                  else
+                  {
+                      DisplayLine = _fullLine;
+                  }
+              }
+          }
+
+          public int LineNumber { get; set; }
+          public string DisplayLine { get; private set; }
+      }
+
     public const int COLUMN_COUNT = 9;
 
     private static XmlConfig xmlConfig = new XmlConfig();
@@ -162,9 +188,13 @@ namespace LogExpert
       return xmlConfig;
     }
 
-    public string GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback)
+    public ILogLine GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback)
     {
-      return logLine.Replace(separatorChar, '|');
+        Log4JLogLine line = new Log4JLogLine();
+
+        line.FullLine = logLine.Replace(separatorChar, '|');
+        line.LineNumber = callback.GetLineNum();
+        return line;
     }
 
     #endregion
@@ -192,15 +222,15 @@ namespace LogExpert
       return config.ActiveColumnNames;
     }
 
-    public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
+    public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
     {
       string[] cols = new string[Log4jXmlColumnizer.COLUMN_COUNT] { "", "", "", "", "", "", "", "", "" };
 
       // If the line is too short (i.e. does not follow the format for this columnizer) return the whole line content
       // in colum 8 (the log message column). Date and time column will be left blank.
-      if (line.Length < 15)
+      if (line.FullLine.Length < 15)
       {
-        cols[8] = line;
+        cols[8] = line.FullLine;
       }
       else
       {
@@ -209,7 +239,7 @@ namespace LogExpert
           DateTime dateTime = GetTimestamp(callback, line);
           if (dateTime == DateTime.MinValue)
           {
-            cols = new string[Log4jXmlColumnizer.COLUMN_COUNT] { "", "", "", "", "", "", "", "", line };
+            cols = new string[Log4jXmlColumnizer.COLUMN_COUNT] { "", "", "", "", "", "", "", "", line.FullLine };
           }
           string newDate = dateTime.ToString(DATETIME_FORMAT);
           cols[0] = newDate;
@@ -223,7 +253,7 @@ namespace LogExpert
         cols = GetColsFromLine(line);
         if (cols.Length != Log4jXmlColumnizer.COLUMN_COUNT)
         {
-          cols = new string[Log4jXmlColumnizer.COLUMN_COUNT]{"", "", "", "", "", "", "", "", line};
+          cols = new string[Log4jXmlColumnizer.COLUMN_COUNT]{"", "", "", "", "", "", "", "", line.FullLine };
         }
         else
         {
@@ -235,10 +265,10 @@ namespace LogExpert
     }
       
 
-    private string[] GetColsFromLine(string line)
+    private string[] GetColsFromLine(ILogLine line)
     {
       string[] cols;
-      cols = line.Split(this.trimChars, Log4jXmlColumnizer.COLUMN_COUNT, StringSplitOptions.None);
+      cols = line.FullLine.Split(this.trimChars, Log4jXmlColumnizer.COLUMN_COUNT, StringSplitOptions.None);
       return cols;
     }
 
@@ -258,19 +288,19 @@ namespace LogExpert
       return this.timeOffset;
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
+    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
     {
-      if (line.Length < 15)
+      if (line.FullLine.Length < 15)
       {
         return DateTime.MinValue;
       }
 
-      int endIndex = line.IndexOf(separatorChar, 1);
+      int endIndex = line.FullLine.IndexOf(separatorChar, 1);
       if (endIndex > 20 || endIndex < 0)
       {
         return DateTime.MinValue;
       }
-      string value = line.Substring(0, endIndex);
+      string value = line.FullLine.Substring(0, endIndex);
 
       try
       {

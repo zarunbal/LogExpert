@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -10,15 +11,15 @@ namespace LogExpert
   /// </summary>
   public interface ILogPaintContext
   {
-    string GetLogLine(int lineNum);
+      ILogLine GetLogLine(int lineNum);
 
     string GetCellValue(int rowIndex, int columnIndex);
 
     Bookmark GetBookmarkForLine(int lineNum);
 
-    HilightEntry FindHilightEntry(string line, bool noWordMatches);
+    HilightEntry FindHilightEntry(ILogLine line, bool noWordMatches);
 
-    IList<HilightMatchEntry> FindHilightMatches(string line);
+    IList<HilightMatchEntry> FindHilightMatches(ILogLine line);
 
     Font MonospacedFont { get; }   // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
     Font NormalFont { get; }

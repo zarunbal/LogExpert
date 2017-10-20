@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -69,7 +70,7 @@ namespace LogExpert
     /// use these markers for line splitting.
     /// When copying to clipboard, this method will remove the special characters and replace them with spaces.
     /// </remarks>
-    string GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback);
+    ILogLine GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback);
   }
 
 }

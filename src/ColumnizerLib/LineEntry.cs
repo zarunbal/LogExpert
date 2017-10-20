@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 namespace LogExpert
 {
   /// <summary>
@@ -10,7 +12,7 @@ namespace LogExpert
     /// <summary>
     /// The content of the line.
     /// </summary>
-    public string logLine;
+    public ILogLine logLine;
 
     /// <summary>
     /// The line number. See <see cref="ILogExpertCallback.AddPipedTab"/> for an explanation of the line number.

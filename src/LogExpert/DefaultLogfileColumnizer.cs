@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -28,9 +29,9 @@ namespace LogExpert
       return new string[]{"Text"};
     }
 
-    public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
+    public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
     {
-      return new string[] { line };
+      return new string[] { line.FullLine };
     }
 
     public string Text
@@ -58,7 +59,7 @@ namespace LogExpert
       throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
+    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
     {
       throw new NotImplementedException();
     }

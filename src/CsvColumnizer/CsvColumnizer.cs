@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
+using ColumnizerLib;
 
 
 namespace CsvColumnizer
@@ -56,11 +57,35 @@ namespace CsvColumnizer
   /// </summary>
   public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer
   {
+      private class CsvLogLine : ILogLine
+      {
+          private string _fullLine;
+          private static readonly int _maxLength = 20000 - 3;
+          public string FullLine
+          {
+              get { return _fullLine; }
+              set
+              {
+                  _fullLine = value;
+                  if (_fullLine.Length > _maxLength)
+                  {
+                      DisplayLine = _fullLine.Substring(0, _maxLength) + "...";
+                  }
+                  else
+                  {
+                      DisplayLine = _fullLine;
+                  }
+              }
+          }
+
+          public int LineNumber { get; set; }
+          public string DisplayLine { get; private set; }
+      }
     private CsvColumnizerConfig config;
 
     private IList<CsvColumn> columnList = new List<CsvColumn>();
 
-    private string firstLine;
+    private ILogLine firstLine;
 
     // if CSV is detected to be 'invalid' the columnizer will behave like a default columnizer
     private bool isValidCsv;
@@ -101,15 +126,15 @@ namespace CsvColumnizer
       return names;
     }
 
-    public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
+    public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
     {
       if (this.isValidCsv)
       {
-        return SplitCsvLine(line);
+        return SplitCsvLine(line.FullLine);
       }
       else
       {
-        return new string[] { line };
+        return new string[] { line.FullLine };
       }
     }
 
@@ -128,7 +153,7 @@ namespace CsvColumnizer
       throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
+    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
     {
       throw new NotImplementedException();
     }
@@ -147,11 +172,11 @@ namespace CsvColumnizer
       if (this.isValidCsv) // see PreProcessLine()
       {
         this.columnList.Clear();
-        string line = this.config.hasFieldNames ? this.firstLine : callback.GetLogLine(0);
+        ILogLine line = this.config.hasFieldNames ? this.firstLine : callback.GetLogLine(0);
         int i = 1;
         if (line != null)
         {
-          string[] fields = SplitCsvLine(line);
+          string[] fields = SplitCsvLine(line.FullLine);
           foreach (string field in fields)
           {
             if (this.config.hasFieldNames)
@@ -252,7 +277,12 @@ namespace CsvColumnizer
     {
       if (realLineNum == 0)
       {
-        this.firstLine = logLine;   // store for later field names and field count retrieval
+          // store for later field names and field count retrieval
+           firstLine = new CsvLogLine
+          {
+              FullLine = logLine,
+              LineNumber = 0
+          };
         if (this.config.minColumns > 0)
         {
           string[] headers = SplitCsvLine(logLine);

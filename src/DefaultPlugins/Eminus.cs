@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -64,29 +65,30 @@ namespace LogExpert
 
     #endregion
 
-    private XmlDocument BuildParam(string line)
+    private XmlDocument BuildParam(ILogLine line)
     {
+        string temp = line.FullLine;
       // no Java stacktrace but some special logging of our applications at work:
-      if (line.IndexOf("Exception of type") != -1 || line.IndexOf("Nested:") != -1)
+      if (temp.IndexOf("Exception of type") != -1 || temp.IndexOf("Nested:") != -1)
       {
-        int pos = line.IndexOf("created in ");
+        int pos = temp.IndexOf("created in ");
         if (pos == -1)
           return null;
         pos += "created in ".Length;
-        int endPos = line.IndexOf(".", pos);
+        int endPos = temp.IndexOf(".", pos);
         if (endPos == -1)
           return null;
-        string className = line.Substring(pos, endPos - pos);
-        pos = line.IndexOf(":", pos);
+        string className = temp.Substring(pos, endPos - pos);
+        pos = temp.IndexOf(":", pos);
         if (pos == -1)
           return null;
-        string lineNum = line.Substring(pos + 1);
+        string lineNum = temp.Substring(pos + 1);
         XmlDocument doc = BuildXmlDocument(className, lineNum);
         return doc;
       }
-      if (line.IndexOf("at ") != -1)
+      if (temp.IndexOf("at ") != -1)
       {
-        string str = line.Trim();
+        string str = temp.Trim();
         string className = null;
         string lineNum = null;
         int pos = str.IndexOf("at ") + 3;

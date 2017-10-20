@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -47,7 +48,7 @@ namespace LogExpert
       }
     }
 
-    public bool WriteToPipe(string textLine, int orgLineNum)
+    public bool WriteToPipe(ILogLine textLine, int orgLineNum)
     {
       try {
         lock (this.FileName)
@@ -56,7 +57,7 @@ namespace LogExpert
           {
             try
             {
-              this.writer.WriteLine(textLine);
+              this.writer.WriteLine(textLine.FullLine);
               this.lineMappingList.Add(orgLineNum);
               return true;
             }

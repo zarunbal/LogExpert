@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -15,7 +16,7 @@ namespace LogExpert
       this.argLine = argTemplate;
     }
 
-    public string ReplaceParams(string logLine, int lineNum, string fileName)
+    public string ReplaceParams(ILogLine logLine, int lineNum, string fileName)
     {
       FileInfo fileInfo = new FileInfo(fileName);
       StringBuilder builder = new StringBuilder(this.argLine);
@@ -35,7 +36,7 @@ namespace LogExpert
         replace = GetNextGroup(builder, ref sPos);
         if (reg != null && replace != null)
         {
-          string result = Regex.Replace(logLine, reg, replace);
+          string result = Regex.Replace(logLine.FullLine, reg, replace);
           builder.Insert(sPos, result);
         }
       }

@@ -29,6 +29,10 @@ namespace LogExpert
                     {
                         DisplayLine = FullLine.Substring(0, _maxStringSize) + "...";
                     }
+                    else
+                    {
+                        DisplayLine = _fullLine;
+                    }
                 }
             }
 

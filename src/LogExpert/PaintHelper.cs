@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using ColumnizerLib;
 using LogExpert.Dialogs;
 
 namespace LogExpert
@@ -23,7 +24,7 @@ namespace LogExpert
         e.Handled = false;
         return;
       }
-      string line = logPaintCtx.GetLogLine(rowIndex);
+        ILogLine line = logPaintCtx.GetLogLine(rowIndex);
       if (line != null)
       {
         HilightEntry entry = logPaintCtx.FindHilightEntry(line, true);
@@ -112,7 +113,7 @@ namespace LogExpert
     private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
     {
       object value = e.Value != null ? e.Value : "";
-      IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as string);
+      IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as ILogLine);
       // too many entries per line seem to cause problems with the GDI 
       while (matchList.Count > 50)
       {

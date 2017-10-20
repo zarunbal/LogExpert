@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -21,7 +22,7 @@ namespace LogExpert
       {
         this.lastColumnizer = columnizer;
         this.lastLineNumber = lineNumber;
-        string line = logFileReader.GetLogLineWithWait(lineNumber);
+          ILogLine line = logFileReader.GetLogLineWithWait(lineNumber);
         if (line != null)
         {
           columnizerCallback.LineNum = lineNumber;

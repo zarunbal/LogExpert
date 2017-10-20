@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -58,7 +59,7 @@ namespace LogExpert
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
     /// <param name="line">The line content to be splitted</param>
-    string[] SplitLine(ILogLineColumnizerCallback callback, string line);
+    string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line);
 
     /// <summary>
     /// Returns true, if the columnizer supports timeshift handling.
@@ -99,7 +100,7 @@ namespace LogExpert
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
     /// <param name="line">The line content which timestamp has to be returned.</param>
-    DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line);
+    DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line);
 
     /// <summary>
     /// This function is called if the user changes a value in a column (edit mode in the log view).

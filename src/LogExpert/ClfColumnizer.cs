@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -38,7 +39,7 @@ namespace LogExpert
       return this.timeOffset;
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
+    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
     {
       string[] cols = SplitLine(callback, line);
       if (cols == null || cols.Length < 8)
@@ -98,22 +99,23 @@ namespace LogExpert
       return new string[] { "IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent" };
     }
 
-    public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
+    public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
     {
       string[] cols = new string[8] { "", "", "", "", "", "", "", ""};
-      if (line.Length > 1024)
+        string temp = line.FullLine;
+      if (temp.Length > 1024)
       {
-        // spam 
-        line = line.Substring(0, 1024);
-        cols[3] = line;
+                // spam 
+          temp = temp.Substring(0, 1024);
+        cols[3] = temp;
         return cols;
       }
       // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
       // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
 
-      if (this.lineRegex.IsMatch(line))
+      if (this.lineRegex.IsMatch(temp))
       {
-        Match match = this.lineRegex.Match(line);
+        Match match = this.lineRegex.Match(temp);
         GroupCollection groups = match.Groups;
         if (groups.Count == 10)
         {
@@ -157,7 +159,7 @@ namespace LogExpert
       }
       else
       {
-        cols[3] = line;
+        cols[3] = temp;
       }
       return cols;
     }

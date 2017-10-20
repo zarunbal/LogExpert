@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -84,7 +85,7 @@ namespace LogExpert
 
 
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, string line)
+    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
     {
       string[] cols = SplitLine(callback, line);
       if (cols == null || cols.Length < 2)
@@ -151,21 +152,22 @@ namespace LogExpert
       return new string[] {"Date", "Time", "Message"};
     }
 
-    public string[] SplitLine(ILogLineColumnizerCallback callback, string line)
+    public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
     { // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
       // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
       // 03.01.2008 14:48:00.066 <rest of line>
+        string temp = line.FullLine;
 
-      if (line.Length < 21)
+      if (temp.Length < 21)
       {
-        return new string[] { "", "", line };
+        return new string[] { "", "", temp };
       }
       string[] cols = new string[3];
       FormatInfo formatInfo = DetermineDateTimeFormatInfo(line);
       if (formatInfo == null)
       {
         cols[0] = cols[1] = "";
-        cols[2] = line;
+        cols[2] = temp;
         return cols;
       }
       int endPos = formatInfo.DateTimeFormat.Length;
@@ -175,25 +177,25 @@ namespace LogExpert
       {
         if (this.timeOffset != 0)
         {
-          DateTime dateTime = DateTime.ParseExact(line.Substring(0, endPos), formatInfo.DateTimeFormat, formatInfo.CultureInfo);
+          DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat, formatInfo.CultureInfo);
           dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
           string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
           cols[0] = newDate.Substring(0, dateLen);         // date
           cols[1] = newDate.Substring(dateLen + 1, timeLen);   // time
-          cols[2] = line.Substring(endPos);           // rest of line
+          cols[2] = temp.Substring(endPos);           // rest of line
         }
         else
         {
-          cols[0] = line.Substring(0, dateLen);             // date
-          cols[1] = line.Substring(dateLen + 1, timeLen);   // time
-          cols[2] = line.Substring(endPos);                 // rest of line
+          cols[0] = temp.Substring(0, dateLen);             // date
+          cols[1] = temp.Substring(dateLen + 1, timeLen);   // time
+          cols[2] = temp.Substring(endPos);                 // rest of line
         }
       }
       catch (Exception)
       {
         cols[0] = "n/a";
         cols[1] = "n/a";
-        cols[2] = line;
+        cols[2] = temp;
       }
       return cols;
     }
@@ -207,58 +209,60 @@ namespace LogExpert
       get { return GetName(); }
     }
 
-    protected FormatInfo DetermineDateTimeFormatInfo(string line)
+    protected FormatInfo DetermineDateTimeFormatInfo(ILogLine line)
     {
+        string temp = line.FullLine;
+
       // dirty hardcoded probing of date/time format (much faster than DateTime.ParseExact()
-      if (line[2] == '.' && line[5] == '.' && line[13] == ':' && line[16] == ':')
+      if (temp[2] == '.' && temp[5] == '.' && temp[13] == ':' && temp[16] == ':')
       {
-        if (line[19] == '.')
+        if (temp[19] == '.')
           return this.formatInfo1;
-        else if (line[19] == ',')
+        else if (temp[19] == ',')
           return this.formatInfo7;
         else
           return this.formatInfo2;
       }
-      else if (line[4] == '/' && line[7] == '/' && line[13] == ':' && line[16] == ':')
+      else if (temp[4] == '/' && temp[7] == '/' && temp[13] == ':' && temp[16] == ':')
       {
-        if (line[19] == '.')
+        if (temp[19] == '.')
           return this.formatInfo3;
-        else if (line[19] == ',')
+        else if (temp[19] == ',')
           return this.formatInfo8;
         else
           return this.formatInfo4;
       }
-      else if (line[4] == '.' && line[7] == '.' && line[13] == ':' && line[16] == ':')
+      else if (temp[4] == '.' && temp[7] == '.' && temp[13] == ':' && temp[16] == ':')
       {
-        if (line[19] == '.')
+        if (temp[19] == '.')
           return this.formatInfo5;
-        else if (line[19] == ',')
+        else if (temp[19] == ',')
           return this.formatInfo9;
         else
           return this.formatInfo6;
       }
-      else if (line[4] == '-' && line[7] == '-' && line[13] == ':' && line[16] == ':')
+      else if (temp[4] == '-' && temp[7] == '-' && temp[13] == ':' && temp[16] == ':')
       {
-        if (line[19] == '.')
+        if (temp[19] == '.')
           return this.formatInfo10;
-        else if (line[19] == ',')
+        else if (temp[19] == ',')
           return this.formatInfo11;
-        else if (line[19] == ':')
+        else if (temp[19] == ':')
           return this.formatInfo17;
         else
           return this.formatInfo12;
       }
-      else if (line[2] == ' ' && line[6] == ' ' && line[14] == ':' && line[17] == ':')
+      else if (temp[2] == ' ' && temp[6] == ' ' && temp[14] == ':' && temp[17] == ':')
       {
-        if (line[20] == ',')
+        if (temp[20] == ',')
           return this.formatInfo13;
-        else if (line[20] == '.')
+        else if (temp[20] == '.')
           return this.formatInfo14;
         else
           return this.formatInfo15;
       }
         //dd.MM.yy HH:mm:ss.fff
-      else if (line[2] == '.' && line[5] == '.' && line[11] == ':' && line[14] == ':' && line[17] == '.')
+      else if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
       {
         return this.formatInfo16;
       }

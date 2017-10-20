@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Drawing;
+using ColumnizerLib;
 
 namespace LogExpert
 {
@@ -55,13 +56,13 @@ namespace LogExpert
         return "" + String.Format("{0:0.00}", ((double)size / 1048576.0)) + " MB";
     }
 
-    public static bool TestFilterCondition(FilterParams filterParams, string line, ILogLineColumnizerCallback columnizerCallback)
+    public static bool TestFilterCondition(FilterParams filterParams, ILogLine line, ILogLineColumnizerCallback columnizerCallback)
     {
-      if (filterParams.lastLine.Equals(line))
+      if (filterParams.lastLine.Equals(line.FullLine))
         return filterParams.lastResult;
 
       bool match = TestFilterMatch(filterParams, line, columnizerCallback);
-      filterParams.lastLine = line;
+      filterParams.lastLine = line.FullLine;
 
       if (filterParams.isRangeSearch)
       {
@@ -90,7 +91,7 @@ namespace LogExpert
       return match;
     }
 
-    private static bool TestFilterMatch(FilterParams filterParams, string line, ILogLineColumnizerCallback columnizerCallback)
+    private static bool TestFilterMatch(FilterParams filterParams, ILogLine line, ILogLineColumnizerCallback columnizerCallback)
     {
       string lowerSearchText;
       string searchText;
@@ -147,7 +148,7 @@ namespace LogExpert
       }
       else
       {
-        return TestMatchSub(filterParams, line, lowerSearchText, searchText, rex, false);
+        return TestMatchSub(filterParams, line.FullLine, lowerSearchText, searchText, rex, false);
       }
     }
 

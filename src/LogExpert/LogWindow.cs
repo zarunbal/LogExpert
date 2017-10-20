@@ -14,6 +14,7 @@ using System.IO;
 using System.Globalization;
 using System.Reflection;
 using System.Collections;
+using ColumnizerLib;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
@@ -867,7 +868,7 @@ namespace LogExpert
                 e.Handled = false;
                 return;
             }
-            string line = this.logFileReader.GetLogLineWithWait(rowIndex);
+            ILogLine line = this.logFileReader.GetLogLineWithWait(rowIndex);
             if (line != null)
             {
                 HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
@@ -959,7 +960,7 @@ namespace LogExpert
        * Returns the first HilightEntry that matches the given line
        */
 
-        public HilightEntry FindHilightEntry(string line, bool noWordMatches)
+        public HilightEntry FindHilightEntry(ILogLine line, bool noWordMatches)
         {
             // first check the temp entries
             lock (this.tempHilightEntryListLock)
@@ -994,7 +995,7 @@ namespace LogExpert
             }
         }
 
-        public IList<HilightMatchEntry> FindHilightMatches(string line)
+        public IList<HilightMatchEntry> FindHilightMatches(ILogLine line)
         {
             IList<HilightMatchEntry> resultList = new List<HilightMatchEntry>();
             if (line != null)
@@ -1311,10 +1312,7 @@ namespace LogExpert
                 Bookmark bookmark = this.bookmarkProvider.GetBookmarkForLine(lineNum);
                 if (bookmark.Text != null && bookmark.Text.Length > 0)
                 {
-                    if (DialogResult.No ==
-                        MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?",
-                            "LogExpert",
-                            MessageBoxButtons.YesNo))
+                    if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
                     {
                         return;
                     }
@@ -1334,7 +1332,7 @@ namespace LogExpert
         {
             lock (this.bookmarkLock)
             {
-                string line = this.logFileReader.GetLogLine(lineNum);
+                ILogLine line = this.logFileReader.GetLogLine(lineNum);
                 if (line == null)
                 {
                     return;
@@ -1856,7 +1854,7 @@ namespace LogExpert
                             return DateTime.MinValue;
                         }
                         lookBack = true;
-                        string logLine = this.logFileReader.GetLogLine(lineNum);
+                        ILogLine logLine = this.logFileReader.GetLogLine(lineNum);
                         if (logLine == null)
                         {
                             return DateTime.MinValue;
@@ -1901,7 +1899,7 @@ namespace LogExpert
                     while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < this.dataGridView.RowCount)
                     {
                         lookFwd = true;
-                        string logLine = this.logFileReader.GetLogLine(lineNum);
+                        ILogLine logLine = this.logFileReader.GetLogLine(lineNum);
                         if (logLine == null)
                         {
                             timeStamp = DateTime.MinValue;
@@ -1933,7 +1931,7 @@ namespace LogExpert
             InvalidateCurrentRow(this.dataGridView);
         }
 
-        public string GetCurrentLine()
+        public ILogLine GetCurrentLine()
         {
             if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
             {
@@ -1942,7 +1940,7 @@ namespace LogExpert
             return null;
         }
 
-        public string GetLine(int lineNum)
+        public ILogLine GetLine(int lineNum)
         {
             if (lineNum < 0 || lineNum >= this.logFileReader.LineCount)
             {
@@ -3036,7 +3034,7 @@ namespace LogExpert
                 bool filterLineAdded = false;
                 for (int i = filterStart; i < e.LineCount; ++i)
                 {
-                    string line = this.logFileReader.GetLogLine(i);
+                    ILogLine line = this.logFileReader.GetLogLine(i);
                     if (line == null)
                     {
                         return;
@@ -3099,7 +3097,7 @@ namespace LogExpert
                 }
                 for (int i = startLine; i < e.LineCount; ++i)
                 {
-                    string line = this.logFileReader.GetLogLine(i);
+                    ILogLine line = this.logFileReader.GetLogLine(i);
                     if (line != null)
                     {
                         IList<HilightEntry> matchingList = FindMatchingHilightEntries(line);
@@ -3366,7 +3364,7 @@ namespace LogExpert
             HilightEntry groundEntry)
         {
             object value = e.Value != null ? e.Value : "";
-            IList<HilightMatchEntry> matchList = FindHilightMatches(value as string);
+            IList<HilightMatchEntry> matchList = FindHilightMatches(value as ILogLine);
             // too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
             {
@@ -3530,22 +3528,22 @@ namespace LogExpert
        * Returns the first HilightEntry that matches the given line
        */
 
-        private HilightEntry FindHilightEntry(string line)
+        private HilightEntry FindHilightEntry(ILogLine line)
         {
             return FindHilightEntry(line, false);
         }
 
-        private HilightEntry FindFirstNoWordMatchHilightEntry(string line)
+        private HilightEntry FindFirstNoWordMatchHilightEntry(ILogLine line)
         {
             return FindHilightEntry(line, true);
         }
 
-        private bool CheckHighlightEntryMatch(HilightEntry entry, string line)
+        private bool CheckHighlightEntryMatch(HilightEntry entry, ILogLine line)
         {
             if (entry.IsRegEx)
             {
                 //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                if (entry.Regex.IsMatch(line))
+                if (entry.Regex.IsMatch(line.FullLine))
                 {
                     return true;
                 }
@@ -3554,14 +3552,14 @@ namespace LogExpert
             {
                 if (entry.IsCaseSensitive)
                 {
-                    if (line.Contains(entry.SearchText))
+                    if (line.FullLine.Contains(entry.SearchText))
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if (line.ToLower().Contains(entry.SearchText.ToLower()))
+                    if (line.FullLine.ToLower().Contains(entry.SearchText.ToLower()))
                     {
                         return true;
                     }
@@ -3574,7 +3572,7 @@ namespace LogExpert
        * Returns all HilightEntry entries which matches the given line
        */
 
-        private IList<HilightEntry> FindMatchingHilightEntries(string line)
+        private IList<HilightEntry> FindMatchingHilightEntries(ILogLine line)
         {
             IList<HilightEntry> resultList = new List<HilightEntry>();
             if (line != null)
@@ -3593,14 +3591,13 @@ namespace LogExpert
             return resultList;
         }
 
-        private void GetHighlightEntryMatches(string line, IList<HilightEntry> hilightEntryList,
-            IList<HilightMatchEntry> resultList)
+        private void GetHighlightEntryMatches(ILogLine line, IList<HilightEntry> hilightEntryList, IList<HilightMatchEntry> resultList)
         {
             foreach (HilightEntry entry in hilightEntryList)
             {
                 if (entry.IsWordMatch)
                 {
-                    MatchCollection matches = entry.Regex.Matches(line);
+                    MatchCollection matches = entry.Regex.Matches(line.FullLine);
                     foreach (Match match in matches)
                     {
                         HilightMatchEntry me = new HilightMatchEntry();
@@ -3617,7 +3614,7 @@ namespace LogExpert
                         HilightMatchEntry me = new HilightMatchEntry();
                         me.HilightEntry = entry;
                         me.StartPos = 0;
-                        me.Length = line.Length;
+                        me.Length = line.FullLine.Length;
                         resultList.Add(me);
                     }
                 }
@@ -3845,7 +3842,7 @@ namespace LogExpert
                     }
                 }
 
-                string line = this.logFileReader.GetLogLine(lineNum);
+                ILogLine line = this.logFileReader.GetLogLine(lineNum);
                 if (line == null)
                 {
                     return -1;
@@ -3855,7 +3852,7 @@ namespace LogExpert
                 {
                     Regex rex = new Regex(searchParams.searchText,
                         searchParams.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                    if (rex.IsMatch(line))
+                    if (rex.IsMatch(line.FullLine))
                     {
                         return lineNum;
                     }
@@ -3864,14 +3861,14 @@ namespace LogExpert
                 {
                     if (!searchParams.isCaseSensitive)
                     {
-                        if (line.ToLower().Contains(lowerSearchText))
+                        if (line.FullLine.ToLower().Contains(lowerSearchText))
                         {
                             return lineNum;
                         }
                     }
                     else
                     {
-                        if (line.Contains(searchParams.searchText))
+                        if (line.FullLine.Contains(searchParams.searchText))
                         {
                             return lineNum;
                         }
@@ -4043,7 +4040,7 @@ namespace LogExpert
             while (lineNum > 0)
             {
                 lineNum--;
-                string line = this.logFileReader.GetLogLine(lineNum);
+                ILogLine line = this.logFileReader.GetLogLine(lineNum);
                 if (line != null)
                 {
                     HilightEntry entry = FindHilightEntry(line);
@@ -4062,7 +4059,7 @@ namespace LogExpert
             while (lineNum < this.logFileReader.LineCount)
             {
                 lineNum++;
-                string line = this.logFileReader.GetLogLine(lineNum);
+                ILogLine line = this.logFileReader.GetLogLine(lineNum);
                 if (line != null)
                 {
                     HilightEntry entry = FindHilightEntry(line);
@@ -4333,7 +4330,7 @@ namespace LogExpert
                 ColumnizerCallback callback = new ColumnizerCallback(this);
                 while (true)
                 {
-                    string line = this.logFileReader.GetLogLine(lineNum);
+                    ILogLine line = this.logFileReader.GetLogLine(lineNum);
                     if (line == null)
                     {
                         break;
@@ -4940,11 +4937,11 @@ namespace LogExpert
                 {
                     break;
                 }
-                string line = this.logFileReader.GetLogLine(i);
+                ILogLine line = this.logFileReader.GetLogLine(i);
                 if (this.CurrentColumnizer is ILogLineXmlColumnizer)
                 {
                     callback.LineNum = i;
-                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
+                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine, callback);
                 }
                 pipe.WriteToPipe(line, i);
                 if (++count % PROGRESS_BAR_MODULO == 0)
@@ -5045,7 +5042,7 @@ namespace LogExpert
 
         private void ProcessFilterPipes(int lineNum)
         {
-            string searchLine = this.logFileReader.GetLogLine(lineNum);
+            ILogLine searchLine = this.logFileReader.GetLogLine(lineNum);
             if (searchLine == null)
             {
                 return;
@@ -5076,7 +5073,7 @@ namespace LogExpert
                                 pipe.LastLinesHistoryList.RemoveAt(0);
                             }
 
-                            string textLine = this.logFileReader.GetLogLine(line);
+                            ILogLine textLine = this.logFileReader.GetLogLine(line);
                             bool fileOk = pipe.WriteToPipe(textLine, line);
                             if (!fileOk)
                             {
@@ -5117,13 +5114,13 @@ namespace LogExpert
                 LogExpertCallback callback = new LogExpertCallback(this);
                 foreach (int lineNum in lineNumList)
                 {
-                    string line = this.logFileReader.GetLogLine(lineNum);
+                    ILogLine line = this.logFileReader.GetLogLine(lineNum);
                     if (CurrentColumnizer is ILogLineXmlColumnizer)
                     {
                         callback.LineNum = lineNum;
-                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
+                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine, callback);
                     }
-                    clipText.AppendLine(line);
+                    clipText.AppendLine(line.FullLine);
                 }
                 Clipboard.SetText(clipText.ToString());
             }
@@ -5641,7 +5638,7 @@ namespace LogExpert
 
         private string GetMsgForLine(int i)
         {
-            string line = this.logFileReader.GetLogLine(i);
+            ILogLine line = this.logFileReader.GetLogLine(i);
             ILogLineColumnizer columnizer = this.CurrentColumnizer;
             ColumnizerCallback callback = new ColumnizerCallback(this);
             string[] cols = columnizer.SplitLine(callback, line);
@@ -6119,7 +6116,7 @@ namespace LogExpert
             {
                 return;
             }
-            string line = this.logFileReader.GetLogLine(e.RowIndex);
+            ILogLine line = this.logFileReader.GetLogLine(e.RowIndex);
             int offset = this.CurrentColumnizer.GetTimeOffset();
             this.CurrentColumnizer.SetTimeOffset(0);
             this.columnizerCallback.LineNum = e.RowIndex;
@@ -6224,7 +6221,7 @@ namespace LogExpert
                 return;
             }
             int lineNum = this.filterResultList[e.RowIndex];
-            string line = this.logFileReader.GetLogLineWithWait(lineNum);
+            ILogLine line = this.logFileReader.GetLogLineWithWait(lineNum);
             if (line != null)
             {
                 HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
@@ -7666,7 +7663,7 @@ namespace LogExpert
                 return this.logWindow.GetCurrentFileName(LineNum);
             }
 
-            public string GetLogLine(int lineNum)
+            public ILogLine GetLogLine(int lineNum)
             {
                 return this.logWindow.GetLine(lineNum);
             }
@@ -7726,7 +7723,7 @@ namespace LogExpert
 
         #region ILogPaintContext Member
 
-        public string GetLogLine(int lineNum)
+        public ILogLine GetLogLine(int lineNum)
         {
             return this.logFileReader.GetLogLine(lineNum);
         }
