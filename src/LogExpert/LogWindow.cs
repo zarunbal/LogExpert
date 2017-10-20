@@ -7393,10 +7393,6 @@ namespace LogExpert
 
         #endregion
 
-        ~LogWindow()
-        {
-        }
-
         protected virtual Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
         {
             Rectangle rect = new Rectangle();
