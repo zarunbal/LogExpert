@@ -253,11 +253,22 @@ namespace LogExpert
 
         static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
         {
-            string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins\\";
+            string file = new AssemblyName(args.Name).Name + ".dll";
 
-            if (File.Exists(pluginDir))
+            string mainDir = Application.StartupPath + Path.DirectorySeparatorChar;
+            string pluginDir = mainDir + "plugins\\";
+
+            FileInfo mainFile = new FileInfo(mainDir + file);
+
+            FileInfo pluginFile = new FileInfo(pluginDir + file);
+            if (mainFile.Exists)
             {
-                return Assembly.LoadFrom(pluginDir + new AssemblyName(args.Name).Name + ".dll");
+                return Assembly.LoadFrom(mainFile.FullName);
+            }
+            else if (pluginFile.Exists)
+            {
+                return Assembly.LoadFrom(pluginFile.FullName);
+
             }
 
             return null;
