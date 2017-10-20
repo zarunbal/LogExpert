@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ColumnizerLib;
 
 //using System.Linq;
 
@@ -15,8 +16,8 @@ namespace LogExpert
         private bool isDisposed = false;
         private int lineCount = 0;
 
-        private IList<string> logLines = new List<string>();
-        public int MAX_LINES = 500;
+        private IList<ILogLine> logLines = new List<ILogLine>();
+        private int MAX_LINES = 500;
         private int prevBuffersDroppedLinesSum = 0; // sum over all preceeding log buffers
         private long size = 0;
         private int startLine = 0;
@@ -100,7 +101,7 @@ namespace LogExpert
 
         #region Public methods
 
-        public void AddLine(string line, long filePos)
+        public void AddLine(ILogLine line, long filePos)
         {
             this.logLines.Add(line);
 #if DEBUG
@@ -125,7 +126,7 @@ namespace LogExpert
 #endif
         }
 
-        public string GetLineOfBlock(int num)
+        public ILogLine GetLineOfBlock(int num)
         {
             if (num < this.logLines.Count && num >= 0)
             {

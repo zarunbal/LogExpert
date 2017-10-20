@@ -6,11 +6,37 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Diagnostics;
+using ColumnizerLib;
 
 namespace LogExpert
 {
     public class LogfileReader
     {
+        private readonly GetLogLineFx _logLineFx;
+        private class LogLine : ILogLine
+
+        {
+            private static readonly int _maxStringSize = 200000 -3;
+            private string _fullLine;
+
+            public string FullLine
+            {
+                get { return _fullLine; }
+                set
+                {
+                    _fullLine = value;
+                    if (_fullLine.Length > _maxStringSize)
+                    {
+                        DisplayLine = FullLine.Substring(0, _maxStringSize) + "...";
+                    }
+                }
+            }
+
+            public int LineNumber { get; set; }
+
+            public string DisplayLine { get; private set; }
+        }
+
         #region Fields
 
         private IList<LogBuffer> bufferList;
@@ -61,12 +87,12 @@ namespace LogExpert
                 return;
             }
             this.fileName = fileName;
-            this.EncodingOptions = encodingOptions;
-            this.isMultiFile = multiFile;
-            this.MAX_BUFFERS = bufferCount;
-            this.MAX_LINES_PER_BUFFER = linesPerBuffer;
+            EncodingOptions = encodingOptions;
+            isMultiFile = multiFile;
+            MAX_BUFFERS = bufferCount;
+            MAX_LINES_PER_BUFFER = linesPerBuffer;
             this.mutlifileOptions = mutlifileOptions;
-
+             _logLineFx   = GetLogLineInternal;
             InitLruBuffers();
 
             if (multiFile)
@@ -80,11 +106,11 @@ namespace LogExpert
                 {
                     fileInfo = AddFile(name);
                 }
-                this.watchedILogFileInfo = fileInfo; // last added file in the list is the watched file
+                watchedILogFileInfo = fileInfo; // last added file in the list is the watched file
             }
             else
             {
-                this.watchedILogFileInfo = AddFile(fileName);
+                watchedILogFileInfo = AddFile(fileName);
             }
             StartGCThread();
         }
@@ -97,11 +123,12 @@ namespace LogExpert
             {
                 return;
             }
-            this.EncodingOptions = encodingOptions;
-            this.isMultiFile = true;
-            this.MAX_BUFFERS = bufferCount;
-            this.MAX_LINES_PER_BUFFER = linesPerBuffer;
+            EncodingOptions = encodingOptions;
+            isMultiFile = true;
+            MAX_BUFFERS = bufferCount;
+            MAX_LINES_PER_BUFFER = linesPerBuffer;
             this.mutlifileOptions = mutlifileOptions;
+            _logLineFx = GetLogLineInternal;
 
             InitLruBuffers();
 
@@ -110,8 +137,8 @@ namespace LogExpert
             {
                 fileInfo = AddFile(name);
             }
-            this.watchedILogFileInfo = fileInfo;
-            this.fileName = fileInfo.FullName;
+            watchedILogFileInfo = fileInfo;
+            fileName = fileInfo.FullName;
 
             StartGCThread();
         }
@@ -151,53 +178,53 @@ namespace LogExpert
         {
             get
             {
-                if (this.isLineCountDirty)
+                if (isLineCountDirty)
                 {
-                    this.currLineCount = 0;
+                    currLineCount = 0;
                     AcquireBufferListReaderLock();
-                    foreach (LogBuffer buffer in this.bufferList)
+                    foreach (LogBuffer buffer in bufferList)
                     {
-                        this.currLineCount += buffer.LineCount;
+                        currLineCount += buffer.LineCount;
                     }
                     ReleaseBufferListReaderLock();
-                    this.isLineCountDirty = false;
+                    isLineCountDirty = false;
                 }
-                return this.currLineCount;
+                return currLineCount;
             }
-            set { this.currLineCount = value; }
+            set { currLineCount = value; }
         }
 
         public bool IsMultiFile
         {
-            get { return this.isMultiFile; }
+            get { return isMultiFile; }
         }
 
         public Encoding CurrentEncoding
         {
-            get { return this.currentEncoding; }
+            get { return currentEncoding; }
         }
 
         public long FileSize
         {
-            get { return this.currFileSize; }
+            get { return currFileSize; }
         }
 
         public bool IsXmlMode
         {
-            get { return this.isXmlMode; }
-            set { this.isXmlMode = value; }
+            get { return isXmlMode; }
+            set { isXmlMode = value; }
         }
 
         public IXmlLogConfiguration XmlLogConfig
         {
-            get { return this.xmlLogConfig; }
-            set { this.xmlLogConfig = value; }
+            get { return xmlLogConfig; }
+            set { xmlLogConfig = value; }
         }
 
         public IPreProcessColumnizer PreProcessColumnizer
         {
-            get { return this.preProcessColumnizer; }
-            set { this.preProcessColumnizer = value; }
+            get { return preProcessColumnizer; }
+            set { preProcessColumnizer = value; }
         }
 
         public EncodingOptions EncodingOptions
@@ -223,11 +250,11 @@ namespace LogExpert
 
         #region Public methods
 
-        public ILogFileInfo AddFile(string fileName)
+        private ILogFileInfo AddFile(string fileName)
         {
             Logger.logInfo("Adding file to ILogFileInfoList: " + fileName);
             ILogFileInfo info = GetLogFileInfo(fileName);
-            this.logFileInfoList.Add(info);
+            logFileInfoList.Add(info);
             return info;
         }
 
@@ -237,42 +264,42 @@ namespace LogExpert
         /// </summary>
         public void ReadFiles()
         {
-            this.currFileSize = 0;
-            this.LineCount = 0;
+            currFileSize = 0;
+            LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
             //this.lastReturnedLineNumForBuffer = -1;
-            this.isDeleted = false;
+            isDeleted = false;
             ClearLru();
             AcquireBufferListWriterLock();
-            this.bufferList.Clear();
+            bufferList.Clear();
             ReleaseBufferListWriterLock();
             try
             {
-                foreach (ILogFileInfo info in this.logFileInfoList)
+                foreach (ILogFileInfo info in logFileInfoList)
                 {
                     //info.OpenFile();
-                    ReadToBufferList(info, 0, this.LineCount);
+                    ReadToBufferList(info, 0, LineCount);
                 }
-                if (this.logFileInfoList.Count > 0)
+                if (logFileInfoList.Count > 0)
                 {
-                    ILogFileInfo info = this.logFileInfoList[this.logFileInfoList.Count - 1];
-                    this.fileLength = info.Length;
-                    this.watchedILogFileInfo = info;
+                    ILogFileInfo info = logFileInfoList[logFileInfoList.Count - 1];
+                    fileLength = info.Length;
+                    watchedILogFileInfo = info;
                 }
             }
             catch (IOException e)
             {
                 Logger.logWarn("IOException: " + e.Message);
-                this.fileLength = 0;
-                this.isDeleted = true;
-                this.LineCount = 0;
+                fileLength = 0;
+                isDeleted = true;
+                LineCount = 0;
             }
             LogEventArgs args = new LogEventArgs();
             args.PrevFileSize = 0;
             args.PrevLineCount = 0;
-            args.LineCount = this.LineCount;
-            args.FileSize = this.currFileSize;
+            args.LineCount = LineCount;
+            args.FileSize = currFileSize;
             OnFileSizeChanged(args);
         }
 
@@ -285,18 +312,18 @@ namespace LogExpert
             Logger.logInfo("ShiftBuffers() begin for " + this.fileName + (IsMultiFile ? " (MultiFile)" : ""));
             AcquireBufferListWriterLock();
             int offset = 0;
-            this.isLineCountDirty = true;
-            lock (this.monitor)
+            isLineCountDirty = true;
+            lock (monitor)
             {
                 RolloverFilenameHandler rolloverHandler =
-                    new RolloverFilenameHandler(this.watchedILogFileInfo, this.mutlifileOptions);
+                    new RolloverFilenameHandler(watchedILogFileInfo, mutlifileOptions);
                 LinkedList<string> fileNameList = rolloverHandler.GetNameList();
 
                 ResetBufferCache();
                 IList<ILogFileInfo> lostILogFileInfoList = new List<ILogFileInfo>();
                 IList<ILogFileInfo> readNewILogFileInfoList = new List<ILogFileInfo>();
                 IList<ILogFileInfo> newFileInfoList = new List<ILogFileInfo>();
-                IEnumerator<ILogFileInfo> enumerator = this.logFileInfoList.GetEnumerator();
+                IEnumerator<ILogFileInfo> enumerator = logFileInfoList.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     ILogFileInfo logFileInfo = enumerator.Current;
@@ -371,18 +398,18 @@ namespace LogExpert
                             offset += lastBuffer.StartLine + lastBuffer.LineCount;
                         }
                     }
-                    this.lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-                    Logger.logInfo("Adjusting StartLine values in " + this.bufferList.Count + " buffers by offset " +
+                    lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+                    Logger.logInfo("Adjusting StartLine values in " + bufferList.Count + " buffers by offset " +
                                    offset);
-                    foreach (LogBuffer buffer in this.bufferList)
+                    foreach (LogBuffer buffer in bufferList)
                     {
                         SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
                     }
-                    this.lruCacheDictLock.ReleaseWriterLock();
+                    lruCacheDictLock.ReleaseWriterLock();
 #if DEBUG
-                    if (this.bufferList.Count > 0)
+                    if (bufferList.Count > 0)
                     {
-                        Logger.logInfo("First buffer now has StartLine " + this.bufferList[0].StartLine);
+                        Logger.logInfo("First buffer now has StartLine " + bufferList[0].StartLine);
                     }
 #endif
                 }
@@ -394,22 +421,22 @@ namespace LogExpert
                     //this.ILogFileInfoList.Remove(ILogFileInfo);
                 }
                 Logger.logInfo("Deleting buffers for the watched file");
-                DeleteBuffersForInfo(this.watchedILogFileInfo, true);
+                DeleteBuffersForInfo(watchedILogFileInfo, true);
                 int startLine = LineCount - 1;
                 Logger.logInfo("Re-Reading files");
                 foreach (ILogFileInfo ILogFileInfo in readNewILogFileInfoList)
                 {
                     //ILogFileInfo.OpenFile();
-                    ReadToBufferList(ILogFileInfo, 0, this.LineCount);
+                    ReadToBufferList(ILogFileInfo, 0, LineCount);
                     //this.ILogFileInfoList.Add(ILogFileInfo);
                     newFileInfoList.Add(ILogFileInfo);
                 }
                 //this.watchedILogFileInfo = this.ILogFileInfoList[this.ILogFileInfoList.Count - 1];
-                this.logFileInfoList = newFileInfoList;
-                this.watchedILogFileInfo = GetLogFileInfo(this.watchedILogFileInfo.FullName);
-                this.logFileInfoList.Add(this.watchedILogFileInfo);
+                logFileInfoList = newFileInfoList;
+                watchedILogFileInfo = GetLogFileInfo(watchedILogFileInfo.FullName);
+                logFileInfoList.Add(watchedILogFileInfo);
                 Logger.logInfo("Reading watched file");
-                ReadToBufferList(watchedILogFileInfo, 0, this.LineCount);
+                ReadToBufferList(watchedILogFileInfo, 0, LineCount);
             }
             Logger.logInfo("ShiftBuffers() end. offset=" + offset);
             ReleaseBufferListWriterLock();
@@ -417,7 +444,7 @@ namespace LogExpert
         }
 
 
-        public string GetLogLine(int lineNum)
+        public ILogLine GetLogLine(int lineNum)
         {
             return GetLogLineInternal(lineNum);
         }
@@ -437,24 +464,24 @@ namespace LogExpert
         /// </remarks>
         /// <param name="lineNum">line to retrieve</param>
         /// <returns></returns>
-        public string GetLogLineWithWait(int lineNum)
+        public ILogLine GetLogLineWithWait(int lineNum)
         {
             const int WAIT_TIME = 1000;
-            GetLogLineFx logLineFx = new GetLogLineFx(GetLogLineInternal);
-            string result = null;
 
-            if (!this.isFastFailOnGetLogLine)
+            ILogLine result = null;
+
+            if (!isFastFailOnGetLogLine)
             {
-                IAsyncResult asyncResult = logLineFx.BeginInvoke(lineNum, null, null);
+                IAsyncResult asyncResult = _logLineFx.BeginInvoke(lineNum, null, null);
                 if (asyncResult.AsyncWaitHandle.WaitOne(WAIT_TIME, false))
                 {
-                    result = logLineFx.EndInvoke(asyncResult);
-                    this.isFastFailOnGetLogLine = false;
+                    result = _logLineFx.EndInvoke(asyncResult);
+                    isFastFailOnGetLogLine = false;
                 }
                 else
                 {
-                    logLineFx.EndInvoke(asyncResult); // must be called according to MSDN docs... :(
-                    this.isFastFailOnGetLogLine = true;
+                    _logLineFx.EndInvoke(asyncResult); // must be called according to MSDN docs... :(
+                    isFastFailOnGetLogLine = true;
 #if DEBUG
                     Logger.logDebug("No result after " + WAIT_TIME + "ms. Returning <null>.");
 #endif
@@ -463,20 +490,20 @@ namespace LogExpert
             else
             {
                 Logger.logDebug("Fast failing GetLogLine()");
-                if (!this.isFailModeCheckCallPending)
+                if (!isFailModeCheckCallPending)
                 {
-                    this.isFailModeCheckCallPending = true;
+                    isFailModeCheckCallPending = true;
                     IAsyncResult asyncResult =
-                        logLineFx.BeginInvoke(lineNum, new AsyncCallback(GetLineFinishedCallback), logLineFx);
+                        _logLineFx.BeginInvoke(lineNum, new AsyncCallback(GetLineFinishedCallback), _logLineFx);
                 }
             }
             return result;
         }
 
 
-        public string GetLogLineInternal(int lineNum)
+        private ILogLine GetLogLineInternal(int lineNum)
         {
-            if (this.isDeleted)
+            if (isDeleted)
             {
 #if DEBUG
                 Logger.logDebug("Returning null for line " + lineNum + " because file is deleted.");
@@ -490,25 +517,25 @@ namespace LogExpert
             if (logBuffer == null)
             {
                 ReleaseBufferListReaderLock();
-                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + this.fileName +
-                                (this.IsMultiFile ? " (MultiFile)" : ""));
+                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + fileName +
+                                (IsMultiFile ? " (MultiFile)" : ""));
                 return null;
             }
             // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-            string line = null;
-            this.disposeLock.AcquireReaderLock(Timeout.Infinite);
+            disposeLock.AcquireReaderLock(Timeout.Infinite);
             if (logBuffer.IsDisposed)
             {
-                LockCookie cookie = this.disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                LockCookie cookie = disposeLock.UpgradeToWriterLock(Timeout.Infinite);
                 lock (logBuffer.FileInfo)
                 {
                     ReReadBuffer(logBuffer);
                 }
-                this.disposeLock.DowngradeFromWriterLock(ref cookie);
+                disposeLock.DowngradeFromWriterLock(ref cookie);
             }
-            line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
-            this.disposeLock.ReleaseReaderLock();
+            ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+            disposeLock.ReleaseReaderLock();
             ReleaseBufferListReaderLock();
+
             return line;
         }
 
@@ -554,14 +581,14 @@ namespace LogExpert
             LogBuffer logBuffer = getBufferForLine(lineNum);
             if (logBuffer != null)
             {
-                int index = this.bufferList.IndexOf(logBuffer);
+                int index = bufferList.IndexOf(logBuffer);
                 if (index != -1)
                 {
-                    for (int i = index; i < this.bufferList.Count; ++i)
+                    for (int i = index; i < bufferList.Count; ++i)
                     {
-                        if (this.bufferList[i].FileInfo != logBuffer.FileInfo)
+                        if (bufferList[i].FileInfo != logBuffer.FileInfo)
                         {
-                            result = this.bufferList[i].StartLine;
+                            result = bufferList[i].StartLine;
                             break;
                         }
                     }
@@ -578,14 +605,14 @@ namespace LogExpert
             LogBuffer logBuffer = getBufferForLine(lineNum);
             if (logBuffer != null)
             {
-                int index = this.bufferList.IndexOf(logBuffer);
+                int index = bufferList.IndexOf(logBuffer);
                 if (index != -1)
                 {
                     for (int i = index; i >= 0; --i)
                     {
-                        if (this.bufferList[i].FileInfo != logBuffer.FileInfo)
+                        if (bufferList[i].FileInfo != logBuffer.FileInfo)
                         {
-                            result = this.bufferList[i].StartLine + this.bufferList[i].LineCount;
+                            result = bufferList[i].StartLine + bufferList[i].LineCount;
                             break;
                         }
                     }
@@ -624,41 +651,41 @@ namespace LogExpert
         public void startMonitoring()
         {
             Logger.logInfo("startMonitoring()");
-            this.monitorThread = new Thread(new ThreadStart(this.MonitorThreadProc));
-            this.monitorThread.IsBackground = true;
-            this.shouldStop = false;
-            this.monitorThread.Start();
+            monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
+            monitorThread.IsBackground = true;
+            shouldStop = false;
+            monitorThread.Start();
         }
 
         public void stopMonitoring()
         {
             Logger.logInfo("stopMonitoring()");
-            this.shouldStop = true;
+            shouldStop = true;
 
-            System.Threading.Thread.Sleep(this.watchedILogFileInfo
+            Thread.Sleep(watchedILogFileInfo
                 .PollInterval); // leave time for the threads to stop by themselves
 
-            if (this.monitorThread != null)
+            if (monitorThread != null)
             {
                 if (monitorThread.IsAlive) // if thread has not finished, abort it
                 {
-                    this.monitorThread.Interrupt();
-                    this.monitorThread.Abort();
-                    this.monitorThread.Join();
+                    monitorThread.Interrupt();
+                    monitorThread.Abort();
+                    monitorThread.Join();
                 }
             }
-            if (this.garbageCollectorThread != null)
+            if (garbageCollectorThread != null)
             {
-                if (this.garbageCollectorThread.IsAlive) // if thread has not finished, abort it
+                if (garbageCollectorThread.IsAlive) // if thread has not finished, abort it
                 {
-                    this.garbageCollectorThread.Interrupt();
-                    this.garbageCollectorThread.Abort();
-                    this.garbageCollectorThread.Join();
+                    garbageCollectorThread.Interrupt();
+                    garbageCollectorThread.Abort();
+                    garbageCollectorThread.Join();
                 }
             }
             //this.loadThread = null;
-            this.monitorThread = null;
-            this.garbageCollectorThread = null; // preventive call
+            monitorThread = null;
+            garbageCollectorThread = null; // preventive call
             CloseFiles();
         }
 
@@ -668,7 +695,7 @@ namespace LogExpert
         /// </summary>
         public void StopMonitoringAsync()
         {
-            Thread stopperThread = new Thread(new ThreadStart(this.stopMonitoring));
+            Thread stopperThread = new Thread(new ThreadStart(stopMonitoring));
             stopperThread.IsBackground = true;
             stopperThread.Start();
         }
@@ -680,32 +707,32 @@ namespace LogExpert
         /// </summary>
         public void DeleteAllContent()
         {
-            if (this.contentDeleted)
+            if (contentDeleted)
             {
-                Logger.logDebug("Buffers for " + Util.GetNameFromPath(this.fileName) + " already deleted.");
+                Logger.logDebug("Buffers for " + Util.GetNameFromPath(fileName) + " already deleted.");
                 return;
             }
-            Logger.logInfo("Deleting all log buffers for " + Util.GetNameFromPath(this.fileName) + ". Used mem: " +
+            Logger.logInfo("Deleting all log buffers for " + Util.GetNameFromPath(fileName) + ". Used mem: " +
                            GC.GetTotalMemory(true).ToString("N0"));
             AcquireBufferListWriterLock();
-            this.lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-            this.disposeLock.AcquireWriterLock(Timeout.Infinite);
+            lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+            disposeLock.AcquireWriterLock(Timeout.Infinite);
 
-            foreach (LogBuffer logBuffer in this.bufferList)
+            foreach (LogBuffer logBuffer in bufferList)
             {
                 if (!logBuffer.IsDisposed)
                 {
                     logBuffer.DisposeContent();
                 }
             }
-            this.lruCacheDict.Clear();
-            this.bufferList.Clear();
+            lruCacheDict.Clear();
+            bufferList.Clear();
 
-            this.disposeLock.ReleaseWriterLock();
-            this.lruCacheDictLock.ReleaseWriterLock();
+            disposeLock.ReleaseWriterLock();
+            lruCacheDictLock.ReleaseWriterLock();
             ReleaseBufferListWriterLock();
             GC.Collect();
-            this.contentDeleted = true;
+            contentDeleted = true;
             Logger.logInfo("Deleting complete. Used mem: " + GC.GetTotalMemory(true).ToString("N0"));
         }
 
@@ -715,8 +742,8 @@ namespace LogExpert
         /// <param name="encoding"></param>
         public void ChangeEncoding(Encoding encoding)
         {
-            this.currentEncoding = encoding;
-            this.EncodingOptions.Encoding = encoding;
+            currentEncoding = encoding;
+            EncodingOptions.Encoding = encoding;
             ResetBufferCache();
             ClearLru();
         }
@@ -727,7 +754,7 @@ namespace LogExpert
         /// <returns></returns>
         public IList<ILogFileInfo> GetLogFileInfoList()
         {
-            return this.logFileInfoList;
+            return logFileInfoList;
         }
 
         /// <summary>
@@ -736,7 +763,7 @@ namespace LogExpert
         /// <returns></returns>
         public IList<LogBuffer> GetBufferList()
         {
-            return this.bufferList;
+            return bufferList;
         }
 
         #endregion
@@ -745,26 +772,26 @@ namespace LogExpert
 
         private void InitLruBuffers()
         {
-            this.bufferList = new List<LogBuffer>();
-            this.bufferLru = new List<LogBuffer>(this.MAX_BUFFERS + 1);
+            bufferList = new List<LogBuffer>();
+            bufferLru = new List<LogBuffer>(MAX_BUFFERS + 1);
             //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
-            this.lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(this.MAX_BUFFERS + 1);
-            this.lruCacheDictLock = new ReaderWriterLock();
-            this.bufferListLock = new ReaderWriterLock();
-            this.disposeLock = new ReaderWriterLock();
+            lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(MAX_BUFFERS + 1);
+            lruCacheDictLock = new ReaderWriterLock();
+            bufferListLock = new ReaderWriterLock();
+            disposeLock = new ReaderWriterLock();
         }
 
         private void StartGCThread()
         {
-            this.garbageCollectorThread = new Thread(new ThreadStart(this.GarbageCollectorThreadProc));
-            this.garbageCollectorThread.IsBackground = true;
-            this.garbageCollectorThread.Start();
+            garbageCollectorThread = new Thread(new ThreadStart(GarbageCollectorThreadProc));
+            garbageCollectorThread.IsBackground = true;
+            garbageCollectorThread.Start();
         }
 
         private void ResetBufferCache()
         {
-            this.currFileSize = 0;
-            this.LineCount = 0;
+            currFileSize = 0;
+            LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
             //this.lastReturnedLineNumForBuffer = -1;
@@ -776,8 +803,8 @@ namespace LogExpert
             //{
             //  info.CloseFile();
             //}
-            this.currFileSize = 0;
-            this.LineCount = 0;
+            currFileSize = 0;
+            LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
             //this.lastReturnedLineNumForBuffer = -1;
@@ -799,30 +826,11 @@ namespace LogExpert
             return logFileInfo;
         }
 
-
-        private void ReloadBufferList()
-        {
-            lock (this.monitor)
-            {
-                AcquireBufferListWriterLock();
-                this.bufferList.Clear();
-                ReleaseBufferListWriterLock();
-                ClearLru();
-                //CloseFiles();
-                ReadFiles();
-                // Trigger "new file" handling (reload)
-                if (currFileSize > 0)
-                {
-                    OnLoadFile(new LoadFileEventArgs(this.fileName, 0, true, this.fileLength, true));
-                }
-            }
-        }
-
         private void ReplaceBufferInfos(ILogFileInfo oldLogFileInfo, ILogFileInfo newLogFileInfo)
         {
             Logger.logDebug("ReplaceBufferInfos() " + oldLogFileInfo.FullName + " -> " + newLogFileInfo.FullName);
             AcquireBufferListReaderLock();
-            foreach (LogBuffer buffer in this.bufferList)
+            foreach (LogBuffer buffer in bufferList)
             {
                 if (buffer.FileInfo == oldLogFileInfo)
                 {
@@ -841,10 +849,10 @@ namespace LogExpert
             LogBuffer lastRemovedBuffer = null;
             IList<LogBuffer> deleteList = new List<LogBuffer>();
             AcquireBufferListWriterLock();
-            this.lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+            lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
             if (matchNamesOnly)
             {
-                foreach (LogBuffer buffer in this.bufferList)
+                foreach (LogBuffer buffer in bufferList)
                 {
                     if (buffer.FileInfo.FullName.ToLower().Equals(ILogFileInfo.FullName.ToLower()))
                     {
@@ -855,7 +863,7 @@ namespace LogExpert
             }
             else
             {
-                foreach (LogBuffer buffer in this.bufferList)
+                foreach (LogBuffer buffer in bufferList)
                 {
                     if (buffer.FileInfo == ILogFileInfo)
                     {
@@ -868,7 +876,7 @@ namespace LogExpert
             {
                 RemoveFromBufferList(buffer);
             }
-            this.lruCacheDictLock.ReleaseWriterLock();
+            lruCacheDictLock.ReleaseWriterLock();
             ReleaseBufferListWriterLock();
             if (lastRemovedBuffer == null)
             {
@@ -888,43 +896,41 @@ namespace LogExpert
         /// <param name="buffer"></param>
         private void RemoveFromBufferList(LogBuffer buffer)
         {
-            Util.AssertTrue(this.lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
-            Util.AssertTrue(this.bufferListLock.IsWriterLockHeld, "No writer lock for buffer list");
-            this.lruCacheDict.Remove(buffer.StartLine);
-            this.bufferList.Remove(buffer);
+            Util.AssertTrue(lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
+            Util.AssertTrue(bufferListLock.IsWriterLockHeld, "No writer lock for buffer list");
+            lruCacheDict.Remove(buffer.StartLine);
+            bufferList.Remove(buffer);
         }
 
         private void ReadToBufferList(ILogFileInfo logFileInfo, long filePos, int startLine)
         {
-#if DEBUG
-            //Logger.logDebug("ReadToBufferList(): " + ILogFileInfo.FileName + ", filePos " + filePos + ", startLine: " + startLine);
-#endif
             Stream fileStream;
             ILogStreamReader reader = null;
             try
             {
                 fileStream = logFileInfo.OpenStream();
-                bool canSeek = fileStream.CanSeek;
             }
             catch (IOException fe)
             {
-                Logger.logWarn("IOException: " + fe.ToString());
-                this.isDeleted = true;
-                this.LineCount = 0;
-                this.currFileSize = 0;
+                Logger.logWarn("IOException: " + fe);
+                isDeleted = true;
+                LineCount = 0;
+                currFileSize = 0;
                 OnFileNotFound(); // notify LogWindow
                 return;
             }
             try
             {
-                reader = GetLogStreamReader(fileStream, this.EncodingOptions, this.UseNewReader);
+                reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
                 reader.Position = filePos;
-                this.fileLength = logFileInfo.Length;
+                fileLength = logFileInfo.Length;
+                LogLine logLine = new LogLine();
+
                 string line;
                 int lineNum = startLine;
                 LogBuffer logBuffer;
                 AcquireBufferListReaderLock();
-                if (this.bufferList.Count == 0)
+                if (bufferList.Count == 0)
                 {
                     logBuffer = new LogBuffer(logFileInfo, MAX_LINES_PER_BUFFER);
                     logBuffer.StartLine = startLine;
@@ -932,34 +938,28 @@ namespace LogExpert
                     LockCookie cookie = UpgradeBufferListLockToWriter();
                     AddBufferToList(logBuffer);
                     DowngradeBufferListLockFromWriter(ref cookie);
-#if DEBUG
-                    //Logger.logDebug("ReadToBufferList(): new buffer created");
-#endif
                 }
                 else
                 {
-                    logBuffer = this.bufferList[this.bufferList.Count - 1];
-                    //if (logBuffer.FileInfo != ILogFileInfo)
+                    logBuffer = bufferList[bufferList.Count - 1];
+
                     if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName))
                     {
-                        logBuffer = new LogBuffer(logFileInfo, this.MAX_LINES_PER_BUFFER);
+                        logBuffer = new LogBuffer(logFileInfo, MAX_LINES_PER_BUFFER);
                         logBuffer.StartLine = startLine;
                         logBuffer.StartPos = filePos;
                         LockCookie cookie = UpgradeBufferListLockToWriter();
                         AddBufferToList(logBuffer);
                         DowngradeBufferListLockFromWriter(ref cookie);
-#if DEBUG
-                        //Logger.logDebug("ReadToBufferList(): new buffer created because new ILogFileInfo");
-#endif
                     }
-                    this.disposeLock.AcquireReaderLock(Timeout.Infinite);
+                    disposeLock.AcquireReaderLock(Timeout.Infinite);
                     if (logBuffer.IsDisposed)
                     {
-                        LockCookie cookie = this.disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                        LockCookie cookie = disposeLock.UpgradeToWriterLock(Timeout.Infinite);
                         ReReadBuffer(logBuffer);
-                        this.disposeLock.DowngradeFromWriterLock(ref cookie);
+                        disposeLock.DowngradeFromWriterLock(ref cookie);
                     }
-                    this.disposeLock.ReleaseReaderLock();
+                    disposeLock.ReleaseReaderLock();
                 }
 
                 Monitor.Enter(logBuffer); // Lock the buffer
@@ -967,11 +967,10 @@ namespace LogExpert
                 int lineCount = logBuffer.LineCount;
                 int droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
-                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
-                    logBuffer.StartLine + logBuffer.LineCount + droppedLines,
-                    out line))
+
+                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out line))
                 {
-                    if (this.shouldStop)
+                    if (shouldStop)
                     {
                         Monitor.Exit(logBuffer);
                         return;
@@ -985,16 +984,12 @@ namespace LogExpert
                     }
 
                     lineCount++;
-                    if (lineCount > this.MAX_LINES_PER_BUFFER && reader.IsBufferComplete)
+                    if (lineCount > MAX_LINES_PER_BUFFER && reader.IsBufferComplete)
                     {
-                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length,
-                            false));
-#if DEBUG
-                        //Logger.logDebug("ReadToBufferList(): new buffer created. lineCount: " + lineCount + ", lineNum:" + lineNum + ", text: " + line);
-#endif
-                        //logBuffer.Size = filePos - logBuffer.StartPos;
+                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
+
                         Monitor.Exit(logBuffer);
-                        logBuffer = new LogBuffer(logFileInfo, this.MAX_LINES_PER_BUFFER);
+                        logBuffer = new LogBuffer(logFileInfo, MAX_LINES_PER_BUFFER);
                         Monitor.Enter(logBuffer);
                         logBuffer.StartLine = lineNum;
                         logBuffer.StartPos = filePos;
@@ -1004,18 +999,24 @@ namespace LogExpert
                         ReleaseBufferListWriterLock();
                         lineCount = 1;
                     }
-                    logBuffer.AddLine(line, filePos);
+
+                    logLine.FullLine = line;
+                    logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
+
+                    logBuffer.AddLine(logLine, filePos);
                     filePos = reader.Position;
                     lineNum++;
                 }
+
+
                 logBuffer.Size = filePos - logBuffer.StartPos;
                 Monitor.Exit(logBuffer);
-                this.isLineCountDirty = true;
-                this.currFileSize = reader.Position;
-                this.currentEncoding = reader.Encoding; // Reader may have detected another encoding
-                if (!this.shouldStop)
+                isLineCountDirty = true;
+                currFileSize = reader.Position;
+                currentEncoding = reader.Encoding; // Reader may have detected another encoding
+                if (!shouldStop)
                 {
-                    OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, true, this.fileLength, false));
+                    OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, true, fileLength, false));
                     // Fire "Ready" Event
                 }
                 GC.KeepAlive(fileStream);
@@ -1037,7 +1038,7 @@ namespace LogExpert
             Logger.logDebug("AddBufferToList(): " + logBuffer.StartLine + "/" + logBuffer.LineCount + "/" +
                             logBuffer.FileInfo.FullName);
 #endif
-            this.bufferList.Add(logBuffer);
+            bufferList.Add(logBuffer);
             //UpdateLru(logBuffer);
             UpdateLruCache(logBuffer);
         }
@@ -1045,22 +1046,22 @@ namespace LogExpert
         private void UpdateLruCache(LogBuffer logBuffer)
         {
             LogBufferCacheEntry cacheEntry;
-            this.lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
-            if (this.lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry))
+            lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
+            if (lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry))
             {
                 cacheEntry.Touch();
             }
             else
             {
-                LockCookie cookie = this.lruCacheDictLock.UpgradeToWriterLock(Timeout.Infinite);
-                if (!this.lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry)
+                LockCookie cookie = lruCacheDictLock.UpgradeToWriterLock(Timeout.Infinite);
+                if (!lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry)
                 ) // #536: re-test, because multiple threads may have been waiting for writer lock
                 {
                     cacheEntry = new LogBufferCacheEntry();
                     cacheEntry.LogBuffer = logBuffer;
                     try
                     {
-                        this.lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
+                        lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
                     }
                     catch (ArgumentException e)
                     {
@@ -1070,7 +1071,7 @@ namespace LogExpert
                         Logger.logInfo("Added buffer:");
                         DumpBufferInfos(logBuffer);
                         LogBufferCacheEntry exisingEntry;
-                        if (this.lruCacheDict.TryGetValue(logBuffer.StartLine, out exisingEntry))
+                        if (lruCacheDict.TryGetValue(logBuffer.StartLine, out exisingEntry))
                         {
                             Logger.logInfo("Existing buffer: ");
                             DumpBufferInfos(exisingEntry.LogBuffer);
@@ -1080,13 +1081,13 @@ namespace LogExpert
                             Logger.logWarn("Ooops? Cannot find the already existing entry in LRU.");
                         }
 #endif
-                        this.lruCacheDictLock.ReleaseLock();
+                        lruCacheDictLock.ReleaseLock();
                         throw e;
                     }
                 }
-                this.lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
+                lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
             }
-            this.lruCacheDictLock.ReleaseReaderLock();
+            lruCacheDictLock.ReleaseReaderLock();
         }
 
         /// <summary>
@@ -1097,14 +1098,14 @@ namespace LogExpert
         /// <param name="newLineNum"></param>
         private void SetNewStartLineForBuffer(LogBuffer logBuffer, int newLineNum)
         {
-            Util.AssertTrue(this.lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
-            if (this.lruCacheDict.ContainsKey(logBuffer.StartLine))
+            Util.AssertTrue(lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
+            if (lruCacheDict.ContainsKey(logBuffer.StartLine))
             {
-                this.lruCacheDict.Remove(logBuffer.StartLine);
+                lruCacheDict.Remove(logBuffer.StartLine);
                 logBuffer.StartLine = newLineNum;
                 LogBufferCacheEntry cacheEntry = new LogBufferCacheEntry();
                 cacheEntry.LogBuffer = logBuffer;
-                this.lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
+                lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
             }
             else
             {
@@ -1119,21 +1120,21 @@ namespace LogExpert
 #endif
             Logger.logDebug("Starting garbage collection");
             int threshold = 10;
-            this.lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+            lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
             int diff = 0;
-            if (this.lruCacheDict.Count - (MAX_BUFFERS + threshold) > 0)
+            if (lruCacheDict.Count - (MAX_BUFFERS + threshold) > 0)
             {
-                diff = this.lruCacheDict.Count - MAX_BUFFERS;
+                diff = lruCacheDict.Count - MAX_BUFFERS;
 #if DEBUG
                 if (diff > 0)
                 {
                     Logger.logInfo("Removing " + diff + " entries from LRU cache for " +
-                                   Util.GetNameFromPath(this.fileName));
+                                   Util.GetNameFromPath(fileName));
                 }
 #endif
                 SortedList<long, int> useSorterList = new SortedList<long, int>();
                 // sort by usage counter
-                foreach (LogBufferCacheEntry entry in this.lruCacheDict.Values)
+                foreach (LogBufferCacheEntry entry in lruCacheDict.Values)
                 {
                     if (!useSorterList.ContainsKey(entry.LastUseTimeStamp))
                     {
@@ -1141,7 +1142,7 @@ namespace LogExpert
                     }
                 }
                 // remove first <diff> entries (least usage)
-                this.disposeLock.AcquireWriterLock(Timeout.Infinite);
+                disposeLock.AcquireWriterLock(Timeout.Infinite);
                 for (int i = 0; i < diff; ++i)
                 {
                     if (i >= useSorterList.Count)
@@ -1149,13 +1150,13 @@ namespace LogExpert
                         break;
                     }
                     int startLine = useSorterList.Values[i];
-                    LogBufferCacheEntry entry = this.lruCacheDict[startLine];
-                    this.lruCacheDict.Remove(startLine);
+                    LogBufferCacheEntry entry = lruCacheDict[startLine];
+                    lruCacheDict.Remove(startLine);
                     entry.LogBuffer.DisposeContent();
                 }
-                this.disposeLock.ReleaseWriterLock();
+                disposeLock.ReleaseWriterLock();
             }
-            this.lruCacheDictLock.ReleaseWriterLock();
+            lruCacheDictLock.ReleaseWriterLock();
 #if DEBUG
             if (diff > 0)
             {
@@ -1167,7 +1168,7 @@ namespace LogExpert
 
         private void GarbageCollectorThreadProc()
         {
-            while (!this.shouldStop)
+            while (!shouldStop)
             {
                 try
                 {
@@ -1270,15 +1271,15 @@ namespace LogExpert
             //  this.lruDict.Clear();
             //}
             Logger.logInfo("Clearing LRU cache.");
-            this.lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-            this.disposeLock.AcquireWriterLock(Timeout.Infinite);
-            foreach (LogBufferCacheEntry entry in this.lruCacheDict.Values)
+            lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+            disposeLock.AcquireWriterLock(Timeout.Infinite);
+            foreach (LogBufferCacheEntry entry in lruCacheDict.Values)
             {
                 entry.LogBuffer.DisposeContent();
             }
-            this.lruCacheDict.Clear();
-            this.disposeLock.ReleaseWriterLock();
-            this.lruCacheDictLock.ReleaseWriterLock();
+            lruCacheDict.Clear();
+            disposeLock.ReleaseWriterLock();
+            lruCacheDictLock.ReleaseWriterLock();
             Logger.logInfo("Clearing done.");
         }
 
@@ -1304,7 +1305,9 @@ namespace LogExpert
                 }
                 try
                 {
-                    ILogStreamReader reader = GetLogStreamReader(fileStream, this.EncodingOptions, this.UseNewReader);
+                    ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                    LogLine logLine = new LogLine();
+                    
                     string line;
                     long filePos = logBuffer.StartPos;
                     reader.Position = logBuffer.StartPos;
@@ -1312,9 +1315,7 @@ namespace LogExpert
                     int lineCount = 0;
                     int dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                     logBuffer.ClearLines();
-                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
-                        logBuffer.StartLine + logBuffer.LineCount + dropCount,
-                        out line))
+                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out line))
                     {
                         if (lineCount >= maxLinesCount)
                         {
@@ -1326,8 +1327,10 @@ namespace LogExpert
                             dropCount++;
                             continue;
                         }
+                        logLine.FullLine = line;
+                        logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
 
-                        logBuffer.AddLine(line, filePos);
+                        logBuffer.AddLine(logLine, filePos);
                         filePos = reader.Position;
                         lineCount++;
                     }
@@ -1375,10 +1378,10 @@ namespace LogExpert
 
             //int startIndex = lineNum / LogBuffer.MAX_LINES;  // doesn't work anymore since XML buffer may contain more lines than MAX_LINES
             int startIndex = 0;
-            int count = this.bufferList.Count;
+            int count = bufferList.Count;
             for (int i = startIndex; i < count; ++i)
             {
-                logBuffer = this.bufferList[i];
+                logBuffer = bufferList[i];
                 if (lineNum >= logBuffer.StartLine && lineNum < logBuffer.StartLine + logBuffer.LineCount)
                 {
                     //UpdateLru(logBuffer);
@@ -1401,13 +1404,13 @@ namespace LogExpert
         /// </summary>
         private void GetLineFinishedCallback(IAsyncResult res)
         {
-            this.isFailModeCheckCallPending = false;
+            isFailModeCheckCallPending = false;
             GetLogLineFx logLineFx = (GetLogLineFx) res.AsyncState;
-            string line = logLineFx.EndInvoke(res);
+            ILogLine line = logLineFx.EndInvoke(res);
             if (line != null)
             {
                 Logger.logDebug("'isFastFailOnGetLogLine' flag was reset");
-                this.isFastFailOnGetLogLine = false;
+                isFastFailOnGetLogLine = false;
             }
             Logger.logDebug("'isLogLineCallPending' flag was reset.");
         }
@@ -1416,7 +1419,7 @@ namespace LogExpert
         {
             ILogFileInfo info = logBuffer.FileInfo;
             AcquireBufferListReaderLock();
-            int index = this.bufferList.IndexOf(logBuffer);
+            int index = bufferList.IndexOf(logBuffer);
             if (index == -1)
             {
                 ReleaseBufferListReaderLock();
@@ -1426,11 +1429,11 @@ namespace LogExpert
             while (true)
             {
                 index--;
-                if (index < 0 || this.bufferList[index].FileInfo != info)
+                if (index < 0 || bufferList[index].FileInfo != info)
                 {
                     break;
                 }
-                resultBuffer = this.bufferList[index];
+                resultBuffer = bufferList[index];
             }
             ReleaseBufferListReaderLock();
             return resultBuffer;
@@ -1440,16 +1443,16 @@ namespace LogExpert
         {
             Thread.CurrentThread.Name = "MonitorThread";
             //IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(this.watchedILogFileInfo.FullName);
-            Logger.logInfo("MonitorThreadProc() for file " + this.watchedILogFileInfo.FullName);
+            Logger.logInfo("MonitorThreadProc() for file " + watchedILogFileInfo.FullName);
 
             long oldSize = 0;
             try
             {
-                OnLoadingStarted(new LoadFileEventArgs(this.fileName, 0, false, 0, false));
+                OnLoadingStarted(new LoadFileEventArgs(fileName, 0, false, 0, false));
                 ReadFiles();
-                if (!this.isDeleted)
+                if (!isDeleted)
                 {
-                    oldSize = this.fileLength;
+                    oldSize = fileLength;
                     OnLoadingFinished();
                 }
             }
@@ -1458,11 +1461,11 @@ namespace LogExpert
                 Logger.logError(e.Message);
             }
 
-            while (!this.shouldStop)
+            while (!shouldStop)
             {
                 try
                 {
-                    int pollInterval = this.watchedILogFileInfo.PollInterval;
+                    int pollInterval = watchedILogFileInfo.PollInterval;
                     //#if DEBUG
                     //          if (Logger.IsDebug)
                     //          {
@@ -1481,16 +1484,16 @@ namespace LogExpert
                 }
                 try
                 {
-                    if (this.watchedILogFileInfo.FileHasChanged())
+                    if (watchedILogFileInfo.FileHasChanged())
                     {
-                        this.fileLength = this.watchedILogFileInfo.Length;
-                        if (this.fileLength == -1)
+                        fileLength = watchedILogFileInfo.Length;
+                        if (fileLength == -1)
                         {
                             MonitoredFileNotFound();
                         }
                         else
                         {
-                            oldSize = this.fileLength;
+                            oldSize = fileLength;
                             FileChanged();
                         }
                     }
@@ -1505,12 +1508,12 @@ namespace LogExpert
         private void MonitoredFileNotFound()
         {
             long oldSize;
-            if (!this.isDeleted)
+            if (!isDeleted)
             {
                 Logger.logDebug("File not FileNotFoundException catched. Switching to 'deleted' mode.");
-                this.isDeleted = true;
-                oldSize = this.fileLength = -1;
-                this.currFileSize = 0;
+                isDeleted = true;
+                oldSize = fileLength = -1;
+                currFileSize = 0;
                 OnFileNotFound(); // notify LogWindow
             }
 #if DEBUG
@@ -1521,27 +1524,18 @@ namespace LogExpert
 #endif
         }
 
-        private void LoaderThreadProc()
-        {
-            if (!this.isDeleted)
-            {
-                FireChangeEvent();
-            }
-            OnLoadingFinished();
-        }
-
         private void FileChanged()
         {
-            if (this.isDeleted)
+            if (isDeleted)
             {
                 OnRespawned();
                 // prevent size update events. The window should reload the complete file.
-                this.currFileSize = this.fileLength;
+                currFileSize = fileLength;
             }
-            long newSize = this.fileLength;
+            long newSize = fileLength;
             //if (this.currFileSize != newSize)
             {
-                Logger.logInfo("file size changed. new size=" + newSize + ", file: " + this.fileName);
+                Logger.logInfo("file size changed. new size=" + newSize + ", file: " + fileName);
                 FireChangeEvent();
             }
         }
@@ -1549,44 +1543,44 @@ namespace LogExpert
         private void FireChangeEvent()
         {
             LogEventArgs args = new LogEventArgs();
-            args.PrevFileSize = this.currFileSize;
-            args.PrevLineCount = this.LineCount;
-            long newSize = this.fileLength;
-            if (newSize < this.currFileSize || this.isDeleted)
+            args.PrevFileSize = currFileSize;
+            args.PrevLineCount = LineCount;
+            long newSize = fileLength;
+            if (newSize < currFileSize || isDeleted)
             {
-                Logger.logInfo("File was created anew: new size=" + newSize + ", oldSize=" + this.currFileSize);
+                Logger.logInfo("File was created anew: new size=" + newSize + ", oldSize=" + currFileSize);
                 // Fire "New File" event
-                this.currFileSize = 0;
-                this.LineCount = 0;
+                currFileSize = 0;
+                LineCount = 0;
                 try
                 {
                     if (!IsMultiFile)
                     {
                         // ReloadBufferList();  // removed because reloading is triggered by owning LogWindow
                         // Trigger "new file" handling (reload)
-                        OnLoadFile(new LoadFileEventArgs(this.fileName, 0, true, this.fileLength, true));
+                        OnLoadFile(new LoadFileEventArgs(fileName, 0, true, fileLength, true));
 
-                        if (this.isDeleted)
+                        if (isDeleted)
                         {
                             args.FileSize = newSize;
-                            args.LineCount = this.LineCount;
-                            if (args.PrevLineCount != args.LineCount && !this.shouldStop)
+                            args.LineCount = LineCount;
+                            if (args.PrevLineCount != args.LineCount && !shouldStop)
                             {
                                 OnFileSizeChanged(args);
                             }
                         }
-                        this.isDeleted = false;
+                        isDeleted = false;
                     }
                     else
                     {
                         int offset = ShiftBuffers();
                         //this.currFileSize = newSize;    // removed because ShiftBuffers() calls ReadToBuffer() which will set the actual read size
                         args.FileSize = newSize;
-                        args.LineCount = this.LineCount;
+                        args.LineCount = LineCount;
                         args.IsRollover = true;
                         args.RolloverOffset = offset;
-                        this.isDeleted = false;
-                        if (!this.shouldStop)
+                        isDeleted = false;
+                        if (!shouldStop)
                         {
                             OnFileSizeChanged(args);
                         }
@@ -1601,10 +1595,10 @@ namespace LogExpert
             }
             else
             {
-                ReadToBufferList(this.watchedILogFileInfo,
-                    this.currFileSize > 0 ? this.currFileSize : this.currFileSize, this.LineCount);
+                ReadToBufferList(watchedILogFileInfo,
+                    currFileSize > 0 ? currFileSize : currFileSize, LineCount);
                 args.FileSize = newSize;
-                args.LineCount = this.LineCount;
+                args.LineCount = LineCount;
                 //if (args.PrevLineCount != args.LineCount && !this.shouldStop)
                 OnFileSizeChanged(args);
             }
@@ -1660,7 +1654,7 @@ namespace LogExpert
         {
             try
             {
-                this.bufferListLock.AcquireReaderLock(10000);
+                bufferListLock.AcquireReaderLock(10000);
 #if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(2);
@@ -1674,20 +1668,20 @@ namespace LogExpert
 #if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
-                this.bufferListLock.AcquireReaderLock(Timeout.Infinite);
+                bufferListLock.AcquireReaderLock(Timeout.Infinite);
             }
         }
 
         private void ReleaseBufferListReaderLock()
         {
-            this.bufferListLock.ReleaseReaderLock();
+            bufferListLock.ReleaseReaderLock();
         }
 
         private void AcquireBufferListWriterLock()
         {
             try
             {
-                this.bufferListLock.AcquireWriterLock(10000);
+                bufferListLock.AcquireWriterLock(10000);
 #if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(1);
@@ -1702,20 +1696,20 @@ namespace LogExpert
 #if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
-                this.bufferListLock.AcquireWriterLock(Timeout.Infinite);
+                bufferListLock.AcquireWriterLock(Timeout.Infinite);
             }
         }
 
         private void ReleaseBufferListWriterLock()
         {
-            this.bufferListLock.ReleaseWriterLock();
+            bufferListLock.ReleaseWriterLock();
         }
 
         private LockCookie UpgradeBufferListLockToWriter()
         {
             try
             {
-                LockCookie cookie = this.bufferListLock.UpgradeToWriterLock(10000);
+                LockCookie cookie = bufferListLock.UpgradeToWriterLock(10000);
 #if DEBUG && TRACE_LOCKS
         StackTrace st = new StackTrace(true);
         StackFrame callerFrame = st.GetFrame(2);
@@ -1730,13 +1724,13 @@ namespace LogExpert
 #if DEBUG && TRACE_LOCKS
         Logger.logInfo(this.bufferListLockInfo);
 #endif
-                return this.bufferListLock.UpgradeToWriterLock(Timeout.Infinite);
+                return bufferListLock.UpgradeToWriterLock(Timeout.Infinite);
             }
         }
 
         private void DowngradeBufferListLockFromWriter(ref LockCookie cookie)
         {
-            this.bufferListLock.DowngradeFromWriterLock(ref cookie);
+            bufferListLock.DowngradeFromWriterLock(ref cookie);
 #if DEBUG && TRACE_LOCKS
       StackTrace st = new StackTrace(true);
       StackFrame callerFrame = st.GetFrame(2);
@@ -1802,7 +1796,7 @@ namespace LogExpert
             }
         }
 
-        private delegate string GetLogLineFx(int lineNum);
+        private delegate ILogLine GetLogLineFx(int lineNum);
 
         #region Debug output
 
@@ -1815,16 +1809,16 @@ namespace LogExpert
             if (buffer == null)
             {
                 ReleaseBufferListReaderLock();
-                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + this.fileName +
-                                (this.IsMultiFile ? " (MultiFile)" : ""));
+                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + fileName +
+                                (IsMultiFile ? " (MultiFile)" : ""));
                 return;
             }
             Logger.logInfo("-----------------------------------");
-            this.disposeLock.AcquireReaderLock(Timeout.Infinite);
+            disposeLock.AcquireReaderLock(Timeout.Infinite);
             Logger.logInfo("Buffer info for line " + lineNum);
             DumpBufferInfos(buffer);
             Logger.logInfo("File pos for current line: " + buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
-            this.disposeLock.ReleaseReaderLock();
+            disposeLock.ReleaseReaderLock();
             Logger.logInfo("-----------------------------------");
             ReleaseBufferListReaderLock();
         }
@@ -1847,23 +1841,23 @@ namespace LogExpert
         internal void LogBufferDiagnostic()
         {
             Logger.logInfo("-------- Buffer diagnostics -------");
-            this.lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
-            int cacheCount = this.lruCacheDict.Count;
+            lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
+            int cacheCount = lruCacheDict.Count;
             Logger.logInfo("LRU entries: " + cacheCount);
-            this.lruCacheDictLock.ReleaseReaderLock();
+            lruCacheDictLock.ReleaseReaderLock();
 
             AcquireBufferListReaderLock();
-            Logger.logInfo("File: " + this.fileName);
-            Logger.logInfo("Buffer count: " + this.bufferList.Count);
-            Logger.logInfo("Disposed buffers: " + (this.bufferList.Count - cacheCount));
+            Logger.logInfo("File: " + fileName);
+            Logger.logInfo("Buffer count: " + bufferList.Count);
+            Logger.logInfo("Disposed buffers: " + (bufferList.Count - cacheCount));
             int lineNum = 0;
             long disposeSum = 0;
             long maxDispose = 0;
             long minDispose = int.MaxValue;
-            for (int i = 0; i < this.bufferList.Count; ++i)
+            for (int i = 0; i < bufferList.Count; ++i)
             {
-                LogBuffer buffer = this.bufferList[i];
-                this.disposeLock.AcquireReaderLock(Timeout.Infinite);
+                LogBuffer buffer = bufferList[i];
+                disposeLock.AcquireReaderLock(Timeout.Infinite);
                 if (buffer.StartLine != lineNum)
                 {
                     Logger.logError("Start line of buffer is: " + buffer.StartLine + ", expected: " + lineNum);
@@ -1874,7 +1868,7 @@ namespace LogExpert
                 disposeSum += buffer.DisposeCount;
                 maxDispose = Math.Max(maxDispose, buffer.DisposeCount);
                 minDispose = Math.Min(minDispose, buffer.DisposeCount);
-                this.disposeLock.ReleaseReaderLock();
+                disposeLock.ReleaseReaderLock();
             }
             ReleaseBufferListReaderLock();
             Logger.logInfo("Dispose count sum is: " + disposeSum);
