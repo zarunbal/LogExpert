@@ -233,6 +233,8 @@ namespace LogExpert
 
             public int LineNumber { get; set; }
 
+            string ITextValue.Text => FullLine;
+
             #endregion
         }
 

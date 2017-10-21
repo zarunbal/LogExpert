@@ -5,13 +5,11 @@ using System.Text;
 
 namespace ColumnizerLib
 {
-    public interface ILogLine : ITextValue
+    public interface ITextValue
     {
         #region Properties
 
-        string FullLine { get; }
-
-        int LineNumber { get; }
+        string Text { get; }
 
         #endregion
     }

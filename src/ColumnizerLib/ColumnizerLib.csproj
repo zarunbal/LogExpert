@@ -64,6 +64,7 @@
     <Compile Include="ILogLineXmlColumnizer.cs" />
     <Compile Include="ILogLineColumnizerCallback.cs" />
     <Compile Include="ILogExpertCallback.cs" />
+    <Compile Include="ITextValue.cs" />
     <Compile Include="IXmlLogConfiguration.cs" />
     <Compile Include="LineEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

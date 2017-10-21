@@ -758,15 +758,18 @@ namespace LogExpert
             ApplyFrozenState(gridView);
         }
 
-        public string GetCellValue(int rowIndex, int columnIndex)
+        public IColumn GetCellValue(int rowIndex, int columnIndex)
         {
             if (columnIndex == 1)
             {
-                return "" + (rowIndex + 1); // line number
+                return new Column
+                {
+                    FullValue = (rowIndex + 1).ToString() // line number
+                };
             }
             if (columnIndex == 0) // marker column
             {
-                return "";
+                return Column.EmptyColumn;
             }
 
             try
@@ -780,28 +783,29 @@ namespace LogExpert
 
                         if (value != null && value.DisplayValue != null)
                         {
-                            return value.DisplayValue.Replace("\t", "  ");
+                            return value;
                         }
-                        return value.DisplayValue;
+                        return value;
                     }
                     else
                     {
                         if (columnIndex == 2)
                         {
-                            return cols.ColumnValues[cols.ColumnValues.Length - 1].DisplayValue.Replace("\t", "  ");
+                            return cols.ColumnValues[cols.ColumnValues.Length - 1];
                         }
                         else
                         {
-                            return "";
+                            return Column.EmptyColumn;
+                            ;
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                return "";
+                return Column.EmptyColumn;
             }
-            return "";
+            return Column.EmptyColumn;
         }
 
         public void CellPainting(DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
@@ -903,7 +907,7 @@ namespace LogExpert
        * Returns the first HilightEntry that matches the given line
        */
 
-        public HilightEntry FindHilightEntry(ILogLine line, bool noWordMatches)
+        public HilightEntry FindHilightEntry(ITextValue line, bool noWordMatches)
         {
             // first check the temp entries
             lock (this.tempHilightEntryListLock)
@@ -938,18 +942,18 @@ namespace LogExpert
             }
         }
 
-        public IList<HilightMatchEntry> FindHilightMatches(ILogLine line)
+        public IList<HilightMatchEntry> FindHilightMatches(ITextValue column)
         {
             IList<HilightMatchEntry> resultList = new List<HilightMatchEntry>();
-            if (line != null)
+            if (column != null)
             {
                 lock (this.currentHighlightGroupLock)
                 {
-                    GetHighlightEntryMatches(line, this.currentHighlightGroup.HilightEntryList, resultList);
+                    GetHighlightEntryMatches(column, this.currentHighlightGroup.HilightEntryList, resultList);
                 }
                 lock (this.tempHilightEntryList)
                 {
-                    GetHighlightEntryMatches(line, this.tempHilightEntryList, resultList);
+                    GetHighlightEntryMatches(column, this.tempHilightEntryList, resultList);
                 }
             }
             return resultList;
@@ -3310,7 +3314,8 @@ namespace LogExpert
             HilightEntry groundEntry)
         {
             object value = e.Value != null ? e.Value : "";
-            IList<HilightMatchEntry> matchList = FindHilightMatches(value as ILogLine);
+            IColumn column = value as IColumn;
+            IList<HilightMatchEntry> matchList = FindHilightMatches(column);
             // too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
             {
@@ -3319,8 +3324,8 @@ namespace LogExpert
 
             HilightMatchEntry hme = new HilightMatchEntry();
             hme.StartPos = 0;
-            hme.Length = (value as string).Length;
-            hme.HilightEntry = new HilightEntry(value as string,
+            hme.Length = column.DisplayValue.Length;
+            hme.HilightEntry = new HilightEntry(column,
                 groundEntry != null
                     ? groundEntry.ForegroundColor
                     : Color.FromKnownColor(KnownColor.Black),
@@ -3474,22 +3479,22 @@ namespace LogExpert
        * Returns the first HilightEntry that matches the given line
        */
 
-        private HilightEntry FindHilightEntry(ILogLine line)
+        private HilightEntry FindHilightEntry(ITextValue line)
         {
             return FindHilightEntry(line, false);
         }
 
-        private HilightEntry FindFirstNoWordMatchHilightEntry(ILogLine line)
+        private HilightEntry FindFirstNoWordMatchHilightEntry(ITextValue line)
         {
             return FindHilightEntry(line, true);
         }
 
-        private bool CheckHighlightEntryMatch(HilightEntry entry, ILogLine line)
+        private bool CheckHighlightEntryMatch(HilightEntry entry, ITextValue column)
         {
             if (entry.IsRegEx)
             {
                 //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                if (entry.Regex.IsMatch(line.FullLine))
+                if (entry.Regex.IsMatch(column.Text))
                 {
                     return true;
                 }
@@ -3498,14 +3503,14 @@ namespace LogExpert
             {
                 if (entry.IsCaseSensitive)
                 {
-                    if (line.FullLine.Contains(entry.SearchText))
+                    if (column.Text.Contains(entry.SearchText))
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if (line.FullLine.ToLower().Contains(entry.SearchText.ToLower()))
+                    if (column.Text.ToLower().Contains(entry.SearchText.ToLower()))
                     {
                         return true;
                     }
@@ -3518,7 +3523,7 @@ namespace LogExpert
        * Returns all HilightEntry entries which matches the given line
        */
 
-        private IList<HilightEntry> FindMatchingHilightEntries(ILogLine line)
+        private IList<HilightEntry> FindMatchingHilightEntries(ITextValue line)
         {
             IList<HilightEntry> resultList = new List<HilightEntry>();
             if (line != null)
@@ -3537,14 +3542,14 @@ namespace LogExpert
             return resultList;
         }
 
-        private void GetHighlightEntryMatches(ILogLine line, IList<HilightEntry> hilightEntryList,
+        private void GetHighlightEntryMatches(ITextValue line, IList<HilightEntry> hilightEntryList,
             IList<HilightMatchEntry> resultList)
         {
             foreach (HilightEntry entry in hilightEntryList)
             {
                 if (entry.IsWordMatch)
                 {
-                    MatchCollection matches = entry.Regex.Matches(line.FullLine);
+                    MatchCollection matches = entry.Regex.Matches(line.Text);
                     foreach (Match match in matches)
                     {
                         HilightMatchEntry me = new HilightMatchEntry();
@@ -3561,7 +3566,7 @@ namespace LogExpert
                         HilightMatchEntry me = new HilightMatchEntry();
                         me.HilightEntry = entry;
                         me.StartPos = 0;
-                        me.Length = line.FullLine.Length;
+                        me.Length = line.Text.Length;
                         resultList.Add(me);
                     }
                 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ColumnizerLib
 {
-    public interface IColumn
+    public interface IColumn : ITextValue
     {
         #region Properties
 

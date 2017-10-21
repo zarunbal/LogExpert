@@ -180,6 +180,8 @@ namespace CsvColumnizer
 
             public int LineNumber { get; set; }
 
+            string ITextValue.Text => FullLine;
+
             #endregion
         }
     

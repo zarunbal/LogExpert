@@ -9,13 +9,15 @@ namespace ColumnizerLib
     {
         #region Fields
 
-        private static readonly int _maxLength = 20000 - 3;
+        private static readonly int _maxLength = 4680 - 3;
 
         private string _fullValue;
 
         #endregion
 
         #region Properties
+
+        public static IColumn EmptyColumn { get; } = new Column {FullValue = string.Empty};
 
         public IColumnizedLogLine Parent { get; set; }
 
@@ -27,16 +29,18 @@ namespace ColumnizerLib
                 _fullValue = value;
                 if (_fullValue.Length > _maxLength)
                 {
-                    DisplayValue = _fullValue.Substring(0, _maxLength) + "...";
+                    DisplayValue = (_fullValue.Substring(0, _maxLength) + "...").Replace("\t", "  ");
                 }
                 else
                 {
-                    DisplayValue = _fullValue;
+                    DisplayValue = _fullValue.Replace("\t", "  ");
                 }
             }
         }
 
         public string DisplayValue { get; private set; }
+
+        string ITextValue.Text => FullValue;
 
         #endregion
 
@@ -57,6 +61,11 @@ namespace ColumnizerLib
             }
 
             return output;
+        }
+
+        public override string ToString()
+        {
+            return DisplayValue ?? "";
         }
 
         #endregion
