@@ -9,11 +9,6 @@ namespace GlassfishColumnizer
 {
     internal class XmlConfig : IXmlLogConfiguration
     {
-        #region Fields
-
-        #endregion
-
-
         #region IXmlLogConfiguration Member
 
         public string XmlStartTag { get; } = "[#|";
