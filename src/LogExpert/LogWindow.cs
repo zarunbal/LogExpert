@@ -3313,8 +3313,13 @@ namespace LogExpert
             bool noBackgroundFill,
             HilightEntry groundEntry)
         {
-            object value = e.Value != null ? e.Value : "";
-            IColumn column = value as IColumn;
+            IColumn column = e.Value as IColumn;
+
+            if (column == null)
+            {
+                column = Column.EmptyColumn;
+            }
+
             IList<HilightMatchEntry> matchList = FindHilightMatches(column);
             // too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
@@ -3325,7 +3330,7 @@ namespace LogExpert
             HilightMatchEntry hme = new HilightMatchEntry();
             hme.StartPos = 0;
             hme.Length = column.DisplayValue.Length;
-            hme.HilightEntry = new HilightEntry(column,
+            hme.HilightEntry = new HilightEntry(column.DisplayValue,
                 groundEntry != null
                     ? groundEntry.ForegroundColor
                     : Color.FromKnownColor(KnownColor.Black),
@@ -3378,7 +3383,7 @@ namespace LogExpert
                 Brush bgBrush = matchEntry.HilightEntry.BackgroundColor != Color.Empty
                     ? new SolidBrush(matchEntry.HilightEntry.BackgroundColor)
                     : null;
-                string matchWord = (value as string).Substring(matchEntry.StartPos, matchEntry.Length);
+                string matchWord = column.DisplayValue.Substring(matchEntry.StartPos, matchEntry.Length);
                 Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
                 wordSize.Height = e.CellBounds.Height;
                 Rectangle wordRect = new Rectangle(wordPos, wordSize);

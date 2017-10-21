@@ -9,7 +9,7 @@ namespace ColumnizerLib
     {
         #region Fields
 
-        private static readonly int _maxLength = 4680 - 3;
+        private static readonly int _maxLength = 4678 - 3;
 
         private string _fullValue;
 
@@ -29,7 +29,7 @@ namespace ColumnizerLib
                 _fullValue = value;
                 if (_fullValue.Length > _maxLength)
                 {
-                    DisplayValue = (_fullValue.Substring(0, _maxLength) + "...").Replace("\t", "  ");
+                    DisplayValue = _fullValue.Replace("\t", "  ").Substring(0, _maxLength) + "...";
                 }
                 else
                 {
