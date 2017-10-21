@@ -4,6 +4,7 @@ using System.Text;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
@@ -199,57 +200,38 @@ namespace LogExpert
         /// </summary>
         /// <param name="cols"></param>
         /// <returns></returns>
-        private string[] MapColumns(string[] cols)
+        private Column[] MapColumns(Column[] cols)
         {
-            string[] result = new string[GetColumnCount()];
+            List<Column> output = new List<Column>();
             int index = 0;
-            foreach (Log4jColumnEntry entry in this.config.columnList)
+            foreach (Log4jColumnEntry entry in config.columnList)
             {
                 if (entry.visible)
                 {
-                    result[index] = cols[entry.columnIndex];
-                    if (entry.maxLen > 0 && result[index].Length > entry.maxLen)
+                    Column column = cols[index];
+                    output.Add(column);
+
+                    if (entry.maxLen > 0 && column.FullValue.Length > entry.maxLen)
                     {
-                        result[index] = result[index].Substring(result[index].Length - entry.maxLen);
+                        column.FullValue = column.FullValue.Substring(column.FullValue.Length - entry.maxLen);
                     }
-                    index++;
                 }
+                index++;
             }
-            return result;
+
+
+            return output.ToArray();
         }
 
         #endregion
 
         private class Log4JLogLine : ILogLine
         {
-            #region Fields
-
-            private static readonly int _maxLength = 20000 - 3;
-            private string _fullLine;
-
-            #endregion
-
             #region Properties
 
-            public string FullLine
-            {
-                get { return _fullLine; }
-                set
-                {
-                    _fullLine = value;
-                    if (_fullLine.Length > _maxLength)
-                    {
-                        DisplayLine = _fullLine.Substring(0, _maxLength) + "...";
-                    }
-                    else
-                    {
-                        DisplayLine = _fullLine;
-                    }
-                }
-            }
+            public string FullLine { get; set; }
 
             public int LineNumber { get; set; }
-            public string DisplayLine { get; private set; }
 
             #endregion
         }
@@ -295,15 +277,19 @@ namespace LogExpert
             return config.ActiveColumnNames;
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            string[] cols = new string[Log4jXmlColumnizer.COLUMN_COUNT] {"", "", "", "", "", "", "", "", ""};
+            ColumnizedLogLine clogLine = new ColumnizedLogLine();
+            clogLine.LogLine = line;
+
+            Column[] columns = Column.CreateColumns(Log4jXmlColumnizer.COLUMN_COUNT, clogLine);
+
 
             // If the line is too short (i.e. does not follow the format for this columnizer) return the whole line content
             // in colum 8 (the log message column). Date and time column will be left blank.
             if (line.FullLine.Length < 15)
             {
-                cols[8] = line.FullLine;
+                columns[8].FullValue = line.FullLine;
             }
             else
             {
@@ -312,38 +298,50 @@ namespace LogExpert
                     DateTime dateTime = GetTimestamp(callback, line);
                     if (dateTime == DateTime.MinValue)
                     {
-                        cols = new string[Log4jXmlColumnizer.COLUMN_COUNT]
-                            {"", "", "", "", "", "", "", "", line.FullLine};
+                        columns[8].FullValue = line.FullLine;
                     }
                     string newDate = dateTime.ToString(DATETIME_FORMAT);
-                    cols[0] = newDate;
+                    columns[0].FullValue = newDate;
                 }
                 catch (Exception)
                 {
-                    cols[0] = "n/a";
+                    columns[0].FullValue = "n/a";
                 }
 
-                string timestmp = cols[0];
-                cols = GetColsFromLine(line);
+                Column timestmp = columns[0];
+
+                string[] cols;
+                cols = line.FullLine.Split(this.trimChars, Log4jXmlColumnizer.COLUMN_COUNT, StringSplitOptions.None);
+
                 if (cols.Length != Log4jXmlColumnizer.COLUMN_COUNT)
                 {
-                    cols = new string[Log4jXmlColumnizer.COLUMN_COUNT] {"", "", "", "", "", "", "", "", line.FullLine};
+                    columns[0].FullValue = "";
+                    columns[1].FullValue = "";
+                    columns[2].FullValue = "";
+                    columns[3].FullValue = "";
+                    columns[4].FullValue = "";
+                    columns[5].FullValue = "";
+                    columns[6].FullValue = "";
+                    columns[7].FullValue = "";
+                    columns[8].FullValue = line.FullLine;
                 }
                 else
                 {
-                    cols[0] = timestmp;
+                    columns[0] = timestmp;
+
+                    for (int i = 1; i < cols.Length; i++)
+                    {
+                        columns[i].FullValue = cols[i];
+                    }
                 }
             }
 
-            return MapColumns(cols);
-        }
+            Column[] filteredColumns = MapColumns(columns);
+
+            clogLine.ColumnValues = filteredColumns.Select(a => a as IColumn).ToArray();
 
 
-        private string[] GetColsFromLine(ILogLine line)
-        {
-            string[] cols;
-            cols = line.FullLine.Split(this.trimChars, Log4jXmlColumnizer.COLUMN_COUNT, StringSplitOptions.None);
-            return cols;
+            return clogLine;
         }
 
 

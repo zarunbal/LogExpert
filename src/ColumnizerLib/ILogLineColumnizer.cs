@@ -61,7 +61,7 @@ namespace LogExpert
         /// </remarks>
         /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
         /// <param name="line">The line content to be splitted</param>
-        string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line);
+        IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line);
 
         /// <summary>
         /// Returns true, if the columnizer supports timeshift handling.

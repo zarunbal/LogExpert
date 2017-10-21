@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ColumnizerLib;
 
@@ -84,12 +85,12 @@ namespace LogExpert
 
         public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            string[] cols = SplitLine(callback, line);
-            if (cols == null || cols.Length < 2)
+            IColumnizedLogLine cols = SplitLine(callback, line);
+            if (cols == null || cols.ColumnValues.Length < 2)
             {
                 return DateTime.MinValue;
             }
-            if (cols[0].Length == 0 || cols[1].Length == 0)
+            if (cols.ColumnValues[0].FullValue.Length == 0 || cols.ColumnValues[1].FullValue.Length == 0)
             {
                 return DateTime.MinValue;
             }
@@ -101,7 +102,8 @@ namespace LogExpert
 
             try
             {
-                DateTime dateTime = DateTime.ParseExact(cols[0] + " " + cols[1], formatInfo.DateTimeFormat,
+                DateTime dateTime = DateTime.ParseExact(
+                    cols.ColumnValues[0].FullValue + " " + cols.ColumnValues[1].FullValue, formatInfo.DateTimeFormat,
                     formatInfo.CultureInfo);
                 return dateTime;
             }
@@ -155,24 +157,38 @@ namespace LogExpert
             return new string[] {"Date", "Time", "Message"};
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
             // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
             // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
             // 03.01.2008 14:48:00.066 <rest of line>
+
+            ColumnizedLogLine clogLine = new ColumnizedLogLine();
+            clogLine.LogLine = line;
+
+            Column[] columns = new Column[3]
+            {
+                new Column {FullValue = "", Parent = clogLine},
+                new Column {FullValue = "", Parent = clogLine},
+                new Column {FullValue = "", Parent = clogLine},
+            };
+
+            clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+
             string temp = line.FullLine;
+
 
             if (temp.Length < 21)
             {
-                return new string[] {"", "", temp};
+                columns[2].FullValue = temp;
+                return clogLine;
             }
-            string[] cols = new string[3];
+
             FormatInfo formatInfo = DetermineDateTimeFormatInfo(line);
             if (formatInfo == null)
             {
-                cols[0] = cols[1] = "";
-                cols[2] = temp;
-                return cols;
+                columns[2].FullValue = temp;
+                return clogLine;
             }
             int endPos = formatInfo.DateTimeFormat.Length;
             int timeLen = formatInfo.TimeFormat.Length;
@@ -185,24 +201,24 @@ namespace LogExpert
                         formatInfo.CultureInfo);
                     dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
                     string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
-                    cols[0] = newDate.Substring(0, dateLen); // date
-                    cols[1] = newDate.Substring(dateLen + 1, timeLen); // time
-                    cols[2] = temp.Substring(endPos); // rest of line
+                    columns[0].FullValue = newDate.Substring(0, dateLen); // date
+                    columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
+                    columns[2].FullValue = temp.Substring(endPos); // rest of line
                 }
                 else
                 {
-                    cols[0] = temp.Substring(0, dateLen); // date
-                    cols[1] = temp.Substring(dateLen + 1, timeLen); // time
-                    cols[2] = temp.Substring(endPos); // rest of line
+                    columns[0].FullValue = temp.Substring(0, dateLen); // date
+                    columns[1].FullValue = temp.Substring(dateLen + 1, timeLen); // time
+                    columns[2].FullValue = temp.Substring(endPos); // rest of line
                 }
             }
             catch (Exception)
             {
-                cols[0] = "n/a";
-                cols[1] = "n/a";
-                cols[2] = temp;
+                columns[0].FullValue = "n/a";
+                columns[1].FullValue = "n/a";
+                columns[2].FullValue = temp;
             }
-            return cols;
+            return clogLine;
         }
 
         #endregion

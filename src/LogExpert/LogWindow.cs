@@ -14,6 +14,7 @@ using System.IO;
 using System.Globalization;
 using System.Reflection;
 using System.Collections;
+using System.Linq;
 using ColumnizerLib;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -29,7 +30,6 @@ namespace LogExpert
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
         private readonly BookmarkDataProvider bookmarkProvider = new BookmarkDataProvider();
-        private readonly ColumnizerCallback columnizerCallback;
         private readonly object currentColumnizerLock = new object();
 
         private readonly EventWaitHandle externaLoadingFinishedEvent = new ManualResetEvent(false);
@@ -59,7 +59,6 @@ namespace LogExpert
 
         private Image advancedButtonImage;
 
-        private Color bookmarkColor = Color.FromArgb(165, 200, 225);
         private object bookmarkLock = new object();
 
         private IList<BackgroundProcessCancelHandler> cancelHandlerList = new List<BackgroundProcessCancelHandler>();
@@ -72,33 +71,23 @@ namespace LogExpert
 
         private object currentHighlightGroupLock = new object();
         private SearchParams currentSearchParams = null;
-        private EncodingOptions encodingOptions;
 
-        private string fileNameField;
         private string[] fileNames;
         private List<int> filterHitList = new List<int>();
         private FilterParams filterParams = new FilterParams();
-        private FilterPipe filterPipe = null;
         private int filterPipeNameCounter = 0;
         private List<int> filterResultList = new List<int>();
 
         private EventWaitHandle filterUpdateEvent = new ManualResetEvent(false);
 
-        private Font font;
-        private Font fontBold;
-        private Font fontMonospaced;
         private ILogLineColumnizer forcedColumnizer;
         private ILogLineColumnizer forcedColumnizerForLoading;
-        private string forcedPersistenceFileName = null;
-        private bool forcePersistenceLoading = false;
-        private string givenFileName = null; // file name of given file used for loading (maybe logfile or lxp)
         private bool isDeadFile = false;
         private bool isErrorShowing = false;
         private bool isLoadError = false;
         private bool isLoading = false;
         private bool isMultiFile = false;
         private bool isSearching = false;
-        private bool isTempFile = false;
         private bool isTimestampDisplaySyncing = false;
         private List<int> lastFilterLinesList = new List<int>();
 
@@ -121,7 +110,6 @@ namespace LogExpert
         private Image searchButtonImage;
         private int selectedCol = 0; // set by context menu event for column headers only
         private DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
-        private string sessionFileName = null; // unused?
         private bool shouldCallTimeSync = false;
         private bool shouldCancel = false;
         private bool shouldTimestampDisplaySyncingCancel = false;
@@ -130,10 +118,8 @@ namespace LogExpert
         private DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
         private List<HilightEntry> tempHilightEntryList = new List<HilightEntry>();
         private object tempHilightEntryListLock = new object();
-        private string tempTitleName = "";
         private int timeshiftSyncLine = 0;
 
-        private TimeSyncList timeSyncList = null;
         private object timeSyncListLock = new object();
 
         private bool waitingForClose = false;
@@ -152,12 +138,12 @@ namespace LogExpert
             this.columnNamesLabel.Text = ""; // no filtering on columns by default
 
             this.parentLogTabWin = parent;
-            this.isTempFile = isTempFile;
+            this.IsTempFile = isTempFile;
             this.loadingFinishedFx = loadingFinishedFx;
             //Thread.CurrentThread.Name = "LogWindowThread";
-            columnizerCallback = new ColumnizerCallback(this);
+            ColumnizerCallbackObject = new ColumnizerCallback(this);
 
-            this.fileNameField = fileName;
+            this.FileName = fileName;
             this.ForcePersistenceLoading = forcePersistenceLoading;
 
             this.dataGridView.CellValueNeeded += new DataGridViewCellValueEventHandler(dataGridView_CellValueNeeded);
@@ -356,11 +342,7 @@ namespace LogExpert
 
         #region Properties
 
-        public Color BookmarkColor
-        {
-            get { return bookmarkColor; }
-            set { bookmarkColor = value; }
-        }
+        public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
 
         public ILogLineColumnizer CurrentColumnizer
         {
@@ -387,16 +369,9 @@ namespace LogExpert
             }
         }
 
-        public string FileName
-        {
-            get { return this.fileNameField; }
-        }
+        public string FileName { get; private set; }
 
-        public string SessionFileName
-        {
-            get { return this.sessionFileName; }
-            set { this.sessionFileName = value; }
-        }
+        public string SessionFileName { get; set; } = null;
 
         public bool IsMultiFile
         {
@@ -404,22 +379,11 @@ namespace LogExpert
             set { this.guiStateArgs.IsMultiFileActive = this.isMultiFile = value; }
         }
 
-        public bool IsTempFile
-        {
-            get { return isTempFile; }
-        }
+        public bool IsTempFile { get; } = false;
 
-        public string TempTitleName
-        {
-            get { return tempTitleName; }
-            set { tempTitleName = value; }
-        }
+        public string TempTitleName { get; set; } = "";
 
-        internal FilterPipe FilterPipe
-        {
-            get { return filterPipe; }
-            set { filterPipe = value; }
-        }
+        internal FilterPipe FilterPipe { get; set; } = null;
 
         public string Title
         {
@@ -436,49 +400,27 @@ namespace LogExpert
             }
         }
 
-        public ColumnizerCallback ColumnizerCallbackObject
-        {
-            get { return this.columnizerCallback; }
-        }
+        public ColumnizerCallback ColumnizerCallbackObject { get; }
 
-        public bool ForcePersistenceLoading
-        {
-            get { return this.forcePersistenceLoading; }
-            set { this.forcePersistenceLoading = value; }
-        }
+        public bool ForcePersistenceLoading { get; set; } = false;
 
-        public string ForcedPersistenceFileName
-        {
-            get { return this.forcedPersistenceFileName; }
-            set { this.forcedPersistenceFileName = value; }
-        }
+        public string ForcedPersistenceFileName { get; set; } = null;
 
         public Preferences Preferences
         {
             get { return ConfigManager.Settings.preferences; }
         }
 
-        public string GivenFileName
-        {
-            get { return this.givenFileName; }
-            set { this.givenFileName = value; }
-        }
+        public string GivenFileName { get; set; } = null;
 
-        public TimeSyncList TimeSyncList
-        {
-            get { return this.timeSyncList; }
-        }
+        public TimeSyncList TimeSyncList { get; private set; } = null;
 
         public bool IsTimeSynced
         {
-            get { return this.timeSyncList != null; }
+            get { return this.TimeSyncList != null; }
         }
 
-        protected EncodingOptions EncodingOptions
-        {
-            get { return encodingOptions; }
-            set { encodingOptions = value; }
-        }
+        protected EncodingOptions EncodingOptions { get; set; }
 
         public IBookmarkData BookmarkData
         {
@@ -499,7 +441,7 @@ namespace LogExpert
 
             if (fileName != null)
             {
-                this.fileNameField = fileName;
+                this.FileName = fileName;
                 this.EncodingOptions = encodingOptions;
 
                 if (this.logFileReader != null)
@@ -592,7 +534,7 @@ namespace LogExpert
             this.logFileReader.UseNewReader = !this.Preferences.useLegacyReader;
             RegisterLogFileReaderEvents();
             this.logFileReader.startMonitoring();
-            this.fileNameField = fileNames[fileNames.Length - 1];
+            this.FileName = fileNames[fileNames.Length - 1];
             this.fileNames = fileNames;
             this.IsMultiFile = true;
             //if (this.isTempFile)
@@ -611,7 +553,7 @@ namespace LogExpert
                 }
             }
 
-            if (this.isTempFile || this.isLoadError)
+            if (this.IsTempFile || this.isLoadError)
             {
                 return null;
             }
@@ -829,23 +771,24 @@ namespace LogExpert
 
             try
             {
-                string[] cols = GetColumnsForLine(rowIndex);
-                if (cols != null)
+                IColumnizedLogLine cols = GetColumnsForLine(rowIndex);
+                if (cols != null && cols.ColumnValues != null)
                 {
-                    if (columnIndex <= cols.Length + 1)
+                    if (columnIndex <= cols.ColumnValues.Length + 1)
                     {
-                        string value = cols[columnIndex - 2];
-                        if (value != null)
+                        IColumn value = cols.ColumnValues[columnIndex - 2];
+
+                        if (value != null && value.DisplayValue != null)
                         {
-                            value = value.Replace("\t", "  ");
+                            return value.DisplayValue.Replace("\t", "  ");
                         }
-                        return value;
+                        return value.DisplayValue;
                     }
                     else
                     {
                         if (columnIndex == 2)
                         {
-                            return cols[cols.Length - 1].Replace("\t", "  ");
+                            return cols.ColumnValues[cols.ColumnValues.Length - 1].DisplayValue.Replace("\t", "  ");
                         }
                         else
                         {
@@ -1312,7 +1255,9 @@ namespace LogExpert
                 Bookmark bookmark = this.bookmarkProvider.GetBookmarkForLine(lineNum);
                 if (bookmark.Text != null && bookmark.Text.Length > 0)
                 {
-                    if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
+                    if (DialogResult.No ==
+                        MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?",
+                            "LogExpert", MessageBoxButtons.YesNo))
                     {
                         return;
                     }
@@ -1617,7 +1562,7 @@ namespace LogExpert
         public void ChangeEncoding(Encoding encoding)
         {
             this.logFileReader.ChangeEncoding(encoding);
-            this.encodingOptions.Encoding = encoding;
+            this.EncodingOptions.Encoding = encoding;
             if (this.guiStateArgs.CurrentEncoding.IsSingleByte != encoding.IsSingleByte ||
                 this.guiStateArgs.CurrentEncoding.GetPreamble().Length != encoding.GetPreamble().Length)
             {
@@ -1664,17 +1609,18 @@ namespace LogExpert
         {
             if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
             {
-                this.font = new Font(new FontFamily(newPreferences.fontName), newPreferences.fontSize);
-                this.fontBold = new Font(this.font, FontStyle.Bold);
-                this.fontMonospaced = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+                this.NormalFont = new Font(new FontFamily(newPreferences.fontName), newPreferences.fontSize);
+                this.BoldFont = new Font(this.NormalFont, FontStyle.Bold);
+                this.MonospacedFont = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
 
-                int lineSpacing = font.FontFamily.GetLineSpacing(FontStyle.Regular);
-                float lineSpacingPixel = font.Size * lineSpacing / font.FontFamily.GetEmHeight(FontStyle.Regular);
+                int lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
+                float lineSpacingPixel =
+                    NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);
 
-                this.dataGridView.DefaultCellStyle.Font = font;
-                this.filterGridView.DefaultCellStyle.Font = font;
-                this.lineHeight = font.Height + 4;
-                this.dataGridView.RowTemplate.Height = font.Height + 4;
+                this.dataGridView.DefaultCellStyle.Font = NormalFont;
+                this.filterGridView.DefaultCellStyle.Font = NormalFont;
+                this.lineHeight = NormalFont.Height + 4;
+                this.dataGridView.RowTemplate.Height = NormalFont.Height + 4;
 
                 this.ShowBookmarkBubbles = this.Preferences.showBubbles;
 
@@ -1859,8 +1805,8 @@ namespace LogExpert
                         {
                             return DateTime.MinValue;
                         }
-                        this.columnizerCallback.LineNum = lineNum;
-                        timeStamp = this.CurrentColumnizer.GetTimestamp(this.columnizerCallback, logLine);
+                        this.ColumnizerCallbackObject.LineNum = lineNum;
+                        timeStamp = this.CurrentColumnizer.GetTimestamp(this.ColumnizerCallbackObject, logLine);
                         if (roundToSeconds)
                         {
                             timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
@@ -1905,7 +1851,7 @@ namespace LogExpert
                             timeStamp = DateTime.MinValue;
                             break;
                         }
-                        timeStamp = this.CurrentColumnizer.GetTimestamp(this.columnizerCallback, logLine);
+                        timeStamp = this.CurrentColumnizer.GetTimestamp(this.ColumnizerCallbackObject, logLine);
                         if (roundToSeconds)
                         {
                             timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
@@ -2210,14 +2156,14 @@ namespace LogExpert
                            Util.GetNameFromPath(master.FileName));
             lock (this.timeSyncListLock)
             {
-                if (this.IsTimeSynced && master.TimeSyncList != this.timeSyncList)
+                if (this.IsTimeSynced && master.TimeSyncList != this.TimeSyncList)
                     // already synced but master has different sync list
                 {
                     FreeFromTimeSync();
                 }
-                this.timeSyncList = master.TimeSyncList;
-                this.timeSyncList.AddWindow(this);
-                this.ScrollToTimestamp(this.timeSyncList.CurrentTimestamp, false, false);
+                this.TimeSyncList = master.TimeSyncList;
+                this.TimeSyncList.AddWindow(this);
+                this.ScrollToTimestamp(this.TimeSyncList.CurrentTimestamp, false, false);
             }
             OnSyncModeChanged();
         }
@@ -2229,9 +2175,9 @@ namespace LogExpert
                 if (this.TimeSyncList != null)
                 {
                     Logger.logInfo("De-Syncing window for " + Util.GetNameFromPath(this.FileName));
-                    this.timeSyncList.WindowRemoved -= timeSyncList_WindowRemoved;
+                    this.TimeSyncList.WindowRemoved -= timeSyncList_WindowRemoved;
                     this.TimeSyncList.RemoveWindow(this);
-                    this.timeSyncList = null;
+                    this.TimeSyncList = null;
                 }
             }
             OnSyncModeChanged();
@@ -2250,10 +2196,10 @@ namespace LogExpert
 
         #region Internals
 
-        internal string[] GetColumnsForLine(int lineNumber)
+        internal IColumnizedLogLine GetColumnsForLine(int lineNumber)
         {
             return this.columnCache.GetColumnsForLine(this.logFileReader, lineNumber, this.CurrentColumnizer,
-                this.columnizerCallback);
+                this.ColumnizerCallbackObject);
 
             //string line = this.logFileReader.GetLogLine(lineNumber);
             //if (line != null)
@@ -2447,7 +2393,7 @@ namespace LogExpert
                 return;
             }
 
-            if (this.isTempFile)
+            if (this.IsTempFile)
             {
                 SetDefaultsFromPrefs();
                 return;
@@ -2659,9 +2605,9 @@ namespace LogExpert
         {
             if (this.Text.Length == 0)
             {
-                if (this.isTempFile)
+                if (this.IsTempFile)
                 {
-                    this.Text = this.tempTitleName;
+                    this.Text = this.TempTitleName;
                 }
                 else
                 {
@@ -3423,7 +3369,7 @@ namespace LogExpert
 
             foreach (HilightMatchEntry matchEntry in matchList)
             {
-                Font font = matchEntry != null && matchEntry.HilightEntry.IsBold ? this.fontBold : this.font;
+                Font font = matchEntry != null && matchEntry.HilightEntry.IsBold ? this.BoldFont : this.NormalFont;
                 Brush bgBrush = matchEntry.HilightEntry.BackgroundColor != Color.Empty
                     ? new SolidBrush(matchEntry.HilightEntry.BackgroundColor)
                     : null;
@@ -3591,7 +3537,8 @@ namespace LogExpert
             return resultList;
         }
 
-        private void GetHighlightEntryMatches(ILogLine line, IList<HilightEntry> hilightEntryList, IList<HilightMatchEntry> resultList)
+        private void GetHighlightEntryMatches(ILogLine line, IList<HilightEntry> hilightEntryList,
+            IList<HilightMatchEntry> resultList)
         {
             foreach (HilightEntry entry in hilightEntryList)
             {
@@ -4941,7 +4888,8 @@ namespace LogExpert
                 if (this.CurrentColumnizer is ILogLineXmlColumnizer)
                 {
                     callback.LineNum = i;
-                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine, callback);
+                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
+                        callback);
                 }
                 pipe.WriteToPipe(line, i);
                 if (++count % PROGRESS_BAR_MODULO == 0)
@@ -5118,7 +5066,8 @@ namespace LogExpert
                     if (CurrentColumnizer is ILogLineXmlColumnizer)
                     {
                         callback.LineNum = lineNum;
-                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine, callback);
+                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
+                            callback);
                     }
                     clipText.AppendLine(line.FullLine);
                 }
@@ -5641,8 +5590,8 @@ namespace LogExpert
             ILogLine line = this.logFileReader.GetLogLine(i);
             ILogLineColumnizer columnizer = this.CurrentColumnizer;
             ColumnizerCallback callback = new ColumnizerCallback(this);
-            string[] cols = columnizer.SplitLine(callback, line);
-            return cols[columnizer.GetColumnCount() - 1];
+            IColumnizedLogLine cols = columnizer.SplitLine(callback, line);
+            return cols.ColumnValues.Last().FullValue;
         }
 
         private void UpdateBookmarkGui()
@@ -5849,9 +5798,9 @@ namespace LogExpert
         {
             lock (this.timeSyncListLock)
             {
-                if (this.timeSyncList != null)
+                if (this.TimeSyncList != null)
                 {
-                    this.timeSyncList.NavigateToTimestamp(timestamp, this);
+                    this.TimeSyncList.NavigateToTimestamp(timestamp, this);
                 }
             }
         }
@@ -5860,25 +5809,25 @@ namespace LogExpert
         {
             lock (this.timeSyncListLock)
             {
-                if (this.timeSyncList == null)
+                if (this.TimeSyncList == null)
                 {
                     if (slave.TimeSyncList == null)
                     {
-                        this.timeSyncList = new TimeSyncList();
-                        this.timeSyncList.AddWindow(this);
+                        this.TimeSyncList = new TimeSyncList();
+                        this.TimeSyncList.AddWindow(this);
                     }
                     else
                     {
-                        this.timeSyncList = slave.TimeSyncList;
+                        this.TimeSyncList = slave.TimeSyncList;
                     }
                     int currentLineNum = this.dataGridView.CurrentCellAddress.Y;
                     int refLine = currentLineNum;
                     DateTime timeStamp = GetTimestampForLine(ref refLine, true);
                     if (!timeStamp.Equals(DateTime.MinValue) && !this.shouldTimestampDisplaySyncingCancel)
                     {
-                        this.timeSyncList.CurrentTimestamp = timeStamp;
+                        this.TimeSyncList.CurrentTimestamp = timeStamp;
                     }
-                    this.timeSyncList.WindowRemoved += timeSyncList_WindowRemoved;
+                    this.TimeSyncList.WindowRemoved += timeSyncList_WindowRemoved;
                 }
             }
             slave.AddToTimeSync(this);
@@ -6119,18 +6068,18 @@ namespace LogExpert
             ILogLine line = this.logFileReader.GetLogLine(e.RowIndex);
             int offset = this.CurrentColumnizer.GetTimeOffset();
             this.CurrentColumnizer.SetTimeOffset(0);
-            this.columnizerCallback.LineNum = e.RowIndex;
-            string[] cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
+            this.ColumnizerCallbackObject.LineNum = e.RowIndex;
+            IColumnizedLogLine cols = this.CurrentColumnizer.SplitLine(this.ColumnizerCallbackObject, line);
             this.CurrentColumnizer.SetTimeOffset(offset);
-            if (cols.Length <= e.ColumnIndex - 2)
+            if (cols.ColumnValues.Length <= e.ColumnIndex - 2)
             {
                 return;
             }
 
-            string oldValue = cols[e.ColumnIndex - 2];
+            string oldValue = cols.ColumnValues[e.ColumnIndex - 2].FullValue;
             string newValue = (string) e.Value;
             //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-            this.CurrentColumnizer.PushValue(this.columnizerCallback, e.ColumnIndex - 2, newValue, oldValue);
+            this.CurrentColumnizer.PushValue(this.ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
             this.dataGridView.Refresh();
             TimeSpan timeSpan = new TimeSpan(this.CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
             string span = timeSpan.ToString();
@@ -6639,7 +6588,7 @@ namespace LogExpert
                             this.syncTimestampsToToolStripMenuItem.DropDownItems.Add(fileEntry.Title, null, ev) as
                                 ToolStripMenuItem;
                         item.Tag = fileEntry;
-                        item.Checked = this.timeSyncList != null && this.timeSyncList.Contains(fileEntry.LogWindow);
+                        item.Checked = this.TimeSyncList != null && this.TimeSyncList.Contains(fileEntry.LogWindow);
                         if (fileEntry.LogWindow.TimeSyncList != null &&
                             !fileEntry.LogWindow.TimeSyncList.Contains(this))
                         {
@@ -6654,8 +6603,8 @@ namespace LogExpert
             {
                 this.syncTimestampsToToolStripMenuItem.Enabled = false;
             }
-            this.freeThisWindowFromTimeSyncToolStripMenuItem.Enabled = this.timeSyncList != null &&
-                                                                       this.timeSyncList.Count > 1;
+            this.freeThisWindowFromTimeSyncToolStripMenuItem.Enabled = this.TimeSyncList != null &&
+                                                                       this.TimeSyncList.Count > 1;
         }
 
         private void HandlePluginContextMenu(object sender, EventArgs args)
@@ -6673,7 +6622,7 @@ namespace LogExpert
             {
                 WindowFileEntry entry = (sender as ToolStripItem).Tag as WindowFileEntry;
 
-                if (this.timeSyncList != null && this.timeSyncList.Contains(entry.LogWindow))
+                if (this.TimeSyncList != null && this.TimeSyncList.Contains(entry.LogWindow))
                 {
                     FreeSlaveFromTimesync(entry.LogWindow);
                 }
@@ -7296,9 +7245,9 @@ namespace LogExpert
             {
                 if (syncList.Count == 0 || syncList.Count == 1 && syncList.Contains(this))
                 {
-                    if (syncList == this.timeSyncList)
+                    if (syncList == this.TimeSyncList)
                     {
-                        this.timeSyncList = null;
+                        this.TimeSyncList = null;
                         OnSyncModeChanged();
                     }
                 }
@@ -7616,7 +7565,6 @@ namespace LogExpert
         {
             #region Fields
 
-            private int lineNum;
             protected LogWindow logWindow;
 
             #endregion
@@ -7638,11 +7586,7 @@ namespace LogExpert
 
             #region Properties
 
-            public int LineNum
-            {
-                get { return this.lineNum; }
-                set { lineNum = value; }
-            }
+            public int LineNum { get; set; }
 
             #endregion
 
@@ -7733,20 +7677,11 @@ namespace LogExpert
             return this.bookmarkProvider.GetBookmarkForLine(lineNum);
         }
 
-        public Font MonospacedFont
-        {
-            get { return this.fontMonospaced; }
-        }
+        public Font MonospacedFont { get; private set; }
 
-        public Font NormalFont
-        {
-            get { return this.font; }
-        }
+        public Font NormalFont { get; private set; }
 
-        public Font BoldFont
-        {
-            get { return this.fontBold; }
-        }
+        public Font BoldFont { get; private set; }
 
         #endregion
     }

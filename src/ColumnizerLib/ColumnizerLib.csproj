@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Column.cs" />
+    <Compile Include="ColumnizedLogLine.cs" />
+    <Compile Include="IColumn.cs" />
     <Compile Include="IColumnizerConfigurator.cs" />
     <Compile Include="IContextMenuEntry.cs" />
     <Compile Include="IFileSystemCallback.cs" />
@@ -52,6 +55,7 @@
     <Compile Include="ILogExpertLogger.cs" />
     <Compile Include="ILogFileInfo.cs" />
     <Compile Include="ILogLine.cs" />
+    <Compile Include="IColumnizedLogLine.cs" />
     <Compile Include="IPreProcessColumnizer.cs" />
     <Compile Include="IKeywordAction.cs" />
     <Compile Include="ILogExpertPlugin.cs" />

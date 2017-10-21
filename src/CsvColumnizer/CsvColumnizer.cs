@@ -4,6 +4,7 @@ using System.Text;
 using LogExpert;
 using LumenWorks.Framework.IO.Csv;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
@@ -14,10 +15,6 @@ namespace CsvColumnizer
 {
     internal class CsvColumn
     {
-        #region Fields
-
-        #endregion
-
         #region cTor
 
         public CsvColumn(string name)
@@ -107,12 +104,20 @@ namespace CsvColumnizer
                 };
                 if (this.config.minColumns > 0)
                 {
-                    string[] headers = SplitCsvLine(logLine);
-                    if (headers.Length < this.config.minColumns)
+                    using (CsvReader csv = new CsvReader(new StringReader(logLine),
+                        false,
+                        this.config.delimiterChar,
+                        this.config.quoteChar,
+                        this.config.escapeChar, // is '\0' when not checked in config dlg
+                        this.config.commentChar,
+                        false))
                     {
-                        // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
-                        this.isValidCsv = false;
-                        return logLine;
+                        if (csv.FieldCount < this.config.minColumns)
+                        {
+                            // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
+                            this.isValidCsv = false;
+                            return logLine;
+                        }
                     }
                 }
                 this.isValidCsv = true;
@@ -137,66 +142,52 @@ namespace CsvColumnizer
 
         #region Private Methods
 
-        private string[] SplitCsvLine(string line)
+        private IColumnizedLogLine SplitCsvLine(ILogLine line)
         {
-            CsvReader csv = new CsvReader(new StringReader(line),
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine();
+            cLogLine.LogLine = line;
+
+
+            using (CsvReader csv = new CsvReader(new StringReader(line.FullLine),
                 false,
                 this.config.delimiterChar,
                 this.config.quoteChar,
                 this.config.escapeChar, // is '\0' when not checked in config dlg
                 this.config.commentChar,
-                false);
-            csv.ReadNextRecord();
-            int fieldCount = csv.FieldCount;
-            string[] fields = new string[fieldCount];
-            for (int i = 0; i < fieldCount; ++i)
+                false))
             {
-                fields[i] = csv[i];
+                csv.ReadNextRecord();
+                int fieldCount = csv.FieldCount;
+
+                List<Column> columns = new List<Column>();
+
+                for (int i = 0; i < fieldCount; ++i)
+                {
+                    columns.Add(new Column {FullValue = csv[i], Parent = cLogLine});
+                }
+
+                return cLogLine;
             }
-            csv.Dispose();
-            return fields;
         }
 
         #endregion
 
         private class CsvLogLine : ILogLine
         {
-            #region Fields
-
-            private static readonly int _maxLength = 20000 - 3;
-            private string _fullLine;
-
-            #endregion
-
             #region Properties
 
-            public string FullLine
-            {
-                get { return _fullLine; }
-                set
-                {
-                    _fullLine = value;
-                    if (_fullLine.Length > _maxLength)
-                    {
-                        DisplayLine = _fullLine.Substring(0, _maxLength) + "...";
-                    }
-                    else
-                    {
-                        DisplayLine = _fullLine;
-                    }
-                }
-            }
+            public string FullLine { get; set; }
 
             public int LineNumber { get; set; }
-            public string DisplayLine { get; private set; }
 
             #endregion
         }
+    
 
 
-        #region ILogLineColumnizer Member
+    #region ILogLineColumnizer Member
 
-        public string GetName()
+    public string GetName()
         {
             return "CSV Columnizer";
         }
@@ -230,15 +221,19 @@ namespace CsvColumnizer
             return names;
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
             if (this.isValidCsv)
             {
-                return SplitCsvLine(line.FullLine);
+                return SplitCsvLine(line);
             }
             else
             {
-                return new string[] {line.FullLine};
+                ColumnizedLogLine cLogLine = new ColumnizedLogLine();
+                cLogLine.LogLine = line;
+                cLogLine.ColumnValues = new IColumn[] {new Column {FullValue = line.FullLine, Parent = cLogLine}};
+
+                return cLogLine;
             }
         }
 
@@ -277,19 +272,33 @@ namespace CsvColumnizer
             {
                 this.columnList.Clear();
                 ILogLine line = this.config.hasFieldNames ? this.firstLine : callback.GetLogLine(0);
-                int i = 1;
+
+
                 if (line != null)
                 {
-                    string[] fields = SplitCsvLine(line.FullLine);
-                    foreach (string field in fields)
+                    using (CsvReader csv = new CsvReader(new StringReader(line.FullLine),
+                        false,
+                        this.config.delimiterChar,
+                        this.config.quoteChar,
+                        this.config.escapeChar, // is '\0' when not checked in config dlg
+                        this.config.commentChar,
+                        false))
                     {
-                        if (this.config.hasFieldNames)
+                        csv.ReadNextRecord();
+                        int fieldCount = csv.FieldCount;
+
+                        List<Column> columns = new List<Column>();
+
+                        for (int i = 0; i < fieldCount; ++i)
                         {
-                            this.columnList.Add(new CsvColumn(field));
-                        }
-                        else
-                        {
-                            this.columnList.Add(new CsvColumn("Column " + i++));
+                            if (this.config.hasFieldNames)
+                            {
+                                this.columnList.Add(new CsvColumn(csv[i]));
+                            }
+                            else
+                            {
+                                this.columnList.Add(new CsvColumn("Column " + i + 1));
+                            }
                         }
                     }
                 }

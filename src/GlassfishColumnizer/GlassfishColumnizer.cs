@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using LogExpert;
 using System.Globalization;
+using System.Linq;
 using ColumnizerLib;
 
 namespace GlassfishColumnizer
@@ -61,34 +62,11 @@ namespace GlassfishColumnizer
 
         private class GlassFishLogLine : ILogLine
         {
-            #region Fields
-
-            private static readonly int _maxLength = 20000 - 3;
-            private string _fullLine;
-
-            #endregion
-
             #region Properties
 
-            public string FullLine
-            {
-                get { return _fullLine; }
-                set
-                {
-                    _fullLine = value;
-                    if (_fullLine.Length > _maxLength)
-                    {
-                        DisplayLine = _fullLine.Substring(0, _maxLength) + "...";
-                    }
-                    else
-                    {
-                        DisplayLine = FullLine;
-                    }
-                }
-            }
+            public string FullLine { get; set; }
 
             public int LineNumber { get; set; }
-            public string DisplayLine { get; private set; }
 
             #endregion
         }
@@ -136,10 +114,16 @@ namespace GlassfishColumnizer
             return new string[] {"Date/Time", "Message"};
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine();
+            cLogLine.LogLine = line;
+
             string temp = line.FullLine;
-            string[] cols = new string[COLUMN_COUNT] {"", ""};
+
+            Column[] columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
+            cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+
 
             // delete '[#|' and '|#]'
             if (temp.StartsWith("[#|"))
@@ -155,7 +139,7 @@ namespace GlassfishColumnizer
             // in colum 8 (the log message column). Date and time column will be left blank.
             if (temp.Length < 28)
             {
-                cols[1] = temp;
+                columns[1].FullValue = temp;
             }
             else
             {
@@ -164,36 +148,33 @@ namespace GlassfishColumnizer
                     DateTime dateTime = GetTimestamp(callback, line);
                     if (dateTime == DateTime.MinValue)
                     {
-                        cols = new string[COLUMN_COUNT] {"", temp};
+                        columns[1].FullValue = temp;
                     }
                     string newDate = dateTime.ToString(DATETIME_FORMAT_OUT);
-                    cols[0] = newDate;
+                    columns[0].FullValue = newDate;
                 }
                 catch (Exception)
                 {
-                    cols[0] = "n/a";
+                    columns[0].FullValue = "n/a";
                 }
 
-                string timestmp = cols[0];
-                cols = GetColsFromLine(temp);
+                Column timestmp = columns[0];
+
+                string[] cols;
+                cols = temp.Split(this.trimChars, COLUMN_COUNT, StringSplitOptions.None);
+
                 if (cols.Length != COLUMN_COUNT)
                 {
-                    cols = new string[COLUMN_COUNT] {"", temp};
+                    columns[0].FullValue = string.Empty;
+                    columns[1].FullValue = temp;
                 }
                 else
                 {
-                    cols[0] = timestmp;
+                    columns[0] = timestmp;
+                    columns[1].FullValue = cols[1];
                 }
             }
-            return cols;
-        }
-
-
-        private string[] GetColsFromLine(string line)
-        {
-            string[] cols;
-            cols = line.Split(this.trimChars, COLUMN_COUNT, StringSplitOptions.None);
-            return cols;
+            return cLogLine;
         }
 
 

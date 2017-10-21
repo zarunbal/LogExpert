@@ -5,13 +5,15 @@ using System.Text;
 
 namespace ColumnizerLib
 {
-    public interface ILogLine
+    public interface IColumn
     {
         #region Properties
 
-        string FullLine { get; }
+        IColumnizedLogLine Parent { get; }
 
-        int LineNumber { get; }
+        string FullValue { get; }
+
+        string DisplayValue { get; }
 
         #endregion
     }

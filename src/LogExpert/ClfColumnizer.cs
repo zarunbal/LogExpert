@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ColumnizerLib;
 
@@ -59,18 +60,19 @@ namespace LogExpert
 
         public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            string[] cols = SplitLine(callback, line);
-            if (cols == null || cols.Length < 8)
+            IColumnizedLogLine cols = SplitLine(callback, line);
+            if (cols == null || cols.ColumnValues.Length < 8)
             {
                 return DateTime.MinValue;
             }
-            if (cols[2].Length == 0)
+            if (cols.ColumnValues[2].FullValue.Length == 0)
             {
                 return DateTime.MinValue;
             }
             try
             {
-                DateTime dateTime = DateTime.ParseExact(cols[2], "dd/MMM/yyyy:HH:mm:ss zzz", new CultureInfo("en-US"));
+                DateTime dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, "dd/MMM/yyyy:HH:mm:ss zzz",
+                    new CultureInfo("en-US"));
                 return dateTime;
             }
             catch (Exception)
@@ -120,16 +122,36 @@ namespace LogExpert
             return new string[] {"IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"};
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            string[] cols = new string[8] {"", "", "", "", "", "", "", ""};
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine
+            {
+                LogLine = line
+            };
+
+            Column[] columns = new Column[8]
+            {
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine},
+                new Column {FullValue = "", Parent = cLogLine}
+            };
+
+
+            cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+
+
             string temp = line.FullLine;
             if (temp.Length > 1024)
             {
                 // spam 
                 temp = temp.Substring(0, 1024);
-                cols[3] = temp;
-                return cols;
+                columns[3].FullValue = temp;
+                return cLogLine;
             }
             // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
             // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
@@ -140,13 +162,13 @@ namespace LogExpert
                 GroupCollection groups = match.Groups;
                 if (groups.Count == 10)
                 {
-                    cols[0] = groups[1].Value;
-                    cols[1] = groups[3].Value;
-                    cols[3] = groups[5].Value;
-                    cols[4] = groups[6].Value;
-                    cols[5] = groups[7].Value;
-                    cols[6] = groups[8].Value;
-                    cols[7] = groups[9].Value;
+                    columns[0].FullValue = groups[1].Value;
+                    columns[1].FullValue = groups[3].Value;
+                    columns[3].FullValue = groups[5].Value;
+                    columns[4].FullValue = groups[6].Value;
+                    columns[5].FullValue = groups[7].Value;
+                    columns[6].FullValue = groups[8].Value;
+                    columns[7].FullValue = groups[9].Value;
 
                     string dateTimeStr = groups[4].Value.Substring(1, 26);
 
@@ -162,29 +184,29 @@ namespace LogExpert
                                 dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
                                 string newDate = dateTime.ToString("dd/MMM/yyyy:HH:mm:ss zzz",
                                     new CultureInfo("en-US"));
-                                cols[2] = newDate;
+                                columns[2].FullValue = newDate;
                             }
                             catch (Exception)
                             {
-                                cols[2] = "n/a";
+                                columns[2].FullValue = "n/a";
                             }
                         }
                         else
                         {
-                            cols[2] = dateTimeStr;
+                            columns[2].FullValue = dateTimeStr;
                         }
                     }
                     else
                     {
-                        cols[2] = dateTimeStr;
+                        columns[2].FullValue = dateTimeStr;
                     }
                 }
             }
             else
             {
-                cols[3] = temp;
+                columns[3].FullValue = temp;
             }
-            return cols;
+            return cLogLine;
         }
 
         #endregion

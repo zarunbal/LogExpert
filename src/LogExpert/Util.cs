@@ -506,13 +506,14 @@ namespace LogExpert
 
             if (filterParams.columnRestrict)
             {
-                string[] columns = filterParams.currentColumnizer.SplitLine(columnizerCallback, line);
+                IColumnizedLogLine columns = filterParams.currentColumnizer.SplitLine(columnizerCallback, line);
                 bool found = false;
                 foreach (int colIndex in filterParams.columnList)
                 {
-                    if (colIndex < columns.Length) // just to be sure, maybe the columnizer has changed anyhow
+                    if (colIndex < columns.ColumnValues.Length
+                    ) // just to be sure, maybe the columnizer has changed anyhow
                     {
-                        if (columns[colIndex].Trim().Length == 0)
+                        if (columns.ColumnValues[colIndex].FullValue.Trim().Length == 0)
                         {
                             if (filterParams.emptyColumnUsePrev)
                             {
@@ -533,8 +534,9 @@ namespace LogExpert
                         }
                         else
                         {
-                            filterParams.lastNonEmptyCols[colIndex] = columns[colIndex];
-                            if (TestMatchSub(filterParams, columns[colIndex], lowerSearchText, searchText, rex,
+                            filterParams.lastNonEmptyCols[colIndex] = columns.ColumnValues[colIndex].FullValue;
+                            if (TestMatchSub(filterParams, columns.ColumnValues[colIndex].FullValue, lowerSearchText,
+                                searchText, rex,
                                 filterParams.exactColumnMatch))
                             {
                                 found = true;

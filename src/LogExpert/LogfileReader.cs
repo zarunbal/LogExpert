@@ -12,43 +12,14 @@ namespace LogExpert
 {
     public class LogfileReader
     {
-        private readonly GetLogLineFx _logLineFx;
-        private class LogLine : ILogLine
-
-        {
-            private static readonly int _maxStringSize = 200000 -3;
-            private string _fullLine;
-
-            public string FullLine
-            {
-                get { return _fullLine; }
-                set
-                {
-                    _fullLine = value;
-                    if (_fullLine.Length > _maxStringSize)
-                    {
-                        DisplayLine = FullLine.Substring(0, _maxStringSize) + "...";
-                    }
-                    else
-                    {
-                        DisplayLine = _fullLine;
-                    }
-                }
-            }
-
-            public int LineNumber { get; set; }
-
-            public string DisplayLine { get; private set; }
-        }
-
         #region Fields
+
+        private readonly GetLogLineFx _logLineFx;
 
         private IList<LogBuffer> bufferList;
         private ReaderWriterLock bufferListLock;
         private IList<LogBuffer> bufferLru;
         private bool contentDeleted = false;
-        private Encoding currentEncoding;
-        private long currFileSize = 0;
         private int currLineCount = 0;
         private ReaderWriterLock disposeLock;
         private EncodingOptions encodingOptions;
@@ -60,8 +31,6 @@ namespace LogExpert
         private bool isFailModeCheckCallPending = false;
         private bool isFastFailOnGetLogLine = false;
         private bool isLineCountDirty = true;
-        private bool isMultiFile = false;
-        private bool isXmlMode = false;
         private IList<ILogFileInfo> logFileInfoList = new List<ILogFileInfo>();
         private Dictionary<int, LogBufferCacheEntry> lruCacheDict;
 
@@ -73,11 +42,8 @@ namespace LogExpert
 
         private Thread monitorThread = null;
         private MultifileOptions mutlifileOptions;
-        private IPreProcessColumnizer preProcessColumnizer = null;
         private bool shouldStop;
-        private bool useNewReader;
         private ILogFileInfo watchedILogFileInfo;
-        private IXmlLogConfiguration xmlLogConfig;
 
         #endregion
 
@@ -92,11 +58,11 @@ namespace LogExpert
             }
             this.fileName = fileName;
             EncodingOptions = encodingOptions;
-            isMultiFile = multiFile;
+            IsMultiFile = multiFile;
             MAX_BUFFERS = bufferCount;
             MAX_LINES_PER_BUFFER = linesPerBuffer;
             this.mutlifileOptions = mutlifileOptions;
-             _logLineFx   = GetLogLineInternal;
+            _logLineFx = GetLogLineInternal;
             InitLruBuffers();
 
             if (multiFile)
@@ -128,7 +94,7 @@ namespace LogExpert
                 return;
             }
             EncodingOptions = encodingOptions;
-            isMultiFile = true;
+            IsMultiFile = true;
             MAX_BUFFERS = bufferCount;
             MAX_LINES_PER_BUFFER = linesPerBuffer;
             this.mutlifileOptions = mutlifileOptions;
@@ -198,38 +164,17 @@ namespace LogExpert
             set { currLineCount = value; }
         }
 
-        public bool IsMultiFile
-        {
-            get { return isMultiFile; }
-        }
+        public bool IsMultiFile { get; } = false;
 
-        public Encoding CurrentEncoding
-        {
-            get { return currentEncoding; }
-        }
+        public Encoding CurrentEncoding { get; private set; }
 
-        public long FileSize
-        {
-            get { return currFileSize; }
-        }
+        public long FileSize { get; private set; } = 0;
 
-        public bool IsXmlMode
-        {
-            get { return isXmlMode; }
-            set { isXmlMode = value; }
-        }
+        public bool IsXmlMode { get; set; } = false;
 
-        public IXmlLogConfiguration XmlLogConfig
-        {
-            get { return xmlLogConfig; }
-            set { xmlLogConfig = value; }
-        }
+        public IXmlLogConfiguration XmlLogConfig { get; set; }
 
-        public IPreProcessColumnizer PreProcessColumnizer
-        {
-            get { return preProcessColumnizer; }
-            set { preProcessColumnizer = value; }
-        }
+        public IPreProcessColumnizer PreProcessColumnizer { get; set; } = null;
 
         public EncodingOptions EncodingOptions
         {
@@ -244,31 +189,18 @@ namespace LogExpert
             }
         }
 
-        public bool UseNewReader
-        {
-            get { return useNewReader; }
-            set { useNewReader = value; }
-        }
+        public bool UseNewReader { get; set; }
 
         #endregion
 
         #region Public methods
-
-        private ILogFileInfo AddFile(string fileName)
-        {
-            Logger.logInfo("Adding file to ILogFileInfoList: " + fileName);
-            ILogFileInfo info = GetLogFileInfo(fileName);
-            logFileInfoList.Add(info);
-            return info;
-        }
-
 
         /// <summary>
         /// Public for unit test reasons
         /// </summary>
         public void ReadFiles()
         {
-            currFileSize = 0;
+            FileSize = 0;
             LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
@@ -303,7 +235,7 @@ namespace LogExpert
             args.PrevFileSize = 0;
             args.PrevLineCount = 0;
             args.LineCount = LineCount;
-            args.FileSize = currFileSize;
+            args.FileSize = FileSize;
             OnFileSizeChanged(args);
         }
 
@@ -502,45 +434,6 @@ namespace LogExpert
                 }
             }
             return result;
-        }
-
-
-        private ILogLine GetLogLineInternal(int lineNum)
-        {
-            if (isDeleted)
-            {
-#if DEBUG
-                Logger.logDebug("Returning null for line " + lineNum + " because file is deleted.");
-#endif
-                // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
-                return null;
-            }
-
-            AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
-            if (logBuffer == null)
-            {
-                ReleaseBufferListReaderLock();
-                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + fileName +
-                                (IsMultiFile ? " (MultiFile)" : ""));
-                return null;
-            }
-            // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-            disposeLock.AcquireReaderLock(Timeout.Infinite);
-            if (logBuffer.IsDisposed)
-            {
-                LockCookie cookie = disposeLock.UpgradeToWriterLock(Timeout.Infinite);
-                lock (logBuffer.FileInfo)
-                {
-                    ReReadBuffer(logBuffer);
-                }
-                disposeLock.DowngradeFromWriterLock(ref cookie);
-            }
-            ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
-            disposeLock.ReleaseReaderLock();
-            ReleaseBufferListReaderLock();
-
-            return line;
         }
 
         /// <summary>
@@ -746,7 +639,7 @@ namespace LogExpert
         /// <param name="encoding"></param>
         public void ChangeEncoding(Encoding encoding)
         {
-            currentEncoding = encoding;
+            CurrentEncoding = encoding;
             EncodingOptions.Encoding = encoding;
             ResetBufferCache();
             ClearLru();
@@ -774,6 +667,53 @@ namespace LogExpert
 
         #region Private Methods
 
+        private ILogFileInfo AddFile(string fileName)
+        {
+            Logger.logInfo("Adding file to ILogFileInfoList: " + fileName);
+            ILogFileInfo info = GetLogFileInfo(fileName);
+            logFileInfoList.Add(info);
+            return info;
+        }
+
+
+        private ILogLine GetLogLineInternal(int lineNum)
+        {
+            if (isDeleted)
+            {
+#if DEBUG
+                Logger.logDebug("Returning null for line " + lineNum + " because file is deleted.");
+#endif
+                // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
+                return null;
+            }
+
+            AcquireBufferListReaderLock();
+            LogBuffer logBuffer = getBufferForLine(lineNum);
+            if (logBuffer == null)
+            {
+                ReleaseBufferListReaderLock();
+                Logger.logError("Cannot find buffer for line " + lineNum + ", file: " + fileName +
+                                (IsMultiFile ? " (MultiFile)" : ""));
+                return null;
+            }
+            // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
+            disposeLock.AcquireReaderLock(Timeout.Infinite);
+            if (logBuffer.IsDisposed)
+            {
+                LockCookie cookie = disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                lock (logBuffer.FileInfo)
+                {
+                    ReReadBuffer(logBuffer);
+                }
+                disposeLock.DowngradeFromWriterLock(ref cookie);
+            }
+            ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+            disposeLock.ReleaseReaderLock();
+            ReleaseBufferListReaderLock();
+
+            return line;
+        }
+
         private void InitLruBuffers()
         {
             bufferList = new List<LogBuffer>();
@@ -794,7 +734,7 @@ namespace LogExpert
 
         private void ResetBufferCache()
         {
-            currFileSize = 0;
+            FileSize = 0;
             LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
@@ -807,7 +747,7 @@ namespace LogExpert
             //{
             //  info.CloseFile();
             //}
-            currFileSize = 0;
+            FileSize = 0;
             LineCount = 0;
             //this.lastReturnedLine = "";
             //this.lastReturnedLineNum = -1;
@@ -919,7 +859,7 @@ namespace LogExpert
                 Logger.logWarn("IOException: " + fe);
                 isDeleted = true;
                 LineCount = 0;
-                currFileSize = 0;
+                FileSize = 0;
                 OnFileNotFound(); // notify LogWindow
                 return;
             }
@@ -928,7 +868,7 @@ namespace LogExpert
                 reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
                 reader.Position = filePos;
                 fileLength = logFileInfo.Length;
-                LogLine logLine = new LogLine();
+
 
                 string line;
                 int lineNum = startLine;
@@ -972,8 +912,10 @@ namespace LogExpert
                 int droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
 
-                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out line))
+                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
+                    logBuffer.StartLine + logBuffer.LineCount + droppedLines, out line))
                 {
+                    LogLine logLine = new LogLine();
                     if (shouldStop)
                     {
                         Monitor.Exit(logBuffer);
@@ -990,7 +932,8 @@ namespace LogExpert
                     lineCount++;
                     if (lineCount > MAX_LINES_PER_BUFFER && reader.IsBufferComplete)
                     {
-                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
+                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length,
+                            false));
 
                         Monitor.Exit(logBuffer);
                         logBuffer = new LogBuffer(logFileInfo, MAX_LINES_PER_BUFFER);
@@ -1016,8 +959,8 @@ namespace LogExpert
                 logBuffer.Size = filePos - logBuffer.StartPos;
                 Monitor.Exit(logBuffer);
                 isLineCountDirty = true;
-                currFileSize = reader.Position;
-                currentEncoding = reader.Encoding; // Reader may have detected another encoding
+                FileSize = reader.Position;
+                CurrentEncoding = reader.Encoding; // Reader may have detected another encoding
                 if (!shouldStop)
                 {
                     OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, true, fileLength, false));
@@ -1311,7 +1254,7 @@ namespace LogExpert
                 {
                     ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
                     LogLine logLine = new LogLine();
-                    
+
                     string line;
                     long filePos = logBuffer.StartPos;
                     reader.Position = logBuffer.StartPos;
@@ -1319,7 +1262,8 @@ namespace LogExpert
                     int lineCount = 0;
                     int dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                     logBuffer.ClearLines();
-                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out line))
+                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
+                        logBuffer.StartLine + logBuffer.LineCount + dropCount, out line))
                     {
                         if (lineCount >= maxLinesCount)
                         {
@@ -1517,7 +1461,7 @@ namespace LogExpert
                 Logger.logDebug("File not FileNotFoundException catched. Switching to 'deleted' mode.");
                 isDeleted = true;
                 oldSize = fileLength = -1;
-                currFileSize = 0;
+                FileSize = 0;
                 OnFileNotFound(); // notify LogWindow
             }
 #if DEBUG
@@ -1534,7 +1478,7 @@ namespace LogExpert
             {
                 OnRespawned();
                 // prevent size update events. The window should reload the complete file.
-                currFileSize = fileLength;
+                FileSize = fileLength;
             }
             long newSize = fileLength;
             //if (this.currFileSize != newSize)
@@ -1547,14 +1491,14 @@ namespace LogExpert
         private void FireChangeEvent()
         {
             LogEventArgs args = new LogEventArgs();
-            args.PrevFileSize = currFileSize;
+            args.PrevFileSize = FileSize;
             args.PrevLineCount = LineCount;
             long newSize = fileLength;
-            if (newSize < currFileSize || isDeleted)
+            if (newSize < FileSize || isDeleted)
             {
-                Logger.logInfo("File was created anew: new size=" + newSize + ", oldSize=" + currFileSize);
+                Logger.logInfo("File was created anew: new size=" + newSize + ", oldSize=" + FileSize);
                 // Fire "New File" event
-                currFileSize = 0;
+                FileSize = 0;
                 LineCount = 0;
                 try
                 {
@@ -1600,7 +1544,7 @@ namespace LogExpert
             else
             {
                 ReadToBufferList(watchedILogFileInfo,
-                    currFileSize > 0 ? currFileSize : currFileSize, LineCount);
+                    FileSize > 0 ? FileSize : FileSize, LineCount);
                 args.FileSize = newSize;
                 args.LineCount = LineCount;
                 //if (args.PrevLineCount != args.LineCount && !this.shouldStop)
@@ -1798,6 +1742,17 @@ namespace LogExpert
             {
                 Respawned(this, new EventArgs());
             }
+        }
+
+        private class LogLine : ILogLine
+        {
+            #region Properties
+
+            public string FullLine { get; set; }
+
+            public int LineNumber { get; set; }
+
+            #endregion
         }
 
         private delegate ILogLine GetLogLineFx(int lineNum);

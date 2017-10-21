@@ -29,9 +29,21 @@ namespace LogExpert
             return new string[] {"Text"};
         }
 
-        public string[] SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            return new string[] {line.FullLine};
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine();
+            cLogLine.LogLine = line;
+            cLogLine.ColumnValues = new IColumn[]
+            {
+                new Column
+                {
+                    FullValue = line.FullLine,
+                    Parent = cLogLine
+                }
+            };
+
+
+            return cLogLine;
         }
 
         public string Text
