@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="LumenWorks.Framework.IO, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\LumenWorks.Framework.IO.dll</HintPath>
+      <HintPath>..\..\lib\LumenWorks.Framework.IO.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
