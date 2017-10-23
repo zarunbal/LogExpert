@@ -8,39 +8,44 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class ExceptionWindow : Form
-  {
-    String stackTrace;
-    String errorText;
-
-    public ExceptionWindow(String errorText, String stackTrace)
+    public partial class ExceptionWindow : Form
     {
-      InitializeComponent();
-      this.errorText = errorText;
-      this.stackTrace = stackTrace;
-      this.stackTraceTextBox.Text = this.errorText + "\n\n" + this.stackTrace;
-      this.stackTraceTextBox.Select(0, 0);
-    }
+        #region Fields
 
-    private void bugzillaButton_Click(object sender, EventArgs e)
-    {
-      BugzillaDialog bugzillaDlg = new BugzillaDialog(errorText, stackTrace);
-      //bugzillaDlg.Parent = this;
-      if (bugzillaDlg.ShowDialog() == DialogResult.OK)
-      {
-        this.Close();
-      }
-    }
+        private string errorText;
+        private string stackTrace;
 
-    private void copyButton_Click(object sender, EventArgs e)
-    {
-      CopyToClipboard();
-    }
+        #endregion
 
-    private void CopyToClipboard()
-    {
-      Clipboard.SetText(this.errorText + "\n\n" + this.stackTrace);
-    }
+        #region cTor
 
-  }
+        public ExceptionWindow(string errorText, string stackTrace)
+        {
+            InitializeComponent();
+            this.errorText = errorText;
+            this.stackTrace = stackTrace;
+            this.stackTraceTextBox.Text = this.errorText + "\n\n" + this.stackTrace;
+            this.stackTraceTextBox.Select(0, 0);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void CopyToClipboard()
+        {
+            Clipboard.SetText(this.errorText + "\n\n" + this.stackTrace);
+        }
+
+        #endregion
+
+        #region Events handler
+
+        private void copyButton_Click(object sender, EventArgs e)
+        {
+            CopyToClipboard();
+        }
+
+        #endregion
+    }
 }

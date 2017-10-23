@@ -77,7 +77,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(SolutionDir)\$(OutDir)\plugins
-copy $(TargetPath) $(SolutionDir)\$(OutDir)\plugins</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
