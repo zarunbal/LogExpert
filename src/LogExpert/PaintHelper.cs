@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
-using ColumnizerLib;
+
 using LogExpert.Dialogs;
 
 namespace LogExpert

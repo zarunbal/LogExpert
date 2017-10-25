@@ -4,7 +4,6 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using ColumnizerLib;
 using LogExpert.Dialogs;
 
 namespace LogExpert

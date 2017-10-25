@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
-using ColumnizerLib;
+
 
 namespace LogExpert
 {

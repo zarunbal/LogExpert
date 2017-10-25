@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
-using ColumnizerLib;
+
 
 
 namespace LogExpert

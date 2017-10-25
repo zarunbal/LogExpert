@@ -8,7 +8,7 @@
     <ProjectGuid>{E72C2BB1-34DE-4D66-A830-9647C3837833}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ColumnizerLib</RootNamespace>
+    <RootNamespace>LogExpert</RootNamespace>
     <AssemblyName>ColumnizerLib</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

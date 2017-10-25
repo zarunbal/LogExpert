@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security;
-using ColumnizerLib;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert

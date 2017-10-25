@@ -15,7 +15,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
-using ColumnizerLib;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert

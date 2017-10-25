@@ -6,7 +6,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Diagnostics;
-using ColumnizerLib;
+
 
 namespace LogExpert
 {

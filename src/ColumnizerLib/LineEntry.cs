@@ -1,4 +1,3 @@
-using ColumnizerLib;
 
 namespace LogExpert
 {

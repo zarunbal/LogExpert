@@ -8,7 +8,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
-using ColumnizerLib;
 
 
 namespace CsvColumnizer
@@ -184,12 +183,11 @@ namespace CsvColumnizer
 
             #endregion
         }
-    
 
 
-    #region ILogLineColumnizer Member
+        #region ILogLineColumnizer Member
 
-    public string GetName()
+        public string GetName()
         {
             return "CSV Columnizer";
         }

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Drawing;
-using ColumnizerLib;
+
 
 namespace LogExpert
 {
