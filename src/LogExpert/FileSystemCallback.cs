@@ -5,15 +5,19 @@ using System.Text;
 
 namespace LogExpert
 {
-  class FileSystemCallback : IFileSystemCallback
-  {
-    #region IFileSystemCallback Member
-
-    public ILogExpertLogger GetLogger()
+    internal class FileSystemCallback : IFileSystemCallback
     {
-      return Logger.GetLogger();
-    }
+        #region Public methods
 
-    #endregion
-  }
+        #region IFileSystemCallback Member
+
+        public ILogExpertLogger GetLogger()
+        {
+            return Logger.GetLogger();
+        }
+
+        #endregion
+
+        #endregion
+    }
 }

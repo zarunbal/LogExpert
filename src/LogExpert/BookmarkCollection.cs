@@ -5,14 +5,22 @@ using System.Collections.ObjectModel;
 
 namespace LogExpert
 {
-  public class BookmarkCollection : ReadOnlyCollection<Bookmark>
-  {
-    private SortedList<int, Bookmark> bookmarkList;
-
-    internal BookmarkCollection(SortedList<int, Bookmark> bookmarkList)
-      : base(bookmarkList.Values)
+    public class BookmarkCollection : ReadOnlyCollection<Bookmark>
     {
-      this.bookmarkList = bookmarkList;
+        #region Fields
+
+        private SortedList<int, Bookmark> bookmarkList;
+
+        #endregion
+
+        #region cTor
+
+        internal BookmarkCollection(SortedList<int, Bookmark> bookmarkList)
+            : base(bookmarkList.Values)
+        {
+            this.bookmarkList = bookmarkList;
+        }
+
+        #endregion
     }
-  }
 }

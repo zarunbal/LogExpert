@@ -4,51 +4,26 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class LogEventArgs : EventArgs 
-  {
-    private long  fileSize;
-    private int   lineCount;
-    private int   prevLineCount;
-    private long  prevFileSize;
-    private bool isRollover = false;
-    private int rolloverOffset = 0;
-
-    public int RolloverOffset
+    public class LogEventArgs : EventArgs
     {
-      get { return rolloverOffset; }
-      set { rolloverOffset = value; }
-    } 
+        #region Fields
 
-    public bool IsRollover
-    {
-      get { return isRollover; }
-      set { isRollover = value; }
+        #endregion
+
+        #region Properties
+
+        public int RolloverOffset { get; set; } = 0;
+
+        public bool IsRollover { get; set; } = false;
+
+        public long FileSize { get; set; }
+
+        public int LineCount { get; set; }
+
+        public int PrevLineCount { get; set; }
+
+        public long PrevFileSize { get; set; }
+
+        #endregion
     }
-
-    public long FileSize
-    {
-      get { return this.fileSize; }
-      set { this.fileSize = value; }
-    }
-
-    public int LineCount
-    {
-      get { return this.lineCount; }
-      set { this.lineCount = value;}
-    }
-
-    public int PrevLineCount
-    {
-      get { return this.prevLineCount; }
-      set { this.prevLineCount = value; }
-    }
-
-    public long PrevFileSize
-    {
-      get { return this.prevFileSize; }
-      set { this.prevFileSize = value; }
-    }
-
-
-  }
 }

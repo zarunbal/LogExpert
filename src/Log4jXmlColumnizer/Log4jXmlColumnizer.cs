@@ -159,12 +159,12 @@ namespace LogExpert
         public const int COLUMN_COUNT = 9;
         protected const string DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss.fff";
 
-        private static XmlConfig xmlConfig = new XmlConfig();
+        private static readonly XmlConfig xmlConfig = new XmlConfig();
+        private readonly char separatorChar = '\xFFFD';
+        private readonly char[] trimChars = new char[] {'\xFFFD'};
         private Log4jXmlColumnizerConfig config;
         protected CultureInfo cultureInfo = new CultureInfo("de-DE");
-        private char separatorChar = '\xFFFD';
         protected int timeOffset = 0;
-        private char[] trimChars = new char[] {'\xFFFD'};
 
         #endregion
 

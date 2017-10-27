@@ -2,13 +2,21 @@ using System;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-	internal static class Measures
-	{
-		public const int SplitterSize = 4;
-	}
+    internal static class Measures
+    {
+        #region Fields
 
-	internal static class MeasurePane
-	{
-		public const int MinSize = 24;
-	}
+        public const int SplitterSize = 4;
+
+        #endregion
+    }
+
+    internal static class MeasurePane
+    {
+        #region Fields
+
+        public const int MinSize = 24;
+
+        #endregion
+    }
 }

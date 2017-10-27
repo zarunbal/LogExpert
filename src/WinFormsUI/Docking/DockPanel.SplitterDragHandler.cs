@@ -10,49 +10,50 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     partial class DockPanel
     {
+        #region Fields
+
+        private SplitterDragHandler m_splitterDragHandler = null;
+
+        #endregion
+
+        #region Internals
+
+        internal void BeginDrag(ISplitterDragSource dragSource, Rectangle rectSplitter)
+        {
+            GetSplitterDragHandler().BeginDrag(dragSource, rectSplitter);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private SplitterDragHandler GetSplitterDragHandler()
+        {
+            if (m_splitterDragHandler == null)
+            {
+                m_splitterDragHandler = new SplitterDragHandler(this);
+            }
+            return m_splitterDragHandler;
+        }
+
+        #endregion
+
         private sealed class SplitterDragHandler : DragHandler
         {
-            private class SplitterOutline
-            {
-                public SplitterOutline()
-                {
-                    m_dragForm = new DragForm();
-                    SetDragForm(Rectangle.Empty);
-                    DragForm.BackColor = Color.Black;
-                    DragForm.Opacity = 0.7;
-                    DragForm.Show(false);
-                }
+            #region Fields
 
-                DragForm m_dragForm;
-                private DragForm DragForm
-                {
-                    get { return m_dragForm; }
-                }
+            #endregion
 
-                public void Show(Rectangle rect)
-                {
-                    SetDragForm(rect);
-                }
-
-                public void Close()
-                {
-                    DragForm.Close();
-                }
-
-                private void SetDragForm(Rectangle rect)
-                {
-                    DragForm.Bounds = rect;
-                    if (rect == Rectangle.Empty)
-                        DragForm.Region = new Region(Rectangle.Empty);
-                    else if (DragForm.Region != null)
-                        DragForm.Region = null;
-                }
-            }
+            #region cTor
 
             public SplitterDragHandler(DockPanel dockPanel)
                 : base(dockPanel)
             {
             }
+
+            #endregion
+
+            #region Properties
 
             public new ISplitterDragSource DragSource
             {
@@ -60,19 +61,13 @@ namespace WeifenLuo.WinFormsUI.Docking
                 private set { base.DragSource = value; }
             }
 
-            private SplitterOutline m_outline;
-            private SplitterOutline Outline
-            {
-                get { return m_outline; }
-                set { m_outline = value; }
-            }
+            private SplitterOutline Outline { get; set; }
 
-            private Rectangle m_rectSplitter;
-            private Rectangle RectSplitter
-            {
-                get { return m_rectSplitter; }
-                set { m_rectSplitter = value; }
-            }
+            private Rectangle RectSplitter { get; set; }
+
+            #endregion
+
+            #region Public methods
 
             public void BeginDrag(ISplitterDragSource dragSource, Rectangle rectSplitter)
             {
@@ -90,6 +85,10 @@ namespace WeifenLuo.WinFormsUI.Docking
                 DragSource.BeginDrag(rectSplitter);
             }
 
+            #endregion
+
+            #region Overrides
+
             protected override void OnDragging()
             {
                 Outline.Show(GetSplitterOutlineBounds(Control.MousePosition));
@@ -102,19 +101,29 @@ namespace WeifenLuo.WinFormsUI.Docking
                 Outline.Close();
 
                 if (!abort)
+                {
                     DragSource.MoveSplitter(GetMovingOffset(Control.MousePosition));
+                }
 
                 DragSource.EndDrag();
                 DockPanel.ResumeLayout(true, true);
             }
 
+            #endregion
+
+            #region Private Methods
+
             private int GetMovingOffset(Point ptMouse)
             {
                 Rectangle rect = GetSplitterOutlineBounds(ptMouse);
                 if (DragSource.IsVertical)
+                {
                     return rect.X - RectSplitter.X;
+                }
                 else
+                {
                     return rect.Y - RectSplitter.Y;
+                }
             }
 
             private Rectangle GetSplitterOutlineBounds(Point ptMouse)
@@ -123,7 +132,9 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 Rectangle rect = RectSplitter;
                 if (rectLimit.Width <= 0 || rectLimit.Height <= 0)
+                {
                     return rect;
+                }
 
                 if (DragSource.IsVertical)
                 {
@@ -137,29 +148,83 @@ namespace WeifenLuo.WinFormsUI.Docking
                 }
 
                 if (rect.Left < rectLimit.Left)
+                {
                     rect.X = rectLimit.X;
+                }
                 if (rect.Top < rectLimit.Top)
+                {
                     rect.Y = rectLimit.Y;
+                }
                 if (rect.Right > rectLimit.Right)
+                {
                     rect.X -= rect.Right - rectLimit.Right;
+                }
                 if (rect.Bottom > rectLimit.Bottom)
+                {
                     rect.Y -= rect.Bottom - rectLimit.Bottom;
+                }
 
                 return rect;
             }
-        }
 
-        private SplitterDragHandler m_splitterDragHandler = null;
-        private SplitterDragHandler GetSplitterDragHandler()
-        {
-            if (m_splitterDragHandler == null)
-                m_splitterDragHandler = new SplitterDragHandler(this);
-            return m_splitterDragHandler;
-        }
+            #endregion
 
-        internal void BeginDrag(ISplitterDragSource dragSource, Rectangle rectSplitter)
-        {
-            GetSplitterDragHandler().BeginDrag(dragSource, rectSplitter);
+            private class SplitterOutline
+            {
+                #region Fields
+
+                #endregion
+
+                #region cTor
+
+                public SplitterOutline()
+                {
+                    DragForm = new DragForm();
+                    SetDragForm(Rectangle.Empty);
+                    DragForm.BackColor = Color.Black;
+                    DragForm.Opacity = 0.7;
+                    DragForm.Show(false);
+                }
+
+                #endregion
+
+                #region Properties
+
+                private DragForm DragForm { get; }
+
+                #endregion
+
+                #region Public methods
+
+                public void Show(Rectangle rect)
+                {
+                    SetDragForm(rect);
+                }
+
+                public void Close()
+                {
+                    DragForm.Close();
+                }
+
+                #endregion
+
+                #region Private Methods
+
+                private void SetDragForm(Rectangle rect)
+                {
+                    DragForm.Bounds = rect;
+                    if (rect == Rectangle.Empty)
+                    {
+                        DragForm.Region = new Region(Rectangle.Empty);
+                    }
+                    else if (DragForm.Region != null)
+                    {
+                        DragForm.Region = null;
+                    }
+                }
+
+                #endregion
+            }
         }
     }
 }

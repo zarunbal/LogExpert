@@ -9,77 +9,87 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class ToolArgsDialog : Form
-  {
-    LogTabWindow logTabWin;
-    string arg = null;
-
-    public string Arg
+    public partial class ToolArgsDialog : Form
     {
-      get { return arg; }
-      set { arg = value; }
-    }
-    
-    public ToolArgsDialog(LogTabWindow logTabWin, Form parent)
-    {
-      this.logTabWin = logTabWin;
-      parent.AddOwnedForm(this);
-      this.TopMost = parent.TopMost;
-      InitializeComponent();
-    }
+        #region Fields
 
-    private void ToolArgsDialog_Load(object sender, EventArgs e)
-    {
-      this.helpLabel.Text = "" +
-        "%L = Current line number\n" +
-        "%N = Current log file name without path\n" +
-        "%P = Path (directory) of current log file\n" +
-        "%F = Full name (incl. path) of log file\n" +
-        "%E = Extension of log file name (e.g. 'txt')\n" +
-        "%M = Name of log file without extension\n" +
-        "%S = User (from URI)\n" +
-        "%R = Path (from URI)\n" +
-        "%H = Host (from URI)\n" +
-        "%T = Port (from URI)\n" +
-        "?\"<name>\" = variable parameter 'name'\n" +
-        "?\"<name>\"(def1,def2,...) = variable parameter with predefined values\n" +
-        "\n" +
-        "{<regex>}{<replace>}:\n" +
-        "Regex search/replace on current selected line.";
+        private readonly LogTabWindow logTabWin;
 
-      this.argsTextBox.Text = this.Arg;
-    }
+        #endregion
 
-    private void regexHelpButton_Click(object sender, EventArgs e)
-    {
-      RegexHelperDialog regexDlg = new RegexHelperDialog();
-      if (regexDlg.ShowDialog() == DialogResult.OK)
-      {
-        this.argsTextBox.SelectedText = regexDlg.Pattern;
-      }
-    }
+        #region cTor
 
-
-    private void testButton_Click(object sender, EventArgs e)
-    {
-      if (this.logTabWin.CurrentLogWindow != null)
-      {
-          ILogLine line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
-        ILogFileInfo info = this.logTabWin.CurrentLogWindow.GetCurrentFileInfo();
-        if (line != null && info != null)
+        public ToolArgsDialog(LogTabWindow logTabWin, Form parent)
         {
-          ArgParser parser = new ArgParser(this.argsTextBox.Text);
-          string args = parser.BuildArgs(line, this.logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info, this);
-          this.testResultLabel.Text = args;
+            this.logTabWin = logTabWin;
+            parent.AddOwnedForm(this);
+            this.TopMost = parent.TopMost;
+            InitializeComponent();
         }
-      }
 
-    }
+        #endregion
 
-    private void button1_Click(object sender, EventArgs e)
-    {
-      this.Arg = this.argsTextBox.Text;
+        #region Properties
+
+        public string Arg { get; set; } = null;
+
+        #endregion
+
+        #region Events handler
+
+        private void ToolArgsDialog_Load(object sender, EventArgs e)
+        {
+            this.helpLabel.Text = "" +
+                                  "%L = Current line number\n" +
+                                  "%N = Current log file name without path\n" +
+                                  "%P = Path (directory) of current log file\n" +
+                                  "%F = Full name (incl. path) of log file\n" +
+                                  "%E = Extension of log file name (e.g. 'txt')\n" +
+                                  "%M = Name of log file without extension\n" +
+                                  "%S = User (from URI)\n" +
+                                  "%R = Path (from URI)\n" +
+                                  "%H = Host (from URI)\n" +
+                                  "%T = Port (from URI)\n" +
+                                  "?\"<name>\" = variable parameter 'name'\n" +
+                                  "?\"<name>\"(def1,def2,...) = variable parameter with predefined values\n" +
+                                  "\n" +
+                                  "{<regex>}{<replace>}:\n" +
+                                  "Regex search/replace on current selected line.";
+
+            this.argsTextBox.Text = this.Arg;
+        }
+
+        private void regexHelpButton_Click(object sender, EventArgs e)
+        {
+            RegexHelperDialog regexDlg = new RegexHelperDialog();
+            if (regexDlg.ShowDialog() == DialogResult.OK)
+            {
+                this.argsTextBox.SelectedText = regexDlg.Pattern;
+            }
+        }
+
+
+        private void testButton_Click(object sender, EventArgs e)
+        {
+            if (this.logTabWin.CurrentLogWindow != null)
+            {
+                ILogLine line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
+                ILogFileInfo info = this.logTabWin.CurrentLogWindow.GetCurrentFileInfo();
+                if (line != null && info != null)
+                {
+                    ArgParser parser = new ArgParser(this.argsTextBox.Text);
+                    string args = parser.BuildArgs(line, this.logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info,
+                        this);
+                    this.testResultLabel.Text = args;
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Arg = this.argsTextBox.Text;
+        }
+
+        #endregion
     }
-  }
 }
- 

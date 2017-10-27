@@ -8,22 +8,48 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     partial class DockPane
     {
+        #region Fields
+
+        #endregion
+
+        #region Properties
+
+        private SplitterControl Splitter { get; set; }
+
+        internal Rectangle SplitterBounds
+        {
+            set { Splitter.Bounds = value; }
+        }
+
+        internal DockAlignment SplitterAlignment
+        {
+            set { Splitter.Alignment = value; }
+        }
+
+        #endregion
+
         private class SplitterControl : Control, ISplitterDragSource
         {
-            DockPane m_pane;
+            #region Fields
+
+            private DockAlignment m_alignment;
+
+            #endregion
+
+            #region cTor
 
             public SplitterControl(DockPane pane)
             {
                 SetStyle(ControlStyles.Selectable, false);
-                m_pane = pane;
+                DockPane = pane;
             }
 
-            public DockPane DockPane
-            {
-                get { return m_pane; }
-            }
+            #endregion
 
-            private DockAlignment m_alignment;
+            #region Properties
+
+            public DockPane DockPane { get; }
+
             public DockAlignment Alignment
             {
                 get { return m_alignment; }
@@ -31,30 +57,48 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     m_alignment = value;
                     if (m_alignment == DockAlignment.Left || m_alignment == DockAlignment.Right)
+                    {
                         Cursor = Cursors.VSplit;
+                    }
                     else if (m_alignment == DockAlignment.Top || m_alignment == DockAlignment.Bottom)
+                    {
                         Cursor = Cursors.HSplit;
+                    }
                     else
+                    {
                         Cursor = Cursors.Default;
+                    }
 
                     if (DockPane.DockState == DockState.Document)
+                    {
                         Invalidate();
+                    }
                 }
             }
+
+            #endregion
+
+            #region Overrides
 
             protected override void OnPaint(PaintEventArgs e)
             {
                 base.OnPaint(e);
 
                 if (DockPane.DockState != DockState.Document)
+                {
                     return;
+                }
 
                 Graphics g = e.Graphics;
                 Rectangle rect = ClientRectangle;
                 if (Alignment == DockAlignment.Top || Alignment == DockAlignment.Bottom)
+                {
                     g.DrawLine(SystemPens.ControlDark, rect.Left, rect.Bottom - 1, rect.Right, rect.Bottom - 1);
+                }
                 else if (Alignment == DockAlignment.Left || Alignment == DockAlignment.Right)
+                {
                     g.DrawLine(SystemPens.ControlDarkDark, rect.Right - 1, rect.Top, rect.Right - 1, rect.Bottom);
+                }
             }
 
             protected override void OnMouseDown(MouseEventArgs e)
@@ -62,10 +106,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                 base.OnMouseDown(e);
 
                 if (e.Button != MouseButtons.Left)
+                {
                     return;
+                }
 
                 DockPane.DockPanel.BeginDrag(this, Parent.RectangleToScreen(Bounds));
             }
+
+            #endregion
 
             #region ISplitterDragSource Members
 
@@ -82,8 +130,8 @@ namespace WeifenLuo.WinFormsUI.Docking
                 get
                 {
                     NestedDockingStatus status = DockPane.NestedDockingStatus;
-                    return (status.DisplayingAlignment == DockAlignment.Left ||
-                        status.DisplayingAlignment == DockAlignment.Right);
+                    return status.DisplayingAlignment == DockAlignment.Left ||
+                           status.DisplayingAlignment == DockAlignment.Right;
                 }
             }
 
@@ -93,7 +141,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     NestedDockingStatus status = DockPane.NestedDockingStatus;
                     Rectangle rectLimit = Parent.RectangleToScreen(status.LogicalBounds);
-                    if (((ISplitterDragSource)this).IsVertical)
+                    if (((ISplitterDragSource) this).IsVertical)
                     {
                         rectLimit.X += MeasurePane.MinSize;
                         rectLimit.Width -= 2 * MeasurePane.MinSize;
@@ -113,15 +161,25 @@ namespace WeifenLuo.WinFormsUI.Docking
                 NestedDockingStatus status = DockPane.NestedDockingStatus;
                 double proportion = status.Proportion;
                 if (status.LogicalBounds.Width <= 0 || status.LogicalBounds.Height <= 0)
+                {
                     return;
+                }
                 else if (status.DisplayingAlignment == DockAlignment.Left)
-                    proportion += ((double)offset) / (double)status.LogicalBounds.Width;
+                {
+                    proportion += (double) offset / (double) status.LogicalBounds.Width;
+                }
                 else if (status.DisplayingAlignment == DockAlignment.Right)
-                    proportion -= ((double)offset) / (double)status.LogicalBounds.Width;
+                {
+                    proportion -= (double) offset / (double) status.LogicalBounds.Width;
+                }
                 else if (status.DisplayingAlignment == DockAlignment.Top)
-                    proportion += ((double)offset) / (double)status.LogicalBounds.Height;
+                {
+                    proportion += (double) offset / (double) status.LogicalBounds.Height;
+                }
                 else
-                    proportion -= ((double)offset) / (double)status.LogicalBounds.Height;
+                {
+                    proportion -= (double) offset / (double) status.LogicalBounds.Height;
+                }
 
                 DockPane.SetNestedDockingProportion(proportion);
             }
@@ -136,22 +194,6 @@ namespace WeifenLuo.WinFormsUI.Docking
             #endregion
 
             #endregion
-        }
-
-        private SplitterControl m_splitter;
-        private SplitterControl Splitter
-        {
-            get { return m_splitter; }
-        }
-
-        internal Rectangle SplitterBounds
-        {
-            set { Splitter.Bounds = value; }
-        }
-
-        internal DockAlignment SplitterAlignment
-        {
-            set { Splitter.Alignment = value; }
         }
     }
 }

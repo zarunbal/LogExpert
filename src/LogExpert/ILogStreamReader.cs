@@ -4,24 +4,23 @@ using System.Text;
 
 namespace LogExpert
 {
-  interface ILogStreamReader
-  {
-    int ReadChar();
-    string ReadLine();
-
-    long Position
+    internal interface ILogStreamReader
     {
-      get; set;
-    }
+        #region Properties
 
-    bool IsBufferComplete
-    {
-      get;
-    }
+        long Position { get; set; }
 
-    Encoding Encoding
-    {
-      get;
+        bool IsBufferComplete { get; }
+
+        Encoding Encoding { get; }
+
+        #endregion
+
+        #region Public methods
+
+        int ReadChar();
+        string ReadLine();
+
+        #endregion
     }
-  }
 }

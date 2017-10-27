@@ -4,33 +4,34 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class RowHeightEntry
-  {
-    public RowHeightEntry()
+    public class RowHeightEntry
     {
-      LineNum = 0;
-      Height = 0;
-    }
-    public RowHeightEntry(int lineNum, int height)
-    {
-      LineNum = lineNum;
-      Height = height;
-    }
+        #region Fields
 
-    int lineNum;
+        #endregion
 
-    public int LineNum
-    {
-      get { return lineNum; }
-      set { lineNum = value; }
+        #region cTor
+
+        public RowHeightEntry()
+        {
+            LineNum = 0;
+            Height = 0;
+        }
+
+        public RowHeightEntry(int lineNum, int height)
+        {
+            LineNum = lineNum;
+            Height = height;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public int LineNum { get; set; }
+
+        public int Height { get; set; }
+
+        #endregion
     }
-
-    int height;
-
-    public int Height
-    {
-      get { return height; }
-      set { height = value; }
-    }
-  }
 }

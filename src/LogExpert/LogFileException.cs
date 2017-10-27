@@ -4,17 +4,20 @@ using System.Text;
 
 namespace LogExpert
 {
-  internal class LogFileException : ApplicationException
-  {
-    internal LogFileException(string msg)
-      : base(msg)
+    internal class LogFileException : ApplicationException
     {
-    }
+        #region cTor
 
-    internal LogFileException(string msg, Exception inner)
-      : base(msg, inner)
-    {
-    }
+        internal LogFileException(string msg)
+            : base(msg)
+        {
+        }
 
-  }
+        internal LogFileException(string msg, Exception inner)
+            : base(msg, inner)
+        {
+        }
+
+        #endregion
+    }
 }

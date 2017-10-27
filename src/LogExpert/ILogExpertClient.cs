@@ -1,23 +1,24 @@
 using System;
 using System.Security.Permissions;
+
 namespace LogExpert
 {
-  public interface ILogExpertClient
-  {
-    int Id
+    public interface ILogExpertClient
     {
-      get;
+        #region Properties
+
+        int Id { get; }
+
+        ILogExpertProxy Proxy { get; }
+
+        #endregion
+
+        #region Public methods
+
+        void NotifySettingsChanged(ILogExpertProxy server, object cookie);
+
+        void OnSettingsChanged(object cookie);
+
+        #endregion
     }
-
-    void NotifySettingsChanged(ILogExpertProxy server, Object cookie);
-
-    void OnSettingsChanged(Object cookie);
-
-    ILogExpertProxy Proxy
-    {
-      get;
-    }
-    
-  }
-
 }

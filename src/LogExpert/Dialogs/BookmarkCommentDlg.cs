@@ -8,19 +8,25 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class BookmarkCommentDlg : Form
-  {
-
-    public string Comment
+    public partial class BookmarkCommentDlg : Form
     {
-      set { this.commentTextBox.Text = value; }
-      get { return this.commentTextBox.Text; }
-    }
+        #region cTor
 
+        public BookmarkCommentDlg()
+        {
+            InitializeComponent();
+        }
 
-    public BookmarkCommentDlg()
-    {
-      InitializeComponent();
+        #endregion
+
+        #region Properties
+
+        public string Comment
+        {
+            set { this.commentTextBox.Text = value; }
+            get { return this.commentTextBox.Text; }
+        }
+
+        #endregion
     }
-  }
 }

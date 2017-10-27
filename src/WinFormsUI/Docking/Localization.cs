@@ -3,44 +3,66 @@ using System.ComponentModel;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-	[AttributeUsage(AttributeTargets.All)]
-	internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
-	{
-		private bool m_initialized = false;
+    [AttributeUsage(AttributeTargets.All)]
+    internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
+    {
+        #region Fields
 
-		public LocalizedDescriptionAttribute(string key) : base(key)
-		{
-		}
+        private bool m_initialized = false;
 
-		public override string Description
-		{
-			get
-			{	
-				if (!m_initialized)
-				{
-					string key = base.Description;
-					DescriptionValue = ResourceHelper.GetString(key);
-					if (DescriptionValue == null)
-						DescriptionValue = String.Empty;
+        #endregion
 
-					m_initialized = true;
-				}
+        #region cTor
 
-				return DescriptionValue;
-			}
-		}
-	}
+        public LocalizedDescriptionAttribute(string key) : base(key)
+        {
+        }
 
-	[AttributeUsage(AttributeTargets.All)]
-	internal sealed class LocalizedCategoryAttribute : CategoryAttribute
-	{
-		public LocalizedCategoryAttribute(string key) : base(key)
-		{
-		}
+        #endregion
 
-		protected override string GetLocalizedString(string key)
-		{
-			return ResourceHelper.GetString(key);
-		}
-	}
+        #region Properties
+
+        public override string Description
+        {
+            get
+            {
+                if (!m_initialized)
+                {
+                    string key = base.Description;
+                    DescriptionValue = ResourceHelper.GetString(key);
+                    if (DescriptionValue == null)
+                    {
+                        DescriptionValue = string.Empty;
+                    }
+
+                    m_initialized = true;
+                }
+
+                return DescriptionValue;
+            }
+        }
+
+        #endregion
+    }
+
+    [AttributeUsage(AttributeTargets.All)]
+    internal sealed class LocalizedCategoryAttribute : CategoryAttribute
+    {
+        #region cTor
+
+        public LocalizedCategoryAttribute(string key) : base(key)
+        {
+        }
+
+        #endregion
+
+        #region Overrides
+
+        protected override string GetLocalizedString(string key)
+        {
+            return ResourceHelper.GetString(key);
+        }
+
+        #endregion
+    }
 }

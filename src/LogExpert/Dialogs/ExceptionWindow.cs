@@ -12,8 +12,8 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
-        private string errorText;
-        private string stackTrace;
+        private readonly string errorText;
+        private readonly string stackTrace;
 
         #endregion
 

@@ -8,77 +8,75 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public struct ActEntry
-  {
-    private string name;
-    private IKeywordAction plugin;
-
-    public string Name
+    public struct ActEntry
     {
-      get { return this.name; }
-      set { this.name = value; }
+        public string Name { get; set; }
+
+        public IKeywordAction Plugin { get; set; }
     }
 
-    public IKeywordAction Plugin
+
+    public partial class KeywordActionDlg : Form
     {
-      get { return this.plugin; }
-      set { this.plugin = value; }
-    }
-  }
+        #region Fields
 
+        private readonly IDictionary<string, IKeywordAction> actionDict = new Dictionary<string, IKeywordAction>();
+        private IList<IKeywordAction> keywordActionList;
 
-  public partial class KeywordActionDlg : Form
-  {
-    IList<IKeywordAction>   keywordActionList;
-    private ActionEntry   actionEntry;
-    IDictionary<string, IKeywordAction> actionDict = new Dictionary<string, IKeywordAction>();
+        #endregion
 
-    public KeywordActionDlg(ActionEntry entry, IList<IKeywordAction> actionList)
-    {
-      this.keywordActionList = actionList;
-      this.actionEntry = entry;
-      InitializeComponent();
-      this.actionComboBox.Items.Clear();
-      foreach (IKeywordAction action in actionList)
-      {
-        this.actionComboBox.Items.Add(action.GetName());
-        this.actionDict[action.GetName()] = action;
-      }
-      if (this.actionComboBox.Items.Count > 0)
-      {
-        if (this.actionEntry.pluginName != null && this.actionDict.ContainsKey(this.actionEntry.pluginName))
+        #region cTor
+
+        public KeywordActionDlg(ActionEntry entry, IList<IKeywordAction> actionList)
         {
-          this.actionComboBox.SelectedItem = this.actionEntry.pluginName;
+            this.keywordActionList = actionList;
+            this.ActionEntry = entry;
+            InitializeComponent();
+            this.actionComboBox.Items.Clear();
+            foreach (IKeywordAction action in actionList)
+            {
+                this.actionComboBox.Items.Add(action.GetName());
+                this.actionDict[action.GetName()] = action;
+            }
+            if (this.actionComboBox.Items.Count > 0)
+            {
+                if (this.ActionEntry.pluginName != null && this.actionDict.ContainsKey(this.ActionEntry.pluginName))
+                {
+                    this.actionComboBox.SelectedItem = this.ActionEntry.pluginName;
+                }
+                else
+                {
+                    this.actionComboBox.SelectedIndex = 0;
+                }
+            }
+            this.parameterTextBox.Text = this.ActionEntry.actionParam;
         }
-        else
+
+        #endregion
+
+        #region Properties
+
+        public ActionEntry ActionEntry { get; private set; }
+
+        #endregion
+
+        #region Events handler
+
+        private void okButton_Click(object sender, EventArgs e)
         {
-          this.actionComboBox.SelectedIndex = 0;
+            ActionEntry = new ActionEntry();
+            ActionEntry.actionParam = this.parameterTextBox.Text;
+            if (this.actionDict.ContainsKey((string) this.actionComboBox.SelectedItem))
+            {
+                ActionEntry.pluginName = (string) this.actionComboBox.SelectedItem;
+            }
         }
-      }
-      this.parameterTextBox.Text = this.actionEntry.actionParam;
+
+        private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.commentTextBox.Text = this.actionDict[(string) this.actionComboBox.SelectedItem].GetDescription();
+        }
+
+        #endregion
     }
-
-
-    public ActionEntry ActionEntry
-    {
-      get { return this.actionEntry; }
-    }
-
-
-    private void okButton_Click(object sender, EventArgs e)
-    {
-      actionEntry = new ActionEntry();
-      actionEntry.actionParam = this.parameterTextBox.Text;
-      if (this.actionDict.ContainsKey((string)this.actionComboBox.SelectedItem))
-      {
-        actionEntry.pluginName = (string)this.actionComboBox.SelectedItem;
-      }
-    }
-
-    private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      this.commentTextBox.Text = this.actionDict[(string)this.actionComboBox.SelectedItem].GetDescription();
-    }
-
-  }
 }

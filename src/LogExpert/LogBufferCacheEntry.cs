@@ -5,29 +5,36 @@ using System.Threading;
 
 namespace LogExpert
 {
-  internal class LogBufferCacheEntry
-  {
-    private LogBuffer logBuffer;
-    private long lastUseTimeStamp;
-    public LogBufferCacheEntry()
+    internal class LogBufferCacheEntry
     {
-      Touch();
-    }
+        #region Fields
 
-    public void Touch()
-    {
-      lastUseTimeStamp = (long)(Environment.TickCount & Int32.MaxValue);
-    }
+        #endregion
 
-    internal LogBuffer LogBuffer
-    {
-      get { return this.logBuffer; }
-      set { this.logBuffer = value; }
-    }
+        #region cTor
 
-    public long LastUseTimeStamp
-    {
-      get { return this.lastUseTimeStamp; }
+        public LogBufferCacheEntry()
+        {
+            Touch();
+        }
+
+        #endregion
+
+        #region Properties
+
+        internal LogBuffer LogBuffer { get; set; }
+
+        public long LastUseTimeStamp { get; private set; }
+
+        #endregion
+
+        #region Public methods
+
+        public void Touch()
+        {
+            LastUseTimeStamp = (long) (Environment.TickCount & int.MaxValue);
+        }
+
+        #endregion
     }
-  }
 }

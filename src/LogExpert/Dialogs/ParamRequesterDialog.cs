@@ -8,54 +8,51 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class ParamRequesterDialog : Form
-  {
-    string paramName;
-
-    public string ParamName
+    public partial class ParamRequesterDialog : Form
     {
-      get { return paramName; }
-      set { paramName = value; }
-    }
-    string paramValue;
+        #region Fields
 
-    public string ParamValue
-    {
-      get { return paramValue; }
-      set { paramValue = value; }
-    }
+        #endregion
 
-    string[] values;
+        #region cTor
 
-    public string[] Values
-    {
-      get { return values; }
-      set { values = value; }
-    }
-
-
-    public ParamRequesterDialog()
-    {
-      InitializeComponent();
-    }
-
-    private void ParamRequesterDialog_Shown(object sender, EventArgs e)
-    {
-      this.paramLabel.Text = ParamName;
-      if (this.values != null)
-      {
-        foreach (string value in this.values)
+        public ParamRequesterDialog()
         {
-          this.valueComboBox.Items.Add(value);
+            InitializeComponent();
         }
-        this.valueComboBox.SelectedIndex = 0;
-      }
-    }
 
-    private void okButton_Click(object sender, EventArgs e)
-    {
-      this.ParamValue = this.valueComboBox.Text;
-    }
+        #endregion
 
-  }
+        #region Properties
+
+        public string ParamName { get; set; }
+
+        public string ParamValue { get; set; }
+
+        public string[] Values { get; set; }
+
+        #endregion
+
+        #region Events handler
+
+        private void ParamRequesterDialog_Shown(object sender, EventArgs e)
+        {
+            this.paramLabel.Text = ParamName;
+            if (this.Values != null)
+            {
+                foreach (string value in this.Values)
+                {
+                    this.valueComboBox.Items.Add(value);
+                }
+                this.valueComboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            this.ParamValue = this.valueComboBox.Text;
+        }
+
+        #endregion
+    }
 }

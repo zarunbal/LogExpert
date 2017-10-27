@@ -2,18 +2,25 @@ using System;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-	public class DockContentEventArgs : EventArgs
-	{
-		private IDockContent m_content;
+    public class DockContentEventArgs : EventArgs
+    {
+        #region Fields
 
-		public DockContentEventArgs(IDockContent content)
-		{
-			m_content = content;
-		}
+        #endregion
 
-		public IDockContent Content
-		{
-			get	{	return m_content;	}
-		}
-	}
+        #region cTor
+
+        public DockContentEventArgs(IDockContent content)
+        {
+            Content = content;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public IDockContent Content { get; }
+
+        #endregion
+    }
 }

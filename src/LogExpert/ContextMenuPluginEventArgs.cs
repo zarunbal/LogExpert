@@ -4,40 +4,35 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class ContextMenuPluginEventArgs : EventArgs
-  {
-    IContextMenuEntry entry;
-
-    public IContextMenuEntry Entry
+    public class ContextMenuPluginEventArgs : EventArgs
     {
-      get { return entry; }
-    }
+        #region Fields
 
-    IList<int> logLines;
+        #endregion
 
-    public IList<int> LogLines
-    {
-      get { return logLines; }
-    }
-    ILogLineColumnizer columnizer;
+        #region cTor
 
-    public ILogLineColumnizer Columnizer
-    {
-      get { return columnizer; }
-    }
-    ILogExpertCallback callback;
+        public ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineColumnizer columnizer,
+            ILogExpertCallback callback)
+        {
+            this.Entry = entry;
+            this.LogLines = logLines;
+            this.Columnizer = columnizer;
+            this.Callback = callback;
+        }
 
-    public ILogExpertCallback Callback
-    {
-      get { return callback; }
-    }
+        #endregion
 
-    public ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineColumnizer columnizer, ILogExpertCallback callback)
-    {
-      this.entry = entry;
-      this.logLines = logLines;
-      this.columnizer = columnizer;
-      this.callback = callback;
+        #region Properties
+
+        public IContextMenuEntry Entry { get; }
+
+        public IList<int> LogLines { get; }
+
+        public ILogLineColumnizer Columnizer { get; }
+
+        public ILogExpertCallback Callback { get; }
+
+        #endregion
     }
-  }
 }

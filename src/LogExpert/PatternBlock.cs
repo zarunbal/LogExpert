@@ -4,28 +4,43 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class QualityInfo
-  {
-    public int quality;
-  }
-
-  public class PatternBlock
-  {
-    public int startLine;
-    public int endLine;
-    public int targetStart;
-    public int targetEnd;
-    public int weigth;
-    public int blockId;
-    public SortedDictionary<int, int> srcLines = new SortedDictionary<int, int>();
-    public SortedDictionary<int, int> targetLines = new SortedDictionary<int, int>();
-    // key: line num
-    public Dictionary<int, QualityInfo> qualityInfoList = new Dictionary<int, QualityInfo>();
-
-    public override string ToString()
+    public class QualityInfo
     {
-      return "srcStart=" + startLine + ", srcEnd=" + endLine + ", targetStart=" + targetStart +
-        ", targetEnd=" + targetEnd + ", weight=" + weigth;
+        #region Fields
+
+        public int quality;
+
+        #endregion
     }
-  }
+
+    public class PatternBlock
+    {
+        #region Fields
+
+        public int blockId;
+
+        public int endLine;
+
+        // key: line num
+        public Dictionary<int, QualityInfo> qualityInfoList = new Dictionary<int, QualityInfo>();
+
+        public SortedDictionary<int, int> srcLines = new SortedDictionary<int, int>();
+        public int startLine;
+        public int targetEnd;
+        public SortedDictionary<int, int> targetLines = new SortedDictionary<int, int>();
+        public int targetStart;
+        public int weigth;
+
+        #endregion
+
+        #region Public methods
+
+        public override string ToString()
+        {
+            return "srcStart=" + startLine + ", srcEnd=" + endLine + ", targetStart=" + targetStart +
+                   ", targetEnd=" + targetEnd + ", weight=" + weigth;
+        }
+
+        #endregion
+    }
 }

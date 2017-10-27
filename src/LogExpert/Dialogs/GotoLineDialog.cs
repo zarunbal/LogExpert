@@ -9,37 +9,46 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class GotoLineDialog : Form
-  {
-    private int line;
-
-    public GotoLineDialog(Form parent)
+    public partial class GotoLineDialog : Form
     {
-      InitializeComponent();
-      this.Owner = parent;
+        #region Fields
+
+        #endregion
+
+        #region cTor
+
+        public GotoLineDialog(Form parent)
+        {
+            InitializeComponent();
+            this.Owner = parent;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public int Line { get; private set; }
+
+        #endregion
+
+        #region Events handler
+
+        private void GotoLineDialog_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Line = int.Parse(this.lineNumberTextBox.Text);
+            }
+            catch (Exception)
+            {
+                this.Line = -1;
+            }
+        }
+
+        #endregion
     }
-
-    private void GotoLineDialog_Load(object sender, EventArgs e)
-    {
-
-    }
-
-
-    public int Line
-    {
-      get { return this.line; }
-    }
-
-    private void okButton_Click(object sender, EventArgs e)
-    {
-      try
-      {
-        this.line = Int32.Parse(this.lineNumberTextBox.Text);
-      }
-      catch (Exception)
-      {
-        this.line = -1;
-      }
-    }
-  }
 }

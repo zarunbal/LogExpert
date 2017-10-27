@@ -4,19 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class SyncModeEventArgs : EventArgs
-  {
-    private bool isTimeSynced;
-
-    public SyncModeEventArgs(bool isSynced)
+    public class SyncModeEventArgs : EventArgs
     {
-      this.isTimeSynced = isSynced;
-    }
+        #region Fields
 
+        #endregion
 
-    public bool IsTimeSynced
-    {
-      get { return this.isTimeSynced; }
+        #region cTor
+
+        public SyncModeEventArgs(bool isSynced)
+        {
+            this.IsTimeSynced = isSynced;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public bool IsTimeSynced { get; }
+
+        #endregion
     }
-  }
 }

@@ -13,7 +13,7 @@ namespace LogExpert
         private IList<long> filePositions = new List<long>(); // file position for every line
 #endif
 
-        private IList<ILogLine> logLines = new List<ILogLine>();
+        private readonly IList<ILogLine> logLines = new List<ILogLine>();
         private int MAX_LINES = 500;
         private long size = 0;
 

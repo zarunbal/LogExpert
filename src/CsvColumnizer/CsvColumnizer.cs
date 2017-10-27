@@ -68,7 +68,7 @@ namespace CsvColumnizer
     {
         #region Fields
 
-        private IList<CsvColumn> columnList = new List<CsvColumn>();
+        private readonly IList<CsvColumn> columnList = new List<CsvColumn>();
         private CsvColumnizerConfig config;
 
         private ILogLine firstLine;

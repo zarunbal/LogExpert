@@ -6,65 +6,93 @@ using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-	internal class SplitterBase : Control
-	{
-		public SplitterBase()
-		{
-			SetStyle(ControlStyles.Selectable, false);
-		}
+    internal class SplitterBase : Control
+    {
+        #region cTor
 
-		public override DockStyle Dock
-		{
-			get	{	return base.Dock;	}
-			set
-			{
-				SuspendLayout();
-				base.Dock = value;
+        public SplitterBase()
+        {
+            SetStyle(ControlStyles.Selectable, false);
+        }
 
-				if (Dock == DockStyle.Left || Dock == DockStyle.Right)
-					Width = SplitterSize;
-				else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
-					Height = SplitterSize;
-				else
-					Bounds = Rectangle.Empty;
+        #endregion
 
-				if (Dock == DockStyle.Left || Dock == DockStyle.Right)
-					Cursor = Cursors.VSplit;
-				else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
-					Cursor = Cursors.HSplit;
-				else
-					Cursor = Cursors.Default;
-					
-				ResumeLayout();
-			}
-		}
+        #region Properties
 
-		protected virtual int SplitterSize
-		{
-			get	{	return 0;	}
-		}
+        public override DockStyle Dock
+        {
+            get { return base.Dock; }
+            set
+            {
+                SuspendLayout();
+                base.Dock = value;
 
-		protected override void OnMouseDown(MouseEventArgs e)
-		{
-			base.OnMouseDown(e);
+                if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+                {
+                    Width = SplitterSize;
+                }
+                else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+                {
+                    Height = SplitterSize;
+                }
+                else
+                {
+                    Bounds = Rectangle.Empty;
+                }
 
-			if (e.Button != MouseButtons.Left)
-				return;
+                if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+                {
+                    Cursor = Cursors.VSplit;
+                }
+                else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+                {
+                    Cursor = Cursors.HSplit;
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
 
-			StartDrag();
-		}
+                ResumeLayout();
+            }
+        }
 
-		protected virtual void StartDrag()
-		{
-		}
+        protected virtual int SplitterSize
+        {
+            get { return 0; }
+        }
 
-		protected override void WndProc(ref Message m)
-		{
+        #endregion
+
+        #region Overrides
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            StartDrag();
+        }
+
+        protected override void WndProc(ref Message m)
+        {
             // eat the WM_MOUSEACTIVATE message
-			if (m.Msg == (int)Win32.Msgs.WM_MOUSEACTIVATE)
-				return;
+            if (m.Msg == (int) Win32.Msgs.WM_MOUSEACTIVATE)
+            {
+                return;
+            }
 
-			base.WndProc(ref m);
-		}
-	}
+            base.WndProc(ref m);
+        }
+
+        #endregion
+
+        protected virtual void StartDrag()
+        {
+        }
+    }
 }

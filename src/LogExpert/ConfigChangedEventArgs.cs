@@ -4,19 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-  internal class ConfigChangedEventArgs : EventArgs
-  {
-    private SettingsFlags flags;
-
-    internal ConfigChangedEventArgs(SettingsFlags changeFlags)
+    internal class ConfigChangedEventArgs : EventArgs
     {
-      this.flags = changeFlags;
-    }
+        #region Fields
 
+        #endregion
 
-    public SettingsFlags Flags
-    {
-      get { return this.flags; }
+        #region cTor
+
+        internal ConfigChangedEventArgs(SettingsFlags changeFlags)
+        {
+            this.Flags = changeFlags;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public SettingsFlags Flags { get; }
+
+        #endregion
     }
-  }
 }

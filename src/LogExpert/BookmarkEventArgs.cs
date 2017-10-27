@@ -4,18 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class BookmarkEventArgs : EventArgs
-  {
-    private Bookmark bookmark;
-
-    public BookmarkEventArgs(Bookmark bookmark)
+    public class BookmarkEventArgs : EventArgs
     {
-      this.bookmark = bookmark;
-    }
+        #region Fields
 
-    public Bookmark Bookmark
-    {
-      get { return bookmark; }
+        #endregion
+
+        #region cTor
+
+        public BookmarkEventArgs(Bookmark bookmark)
+        {
+            this.Bookmark = bookmark;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public Bookmark Bookmark { get; }
+
+        #endregion
     }
-  }
 }

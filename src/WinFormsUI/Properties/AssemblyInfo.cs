@@ -21,8 +21,18 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: AssemblyVersion("2.5.0.*")]
 [assembly: AssemblyFileVersion("2.5.0.0")]
 
-[module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "namespace", Target = "WeifenLuo.WinFormsUI.Docking", MessageId = "Weifen")]
-[module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "namespace", Target = "WeifenLuo.WinFormsUI.Docking", MessageId = "Luo")]
-[module: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource", Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Weifen")]
-[module: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource", Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Luo")]
-[module: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource", Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Dockable")]
+[module:
+    SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "namespace",
+        Target = "WeifenLuo.WinFormsUI.Docking", MessageId = "Weifen")]
+[module:
+    SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "namespace",
+        Target = "WeifenLuo.WinFormsUI.Docking", MessageId = "Luo")]
+[module:
+    SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource",
+        Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Weifen")]
+[module:
+    SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource",
+        Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Luo")]
+[module:
+    SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource",
+        Target = "WeifenLuo.WinFormsUI.Docking.Strings.resources", MessageId = "Dockable")]

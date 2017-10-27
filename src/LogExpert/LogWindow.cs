@@ -56,11 +56,13 @@ namespace LogExpert
 
         private readonly TimeSpreadCalculator timeSpreadCalc;
 
-        private Image advancedButtonImage;
+        private readonly Image advancedButtonImage;
 
-        private object bookmarkLock = new object();
+        private readonly object bookmarkLock = new object();
 
-        private IList<BackgroundProcessCancelHandler> cancelHandlerList = new List<BackgroundProcessCancelHandler>();
+        private readonly IList<BackgroundProcessCancelHandler> cancelHandlerList =
+            new List<BackgroundProcessCancelHandler>();
+
         private ColumnCache columnCache = new ColumnCache();
 
         private ILogLineColumnizer currentColumnizer;
@@ -68,7 +70,7 @@ namespace LogExpert
         //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
         private HilightGroup currentHighlightGroup = new HilightGroup();
 
-        private object currentHighlightGroupLock = new object();
+        private readonly object currentHighlightGroupLock = new object();
         private SearchParams currentSearchParams = null;
 
         private string[] fileNames;
@@ -90,36 +92,36 @@ namespace LogExpert
         private bool isTimestampDisplaySyncing = false;
         private List<int> lastFilterLinesList = new List<int>();
 
-        private List<int> lineHashList = new List<int>();
+        private readonly List<int> lineHashList = new List<int>();
 
         private int lineHeight = 0;
 
         private LogfileReader logFileReader;
         private MultifileOptions multifileOptions = new MultifileOptions();
         private bool noSelectionUpdates = false;
-        private Image panelCloseButtonImage;
+        private readonly Image panelCloseButtonImage;
 
-        private Image panelOpenButtonImage;
+        private readonly Image panelOpenButtonImage;
         private PatternArgs patternArgs = new PatternArgs();
         private PatternWindow patternWindow;
 
         private ReloadMemento reloadMemento;
         private int reloadOverloadCounter = 0;
         private SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
-        private Image searchButtonImage;
+        private readonly Image searchButtonImage;
         private int selectedCol = 0; // set by context menu event for column headers only
-        private DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
+        private readonly DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
         private bool shouldCallTimeSync = false;
         private bool shouldCancel = false;
         private bool shouldTimestampDisplaySyncingCancel = false;
         private bool showAdvanced = false;
 
-        private DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
+        private readonly DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
         private List<HilightEntry> tempHilightEntryList = new List<HilightEntry>();
-        private object tempHilightEntryListLock = new object();
+        private readonly object tempHilightEntryListLock = new object();
         private int timeshiftSyncLine = 0;
 
-        private object timeSyncListLock = new object();
+        private readonly object timeSyncListLock = new object();
 
         private bool waitingForClose = false;
 
@@ -432,8 +434,7 @@ namespace LogExpert
 
         public void LoadFile(string fileName, EncodingOptions encodingOptions)
         {
-#if DEBUG
-            //MessageBox.Show("Pause vor LoadFile()");
+#if DEBUG //MessageBox.Show("Pause vor LoadFile()");
 #endif
 
             EnterLoadFileStatus();

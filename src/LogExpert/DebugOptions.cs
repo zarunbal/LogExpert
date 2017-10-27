@@ -4,8 +4,12 @@ using System.Text;
 
 namespace LogExpert
 {
-  internal class DebugOptions
-  {
-    internal static bool disableWordHighlight = false;
-  }
+    internal class DebugOptions
+    {
+        #region Fields
+
+        internal static bool disableWordHighlight = false;
+
+        #endregion
+    }
 }

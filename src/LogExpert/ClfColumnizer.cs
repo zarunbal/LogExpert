@@ -16,8 +16,9 @@ namespace LogExpert
     {
         #region Fields
 
+        private readonly Regex lineRegex = new Regex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
+
         protected CultureInfo cultureInfo = new CultureInfo("de-DE");
-        private Regex lineRegex = new Regex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
         protected int timeOffset = 0;
 
         #endregion

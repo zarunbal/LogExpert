@@ -4,27 +4,28 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class CellContent
-  {
-    private string value;
-    private int cellPosX;
-
-    public CellContent(string value, int x)
+    public class CellContent
     {
-      this.value = value;
-      this.cellPosX = x;
-    }
+        #region Fields
 
-    public string Value
-    {
-      get { return this.value; }
-      set { this.value = value; }
-    }
+        #endregion
 
-    public int CellPosX
-    {
-      get { return this.cellPosX; }
-      set { this.cellPosX = value; }
+        #region cTor
+
+        public CellContent(string value, int x)
+        {
+            this.Value = value;
+            this.CellPosX = x;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public string Value { get; set; }
+
+        public int CellPosX { get; set; }
+
+        #endregion
     }
-  }
 }

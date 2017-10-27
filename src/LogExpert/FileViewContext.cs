@@ -4,25 +4,28 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class FileViewContext
-  {
-    private ILogPaintContext logPaintContext;
-    private ILogView logView;
-
-    internal FileViewContext(ILogPaintContext logPaintContext, ILogView logView)
+    public class FileViewContext
     {
-      this.logPaintContext = logPaintContext;
-      this.logView = logView;
-    }
+        #region Fields
 
-    public ILogPaintContext LogPaintContext
-    {
-      get { return logPaintContext; }
-    }
+        #endregion
 
-    public ILogView LogView
-    {
-      get { return logView; }
+        #region cTor
+
+        internal FileViewContext(ILogPaintContext logPaintContext, ILogView logView)
+        {
+            this.LogPaintContext = logPaintContext;
+            this.LogView = logView;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public ILogPaintContext LogPaintContext { get; }
+
+        public ILogView LogView { get; }
+
+        #endregion
     }
-  }
 }

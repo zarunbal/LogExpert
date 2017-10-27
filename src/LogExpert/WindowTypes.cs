@@ -4,9 +4,9 @@ using System.Text;
 
 namespace LogExpert
 {
-  internal enum WindowTypes
-  {
-    BookmarkWindow,
-    LogWindow,
-  }
+    internal enum WindowTypes
+    {
+        BookmarkWindow,
+        LogWindow,
+    }
 }

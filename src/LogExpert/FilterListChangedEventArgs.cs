@@ -4,19 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class FilterListChangedEventArgs
-  {
-    private LogWindow logWindow;
-
-    public FilterListChangedEventArgs(LogWindow logWindow)
+    public class FilterListChangedEventArgs
     {
-      this.logWindow = logWindow;
-    }
+        #region Fields
 
+        #endregion
 
-    public LogWindow LogWindow
-    {
-      get { return this.logWindow; }
+        #region cTor
+
+        public FilterListChangedEventArgs(LogWindow logWindow)
+        {
+            this.LogWindow = logWindow;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public LogWindow LogWindow { get; }
+
+        #endregion
     }
-  }
 }

@@ -5,25 +5,28 @@ using System.Runtime.InteropServices;
 
 namespace FlashIconHighlighter
 {
-  /*
-   * Flash stuff stolen from http://blogs.x2line.com/al/archive/2008/04/19/3392.aspx
-   */
+    /*
+     * Flash stuff stolen from http://blogs.x2line.com/al/archive/2008/04/19/3392.aspx
+     */
 
-  [StructLayout(LayoutKind.Sequential)]
-  public struct FLASHWINFO
-  {
-    public UInt32 cbSize;
-    public IntPtr hwnd;
-    public Int32 dwFlags;
-    public UInt32 uCount;
-    public Int32 dwTimeout;
-  }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FLASHWINFO
+    {
+        public uint cbSize;
+        public IntPtr hwnd;
+        public int dwFlags;
+        public uint uCount;
+        public int dwTimeout;
+    }
 
 
+    public class Win32Stuff
+    {
+        #region Public methods
 
-  public class Win32Stuff
-  {
-    [DllImport("user32.dll")]
-    public static extern Int32 FlashWindowEx(ref FLASHWINFO pwfi);
-  }
+        [DllImport("user32.dll")]
+        public static extern int FlashWindowEx(ref FLASHWINFO pwfi);
+
+        #endregion
+    }
 }

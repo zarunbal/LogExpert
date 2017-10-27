@@ -15,39 +15,43 @@ namespace LogExpert
     /// It all has started with Columnizers only. So the different types of plugins have no common super interface. I didn't change it
     /// to keep existing plugin API stable. In a future version this may change.
     /// </remarks>
-    class PluginRegistry
+    internal class PluginRegistry
     {
-        static Object lockObject = new Object();
-        static PluginRegistry instance = null;
+        #region Fields
 
-        private IList<ILogLineColumnizer> registeredColumnizers;
-        private IList<IContextMenuEntry> registeredContextMenuPlugins = new List<IContextMenuEntry>();
-        private IList<IKeywordAction> registeredKeywordActions = new List<IKeywordAction>();
-        private IDictionary<string, IKeywordAction> registeredKeywordsDict = new Dictionary<string, IKeywordAction>();
-        private IList<ILogExpertPlugin> pluginList = new List<ILogExpertPlugin>();
-        private IList<IFileSystemPlugin> fileSystemPlugins = new List<IFileSystemPlugin>();
+        private static readonly object lockObject = new object();
+        private static PluginRegistry instance = null;
 
-        private IFileSystemCallback fileSystemCallback = new FileSystemCallback();
+        private readonly IFileSystemCallback fileSystemCallback = new FileSystemCallback();
+        private readonly IList<ILogExpertPlugin> pluginList = new List<ILogExpertPlugin>();
 
-        public IList<ILogLineColumnizer> RegisteredColumnizers
+        private readonly IDictionary<string, IKeywordAction> registeredKeywordsDict =
+            new Dictionary<string, IKeywordAction>();
+
+        #endregion
+
+        #region cTor
+
+        private PluginRegistry()
         {
-            get { return this.registeredColumnizers; }
+            LoadPlugins();
         }
 
-        public IList<IContextMenuEntry> RegisteredContextMenuPlugins
-        {
-            get { return this.registeredContextMenuPlugins; }
-        }
+        #endregion
 
-        public IList<IKeywordAction> RegisteredKeywordActions
-        {
-            get { return this.registeredKeywordActions; }
-        }
+        #region Properties
 
-        public IList<IFileSystemPlugin> RegisteredFileSystemPlugins
-        {
-            get { return this.fileSystemPlugins; }
-        }
+        public IList<ILogLineColumnizer> RegisteredColumnizers { get; private set; }
+
+        public IList<IContextMenuEntry> RegisteredContextMenuPlugins { get; } = new List<IContextMenuEntry>();
+
+        public IList<IKeywordAction> RegisteredKeywordActions { get; } = new List<IKeywordAction>();
+
+        public IList<IFileSystemPlugin> RegisteredFileSystemPlugins { get; } = new List<IFileSystemPlugin>();
+
+        #endregion
+
+        #region Public methods
 
         public static PluginRegistry GetInstance()
         {
@@ -61,19 +65,17 @@ namespace LogExpert
             }
         }
 
+        #endregion
 
-        private PluginRegistry()
-        {
-            LoadPlugins();
-        }
+        #region Internals
 
         internal void LoadPlugins()
         {
             Logger.logInfo("Loading plugins...");
-            this.registeredColumnizers = new List<ILogLineColumnizer>();
-            this.registeredColumnizers.Add(new DefaultLogfileColumnizer());
-            this.registeredColumnizers.Add(new TimestampColumnizer());
-            this.registeredColumnizers.Add(new ClfColumnizer());
+            this.RegisteredColumnizers = new List<ILogLineColumnizer>();
+            this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
+            this.RegisteredColumnizers.Add(new TimestampColumnizer());
+            this.RegisteredColumnizers.Add(new ClfColumnizer());
             this.RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 
             string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins";
@@ -96,7 +98,9 @@ namespace LogExpert
                             foreach (Type type in types)
                             {
                                 if (type.IsInterface)
+                                {
                                     continue;
+                                }
                                 if (type.Name.EndsWith("Columnizer"))
                                 {
                                     Type t = typeof(ILogLineColumnizer);
@@ -124,11 +128,17 @@ namespace LogExpert
                                 else
                                 {
                                     if (TryAsContextMenu(type))
+                                    {
                                         continue;
+                                    }
                                     if (TryAsKeywordAction(type))
+                                    {
                                         continue;
+                                    }
                                     if (TryAsFileSystem(type))
+                                    {
                                         continue;
+                                    }
                                 }
                             }
                         }
@@ -147,6 +157,49 @@ namespace LogExpert
             Logger.logInfo("Plugin loading complete.");
         }
 
+        internal IKeywordAction FindKeywordActionPluginByName(string name)
+        {
+            IKeywordAction action = null;
+            this.registeredKeywordsDict.TryGetValue(name, out action);
+            return action;
+        }
+
+        internal void CleanupPlugins()
+        {
+            foreach (ILogExpertPlugin plugin in this.pluginList)
+            {
+                plugin.AppExiting();
+            }
+        }
+
+        internal IFileSystemPlugin FindFileSystemForUri(string uriString)
+        {
+            if (Logger.IsDebug)
+            {
+                Logger.logDebug("Trying to find file system plugin for uri " + uriString);
+            }
+            foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
+            {
+                if (Logger.IsDebug)
+                {
+                    Logger.logDebug("Checking " + fs.Text);
+                }
+                if (fs.CanHandleUri(uriString))
+                {
+                    if (Logger.IsDebug)
+                    {
+                        Logger.logDebug("Found match " + fs.Text);
+                    }
+                    return fs;
+                }
+            }
+            Logger.logError("No file system plugin found for uri " + uriString);
+            return null;
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private bool TryAsContextMenu(Type type)
         {
@@ -250,8 +303,11 @@ namespace LogExpert
             return default(T);
         }
 
+        #endregion
 
-        static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
+        #region Events handler
+
+        private static Assembly ColumnizerResolveEventHandler(object sender, ResolveEventArgs args)
         {
             string file = new AssemblyName(args.Name).Name + ".dll";
 
@@ -268,41 +324,11 @@ namespace LogExpert
             else if (pluginFile.Exists)
             {
                 return Assembly.LoadFrom(pluginFile.FullName);
-
             }
 
             return null;
         }
 
-        internal IKeywordAction FindKeywordActionPluginByName(string name)
-        {
-            IKeywordAction action = null;
-            this.registeredKeywordsDict.TryGetValue(name, out action);
-            return action;
-        }
-
-        internal void CleanupPlugins()
-        {
-            foreach (ILogExpertPlugin plugin in this.pluginList)
-            {
-                plugin.AppExiting();
-            }
-        }
-
-        internal IFileSystemPlugin FindFileSystemForUri(string uriString)
-        {
-            if (Logger.IsDebug) Logger.logDebug("Trying to find file system plugin for uri " + uriString);
-            foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
-            {
-                if (Logger.IsDebug) Logger.logDebug("Checking " + fs.Text);
-                if (fs.CanHandleUri(uriString))
-                {
-                    if (Logger.IsDebug) Logger.logDebug("Found match " + fs.Text);
-                    return fs;
-                }
-            }
-            Logger.logError("No file system plugin found for uri " + uriString);
-            return null;
-        }
+        #endregion
     }
 }

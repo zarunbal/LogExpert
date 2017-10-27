@@ -4,44 +4,42 @@ using System.Text;
 
 namespace LogExpert
 {
-  class BookmarkView : IBookmarkView
-  {
-    private bool isActive = false;
-
-
-    #region IBookmarkView Member
-
-    public void UpdateView()
+    internal class BookmarkView : IBookmarkView
     {
-      throw new NotImplementedException();
-    }
+        #region Fields
 
-    public void BookmarkTextChanged(Bookmark bookmark)
-    {
-      throw new NotImplementedException();
-    }
+        #endregion
 
-    public void SelectBookmark(int lineNum)
-    {
-      throw new NotImplementedException();
-    }
 
-    public bool LineColumnVisible
-    {
-      set { throw new NotImplementedException(); }
-    }
+        #region IBookmarkView Member
 
-    public bool IsActive
-    {
-      get { return isActive; }
-      set { isActive = value; }
-    }
+        public void UpdateView()
+        {
+            throw new NotImplementedException();
+        }
 
-    public void SetBookmarkData(IBookmarkData bookmarkData)
-    {
-      throw new NotImplementedException();
-    }
+        public void BookmarkTextChanged(Bookmark bookmark)
+        {
+            throw new NotImplementedException();
+        }
 
-    #endregion
-  }
+        public void SelectBookmark(int lineNum)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool LineColumnVisible
+        {
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool IsActive { get; set; } = false;
+
+        public void SetBookmarkData(IBookmarkData bookmarkData)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }

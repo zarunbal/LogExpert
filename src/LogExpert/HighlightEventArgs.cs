@@ -4,26 +4,28 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class HighlightEventArgs : EventArgs
-  {
-    private int startLine;
-    private int count;
-
-    public HighlightEventArgs(int startLine, int count)
+    public class HighlightEventArgs : EventArgs
     {
-      this.startLine = startLine;
-      this.count = count;
-    }
+        #region Fields
 
+        #endregion
 
-    public int StartLine
-    {
-      get { return this.startLine; }
-    }
+        #region cTor
 
-    public int Count
-    {
-      get { return this.count; }
+        public HighlightEventArgs(int startLine, int count)
+        {
+            this.StartLine = startLine;
+            this.Count = count;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public int StartLine { get; }
+
+        public int Count { get; }
+
+        #endregion
     }
-  }
 }

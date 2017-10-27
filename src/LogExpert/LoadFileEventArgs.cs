@@ -5,46 +5,37 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class LoadFileEventArgs
-  {
-    private long readPos;
-    private bool finished;
-    private long fileSize;
-    private bool newFile;
-    private string fileName;
-
-    public LoadFileEventArgs(string fileName, long pos, bool finished, long fileSize, bool newFile)
+    public class LoadFileEventArgs
     {
-      this.fileName = fileName;
-      this.readPos = pos;
-      this.finished = finished;
-      this.fileSize = fileSize;
-      this.newFile = newFile;
-    }
+        #region Fields
 
-    public long ReadPos
-    {
-      get {return this.readPos;}
-    }
+        #endregion
 
-    public bool Finished
-    {
-      get {return this.finished;}
-    }
+        #region cTor
 
-    public long FileSize
-    {
-      get { return this.fileSize; }
-    }
+        public LoadFileEventArgs(string fileName, long pos, bool finished, long fileSize, bool newFile)
+        {
+            this.FileName = fileName;
+            this.ReadPos = pos;
+            this.Finished = finished;
+            this.FileSize = fileSize;
+            this.NewFile = newFile;
+        }
 
-    public bool NewFile
-    {
-      get { return this.newFile; }
-    }
+        #endregion
 
-    public string FileName
-    {
-      get { return this.fileName; }
+        #region Properties
+
+        public long ReadPos { get; }
+
+        public bool Finished { get; }
+
+        public long FileSize { get; }
+
+        public bool NewFile { get; }
+
+        public string FileName { get; }
+
+        #endregion
     }
-  }
 }

@@ -5,21 +5,33 @@ using System.Windows.Forms;
 
 namespace LogExpert
 {
-  class LogExpertApplicationContext : ApplicationContext
-  {
-    private LogExpertProxy proxy;
-
-    public LogExpertApplicationContext(LogExpertProxy proxy, LogTabWindow firstLogWin)
+    internal class LogExpertApplicationContext : ApplicationContext
     {
-      this.proxy = proxy;
-      this.proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(proxy_LastWindowClosed);
-      firstLogWin.Show();
-    }
+        #region Fields
 
-    void proxy_LastWindowClosed(object sender, EventArgs e)
-    {
-      ExitThread();
-      Application.Exit();
+        private readonly LogExpertProxy proxy;
+
+        #endregion
+
+        #region cTor
+
+        public LogExpertApplicationContext(LogExpertProxy proxy, LogTabWindow firstLogWin)
+        {
+            this.proxy = proxy;
+            this.proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(proxy_LastWindowClosed);
+            firstLogWin.Show();
+        }
+
+        #endregion
+
+        #region Events handler
+
+        private void proxy_LastWindowClosed(object sender, EventArgs e)
+        {
+            ExitThread();
+            Application.Exit();
+        }
+
+        #endregion
     }
-  }
 }

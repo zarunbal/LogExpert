@@ -5,30 +5,20 @@ using System.Drawing;
 
 namespace LogExpert
 {
-  public class BookmarkOverlay
-  {
-    Bookmark bookmark;
-    public Bookmark Bookmark
+    public class BookmarkOverlay
     {
-      get { return bookmark; }
-      set { bookmark = value; }
+        #region Fields
+
+        #endregion
+
+        #region Properties
+
+        public Bookmark Bookmark { get; set; }
+
+        public Point Position { get; set; }
+
+        public Rectangle BubbleRect { get; set; }
+
+        #endregion
     }
-
-    Point position;
-    public Point Position
-    {
-      get { return position; }
-      set { position = value; }
-    }
-
-    Rectangle bubbleRect;
-
-    public Rectangle BubbleRect
-    {
-      get { return bubbleRect; }
-      set { bubbleRect = value; }
-    }
-
-
-  }
 }

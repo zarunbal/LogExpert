@@ -4,23 +4,30 @@ using System.Text;
 
 namespace LogExpert
 {
-  [Serializable]
-  public class HilightGroup
-  {
-    private string groupName = "";
-    private List<HilightEntry> hilightEntryList = new List<HilightEntry>();
-
-    public string GroupName
+    [Serializable]
+    public class HilightGroup
     {
-      get { return this.groupName; }
-      set { this.groupName = value; }
-    }
+        #region Fields
 
-    public List<HilightEntry> HilightEntryList
-    {
-      get { return this.hilightEntryList; }
-      set { this.hilightEntryList = value; }
-    }
+        private string groupName = "";
+        private List<HilightEntry> hilightEntryList = new List<HilightEntry>();
 
-  }
+        #endregion
+
+        #region Properties
+
+        public string GroupName
+        {
+            get { return this.groupName; }
+            set { this.groupName = value; }
+        }
+
+        public List<HilightEntry> HilightEntryList
+        {
+            get { return this.hilightEntryList; }
+            set { this.hilightEntryList = value; }
+        }
+
+        #endregion
+    }
 }

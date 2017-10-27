@@ -4,19 +4,25 @@ using System.Text;
 
 namespace LogExpert.Dialogs
 {
-  public class OverlayEventArgs : EventArgs
-  {
-    private BookmarkOverlay bookmarkOverlay;
-
-    public OverlayEventArgs(BookmarkOverlay overlay)
+    public class OverlayEventArgs : EventArgs
     {
-      this.BookmarkOverlay = overlay;
-    }
+        #region Fields
 
-    public BookmarkOverlay BookmarkOverlay
-    {
-      get { return this.bookmarkOverlay; }
-      set { this.bookmarkOverlay = value; }
+        #endregion
+
+        #region cTor
+
+        public OverlayEventArgs(BookmarkOverlay overlay)
+        {
+            this.BookmarkOverlay = overlay;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public BookmarkOverlay BookmarkOverlay { get; set; }
+
+        #endregion
     }
-  }
 }

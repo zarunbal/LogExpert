@@ -25,7 +25,7 @@ namespace LogExpert
         private EncodingOptions encodingOptions;
         private long fileLength;
 
-        private string fileName;
+        private readonly string fileName;
         private Thread garbageCollectorThread = null;
         private bool isDeleted;
         private bool isFailModeCheckCallPending = false;
@@ -35,13 +35,13 @@ namespace LogExpert
         private Dictionary<int, LogBufferCacheEntry> lruCacheDict;
 
         private ReaderWriterLock lruCacheDictLock;
-        private int MAX_BUFFERS = 10;
-        private int MAX_LINES_PER_BUFFER = 100;
+        private readonly int MAX_BUFFERS = 10;
+        private readonly int MAX_LINES_PER_BUFFER = 100;
 
-        private object monitor = new object();
+        private readonly object monitor = new object();
 
         private Thread monitorThread = null;
-        private MultifileOptions mutlifileOptions;
+        private readonly MultifileOptions mutlifileOptions;
         private bool shouldStop;
         private ILogFileInfo watchedILogFileInfo;
 
@@ -315,10 +315,9 @@ namespace LogExpert
                     {
                         Logger.logInfo(fileName + " does not exist");
                         lostILogFileInfoList.Add(logFileInfo);
-#if DEBUG
-                        // for better overview in logfile:
-                        //ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
-                        //ReplaceBufferInfos(ILogFileInfo, newILogFileInfo);
+#if DEBUG // for better overview in logfile:
+//ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
+//ReplaceBufferInfos(ILogFileInfo, newILogFileInfo);
 #endif
                     }
                 }
@@ -1012,8 +1011,7 @@ namespace LogExpert
                     }
                     catch (ArgumentException e)
                     {
-#if DEBUG
-                        // there seems to be a bug with double added key
+#if DEBUG // there seems to be a bug with double added key
                         Logger.logError("Error in LRU cache: " + e.Message);
                         Logger.logInfo("Added buffer:");
                         DumpBufferInfos(logBuffer);

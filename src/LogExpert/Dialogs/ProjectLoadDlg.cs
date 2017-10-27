@@ -8,46 +8,55 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public enum ProjectLoadDlgResult
-  {
-    Cancel,
-    CloseTabs,
-    NewWindow,
-    IgnoreLayout
-  }
-
-  public partial class ProjectLoadDlg : Form
-  {
-    private ProjectLoadDlgResult projectLoadResult = ProjectLoadDlgResult.Cancel;
-
-
-    public ProjectLoadDlg()
+    public enum ProjectLoadDlgResult
     {
-      InitializeComponent();
+        Cancel,
+        CloseTabs,
+        NewWindow,
+        IgnoreLayout
     }
 
-    public ProjectLoadDlgResult ProjectLoadResult
+    public partial class ProjectLoadDlg : Form
     {
-      get { return projectLoadResult; }
-      set { projectLoadResult = value; }
-    }
+        #region Fields
 
-    private void closeTabsButton_Click(object sender, EventArgs e)
-    {
-      this.ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
-      Close();
-    }
+        #endregion
 
-    private void newWindowButton_Click(object sender, EventArgs e)
-    {
-      this.ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
-      Close();
-    }
+        #region cTor
 
-    private void ignoreButton_Click(object sender, EventArgs e)
-    {
-      this.ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
-      Close();
+        public ProjectLoadDlg()
+        {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region Properties
+
+        public ProjectLoadDlgResult ProjectLoadResult { get; set; } = ProjectLoadDlgResult.Cancel;
+
+        #endregion
+
+        #region Events handler
+
+        private void closeTabsButton_Click(object sender, EventArgs e)
+        {
+            this.ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
+            Close();
+        }
+
+        private void newWindowButton_Click(object sender, EventArgs e)
+        {
+            this.ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
+            Close();
+        }
+
+        private void ignoreButton_Click(object sender, EventArgs e)
+        {
+            this.ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
+            Close();
+        }
+
+        #endregion
     }
-  }
 }

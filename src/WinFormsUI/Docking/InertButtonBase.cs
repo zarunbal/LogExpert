@@ -9,25 +9,35 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     internal abstract class InertButtonBase : Control
     {
+        #region Fields
+
+        private bool m_isMouseOver = false;
+
+        #endregion
+
+        #region cTor
+
         protected InertButtonBase()
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             BackColor = Color.Transparent;
         }
 
-        public abstract Bitmap Image
-        {
-            get;
-        }
+        #endregion
 
-        private bool m_isMouseOver = false;
+        #region Properties
+
+        public abstract Bitmap Image { get; }
+
         protected bool IsMouseOver
         {
             get { return m_isMouseOver; }
             private set
             {
                 if (m_isMouseOver == value)
+                {
                     return;
+                }
 
                 m_isMouseOver = value;
                 Invalidate();
@@ -39,26 +49,56 @@ namespace WeifenLuo.WinFormsUI.Docking
             get { return Resources.DockPane_Close.Size; }
         }
 
+        #endregion
+
+        #region Public methods
+
+        public void RefreshChanges()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            bool mouseOver = ClientRectangle.Contains(PointToClient(Control.MousePosition));
+            if (mouseOver != IsMouseOver)
+            {
+                IsMouseOver = mouseOver;
+            }
+
+            OnRefreshChanges();
+        }
+
+        #endregion
+
+        #region Overrides
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
             bool over = ClientRectangle.Contains(e.X, e.Y);
             if (IsMouseOver != over)
+            {
                 IsMouseOver = over;
+            }
         }
 
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
             if (!IsMouseOver)
+            {
                 IsMouseOver = true;
+            }
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
             if (IsMouseOver)
+            {
                 IsMouseOver = false;
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -84,29 +124,19 @@ namespace WeifenLuo.WinFormsUI.Docking
                 imageAttributes.SetRemapTable(colorMap);
 
                 e.Graphics.DrawImage(
-                   Image,
-                   new Rectangle(0, 0, Image.Width, Image.Height),
-                   0, 0,
-                   Image.Width,
-                   Image.Height,
-                   GraphicsUnit.Pixel,
-                   imageAttributes);
+                    Image,
+                    new Rectangle(0, 0, Image.Width, Image.Height),
+                    0, 0,
+                    Image.Width,
+                    Image.Height,
+                    GraphicsUnit.Pixel,
+                    imageAttributes);
             }
 
             base.OnPaint(e);
         }
 
-        public void RefreshChanges()
-        {
-            if (IsDisposed)
-                return;
-
-            bool mouseOver = ClientRectangle.Contains(PointToClient(Control.MousePosition));
-            if (mouseOver != IsMouseOver)
-                IsMouseOver = mouseOver;
-
-            OnRefreshChanges();
-        }
+        #endregion
 
         protected virtual void OnRefreshChanges()
         {

@@ -35,11 +35,11 @@ namespace GlassfishColumnizer
         protected const string DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.fffzzzz";
         protected const string DATETIME_FORMAT_OUT = "yyyy-MM-dd HH:mm:ss.fff";
 
-        private static XmlConfig xmlConfig = new XmlConfig();
+        private static readonly XmlConfig xmlConfig = new XmlConfig();
+        private readonly char separatorChar = '|';
+        private readonly char[] trimChars = new char[] {'|'};
         protected CultureInfo cultureInfo = new CultureInfo("en-US");
-        private char separatorChar = '|';
         protected int timeOffset = 0;
-        private char[] trimChars = new char[] {'|'};
 
         #endregion
 

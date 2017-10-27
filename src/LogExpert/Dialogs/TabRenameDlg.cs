@@ -8,32 +8,38 @@ using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
-  public partial class TabRenameDlg : Form
-  {
-    public TabRenameDlg()
+    public partial class TabRenameDlg : Form
     {
-      InitializeComponent();
-    }
+        #region cTor
 
-    public string TabName
-    {
-      get
-      {
-        return this.tabNameTextBox.Text;
-      }
-      set
-      {
-        this.tabNameTextBox.Text = value;
-      }
-    }
+        public TabRenameDlg()
+        {
+            InitializeComponent();
+        }
 
-    private void TabRenameDlg_KeyDown(object sender, KeyEventArgs e)
-    {
-      if (e.KeyCode == Keys.Escape)
-      {
-        DialogResult = DialogResult.Cancel;
-        Close();
-      }
+        #endregion
+
+        #region Properties
+
+        public string TabName
+        {
+            get { return this.tabNameTextBox.Text; }
+            set { this.tabNameTextBox.Text = value; }
+        }
+
+        #endregion
+
+        #region Events handler
+
+        private void TabRenameDlg_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                DialogResult = DialogResult.Cancel;
+                Close();
+            }
+        }
+
+        #endregion
     }
-  }
 }

@@ -4,26 +4,28 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class CurrentHighlightGroupChangedEventArgs
-  {
-    private LogWindow logWindow;
-    private HilightGroup currentGroup;
-
-    public CurrentHighlightGroupChangedEventArgs(LogWindow logWindow, HilightGroup currentGroup)
+    public class CurrentHighlightGroupChangedEventArgs
     {
-      this.logWindow = logWindow;
-      this.currentGroup = currentGroup;
-    }
+        #region Fields
 
+        #endregion
 
-    public LogWindow LogWindow
-    {
-      get { return this.logWindow; }
-    }
+        #region cTor
 
-    public HilightGroup CurrentGroup
-    {
-      get { return this.currentGroup; }
+        public CurrentHighlightGroupChangedEventArgs(LogWindow logWindow, HilightGroup currentGroup)
+        {
+            this.LogWindow = logWindow;
+            this.CurrentGroup = currentGroup;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public LogWindow LogWindow { get; }
+
+        public HilightGroup CurrentGroup { get; }
+
+        #endregion
     }
-  }
 }

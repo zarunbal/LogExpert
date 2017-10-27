@@ -4,14 +4,16 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class HighlightResults
-  {
-    private IList<HilightEntry> highlightEntryList = new List<HilightEntry>();
-
-    public IList<HilightEntry> HighlightEntryList
+    public class HighlightResults
     {
-      get { return this.highlightEntryList; }
-      set { this.highlightEntryList = value; }
+        #region Fields
+
+        #endregion
+
+        #region Properties
+
+        public IList<HilightEntry> HighlightEntryList { get; set; } = new List<HilightEntry>();
+
+        #endregion
     }
-  }
 }

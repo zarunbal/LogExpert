@@ -4,21 +4,28 @@ using System.Text;
 
 namespace LogExpert
 {
-  [Serializable]
-  public class EminusConfig
-  {
-    public string host = "127.0.0.1";
-    public int port = 12345;
-    public string password = "";
-
-    public EminusConfig Clone()
+    [Serializable]
+    public class EminusConfig
     {
-      EminusConfig config = new EminusConfig();
-      config.host = this.host;
-      config.port = this.port;
-      config.password = this.password;
-      return config;
-    }
+        #region Fields
 
-  }
+        public string host = "127.0.0.1";
+        public string password = "";
+        public int port = 12345;
+
+        #endregion
+
+        #region Public methods
+
+        public EminusConfig Clone()
+        {
+            EminusConfig config = new EminusConfig();
+            config.host = this.host;
+            config.port = this.port;
+            config.password = this.password;
+            return config;
+        }
+
+        #endregion
+    }
 }

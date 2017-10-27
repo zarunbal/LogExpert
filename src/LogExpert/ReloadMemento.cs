@@ -1,5 +1,9 @@
 ﻿internal class ReloadMemento
 {
-  internal int currentLine;
-  internal int firstDisplayedLine;
+    #region Fields
+
+    internal int currentLine;
+    internal int firstDisplayedLine;
+
+    #endregion
 }

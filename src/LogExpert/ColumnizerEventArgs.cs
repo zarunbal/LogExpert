@@ -4,19 +4,25 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class ColumnizerEventArgs : EventArgs
-  {
-    private ILogLineColumnizer columnizer;
-
-    public ColumnizerEventArgs(ILogLineColumnizer columnizer)
+    public class ColumnizerEventArgs : EventArgs
     {
-      this.columnizer = columnizer;
-    }
+        #region Fields
 
+        #endregion
 
-    public ILogLineColumnizer Columnizer
-    {
-      get { return columnizer; }
+        #region cTor
+
+        public ColumnizerEventArgs(ILogLineColumnizer columnizer)
+        {
+            this.Columnizer = columnizer;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public ILogLineColumnizer Columnizer { get; }
+
+        #endregion
     }
-  }
 }

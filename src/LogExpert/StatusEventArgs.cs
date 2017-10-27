@@ -4,46 +4,36 @@ using System.Text;
 
 namespace LogExpert
 {
-  public class StatusLineEventArgs : EventArgs
-  {
-    string statusText = null;
-    int currentLineNum = 0;
-    int lineCount = 0;
-    long fileSize = 0;
-
-    public StatusLineEventArgs Clone()
+    public class StatusLineEventArgs : EventArgs
     {
-      StatusLineEventArgs e = new StatusLineEventArgs();
-      e.StatusText = StatusText;
-      e.CurrentLineNum = CurrentLineNum;
-      e.LineCount = LineCount;
-      e.FileSize = FileSize;
-      return e;
-    }
+        #region Fields
 
-    public long FileSize
-    {
-      get { return fileSize; }
-      set { fileSize = value; }
-    }
+        #endregion
 
-    public string StatusText
-    {
-      get { return statusText; }
-      set { statusText = value; }
-    }
+        #region Properties
 
-    public int LineCount
-    {
-      get { return lineCount; }
-      set { lineCount = value; }
-    }
+        public long FileSize { get; set; } = 0;
 
-    public int CurrentLineNum
-    {
-      get { return currentLineNum; }
-      set { currentLineNum = value; }
-    }
+        public string StatusText { get; set; } = null;
 
-  }
+        public int LineCount { get; set; } = 0;
+
+        public int CurrentLineNum { get; set; } = 0;
+
+        #endregion
+
+        #region Public methods
+
+        public StatusLineEventArgs Clone()
+        {
+            StatusLineEventArgs e = new StatusLineEventArgs();
+            e.StatusText = StatusText;
+            e.CurrentLineNum = CurrentLineNum;
+            e.LineCount = LineCount;
+            e.FileSize = FileSize;
+            return e;
+        }
+
+        #endregion
+    }
 }

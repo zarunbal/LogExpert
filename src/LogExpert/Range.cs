@@ -4,30 +4,32 @@ using System.Text;
 
 namespace LogExpert
 {
-  class Range
-  {
-    private int startLine;
-    private int endLine;
+    internal class Range
+    {
+        #region Fields
 
-    public Range()
-    {
-    }
-    public Range(int startLine, int endLine)
-    {
-      this.StartLine = startLine;
-      this.EndLine = endLine;
-    }
+        #endregion
 
-    public int StartLine
-    {
-      get { return this.startLine; }
-      set { this.startLine = value; }
-    }
+        #region cTor
 
-    public int EndLine
-    {
-      get { return this.endLine; }
-      set { this.endLine = value; }
+        public Range()
+        {
+        }
+
+        public Range(int startLine, int endLine)
+        {
+            this.StartLine = startLine;
+            this.EndLine = endLine;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public int StartLine { get; set; }
+
+        public int EndLine { get; set; }
+
+        #endregion
     }
-  }
 }
