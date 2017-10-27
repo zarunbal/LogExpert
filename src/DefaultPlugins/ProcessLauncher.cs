@@ -27,7 +27,7 @@ namespace LogExpert
       parameters = parameters.Replace("%K", keyword);
       parameters = parameters.Replace("%L", "" + callback.GetLineNum());
       parameters = parameters.Replace("%T", callback.GetTabTitle());
-      parameters = parameters.Replace("%C", callback.GetLogLine(callback.GetLineNum()));
+      parameters = parameters.Replace("%C", callback.GetLogLine(callback.GetLineNum()).FullLine);
       Process explorer = new Process();
       explorer.StartInfo.FileName = procName;
       explorer.StartInfo.Arguments = parameters;

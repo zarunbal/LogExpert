@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace LogExpert
 {
 	/// <summary>
@@ -35,7 +36,7 @@ namespace LogExpert
 
 			this.filterParams.isRangeSearch = false;
 			this.filterParams.isInRange = false;
-			string line;
+			ILogLine line;
 			int lineCount = this.callback.GetLineCount();
 			int lineNum = startLine;
 			bool foundStartLine = false;

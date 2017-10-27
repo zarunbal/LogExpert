@@ -2,37 +2,44 @@
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace LogExpert
 {
-  internal class ColumnCache
-  {
-    private string[] cachedColumns = null;
-    private ILogLineColumnizer lastColumnizer;
-    private int lastLineNumber = -1;
-
-    internal ColumnCache()
+    internal class ColumnCache
     {
+        #region Fields
 
-    }
+        private IColumnizedLogLine cachedColumns = null;
+        private ILogLineColumnizer lastColumnizer;
+        private int lastLineNumber = -1;
 
-    internal string[] GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, LogExpert.LogWindow.ColumnizerCallback columnizerCallback)
-    {
-      if (this.lastColumnizer != columnizer || this.lastLineNumber != lineNumber && this.cachedColumns != null || columnizerCallback.LineNum != lineNumber)
-      {
-        this.lastColumnizer = columnizer;
-        this.lastLineNumber = lineNumber;
-        string line = logFileReader.GetLogLineWithWait(lineNumber);
-        if (line != null)
+        #endregion
+
+        #region Internals
+
+        internal IColumnizedLogLine GetColumnsForLine(LogfileReader logFileReader, int lineNumber,
+            ILogLineColumnizer columnizer,
+            LogWindow.ColumnizerCallback columnizerCallback)
         {
-          columnizerCallback.LineNum = lineNumber;
-          this.cachedColumns = columnizer.SplitLine(columnizerCallback, line);
+            if (lastColumnizer != columnizer || lastLineNumber != lineNumber && cachedColumns != null ||
+                columnizerCallback.LineNum != lineNumber)
+            {
+                lastColumnizer = columnizer;
+                lastLineNumber = lineNumber;
+                ILogLine line = logFileReader.GetLogLineWithWait(lineNumber);
+                if (line != null)
+                {
+                    columnizerCallback.LineNum = lineNumber;
+                    cachedColumns = columnizer.SplitLine(columnizerCallback, line);
+                }
+                else
+                {
+                    cachedColumns = null;
+                }
+            }
+            return cachedColumns;
         }
-        else
-        {
-          this.cachedColumns = null;
-        }
-      }
-      return this.cachedColumns;
+
+        #endregion
     }
-  }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
+
 namespace LogExpert
 {
 
@@ -70,7 +71,7 @@ namespace LogExpert
           {
             return count;
           }
-          string line = this.callback.GetLogLine(lineNum);
+          ILogLine line = this.callback.GetLogLine(lineNum);
           if (line == null)
           {
             return count;

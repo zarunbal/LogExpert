@@ -17,7 +17,7 @@ namespace LogExpert
       this.argLine = argTemplate;
     }
 
-    public string BuildArgs(string logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
+    public string BuildArgs(ILogLine logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
     {
       StringBuilder builder = new StringBuilder(this.argLine);
       builder.Replace("%L", "" + lineNum);
@@ -48,7 +48,7 @@ namespace LogExpert
         replace = GetNextGroup(builder, ref sPos);
         if (reg != null && replace != null)
         {
-          string result = Regex.Replace(logLine, reg, replace);
+          string result = Regex.Replace(logLine.FullLine, reg, replace);
           builder.Insert(sPos, result);
         }
       }

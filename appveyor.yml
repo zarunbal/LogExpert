@@ -1,15 +1,12 @@
 version: 1.0.{build}
-
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
-
 build:
   project: src/LogExpert.sln
   parallel: true
   verbosity: minimal
-
 test: off
 artifacts:
 - path: bin\Release\
-  name: ci-master
+  name: ci-LongLineTruncate

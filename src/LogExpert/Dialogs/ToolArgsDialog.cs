@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+
 namespace LogExpert.Dialogs
 {
   public partial class ToolArgsDialog : Form
@@ -63,7 +64,7 @@ namespace LogExpert.Dialogs
     {
       if (this.logTabWin.CurrentLogWindow != null)
       {
-        string line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
+          ILogLine line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
         ILogFileInfo info = this.logTabWin.CurrentLogWindow.GetCurrentFileInfo();
         if (line != null && info != null)
         {

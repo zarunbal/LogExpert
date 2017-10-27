@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
@@ -2038,7 +2039,7 @@ namespace LogExpert
       }
       if (this.CurrentLogWindow != null)
       {
-        string line = this.CurrentLogWindow.GetCurrentLine();
+        ILogLine line = this.CurrentLogWindow.GetCurrentLine();
         ILogFileInfo info = this.CurrentLogWindow.GetCurrentFileInfo();
         if (line != null && info != null)
         {

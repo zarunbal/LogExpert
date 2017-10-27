@@ -4,7 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Windows.Forms;
 using System.IO;
-using ColumnizerLib;
+
 
 namespace LogExpert
 {

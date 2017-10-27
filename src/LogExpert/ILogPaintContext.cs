@@ -3,27 +3,35 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 
+
 namespace LogExpert
 {
-  /// <summary>
-  /// Declares methods that are needed for drawing log lines. Used by PaintHelper.
-  /// </summary>
-  public interface ILogPaintContext
-  {
-    string GetLogLine(int lineNum);
+    /// <summary>
+    /// Declares methods that are needed for drawing log lines. Used by PaintHelper.
+    /// </summary>
+    public interface ILogPaintContext
+    {
+        #region Properties
 
-    string GetCellValue(int rowIndex, int columnIndex);
+        Font MonospacedFont { get; } // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+        Font NormalFont { get; }
+        Font BoldFont { get; }
+        Color BookmarkColor { get; }
 
-    Bookmark GetBookmarkForLine(int lineNum);
+        #endregion
 
-    HilightEntry FindHilightEntry(string line, bool noWordMatches);
+        #region Public methods
 
-    IList<HilightMatchEntry> FindHilightMatches(string line);
+        ILogLine GetLogLine(int lineNum);
 
-    Font MonospacedFont { get; }   // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
-    Font NormalFont { get; }
-    Font BoldFont { get; }
-    Color BookmarkColor { get; }
-    
-  }
+        IColumn GetCellValue(int rowIndex, int columnIndex);
+
+        Bookmark GetBookmarkForLine(int lineNum);
+
+        HilightEntry FindHilightEntry(ITextValue line, bool noWordMatches);
+
+        IList<HilightMatchEntry> FindHilightMatches(ITextValue line);
+
+        #endregion
+    }
 }
