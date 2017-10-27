@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Solution Items\AssemblyVersion.cs">
+      <Link>Properties\AssemblyVersion.cs</Link>
+    </Compile>
     <Compile Include="Log4jXmlColumnizer.cs" />
     <Compile Include="Log4jXmlColumnizerConfigDlg.cs">
       <SubType>Form</SubType>

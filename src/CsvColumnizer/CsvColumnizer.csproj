@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Solution Items\AssemblyVersion.cs">
+      <Link>Properties\AssemblyVersion.cs</Link>
+    </Compile>
     <Compile Include="CsvColumnizer.cs" />
     <Compile Include="CsvColumnizerConfigDlg.cs">
       <SubType>Form</SubType>
