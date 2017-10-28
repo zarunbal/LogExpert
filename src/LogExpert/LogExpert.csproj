@@ -454,10 +454,6 @@
     <None Include="Resources\search-icon-blue.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LogExpert_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="LogExpert_1_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />
     <None Include="Resources\LogExpert.bmp" />
     <None Include="Resources\Icon1.ico" />
