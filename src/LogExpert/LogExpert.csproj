@@ -72,6 +72,15 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\SettingsFlags.cs" />
     <Compile Include="Config\ToolEntry.cs" />
+    <Compile Include="Controls\LogWindow\LogWindowEventHandlers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\LogWindow\LogWindowPrivate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\BookmarkCollection.cs" />
