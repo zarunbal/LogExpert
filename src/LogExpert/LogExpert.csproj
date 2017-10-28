@@ -55,24 +55,38 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
-    <Compile Include="ArgParser.cs" />
-    <Compile Include="BackgroundProcessCancelHandler.cs" />
-    <Compile Include="Bookmark.cs" />
-    <Compile Include="BookmarkCollection.cs" />
-    <Compile Include="BookmarkDataProvider.cs" />
-    <Compile Include="BookmarkEventArgs.cs" />
-    <Compile Include="BookmarkExporter.cs" />
-    <Compile Include="BookmarkOverlay.cs" />
-    <Compile Include="BookmarkView.cs" />
-    <Compile Include="CellContent.cs" />
-    <Compile Include="CmdLine.cs" />
-    <Compile Include="ColumnCache.cs" />
-    <Compile Include="ColumnizerEventArgs.cs" />
-    <Compile Include="ConfigChangedEventArgs.cs" />
-    <Compile Include="ContextMenuPluginEventArgs.cs" />
-    <Compile Include="CurrentHighlightGroupChangedEventArgs.cs" />
-    <Compile Include="DebugOptions.cs" />
-    <Compile Include="DelayedTrigger.cs" />
+    <Compile Include="Classes\Highlight\ActionEntry.cs" />
+    <Compile Include="Classes\ArgParser.cs" />
+    <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Config\ColorEntry.cs" />
+    <Compile Include="Config\ColumnizerHistoryEntry.cs" />
+    <Compile Include="Config\ColumnizerMaskEntry.cs" />
+    <Compile Include="Config\ExportImportFlags.cs" />
+    <Compile Include="Config\HighlightMaskEntry.cs" />
+    <Compile Include="Config\MultiFileOption.cs" />
+    <Compile Include="Config\Preferences.cs" />
+    <Compile Include="Config\RegexHistory.cs" />
+    <Compile Include="Config\SessionSaveLocation.cs" />
+    <Compile Include="Config\Settings.cs" />
+    <Compile Include="Config\SettingsFlags.cs" />
+    <Compile Include="Config\ToolEntry.cs" />
+    <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
+    <Compile Include="Entities\Bookmark.cs" />
+    <Compile Include="Entities\BookmarkCollection.cs" />
+    <Compile Include="Classes\Bookmark\BookmarkDataProvider.cs" />
+    <Compile Include="Entities\EventArgs\BookmarkEventArgs.cs" />
+    <Compile Include="Classes\Bookmark\BookmarkExporter.cs" />
+    <Compile Include="Entities\BookmarkOverlay.cs" />
+    <Compile Include="Classes\Bookmark\BookmarkView.cs" />
+    <Compile Include="Entities\CellContent.cs" />
+    <Compile Include="Classes\CmdLine.cs" />
+    <Compile Include="Classes\ColumnCache.cs" />
+    <Compile Include="Entities\EventArgs\ColumnizerEventArgs.cs" />
+    <Compile Include="Entities\EventArgs\ConfigChangedEventArgs.cs" />
+    <Compile Include="Entities\EventArgs\ContextMenuPluginEventArgs.cs" />
+    <Compile Include="Entities\EventArgs\CurrentHighlightGroupChangedEventArgs.cs" />
+    <Compile Include="Entities\DebugOptions.cs" />
+    <Compile Include="Classes\DelayedTrigger.cs" />
     <Compile Include="Dialogs\BookmarkCommentDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -128,35 +142,35 @@
     <Compile Include="Dialogs\TabRenameDlg.Designer.cs">
       <DependentUpon>TabRenameDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="EncodingOptions.cs" />
-    <Compile Include="FileSystemCallback.cs" />
-    <Compile Include="FileViewContext.cs" />
-    <Compile Include="Filter.cs" />
-    <Compile Include="FilterCancelHandler.cs" />
-    <Compile Include="FilterStarter.cs" />
-    <Compile Include="HighlightEventArgs.cs" />
-    <Compile Include="FilterListChangedEventArgs.cs" />
-    <Compile Include="HighlightResults.cs" />
-    <Compile Include="HilightGroup.cs" />
-    <Compile Include="IBookmarkData.cs" />
-    <Compile Include="IBookmarkView.cs" />
-    <Compile Include="ILogExpertClient.cs" />
-    <Compile Include="ILogExpertProxy.cs" />
-    <Compile Include="ILogStreamReader.cs" />
-    <Compile Include="ILogPaintContext.cs" />
-    <Compile Include="ILogView.cs" />
-    <Compile Include="ISharedToolWindow.cs" />
-    <Compile Include="LocalFileSystem.cs" />
-    <Compile Include="LogBufferCacheEntry.cs" />
-    <Compile Include="LogExpertApplicationContext.cs" />
-    <Compile Include="LogFileException.cs" />
-    <Compile Include="MultifileOptions.cs" />
-    <Compile Include="ObjectClone.cs" />
-    <Compile Include="PaintHelper.cs" />
-    <Compile Include="ParamParser.cs" />
-    <Compile Include="Persister.cs" />
-    <Compile Include="ClfColumnizer.cs" />
-    <Compile Include="ConfigManager.cs" />
+    <Compile Include="Entities\EncodingOptions.cs" />
+    <Compile Include="Classes\FileSystemCallback.cs" />
+    <Compile Include="Entities\FileViewContext.cs" />
+    <Compile Include="Classes\Filter\Filter.cs" />
+    <Compile Include="Classes\Filter\FilterCancelHandler.cs" />
+    <Compile Include="Classes\Filter\FilterStarter.cs" />
+    <Compile Include="Entities\EventArgs\HighlightEventArgs.cs" />
+    <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
+    <Compile Include="Entities\HighlightResults.cs" />
+    <Compile Include="Entities\HilightGroup.cs" />
+    <Compile Include="Interface\IBookmarkData.cs" />
+    <Compile Include="Interface\IBookmarkView.cs" />
+    <Compile Include="Interface\ILogExpertClient.cs" />
+    <Compile Include="Interface\ILogExpertProxy.cs" />
+    <Compile Include="Interface\ILogStreamReader.cs" />
+    <Compile Include="Interface\ILogPaintContext.cs" />
+    <Compile Include="Interface\ILogView.cs" />
+    <Compile Include="Interface\ISharedToolWindow.cs" />
+    <Compile Include="Classes\LocalFileSystem.cs" />
+    <Compile Include="Classes\Log\LogBufferCacheEntry.cs" />
+    <Compile Include="Classes\LogExpertApplicationContext.cs" />
+    <Compile Include="Entities\LogFileException.cs" />
+    <Compile Include="Entities\MultifileOptions.cs" />
+    <Compile Include="Classes\ObjectClone.cs" />
+    <Compile Include="Classes\PaintHelper.cs" />
+    <Compile Include="Classes\ParamParser.cs" />
+    <Compile Include="Classes\Persister.cs" />
+    <Compile Include="Classes\Columnizer\ClfColumnizer.cs" />
+    <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Dialogs\BookmarkWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -206,30 +220,30 @@
     <Compile Include="Dialogs\ToolArgsDialog.Designer.cs">
       <DependentUpon>ToolArgsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FilterPipe.cs" />
-    <Compile Include="GuiStateArgs.cs" />
-    <Compile Include="KnobControl.cs">
+    <Compile Include="Classes\Filter\FilterPipe.cs" />
+    <Compile Include="Entities\EventArgs\GuiStateArgs.cs" />
+    <Compile Include="Controls\KnobControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="KnobControl.Designer.cs">
+    <Compile Include="Controls\KnobControl.Designer.cs">
       <DependentUpon>KnobControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="LogExpertProxy.cs" />
-    <Compile Include="LogTabControl.cs">
+    <Compile Include="Classes\LogExpertProxy.cs" />
+    <Compile Include="Controls\LogTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="LogTabPage.cs">
+    <Compile Include="Controls\LogTabPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="LogTabWindow.cs">
+    <Compile Include="Controls\LogTabWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LogTabWindow.designer.cs">
+    <Compile Include="Controls\LogTabWindow.designer.cs">
       <DependentUpon>LogTabWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logger.cs">
+    <Compile Include="Classes\Logger.cs">
     </Compile>
-    <Compile Include="DefaultLogfileColumnizer.cs" />
+    <Compile Include="Entities\DefaultLogfileColumnizer.cs" />
     <Compile Include="Dialogs\AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -281,32 +295,32 @@
     <Compile Include="Dialogs\SearchProgressDialog.Designer.cs">
       <DependentUpon>SearchProgressDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FilterParams.cs" />
-    <Compile Include="HilightEntry.cs" />
-    <Compile Include="LoadFileEventArgs.cs" />
-    <Compile Include="LogBuffer.cs" />
-    <Compile Include="LogEventData.cs" />
-    <Compile Include="LogFileInfo.cs" />
-    <Compile Include="LogfileReader.cs" />
-    <Compile Include="LogWindow.cs">
+    <Compile Include="Classes\Filter\FilterParams.cs" />
+    <Compile Include="Classes\Highlight\HilightEntry.cs" />
+    <Compile Include="Entities\EventArgs\LoadFileEventArgs.cs" />
+    <Compile Include="Classes\Log\LogBuffer.cs" />
+    <Compile Include="Entities\LogEventData.cs" />
+    <Compile Include="Classes\Log\LogFileInfo.cs" />
+    <Compile Include="Classes\Log\LogfileReader.cs" />
+    <Compile Include="Controls\LogWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LogWindow.designer.cs">
+    <Compile Include="Controls\LogWindow.designer.cs">
       <DependentUpon>LogWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="PatternArgs.cs" />
-    <Compile Include="PatternBlock.cs" />
-    <Compile Include="PatternWindow.cs">
+    <Compile Include="Entities\EventArgs\PatternArgs.cs" />
+    <Compile Include="Classes\PatternBlock.cs" />
+    <Compile Include="Controls\PatternWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PatternWindow.Designer.cs">
+    <Compile Include="Controls\PatternWindow.Designer.cs">
       <DependentUpon>PatternWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="PluginRegistry.cs" />
-    <Compile Include="PositionAwareStreamReader.cs" />
+    <Compile Include="Classes\PluginRegistry.cs" />
+    <Compile Include="Classes\Log\PositionAwareStreamReader.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgressEventArgs.cs" />
-    <Compile Include="ProjectPersister.cs" />
+    <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
+    <Compile Include="Classes\ProjectPersister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Dialogs\DateTimeDragControl.resx">
       <DependentUpon>DateTimeDragControl.cs</DependentUpon>
@@ -328,11 +342,11 @@
       <DependentUpon>ToolArgsDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="KnobControl.resx">
+    <EmbeddedResource Include="Controls\KnobControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>KnobControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LogTabWindow.resx">
+    <EmbeddedResource Include="Controls\LogTabWindow.resx">
       <DependentUpon>LogTabWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -364,7 +378,7 @@
       <DependentUpon>SearchProgressDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="LogWindow.resx">
+    <EmbeddedResource Include="Controls\LogWindow.resx">
       <DependentUpon>LogWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -393,33 +407,33 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Range.cs" />
-    <Compile Include="RangeFinder.cs" />
-    <Compile Include="ReloadMemento.cs" />
+    <Compile Include="Entities\Range.cs" />
+    <Compile Include="Classes\RangeFinder.cs" />
+    <Compile Include="Entities\ReloadMemento.cs" />
     <Compile Include="Resources\Resource1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource1.resx</DependentUpon>
     </Compile>
-    <Compile Include="RolloverFilenameBuilder.cs" />
-    <Compile Include="RolloverFilenameHandler.cs" />
-    <Compile Include="RowHeightEntry.cs" />
-    <Compile Include="SearchParams.cs" />
-    <Compile Include="StatusEventArgs.cs" />
-    <Compile Include="SyncModeEventArgs.cs" />
-    <Compile Include="SysoutPipe.cs" />
-    <Compile Include="SystemInfo.cs" />
-    <Compile Include="TimeSpreadCalculator.cs" />
-    <Compile Include="TimestampColumnizer.cs">
+    <Compile Include="Classes\Log\RolloverFilenameBuilder.cs" />
+    <Compile Include="Classes\Log\RolloverFilenameHandler.cs" />
+    <Compile Include="Entities\RowHeightEntry.cs" />
+    <Compile Include="Entities\SearchParams.cs" />
+    <Compile Include="Entities\EventArgs\StatusEventArgs.cs" />
+    <Compile Include="Entities\EventArgs\SyncModeEventArgs.cs" />
+    <Compile Include="Classes\SysoutPipe.cs" />
+    <Compile Include="Classes\SystemInfo.cs" />
+    <Compile Include="Classes\TimeSpreadCalculator.cs" />
+    <Compile Include="Classes\Columnizer\TimestampColumnizer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TimeSyncList.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="Win32.cs" />
-    <Compile Include="WindowFileEntry.cs" />
-    <Compile Include="WindowTypes.cs" />
-    <Compile Include="XmlBlockSplitter.cs" />
-    <Compile Include="XmlLogReader.cs" />
+    <Compile Include="Classes\TimeSyncList.cs" />
+    <Compile Include="Classes\Util.cs" />
+    <Compile Include="Classes\Win32.cs" />
+    <Compile Include="Entities\WindowFileEntry.cs" />
+    <Compile Include="Entities\WindowTypes.cs" />
+    <Compile Include="Classes\xml\XmlBlockSplitter.cs" />
+    <Compile Include="Classes\xml\XmlLogReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\up-blue.gif" />
@@ -501,7 +515,7 @@
       <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="PatternWindow.resx">
+    <EmbeddedResource Include="Controls\PatternWindow.resx">
       <DependentUpon>PatternWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -525,6 +539,9 @@
       <Project>{c75532c4-765b-418e-b09b-46d36b2abdb1}</Project>
       <Name>WinFormsUI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Functionality\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

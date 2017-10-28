@@ -8,29 +8,6 @@ using System.Text.RegularExpressions;
 namespace LogExpert
 {
     [Serializable]
-    public class ActionEntry
-    {
-        #region Fields
-
-        public string actionParam;
-        public string pluginName;
-
-        #endregion
-
-        #region Public methods
-
-        public ActionEntry Copy()
-        {
-            ActionEntry e = new ActionEntry();
-            e.pluginName = this.pluginName;
-            e.actionParam = this.actionParam;
-            return e;
-        }
-
-        #endregion
-    }
-
-    [Serializable]
     public class HilightEntry
     {
         #region Fields
@@ -215,35 +192,6 @@ namespace LogExpert
         {
             get { return noBackground; }
             set { noBackground = value; }
-        }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Class for storing word-wise hilight matches. Used for colouring different matches on one line.
-    /// </summary>
-    public class HilightMatchEntry
-    {
-        #region Fields
-
-        #endregion
-
-        #region Properties
-
-        public HilightEntry HilightEntry { get; set; }
-
-        public int StartPos { get; set; }
-
-        public int Length { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        public override string ToString()
-        {
-            return this.HilightEntry.SearchText + "/" + this.StartPos + "/" + this.Length;
         }
 
         #endregion
