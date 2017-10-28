@@ -5,16 +5,6 @@ using System.Xml;
 
 namespace LogExpert
 {
-    public class ProjectData
-    {
-        #region Fields
-
-        public List<string> memberList = new List<string>();
-        public string tabLayoutXml = null;
-
-        #endregion
-    }
-
     public class ProjectPersister
     {
         #region Public methods

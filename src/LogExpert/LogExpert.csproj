@@ -58,6 +58,8 @@
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Classes\Persister\FilterTabData.cs" />
+    <Compile Include="Classes\Persister\ProjectData.cs" />
     <Compile Include="Config\ColorEntry.cs" />
     <Compile Include="Config\ColumnizerHistoryEntry.cs" />
     <Compile Include="Config\ColumnizerMaskEntry.cs" />
@@ -168,7 +170,7 @@
     <Compile Include="Classes\ObjectClone.cs" />
     <Compile Include="Classes\PaintHelper.cs" />
     <Compile Include="Classes\ParamParser.cs" />
-    <Compile Include="Classes\Persister.cs" />
+    <Compile Include="Classes\Persister\Persister.cs" />
     <Compile Include="Classes\Columnizer\ClfColumnizer.cs" />
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Dialogs\BookmarkWindow.cs">
@@ -320,7 +322,7 @@
     <Compile Include="Classes\Log\PositionAwareStreamReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
-    <Compile Include="Classes\ProjectPersister.cs" />
+    <Compile Include="Classes\Persister\ProjectPersister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Dialogs\DateTimeDragControl.resx">
       <DependentUpon>DateTimeDragControl.cs</DependentUpon>
@@ -536,9 +538,7 @@
       <Name>WinFormsUI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functionality\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
