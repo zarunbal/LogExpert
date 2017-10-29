@@ -54,6 +54,7 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
       <Name>ColumnizerLib</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

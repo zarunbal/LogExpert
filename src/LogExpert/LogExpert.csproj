@@ -544,6 +544,7 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
       <Name>ColumnizerLib</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
       <Project>{c75532c4-765b-418e-b09b-46d36b2abdb1}</Project>
