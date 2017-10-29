@@ -445,6 +445,9 @@
     <Compile Include="Entities\WindowTypes.cs" />
     <Compile Include="Classes\xml\XmlBlockSplitter.cs" />
     <Compile Include="Classes\xml\XmlLogReader.cs" />
+    <None Include="Start.cmd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\up-blue.gif" />
