@@ -9,6 +9,8 @@ namespace LogExpert.Dialogs
 {
     internal partial class AboutBox : Form
     {
+        private readonly Assembly _assembly;
+
         #region cTor
 
         public AboutBox()
@@ -16,7 +18,7 @@ namespace LogExpert.Dialogs
             InitializeComponent();
             this.Text = string.Format("About {0}", AssemblyTitle);
             this.labelProductName.Text = AssemblyProduct;
-            this.labelVersion.Text = string.Format("Version {0} / {1}", AssemblyVersion, AssemblyBuild);
+            this.labelVersion.Text = AssemblyVersion;
             this.labelCopyright.Text = AssemblyCopyright;
             //this.labelCompanyName.Text = AssemblyCompany;
             this.textBoxDescription.Text = AssemblyDescription +
@@ -26,10 +28,10 @@ namespace LogExpert.Dialogs
                                            "\r\n" +
                                            "LogExpert uses modules from:\r\n" +
                                            "http://sourceforge.net/projects/dockpanelsuite/\r\n" +
-                                           "http://sourceforge.net/projects/bugzproxy/\r\n" +
                                            "http://www.xml-rpc.net/";
             string link = "http://www.log-expert.de/";
             this.linkLabel1.Links.Add(new LinkLabel.Link(0, link.Length, link));
+            _assembly = Assembly.GetExecutingAssembly();
         }
 
         #endregion
@@ -56,7 +58,7 @@ namespace LogExpert.Dialogs
         {
             get
             {
-                object[] attributes = Assembly.GetExecutingAssembly()
+                object[] attributes = _assembly
                     .GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
                 if (attributes.Length > 0)
                 {
@@ -66,30 +68,17 @@ namespace LogExpert.Dialogs
                         return titleAttribute.Title;
                     }
                 }
-                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+                return System.IO.Path.GetFileNameWithoutExtension(_assembly.CodeBase);
             }
         }
 
-        public string AssemblyVersion
-        {
-            get
-            {
-                return Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
-                       Assembly.GetExecutingAssembly().GetName().Version.Minor;
-//        return Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-        }
-
-        public string AssemblyBuild
-        {
-            get { return Assembly.GetExecutingAssembly().GetName().Version.Build.ToString(); }
-        }
+        public string AssemblyVersion => _assembly.GetName().Version.ToString(3);
 
         public string AssemblyDescription
         {
             get
             {
-                object[] attributes = Assembly.GetExecutingAssembly()
+                object[] attributes = _assembly
                     .GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
                 if (attributes.Length == 0)
                 {
@@ -103,7 +92,7 @@ namespace LogExpert.Dialogs
         {
             get
             {
-                object[] attributes = Assembly.GetExecutingAssembly()
+                object[] attributes = _assembly
                     .GetCustomAttributes(typeof(AssemblyProductAttribute), false);
                 if (attributes.Length == 0)
                 {
@@ -117,27 +106,13 @@ namespace LogExpert.Dialogs
         {
             get
             {
-                object[] attributes = Assembly.GetExecutingAssembly()
+                object[] attributes = _assembly
                     .GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
                 if (attributes.Length == 0)
                 {
                     return "";
                 }
                 return ((AssemblyCopyrightAttribute) attributes[0]).Copyright;
-            }
-        }
-
-        public string AssemblyCompany
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly()
-                    .GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((AssemblyCompanyAttribute) attributes[0]).Company;
             }
         }
 
