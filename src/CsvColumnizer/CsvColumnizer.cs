@@ -165,6 +165,8 @@ namespace CsvColumnizer
                     columns.Add(new Column {FullValue = csv[i], Parent = cLogLine});
                 }
 
+                cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+
                 return cLogLine;
             }
         }
