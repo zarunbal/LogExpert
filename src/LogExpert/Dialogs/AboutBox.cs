@@ -9,13 +9,19 @@ namespace LogExpert.Dialogs
 {
     internal partial class AboutBox : Form
     {
+        #region Fields
+
         private readonly Assembly _assembly;
+
+        #endregion
 
         #region cTor
 
         public AboutBox()
         {
             InitializeComponent();
+            _assembly = Assembly.GetExecutingAssembly();
+
             this.Text = string.Format("About {0}", AssemblyTitle);
             this.labelProductName.Text = AssemblyProduct;
             this.labelVersion.Text = AssemblyVersion;
@@ -31,7 +37,6 @@ namespace LogExpert.Dialogs
                                            "http://www.xml-rpc.net/";
             string link = "http://www.log-expert.de/";
             this.linkLabel1.Links.Add(new LinkLabel.Link(0, link.Length, link));
-            _assembly = Assembly.GetExecutingAssembly();
         }
 
         #endregion
