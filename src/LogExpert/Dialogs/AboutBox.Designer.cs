@@ -109,7 +109,7 @@
             this.labelCopyright.Location = new System.Drawing.Point(214, 82);
             this.labelCopyright.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
             this.labelCopyright.Name = "labelCopyright";
-            this.labelCopyright.Size = new System.Drawing.Size(393, 17);
+            this.labelCopyright.Size = new System.Drawing.Size(393, 39);
             this.labelCopyright.TabIndex = 21;
             this.labelCopyright.Text = "Copyright";
             this.labelCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
