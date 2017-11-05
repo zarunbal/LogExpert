@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NLog;
 
 namespace LogExpert
 {
     internal class FilterCancelHandler : BackgroundProcessCancelHandler
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
         private readonly FilterStarter filterStarter;
@@ -23,15 +25,11 @@ namespace LogExpert
 
         #region Public methods
 
-        #region BackgroundProcessCancelHandler Member
-
         public void EscapePressed()
         {
-            Logger.logInfo("FilterCancelHandler called.");
+            _logger.Info("FilterCancelHandler called.");
             this.filterStarter.CancelFilter();
         }
-
-        #endregion
 
         #endregion
     }

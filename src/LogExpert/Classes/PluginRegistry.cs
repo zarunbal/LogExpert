@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Windows.Forms;
 using System.IO;
+using NLog;
 
 
 namespace LogExpert
@@ -18,6 +19,8 @@ namespace LogExpert
     internal class PluginRegistry
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private static readonly object lockObject = new object();
         private static PluginRegistry instance = null;
@@ -71,7 +74,7 @@ namespace LogExpert
 
         internal void LoadPlugins()
         {
-            Logger.logInfo("Loading plugins...");
+            _logger.Info("Loading plugins...");
             this.RegisteredColumnizers = new List<ILogLineColumnizer>();
             this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
             this.RegisteredColumnizers.Add(new TimestampColumnizer());
@@ -121,7 +124,7 @@ namespace LogExpert
                                                 this.pluginList.Add(o as ILogExpertPlugin);
                                                 (o as ILogExpertPlugin).PluginLoaded();
                                             }
-                                            Logger.logInfo("Added columnizer " + type.Name);
+                                            _logger.Info("Added columnizer " + type.Name);
                                         }
                                     }
                                 }
@@ -150,11 +153,11 @@ namespace LogExpert
                     catch (FileLoadException e)
                     {
                         // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
-                        Logger.logError(e.Message);
+                        _logger.Error(e.Message);
                     }
                 }
             }
-            Logger.logInfo("Plugin loading complete.");
+            _logger.Info("Plugin loading complete.");
         }
 
         internal IKeywordAction FindKeywordActionPluginByName(string name)
@@ -174,26 +177,26 @@ namespace LogExpert
 
         internal IFileSystemPlugin FindFileSystemForUri(string uriString)
         {
-            if (Logger.IsDebug)
+            if (_logger.IsDebugEnabled)
             {
-                Logger.logDebug("Trying to find file system plugin for uri " + uriString);
+                _logger.Debug("Trying to find file system plugin for uri " + uriString);
             }
             foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
             {
-                if (Logger.IsDebug)
+                if (_logger.IsDebugEnabled)
                 {
-                    Logger.logDebug("Checking " + fs.Text);
+                    _logger.Debug("Checking " + fs.Text);
                 }
                 if (fs.CanHandleUri(uriString))
                 {
-                    if (Logger.IsDebug)
+                    if (_logger.IsDebugEnabled)
                     {
-                        Logger.logDebug("Found match " + fs.Text);
+                        _logger.Debug("Found match " + fs.Text);
                     }
                     return fs;
                 }
             }
-            Logger.logError("No file system plugin found for uri " + uriString);
+            _logger.Error("No file system plugin found for uri " + uriString);
             return null;
         }
 
@@ -216,7 +219,7 @@ namespace LogExpert
                     this.pluginList.Add(me as ILogExpertPlugin);
                     (me as ILogExpertPlugin).PluginLoaded();
                 }
-                Logger.logInfo("Added context menu plugin " + type.Name);
+                _logger.Info("Added context menu plugin " + type.Name);
                 return true;
             }
             return false;
@@ -238,7 +241,7 @@ namespace LogExpert
                     this.pluginList.Add(ka as ILogExpertPlugin);
                     (ka as ILogExpertPlugin).PluginLoaded();
                 }
-                Logger.logInfo("Added keyword plugin " + type.Name);
+                _logger.Info("Added keyword plugin " + type.Name);
                 return true;
             }
             return false;
@@ -264,7 +267,7 @@ namespace LogExpert
                     this.pluginList.Add(fs as ILogExpertPlugin);
                     (fs as ILogExpertPlugin).PluginLoaded();
                 }
-                Logger.logInfo("Added file system plugin " + type.Name);
+                _logger.Info("Added file system plugin " + type.Name);
                 return true;
             }
             return false;

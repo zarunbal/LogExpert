@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NLog;
 
 
 namespace LogExpert
@@ -9,8 +10,10 @@ namespace LogExpert
     {
         #region Fields
 
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
 #if DEBUG
-        private IList<long> filePositions = new List<long>(); // file position for every line
+        private readonly IList<long> filePositions = new List<long>(); // file position for every line
 #endif
 
         private readonly IList<ILogLine> logLines = new List<ILogLine>();
@@ -45,7 +48,7 @@ namespace LogExpert
                 {
                     if (this.size < this.filePositions[this.filePositions.Count - 1] - this.StartPos)
                     {
-                        Logger.logError("LogBuffer overall Size must be greater than last line file position!");
+                        _logger.Error("LogBuffer overall Size must be greater than last line file position!");
                     }
                 }
 #endif

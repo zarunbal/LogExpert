@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Threading;
+using NLog;
 
 namespace LogExpert
 {
@@ -12,6 +13,7 @@ namespace LogExpert
 
         private const int RETRY_COUNT = 5;
         private const int RETRY_SLEEP = 250;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         //FileStream fStream;
         private readonly FileInfo fInfo;
@@ -78,7 +80,7 @@ namespace LogExpert
                     {
                         if (--retry <= 0)
                         {
-                            Logger.logWarn("LogFileInfo.Length: " + e.ToString());
+                            _logger.Warn("LogFileInfo.Length: " + e.ToString());
                             return -1;
                         }
                         Thread.Sleep(RETRY_SLEEP);
@@ -147,8 +149,8 @@ namespace LogExpert
                 }
                 catch (IOException fe)
                 {
-                    Logger.logDebug("LogFileInfo.OpenFile(): " + fe.ToString());
-                    Logger.logDebug("Retry counter: " + retry);
+                    _logger.Debug("LogFileInfo.OpenFile(): " + fe.ToString());
+                    _logger.Debug("Retry counter: " + retry);
                     if (--retry <= 0)
                     {
                         throw fe;
@@ -157,8 +159,8 @@ namespace LogExpert
                 }
                 catch (UnauthorizedAccessException uae)
                 {
-                    Logger.logDebug("LogFileInfo.OpenFile(): " + uae.ToString());
-                    Logger.logDebug("Retry counter: " + retry);
+                    _logger.Debug("LogFileInfo.OpenFile(): " + uae.ToString());
+                    _logger.Debug("Retry counter: " + retry);
                     if (--retry <= 0)
                     {
                         throw new IOException("Error opening file", uae);

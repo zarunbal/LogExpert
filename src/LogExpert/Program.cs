@@ -12,11 +12,18 @@ using System.Reflection;
 using System.Security.Principal;
 using LogExpert.Dialogs;
 using ITDM;
+using NLog;
 
 namespace LogExpert
 {
     internal static class Program
     {
+        #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #endregion
+
         #region Private Methods
 
         /// <summary>
@@ -45,12 +52,12 @@ namespace LogExpert
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            Logger.logInfo("============================================================================");
-            Logger.logInfo("LogExpert " + Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
-                           Assembly.GetExecutingAssembly().GetName().Version.Minor + "/" +
-                           Assembly.GetExecutingAssembly().GetName().Version.Build.ToString() +
-                           " started.");
-            Logger.logInfo("============================================================================");
+            _logger.Info("============================================================================");
+            _logger.Info("LogExpert " + Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
+                         Assembly.GetExecutingAssembly().GetName().Version.Minor + "/" +
+                         Assembly.GetExecutingAssembly().GetName().Version.Build.ToString() +
+                         " started.");
+            _logger.Info("============================================================================");
 
             CmdLine cmdLine = new CmdLine();
             CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
@@ -150,7 +157,7 @@ namespace LogExpert
                         }
                         catch (RemotingException e)
                         {
-                            Logger.logError("IpcClientChannel error: " + e.Message);
+                            _logger.Error("IpcClientChannel error: " + e.Message);
                             errMsg = e.Message;
                             counter--;
                             Thread.Sleep(500);
@@ -158,7 +165,7 @@ namespace LogExpert
                     }
                     if (counter == 0)
                     {
-                        Logger.logError("IpcClientChannel error, giving up: " + errMsg);
+                        _logger.Error("IpcClientChannel error, giving up: " + errMsg);
                         MessageBox.Show("Cannot open connection to first instance (" + errMsg + ")", "LogExpert");
                     }
                 }
@@ -166,7 +173,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("Mutex error, giving up: " + ex.Message);
+                _logger.Error("Mutex error, giving up: " + ex.Message);
                 MessageBox.Show("Cannot open connection to first instance (" + ex.Message + ")", "LogExpert");
             }
         }
@@ -174,7 +181,7 @@ namespace LogExpert
         [STAThread]
         private static void ShowUnhandledException(object exceptionObject)
         {
-            Logger.logError("Exception: " + exceptionObject.ToString());
+            _logger.Error("Exception: " + exceptionObject.ToString());
             string errorText = "";
             string stackTrace = "";
             if (exceptionObject is Exception)

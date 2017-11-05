@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
+using NLog;
 
 namespace LogExpert
 {
@@ -11,11 +12,13 @@ namespace LogExpert
     {
         #region Fields
 
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        [NonSerialized] private readonly List<LogTabWindow> windowList = new List<LogTabWindow>();
+
         [NonSerialized] private LogTabWindow firstLogTabWindow;
 
         [NonSerialized] private int logWindowIndex = 1;
-
-        [NonSerialized] private readonly List<LogTabWindow> windowList = new List<LogTabWindow>();
 
         #endregion
 
@@ -58,7 +61,7 @@ namespace LogExpert
 
         public void LoadFiles(string[] fileNames)
         {
-            Logger.logInfo("Loading files into existing LogTabWindow");
+            _logger.Info("Loading files into existing LogTabWindow");
             LogTabWindow logWin = this.windowList[this.windowList.Count - 1];
             logWin.Invoke(new MethodInvoker(logWin.SetForeground));
             logWin.LoadFiles(fileNames);
@@ -68,13 +71,13 @@ namespace LogExpert
         {
             if (this.firstLogTabWindow.IsDisposed)
             {
-                Logger.logWarn("first GUI thread window is disposed. Setting a new one.");
+                _logger.Warn("first GUI thread window is disposed. Setting a new one.");
                 // may occur if a window is closed because of unhandled exception.
                 // Determine a new 'firstWindow'. If no window is left, start a new one.
                 RemoveWindow(this.firstLogTabWindow);
                 if (this.windowList.Count == 0)
                 {
-                    Logger.logInfo("No windows left. New created window will be the new 'first' GUI window");
+                    _logger.Info("No windows left. New created window will be the new 'first' GUI window");
                     LoadFiles(fileNames);
                 }
                 else
@@ -107,7 +110,7 @@ namespace LogExpert
 
         public void NewWindowWorker(string[] fileNames)
         {
-            Logger.logInfo("Creating new LogTabWindow");
+            _logger.Info("Creating new LogTabWindow");
             LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, logWindowIndex++, true);
             logWin.LogExpertProxy = this;
             AddWindow(logWin);
@@ -121,7 +124,7 @@ namespace LogExpert
             RemoveWindow(logWin);
             if (this.windowList.Count == 0)
             {
-                Logger.logInfo("Last LogTabWindow was closed");
+                _logger.Info("Last LogTabWindow was closed");
                 PluginRegistry.GetInstance().CleanupPlugins();
                 OnLastWindowClosed();
             }
@@ -151,13 +154,13 @@ namespace LogExpert
 
         private void AddWindow(LogTabWindow window)
         {
-            Logger.logInfo("Adding window to list");
+            _logger.Info("Adding window to list");
             this.windowList.Add(window);
         }
 
         private void RemoveWindow(LogTabWindow window)
         {
-            Logger.logInfo("Removing window from list");
+            _logger.Info("Removing window from list");
             this.windowList.Remove(window);
         }
 

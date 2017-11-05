@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Binary;
+using NLog;
 
 namespace LogExpert
 {
@@ -45,6 +46,12 @@ namespace LogExpert
 
     public class Persister
     {
+        #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #endregion
+
         #region Public methods
 
         public static string SavePersistenceData(string logFileName, PersistenceData persistenceData,
@@ -376,12 +383,12 @@ namespace LogExpert
                 }
                 catch (ArgumentException e)
                 {
-                    Logger.logError(e.Message);
+                    _logger.Error(e.Message);
                     return Encoding.Default;
                 }
                 catch (NotSupportedException e)
                 {
-                    Logger.logError(e.Message);
+                    _logger.Error(e.Message);
                     return Encoding.Default;
                 }
             }
@@ -426,7 +433,7 @@ namespace LogExpert
                     }
                     if (line == null || posX == null || posY == null)
                     {
-                        Logger.logError("Invalid XML format for bookmark: " + node.InnerText);
+                        _logger.Error("Invalid XML format for bookmark: " + node.InnerText);
                         continue;
                     }
                     int lineNum = int.Parse(line);

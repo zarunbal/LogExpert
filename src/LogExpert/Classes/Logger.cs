@@ -13,7 +13,8 @@ using System.Diagnostics;
 
 namespace LogExpert
 {
-    public class Logger : ILogExpertLogger
+    [Obsolete]
+    public class Logger
     {
         #region Fields
 
@@ -73,35 +74,35 @@ namespace LogExpert
             return instance;
         }
 
-        public static void logInfo(string msg)
+        public static void Info(string msg)
         {
             GetLogger().log(msg, Level.INFO);
         }
 
         [Conditional("DEBUG")]
-        public static void logDebug(string msg)
+        public static void Debug(string msg)
         {
 #if DEBUG
-      GetLogger().log(msg, Level.DEBUG);
+            GetLogger().log(msg, Level.DEBUG);
 #endif
         }
 
-        public static void logWarn(string msg)
+        public static void Warn(string msg)
         {
             GetLogger().log(msg, Level.WARN);
         }
 
-        public static void logWarn(Exception e)
+        public static void Warn(Exception e)
         {
             GetLogger().log(e.GetType().Name + ": " + e.Message, Level.WARN);
         }
 
-        public static void logWarn(string msg, Exception e)
+        public static void Warn(string msg, Exception e)
         {
             GetLogger().log(msg + " " + e.GetType().Name + ": " + e.Message, Level.WARN);
         }
 
-        public static void logError(string msg)
+        public static void Error(string msg)
         {
             GetLogger().log(msg, Level.ERROR);
         }
@@ -113,15 +114,15 @@ namespace LogExpert
         private void createLogFile()
         {
 #if DEBUG
-      string dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\LogExpert";
-      if (!Directory.Exists(dir))
-      {
-        Directory.CreateDirectory(dir);
-      }
-      this.fileName = dir + "\\logfile.txt";
-      this.writer =
-new StreamWriter(new FileStream(this.fileName, FileMode.Append, FileAccess.Write, FileShare.Read|FileShare.Write));
-      this.fileInfo = new FileInfo(this.fileName);
+            string dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\LogExpert";
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            this.fileName = dir + "\\logfile.txt";
+            this.writer =
+                new StreamWriter(new FileStream(this.fileName, FileMode.Append, FileAccess.Write, FileShare.Read | FileShare.Write));
+            this.fileInfo = new FileInfo(this.fileName);
 #endif
         }
 
@@ -174,11 +175,11 @@ new StreamWriter(new FileStream(this.fileName, FileMode.Append, FileAccess.Write
         protected void log(string msg, Level level)
         {
 #if DEBUG
-      StackTrace st = new StackTrace();
-      StackFrame callerFrame = st.GetFrame(2);
-      string callerInfo = callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "()";
-      LogCallback callback = new LogCallback(logCallback);
-      callback.BeginInvoke(msg, level, DateTime.Now, callerInfo, Thread.CurrentThread.ManagedThreadId, null, null);
+            StackTrace st = new StackTrace();
+            StackFrame callerFrame = st.GetFrame(2);
+            string callerInfo = callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "()";
+            LogCallback callback = new LogCallback(logCallback);
+            callback.BeginInvoke(msg, level, DateTime.Now, callerInfo, Thread.CurrentThread.ManagedThreadId, null, null);
 #endif
         }
 
@@ -209,30 +210,5 @@ new StreamWriter(new FileStream(this.fileName, FileMode.Append, FileAccess.Write
             WARN,
             ERROR
         };
-
-
-        #region ILogExpertLogger Member
-
-        public void LogInfo(string msg)
-        {
-            GetLogger().log(msg, Level.INFO);
-        }
-
-        public void LogDebug(string msg)
-        {
-            GetLogger().log(msg, Level.DEBUG);
-        }
-
-        public void LogWarn(string msg)
-        {
-            GetLogger().log(msg, Level.WARN);
-        }
-
-        public void LogError(string msg)
-        {
-            GetLogger().log(msg, Level.ERROR);
-        }
-
-        #endregion
     }
 }

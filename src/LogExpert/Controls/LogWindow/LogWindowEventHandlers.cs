@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
+using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
@@ -42,7 +43,7 @@ namespace LogExpert
         private void logFileReader_FinishedLoading(object sender, EventArgs e)
         {
             //Thread.CurrentThread.Name = "FinishedLoading event thread";
-            Logger.logInfo("Finished loading.");
+            _logger.Info("Finished loading.");
             this.isLoading = false;
             this.isDeadFile = false;
             if (!this.waitingForClose)
@@ -64,7 +65,7 @@ namespace LogExpert
                 }
                 if (this.filterTailCheckBox.Checked)
                 {
-                    Logger.logInfo("Refreshing filter view because of reload.");
+                    _logger.Info("Refreshing filter view because of reload.");
                     this.Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
                 }
 
@@ -77,7 +78,7 @@ namespace LogExpert
         {
             if (!this.IsDisposed && !this.Disposing)
             {
-                Logger.logInfo("Handling file not found event.");
+                _logger.Info("Handling file not found event.");
                 this.isDeadFile = true;
                 this.BeginInvoke(new MethodInvoker(LogfileDead));
             }
@@ -118,7 +119,7 @@ namespace LogExpert
         {
             if (e.NewFile)
             {
-                Logger.logInfo("File created anew.");
+                _logger.Info("File created anew.");
 
                 // File was new created (e.g. rollover)
                 this.isDeadFile = false;
@@ -128,7 +129,7 @@ namespace LogExpert
                 this.BeginInvoke(invoker);
                 //Thread loadThread = new Thread(new ThreadStart(ReloadNewFile));
                 //loadThread.Start();
-                Logger.logDebug("Reloading invoked.");
+                _logger.Debug("Reloading invoked.");
                 return;
             }
 
@@ -143,7 +144,7 @@ namespace LogExpert
         private void FileSizeChangedHandler(object sender, LogEventArgs e)
         {
             //OnFileSizeChanged(e);  // now done in UpdateGrid()
-            Logger.logInfo("Got FileSizeChanged event. prevLines:" + e.PrevLineCount + ", curr lines: " + e.LineCount);
+            _logger.Info("Got FileSizeChanged event. prevLines:" + e.PrevLineCount + ", curr lines: " + e.LineCount);
 
             // - now done in the thread that works on the event args list
             //if (e.IsRollover)
@@ -548,7 +549,7 @@ namespace LogExpert
 
         private void selectionChangedTrigger_Signal(object sender, EventArgs e)
         {
-            Logger.logDebug("Selection changed trigger");
+            _logger.Debug("Selection changed trigger");
             int selCount = this.dataGridView.SelectedRows.Count;
             if (selCount > 1)
             {

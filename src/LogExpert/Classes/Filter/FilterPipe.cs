@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using NLog;
 
 
 namespace LogExpert
@@ -9,6 +10,8 @@ namespace LogExpert
     public class FilterPipe
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private IList<int> lineMappingList = new List<int>();
         private StreamWriter writer;
@@ -24,7 +27,7 @@ namespace LogExpert
             this.IsStopped = false;
             this.FileName = Path.GetTempFileName();
 
-            Logger.logInfo("Created temp file: " + this.FileName);
+            _logger.Info("Created temp file: " + this.FileName);
         }
 
         #endregion
@@ -90,15 +93,15 @@ namespace LogExpert
                         }
                         catch (IOException e)
                         {
-                            Logger.logError("writeToPipe(): " + e.ToString());
+                            _logger.Error(e, "writeToPipe()");
                             return false;
                         }
                     }
                 }
             }
-            catch (IOException)
+            catch (IOException ex)
             {
-                Logger.logError("writeToPipe(): file was closed: " + this.FileName);
+                _logger.Error(ex, "writeToPipe(): file was closed");
                 return false;
             }
         }
@@ -120,7 +123,7 @@ namespace LogExpert
 
         public void ShiftLineNums(int offset)
         {
-            Logger.logDebug("FilterPipe.ShiftLineNums() offset=" + offset);
+            _logger.Debug("FilterPipe.ShiftLineNums() offset={0}", offset);
             List<int> newList = new List<int>();
             lock (this.lineMappingList)
             {
@@ -142,7 +145,7 @@ namespace LogExpert
 
         public void ClearLineNums()
         {
-            Logger.logDebug("FilterPipe.ClearLineNums()");
+            _logger.Debug("FilterPipe.ClearLineNums()");
             lock (this.lineMappingList)
             {
                 for (int i = 0; i < this.lineMappingList.Count; ++i)

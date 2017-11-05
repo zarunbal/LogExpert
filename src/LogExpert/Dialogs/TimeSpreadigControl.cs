@@ -5,11 +5,13 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
+using NLog;
 
 namespace LogExpert.Dialogs
 {
     public partial class TimeSpreadingControl : UserControl
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
         private Bitmap bmp = new Bitmap(1, 1);
@@ -146,7 +148,7 @@ namespace LogExpert.Dialogs
 
         private void timeSpreadCalc_CalcDone(object sender, EventArgs e)
         {
-            Logger.logDebug("timeSpreadCalc_CalcDone()");
+            _logger.Debug("timeSpreadCalc_CalcDone()");
             lock (this.monitor)
             {
                 this.Invalidate();

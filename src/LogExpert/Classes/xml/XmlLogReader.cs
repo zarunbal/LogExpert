@@ -104,14 +104,14 @@ namespace LogExpert
                     case 0:
                         if (readChar == this.StartTag[0])
                         {
-                            //Logger.logInfo("state = 1");
+                            //_logger.logInfo("state = 1");
                             state = 1;
                             tagIndex = 1;
                             AddToBuffer(readChar);
                         }
                         //else
                         //{
-                        //  Logger.logInfo("char: " + readChar);
+                        //  _logger.logInfo("char: " + readChar);
                         //}
                         break;
                     case 1:
@@ -120,7 +120,7 @@ namespace LogExpert
                             AddToBuffer(readChar);
                             if (++tagIndex >= this.StartTag.Length)
                             {
-                                //Logger.logInfo("state = 2");
+                                //_logger.logInfo("state = 2");
                                 state = 2; // start Tag complete
                                 tagIndex = 0;
                             }
@@ -128,7 +128,7 @@ namespace LogExpert
                         else
                         {
                             // tag doesn't match anymore
-                            //Logger.logInfo("state = 0 [" + this.buffer.ToString() + readChar + "]");
+                            //_logger.logInfo("state = 0 [" + this.buffer.ToString() + readChar + "]");
                             state = 0;
                             ResetBuffer();
                         }
@@ -137,7 +137,7 @@ namespace LogExpert
                         AddToBuffer(readChar);
                         if (readChar == this.EndTag[0])
                         {
-                            //Logger.logInfo("state = 3");
+                            //_logger.logInfo("state = 3");
                             state = 3;
                             tagIndex = 1;
                         }
@@ -155,7 +155,7 @@ namespace LogExpert
                         }
                         else
                         {
-                            //Logger.logInfo("state = 2");
+                            //_logger.logInfo("state = 2");
                             state = 2;
                         }
                         break;

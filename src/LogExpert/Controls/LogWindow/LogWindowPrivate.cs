@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
+using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
 
@@ -74,7 +75,7 @@ namespace LogExpert
 
                 if (persistenceData == null)
                 {
-                    Logger.logInfo("No persistence data for " + this.FileName + " found.");
+                    _logger.Info("No persistence data for " + this.FileName + " found.");
                     return false;
                 }
 
@@ -104,7 +105,7 @@ namespace LogExpert
                 SetCurrentHighlightGroup(persistenceData.highlightGroupName);
                 if (persistenceData.multiFileNames.Count > 0)
                 {
-                    Logger.logInfo("Detected MultiFile name list in persistence options");
+                    _logger.Info("Detected MultiFile name list in persistence options");
                     this.fileNames = new string[persistenceData.multiFileNames.Count];
                     persistenceData.multiFileNames.CopyTo(this.fileNames);
                 }
@@ -118,7 +119,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("Error loading persistence data: " + ex.Message);
+                _logger.Error("Error loading persistence data: " + ex.Message);
                 return false;
             }
         }
@@ -169,7 +170,7 @@ namespace LogExpert
                 {
                     // outdated persistence data (logfile rollover)
                     // MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
-                    Logger.logInfo("Persistence data for " + this.FileName + " is outdated. It was discarded.");
+                    _logger.Info("Persistence data for " + this.FileName + " is outdated. It was discarded.");
                     LoadPersistenceOptions();
                     return;
                 }
@@ -212,7 +213,7 @@ namespace LogExpert
             catch (IOException ex)
             {
                 SetDefaultsFromPrefs();
-                Logger.logError("Error loading bookmarks: " + ex.Message);
+                _logger.Error("Error loading bookmarks: " + ex.Message);
             }
         }
 
@@ -232,7 +233,7 @@ namespace LogExpert
             }
             catch (InvalidOperationException e)
             {
-                Logger.logError("Error setting splitter distance: " + e.Message);
+                _logger.Error("Error setting splitter distance: " + e.Message);
             }
             ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
             if (this.filterPipeList.Count == 0) // don't restore if it's only a reload
@@ -277,7 +278,7 @@ namespace LogExpert
 
         private void EnterLoadFileStatus()
         {
-            Logger.logDebug("EnterLoadFileStatus begin");
+            _logger.Debug("EnterLoadFileStatus begin");
 
             if (this.InvokeRequired)
             {
@@ -301,7 +302,7 @@ namespace LogExpert
             ClearBookmarkList();
             this.dataGridView.ClearSelection();
             this.dataGridView.RowCount = 0;
-            Logger.logDebug("EnterLoadFileStatus end");
+            _logger.Debug("EnterLoadFileStatus end");
         }
 
         private void PositionAfterReload(ReloadMemento reloadMemento)
@@ -319,7 +320,7 @@ namespace LogExpert
 
         private void LogfileDead()
         {
-            Logger.logInfo("File not found.");
+            _logger.Info("File not found.");
             this.isDeadFile = true;
 
             //this.logFileReader.FileSizeChanged -= this.FileSizeChangedHandler;
@@ -345,7 +346,7 @@ namespace LogExpert
 
         private void LogfileRespawned()
         {
-            Logger.logInfo("LogfileDead(): Reloading file because it has been respawned.");
+            _logger.Info("LogfileDead(): Reloading file because it has been respawned.");
             this.isDeadFile = false;
             this.dataGridView.Enabled = true;
             StatusLineText("");
@@ -450,7 +451,7 @@ namespace LogExpert
             lock (this.reloadLock)
             {
                 this.reloadOverloadCounter++;
-                Logger.logInfo("ReloadNewFile(): counter = " + this.reloadOverloadCounter);
+                _logger.Info("ReloadNewFile(): counter = " + this.reloadOverloadCounter);
                 if (this.reloadOverloadCounter <= 1)
                 {
                     SavePersistenceData(false);
@@ -466,16 +467,16 @@ namespace LogExpert
 
                     //if (this.filterTailCheckBox.Checked)
                     //{
-                    //  Logger.logDebug("Waiting for loading to be complete.");
+                    //  _logger.logDebug("Waiting for loading to be complete.");
                     //  loadingFinishedEvent.WaitOne();
-                    //  Logger.logDebug("Refreshing filter view because of reload.");
+                    //  _logger.logDebug("Refreshing filter view because of reload.");
                     //  FilterSearch();
                     //}
                     //LoadFilterPipes();
                 }
                 else
                 {
-                    Logger.logDebug("Preventing reload because of recursive calls.");
+                    _logger.Debug("Preventing reload because of recursive calls.");
                 }
                 this.reloadOverloadCounter--;
             }
@@ -483,9 +484,9 @@ namespace LogExpert
 
         private void ReloadFinishedThreadFx()
         {
-            Logger.logInfo("Waiting for loading to be complete.");
+            _logger.Info("Waiting for loading to be complete.");
             this.loadingFinishedEvent.WaitOne();
-            Logger.logInfo("Refreshing filter view because of reload.");
+            _logger.Info("Refreshing filter view because of reload.");
             this.Invoke(new MethodInvoker(FilterSearch));
             LoadFilterPipes();
             OnFileReloadFinished();
@@ -497,7 +498,7 @@ namespace LogExpert
             {
                 if (e.ReadPos >= e.FileSize)
                 {
-                    //Logger.logWarn("UpdateProgress(): ReadPos (" + e.ReadPos + ") is greater than file size (" + e.FileSize + "). Aborting Update");
+                    //_logger.Warn("UpdateProgress(): ReadPos (" + e.ReadPos + ") is greater than file size (" + e.FileSize + "). Aborting Update");
                     return;
                 }
 
@@ -510,7 +511,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("UpdateProgress(): \n" + ex + "\n" + ex.StackTrace);
+                _logger.Error("UpdateProgress(): \n" + ex + "\n" + ex.StackTrace);
             }
         }
 
@@ -528,13 +529,13 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("LoadingStarted(): " + ex + "\n" + ex.StackTrace);
+                _logger.Error("LoadingStarted(): " + ex + "\n" + ex.StackTrace);
             }
         }
 
         private void LoadingFinished()
         {
-            Logger.logInfo("File loading complete.");
+            _logger.Info("File loading complete.");
             StatusLineText("");
             this.logFileReader.FileSizeChanged += this.FileSizeChangedHandler;
             this.isLoading = false;
@@ -568,16 +569,16 @@ namespace LogExpert
             Thread.CurrentThread.Name = "LogEventWorker";
             while (true)
             {
-                Logger.logDebug("Waiting for signal");
+                _logger.Debug("Waiting for signal");
                 this.logEventArgsEvent.WaitOne();
-                Logger.logDebug("Wakeup signal received.");
+                _logger.Debug("Wakeup signal received.");
                 while (true)
                 {
                     LogEventArgs e;
                     int lastLineCount = 0;
                     lock (this.logEventArgsList)
                     {
-                        Logger.logInfo("" + this.logEventArgsList.Count + " events in queue");
+                        _logger.Info("" + this.logEventArgsList.Count + " events in queue");
                         if (this.logEventArgsList.Count == 0)
                         {
                             this.logEventArgsEvent.Reset();
@@ -597,9 +598,9 @@ namespace LogExpert
                     {
                         if (e.LineCount < lastLineCount)
                         {
-                            Logger.logError("Line count of event is: " + e.LineCount +
-                                            ", should be greater than last line count: " +
-                                            lastLineCount);
+                            _logger.Error("Line count of event is: " + e.LineCount +
+                                          ", should be greater than last line count: " +
+                                          lastLineCount);
                         }
                     }
                     UpdateGridCallback callback = new UpdateGridCallback(UpdateGrid);
@@ -655,7 +656,7 @@ namespace LogExpert
                 {
                     this.dataGridView.RowCount = e.LineCount;
                 }
-                Logger.logDebug("UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
+                _logger.Debug("UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
                 if (e.IsRollover)
                 {
                     // Multifile rollover
@@ -668,9 +669,9 @@ namespace LogExpert
                         {
                             currentLineNum = 0;
                         }
-                        Logger.logDebug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset +
-                                        ", currLineNum was " +
-                                        this.dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
+                        _logger.Debug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset +
+                                      ", currLineNum was " +
+                                      this.dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
                         firstDisplayedLine -= e.RolloverOffset;
                         if (firstDisplayedLine < 0)
                         {
@@ -705,7 +706,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("Fehler bei UpdateGrid(): " + ex + "\n" + ex.StackTrace);
+                _logger.Error("Fehler bei UpdateGrid(): " + ex + "\n" + ex.StackTrace);
             }
 
             //this.dataGridView.Refresh();
@@ -881,7 +882,7 @@ namespace LogExpert
 
         private void SetColumnizerInternal(ILogLineColumnizer columnizer)
         {
-            Logger.logInfo("SetColumnizerInternal(): " + columnizer.GetName());
+            _logger.Info("SetColumnizerInternal(): " + columnizer.GetName());
 
             ILogLineColumnizer oldColumnizer = this.CurrentColumnizer;
             bool oldColumnizerIsXmlType = this.CurrentColumnizer is ILogLineXmlColumnizer;
@@ -1046,8 +1047,8 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                Logger.logError("Error while resizing columns: " + e.Message);
-                Logger.logError(e.StackTrace);
+                _logger.Error("Error while resizing columns: " + e.Message);
+                _logger.Error(e.StackTrace);
             }
         }
 
@@ -1493,7 +1494,7 @@ namespace LogExpert
             }
             catch (Exception e)
             {
-                Logger.logError("SyncFilterGridPos(): " + e.Message);
+                _logger.Error("SyncFilterGridPos(): " + e.Message);
             }
         }
 
@@ -1667,7 +1668,7 @@ namespace LogExpert
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
-                Logger.logError("Error while selecting line: " + e.ToString());
+                _logger.Error("Error while selecting line: " + e.ToString());
             }
         }
 
@@ -1696,7 +1697,7 @@ namespace LogExpert
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
-                Logger.logError("Error while selecting line: " + e.ToString());
+                _logger.Error("Error while selecting line: " + e.ToString());
             }
         }
 
@@ -1735,7 +1736,7 @@ namespace LogExpert
             {
                 int pos = editControl.SelectionStart + editControl.SelectionLength;
                 StatusLineText("   " + pos);
-                Logger.logDebug("SelStart: " + editControl.SelectionStart + ", SelLen: " + editControl.SelectionLength);
+                _logger.Debug("SelStart: " + editControl.SelectionStart + ", SelLen: " + editControl.SelectionLength);
             }
         }
 
@@ -2012,7 +2013,7 @@ namespace LogExpert
 
             long endTime = Environment.TickCount;
 #if DEBUG
-            Logger.logInfo("Multi threaded filter duration: " + (endTime - startTime) + " ms.");
+            _logger.Info("Multi threaded filter duration: " + (endTime - startTime) + " ms.");
 #endif
             DeRegisterCancelHandler(cancelHandler);
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
@@ -2059,15 +2060,15 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" +
-                                ex.StackTrace);
+                _logger.Error("Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" +
+                              ex.StackTrace);
                 MessageBox.Show(null,
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");
             }
             long endTime = Environment.TickCount;
 #if DEBUG
-            Logger.logInfo("Single threaded filter duration: " + (endTime - startTime) + " ms.");
+            _logger.Info("Single threaded filter duration: " + (endTime - startTime) + " ms.");
 #endif
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
         }
@@ -2178,7 +2179,7 @@ namespace LogExpert
         //      this.filterUpdateEvent.Reset();
         //    }
 
-        //    //Logger.logDebug("FilterUpdateWorker: Waiting for signal");
+        //    //_logger.logDebug("FilterUpdateWorker: Waiting for signal");
         //    //bool signaled = this.filterUpdateEvent.WaitOne(1000, false);
 
         //    //if (!signaled)
@@ -2188,21 +2189,21 @@ namespace LogExpert
         //    //    if (this.filterEventCount > 0)
         //    //    {
         //    //      this.filterEventCount = 0;
-        //    //      Logger.logDebug("FilterUpdateWorker: Invoking GUI update because of wait timeout");
+        //    //      _logger.logDebug("FilterUpdateWorker: Invoking GUI update because of wait timeout");
         //    //      this.Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
         //    //    }
         //    //  }
         //    //}
         //    //else
         //    //{
-        //    //  Logger.logDebug("FilterUpdateWorker: Wakeup signal received.");
+        //    //  _logger.logDebug("FilterUpdateWorker: Wakeup signal received.");
         //    //  lock (this.filterUpdateThread)
         //    //  {
-        //    //    Logger.logDebug("FilterUpdateWorker: event count: " + this.filterEventCount);
+        //    //    _logger.logDebug("FilterUpdateWorker: event count: " + this.filterEventCount);
         //    //    if (this.filterEventCount > 100)
         //    //    {
         //    //      this.filterEventCount = 0;
-        //    //      Logger.logDebug("FilterUpdateWorker: Invoking GUI update because of event count");
+        //    //      _logger.logDebug("FilterUpdateWorker: Invoking GUI update because of event count");
         //    //      this.Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
         //    //    }
         //    //    this.filterUpdateEvent.Reset();
@@ -2244,7 +2245,7 @@ namespace LogExpert
             }
             catch (Exception e)
             {
-                Logger.logError("AddFilterLineGuiUpdate(): " + e.Message);
+                _logger.Error("AddFilterLineGuiUpdate(): " + e.Message);
             }
         }
 
@@ -2291,8 +2292,8 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                Logger.logError("Error: " + e.Message);
-                Logger.logError(e.StackTrace);
+                _logger.Error("Error: " + e.Message);
+                _logger.Error(e.StackTrace);
             }
         }
 
@@ -2316,7 +2317,7 @@ namespace LogExpert
             catch (Exception ex)
             {
                 MessageBox.Show(null, ex.StackTrace, "Wieder dieser sporadische Fehler:");
-                Logger.logError("Wieder dieser sporadische Fehler: " + ex + "\n" + ex.StackTrace);
+                _logger.Error("Wieder dieser sporadische Fehler: " + ex + "\n" + ex.StackTrace);
             }
         }
 
@@ -2616,7 +2617,7 @@ namespace LogExpert
         private void WritePipeToTab(FilterPipe pipe, IList<int> lineNumberList, string name,
             PersistenceData persistenceData)
         {
-            Logger.logInfo("WritePipeToTab(): " + lineNumberList.Count + " lines.");
+            _logger.Info("WritePipeToTab(): " + lineNumberList.Count + " lines.");
             StatusLineText("Writing to temp file... Press ESC to cancel.");
             this.guiStateArgs.MenuEnabled = false;
             SendGuiStateUpdate();
@@ -2657,7 +2658,7 @@ namespace LogExpert
                 }
             }
             pipe.CloseFile();
-            Logger.logInfo("WritePipeToTab(): finished");
+            _logger.Info("WritePipeToTab(): finished");
             this.Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished),
                 new object[] {pipe, name, persistenceData});
         }
@@ -2731,7 +2732,7 @@ namespace LogExpert
             }
             else
             {
-                Logger.logWarn("FilterRestore(): Columnizer " + persistenceData.columnizerName + " not found");
+                _logger.Warn("FilterRestore(): Columnizer " + persistenceData.columnizerName + " not found");
             }
             newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
         }
@@ -2789,7 +2790,7 @@ namespace LogExpert
                         pipe.CloseFile();
                     }
                     long endTime = Environment.TickCount;
-                    //Logger.logDebug("ProcessFilterPipes(" + lineNum + ") duration: " + ((endTime - startTime)));
+                    //_logger.logDebug("ProcessFilterPipes(" + lineNum + ") duration: " + ((endTime - startTime)));
                 }
             }
             foreach (FilterPipe pipe in deleteList)
@@ -3005,7 +3006,7 @@ namespace LogExpert
         private void TestStatistic(PatternArgs patternArgs)
         {
             int beginLine = patternArgs.startLine;
-            Logger.logInfo("TestStatistics() called with start line " + beginLine);
+            _logger.Info("TestStatistics() called with start line " + beginLine);
 
             this.patternArgs = patternArgs;
 
@@ -3036,7 +3037,7 @@ namespace LogExpert
                 PatternBlock block;
                 int maxBlockLen = patternArgs.endLine - patternArgs.startLine;
                 //int searchLine = i + 1;
-                Logger.logDebug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
+                _logger.Debug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
                 //bool firstBlock = true;
                 searchLine++;
                 UpdateProgressBar(searchLine);
@@ -3046,7 +3047,7 @@ namespace LogExpert
                                this.patternArgs.maxMisses,
                                processedLinesDict)) != null)
                 {
-                    Logger.logDebug("Found block: " + block);
+                    _logger.Debug("Found block: " + block);
                     if (block.weigth >= this.patternArgs.minWeight)
                     {
                         //PatternBlock existingBlock = FindExistingBlock(block, blockList);
@@ -3089,7 +3090,7 @@ namespace LogExpert
             //  this.Invoke(new MethodInvoker(CreatePatternWindow));
             //}
             this.patternWindow.SetBlockList(blockList, this.patternArgs);
-            Logger.logInfo("TestStatistics() ended");
+            _logger.Info("TestStatistics() ended");
         }
 
         private void addBlockSrcLinesToDict(SortedDictionary<int, int> dict, PatternBlock block)

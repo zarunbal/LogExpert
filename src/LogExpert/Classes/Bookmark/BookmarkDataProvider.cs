@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using NLog;
 
 namespace LogExpert
 {
     internal class BookmarkDataProvider : IBookmarkData
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         #endregion
 
@@ -39,6 +43,48 @@ namespace LogExpert
         public event BookmarkAddedEventHandler BookmarkAdded;
         public event BookmarkRemovedEventHandler BookmarkRemoved;
         public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
+
+        #endregion
+
+        #region Properties
+
+        public BookmarkCollection Bookmarks
+        {
+            get { return new BookmarkCollection(this.BookmarkList); }
+        }
+
+        internal SortedList<int, Bookmark> BookmarkList { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        public void ToggleBookmark(int lineNum)
+        {
+            if (IsBookmarkAtLine(lineNum))
+            {
+                RemoveBookmarkForLine(lineNum);
+            }
+            else
+            {
+                AddBookmark(new Bookmark(lineNum));
+            }
+        }
+
+        public bool IsBookmarkAtLine(int lineNum)
+        {
+            return this.BookmarkList.ContainsKey(lineNum);
+        }
+
+        public int GetBookmarkIndexForLine(int lineNum)
+        {
+            return this.BookmarkList.IndexOfKey(lineNum);
+        }
+
+        public Bookmark GetBookmarkForLine(int lineNum)
+        {
+            return this.BookmarkList[lineNum];
+        }
 
         #endregion
 
@@ -109,7 +155,7 @@ namespace LogExpert
 
         internal void ClearAllBookmarks()
         {
-            Logger.logDebug("Removing all bookmarks");
+            _logger.Debug("Removing all bookmarks");
             this.BookmarkList.Clear();
             OnAllBookmarksRemoved();
         }
@@ -139,44 +185,5 @@ namespace LogExpert
                 AllBookmarksRemoved(this, new EventArgs());
             }
         }
-
-        #region IBookmarkData Member
-
-        public void ToggleBookmark(int lineNum)
-        {
-            if (IsBookmarkAtLine(lineNum))
-            {
-                RemoveBookmarkForLine(lineNum);
-            }
-            else
-            {
-                AddBookmark(new Bookmark(lineNum));
-            }
-        }
-
-        public bool IsBookmarkAtLine(int lineNum)
-        {
-            return this.BookmarkList.ContainsKey(lineNum);
-        }
-
-        public int GetBookmarkIndexForLine(int lineNum)
-        {
-            return this.BookmarkList.IndexOfKey(lineNum);
-        }
-
-        public Bookmark GetBookmarkForLine(int lineNum)
-        {
-            return this.BookmarkList[lineNum];
-        }
-
-
-        public BookmarkCollection Bookmarks
-        {
-            get { return new BookmarkCollection(this.BookmarkList); }
-        }
-
-        internal SortedList<int, Bookmark> BookmarkList { get; set; }
-
-        #endregion
     }
 }

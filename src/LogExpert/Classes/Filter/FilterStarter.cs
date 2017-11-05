@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using NLog;
 
 namespace LogExpert
 {
@@ -9,6 +10,7 @@ namespace LogExpert
 
     internal class FilterStarter
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
         private readonly LogExpert.LogWindow.ColumnizerCallback callback;
@@ -94,7 +96,7 @@ namespace LogExpert
                         break;
                     }
                 }
-                Logger.logInfo("FilterStarter starts worker for line " + workStartLine + ", lineCount " + interval);
+                _logger.Info("FilterStarter starts worker for line " + workStartLine + ", lineCount " + interval);
                 WorkerFx workerFx = new WorkerFx(this.DoWork);
                 IAsyncResult ar = workerFx.BeginInvoke(filterParams, workStartLine, interval, ThreadProgressCallback,
                     FilterDoneCallback, workerFx);
@@ -121,7 +123,7 @@ namespace LogExpert
             this.shouldStop = true;
             lock (this.filterWorkerList)
             {
-                Logger.logInfo("Filter cancel requested. Stopping all " + this.filterWorkerList.Count + " threads.");
+                _logger.Info("Filter cancel requested. Stopping all " + this.filterWorkerList.Count + " threads.");
                 foreach (Filter filter in this.filterWorkerList)
                 {
                     filter.ShouldCancel = true;
@@ -141,7 +143,7 @@ namespace LogExpert
 
         private Filter DoWork(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            Logger.logInfo("Started Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " +
+            _logger.Info("Started Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " +
                            startLine);
 
             // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
@@ -158,7 +160,7 @@ namespace LogExpert
                 return filter;
             }
             int realCount = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
-            Logger.logInfo("Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " + startLine +
+            _logger.Info("Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " + startLine +
                            " has completed.");
             lock (this.filterReadyList)
             {
@@ -182,7 +184,7 @@ namespace LogExpert
 
         private void MergeResults()
         {
-            Logger.logInfo("Merging filter results.");
+            _logger.Info("Merging filter results.");
             foreach (Filter filter in this.filterReadyList)
             {
                 foreach (int lineNum in filter.FilterHitList)
@@ -210,7 +212,7 @@ namespace LogExpert
             this.FilterHitList.AddRange(this.filterHitDict.Keys);
             this.FilterResultLines.AddRange(this.filterResultDict.Keys);
             this.LastFilterLinesList.AddRange(this.lastFilterLinesDict.Keys);
-            Logger.logInfo("Merging done.");
+            _logger.Info("Merging done.");
         }
 
         #endregion

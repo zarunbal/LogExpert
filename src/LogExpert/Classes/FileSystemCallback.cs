@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NLog;
 
 
 namespace LogExpert
@@ -9,15 +10,44 @@ namespace LogExpert
     {
         #region Public methods
 
-        #region IFileSystemCallback Member
-
         public ILogExpertLogger GetLogger()
         {
-            return Logger.GetLogger();
+            return new NLogLogExpertWrapper();
         }
 
         #endregion
 
-        #endregion
+        private class NLogLogExpertWrapper : ILogExpertLogger
+        {
+            #region Fields
+
+            private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+            #endregion
+
+            #region Public methods
+
+            public void Info(string msg)
+            {
+                _logger.Info(msg);
+            }
+
+            public void Debug(string msg)
+            {
+                _logger.Debug(msg);
+            }
+
+            public void LogWarn(string msg)
+            {
+                _logger.Warn(msg);
+            }
+
+            public void LogError(string msg)
+            {
+                _logger.Error(msg);
+            }
+
+            #endregion
+        }
     }
 }

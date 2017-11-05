@@ -6,6 +6,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using NLog;
 
 namespace LogExpert.Dialogs
 {
@@ -13,14 +14,16 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
-        private BookmarkOverlay draggedOverlay;
-        private Point dragStartPoint;
-        private bool isDrag = false;
-        private Size oldOverlayOffset;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         //BufferedGraphics myBuffer;
 
         private readonly SortedList<int, BookmarkOverlay> overlayList = new SortedList<int, BookmarkOverlay>();
+
+        private BookmarkOverlay draggedOverlay;
+        private Point dragStartPoint;
+        private bool isDrag = false;
+        private Size oldOverlayOffset;
 
         #endregion
 
@@ -127,7 +130,7 @@ namespace LogExpert.Dialogs
             }
             catch (Exception ex)
             {
-                Logger.logError(ex.ToString());
+                _logger.Error(ex.ToString());
             }
         }
 
@@ -365,12 +368,12 @@ namespace LogExpert.Dialogs
                         new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
                     myBuffer.Graphics.DrawString(overlay.Bookmark.Text, font, textBrush, textRect, format);
 
-                    if (Logger.IsDebug)
+                    if (_logger.IsDebugEnabled)
                     {
-                        Logger.logDebug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
-                                        myBuffer.Graphics.ClipBounds.Top + "," +
-                                        myBuffer.Graphics.ClipBounds.Width + "," +
-                                        myBuffer.Graphics.ClipBounds.Height);
+                        _logger.Debug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
+                                      myBuffer.Graphics.ClipBounds.Top + "," +
+                                      myBuffer.Graphics.ClipBounds.Width + "," +
+                                      myBuffer.Graphics.ClipBounds.Height);
                     }
                     Rectangle testRect = this.ClientRectangle;
                 }

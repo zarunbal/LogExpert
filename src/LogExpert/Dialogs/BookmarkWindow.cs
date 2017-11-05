@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Dialogs
@@ -10,10 +11,12 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly object paintLock = new object();
+
         private IBookmarkData bookmarkData;
         private ILogPaintContext logPaintContext;
         private ILogView logView;
-        private readonly object paintLock = new object();
 
         #endregion
 
@@ -128,6 +131,45 @@ namespace LogExpert.Dialogs
             HideIfNeeded();
         }
 
+        public void PreferencesChanged(Preferences newPreferences, bool isLoadTime, SettingsFlags flags)
+        {
+            if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
+            {
+                SetFont(newPreferences.fontName, newPreferences.fontSize);
+                if (this.bookmarkDataGridView.Columns.Count > 1 && newPreferences.setLastColumnWidth)
+                {
+                    this.bookmarkDataGridView.Columns[this.bookmarkDataGridView.Columns.Count - 1].MinimumWidth =
+                        newPreferences.lastColumnWidth;
+                }
+                PaintHelper.ApplyDataGridViewPrefs(this.bookmarkDataGridView, newPreferences);
+            }
+        }
+
+        public void SetCurrentFile(FileViewContext ctx)
+        {
+            if (ctx != null)
+            {
+                _logger.Debug("Current file changed to " + ctx.LogView.FileName);
+                lock (this.paintLock)
+                {
+                    this.logView = ctx.LogView;
+                    this.logPaintContext = ctx.LogPaintContext;
+                }
+                this.SetColumnizer(ctx.LogView.CurrentColumnizer);
+            }
+            else
+            {
+                this.logView = null;
+                this.logPaintContext = null;
+            }
+            UpdateView();
+        }
+
+        public void FileChanged()
+        {
+            // nothing to do
+        }
+
         #endregion
 
         #region Overrides
@@ -178,12 +220,12 @@ namespace LogExpert.Dialogs
                 Brush brush;
                 if (gridView.Focused)
                 {
-                    //Logger.logDebug("CellPaint Focus");
+                    //_logger.logDebug("CellPaint Focus");
                     brush = new SolidBrush(e.CellStyle.SelectionBackColor);
                 }
                 else
                 {
-                    //Logger.logDebug("CellPaint No Focus");
+                    //_logger.logDebug("CellPaint No Focus");
                     Color color = Color.FromArgb(255, 170, 170, 170);
                     brush = new SolidBrush(color);
                 }
@@ -284,7 +326,7 @@ namespace LogExpert.Dialogs
                 }
                 catch (Exception ex)
                 {
-                    Logger.logError(ex.StackTrace);
+                    _logger.Error(ex.StackTrace);
                 }
             }
         }
@@ -558,49 +600,6 @@ namespace LogExpert.Dialogs
             //  // redraw the "no bookmarks" display
             //  Invalidate();
             //} 
-        }
-
-        #endregion
-
-        #region ISharedToolWindow Member
-
-        public void PreferencesChanged(Preferences newPreferences, bool isLoadTime, SettingsFlags flags)
-        {
-            if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
-            {
-                SetFont(newPreferences.fontName, newPreferences.fontSize);
-                if (this.bookmarkDataGridView.Columns.Count > 1 && newPreferences.setLastColumnWidth)
-                {
-                    this.bookmarkDataGridView.Columns[this.bookmarkDataGridView.Columns.Count - 1].MinimumWidth =
-                        newPreferences.lastColumnWidth;
-                }
-                PaintHelper.ApplyDataGridViewPrefs(this.bookmarkDataGridView, newPreferences);
-            }
-        }
-
-        public void SetCurrentFile(FileViewContext ctx)
-        {
-            if (ctx != null)
-            {
-                Logger.logDebug("Current file changed to " + ctx.LogView.FileName);
-                lock (this.paintLock)
-                {
-                    this.logView = ctx.LogView;
-                    this.logPaintContext = ctx.LogPaintContext;
-                }
-                this.SetColumnizer(ctx.LogView.CurrentColumnizer);
-            }
-            else
-            {
-                this.logView = null;
-                this.logPaintContext = null;
-            }
-            UpdateView();
-        }
-
-        public void FileChanged()
-        {
-            // nothing to do
         }
 
         #endregion

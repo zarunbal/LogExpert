@@ -4,12 +4,15 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using LogExpert.Dialogs;
+using NLog;
 
 namespace LogExpert
 {
     internal class PaintHelper
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private Color bookmarkColor = Color.FromArgb(165, 200, 225);
 
@@ -130,7 +133,7 @@ namespace LogExpert
             {
                 // Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
                 // Don't know why.
-                Logger.logError(ae.Message);
+                _logger.Error(ae.Message);
             }
 
             DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
@@ -194,8 +197,8 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                Logger.logError("Error while resizing columns: " + e.Message);
-                Logger.logError(e.StackTrace);
+                _logger.Error("Error while resizing columns: " + e.Message);
+                _logger.Error(e.StackTrace);
             }
         }
 

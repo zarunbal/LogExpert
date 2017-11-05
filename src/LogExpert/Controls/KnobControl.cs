@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
+using NLog;
 
 namespace LogExpert
 {
@@ -12,13 +13,15 @@ namespace LogExpert
     {
         #region Fields
 
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+
+        private readonly StringFormat stringFormat = new StringFormat();
+
         private bool isShiftPressed = false;
 
         private int oldValue = 0;
         private int startMouseY = 0;
-
-
-        private readonly StringFormat stringFormat = new StringFormat();
         private int value;
 
         #endregion
@@ -146,7 +149,7 @@ namespace LogExpert
             int sense = this.isShiftPressed ? this.DragSensitivity * 2 : this.DragSensitivity;
 
             int diff = this.startMouseY - e.Y;
-            Logger.logDebug("KnobDiff: " + diff);
+            _logger.Debug("KnobDiff: " + diff);
             int range = this.MaxValue - this.MinValue;
             this.value = this.oldValue + diff / sense;
             if (this.value < this.MinValue)

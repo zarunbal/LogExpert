@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NLog;
 
 
 namespace LogExpert
@@ -11,6 +12,8 @@ namespace LogExpert
     internal class RangeFinder
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly LogExpert.LogWindow.ColumnizerCallback callback;
         private readonly FilterParams filterParams;
@@ -31,16 +34,16 @@ namespace LogExpert
 
         public Range FindRange(int startLine)
         {
-            Logger.logInfo("Starting range search for " + this.filterParams.searchText + " ... " +
-                           this.filterParams.rangeSearchText);
+            _logger.Info("Starting range search for " + this.filterParams.searchText + " ... " +
+                         this.filterParams.rangeSearchText);
             if (this.filterParams.rangeSearchText == null || this.filterParams.rangeSearchText.Trim().Length == 0)
             {
-                Logger.logInfo("Range search text not set. Cancelling range search.");
+                _logger.Info("Range search text not set. Cancelling range search.");
                 return null;
             }
             if (this.filterParams.searchText == null || this.filterParams.searchText.Trim().Length == 0)
             {
-                Logger.logInfo("Search text not set. Cancelling range search.");
+                _logger.Info("Search text not set. Cancelling range search.");
                 return null;
             }
 
@@ -75,7 +78,7 @@ namespace LogExpert
             }
             if (!foundStartLine)
             {
-                Logger.logInfo("Range start not found");
+                _logger.Info("Range start not found");
                 return null;
             }
             range.StartLine = lineNum;
@@ -95,7 +98,7 @@ namespace LogExpert
             lineNum--;
             range.EndLine = lineNum;
 #if DEBUG
-			Logger.logInfo("Range search finished. Found " + (range.EndLine - range.StartLine) + " lines");
+            _logger.Info("Range search finished. Found " + (range.EndLine - range.StartLine) + " lines");
 #endif
             return range;
         }

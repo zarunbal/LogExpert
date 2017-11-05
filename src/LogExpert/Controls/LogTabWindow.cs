@@ -17,12 +17,14 @@ using System.Diagnostics;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security;
+using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
 {
     public partial class LogTabWindow : Form
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
         private const int MAX_HISTORY = 30;
@@ -426,7 +428,7 @@ namespace LogExpert
                     }
                     catch (ArgumentException e)
                     {
-                        Logger.logError("RegEx-error while finding columnizer: " + e.Message);
+                        _logger.Error("RegEx-error while finding columnizer: " + e.Message);
                         // occurs on invalid regex patterns
                     }
                 }
@@ -652,7 +654,7 @@ namespace LogExpert
                 }
                 catch (ArgumentException)
                 {
-                    Logger.logWarn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
+                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
                                    " is not a valid encoding");
                     encodingOptions.DefaultEncoding = null;
                 }
@@ -897,7 +899,7 @@ namespace LogExpert
                     }
                     catch (SecurityException e)
                     {
-                        Logger.logWarn("Insufficient rights for GetFolderPath(): " + e.Message);
+                        _logger.Warn("Insufficient rights for GetFolderPath(): " + e.Message);
                         // no initial directory if insufficient rights
                     }
                 }
@@ -1200,7 +1202,7 @@ namespace LogExpert
 
         private void StatusLineEventWorker(StatusLineEventArgs e)
         {
-            //Logger.logDebug("StatusLineEvent: text = " + e.StatusText);
+            //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
             this.statusLabel.Text = e.StatusText;
             this.linesLabel.Text = "" + e.LineCount + " lines";
             this.sizeLabel.Text = Util.GetFileSizeAsText(e.FileSize);
@@ -1452,7 +1454,7 @@ namespace LogExpert
 
         private void NotifyWindowsForChangedPrefs(SettingsFlags flags)
         {
-            Logger.logInfo("The preferences have changed");
+            _logger.Info("The preferences have changed");
             ApplySettings(ConfigManager.Settings, flags);
 
             lock (this.logWindowList)
@@ -1587,7 +1589,7 @@ namespace LogExpert
                     columnizer = PluginRegistry.GetInstance().RegisteredColumnizers[0];
                 }
 
-                Logger.logInfo("Starting external tool with sysout redirection: " + cmd + " " + args);
+                _logger.Info("Starting external tool with sysout redirection: " + cmd + " " + args);
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardOutput = true;
                 //process.OutputDataReceived += pipe.DataReceivedEventHandler;
@@ -1597,7 +1599,7 @@ namespace LogExpert
                 }
                 catch (Win32Exception e)
                 {
-                    Logger.logError(e.Message);
+                    _logger.Error(e.Message);
                     MessageBox.Show(e.Message);
                     return;
                 }
@@ -1612,7 +1614,7 @@ namespace LogExpert
             }
             else
             {
-                Logger.logInfo("Starting external tool: " + cmd + " " + args);
+                _logger.Info("Starting external tool: " + cmd + " " + args);
                 try
                 {
                     startInfo.UseShellExecute = false;
@@ -1620,7 +1622,7 @@ namespace LogExpert
                 }
                 catch (Exception e)
                 {
-                    Logger.logError(e.Message);
+                    _logger.Error(e.Message);
                     MessageBox.Show(e.Message);
                 }
             }
@@ -1748,20 +1750,20 @@ namespace LogExpert
 
         private void runGC()
         {
-            Logger.logInfo("Running GC. Used mem before: " + GC.GetTotalMemory(false).ToString("N0"));
+            _logger.Info("Running GC. Used mem before: " + GC.GetTotalMemory(false).ToString("N0"));
             GC.Collect();
-            Logger.logInfo("GC done.    Used mem after:  " + GC.GetTotalMemory(true).ToString("N0"));
+            _logger.Info("GC done.    Used mem after:  " + GC.GetTotalMemory(true).ToString("N0"));
         }
 
         private void dumpGCInfo()
         {
-            Logger.logInfo("-------- GC info -----------");
-            Logger.logInfo("Used mem: " + GC.GetTotalMemory(false).ToString("N0"));
+            _logger.Info("-------- GC info -----------");
+            _logger.Info("Used mem: " + GC.GetTotalMemory(false).ToString("N0"));
             for (int i = 0; i < GC.MaxGeneration; ++i)
             {
-                Logger.logInfo("Generation " + i + " collect count: " + GC.CollectionCount(i));
+                _logger.Info("Generation " + i + " collect count: " + GC.CollectionCount(i));
             }
-            Logger.logInfo("----------------------------");
+            _logger.Info("----------------------------");
         }
 
         private void throwExceptionFx()
@@ -1812,7 +1814,7 @@ namespace LogExpert
                 }
                 else
                 {
-                    Logger.logWarn("Layout data contains non-existing LogWindow for " + fileName);
+                    _logger.Warn("Layout data contains non-existing LogWindow for " + fileName);
                 }
             }
             return null;
@@ -2068,7 +2070,7 @@ namespace LogExpert
         s += " , ";
       }
       s = s.Substring(0, s.Length - 3);
-      Logger.logInfo(s);
+      _logger.Info(s);
 #endif
         }
 
@@ -2107,7 +2109,7 @@ namespace LogExpert
         s += " , ";
       }
       s = s.Substring(0, s.Length - 3);
-      Logger.logDebug(s);
+      _logger.Debug(s);
 #endif
 
             object test = e.Data.GetData(DataFormats.StringFormat);
@@ -2392,7 +2394,7 @@ namespace LogExpert
             }
             else
             {
-                Logger.logWarn("Received SyncModeChanged event while disposing. Event ignored.");
+                _logger.Warn("Received SyncModeChanged event while disposing. Event ignored.");
             }
         }
 
@@ -2868,17 +2870,17 @@ namespace LogExpert
 
         private void warnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Logger.GetLogger().LogLevel = Logger.Level.WARN;
+            //_logger.GetLogger().LogLevel = _logger.Level.WARN;
         }
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Logger.GetLogger().LogLevel = Logger.Level.INFO;
+            //_logger.Get_logger().LogLevel = _logger.Level.INFO;
         }
 
         private void debugToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Logger.GetLogger().LogLevel = Logger.Level.DEBUG;
+            //_logger.Get_logger().LogLevel = _logger.Level.DEBUG;
         }
 
         private void loglevelToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2887,9 +2889,9 @@ namespace LogExpert
 
         private void loglevelToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            warnToolStripMenuItem.Checked = Logger.GetLogger().LogLevel == Logger.Level.WARN;
-            infoToolStripMenuItem.Checked = Logger.GetLogger().LogLevel == Logger.Level.INFO;
-            debugToolStripMenuItem1.Checked = Logger.GetLogger().LogLevel == Logger.Level.DEBUG;
+            //warnToolStripMenuItem.Checked = _logger.Get_logger().LogLevel == _logger.Level.WARN;
+            //infoToolStripMenuItem.Checked = _logger.Get_logger().LogLevel == _logger.Level.INFO;
+            //debugToolStripMenuItem1.Checked = _logger.Get_logger().LogLevel == _logger.Level.DEBUG;
         }
 
         private void disableWordHighlightModeToolStripMenuItem_Click(object sender, EventArgs e)

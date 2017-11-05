@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
+using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert
@@ -28,14 +29,27 @@ namespace LogExpert
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        private readonly Image advancedButtonImage;
+
+        private readonly object bookmarkLock = new object();
         private readonly BookmarkDataProvider bookmarkProvider = new BookmarkDataProvider();
+
+        private readonly IList<BackgroundProcessCancelHandler> cancelHandlerList =
+            new List<BackgroundProcessCancelHandler>();
+
         private readonly object currentColumnizerLock = new object();
+
+        private readonly object currentHighlightGroupLock = new object();
 
         private readonly EventWaitHandle externaLoadingFinishedEvent = new ManualResetEvent(false);
 
         private readonly IList<FilterPipe> filterPipeList = new List<FilterPipe>();
         private readonly Dictionary<Control, bool> freezeStateMap = new Dictionary<Control, bool>();
         private readonly GuiStateArgs guiStateArgs = new GuiStateArgs();
+
+        private readonly List<int> lineHashList = new List<int>();
 
         private readonly EventWaitHandle loadingFinishedEvent = new ManualResetEvent(false);
 
@@ -44,11 +58,19 @@ namespace LogExpert
 
         private readonly List<LogEventArgs> logEventArgsList = new List<LogEventArgs>();
         private readonly Thread logEventHandlerThread = null;
+        private readonly Image panelCloseButtonImage;
+
+        private readonly Image panelOpenButtonImage;
         private readonly LogTabWindow parentLogTabWin;
 
         private readonly ProgressEventArgs progressEventArgs = new ProgressEventArgs();
         private readonly object reloadLock = new object();
+        private readonly Image searchButtonImage;
+        private readonly DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
         private readonly StatusLineEventArgs statusEventArgs = new StatusLineEventArgs();
+
+        private readonly DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
+        private readonly object tempHilightEntryListLock = new object();
 
         private readonly Thread timeshiftSyncThread = null;
         private readonly EventWaitHandle timeshiftSyncTimerEvent = new ManualResetEvent(false);
@@ -56,12 +78,7 @@ namespace LogExpert
 
         private readonly TimeSpreadCalculator timeSpreadCalc;
 
-        private readonly Image advancedButtonImage;
-
-        private readonly object bookmarkLock = new object();
-
-        private readonly IList<BackgroundProcessCancelHandler> cancelHandlerList =
-            new List<BackgroundProcessCancelHandler>();
+        private readonly object timeSyncListLock = new object();
 
         private ColumnCache columnCache = new ColumnCache();
 
@@ -70,7 +87,6 @@ namespace LogExpert
         //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
         private HilightGroup currentHighlightGroup = new HilightGroup();
 
-        private readonly object currentHighlightGroupLock = new object();
         private SearchParams currentSearchParams = null;
 
         private string[] fileNames;
@@ -92,36 +108,24 @@ namespace LogExpert
         private bool isTimestampDisplaySyncing = false;
         private List<int> lastFilterLinesList = new List<int>();
 
-        private readonly List<int> lineHashList = new List<int>();
-
         private int lineHeight = 0;
 
         private LogfileReader logFileReader;
         private MultifileOptions multifileOptions = new MultifileOptions();
         private bool noSelectionUpdates = false;
-        private readonly Image panelCloseButtonImage;
-
-        private readonly Image panelOpenButtonImage;
         private PatternArgs patternArgs = new PatternArgs();
         private PatternWindow patternWindow;
 
         private ReloadMemento reloadMemento;
         private int reloadOverloadCounter = 0;
         private SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
-        private readonly Image searchButtonImage;
         private int selectedCol = 0; // set by context menu event for column headers only
-        private readonly DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
         private bool shouldCallTimeSync = false;
         private bool shouldCancel = false;
         private bool shouldTimestampDisplaySyncingCancel = false;
         private bool showAdvanced = false;
-
-        private readonly DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
         private List<HilightEntry> tempHilightEntryList = new List<HilightEntry>();
-        private readonly object tempHilightEntryListLock = new object();
         private int timeshiftSyncLine = 0;
-
-        private readonly object timeSyncListLock = new object();
 
         private bool waitingForClose = false;
 
@@ -353,7 +357,7 @@ namespace LogExpert
                 lock (this.currentColumnizerLock)
                 {
                     this.currentColumnizer = value;
-                    Logger.logDebug("Setting columnizer " + this.currentColumnizer != null
+                    _logger.Debug("Setting columnizer " + this.currentColumnizer != null
                         ? this.currentColumnizer.GetName()
                         : "<none>");
                 }
@@ -428,8 +432,27 @@ namespace LogExpert
             get { return this.bookmarkProvider; }
         }
 
+        public Font MonospacedFont { get; private set; }
+
+        public Font NormalFont { get; private set; }
+
+        public Font BoldFont { get; private set; }
+
         #endregion
 
+        #region Public methods
+
+        public ILogLine GetLogLine(int lineNum)
+        {
+            return this.logFileReader.GetLogLine(lineNum);
+        }
+
+        public Bookmark GetBookmarkForLine(int lineNum)
+        {
+            return this.bookmarkProvider.GetBookmarkForLine(lineNum);
+        }
+
+        #endregion
 
         #region Internals
 
@@ -631,7 +654,7 @@ namespace LogExpert
 
             #endregion
 
-            #region ILogExpertCallback Member
+            #region Public methods
 
             public void AddTempFileTab(string fileName, string title)
             {
@@ -664,25 +687,5 @@ namespace LogExpert
         }
 
 #endif
-
-        #region ILogPaintContext Member
-
-        public ILogLine GetLogLine(int lineNum)
-        {
-            return this.logFileReader.GetLogLine(lineNum);
-        }
-
-        public Bookmark GetBookmarkForLine(int lineNum)
-        {
-            return this.bookmarkProvider.GetBookmarkForLine(lineNum);
-        }
-
-        public Font MonospacedFont { get; private set; }
-
-        public Font NormalFont { get; private set; }
-
-        public Font BoldFont { get; private set; }
-
-        #endregion
     }
 }

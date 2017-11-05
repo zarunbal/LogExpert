@@ -16,14 +16,14 @@ namespace LogExpert
         /// The logger in LogExpert will automatically add the class and the method name of the caller.
         /// </summary>
         /// <param name="msg">A message to be logged.</param>
-        void LogInfo(string msg);
+        void Info(string msg);
 
         /// <summary>
         /// Logs a message on DEBUG level to LogExpert#s log file. The logfile is only active in debug builds.
         /// The logger in LogExpert will automatically add the class and the method name of the caller.
         /// </summary>
         /// <param name="msg">A message to be logged.</param>
-        void LogDebug(string msg);
+        void Debug(string msg);
 
         /// <summary>
         /// Logs a message on WARN level to LogExpert#s log file. The logfile is only active in debug builds.

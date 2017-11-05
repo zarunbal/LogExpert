@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using NLog;
 
 
 namespace LogExpert
@@ -15,6 +16,7 @@ namespace LogExpert
 
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int SPREAD_MAX = 50;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly LogExpert.LogWindow.ColumnizerCallback callback;
 
@@ -94,8 +96,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                Logger.logError("Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" +
-                                ex.StackTrace);
+                _logger.Error(ex, "Exception while filtering. Please report to developer");
                 MessageBox.Show(null,
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");

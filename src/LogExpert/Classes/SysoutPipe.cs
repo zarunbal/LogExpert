@@ -4,12 +4,15 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using NLog;
 
 namespace LogExpert
 {
     internal class SysoutPipe
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly StreamReader sysout;
         private StreamWriter writer;
@@ -22,7 +25,7 @@ namespace LogExpert
         {
             this.sysout = sysout;
             this.FileName = Path.GetTempFileName();
-            Logger.logInfo("sysoutPipe created temp file: " + this.FileName);
+            _logger.Info("sysoutPipe created temp file: " + this.FileName);
             FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
             this.writer = new StreamWriter(fStream, Encoding.Unicode);
             Thread thread = new Thread(new ThreadStart(this.ReaderThread));

@@ -8,12 +8,15 @@ using System.Runtime.Serialization;
 using System.Drawing;
 using System.Collections;
 using System.Reflection;
+using NLog;
 
 namespace LogExpert
 {
     public class ConfigManager
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private static readonly object monitor = new object();
         private static ConfigManager instance = null;
@@ -103,7 +106,7 @@ namespace LogExpert
 
         private Settings Load()
         {
-            Logger.logInfo("Loading settings");
+            _logger.Info("Loading settings");
             string dir = ConfigDir;
             if (!Directory.Exists(dir))
             {
@@ -145,7 +148,7 @@ namespace LogExpert
                     }
                     catch (SerializationException)
                     {
-                        //Logger.logError("Error while deserializing config data: " + e.Message); 
+                        //_logger.Error("Error while deserializing config data: " + e.Message); 
                         settings = new Settings();
                     }
                 }
@@ -245,7 +248,7 @@ namespace LogExpert
         {
             lock (this.loadSaveLock)
             {
-                Logger.logInfo("Saving settings");
+                _logger.Info("Saving settings");
                 lock (this)
                 {
                     string dir = ConfigDir;
@@ -374,7 +377,7 @@ namespace LogExpert
             ConfigChangedEventHandler handler = ConfigChanged;
             if (handler != null)
             {
-                Logger.logInfo("Fire config changed event");
+                _logger.Info("Fire config changed event");
                 handler(this, new ConfigChangedEventArgs(flags));
             }
         }
