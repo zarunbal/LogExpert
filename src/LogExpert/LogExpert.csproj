@@ -479,6 +479,7 @@
     <None Include="Resources\AdvancedIcon2.gif" />
     <None Include="Resources\ArrowDown.gif" />
     <None Include="Resources\ArrowUp.gif" />
+    <Content Include="Licenses\Nlog.license.txt" />
     <Content Include="Resources\bubble.ico" />
     <Content Include="Resources\check-blue.gif" />
     <None Include="Resources\LogExpert-Icon.gif" />
