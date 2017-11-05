@@ -1,7 +1,9 @@
-version: 1.0.{build}
+version: 0.0.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
+before_build:
+- cmd: nuget restore src/LogExpert.sln
 build:
   project: src/LogExpert.sln
   parallel: true
@@ -9,4 +11,4 @@ build:
 test: off
 artifacts:
 - path: bin\Release\
-  name: ci-master
+  name: ci-{APPVEYOR_REPO_BRANCH}
