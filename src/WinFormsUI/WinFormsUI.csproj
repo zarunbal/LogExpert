@@ -205,9 +205,7 @@
     <None Include="Docking\Resources\DockIndicator_PanelTop_Active.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="license.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="license.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Docking\Resources\DockPane_AutoHide.bmp" />
