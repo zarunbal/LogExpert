@@ -11,4 +11,4 @@ build:
 test: off
 artifacts:
 - path: bin\Release\
-  name: ci-{APPVEYOR_REPO_BRANCH}
+  name: ci-Development
