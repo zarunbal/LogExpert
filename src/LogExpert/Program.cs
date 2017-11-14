@@ -20,7 +20,7 @@ namespace LogExpert
     {
         #region Fields
 
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger _logger = LogManager.GetLogger("Program");
 
         #endregion
 
@@ -209,6 +209,8 @@ namespace LogExpert
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
+            _logger.Fatal(e);
+
             //ShowUnhandledException(e.Exception);
             Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
             thread.IsBackground = true;
@@ -219,6 +221,8 @@ namespace LogExpert
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            _logger.Fatal(e);
+
             object exceptionObject = e.ExceptionObject;
             //ShowUnhandledException(exceptionObject);
             Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
