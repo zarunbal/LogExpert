@@ -41,23 +41,7 @@ namespace LogExpert.Dialogs
 
         #endregion
 
-        #region Events handler
-
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            string target = e.Link.LinkData as string;
-            System.Diagnostics.Process.Start(target);
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            SystemInfo info = new SystemInfo();
-            MessageBox.Show(info.Info, "System info");
-        }
-
-        #endregion
-
-        #region Assembly Attribute Accessors
+        #region Properties
 
         public string AssemblyTitle
         {
@@ -119,6 +103,22 @@ namespace LogExpert.Dialogs
                 }
                 return ((AssemblyCopyrightAttribute) attributes[0]).Copyright;
             }
+        }
+
+        #endregion
+
+        #region Events handler
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string target = e.Link.LinkData as string;
+            System.Diagnostics.Process.Start(target);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            SystemInfo info = new SystemInfo();
+            MessageBox.Show(info.Info, "System info");
         }
 
         #endregion

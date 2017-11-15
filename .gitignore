@@ -10,3 +10,4 @@ temp.txt
 *.userprefs
 .vs/
 *.scgdat
+/Data

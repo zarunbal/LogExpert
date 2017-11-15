@@ -80,7 +80,7 @@ namespace LogExpert
                     {
                         if (--retry <= 0)
                         {
-                            _logger.Warn("LogFileInfo.Length: " + e.ToString());
+                            _logger.Warn(e, "LogFileInfo.Length");
                             return -1;
                         }
                         Thread.Sleep(RETRY_SLEEP);
@@ -149,18 +149,16 @@ namespace LogExpert
                 }
                 catch (IOException fe)
                 {
-                    _logger.Debug("LogFileInfo.OpenFile(): " + fe.ToString());
-                    _logger.Debug("Retry counter: " + retry);
+                    _logger.Debug(fe, "LogFileInfo.OpenFile(): \r\nRetry counter {0}", retry);
                     if (--retry <= 0)
                     {
-                        throw fe;
+                        throw;
                     }
                     Thread.Sleep(RETRY_SLEEP);
                 }
                 catch (UnauthorizedAccessException uae)
                 {
-                    _logger.Debug("LogFileInfo.OpenFile(): " + uae.ToString());
-                    _logger.Debug("Retry counter: " + retry);
+                    _logger.Debug(uae, "LogFileInfo.OpenFile(): \r\nRetry counter: {0}", retry);
                     if (--retry <= 0)
                     {
                         throw new IOException("Error opening file", uae);
@@ -184,20 +182,6 @@ namespace LogExpert
         public override string ToString()
         {
             return this.fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static string GetNameFromPath(string fileName)
-        {
-            int i = fileName.LastIndexOf('\\');
-            if (i < 0)
-            {
-                i = -1;
-            }
-            return fileName.Substring(i + 1);
         }
 
         #endregion

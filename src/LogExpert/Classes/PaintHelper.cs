@@ -133,7 +133,7 @@ namespace LogExpert
             {
                 // Occures sometimes on empty gridViews (no lines) if bookmark window was closed and re-opened in floating mode. 
                 // Don't know why.
-                _logger.Error(ae.Message);
+                _logger.Error(ae);
             }
 
             DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
@@ -197,8 +197,7 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                _logger.Error("Error while resizing columns: " + e.Message);
-                _logger.Error(e.StackTrace);
+                _logger.Error(e, "Error while resizing columns: ");
             }
         }
 

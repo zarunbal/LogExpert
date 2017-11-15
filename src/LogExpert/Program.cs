@@ -134,7 +134,7 @@ namespace LogExpert
                 else
                 {
                     int counter = 3;
-                    string errMsg = "";
+                    Exception errMsg = null;
                     IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
                     ChannelServices.RegisterChannel(ipcChannel, false);
                     while (counter > 0)
@@ -157,31 +157,30 @@ namespace LogExpert
                         }
                         catch (RemotingException e)
                         {
-                            _logger.Error("IpcClientChannel error: " + e.Message);
-                            errMsg = e.Message;
+                            _logger.Warn(e, "IpcClientChannel error: ");
+                            errMsg = e;
                             counter--;
                             Thread.Sleep(500);
                         }
                     }
                     if (counter == 0)
                     {
-                        _logger.Error("IpcClientChannel error, giving up: " + errMsg);
-                        MessageBox.Show("Cannot open connection to first instance (" + errMsg + ")", "LogExpert");
+                        _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
+                        MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
                 }
                 mutex.Close();
             }
             catch (Exception ex)
             {
-                _logger.Error("Mutex error, giving up: " + ex.Message);
-                MessageBox.Show("Cannot open connection to first instance (" + ex.Message + ")", "LogExpert");
+                _logger.Error(ex, "Mutex error, giving up: ");
+                MessageBox.Show($"Cannot open connection to first instance ({ex.Message})", "LogExpert");
             }
         }
 
         [STAThread]
         private static void ShowUnhandledException(object exceptionObject)
         {
-            _logger.Error("Exception: " + exceptionObject.ToString());
             string errorText = "";
             string stackTrace = "";
             if (exceptionObject is Exception)

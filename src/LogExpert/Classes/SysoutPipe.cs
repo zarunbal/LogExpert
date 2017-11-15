@@ -25,7 +25,7 @@ namespace LogExpert
         {
             this.sysout = sysout;
             this.FileName = Path.GetTempFileName();
-            _logger.Info("sysoutPipe created temp file: " + this.FileName);
+            _logger.Info("sysoutPipe created temp file: {0}", this.FileName);
             FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
             this.writer = new StreamWriter(fStream, Encoding.Unicode);
             Thread thread = new Thread(new ThreadStart(this.ReaderThread));
@@ -81,8 +81,9 @@ namespace LogExpert
                     }
                     writer.Write(buff, 0, read);
                 }
-                catch (IOException)
+                catch (IOException e)
                 {
+                    _logger.Error(e);
                     break;
                 }
             }

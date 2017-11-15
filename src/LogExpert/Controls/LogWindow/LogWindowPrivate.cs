@@ -75,7 +75,7 @@ namespace LogExpert
 
                 if (persistenceData == null)
                 {
-                    _logger.Info("No persistence data for " + this.FileName + " found.");
+                    _logger.Info("No persistence data for {0} found.", this.FileName);
                     return false;
                 }
 
@@ -119,7 +119,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                _logger.Error("Error loading persistence data: " + ex.Message);
+                _logger.Error(ex, "Error loading persistence data: ");
                 return false;
             }
         }
@@ -170,7 +170,7 @@ namespace LogExpert
                 {
                     // outdated persistence data (logfile rollover)
                     // MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
-                    _logger.Info("Persistence data for " + this.FileName + " is outdated. It was discarded.");
+                    _logger.Info("Persistence data for {0} is outdated. It was discarded.", this.FileName);
                     LoadPersistenceOptions();
                     return;
                 }
@@ -213,7 +213,7 @@ namespace LogExpert
             catch (IOException ex)
             {
                 SetDefaultsFromPrefs();
-                _logger.Error("Error loading bookmarks: " + ex.Message);
+                _logger.Error(ex, "Error loading bookmarks: ");
             }
         }
 
@@ -233,7 +233,7 @@ namespace LogExpert
             }
             catch (InvalidOperationException e)
             {
-                _logger.Error("Error setting splitter distance: " + e.Message);
+                _logger.Error(e, "Error setting splitter distance: ");
             }
             ShowAdvancedFilterPanel(persistenceData.filterAdvanced);
             if (this.filterPipeList.Count == 0) // don't restore if it's only a reload
@@ -451,7 +451,7 @@ namespace LogExpert
             lock (this.reloadLock)
             {
                 this.reloadOverloadCounter++;
-                _logger.Info("ReloadNewFile(): counter = " + this.reloadOverloadCounter);
+                _logger.Info("ReloadNewFile(): counter = {0}", this.reloadOverloadCounter);
                 if (this.reloadOverloadCounter <= 1)
                 {
                     SavePersistenceData(false);
@@ -511,7 +511,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                _logger.Error("UpdateProgress(): \n" + ex + "\n" + ex.StackTrace);
+                _logger.Error(ex, "UpdateProgress(): ");
             }
         }
 
@@ -529,7 +529,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                _logger.Error("LoadingStarted(): " + ex + "\n" + ex.StackTrace);
+                _logger.Error(ex, "LoadingStarted(): ");
             }
         }
 
@@ -578,7 +578,7 @@ namespace LogExpert
                     int lastLineCount = 0;
                     lock (this.logEventArgsList)
                     {
-                        _logger.Info("" + this.logEventArgsList.Count + " events in queue");
+                        _logger.Info("{0} events in queue", this.logEventArgsList.Count);
                         if (this.logEventArgsList.Count == 0)
                         {
                             this.logEventArgsEvent.Reset();
@@ -598,9 +598,7 @@ namespace LogExpert
                     {
                         if (e.LineCount < lastLineCount)
                         {
-                            _logger.Error("Line count of event is: " + e.LineCount +
-                                          ", should be greater than last line count: " +
-                                          lastLineCount);
+                            _logger.Error("Line count of event is: {0}, should be greater than last line count: {1}", e.LineCount, lastLineCount);
                         }
                     }
                     UpdateGridCallback callback = new UpdateGridCallback(UpdateGrid);
@@ -656,7 +654,7 @@ namespace LogExpert
                 {
                     this.dataGridView.RowCount = e.LineCount;
                 }
-                _logger.Debug("UpdateGrid(): new RowCount=" + this.dataGridView.RowCount);
+                _logger.Debug("UpdateGrid(): new RowCount={0}", this.dataGridView.RowCount);
                 if (e.IsRollover)
                 {
                     // Multifile rollover
@@ -669,9 +667,7 @@ namespace LogExpert
                         {
                             currentLineNum = 0;
                         }
-                        _logger.Debug("UpdateGrid(): Rollover=true, Rollover offset=" + e.RolloverOffset +
-                                      ", currLineNum was " +
-                                      this.dataGridView.CurrentCellAddress.Y + ", new currLineNum=" + currentLineNum);
+                        _logger.Debug("UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}", e.RolloverOffset, this.dataGridView.CurrentCellAddress.Y, currentLineNum);
                         firstDisplayedLine -= e.RolloverOffset;
                         if (firstDisplayedLine < 0)
                         {
@@ -706,7 +702,7 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                _logger.Error("Fehler bei UpdateGrid(): " + ex + "\n" + ex.StackTrace);
+                _logger.Error(ex, "Fehler bei UpdateGrid(): ");
             }
 
             //this.dataGridView.Refresh();
@@ -882,7 +878,7 @@ namespace LogExpert
 
         private void SetColumnizerInternal(ILogLineColumnizer columnizer)
         {
-            _logger.Info("SetColumnizerInternal(): " + columnizer.GetName());
+            _logger.Info("SetColumnizerInternal(): {0}", columnizer.GetName());
 
             ILogLineColumnizer oldColumnizer = this.CurrentColumnizer;
             bool oldColumnizerIsXmlType = this.CurrentColumnizer is ILogLineXmlColumnizer;
@@ -1047,8 +1043,7 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                _logger.Error("Error while resizing columns: " + e.Message);
-                _logger.Error(e.StackTrace);
+                _logger.Error(e, "Error while resizing columns: ");
             }
         }
 
@@ -1494,7 +1489,7 @@ namespace LogExpert
             }
             catch (Exception e)
             {
-                _logger.Error("SyncFilterGridPos(): " + e.Message);
+                _logger.Error(e, "SyncFilterGridPos(): ");
             }
         }
 
@@ -1668,7 +1663,7 @@ namespace LogExpert
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
-                _logger.Error("Error while selecting line: " + e.ToString());
+                _logger.Error(e, "Error while selecting line: ");
             }
         }
 
@@ -1697,7 +1692,7 @@ namespace LogExpert
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
-                _logger.Error("Error while selecting line: " + e.ToString());
+                _logger.Error(e, "Error while selecting line: ");
             }
         }
 
@@ -1736,7 +1731,7 @@ namespace LogExpert
             {
                 int pos = editControl.SelectionStart + editControl.SelectionLength;
                 StatusLineText("   " + pos);
-                _logger.Debug("SelStart: " + editControl.SelectionStart + ", SelLen: " + editControl.SelectionLength);
+                _logger.Debug("SelStart: {0}, SelLen: {1}", editControl.SelectionStart, editControl.SelectionLength);
             }
         }
 
@@ -2012,9 +2007,9 @@ namespace LogExpert
             fs.DoFilter(filterParams, 0, this.logFileReader.LineCount, FilterProgressCallback);
 
             long endTime = Environment.TickCount;
-#if DEBUG
-            _logger.Info("Multi threaded filter duration: " + (endTime - startTime) + " ms.");
-#endif
+
+            _logger.Debug("Multi threaded filter duration: {0} ms.", endTime - startTime);
+
             DeRegisterCancelHandler(cancelHandler);
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
         }
@@ -2060,16 +2055,15 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
-                _logger.Error("Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" +
-                              ex.StackTrace);
+                _logger.Error(ex, "Exception while filtering. Please report to developer: ");
                 MessageBox.Show(null,
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");
             }
             long endTime = Environment.TickCount;
-#if DEBUG
-            _logger.Info("Single threaded filter duration: " + (endTime - startTime) + " ms.");
-#endif
+
+            _logger.Info("Single threaded filter duration: {0} ms.", endTime - startTime);
+
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
         }
 
@@ -2245,7 +2239,7 @@ namespace LogExpert
             }
             catch (Exception e)
             {
-                _logger.Error("AddFilterLineGuiUpdate(): " + e.Message);
+                _logger.Error(e, "AddFilterLineGuiUpdate(): ");
             }
         }
 
@@ -2292,8 +2286,7 @@ namespace LogExpert
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
-                _logger.Error("Error: " + e.Message);
-                _logger.Error(e.StackTrace);
+                _logger.Error(e, "Error: ");
             }
         }
 
@@ -2316,8 +2309,9 @@ namespace LogExpert
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "Wieder dieser sporadische Fehler: ");
+
                 MessageBox.Show(null, ex.StackTrace, "Wieder dieser sporadische Fehler:");
-                _logger.Error("Wieder dieser sporadische Fehler: " + ex + "\n" + ex.StackTrace);
             }
         }
 
@@ -2617,7 +2611,7 @@ namespace LogExpert
         private void WritePipeToTab(FilterPipe pipe, IList<int> lineNumberList, string name,
             PersistenceData persistenceData)
         {
-            _logger.Info("WritePipeToTab(): " + lineNumberList.Count + " lines.");
+            _logger.Info("WritePipeToTab(): {0} lines.", lineNumberList.Count);
             StatusLineText("Writing to temp file... Press ESC to cancel.");
             this.guiStateArgs.MenuEnabled = false;
             SendGuiStateUpdate();
@@ -2732,7 +2726,7 @@ namespace LogExpert
             }
             else
             {
-                _logger.Warn("FilterRestore(): Columnizer " + persistenceData.columnizerName + " not found");
+                _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
             newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
         }
@@ -3006,7 +3000,7 @@ namespace LogExpert
         private void TestStatistic(PatternArgs patternArgs)
         {
             int beginLine = patternArgs.startLine;
-            _logger.Info("TestStatistics() called with start line " + beginLine);
+            _logger.Info("TestStatistics() called with start line {0}", beginLine);
 
             this.patternArgs = patternArgs;
 
@@ -3037,7 +3031,7 @@ namespace LogExpert
                 PatternBlock block;
                 int maxBlockLen = patternArgs.endLine - patternArgs.startLine;
                 //int searchLine = i + 1;
-                _logger.Debug("TestStatistic(): i=" + i + " searchLine=" + searchLine);
+                _logger.Debug("TestStatistic(): i={0} searchLine={1}", i, searchLine);
                 //bool firstBlock = true;
                 searchLine++;
                 UpdateProgressBar(searchLine);
@@ -3047,7 +3041,7 @@ namespace LogExpert
                                this.patternArgs.maxMisses,
                                processedLinesDict)) != null)
                 {
-                    _logger.Debug("Found block: " + block);
+                    _logger.Debug("Found block: {0}", block);
                     if (block.weigth >= this.patternArgs.minWeight)
                     {
                         //PatternBlock existingBlock = FindExistingBlock(block, blockList);

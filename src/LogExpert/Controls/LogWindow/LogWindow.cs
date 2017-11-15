@@ -357,9 +357,7 @@ namespace LogExpert
                 lock (this.currentColumnizerLock)
                 {
                     this.currentColumnizer = value;
-                    _logger.Debug("Setting columnizer " + this.currentColumnizer != null
-                        ? this.currentColumnizer.GetName()
-                        : "<none>");
+                    _logger.Debug("Setting columnizer {0} ", currentColumnizer.GetName());
                 }
             }
         }

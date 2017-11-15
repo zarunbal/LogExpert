@@ -149,7 +149,7 @@ namespace LogExpert
             int sense = this.isShiftPressed ? this.DragSensitivity * 2 : this.DragSensitivity;
 
             int diff = this.startMouseY - e.Y;
-            _logger.Debug("KnobDiff: " + diff);
+            _logger.Debug("KnobDiff: {0}", diff);
             int range = this.MaxValue - this.MinValue;
             this.value = this.oldValue + diff / sense;
             if (this.value < this.MinValue)

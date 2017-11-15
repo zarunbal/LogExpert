@@ -130,7 +130,7 @@ namespace LogExpert.Dialogs
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.ToString());
+                _logger.Error(ex);
             }
         }
 
@@ -370,10 +370,7 @@ namespace LogExpert.Dialogs
 
                     if (_logger.IsDebugEnabled)
                     {
-                        _logger.Debug("ClipRgn: " + myBuffer.Graphics.ClipBounds.Left + "," +
-                                      myBuffer.Graphics.ClipBounds.Top + "," +
-                                      myBuffer.Graphics.ClipBounds.Width + "," +
-                                      myBuffer.Graphics.ClipBounds.Height);
+                        _logger.Debug("ClipRgn: {0},{1},{2},{3}", myBuffer.Graphics.ClipBounds.Left, myBuffer.Graphics.ClipBounds.Top, myBuffer.Graphics.ClipBounds.Width, myBuffer.Graphics.ClipBounds.Height);
                     }
                     Rectangle testRect = this.ClientRectangle;
                 }

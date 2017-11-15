@@ -146,9 +146,9 @@ namespace LogExpert
                     {
                         settings = (Settings) formatter.Deserialize(fs);
                     }
-                    catch (SerializationException)
+                    catch (SerializationException e)
                     {
-                        //_logger.Error("Error while deserializing config data: " + e.Message); 
+                        _logger.Error(e, "Error while deserializing config data: ");
                         settings = new Settings();
                     }
                 }

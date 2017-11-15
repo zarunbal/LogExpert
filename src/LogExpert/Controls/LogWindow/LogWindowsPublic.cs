@@ -98,7 +98,7 @@ namespace LogExpert
                     this.logFileReader.PreProcessColumnizer = null;
                 }
                 RegisterLogFileReaderEvents();
-                _logger.Info("Loading logfile: " + fileName);
+                _logger.Info("Loading logfile: {0}", fileName);
                 this.logFileReader.startMonitoring();
             }
         }
@@ -111,7 +111,7 @@ namespace LogExpert
 
             foreach (string name in fileNames)
             {
-                _logger.Info("File: " + name);
+                _logger.Info("File: {0}", name);
             }
             if (this.logFileReader != null)
             {
@@ -163,11 +163,11 @@ namespace LogExpert
             }
             catch (IOException ex)
             {
-                _logger.Error("Error saving persistence: " + ex.Message);
+                _logger.Error(ex, "Error saving persistence: ");
             }
             catch (Exception e)
             {
-                MessageBox.Show("Unexpected error while saving persistence: " + e.Message);
+                MessageBox.Show($"Unexpected error while saving persistence: {e.Message}");
             }
             return null;
         }
@@ -248,14 +248,14 @@ namespace LogExpert
             }
             if (this.IsTempFile)
             {
-                _logger.Info("Deleting temp file " + this.FileName);
+                _logger.Info("Deleting temp file {0}", this.FileName);
                 try
                 {
                     File.Delete(this.FileName);
                 }
                 catch (IOException e)
                 {
-                    _logger.Error("Error while deleting temp file " + this.FileName + ": " + e.ToString());
+                    _logger.Error(e, "Error while deleting temp file {0}: {1}", this.FileName, e);
                 }
             }
             if (this.FilterPipe != null)
@@ -655,7 +655,7 @@ namespace LogExpert
             {
                 // In rare situations there seems to be an invalid argument exceptions (or something like this). Concrete location isn't visible in stack
                 // trace because use of Invoke(). So catch it, and log (better than crashing the app).
-                _logger.Error(e.ToString());
+                _logger.Error(e);
             }
         }
 
@@ -805,8 +805,7 @@ namespace LogExpert
                         }
                         if (_logger.IsDebugEnabled)
                         {
-                            _logger.Debug("AddBookmarkOverlay() r.Location=" + r.Location.X + ", width=" + r.Width +
-                                          ", scroll_offset=" + this.dataGridView.HorizontalScrollingOffset);
+                            _logger.Debug("AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}", r.Location.X, r.Width, this.dataGridView.HorizontalScrollingOffset);
                         }
                         overlay.Position = r.Location - new Size(this.dataGridView.HorizontalScrollingOffset, 0);
                         overlay.Position = overlay.Position + new Size(10, r.Height / 2);
@@ -1059,7 +1058,7 @@ namespace LogExpert
                 }
                 catch (FormatException ex)
                 {
-                    _logger.Error(ex.StackTrace);
+                    _logger.Error(ex);
                 }
             }
         }
@@ -1324,9 +1323,7 @@ namespace LogExpert
         public int FindTimestampLine_Internal(int lineNum, int rangeStart, int rangeEnd, DateTime timestamp,
             bool roundToSeconds)
         {
-            _logger.Debug("FindTimestampLine_Internal(): timestamp=" + timestamp + ", lineNum=" + lineNum +
-                          ", rangeStart=" +
-                          rangeStart + ", rangeEnd=" + rangeEnd);
+            _logger.Debug("FindTimestampLine_Internal(): timestamp={0}, lineNum={1}, rangeStart={2}, rangeEnd={3}", timestamp, lineNum, rangeStart, rangeEnd);
             int refLine = lineNum;
             DateTime currentTimestamp = GetTimestampForLine(ref refLine, roundToSeconds);
             if (currentTimestamp.CompareTo(timestamp) == 0)
@@ -1383,7 +1380,7 @@ namespace LogExpert
                 {
                     return DateTime.MinValue;
                 }
-                _logger.Debug("GetTimestampForLine(" + lineNum + ") enter");
+                _logger.Debug("GetTimestampForLine({0}) enter", lineNum);
                 DateTime timeStamp = DateTime.MinValue;
                 bool lookBack = false;
                 if (lineNum >= 0 && lineNum < this.dataGridView.RowCount)
@@ -1413,7 +1410,7 @@ namespace LogExpert
                 {
                     lineNum++;
                 }
-                _logger.Debug("GetTimestampForLine() leave with lineNum=" + lineNum);
+                _logger.Debug("GetTimestampForLine() leave with lineNum={0}", lineNum);
                 return timeStamp;
             }
         }
@@ -1747,8 +1744,7 @@ namespace LogExpert
 
         public void AddToTimeSync(LogWindow master)
         {
-            _logger.Info("Syncing window for " + Util.GetNameFromPath(this.FileName) + " to " +
-                         Util.GetNameFromPath(master.FileName));
+            _logger.Info("Syncing window for {0} to {1}", Util.GetNameFromPath(this.FileName), Util.GetNameFromPath(master.FileName));
             lock (this.timeSyncListLock)
             {
                 if (this.IsTimeSynced && master.TimeSyncList != this.TimeSyncList)
@@ -1769,7 +1765,7 @@ namespace LogExpert
             {
                 if (this.TimeSyncList != null)
                 {
-                    _logger.Info("De-Syncing window for " + Util.GetNameFromPath(this.FileName));
+                    _logger.Info("De-Syncing window for {0}", Util.GetNameFromPath(this.FileName));
                     this.TimeSyncList.WindowRemoved -= timeSyncList_WindowRemoved;
                     this.TimeSyncList.RemoveWindow(this);
                     this.TimeSyncList = null;

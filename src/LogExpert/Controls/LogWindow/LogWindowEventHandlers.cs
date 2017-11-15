@@ -144,7 +144,7 @@ namespace LogExpert
         private void FileSizeChangedHandler(object sender, LogEventArgs e)
         {
             //OnFileSizeChanged(e);  // now done in UpdateGrid()
-            _logger.Info("Got FileSizeChanged event. prevLines:" + e.PrevLineCount + ", curr lines: " + e.LineCount);
+            _logger.Info("Got FileSizeChanged event. prevLines:{0}, curr lines: {1}", e.PrevLineCount, e.LineCount);
 
             // - now done in the thread that works on the event args list
             //if (e.IsRollover)

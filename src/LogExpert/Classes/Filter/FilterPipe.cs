@@ -27,7 +27,7 @@ namespace LogExpert
             this.IsStopped = false;
             this.FileName = Path.GetTempFileName();
 
-            _logger.Info("Created temp file: " + this.FileName);
+            _logger.Info("Created temp file: {0}", this.FileName);
         }
 
         #endregion

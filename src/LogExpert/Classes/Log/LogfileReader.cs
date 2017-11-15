@@ -229,7 +229,7 @@ namespace LogExpert
             }
             catch (IOException e)
             {
-                _logger.Warn("IOException: " + e.Message);
+                _logger.Warn(e, "IOException");
                 fileLength = 0;
                 isDeleted = true;
                 LineCount = 0;
@@ -248,7 +248,7 @@ namespace LogExpert
         /// <returns></returns>
         public int ShiftBuffers()
         {
-            _logger.Info("ShiftBuffers() begin for " + this.fileName + (IsMultiFile ? " (MultiFile)" : ""));
+            _logger.Info("ShiftBuffers() begin for {0}{1}", this.fileName, IsMultiFile ? " (MultiFile)" : "");
             AcquireBufferListWriterLock();
             int offset = 0;
             isLineCountDirty = true;
@@ -267,20 +267,18 @@ namespace LogExpert
                 {
                     ILogFileInfo logFileInfo = enumerator.Current;
                     string fileName = logFileInfo.FullName;
-                    _logger.Debug("Testing file " + fileName);
+                    _logger.Debug("Testing file {0}", fileName);
                     LinkedListNode<string> node = fileNameList.Find(fileName);
                     if (node == null)
                     {
-                        _logger.Warn("File " + fileName + " not found");
+                        _logger.Warn("File {0} not found", fileName);
                         continue;
                     }
                     if (node.Previous != null)
                     {
                         fileName = node.Previous.Value;
                         ILogFileInfo newILogFileInfo = GetLogFileInfo(fileName);
-                        _logger.Debug(fileName + " exists");
-                        _logger.Debug("Old size=" + logFileInfo.OriginalLength + ", new size=" +
-                                      newILogFileInfo.Length);
+                        _logger.Debug("{0} exists\r\nOld size={1}, new size={2}", fileName, logFileInfo.OriginalLength, newILogFileInfo.Length);
                         // is the new file the same as the old buffer info?
                         if (newILogFileInfo.Length == logFileInfo.OriginalLength)
                         {
@@ -289,7 +287,7 @@ namespace LogExpert
                         }
                         else
                         {
-                            _logger.Debug("Buffer for " + fileName + " must be re-read.");
+                            _logger.Debug("Buffer for {0} must be re-read.", fileName);
                             // not the same. so must read the rest of the list anew from the files
                             readNewILogFileInfoList.Add(newILogFileInfo);
                             while (enumerator.MoveNext())
@@ -298,25 +296,25 @@ namespace LogExpert
                                 node = fileNameList.Find(fileName);
                                 if (node == null)
                                 {
-                                    _logger.Warn("File " + fileName + " not found");
+                                    _logger.Warn("File {0} not found", fileName);
                                     continue;
                                 }
                                 if (node.Previous != null)
                                 {
                                     fileName = node.Previous.Value;
-                                    _logger.Debug("New name is " + fileName);
+                                    _logger.Debug("New name is {0}", fileName);
                                     readNewILogFileInfoList.Add(GetLogFileInfo(fileName));
                                 }
                                 else
                                 {
-                                    _logger.Warn("No previous file for " + fileName + " found");
+                                    _logger.Warn("No previous file for {0} found", fileName);
                                 }
                             }
                         }
                     }
                     else
                     {
-                        _logger.Info(fileName + " does not exist");
+                        _logger.Info("{0} does not exist", fileName);
                         lostILogFileInfoList.Add(logFileInfo);
 #if DEBUG // for better overview in logfile:
 //ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
@@ -337,8 +335,7 @@ namespace LogExpert
                         }
                     }
                     lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-                    _logger.Info("Adjusting StartLine values in " + bufferList.Count + " buffers by offset " +
-                                 offset);
+                    _logger.Info("Adjusting StartLine values in {0} buffers by offset {1}", bufferList.Count, offset);
                     foreach (LogBuffer buffer in bufferList)
                     {
                         SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
@@ -347,7 +344,7 @@ namespace LogExpert
 #if DEBUG
                     if (bufferList.Count > 0)
                     {
-                        _logger.Info("First buffer now has StartLine " + bufferList[0].StartLine);
+                        _logger.Debug("First buffer now has StartLine {0}", bufferList[0].StartLine);
                     }
 #endif
                 }
@@ -376,7 +373,7 @@ namespace LogExpert
                 _logger.Info("Reading watched file");
                 ReadToBufferList(watchedILogFileInfo, 0, LineCount);
             }
-            _logger.Info("ShiftBuffers() end. offset=" + offset);
+            _logger.Info("ShiftBuffers() end. offset={0}", offset);
             ReleaseBufferListWriterLock();
             return offset;
         }
@@ -420,9 +417,8 @@ namespace LogExpert
                 {
                     _logLineFx.EndInvoke(asyncResult); // must be called according to MSDN docs... :(
                     isFastFailOnGetLogLine = true;
-#if DEBUG
-                    _logger.Debug("No result after " + WAIT_TIME + "ms. Returning <null>.");
-#endif
+
+                    _logger.Debug("No result after {0}ms. Returning <null>.", WAIT_TIME);
                 }
             }
             else
@@ -608,11 +604,10 @@ namespace LogExpert
         {
             if (contentDeleted)
             {
-                _logger.Debug("Buffers for " + Util.GetNameFromPath(fileName) + " already deleted.");
+                _logger.Debug("Buffers for {0} already deleted.", Util.GetNameFromPath(fileName));
                 return;
             }
-            _logger.Info("Deleting all log buffers for " + Util.GetNameFromPath(fileName) + ". Used mem: " +
-                         GC.GetTotalMemory(true).ToString("N0"));
+            _logger.Info("Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(fileName), GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
             AcquireBufferListWriterLock();
             lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
             disposeLock.AcquireWriterLock(Timeout.Infinite);
@@ -632,7 +627,7 @@ namespace LogExpert
             ReleaseBufferListWriterLock();
             GC.Collect();
             contentDeleted = true;
-            _logger.Info("Deleting complete. Used mem: " + GC.GetTotalMemory(true).ToString("N0"));
+            _logger.Info("Deleting complete. Used mem: {0:N0}", GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
         }
 
         /// <summary>

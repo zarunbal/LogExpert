@@ -34,8 +34,7 @@ namespace LogExpert
 
         public Range FindRange(int startLine)
         {
-            _logger.Info("Starting range search for " + this.filterParams.searchText + " ... " +
-                         this.filterParams.rangeSearchText);
+            _logger.Info("Starting range search for {0} ... {1}", this.filterParams.searchText, this.filterParams.rangeSearchText);
             if (this.filterParams.rangeSearchText == null || this.filterParams.rangeSearchText.Trim().Length == 0)
             {
                 _logger.Info("Range search text not set. Cancelling range search.");
@@ -97,9 +96,9 @@ namespace LogExpert
             }
             lineNum--;
             range.EndLine = lineNum;
-#if DEBUG
-            _logger.Info("Range search finished. Found " + (range.EndLine - range.StartLine) + " lines");
-#endif
+
+            _logger.Info("Range search finished. Found {0} lines", range.EndLine - range.StartLine);
+
             return range;
         }
 

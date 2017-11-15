@@ -124,7 +124,7 @@ namespace LogExpert
                                                 this.pluginList.Add(o as ILogExpertPlugin);
                                                 (o as ILogExpertPlugin).PluginLoaded();
                                             }
-                                            _logger.Info("Added columnizer " + type.Name);
+                                            _logger.Info("Added columnizer {0}", type.Name);
                                         }
                                     }
                                 }
@@ -146,14 +146,15 @@ namespace LogExpert
                             }
                         }
                     }
-                    catch (BadImageFormatException)
+                    catch (BadImageFormatException e)
                     {
+                        _logger.Error(e, dllName);
                         // nothing... could be a DLL which is needed by any plugin
                     }
                     catch (FileLoadException e)
                     {
                         // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
-                        _logger.Error(e.Message);
+                        _logger.Error(e, dllName);
                     }
                 }
             }
@@ -179,24 +180,24 @@ namespace LogExpert
         {
             if (_logger.IsDebugEnabled)
             {
-                _logger.Debug("Trying to find file system plugin for uri " + uriString);
+                _logger.Debug("Trying to find file system plugin for uri {0}", uriString);
             }
             foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
             {
                 if (_logger.IsDebugEnabled)
                 {
-                    _logger.Debug("Checking " + fs.Text);
+                    _logger.Debug("Checking {0}", fs.Text);
                 }
                 if (fs.CanHandleUri(uriString))
                 {
                     if (_logger.IsDebugEnabled)
                     {
-                        _logger.Debug("Found match " + fs.Text);
+                        _logger.Debug("Found match {0}", fs.Text);
                     }
                     return fs;
                 }
             }
-            _logger.Error("No file system plugin found for uri " + uriString);
+            _logger.Error("No file system plugin found for uri {0}", uriString);
             return null;
         }
 
@@ -219,7 +220,7 @@ namespace LogExpert
                     this.pluginList.Add(me as ILogExpertPlugin);
                     (me as ILogExpertPlugin).PluginLoaded();
                 }
-                _logger.Info("Added context menu plugin " + type.Name);
+                _logger.Info("Added context menu plugin {0}", type);
                 return true;
             }
             return false;
@@ -241,7 +242,7 @@ namespace LogExpert
                     this.pluginList.Add(ka as ILogExpertPlugin);
                     (ka as ILogExpertPlugin).PluginLoaded();
                 }
-                _logger.Info("Added keyword plugin " + type.Name);
+                _logger.Info("Added keyword plugin {0}", type);
                 return true;
             }
             return false;
@@ -267,7 +268,7 @@ namespace LogExpert
                     this.pluginList.Add(fs as ILogExpertPlugin);
                     (fs as ILogExpertPlugin).PluginLoaded();
                 }
-                _logger.Info("Added file system plugin " + type.Name);
+                _logger.Info("Added file system plugin {0}", type);
                 return true;
             }
             return false;

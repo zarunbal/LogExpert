@@ -383,12 +383,12 @@ namespace LogExpert
                 }
                 catch (ArgumentException e)
                 {
-                    _logger.Error(e.Message);
+                    _logger.Error(e);
                     return Encoding.Default;
                 }
                 catch (NotSupportedException e)
                 {
-                    _logger.Error(e.Message);
+                    _logger.Error(e);
                     return Encoding.Default;
                 }
             }
@@ -433,7 +433,7 @@ namespace LogExpert
                     }
                     if (line == null || posX == null || posY == null)
                     {
-                        _logger.Error("Invalid XML format for bookmark: " + node.InnerText);
+                        _logger.Error("Invalid XML format for bookmark: {0}", node.InnerText);
                         continue;
                     }
                     int lineNum = int.Parse(line);

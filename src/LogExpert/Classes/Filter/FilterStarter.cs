@@ -10,8 +10,9 @@ namespace LogExpert
 
     internal class FilterStarter
     {
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly LogExpert.LogWindow.ColumnizerCallback callback;
         private readonly SortedDictionary<int, int> filterHitDict;
@@ -96,7 +97,7 @@ namespace LogExpert
                         break;
                     }
                 }
-                _logger.Info("FilterStarter starts worker for line " + workStartLine + ", lineCount " + interval);
+                _logger.Info("FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
                 WorkerFx workerFx = new WorkerFx(this.DoWork);
                 IAsyncResult ar = workerFx.BeginInvoke(filterParams, workStartLine, interval, ThreadProgressCallback,
                     FilterDoneCallback, workerFx);
@@ -123,7 +124,7 @@ namespace LogExpert
             this.shouldStop = true;
             lock (this.filterWorkerList)
             {
-                _logger.Info("Filter cancel requested. Stopping all " + this.filterWorkerList.Count + " threads.");
+                _logger.Info("Filter cancel requested. Stopping all {0} threads.", this.filterWorkerList.Count);
                 foreach (Filter filter in this.filterWorkerList)
                 {
                     filter.ShouldCancel = true;
@@ -143,8 +144,7 @@ namespace LogExpert
 
         private Filter DoWork(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            _logger.Info("Started Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " +
-                           startLine);
+            _logger.Info("Started Filter worker [{0}] for line {1}", Thread.CurrentThread.ManagedThreadId, startLine);
 
             // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
             FilterParams threadFilterParams = filterParams.CreateCopy2();
@@ -160,8 +160,7 @@ namespace LogExpert
                 return filter;
             }
             int realCount = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
-            _logger.Info("Filter worker [" + Thread.CurrentThread.ManagedThreadId + "] for line " + startLine +
-                           " has completed.");
+            _logger.Info("Filter worker [{0}] for line {1} has completed.", Thread.CurrentThread.ManagedThreadId, startLine);
             lock (this.filterReadyList)
             {
                 this.filterReadyList.Add(filter);

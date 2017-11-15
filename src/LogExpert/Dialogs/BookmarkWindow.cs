@@ -149,7 +149,7 @@ namespace LogExpert.Dialogs
         {
             if (ctx != null)
             {
-                _logger.Debug("Current file changed to " + ctx.LogView.FileName);
+                _logger.Debug("Current file changed to {0}", ctx.LogView.FileName);
                 lock (this.paintLock)
                 {
                     this.logView = ctx.LogView;
@@ -326,7 +326,7 @@ namespace LogExpert.Dialogs
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex.StackTrace);
+                    _logger.Error(ex);
                 }
             }
         }

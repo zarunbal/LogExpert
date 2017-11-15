@@ -24,7 +24,6 @@ namespace LogExpert
 {
     public partial class LogTabWindow : Form
     {
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
         private const int MAX_HISTORY = 30;
@@ -32,6 +31,7 @@ namespace LogExpert
         private const int MAX_COLOR_HISTORY = 40;
         private const int DIFF_MAX = 100;
         private const int MAX_FILE_HISTORY = 10;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly Icon deadIcon;
 
         private readonly Color defaultTabColor = Color.FromArgb(255, 192, 192, 192);
@@ -428,7 +428,7 @@ namespace LogExpert
                     }
                     catch (ArgumentException e)
                     {
-                        _logger.Error("RegEx-error while finding columnizer: " + e.Message);
+                        _logger.Error(e, "RegEx-error while finding columnizer: ");
                         // occurs on invalid regex patterns
                     }
                 }
@@ -450,8 +450,9 @@ namespace LogExpert
                             return group;
                         }
                     }
-                    catch (ArgumentException)
+                    catch (ArgumentException e)
                     {
+                        _logger.Error(e, "RegEx-error while finding columnizer: ");
                         // occurs on invalid regex patterns
                     }
                 }
@@ -655,7 +656,7 @@ namespace LogExpert
                 catch (ArgumentException)
                 {
                     _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
-                                   " is not a valid encoding");
+                                 " is not a valid encoding");
                     encodingOptions.DefaultEncoding = null;
                 }
             }
@@ -899,7 +900,7 @@ namespace LogExpert
                     }
                     catch (SecurityException e)
                     {
-                        _logger.Warn("Insufficient rights for GetFolderPath(): " + e.Message);
+                        _logger.Warn(e, "Insufficient rights for GetFolderPath(): ");
                         // no initial directory if insufficient rights
                     }
                 }
@@ -1589,7 +1590,7 @@ namespace LogExpert
                     columnizer = PluginRegistry.GetInstance().RegisteredColumnizers[0];
                 }
 
-                _logger.Info("Starting external tool with sysout redirection: " + cmd + " " + args);
+                _logger.Info("Starting external tool with sysout redirection: {0} {1}", cmd, args);
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardOutput = true;
                 //process.OutputDataReceived += pipe.DataReceivedEventHandler;
@@ -1599,7 +1600,7 @@ namespace LogExpert
                 }
                 catch (Win32Exception e)
                 {
-                    _logger.Error(e.Message);
+                    _logger.Error(e);
                     MessageBox.Show(e.Message);
                     return;
                 }
@@ -1614,7 +1615,7 @@ namespace LogExpert
             }
             else
             {
-                _logger.Info("Starting external tool: " + cmd + " " + args);
+                _logger.Info("Starting external tool: {0} {1}", cmd, args);
                 try
                 {
                     startInfo.UseShellExecute = false;
@@ -1622,7 +1623,7 @@ namespace LogExpert
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e.Message);
+                    _logger.Error(e);
                     MessageBox.Show(e.Message);
                 }
             }
@@ -1750,18 +1751,17 @@ namespace LogExpert
 
         private void runGC()
         {
-            _logger.Info("Running GC. Used mem before: " + GC.GetTotalMemory(false).ToString("N0"));
+            _logger.Info("Running GC. Used mem before: {0:N0}", GC.GetTotalMemory(false));
             GC.Collect();
-            _logger.Info("GC done.    Used mem after:  " + GC.GetTotalMemory(true).ToString("N0"));
+            _logger.Info("GC done.    Used mem after:  {0:N0}", GC.GetTotalMemory(true));
         }
 
         private void dumpGCInfo()
         {
-            _logger.Info("-------- GC info -----------");
-            _logger.Info("Used mem: " + GC.GetTotalMemory(false).ToString("N0"));
+            _logger.Info("-------- GC info -----------\r\nUsed mem: {0:N0}", GC.GetTotalMemory(false));
             for (int i = 0; i < GC.MaxGeneration; ++i)
             {
-                _logger.Info("Generation " + i + " collect count: " + GC.CollectionCount(i));
+                _logger.Info("Generation {0} collect count: {1}", i, GC.CollectionCount(i));
             }
             _logger.Info("----------------------------");
         }
@@ -1814,7 +1814,7 @@ namespace LogExpert
                 }
                 else
                 {
-                    _logger.Warn("Layout data contains non-existing LogWindow for " + fileName);
+                    _logger.Warn("Layout data contains non-existing LogWindow for {0}", fileName);
                 }
             }
             return null;
@@ -2062,15 +2062,15 @@ namespace LogExpert
         private void LogTabWindow_DragEnter(object sender, DragEventArgs e)
         {
 #if DEBUG
-      string[] formats = e.Data.GetFormats();
-      string s = "Dragging something over LogExpert. Formats:  ";
-      foreach (string format in formats)
-      {
-        s += format;
-        s += " , ";
-      }
-      s = s.Substring(0, s.Length - 3);
-      _logger.Info(s);
+            string[] formats = e.Data.GetFormats();
+            string s = "Dragging something over LogExpert. Formats:  ";
+            foreach (string format in formats)
+            {
+                s += format;
+                s += " , ";
+            }
+            s = s.Substring(0, s.Length - 3);
+            _logger.Info(s);
 #endif
         }
 
@@ -2101,15 +2101,15 @@ namespace LogExpert
         private void LogWindow_DragDrop(object sender, DragEventArgs e)
         {
 #if DEBUG
-      string[] formats = e.Data.GetFormats();
-      string s = "Dropped formats:  ";
-      foreach (string format in formats)
-      {
-        s += format;
-        s += " , ";
-      }
-      s = s.Substring(0, s.Length - 3);
-      _logger.Debug(s);
+            string[] formats = e.Data.GetFormats();
+            string s = "Dropped formats:  ";
+            foreach (string format in formats)
+            {
+                s += format;
+                s += " , ";
+            }
+            s = s.Substring(0, s.Length - 3);
+            _logger.Debug(s);
 #endif
 
             object test = e.Data.GetData(DataFormats.StringFormat);
@@ -2805,20 +2805,20 @@ namespace LogExpert
         private void dumpLogBufferInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
 #if DEBUG
-      if (this.CurrentLogWindow != null)
-      {
-        this.CurrentLogWindow.DumpBufferInfo();
-      }
+            if (this.CurrentLogWindow != null)
+            {
+                this.CurrentLogWindow.DumpBufferInfo();
+            }
 #endif
         }
 
         private void dumpBufferDiagnosticToolStripMenuItem_Click(object sender, EventArgs e)
         {
 #if DEBUG
-      if (this.CurrentLogWindow != null)
-      {
-        this.CurrentLogWindow.DumpBufferDiagnostic();
-      }
+            if (this.CurrentLogWindow != null)
+            {
+                this.CurrentLogWindow.DumpBufferDiagnostic();
+            }
 #endif
         }
 

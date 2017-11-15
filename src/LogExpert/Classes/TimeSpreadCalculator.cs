@@ -244,8 +244,7 @@ namespace LogExpert
                     step = 1;
                 }
 
-                _logger.Debug("TimeSpreadCalculator.DoCalc() collecting data for " + lastLineNum +
-                              " lines with step size " + step);
+                _logger.Debug("TimeSpreadCalculator.DoCalc() collecting data for {0} lines with step size {1}", lastLineNum, step);
 
                 List<SpreadEntry> newDiffList = new List<SpreadEntry>();
                 List<TimeSpan> maxList = new List<TimeSpan>();
@@ -261,7 +260,7 @@ namespace LogExpert
                         timePerLineSum += (int) (span.Ticks / TimeSpan.TicksPerMillisecond);
                         newDiffList.Add(new SpreadEntry(i, 0, time));
                         oldTime = time;
-                        _logger.Debug("TimeSpreadCalculator.DoCalc() time diff " + span.ToString());
+                        _logger.Debug("TimeSpreadCalculator.DoCalc() time diff {0}", span);
                     }
                 }
                 if (maxList.Count > 3)
@@ -311,7 +310,7 @@ namespace LogExpert
                     step = 1;
                 }
 
-                _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() time range is " + overallSpanMillis + " ms");
+                _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() time range is {0} ms", overallSpanMillis);
 
                 lineNum = 0;
                 DateTime searchTimeStamp = this.startTimestamp;
@@ -331,9 +330,9 @@ namespace LogExpert
                         lineNum = -lineNum;
                     }
                     int lineDiff = lineNum - oldLineNum;
-#if DEBUG
-                    _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() test time " + searchTimeStamp.ToString("HH:mm:ss.fff") + " line diff=" + lineDiff);
-#endif
+
+                    _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() test time {0:HH:mm:ss.fff} line diff={1}", searchTimeStamp, lineDiff);
+
                     if (lineDiff >= 0)
                     {
                         lineDiffSum += lineDiff;
@@ -360,7 +359,7 @@ namespace LogExpert
                 }
                 this.average = (double) lineDiffSum / (double) loopCount;
                 //double average = maxList[maxList.Count / 2];
-                _logger.Debug("Average diff=" + average + " minDiff=" + minDiff + " maxDiff=" + maxDiff);
+                _logger.Debug("Average diff={0} minDiff={1} maxDiff={2}", average, minDiff, maxDiff);
                 lock (this.diffListLock)
                 {
                     if (newDiffList.Count > 0)
@@ -415,8 +414,7 @@ namespace LogExpert
                 }
                 int value = (int) (diffFromAverage / (double) maxDiff * (double) this.contrast);
                 entry.value = 255 - value;
-                _logger.Debug("TimeSpreadCalculator.DoCalc() test time " + entry.timestamp.ToString("HH:mm:ss.fff") +
-                              " line diff=" + lineDiff + " value=" + value);
+                _logger.Debug("TimeSpreadCalculator.DoCalc() test time {0:HH:mm:ss.fff} line diff={1} value={2}", entry.timestamp, lineDiff, value);
             }
         }
 
