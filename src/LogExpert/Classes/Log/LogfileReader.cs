@@ -1307,7 +1307,6 @@ namespace LogExpert
                 try
                 {
                     ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
-                    LogLine logLine = new LogLine();
 
                     string line;
                     long filePos = logBuffer.StartPos;
@@ -1329,6 +1328,7 @@ namespace LogExpert
                             dropCount++;
                             continue;
                         }
+                        LogLine logLine = new LogLine();
 
                         logLine.FullLine = line;
                         logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
