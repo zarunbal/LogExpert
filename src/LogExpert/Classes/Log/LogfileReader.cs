@@ -1739,6 +1739,7 @@ namespace LogExpert
 #endif
         }
 
+#if DEBUG
         private void DumpBufferInfos(LogBuffer buffer)
         {
             if (_logger.IsTraceEnabled)
@@ -1753,6 +1754,8 @@ namespace LogExpert
                     buffer.FileInfo.FullName);
             }
         }
+
+#endif
 
         #endregion
 
