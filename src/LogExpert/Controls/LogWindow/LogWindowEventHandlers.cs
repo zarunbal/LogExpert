@@ -565,11 +565,6 @@ namespace LogExpert
             CheckForFilterDirty();
         }
 
-        private void filterKnobControl2_ValueChanged(object sender, EventArgs e)
-        {
-            CheckForFilterDirty();
-        }
-
         private void filterToTabButton_Click(object sender, EventArgs e)
         {
             FilterToTab();

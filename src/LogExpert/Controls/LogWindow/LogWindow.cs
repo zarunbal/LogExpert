@@ -235,7 +235,7 @@ namespace LogExpert
             this.filterKnobControl2.MinValue = 0;
             this.filterKnobControl2.MaxValue = SPREAD_MAX;
             this.filterKnobControl2.ValueChanged +=
-                new KnobControl.ValueChangedEventHandler(filterKnobControl2_ValueChanged);
+                new KnobControl.ValueChangedEventHandler(filterKnobControl1_ValueChanged);
             this.fuzzyKnobControl.MinValue = 0;
             this.fuzzyKnobControl.MaxValue = 10;
             //PreferencesChanged(settings.preferences, true);
