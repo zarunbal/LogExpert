@@ -2117,11 +2117,6 @@ namespace LogExpert
             }
         }
 
-        private void UpdateFilterCountLabel(int count)
-        {
-            this.filterCountLabel.Text = "" + this.filterResultList.Count;
-        }
-
         private void TriggerFilterLineGuiUpdate()
         {
             //lock (this.filterUpdateThread)
@@ -2486,12 +2481,6 @@ namespace LogExpert
         {
             this.statusEventArgs.StatusText = text;
             SendStatusLineUpdate();
-        }
-
-        private void StatusLineTextImmediate(string text)
-        {
-            this.statusEventArgs.StatusText = text;
-            this.statusLineTrigger.TriggerImmediate();
         }
 
         private void StatusLineError(string text)
