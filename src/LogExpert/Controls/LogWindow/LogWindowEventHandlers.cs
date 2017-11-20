@@ -413,15 +413,6 @@ namespace LogExpert
             }
         }
 
-        private void filterGridView_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            //if (this.filterGridView.CurrentRow != null)
-            //{
-            //  int lineNum = this.filterResultList[this.filterGridView.CurrentRow.Index];
-            //  SelectLine(lineNum);
-            //}
-        }
-
         private void rangeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             this.filterRangeComboBox.Enabled = this.rangeCheckBox.Checked;

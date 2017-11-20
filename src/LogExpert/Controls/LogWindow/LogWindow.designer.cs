@@ -737,7 +737,6 @@ namespace LogExpert
       this.filterGridView.VirtualMode = true;
       this.filterGridView.Enter += new System.EventHandler(this.filterGridView_Enter);
       this.filterGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.filterGridView_CellDoubleClick);
-      this.filterGridView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.filterGridView_MouseDoubleClick);
       this.filterGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.filterGridView_RowHeightInfoNeeded);
       this.filterGridView.Leave += new System.EventHandler(this.filterGridView_Leave);
       this.filterGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.filterGridView_CellContextMenuStripNeeded);
