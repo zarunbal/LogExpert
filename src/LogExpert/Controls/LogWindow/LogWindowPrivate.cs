@@ -1085,7 +1085,7 @@ namespace LogExpert
             int leftPad = e.CellStyle.Padding.Left;
             RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width,
                 e.CellBounds.Height);
-            Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
+            Rectangle borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
             Rectangle valBounds = e.CellBounds;
             valBounds.Offset(borderWidths.X, borderWidths.Y);
             valBounds.Width -= borderWidths.Right;
