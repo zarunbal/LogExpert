@@ -54,10 +54,6 @@ namespace LogExpert
                 this.loadingFinishedEvent.Set();
                 this.externaLoadingFinishedEvent.Set();
                 this.timeSpreadCalc.SetLineCount(this.logFileReader.LineCount);
-                if (this.loadingFinishedFx != null)
-                {
-                    this.loadingFinishedFx(this);
-                }
 
                 if (this.reloadMemento != null)
                 {

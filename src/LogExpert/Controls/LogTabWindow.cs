@@ -190,13 +190,12 @@ namespace LogExpert
 
         public LogWindow AddTempFileTab(string fileName, string title)
         {
-            return AddFileTab(fileName, true, title, null, false, null);
+            return AddFileTab(fileName, true, title, false, null);
         }
 
-        public LogWindow AddFilterTab(FilterPipe pipe, string title, LogWindow.LoadingFinishedFx loadingFinishedFx,
-            ILogLineColumnizer preProcessColumnizer)
+        public LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
         {
-            LogWindow logWin = AddFileTab(pipe.FileName, true, title, loadingFinishedFx, false, preProcessColumnizer);
+            LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
             if (pipe.FilterParams.searchText.Length > 0)
             {
                 ToolTip tip = new ToolTip(this.components);
@@ -215,24 +214,24 @@ namespace LogExpert
 
 
         public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title,
-            LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading,
+           bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer)
         {
-            return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading,
+            return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
                 preProcessColumnizer, true);
         }
 
         public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
-            LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading,
+             bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer)
         {
-            return AddFileTab(givenFileName, isTempFile, title, loadingFinishedFx, forcePersistenceLoading,
+            return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
                 preProcessColumnizer, false);
         }
 
 
         public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
-            LogWindow.LoadingFinishedFx loadingFinishedFx, bool forcePersistenceLoading,
+            bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel)
         {
             string logFileName = FindFilenameForSettings(givenFileName);
@@ -250,7 +249,7 @@ namespace LogExpert
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
             LogWindow logWindow =
-                new LogWindow(this, logFileName, isTempFile, loadingFinishedFx, forcePersistenceLoading);
+                new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
 
             logWindow.GivenFileName = givenFileName;
 
@@ -308,7 +307,7 @@ namespace LogExpert
             {
                 return null;
             }
-            LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, null, false);
+            LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, false);
             AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
             this.multiFileToolStripMenuItem.Checked = true;
             this.multiFileEnabledStripMenuItem.Checked = true;
@@ -674,7 +673,7 @@ namespace LogExpert
                     }
                     else
                     {
-                        AddFileTab(fileName, false, null, null, false, null);
+                        AddFileTab(fileName, false, null, false, null);
                     }
                 }
             }
@@ -934,7 +933,7 @@ namespace LogExpert
                 }
                 else
                 {
-                    AddFileTab(names[0], false, null, null, false, null);
+                    AddFileTab(names[0], false, null, false, null);
                     return;
                 }
             }
@@ -1689,11 +1688,11 @@ namespace LogExpert
                 {
                     if (hasLayoutData)
                     {
-                        AddFileTabDeferred(fileName, false, null, null, true, null);
+                        AddFileTabDeferred(fileName, false, null, true, null);
                     }
                     else
                     {
-                        AddFileTab(fileName, false, null, null, true, null);
+                        AddFileTab(fileName, false, null, true, null);
                     }
                 }
 
@@ -1857,7 +1856,7 @@ namespace LogExpert
                 {
                     if (name != null && name.Length > 0)
                     {
-                        AddFileTab(name, false, null, null, false, null);
+                        AddFileTab(name, false, null, false, null);
                     }
                 }
             }
@@ -1928,7 +1927,7 @@ namespace LogExpert
         {
             if (sender is ToolStripDropDown)
             {
-                AddFileTab(((ToolStripDropDown) sender).Text, false, null, null, false, null);
+                AddFileTab(((ToolStripDropDown) sender).Text, false, null, false, null);
             }
         }
 
@@ -1936,7 +1935,7 @@ namespace LogExpert
         {
             if (e.ClickedItem.Text != null && e.ClickedItem.Text.Length > 0)
             {
-                AddFileTab(e.ClickedItem.Text, false, null, null, false, null);
+                AddFileTab(e.ClickedItem.Text, false, null, false, null);
             }
         }
 

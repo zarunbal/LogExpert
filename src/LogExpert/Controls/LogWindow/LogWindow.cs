@@ -53,7 +53,6 @@ namespace LogExpert
 
         private readonly EventWaitHandle loadingFinishedEvent = new ManualResetEvent(false);
 
-        private readonly LoadingFinishedFx loadingFinishedFx;
         private readonly EventWaitHandle logEventArgsEvent = new ManualResetEvent(false);
 
         private readonly List<LogEventArgs> logEventArgsList = new List<LogEventArgs>();
@@ -133,7 +132,7 @@ namespace LogExpert
 
         #region cTor
 
-        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx,
+        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile,
             bool forcePersistenceLoading)
         {
             this.SuspendLayout();
@@ -144,7 +143,6 @@ namespace LogExpert
 
             this.parentLogTabWin = parent;
             this.IsTempFile = isTempFile;
-            this.loadingFinishedFx = loadingFinishedFx;
             //Thread.CurrentThread.Name = "LogWindowThread";
             ColumnizerCallbackObject = new ColumnizerCallback(this);
 

@@ -2629,7 +2629,6 @@ namespace LogExpert
                     preProcessColumnizer = this.CurrentColumnizer;
                 }
                 LogWindow newWin = this.parentLogTabWin.AddFilterTab(pipe, title,
-                    new LoadingFinishedFx(LoadingFinishedFunc),
                     preProcessColumnizer);
                 newWin.FilterPipe = pipe;
                 pipe.OwnLogWindow = newWin;
@@ -2689,16 +2688,6 @@ namespace LogExpert
                 _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
             newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
-        }
-
-        private void LoadingFinishedFunc(LogWindow newWin)
-        {
-            //if (newWin.forcedColumnizerForLoading != null)
-            //{
-            //  SetColumnizerFx fx = new SetColumnizerFx(newWin.ForceColumnizer);
-            //  newWin.Invoke(fx, new object[] { newWin.forcedColumnizerForLoading });
-            //  newWin.forcedColumnizerForLoading = null;
-            //}
         }
 
         private void ProcessFilterPipes(int lineNum)
