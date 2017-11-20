@@ -573,11 +573,11 @@ namespace LogExpert
             {
                 if (line < this.dataGridView.RowCount)
                 {
-                    SelectLine(line, false);
+                    SelectLine(line, false, true);
                 }
                 else
                 {
-                    SelectLine(this.dataGridView.RowCount - 1, false);
+                    SelectLine(this.dataGridView.RowCount - 1, false, true);
                 }
                 this.dataGridView.Focus();
             }
@@ -618,14 +618,14 @@ namespace LogExpert
 
         public void SelectLogLine(int line)
         {
-            this.Invoke(new SelectLineFx(this.SelectLine), new object[] {line, true});
+            this.Invoke(new SelectLineFx((line1, triggerSyncCall) => this.SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
         }
 
         public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
         {
             try
             {
-                SelectLine_NoScroll(line, triggerSyncCall);
+                SelectLine(line, triggerSyncCall, false);
 
                 //if (!this.dataGridView.CurrentRow.Displayed)
                 if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
@@ -695,7 +695,7 @@ namespace LogExpert
                 int newLine = this.logFileReader.GetNextMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
                 if (newLine != -1)
                 {
-                    SelectLine(newLine, false);
+                    SelectLine(newLine, false, true);
                 }
                 e.Handled = true;
             }
@@ -704,7 +704,7 @@ namespace LogExpert
                 int newLine = this.logFileReader.GetPrevMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
                 if (newLine != -1)
                 {
-                    SelectLine(newLine - 1, false);
+                    SelectLine(newLine - 1, false, true);
                 }
                 e.Handled = true;
             }
@@ -934,7 +934,7 @@ namespace LogExpert
                     }
 
                     int lineNum = this.bookmarkProvider.Bookmarks[index].LineNum;
-                    SelectLine(lineNum, true);
+                    SelectLine(lineNum, true, true);
                 }
             }
         }
@@ -987,7 +987,7 @@ namespace LogExpert
                     }
 
                     int lineNum = this.bookmarkProvider.Bookmarks[index].LineNum;
-                    SelectLine(lineNum, false);
+                    SelectLine(lineNum, false, true);
                 }
             }
         }

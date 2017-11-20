@@ -180,14 +180,14 @@ namespace LogExpert
                 {
                     if (persistenceData.currentLine >= 0 && persistenceData.currentLine < this.dataGridView.RowCount)
                     {
-                        SelectLine(persistenceData.currentLine, false);
+                        SelectLine(persistenceData.currentLine, false, true);
                     }
                     else
                     {
                         if (this.logFileReader.LineCount > 0)
                         {
                             this.dataGridView.FirstDisplayedScrollingRowIndex = this.logFileReader.LineCount - 1;
-                            SelectLine(this.logFileReader.LineCount - 1, false);
+                            SelectLine(this.logFileReader.LineCount - 1, false, true);
                         }
                     }
                     if (persistenceData.firstDisplayedLine >= 0 &&
@@ -1597,8 +1597,9 @@ namespace LogExpert
                             this.Invoke(progressFx, new object[] {count});
                         }
                     }
-                    catch (ObjectDisposedException) // can occur when closing the app while searching
+                    catch (ObjectDisposedException ex) // can occur when closing the app while searching
                     {
+                        _logger.Warn(ex);
                     }
                 }
             }
@@ -1622,10 +1623,11 @@ namespace LogExpert
                 {
                     return;
                 }
-                this.dataGridView.Invoke(new SelectLineFx(SelectLine), new object[] {line, true});
+                this.dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
             }
-            catch (Exception) // in the case the windows is already destroyed
+            catch (Exception ex) // in the case the windows is already destroyed
             {
+                _logger.Warn(ex);
             }
         }
 
@@ -1636,16 +1638,16 @@ namespace LogExpert
             SendProgressBarUpdate();
         }
 
-        private void SelectLine(int line, bool triggerSyncCall)
+        private void SelectLine(int line, bool triggerSyncCall, bool shouldScroll)
         {
             try
             {
-                this.shouldCallTimeSync = triggerSyncCall;
-                bool wasCancelled = this.shouldCancel;
-                this.shouldCancel = false;
-                this.isSearching = false;
+                shouldCallTimeSync = triggerSyncCall;
+                bool wasCancelled = shouldCancel;
+                shouldCancel = false;
+                isSearching = false;
                 StatusLineText("");
-                this.guiStateArgs.MenuEnabled = true;
+                guiStateArgs.MenuEnabled = true;
                 if (wasCancelled)
                 {
                     return;
@@ -1656,50 +1658,19 @@ namespace LogExpert
                         "Search result"); // Hmm... is that experimental code from early days?  
                     return;
                 }
-                this.dataGridView.Rows[line].Selected = true;
-                this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-                this.dataGridView.Focus();
+                dataGridView.Rows[line].Selected = true;
+
+                if (shouldScroll)
+                {
+                    dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
+                    dataGridView.Focus(); 
+                }
             }
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
                 _logger.Error(e, "Error while selecting line: ");
             }
-        }
-
-        private void SelectLine_NoScroll(int line, bool triggerSyncCall)
-        {
-            try
-            {
-                this.shouldCallTimeSync = triggerSyncCall;
-                bool wasCancelled = this.shouldCancel;
-                this.shouldCancel = false;
-                this.isSearching = false;
-                StatusLineText("");
-                this.guiStateArgs.MenuEnabled = true;
-                if (wasCancelled)
-                {
-                    return;
-                }
-                if (line == -1)
-                {
-                    MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?  
-                    return;
-                }
-                this.dataGridView.Rows[line].Selected = true;
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                // Occures sometimes (but cannot reproduce)
-                _logger.Error(e, "Error while selecting line: ");
-            }
-        }
-
-        private void SelectAndScrollToLine(int line)
-        {
-            SelectLine(line, false);
-            this.dataGridView.FirstDisplayedScrollingRowIndex = line;
         }
 
         private void StartEditMode()
@@ -1747,7 +1718,7 @@ namespace LogExpert
                     HilightEntry entry = FindHilightEntry(line);
                     if (entry != null)
                     {
-                        SelectLine(lineNum, false);
+                        SelectLine(lineNum, false, true);
                         break;
                     }
                 }
@@ -1766,7 +1737,7 @@ namespace LogExpert
                     HilightEntry entry = FindHilightEntry(line);
                     if (entry != null)
                     {
-                        SelectLine(lineNum, false);
+                        SelectLine(lineNum, false, true);
                         break;
                     }
                 }

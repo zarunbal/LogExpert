@@ -455,7 +455,7 @@ namespace LogExpert
                     this.filterGridView.CurrentCellAddress.Y < this.filterResultList.Count)
                 {
                     int lineNum = this.filterResultList[this.filterGridView.CurrentCellAddress.Y];
-                    SelectLine(lineNum, false);
+                    SelectLine(lineNum, false, true);
                     e.Handled = true;
                 }
             }
@@ -763,7 +763,7 @@ namespace LogExpert
                 int lineNum = this.FilterPipe.GetOriginalLineNum(this.dataGridView.CurrentRow.Index);
                 if (lineNum != -1)
                 {
-                    this.FilterPipe.LogWindow.SelectLine(lineNum, false);
+                    this.FilterPipe.LogWindow.SelectLine(lineNum, false, true);
                     this.parentLogTabWin.SelectTab(this.FilterPipe.LogWindow);
                 }
             }
@@ -786,12 +786,6 @@ namespace LogExpert
         }
 
         // ======================= Bookmark list ====================================
-
-        private void bookmarkWindow_BookmarkCommentChanged(object sender, EventArgs e)
-        {
-            this.dataGridView.Refresh();
-            //this.bookmarkDirty = true;
-        }
 
         private void columnRestrictCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -833,7 +827,7 @@ namespace LogExpert
             if (e.RowIndex > 0 && e.RowIndex < this.dataGridView.RowCount
                 && !this.dataGridView.Rows[e.RowIndex].Selected)
             {
-                SelectLine(e.RowIndex, false);
+                SelectLine(e.RowIndex, false, true);
             }
             if (e.ContextMenuStrip == this.columnContextMenuStrip)
             {
@@ -1002,7 +996,7 @@ namespace LogExpert
 
         private void timeSpreadingControl1_LineSelected(object sender, SelectLineEventArgs e)
         {
-            SelectLine(e.Line, false);
+            SelectLine(e.Line, false, true);
         }
 
         private void bookmarkCommentToolStripMenuItem_Click(object sender, EventArgs e)
