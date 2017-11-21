@@ -25,9 +25,6 @@ namespace LogExpert
 
         public void LoadFile(string fileName, EncodingOptions encodingOptions)
         {
-#if DEBUG //MessageBox.Show("Pause vor LoadFile()");
-#endif
-
             EnterLoadFileStatus();
 
             if (fileName != null)
@@ -73,6 +70,7 @@ namespace LogExpert
                 }
                 catch (LogFileException lfe)
                 {
+                    _logger.Error(lfe);
                     MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
                     this.BeginInvoke(new FunctionWith1BoolParam(Close), new object[] {true});
                     this.isLoadError = true;
