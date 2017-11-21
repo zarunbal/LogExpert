@@ -530,25 +530,15 @@ namespace LogExpert
             FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines,
             List<int> filterHitList);
 
-        private delegate void AddFilterLineGuiUpdateFx();
-
         private delegate void UpdateProgressBarFx(int lineNum);
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
-
-        private delegate void ProcessFilterPipeFx(int lineNum);
 
         private delegate void WriteFilterToTabFinishedFx(FilterPipe pipe, string namePrefix,
             PersistenceData persistenceData
         );
 
-        private delegate void TimestampSyncFx(int lineNum);
-
         private delegate void SetBookmarkFx(int lineNum, string comment);
-
-        private delegate void UpdateBookmarkViewFx();
-
-        private delegate void FunctionWith1IntParam(int arg);
 
         private delegate void FunctionWith1BoolParam(bool arg);
 
