@@ -25,7 +25,6 @@ namespace LogExpert
         #region Fields
 
         private const int MAX_HISTORY = 30;
-        private const int MAX_COLUMNIZER_HISTORY = 40;
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
@@ -260,8 +259,6 @@ namespace LogExpert
 
         #region Delegates
 
-        public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
-
         public delegate void BookmarkAddedEventHandler(object sender, EventArgs e);
 
         public delegate void BookmarkRemovedEventHandler(object sender, EventArgs e);
@@ -276,8 +273,6 @@ namespace LogExpert
 
         public delegate void FileNotFoundEventHandler(object sender, EventArgs e);
 
-        public delegate void FileReloadFinishedEventHandler(object sender, EventArgs e);
-
         public delegate void FileRespawnedEventHandler(object sender, EventArgs e);
 
         public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);
@@ -288,10 +283,6 @@ namespace LogExpert
         public delegate void FilterRestoreFx(LogWindow newWin, PersistenceData persistenceData);
 
         public delegate void GuiStateEventHandler(object sender, GuiStateArgs e);
-
-        public delegate void HideRowFx(int lineNum, bool show);
-
-        public delegate void LoadingFinishedFx(LogWindow newWin);
 
         public delegate void ProgressBarEventHandler(object sender, ProgressEventArgs e);
 
