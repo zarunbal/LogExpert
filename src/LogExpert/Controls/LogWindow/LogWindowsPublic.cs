@@ -1506,15 +1506,6 @@ namespace LogExpert
             return this.logFileReader.GetRealLineNumForVirtualLineNum(lineNum);
         }
 
-        public string GetCurrentFileName()
-        {
-            if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
-            {
-                return this.logFileReader.GetLogFileNameForLine(this.dataGridView.CurrentRow.Index);
-            }
-            return null;
-        }
-
         public ILogFileInfo GetCurrentFileInfo()
         {
             if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
