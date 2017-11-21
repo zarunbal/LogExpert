@@ -77,19 +77,21 @@ namespace LogExpert
                     return;
                 }
 
-                if (this.CurrentColumnizer is ILogLineXmlColumnizer)
+                ILogLineXmlColumnizer xmlColumnizer = this.CurrentColumnizer as ILogLineXmlColumnizer;
+                if (xmlColumnizer != null)
                 {
                     this.logFileReader.IsXmlMode = true;
                     this.logFileReader.XmlLogConfig =
-                        (this.CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
+                        xmlColumnizer.GetXmlLogConfiguration();
                 }
                 if (this.forcedColumnizerForLoading != null)
                 {
                     this.CurrentColumnizer = this.forcedColumnizerForLoading;
                 }
-                if (this.CurrentColumnizer is IPreProcessColumnizer)
+                IPreProcessColumnizer processColumnizer = this.CurrentColumnizer as IPreProcessColumnizer;
+                if (processColumnizer != null)
                 {
-                    this.logFileReader.PreProcessColumnizer = (IPreProcessColumnizer) this.CurrentColumnizer;
+                    this.logFileReader.PreProcessColumnizer = processColumnizer;
                 }
                 else
                 {
