@@ -489,7 +489,6 @@ namespace LogExpert
             _logger.Info("Refreshing filter view because of reload.");
             this.Invoke(new MethodInvoker(FilterSearch));
             LoadFilterPipes();
-            OnFileReloadFinished();
         }
 
         private void UpdateProgress(LoadFileEventArgs e)

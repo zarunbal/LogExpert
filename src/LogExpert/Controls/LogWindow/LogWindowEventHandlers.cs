@@ -1491,14 +1491,6 @@ namespace LogExpert
             }
         }
 
-        protected void OnFileReloadFinished()
-        {
-            if (FileReloadFinished != null)
-            {
-                FileReloadFinished(this, new EventArgs());
-            }
-        }
-
         protected void OnBookmarkAdded()
         {
             if (BookmarkAdded != null)

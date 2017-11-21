@@ -327,8 +327,6 @@ namespace LogExpert
 
         public event CurrentHighlightGroupChangedEventHandler CurrentHighlightGroupChanged;
 
-        public event FileReloadFinishedEventHandler FileReloadFinished;
-
         public event BookmarkAddedEventHandler BookmarkAdded;
 
         public event BookmarkRemovedEventHandler BookmarkRemoved;
