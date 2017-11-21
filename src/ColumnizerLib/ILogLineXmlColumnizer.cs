@@ -58,7 +58,6 @@ namespace LogExpert
         /// <param name="logLine">The line as retrieved from the internal log reader. This is
         /// the result of the XSLT processing with your provided stylesheet.
         /// </param>
-        /// <param name="lineNum">The line number for the log line</param>
         /// <param name="callback">Callback which may be used by the Columnizer</param>
         /// <returns>A string which is placed into the clipboard</returns>
         /// <remarks>
