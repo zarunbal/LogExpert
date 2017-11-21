@@ -2283,7 +2283,6 @@ namespace LogExpert
         private void ClearBookmarkList()
         {
             this.bookmarkProvider.ClearAllBookmarks();
-            OnAllBookmarksRemoved();
         }
 
         /**

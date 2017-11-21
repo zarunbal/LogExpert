@@ -1507,14 +1507,6 @@ namespace LogExpert
             }
         }
 
-        protected void OnAllBookmarksRemoved()
-        {
-            if (AllBookmarksRemoved != null)
-            {
-                AllBookmarksRemoved(this, new EventArgs());
-            }
-        }
-
         protected void OnBookmarkTextChanged(Bookmark bookmark)
         {
             if (BookmarkTextChanged != null)

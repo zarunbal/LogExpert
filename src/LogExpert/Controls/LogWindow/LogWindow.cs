@@ -331,8 +331,6 @@ namespace LogExpert
 
         public event BookmarkRemovedEventHandler BookmarkRemoved;
 
-        public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
-
         public event BookmarkTextChangedEventHandler BookmarkTextChanged;
 
         public event ColumnizerChangedEventHandler ColumnizerChanged;
