@@ -1596,6 +1596,7 @@ namespace LogExpert
                 }
                 catch (IOException e)
                 {
+                    _logger.Error(e);
                     MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
                 }
             }
@@ -1647,6 +1648,7 @@ namespace LogExpert
                 }
                 catch (IOException e)
                 {
+                    _logger.Error(e);
                     MessageBox.Show("Error while importing bookmark list: " + e.Message, "LogExpert");
                 }
             }
