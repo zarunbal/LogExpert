@@ -20,7 +20,7 @@ namespace LogExpert
     /// </summary>
     internal class XmlConfig : IXmlLogConfiguration
     {
-        #region IXmlLogConfiguration Member
+        #region Properties
 
         public string XmlStartTag { get; } = "<log4j:event";
 
@@ -186,78 +186,23 @@ namespace LogExpert
 
         #endregion
 
-        #region Private Methods
-
-        private string[] GetAllColumnNames()
-        {
-            return new string[]
-                {"Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"};
-        }
-
-
-        /// <summary>
-        /// Returns only the columns which are "active". The order of the columns depends on the column order in the config
-        /// </summary>
-        /// <param name="cols"></param>
-        /// <returns></returns>
-        private Column[] MapColumns(Column[] cols)
-        {
-            List<Column> output = new List<Column>();
-            int index = 0;
-            foreach (Log4jColumnEntry entry in config.columnList)
-            {
-                if (entry.visible)
-                {
-                    Column column = cols[index];
-                    output.Add(column);
-
-                    if (entry.maxLen > 0 && column.FullValue.Length > entry.maxLen)
-                    {
-                        column.FullValue = column.FullValue.Substring(column.FullValue.Length - entry.maxLen);
-                    }
-                }
-                index++;
-            }
-
-
-            return output.ToArray();
-        }
-
-        #endregion
-
-        private class Log4JLogLine : ILogLine
-        {
-            #region Properties
-
-            public string FullLine { get; set; }
-
-            public int LineNumber { get; set; }
-
-            string ITextValue.Text => FullLine;
-
-            #endregion
-        }
-
-        #region ILogLineXmlColumnizer Member
+        #region Public methods
 
         public IXmlLogConfiguration GetXmlLogConfiguration()
         {
             return xmlConfig;
         }
 
-        public ILogLine GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback)
+        public ILogLine GetLineTextForClipboard(ILogLine logLine, ILogLineColumnizerCallback callback)
         {
-            Log4JLogLine line = new Log4JLogLine();
+            Log4JLogLine line = new Log4JLogLine
+            {
+                FullLine = logLine.FullLine.Replace(separatorChar, '|'),
+                LineNumber = logLine.LineNumber
+            };
 
-            line.FullLine = logLine.Replace(separatorChar, '|');
-            line.LineNumber = callback.GetLineNum();
             return line;
         }
-
-        #endregion
-
-
-        #region ILogLineColumnizer Member
 
         public string GetName()
         {
@@ -420,10 +365,6 @@ namespace LogExpert
             }
         }
 
-        #endregion
-
-        #region IColumnizerConfigurator Member
-
         public void Configure(ILogLineColumnizerCallback callback, string configDir)
         {
             string configPath = configDir + "\\log4jxmlcolumnizer.dat";
@@ -470,5 +411,57 @@ namespace LogExpert
         }
 
         #endregion
+
+        #region Private Methods
+
+        private string[] GetAllColumnNames()
+        {
+            return new string[]
+                {"Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"};
+        }
+
+
+        /// <summary>
+        /// Returns only the columns which are "active". The order of the columns depends on the column order in the config
+        /// </summary>
+        /// <param name="cols"></param>
+        /// <returns></returns>
+        private Column[] MapColumns(Column[] cols)
+        {
+            List<Column> output = new List<Column>();
+            int index = 0;
+            foreach (Log4jColumnEntry entry in config.columnList)
+            {
+                if (entry.visible)
+                {
+                    Column column = cols[index];
+                    output.Add(column);
+
+                    if (entry.maxLen > 0 && column.FullValue.Length > entry.maxLen)
+                    {
+                        column.FullValue = column.FullValue.Substring(column.FullValue.Length - entry.maxLen);
+                    }
+                }
+                index++;
+            }
+
+
+            return output.ToArray();
+        }
+
+        #endregion
+
+        private class Log4JLogLine : ILogLine
+        {
+            #region Properties
+
+            public string FullLine { get; set; }
+
+            public int LineNumber { get; set; }
+
+            string ITextValue.Text => FullLine;
+
+            #endregion
+        }
     }
 }

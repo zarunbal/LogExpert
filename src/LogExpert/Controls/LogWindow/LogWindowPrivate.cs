@@ -2601,7 +2601,7 @@ namespace LogExpert
                 if (this.CurrentColumnizer is ILogLineXmlColumnizer)
                 {
                     callback.LineNum = i;
-                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
+                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line,
                         callback);
                 }
                 pipe.WriteToPipe(line, i);
@@ -2762,14 +2762,16 @@ namespace LogExpert
                 lineNumList.Sort();
                 StringBuilder clipText = new StringBuilder();
                 LogExpertCallback callback = new LogExpertCallback(this);
+
+                var xmlColumnizer = currentColumnizer as ILogLineXmlColumnizer;
+              
                 foreach (int lineNum in lineNumList)
                 {
                     ILogLine line = this.logFileReader.GetLogLine(lineNum);
-                    if (CurrentColumnizer is ILogLineXmlColumnizer)
+                    if (xmlColumnizer != null)
                     {
                         callback.LineNum = lineNum;
-                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
-                            callback);
+                        line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                     }
                     clipText.AppendLine(line.FullLine);
                 }
@@ -3036,17 +3038,6 @@ namespace LogExpert
             _logger.Info("TestStatistics() ended");
         }
 
-        private void addBlockSrcLinesToDict(SortedDictionary<int, int> dict, PatternBlock block)
-        {
-            foreach (int lineNum in block.srcLines.Keys)
-            {
-                if (!dict.ContainsKey(lineNum))
-                {
-                    dict.Add(lineNum, lineNum);
-                }
-            }
-        }
-
         private void addBlockTargetLinesToDict(Dictionary<int, int> dict, PatternBlock block)
         {
             foreach (int lineNum in block.targetLines.Keys)
@@ -3058,6 +3049,7 @@ namespace LogExpert
             }
         }
 
+        //Well keep this for the moment because there is some other commented code which calls this one
         private PatternBlock FindExistingBlock(PatternBlock block, List<PatternBlock> blockList)
         {
             foreach (PatternBlock searchBlock in blockList)
@@ -3294,12 +3286,6 @@ namespace LogExpert
             ColumnizerCallback callback = new ColumnizerCallback(this);
             IColumnizedLogLine cols = columnizer.SplitLine(callback, line);
             return cols.ColumnValues.Last().FullValue;
-        }
-
-        private void UpdateBookmarkGui()
-        {
-            this.dataGridView.Refresh();
-            this.filterGridView.Refresh();
         }
 
         private void ChangeRowHeight(bool decrease)

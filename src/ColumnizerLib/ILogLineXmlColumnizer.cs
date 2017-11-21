@@ -71,7 +71,7 @@ namespace LogExpert
         /// use these markers for line splitting.
         /// When copying to clipboard, this method will remove the special characters and replace them with spaces.
         /// </remarks>
-        ILogLine GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback);
+        ILogLine GetLineTextForClipboard(ILogLine logLine, ILogLineColumnizerCallback callback);
 
         #endregion
     }
