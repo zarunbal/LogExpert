@@ -1,0 +1,3 @@
+$base64Str = $env:my_signing_key
+$bytes = [System.Convert]::FromBase64String($base64Str)
+[System.IO.File]::WriteAllBytes("../src/Solution Items/Key.snk", $base64Str)
