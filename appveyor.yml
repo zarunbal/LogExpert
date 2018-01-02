@@ -13,7 +13,7 @@ before_build:
 
     $bytes = [System.Convert]::FromBase64String($base64Str)
 
-    Write-Host "Got " + $base64Str.Count + " of bytes"
+    Write-Host "Got " + $base64Str.Length + " of bytes"
 
     [System.IO.File]::Delete("../src/Solution Items/Key.snk")
 
