@@ -8,6 +8,7 @@ environment:
 before_build:
 - ps: >-
     $base64Str = $env:my_signing_key
+	$keyFile = $env:APPVEYOR_BUILD_FOLDER + "/src/Solution Items/Key.snk"
 
     Write-Host "Got " + $base64Str.Length + " of base 64"
 
@@ -15,9 +16,9 @@ before_build:
 
     Write-Host "Got " + $base64Str.Length + " of bytes"
 
-    [System.IO.File]::Delete($env:APPVEYOR_BUILD_FOLDER + "/src/Solution Items/Key.snk")
+    [System.IO.File]::Delete($keyFile)
 
-    [System.IO.File]::WriteAllBytes($env:APPVEYOR_BUILD_FOLDER + "/src/Solution Items/Key.snk", $base64Str)
+    [System.IO.File]::WriteAllBytes($keyFile, $bytes)
 - cmd: nuget restore src/LogExpert.sln
 build:
   project: src/LogExpert.sln
