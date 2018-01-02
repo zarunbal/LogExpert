@@ -1,6 +1,0 @@
-$base64Str = $env:my_signing_key
-Write-Host "Got " + $base64Str.Length + " of base 64"
-$bytes = [System.Convert]::FromBase64String($base64Str)
-Write-Host "Got " + $base64Str.Count + " of bytes"
-[System.IO.File]::DeleteFile("../src/Solution Items/Key.snk")
-[System.IO.File]::WriteAllBytes("../src/Solution Items/Key.snk", $base64Str)
