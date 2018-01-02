@@ -15,7 +15,7 @@ before_build:
 
     Write-Host "Got " + $base64Str.Count + " of bytes"
 
-    [System.IO.File]::DeleteFile("../src/Solution Items/Key.snk")
+    [System.IO.File]::Delete("../src/Solution Items/Key.snk")
 
     [System.IO.File]::WriteAllBytes("../src/Solution Items/Key.snk", $base64Str)
 - cmd: nuget restore src/LogExpert.sln
