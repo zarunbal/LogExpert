@@ -7,6 +7,8 @@ environment:
     secure: 5+tJAGXhhYmF4qwybdyR9IlfSi7EJvmgxTG2IuQ/kx6TXWHzxDxXV8Qgpg2baJlGGX8MF7JOtedAFbHFjESFBc2kW20b/nxNMe+x71kO41EnC+VnQS0oQz+zeYAMN/nFGBRpMndcCd9JHp1a3/qjJohEiI+1K695FSqolUc0hEQgCb2sOaea5Qd8QUVB/Ws8HE50UDUxymc4p8zh6k0cSXc4SCgH69CPmWbLZhFiVIJz+siSleuaCynHFWI/c3FS/IkPenjHshaCcWE7WPC+NRxFrVt5i96X9VMeAQxuagaTsp0uKwhoiRKF2X4jDfLvvluRiGeKT1NBysd87hRNLFDFiwzFBMzgYXJoVCD5LX1+U7C6oPT4nrQh5idM/3ivPfja6kyyb8C9HBCP87RDBGFbqoj6qqTB2LmRM70Zviw1GGNguRBe/HAhxOkaP3fmMw4R2FFcAe7695lGhA42bbBMQbpQbmiCQDYRLZPuFHjqOOSH6zk7/RPoHiCnIi2iff7UuiXxl70P0qAHmOs4L6e7W/gsazvZT1iern9OyAsEo73bR1MPiFyyzbqjz6ChnxsTal+CHur92xt0/Qd5o9EOPONsoiSnP2K5WVlyeZ+LiUpf48sDiPzK2XTMoSbfdtK/o8jGBqmsFOl/dDGSs7otMkzzSDLzgYOwOG3lQjvyBbMI7WszF2j/hwnzNFYFfXo0uv3ac0i25lbc2sS6s8Njw31eVX7HpeJNpWnq0665L08bRaBU7pfiFcEydOHJhXsTmaObqJlUiBkFE4Aj2IbwBx0/Jzm+YMx4iWkBxJd707OJmTehIXGuZ6vKRcXSk4SrcCuTva/wdd5jWQpy5I4SdnjvXVZ+nRMxrEK6BfKsg4/KzaXsVN00QWk4kXvZL7y55IMe7E3K87JYEDMbyoSccncW3ZkLgxZHf5qkSAn96k3B/SzcpUgaOfed9y56B/ULxNoEs75elmsW4d5x7yvXKxn3rpgv4uPmiqson97HnHZq+CAZhIKU2gF8mBp9cC6HLy/qxm1tnoxs9P6fP5cJMYk+PZHMcyzfP9a5okI=
 before_build:
 - ps: >-
+    Set-Location $env:APPVEYOR_BUILD_FOLDER
+
     $base64Str = $env:my_signing_key
 
     Write-Host "Got " + $base64Str.Length + " of base 64"
@@ -15,9 +17,9 @@ before_build:
 
     Write-Host "Got " + $base64Str.Length + " of bytes"
 
-    [System.IO.File]::Delete("../src/Solution Items/Key.snk")
+    [System.IO.File]::Delete("src/Solution Items/Key.snk")
 
-    [System.IO.File]::WriteAllBytes("../src/Solution Items/Key.snk", $base64Str)
+    [System.IO.File]::WriteAllBytes("src/Solution Items/Key.snk", $base64Str)
 - cmd: nuget restore src/LogExpert.sln
 build:
   project: src/LogExpert.sln
