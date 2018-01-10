@@ -153,7 +153,7 @@ namespace LogExpert
             return readInt;
         }
 
-        public unsafe string ReadLine()
+        public string ReadLine()
         {
             return this.useSystemReaderMethod ? ReadLineNew() : ReadLineOld();
         }
@@ -220,7 +220,7 @@ namespace LogExpert
         //  this.builder = new StringBuilder(400);
         //}
 
-        private unsafe string GetLineAndResetBuilder()
+        private string GetLineAndResetBuilder()
         {
             string result = new string(this.charBuffer, 0, this.charBufferPos);
             NewBuilder();
@@ -310,7 +310,7 @@ namespace LogExpert
 
         #endregion
 
-        protected unsafe string ReadLineNew()
+        protected string ReadLineNew()
         {
             if (this.newLineSequenceLength == 0)
             {
@@ -332,7 +332,7 @@ namespace LogExpert
             return line;
         }
 
-        protected unsafe string ReadLineOld()
+        protected string ReadLineOld()
         {
             string result;
             int readInt;
