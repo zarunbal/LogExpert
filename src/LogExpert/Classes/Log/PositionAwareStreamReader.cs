@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 //using System.Linq;
 using System.Text;
 using System.IO;
@@ -319,7 +320,10 @@ namespace LogExpert
             if (line != null)
             {
                 this.pos += this.Encoding.GetByteCount(line);
-                this.pos += this.newLineSequenceLength;
+                if (!reader.EndOfStream) //TO avoid setting position ahead of the file
+                {
+                    this.pos += this.newLineSequenceLength;
+                }
                 if (line.Length > MAX_LINE_LEN)
                 {
                     line = line.Remove(MAX_LINE_LEN);
