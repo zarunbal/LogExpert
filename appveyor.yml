@@ -25,7 +25,6 @@ build:
   project: src/LogExpert.sln
   parallel: true
   verbosity: minimal
-test: off
 artifacts:
 - path: bin\Release\
   name: ci-Development
