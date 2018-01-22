@@ -2077,6 +2077,10 @@ namespace LogExpert
         {
             IEnumerable<ListViewItem> list = e.Data.GetData(e.Data.GetFormats()[0]) as IEnumerable<ListViewItem>;
             object data = e.Data.GetData("Shell IDList Array");
+            if (data == null)
+            {
+            	return;	// prevent crash
+            }
             StreamReader r = new StreamReader(data as Stream);
             string line = r.ReadToEnd();
 
