@@ -214,7 +214,7 @@ namespace LogExpert
 
 
         public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title,
-           bool forcePersistenceLoading,
+            bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer)
         {
             return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
@@ -222,7 +222,7 @@ namespace LogExpert
         }
 
         public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
-             bool forcePersistenceLoading,
+            bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer)
         {
             return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
@@ -2075,25 +2075,15 @@ namespace LogExpert
 
         private void LogWindow_DragOver(object sender, DragEventArgs e)
         {
-            IEnumerable<ListViewItem> list = e.Data.GetData(e.Data.GetFormats()[0]) as IEnumerable<ListViewItem>;
             object data = e.Data.GetData("Shell IDList Array");
             if (data == null)
             {
-            	return;	// prevent crash
+                return; // prevent crash
             }
-            StreamReader r = new StreamReader(data as Stream);
-            string line = r.ReadToEnd();
-
-            string[] formats = e.Data.GetFormats();
-            bool yeah = e.Data.GetDataPresent(formats[0], true);
-            object obj = e.Data.GetData(formats[0], true);
-            object obj1 = e.Data.GetData(formats[1]);
-            object obj2 = e.Data.GetData(formats[2]);
 
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.None;
-                return;
             }
             else
             {
@@ -2115,14 +2105,13 @@ namespace LogExpert
             _logger.Debug(s);
 #endif
 
-            object test = e.Data.GetData(DataFormats.StringFormat);
-
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 object o = e.Data.GetData(DataFormats.FileDrop);
-                if (o is string[])
+                string[] names = o as string[];
+                if (names != null)
                 {
-                    LoadFiles((string[]) o, (e.KeyState & 4) == 4); // (shift pressed?)
+                    LoadFiles(names, (e.KeyState & 4) == 4); // (shift pressed?)
                     e.Effect = DragDropEffects.Copy;
                 }
             }
