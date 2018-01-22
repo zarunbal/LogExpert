@@ -13,6 +13,8 @@ before_build:
 
     Write-Host "Got " + $base64Str.Length + " of base 64"
 
+    if($base64Str -eq 0) {Return}
+
     $bytes = [System.Convert]::FromBase64String($base64Str)
 
     Write-Host "Got " + $base64Str.Length + " of bytes"
