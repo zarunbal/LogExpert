@@ -2075,12 +2075,6 @@ namespace LogExpert
 
         private void LogWindow_DragOver(object sender, DragEventArgs e)
         {
-            object data = e.Data.GetData("Shell IDList Array");
-            if (data == null)
-            {
-                return; // prevent crash
-            }
-
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.None;
