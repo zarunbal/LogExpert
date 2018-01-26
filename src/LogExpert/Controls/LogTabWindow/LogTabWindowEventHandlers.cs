@@ -26,7 +26,6 @@ namespace LogExpert
             ApplySettings(ConfigManager.Settings, SettingsFlags.All);
             if (ConfigManager.Settings.isMaximized)
             {
-                Rectangle tmpBounds = Bounds;
                 if (ConfigManager.Settings.appBoundsFullscreen != null)
                 {
                     Bounds = ConfigManager.Settings.appBoundsFullscreen;
