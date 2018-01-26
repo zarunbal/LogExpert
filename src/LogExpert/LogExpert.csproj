@@ -78,6 +78,15 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\SettingsFlags.cs" />
     <Compile Include="Config\ToolEntry.cs" />
+    <Compile Include="Controls\LogTabWindow\LogTabWindowEventHandlers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\LogTabWindow\LogTabWindowPrivate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\LogTabWindow\LogTabWindowPublic.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls\LogWindow\LogWindowEventHandlers.cs">
       <SubType>Form</SubType>
     </Compile>
