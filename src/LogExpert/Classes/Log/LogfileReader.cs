@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Diagnostics;
 using NLog;
 
-
 namespace LogExpert
 {
     public class LogfileReader
@@ -88,7 +87,6 @@ namespace LogExpert
             StartGCThread();
         }
 
-
         public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer,
             MultifileOptions mutlifileOptions)
         {
@@ -129,6 +127,8 @@ namespace LogExpert
         public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);
 
         public delegate void FinishedLoadingEventHandler(object sender, EventArgs e);
+
+        private delegate ILogLine GetLogLineFx(int lineNum);
 
         public delegate void LoadingStartedEventHandler(object sender, LoadFileEventArgs e);
 
@@ -378,7 +378,6 @@ namespace LogExpert
             return offset;
         }
 
-
         public ILogLine GetLogLine(int lineNum)
         {
             return GetLogLineInternal(lineNum);
@@ -461,7 +460,6 @@ namespace LogExpert
             ReleaseBufferListReaderLock();
             return info;
         }
-
 
         /// <summary>
         /// Returns the line number (starting from the given number) where the next multi file
@@ -594,7 +592,6 @@ namespace LogExpert
             stopperThread.IsBackground = true;
             stopperThread.Start();
         }
-
 
         /// <summary>
         /// Deletes all buffer lines and disposes their content. Use only when the LogfileReader
@@ -736,7 +733,6 @@ namespace LogExpert
             return info;
         }
 
-
         private ILogLine GetLogLineInternal(int lineNum)
         {
             if (isDeleted)
@@ -812,7 +808,6 @@ namespace LogExpert
             //this.lastReturnedLineNum = -1;
             //this.lastReturnedLineNumForBuffer = -1;
         }
-
 
         private ILogFileInfo GetLogFileInfo(string fileNameOrUri)
         {
@@ -890,7 +885,6 @@ namespace LogExpert
             return lastRemovedBuffer;
         }
 
-
         /// <summary>
         /// The caller must have writer locks for lruCache and buffer list!
         /// </summary>
@@ -905,8 +899,7 @@ namespace LogExpert
 
         private void ReadToBufferList(ILogFileInfo logFileInfo, long filePos, int startLine)
         {
-            Stream fileStream;
-            ILogStreamReader reader = null;
+            Stream fileStream = null;
             try
             {
                 fileStream = logFileInfo.OpenStream();
@@ -914,6 +907,7 @@ namespace LogExpert
             catch (IOException fe)
             {
                 _logger.Warn(fe, "IOException: ");
+                fileStream?.Dispose();
                 isDeleted = true;
                 LineCount = 0;
                 FileSize = 0;
@@ -922,10 +916,9 @@ namespace LogExpert
             }
             try
             {
-                reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
                 reader.Position = filePos;
                 fileLength = logFileInfo.Length;
-
 
                 string line;
                 int lineNum = startLine;
@@ -972,7 +965,6 @@ namespace LogExpert
                 while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
                     logBuffer.StartLine + logBuffer.LineCount + droppedLines, out line))
                 {
-                    LogLine logLine = new LogLine();
                     if (shouldStop)
                     {
                         Monitor.Exit(logBuffer);
@@ -1003,6 +995,7 @@ namespace LogExpert
                         ReleaseBufferListWriterLock();
                         lineCount = 1;
                     }
+                    LogLine logLine = new LogLine();
 
                     logLine.FullLine = line;
                     logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
@@ -1011,7 +1004,6 @@ namespace LogExpert
                     filePos = reader.Position;
                     lineNum++;
                 }
-
 
                 logBuffer.Size = filePos - logBuffer.StartPos;
                 Monitor.Exit(logBuffer);
@@ -1032,9 +1024,10 @@ namespace LogExpert
             finally
             {
                 fileStream.Close();
+                fileStream.Dispose();
+                fileStream = null;
             }
         }
-
 
         private void AddBufferToList(LogBuffer logBuffer)
         {
@@ -1183,7 +1176,6 @@ namespace LogExpert
             }
         }
 
-
         //    private void UpdateLru(LogBuffer logBuffer)
         //    {
         //      lock (this.monitor)
@@ -1250,7 +1242,6 @@ namespace LogExpert
         //  }
         //}
 
-
         //private void AddBufferToLru(LogBuffer logBuffer)
         //{
         //  lock (this.monitor)
@@ -1285,84 +1276,72 @@ namespace LogExpert
             _logger.Info("Clearing done.");
         }
 
-
         private void ReReadBuffer(LogBuffer logBuffer)
         {
-#if DEBUG
-            _logger.Info("re-reading buffer: {0}/{1}/{2}", logBuffer.StartLine, logBuffer.LineCount, logBuffer.FileInfo.FullName);
-#endif
+            _logger.Debug("re-reading buffer: {0}/{1}/{2}", logBuffer.StartLine, logBuffer.LineCount, logBuffer.FileInfo.FullName);
+
+            Stream fileStream = null;
+
             try
             {
                 Monitor.Enter(logBuffer);
-                Stream fileStream = null;
-                try
-                {
-                    fileStream = logBuffer.FileInfo.OpenStream();
-                }
-                catch (IOException e)
-                {
-                    _logger.Warn(e);
-                    return;
-                }
-                try
-                {
-                    ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                fileStream = logBuffer.FileInfo.OpenStream();
 
-                    string line;
-                    long filePos = logBuffer.StartPos;
-                    reader.Position = logBuffer.StartPos;
-                    int maxLinesCount = logBuffer.LineCount;
-                    int lineCount = 0;
-                    int dropCount = logBuffer.PrevBuffersDroppedLinesSum;
-                    logBuffer.ClearLines();
-                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
-                        logBuffer.StartLine + logBuffer.LineCount + dropCount, out line))
+                ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+
+                string line;
+                long filePos = logBuffer.StartPos;
+                reader.Position = logBuffer.StartPos;
+                int maxLinesCount = logBuffer.LineCount;
+                int lineCount = 0;
+                int dropCount = logBuffer.PrevBuffersDroppedLinesSum;
+                logBuffer.ClearLines();
+                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
+                    logBuffer.StartLine + logBuffer.LineCount + dropCount, out line))
+                {
+                    if (lineCount >= maxLinesCount)
                     {
-                        if (lineCount >= maxLinesCount)
-                        {
-                            break;
-                        }
-
-                        if (line == null)
-                        {
-                            dropCount++;
-                            continue;
-                        }
-                        LogLine logLine = new LogLine();
-
-                        logLine.FullLine = line;
-                        logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
-
-                        logBuffer.AddLine(logLine, filePos);
-                        filePos = reader.Position;
-                        lineCount++;
+                        break;
                     }
-                    if (maxLinesCount != logBuffer.LineCount)
+
+                    if (line == null)
                     {
-                        _logger.Warn("LineCount in buffer differs after re-reading. old={0}, new={1}", maxLinesCount, logBuffer.LineCount);
+                        dropCount++;
+                        continue;
                     }
-                    if (dropCount - logBuffer.PrevBuffersDroppedLinesSum != logBuffer.DroppedLinesCount)
-                    {
-                        _logger.Warn("DroppedLinesCount in buffer differs after re-reading. old={0}, new={1}", logBuffer.DroppedLinesCount, dropCount);
-                        logBuffer.DroppedLinesCount = dropCount - logBuffer.PrevBuffersDroppedLinesSum;
-                    }
-                    GC.KeepAlive(fileStream);
+                    LogLine logLine = new LogLine();
+
+                    logLine.FullLine = line;
+                    logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
+
+                    logBuffer.AddLine(logLine, filePos);
+                    filePos = reader.Position;
+                    lineCount++;
                 }
-                catch (IOException e)
+                if (maxLinesCount != logBuffer.LineCount)
                 {
-                    _logger.Warn(e);
+                    _logger.Warn("LineCount in buffer differs after re-reading. old={0}, new={1}", maxLinesCount, logBuffer.LineCount);
                 }
-                finally
+                if (dropCount - logBuffer.PrevBuffersDroppedLinesSum != logBuffer.DroppedLinesCount)
                 {
-                    fileStream.Close();
+                    _logger.Warn("DroppedLinesCount in buffer differs after re-reading. old={0}, new={1}", logBuffer.DroppedLinesCount, dropCount);
+                    logBuffer.DroppedLinesCount = dropCount - logBuffer.PrevBuffersDroppedLinesSum;
                 }
+                GC.KeepAlive(fileStream);
+            }
+            catch (IOException e)
+            {
+                _logger.Warn(e);
             }
             finally
             {
+                fileStream?.Close();
+                fileStream?.Dispose();
+                fileStream = null;
+
                 Monitor.Exit(logBuffer);
             }
         }
-
 
         private LogBuffer getBufferForLine(int lineNum)
         {
@@ -1759,7 +1738,6 @@ namespace LogExpert
 
         #endregion
 
-
         ~LogfileReader()
         {
             DeleteAllContent();
@@ -1826,7 +1804,5 @@ namespace LogExpert
 
             #endregion
         }
-
-        private delegate ILogLine GetLogLineFx(int lineNum);
     }
 }
