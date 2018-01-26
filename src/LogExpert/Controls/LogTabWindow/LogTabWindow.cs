@@ -220,30 +220,6 @@ namespace LogExpert
             }
         }
 
-        /// <summary>
-        /// Creates a temp file with the text content of the clipboard and opens the temp file in a new tab.
-        /// </summary>
-        internal void PasteFromClipboard()
-        {
-            if (Clipboard.ContainsText())
-            {
-                string text = Clipboard.GetText();
-                string fileName = Path.GetTempFileName();
-                FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-                StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode);
-                writer.Write(text);
-                writer.Close();
-                string title = "Clipboard";
-                LogWindow logWindow = AddTempFileTab(fileName, title);
-                LogWindowData data = logWindow.Tag as LogWindowData;
-                if (data != null)
-                {
-                    DateTime now = DateTime.Now;
-                    SetTooltipText(logWindow, "Pasted on " + now.ToString());
-                }
-            }
-        }
-
         #endregion
 
         private class LogWindowData
