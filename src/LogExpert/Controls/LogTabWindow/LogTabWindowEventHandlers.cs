@@ -56,11 +56,11 @@ namespace LogExpert
             {
                 LoadFiles(startupFileNames, false);
             }
-            ledThread = new Thread(new ThreadStart(LedThreadProc));
+            ledThread = new Thread(LedThreadProc);
             ledThread.IsBackground = true;
             ledThread.Start();
 
-            statusLineThread = new Thread(new ThreadStart(StatusLineThreadFunc));
+            statusLineThread = new Thread(StatusLineThreadFunc);
             statusLineThread.IsBackground = true;
             statusLineThread.Start();
 
@@ -170,8 +170,8 @@ namespace LogExpert
                             if (!logWindow.CurrentColumnizer.GetType().Equals(form.SelectedColumnizer.GetType()))
                             {
                                 //logWindow.SetColumnizer(form.SelectedColumnizer);
-                                SetColumnizerFx fx = new SetColumnizerFx(logWindow.ForceColumnizer);
-                                logWindow.Invoke(fx, new object[] {form.SelectedColumnizer});
+                                SetColumnizerFx fx = logWindow.ForceColumnizer;
+                                logWindow.Invoke(fx, form.SelectedColumnizer);
                                 setColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
                             }
                             else
@@ -188,8 +188,8 @@ namespace LogExpert
                 {
                     if (!CurrentLogWindow.CurrentColumnizer.GetType().Equals(form.SelectedColumnizer.GetType()))
                     {
-                        SetColumnizerFx fx = new SetColumnizerFx(CurrentLogWindow.ForceColumnizer);
-                        CurrentLogWindow.Invoke(fx, new object[] {form.SelectedColumnizer});
+                        SetColumnizerFx fx = CurrentLogWindow.ForceColumnizer;
+                        CurrentLogWindow.Invoke(fx, form.SelectedColumnizer);
                         setColumnizerHistoryEntry(CurrentLogWindow.FileName, form.SelectedColumnizer);
                     }
                     if (form.IsConfigPressed)
@@ -337,7 +337,7 @@ namespace LogExpert
 
         private void GuiStateUpdate(object sender, GuiStateArgs e)
         {
-            BeginInvoke(new GuiStateUpdateWorkerDelegate(GuiStateUpdateWorker), new object[] {e});
+            BeginInvoke(new GuiStateUpdateWorkerDelegate(GuiStateUpdateWorker), e);
         }
 
         private void ColumnizerChanged(object sender, ColumnizerEventArgs e)
@@ -365,7 +365,7 @@ namespace LogExpert
 
         private void ProgressBarUpdate(object sender, ProgressEventArgs e)
         {
-            Invoke(new ProgressBarEventFx(ProgressBarUpdateWorker), new object[] {e});
+            Invoke(new ProgressBarEventFx(ProgressBarUpdateWorker), e);
         }
 
         private void StatusLineEvent(object sender, StatusLineEventArgs e)
@@ -467,7 +467,6 @@ namespace LogExpert
                 int diff = e.LineCount - e.PrevLineCount;
                 if (diff < 0)
                 {
-                    diff = DIFF_MAX;
                     return;
                 }
                 LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
@@ -490,19 +489,19 @@ namespace LogExpert
                         data.dirty = true;
                     }
                     Icon icon = GetIcon(diff, data);
-                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {(LogWindow) sender, icon});
+                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
                 }
             }
         }
 
         private void logWindow_FileNotFound(object sender, EventArgs e)
         {
-            Invoke(new FileNotFoundDelegate(FileNotFound), new object[] {sender});
+            Invoke(new FileNotFoundDelegate(FileNotFound), sender);
         }
 
         private void logWindow_FileRespawned(object sender, EventArgs e)
         {
-            Invoke(new FileRespawnedDelegate(FileRespawned), new object[] {sender});
+            Invoke(new FileRespawnedDelegate(FileRespawned), sender);
         }
 
         private void logWindow_FilterListChanged(object sender, FilterListChangedEventArgs e)
@@ -540,7 +539,7 @@ namespace LogExpert
                     LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
                     data.dirty = false;
                     Icon icon = GetIcon(data.diffSum, data);
-                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {(LogWindow) sender, icon});
+                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
                 }
             }
         }
@@ -552,7 +551,7 @@ namespace LogExpert
                 LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
                 data.syncMode = e.IsTimeSynced ? 1 : 0;
                 Icon icon = GetIcon(data.diffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {(LogWindow) sender, icon});
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
             }
             else
             {
@@ -630,7 +629,7 @@ namespace LogExpert
             {
                 LogWindowData data = CurrentLogWindow.Tag as LogWindowData;
                 Icon icon = GetIcon(0, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {CurrentLogWindow, icon});
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), CurrentLogWindow, icon);
                 CurrentLogWindow.Reload();
             }
         }
@@ -1017,13 +1016,13 @@ namespace LogExpert
 
         private void throwExceptionbackgroundThToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExceptionFx fx = new ExceptionFx(throwExceptionFx);
+            ExceptionFx fx = throwExceptionFx;
             fx.BeginInvoke(null, null);
         }
 
         private void throwExceptionbackgroundThreadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Thread thread = new Thread(new ThreadStart(throwExceptionThreadFx));
+            Thread thread = new Thread(throwExceptionThreadFx);
             thread.IsBackground = true;
             thread.Start();
         }
