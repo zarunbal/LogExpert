@@ -26,7 +26,6 @@ namespace LogExpert
     {
         #region Fields
 
-        private const int MAX_HISTORY = 30;
         private const int MAX_COLUMNIZER_HISTORY = 40;
         private const int MAX_COLOR_HISTORY = 40;
         private const int DIFF_MAX = 100;
@@ -37,14 +36,11 @@ namespace LogExpert
         private readonly Color defaultTabColor = Color.FromArgb(255, 192, 192, 192);
         private readonly Brush dirtyLedBrush;
 
-        //Color defaultTabBorderColor = Color.FromArgb(255, 255, 140, 5);
-
         private readonly int instanceNumber = 0;
         private readonly Brush[] ledBrushes = new Brush[5];
         private readonly Icon[,,,] ledIcons = new Icon[6, 2, 4, 2];
 
         private readonly Rectangle[] leds = new Rectangle[5];
-        //private List<FilterParams> filterList = new List<FilterParams>();
 
         private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
         private readonly Brush offLedBrush;
@@ -72,7 +68,6 @@ namespace LogExpert
 
         private bool shouldStop = false;
 
-        //bool waitingForClose = false;
         private bool skipEvents = false;
 
         private Thread statusLineThread;
@@ -212,7 +207,6 @@ namespace LogExpert
             return logWin;
         }
 
-
         public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title,
             bool forcePersistenceLoading,
             ILogLineColumnizer preProcessColumnizer)
@@ -228,7 +222,6 @@ namespace LogExpert
             return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
                 preProcessColumnizer, false);
         }
-
 
         public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
             bool forcePersistenceLoading,
@@ -324,7 +317,6 @@ namespace LogExpert
             this.Invoke(new AddFileTabsDelegate(AddFileTabs), new object[] {fileNames});
         }
 
-
         public void OpenSearchDialog()
         {
             if (this.CurrentLogWindow == null)
@@ -345,7 +337,6 @@ namespace LogExpert
             }
         }
 
-
         public ILogLineColumnizer GetColumnizerHistoryEntry(string fileName)
         {
             ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
@@ -362,7 +353,6 @@ namespace LogExpert
             }
             return null;
         }
-
 
         public void SwitchTab(bool shiftPressed)
         {
@@ -482,7 +472,6 @@ namespace LogExpert
 
         [DllImport("User32.dll")]
         public static extern int SetForegroundWindow(IntPtr hWnd);
-
 
         // called from LogWindow when follow tail was changed
         public void FollowTailChanged(LogWindow logWindow, bool isEnabled, bool offByTrigger)
@@ -616,7 +605,6 @@ namespace LogExpert
                 }
             }
         }
-
 
         private void SaveWindowPosition()
         {
@@ -801,7 +789,6 @@ namespace LogExpert
             return fileName;
         }
 
-
         private void FillHistoryMenu()
         {
             ToolStripDropDown strip = new ToolStripDropDownMenu();
@@ -815,7 +802,6 @@ namespace LogExpert
             this.lastUsedToolStripMenuItem.DropDown = strip;
         }
 
-
         private void RemoveLogWindow(LogWindow logWindow)
         {
             lock (this.logWindowList)
@@ -824,7 +810,6 @@ namespace LogExpert
             }
             DisconnectEventHandlers(logWindow);
         }
-
 
         private void RemoveAndDisposeLogWindow(LogWindow logWindow, bool dontAsk)
         {
@@ -838,7 +823,6 @@ namespace LogExpert
             }
             logWindow.Close(dontAsk);
         }
-
 
         private void ShowHighlightSettingsDialog()
         {
@@ -859,7 +843,6 @@ namespace LogExpert
             }
         }
 
-
         private void FillHighlightComboBox()
         {
             string currentGroupName = this.highlightGroupsComboBox.Text;
@@ -873,7 +856,6 @@ namespace LogExpert
                 }
             }
         }
-
 
         private void OpenFileDialog()
         {
@@ -920,7 +902,6 @@ namespace LogExpert
                 }
             }
         }
-
 
         private void LoadFiles(string[] names, bool invertLogic)
         {
@@ -980,7 +961,6 @@ namespace LogExpert
             }
         }
 
-
         private void setColumnizerHistoryEntry(string fileName, ILogLineColumnizer columnizer)
         {
             ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
@@ -995,7 +975,6 @@ namespace LogExpert
                 ConfigManager.Settings.columnizerHistoryList.RemoveAt(0);
             }
         }
-
 
         private ColumnizerHistoryEntry findColumnizerHistoryEntry(string fileName)
         {
@@ -1210,7 +1189,6 @@ namespace LogExpert
             this.statusStrip1.Refresh();
         }
 
-
         // tailState: 0,1,2 = on/off/off by Trigger
         // syncMode: 0 = normal (no), 1 = time synced 
         private Icon CreateLedIcon(int level, bool dirty, int tailState, int syncMode)
@@ -1318,7 +1296,6 @@ namespace LogExpert
             this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWin, icon});
         }
 
-
         private void ShowLedPeak(LogWindow logWin)
         {
             LogWindowData data = logWin.Tag as LogWindowData;
@@ -1329,7 +1306,6 @@ namespace LogExpert
             Icon icon = GetIcon(data.diffSum, data);
             this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWin, icon});
         }
-
 
         private int GetLevelFromDiff(int diff)
         {
@@ -1404,7 +1380,6 @@ namespace LogExpert
             return icon;
         }
 
-
         private void RefreshEncodingMenuBar(Encoding encoding)
         {
             this.aSCIIToolStripMenuItem.Checked = false;
@@ -1451,7 +1426,6 @@ namespace LogExpert
             }
         }
 
-
         private void NotifyWindowsForChangedPrefs(SettingsFlags flags)
         {
             _logger.Info("The preferences have changed");
@@ -1472,7 +1446,6 @@ namespace LogExpert
                 OnHighlightSettingsChanged();
             }
         }
-
 
         private void ApplySettings(Settings settings, SettingsFlags flags)
         {
@@ -1819,6 +1792,14 @@ namespace LogExpert
             return null;
         }
 
+        private void OnHighlightSettingsChanged()
+        {
+            if (HighlightSettingsChanged != null)
+            {
+                HighlightSettingsChanged(this, new EventArgs());
+            }
+        }
+
         #endregion
 
         #region Events handler
@@ -1922,7 +1903,6 @@ namespace LogExpert
             }
         }
 
-
         private void strip_MouseUp(object sender, MouseEventArgs e)
         {
             if (sender is ToolStripDropDown)
@@ -1950,12 +1930,10 @@ namespace LogExpert
             logWindow.Tag = null;
         }
 
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-
 
         private void selectFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2020,7 +1998,6 @@ namespace LogExpert
             }
         }
 
-
         private void goToLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.CurrentLogWindow == null)
@@ -2039,24 +2016,20 @@ namespace LogExpert
             }
         }
 
-
         private void hilightingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowHighlightSettingsDialog();
         }
-
 
         private void searchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenSearchDialog();
         }
 
-
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog();
         }
-
 
         private void LogTabWindow_DragEnter(object sender, DragEventArgs e)
         {
@@ -2111,7 +2084,6 @@ namespace LogExpert
             }
         }
 
-
         private void timeshiftToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
         {
             if (!this.skipEvents && this.CurrentLogWindow != null)
@@ -2130,7 +2102,6 @@ namespace LogExpert
             aboutBox.ShowDialog();
         }
 
-
         private void filterToggleButton_Click(object sender, EventArgs e)
         {
             if (this.CurrentLogWindow != null)
@@ -2146,7 +2117,6 @@ namespace LogExpert
                 this.CurrentLogWindow.ToggleFilterPanel();
             }
         }
-
 
         private void multiFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2214,7 +2184,6 @@ namespace LogExpert
         {
             OpenSearchDialog();
         }
-
 
         private void LogTabWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -2315,12 +2284,10 @@ namespace LogExpert
             }
         }
 
-
         private void logWindow_FileNotFound(object sender, EventArgs e)
         {
             this.Invoke(new FileNotFoundDelegate(FileNotFound), new object[] {sender});
         }
-
 
         private void logWindow_FileRespawned(object sender, EventArgs e)
         {
@@ -2342,14 +2309,12 @@ namespace LogExpert
             ConfigManager.Save(SettingsFlags.FilterList);
         }
 
-
         private void logWindow_CurrentHighlightGroupChanged(object sender, CurrentHighlightGroupChangedEventArgs e)
         {
             OnHighlightSettingsChanged();
             ConfigManager.Settings.hilightGroupList = this.HilightGroupList;
             ConfigManager.Save(SettingsFlags.HighlightSettings);
         }
-
 
         private void TailFollowed(object sender, EventArgs e)
         {
@@ -2719,7 +2684,6 @@ namespace LogExpert
             }
         }
 
-
         private void toolStripButtonBubbles_Click(object sender, EventArgs e)
         {
             if (this.CurrentLogWindow != null)
@@ -2765,7 +2729,6 @@ namespace LogExpert
         {
             ApplySelectedHighlightGroup();
         }
-
 
         private void highlightGroupsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -2980,14 +2943,6 @@ namespace LogExpert
 
         #endregion
 
-        protected void OnHighlightSettingsChanged()
-        {
-            if (HighlightSettingsChanged != null)
-            {
-                HighlightSettingsChanged(this, new EventArgs());
-            }
-        }
-
         private class LogWindowData
         {
             #region Fields
@@ -3014,20 +2969,6 @@ namespace LogExpert
             #endregion
         }
 
-        private delegate void UpdateGridCallback(LogEventArgs e);
-
-        private delegate void UpdateProgressCallback(LoadFileEventArgs e);
-
-        private delegate int SearchFx(SearchParams searchParams);
-
-        private delegate void SelectLineFx(int line);
-
-        private delegate void FilterFx(FilterParams filterParams);
-
-        private delegate void AddFilterLineFx(int lineNum, bool immediate);
-
-        private delegate void UpdateProgressBarFx(int lineNum);
-
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
 
         private delegate void StatusLineEventFx(StatusLineEventArgs e);
@@ -3038,26 +2979,11 @@ namespace LogExpert
 
         private delegate void SetTabIconDelegate(LogWindow logWindow, Icon icon);
 
-        private delegate void HandleTabDoubleClick(object sender);
-
         private delegate void LoadFileDelegate(string fileName, EncodingOptions encodingOptions);
 
         private delegate void LoadMultiFilesDelegate(string[] fileName, EncodingOptions encodingOptions);
 
         private delegate void AddFileTabsDelegate(string[] fileNames);
-
-
-        private class LowercaseStringComparer : IComparer<string>
-        {
-            #region Public methods
-
-            public int Compare(string x, string y)
-            {
-                return x.ToLower().CompareTo(y.ToLower());
-            }
-
-            #endregion
-        };
 
         private delegate void FileNotFoundDelegate(LogWindow logWin);
 
