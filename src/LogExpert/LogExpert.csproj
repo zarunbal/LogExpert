@@ -252,10 +252,10 @@
     <Compile Include="Controls\LogTabPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\LogTabWindow.cs">
+    <Compile Include="Controls\LogTabWindow\LogTabWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\LogTabWindow.designer.cs">
+    <Compile Include="Controls\LogTabWindow\LogTabWindow.designer.cs">
       <DependentUpon>LogTabWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Entities\DefaultLogfileColumnizer.cs" />
@@ -361,7 +361,7 @@
       <SubType>Designer</SubType>
       <DependentUpon>KnobControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\LogTabWindow.resx">
+    <EmbeddedResource Include="Controls\LogTabWindow\LogTabWindow.resx">
       <DependentUpon>LogTabWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
