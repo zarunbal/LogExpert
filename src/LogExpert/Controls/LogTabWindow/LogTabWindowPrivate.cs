@@ -97,12 +97,10 @@ namespace LogExpert
             }
             else
             {
-                FormWindowState state = WindowState;
                 ConfigManager.Settings.appBoundsFullscreen = Bounds;
                 ConfigManager.Settings.isMaximized = true;
                 WindowState = FormWindowState.Normal;
                 ConfigManager.Settings.appBounds = Bounds;
-                //this.WindowState = state;
             }
             ResumeLayout();
         }
@@ -650,7 +648,7 @@ namespace LogExpert
                             {
                                 e = lastStatusLineEvent.Clone();
                             }
-                            BeginInvoke(new StatusLineEventFx(StatusLineEventWorker), new object[] {e});
+                            BeginInvoke(new StatusLineEventFx(StatusLineEventWorker), e);
                         }
                         catch (ObjectDisposedException)
                         {
@@ -766,7 +764,7 @@ namespace LogExpert
         private void FileNotFound(LogWindow logWin)
         {
             LogWindowData data = logWin.Tag as LogWindowData;
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWin, deadIcon});
+            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, deadIcon);
             dateTimeDragControl.Visible = false;
         }
 
@@ -774,7 +772,7 @@ namespace LogExpert
         {
             LogWindowData data = logWin.Tag as LogWindowData;
             Icon icon = GetIcon(0, data);
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWin, icon});
+            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
         }
 
         private void ShowLedPeak(LogWindow logWin)
@@ -785,7 +783,7 @@ namespace LogExpert
                 data.diffSum = DIFF_MAX;
             }
             Icon icon = GetIcon(data.diffSum, data);
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWin, icon});
+            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
         }
 
         private int GetLevelFromDiff(int diff)
@@ -832,7 +830,7 @@ namespace LogExpert
                                 data.diffSum = 0;
                             }
                             Icon icon = GetIcon(data.diffSum, data);
-                            BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+                            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
                         }
                     }
                 }
@@ -964,7 +962,7 @@ namespace LogExpert
                 {
                     LogWindowData data = logWindow.Tag as LogWindowData;
                     Icon icon = GetIcon(data.diffSum, data);
-                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
                 }
             }
         }
@@ -989,7 +987,7 @@ namespace LogExpert
                 DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
-            if (entry.cmd != null && entry.cmd.Length > 0)
+            if (!string.IsNullOrEmpty(entry.cmd))
             {
                 item.ToolTipText = entry.name;
             }
@@ -997,7 +995,7 @@ namespace LogExpert
 
         private void ToolButtonClick(ToolEntry toolEntry)
         {
-            if (toolEntry.cmd == null || toolEntry.cmd.Length == 0)
+            if (string.IsNullOrEmpty(toolEntry.cmd))
             {
                 OpenSettings(2);
                 return;
@@ -1021,7 +1019,7 @@ namespace LogExpert
 
         private void StartTool(string cmd, string args, bool sysoutPipe, string columnizerName, string workingDir)
         {
-            if (cmd == null || cmd.Length == 0)
+            if (string.IsNullOrEmpty(cmd))
             {
                 return;
             }
@@ -1231,24 +1229,33 @@ namespace LogExpert
 
         private string SaveLayout()
         {
-            MemoryStream memStream = new MemoryStream(2000);
-            dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
-            memStream.Seek(0, SeekOrigin.Begin);
-            StreamReader r = new StreamReader(memStream);
-            string resultXml = r.ReadToEnd();
-            r.Close();
-            return resultXml;
+            ;
+            using (MemoryStream memStream = new MemoryStream(2000))
+            using (StreamReader r = new StreamReader(memStream))
+            {
+                dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
+
+                memStream.Seek(0, SeekOrigin.Begin);
+                string resultXml = r.ReadToEnd();
+
+                r.Close();
+
+                return resultXml;
+            }
         }
 
         private void RestoreLayout(string layoutXml)
         {
-            MemoryStream memStream = new MemoryStream(2000);
-            StreamWriter w = new StreamWriter(memStream);
-            w.Write(layoutXml);
-            w.Flush();
-            memStream.Seek(0, SeekOrigin.Begin);
-            dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
-            w.Dispose();
+            using (MemoryStream memStream = new MemoryStream(2000))
+            using (StreamWriter w = new StreamWriter(memStream))
+            {
+                w.Write(layoutXml);
+                w.Flush();
+
+                memStream.Seek(0, SeekOrigin.Begin);
+
+                dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+            }
         }
 
         private IDockContent DeserializeDockContent(string persistString)
