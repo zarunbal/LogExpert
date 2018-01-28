@@ -180,14 +180,14 @@ namespace LogExpert
                 {
                     if (persistenceData.currentLine >= 0 && persistenceData.currentLine < this.dataGridView.RowCount)
                     {
-                        SelectLine(persistenceData.currentLine, false);
+                        SelectLine(persistenceData.currentLine, false, true);
                     }
                     else
                     {
                         if (this.logFileReader.LineCount > 0)
                         {
                             this.dataGridView.FirstDisplayedScrollingRowIndex = this.logFileReader.LineCount - 1;
-                            SelectLine(this.logFileReader.LineCount - 1, false);
+                            SelectLine(this.logFileReader.LineCount - 1, false, true);
                         }
                     }
                     if (persistenceData.firstDisplayedLine >= 0 &&
@@ -489,7 +489,6 @@ namespace LogExpert
             _logger.Info("Refreshing filter view because of reload.");
             this.Invoke(new MethodInvoker(FilterSearch));
             LoadFilterPipes();
-            OnFileReloadFinished();
         }
 
         private void UpdateProgress(LoadFileEventArgs e)
@@ -1085,7 +1084,7 @@ namespace LogExpert
             int leftPad = e.CellStyle.Padding.Left;
             RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width,
                 e.CellBounds.Height);
-            Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
+            Rectangle borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
             Rectangle valBounds = e.CellBounds;
             valBounds.Offset(borderWidths.X, borderWidths.Y);
             valBounds.Width -= borderWidths.Right;
@@ -1597,8 +1596,9 @@ namespace LogExpert
                             this.Invoke(progressFx, new object[] {count});
                         }
                     }
-                    catch (ObjectDisposedException) // can occur when closing the app while searching
+                    catch (ObjectDisposedException ex) // can occur when closing the app while searching
                     {
+                        _logger.Warn(ex);
                     }
                 }
             }
@@ -1622,10 +1622,11 @@ namespace LogExpert
                 {
                     return;
                 }
-                this.dataGridView.Invoke(new SelectLineFx(SelectLine), new object[] {line, true});
+                this.dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
             }
-            catch (Exception) // in the case the windows is already destroyed
+            catch (Exception ex) // in the case the windows is already destroyed
             {
+                _logger.Warn(ex);
             }
         }
 
@@ -1636,16 +1637,16 @@ namespace LogExpert
             SendProgressBarUpdate();
         }
 
-        private void SelectLine(int line, bool triggerSyncCall)
+        private void SelectLine(int line, bool triggerSyncCall, bool shouldScroll)
         {
             try
             {
-                this.shouldCallTimeSync = triggerSyncCall;
-                bool wasCancelled = this.shouldCancel;
-                this.shouldCancel = false;
-                this.isSearching = false;
+                shouldCallTimeSync = triggerSyncCall;
+                bool wasCancelled = shouldCancel;
+                shouldCancel = false;
+                isSearching = false;
                 StatusLineText("");
-                this.guiStateArgs.MenuEnabled = true;
+                guiStateArgs.MenuEnabled = true;
                 if (wasCancelled)
                 {
                     return;
@@ -1656,50 +1657,19 @@ namespace LogExpert
                         "Search result"); // Hmm... is that experimental code from early days?  
                     return;
                 }
-                this.dataGridView.Rows[line].Selected = true;
-                this.dataGridView.CurrentCell = this.dataGridView.Rows[line].Cells[0];
-                this.dataGridView.Focus();
+                dataGridView.Rows[line].Selected = true;
+
+                if (shouldScroll)
+                {
+                    dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
+                    dataGridView.Focus(); 
+                }
             }
             catch (IndexOutOfRangeException e)
             {
                 // Occures sometimes (but cannot reproduce)
                 _logger.Error(e, "Error while selecting line: ");
             }
-        }
-
-        private void SelectLine_NoScroll(int line, bool triggerSyncCall)
-        {
-            try
-            {
-                this.shouldCallTimeSync = triggerSyncCall;
-                bool wasCancelled = this.shouldCancel;
-                this.shouldCancel = false;
-                this.isSearching = false;
-                StatusLineText("");
-                this.guiStateArgs.MenuEnabled = true;
-                if (wasCancelled)
-                {
-                    return;
-                }
-                if (line == -1)
-                {
-                    MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?  
-                    return;
-                }
-                this.dataGridView.Rows[line].Selected = true;
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                // Occures sometimes (but cannot reproduce)
-                _logger.Error(e, "Error while selecting line: ");
-            }
-        }
-
-        private void SelectAndScrollToLine(int line)
-        {
-            SelectLine(line, false);
-            this.dataGridView.FirstDisplayedScrollingRowIndex = line;
         }
 
         private void StartEditMode()
@@ -1747,7 +1717,7 @@ namespace LogExpert
                     HilightEntry entry = FindHilightEntry(line);
                     if (entry != null)
                     {
-                        SelectLine(lineNum, false);
+                        SelectLine(lineNum, false, true);
                         break;
                     }
                 }
@@ -1766,7 +1736,7 @@ namespace LogExpert
                     HilightEntry entry = FindHilightEntry(line);
                     if (entry != null)
                     {
-                        SelectLine(lineNum, false);
+                        SelectLine(lineNum, false, true);
                         break;
                     }
                 }
@@ -2146,11 +2116,6 @@ namespace LogExpert
             }
         }
 
-        private void UpdateFilterCountLabel(int count)
-        {
-            this.filterCountLabel.Text = "" + this.filterResultList.Count;
-        }
-
         private void TriggerFilterLineGuiUpdate()
         {
             //lock (this.filterUpdateThread)
@@ -2318,7 +2283,6 @@ namespace LogExpert
         private void ClearBookmarkList()
         {
             this.bookmarkProvider.ClearAllBookmarks();
-            OnAllBookmarksRemoved();
         }
 
         /**
@@ -2517,12 +2481,6 @@ namespace LogExpert
             SendStatusLineUpdate();
         }
 
-        private void StatusLineTextImmediate(string text)
-        {
-            this.statusEventArgs.StatusText = text;
-            this.statusLineTrigger.TriggerImmediate();
-        }
-
         private void StatusLineError(string text)
         {
             StatusLineText(text);
@@ -2641,7 +2599,7 @@ namespace LogExpert
                 if (this.CurrentColumnizer is ILogLineXmlColumnizer)
                 {
                     callback.LineNum = i;
-                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
+                    line = (this.CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line,
                         callback);
                 }
                 pipe.WriteToPipe(line, i);
@@ -2669,7 +2627,6 @@ namespace LogExpert
                     preProcessColumnizer = this.CurrentColumnizer;
                 }
                 LogWindow newWin = this.parentLogTabWin.AddFilterTab(pipe, title,
-                    new LoadingFinishedFx(LoadingFinishedFunc),
                     preProcessColumnizer);
                 newWin.FilterPipe = pipe;
                 pipe.OwnLogWindow = newWin;
@@ -2729,16 +2686,6 @@ namespace LogExpert
                 _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
             newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
-        }
-
-        private void LoadingFinishedFunc(LogWindow newWin)
-        {
-            //if (newWin.forcedColumnizerForLoading != null)
-            //{
-            //  SetColumnizerFx fx = new SetColumnizerFx(newWin.ForceColumnizer);
-            //  newWin.Invoke(fx, new object[] { newWin.forcedColumnizerForLoading });
-            //  newWin.forcedColumnizerForLoading = null;
-            //}
         }
 
         private void ProcessFilterPipes(int lineNum)
@@ -2813,14 +2760,16 @@ namespace LogExpert
                 lineNumList.Sort();
                 StringBuilder clipText = new StringBuilder();
                 LogExpertCallback callback = new LogExpertCallback(this);
+
+                var xmlColumnizer = currentColumnizer as ILogLineXmlColumnizer;
+              
                 foreach (int lineNum in lineNumList)
                 {
                     ILogLine line = this.logFileReader.GetLogLine(lineNum);
-                    if (CurrentColumnizer is ILogLineXmlColumnizer)
+                    if (xmlColumnizer != null)
                     {
                         callback.LineNum = lineNum;
-                        line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line.FullLine,
-                            callback);
+                        line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                     }
                     clipText.AppendLine(line.FullLine);
                 }
@@ -3087,17 +3036,6 @@ namespace LogExpert
             _logger.Info("TestStatistics() ended");
         }
 
-        private void addBlockSrcLinesToDict(SortedDictionary<int, int> dict, PatternBlock block)
-        {
-            foreach (int lineNum in block.srcLines.Keys)
-            {
-                if (!dict.ContainsKey(lineNum))
-                {
-                    dict.Add(lineNum, lineNum);
-                }
-            }
-        }
-
         private void addBlockTargetLinesToDict(Dictionary<int, int> dict, PatternBlock block)
         {
             foreach (int lineNum in block.targetLines.Keys)
@@ -3109,6 +3047,7 @@ namespace LogExpert
             }
         }
 
+        //Well keep this for the moment because there is some other commented code which calls this one
         private PatternBlock FindExistingBlock(PatternBlock block, List<PatternBlock> blockList)
         {
             foreach (PatternBlock searchBlock in blockList)
@@ -3345,12 +3284,6 @@ namespace LogExpert
             ColumnizerCallback callback = new ColumnizerCallback(this);
             IColumnizedLogLine cols = columnizer.SplitLine(callback, line);
             return cols.ColumnValues.Last().FullValue;
-        }
-
-        private void UpdateBookmarkGui()
-        {
-            this.dataGridView.Refresh();
-            this.filterGridView.Refresh();
         }
 
         private void ChangeRowHeight(bool decrease)

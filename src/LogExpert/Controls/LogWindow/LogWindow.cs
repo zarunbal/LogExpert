@@ -25,7 +25,6 @@ namespace LogExpert
         #region Fields
 
         private const int MAX_HISTORY = 30;
-        private const int MAX_COLUMNIZER_HISTORY = 40;
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
@@ -53,7 +52,6 @@ namespace LogExpert
 
         private readonly EventWaitHandle loadingFinishedEvent = new ManualResetEvent(false);
 
-        private readonly LoadingFinishedFx loadingFinishedFx;
         private readonly EventWaitHandle logEventArgsEvent = new ManualResetEvent(false);
 
         private readonly List<LogEventArgs> logEventArgsList = new List<LogEventArgs>();
@@ -133,7 +131,7 @@ namespace LogExpert
 
         #region cTor
 
-        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, LoadingFinishedFx loadingFinishedFx,
+        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile,
             bool forcePersistenceLoading)
         {
             this.SuspendLayout();
@@ -144,7 +142,6 @@ namespace LogExpert
 
             this.parentLogTabWin = parent;
             this.IsTempFile = isTempFile;
-            this.loadingFinishedFx = loadingFinishedFx;
             //Thread.CurrentThread.Name = "LogWindowThread";
             ColumnizerCallbackObject = new ColumnizerCallback(this);
 
@@ -235,7 +232,7 @@ namespace LogExpert
             this.filterKnobControl2.MinValue = 0;
             this.filterKnobControl2.MaxValue = SPREAD_MAX;
             this.filterKnobControl2.ValueChanged +=
-                new KnobControl.ValueChangedEventHandler(filterKnobControl2_ValueChanged);
+                new KnobControl.ValueChangedEventHandler(filterKnobControl1_ValueChanged);
             this.fuzzyKnobControl.MinValue = 0;
             this.fuzzyKnobControl.MaxValue = 10;
             //PreferencesChanged(settings.preferences, true);
@@ -262,8 +259,6 @@ namespace LogExpert
 
         #region Delegates
 
-        public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
-
         public delegate void BookmarkAddedEventHandler(object sender, EventArgs e);
 
         public delegate void BookmarkRemovedEventHandler(object sender, EventArgs e);
@@ -278,8 +273,6 @@ namespace LogExpert
 
         public delegate void FileNotFoundEventHandler(object sender, EventArgs e);
 
-        public delegate void FileReloadFinishedEventHandler(object sender, EventArgs e);
-
         public delegate void FileRespawnedEventHandler(object sender, EventArgs e);
 
         public delegate void FileSizeChangedEventHandler(object sender, LogEventArgs e);
@@ -290,10 +283,6 @@ namespace LogExpert
         public delegate void FilterRestoreFx(LogWindow newWin, PersistenceData persistenceData);
 
         public delegate void GuiStateEventHandler(object sender, GuiStateArgs e);
-
-        public delegate void HideRowFx(int lineNum, bool show);
-
-        public delegate void LoadingFinishedFx(LogWindow newWin);
 
         public delegate void ProgressBarEventHandler(object sender, ProgressEventArgs e);
 
@@ -329,13 +318,9 @@ namespace LogExpert
 
         public event CurrentHighlightGroupChangedEventHandler CurrentHighlightGroupChanged;
 
-        public event FileReloadFinishedEventHandler FileReloadFinished;
-
         public event BookmarkAddedEventHandler BookmarkAdded;
 
         public event BookmarkRemovedEventHandler BookmarkRemoved;
-
-        public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
 
         public event BookmarkTextChangedEventHandler BookmarkTextChanged;
 
@@ -545,25 +530,15 @@ namespace LogExpert
             FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines,
             List<int> filterHitList);
 
-        private delegate void AddFilterLineGuiUpdateFx();
-
         private delegate void UpdateProgressBarFx(int lineNum);
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
-
-        private delegate void ProcessFilterPipeFx(int lineNum);
 
         private delegate void WriteFilterToTabFinishedFx(FilterPipe pipe, string namePrefix,
             PersistenceData persistenceData
         );
 
-        private delegate void TimestampSyncFx(int lineNum);
-
         private delegate void SetBookmarkFx(int lineNum, string comment);
-
-        private delegate void UpdateBookmarkViewFx();
-
-        private delegate void FunctionWith1IntParam(int arg);
 
         private delegate void FunctionWith1BoolParam(bool arg);
 

@@ -10,7 +10,7 @@ namespace GlassfishColumnizer
 {
     internal class XmlConfig : IXmlLogConfiguration
     {
-        #region IXmlLogConfiguration Member
+        #region Properties
 
         public string XmlStartTag { get; } = "[#|";
 
@@ -60,41 +60,23 @@ namespace GlassfishColumnizer
 
         #endregion
 
-        private class GlassFishLogLine : ILogLine
-        {
-            #region Properties
-
-            public string FullLine { get; set; }
-
-            public int LineNumber { get; set; }
-
-            string ITextValue.Text => FullLine;
-
-            #endregion
-        }
-
-        #region ILogLineXmlColumnizer Member
+        #region Public methods
 
         public IXmlLogConfiguration GetXmlLogConfiguration()
         {
             return xmlConfig;
         }
 
-        public ILogLine GetLineTextForClipboard(string logLine, ILogLineColumnizerCallback callback)
+        public ILogLine GetLineTextForClipboard(ILogLine logLine, ILogLineColumnizerCallback callback)
         {
             GlassFishLogLine line = new GlassFishLogLine
             {
-                FullLine = logLine.Replace(separatorChar, '|'),
-                LineNumber = callback.GetLineNum()
+                FullLine = logLine.FullLine.Replace(separatorChar, '|'),
+                LineNumber = logLine.LineNumber
             };
 
             return line;
         }
-
-        #endregion
-
-
-        #region ILogLineColumnizer Member
 
         public string GetName()
         {
@@ -260,5 +242,18 @@ namespace GlassfishColumnizer
         }
 
         #endregion
+
+        private class GlassFishLogLine : ILogLine
+        {
+            #region Properties
+
+            public string FullLine { get; set; }
+
+            public int LineNumber { get; set; }
+
+            string ITextValue.Text => FullLine;
+
+            #endregion
+        }
     }
 }

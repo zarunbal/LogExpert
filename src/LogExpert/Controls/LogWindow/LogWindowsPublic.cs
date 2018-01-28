@@ -25,9 +25,6 @@ namespace LogExpert
 
         public void LoadFile(string fileName, EncodingOptions encodingOptions)
         {
-#if DEBUG //MessageBox.Show("Pause vor LoadFile()");
-#endif
-
             EnterLoadFileStatus();
 
             if (fileName != null)
@@ -73,25 +70,28 @@ namespace LogExpert
                 }
                 catch (LogFileException lfe)
                 {
+                    _logger.Error(lfe);
                     MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
                     this.BeginInvoke(new FunctionWith1BoolParam(Close), new object[] {true});
                     this.isLoadError = true;
                     return;
                 }
 
-                if (this.CurrentColumnizer is ILogLineXmlColumnizer)
+                ILogLineXmlColumnizer xmlColumnizer = this.CurrentColumnizer as ILogLineXmlColumnizer;
+                if (xmlColumnizer != null)
                 {
                     this.logFileReader.IsXmlMode = true;
                     this.logFileReader.XmlLogConfig =
-                        (this.CurrentColumnizer as ILogLineXmlColumnizer).GetXmlLogConfiguration();
+                        xmlColumnizer.GetXmlLogConfiguration();
                 }
                 if (this.forcedColumnizerForLoading != null)
                 {
                     this.CurrentColumnizer = this.forcedColumnizerForLoading;
                 }
-                if (this.CurrentColumnizer is IPreProcessColumnizer)
+                IPreProcessColumnizer processColumnizer = this.CurrentColumnizer as IPreProcessColumnizer;
+                if (processColumnizer != null)
                 {
-                    this.logFileReader.PreProcessColumnizer = (IPreProcessColumnizer) this.CurrentColumnizer;
+                    this.logFileReader.PreProcessColumnizer = processColumnizer;
                 }
                 else
                 {
@@ -573,11 +573,11 @@ namespace LogExpert
             {
                 if (line < this.dataGridView.RowCount)
                 {
-                    SelectLine(line, false);
+                    SelectLine(line, false, true);
                 }
                 else
                 {
-                    SelectLine(this.dataGridView.RowCount - 1, false);
+                    SelectLine(this.dataGridView.RowCount - 1, false, true);
                 }
                 this.dataGridView.Focus();
             }
@@ -618,14 +618,14 @@ namespace LogExpert
 
         public void SelectLogLine(int line)
         {
-            this.Invoke(new SelectLineFx(this.SelectLine), new object[] {line, true});
+            this.Invoke(new SelectLineFx((line1, triggerSyncCall) => this.SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
         }
 
         public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
         {
             try
             {
-                SelectLine_NoScroll(line, triggerSyncCall);
+                SelectLine(line, triggerSyncCall, false);
 
                 //if (!this.dataGridView.CurrentRow.Displayed)
                 if (line < this.dataGridView.FirstDisplayedScrollingRowIndex ||
@@ -695,7 +695,7 @@ namespace LogExpert
                 int newLine = this.logFileReader.GetNextMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
                 if (newLine != -1)
                 {
-                    SelectLine(newLine, false);
+                    SelectLine(newLine, false, true);
                 }
                 e.Handled = true;
             }
@@ -704,7 +704,7 @@ namespace LogExpert
                 int newLine = this.logFileReader.GetPrevMultiFileLine(this.dataGridView.CurrentCellAddress.Y);
                 if (newLine != -1)
                 {
-                    SelectLine(newLine - 1, false);
+                    SelectLine(newLine - 1, false, true);
                 }
                 e.Handled = true;
             }
@@ -934,7 +934,7 @@ namespace LogExpert
                     }
 
                     int lineNum = this.bookmarkProvider.Bookmarks[index].LineNum;
-                    SelectLine(lineNum, true);
+                    SelectLine(lineNum, true, true);
                 }
             }
         }
@@ -987,7 +987,7 @@ namespace LogExpert
                     }
 
                     int lineNum = this.bookmarkProvider.Bookmarks[index].LineNum;
-                    SelectLine(lineNum, false);
+                    SelectLine(lineNum, false, true);
                 }
             }
         }
@@ -1506,15 +1506,6 @@ namespace LogExpert
             return this.logFileReader.GetRealLineNumForVirtualLineNum(lineNum);
         }
 
-        public string GetCurrentFileName()
-        {
-            if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
-            {
-                return this.logFileReader.GetLogFileNameForLine(this.dataGridView.CurrentRow.Index);
-            }
-            return null;
-        }
-
         public ILogFileInfo GetCurrentFileInfo()
         {
             if (this.dataGridView.CurrentRow != null && this.dataGridView.CurrentRow.Index != -1)
@@ -1605,6 +1596,7 @@ namespace LogExpert
                 }
                 catch (IOException e)
                 {
+                    _logger.Error(e);
                     MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
                 }
             }
@@ -1656,6 +1648,7 @@ namespace LogExpert
                 }
                 catch (IOException e)
                 {
+                    _logger.Error(e);
                     MessageBox.Show("Error while importing bookmark list: " + e.Message, "LogExpert");
                 }
             }

@@ -54,10 +54,6 @@ namespace LogExpert
                 this.loadingFinishedEvent.Set();
                 this.externaLoadingFinishedEvent.Set();
                 this.timeSpreadCalc.SetLineCount(this.logFileReader.LineCount);
-                if (this.loadingFinishedFx != null)
-                {
-                    this.loadingFinishedFx(this);
-                }
 
                 if (this.reloadMemento != null)
                 {
@@ -413,15 +409,6 @@ namespace LogExpert
             }
         }
 
-        private void filterGridView_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            //if (this.filterGridView.CurrentRow != null)
-            //{
-            //  int lineNum = this.filterResultList[this.filterGridView.CurrentRow.Index];
-            //  SelectLine(lineNum);
-            //}
-        }
-
         private void rangeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             this.filterRangeComboBox.Enabled = this.rangeCheckBox.Checked;
@@ -464,7 +451,7 @@ namespace LogExpert
                     this.filterGridView.CurrentCellAddress.Y < this.filterResultList.Count)
                 {
                     int lineNum = this.filterResultList[this.filterGridView.CurrentCellAddress.Y];
-                    SelectLine(lineNum, false);
+                    SelectLine(lineNum, false, true);
                     e.Handled = true;
                 }
             }
@@ -570,11 +557,6 @@ namespace LogExpert
         }
 
         private void filterKnobControl1_ValueChanged(object sender, EventArgs e)
-        {
-            CheckForFilterDirty();
-        }
-
-        private void filterKnobControl2_ValueChanged(object sender, EventArgs e)
         {
             CheckForFilterDirty();
         }
@@ -777,7 +759,7 @@ namespace LogExpert
                 int lineNum = this.FilterPipe.GetOriginalLineNum(this.dataGridView.CurrentRow.Index);
                 if (lineNum != -1)
                 {
-                    this.FilterPipe.LogWindow.SelectLine(lineNum, false);
+                    this.FilterPipe.LogWindow.SelectLine(lineNum, false, true);
                     this.parentLogTabWin.SelectTab(this.FilterPipe.LogWindow);
                 }
             }
@@ -800,12 +782,6 @@ namespace LogExpert
         }
 
         // ======================= Bookmark list ====================================
-
-        private void bookmarkWindow_BookmarkCommentChanged(object sender, EventArgs e)
-        {
-            this.dataGridView.Refresh();
-            //this.bookmarkDirty = true;
-        }
 
         private void columnRestrictCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -847,7 +823,7 @@ namespace LogExpert
             if (e.RowIndex > 0 && e.RowIndex < this.dataGridView.RowCount
                 && !this.dataGridView.Rows[e.RowIndex].Selected)
             {
-                SelectLine(e.RowIndex, false);
+                SelectLine(e.RowIndex, false, true);
             }
             if (e.ContextMenuStrip == this.columnContextMenuStrip)
             {
@@ -1016,7 +992,7 @@ namespace LogExpert
 
         private void timeSpreadingControl1_LineSelected(object sender, SelectLineEventArgs e)
         {
-            SelectLine(e.Line, false);
+            SelectLine(e.Line, false, true);
         }
 
         private void bookmarkCommentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1447,44 +1423,6 @@ namespace LogExpert
 
         #endregion
 
-        protected virtual Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
-        {
-            Rectangle rect = new Rectangle();
-
-            rect.X = advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.X++;
-            }
-
-            rect.Y = advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Y++;
-            }
-
-            rect.Width = advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Width++;
-            }
-
-            rect.Height = advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Height++;
-            }
-
-            //rect.Width += this.owningColumn.DividerWidth;
-            //rect.Height += this.owningRow.DividerHeight;
-
-            return rect;
-        }
-
         protected void OnProgressBarUpdate(ProgressEventArgs e)
         {
             ProgressBarEventHandler handler = ProgressBarUpdate;
@@ -1553,14 +1491,6 @@ namespace LogExpert
             }
         }
 
-        protected void OnFileReloadFinished()
-        {
-            if (FileReloadFinished != null)
-            {
-                FileReloadFinished(this, new EventArgs());
-            }
-        }
-
         protected void OnBookmarkAdded()
         {
             if (BookmarkAdded != null)
@@ -1574,14 +1504,6 @@ namespace LogExpert
             if (BookmarkRemoved != null)
             {
                 BookmarkRemoved(this, new EventArgs());
-            }
-        }
-
-        protected void OnAllBookmarksRemoved()
-        {
-            if (AllBookmarksRemoved != null)
-            {
-                AllBookmarksRemoved(this, new EventArgs());
             }
         }
 

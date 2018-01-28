@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 //using System.Linq;
 using System.Text;
 using System.IO;
@@ -152,7 +153,7 @@ namespace LogExpert
             return readInt;
         }
 
-        public unsafe string ReadLine()
+        public string ReadLine()
         {
             return this.useSystemReaderMethod ? ReadLineNew() : ReadLineOld();
         }
@@ -219,7 +220,7 @@ namespace LogExpert
         //  this.builder = new StringBuilder(400);
         //}
 
-        private unsafe string GetLineAndResetBuilder()
+        private string GetLineAndResetBuilder()
         {
             string result = new string(this.charBuffer, 0, this.charBufferPos);
             NewBuilder();
@@ -309,7 +310,7 @@ namespace LogExpert
 
         #endregion
 
-        protected unsafe string ReadLineNew()
+        protected string ReadLineNew()
         {
             if (this.newLineSequenceLength == 0)
             {
@@ -319,7 +320,10 @@ namespace LogExpert
             if (line != null)
             {
                 this.pos += this.Encoding.GetByteCount(line);
-                this.pos += this.newLineSequenceLength;
+                if (!reader.EndOfStream) //TO avoid setting position ahead of the file
+                {
+                    this.pos += this.newLineSequenceLength;
+                }
                 if (line.Length > MAX_LINE_LEN)
                 {
                     line = line.Remove(MAX_LINE_LEN);
@@ -328,7 +332,7 @@ namespace LogExpert
             return line;
         }
 
-        protected unsafe string ReadLineOld()
+        protected string ReadLineOld()
         {
             string result;
             int readInt;
