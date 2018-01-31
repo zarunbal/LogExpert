@@ -41,9 +41,9 @@ deploy_script:
 
     New-Item -ItemType Directory -Force -Path $chocodir\tools\
 
-    (Get-Content '$chocodir\logexpert.portable.nuspec.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$chocodir\logexpert.portable.nuspec'
-    (Get-Content '$chocodir\tools\LICENSE.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$chocodir\tools\LICENSE.txt'
-    (Get-Content '$chocodir\tools\VERIFICATION.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$chocodir\tools\VERIFICATION.txt.template'
+    (Get-Content '$($chocodir)\logexpert.portable.nuspec.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$($chocodir)\logexpert.portable.nuspec'
+    (Get-Content '$($chocodir)\tools\LICENSE.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$($chocodir)\tools\LICENSE.txt'
+    (Get-Content '$($chocodir)\tools\VERIFICATION.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '$($chocodir)\tools\VERIFICATION.txt.template'
 
     Copy-Item -Path .\bin\Release\* -Destination $packagedir\LogExpert\ –Recurse
 
