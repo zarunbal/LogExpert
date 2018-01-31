@@ -33,26 +33,30 @@ artifacts:
 deploy_script:
 
 - ps: >-
-    New-Item -ItemType Directory -Force -Path .\bin\package\LogExpert\
+    $packagedir = .\bin\package
 
-    New-Item -ItemType Directory -Force -Path .\chocolatey\tools\
+    $chocodir = .\chocolatey
+
+    New-Item -ItemType Directory -Force -Path $packagedir\LogExpert\
+
+    New-Item -ItemType Directory -Force -Path $chocodir\tools\
 
     (Get-Content '.\chocolatey\logexpert.portable.nuspec.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '.\chocolatey\logexpert.portable.nuspec'
 
-    copy .\bin\Release\** .\bin\package\LogExpert\
+    copy .\bin\Release\** $packagedir\LogExpert\
 
-    del .\package\LogExpert\**\*.xml
+    del $packagedir\LogExpert\**\*.xml
 
-    del .\package\LogExpert\**\*.pdb
+    del .$packagedir\LogExpert\**\*.pdb
 
-    copy .\bin\package\LogExpert\** .\chocolatey\tools\
+    copy $packagedir\LogExpert\** $chocodir\tools\
 
-    choco pack .\chocolatey\logexpert.portable.nuspec
+    choco pack $chocodir\logexpert.portable.nuspec
 
-    Push-AppveyorArtifact ".\chocolatey\logexpert.portable.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
+    Push-AppveyorArtifact "$($chocodir)\logexpert.portable.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
 
-    cd .\bin\package
+    cd $packagedir
 
-    7z a bin\packageLogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip LogExpert
+    7z a LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip LogExpert
 
     Push-AppveyorArtifact "LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip"
