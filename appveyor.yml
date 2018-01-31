@@ -45,15 +45,15 @@ deploy_script:
 
     copy .\bin\Release\** $packagedir\LogExpert\
 
-    del $packagedir\LogExpert\**\*.xml
+    get-childitem $packagedir\LogExpert -include *.xml -recurse | remove-item
 
-    del .$packagedir\LogExpert\**\*.pdb
+    get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
 
     copy $packagedir\LogExpert\** $chocodir\tools\
 
     choco pack $chocodir\logexpert.portable.nuspec
 
-    Push-AppveyorArtifact "$($chocodir)\logexpert.portable.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
+    Push-AppveyorArtifact "logexpert.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
 
     cd $packagedir
 
