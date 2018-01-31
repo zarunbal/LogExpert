@@ -42,6 +42,8 @@ deploy_script:
     New-Item -ItemType Directory -Force -Path $chocodir\tools\
 
     (Get-Content '.\chocolatey\logexpert.portable.nuspec.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '.\chocolatey\logexpert.portable.nuspec'
+    (Get-Content '.\chocolatey\LICENSE.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '.\chocolatey\LICENSE.txt'
+    (Get-Content '.\chocolatey\VERIFICATION.txt.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '.\chocolatey\VERIFICATION.txt.template'
 
     Copy-Item -Path .\bin\Release\* -Destination $packagedir\LogExpert\ –Recurse
 
