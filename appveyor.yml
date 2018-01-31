@@ -43,13 +43,13 @@ deploy_script:
 
     (Get-Content '.\chocolatey\logexpert.portable.nuspec.template' -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File '.\chocolatey\logexpert.portable.nuspec'
 
-    copy .\bin\Release\** $packagedir\LogExpert\
+    Copy-Item -Path .\bin\Release\ -Destination $packagedir\LogExpert\ –Recurse
 
     get-childitem $packagedir\LogExpert -include *.xml -recurse | remove-item
 
     get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
 
-    copy $packagedir\LogExpert\** $chocodir\tools\
+    Copy-Item -Path $packagedir\LogExpert\ -Destination $chocodir\tools\ –Recurse
 
     choco pack $chocodir\logexpert.portable.nuspec
 
