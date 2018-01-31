@@ -33,9 +33,9 @@ artifacts:
 deploy_script:
 
 - ps: >-
-    $packagedir = .\bin\package
+    $packagedir = ".\bin\package"
 
-    $chocodir = .\chocolatey
+    $chocodir = ".\chocolatey"
 
     New-Item -ItemType Directory -Force -Path $packagedir\LogExpert\
 
