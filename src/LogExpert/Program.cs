@@ -52,12 +52,8 @@ namespace LogExpert
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            _logger.Info("============================================================================");
-            _logger.Info("LogExpert " + Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
-                         Assembly.GetExecutingAssembly().GetName().Version.Minor + "/" +
-                         Assembly.GetExecutingAssembly().GetName().Version.Build.ToString() +
-                         " started.");
-            _logger.Info("============================================================================");
+            _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================",
+                Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
 
             CmdLine cmdLine = new CmdLine();
             CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");

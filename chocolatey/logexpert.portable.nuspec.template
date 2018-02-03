@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+    <metadata>
+    <id>logexpert</id>
+    <version>##version##</version>
+    <title>LogExpert</title>
+    <authors>Zarunbal Previous:Hagen Raab</authors>
+    <owners>Zarunbal</owners>
+    <licenseUrl>https://cdn.rawgit.com/zarunbal/LogExpert/v##version##/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <dependency id="chocolatey" version="0.10.8" />
+    </dependencies>
+    <description>LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
+
+Summary of (most) features:
+
+* Tail mode
+* MDI-Interface with Tabs
+* Search function (including RegEx)
+* Bookmarks
+* A very flexible filter view and possibility to filter to tab
+* Highlighting lines via search criteria
+* Triggers (e.g. create Bookmark or execute a plugin) via search criteria
+* Columnizers: Plugins which split log lines into columns
+* Unicode support
+* log4j XML file support
+* 3rd party plugin support
+* Plugin API for more log file data sources
+                    From bennewcomb:
+                    [** FOR Chocolatey ONLY **]
+                    I've found this to be a worthy and necessary tool job after job, computer after computer.  Is it bug-hunting season?  This is a low investment-high return application that, if added to your stack, will enhance application debugging with minimal time and effort.  You can watch multiple files at once and determine quickly when each is updated, optionally tailing them all so you can watch the logging output as it's being written.  You can also set editor formatting rules to decorate useful sections to visually separate groups of text while reviewing the file, and even have it stop when it finds something of interest. This tool saves me time and helps me highlight certain files in the forest of log file statements for easier visibility and faster identification of relevant log lines.  A tail program, if you're not a superuser or sysadmin, is software that appears to continually scroll to the bottom of any file you load, making the newest updates immediately visible on the screen withing requiring you to refresh the file.
+
+                    Installation Directory: $(Split-Path -parent $MyInvocation.MyCommand.Definition)
+                    On my computer, it lands in {chocolatey}\lib\logexpert.##version##</description>
+    <summary>LogExpert is log file viewing for the Pros.</summary>
+    <copyright>Original work Copyright (c) 2011 Hagen Raab, Modified work Copyright (c) 2017 Zarunbal</copyright>
+    <tags>LogExpert windows tail logging viewer troubleshooting</tags>
+  </metadata>
+  <files>
+        <file src="tools\**" target="tools" />        
+    </files>  
+</package>
