@@ -25,10 +25,10 @@ namespace LogExpert.Dialogs
         private readonly Pen _pen;
         private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90));
 
-        private BookmarkOverlay draggedOverlay;
-        private Point dragStartPoint;
-        private bool isDrag = false;
-        private Size oldOverlayOffset;
+        private BookmarkOverlay _draggedOverlay;
+        private Point _dragStartPoint;
+        private bool _isDrag = false;
+        private Size _oldOverlayOffset;
 
         #endregion
 
@@ -124,34 +124,34 @@ namespace LogExpert.Dialogs
             {
                 if (e.Button == MouseButtons.Right)
                 {
-                    if (isDrag)
+                    if (_isDrag)
                     {
-                        isDrag = false;
-                        overlay.Bookmark.OverlayOffset = oldOverlayOffset;
+                        _isDrag = false;
+                        overlay.Bookmark.OverlayOffset = _oldOverlayOffset;
                         Refresh();
                         return;
                     }
                 }
                 else
                 {
-                    dragStartPoint = e.Location;
-                    isDrag = true;
-                    draggedOverlay = overlay;
-                    oldOverlayOffset = overlay.Bookmark.OverlayOffset;
+                    _dragStartPoint = e.Location;
+                    _isDrag = true;
+                    _draggedOverlay = overlay;
+                    _oldOverlayOffset = overlay.Bookmark.OverlayOffset;
                 }
             }
             else
             {
-                isDrag = false;
+                _isDrag = false;
                 base.OnMouseDown(e);
             }
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            if (isDrag)
+            if (_isDrag)
             {
-                isDrag = false;
+                _isDrag = false;
                 Refresh();
             }
             else
@@ -162,11 +162,11 @@ namespace LogExpert.Dialogs
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (isDrag)
+            if (_isDrag)
             {
                 Cursor = Cursors.Hand;
-                Size offset = new Size(e.X - dragStartPoint.X, e.Y - dragStartPoint.Y);
-                draggedOverlay.Bookmark.OverlayOffset = oldOverlayOffset + offset;
+                Size offset = new Size(e.X - _dragStartPoint.X, e.Y - _dragStartPoint.Y);
+                _draggedOverlay.Bookmark.OverlayOffset = _oldOverlayOffset + offset;
                 Refresh();
             }
             else
@@ -294,39 +294,37 @@ namespace LogExpert.Dialogs
             {
                 if (EditingControl != null)
                 {
-                    if (EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
+                    LogCellEditingControl editControl = EditingControl as LogCellEditingControl;
+
+                    if (editControl != null)
                     {
-                        DataGridViewTextBoxEditingControl editControl = EditingControl as DataGridViewTextBoxEditingControl;
-                        if (editControl != null)
+                        editControl.EditingControlDataGridView.EndEdit();
+                        int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
+                        if (e.KeyCode == Keys.Up)
                         {
-                            editControl.EditingControlDataGridView.EndEdit();
-                            int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
-                            if (e.KeyCode == Keys.Up)
+                            if (line > 0)
                             {
-                                if (line > 0)
-                                {
-                                    line--;
-                                }
+                                line--;
                             }
-
-                            if (e.KeyCode == Keys.Down)
-                            {
-                                if (line < editControl.EditingControlDataGridView.RowCount - 1)
-                                {
-                                    line++;
-                                }
-                            }
-
-                            int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
-                            int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
-                            int selStart = editControl.SelectionStart;
-                            editControl.EditingControlDataGridView.CurrentCell = editControl.EditingControlDataGridView.Rows[line].Cells[col];
-                            editControl.EditingControlDataGridView.BeginEdit(false);
-                            editControl.SelectionStart = selStart;
-                            editControl.ScrollToCaret();
-                            editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
-                            e.Handled = true;
                         }
+
+                        if (e.KeyCode == Keys.Down)
+                        {
+                            if (line < editControl.EditingControlDataGridView.RowCount - 1)
+                            {
+                                line++;
+                            }
+                        }
+
+                        int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
+                        int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
+                        int selStart = editControl.SelectionStart;
+                        editControl.EditingControlDataGridView.CurrentCell = editControl.EditingControlDataGridView.Rows[line].Cells[col];
+                        editControl.EditingControlDataGridView.BeginEdit(false);
+                        editControl.SelectionStart = selStart;
+                        editControl.ScrollToCaret();
+                        editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
+                        e.Handled = true;
                     }
                     else
                     {
@@ -405,92 +403,6 @@ namespace LogExpert.Dialogs
         }
 
         #endregion
-
-        //#region IDataGridViewEditingControl Members
-
-        //public void ApplyCellStyleToEditingControl(DataGridViewCellStyle dataGridViewCellStyle)
-        //{
-        //  this.Font = dataGridViewCellStyle.Font;
-        //}
-
-        //public DataGridView EditingControlDataGridView
-        //{
-        //  get
-        //  {
-        //    return this.dataGridView;
-        //  }
-        //  set
-        //  {
-        //    this.dataGridView = value;
-        //  }
-        //}
-
-        //public object EditingControlFormattedValue
-        //{
-        //  get
-        //  {
-        //    return this.Text;
-        //  }
-        //  set
-        //  {
-        //    this.Text = value as string;
-        //  }
-        //}
-
-        //public int EditingControlRowIndex
-        //{
-        //  get
-        //  {
-        //    return rowIndex;
-        //  }
-        //  set
-        //  {
-        //    this.rowIndex = value;
-        //  }
-        //}
-
-        //public bool EditingControlValueChanged
-        //{
-        //  get
-        //  {
-        //    return this.valueChanged;
-        //  }
-        //  set
-        //  {
-        //    this.valueChanged = value;
-        //  }
-        //}
-
-        //protected override void OnTextChanged(EventArgs eventargs)
-        //{
-        //  // Notify the DataGridView that the contents of the cell
-        //  // have changed.
-        //  valueChanged = true;
-        //  this.EditingControlDataGridView.NotifyCurrentCellDirty(true);
-        //  base.OnTextChanged(eventargs);
-        //}
-
-        //public Cursor EditingPanelCursor
-        //{
-        //  get { return base.Cursor; }
-        //}
-
-        //public object GetEditingControlFormattedValue(DataGridViewDataErrorContexts context)
-        //{
-        //  return this.EditingControlFormattedValue;
-        //}
-
-        //public void PrepareEditingControlForEdit(bool selectAll)
-        //{
-        //  // nothing 
-        //}
-
-        //public bool RepositionEditingControlOnValueChange
-        //{
-        //  get { return false; }
-        //}
-
-        //#endregion
     }
 
     public class LogTextColumn : DataGridViewColumn
