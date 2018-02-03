@@ -20,12 +20,10 @@ namespace LogExpert.Dialogs
         private readonly Color _bubbleColor = Color.FromArgb(160, 250, 250, 00);
         private readonly Font _font = new Font("Arial", 10);
 
+        private readonly SortedList<int, BookmarkOverlay> _overlayList = new SortedList<int, BookmarkOverlay>();
+
         private readonly Pen _pen;
         private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90));
-
-        //BufferedGraphics myBuffer;
-
-        private readonly SortedList<int, BookmarkOverlay> overlayList = new SortedList<int, BookmarkOverlay>();
 
         private BookmarkOverlay draggedOverlay;
         private Point dragStartPoint;
@@ -35,8 +33,6 @@ namespace LogExpert.Dialogs
         #endregion
 
         #region cTor
-
-        //UserControl ctl = new UserControl();
 
         public BufferedDataGridView()
         {
@@ -78,16 +74,11 @@ namespace LogExpert.Dialogs
 
         #region Public methods
 
-        public void SetCurrentRow(int rowIndex)
-        {
-            SetCurrentCellAddressCore(0, rowIndex, true, false, false);
-        }
-
         public void AddOverlay(BookmarkOverlay overlay)
         {
-            lock (overlayList)
+            lock (_overlayList)
             {
-                overlayList.Add(overlay.Position.Y, overlay);
+                _overlayList.Add(overlay.Position.Y, overlay);
             }
         }
 
@@ -119,8 +110,7 @@ namespace LogExpert.Dialogs
             base.OnEditingControlShowing(e);
             e.Control.KeyDown -= Control_KeyDown;
             e.Control.KeyDown += Control_KeyDown;
-            DataGridViewTextBoxEditingControl editControl =
-                (DataGridViewTextBoxEditingControl) e.Control;
+            DataGridViewTextBoxEditingControl editControl = (DataGridViewTextBoxEditingControl) e.Control;
             e.Control.PreviewKeyDown -= Control_PreviewKeyDown;
             e.Control.PreviewKeyDown += Control_PreviewKeyDown;
 
@@ -209,9 +199,9 @@ namespace LogExpert.Dialogs
 
         private BookmarkOverlay GetOverlayForPosition(Point pos)
         {
-            lock (overlayList)
+            lock (_overlayList)
             {
-                foreach (BookmarkOverlay overlay in overlayList.Values)
+                foreach (BookmarkOverlay overlay in _overlayList.Values)
                 {
                     if (overlay.BubbleRect.Contains(pos))
                     {
@@ -228,9 +218,9 @@ namespace LogExpert.Dialogs
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
             using (BufferedGraphics myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle))
             {
-                lock (overlayList)
+                lock (_overlayList)
                 {
-                    overlayList.Clear();
+                    _overlayList.Clear();
                 }
 
                 myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
@@ -252,9 +242,9 @@ namespace LogExpert.Dialogs
 
                 //e.Graphics.SetClip(rect, CombineMode.Union);
 
-                lock (overlayList)
+                lock (_overlayList)
                 {
-                    foreach (BookmarkOverlay overlay in overlayList.Values)
+                    foreach (BookmarkOverlay overlay in _overlayList.Values)
                     {
                         SizeF textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
                         Rectangle rectBubble = new Rectangle(overlay.Position,
