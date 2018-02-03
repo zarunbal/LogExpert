@@ -320,8 +320,7 @@ namespace LogExpert.Dialogs
                             int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
                             int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
                             int selStart = editControl.SelectionStart;
-                            editControl.EditingControlDataGridView.CurrentCell =
-                                editControl.EditingControlDataGridView.Rows[line].Cells[col];
+                            editControl.EditingControlDataGridView.CurrentCell = editControl.EditingControlDataGridView.Rows[line].Cells[col];
                             editControl.EditingControlDataGridView.BeginEdit(false);
                             editControl.SelectionStart = selStart;
                             editControl.ScrollToCaret();
