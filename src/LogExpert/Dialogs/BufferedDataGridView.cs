@@ -63,9 +63,12 @@ namespace LogExpert.Dialogs
 
         #region Properties
 
-        public Rectangle LastRowRect { get; set; }
-
-        public bool MustDrawFocus { get; set; }
+        /*    
+      public Graphics Buffer
+      {
+        get { return this.myBuffer.Graphics; }
+      }
+       */
 
         public ContextMenuStrip EditModeMenuStrip { get; set; } = null;
 
@@ -86,26 +89,6 @@ namespace LogExpert.Dialogs
             {
                 overlayList.Add(overlay.Position.Y, overlay);
             }
-        }
-
-        public CellContent GetCellContentFromPoint(int x, int y)
-        {
-            HitTestInfo hit = HitTest(x, y);
-            if (hit.Type == DataGridViewHitTestType.Cell)
-            {
-                DataGridViewCellValueEventArgs args = new DataGridViewCellValueEventArgs(hit.ColumnIndex, hit.RowIndex);
-                OnCellValueNeeded(args);
-                for (int i = 0; i < ColumnCount; ++i)
-                {
-                    Rectangle r = GetColumnDisplayRectangle(i, false);
-                    if (x > r.Left && x < r.Right)
-                    {
-                        return new CellContent(args.Value as string, r.Left);
-                    }
-                }
-            }
-
-            return null;
         }
 
         #endregion
