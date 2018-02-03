@@ -244,68 +244,7 @@ namespace LogExpert.Dialogs
             return null;
         }
 
-        #endregion
-
-        #region Events handler
-
-        private void Control_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if ((e.KeyCode == Keys.C || e.KeyCode == Keys.Insert) && e.Control)
-            {
-                if (EditingControl != null)
-                {
-                    e.IsInputKey = true;
-                }
-            }
-        }
-
-        private void Control_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
-            {
-                if (EditingControl != null)
-                {
-                    if (EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
-                    {
-                        DataGridViewTextBoxEditingControl editControl =
-                            EditingControl as DataGridViewTextBoxEditingControl;
-                        editControl.EditingControlDataGridView.EndEdit();
-                        int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
-                        if (e.KeyCode == Keys.Up)
-                        {
-                            if (line > 0)
-                            {
-                                line--;
-                            }
-                        }
-
-                        if (e.KeyCode == Keys.Down)
-                        {
-                            if (line < editControl.EditingControlDataGridView.RowCount - 1)
-                            {
-                                line++;
-                            }
-                        }
-
-                        int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
-                        int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
-                        int selStart = editControl.SelectionStart;
-                        editControl.EditingControlDataGridView.CurrentCell =
-                            editControl.EditingControlDataGridView.Rows[line].Cells[col];
-                        editControl.EditingControlDataGridView.BeginEdit(false);
-                        editControl.SelectionStart = selStart;
-                        editControl.ScrollToCaret();
-                        editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
-                        e.Handled = true;
-                        return;
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        protected void PaintOverlays(PaintEventArgs e)
+        private void PaintOverlays(PaintEventArgs e)
         {
             BufferedGraphicsContext currentContext;
             currentContext = BufferedGraphicsManager.Current;
@@ -382,6 +321,67 @@ namespace LogExpert.Dialogs
             myBuffer.Render(e.Graphics);
             myBuffer.Dispose();
         }
+
+        #endregion
+
+        #region Events handler
+
+        private void Control_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if ((e.KeyCode == Keys.C || e.KeyCode == Keys.Insert) && e.Control)
+            {
+                if (EditingControl != null)
+                {
+                    e.IsInputKey = true;
+                }
+            }
+        }
+
+        private void Control_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
+            {
+                if (EditingControl != null)
+                {
+                    if (EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
+                    {
+                        DataGridViewTextBoxEditingControl editControl =
+                            EditingControl as DataGridViewTextBoxEditingControl;
+                        editControl.EditingControlDataGridView.EndEdit();
+                        int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
+                        if (e.KeyCode == Keys.Up)
+                        {
+                            if (line > 0)
+                            {
+                                line--;
+                            }
+                        }
+
+                        if (e.KeyCode == Keys.Down)
+                        {
+                            if (line < editControl.EditingControlDataGridView.RowCount - 1)
+                            {
+                                line++;
+                            }
+                        }
+
+                        int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
+                        int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
+                        int selStart = editControl.SelectionStart;
+                        editControl.EditingControlDataGridView.CurrentCell =
+                            editControl.EditingControlDataGridView.Rows[line].Cells[col];
+                        editControl.EditingControlDataGridView.BeginEdit(false);
+                        editControl.SelectionStart = selStart;
+                        editControl.ScrollToCaret();
+                        editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
+                        e.Handled = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         protected virtual void OnOverlayDoubleClicked(OverlayEventArgs e)
         {
