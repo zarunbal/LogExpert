@@ -41,6 +41,7 @@ namespace LogExpert.Dialogs
 
             InitializeComponent();
             DoubleBuffered = true;
+            VirtualMode = true;
         }
 
         #endregion
