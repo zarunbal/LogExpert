@@ -31,11 +31,10 @@ namespace LogExpert.Dialogs
 
         //UserControl ctl = new UserControl();
 
-
         public BufferedDataGridView()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
 
             //ctl.Location = new Point(0, 0);
             //ctl.Size = new Size(200, 200);
@@ -68,7 +67,6 @@ namespace LogExpert.Dialogs
       }
        */
 
-
         public Rectangle LastRowRect { get; set; }
 
         public bool MustDrawFocus { get; set; }
@@ -86,10 +84,9 @@ namespace LogExpert.Dialogs
             SetCurrentCellAddressCore(0, rowIndex, true, false, false);
         }
 
-
         public void AddOverlay(BookmarkOverlay overlay)
         {
-            this.overlayList.Add(overlay.Position.Y, overlay);
+            overlayList.Add(overlay.Position.Y, overlay);
         }
 
         public CellContent GetCellContentFromPoint(int x, int y)
@@ -99,15 +96,16 @@ namespace LogExpert.Dialogs
             {
                 DataGridViewCellValueEventArgs args = new DataGridViewCellValueEventArgs(hit.ColumnIndex, hit.RowIndex);
                 OnCellValueNeeded(args);
-                for (int i = 0; i < this.ColumnCount; ++i)
+                for (int i = 0; i < ColumnCount; ++i)
                 {
-                    Rectangle r = this.GetColumnDisplayRectangle(i, false);
+                    Rectangle r = GetColumnDisplayRectangle(i, false);
                     if (x > r.Left && x < r.Right)
                     {
                         return new CellContent(args.Value as string, r.Left);
                     }
                 }
             }
+
             return null;
         }
 
@@ -134,7 +132,6 @@ namespace LogExpert.Dialogs
             }
         }
 
-
         protected override void OnEditingControlShowing(DataGridViewEditingControlShowingEventArgs e)
         {
             base.OnEditingControlShowing(e);
@@ -145,9 +142,8 @@ namespace LogExpert.Dialogs
             e.Control.PreviewKeyDown -= Control_PreviewKeyDown;
             e.Control.PreviewKeyDown += Control_PreviewKeyDown;
 
-            editControl.ContextMenuStrip = this.EditModeMenuStrip;
+            editControl.ContextMenuStrip = EditModeMenuStrip;
         }
-
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -156,36 +152,35 @@ namespace LogExpert.Dialogs
             {
                 if (e.Button == MouseButtons.Right)
                 {
-                    if (this.isDrag)
+                    if (isDrag)
                     {
-                        this.isDrag = false;
-                        overlay.Bookmark.OverlayOffset = this.oldOverlayOffset;
-                        this.Refresh();
+                        isDrag = false;
+                        overlay.Bookmark.OverlayOffset = oldOverlayOffset;
+                        Refresh();
                         return;
                     }
                 }
                 else
                 {
-                    this.dragStartPoint = e.Location;
-                    this.isDrag = true;
-                    this.draggedOverlay = overlay;
-                    this.oldOverlayOffset = overlay.Bookmark.OverlayOffset;
+                    dragStartPoint = e.Location;
+                    isDrag = true;
+                    draggedOverlay = overlay;
+                    oldOverlayOffset = overlay.Bookmark.OverlayOffset;
                 }
             }
             else
             {
-                this.isDrag = false;
+                isDrag = false;
                 base.OnMouseDown(e);
             }
         }
 
-
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            if (this.isDrag)
+            if (isDrag)
             {
-                this.isDrag = false;
-                this.Refresh();
+                isDrag = false;
+                Refresh();
             }
             else
             {
@@ -193,20 +188,19 @@ namespace LogExpert.Dialogs
             }
         }
 
-
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (this.isDrag)
+            if (isDrag)
             {
-                this.Cursor = Cursors.Hand;
-                Size offset = new Size(e.X - this.dragStartPoint.X, e.Y - this.dragStartPoint.Y);
-                this.draggedOverlay.Bookmark.OverlayOffset = this.oldOverlayOffset + offset;
-                this.Refresh();
+                Cursor = Cursors.Hand;
+                Size offset = new Size(e.X - dragStartPoint.X, e.Y - dragStartPoint.Y);
+                draggedOverlay.Bookmark.OverlayOffset = oldOverlayOffset + offset;
+                Refresh();
             }
             else
             {
                 BookmarkOverlay overlay = GetOverlayForPosition(e.Location);
-                this.Cursor = overlay != null ? Cursors.Hand : Cursors.Default;
+                Cursor = overlay != null ? Cursors.Hand : Cursors.Default;
                 base.OnMouseMove(e);
             }
         }
@@ -233,9 +227,9 @@ namespace LogExpert.Dialogs
 
         private BookmarkOverlay GetOverlayForPosition(Point pos)
         {
-            lock (this.overlayList)
+            lock (overlayList)
             {
-                foreach (BookmarkOverlay overlay in this.overlayList.Values)
+                foreach (BookmarkOverlay overlay in overlayList.Values)
                 {
                     if (overlay.BubbleRect.Contains(pos))
                     {
@@ -243,6 +237,7 @@ namespace LogExpert.Dialogs
                     }
                 }
             }
+
             return null;
         }
 
@@ -254,24 +249,23 @@ namespace LogExpert.Dialogs
         {
             if ((e.KeyCode == Keys.C || e.KeyCode == Keys.Insert) && e.Control)
             {
-                if (this.EditingControl != null)
+                if (EditingControl != null)
                 {
                     e.IsInputKey = true;
                 }
             }
         }
 
-
         private void Control_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
             {
-                if (this.EditingControl != null)
+                if (EditingControl != null)
                 {
-                    if (this.EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
+                    if (EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
                     {
                         DataGridViewTextBoxEditingControl editControl =
-                            this.EditingControl as DataGridViewTextBoxEditingControl;
+                            EditingControl as DataGridViewTextBoxEditingControl;
                         editControl.EditingControlDataGridView.EndEdit();
                         int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
                         if (e.KeyCode == Keys.Up)
@@ -281,6 +275,7 @@ namespace LogExpert.Dialogs
                                 line--;
                             }
                         }
+
                         if (e.KeyCode == Keys.Down)
                         {
                             if (line < editControl.EditingControlDataGridView.RowCount - 1)
@@ -311,8 +306,7 @@ namespace LogExpert.Dialogs
         {
             BufferedGraphicsContext currentContext;
             currentContext = BufferedGraphicsManager.Current;
-            BufferedGraphics myBuffer = currentContext.Allocate(this.CreateGraphics(), this.ClientRectangle);
-
+            BufferedGraphics myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle);
 
             //base.OnPaint(e);
 
@@ -320,13 +314,13 @@ namespace LogExpert.Dialogs
             {
                 overlayList.Clear();
             }
+
             myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
             e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
 
             PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
             //PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, ClientRectangle);
             base.OnPaint(args);
-
 
             Color bubbleColor = Color.FromArgb(160, 250, 250, 00);
             Pen pen = new Pen(bubbleColor, (float) 3.0);
@@ -337,18 +331,18 @@ namespace LogExpert.Dialogs
             format.LineAlignment = StringAlignment.Center;
             format.Alignment = StringAlignment.Near;
 
-            myBuffer.Graphics.SetClip(this.DisplayRectangle, CombineMode.Intersect);
+            myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
 
             // Spaltenheader aus Clipbereich rausnehmen
-            Rectangle rectTableHeader = new Rectangle(this.DisplayRectangle.X, this.DisplayRectangle.Y,
-                this.DisplayRectangle.Width, this.ColumnHeadersHeight);
+            Rectangle rectTableHeader = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y,
+                DisplayRectangle.Width, ColumnHeadersHeight);
             myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
 
             //e.Graphics.SetClip(rect, CombineMode.Union);
 
-            lock (this.overlayList)
+            lock (overlayList)
             {
-                foreach (BookmarkOverlay overlay in this.overlayList.Values)
+                foreach (BookmarkOverlay overlay in overlayList.Values)
                 {
                     SizeF textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, font, 300);
                     Rectangle rectBubble = new Rectangle(overlay.Position,
@@ -372,9 +366,11 @@ namespace LogExpert.Dialogs
                     {
                         _logger.Debug("ClipRgn: {0},{1},{2},{3}", myBuffer.Graphics.ClipBounds.Left, myBuffer.Graphics.ClipBounds.Top, myBuffer.Graphics.ClipBounds.Width, myBuffer.Graphics.ClipBounds.Height);
                     }
-                    Rectangle testRect = this.ClientRectangle;
+
+                    Rectangle testRect = ClientRectangle;
                 }
             }
+
             pen.Dispose();
             brush.Dispose();
             textBrush.Dispose();
@@ -428,7 +424,6 @@ namespace LogExpert.Dialogs
         #endregion
     }
 
-
     public class LogCellEditingControl : DataGridViewTextBoxEditingControl, IDataGridViewEditingControl
     {
         #region cTor
@@ -461,6 +456,7 @@ namespace LogExpert.Dialogs
                 case Keys.PageUp:
                     return true;
             }
+
             return !dataGridViewWantsInputKey;
         }
 
@@ -529,7 +525,6 @@ namespace LogExpert.Dialogs
         //  this.EditingControlDataGridView.NotifyCurrentCellDirty(true);
         //  base.OnTextChanged(eventargs);
         //}
-
 
         //public Cursor EditingPanelCursor
         //{
