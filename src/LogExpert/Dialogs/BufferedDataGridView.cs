@@ -15,6 +15,13 @@ namespace LogExpert.Dialogs
         #region Fields
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Brush _brush;
+
+        private readonly Color _bubbleColor = Color.FromArgb(160, 250, 250, 00);
+        private readonly Font _font = new Font("Arial", 10);
+
+        private readonly Pen _pen;
+        private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90));
 
         //BufferedGraphics myBuffer;
 
@@ -33,15 +40,11 @@ namespace LogExpert.Dialogs
 
         public BufferedDataGridView()
         {
+            _pen = new Pen(_bubbleColor, (float) 3.0);
+            _brush = new SolidBrush(_bubbleColor);
+
             InitializeComponent();
             DoubleBuffered = true;
-
-            //ctl.Location = new Point(0, 0);
-            //ctl.Size = new Size(200, 200);
-            //ctl.Visible = true;
-            //ctl.BackColor = Color.FromArgb(50, 100, 100, 100);
-            //ctl.Parent = this;
-            //this.Controls.Add(ctl);
         }
 
         #endregion
@@ -59,13 +62,6 @@ namespace LogExpert.Dialogs
         #endregion
 
         #region Properties
-
-        /*    
-      public Graphics Buffer
-      {
-        get { return this.myBuffer.Graphics; }
-      }
-       */
 
         public Rectangle LastRowRect { get; set; }
 
@@ -246,80 +242,62 @@ namespace LogExpert.Dialogs
 
         private void PaintOverlays(PaintEventArgs e)
         {
-            BufferedGraphicsContext currentContext;
-            currentContext = BufferedGraphicsManager.Current;
-            BufferedGraphics myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle);
-
-            //base.OnPaint(e);
-
-            lock (overlayList)
+            BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
+            using (BufferedGraphics myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle))
             {
-                overlayList.Clear();
-            }
-
-            myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
-            e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
-
-            PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
-            //PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, ClientRectangle);
-            base.OnPaint(args);
-
-            Color bubbleColor = Color.FromArgb(160, 250, 250, 00);
-            Pen pen = new Pen(bubbleColor, (float) 3.0);
-            Brush brush = new SolidBrush(bubbleColor);
-            Brush textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90));
-            Font font = new Font("Arial", 10);
-            StringFormat format = new StringFormat();
-            format.LineAlignment = StringAlignment.Center;
-            format.Alignment = StringAlignment.Near;
-
-            myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
-
-            // Spaltenheader aus Clipbereich rausnehmen
-            Rectangle rectTableHeader = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y,
-                DisplayRectangle.Width, ColumnHeadersHeight);
-            myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
-
-            //e.Graphics.SetClip(rect, CombineMode.Union);
-
-            lock (overlayList)
-            {
-                foreach (BookmarkOverlay overlay in overlayList.Values)
+                lock (overlayList)
                 {
-                    SizeF textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, font, 300);
-                    Rectangle rectBubble = new Rectangle(overlay.Position,
-                        new Size((int) textSize.Width, (int) textSize.Height));
-                    rectBubble.Offset(60, -(rectBubble.Height + 40));
-                    rectBubble.Inflate(3, 3);
-                    rectBubble.Location = rectBubble.Location + overlay.Bookmark.OverlayOffset;
-                    overlay.BubbleRect = rectBubble;
-                    myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
-                    myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
-                    e.Graphics.SetClip(rectBubble, CombineMode.Union);
-                    RectangleF textRect =
-                        new RectangleF(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
-                    myBuffer.Graphics.FillRectangle(brush, rectBubble);
-                    //myBuffer.Graphics.DrawLine(pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
-                    myBuffer.Graphics.DrawLine(pen, overlay.Position,
-                        new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
-                    myBuffer.Graphics.DrawString(overlay.Bookmark.Text, font, textBrush, textRect, format);
-
-                    if (_logger.IsDebugEnabled)
-                    {
-                        _logger.Debug("ClipRgn: {0},{1},{2},{3}", myBuffer.Graphics.ClipBounds.Left, myBuffer.Graphics.ClipBounds.Top, myBuffer.Graphics.ClipBounds.Width, myBuffer.Graphics.ClipBounds.Height);
-                    }
-
-                    Rectangle testRect = ClientRectangle;
+                    overlayList.Clear();
                 }
+
+                myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
+                e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
+
+                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
+
+                base.OnPaint(args);
+
+                StringFormat format = new StringFormat();
+                format.LineAlignment = StringAlignment.Center;
+                format.Alignment = StringAlignment.Near;
+
+                myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
+
+                // Spaltenheader aus Clipbereich rausnehmen
+                Rectangle rectTableHeader = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, DisplayRectangle.Width, ColumnHeadersHeight);
+                myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
+
+                //e.Graphics.SetClip(rect, CombineMode.Union);
+
+                lock (overlayList)
+                {
+                    foreach (BookmarkOverlay overlay in overlayList.Values)
+                    {
+                        SizeF textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
+                        Rectangle rectBubble = new Rectangle(overlay.Position,
+                            new Size((int) textSize.Width, (int) textSize.Height));
+                        rectBubble.Offset(60, -(rectBubble.Height + 40));
+                        rectBubble.Inflate(3, 3);
+                        rectBubble.Location = rectBubble.Location + overlay.Bookmark.OverlayOffset;
+                        overlay.BubbleRect = rectBubble;
+                        myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
+                        myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
+                        e.Graphics.SetClip(rectBubble, CombineMode.Union);
+                        RectangleF textRect = new RectangleF(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
+                        myBuffer.Graphics.FillRectangle(_brush, rectBubble);
+                        //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
+                        myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
+                        myBuffer.Graphics.DrawString(overlay.Bookmark.Text, _font, _textBrush, textRect, format);
+
+                        if (_logger.IsDebugEnabled)
+                        {
+                            _logger.Debug("ClipRgn: {0},{1},{2},{3}", myBuffer.Graphics.ClipBounds.Left, myBuffer.Graphics.ClipBounds.Top, myBuffer.Graphics.ClipBounds.Width, myBuffer.Graphics.ClipBounds.Height);
+                        }
+                    }
+                }
+
+                myBuffer.Render(e.Graphics);
             }
-
-            pen.Dispose();
-            brush.Dispose();
-            textBrush.Dispose();
-            font.Dispose();
-
-            myBuffer.Render(e.Graphics);
-            myBuffer.Dispose();
         }
 
         #endregion
@@ -345,37 +323,42 @@ namespace LogExpert.Dialogs
                 {
                     if (EditingControl.GetType().IsAssignableFrom(typeof(LogCellEditingControl)))
                     {
-                        DataGridViewTextBoxEditingControl editControl =
-                            EditingControl as DataGridViewTextBoxEditingControl;
-                        editControl.EditingControlDataGridView.EndEdit();
-                        int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
-                        if (e.KeyCode == Keys.Up)
+                        DataGridViewTextBoxEditingControl editControl = EditingControl as DataGridViewTextBoxEditingControl;
+                        if (editControl != null)
                         {
-                            if (line > 0)
+                            editControl.EditingControlDataGridView.EndEdit();
+                            int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
+                            if (e.KeyCode == Keys.Up)
                             {
-                                line--;
+                                if (line > 0)
+                                {
+                                    line--;
+                                }
                             }
-                        }
 
-                        if (e.KeyCode == Keys.Down)
-                        {
-                            if (line < editControl.EditingControlDataGridView.RowCount - 1)
+                            if (e.KeyCode == Keys.Down)
                             {
-                                line++;
+                                if (line < editControl.EditingControlDataGridView.RowCount - 1)
+                                {
+                                    line++;
+                                }
                             }
-                        }
 
-                        int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
-                        int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
-                        int selStart = editControl.SelectionStart;
-                        editControl.EditingControlDataGridView.CurrentCell =
-                            editControl.EditingControlDataGridView.Rows[line].Cells[col];
-                        editControl.EditingControlDataGridView.BeginEdit(false);
-                        editControl.SelectionStart = selStart;
-                        editControl.ScrollToCaret();
-                        editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
-                        e.Handled = true;
-                        return;
+                            int col = editControl.EditingControlDataGridView.CurrentCellAddress.X;
+                            int scrollIndex = editControl.EditingControlDataGridView.HorizontalScrollingOffset;
+                            int selStart = editControl.SelectionStart;
+                            editControl.EditingControlDataGridView.CurrentCell =
+                                editControl.EditingControlDataGridView.Rows[line].Cells[col];
+                            editControl.EditingControlDataGridView.BeginEdit(false);
+                            editControl.SelectionStart = selStart;
+                            editControl.ScrollToCaret();
+                            editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        _logger.Warn("Edit control was null, to be checked");
                     }
                 }
             }
@@ -408,20 +391,6 @@ namespace LogExpert.Dialogs
         public override Type EditType
         {
             get { return typeof(LogCellEditingControl); }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public override void InitializeEditingControl(int rowIndex, object
-            initialFormattedValue, DataGridViewCellStyle dataGridViewCellStyle)
-        {
-            // Set the value of the editing control to the current cell value.
-            base.InitializeEditingControl(rowIndex, initialFormattedValue,
-                dataGridViewCellStyle);
-            LogCellEditingControl ctl =
-                DataGridView.EditingControl as LogCellEditingControl;
         }
 
         #endregion
