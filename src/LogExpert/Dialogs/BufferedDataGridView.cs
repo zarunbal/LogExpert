@@ -86,7 +86,10 @@ namespace LogExpert.Dialogs
 
         public void AddOverlay(BookmarkOverlay overlay)
         {
-            overlayList.Add(overlay.Position.Y, overlay);
+            lock (overlayList)
+            {
+                overlayList.Add(overlay.Position.Y, overlay);
+            }
         }
 
         public CellContent GetCellContentFromPoint(int x, int y)
