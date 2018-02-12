@@ -322,10 +322,8 @@ namespace LogExpert
             if (line != null)
             {
                 pos += Encoding.GetByteCount(line);
-                if (!reader.EndOfStream) //TO avoid setting position ahead of the file
-                {
-                    pos += newLineSequenceLength;
-                }
+
+                pos += newLineSequenceLength;
 
                 if (line.Length > MAX_LINE_LEN)
                 {
