@@ -42,12 +42,12 @@ namespace LogExpert
         {
             this.useSystemReaderMethod = useSystemReaderMethod;
             this.stream = new BufferedStream(stream);
-            this.preambleLength = DetectPreambleLengthAndEncoding();
+            preambleLength = DetectPreambleLengthAndEncoding();
 
             Encoding usedEncoding;
-            if (this.detectedEncoding != null && encodingOptions.Encoding == null)
+            if (detectedEncoding != null && encodingOptions.Encoding == null)
             {
-                usedEncoding = this.detectedEncoding;
+                usedEncoding = detectedEncoding;
             }
             else if (encodingOptions.Encoding != null)
             {
@@ -60,11 +60,11 @@ namespace LogExpert
                     : Encoding.Default;
             }
 
-            if (usedEncoding is System.Text.UTF8Encoding)
+            if (usedEncoding is UTF8Encoding)
             {
                 posInc_precomputed = 0;
             }
-            else if (usedEncoding is System.Text.UnicodeEncoding)
+            else if (usedEncoding is UnicodeEncoding)
             {
                 posInc_precomputed = 2;
             }
@@ -73,13 +73,13 @@ namespace LogExpert
                 posInc_precomputed = 1;
             }
 
-            this.reader = new StreamReader(this.stream, usedEncoding, true);
+            reader = new StreamReader(this.stream, usedEncoding, true);
             ResetReader();
             Position = 0;
 
             if (this.useSystemReaderMethod)
             {
-                this.newLineSequenceLength = guessNewLineSequenceLength();
+                newLineSequenceLength = guessNewLineSequenceLength();
             }
         }
 
@@ -93,7 +93,7 @@ namespace LogExpert
         /// <value>The position.</value>
         public long Position
         {
-            get { return this.pos; }
+            get { return pos; }
             set
             {
                 /*
@@ -104,17 +104,17 @@ namespace LogExpert
                  * 4: 27.07.09: Preamble-Length wird jetzt im CT ermittelt, da Encoding.GetPreamble().Length
                  *    immer eine fixe Länge liefert (unabhängig vom echtem Dateiinhalt)
                  */
-                this.pos = value; //  +this.Encoding.GetPreamble().Length;      // 1
+                pos = value; //  +this.Encoding.GetPreamble().Length;      // 1
                 //this.stream.Seek(this.pos, SeekOrigin.Begin);     // 2
                 //this.stream.Seek(this.pos + this.Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
-                this.stream.Seek(this.pos + this.preambleLength, SeekOrigin.Begin); // 4
+                stream.Seek(pos + preambleLength, SeekOrigin.Begin); // 4
                 ResetReader();
             }
         }
 
         public Encoding Encoding
         {
-            get { return this.reader.CurrentEncoding; }
+            get { return reader.CurrentEncoding; }
         }
 
         public bool IsBufferComplete
@@ -128,7 +128,7 @@ namespace LogExpert
 
         public void Close()
         {
-            this.stream.Close();
+            stream.Close();
         }
 
         public unsafe int ReadChar()
@@ -136,26 +136,27 @@ namespace LogExpert
             int readInt;
             try
             {
-                readInt = this.reader.Read();
+                readInt = reader.Read();
                 if (readInt != -1)
                 {
                     char readChar = (char) readInt;
                     int posInc = posInc_precomputed != 0
                         ? posInc_precomputed
-                        : this.reader.CurrentEncoding.GetByteCount(&readChar, 1);
-                    this.pos += posInc;
+                        : reader.CurrentEncoding.GetByteCount(&readChar, 1);
+                    pos += posInc;
                 }
             }
             catch (IOException)
             {
                 readInt = -1;
             }
+
             return readInt;
         }
 
         public string ReadLine()
         {
-            return this.useSystemReaderMethod ? ReadLineNew() : ReadLineOld();
+            return useSystemReaderMethod ? ReadLineNew() : ReadLineOld();
         }
 
         #endregion
@@ -166,17 +167,17 @@ namespace LogExpert
         {
             long currentPos = Position;
             int len = 0;
-            string line = this.reader.ReadLine();
+            string line = reader.ReadLine();
             if (line != null)
             {
-                this.stream.Seek(this.Encoding.GetByteCount(line) + this.preambleLength, SeekOrigin.Begin);
+                stream.Seek(Encoding.GetByteCount(line) + preambleLength, SeekOrigin.Begin);
                 ResetReader();
-                int b = this.reader.Read();
+                int b = reader.Read();
                 // int b = this.stream.ReadByte();
                 if (b == 0x0d)
                 {
                     // b = this.stream.ReadByte();
-                    b = this.reader.Read();
+                    b = reader.Read();
                     if (b == 0x0a)
                     {
                         len = 2;
@@ -190,12 +191,13 @@ namespace LogExpert
                 {
                     len = 1;
                 }
-                len *= this.Encoding.GetByteCount("\r");
+
+                len *= Encoding.GetByteCount("\r");
             }
+
             Position = currentPos;
             return len;
         }
-
 
         //private string GetLineAndResetBuilder()
         //{
@@ -208,12 +210,10 @@ namespace LogExpert
         //  return result;
         //}
 
-
         //private void appendToBuilder(char[] readChar)
         //{
         //  this.builder.Append(Char.ToString(readChar[0]));
         //}
-
 
         //private void NewBuilder()
         //{
@@ -222,34 +222,32 @@ namespace LogExpert
 
         private string GetLineAndResetBuilder()
         {
-            string result = new string(this.charBuffer, 0, this.charBufferPos);
+            string result = new string(charBuffer, 0, charBufferPos);
             NewBuilder();
-            this.state = 0;
+            state = 0;
             return result;
         }
 
-
         private void appendToBuilder(char readChar)
         {
-            if (this.charBufferPos >= MAX_LINE_LEN)
+            if (charBufferPos >= MAX_LINE_LEN)
             {
                 return;
             }
-            this.charBuffer[this.charBufferPos++] = readChar;
-        }
 
+            charBuffer[charBufferPos++] = readChar;
+        }
 
         private void NewBuilder()
         {
-            this.charBufferPos = 0;
+            charBufferPos = 0;
         }
-
 
         private void ResetReader()
         {
             state = 0;
             NewBuilder();
-            this.reader.DiscardBufferedData();
+            reader.DiscardBufferedData();
         }
 
         /// <summary>
@@ -268,11 +266,12 @@ namespace LogExpert
 
             detectedEncoding = null;
             byte[] readPreamble = new byte[4];
-            int readLen = this.stream.Read(readPreamble, 0, 4);
+            int readLen = stream.Read(readPreamble, 0, 4);
             if (readLen < 2)
             {
                 return 0;
             }
+
             Encoding[] encodings = new Encoding[]
             {
                 Encoding.UTF8,
@@ -299,12 +298,14 @@ namespace LogExpert
                         break;
                     }
                 }
+
                 if (!fail)
                 {
                     detectedEncoding = encoding;
                     return preamble.Length;
                 }
             }
+
             return 0;
         }
 
@@ -312,23 +313,26 @@ namespace LogExpert
 
         protected string ReadLineNew()
         {
-            if (this.newLineSequenceLength == 0)
+            if (newLineSequenceLength == 0)
             {
-                this.newLineSequenceLength = guessNewLineSequenceLength();
+                newLineSequenceLength = guessNewLineSequenceLength();
             }
-            string line = this.reader.ReadLine();
+
+            string line = reader.ReadLine();
             if (line != null)
             {
-                this.pos += this.Encoding.GetByteCount(line);
+                pos += Encoding.GetByteCount(line);
                 if (!reader.EndOfStream) //TO avoid setting position ahead of the file
                 {
-                    this.pos += this.newLineSequenceLength;
+                    pos += newLineSequenceLength;
                 }
+
                 if (line.Length > MAX_LINE_LEN)
                 {
                     line = line.Remove(MAX_LINE_LEN);
                 }
             }
+
             return line;
         }
 
@@ -356,6 +360,7 @@ namespace LogExpert
                                 result = GetLineAndResetBuilder();
                                 return result;
                         }
+
                         break;
                     case '\n':
                         switch (state)
@@ -366,6 +371,7 @@ namespace LogExpert
                                 result = GetLineAndResetBuilder();
                                 return result;
                         }
+
                         break;
                     default:
                         switch (state)
@@ -378,11 +384,14 @@ namespace LogExpert
                                 state = 0;
                                 break;
                         }
+
                         break;
                 }
+
                 //if (this.builder.Length > MAX_LINE_LEN)
                 //  break;
             }
+
             //if (builder.Length == 0)
             //  return null;  // EOF
             result = GetLineAndResetBuilder();
@@ -392,6 +401,7 @@ namespace LogExpert
             {
                 return null; // EOF
             }
+
             return result;
         }
     }
