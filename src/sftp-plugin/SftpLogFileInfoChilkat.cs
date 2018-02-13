@@ -218,6 +218,7 @@ namespace SftpFileSystem
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError(e.Message);
                     return false;
                 }
             }

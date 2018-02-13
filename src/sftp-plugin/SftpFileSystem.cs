@@ -32,17 +32,14 @@ namespace SftpFileSystem
 
         #region Properties
 
-        internal CredentialCache CredentialsCache { get; }
+        private CredentialCache CredentialsCache { get; }
 
         public string Text
         {
             get { return "SFTP plugin"; }
         }
 
-        public string Description
-        {
-            get { return "Can read log files directly from SFTP server."; }
-        }
+        public string Description => "Can read log files directly from SFTP server.";
 
         public ConfigData ConfigData { get; private set; } = new ConfigData();
 
@@ -99,15 +96,31 @@ namespace SftpFileSystem
         public void LoadConfig(string configDir)
         {
             XmlSerializer xml = new XmlSerializer(ConfigData.GetType());
+
+            FileInfo configFile = new FileInfo(configDir + "\\" + "sftpfilesystem.cfg");
+
+            if (!configFile.Exists)
+            {
+                return;
+            }
+
+            FileStream fs = null;
+
             try
             {
-                FileStream fs = new FileStream(configDir + "\\" + "sftpfilesystem.cfg", FileMode.Open);
+                fs = configFile.OpenRead();
+
                 ConfigData = (ConfigData) xml.Deserialize(fs);
-                fs.Close();
             }
             catch (IOException e)
             {
                 _logger.LogError(e.Message);
+            }
+            finally
+            {
+                fs?.Flush();
+                fs?.Close();
+                fs?.Dispose();
             }
         }
 
@@ -115,15 +128,24 @@ namespace SftpFileSystem
         {
             _logger.Info("Saving SFTP config");
             XmlSerializer xml = new XmlSerializer(ConfigData.GetType());
+
+            FileStream fs = null;
+
             try
             {
-                FileStream fs = new FileStream(configDir + "\\" + "sftpfilesystem.cfg", FileMode.Create);
+                fs = new FileStream(configDir + "\\" + "sftpfilesystem.cfg", FileMode.Create);
                 xml.Serialize(fs, ConfigData);
                 fs.Close();
             }
             catch (IOException e)
             {
                 _logger.LogError(e.Message);
+            }
+            finally
+            {
+                fs?.Flush();
+                fs?.Close();
+                fs?.Dispose();
             }
         }
 
