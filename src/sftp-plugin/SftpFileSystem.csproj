@@ -94,7 +94,6 @@
       <DependentUpon>LoginDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SftpConfigData.cs" />
     <Compile Include="SftpFileSystem.cs" />
     <Compile Include="SftpLogFileInfoChilkat.cs" />
     <Compile Include="SftpStreamChilkat.cs" />

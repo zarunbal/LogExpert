@@ -8,29 +8,37 @@ using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
-  public partial class FailedKeyDialog : Form
-  {
-    public FailedKeyDialog()
+    public partial class FailedKeyDialog : Form
     {
-      InitializeComponent();
-    }
+        #region cTor
 
-    private void button1_Click(object sender, EventArgs e)
-    {
-      DialogResult = DialogResult.OK;
-      Close();
-    }
+        public FailedKeyDialog()
+        {
+            InitializeComponent();
+        }
 
-    private void button2_Click(object sender, EventArgs e)
-    {
-      DialogResult = DialogResult.Cancel;
-      Close();
-    }
+        #endregion
 
-    private void button3_Click(object sender, EventArgs e)
-    {
-      DialogResult = DialogResult.Retry;
-      Close();
+        #region Events handler
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Retry;
+            Close();
+        }
+
+        #endregion
     }
-  }
 }

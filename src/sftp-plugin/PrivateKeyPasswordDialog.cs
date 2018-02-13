@@ -8,28 +8,35 @@ using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
-  public partial class PrivateKeyPasswordDialog : Form
-  {
-    private string password;
-
-    public PrivateKeyPasswordDialog()
+    public partial class PrivateKeyPasswordDialog : Form
     {
-      InitializeComponent();
-    }
+        #region cTor
 
-    public string Password
-    {
-      get { return password; }
-    }
+        public PrivateKeyPasswordDialog()
+        {
+            InitializeComponent();
+        }
 
-    private void okButton_Click(object sender, EventArgs e)
-    {
-      this.password = this.passwordTextBox.Text;
-    }
+        #endregion
 
-    private void LoginDialog_Load(object sender, EventArgs e)
-    {
-        this.passwordTextBox.Focus();
+        #region Properties
+
+        public string Password { get; private set; }
+
+        #endregion
+
+        #region Events handler
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            Password = passwordTextBox.Text;
+        }
+
+        private void LoginDialog_Load(object sender, EventArgs e)
+        {
+            passwordTextBox.Focus();
+        }
+
+        #endregion
     }
-  }
 }

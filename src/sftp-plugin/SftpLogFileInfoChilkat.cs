@@ -15,14 +15,14 @@ namespace SftpFileSystem
 
         private const int RETRY_COUNT = 20;
         private const int RETRY_SLEEP = 250;
-        private DateTime lastChange = DateTime.Now;
-        private long lastLength;
         private readonly ILogExpertLogger logger;
         private readonly string remoteFileName;
 
         private readonly SftpFileSystem sftFileSystem;
         private readonly SFtp sftp = new SFtp();
         private readonly object sshKeyMonitor = new object();
+        private DateTime lastChange = DateTime.Now;
+        private long lastLength;
 
         #endregion
 

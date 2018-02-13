@@ -5,56 +5,64 @@ using System.Collections;
 
 namespace SftpFileSystem
 {
-  internal class CredentialCache
-  {
-    private IDictionary<string, Credentials> credentialDict = new Dictionary<string, Credentials>();
-
-    private IList<Credentials> credList = new List<Credentials>(); 
-
-  
-    internal IList<string> GetUsersForHost(string host)
+    internal class CredentialCache
     {
-      IList<string> result = new List<string>();
-      foreach (Credentials cred in this.credList)
-      {
-        if (cred.Host.Equals(host))
+        #region Fields
+
+        private readonly IList<Credentials> credList = new List<Credentials>();
+
+        private IDictionary<string, Credentials> credentialDict = new Dictionary<string, Credentials>();
+
+        #endregion
+
+        #region Internals
+
+        internal IList<string> GetUsersForHost(string host)
         {
-          result.Add(cred.UserName);
-        }
-      }
-      return result;
-    }
+            IList<string> result = new List<string>();
+            foreach (Credentials cred in credList)
+            {
+                if (cred.Host.Equals(host))
+                {
+                    result.Add(cred.UserName);
+                }
+            }
 
-    internal Credentials GetCredentials(string host, string user)
-    {
-      foreach (Credentials cred in this.credList)
-      {
-        if (cred.Host.Equals(host) && cred.UserName.Equals(user))
+            return result;
+        }
+
+        internal Credentials GetCredentials(string host, string user)
         {
-          return cred;
+            foreach (Credentials cred in credList)
+            {
+                if (cred.Host.Equals(host) && cred.UserName.Equals(user))
+                {
+                    return cred;
+                }
+            }
+
+            return null;
         }
-      }
-      return null;
+
+        internal void Add(Credentials cred)
+        {
+            RemoveCredentials(cred.Host, cred.UserName);
+            credList.Add(cred);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void RemoveCredentials(string host, string user)
+        {
+            Credentials credentials = GetCredentials(host, user);
+            if (credentials != null)
+            {
+                credList.Remove(credentials);
+            }
+        }
+
+        #endregion
     }
-
-
-    internal void RemoveCredentials(string host, string user)
-    {
-      Credentials credentials = GetCredentials(host, user);
-      if (credentials != null)
-      {
-        this.credList.Remove(credentials);
-      }
-    }
-
-    internal void Add(Credentials cred)
-    {
-      RemoveCredentials(cred.Host, cred.UserName);
-      this.credList.Add(cred);
-    }
-
-
-
-
-  }
 }

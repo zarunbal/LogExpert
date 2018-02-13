@@ -8,61 +8,70 @@ using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
-  public partial class ConfigDialog : Form
-  {
-    private ConfigData configData;
-
-    public ConfigDialog(ConfigData configData)
+    public partial class ConfigDialog : Form
     {
-      InitializeComponent();
-      TopLevel = false;
-      this.configData = configData;
-      this.pkCheckBox.Checked = this.configData.UseKeyfile;
-      this.puttyKeyRadioButton.Checked = this.configData.KeyType == KeyType.Putty;
-      this.sshKeyRadioButton.Checked = this.configData.KeyType == KeyType.Ssh;
-      this.fileLabel.Text = this.configData.KeyFile;
-    }
+        #region Fields
 
-    public ConfigData ConfigData
-    {
-      get { return configData; }
-    }
+        #endregion
 
-    private void pkCheckBox_CheckStateChanged(object sender, EventArgs e)
-    {
-      keyFileButton.Enabled = pkCheckBox.Checked;
-      keyTypeGroupBox.Enabled = pkCheckBox.Checked;
-    }
+        #region cTor
 
-    private void ConfigDialog_Load(object sender, EventArgs e)
-    {
-      
-    }
+        public ConfigDialog(ConfigData configData)
+        {
+            InitializeComponent();
+            TopLevel = false;
+            ConfigData = configData;
+            pkCheckBox.Checked = ConfigData.UseKeyfile;
+            puttyKeyRadioButton.Checked = ConfigData.KeyType == KeyType.Putty;
+            sshKeyRadioButton.Checked = ConfigData.KeyType == KeyType.Ssh;
+            fileLabel.Text = ConfigData.KeyFile;
+        }
 
-    private void keyFileButton_Click(object sender, EventArgs e)
-    {
-      FileDialog dlg = new OpenFileDialog();
-      if (DialogResult.OK == dlg.ShowDialog())
-      {
-        this.ConfigData.KeyFile = dlg.FileName;
-        this.fileLabel.Text = this.ConfigData.KeyFile;
-      }
+        #endregion
 
-    }
+        #region Properties
 
-    private void pkCheckBox_CheckedChanged(object sender, EventArgs e)
-    {
-      this.configData.UseKeyfile = this.pkCheckBox.Checked;
-    }
+        public ConfigData ConfigData { get; }
 
-    private void puttyKeyRadioButton_CheckedChanged(object sender, EventArgs e)
-    {
-      this.configData.KeyType = KeyType.Putty;
-    }
+        #endregion
 
-    private void sshKeyRadioButton_CheckedChanged(object sender, EventArgs e)
-    {
-      this.configData.KeyType = KeyType.Ssh;
+        #region Events handler
+
+        private void pkCheckBox_CheckStateChanged(object sender, EventArgs e)
+        {
+            keyFileButton.Enabled = pkCheckBox.Checked;
+            keyTypeGroupBox.Enabled = pkCheckBox.Checked;
+        }
+
+        private void ConfigDialog_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void keyFileButton_Click(object sender, EventArgs e)
+        {
+            FileDialog dlg = new OpenFileDialog();
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                ConfigData.KeyFile = dlg.FileName;
+                fileLabel.Text = ConfigData.KeyFile;
+            }
+        }
+
+        private void pkCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigData.UseKeyfile = pkCheckBox.Checked;
+        }
+
+        private void puttyKeyRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigData.KeyType = KeyType.Putty;
+        }
+
+        private void sshKeyRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigData.KeyType = KeyType.Ssh;
+        }
+
+        #endregion
     }
-  }
 }

@@ -4,35 +4,27 @@ using System.Text;
 
 namespace SftpFileSystem
 {
-  internal class Credentials
-  {
-    private string host;
-    private string userName;
-    private string password;
-
-    internal Credentials(string host, string userName, string password)
+    internal class Credentials
     {
-      this.Host = host;
-      this.UserName = userName;
-      this.Password = password;
-    }
+        #region cTor
 
-    public string Host
-    {
-      get { return host; }
-      set { host = value; }
-    }
+        internal Credentials(string host, string userName, string password)
+        {
+            Host = host;
+            UserName = userName;
+            Password = password;
+        }
 
-    public string UserName
-    {
-      get { return userName; }
-      set { userName = value; }
-    }
+        #endregion
 
-    public string Password
-    {
-      get { return password; }
-      set { password = value; }
+        #region Properties
+
+        public string Host { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        #endregion
     }
-  }
 }

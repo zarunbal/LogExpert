@@ -1,8 +1,8 @@
 ﻿namespace SftpFileSystem
 {
-  public enum KeyType
-  {
-    Putty,
-    Ssh
-  }
+    public enum KeyType
+    {
+        Putty,
+        Ssh
+    }
 }
