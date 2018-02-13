@@ -6,10 +6,6 @@ namespace SftpFileSystem
 {
     public class ConfigData
     {
-        #region Fields
-
-        #endregion
-
         #region Properties
 
         public string KeyFile { get; set; }
