@@ -9,9 +9,7 @@ namespace SftpFileSystem
     {
         #region Fields
 
-        private readonly IList<Credentials> credList = new List<Credentials>();
-
-        private IDictionary<string, Credentials> credentialDict = new Dictionary<string, Credentials>();
+        private readonly IList<Credentials> _credList = new List<Credentials>();
 
         #endregion
 
@@ -20,7 +18,7 @@ namespace SftpFileSystem
         internal IList<string> GetUsersForHost(string host)
         {
             IList<string> result = new List<string>();
-            foreach (Credentials cred in credList)
+            foreach (Credentials cred in _credList)
             {
                 if (cred.Host.Equals(host))
                 {
@@ -33,7 +31,7 @@ namespace SftpFileSystem
 
         internal Credentials GetCredentials(string host, string user)
         {
-            foreach (Credentials cred in credList)
+            foreach (Credentials cred in _credList)
             {
                 if (cred.Host.Equals(host) && cred.UserName.Equals(user))
                 {
@@ -47,7 +45,7 @@ namespace SftpFileSystem
         internal void Add(Credentials cred)
         {
             RemoveCredentials(cred.Host, cred.UserName);
-            credList.Add(cred);
+            _credList.Add(cred);
         }
 
         #endregion
@@ -59,7 +57,7 @@ namespace SftpFileSystem
             Credentials credentials = GetCredentials(host, user);
             if (credentials != null)
             {
-                credList.Remove(credentials);
+                _credList.Remove(credentials);
             }
         }
 

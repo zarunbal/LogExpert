@@ -12,7 +12,7 @@ namespace SftpFileSystem
     {
         #region Fields
 
-        private string userName;
+        private string _userName;
 
         #endregion
 
@@ -46,10 +46,10 @@ namespace SftpFileSystem
 
         public string UserName
         {
-            get { return userName; }
+            get { return _userName; }
             set
             {
-                userName = value != null ? value : "";
+                _userName = value != null ? value : "";
                 userNameComboBox.Text = value;
             }
         }
@@ -63,7 +63,7 @@ namespace SftpFileSystem
         private void okButton_Click(object sender, EventArgs e)
         {
             Password = passwordTextBox.Text;
-            userName = userNameComboBox.Text;
+            _userName = userNameComboBox.Text;
         }
 
         private void LoginDialog_Load(object sender, EventArgs e)

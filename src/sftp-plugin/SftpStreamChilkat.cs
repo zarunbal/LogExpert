@@ -9,10 +9,11 @@ namespace SftpFileSystem
     {
         #region Fields
 
-        private long currentPos;
-        private readonly string handle;
-        private readonly string remoteFileName;
-        private readonly Chilkat.SFtp sftp;
+        private readonly string _handle;
+        private readonly string _remoteFileName;
+        private readonly Chilkat.SFtp _sftp;
+
+        private long _currentPos;
 
         #endregion
 
@@ -20,11 +21,11 @@ namespace SftpFileSystem
 
         internal SftpStreamChilkat(Chilkat.SFtp sftp, string remoteFileName)
         {
-            this.sftp = sftp;
-            currentPos = 0;
-            this.remoteFileName = remoteFileName;
-            handle = this.sftp.OpenFile(this.remoteFileName, "readOnly", "openExisting");
-            if (handle == null)
+            _sftp = sftp;
+            _currentPos = 0;
+            _remoteFileName = remoteFileName;
+            _handle = _sftp.OpenFile(_remoteFileName, "readOnly", "openExisting");
+            if (_handle == null)
             {
                 throw new IOException("Cannot open " + remoteFileName);
             }
@@ -51,13 +52,13 @@ namespace SftpFileSystem
 
         public override long Length
         {
-            get { return sftp.GetFileSize64(remoteFileName, true, false); }
+            get { return _sftp.GetFileSize64(_remoteFileName, true, false); }
         }
 
         public override long Position
         {
-            get { return currentPos; }
-            set { currentPos = value; }
+            get { return _currentPos; }
+            set { _currentPos = value; }
         }
 
         #endregion
@@ -71,8 +72,8 @@ namespace SftpFileSystem
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            byte[] bytes = sftp.ReadFileBytes64(handle, Position, count);
-            currentPos += bytes.Length;
+            byte[] bytes = _sftp.ReadFileBytes64(_handle, Position, count);
+            _currentPos += bytes.Length;
             Array.Copy(bytes, 0, buffer, offset, bytes.Length);
             return bytes.Length;
         }
@@ -108,7 +109,7 @@ namespace SftpFileSystem
         public override void Close()
         {
             base.Close();
-            sftp.CloseHandle(handle);
+            _sftp.CloseHandle(_handle);
         }
 
         #endregion

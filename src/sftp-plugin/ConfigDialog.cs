@@ -10,10 +10,6 @@ namespace SftpFileSystem
 {
     public partial class ConfigDialog : Form
     {
-        #region Fields
-
-        #endregion
-
         #region cTor
 
         public ConfigDialog(ConfigData configData)

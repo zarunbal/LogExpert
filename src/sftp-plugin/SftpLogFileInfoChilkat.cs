@@ -13,16 +13,16 @@ namespace SftpFileSystem
     {
         #region Fields
 
-        private const int RETRY_COUNT = 20;
-        private const int RETRY_SLEEP = 250;
-        private readonly ILogExpertLogger logger;
-        private readonly string remoteFileName;
+        private const int RetryCount = 20;
+        private const int RetrySleep = 250;
+        private readonly ILogExpertLogger _logger;
+        private readonly string _remoteFileName;
 
-        private readonly SftpFileSystem sftFileSystem;
-        private readonly SFtp sftp = new SFtp();
-        private readonly object sshKeyMonitor = new object();
-        private DateTime lastChange = DateTime.Now;
-        private long lastLength;
+        private readonly SftpFileSystem _sftFileSystem;
+        private readonly SFtp _sftp = new SFtp();
+        private readonly object _sshKeyMonitor = new object();
+        private DateTime _lastChange = DateTime.Now;
+        private long _lastLength;
 
         #endregion
 
@@ -30,42 +30,42 @@ namespace SftpFileSystem
 
         internal SftpLogFileInfoChilkat(SftpFileSystem sftFileSystem, Uri fileUri, ILogExpertLogger logger)
         {
-            this.logger = logger;
-            this.sftFileSystem = sftFileSystem;
+            _logger = logger;
+            _sftFileSystem = sftFileSystem;
             Uri = fileUri;
-            remoteFileName = Uri.PathAndQuery;
+            _remoteFileName = Uri.PathAndQuery;
 
             //  Any string automatically begins a fully-functional 30-day trial.
             bool success;
-            success = sftp.UnlockComponent("PUT_SERIAL_HERE");
+            success = _sftp.UnlockComponent("PUT_SERIAL_HERE");
             if (success != true)
             {
-                this.logger.LogError(sftp.LastErrorText);
-                MessageBox.Show(sftp.LastErrorText);
+                _logger.LogError(_sftp.LastErrorText);
+                MessageBox.Show(_sftp.LastErrorText);
                 return;
             }
 
             int port = Uri.Port != -1 ? Uri.Port : 22;
-            success = sftp.Connect(Uri.Host, port);
+            success = _sftp.Connect(Uri.Host, port);
             if (success != true)
             {
-                this.logger.LogError(sftp.LastErrorText);
-                MessageBox.Show(sftp.LastErrorText);
+                _logger.LogError(_sftp.LastErrorText);
+                MessageBox.Show(_sftp.LastErrorText);
                 return;
             }
 
             success = false;
             bool cancelled = false;
-            if (this.sftFileSystem.ConfigData.UseKeyfile)
+            if (_sftFileSystem.ConfigData.UseKeyfile)
             {
-                lock (sshKeyMonitor) // prevent multiple password dialogs when opening multiple files at once
+                lock (_sshKeyMonitor) // prevent multiple password dialogs when opening multiple files at once
                 {
-                    while (this.sftFileSystem.SshKey == null)
+                    while (_sftFileSystem.SshKey == null)
                     {
                         // Load key from file, possibly encrypted by password
 
                         SshKey sshKey = new SshKey();
-                        string keyText = sshKey.LoadText(this.sftFileSystem.ConfigData.KeyFile);
+                        string keyText = sshKey.LoadText(_sftFileSystem.ConfigData.KeyFile);
 
                         PrivateKeyPasswordDialog dlg = new PrivateKeyPasswordDialog();
                         DialogResult dialogResult = dlg.ShowDialog();
@@ -76,14 +76,14 @@ namespace SftpFileSystem
                         }
 
                         sshKey.Password = dlg.Password;
-                        if (this.sftFileSystem.ConfigData.KeyType == KeyType.Ssh)
+                        if (_sftFileSystem.ConfigData.KeyType == KeyType.Ssh)
                         {
-                            logger.Info("Loading SSH key from " + this.sftFileSystem.ConfigData.KeyFile);
+                            logger.Info("Loading SSH key from " + _sftFileSystem.ConfigData.KeyFile);
                             success = sshKey.FromOpenSshPrivateKey(keyText);
                         }
                         else
                         {
-                            logger.Info("Loading Putty key from " + this.sftFileSystem.ConfigData.KeyFile);
+                            logger.Info("Loading Putty key from " + _sftFileSystem.ConfigData.KeyFile);
                             success = sshKey.FromPuttyPrivateKey(keyText);
                         }
 
@@ -93,7 +93,7 @@ namespace SftpFileSystem
                         }
                         else
                         {
-                            this.sftFileSystem.SshKey = sshKey;
+                            _sftFileSystem.SshKey = sshKey;
                         }
                     }
                 }
@@ -101,10 +101,10 @@ namespace SftpFileSystem
                 if (!cancelled)
                 {
                     success = false;
-                    Credentials credentials = this.sftFileSystem.GetCredentials(Uri, true, true);
+                    Credentials credentials = _sftFileSystem.GetCredentials(Uri, true, true);
                     while (!success)
                     {
-                        success = sftp.AuthenticatePk(credentials.UserName, this.sftFileSystem.SshKey);
+                        success = _sftp.AuthenticatePk(credentials.UserName, _sftFileSystem.SshKey);
                         if (!success)
                         {
                             FailedKeyDialog dlg = new FailedKeyDialog();
@@ -121,7 +121,7 @@ namespace SftpFileSystem
                             }
 
                             // retries with disabled cache
-                            credentials = this.sftFileSystem.GetCredentials(Uri, false, true);
+                            credentials = _sftFileSystem.GetCredentials(Uri, false, true);
                         }
                     }
                 }
@@ -131,13 +131,13 @@ namespace SftpFileSystem
             {
                 // username/password auth
 
-                Credentials credentials = this.sftFileSystem.GetCredentials(Uri, true, false);
-                success = sftp.AuthenticatePw(credentials.UserName, credentials.Password);
+                Credentials credentials = _sftFileSystem.GetCredentials(Uri, true, false);
+                success = _sftp.AuthenticatePw(credentials.UserName, credentials.Password);
                 if (success != true)
                 {
                     // first fail -> try again with disabled cache
-                    credentials = this.sftFileSystem.GetCredentials(Uri, false, false);
-                    success = sftp.AuthenticatePw(credentials.UserName, credentials.Password);
+                    credentials = _sftFileSystem.GetCredentials(Uri, false, false);
+                    success = _sftp.AuthenticatePw(credentials.UserName, credentials.Password);
                     if (success != true)
                     {
                         // 2nd fail -> abort
@@ -148,15 +148,15 @@ namespace SftpFileSystem
                 }
             }
 
-            success = sftp.InitializeSftp();
+            success = _sftp.InitializeSftp();
             if (success != true)
             {
-                this.logger.LogError(sftp.LastErrorText);
-                MessageBox.Show(sftp.LastErrorText);
+                _logger.LogError(_sftp.LastErrorText);
+                MessageBox.Show(_sftp.LastErrorText);
                 return;
             }
 
-            OriginalLength = lastLength = Length;
+            OriginalLength = _lastLength = Length;
         }
 
         #endregion
@@ -202,7 +202,7 @@ namespace SftpFileSystem
 
         public long Length
         {
-            get { return sftp.GetFileSize64(remoteFileName, true, false); }
+            get { return _sftp.GetFileSize64(_remoteFileName, true, false); }
         }
 
         public long OriginalLength { get; } = -1;
@@ -213,7 +213,7 @@ namespace SftpFileSystem
             {
                 try
                 {
-                    long len = sftp.GetFileSize64(remoteFileName, true, false);
+                    long len = _sftp.GetFileSize64(_remoteFileName, true, false);
                     return len != -1;
                 }
                 catch (Exception e)
@@ -227,7 +227,7 @@ namespace SftpFileSystem
         {
             get
             {
-                TimeSpan diff = DateTime.Now - lastChange;
+                TimeSpan diff = DateTime.Now - _lastChange;
                 if (diff.TotalSeconds < 4)
                 {
                     return 400;
@@ -249,12 +249,12 @@ namespace SftpFileSystem
 
         public System.IO.Stream OpenStream()
         {
-            int retry = RETRY_COUNT;
+            int retry = RetryCount;
             while (true)
             {
                 try
                 {
-                    return new SftpStreamChilkat(sftp, remoteFileName);
+                    return new SftpStreamChilkat(_sftp, _remoteFileName);
                 }
                 catch (IOException fe)
                 {
@@ -263,17 +263,17 @@ namespace SftpFileSystem
                         throw fe;
                     }
 
-                    Thread.Sleep(RETRY_SLEEP);
+                    Thread.Sleep(RetrySleep);
                 }
             }
         }
 
         public bool FileHasChanged()
         {
-            if (Length != lastLength)
+            if (Length != _lastLength)
             {
-                lastLength = Length;
-                lastChange = DateTime.Now;
+                _lastLength = Length;
+                _lastChange = DateTime.Now;
                 return true;
             }
 
@@ -287,8 +287,8 @@ namespace SftpFileSystem
         private void Configure()
         {
             //  Set some timeouts, in milliseconds:
-            sftp.ConnectTimeoutMs = 5000;
-            sftp.IdleTimeoutMs = 15000;
+            _sftp.ConnectTimeoutMs = 5000;
+            _sftp.IdleTimeoutMs = 15000;
         }
 
         #endregion

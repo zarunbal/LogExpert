@@ -13,10 +13,10 @@ namespace SftpFileSystem
     {
         #region Fields
 
-        private readonly ILogExpertLogger logger;
+        private readonly ILogExpertLogger _logger;
 
-        private ConfigDialog configDialog;
-        private volatile SshKey sshKey;
+        private ConfigDialog _configDialog;
+        private volatile SshKey _sshKey;
 
         #endregion
 
@@ -24,7 +24,7 @@ namespace SftpFileSystem
 
         public SftpFileSystem(IFileSystemCallback callback)
         {
-            logger = callback.GetLogger();
+            _logger = callback.GetLogger();
             CredentialsCache = new CredentialCache();
         }
 
@@ -48,8 +48,8 @@ namespace SftpFileSystem
 
         public SshKey SshKey
         {
-            get { return sshKey; }
-            set { sshKey = value; }
+            get { return _sshKey; }
+            set { _sshKey = value; }
         }
 
         #endregion
@@ -65,7 +65,7 @@ namespace SftpFileSystem
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                _logger.LogError(e.Message);
                 return false;
             }
         }
@@ -75,11 +75,11 @@ namespace SftpFileSystem
             try
             {
                 Uri uri = new Uri(uriString.Replace('\\', '/'));
-                return new SftpLogFileInfoChilkat(this, uri, logger);
+                return new SftpLogFileInfoChilkat(this, uri, _logger);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                _logger.LogError(e.Message);
                 return null;
             }
         }
@@ -91,9 +91,9 @@ namespace SftpFileSystem
 
         public void HideConfigForm()
         {
-            ConfigData = configDialog.ConfigData;
-            configDialog.Hide();
-            configDialog.Dispose();
+            ConfigData = _configDialog.ConfigData;
+            _configDialog.Hide();
+            _configDialog.Dispose();
         }
 
         public void LoadConfig(string configDir)
@@ -107,13 +107,13 @@ namespace SftpFileSystem
             }
             catch (IOException e)
             {
-                logger.LogError(e.Message);
+                _logger.LogError(e.Message);
             }
         }
 
         public void SaveConfig(string configDir)
         {
-            logger.Info("Saving SFTP config");
+            _logger.Info("Saving SFTP config");
             XmlSerializer xml = new XmlSerializer(ConfigData.GetType());
             try
             {
@@ -123,7 +123,7 @@ namespace SftpFileSystem
             }
             catch (IOException e)
             {
-                logger.LogError(e.Message);
+                _logger.LogError(e.Message);
             }
         }
 
@@ -134,9 +134,9 @@ namespace SftpFileSystem
 
         public void ShowConfigForm(Panel parentPanel)
         {
-            configDialog = new ConfigDialog(ConfigData);
-            configDialog.Parent = parentPanel;
-            configDialog.Show();
+            _configDialog = new ConfigDialog(ConfigData);
+            _configDialog.Parent = parentPanel;
+            _configDialog.Show();
         }
 
         public void StartConfig()
