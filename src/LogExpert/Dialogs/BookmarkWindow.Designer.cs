@@ -109,10 +109,8 @@
       this.bookmarkDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
       this.bookmarkDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
       this.bookmarkDataGridView.EditModeMenuStrip = null;
-      this.bookmarkDataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
       this.bookmarkDataGridView.Location = new System.Drawing.Point(0, 0);
       this.bookmarkDataGridView.Margin = new System.Windows.Forms.Padding(0);
-      this.bookmarkDataGridView.MustDrawFocus = false;
       this.bookmarkDataGridView.Name = "bookmarkDataGridView";
       this.bookmarkDataGridView.PaintWithOverlays = false;
       this.bookmarkDataGridView.ReadOnly = true;
