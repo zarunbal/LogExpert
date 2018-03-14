@@ -13,7 +13,16 @@ before_build:
 
     Write-Host "Got " + $base64Str.Length + " of base 64"
 
-    if($base64Str -eq 0) {Return}
+    if($base64Str -eq 0) 
+    {
+
+    Exit
+
+    }
+
+    else
+
+    {
 
     $bytes = [System.Convert]::FromBase64String($base64Str)
 
@@ -22,6 +31,7 @@ before_build:
     [System.IO.File]::Delete($keyFile)
 
     [System.IO.File]::WriteAllBytes($keyFile, $bytes)
+    }
 - cmd: nuget restore src/LogExpert.sln
 build:
   project: src/LogExpert.sln
