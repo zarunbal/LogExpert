@@ -54,13 +54,19 @@ namespace JsonColumnizer
 
             if (line != null)
             {
-                var json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
-
-                var fieldCount = json.Properties().Count();
-
-                for (var i = 0; i < fieldCount; ++i)
+                var json = ParseJson(line);
+                if (json != null)
                 {
-                    _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
+                    var fieldCount = json.Properties().Count();
+
+                    for (var i = 0; i < fieldCount; ++i)
+                    {
+                        _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
+                    }
+                }
+                else
+                {
+                    _columnList.Add(_initialColumn);
                 }
             }
             else
@@ -81,7 +87,7 @@ namespace JsonColumnizer
 
         public string GetDescription()
         {
-            return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n";
+            return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n\r\nFirst line must be valid or else only one column will be displayed and the other values dropped!";
         }
 
         public int GetColumnCount()
@@ -103,7 +109,7 @@ namespace JsonColumnizer
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            JObject json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
+            JObject json = ParseJson(line);
 
             if (json != null)
             {
@@ -111,7 +117,12 @@ namespace JsonColumnizer
             }
 
             var cLogLine = new ColumnizedLogLine {LogLine = line};
-            cLogLine.ColumnValues = new IColumn[] {new Column {FullValue = line.FullLine, Parent = cLogLine}};
+
+            var columns = Column.CreateColumns(_columnList.Count, cLogLine);
+
+            columns.Last().FullValue = line.FullLine;
+
+            cLogLine.ColumnValues = columns.Select(a => (IColumn) a).ToArray();
 
             return cLogLine;
         }
@@ -144,6 +155,14 @@ namespace JsonColumnizer
         #endregion
 
         #region Private Methods
+
+        private static JObject ParseJson(ILogLine line)
+        {
+            return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings()
+            {
+                Error = (sender, args) => { args.ErrorContext.Handled = true; } //We ignore the error and handle the null value
+            });
+        }
 
         private IColumnizedLogLine SplitJsonLine(ILogLine line, JObject json)
         {
