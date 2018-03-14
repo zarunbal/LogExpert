@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Forms;
 using LogExpert;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,20 +9,20 @@ namespace JsonColumnizer
 {
     internal class JsonColumn
     {
+        #region cTor
+
         public JsonColumn(string name)
         {
             Name = name;
         }
 
-        public string Name { get; }
-    }
+        #endregion
 
-    [Serializable]
-    public class JsonColumnizerConfig
-    {
-        public void InitDefaults()
-        {
-        }
+        #region Properties
+
+        public string Name { get; }
+
+        #endregion
     }
 
     /// <summary>
@@ -34,57 +30,23 @@ namespace JsonColumnizer
     ///     The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
     ///     the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
     /// </summary>
-    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer
+    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IPreProcessColumnizer
     {
+        #region Fields
+
         private readonly IList<JsonColumn> _columnList = new List<JsonColumn>();
-        private JsonColumnizerConfig _config;
 
         private bool _isValidJson;
+
+        #endregion
+
+        #region Properties
+
         public string Text => GetName();
 
-        public void Configure(ILogLineColumnizerCallback callback, string configDir)
-        {
-            var configPath = configDir + "\\jsoncolumnizer.dat";
-            var dlg = new JsonColumnizerConfigDlg(_config);
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                var formatter = new BinaryFormatter();
-                Stream fs = new FileStream(configPath, FileMode.Create, FileAccess.Write);
-                formatter.Serialize(fs, _config);
-                fs.Close();
-                Selected(callback);
-            }
-        }
+        #endregion
 
-        public void LoadConfig(string configDir)
-        {
-            var configPath = configDir + "\\jsoncolumnizer.dat";
-
-            if (!File.Exists(configPath))
-            {
-                _config = new JsonColumnizerConfig();
-                _config.InitDefaults();
-            }
-            else
-            {
-                Stream fs = File.OpenRead(configPath);
-                var formatter = new BinaryFormatter();
-                try
-                {
-                    _config = (JsonColumnizerConfig) formatter.Deserialize(fs);
-                }
-                catch (SerializationException e)
-                {
-                    MessageBox.Show(e.Message, "Deserialize");
-                    _config = new JsonColumnizerConfig();
-                    _config.InitDefaults();
-                }
-                finally
-                {
-                    fs.Close();
-                }
-            }
-        }
+        #region Public methods
 
         public void Selected(ILogLineColumnizerCallback callback)
         {
@@ -107,7 +69,6 @@ namespace JsonColumnizer
             }
         }
 
-
         public void DeSelected(ILogLineColumnizerCallback callback)
         {
             // nothing to do 
@@ -121,7 +82,7 @@ namespace JsonColumnizer
         public string GetDescription()
         {
             return
-                "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package written by someone. Downloaded from codeproject.com.\r\n";
+                "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n";
         }
 
         public int GetColumnCount()
@@ -144,6 +105,7 @@ namespace JsonColumnizer
             {
                 names[0] = "Text";
             }
+
             return names;
         }
 
@@ -153,6 +115,7 @@ namespace JsonColumnizer
             {
                 return SplitJsonLine(line);
             }
+
             var cLogLine = new ColumnizedLogLine {LogLine = line};
             cLogLine.ColumnValues = new IColumn[] {new Column {FullValue = line.FullLine, Parent = cLogLine}};
 
@@ -190,10 +153,14 @@ namespace JsonColumnizer
             return logLine;
         }
 
+        #endregion
+
+        #region Private Methods
+
         private IColumnizedLogLine SplitJsonLine(ILogLine line)
         {
             var cLogLine = new ColumnizedLogLine {LogLine = line};
-            
+
             var json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
 
             var columns = json.Properties().Select(property => new Column {FullValue = property.Value.ToString(), Parent = cLogLine}).ToList();
@@ -202,5 +169,7 @@ namespace JsonColumnizer
 
             return cLogLine;
         }
+
+        #endregion
     }
 }
