@@ -28,13 +28,13 @@ namespace JsonColumnizer
     /// <summary>
     ///     This Columnizer can parse JSON files.
     /// </summary>
-    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IPreProcessColumnizer
+    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer
     {
         #region Fields
 
-        private readonly IList<JsonColumn> _columnList = new List<JsonColumn>();
+        private static readonly JsonColumn _initialColumn = new JsonColumn("Text");
 
-        private bool _isValidJson;
+        private readonly IList<JsonColumn> _columnList = new List<JsonColumn>(new[] {_initialColumn});
 
         #endregion
 
@@ -48,21 +48,19 @@ namespace JsonColumnizer
 
         public void Selected(ILogLineColumnizerCallback callback)
         {
-            if (_isValidJson)
+            _columnList.Clear();
+            _columnList.Add(_initialColumn);
+            var line = callback.GetLogLine(0);
+
+            if (line != null)
             {
-                _columnList.Clear();
-                var line = callback.GetLogLine(0);
+                var json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
 
-                if (line != null)
+                var fieldCount = json.Properties().Count();
+
+                for (var i = 0; i < fieldCount; ++i)
                 {
-                    var json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
-
-                    var fieldCount = json.Properties().Count();
-
-                    for (var i = 0; i < fieldCount; ++i)
-                    {
-                        _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
-                    }
+                    _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
                 }
             }
         }
@@ -79,29 +77,21 @@ namespace JsonColumnizer
 
         public string GetDescription()
         {
-            return
-                "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n";
+            return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n";
         }
 
         public int GetColumnCount()
         {
-            return _isValidJson ? _columnList.Count : 1;
+            return _columnList.Count;
         }
 
         public string[] GetColumnNames()
         {
-            var names = new string[GetColumnCount()];
-            if (_isValidJson)
+            string[] names = new string[GetColumnCount()];
+            int i = 0;
+            foreach (var column in _columnList)
             {
-                var i = 0;
-                foreach (var column in _columnList)
-                {
-                    names[i++] = column.Name;
-                }
-            }
-            else
-            {
-                names[0] = "Text";
+                names[i++] = column.Name;
             }
 
             return names;
@@ -109,9 +99,11 @@ namespace JsonColumnizer
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            if (_isValidJson)
+            JObject json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
+
+            if (json != null)
             {
-                return SplitJsonLine(line);
+                return SplitJsonLine(line, json);
             }
 
             var cLogLine = new ColumnizedLogLine {LogLine = line};
@@ -145,21 +137,13 @@ namespace JsonColumnizer
             throw new NotImplementedException();
         }
 
-        public string PreProcessLine(string logLine, int lineNum, int realLineNum)
-        {
-            _isValidJson = JsonConvert.DeserializeObject<JObject>(logLine) != null;
-            return logLine;
-        }
-
         #endregion
 
         #region Private Methods
 
-        private IColumnizedLogLine SplitJsonLine(ILogLine line)
+        private IColumnizedLogLine SplitJsonLine(ILogLine line, JObject json)
         {
             var cLogLine = new ColumnizedLogLine {LogLine = line};
-
-            var json = JsonConvert.DeserializeObject<JObject>(line.FullLine);
 
             var columns = json.Properties().Select(property => new Column {FullValue = property.Value.ToString(), Parent = cLogLine}).ToList();
 
