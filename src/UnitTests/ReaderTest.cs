@@ -21,38 +21,48 @@ namespace UnitTests
         {
         }
 
-        private void compareReaderImplementations(string fileName, Encoding enc)
+        private void compareReaderImplementations(string fileName, Encoding enc, int maxPosition)
         {
             string DataPath = "..\\..\\data\\";
             EncodingOptions encOpts = new EncodingOptions();
             encOpts.Encoding = enc;
 
-            Stream s1 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read);
-            PositionAwareStreamReader r1 = new PositionAwareStreamReader(s1, encOpts, false);
-
-            Stream s2 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read);
-            PositionAwareStreamReader r2 = new PositionAwareStreamReader(s2, encOpts, true);
-
-            for (int lineNum = 0;; lineNum++)
+            using (Stream s1 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read))
+            using (Stream s2 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read))
             {
-                string line1 = r1.ReadLine();
-                string line2 = r2.ReadLine();
-                if (line1 == null && line2 == null)
+                PositionAwareStreamReader r1 = new PositionAwareStreamReader(s1, encOpts, false);
+
+                PositionAwareStreamReader r2 = new PositionAwareStreamReader(s2, encOpts, true);
+
+                for (int lineNum = 0;; lineNum++)
                 {
-                    break;
+                    string line1 = r1.ReadLine();
+                    string line2 = r2.ReadLine();
+                    if (line1 == null && line2 == null)
+                    {
+                        break;
+                    }
+
+                    Assert.AreEqual(line1, line2, "File " + fileName);
+                    if (r1.Position != maxPosition)
+                    {
+                        Assert.AreEqual(r1.Position, r2.Position, "Line " + lineNum + ", File: " + fileName);
+                    }
+                    else
+                    {
+                        //Its desired that the position of the new implementation is 2 bytes ahead to fix the problem of empty lines every time a new line is appended.
+                        Assert.AreEqual(r1.Position, r2.Position - 2, "Line " + lineNum + ", File: " + fileName);
+                    }
                 }
-                Assert.AreEqual(line1, line2, "File " + fileName);
-                Assert.AreEqual(r1.Position, r2.Position, "Zeile " + lineNum + ", File: " + fileName);
             }
         }
-
 
         [Test]
         public void compareReaderImplementations()
         {
-            compareReaderImplementations("50 MB.txt", Encoding.Default);
-            compareReaderImplementations("50 MB UTF16.txt", Encoding.Unicode);
-            compareReaderImplementations("50 MB UTF8.txt", Encoding.UTF8);
+            compareReaderImplementations("50 MB.txt", Encoding.Default, 50000000);
+            compareReaderImplementations("50 MB UTF16.txt", Encoding.Unicode, 49999998);
+            compareReaderImplementations("50 MB UTF8.txt", Encoding.UTF8, 50000000);
         }
     }
 }
