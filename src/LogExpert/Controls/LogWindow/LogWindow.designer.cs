@@ -247,10 +247,8 @@ namespace LogExpert
       this.dataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
       this.dataGridView.EditModeMenuStrip = null;
       this.dataGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
-      this.dataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
       this.dataGridView.Location = new System.Drawing.Point(1, 30);
       this.dataGridView.Margin = new System.Windows.Forms.Padding(0);
-      this.dataGridView.MustDrawFocus = false;
       this.dataGridView.Name = "dataGridView";
       this.dataGridView.PaintWithOverlays = false;
       this.dataGridView.RowHeadersVisible = false;
@@ -717,10 +715,8 @@ namespace LogExpert
       this.filterGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
       this.filterGridView.EditModeMenuStrip = null;
       this.filterGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
-      this.filterGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
       this.filterGridView.Location = new System.Drawing.Point(0, 0);
       this.filterGridView.Margin = new System.Windows.Forms.Padding(0);
-      this.filterGridView.MustDrawFocus = false;
       this.filterGridView.Name = "filterGridView";
       this.filterGridView.PaintWithOverlays = false;
       this.filterGridView.ReadOnly = true;
