@@ -64,9 +64,9 @@ deploy_script:
 
     get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
 
-    remove-item $packagedir\LogExpert\SftpFileSystem.dll
+    remove-item $packagedir\LogExpert\plugins\SftpFileSystem.dll
 
-    remove-item $packagedir\LogExpert\ChilkatDotNet4.dll
+    remove-item $packagedir\LogExpert\plugins\ChilkatDotNet4.dll
 
     Copy-Item -Path $packagedir\LogExpert\* -Destination $chocodir\tools\ –Recurse
 
