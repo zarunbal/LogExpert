@@ -49,7 +49,7 @@ namespace JsonColumnizer
         public void Selected(ILogLineColumnizerCallback callback)
         {
             _columnList.Clear();
-            _columnList.Add(_initialColumn);
+
             var line = callback.GetLogLine(0);
 
             if (line != null)
@@ -62,6 +62,10 @@ namespace JsonColumnizer
                 {
                     _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
                 }
+            }
+            else
+            {
+                _columnList.Add(_initialColumn);
             }
         }
 
