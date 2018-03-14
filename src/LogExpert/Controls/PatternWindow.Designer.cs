@@ -326,10 +326,8 @@
       this.patternHitsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.patternHitsDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
       this.patternHitsDataGridView.EditModeMenuStrip = null;
-      this.patternHitsDataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
       this.patternHitsDataGridView.Location = new System.Drawing.Point(3, 3);
       this.patternHitsDataGridView.MultiSelect = false;
-      this.patternHitsDataGridView.MustDrawFocus = false;
       this.patternHitsDataGridView.Name = "patternHitsDataGridView";
       this.patternHitsDataGridView.ReadOnly = true;
       this.patternHitsDataGridView.RowHeadersVisible = false;
@@ -357,9 +355,7 @@
       this.contentDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
       this.contentDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.contentDataGridView.EditModeMenuStrip = null;
-      this.contentDataGridView.LastRowRect = new System.Drawing.Rectangle(0, 0, 0, 0);
       this.contentDataGridView.Location = new System.Drawing.Point(3, 3);
-      this.contentDataGridView.MustDrawFocus = false;
       this.contentDataGridView.Name = "contentDataGridView";
       this.contentDataGridView.ReadOnly = true;
       this.contentDataGridView.RowHeadersVisible = false;
