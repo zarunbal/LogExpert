@@ -37,3 +37,41 @@ test: off
 artifacts:
 - path: bin\Release\
   name: LogExpert
+deploy_script:
+
+- ps: >-
+    $packagedir = ".\bin\package"
+
+    $chocodir = ".\chocolatey"
+
+    New-Item -ItemType Directory -Force -Path $packagedir\LogExpert\
+
+    New-Item -ItemType Directory -Force -Path $chocodir\tools\
+
+    (Get-Content "$($chocodir)\logexpert.portable.nuspec.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\logexpert.portable.nuspec"
+
+    (Get-Content "$($chocodir)\tools\LICENSE.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\LICENSE.txt"
+
+    (Get-Content "$($chocodir)\tools\VERIFICATION.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\VERIFICATION.txt.template"
+
+    Copy-Item -Path .\bin\Release\* -Destination $packagedir\LogExpert\ –Recurse
+
+    get-childitem $packagedir\LogExpert -include *.xml -recurse | remove-item
+
+    get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
+
+    remove-item $packagedir\LogExpert\SftpFileSystem.dll
+
+    remove-item $packagedir\LogExpert\ChilkatDotNet4.dll
+
+    Copy-Item -Path $packagedir\LogExpert\* -Destination $chocodir\tools\ –Recurse
+
+    choco pack $chocodir\logexpert.portable.nuspec
+
+    Push-AppveyorArtifact "logexpert.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
+
+    cd $packagedir
+
+    7z a LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip LogExpert
+
+    Push-AppveyorArtifact "LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip"

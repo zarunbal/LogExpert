@@ -57,6 +57,10 @@ deploy_script:
 
     get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
 
+    remove-item $packagedir\LogExpert\SftpFileSystem.dll
+
+    remove-item $packagedir\LogExpert\ChilkatDotNet4.dll
+
     Copy-Item -Path $packagedir\LogExpert\* -Destination $chocodir\tools\ –Recurse
 
     choco pack $chocodir\logexpert.portable.nuspec
