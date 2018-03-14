@@ -26,9 +26,7 @@ namespace JsonColumnizer
     }
 
     /// <summary>
-    ///     This Columnizer can parse JSON files. It uses the IInitColumnizer interface for support of dynamic field count.
-    ///     The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
-    ///     the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
+    ///     This Columnizer can parse JSON files.
     /// </summary>
     public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IPreProcessColumnizer
     {
