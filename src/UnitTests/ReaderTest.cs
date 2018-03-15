@@ -5,6 +5,7 @@ using NUnit.Framework;
 using LogExpert;
 using System.IO;
 using System.Windows.Forms;
+using LogExpert.Classes.Log;
 
 namespace UnitTests
 {
@@ -30,9 +31,9 @@ namespace UnitTests
             using (Stream s1 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read))
             using (Stream s2 = new FileStream(DataPath + fileName, FileMode.Open, FileAccess.Read))
             {
-                PositionAwareStreamReader r1 = new PositionAwareStreamReader(s1, encOpts, false);
+                ILogStreamReader r1 = new PositionAwareStreamReaderLegacy(s1, encOpts);
 
-                PositionAwareStreamReader r2 = new PositionAwareStreamReader(s2, encOpts, true);
+                ILogStreamReader r2 = new PositionAwareStreamReader(s2, encOpts);
 
                 for (int lineNum = 0;; lineNum++)
                 {

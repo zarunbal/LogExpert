@@ -9,18 +9,18 @@ namespace LogExpert
     {
         #region Fields
 
+        private readonly ILogStreamReader reader;
+
         //private const int MAX_BUFFER_LEN = 4096;
         //private char[] buffer = new char[MAX_BUFFER_LEN];
         //private int bufferPos = 0;
         private StringBuilder buffer = new StringBuilder();
 
-        private readonly PositionAwareStreamReader reader;
-
         #endregion
 
         #region cTor
 
-        public XmlLogReader(PositionAwareStreamReader reader)
+        public XmlLogReader(ILogStreamReader reader)
         {
             this.reader = reader;
         }
@@ -31,18 +31,18 @@ namespace LogExpert
 
         public long Position
         {
-            get { return this.reader.Position; }
-            set { this.reader.Position = value; }
+            get { return reader.Position; }
+            set { reader.Position = value; }
         }
 
         public Encoding Encoding
         {
-            get { return this.reader.Encoding; }
+            get { return reader.Encoding; }
         }
 
         public bool IsBufferComplete
         {
-            get { return this.reader.IsBufferComplete; }
+            get { return reader.IsBufferComplete; }
         }
 
         public string StartTag { get; set; } = "<log4j:event";
@@ -55,9 +55,8 @@ namespace LogExpert
 
         public int ReadChar()
         {
-            return this.reader.ReadChar();
+            return reader.ReadChar();
         }
-
 
         public string ReadLine()
         {
@@ -102,23 +101,24 @@ namespace LogExpert
                 switch (state)
                 {
                     case 0:
-                        if (readChar == this.StartTag[0])
+                        if (readChar == StartTag[0])
                         {
                             //_logger.logInfo("state = 1");
                             state = 1;
                             tagIndex = 1;
                             AddToBuffer(readChar);
                         }
+
                         //else
                         //{
                         //  _logger.logInfo("char: " + readChar);
                         //}
                         break;
                     case 1:
-                        if (readChar == this.StartTag[tagIndex])
+                        if (readChar == StartTag[tagIndex])
                         {
                             AddToBuffer(readChar);
-                            if (++tagIndex >= this.StartTag.Length)
+                            if (++tagIndex >= StartTag.Length)
                             {
                                 //_logger.logInfo("state = 2");
                                 state = 2; // start Tag complete
@@ -132,22 +132,24 @@ namespace LogExpert
                             state = 0;
                             ResetBuffer();
                         }
+
                         break;
                     case 2:
                         AddToBuffer(readChar);
-                        if (readChar == this.EndTag[0])
+                        if (readChar == EndTag[0])
                         {
                             //_logger.logInfo("state = 3");
                             state = 3;
                             tagIndex = 1;
                         }
+
                         break;
                     case 3:
                         AddToBuffer(readChar);
-                        if (readChar == this.EndTag[tagIndex])
+                        if (readChar == EndTag[tagIndex])
                         {
                             tagIndex++;
-                            if (tagIndex >= this.EndTag.Length)
+                            if (tagIndex >= EndTag.Length)
                             {
                                 blockComplete = true;
                                 break;
@@ -158,15 +160,18 @@ namespace LogExpert
                             //_logger.logInfo("state = 2");
                             state = 2;
                         }
+
                         break;
                 }
             }
+
             if (!blockComplete)
             {
                 return null; // EOF
             }
+
             //string result = new string(this.buffer, 0, this.bufferPos);
-            string result = this.buffer.ToString();
+            string result = buffer.ToString();
             return result;
         }
 

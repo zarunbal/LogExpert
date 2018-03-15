@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LogExpert
 {
-    internal interface ILogStreamReader
+    public interface ILogStreamReader
     {
         #region Properties
 
