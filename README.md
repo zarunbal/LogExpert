@@ -27,6 +27,9 @@ Or Install via chocolatey
 
 ```choco install logexpert```
 
+Requirements
+- .NET 4.0
+
 # How to Build
 
 - Clone / Fork / Download the source code
