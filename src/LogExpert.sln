@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5A7DFA4-48A8-4616-8008-7441699EC946} = {B5A7DFA4-48A8-4616-8008-7441699EC946}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvColumnizer", "CsvColumnizer\CsvColumnizer.csproj", "{2563526E-4566-40CB-AA27-587B904FD25B}"
 EndProject
@@ -29,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonColumnizer", "JsonColumnizer\JsonColumnizer.csproj", "{4C899885-E361-410A-B6AC-C2F236C436FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystem", "sftp-plugin\SftpFileSystem.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,6 +218,24 @@ Global
 		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Win32.ActiveCfg = Release|Any CPU
 		{B9BF5AB6-4791-4CC1-B9B7-66151A212814}.Release|Win32.Build.0 = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.DebugNoTimeout|Win32.Build.0 = Debug|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B5A7DFA4-48A8-4616-8008-7441699EC946}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

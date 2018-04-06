@@ -19,3 +19,21 @@ Summary of (most) features:
 * log4j XML file support
 * 3rd party plugin support
 * Plugin API for more log file data sources
+
+# Download
+Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application.
+
+Or Install via chocolatey
+
+```choco install logexpert```
+
+Requirements
+- .NET 4.0
+
+# How to Build
+
+- Clone / Fork / Download the source code
+- Open the Solution (src/LogExpert.sln) with Visual Studio 2017 (e.g. Community Edition)
+- Restore Nuget Packages on Solution
+- Build
+- The output is under bin/(Debug/Release)/

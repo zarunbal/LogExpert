@@ -52,7 +52,11 @@ deploy_script:
 
     (Get-Content "$($chocodir)\tools\LICENSE.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\LICENSE.txt"
 
-    (Get-Content "$($chocodir)\tools\VERIFICATION.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\VERIFICATION.txt.template"
+    (Get-Content "$($chocodir)\tools\VERIFICATION.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\VERIFICATION.txt"
+
+    remove-item $chocodir\tools\LICENSE.txt.template
+
+    remove-item $chocodir\tools\VERIFICATION.txt.template
 
     Copy-Item -Path .\bin\Release\* -Destination $packagedir\LogExpert\ –Recurse
 
@@ -60,9 +64,9 @@ deploy_script:
 
     get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
 
-    remove-item $packagedir\LogExpert\SftpFileSystem.dll
+    remove-item $packagedir\LogExpert\plugins\SftpFileSystem.dll
 
-    remove-item $packagedir\LogExpert\ChilkatDotNet4.dll
+    remove-item $packagedir\LogExpert\plugins\ChilkatDotNet4.dll
 
     Copy-Item -Path $packagedir\LogExpert\* -Destination $chocodir\tools\ –Recurse
 
