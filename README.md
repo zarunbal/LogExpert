@@ -37,3 +37,6 @@ Requirements
 - Restore Nuget Packages on Solution
 - Build
 - The output is under bin/(Debug/Release)/
+
+# Pull Request
+- Use Development branch as target
