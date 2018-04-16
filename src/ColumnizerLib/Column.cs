@@ -1,73 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Windows.Forms;
 
 namespace LogExpert
 {
-    public class Column : IColumn
-    {
-        #region Fields
+	public class Column : IColumn
+	{
+		#region Fields
 
-        private static readonly int _maxLength = 4678 - 3;
+		private static readonly int _maxLength = 4678 - 3;
+		private static readonly string replacement = "...";
 
-        private string _fullValue;
+		private static IEnumerable<Func<string, string>> replacements = new List<Func<string, string>>(
+			new Func<string, string>[]
+			{
+				//replace tab with 3 spaces, from old coding. Needed???
+				input => input.Replace("\t", "  "),
 
-        #endregion
+				//shorten string if it exceeds maxLength
+				input =>
+				{
+					if (input.Length > _maxLength)
+					{
+						return input.Substring(0, _maxLength) + replacement;
+					}
 
-        #region Properties
+					return input;
+				}
+			});
+		private string _fullValue;
 
-        public static IColumn EmptyColumn { get; } = new Column {FullValue = string.Empty};
+		#endregion
 
-        public IColumnizedLogLine Parent { get; set; }
+		#region Properties
 
-        public string FullValue
-        {
-            get { return _fullValue; }
-            set
-            {
-                _fullValue = value;
-                if (_fullValue.Length > _maxLength)
-                {
-                    DisplayValue = _fullValue.Replace("\t", "  ").Substring(0, _maxLength) + "...";
-                }
-                else
-                {
-                    DisplayValue = _fullValue.Replace("\t", "  ");
-                }
-            }
-        }
+		public static IColumn EmptyColumn { get; } = new Column {FullValue = string.Empty};
 
-        public string DisplayValue { get; private set; }
+		public IColumnizedLogLine Parent { get; set; }
 
-        string ITextValue.Text => FullValue;
+		public string FullValue
+		{
+			get { return _fullValue; }
+			set
+			{
+				_fullValue = value;
 
-        #endregion
+				string temp = FullValue;
 
-        #region Public methods
+				foreach (var replacement in replacements)
+				{
+					temp = replacement(temp);
+				}
+			}
+		}
 
-        public static Column[] CreateColumns(int count, IColumnizedLogLine parent)
-        {
-            return CreateColumns(count, parent, string.Empty);
-        }
+		public string DisplayValue { get; private set; }
 
-        public static Column[] CreateColumns(int count, IColumnizedLogLine parent, string defaultValue)
-        {
-            Column[] output = new Column[count];
+		string ITextValue.Text => FullValue;
 
-            for (int i = 0; i < count; i++)
-            {
-                output[i] = new Column {FullValue = defaultValue, Parent = parent};
-            }
+		#endregion
 
-            return output;
-        }
+		#region Public methods
 
-        public override string ToString()
-        {
-            return DisplayValue ?? "";
-        }
+		public static Column[] CreateColumns(int count, IColumnizedLogLine parent)
+		{
+			return CreateColumns(count, parent, string.Empty);
+		}
 
-        #endregion
-    }
+		public static Column[] CreateColumns(int count, IColumnizedLogLine parent, string defaultValue)
+		{
+			Column[] output = new Column[count];
+
+			for (int i = 0; i < count; i++)
+			{
+				output[i] = new Column {FullValue = defaultValue, Parent = parent};
+			}
+
+			return output;
+		}
+
+		public override string ToString()
+		{
+			return DisplayValue ?? "";
+		}
+
+		#endregion
+	}
 }
