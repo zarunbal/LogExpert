@@ -30,6 +30,11 @@ Or Install via chocolatey
 Requirements
 - .NET 4.0
 
+## CI
+This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
+
+[CI Download](https://ci.appveyor.com/project/Zarunbal/logexpert)
+
 # How to Build
 
 - Clone / Fork / Download the source code
@@ -37,3 +42,6 @@ Requirements
 - Restore Nuget Packages on Solution
 - Build
 - The output is under bin/(Debug/Release)/
+
+# Pull Request
+- Use Development branch as target
