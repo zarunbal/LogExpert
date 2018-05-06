@@ -18,7 +18,7 @@ namespace LogExpert
     {
         #region Fields
 
-        private int _newLineSequenceLength;
+        protected int _newLineSequenceLength;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace LogExpert
         public PositionAwareStreamReader(Stream stream, EncodingOptions encodingOptions)
             : base(stream, encodingOptions)
         {
-            _newLineSequenceLength = guessNewLineSequenceLength();
+            _newLineSequenceLength = GuessNewLineSequenceLength();
         }
 
         #endregion
@@ -38,7 +38,7 @@ namespace LogExpert
         {
             if (_newLineSequenceLength == 0)
             {
-                _newLineSequenceLength = guessNewLineSequenceLength();
+                _newLineSequenceLength = GuessNewLineSequenceLength();
             }
 
             string line = _reader.ReadLine();
@@ -59,9 +59,7 @@ namespace LogExpert
 
         #endregion
 
-        #region Private Methods
-
-        private int guessNewLineSequenceLength()
+        protected int GuessNewLineSequenceLength()
         {
             long currentPos = Position;
             int len = 0;
@@ -96,7 +94,5 @@ namespace LogExpert
             Position = currentPos;
             return len;
         }
-
-        #endregion
     }
 }

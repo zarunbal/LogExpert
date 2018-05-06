@@ -66,7 +66,9 @@
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderFactory.cs" />
+    <Compile Include="Classes\Log\PositionAwareStreamReaderImplementation.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
+    <Compile Include="Classes\Log\PositionAwareStreamReaderNoLimit.cs" />
     <Compile Include="Classes\Persister\FilterTabData.cs" />
     <Compile Include="Classes\Persister\ProjectData.cs" />
     <Compile Include="Config\ColorEntry.cs" />

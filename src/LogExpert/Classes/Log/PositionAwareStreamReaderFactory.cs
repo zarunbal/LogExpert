@@ -22,6 +22,27 @@ namespace LogExpert.Classes.Log
             }
         }
 
+        internal static ILogStreamReader CreateStreamReader(Stream stream, EncodingOptions encodingOptions, PositionAwareStreamReaderImplementation implementation)
+        {
+            ILogStreamReader output = null;
+            switch (implementation)
+            {
+                case PositionAwareStreamReaderImplementation.Legacy:
+                    output = new PositionAwareStreamReaderLegacy(stream, encodingOptions);
+
+                    break;
+                case PositionAwareStreamReaderImplementation.NoLimit:
+                    output = new PositionAwareStreamReaderNoLimit(stream, encodingOptions);
+                    break;
+                case PositionAwareStreamReaderImplementation.Default:
+                default:
+                    output = new PositionAwareStreamReader(stream, encodingOptions);
+                    break;
+            }
+
+            return output;
+        }
+
         #endregion
     }
 }
