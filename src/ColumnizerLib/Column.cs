@@ -62,10 +62,9 @@ namespace LogExpert
 
         #endregion
 
-
         #region Properties
 
-        public static IColumn EmptyColumn { get;}
+        public static IColumn EmptyColumn { get; }
 
         public IColumnizedLogLine Parent { get; set; }
 
@@ -89,7 +88,7 @@ namespace LogExpert
 
         public string DisplayValue { get; private set; }
 
-        string ITextValue.Text => FullValue;
+        string ITextValue.Text => DisplayValue;
 
         #endregion
 
