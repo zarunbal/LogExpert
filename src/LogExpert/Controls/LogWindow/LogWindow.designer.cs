@@ -270,7 +270,8 @@ namespace LogExpert
       this.dataGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.dataGridView_RowHeightInfoNeeded);
       this.dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellContentDoubleClick);
       this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
-      this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
+      this.dataGridView.RowUnshared += new System.Windows.Forms.DataGridViewRowEventHandler(this.dataGridView_RowUnshared);
+            this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
       this.dataGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridView_CellContextMenuStripNeeded);
       this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
       this.dataGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView_CellValuePushed);

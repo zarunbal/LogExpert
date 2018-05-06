@@ -1454,6 +1454,14 @@ namespace LogExpert
             InvalidateCurrentRow();
         }
 
+        private void dataGridView_RowUnshared(object sender, DataGridViewRowEventArgs e)
+        {
+            if (_logger.IsDebugEnabled)
+            {
+                _logger.Debug("Row unshared line {0}", e.Row.Cells[1].Value); 
+            }
+        }
+
         #endregion
 
         protected void OnProgressBarUpdate(ProgressEventArgs e)
