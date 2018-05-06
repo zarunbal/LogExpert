@@ -7,86 +7,92 @@ using System.Windows.Forms;
 
 namespace LogExpert
 {
-	public class Column : IColumn
-	{
-		#region Fields
+    public class Column : IColumn
+    {
+        #region Fields
 
-		private static readonly int _maxLength = 4678 - 3;
-		private static readonly string replacement = "...";
+        private static readonly int _maxLength = 4678 - 3;
+        private static readonly string _replacement = "...";
 
-		private static IEnumerable<Func<string, string>> replacements = new List<Func<string, string>>(
-			new Func<string, string>[]
-			{
-				//replace tab with 3 spaces, from old coding. Needed???
-				input => input.Replace("\t", "  "),
+        private static readonly IEnumerable<Func<string, string>> _replacements = new List<Func<string, string>>(
+            new Func<string, string>[]
+            {
+                //replace tab with 3 spaces, from old coding. Needed???
+                input => input.Replace("\t", "  "),
 
-				//shorten string if it exceeds maxLength
-				input =>
-				{
-					if (input.Length > _maxLength)
-					{
-						return input.Substring(0, _maxLength) + replacement;
-					}
+                //Replace null char with UTF8 Symbol U+2400 (␀)
+                input => input.Replace("\0", "␀"),
 
-					return input;
-				}
-			});
-		private string _fullValue;
+                //shorten string if it exceeds maxLength
+                input =>
+                {
+                    if (input.Length > _maxLength)
+                    {
+                        return input.Substring(0, _maxLength) + _replacement;
+                    }
 
-		#endregion
+                    return input;
+                }
+            });
 
-		#region Properties
+        private string _fullValue;
 
-		public static IColumn EmptyColumn { get; } = new Column {FullValue = string.Empty};
+        #endregion
 
-		public IColumnizedLogLine Parent { get; set; }
+        #region Properties
 
-		public string FullValue
-		{
-			get { return _fullValue; }
-			set
-			{
-				_fullValue = value;
+        public static IColumn EmptyColumn { get; } = new Column {FullValue = string.Empty};
 
-				string temp = FullValue;
+        public IColumnizedLogLine Parent { get; set; }
 
-				foreach (var replacement in replacements)
-				{
-					temp = replacement(temp);
-				}
-			}
-		}
+        public string FullValue
+        {
+            get { return _fullValue; }
+            set
+            {
+                _fullValue = value;
 
-		public string DisplayValue { get; private set; }
+                string temp = FullValue;
 
-		string ITextValue.Text => FullValue;
+                foreach (var replacement in _replacements)
+                {
+                    temp = replacement(temp);
+                }
 
-		#endregion
+                DisplayValue = temp;
+            }
+        }
 
-		#region Public methods
+        public string DisplayValue { get; private set; }
 
-		public static Column[] CreateColumns(int count, IColumnizedLogLine parent)
-		{
-			return CreateColumns(count, parent, string.Empty);
-		}
+        string ITextValue.Text => FullValue;
 
-		public static Column[] CreateColumns(int count, IColumnizedLogLine parent, string defaultValue)
-		{
-			Column[] output = new Column[count];
+        #endregion
 
-			for (int i = 0; i < count; i++)
-			{
-				output[i] = new Column {FullValue = defaultValue, Parent = parent};
-			}
+        #region Public methods
 
-			return output;
-		}
+        public static Column[] CreateColumns(int count, IColumnizedLogLine parent)
+        {
+            return CreateColumns(count, parent, string.Empty);
+        }
 
-		public override string ToString()
-		{
-			return DisplayValue ?? "";
-		}
+        public static Column[] CreateColumns(int count, IColumnizedLogLine parent, string defaultValue)
+        {
+            Column[] output = new Column[count];
 
-		#endregion
-	}
+            for (int i = 0; i < count; i++)
+            {
+                output[i] = new Column {FullValue = defaultValue, Parent = parent};
+            }
+
+            return output;
+        }
+
+        public override string ToString()
+        {
+            return DisplayValue ?? "";
+        }
+
+        #endregion
+    }
 }
