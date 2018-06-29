@@ -33,12 +33,24 @@ namespace RegexColumnizer
 			if (Regex != null)
 			{
 				var m = Regex.Match(line.FullLine);
-				for (int i = m.Groups.Count - 1; i > 0; i--)
+				
+				if (m.Success)
 				{
-					logLine.ColumnValues[i-1] = new Column
+					for (int i = m.Groups.Count - 1; i > 0; i--)
+					{
+						logLine.ColumnValues[i-1] = new Column
+						{
+							Parent = logLine,
+							FullValue = m.Groups[i].Value
+						};
+					}
+				}
+				else
+				{
+					logLine.ColumnValues[columns.Length - 1] = new Column
 					{
 						Parent = logLine,
-						FullValue = m.Groups[i].Value
+						FullValue = line.FullLine
 					};
 				}
 			}
