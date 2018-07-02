@@ -93,6 +93,8 @@ namespace RegexColumnizer
 				{
 					xml.Serialize(w, d.Config);
 				}
+
+		                Init(d.Config);
 			}
 		}
 
