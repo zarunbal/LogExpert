@@ -7,12 +7,15 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NLog;
 
 namespace LogExpert.Dialogs
 {
     public partial class HilightDialog : Form
     {
         #region Fields
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly Image _applyButtonImage;
         private string _bookmarkComment;
@@ -58,27 +61,36 @@ namespace LogExpert.Dialogs
 
         private void AddNewEntry()
         {
-            if (searchStringTextBox.Text.Length > 0)
             {
-                // Create a new entry
-                HilightEntry entry = new HilightEntry(searchStringTextBox.Text,
-                    foregroundColorBox.SelectedColor,
-                    backgroundColorBox.SelectedColor,
-                    regexCheckBox.Checked,
-                    caseSensitiveCheckBox.Checked,
-                    ledCheckBox.Checked,
-                    stopTailCheckBox.Checked,
-                    bookmarkCheckBox.Checked,
-                    pluginCheckBox.Checked,
-                    _currentActionEntry,
-                    wordMatchCheckBox.Checked);
-                entry.IsBold = boldCheckBox.Checked;
-                entry.NoBackground = noBackgroundCheckBox.Checked;
-                hilightListBox.Items.Add(entry);
+                try
+                {
+                    CheckRegex();
 
-                // Select the newly created item
-                _currentGroup.HilightEntryList.Add(entry);
-                hilightListBox.SelectedItem = entry;
+                    // Create a new entry
+                    HilightEntry entry = new HilightEntry(searchStringTextBox.Text,
+                        foregroundColorBox.SelectedColor,
+                        backgroundColorBox.SelectedColor,
+                        regexCheckBox.Checked,
+                        caseSensitiveCheckBox.Checked,
+                        ledCheckBox.Checked,
+                        stopTailCheckBox.Checked,
+                        bookmarkCheckBox.Checked,
+                        pluginCheckBox.Checked,
+                        _currentActionEntry,
+                        wordMatchCheckBox.Checked);
+                    entry.IsBold = boldCheckBox.Checked;
+                    entry.NoBackground = noBackgroundCheckBox.Checked;
+                    hilightListBox.Items.Add(entry);
+
+                    // Select the newly created item
+                    _currentGroup.HilightEntryList.Add(entry);
+                    hilightListBox.SelectedItem = entry;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error during add of highlight entry");
+                    MessageBox.Show($"Error during add of entry.\r\n{ex.Message}");
+                }
             }
         }
 
@@ -140,6 +152,39 @@ namespace LogExpert.Dialogs
 
         private void SaveEntry()
         {
+            try
+            {
+                CheckRegex();
+
+                HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
+
+                entry.ForegroundColor = (Color) foregroundColorBox.SelectedItem;
+                entry.BackgroundColor = (Color) backgroundColorBox.SelectedItem;
+                entry.SearchText = searchStringTextBox.Text;
+                entry.IsRegEx = regexCheckBox.Checked;
+                entry.IsCaseSensitive = caseSensitiveCheckBox.Checked;
+                applyButton.Enabled = false;
+                applyButton.Image = null;
+                entry.IsLedSwitch = ledCheckBox.Checked;
+                entry.IsSetBookmark = bookmarkCheckBox.Checked;
+                entry.IsStopTail = stopTailCheckBox.Checked;
+                entry.IsActionEntry = pluginCheckBox.Checked;
+                entry.ActionEntry = _currentActionEntry.Copy();
+                entry.BookmarkComment = _bookmarkComment;
+                entry.IsWordMatch = wordMatchCheckBox.Checked;
+                entry.IsBold = boldCheckBox.Checked;
+                entry.NoBackground = noBackgroundCheckBox.Checked;
+                hilightListBox.Refresh();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during save of save highlight entry");
+                MessageBox.Show($"Error during save of entry.\r\n{ex.Message}");
+            }
+        }
+
+        private void CheckRegex()
+        {
             if (regexCheckBox.Checked)
             {
                 if (string.IsNullOrWhiteSpace(searchStringTextBox.Text))
@@ -150,26 +195,6 @@ namespace LogExpert.Dialogs
                 // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                 Regex.IsMatch("", searchStringTextBox.Text);
             }
-
-            HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
-
-            entry.ForegroundColor = (Color) foregroundColorBox.SelectedItem;
-            entry.BackgroundColor = (Color) backgroundColorBox.SelectedItem;
-            entry.SearchText = searchStringTextBox.Text;
-            entry.IsRegEx = regexCheckBox.Checked;
-            entry.IsCaseSensitive = caseSensitiveCheckBox.Checked;
-            applyButton.Enabled = false;
-            applyButton.Image = null;
-            entry.IsLedSwitch = ledCheckBox.Checked;
-            entry.IsSetBookmark = bookmarkCheckBox.Checked;
-            entry.IsStopTail = stopTailCheckBox.Checked;
-            entry.IsActionEntry = pluginCheckBox.Checked;
-            entry.ActionEntry = _currentActionEntry.Copy();
-            entry.BookmarkComment = _bookmarkComment;
-            entry.IsWordMatch = wordMatchCheckBox.Checked;
-            entry.IsBold = boldCheckBox.Checked;
-            entry.NoBackground = noBackgroundCheckBox.Checked;
-            hilightListBox.Refresh();
         }
 
         private void StartEditEntry()
