@@ -25,7 +25,7 @@ namespace LogExpert
             LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
             if (pipe.FilterParams.searchText.Length > 0)
             {
-                ToolTip tip = new ToolTip(this.components);
+                ToolTip tip = new ToolTip(components);
                 tip.SetToolTip(logWin,
                     "Filter: \"" + pipe.FilterParams.searchText + "\"" +
                     (pipe.FilterParams.isInvert ? " (Invert match)" : "") +
@@ -36,6 +36,7 @@ namespace LogExpert
                 LogWindowData data = logWin.Tag as LogWindowData;
                 data.toolTip = tip;
             }
+
             return logWin;
         }
 
@@ -67,6 +68,7 @@ namespace LogExpert
                 {
                     AddToFileHistory(givenFileName);
                 }
+
                 SelectTab(win);
                 return win;
             }
@@ -88,6 +90,7 @@ namespace LogExpert
                 logWindow.TempTitleName = title;
                 encodingOptions.Encoding = new UnicodeEncoding(false, false);
             }
+
             AddLogWindow(logWindow, title, doNotAddToDockPanel);
             if (!isTempFile)
             {
@@ -95,8 +98,8 @@ namespace LogExpert
             }
 
             LogWindowData data = logWindow.Tag as LogWindowData;
-            data.color = this.defaultTabColor;
-            setTabColor(logWindow, this.defaultTabColor);
+            data.color = defaultTabColor;
+            setTabColor(logWindow, defaultTabColor);
             //data.tabPage.BorderColor = this.defaultTabBorderColor;
             if (!isTempFile)
             {
@@ -110,6 +113,7 @@ namespace LogExpert
                     }
                 }
             }
+
             if (!isTempFile)
             {
                 SetTooltipText(logWindow, logFileName);
@@ -132,13 +136,14 @@ namespace LogExpert
             {
                 return null;
             }
+
             LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, false);
             AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
-            this.multiFileToolStripMenuItem.Checked = true;
-            this.multiFileEnabledStripMenuItem.Checked = true;
+            multiFileToolStripMenuItem.Checked = true;
+            multiFileEnabledStripMenuItem.Checked = true;
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            this.BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti),
+            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti),
                 new object[] {fileNames, encodingOptions});
             AddToFileHistory(fileNames[0]);
             return logWindow;
@@ -146,26 +151,27 @@ namespace LogExpert
 
         public void LoadFiles(string[] fileNames)
         {
-            this.Invoke(new AddFileTabsDelegate(AddFileTabs), new object[] {fileNames});
+            Invoke(new AddFileTabsDelegate(AddFileTabs), new object[] {fileNames});
         }
 
         public void OpenSearchDialog()
         {
-            if (this.CurrentLogWindow == null)
+            if (CurrentLogWindow == null)
             {
                 return;
             }
+
             SearchDialog dlg = new SearchDialog();
-            this.AddOwnedForm(dlg);
-            dlg.TopMost = this.TopMost;
-            this.SearchParams.historyList = ConfigManager.Settings.searchHistoryList;
-            dlg.SearchParams = this.SearchParams;
+            AddOwnedForm(dlg);
+            dlg.TopMost = TopMost;
+            SearchParams.historyList = ConfigManager.Settings.searchHistoryList;
+            dlg.SearchParams = SearchParams;
             DialogResult res = dlg.ShowDialog();
-            if (res == DialogResult.OK)
+            if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.searchText))
             {
-                this.SearchParams = dlg.SearchParams;
-                this.SearchParams.isFindNext = false;
-                this.CurrentLogWindow.StartSearch();
+                SearchParams = dlg.SearchParams;
+                SearchParams.isFindNext = false;
+                CurrentLogWindow.StartSearch();
             }
         }
 
@@ -181,21 +187,24 @@ namespace LogExpert
                         return columnizer;
                     }
                 }
+
                 ConfigManager.Settings.columnizerHistoryList.Remove(entry); // no valid name -> remove entry
             }
+
             return null;
         }
 
         public void SwitchTab(bool shiftPressed)
         {
-            int index = this.dockPanel.Contents.IndexOf(this.dockPanel.ActiveContent);
+            int index = dockPanel.Contents.IndexOf(dockPanel.ActiveContent);
             if (shiftPressed)
             {
                 index--;
                 if (index < 0)
                 {
-                    index = this.dockPanel.Contents.Count - 1;
+                    index = dockPanel.Contents.Count - 1;
                 }
+
                 if (index < 0)
                 {
                     return;
@@ -204,22 +213,23 @@ namespace LogExpert
             else
             {
                 index++;
-                if (index >= this.dockPanel.Contents.Count)
+                if (index >= dockPanel.Contents.Count)
                 {
                     index = 0;
                 }
             }
-            if (index < this.dockPanel.Contents.Count)
+
+            if (index < dockPanel.Contents.Count)
             {
-                (this.dockPanel.Contents[index] as DockContent).Activate();
+                (dockPanel.Contents[index] as DockContent).Activate();
             }
         }
 
         public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow senderWindow)
         {
-            lock (this.logWindowList)
+            lock (logWindowList)
             {
-                foreach (LogWindow logWindow in this.logWindowList)
+                foreach (LogWindow logWindow in logWindowList)
                 {
                     if (logWindow != senderWindow)
                     {
@@ -254,6 +264,7 @@ namespace LogExpert
                     }
                 }
             }
+
             return null;
         }
 
@@ -278,6 +289,7 @@ namespace LogExpert
                     }
                 }
             }
+
             return null;
         }
 
@@ -288,16 +300,16 @@ namespace LogExpert
 
         public void SetForeground()
         {
-            SetForegroundWindow(this.Handle);
-            if (this.WindowState == FormWindowState.Minimized)
+            SetForegroundWindow(Handle);
+            if (WindowState == FormWindowState.Minimized)
             {
-                if (this.wasMaximized)
+                if (wasMaximized)
                 {
-                    this.WindowState = FormWindowState.Maximized;
+                    WindowState = FormWindowState.Maximized;
                 }
                 else
                 {
-                    this.WindowState = FormWindowState.Normal;
+                    WindowState = FormWindowState.Normal;
                 }
             }
         }
@@ -313,6 +325,7 @@ namespace LogExpert
             {
                 return;
             }
+
             if (isEnabled)
             {
                 data.tailState = 0;
@@ -321,10 +334,11 @@ namespace LogExpert
             {
                 data.tailState = offByTrigger ? 2 : 1;
             }
-            if (this.Preferences.showTailState)
+
+            if (Preferences.showTailState)
             {
                 Icon icon = GetIcon(data.diffSum, data);
-                this.BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
             }
         }
 
@@ -339,13 +353,14 @@ namespace LogExpert
         public IList<WindowFileEntry> GetListOfOpenFiles()
         {
             IList<WindowFileEntry> list = new List<WindowFileEntry>();
-            lock (this.logWindowList)
+            lock (logWindowList)
             {
-                foreach (LogWindow logWindow in this.logWindowList)
+                foreach (LogWindow logWindow in logWindowList)
                 {
                     list.Add(new WindowFileEntry(logWindow));
                 }
             }
+
             return list;
         }
 
