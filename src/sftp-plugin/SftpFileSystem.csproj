@@ -38,8 +38,13 @@
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChilkatDotNet4, Version=9.5.0.72, Culture=neutral, PublicKeyToken=eb5fc1fc52ef09bd, processorArchitecture=AMD64">
-      <HintPath>..\packages\chilkat-x64.9.5.0.72\lib\net40\ChilkatDotNet4.dll</HintPath>
+    <Reference Include="ChilkatDotNet4, Version=9.5.0.73, Culture=neutral, PublicKeyToken=eb5fc1fc52ef09bd, processorArchitecture=AMD64">
+      <HintPath>..\packages\chilkat-x64.9.5.0.73\lib\net40\ChilkatDotNet4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
+      <HintPath>..\packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -82,7 +87,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SftpFileSystem.cs" />
     <Compile Include="SftpLogFileInfoChilkat.cs" />
+    <Compile Include="SftpLogFileInfoRenci.cs" />
     <Compile Include="SftpStreamChilkat.cs" />
+    <Compile Include="SshApiType.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ConfigDialog.resx">

@@ -20,6 +20,8 @@ namespace SftpFileSystem
             pkCheckBox.Checked = ConfigData.UseKeyfile;
             puttyKeyRadioButton.Checked = ConfigData.KeyType == KeyType.Putty;
             sshKeyRadioButton.Checked = ConfigData.KeyType == KeyType.Ssh;
+            sshApiCombo.Items.AddRange(new object[] { SshApiType.Chilkat, SshApiType.Renci });
+            sshApiCombo.SelectedItem = ConfigData.SshApiType;
             fileLabel.Text = ConfigData.KeyFile;
         }
 
@@ -69,5 +71,27 @@ namespace SftpFileSystem
         }
 
         #endregion
+
+        private void sshApiCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selected = (SshApiType)sshApiCombo.SelectedItem;
+            ConfigData.SshApiType = selected;
+            switch (selected)
+            {
+                case SshApiType.Chilkat:
+                    label3.Visible = true;
+                    chilkatKeyBox.Visible = true;
+                    break;
+                case SshApiType.Renci:
+                    label3.Visible = false;
+                    chilkatKeyBox.Visible = false;
+                    break;
+            }
+        }
+
+        private void chilkatKeyBox_TextChanged(object sender, EventArgs e)
+        {
+            ConfigData.ChilkatKey = chilkatKeyBox.Text;
+        }
     }
 }

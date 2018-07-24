@@ -14,6 +14,10 @@ namespace SftpFileSystem
 
         public KeyType KeyType { get; set; }
 
+        public SshApiType SshApiType { get; set; }
+
+        public string ChilkatKey { get; set; }
+
         #endregion
     }
 }

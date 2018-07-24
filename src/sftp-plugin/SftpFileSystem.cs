@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using System.IO;
 using Chilkat;
 using LogExpert;
+using Renci.SshNet;
 
 namespace SftpFileSystem
 {
@@ -17,6 +18,7 @@ namespace SftpFileSystem
 
         private ConfigDialog _configDialog;
         private volatile SshKey _sshKey;
+        private volatile PrivateKeyFile _sshRenciKey;
 
         #endregion
 
@@ -49,6 +51,12 @@ namespace SftpFileSystem
             set { _sshKey = value; }
         }
 
+        public PrivateKeyFile SshRenciKey
+        {
+            get { return _sshRenciKey; }
+            set { _sshRenciKey = value; }
+        }
+
         #endregion
 
         #region Public methods
@@ -71,8 +79,23 @@ namespace SftpFileSystem
         {
             try
             {
+                ILogFileInfo logFileInfo = null;
                 Uri uri = new Uri(uriString.Replace('\\', '/'));
-                return new SftpLogFileInfoChilkat(this, uri, _logger);
+                switch (ConfigData.SshApiType)
+                {
+                    case SshApiType.Chilkat:
+                        logFileInfo = new SftpLogFileInfoChilkat(this, uri, _logger);
+                        break;
+                    case SshApiType.Renci:
+                        var renciFileInfo = new SftpLogFileInfoRenci(this, uri, _logger);
+                        if (!renciFileInfo.Connected)
+                        {
+                            renciFileInfo = null;
+                        }
+                        logFileInfo = renciFileInfo;
+                        break;
+                }
+                return logFileInfo;
             }
             catch (Exception e)
             {
