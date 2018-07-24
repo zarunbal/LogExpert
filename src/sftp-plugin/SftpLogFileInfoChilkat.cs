@@ -37,7 +37,7 @@ namespace SftpFileSystem
 
             //  Any string automatically begins a fully-functional 30-day trial.
             bool success;
-            success = _sftp.UnlockComponent("PUT_SERIAL_HERE");
+            success = _sftp.UnlockComponent(sftFileSystem.ConfigData.ChilkatKey);
             if (success != true)
             {
                 _logger.LogError(_sftp.LastErrorText);
