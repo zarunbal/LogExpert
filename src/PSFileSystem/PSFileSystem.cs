@@ -58,8 +58,20 @@ namespace PSFileSystem
         {
             try
             {
+                ILogFileInfo fileInfo = null;
                 Uri uri = new Uri(uriString.Replace('\\', '/'));
-                return new PSLogFileInfo(this, uri, _logger);
+
+                UNCLogFileInfo logFileInfo = new UNCLogFileInfo(this, uri, _logger);
+                if (!logFileInfo.IsConnected())
+                {
+                    fileInfo = new PSLogFileInfo(this, uri, _logger);
+                }
+                else
+                {
+                    fileInfo = logFileInfo;
+                }
+
+                return fileInfo;
             }
             catch (Exception e)
             {

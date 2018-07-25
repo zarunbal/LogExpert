@@ -1,15 +1,17 @@
-﻿using System;
-using LogExpert;
-using System.Windows.Forms;
+﻿using LogExpert;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
+using System.Net;
 using System.Threading;
-using System.Management.Automation.Runspaces;
-using System.Management.Automation;
-using System.Collections.ObjectModel;
 
 namespace PSFileSystem
 {
-    internal class PSLogFileInfo : ILogFileInfo
+    internal class UNCLogFileInfo : ILogFileInfo
     {
         #region Fields
 
@@ -17,39 +19,39 @@ namespace PSFileSystem
         private const int RetrySleep = 250;
         private readonly ILogExpertLogger _logger;
         private readonly string _remoteFileName;
+        private readonly string _host;
 
         private readonly PSFileSystem _fileSystem;
 
         private DateTime _lastChange = DateTime.Now;
         private long _lastLength;
 
-        private Runspace _runspace;
-        private int _port = 5985;
+        private NetworkConnection _connection;
+        private NetworkCredential _creds;
         private string _lastErrorText;
 
         #endregion
 
         #region cTor
 
-        internal PSLogFileInfo(PSFileSystem fileSystem, Uri fileUri, ILogExpertLogger logger)
+        internal UNCLogFileInfo(PSFileSystem fileSystem, Uri fileUri, ILogExpertLogger logger)
         {
             _logger = logger;
             _fileSystem = fileSystem;
             Uri = fileUri;
             _remoteFileName = Uri.PathAndQuery;
-            _remoteFileName = Uri.AbsolutePath;
-            _remoteFileName = Uri.LocalPath;
             _remoteFileName = _remoteFileName.Substring(1, _remoteFileName.Length - 1);
+            _remoteFileName = _remoteFileName.Replace(":", "$");
+            _remoteFileName = _remoteFileName.Replace("/", @"\");
+            _host = @"\\" + Uri.Host;
 
-            _port = Uri.Port != -1 ? Uri.Port : 5985;
-            
             Credentials credentials = _fileSystem.GetCredentials(Uri, true, false);
-            bool success = Authenticate(Uri.Host, credentials.UserName, credentials.Password);
+            bool success = Authenticate(credentials.UserName, credentials.Password);
             if (success != true)
             {
                 // first fail -> try again with disabled cache
                 credentials = _fileSystem.GetCredentials(Uri, false, false);
-                success = Authenticate(Uri.Host, credentials.UserName, credentials.Password);
+                success = Authenticate(credentials.UserName, credentials.Password);
                 if (success != true)
                 {
                     // 2nd fail -> abort
@@ -70,38 +72,46 @@ namespace PSFileSystem
             OriginalLength = _lastLength = Length;
         }
 
-        private bool Authenticate(string host, string login, string password)
+
+        public bool IsConnected()
         {
             bool result = false;
             try
             {
-                string shellUri = "http://schemas.microsoft.com/powershell/Microsoft.PowerShell";
+                _connection = new NetworkConnection(_host, _creds);
+
+                _connection.Dispose();
+
+                result = true;
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+            return result;
+        }
+
+        private bool Authenticate(string login, string password)
+        {
+            bool result = false;
+            try
+            {
                 System.Security.SecureString sString = new System.Security.SecureString();
                 foreach (char passwordChar in password)
                 {
                     sString.AppendChar(passwordChar);
                 }
-                PSCredential credential = new PSCredential(login, sString);
-                var connectionInfo = new WSManConnectionInfo(false, host, _port, "/wsman", shellUri, credential);
+                _creds = new NetworkCredential(login, sString);
+                _connection = new NetworkConnection(_host, _creds);
 
-                _runspace = RunspaceFactory.CreateRunspace(connectionInfo);
-                _runspace.Open();
+                _connection.Dispose();
 
                 result = true;
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 _logger.LogError(e.Message);
                 _lastErrorText = e.Message;
-            }
-            return result;
-        }
-
-        private bool IsConnected()
-        {
-            bool result = false;
-            if (_runspace != null)
-            {
-                result = _runspace.RunspaceStateInfo.State == RunspaceState.Opened;
             }
             return result;
         }
@@ -149,13 +159,15 @@ namespace PSFileSystem
 
         public long Length
         {
-            get {
-                Pipeline pipe = _runspace.CreatePipeline();
-                pipe.Commands.AddScript("$(New-Object IO.FileStream " + _remoteFileName + " ,'Open','Read').Length | Write-Output");
-                Collection<PSObject> files = pipe.Invoke();
-                pipe.Dispose();
-
-                return int.Parse(files[0].ToString());
+            get
+            {
+                using(_connection = new NetworkConnection(_host, _creds))
+                {
+                    using (var stream = File.OpenRead(_host + @"\" + _remoteFileName))
+                    {
+                        return stream.Length;
+                    }
+                }
             }
         }
 
@@ -165,19 +177,9 @@ namespace PSFileSystem
         {
             get
             {
-                try
+                using (_connection = new NetworkConnection(_host, _creds))
                 {
-                    Pipeline pipe = _runspace.CreatePipeline();
-                    pipe.Commands.AddScript("$(New-Object IO.FileStream " + _remoteFileName + " ,'Open','Read').Length | Write-Output");
-                    Collection<PSObject> files = pipe.Invoke();
-                    pipe.Dispose();
-
-                    return files.Count != 0;
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e.Message);
-                    return false;
+                    return File.Exists(_host + @"\" + _remoteFileName);
                 }
             }
         }
@@ -193,7 +195,7 @@ namespace PSFileSystem
                 }
                 else if (diff.TotalSeconds < 30)
                 {
-                    return (int) diff.TotalSeconds * 100;
+                    return (int)diff.TotalSeconds * 100;
                 }
                 else
                 {
@@ -213,22 +215,9 @@ namespace PSFileSystem
             {
                 try
                 {
-                    Pipeline pipe = _runspace.CreatePipeline();
-                    pipe.Commands.AddScript("$fs = New-Object IO.FileStream \"" + _remoteFileName + "\" ,'Open','Read','ReadWrite'; $sr = New-Object IO.StreamReader $fs; while($sr.EndOfStream -ne $true){ $sr.ReadLine(); };");
-                    Collection<PSObject> oblines = pipe.Invoke();
-                    pipe.Dispose();
-
-                    if (oblines.Count > 0)
+                    using (_connection = new NetworkConnection(_host, _creds))
                     {
-                        string pathTemp = Path.GetTempPath() + Path.GetRandomFileName();
-                        foreach (var obline in oblines)
-                        {
-                            File.AppendAllText(pathTemp, obline.ToString() + Environment.NewLine);
-                        }
-                        if (File.Exists(pathTemp))
-                        {
-                            return File.OpenText(pathTemp).BaseStream;
-                        }
+                        return File.OpenRead(_host + @"\" + _remoteFileName);
                     }
                 }
                 catch (IOException fe)
