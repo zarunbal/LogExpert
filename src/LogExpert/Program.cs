@@ -115,7 +115,7 @@ namespace LogExpert
                     // first instance
                     //WindowsIdentity wi = WindowsIdentity.GetCurrent();
                     IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
+                    ChannelServices.RegisterChannel(ipcChannel, true);
                     RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
                         "LogExpertProxy",
                         WellKnownObjectMode.Singleton);

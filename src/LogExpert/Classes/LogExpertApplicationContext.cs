@@ -20,6 +20,7 @@ namespace LogExpert
             this.proxy = proxy;
             this.proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(proxy_LastWindowClosed);
             firstLogWin.Show();
+            PluginRegistry.GetInstance();
         }
 
         #endregion
