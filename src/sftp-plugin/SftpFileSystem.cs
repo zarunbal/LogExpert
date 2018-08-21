@@ -7,11 +7,21 @@ using System.IO;
 using Chilkat;
 using LogExpert;
 using Renci.SshNet;
+using System.Runtime.Remoting.Channels.Ipc;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting;
+using System.Diagnostics;
 
 namespace SftpFileSystem
 {
     public class SftpFileSystem : IFileSystemPlugin, ILogExpertPluginConfigurator
     {
+        #region Static
+
+        private static object _lock = new object();
+
+        #endregion
+
         #region Fields
 
         private readonly ILogExpertLogger _logger;
@@ -19,6 +29,8 @@ namespace SftpFileSystem
         private ConfigDialog _configDialog;
         private volatile SshKey _sshKey;
         private volatile PrivateKeyFile _sshRenciKey;
+
+        private IpcServerChannel _ipcChannel;
 
         #endregion
 
@@ -28,6 +40,7 @@ namespace SftpFileSystem
         {
             _logger = callback.GetLogger();
             CredentialsCache = new CredentialCache();
+            InitializeIpc();
         }
 
         #endregion
@@ -186,6 +199,21 @@ namespace SftpFileSystem
 
         public void StartConfig()
         {
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void InitializeIpc()
+        {
+            lock (_lock)
+            {
+                RemotingConfiguration.RegisterWellKnownServiceType(typeof(ICredentialCache),
+                    "CredentialCacheSftp",
+                    WellKnownObjectMode.Singleton);
+                RemotingServices.Marshal(CredentialsCache, "CredentialCacheSftp");
+            }
         }
 
         #endregion

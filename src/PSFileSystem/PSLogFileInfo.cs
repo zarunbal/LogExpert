@@ -36,8 +36,6 @@ namespace PSFileSystem
             _logger = logger;
             _fileSystem = fileSystem;
             Uri = fileUri;
-            _remoteFileName = Uri.PathAndQuery;
-            _remoteFileName = Uri.AbsolutePath;
             _remoteFileName = Uri.LocalPath;
             _remoteFileName = _remoteFileName.Substring(1, _remoteFileName.Length - 1);
 

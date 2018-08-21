@@ -39,7 +39,7 @@ namespace PSFileSystem
             _logger = logger;
             _fileSystem = fileSystem;
             Uri = fileUri;
-            _remoteFileName = Uri.PathAndQuery;
+            _remoteFileName = Uri.LocalPath;
             _remoteFileName = _remoteFileName.Substring(1, _remoteFileName.Length - 1);
             _remoteFileName = _remoteFileName.Replace(":", "$");
             _remoteFileName = _remoteFileName.Replace("/", @"\");
@@ -163,7 +163,7 @@ namespace PSFileSystem
             {
                 using(_connection = new NetworkConnection(_host, _creds))
                 {
-                    using (var stream = File.OpenRead(_host + @"\" + _remoteFileName))
+                    using (var stream = File.Open(_host + @"\" + _remoteFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         return stream.Length;
                     }
@@ -217,7 +217,7 @@ namespace PSFileSystem
                 {
                     using (_connection = new NetworkConnection(_host, _creds))
                     {
-                        return File.OpenRead(_host + @"\" + _remoteFileName);
+                        return File.Open(_host + @"\" + _remoteFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     }
                 }
                 catch (IOException fe)

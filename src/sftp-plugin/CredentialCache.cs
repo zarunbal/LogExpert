@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using System.Security;
+using System.Runtime.InteropServices;
+using LogExpert;
 
 namespace SftpFileSystem
 {
-    internal class CredentialCache
+    internal class CredentialCache : MarshalByRefObject, ICredentialCache
     {
         #region Fields
 
@@ -59,6 +62,17 @@ namespace SftpFileSystem
             {
                 _credList.Remove(credentials);
             }
+        }
+
+        #endregion
+
+        #region Public Methods
+        
+        public void Add(string host, string username, string password)
+        {
+            RemoveCredentials(host, username);
+            Credentials cred = new Credentials(host, username, password);
+            _credList.Add(cred);
         }
 
         #endregion

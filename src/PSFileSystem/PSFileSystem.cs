@@ -4,11 +4,18 @@ using System.Xml.Serialization;
 using System.IO;
 using LogExpert;
 using System.Windows.Forms;
+using System.Runtime.Remoting;
 
 namespace PSFileSystem
 {
     public class PSFileSystem : IFileSystemPlugin
     {
+        #region Static
+
+        private static object _lock = new object();
+
+        #endregion
+
         #region Fields
 
         private readonly ILogExpertLogger _logger;
@@ -21,6 +28,7 @@ namespace PSFileSystem
         {
             _logger = callback.GetLogger();
             CredentialsCache = new CredentialCache();
+            InitializeIpc();
         }
 
         #endregion
@@ -88,6 +96,21 @@ namespace PSFileSystem
         public void StartConfig()
         {
 
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void InitializeIpc()
+        {
+            lock (_lock)
+            {
+                RemotingConfiguration.RegisterWellKnownServiceType(typeof(ICredentialCache),
+                    "CredentialCacheWin",
+                    WellKnownObjectMode.Singleton);
+                RemotingServices.Marshal(CredentialsCache, "CredentialCacheWin");
+            }
         }
 
         #endregion

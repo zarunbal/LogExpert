@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CredentialCache.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="ICredentialCache.cs" />
     <Compile Include="LoginDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using LogExpert;
 
 namespace PSFileSystem
 {
-    internal class CredentialCache
+    internal class CredentialCache : MarshalByRefObject, ICredentialCache
     {
         #region Fields
 
@@ -20,7 +21,7 @@ namespace PSFileSystem
             IList<string> result = new List<string>();
             foreach (Credentials cred in _credList)
             {
-                if (cred.Host.Equals(host))
+                if (cred.Host.ToLower().Equals(host.ToLower()))
                 {
                     result.Add(cred.UserName);
                 }
@@ -33,7 +34,7 @@ namespace PSFileSystem
         {
             foreach (Credentials cred in _credList)
             {
-                if (cred.Host.Equals(host) && cred.UserName.Equals(user))
+                if (cred.Host.ToLower().Equals(host.ToLower()) && cred.UserName.ToLower().Equals(user.ToLower()))
                 {
                     return cred;
                 }
@@ -59,6 +60,17 @@ namespace PSFileSystem
             {
                 _credList.Remove(credentials);
             }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Add(string host, string username, string password)
+        {
+            RemoveCredentials(host, username);
+            Credentials cred = new Credentials(host, username, password);
+            _credList.Add(cred);
         }
 
         #endregion
