@@ -41,6 +41,8 @@ namespace LogExpert
                 get { return this.DateFormat + " " + this.TimeFormat; }
             }
 
+            public bool IgnoreFirstChar { get; set; }
+
             #endregion
         }
 
@@ -197,19 +199,43 @@ namespace LogExpert
             {
                 if (this.timeOffset != 0)
                 {
-                    DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
-                        formatInfo.CultureInfo);
-                    dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
-                    string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
-                    columns[0].FullValue = newDate.Substring(0, dateLen); // date
-                    columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    if (formatInfo.IgnoreFirstChar)
+                    {
+                        // First character is a bracket and should be ignored
+                        DateTime dateTime = DateTime.ParseExact(temp.Substring(1, endPos), formatInfo.DateTimeFormat,
+                            formatInfo.CultureInfo);
+                        dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
+                        string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
+                        columns[0].FullValue = newDate.Substring(0, dateLen); // date
+                        columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
+                        columns[2].FullValue = temp.Substring(endPos + 2); // rest of line
+                    }
+                    else
+                    {
+                        DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
+                            formatInfo.CultureInfo);
+                        dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
+                        string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
+                        columns[0].FullValue = newDate.Substring(0, dateLen); // date
+                        columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
+                        columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    }
                 }
                 else
                 {
-                    columns[0].FullValue = temp.Substring(0, dateLen); // date
-                    columns[1].FullValue = temp.Substring(dateLen + 1, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    if (formatInfo.IgnoreFirstChar)
+                    {
+                        // First character is a bracket and should be ignored
+                        columns[0].FullValue = temp.Substring(1, dateLen); // date
+                        columns[1].FullValue = temp.Substring(dateLen + 2, timeLen); // time
+                        columns[2].FullValue = temp.Substring(endPos + 2); // rest of line
+                    }
+                    else
+                    {
+                        columns[0].FullValue = temp.Substring(0, dateLen); // date
+                        columns[1].FullValue = temp.Substring(dateLen + 1, timeLen); // time
+                        columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    }
                 }
             }
             catch (Exception)
@@ -233,20 +259,32 @@ namespace LogExpert
         protected FormatInfo DetermineDateTimeFormatInfo(ILogLine line)
         {
             string temp = line.FullLine;
+            bool ignoreFirst = false;
+
+            // determine if string starts with bracket and remove it
+            if (temp[0] == '[' || temp[0] == '(' || temp[0] == '{')
+            {
+                temp = temp.Substring(1);
+                ignoreFirst = true;
+
+            }
 
             // dirty hardcoded probing of date/time format (much faster than DateTime.ParseExact()
             if (temp[2] == '.' && temp[5] == '.' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
+                    this.formatInfo1.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo1;
                 }
                 else if (temp[19] == ',')
                 {
+                    this.formatInfo7.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo7;
                 }
                 else
                 {
+                    this.formatInfo2.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo2;
                 }
             }
@@ -254,14 +292,17 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
+                    this.formatInfo3.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo3;
                 }
                 else if (temp[19] == ',')
                 {
+                    this.formatInfo8.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo8;
                 }
                 else
                 {
+                    this.formatInfo4.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo4;
                 }
             }
@@ -269,14 +310,17 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
+                    this.formatInfo5.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo5;
                 }
                 else if (temp[19] == ',')
                 {
+                    this.formatInfo9.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo9;
                 }
                 else
                 {
+                    this.formatInfo6.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo6;
                 }
             }
@@ -284,18 +328,22 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
+                    this.formatInfo10.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo10;
                 }
                 else if (temp[19] == ',')
                 {
+                    this.formatInfo11.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo11;
                 }
                 else if (temp[19] == ':')
                 {
+                    this.formatInfo17.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo17;
                 }
                 else
                 {
+                    this.formatInfo12.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo12;
                 }
             }
@@ -303,20 +351,24 @@ namespace LogExpert
             {
                 if (temp[20] == ',')
                 {
+                    this.formatInfo13.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo13;
                 }
                 else if (temp[20] == '.')
                 {
+                    this.formatInfo14.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo14;
                 }
                 else
                 {
+                    this.formatInfo15.IgnoreFirstChar = ignoreFirst;
                     return this.formatInfo15;
                 }
             }
             //dd.MM.yy HH:mm:ss.fff
             else if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
             {
+                this.formatInfo16.IgnoreFirstChar = ignoreFirst;
                 return this.formatInfo16;
             }
 
