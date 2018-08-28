@@ -10,15 +10,30 @@ namespace RegexColumnizer
 {
 	public class RegexColumnizerConfig
 	{
+		#region Properties
+
 		public string Expression { get; set; } = "(?<text>.*)";
+
+		#endregion
 	}
 
 	public class Regex1Columnizer : ILogLineColumnizer, IColumnizerConfigurator
 	{
+		#region Fields
+
 		private readonly XmlSerializer xml = new XmlSerializer(typeof(RegexColumnizerConfig));
 		private string[] columns;
+
+		#endregion
+
+		#region Properties
+
 		public RegexColumnizerConfig Config { get; private set; }
 		public Regex Regex { get; private set; }
+
+		#endregion
+
+		#region Public methods
 
 		public string GetName() => "Regex";
 		public string GetDescription() => "Columns are filled by regular expression named capture groups";
@@ -33,12 +48,25 @@ namespace RegexColumnizer
 			if (Regex != null)
 			{
 				var m = Regex.Match(line.FullLine);
-				for (int i = m.Groups.Count - 1; i > 0; i--)
+
+				if (m.Success)
 				{
-					logLine.ColumnValues[i-1] = new Column
+					for (int i = m.Groups.Count - 1; i > 0; i--)
+					{
+						logLine.ColumnValues[i - 1] = new Column
+						{
+							Parent = logLine,
+							FullValue = m.Groups[i].Value
+						};
+					}
+				}
+				else
+				{
+					//Move non matching lines in the last column
+					logLine.ColumnValues[columns.Length - 1] = new Column
 					{
 						Parent = logLine,
-						FullValue = m.Groups[i].Value
+						FullValue = line.FullLine
 					};
 				}
 			}
@@ -52,12 +80,10 @@ namespace RegexColumnizer
 
 				logLine.ColumnValues[0] = colVal;
 			}
+
 			logLine.LogLine = line;
 			return logLine;
 		}
-
-
-		#region timeshift       
 
 		public bool IsTimeshiftImplemented() => false;
 
@@ -81,11 +107,9 @@ namespace RegexColumnizer
 			throw new NotImplementedException();
 		}
 
-		#endregion
-
 		public void Configure(ILogLineColumnizerCallback callback, string configDir)
 		{
-			RegexColumnizerConfigDialog d = new RegexColumnizerConfigDialog { Config = Config };
+			RegexColumnizerConfigDialog d = new RegexColumnizerConfigDialog {Config = Config};
 			if (d.ShowDialog() == DialogResult.OK)
 			{
 				var configFile = GetConfigFile(configDir);
@@ -115,6 +139,18 @@ namespace RegexColumnizer
 			Init(config);
 		}
 
+		public string GetConfigFile(string configDir)
+		{
+			var name = GetType().Name;
+			string configPath = Path.Combine(configDir, name);
+			configPath = Path.ChangeExtension(configPath, "xml");
+			return configPath;
+		}
+
+		#endregion
+
+		#region Private Methods
+
 		private void Init(RegexColumnizerConfig config)
 		{
 			Config = config;
@@ -131,21 +167,38 @@ namespace RegexColumnizer
 			}
 		}
 
-		public string GetConfigFile(string configDir)
-		{
-			var name = GetType().Name;
-			string configPath = Path.Combine(configDir, name);
-			configPath = Path.ChangeExtension(configPath, "xml");
-			return configPath;
-		}
+		#endregion
 	}
 
-	public class Regex2Columnizer : Regex1Columnizer { }
-	public class Regex3Columnizer : Regex1Columnizer { }
-	public class Regex4Columnizer : Regex1Columnizer { }
-	public class Regex5Columnizer : Regex1Columnizer { }
-	public class Regex6Columnizer : Regex1Columnizer { }
-	public class Regex7Columnizer : Regex1Columnizer { }
-	public class Regex8Columnizer : Regex1Columnizer { }
-	public class Regex9Columnizer : Regex1Columnizer { }
+	public class Regex2Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex3Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex4Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex5Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex6Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex7Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex8Columnizer : Regex1Columnizer
+	{
+	}
+
+	public class Regex9Columnizer : Regex1Columnizer
+	{
+	}
 }
