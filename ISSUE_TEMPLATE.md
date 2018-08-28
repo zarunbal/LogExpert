@@ -7,6 +7,7 @@ Important questions
 - Windows Version
 - Lokal file or Network
 - Used Columnizer
+- Is this version specific or a new problem
 
 Optional questions(depends on the problem):
 - Continous appending log file?
