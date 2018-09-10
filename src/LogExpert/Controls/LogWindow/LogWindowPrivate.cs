@@ -1109,7 +1109,7 @@ namespace LogExpert
             }
 
             IList<HilightMatchEntry> matchList = FindHilightMatches(column);
-            // too many entries per line seem to cause problems with the GDI 
+            // too many entries per line seem to cause problems with the GDI
             while (matchList.Count > 50)
             {
                 matchList.RemoveAt(50);
@@ -1124,6 +1124,12 @@ namespace LogExpert
                     : Color.FromKnownColor(KnownColor.Black),
                 groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
                 false);
+
+            if (groundEntry != null)
+            {
+                hme.HilightEntry.IsBold = groundEntry.IsBold;
+            }
+
             matchList = MergeHighlightMatchEntries(matchList, hme);
 
             int leftPad = e.CellStyle.Padding.Left;
@@ -1202,9 +1208,9 @@ namespace LogExpert
         }
 
         /// <summary>
-        /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
+        /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
         /// background colors.
-        /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the 
+        /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
         /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
         /// </summary>
         /// <param name="matchList">List of all highlight matches for the current cell</param>
@@ -1719,7 +1725,7 @@ namespace LogExpert
                 if (line == -1)
                 {
                     MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?  
+                        "Search result"); // Hmm... is that experimental code from early days?
                     return;
                 }
 
@@ -2121,9 +2127,9 @@ namespace LogExpert
         }
 
         /// <summary>
-        ///  Returns a list with 'additional filter results'. This is the given line number 
+        ///  Returns a list with 'additional filter results'. This is the given line number
         ///  and (if back spread and/or fore spread is enabled) some additional lines.
-        ///  This function doesn't check the filter condition! 
+        ///  This function doesn't check the filter condition!
         /// </summary>
         /// <param name="filterParams"></param>
         /// <param name="lineNum"></param>
@@ -2547,9 +2553,9 @@ namespace LogExpert
                 {
                     // TODO: handle this concurrent situation better:
                     // this.dataGridView.CurrentRow may be null even if checked before.
-                    // This can happen when MultiFile shift deselects the current row because there 
+                    // This can happen when MultiFile shift deselects the current row because there
                     // are less lines after rollover than before.
-                    // access to dataGridView-Rows should be locked 
+                    // access to dataGridView-Rows should be locked
                 }
             }
         }
@@ -2916,7 +2922,7 @@ namespace LogExpert
                 }
                 else
                 {
-                    // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+                    // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions).
                     dataGridView.FirstDisplayedScrollingColumnIndex = 0;
 
                     dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5; // default
