@@ -348,6 +348,7 @@ namespace LogExpert.Dialogs
         private void AddButton_Click(object sender, EventArgs e)
         {
             AddNewEntry();
+            Dirty();
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
