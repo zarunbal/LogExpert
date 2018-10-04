@@ -331,6 +331,7 @@
             this.boldCheckBox.Text = "Bold";
             this.toolTip1.SetToolTip(this.boldCheckBox, "Display the line in bold characters");
             this.boldCheckBox.UseVisualStyleBackColor = true;
+            this.boldCheckBox.CheckedChanged += new System.EventHandler(this.boldCheckBox_CheckedChanged);
             // 
             // wordMatchCheckBox
             // 

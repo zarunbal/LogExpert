@@ -614,6 +614,10 @@ namespace LogExpert.Dialogs
             Dirty();
         }
 
+        private void boldCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Dirty();
+        }
         #endregion
     }
 }
