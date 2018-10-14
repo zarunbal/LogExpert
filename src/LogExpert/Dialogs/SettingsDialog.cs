@@ -137,6 +137,7 @@ namespace LogExpert.Dialogs
             FillEncodingList();
             encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
             maskPrioCheckBox.Checked = Preferences.maskPrio;
+            askCloseTabsCheckBox.Checked = Preferences.askForClose;
             columnFinderCheckBox.Checked = Preferences.showColumnFinder;
             legacyReaderCheckBox.Checked = Preferences.useLegacyReader;
         }
