@@ -2,6 +2,9 @@
 
 Clone from https://logexpert.codeplex.com/
 
+# Important
+Please participate on this [#81](https://github.com/zarunbal/LogExpert/issues/81) which .NET version should be used in the future
+
 # Overview
 LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
