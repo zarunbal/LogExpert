@@ -1,31 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     [Serializable]
     public class MultifileOptions
     {
-        #region Fields
+        #region Private Fields
 
         private string formatPattern = "*$J(.)";
         private int maxDayTry = 3;
 
         #endregion
 
-        #region Properties
-
-        public int MaxDayTry
-        {
-            get { return maxDayTry; }
-            set { maxDayTry = value; }
-        }
+        #region Properties / Indexers
 
         public string FormatPattern
         {
-            get { return formatPattern; }
-            set { formatPattern = value; }
+            get => formatPattern;
+            set => formatPattern = value;
+        }
+
+        public int MaxDayTry
+        {
+            get => maxDayTry;
+            set => maxDayTry = value;
         }
 
         #endregion

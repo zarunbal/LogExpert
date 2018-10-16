@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class BookmarkEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public BookmarkEventArgs(Bookmark bookmark)
         {
-            this.Bookmark = bookmark;
+            Bookmark = bookmark;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public Bookmark Bookmark { get; }
 

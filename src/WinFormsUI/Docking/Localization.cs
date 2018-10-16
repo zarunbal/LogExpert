@@ -6,13 +6,13 @@ namespace WeifenLuo.WinFormsUI.Docking
     [AttributeUsage(AttributeTargets.All)]
     internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
     {
-        #region Fields
+        #region Private Fields
 
-        private bool m_initialized = false;
+        private bool m_initialized;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public LocalizedDescriptionAttribute(string key) : base(key)
         {
@@ -20,7 +20,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public override string Description
         {
@@ -48,7 +48,7 @@ namespace WeifenLuo.WinFormsUI.Docking
     [AttributeUsage(AttributeTargets.All)]
     internal sealed class LocalizedCategoryAttribute : CategoryAttribute
     {
-        #region cTor
+        #region Ctor
 
         public LocalizedCategoryAttribute(string key) : base(key)
         {

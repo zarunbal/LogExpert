@@ -5,20 +5,20 @@ namespace LogExpert
     [Serializable]
     public class ActionEntry
     {
-        #region Fields
+        #region Private Fields
 
         public string actionParam;
         public string pluginName;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public ActionEntry Copy()
         {
             ActionEntry e = new ActionEntry();
-            e.pluginName = this.pluginName;
-            e.actionParam = this.actionParam;
+            e.pluginName = pluginName;
+            e.actionParam = actionParam;
             return e;
         }
 

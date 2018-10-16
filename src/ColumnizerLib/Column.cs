@@ -1,36 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Windows.Forms;
 
 namespace LogExpert
 {
     public class Column : IColumn
     {
-        #region Fields
+        #region Static/Constants
 
         private static readonly int _maxLength = 4678 - 3;
         private static readonly string _replacement = "...";
 
         private static readonly IEnumerable<Func<string, string>> _replacements;
 
+        #endregion
+
+        #region Private Fields
+
         private string _fullValue;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         static Column()
         {
             List<Func<string, string>> replacements = new List<Func<string, string>>(
                 new Func<string, string>[]
                 {
-                    //replace tab with 3 spaces, from old coding. Needed???
+                    // replace tab with 3 spaces, from old coding. Needed???
                     input => input.Replace("\t", "  "),
 
-                    //shorten string if it exceeds maxLength
+                    // shorten string if it exceeds maxLength
                     input =>
                     {
                         if (input.Length > _maxLength)
@@ -44,14 +44,14 @@ namespace LogExpert
 
             if (Environment.Version >= Version.Parse("6.2"))
             {
-                //Win8 or newer support full UTF8 chars with the preinstalled fonts.
-                //Replace null char with UTF8 Symbol U+2400 (␀) 
+                // Win8 or newer support full UTF8 chars with the preinstalled fonts.
+                // Replace null char with UTF8 Symbol U+2400 (␀) 
                 replacements.Add(input => input.Replace("\0", "␀"));
             }
             else
             {
-                //Everything below Win8 the installed fonts seems to not to support reliabel
-                //Replace null char with space
+                // Everything below Win8 the installed fonts seems to not to support reliabel
+                // Replace null char with space
                 replacements.Add(input => input.Replace("\0", " "));
             }
 
@@ -62,22 +62,20 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
+        #region Interface IColumn
 
-        public static IColumn EmptyColumn { get; }
-
-        public IColumnizedLogLine Parent { get; set; }
+        public string DisplayValue { get; private set; }
 
         public string FullValue
         {
-            get { return _fullValue; }
+            get => _fullValue;
             set
             {
                 _fullValue = value;
 
                 string temp = FullValue;
 
-                foreach (var replacement in _replacements)
+                foreach (Func<string, string> replacement in _replacements)
                 {
                     temp = replacement(temp);
                 }
@@ -86,13 +84,19 @@ namespace LogExpert
             }
         }
 
-        public string DisplayValue { get; private set; }
+        public IColumnizedLogLine Parent { get; set; }
 
         string ITextValue.Text => DisplayValue;
 
         #endregion
 
-        #region Public methods
+        #region Properties / Indexers
+
+        public static IColumn EmptyColumn { get; }
+
+        #endregion
+
+        #region Public Methods
 
         public static Column[] CreateColumns(int count, IColumnizedLogLine parent)
         {
@@ -111,9 +115,13 @@ namespace LogExpert
             return output;
         }
 
+        #endregion
+
+        #region Overrides
+
         public override string ToString()
         {
-            return DisplayValue ?? "";
+            return DisplayValue ?? string.Empty;
         }
 
         #endregion

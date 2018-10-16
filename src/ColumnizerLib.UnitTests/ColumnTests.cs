@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using LogExpert;
 using NUnit.Framework;
@@ -10,6 +8,8 @@ namespace ColumnizerLib.UnitTests
     [TestFixture]
     public class ColumnTests
     {
+        #region Public Methods
+
         [Test]
         public void Column_LineCutOf()
         {
@@ -58,9 +58,9 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = "asdf\0";
 
-            //Switch between the different implementation for the windows versions
-            //Not that great solution but currently I'm out of ideas, I know that currently 
-            //only one implementation depending on the windows version is executed
+            // Switch between the different implementation for the windows versions
+            // Not that great solution but currently I'm out of ideas, I know that currently 
+            // only one implementation depending on the windows version is executed
             if (Environment.Version >= Version.Parse("6.2"))
             {
                 Assert.AreEqual("asdf␀", column.DisplayValue);
@@ -83,5 +83,7 @@ namespace ColumnizerLib.UnitTests
             Assert.AreEqual("asdf  ", column.DisplayValue);
             Assert.AreEqual("asdf\t", column.FullValue);
         }
+
+        #endregion
     }
 }

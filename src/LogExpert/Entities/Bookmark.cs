@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace LogExpert
 {
     public class Bookmark
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public Bookmark(int lineNum)
         {
             LineNum = lineNum;
-            Text = "";
+            Text = string.Empty;
             Overlay = new BookmarkOverlay();
         }
 
@@ -29,18 +22,18 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public int LineNum { get; set; }
-
-        public string Text { get; set; }
 
         public BookmarkOverlay Overlay { get; set; }
 
         /// <summary>
-        /// Position offset of the overlay as set by the user by dragging the overlay with the mouse.
+        ///     Position offset of the overlay as set by the user by dragging the overlay with the mouse.
         /// </summary>
         public Size OverlayOffset { get; set; }
+
+        public string Text { get; set; }
 
         #endregion
     }

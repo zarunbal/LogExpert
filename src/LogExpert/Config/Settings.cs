@@ -7,7 +7,7 @@ namespace LogExpert
     [Serializable]
     public class Settings
     {
-        #region Fields
+        #region Private Fields
 
         public bool alwaysOnTop;
         public Rectangle appBounds;
@@ -21,11 +21,9 @@ namespace LogExpert
         public List<string> filterRangeHistoryList = new List<string>();
         public bool hideLineColumn;
 
-        public List<HilightEntry> hilightEntryList = new List<HilightEntry>()
-            ; // legacy. is automatically converted to highlight groups on settings load
+        public List<HilightEntry> hilightEntryList = new List<HilightEntry>(); // legacy. is automatically converted to highlight groups on settings load
 
-        public List<HilightGroup> hilightGroupList = new List<HilightGroup>()
-            ; // should be in Preferences but is here for mistake. Maybe I migrate it some day.
+        public List<HilightGroup> hilightGroupList = new List<HilightGroup>(); // should be in Preferences but is here for mistake. Maybe I migrate it some day.
 
         public bool isMaximized;
         public string lastDirectory;

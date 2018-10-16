@@ -4,7 +4,7 @@ namespace LogExpert
 {
     public class ProjectData
     {
-        #region Fields
+        #region Private Fields
 
         public List<string> memberList = new List<string>();
         public string tabLayoutXml = null;

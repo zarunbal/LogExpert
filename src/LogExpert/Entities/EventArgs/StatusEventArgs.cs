@@ -1,28 +1,22 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class StatusLineEventArgs : EventArgs
     {
-        #region Fields
+        #region Properties / Indexers
+
+        public int CurrentLineNum { get; set; }
+
+        public long FileSize { get; set; }
+
+        public int LineCount { get; set; }
+
+        public string StatusText { get; set; }
 
         #endregion
 
-        #region Properties
-
-        public long FileSize { get; set; } = 0;
-
-        public string StatusText { get; set; } = null;
-
-        public int LineCount { get; set; } = 0;
-
-        public int CurrentLineNum { get; set; } = 0;
-
-        #endregion
-
-        #region Public methods
+        #region Public Methods
 
         public StatusLineEventArgs Clone()
         {

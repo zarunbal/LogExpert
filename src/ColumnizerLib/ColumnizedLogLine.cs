@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class ColumnizedLogLine : IColumnizedLogLine
     {
-        #region Properties
+        #region Interface IColumnizedLogLine
+
+        public IColumn[] ColumnValues { get; set; }
 
         public ILogLine LogLine { get; set; }
-        public IColumn[] ColumnValues { get; set; }
 
         #endregion
     }

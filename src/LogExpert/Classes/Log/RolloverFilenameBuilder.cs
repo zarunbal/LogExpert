@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LogExpert
 {
-    /* Needed info:
+/* Needed info:
      * - Date/time mask
      * - index counters 
      * - counter direction (up/down)
@@ -23,11 +22,11 @@ namespace LogExpert
      */
 
     /// <summary>
-    /// This class is responsible for building file names for multifile.
+    ///     This class is responsible for building file names for multifile.
     /// </summary>
     public class RolloverFilenameBuilder
     {
-        #region Fields
+        #region Private Fields
 
         private string condContent;
         private Group condGroup;
@@ -35,11 +34,11 @@ namespace LogExpert
 
         private Group dateGroup;
 
-        //private Regex regexCond;
+        // private Regex regexCond;
         private DateTime dateTime;
 
-        //private DateTimeFormatInfo dateFormat;
-        private string dateTimeFormat = null;
+        // private DateTimeFormatInfo dateFormat;
+        private string dateTimeFormat;
 
         private bool hideZeroIndex;
         private Group indexGroup;
@@ -47,7 +46,7 @@ namespace LogExpert
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public RolloverFilenameBuilder(string formatString)
         {
@@ -56,135 +55,90 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public int Index { get; set; }
 
-        public bool IsDatePattern
-        {
-            get { return this.dateGroup != null && this.dateGroup.Success; }
-        }
+        public bool IsDatePattern => dateGroup != null && dateGroup.Success;
 
-        public bool IsIndexPattern
-        {
-            get { return this.indexGroup != null && this.indexGroup.Success; }
-        }
+        public bool IsIndexPattern => indexGroup != null && indexGroup.Success;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
-        public void SetFileName(string fileName)
+        public string BuildFileName()
         {
-            this.currentFileName = fileName;
-            Match match = this.regex.Match(fileName);
-            if (match.Success)
+            string fileName = currentFileName;
+            if (dateGroup != null && dateGroup.Success)
             {
-                this.dateGroup = match.Groups["date"];
-                if (this.dateGroup.Success)
+                string newDate = dateTime.ToString(dateTimeFormat, DateTimeFormatInfo.InvariantInfo);
+                fileName = fileName.Remove(dateGroup.Index, dateGroup.Length);
+                fileName = fileName.Insert(dateGroup.Index, newDate);
+            }
+
+            if (indexGroup != null && indexGroup.Success)
+            {
+                fileName = fileName.Remove(indexGroup.Index, indexGroup.Length);
+                string fileNameBak = fileName;
+                if (!hideZeroIndex || Index > 0)
                 {
-                    string date = fileName.Substring(dateGroup.Index, dateGroup.Length);
-                    if (DateTime.TryParseExact(date, this.dateTimeFormat, DateTimeFormatInfo.InvariantInfo,
-                        DateTimeStyles.None,
-                        out this.dateTime))
+                    string format = "D" + indexGroup.Length;
+                    fileName = fileName.Insert(indexGroup.Index, Index.ToString(format));
+                    if (hideZeroIndex && condContent != null)
                     {
+                        fileName = fileName.Insert(indexGroup.Index, condContent);
                     }
                 }
-                this.indexGroup = match.Groups["index"];
-                if (this.indexGroup.Success)
-                {
-                    this.Index = this.indexGroup.Value.Length > 0 ? int.Parse(indexGroup.Value) : 0;
-                }
-                this.condGroup = match.Groups["cond"];
             }
-        }
 
-        public void IncrementDate()
-        {
-            this.dateTime = dateTime.AddDays(1);
+
+// this.currentFileName = fileName;
+
+// SetFileName(fileName);
+            return fileName;
         }
 
         public void DecrementDate()
         {
-            this.dateTime = dateTime.AddDays(-1);
+            dateTime = dateTime.AddDays(-1);
         }
 
-
-        public string BuildFileName()
+        public void IncrementDate()
         {
-            string fileName = this.currentFileName;
-            if (this.dateGroup != null && this.dateGroup.Success)
+            dateTime = dateTime.AddDays(1);
+        }
+
+        public void SetFileName(string fileName)
+        {
+            currentFileName = fileName;
+            Match match = regex.Match(fileName);
+            if (match.Success)
             {
-                string newDate = dateTime.ToString(this.dateTimeFormat, DateTimeFormatInfo.InvariantInfo);
-                fileName = fileName.Remove(this.dateGroup.Index, this.dateGroup.Length);
-                fileName = fileName.Insert(this.dateGroup.Index, newDate);
-            }
-            if (this.indexGroup != null && this.indexGroup.Success)
-            {
-                fileName = fileName.Remove(this.indexGroup.Index, this.indexGroup.Length);
-                string fileNameBak = fileName;
-                if (!this.hideZeroIndex || this.Index > 0)
+                dateGroup = match.Groups["date"];
+                if (dateGroup.Success)
                 {
-                    string format = "D" + this.indexGroup.Length;
-                    fileName = fileName.Insert(this.indexGroup.Index, this.Index.ToString(format));
-                    if (this.hideZeroIndex && this.condContent != null)
+                    string date = fileName.Substring(dateGroup.Index, dateGroup.Length);
+                    if (DateTime.TryParseExact(date, dateTimeFormat, DateTimeFormatInfo.InvariantInfo,
+                        DateTimeStyles.None,
+                        out dateTime))
                     {
-                        fileName = fileName.Insert(this.indexGroup.Index, this.condContent);
                     }
                 }
+
+                indexGroup = match.Groups["index"];
+                if (indexGroup.Success)
+                {
+                    Index = indexGroup.Value.Length > 0 ? int.Parse(indexGroup.Value) : 0;
+                }
+
+                condGroup = match.Groups["cond"];
             }
-//      this.currentFileName = fileName;
-//      SetFileName(fileName);
-            return fileName;
         }
 
         #endregion
 
         #region Private Methods
-
-        private void ParseFormatString(string formatString)
-        {
-            string fmt = escapeNonvarRegions(formatString);
-            int datePos = formatString.IndexOf("$D(");
-            if (datePos != -1)
-            {
-                int endPos = formatString.IndexOf(')', datePos);
-                if (endPos != -1)
-                {
-                    this.dateTimeFormat = formatString.Substring(datePos + 3, endPos - datePos - 3);
-                    this.dateTimeFormat = this.dateTimeFormat.ToUpper();
-                    this.dateTimeFormat = this.dateTimeFormat.Replace('D', 'd').Replace('Y', 'y');
-
-                    string dtf = this.dateTimeFormat;
-                    dtf = dtf.ToUpper();
-                    dtf = dtf.Replace("D", "\\d");
-                    dtf = dtf.Replace("Y", "\\d");
-                    dtf = dtf.Replace("M", "\\d");
-                    fmt = fmt.Remove(datePos, 2); // remove $D
-                    fmt = fmt.Remove(datePos + 1, this.dateTimeFormat.Length); // replace with regex version of format
-                    fmt = fmt.Insert(datePos + 1, dtf);
-                    fmt = fmt.Insert(datePos + 1, "?'date'"); // name the regex group 
-                }
-            }
-
-            int condPos = fmt.IndexOf("$J(");
-            if (condPos != -1)
-            {
-                int endPos = fmt.IndexOf(')', condPos);
-                if (endPos != -1)
-                {
-                    this.condContent = fmt.Substring(condPos + 3, endPos - condPos - 3);
-                    fmt = fmt.Remove(condPos + 2, endPos - condPos - 1);
-                }
-            }
-
-            fmt = fmt.Replace("*", ".*");
-            this.hideZeroIndex = fmt.Contains("$J");
-            fmt = fmt.Replace("$I", "(?'index'[\\d]+)");
-            fmt = fmt.Replace("$J", "(?'index'[\\d]*)");
-
-            this.regex = new Regex(fmt);
-        }
 
         private string escapeNonvarRegions(string formatString)
         {
@@ -203,11 +157,12 @@ namespace LogExpert
                             segment = new StringBuilder();
                             state = 1;
                         }
+
                         segment.Append(fmt[i]);
                         break;
                     case 1: // the char behind $
                         segment.Append(fmt[i]);
-                        result.Append(segment.ToString());
+                        result.Append(segment);
                         segment = new StringBuilder();
                         state = 2;
                         break;
@@ -222,20 +177,67 @@ namespace LogExpert
                             segment.Append(fmt[i]);
                             state = 0;
                         }
+
                         break;
                     case 3: // looking for )
                         segment.Append(fmt[i]);
                         if (fmt[i] == ')')
                         {
-                            result.Append(segment.ToString());
+                            result.Append(segment);
                             segment = new StringBuilder();
                             state = 0;
                         }
+
                         break;
                 }
             }
+
             fmt = result.ToString().Replace('\xFFFD', '*');
             return fmt;
+        }
+
+        private void ParseFormatString(string formatString)
+        {
+            string fmt = escapeNonvarRegions(formatString);
+            int datePos = formatString.IndexOf("$D(");
+            if (datePos != -1)
+            {
+                int endPos = formatString.IndexOf(')', datePos);
+                if (endPos != -1)
+                {
+                    dateTimeFormat = formatString.Substring(datePos + 3, endPos - datePos - 3);
+                    dateTimeFormat = dateTimeFormat.ToUpper();
+                    dateTimeFormat = dateTimeFormat.Replace('D', 'd').Replace('Y', 'y');
+
+                    string dtf = dateTimeFormat;
+                    dtf = dtf.ToUpper();
+                    dtf = dtf.Replace("D", "\\d");
+                    dtf = dtf.Replace("Y", "\\d");
+                    dtf = dtf.Replace("M", "\\d");
+                    fmt = fmt.Remove(datePos, 2); // remove $D
+                    fmt = fmt.Remove(datePos + 1, dateTimeFormat.Length); // replace with regex version of format
+                    fmt = fmt.Insert(datePos + 1, dtf);
+                    fmt = fmt.Insert(datePos + 1, "?'date'"); // name the regex group 
+                }
+            }
+
+            int condPos = fmt.IndexOf("$J(");
+            if (condPos != -1)
+            {
+                int endPos = fmt.IndexOf(')', condPos);
+                if (endPos != -1)
+                {
+                    condContent = fmt.Substring(condPos + 3, endPos - condPos - 3);
+                    fmt = fmt.Remove(condPos + 2, endPos - condPos - 1);
+                }
+            }
+
+            fmt = fmt.Replace("*", ".*");
+            hideZeroIndex = fmt.Contains("$J");
+            fmt = fmt.Replace("$I", "(?'index'[\\d]+)");
+            fmt = fmt.Replace("$J", "(?'index'[\\d]*)");
+
+            regex = new Regex(fmt);
         }
 
         #endregion

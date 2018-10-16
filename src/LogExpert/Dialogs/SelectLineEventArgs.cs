@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert.Dialogs
 {
     public class SelectLineEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public SelectLineEventArgs(int line)
         {
-            this.Line = line;
+            Line = line;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public int Line { get; }
 

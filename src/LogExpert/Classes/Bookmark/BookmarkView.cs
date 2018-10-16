@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     internal class BookmarkView : IBookmarkView
     {
-        #region Fields
+        #region Interface IBookmarkView
 
-        #endregion
-
-
-        #region IBookmarkView Member
-
-        public void UpdateView()
+        public bool LineColumnVisible
         {
-            throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public void BookmarkTextChanged(Bookmark bookmark)
@@ -28,17 +21,21 @@ namespace LogExpert
             throw new NotImplementedException();
         }
 
-        public bool LineColumnVisible
-        {
-            set { throw new NotImplementedException(); }
-        }
-
-        public bool IsActive { get; set; } = false;
-
         public void SetBookmarkData(IBookmarkData bookmarkData)
         {
             throw new NotImplementedException();
         }
+
+        public void UpdateView()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Properties / Indexers
+
+        public bool IsActive { get; set; } = false;
 
         #endregion
     }

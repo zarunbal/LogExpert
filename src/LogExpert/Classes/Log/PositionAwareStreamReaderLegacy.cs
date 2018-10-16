@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace LogExpert.Classes.Log
 {
     public class PositionAwareStreamReaderLegacy : PositionAwareStreamReaderBase
     {
-        #region Fields
+        #region Private Fields
 
         private readonly char[] charBuffer = new char[MAX_LINE_LEN];
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
         {
@@ -22,7 +18,7 @@ namespace LogExpert.Classes.Log
 
         #endregion
 
-        #region Public methods
+        #region Overrides
 
         public override string ReadLine()
         {
@@ -31,11 +27,11 @@ namespace LogExpert.Classes.Log
 
             while (-1 != (readInt = ReadChar()))
             {
-                char readChar = (char) readInt;
+                char readChar = (char)readInt;
 
                 // state: 0: looking for \r or \n, 
-                //        1: looking for \n after \r
-                //        2: looking for 
+                // 1: looking for \n after \r
+                // 2: looking for 
                 switch (readChar)
                 {
                     case '\r':
@@ -76,15 +72,17 @@ namespace LogExpert.Classes.Log
                         break;
                 }
 
-                //if (this.builder.Length > MAX_LINE_LEN)
-                //  break;
+                // if (this.builder.Length > MAX_LINE_LEN)
+                // break;
             }
 
-            //if (builder.Length == 0)
-            //  return null;  // EOF
+            // if (builder.Length == 0)
+            // return null;  // EOF
             result = GetLineAndResetBuilder();
-            //if (result.Length == 0)
-            //  return null;  // EOF
+
+
+// if (result.Length == 0)
+            // return null;  // EOF
             if (readInt == -1 && result.Length == 0)
             {
                 return null; // EOF
@@ -97,35 +95,6 @@ namespace LogExpert.Classes.Log
 
         #region Private Methods
 
-        //private string GetLineAndResetBuilder()
-        //{
-        //  string result;
-        //  result = this.builder.ToString();
-        //  this.state = 0;
-        //  if (this.builder.Length > MAX_LINE_LEN)
-        //    result = result.Substring(0, MAX_LINE_LEN);
-        //  NewBuilder();
-        //  return result;
-        //}
-
-        //private void appendToBuilder(char[] readChar)
-        //{
-        //  this.builder.Append(Char.ToString(readChar[0]));
-        //}
-
-        //private void NewBuilder()
-        //{
-        //  this.builder = new StringBuilder(400);
-        //}
-
-        private string GetLineAndResetBuilder()
-        {
-            string result = new string(charBuffer, 0, _charBufferPos);
-            NewBuilder();
-            _state = 0;
-            return result;
-        }
-
         private void appendToBuilder(char readChar)
         {
             if (_charBufferPos >= MAX_LINE_LEN)
@@ -134,6 +103,34 @@ namespace LogExpert.Classes.Log
             }
 
             charBuffer[_charBufferPos++] = readChar;
+        }
+
+        // private string GetLineAndResetBuilder()
+        // {
+        // string result;
+        // result = this.builder.ToString();
+        // this.state = 0;
+        // if (this.builder.Length > MAX_LINE_LEN)
+        // result = result.Substring(0, MAX_LINE_LEN);
+        // NewBuilder();
+        // return result;
+        // }
+
+        // private void appendToBuilder(char[] readChar)
+        // {
+        // this.builder.Append(Char.ToString(readChar[0]));
+        // }
+
+        // private void NewBuilder()
+        // {
+        // this.builder = new StringBuilder(400);
+        // }
+        private string GetLineAndResetBuilder()
+        {
+            string result = new string(charBuffer, 0, _charBufferPos);
+            NewBuilder();
+            _state = 0;
+            return result;
         }
 
         #endregion

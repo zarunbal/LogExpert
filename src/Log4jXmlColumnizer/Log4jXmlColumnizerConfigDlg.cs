@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert
 {
     public partial class Log4jXmlColumnizerConfigDlg : Form
     {
-        #region Fields
+        #region Private Fields
 
         private readonly Log4jXmlColumnizerConfig config;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public Log4jXmlColumnizerConfigDlg(Log4jXmlColumnizerConfig config)
         {
             this.config = config;
             InitializeComponent();
             FillListBox();
-            this.localTimeCheckBox.Checked = this.config.localTimestamps;
+            localTimeCheckBox.Checked = this.config.localTimestamps;
         }
 
         #endregion
@@ -32,9 +27,9 @@ namespace LogExpert
 
         private void FillListBox()
         {
-            DataGridViewCheckBoxColumn checkColumn = (DataGridViewCheckBoxColumn) this.columnGridView.Columns[0];
-            DataGridViewTextBoxColumn nameColumn = (DataGridViewTextBoxColumn) this.columnGridView.Columns[1];
-            DataGridViewTextBoxColumn lenColumn = (DataGridViewTextBoxColumn) this.columnGridView.Columns[2];
+            DataGridViewCheckBoxColumn checkColumn = (DataGridViewCheckBoxColumn)columnGridView.Columns[0];
+            DataGridViewTextBoxColumn nameColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[1];
+            DataGridViewTextBoxColumn lenColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[2];
 
             foreach (Log4jColumnEntry entry in config.columnList)
             {
@@ -44,36 +39,33 @@ namespace LogExpert
                 row.Cells.Add(new DataGridViewTextBoxCell());
                 row.Cells[0].Value = entry.visible;
                 row.Cells[1].Value = entry.columnName;
-                row.Cells[2].Value = entry.maxLen > 0 ? "" + entry.maxLen : "";
-                this.columnGridView.Rows.Add(row);
+                row.Cells[2].Value = entry.maxLen > 0 ? string.Empty + entry.maxLen : string.Empty;
+                columnGridView.Rows.Add(row);
             }
         }
 
-        #endregion
-
-        #region Events handler
-
         private void okButton_Click(object sender, EventArgs e)
         {
-            //  for (int i = 0; i < this.config.columnList.Count; ++i)
-            //  {
-            //    this.config.columnList[i]. visible = this.columnListBox.GetItemChecked(i);
-            //  }
-            for (int i = 0; i < this.columnGridView.Rows.Count; ++i)
+            // for (int i = 0; i < this.config.columnList.Count; ++i)
+            // {
+            // this.config.columnList[i]. visible = this.columnListBox.GetItemChecked(i);
+            // }
+            for (int i = 0; i < columnGridView.Rows.Count; ++i)
             {
-                this.config.columnList[i].visible = (bool) this.columnGridView.Rows[i].Cells[0].Value;
-                string sLen = (string) this.columnGridView.Rows[i].Cells[2].Value;
+                config.columnList[i].visible = (bool)columnGridView.Rows[i].Cells[0].Value;
+                string sLen = (string)columnGridView.Rows[i].Cells[2].Value;
                 int len;
                 if (int.TryParse(sLen, out len))
                 {
-                    this.config.columnList[i].maxLen = len;
+                    config.columnList[i].maxLen = len;
                 }
                 else
                 {
-                    this.config.columnList[i].maxLen = 0;
+                    config.columnList[i].maxLen = 0;
                 }
             }
-            this.config.localTimestamps = this.localTimeCheckBox.Checked;
+
+            config.localTimestamps = localTimeCheckBox.Checked;
         }
 
         #endregion

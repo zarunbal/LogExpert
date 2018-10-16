@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,35 +5,33 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     partial class DockPane
     {
-        #region Fields
-
-        #endregion
-
-        #region Properties
-
-        private SplitterControl Splitter { get; set; }
-
-        internal Rectangle SplitterBounds
-        {
-            set { Splitter.Bounds = value; }
-        }
+        #region Properties / Indexers
 
         internal DockAlignment SplitterAlignment
         {
-            set { Splitter.Alignment = value; }
+            set => Splitter.Alignment = value;
         }
+
+        internal Rectangle SplitterBounds
+        {
+            set => Splitter.Bounds = value;
+        }
+
+        private SplitterControl Splitter { get; set; }
 
         #endregion
 
+        #region Nested type: SplitterControl
+
         private class SplitterControl : Control, ISplitterDragSource
         {
-            #region Fields
+            #region Private Fields
 
             private DockAlignment m_alignment;
 
             #endregion
 
-            #region cTor
+            #region Ctor
 
             public SplitterControl(DockPane pane)
             {
@@ -46,13 +41,85 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region Properties
+            #region Interface ISplitterDragSource
 
-            public DockPane DockPane { get; }
+            Control IDragSource.DragControl => this;
+
+            Rectangle ISplitterDragSource.DragLimitBounds
+            {
+                get
+                {
+                    NestedDockingStatus status = DockPane.NestedDockingStatus;
+                    Rectangle rectLimit = Parent.RectangleToScreen(status.LogicalBounds);
+                    if (((ISplitterDragSource)this).IsVertical)
+                    {
+                        rectLimit.X += MeasurePane.MinSize;
+                        rectLimit.Width -= 2 * MeasurePane.MinSize;
+                    }
+                    else
+                    {
+                        rectLimit.Y += MeasurePane.MinSize;
+                        rectLimit.Height -= 2 * MeasurePane.MinSize;
+                    }
+
+                    return rectLimit;
+                }
+            }
+
+            bool ISplitterDragSource.IsVertical
+            {
+                get
+                {
+                    NestedDockingStatus status = DockPane.NestedDockingStatus;
+                    return status.DisplayingAlignment == DockAlignment.Left ||
+                           status.DisplayingAlignment == DockAlignment.Right;
+                }
+            }
+
+            void ISplitterDragSource.BeginDrag(Rectangle rectSplitter)
+            {
+            }
+
+            void ISplitterDragSource.EndDrag()
+            {
+            }
+
+            void ISplitterDragSource.MoveSplitter(int offset)
+            {
+                NestedDockingStatus status = DockPane.NestedDockingStatus;
+                double proportion = status.Proportion;
+                if (status.LogicalBounds.Width <= 0 || status.LogicalBounds.Height <= 0)
+                {
+                    return;
+                }
+
+                if (status.DisplayingAlignment == DockAlignment.Left)
+                {
+                    proportion += offset / (double)status.LogicalBounds.Width;
+                }
+                else if (status.DisplayingAlignment == DockAlignment.Right)
+                {
+                    proportion -= offset / (double)status.LogicalBounds.Width;
+                }
+                else if (status.DisplayingAlignment == DockAlignment.Top)
+                {
+                    proportion += offset / (double)status.LogicalBounds.Height;
+                }
+                else
+                {
+                    proportion -= offset / (double)status.LogicalBounds.Height;
+                }
+
+                DockPane.SetNestedDockingProportion(proportion);
+            }
+
+            #endregion
+
+            #region Properties / Indexers
 
             public DockAlignment Alignment
             {
-                get { return m_alignment; }
+                get => m_alignment;
                 set
                 {
                     m_alignment = value;
@@ -76,9 +143,23 @@ namespace WeifenLuo.WinFormsUI.Docking
                 }
             }
 
+            public DockPane DockPane { get; }
+
             #endregion
 
             #region Overrides
+
+            protected override void OnMouseDown(MouseEventArgs e)
+            {
+                base.OnMouseDown(e);
+
+                if (e.Button != MouseButtons.Left)
+                {
+                    return;
+                }
+
+                DockPane.DockPanel.BeginDrag(this, Parent.RectangleToScreen(Bounds));
+            }
 
             protected override void OnPaint(PaintEventArgs e)
             {
@@ -101,99 +182,9 @@ namespace WeifenLuo.WinFormsUI.Docking
                 }
             }
 
-            protected override void OnMouseDown(MouseEventArgs e)
-            {
-                base.OnMouseDown(e);
-
-                if (e.Button != MouseButtons.Left)
-                {
-                    return;
-                }
-
-                DockPane.DockPanel.BeginDrag(this, Parent.RectangleToScreen(Bounds));
-            }
-
-            #endregion
-
-            #region ISplitterDragSource Members
-
-            void ISplitterDragSource.BeginDrag(Rectangle rectSplitter)
-            {
-            }
-
-            void ISplitterDragSource.EndDrag()
-            {
-            }
-
-            bool ISplitterDragSource.IsVertical
-            {
-                get
-                {
-                    NestedDockingStatus status = DockPane.NestedDockingStatus;
-                    return status.DisplayingAlignment == DockAlignment.Left ||
-                           status.DisplayingAlignment == DockAlignment.Right;
-                }
-            }
-
-            Rectangle ISplitterDragSource.DragLimitBounds
-            {
-                get
-                {
-                    NestedDockingStatus status = DockPane.NestedDockingStatus;
-                    Rectangle rectLimit = Parent.RectangleToScreen(status.LogicalBounds);
-                    if (((ISplitterDragSource) this).IsVertical)
-                    {
-                        rectLimit.X += MeasurePane.MinSize;
-                        rectLimit.Width -= 2 * MeasurePane.MinSize;
-                    }
-                    else
-                    {
-                        rectLimit.Y += MeasurePane.MinSize;
-                        rectLimit.Height -= 2 * MeasurePane.MinSize;
-                    }
-
-                    return rectLimit;
-                }
-            }
-
-            void ISplitterDragSource.MoveSplitter(int offset)
-            {
-                NestedDockingStatus status = DockPane.NestedDockingStatus;
-                double proportion = status.Proportion;
-                if (status.LogicalBounds.Width <= 0 || status.LogicalBounds.Height <= 0)
-                {
-                    return;
-                }
-                else if (status.DisplayingAlignment == DockAlignment.Left)
-                {
-                    proportion += (double) offset / (double) status.LogicalBounds.Width;
-                }
-                else if (status.DisplayingAlignment == DockAlignment.Right)
-                {
-                    proportion -= (double) offset / (double) status.LogicalBounds.Width;
-                }
-                else if (status.DisplayingAlignment == DockAlignment.Top)
-                {
-                    proportion += (double) offset / (double) status.LogicalBounds.Height;
-                }
-                else
-                {
-                    proportion -= (double) offset / (double) status.LogicalBounds.Height;
-                }
-
-                DockPane.SetNestedDockingProportion(proportion);
-            }
-
-            #region IDragSource Members
-
-            Control IDragSource.DragControl
-            {
-                get { return this; }
-            }
-
-            #endregion
-
             #endregion
         }
+
+        #endregion
     }
 }

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NLog;
-
+﻿using NLog;
 
 namespace LogExpert
 {
     internal class FileSystemCallback : IFileSystemCallback
     {
-        #region Public methods
+        #region Interface IFileSystemCallback
 
         public ILogExpertLogger GetLogger()
         {
@@ -17,29 +13,22 @@ namespace LogExpert
 
         #endregion
 
+        #region Nested type: NLogLogExpertWrapper
+
         private class NLogLogExpertWrapper : ILogExpertLogger
         {
-            #region Fields
-
             private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-            #endregion
-
-            #region Public methods
-
-            public void Info(string msg)
-            {
-                _logger.Info(msg);
-            }
+            #region Interface ILogExpertLogger
 
             public void Debug(string msg)
             {
                 _logger.Debug(msg);
             }
 
-            public void LogWarn(string msg)
+            public void Info(string msg)
             {
-                _logger.Warn(msg);
+                _logger.Info(msg);
             }
 
             public void LogError(string msg)
@@ -47,7 +36,14 @@ namespace LogExpert
                 _logger.Error(msg);
             }
 
+            public void LogWarn(string msg)
+            {
+                _logger.Warn(msg);
+            }
+
             #endregion
         }
+
+        #endregion
     }
 }

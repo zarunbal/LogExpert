@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("DockPanel Suite for .Net 2.0")]
 [assembly: AssemblyDescription(".Net Docking Library for Windows Forms")]

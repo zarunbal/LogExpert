@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     public partial class FailedKeyDialog : Form
     {
-        #region cTor
+        #region Ctor
 
         public FailedKeyDialog()
         {
@@ -19,7 +14,7 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Events handler
+        #region Private Methods
 
         private void button1_Click(object sender, EventArgs e)
         {

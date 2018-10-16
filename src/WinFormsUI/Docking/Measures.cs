@@ -1,10 +1,8 @@
-using System;
-
 namespace WeifenLuo.WinFormsUI.Docking
 {
     internal static class Measures
     {
-        #region Fields
+        #region Static/Constants
 
         public const int SplitterSize = 4;
 
@@ -13,7 +11,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
     internal static class MeasurePane
     {
-        #region Fields
+        #region Static/Constants
 
         public const int MinSize = 24;
 

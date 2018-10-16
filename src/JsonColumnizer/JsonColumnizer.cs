@@ -9,7 +9,7 @@ namespace JsonColumnizer
 {
     internal class JsonColumn
     {
-        #region cTor
+        #region Ctor
 
         public JsonColumn(string name)
         {
@@ -18,7 +18,7 @@ namespace JsonColumnizer
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string Name { get; }
 
@@ -30,36 +30,39 @@ namespace JsonColumnizer
     /// </summary>
     public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer
     {
-        #region Fields
+        #region Static/Constants
 
         private static readonly JsonColumn _initialColumn = new JsonColumn("Text");
+
+        #endregion
+
+        #region Private Fields
 
         private readonly IList<JsonColumn> _columnList = new List<JsonColumn>(new[] {_initialColumn});
 
         #endregion
 
-        #region Properties
+        #region Interface IInitColumnizer
 
-        public string Text => GetName();
-
-        #endregion
-
-        #region Public methods
+        public void DeSelected(ILogLineColumnizerCallback callback)
+        {
+            // nothing to do
+        }
 
         public void Selected(ILogLineColumnizerCallback callback)
         {
             _columnList.Clear();
 
-            var line = callback.GetLogLine(0);
+            ILogLine line = callback.GetLogLine(0);
 
             if (line != null)
             {
-                var json = ParseJson(line);
+                JObject json = ParseJson(line);
                 if (json != null)
                 {
-                    var fieldCount = json.Properties().Count();
+                    int fieldCount = json.Properties().Count();
 
-                    for (var i = 0; i < fieldCount; ++i)
+                    for (int i = 0; i < fieldCount; ++i)
                     {
                         _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
                     }
@@ -75,20 +78,9 @@ namespace JsonColumnizer
             }
         }
 
-        public void DeSelected(ILogLineColumnizerCallback callback)
-        {
-            // nothing to do 
-        }
+        #endregion
 
-        public string GetName()
-        {
-            return "JSON Columnizer";
-        }
-
-        public string GetDescription()
-        {
-            return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n\r\nFirst line must be valid or else only one column will be displayed and the other values dropped!";
-        }
+        #region Interface ILogLineColumnizer
 
         public int GetColumnCount()
         {
@@ -99,7 +91,7 @@ namespace JsonColumnizer
         {
             string[] names = new string[GetColumnCount()];
             int i = 0;
-            foreach (var column in _columnList)
+            foreach (JsonColumn column in _columnList)
             {
                 names[i++] = column.Name;
             }
@@ -107,34 +99,14 @@ namespace JsonColumnizer
             return names;
         }
 
-        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public string GetDescription()
         {
-            JObject json = ParseJson(line);
-
-            if (json != null)
-            {
-                return SplitJsonLine(line, json);
-            }
-
-            var cLogLine = new ColumnizedLogLine {LogLine = line};
-
-            var columns = Column.CreateColumns(_columnList.Count, cLogLine);
-
-            columns.Last().FullValue = line.FullLine;
-
-            cLogLine.ColumnValues = columns.Select(a => (IColumn) a).ToArray();
-
-            return cLogLine;
+            return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n\r\nFirst line must be valid or else only one column will be displayed and the other values dropped!";
         }
 
-        public bool IsTimeshiftImplemented()
+        public string GetName()
         {
-            return false;
-        }
-
-        public void SetTimeOffset(int msecOffset)
-        {
-            throw new NotImplementedException();
+            return "JSON Columnizer";
         }
 
         public int GetTimeOffset()
@@ -147,10 +119,46 @@ namespace JsonColumnizer
             throw new NotImplementedException();
         }
 
+        public bool IsTimeshiftImplemented()
+        {
+            return false;
+        }
+
         public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
             throw new NotImplementedException();
         }
+
+        public void SetTimeOffset(int msecOffset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        {
+            JObject json = ParseJson(line);
+
+            if (json != null)
+            {
+                return SplitJsonLine(line, json);
+            }
+
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine {LogLine = line};
+
+            Column[] columns = Column.CreateColumns(_columnList.Count, cLogLine);
+
+            columns.Last().FullValue = line.FullLine;
+
+            cLogLine.ColumnValues = columns.Select(a => (IColumn)a).ToArray();
+
+            return cLogLine;
+        }
+
+        #endregion
+
+        #region Properties / Indexers
+
+        public string Text => GetName();
 
         #endregion
 
@@ -158,17 +166,17 @@ namespace JsonColumnizer
 
         private static JObject ParseJson(ILogLine line)
         {
-            return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings()
+            return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings
             {
-                Error = (sender, args) => { args.ErrorContext.Handled = true; } //We ignore the error and handle the null value
+                Error = (sender, args) => { args.ErrorContext.Handled = true; } // We ignore the error and handle the null value
             });
         }
 
         private IColumnizedLogLine SplitJsonLine(ILogLine line, JObject json)
         {
-            var cLogLine = new ColumnizedLogLine {LogLine = line};
+            ColumnizedLogLine cLogLine = new ColumnizedLogLine {LogLine = line};
 
-            var columns = json.Properties().Select(property => new Column {FullValue = property.Value.ToString(), Parent = cLogLine}).ToList();
+            List<Column> columns = json.Properties().Select(property => new Column {FullValue = property.Value.ToString(), Parent = cLogLine}).ToList();
 
             cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
 

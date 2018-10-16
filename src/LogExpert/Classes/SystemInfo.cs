@@ -1,36 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace LogExpert
 {
     /// <summary>
-    /// Collects some system information (OS, Runtime etc.)
+    ///     Collects some system information (OS, Runtime etc.)
     /// </summary>
     internal class SystemInfo
     {
-        #region Fields
+        #region Private Fields
 
         private readonly StringBuilder info = new StringBuilder();
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         internal SystemInfo()
         {
-            info.Append("OS:  ").AppendLine(System.Environment.OSVersion.ToString());
-            info.Append("CLR: ").AppendLine(System.Environment.Version.ToString());
+            info.Append("OS:  ").AppendLine(Environment.OSVersion.ToString());
+            info.Append("CLR: ").AppendLine(Environment.Version.ToString());
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public string Info
-        {
-            get { return this.info.ToString(); }
-        }
+        public string Info => info.ToString();
 
         #endregion
     }

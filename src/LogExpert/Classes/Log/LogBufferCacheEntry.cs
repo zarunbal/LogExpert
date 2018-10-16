@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 
 namespace LogExpert
 {
     internal class LogBufferCacheEntry
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public LogBufferCacheEntry()
         {
@@ -20,19 +13,19 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
-
-        internal LogBuffer LogBuffer { get; set; }
+        #region Properties / Indexers
 
         public long LastUseTimeStamp { get; private set; }
 
+        internal LogBuffer LogBuffer { get; set; }
+
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void Touch()
         {
-            LastUseTimeStamp = (long) (Environment.TickCount & int.MaxValue);
+            LastUseTimeStamp = Environment.TickCount & int.MaxValue;
         }
 
         #endregion

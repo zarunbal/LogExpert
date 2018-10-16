@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
 using LogExpert;
+using NUnit.Framework;
 
 namespace UnitTests
 {
     [TestFixture]
     internal class BufferShiftTest : RolloverHandlerTestBase
     {
-        [TearDown]
-        public void TearDown()
+        #region Public Methods
+
+        [TestFixtureSetUp]
+        public void Boot()
         {
             Cleanup();
         }
 
-        [TestFixtureSetUp]
-        public void Boot()
+        [TearDown]
+        public void TearDown()
         {
             Cleanup();
         }
@@ -45,14 +46,13 @@ namespace UnitTests
                 Assert.AreEqual(fileName, li.FullName);
                 enumerator.MoveNext();
             }
+
             int oldCount = lil.Count;
 
             // Simulate rollover
-            //
             files = RolloverSimulation(files, "*$J(.)", false);
 
             // Simulate rollover detection 
-            //
             reader.ShiftBuffers();
 
             lil = reader.GetLogFileInfoList();
@@ -61,7 +61,6 @@ namespace UnitTests
             Assert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
 
             // Check if rollover'd file names have been handled by LogfileReader
-            //
             Assert.AreEqual(files.Count, lil.Count);
             enumerator = files.GetEnumerator();
             enumerator.MoveNext();
@@ -74,7 +73,6 @@ namespace UnitTests
 
             // Check if file buffers have correct files. Assuming here that one buffer fits for a 
             // complete file
-            //
             enumerator = files.GetEnumerator();
             enumerator.MoveNext();
             IList<LogBuffer> logBuffers = reader.GetBufferList();
@@ -88,7 +86,6 @@ namespace UnitTests
             }
 
             // Checking file content
-            //
             enumerator = files.GetEnumerator();
             enumerator.MoveNext();
             enumerator.MoveNext(); // move to 2nd entry. The first file now contains 2nd file's content (because rollover)
@@ -101,8 +98,10 @@ namespace UnitTests
                 Assert.IsTrue(line.FullLine.Contains(enumerator.Current));
                 enumerator.MoveNext();
             }
+
             enumerator.MoveNext();
-            // the last 2 files now contain the content of the previously watched file
+
+// the last 2 files now contain the content of the previously watched file
             for (; i < logBuffers.Count; ++i)
             {
                 LogBuffer logBuffer = logBuffers[i];
@@ -113,11 +112,9 @@ namespace UnitTests
             oldCount = lil.Count;
 
             // Simulate rollover again - now latest file will be deleted (simulates logger's rollover history limit)
-            //
             files = RolloverSimulation(files, "*$J(.)", true);
 
             // Simulate rollover detection 
-            //
             reader.ShiftBuffers();
             lil = reader.GetLogFileInfoList();
 
@@ -126,11 +123,12 @@ namespace UnitTests
             Assert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
 
             // Check first line to see if buffers are correct
-            //
             ILogLine firstLine = reader.GetLogLine(0);
             string[] names = new string[files.Count];
             files.CopyTo(names, 0);
             Assert.IsTrue(firstLine.FullLine.Contains(names[2]));
         }
+
+        #endregion
     }
 }

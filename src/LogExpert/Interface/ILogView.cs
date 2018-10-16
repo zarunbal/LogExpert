@@ -1,27 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace LogExpert
 {
     /// <summary>
-    /// Methods to control the LogWindow from other views. 
+    ///     Methods to control the LogWindow from other views.
     /// </summary>
     public interface ILogView
     {
-        #region Properties
+        #region Properties / Indexers
 
         ILogLineColumnizer CurrentColumnizer { get; }
         string FileName { get; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
+
+        void DeleteBookmarks(List<int> lineNumList);
+        void RefreshLogView();
+        void SelectAndEnsureVisible(int line, bool triggerSyncCall);
 
         void SelectLogLine(int lineNumber);
-        void SelectAndEnsureVisible(int line, bool triggerSyncCall);
-        void RefreshLogView();
-        void DeleteBookmarks(List<int> lineNumList);
 
         #endregion
     }

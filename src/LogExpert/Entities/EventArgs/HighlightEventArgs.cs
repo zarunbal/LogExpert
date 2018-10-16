@@ -1,30 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class HighlightEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public HighlightEventArgs(int startLine, int count)
         {
-            this.StartLine = startLine;
-            this.Count = count;
+            StartLine = startLine;
+            Count = count;
         }
 
         #endregion
 
-        #region Properties
-
-        public int StartLine { get; }
+        #region Properties / Indexers
 
         public int Count { get; }
+
+        public int StartLine { get; }
 
         #endregion
     }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using LogExpert.Dialogs;
@@ -10,27 +8,27 @@ namespace LogExpert
 {
     internal class ArgParser
     {
-        #region Fields
+        #region Private Fields
 
         private readonly string argLine;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public ArgParser(string argTemplate)
         {
-            this.argLine = argTemplate;
+            argLine = argTemplate;
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public string BuildArgs(ILogLine logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
         {
-            StringBuilder builder = new StringBuilder(this.argLine);
-            builder.Replace("%L", "" + lineNum);
+            StringBuilder builder = new StringBuilder(argLine);
+            builder.Replace("%L", string.Empty + lineNum);
             builder.Replace("%P", logFileInfo.DirectoryName);
             builder.Replace("%N", logFileInfo.FileName);
             builder.Replace("%F", logFileInfo.FullName);
@@ -44,6 +42,7 @@ namespace LogExpert
             {
                 user = user.Substring(0, user.IndexOf(':'));
             }
+
             builder.Replace("%S", user);
             builder.Replace("%R", logFileInfo.Uri.PathAndQuery);
             builder.Replace("%H", logFileInfo.Uri.Host);
@@ -61,7 +60,8 @@ namespace LogExpert
                     string result = Regex.Replace(logLine.FullLine, reg, replace);
                     builder.Insert(sPos, result);
                 }
-            } while (replace != null);
+            }
+ while (replace != null);
 
             int i = 0;
             while (i < builder.Length)
@@ -78,8 +78,10 @@ namespace LogExpert
                         {
                             end = builder.Length - 1;
                         }
+
                         ask = builder.ToString().Substring(i + 2, end - i - 2);
                     }
+
                     string[] values = null;
                     if (builder[end + 1] == '(')
                     {
@@ -88,8 +90,9 @@ namespace LogExpert
                         {
                             end2 = builder.Length - 1;
                         }
+
                         string valueStr = builder.ToString().Substring(end + 2, end2 - end - 2);
-                        values = valueStr.Split(new char[] {','}, StringSplitOptions.None);
+                        values = valueStr.Split(new[] {','}, StringSplitOptions.None);
                         end = end2;
                     }
 
@@ -107,6 +110,7 @@ namespace LogExpert
                         return null;
                     }
                 }
+
                 ++i;
             }
 
@@ -133,21 +137,26 @@ namespace LogExpert
                         {
                             count++;
                         }
+
                         if (builder[ePos] == '}')
                         {
                             count--;
                         }
+
                         if (count == 0)
                         {
                             string reg = builder.ToString(sPos + 1, ePos - sPos - 1);
                             builder.Remove(sPos, ePos - sPos + 1);
                             return reg;
                         }
+
                         ePos++;
                     }
                 }
+
                 sPos++;
             }
+
             return null;
         }
 

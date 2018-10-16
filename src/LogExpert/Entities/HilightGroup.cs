@@ -1,31 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     [Serializable]
     public class HilightGroup
     {
-        #region Fields
+        #region Private Fields
 
-        private string groupName = "";
+        private string groupName = string.Empty;
         private List<HilightEntry> hilightEntryList = new List<HilightEntry>();
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string GroupName
         {
-            get { return this.groupName; }
-            set { this.groupName = value; }
+            get => groupName;
+            set => groupName = value;
         }
 
         public List<HilightEntry> HilightEntryList
         {
-            get { return this.hilightEntryList; }
-            set { this.hilightEntryList = value; }
+            get => hilightEntryList;
+            set => hilightEntryList = value;
         }
 
         #endregion

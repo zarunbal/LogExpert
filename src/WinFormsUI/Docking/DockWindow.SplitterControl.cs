@@ -1,21 +1,14 @@
-using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public partial class DockWindow
     {
+        #region Nested type: SplitterControl
+
         private class SplitterControl : SplitterBase
         {
-            #region Properties
+            #region Properties / Indexers
 
-            protected override int SplitterSize
-            {
-                get { return Measures.SplitterSize; }
-            }
+            protected override int SplitterSize => Measures.SplitterSize;
 
             #endregion
 
@@ -34,5 +27,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
         }
+
+        #endregion
     }
 }

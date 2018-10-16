@@ -1,30 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class CurrentHighlightGroupChangedEventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public CurrentHighlightGroupChangedEventArgs(LogWindow logWindow, HilightGroup currentGroup)
         {
-            this.LogWindow = logWindow;
-            this.CurrentGroup = currentGroup;
+            LogWindow = logWindow;
+            CurrentGroup = currentGroup;
         }
 
         #endregion
 
-        #region Properties
-
-        public LogWindow LogWindow { get; }
+        #region Properties / Indexers
 
         public HilightGroup CurrentGroup { get; }
+
+        public LogWindow LogWindow { get; }
 
         #endregion
     }

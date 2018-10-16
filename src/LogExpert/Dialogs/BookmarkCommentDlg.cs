@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
     public partial class BookmarkCommentDlg : Form
     {
-        #region cTor
+        #region Ctor
 
         public BookmarkCommentDlg()
         {
@@ -19,12 +13,12 @@ namespace LogExpert.Dialogs
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string Comment
         {
-            set { this.commentTextBox.Text = value; }
-            get { return this.commentTextBox.Text; }
+            get => commentTextBox.Text;
+            set => commentTextBox.Text = value;
         }
 
         #endregion

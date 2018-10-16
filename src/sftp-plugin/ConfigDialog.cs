@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     public partial class ConfigDialog : Form
     {
-        #region cTor
+        #region Ctor
 
         public ConfigDialog(ConfigData configData)
         {
@@ -25,19 +20,13 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public ConfigData ConfigData { get; }
 
         #endregion
 
-        #region Events handler
-
-        private void pkCheckBox_CheckStateChanged(object sender, EventArgs e)
-        {
-            keyFileButton.Enabled = pkCheckBox.Checked;
-            keyTypeGroupBox.Enabled = pkCheckBox.Checked;
-        }
+        #region Private Methods
 
         private void ConfigDialog_Load(object sender, EventArgs e)
         {
@@ -56,6 +45,12 @@ namespace SftpFileSystem
         private void pkCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             ConfigData.UseKeyfile = pkCheckBox.Checked;
+        }
+
+        private void pkCheckBox_CheckStateChanged(object sender, EventArgs e)
+        {
+            keyFileButton.Enabled = pkCheckBox.Checked;
+            keyTypeGroupBox.Enabled = pkCheckBox.Checked;
         }
 
         private void puttyKeyRadioButton_CheckedChanged(object sender, EventArgs e)

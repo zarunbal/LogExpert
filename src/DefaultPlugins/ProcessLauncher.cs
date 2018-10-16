@@ -4,16 +4,7 @@ namespace LogExpert
 {
     public class ProcessLauncher : IKeywordAction
     {
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
-        }
-
-        #endregion
-
-        #region IKeywordAction Member
+        #region Interface IKeywordAction
 
         public void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
         {
@@ -28,15 +19,17 @@ namespace LogExpert
             {
                 end = param.IndexOf(" ");
             }
+
             if (end == -1)
             {
                 end = param.Length;
             }
+
             string procName = param.Substring(start, end - start);
             string parameters = param.Substring(end).Trim();
             parameters = parameters.Replace("%F", callback.GetFileName());
             parameters = parameters.Replace("%K", keyword);
-            parameters = parameters.Replace("%L", "" + callback.GetLineNum());
+            parameters = parameters.Replace("%L", string.Empty + callback.GetLineNum());
             parameters = parameters.Replace("%T", callback.GetTabTitle());
             parameters = parameters.Replace("%C", callback.GetLogLine(callback.GetLineNum()).FullLine);
             Process explorer = new Process();
@@ -44,11 +37,6 @@ namespace LogExpert
             explorer.StartInfo.Arguments = parameters;
             explorer.StartInfo.UseShellExecute = false;
             explorer.Start();
-        }
-
-        public string GetName()
-        {
-            return "ProcessLauncher keyword plugin";
         }
 
 
@@ -63,6 +51,17 @@ namespace LogExpert
                    "%K = Keyword\r\n" +
                    "%C = Complete line content";
         }
+
+        public string GetName()
+        {
+            return "ProcessLauncher keyword plugin";
+        }
+
+        #endregion
+
+        #region Properties / Indexers
+
+        public string Text => GetName();
 
         #endregion
     }

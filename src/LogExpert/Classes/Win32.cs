@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -8,48 +6,54 @@ namespace LogExpert
 {
     internal class Win32
     {
-        #region Fields
+        #region Static/Constants
 
-        public const long SM_CYVSCROLL = 20;
         public const long SM_CXHSCROLL = 21;
         public const long SM_CXVSCROLL = 2;
         public const long SM_CYHSCROLL = 3;
 
+        public const long SM_CYVSCROLL = 20;
+
         #endregion
 
-        #region Public methods
+        #region Externals
 
         [DllImport("user32.dll")]
         public static extern bool DestroyIcon(IntPtr hIcon);
 
-        public static Icon LoadIconFromExe(string fileName, int index)
-        {
-            //IntPtr[] smallIcons = new IntPtr[1];
-            //IntPtr[] largeIcons = new IntPtr[1];
-            IntPtr smallIcons = new IntPtr();
-            IntPtr largeIcons = new IntPtr();
-            int num = (int) ExtractIconEx(fileName, index, ref largeIcons, ref smallIcons, 1);
-            if (num > 0 && smallIcons.ToInt32() != 0)
-            {
-                Icon icon = Icon.FromHandle(smallIcons).Clone() as Icon;
-                DestroyIcon(smallIcons);
-                return icon;
-            }
-            if (num > 0 && largeIcons.ToInt32() != 0)
-            {
-                Icon icon = Icon.FromHandle(largeIcons).Clone() as Icon;
-                DestroyIcon(largeIcons);
-                return icon;
-            }
-            return null;
-        }
 
+        [DllImport("user32.dll")]
+        public static extern long GetSystemMetrics(long index);
+
+        [DllImport("user32.dll")]
+        public static extern short GetKeyState(int vKey);
+
+        /*
+  UINT ExtractIconEx(          
+      LPCTSTR lpszFile,
+      int nIconIndex,
+      HICON *phiconLarge,
+      HICON *phiconSmall,
+      UINT nIcons
+  );    
+       * */
+        [DllImport("shell32.dll")]
+        private static extern uint ExtractIconEx(string fileName,
+                                                 int iconIndex,
+                                                 ref IntPtr iconsLarge,
+                                                 ref IntPtr iconsSmall,
+                                                 uint numIcons
+            );
+
+        #endregion
+
+        #region Public Methods
 
         public static Icon[,] ExtractIcons(string fileName)
         {
             IntPtr smallIcon = IntPtr.Zero;
             IntPtr largeIcon = IntPtr.Zero;
-            int iconCount = (int) ExtractIconEx(fileName, -1, ref largeIcon, ref smallIcon, 0);
+            int iconCount = (int)ExtractIconEx(fileName, -1, ref largeIcon, ref smallIcon, 0);
             if (iconCount <= 0)
             {
                 return null;
@@ -61,7 +65,7 @@ namespace LogExpert
 
             for (int i = 0; i < iconCount; ++i)
             {
-                int num = (int) ExtractIconEx(fileName, i, ref largeIcons, ref smallIcons, 1);
+                int num = (int)ExtractIconEx(fileName, i, ref largeIcons, ref smallIcons, 1);
                 if (smallIcons.ToInt32() != 0)
                 {
                     result[0, i] = Icon.FromHandle(smallIcons).Clone() as Icon;
@@ -71,6 +75,7 @@ namespace LogExpert
                 {
                     result[0, i] = null;
                 }
+
                 if (num > 0 && largeIcons.ToInt32() != 0)
                 {
                     result[1, i] = Icon.FromHandle(largeIcons).Clone() as Icon;
@@ -81,37 +86,33 @@ namespace LogExpert
                     result[1, i] = null;
                 }
             }
+
             return result;
         }
 
+        public static Icon LoadIconFromExe(string fileName, int index)
+        {
+            // IntPtr[] smallIcons = new IntPtr[1];
+            // IntPtr[] largeIcons = new IntPtr[1];
+            IntPtr smallIcons = new IntPtr();
+            IntPtr largeIcons = new IntPtr();
+            int num = (int)ExtractIconEx(fileName, index, ref largeIcons, ref smallIcons, 1);
+            if (num > 0 && smallIcons.ToInt32() != 0)
+            {
+                Icon icon = Icon.FromHandle(smallIcons).Clone() as Icon;
+                DestroyIcon(smallIcons);
+                return icon;
+            }
 
-        [DllImport("user32.dll")]
-        public static extern long GetSystemMetrics(long index);
+            if (num > 0 && largeIcons.ToInt32() != 0)
+            {
+                Icon icon = Icon.FromHandle(largeIcons).Clone() as Icon;
+                DestroyIcon(largeIcons);
+                return icon;
+            }
 
-        [DllImport("user32.dll")]
-        public static extern short GetKeyState(int vKey);
-
-        #endregion
-
-        #region Private Methods
-
-        /*
-  UINT ExtractIconEx(          
-      LPCTSTR lpszFile,
-      int nIconIndex,
-      HICON *phiconLarge,
-      HICON *phiconSmall,
-      UINT nIcons
-  );    
-       * */
-
-        [DllImport("shell32.dll")]
-        private static extern uint ExtractIconEx(string fileName,
-            int iconIndex,
-            ref IntPtr iconsLarge,
-            ref IntPtr iconsSmall,
-            uint numIcons
-        );
+            return null;
+        }
 
         #endregion
     }

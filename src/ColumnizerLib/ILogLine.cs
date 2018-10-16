@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public interface ILogLine : ITextValue
     {
-        #region Properties
+        #region Properties / Indexers
 
         string FullLine { get; }
 

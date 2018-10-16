@@ -1,20 +1,16 @@
-using System;
-using System.Drawing;
-using System.Reflection;
 using System.Resources;
-using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     internal static class ResourceHelper
     {
-        #region Fields
+        #region Static/Constants
 
-        private static ResourceManager _resourceManager = null;
+        private static ResourceManager _resourceManager;
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         private static ResourceManager ResourceManager
         {
@@ -25,13 +21,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                     _resourceManager = new ResourceManager("WeifenLuo.WinFormsUI.Docking.Strings",
                         typeof(ResourceHelper).Assembly);
                 }
+
                 return _resourceManager;
             }
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public static string GetString(string name)
         {

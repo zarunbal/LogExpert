@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace LogExpert
 {
     public class HighlightResults
     {
-        #region Fields
-
-        #endregion
-
-        #region Properties
+        #region Properties / Indexers
 
         public IList<HilightEntry> HighlightEntryList { get; set; } = new List<HilightEntry>();
 

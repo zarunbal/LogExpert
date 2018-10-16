@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public interface ITextValue
     {
-        #region Properties
+        #region Properties / Indexers
 
         string Text { get; }
 

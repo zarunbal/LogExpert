@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Collections;
-
 
 namespace LogExpert
 {
     [TestFixture]
     internal class RolloverHandlerTest : RolloverHandlerTestBase
     {
+        #region Public Methods
+
         [Test]
         public void testFilenameListWithAppendedIndex()
         {
@@ -41,5 +38,7 @@ namespace LogExpert
             Assert.AreEqual(files, fileList);
             Cleanup();
         }
+
+        #endregion
     }
 }

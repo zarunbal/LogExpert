@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     /// <summary>
-    /// Interface which can register at the LogWindow to be informed of pressing ESC.
-    /// Used e.g. for cancelling a filter.
+    ///     Interface which can register at the LogWindow to be informed of pressing ESC.
+    ///     Used e.g. for cancelling a filter.
     /// </summary>
     public interface BackgroundProcessCancelHandler
     {
-        #region Public methods
+        #region Public Methods
 
         /// <summary>
-        /// Called when ESC was pressed.
+        ///     Called when ESC was pressed.
         /// </summary>
         void EscapePressed();
 

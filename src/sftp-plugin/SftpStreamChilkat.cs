@@ -1,25 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using Chilkat;
+using Stream = System.IO.Stream;
 
 namespace SftpFileSystem
 {
     internal class SftpStreamChilkat : Stream
     {
-        #region Fields
+        #region Private Fields
 
         private readonly string _handle;
         private readonly string _remoteFileName;
-        private readonly Chilkat.SFtp _sftp;
+        private readonly SFtp _sftp;
 
         private long _currentPos;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
-        internal SftpStreamChilkat(Chilkat.SFtp sftp, string remoteFileName)
+        internal SftpStreamChilkat(SFtp sftp, string remoteFileName)
         {
             _sftp = sftp;
             _currentPos = 0;
@@ -33,37 +33,31 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get { return true; }
-        }
+        public override bool CanSeek => true;
 
-        public override bool CanWrite
-        {
-            get { return false; }
-        }
+        public override bool CanWrite => false;
 
-        public override long Length
-        {
-            get { return _sftp.GetFileSize64(_remoteFileName, true, false); }
-        }
+        public override long Length => _sftp.GetFileSize64(_remoteFileName, true, false);
 
         public override long Position
         {
-            get { return _currentPos; }
-            set { _currentPos = value; }
+            get => _currentPos;
+            set => _currentPos = value;
         }
 
         #endregion
 
-        #region Public methods
+        #region Overrides
+
+        public override void Close()
+        {
+            base.Close();
+            _sftp.CloseHandle(_handle);
+        }
 
         public override void Flush()
         {
@@ -104,12 +98,6 @@ namespace SftpFileSystem
         public override void Write(byte[] buffer, int offset, int count)
         {
             throw new NotImplementedException();
-        }
-
-        public override void Close()
-        {
-            base.Close();
-            _sftp.CloseHandle(_handle);
         }
 
         #endregion

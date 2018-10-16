@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Threading;
 using NLog;
@@ -9,55 +7,56 @@ namespace LogExpert
 {
     public class LogFileInfo : ILogFileInfo
     {
-        #region Fields
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #region Static/Constants
 
         private const int RETRY_COUNT = 5;
         private const int RETRY_SLEEP = 250;
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        //FileStream fStream;
+        #endregion
+
+        #region Private Fields
+
+        // FileStream fStream;
         private readonly FileInfo fInfo;
 
         private long lastLength;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public LogFileInfo(Uri fileUri)
         {
-            this.fInfo = new FileInfo(fileUri.LocalPath);
-            this.Uri = fileUri;
-            this.OriginalLength = lastLength = LengthWithoutRetry;
-            //this.oldLength = 0;
+            fInfo = new FileInfo(fileUri.LocalPath);
+            Uri = fileUri;
+            OriginalLength = lastLength = LengthWithoutRetry;
+
+
+// this.oldLength = 0;
         }
 
         #endregion
 
-        #region Properties
+        #region Interface ILogFileInfo
 
-        public string FullName
+        public string DirectoryName => fInfo.DirectoryName;
+
+        public char DirectorySeparatorChar => Path.DirectorySeparatorChar;
+
+        public bool FileExists
         {
-            get { return this.fInfo.FullName; }
+            get
+            {
+                fInfo.Refresh();
+                return fInfo.Exists;
+            }
         }
 
-        public string FileName
-        {
-            get { return this.fInfo.Name; }
-        }
+        public string FileName => fInfo.Name;
 
-
-        public string DirectoryName
-        {
-            get { return this.fInfo.DirectoryName; }
-        }
-
-        public char DirectorySeparatorChar
-        {
-            get { return Path.DirectorySeparatorChar; }
-        }
-
-        public Uri Uri { get; }
+        public string FullName => fInfo.FullName;
 
 
         public long Length
@@ -68,13 +67,14 @@ namespace LogExpert
                 {
                     return -1;
                 }
+
                 int retry = RETRY_COUNT;
                 while (retry > 0)
                 {
                     try
                     {
-                        this.fInfo.Refresh();
-                        return this.fInfo.Length;
+                        fInfo.Refresh();
+                        return fInfo.Length;
                     }
                     catch (IOException e)
                     {
@@ -83,28 +83,75 @@ namespace LogExpert
                             _logger.Warn(e, "LogFileInfo.Length");
                             return -1;
                         }
+
                         Thread.Sleep(RETRY_SLEEP);
                     }
                 }
+
                 return -1;
             }
         }
 
         public long OriginalLength { get; }
 
-        public bool FileExists
+        public int PollInterval => ConfigManager.Settings.preferences.pollingInterval;
+
+        public Uri Uri { get; }
+
+        public bool FileHasChanged()
         {
-            get
+            if (LengthWithoutRetry != lastLength)
             {
-                this.fInfo.Refresh();
-                return this.fInfo.Exists;
+                lastLength = LengthWithoutRetry;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Creates a new FileStream for the file. The caller is responsible for closing.
+        ///     If file opening fails it will be tried RETRY_COUNT times. This may be needed sometimes
+        ///     if the file is locked for a short amount of time or temporarly unaccessible because of
+        ///     rollover situations.
+        /// </summary>
+        /// <returns></returns>
+        public Stream OpenStream()
+        {
+            int retry = RETRY_COUNT;
+            while (true)
+            {
+                try
+                {
+                    return new FileStream(fInfo.FullName, FileMode.Open, FileAccess.Read,
+                        FileShare.ReadWrite | FileShare.Delete);
+                }
+                catch (IOException fe)
+                {
+                    _logger.Debug(fe, "LogFileInfo.OpenFile(): \r\nRetry counter {0}", retry);
+                    if (--retry <= 0)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(RETRY_SLEEP);
+                }
+                catch (UnauthorizedAccessException uae)
+                {
+                    _logger.Debug(uae, "LogFileInfo.OpenFile(): \r\nRetry counter: {0}", retry);
+                    if (--retry <= 0)
+                    {
+                        throw new IOException("Error opening file", uae);
+                    }
+
+                    Thread.Sleep(RETRY_SLEEP);
+                }
             }
         }
 
-        public int PollInterval
-        {
-            get { return ConfigManager.Settings.preferences.pollingInterval; }
-        }
+        #endregion
+
+        #region Properties / Indexers
 
         public long LengthWithoutRetry
         {
@@ -114,10 +161,11 @@ namespace LogExpert
                 {
                     return -1;
                 }
+
                 try
                 {
-                    this.fInfo.Refresh();
-                    return this.fInfo.Length;
+                    fInfo.Refresh();
+                    return fInfo.Length;
                 }
                 catch (IOException)
                 {
@@ -128,60 +176,11 @@ namespace LogExpert
 
         #endregion
 
-        #region Public methods
-
-        /// <summary>
-        /// Creates a new FileStream for the file. The caller is responsible for closing.
-        /// If file opening fails it will be tried RETRY_COUNT times. This may be needed sometimes
-        /// if the file is locked for a short amount of time or temporarly unaccessible because of
-        /// rollover situations.
-        /// </summary>
-        /// <returns></returns>
-        public Stream OpenStream()
-        {
-            int retry = RETRY_COUNT;
-            while (true)
-            {
-                try
-                {
-                    return new FileStream(this.fInfo.FullName, FileMode.Open, FileAccess.Read,
-                        FileShare.ReadWrite | FileShare.Delete);
-                }
-                catch (IOException fe)
-                {
-                    _logger.Debug(fe, "LogFileInfo.OpenFile(): \r\nRetry counter {0}", retry);
-                    if (--retry <= 0)
-                    {
-                        throw;
-                    }
-                    Thread.Sleep(RETRY_SLEEP);
-                }
-                catch (UnauthorizedAccessException uae)
-                {
-                    _logger.Debug(uae, "LogFileInfo.OpenFile(): \r\nRetry counter: {0}", retry);
-                    if (--retry <= 0)
-                    {
-                        throw new IOException("Error opening file", uae);
-                    }
-                    Thread.Sleep(RETRY_SLEEP);
-                }
-            }
-        }
-
-        public bool FileHasChanged()
-        {
-            if (this.LengthWithoutRetry != this.lastLength)
-            {
-                this.lastLength = this.LengthWithoutRetry;
-                return true;
-            }
-            return false;
-        }
-
+        #region Overrides
 
         public override string ToString()
         {
-            return this.fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
+            return fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
         }
 
         #endregion

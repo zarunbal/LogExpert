@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert.Dialogs
 {
     public class OverlayEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public OverlayEventArgs(BookmarkOverlay overlay)
         {
-            this.BookmarkOverlay = overlay;
+            BookmarkOverlay = overlay;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public BookmarkOverlay BookmarkOverlay { get; set; }
 

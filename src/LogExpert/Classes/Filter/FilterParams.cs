@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace LogExpert
 {
     [Serializable]
     public class FilterParams
     {
-        #region Fields
+        #region Private Fields
 
-        public string _rangeSearchText = "";
-        public string _searchText = "";
+        public string _rangeSearchText = string.Empty;
+        public string _searchText = string.Empty;
 
         public Color color = Color.Black;
 
-        //public List<string> historyList = new List<string>();
-        //public List<string> rangeHistoryList = new List<string>();
+        // public List<string> historyList = new List<string>();
+        // public List<string> rangeHistoryList = new List<string>();
         public List<int> columnList = new List<int>(); // list of columns in which to search
 
         public bool columnRestrict = false;
@@ -30,28 +29,28 @@ namespace LogExpert
 
         public bool exactColumnMatch = false;
 
-        //public bool isFuzzy;
+        // public bool isFuzzy;
         public int fuzzyValue = 0;
 
         public bool isCaseSensitive;
         public bool isFilterTail;
 
-        [NonSerialized] public bool isInRange = false; // false=looking for start, true=looking for end
+        [NonSerialized] public bool isInRange; // false=looking for start, true=looking for end
 
         public bool isInvert;
         public bool isRangeSearch = false;
         public bool isRegex;
 
-        [NonSerialized] public string lastLine = "";
+        [NonSerialized] public string lastLine = string.Empty;
 
         [NonSerialized] public Hashtable lastNonEmptyCols = new Hashtable();
 
         [NonSerialized] public bool lastResult;
 
-        [NonSerialized] public string lowerRangeSearchText = "";
+        [NonSerialized] public string lowerRangeSearchText = string.Empty;
 
         // transient members:
-        [NonSerialized] public string lowerSearchText = "";
+        [NonSerialized] public string lowerSearchText = string.Empty;
 
         [NonSerialized] public Regex rangeRex;
 
@@ -62,54 +61,73 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
-
-        public string searchText
-        {
-            get { return this._searchText; }
-            set
-            {
-                this._searchText = value;
-                this.lowerSearchText = this._searchText.ToLower();
-            }
-        }
+        #region Properties / Indexers
 
         public string rangeSearchText
         {
-            get { return this._rangeSearchText; }
+            get => _rangeSearchText;
             set
             {
-                this._rangeSearchText = value;
-                this.lowerRangeSearchText = this._rangeSearchText.ToLower();
+                _rangeSearchText = value;
+                lowerRangeSearchText = _rangeSearchText.ToLower();
             }
         }
 
-        public bool SpreadEnabled
+        public string searchText
         {
-            get { return this.spreadBefore > 0 || this.spreadBehind > 0; }
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                lowerSearchText = _searchText.ToLower();
+            }
         }
+
+        public bool SpreadEnabled => spreadBefore > 0 || spreadBehind > 0;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
+
+        public FilterParams CreateCopy()
+        {
+            return (FilterParams)MemberwiseClone();
+        }
 
         public FilterParams CreateCopy2()
         {
             FilterParams newParams = CreateCopy();
             newParams.Init();
-            // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
+
+
+// removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
             // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
-            newParams.currentColumnizer = this.currentColumnizer;
+            newParams.currentColumnizer = currentColumnizer;
             return newParams;
+        }
+
+        public void CreateRegex()
+        {
+            if (_searchText != null)
+            {
+                rex = new Regex(_searchText,
+                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            }
+
+            if (_rangeSearchText != null && isRangeSearch)
+            {
+                rangeRex = new Regex(_rangeSearchText,
+                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            }
         }
 
         // call after deserialization!
         public void Init()
         {
-            this.lastNonEmptyCols = new Hashtable();
-            this.lowerRangeSearchText = this._rangeSearchText.ToLower();
-            this.lowerSearchText = this._searchText.ToLower();
-            this.lastLine = "";
+            lastNonEmptyCols = new Hashtable();
+            lowerRangeSearchText = _rangeSearchText.ToLower();
+            lowerSearchText = _searchText.ToLower();
+            lastLine = string.Empty;
         }
 
         // Reset before a new search
@@ -117,25 +135,6 @@ namespace LogExpert
         {
             lastNonEmptyCols.Clear();
             isInRange = false;
-        }
-
-        public void CreateRegex()
-        {
-            if (this._searchText != null)
-            {
-                this.rex = new Regex(this._searchText,
-                    this.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            }
-            if (this._rangeSearchText != null && this.isRangeSearch)
-            {
-                this.rangeRex = new Regex(this._rangeSearchText,
-                    this.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            }
-        }
-
-        public FilterParams CreateCopy()
-        {
-            return (FilterParams) this.MemberwiseClone();
         }
 
         #endregion

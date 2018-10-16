@@ -1,22 +1,22 @@
 using System;
 using System.Collections;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-    public abstract partial class AutoHideStripBase : Control
+    public abstract class AutoHideStripBase : Control
     {
-        #region Fields
+        #region Private Fields
 
-        private GraphicsPath m_displayingArea = null;
+        private GraphicsPath m_displayingArea;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         protected AutoHideStripBase(DockPanel panel)
         {
@@ -32,11 +32,9 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         protected DockPanel DockPanel { get; }
-
-        protected PaneCollection PanesTop { get; }
 
         protected PaneCollection PanesBottom { get; }
 
@@ -44,27 +42,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         protected PaneCollection PanesRight { get; }
 
-        protected Rectangle RectangleTopLeft
-        {
-            get
-            {
-                int height = MeasureHeight();
-                return PanesTop.Count > 0 && PanesLeft.Count > 0
-                    ? new Rectangle(0, 0, height, height)
-                    : Rectangle.Empty;
-            }
-        }
-
-        protected Rectangle RectangleTopRight
-        {
-            get
-            {
-                int height = MeasureHeight();
-                return PanesTop.Count > 0 && PanesRight.Count > 0
-                    ? new Rectangle(Width - height, 0, height, height)
-                    : Rectangle.Empty;
-            }
-        }
+        protected PaneCollection PanesTop { get; }
 
         protected Rectangle RectangleBottomLeft
         {
@@ -88,6 +66,28 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
+        protected Rectangle RectangleTopLeft
+        {
+            get
+            {
+                int height = MeasureHeight();
+                return PanesTop.Count > 0 && PanesLeft.Count > 0
+                    ? new Rectangle(0, 0, height, height)
+                    : Rectangle.Empty;
+            }
+        }
+
+        protected Rectangle RectangleTopRight
+        {
+            get
+            {
+                int height = MeasureHeight();
+                return PanesTop.Count > 0 && PanesRight.Count > 0
+                    ? new Rectangle(Width - height, 0, height, height)
+                    : Rectangle.Empty;
+            }
+        }
+
         private GraphicsPath DisplayingArea
         {
             get
@@ -103,27 +103,13 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Internals
-
-        internal int GetNumberOfPanes(DockState dockState)
-        {
-            return GetPanes(dockState).Count;
-        }
-
-        internal void RefreshChanges()
-        {
-            if (IsDisposed)
-            {
-                return;
-            }
-
-            SetRegion();
-            OnRefreshChanges();
-        }
-
-        #endregion
-
         #region Overrides
+
+        protected override void OnLayout(LayoutEventArgs levent)
+        {
+            RefreshChanges();
+            base.OnLayout(levent);
+        }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -157,15 +143,60 @@ namespace WeifenLuo.WinFormsUI.Docking
             ResetMouseEventArgs();
         }
 
-        protected override void OnLayout(LayoutEventArgs levent)
+        #endregion
+
+        #region Event handling Methods
+
+        protected virtual void OnRefreshChanges()
         {
-            RefreshChanges();
-            base.OnLayout(levent);
         }
 
         #endregion
 
         #region Private Methods
+
+        protected virtual Pane CreatePane(DockPane dockPane)
+        {
+            return new Pane(dockPane);
+        }
+
+        protected virtual Tab CreateTab(IDockContent content)
+        {
+            return new Tab(content);
+        }
+
+        protected PaneCollection GetPanes(DockState dockState)
+        {
+            if (dockState == DockState.DockTopAutoHide)
+            {
+                return PanesTop;
+            }
+
+            if (dockState == DockState.DockBottomAutoHide)
+            {
+                return PanesBottom;
+            }
+
+            if (dockState == DockState.DockLeftAutoHide)
+            {
+                return PanesLeft;
+            }
+
+            if (dockState == DockState.DockRightAutoHide)
+            {
+                return PanesRight;
+            }
+
+            throw new ArgumentOutOfRangeException("dockState");
+        }
+
+        private IDockContent HitTest()
+        {
+            Point ptMouse = PointToClient(MousePosition);
+            return HitTest(ptMouse);
+        }
+
+        protected abstract IDockContent HitTest(Point point);
 
         private void SetRegion()
         {
@@ -181,108 +212,23 @@ namespace WeifenLuo.WinFormsUI.Docking
             Region = new Region(DisplayingArea);
         }
 
-        private IDockContent HitTest()
-        {
-            Point ptMouse = PointToClient(Control.MousePosition);
-            return HitTest(ptMouse);
-        }
-
         #endregion
 
-        protected PaneCollection GetPanes(DockState dockState)
-        {
-            if (dockState == DockState.DockTopAutoHide)
-            {
-                return PanesTop;
-            }
-            else if (dockState == DockState.DockBottomAutoHide)
-            {
-                return PanesBottom;
-            }
-            else if (dockState == DockState.DockLeftAutoHide)
-            {
-                return PanesLeft;
-            }
-            else if (dockState == DockState.DockRightAutoHide)
-            {
-                return PanesRight;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("dockState");
-            }
-        }
-
-        protected internal Rectangle GetTabStripRectangle(DockState dockState)
-        {
-            int height = MeasureHeight();
-            if (dockState == DockState.DockTopAutoHide && PanesTop.Count > 0)
-            {
-                return new Rectangle(RectangleTopLeft.Width, 0,
-                    Width - RectangleTopLeft.Width - RectangleTopRight.Width, height);
-            }
-            else if (dockState == DockState.DockBottomAutoHide && PanesBottom.Count > 0)
-            {
-                return new Rectangle(RectangleBottomLeft.Width, Height - height,
-                    Width - RectangleBottomLeft.Width - RectangleBottomRight.Width, height);
-            }
-            else if (dockState == DockState.DockLeftAutoHide && PanesLeft.Count > 0)
-            {
-                return new Rectangle(0, RectangleTopLeft.Width, height,
-                    Height - RectangleTopLeft.Height - RectangleBottomLeft.Height);
-            }
-            else if (dockState == DockState.DockRightAutoHide && PanesRight.Count > 0)
-            {
-                return new Rectangle(Width - height, RectangleTopRight.Width, height,
-                    Height - RectangleTopRight.Height - RectangleBottomRight.Height);
-            }
-            else
-            {
-                return Rectangle.Empty;
-            }
-        }
-
-        protected virtual void OnRefreshChanges()
-        {
-        }
-
-        protected internal abstract int MeasureHeight();
-
-        protected virtual Tab CreateTab(IDockContent content)
-        {
-            return new Tab(content);
-        }
-
-        protected virtual Pane CreatePane(DockPane dockPane)
-        {
-            return new Pane(dockPane);
-        }
-
-        protected abstract IDockContent HitTest(Point point);
+        #region Nested type: Pane
 
         [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-        protected class Tab : IDisposable
+        protected class Pane : IDisposable
         {
-            #region Fields
+            #region Ctor
 
-            #endregion
-
-            #region cTor
-
-            protected internal Tab(IDockContent content)
+            protected internal Pane(DockPane dockPane)
             {
-                Content = content;
+                DockPane = dockPane;
             }
 
             #endregion
 
-            #region Properties
-
-            public IDockContent Content { get; }
-
-            #endregion
-
-            #region Public methods
+            #region Interface IDisposable
 
             public void Dispose()
             {
@@ -292,97 +238,63 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            ~Tab()
+            #region Properties / Indexers
+
+            public TabCollection AutoHideTabs
             {
-                Dispose(false);
+                get
+                {
+                    if (DockPane.AutoHideTabs == null)
+                    {
+                        DockPane.AutoHideTabs = new TabCollection(DockPane);
+                    }
+
+                    return DockPane.AutoHideTabs as TabCollection;
+                }
             }
+
+            public DockPane DockPane { get; }
+
+            #endregion
+
+            #region Private Methods
 
             protected virtual void Dispose(bool disposing)
             {
             }
+
+            #endregion
+
+            ~Pane()
+            {
+                Dispose(false);
+            }
         }
 
+        #endregion
+
+        #region Nested type: PaneCollection
+
         [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-        protected sealed class TabCollection : IEnumerable<Tab>
+        protected sealed class PaneCollection : IEnumerable<Pane>
         {
-            #region Fields
+            #region Ctor
 
-            #endregion
-
-            #region cTor
-
-            internal TabCollection(DockPane pane)
+            internal PaneCollection(DockPanel panel, DockState dockState)
             {
-                DockPane = pane;
+                DockPanel = panel;
+                States = new AutoHideStateCollection();
+                States[DockState.DockTopAutoHide].Selected = dockState == DockState.DockTopAutoHide;
+                States[DockState.DockBottomAutoHide].Selected = dockState == DockState.DockBottomAutoHide;
+                States[DockState.DockLeftAutoHide].Selected = dockState == DockState.DockLeftAutoHide;
+                States[DockState.DockRightAutoHide].Selected = dockState == DockState.DockRightAutoHide;
             }
 
             #endregion
 
-            #region Properties
+            #region Interface IEnumerable<Pane>
 
-            public DockPane DockPane { get; } = null;
-
-            public DockPanel DockPanel
-            {
-                get { return DockPane.DockPanel; }
-            }
-
-            public int Count
-            {
-                get { return DockPane.DisplayingContents.Count; }
-            }
-
-            public Tab this[int index]
-            {
-                get
-                {
-                    IDockContent content = DockPane.DisplayingContents[index];
-                    if (content == null)
-                    {
-                        throw new ArgumentOutOfRangeException("index");
-                    }
-                    if (content.DockHandler.AutoHideTab == null)
-                    {
-                        content.DockHandler.AutoHideTab = DockPanel.AutoHideStripControl.CreateTab(content);
-                    }
-                    return content.DockHandler.AutoHideTab as Tab;
-                }
-            }
-
-            #endregion
-
-            #region Public methods
-
-            public bool Contains(Tab tab)
-            {
-                return IndexOf(tab) != -1;
-            }
-
-            public bool Contains(IDockContent content)
-            {
-                return IndexOf(content) != -1;
-            }
-
-            public int IndexOf(Tab tab)
-            {
-                if (tab == null)
-                {
-                    return -1;
-                }
-
-                return IndexOf(tab.Content);
-            }
-
-            public int IndexOf(IDockContent content)
-            {
-                return DockPane.DisplayingContents.IndexOf(content);
-            }
-
-            #endregion
-
-            #region IEnumerable Members
-
-            IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
+            IEnumerator<Pane> IEnumerable<Pane>.GetEnumerator()
             {
                 for (int i = 0; i < Count; i++)
                 {
@@ -399,88 +311,8 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
 
             #endregion
-        }
 
-        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-        protected class Pane : IDisposable
-        {
-            #region Fields
-
-            #endregion
-
-            #region cTor
-
-            protected internal Pane(DockPane dockPane)
-            {
-                DockPane = dockPane;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public DockPane DockPane { get; }
-
-            public TabCollection AutoHideTabs
-            {
-                get
-                {
-                    if (DockPane.AutoHideTabs == null)
-                    {
-                        DockPane.AutoHideTabs = new TabCollection(DockPane);
-                    }
-                    return DockPane.AutoHideTabs as TabCollection;
-                }
-            }
-
-            #endregion
-
-            #region Public methods
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            #endregion
-
-            ~Pane()
-            {
-                Dispose(false);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-            }
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-        protected sealed class PaneCollection : IEnumerable<Pane>
-        {
-            #region Fields
-
-            #endregion
-
-            #region cTor
-
-            internal PaneCollection(DockPanel panel, DockState dockState)
-            {
-                DockPanel = panel;
-                States = new AutoHideStateCollection();
-                States[DockState.DockTopAutoHide].Selected = dockState == DockState.DockTopAutoHide;
-                States[DockState.DockBottomAutoHide].Selected = dockState == DockState.DockBottomAutoHide;
-                States[DockState.DockLeftAutoHide].Selected = dockState == DockState.DockLeftAutoHide;
-                States[DockState.DockRightAutoHide].Selected = dockState == DockState.DockRightAutoHide;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public DockPanel DockPanel { get; }
-
-            private AutoHideStateCollection States { get; }
+            #region Properties / Indexers
 
             public int Count
             {
@@ -498,6 +330,8 @@ namespace WeifenLuo.WinFormsUI.Docking
                     return count;
                 }
             }
+
+            public DockPanel DockPanel { get; }
 
             public Pane this[int index]
             {
@@ -517,18 +351,22 @@ namespace WeifenLuo.WinFormsUI.Docking
                             {
                                 pane.AutoHidePane = DockPanel.AutoHideStripControl.CreatePane(pane);
                             }
+
                             return pane.AutoHidePane as Pane;
                         }
 
                         count++;
                     }
+
                     throw new ArgumentOutOfRangeException("index");
                 }
             }
 
+            private AutoHideStateCollection States { get; }
+
             #endregion
 
-            #region Public methods
+            #region Public Methods
 
             public bool Contains(Pane pane)
             {
@@ -557,21 +395,24 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                     index++;
                 }
+
                 return -1;
             }
 
             #endregion
 
+            #region Nested type: AutoHideState
+
             private class AutoHideState
             {
-                #region Fields
+                #region Private Fields
 
                 public readonly DockState m_dockState;
-                public bool m_selected = false;
+                public bool m_selected;
 
                 #endregion
 
-                #region cTor
+                #region Ctor
 
                 public AutoHideState(DockState dockState)
                 {
@@ -580,35 +421,36 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region Properties
+                #region Properties / Indexers
 
-                public DockState DockState
-                {
-                    get { return m_dockState; }
-                }
+                public DockState DockState => m_dockState;
 
                 public bool Selected
                 {
-                    get { return m_selected; }
-                    set { m_selected = value; }
+                    get => m_selected;
+                    set => m_selected = value;
                 }
 
                 #endregion
             }
 
+            #endregion
+
+            #region Nested type: AutoHideStateCollection
+
             private class AutoHideStateCollection
             {
-                #region Fields
+                #region Private Fields
 
                 private readonly AutoHideState[] m_states;
 
                 #endregion
 
-                #region cTor
+                #region Ctor
 
                 public AutoHideStateCollection()
                 {
-                    m_states = new AutoHideState[]
+                    m_states = new[]
                     {
                         new AutoHideState(DockState.DockTopAutoHide),
                         new AutoHideState(DockState.DockBottomAutoHide),
@@ -619,7 +461,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region Properties
+                #region Properties / Indexers
 
                 public AutoHideState this[DockState dockState]
                 {
@@ -632,13 +474,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                                 return m_states[i];
                             }
                         }
+
                         throw new ArgumentOutOfRangeException("dockState");
                     }
                 }
 
                 #endregion
 
-                #region Public methods
+                #region Public Methods
 
                 public bool ContainsPane(DockPane pane)
                 {
@@ -654,15 +497,81 @@ namespace WeifenLuo.WinFormsUI.Docking
                             return true;
                         }
                     }
+
                     return false;
                 }
 
                 #endregion
             }
 
-            #region IEnumerable Members
+            #endregion
+        }
 
-            IEnumerator<Pane> IEnumerable<Pane>.GetEnumerator()
+        #endregion
+
+        #region Nested type: Tab
+
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
+        protected class Tab : IDisposable
+        {
+            #region Ctor
+
+            protected internal Tab(IDockContent content)
+            {
+                Content = content;
+            }
+
+            #endregion
+
+            #region Interface IDisposable
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            #endregion
+
+            #region Properties / Indexers
+
+            public IDockContent Content { get; }
+
+            #endregion
+
+            #region Private Methods
+
+            protected virtual void Dispose(bool disposing)
+            {
+            }
+
+            #endregion
+
+            ~Tab()
+            {
+                Dispose(false);
+            }
+        }
+
+        #endregion
+
+        #region Nested type: TabCollection
+
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
+        protected sealed class TabCollection : IEnumerable<Tab>
+        {
+            #region Ctor
+
+            internal TabCollection(DockPane pane)
+            {
+                DockPane = pane;
+            }
+
+            #endregion
+
+            #region Interface IEnumerable<Tab>
+
+            IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
             {
                 for (int i = 0; i < Count; i++)
                 {
@@ -679,6 +588,114 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
 
             #endregion
+
+            #region Properties / Indexers
+
+            public int Count => DockPane.DisplayingContents.Count;
+
+            public DockPane DockPane { get; }
+
+            public DockPanel DockPanel => DockPane.DockPanel;
+
+            public Tab this[int index]
+            {
+                get
+                {
+                    IDockContent content = DockPane.DisplayingContents[index];
+                    if (content == null)
+                    {
+                        throw new ArgumentOutOfRangeException("index");
+                    }
+
+                    if (content.DockHandler.AutoHideTab == null)
+                    {
+                        content.DockHandler.AutoHideTab = DockPanel.AutoHideStripControl.CreateTab(content);
+                    }
+
+                    return content.DockHandler.AutoHideTab as Tab;
+                }
+            }
+
+            #endregion
+
+            #region Public Methods
+
+            public bool Contains(Tab tab)
+            {
+                return IndexOf(tab) != -1;
+            }
+
+            public bool Contains(IDockContent content)
+            {
+                return IndexOf(content) != -1;
+            }
+
+            public int IndexOf(Tab tab)
+            {
+                if (tab == null)
+                {
+                    return -1;
+                }
+
+                return IndexOf(tab.Content);
+            }
+
+            public int IndexOf(IDockContent content)
+            {
+                return DockPane.DisplayingContents.IndexOf(content);
+            }
+
+            #endregion
         }
+
+        #endregion
+
+        internal int GetNumberOfPanes(DockState dockState)
+        {
+            return GetPanes(dockState).Count;
+        }
+
+        internal void RefreshChanges()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            SetRegion();
+            OnRefreshChanges();
+        }
+
+        protected internal Rectangle GetTabStripRectangle(DockState dockState)
+        {
+            int height = MeasureHeight();
+            if (dockState == DockState.DockTopAutoHide && PanesTop.Count > 0)
+            {
+                return new Rectangle(RectangleTopLeft.Width, 0,
+                    Width - RectangleTopLeft.Width - RectangleTopRight.Width, height);
+            }
+
+            if (dockState == DockState.DockBottomAutoHide && PanesBottom.Count > 0)
+            {
+                return new Rectangle(RectangleBottomLeft.Width, Height - height,
+                    Width - RectangleBottomLeft.Width - RectangleBottomRight.Width, height);
+            }
+
+            if (dockState == DockState.DockLeftAutoHide && PanesLeft.Count > 0)
+            {
+                return new Rectangle(0, RectangleTopLeft.Width, height,
+                    Height - RectangleTopLeft.Height - RectangleBottomLeft.Height);
+            }
+
+            if (dockState == DockState.DockRightAutoHide && PanesRight.Count > 0)
+            {
+                return new Rectangle(Width - height, RectangleTopRight.Width, height,
+                    Height - RectangleTopRight.Height - RectangleBottomRight.Height);
+            }
+
+            return Rectangle.Empty;
+        }
+
+        protected internal abstract int MeasureHeight();
     }
 }

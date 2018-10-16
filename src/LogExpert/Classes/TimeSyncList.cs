@@ -1,77 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace LogExpert
 {
     /// <summary>
-    /// Holds all windows which are in sync via timestamp
+    ///     Holds all windows which are in sync via timestamp
     /// </summary>
     public class TimeSyncList
     {
-        #region Fields
-
-        private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
-
-        #endregion
-
         #region Delegates
 
         public delegate void WindowRemovedEventHandler(object sender, EventArgs e);
 
         #endregion
 
-        #region Events
+        #region Private Fields
+
+        private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
+
+        #endregion
+
+        #region Public Events
 
         public event WindowRemovedEventHandler WindowRemoved;
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
+
+        public int Count => logWindowList.Count;
 
         public DateTime CurrentTimestamp { get; set; }
 
-        public int Count
-        {
-            get { return this.logWindowList.Count; }
-        }
-
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void AddWindow(LogWindow logWindow)
         {
-            lock (this.logWindowList)
+            lock (logWindowList)
             {
-                if (!this.logWindowList.Contains(logWindow))
+                if (!logWindowList.Contains(logWindow))
                 {
-                    this.logWindowList.Add(logWindow);
+                    logWindowList.Add(logWindow);
                 }
             }
         }
 
 
-        public void RemoveWindow(LogWindow logWindow)
+        public bool Contains(LogWindow logWindow)
         {
-            lock (this.logWindowList)
-            {
-                this.logWindowList.Remove(logWindow);
-            }
-            OnWindowRemoved();
+            return logWindowList.Contains(logWindow);
         }
 
 
         /// <summary>
-        /// Scrolls all LogWindows to the given timestamp
+        ///     Scrolls all LogWindows to the given timestamp
         /// </summary>
         /// <param name="timestamp"></param>
         public void NavigateToTimestamp(DateTime timestamp, LogWindow sender)
         {
-            this.CurrentTimestamp = timestamp;
-            lock (this.logWindowList)
+            CurrentTimestamp = timestamp;
+            lock (logWindowList)
             {
-                foreach (LogWindow logWindow in this.logWindowList)
+                foreach (LogWindow logWindow in logWindowList)
                 {
                     if (sender != logWindow)
                     {
@@ -82,14 +74,19 @@ namespace LogExpert
         }
 
 
-        public bool Contains(LogWindow logWindow)
+        public void RemoveWindow(LogWindow logWindow)
         {
-            return this.logWindowList.Contains(logWindow);
+            lock (logWindowList)
+            {
+                logWindowList.Remove(logWindow);
+            }
+
+            OnWindowRemoved();
         }
 
         #endregion
 
-        #region Private Methods
+        #region Event handling Methods
 
         private void OnWindowRemoved()
         {

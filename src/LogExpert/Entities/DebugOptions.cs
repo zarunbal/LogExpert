@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     internal class DebugOptions
     {
-        #region Fields
+        #region Static/Constants
 
         internal static bool disableWordHighlight = false;
 

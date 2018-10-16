@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -7,13 +6,13 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     public class DockContentCollection : ReadOnlyCollection<IDockContent>
     {
-        #region Fields
+        #region Static/Constants
 
         private static readonly List<IDockContent> _emptyList = new List<IDockContent>(0);
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         internal DockContentCollection()
             : base(new List<IDockContent>())
@@ -28,24 +27,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
-
-        private DockPane DockPane { get; } = null;
-
-        public new IDockContent this[int index]
-        {
-            get
-            {
-                if (DockPane == null)
-                {
-                    return Items[index] as IDockContent;
-                }
-                else
-                {
-                    return GetVisibleContent(index);
-                }
-            }
-        }
+        #region Properties / Indexers
 
         public new int Count
         {
@@ -55,10 +37,21 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     return base.Count;
                 }
-                else
+
+                return CountOfVisibleContents;
+            }
+        }
+
+        public new IDockContent this[int index]
+        {
+            get
+            {
+                if (DockPane == null)
                 {
-                    return CountOfVisibleContents;
+                    return Items[index];
                 }
+
+                return GetVisibleContent(index);
             }
         }
 
@@ -66,10 +59,13 @@ namespace WeifenLuo.WinFormsUI.Docking
         {
             get
             {
-#if DEBUG
-				if (DockPane == null)
-					throw new InvalidOperationException();
-#endif
+                #if DEBUG
+                if (DockPane == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                #endif
 
                 int count = 0;
                 foreach (IDockContent content in DockPane.Contents)
@@ -79,13 +75,16 @@ namespace WeifenLuo.WinFormsUI.Docking
                         count++;
                     }
                 }
+
                 return count;
             }
         }
 
+        private DockPane DockPane { get; }
+
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public new bool Contains(IDockContent content)
         {
@@ -93,10 +92,8 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 return Items.Contains(content);
             }
-            else
-            {
-                return GetIndexOfVisibleContents(content) != -1;
-            }
+
+            return GetIndexOfVisibleContents(content) != -1;
         }
 
         public new int IndexOf(IDockContent content)
@@ -107,27 +104,87 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     return -1;
                 }
-                else
-                {
-                    return Items.IndexOf(content);
-                }
+
+                return Items.IndexOf(content);
             }
-            else
-            {
-                return GetIndexOfVisibleContents(content);
-            }
+
+            return GetIndexOfVisibleContents(content);
         }
 
         #endregion
 
-        #region Internals
+        #region Private Methods
+
+        private int GetIndexOfVisibleContents(IDockContent content)
+        {
+            #if DEBUG
+            if (DockPane == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            #endif
+
+            if (content == null)
+            {
+                return -1;
+            }
+
+            int index = -1;
+            foreach (IDockContent c in DockPane.Contents)
+            {
+                if (c.DockHandler.DockState == DockPane.DockState)
+                {
+                    index++;
+
+                    if (c == content)
+                    {
+                        return index;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        private IDockContent GetVisibleContent(int index)
+        {
+            #if DEBUG
+            if (DockPane == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            #endif
+
+            int currentIndex = -1;
+            foreach (IDockContent content in DockPane.Contents)
+            {
+                if (content.DockHandler.DockState == DockPane.DockState)
+                {
+                    currentIndex++;
+                }
+
+                if (currentIndex == index)
+                {
+                    return content;
+                }
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+
+        #endregion
 
         internal int Add(IDockContent content)
         {
-#if DEBUG
-			if (DockPane != null)
-				throw new InvalidOperationException();
-#endif
+            #if DEBUG
+            if (DockPane != null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            #endif
 
             if (Contains(content))
             {
@@ -140,10 +197,13 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         internal void AddAt(IDockContent content, int index)
         {
-#if DEBUG
-			if (DockPane != null)
-				throw new InvalidOperationException();
-#endif
+            #if DEBUG
+            if (DockPane != null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            #endif
 
             if (index < 0 || index > Items.Count - 1)
             {
@@ -172,62 +232,5 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             Items.Remove(content);
         }
-
-        #endregion
-
-        #region Private Methods
-
-        private IDockContent GetVisibleContent(int index)
-        {
-#if DEBUG
-			if (DockPane == null)
-				throw new InvalidOperationException();
-#endif
-
-            int currentIndex = -1;
-            foreach (IDockContent content in DockPane.Contents)
-            {
-                if (content.DockHandler.DockState == DockPane.DockState)
-                {
-                    currentIndex++;
-                }
-
-                if (currentIndex == index)
-                {
-                    return content;
-                }
-            }
-            throw new ArgumentOutOfRangeException();
-        }
-
-        private int GetIndexOfVisibleContents(IDockContent content)
-        {
-#if DEBUG
-			if (DockPane == null)
-				throw new InvalidOperationException();
-#endif
-
-            if (content == null)
-            {
-                return -1;
-            }
-
-            int index = -1;
-            foreach (IDockContent c in DockPane.Contents)
-            {
-                if (c.DockHandler.DockState == DockPane.DockState)
-                {
-                    index++;
-
-                    if (c == content)
-                    {
-                        return index;
-                    }
-                }
-            }
-            return -1;
-        }
-
-        #endregion
     }
 }

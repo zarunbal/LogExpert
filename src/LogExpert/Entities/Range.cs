@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     internal class Range
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public Range()
         {
@@ -18,17 +10,17 @@ namespace LogExpert
 
         public Range(int startLine, int endLine)
         {
-            this.StartLine = startLine;
-            this.EndLine = endLine;
+            StartLine = startLine;
+            EndLine = endLine;
         }
 
         #endregion
 
-        #region Properties
-
-        public int StartLine { get; set; }
+        #region Properties / Indexers
 
         public int EndLine { get; set; }
+
+        public int StartLine { get; set; }
 
         #endregion
     }

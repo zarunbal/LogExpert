@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     public partial class LoginDialog : Form
     {
-        #region Fields
+        #region Private Fields
 
         private string _userName;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public LoginDialog(string host, IList<string> userNames, bool hidePasswordField)
         {
@@ -42,29 +38,23 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
+
+        public string Password { get; private set; }
 
         public string UserName
         {
-            get { return _userName; }
+            get => _userName;
             set
             {
-                _userName = value != null ? value : "";
+                _userName = value != null ? value : string.Empty;
                 userNameComboBox.Text = value;
             }
         }
 
-        public string Password { get; private set; }
-
         #endregion
 
-        #region Events handler
-
-        private void okButton_Click(object sender, EventArgs e)
-        {
-            Password = passwordTextBox.Text;
-            _userName = userNameComboBox.Text;
-        }
+        #region Private Methods
 
         private void LoginDialog_Load(object sender, EventArgs e)
         {
@@ -72,6 +62,12 @@ namespace SftpFileSystem
             {
                 passwordTextBox.Focus();
             }
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            Password = passwordTextBox.Text;
+            _userName = userNameComboBox.Text;
         }
 
         #endregion

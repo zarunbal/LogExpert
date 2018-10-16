@@ -5,14 +5,14 @@ namespace LogExpert
     [Serializable]
     public class ColumnizerHistoryEntry
     {
-        #region Fields
+        #region Private Fields
 
         public string columnizerName;
         public string fileName;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public ColumnizerHistoryEntry(string fileName, string columnizerName)
         {

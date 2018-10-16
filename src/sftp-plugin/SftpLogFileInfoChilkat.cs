@@ -1,20 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using LogExpert;
-using System.Windows.Forms;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 using Chilkat;
+using LogExpert;
+using Stream = System.IO.Stream;
 
 namespace SftpFileSystem
 {
     internal class SftpLogFileInfoChilkat : ILogFileInfo
     {
-        #region Fields
+        #region Static/Constants
 
         private const int RetryCount = 20;
         private const int RetrySleep = 250;
+
+        #endregion
+
+        #region Private Fields
+
         private readonly ILogExpertLogger _logger;
         private readonly string _remoteFileName;
 
@@ -26,7 +30,7 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         internal SftpLogFileInfoChilkat(SftpFileSystem sftFileSystem, Uri fileUri, ILogExpertLogger logger)
         {
@@ -35,7 +39,7 @@ namespace SftpFileSystem
             Uri = fileUri;
             _remoteFileName = Uri.PathAndQuery;
 
-            //  Any string automatically begins a fully-functional 30-day trial.
+            // Any string automatically begins a fully-functional 30-day trial.
             bool success;
             success = _sftp.UnlockComponent("PUT_SERIAL_HERE");
             if (success != true)
@@ -58,12 +62,12 @@ namespace SftpFileSystem
             bool cancelled = false;
             if (_sftFileSystem.ConfigData.UseKeyfile)
             {
-                lock (_sshKeyMonitor) // prevent multiple password dialogs when opening multiple files at once
+                lock (_sshKeyMonitor)
                 {
+// prevent multiple password dialogs when opening multiple files at once
                     while (_sftFileSystem.SshKey == null)
                     {
                         // Load key from file, possibly encrypted by password
-
                         SshKey sshKey = new SshKey();
                         string keyText = sshKey.LoadText(_sftFileSystem.ConfigData.KeyFile);
 
@@ -130,7 +134,6 @@ namespace SftpFileSystem
             if (!success)
             {
                 // username/password auth
-
                 Credentials credentials = _sftFileSystem.GetCredentials(Uri, true, false);
                 success = _sftp.AuthenticatePw(credentials.UserName, credentials.Password);
                 if (success != true)
@@ -142,7 +145,8 @@ namespace SftpFileSystem
                     {
                         // 2nd fail -> abort
                         MessageBox.Show("Authentication failed!");
-                        //MessageBox.Show(sftp.LastErrorText);
+
+// MessageBox.Show(sftp.LastErrorText);
                         return;
                     }
                 }
@@ -161,22 +165,7 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
-
-        public string FullName
-        {
-            get { return Uri.ToString(); }
-        }
-
-        public string FileName
-        {
-            get
-            {
-                string full = FullName;
-                int i = full.LastIndexOf(DirectorySeparatorChar);
-                return full.Substring(i + 1);
-            }
-        }
+        #region Interface ILogFileInfo
 
         public string DirectoryName
         {
@@ -193,19 +182,7 @@ namespace SftpFileSystem
             }
         }
 
-        public char DirectorySeparatorChar
-        {
-            get { return '/'; }
-        }
-
-        public Uri Uri { get; }
-
-        public long Length
-        {
-            get { return _sftp.GetFileSize64(_remoteFileName, true, false); }
-        }
-
-        public long OriginalLength { get; } = -1;
+        public char DirectorySeparatorChar => '/';
 
         public bool FileExists
         {
@@ -224,6 +201,22 @@ namespace SftpFileSystem
             }
         }
 
+        public string FileName
+        {
+            get
+            {
+                string full = FullName;
+                int i = full.LastIndexOf(DirectorySeparatorChar);
+                return full.Substring(i + 1);
+            }
+        }
+
+        public string FullName => Uri.ToString();
+
+        public long Length => _sftp.GetFileSize64(_remoteFileName, true, false);
+
+        public long OriginalLength { get; } = -1;
+
         public int PollInterval
         {
             get
@@ -233,22 +226,31 @@ namespace SftpFileSystem
                 {
                     return 400;
                 }
-                else if (diff.TotalSeconds < 30)
+
+                if (diff.TotalSeconds < 30)
                 {
-                    return (int) diff.TotalSeconds * 100;
+                    return (int)diff.TotalSeconds * 100;
                 }
-                else
-                {
-                    return 5000;
-                }
+
+                return 5000;
             }
         }
 
-        #endregion
+        public Uri Uri { get; }
 
-        #region Public methods
+        public bool FileHasChanged()
+        {
+            if (Length != _lastLength)
+            {
+                _lastLength = Length;
+                _lastChange = DateTime.Now;
+                return true;
+            }
 
-        public System.IO.Stream OpenStream()
+            return false;
+        }
+
+        public Stream OpenStream()
         {
             int retry = RetryCount;
             while (true)
@@ -269,25 +271,13 @@ namespace SftpFileSystem
             }
         }
 
-        public bool FileHasChanged()
-        {
-            if (Length != _lastLength)
-            {
-                _lastLength = Length;
-                _lastChange = DateTime.Now;
-                return true;
-            }
-
-            return false;
-        }
-
         #endregion
 
         #region Private Methods
 
         private void Configure()
         {
-            //  Set some timeouts, in milliseconds:
+            // Set some timeouts, in milliseconds:
             _sftp.ConnectTimeoutMs = 5000;
             _sftp.IdleTimeoutMs = 15000;
         }

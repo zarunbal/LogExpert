@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-//using System.Linq;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using LogExpert.Classes.Log;
 
+// using System.Linq;
 namespace LogExpert
 {
     /// <summary>
-    /// This class is responsible for reading line from the log file. It also decodes characters with the appropriate charset encoding.
-    /// PositionAwareStreamReader tries a BOM detection to determine correct file offsets when directly seeking into the file (on re-loading flushed buffers).
-    /// UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be determined.
-    /// Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
+    ///     This class is responsible for reading line from the log file. It also decodes characters with the appropriate
+    ///     charset encoding.
+    ///     PositionAwareStreamReader tries a BOM detection to determine correct file offsets when directly seeking into the
+    ///     file (on re-loading flushed buffers).
+    ///     UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be
+    ///     determined.
+    ///     Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
     /// </summary>
     public class PositionAwareStreamReader : PositionAwareStreamReaderBase
     {
-        #region Fields
+        #region Private Fields
 
         private int _newLineSequenceLength;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public PositionAwareStreamReader(Stream stream, EncodingOptions encodingOptions)
             : base(stream, encodingOptions)
@@ -32,7 +31,7 @@ namespace LogExpert
 
         #endregion
 
-        #region Public methods
+        #region Overrides
 
         public override string ReadLine()
         {
@@ -71,7 +70,9 @@ namespace LogExpert
                 _stream.Seek(Encoding.GetByteCount(line) + _preambleLength, SeekOrigin.Begin);
                 ResetReader();
                 int b = _reader.Read();
-                // int b = this.stream.ReadByte();
+
+
+// int b = this.stream.ReadByte();
                 if (b == 0x0d)
                 {
                     // b = this.stream.ReadByte();

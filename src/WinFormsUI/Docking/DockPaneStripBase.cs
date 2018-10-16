@@ -1,23 +1,24 @@
 using System;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Permissions;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Security.Permissions;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking.Win32;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public abstract class DockPaneStripBase : Control
     {
-        #region Fields
+        #region Private Fields
 
-        private TabCollection m_tabs = null;
+        private TabCollection m_tabs;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         protected DockPaneStripBase(DockPane pane)
         {
@@ -30,14 +31,13 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
+
+        protected DockPane.AppearanceStyle Appearance => DockPane.Appearance;
 
         protected DockPane DockPane { get; }
 
-        protected DockPane.AppearanceStyle Appearance
-        {
-            get { return DockPane.Appearance; }
-        }
+        protected bool HasTabPageContextMenu => DockPane.HasTabPageContextMenu;
 
         protected TabCollection Tabs
         {
@@ -52,28 +52,24 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
-        protected bool HasTabPageContextMenu
-        {
-            get { return DockPane.HasTabPageContextMenu; }
-        }
-
-        #endregion
-
-        #region Internals
-
-        internal void RefreshChanges()
-        {
-            if (IsDisposed)
-            {
-                return;
-            }
-
-            OnRefreshChanges();
-        }
-
         #endregion
 
         #region Overrides
+
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            base.OnDragOver(drgevent);
+
+            int index = HitTest();
+            if (index != -1)
+            {
+                IDockContent content = Tabs[index].Content;
+                if (DockPane.ActiveContent != content)
+                {
+                    DockPane.ActiveContent = content;
+                }
+            }
+        }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -108,7 +104,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 ShowTabPageContextMenu(new Point(e.X, e.Y));
             }
             else if (e.Button == MouseButtons.Middle &&
-                     DockPane.Appearance == Docking.DockPane.AppearanceStyle.Document)
+                     DockPane.Appearance == DockPane.AppearanceStyle.Document)
             {
                 // Get the content located under the click (if there is one)
                 int index = HitTest();
@@ -124,7 +120,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == (int) Win32.Msgs.WM_LBUTTONDBLCLK)
+            if (m.Msg == (int)Msgs.WM_LBUTTONDBLCLK)
             {
                 base.WndProc(ref m);
 
@@ -142,46 +138,23 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
 
             base.WndProc(ref m);
-            return;
-        }
-
-        protected override void OnDragOver(DragEventArgs drgevent)
-        {
-            base.OnDragOver(drgevent);
-
-            int index = HitTest();
-            if (index != -1)
-            {
-                IDockContent content = Tabs[index].Content;
-                if (DockPane.ActiveContent != content)
-                {
-                    DockPane.ActiveContent = content;
-                }
-            }
         }
 
         #endregion
+
+        #region Event handling Methods
 
         protected virtual void OnRefreshChanges()
         {
         }
 
-        protected internal abstract int MeasureHeight();
+        #endregion
 
-        protected internal abstract void EnsureTabVisible(IDockContent content);
+        #region Private Methods
 
         protected int HitTest()
         {
-            return HitTest(PointToClient(Control.MousePosition));
-        }
-
-        protected internal abstract int HitTest(Point point);
-
-        protected internal abstract GraphicsPath GetOutline(int index);
-
-        protected internal virtual Tab CreateTab(IDockContent content)
-        {
-            return new Tab(content);
+            return HitTest(PointToClient(MousePosition));
         }
 
         protected void ShowTabPageContextMenu(Point position)
@@ -189,14 +162,14 @@ namespace WeifenLuo.WinFormsUI.Docking
             DockPane.ShowTabPageContextMenu(this, position);
         }
 
+        #endregion
+
+        #region Nested type: Tab
+
         [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         protected internal class Tab : IDisposable
         {
-            #region Fields
-
-            #endregion
-
-            #region cTor
+            #region Ctor
 
             public Tab(IDockContent content)
             {
@@ -205,18 +178,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region Properties
-
-            public IDockContent Content { get; }
-
-            public Form ContentForm
-            {
-                get { return Content as Form; }
-            }
-
-            #endregion
-
-            #region Public methods
+            #region Interface IDisposable
 
             public void Dispose()
             {
@@ -226,24 +188,36 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            ~Tab()
-            {
-                Dispose(false);
-            }
+            #region Properties / Indexers
+
+            public IDockContent Content { get; }
+
+            public Form ContentForm => Content as Form;
+
+            #endregion
+
+            #region Private Methods
 
             protected virtual void Dispose(bool disposing)
             {
             }
+
+            #endregion
+
+            ~Tab()
+            {
+                Dispose(false);
+            }
         }
+
+        #endregion
+
+        #region Nested type: TabCollection
 
         [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         protected sealed class TabCollection : IEnumerable<Tab>
         {
-            #region Fields
-
-            #endregion
-
-            #region cTor
+            #region Ctor
 
             internal TabCollection(DockPane pane)
             {
@@ -252,14 +226,31 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region Properties
+            #region Interface IEnumerable<Tab>
+
+            IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    yield return this[i];
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    yield return this[i];
+                }
+            }
+
+            #endregion
+
+            #region Properties / Indexers
+
+            public int Count => DockPane.DisplayingContents.Count;
 
             public DockPane DockPane { get; }
-
-            public int Count
-            {
-                get { return DockPane.DisplayingContents.Count; }
-            }
 
             public Tab this[int index]
             {
@@ -270,13 +261,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                     {
                         throw new ArgumentOutOfRangeException("index");
                     }
+
                     return content.DockHandler.GetTab(DockPane.TabStripControl);
                 }
             }
 
             #endregion
 
-            #region Public methods
+            #region Public Methods
 
             public bool Contains(Tab tab)
             {
@@ -304,26 +296,31 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
 
             #endregion
+        }
 
-            #region IEnumerable Members
+        #endregion
 
-            IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
+        internal void RefreshChanges()
+        {
+            if (IsDisposed)
             {
-                for (int i = 0; i < Count; i++)
-                {
-                    yield return this[i];
-                }
+                return;
             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                for (int i = 0; i < Count; i++)
-                {
-                    yield return this[i];
-                }
-            }
+            OnRefreshChanges();
+        }
 
-            #endregion
+        protected internal abstract int MeasureHeight();
+
+        protected internal abstract void EnsureTabVisible(IDockContent content);
+
+        protected internal abstract int HitTest(Point point);
+
+        protected internal abstract GraphicsPath GetOutline(int index);
+
+        protected internal virtual Tab CreateTab(IDockContent content)
+        {
+            return new Tab(content);
         }
     }
 }

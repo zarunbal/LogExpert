@@ -1,63 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-
 
 namespace LogExpert
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Globalization;
-
     public class TimestampColumnizer : ILogLineColumnizer
     {
-        #region FormatInfo helper class
+        #region Private Fields
 
-        protected class FormatInfo
-        {
-            #region cTor
-
-            public FormatInfo(string dateFormat, string timeFormat, CultureInfo cultureInfo)
-            {
-                this.DateFormat = dateFormat;
-                this.TimeFormat = timeFormat;
-                this.CultureInfo = cultureInfo;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public string DateFormat { get; }
-
-            public string TimeFormat { get; }
-
-            public CultureInfo CultureInfo { get; }
-
-            public string DateTimeFormat
-            {
-                get { return this.DateFormat + " " + this.TimeFormat; }
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region ILogLineColumnizer implementation
-
-        protected int timeOffset = 0;
         protected FormatInfo formatInfo1 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo2 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo3 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo4 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo5 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo6 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo7 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo8 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo9 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss,fff", new CultureInfo("de-DE"));
         protected FormatInfo formatInfo10 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo11 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo12 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss", new CultureInfo("en-US"));
@@ -66,20 +17,44 @@ namespace LogExpert
         protected FormatInfo formatInfo15 = new FormatInfo("dd MMM yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
         protected FormatInfo formatInfo16 = new FormatInfo("dd.MM.yy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
         protected FormatInfo formatInfo17 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo2 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo3 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo4 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo5 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss.fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo6 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo7 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo8 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo9 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss,fff", new CultureInfo("de-DE"));
 
-        public bool IsTimeshiftImplemented()
+        protected int timeOffset;
+
+        #endregion
+
+        #region Interface ILogLineColumnizer
+
+        public int GetColumnCount()
         {
-            return true;
+            return 3;
         }
 
-        public void SetTimeOffset(int msecOffset)
+        public string[] GetColumnNames()
         {
-            this.timeOffset = msecOffset;
+            return new[] {"Date", "Time", "Message"};
+        }
+
+        public string GetDescription()
+        {
+            return "Splits every line into 3 fields: Date, Time and the rest of the log message";
+        }
+
+        public string GetName()
+        {
+            return "Timestamp Columnizer";
         }
 
         public int GetTimeOffset()
         {
-            return this.timeOffset;
+            return timeOffset;
         }
 
 
@@ -90,10 +65,12 @@ namespace LogExpert
             {
                 return DateTime.MinValue;
             }
+
             if (cols.ColumnValues[0].FullValue.Length == 0 || cols.ColumnValues[1].FullValue.Length == 0)
             {
                 return DateTime.MinValue;
             }
+
             FormatInfo formatInfo = DetermineDateTimeFormatInfo(line);
             if (formatInfo == null)
             {
@@ -113,6 +90,11 @@ namespace LogExpert
             }
         }
 
+        public bool IsTimeshiftImplemented()
+        {
+            return true;
+        }
+
 
         public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
@@ -125,11 +107,12 @@ namespace LogExpert
                     {
                         return;
                     }
+
                     DateTime newDateTime = DateTime.ParseExact(value, formatInfo.TimeFormat, formatInfo.CultureInfo);
                     DateTime oldDateTime = DateTime.ParseExact(oldValue, formatInfo.TimeFormat, formatInfo.CultureInfo);
                     long mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                     long mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                    this.timeOffset = (int) (mSecsNew - mSecsOld);
+                    timeOffset = (int)(mSecsNew - mSecsOld);
                 }
                 catch (FormatException)
                 {
@@ -137,24 +120,9 @@ namespace LogExpert
             }
         }
 
-        public string GetName()
+        public void SetTimeOffset(int msecOffset)
         {
-            return "Timestamp Columnizer";
-        }
-
-        public string GetDescription()
-        {
-            return "Splits every line into 3 fields: Date, Time and the rest of the log message";
-        }
-
-        public int GetColumnCount()
-        {
-            return 3;
-        }
-
-        public string[] GetColumnNames()
-        {
-            return new string[] {"Date", "Time", "Message"};
+            timeOffset = msecOffset;
         }
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
@@ -170,7 +138,7 @@ namespace LogExpert
             {
                 new Column {FullValue = "", Parent = clogLine},
                 new Column {FullValue = "", Parent = clogLine},
-                new Column {FullValue = "", Parent = clogLine},
+                new Column {FullValue = "", Parent = clogLine}
             };
 
             clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
@@ -190,16 +158,17 @@ namespace LogExpert
                 columns[2].FullValue = temp;
                 return clogLine;
             }
+
             int endPos = formatInfo.DateTimeFormat.Length;
             int timeLen = formatInfo.TimeFormat.Length;
             int dateLen = formatInfo.DateFormat.Length;
             try
             {
-                if (this.timeOffset != 0)
+                if (timeOffset != 0)
                 {
                     DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
                         formatInfo.CultureInfo);
-                    dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
+                    dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, timeOffset));
                     string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
                     columns[0].FullValue = newDate.Substring(0, dateLen); // date
                     columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
@@ -218,17 +187,19 @@ namespace LogExpert
                 columns[1].FullValue = "n/a";
                 columns[2].FullValue = temp;
             }
+
             return clogLine;
         }
 
         #endregion
 
-        #region internal stuff
+        #region Properties / Indexers
 
-        public string Text
-        {
-            get { return GetName(); }
-        }
+        public string Text => GetName();
+
+        #endregion
+
+        #region Private Methods
 
         protected FormatInfo DetermineDateTimeFormatInfo(ILogLine line)
         {
@@ -239,85 +210,86 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
-                    return this.formatInfo1;
+                    return formatInfo1;
                 }
-                else if (temp[19] == ',')
+
+                if (temp[19] == ',')
                 {
-                    return this.formatInfo7;
+                    return formatInfo7;
                 }
-                else
-                {
-                    return this.formatInfo2;
-                }
+
+                return formatInfo2;
             }
-            else if (temp[4] == '/' && temp[7] == '/' && temp[13] == ':' && temp[16] == ':')
+
+            if (temp[4] == '/' && temp[7] == '/' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    return this.formatInfo3;
+                    return formatInfo3;
                 }
-                else if (temp[19] == ',')
+
+                if (temp[19] == ',')
                 {
-                    return this.formatInfo8;
+                    return formatInfo8;
                 }
-                else
-                {
-                    return this.formatInfo4;
-                }
+
+                return formatInfo4;
             }
-            else if (temp[4] == '.' && temp[7] == '.' && temp[13] == ':' && temp[16] == ':')
+
+            if (temp[4] == '.' && temp[7] == '.' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    return this.formatInfo5;
+                    return formatInfo5;
                 }
-                else if (temp[19] == ',')
+
+                if (temp[19] == ',')
                 {
-                    return this.formatInfo9;
+                    return formatInfo9;
                 }
-                else
-                {
-                    return this.formatInfo6;
-                }
+
+                return formatInfo6;
             }
-            else if (temp[4] == '-' && temp[7] == '-' && temp[13] == ':' && temp[16] == ':')
+
+            if (temp[4] == '-' && temp[7] == '-' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    return this.formatInfo10;
+                    return formatInfo10;
                 }
-                else if (temp[19] == ',')
+
+                if (temp[19] == ',')
                 {
-                    return this.formatInfo11;
+                    return formatInfo11;
                 }
-                else if (temp[19] == ':')
+
+                if (temp[19] == ':')
                 {
-                    return this.formatInfo17;
+                    return formatInfo17;
                 }
-                else
-                {
-                    return this.formatInfo12;
-                }
+
+                return formatInfo12;
             }
-            else if (temp[2] == ' ' && temp[6] == ' ' && temp[14] == ':' && temp[17] == ':')
+
+            if (temp[2] == ' ' && temp[6] == ' ' && temp[14] == ':' && temp[17] == ':')
             {
                 if (temp[20] == ',')
                 {
-                    return this.formatInfo13;
+                    return formatInfo13;
                 }
-                else if (temp[20] == '.')
+
+                if (temp[20] == '.')
                 {
-                    return this.formatInfo14;
+                    return formatInfo14;
                 }
-                else
-                {
-                    return this.formatInfo15;
-                }
+
+                return formatInfo15;
             }
             //dd.MM.yy HH:mm:ss.fff
-            else if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
+
+            if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
             {
-                return this.formatInfo16;
+                return formatInfo16;
             }
 
             return null;
@@ -332,19 +304,51 @@ namespace LogExpert
                 {
                     if (field[8] == '.')
                     {
-                        return this.formatInfo1;
+                        return formatInfo1;
                     }
-                    else if (field[8] == ',')
+
+                    if (field[8] == ',')
                     {
-                        return this.formatInfo7;
+                        return formatInfo7;
                     }
                 }
                 else
                 {
-                    return this.formatInfo2;
+                    return formatInfo2;
                 }
             }
+
             return null;
+        }
+
+        #endregion
+
+        #region Nested type: FormatInfo
+
+        protected class FormatInfo
+        {
+            #region Ctor
+
+            public FormatInfo(string dateFormat, string timeFormat, CultureInfo cultureInfo)
+            {
+                DateFormat = dateFormat;
+                TimeFormat = timeFormat;
+                CultureInfo = cultureInfo;
+            }
+
+            #endregion
+
+            #region Properties / Indexers
+
+            public CultureInfo CultureInfo { get; }
+
+            public string DateFormat { get; }
+
+            public string DateTimeFormat => DateFormat + " " + TimeFormat;
+
+            public string TimeFormat { get; }
+
+            #endregion
         }
 
         #endregion

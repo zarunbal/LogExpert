@@ -1,59 +1,104 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Diagnostics.CodeAnalysis;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public class DockContent : Form, IDockContent
     {
-        #region Fields
+        #region Static/Constants
 
         private static readonly object DockStateChangedEvent = new object();
 
-        [Localizable(true)] [LocalizedCategory("Category_Docking")]
-        [LocalizedDescription("DockContent_TabText_Description")] [DefaultValue(null)] private string m_tabText = null;
+        #endregion
+
+        #region Private Fields
+
+        [Localizable(true)] [LocalizedCategory("Category_Docking")] [LocalizedDescription("DockContent_TabText_Description")] [DefaultValue(null)]
+        private string m_tabText;
 
         #endregion
 
-        #region cTor
-
-        public DockContent()
-        {
-            DockHandler = new DockContentHandler(this, new GetPersistStringCallback(GetPersistString));
-            DockHandler.DockStateChanged += new EventHandler(DockHandler_DockStateChanged);
-            //Suggested as a fix by bensty regarding form resize
-            this.ParentChanged += new EventHandler(DockContent_ParentChanged);
-        }
-
-        #endregion
-
-        #region Events
+        #region Public Events
 
         [LocalizedCategory("Category_PropertyChanged")]
         [LocalizedDescription("Pane_DockStateChanged_Description")]
         public event EventHandler DockStateChanged
         {
-            add { Events.AddHandler(DockStateChangedEvent, value); }
-            remove { Events.RemoveHandler(DockStateChangedEvent, value); }
+            add => Events.AddHandler(DockStateChangedEvent, value);
+            remove => Events.RemoveHandler(DockStateChangedEvent, value);
         }
 
         #endregion
 
-        #region Properties
+        #region Ctor
+
+        public DockContent()
+        {
+            DockHandler = new DockContentHandler(this, GetPersistString);
+            DockHandler.DockStateChanged += DockHandler_DockStateChanged;
+
+// Suggested as a fix by bensty regarding form resize
+            ParentChanged += DockContent_ParentChanged;
+        }
+
+        #endregion
+
+        #region Interface IDockContent
 
         [Browsable(false)]
-        public DockContentHandler DockHandler { get; } = null;
+        public DockContentHandler DockHandler { get; }
+
+        void IDockContent.OnActivated(EventArgs e)
+        {
+            OnActivated(e);
+        }
+
+        void IDockContent.OnDeactivate(EventArgs e)
+        {
+            OnDeactivate(e);
+        }
+
+        #endregion
+
+        #region Properties / Indexers
 
         [LocalizedCategory("Category_Docking")]
         [LocalizedDescription("DockContent_AllowEndUserDocking_Description")]
         [DefaultValue(true)]
         public bool AllowEndUserDocking
         {
-            get { return DockHandler.AllowEndUserDocking; }
-            set { DockHandler.AllowEndUserDocking = value; }
+            get => DockHandler.AllowEndUserDocking;
+            set => DockHandler.AllowEndUserDocking = value;
+        }
+
+        [LocalizedCategory("Category_Docking")]
+        [LocalizedDescription("DockContent_AutoHidePortion_Description")]
+        [DefaultValue(0.25)]
+        public double AutoHidePortion
+        {
+            get => DockHandler.AutoHidePortion;
+            set => DockHandler.AutoHidePortion = value;
+        }
+
+        [LocalizedCategory("Category_Docking")]
+        [LocalizedDescription("DockContent_CloseButton_Description")]
+        [DefaultValue(true)]
+        public bool CloseButton
+        {
+            get => DockHandler.CloseButton;
+            set => DockHandler.CloseButton = value;
+        }
+
+        [LocalizedCategory("Category_Docking")]
+        [LocalizedDescription("DockContent_CloseButtonVisible_Description")]
+        [DefaultValue(true)]
+        public bool CloseButtonVisible
+        {
+            get => DockHandler.CloseButtonVisible;
+            set => DockHandler.CloseButtonVisible = value;
         }
 
         [LocalizedCategory("Category_Docking")]
@@ -62,97 +107,29 @@ namespace WeifenLuo.WinFormsUI.Docking
                       DockAreas.Document | DockAreas.Float)]
         public DockAreas DockAreas
         {
-            get { return DockHandler.DockAreas; }
-            set { DockHandler.DockAreas = value; }
-        }
-
-        [LocalizedCategory("Category_Docking")]
-        [LocalizedDescription("DockContent_AutoHidePortion_Description")]
-        [DefaultValue(0.25)]
-        public double AutoHidePortion
-        {
-            get { return DockHandler.AutoHidePortion; }
-            set { DockHandler.AutoHidePortion = value; }
-        }
-
-        public string TabText
-        {
-            get { return m_tabText; }
-            set { DockHandler.TabText = m_tabText = value; }
-        }
-
-        [LocalizedCategory("Category_Docking")]
-        [LocalizedDescription("DockContent_CloseButton_Description")]
-        [DefaultValue(true)]
-        public bool CloseButton
-        {
-            get { return DockHandler.CloseButton; }
-            set { DockHandler.CloseButton = value; }
-        }
-
-        [LocalizedCategory("Category_Docking")]
-        [LocalizedDescription("DockContent_CloseButtonVisible_Description")]
-        [DefaultValue(true)]
-        public bool CloseButtonVisible
-        {
-            get { return DockHandler.CloseButtonVisible; }
-            set { DockHandler.CloseButtonVisible = value; }
+            get => DockHandler.DockAreas;
+            set => DockHandler.DockAreas = value;
         }
 
         [Browsable(false)]
         public DockPanel DockPanel
         {
-            get { return DockHandler.DockPanel; }
-            set { DockHandler.DockPanel = value; }
+            get => DockHandler.DockPanel;
+            set => DockHandler.DockPanel = value;
         }
 
         [Browsable(false)]
         public DockState DockState
         {
-            get { return DockHandler.DockState; }
-            set { DockHandler.DockState = value; }
-        }
-
-        [Browsable(false)]
-        public DockPane Pane
-        {
-            get { return DockHandler.Pane; }
-            set { DockHandler.Pane = value; }
-        }
-
-        [Browsable(false)]
-        public bool IsHidden
-        {
-            get { return DockHandler.IsHidden; }
-            set { DockHandler.IsHidden = value; }
-        }
-
-        [Browsable(false)]
-        public DockState VisibleState
-        {
-            get { return DockHandler.VisibleState; }
-            set { DockHandler.VisibleState = value; }
-        }
-
-        [Browsable(false)]
-        public bool IsFloat
-        {
-            get { return DockHandler.IsFloat; }
-            set { DockHandler.IsFloat = value; }
-        }
-
-        [Browsable(false)]
-        public DockPane PanelPane
-        {
-            get { return DockHandler.PanelPane; }
-            set { DockHandler.PanelPane = value; }
+            get => DockHandler.DockState;
+            set => DockHandler.DockState = value;
         }
 
         [Browsable(false)]
         public DockPane FloatPane
         {
-            get { return DockHandler.FloatPane; }
-            set { DockHandler.FloatPane = value; }
+            get => DockHandler.FloatPane;
+            set => DockHandler.FloatPane = value;
         }
 
         [LocalizedCategory("Category_Docking")]
@@ -160,8 +137,39 @@ namespace WeifenLuo.WinFormsUI.Docking
         [DefaultValue(false)]
         public bool HideOnClose
         {
-            get { return DockHandler.HideOnClose; }
-            set { DockHandler.HideOnClose = value; }
+            get => DockHandler.HideOnClose;
+            set => DockHandler.HideOnClose = value;
+        }
+
+        [Browsable(false)]
+        public bool IsActivated => DockHandler.IsActivated;
+
+        [Browsable(false)]
+        public bool IsFloat
+        {
+            get => DockHandler.IsFloat;
+            set => DockHandler.IsFloat = value;
+        }
+
+        [Browsable(false)]
+        public bool IsHidden
+        {
+            get => DockHandler.IsHidden;
+            set => DockHandler.IsHidden = value;
+        }
+
+        [Browsable(false)]
+        public DockPane Pane
+        {
+            get => DockHandler.Pane;
+            set => DockHandler.Pane = value;
+        }
+
+        [Browsable(false)]
+        public DockPane PanelPane
+        {
+            get => DockHandler.PanelPane;
+            set => DockHandler.PanelPane = value;
         }
 
         [LocalizedCategory("Category_Docking")]
@@ -169,14 +177,8 @@ namespace WeifenLuo.WinFormsUI.Docking
         [DefaultValue(DockState.Unknown)]
         public DockState ShowHint
         {
-            get { return DockHandler.ShowHint; }
-            set { DockHandler.ShowHint = value; }
-        }
-
-        [Browsable(false)]
-        public bool IsActivated
-        {
-            get { return DockHandler.IsActivated; }
+            get => DockHandler.ShowHint;
+            set => DockHandler.ShowHint = value;
         }
 
         [LocalizedCategory("Category_Docking")]
@@ -184,8 +186,8 @@ namespace WeifenLuo.WinFormsUI.Docking
         [DefaultValue(null)]
         public ContextMenu TabPageContextMenu
         {
-            get { return DockHandler.TabPageContextMenu; }
-            set { DockHandler.TabPageContextMenu = value; }
+            get => DockHandler.TabPageContextMenu;
+            set => DockHandler.TabPageContextMenu = value;
         }
 
         [LocalizedCategory("Category_Docking")]
@@ -193,8 +195,14 @@ namespace WeifenLuo.WinFormsUI.Docking
         [DefaultValue(null)]
         public ContextMenuStrip TabPageContextMenuStrip
         {
-            get { return DockHandler.TabPageContextMenuStrip; }
-            set { DockHandler.TabPageContextMenuStrip = value; }
+            get => DockHandler.TabPageContextMenuStrip;
+            set => DockHandler.TabPageContextMenuStrip = value;
+        }
+
+        public string TabText
+        {
+            get => m_tabText;
+            set => DockHandler.TabText = m_tabText = value;
         }
 
         [Localizable(true)]
@@ -203,27 +211,50 @@ namespace WeifenLuo.WinFormsUI.Docking
         [DefaultValue(null)]
         public string ToolTipText
         {
-            get { return DockHandler.ToolTipText; }
-            set { DockHandler.ToolTipText = value; }
+            get => DockHandler.ToolTipText;
+            set => DockHandler.ToolTipText = value;
+        }
+
+        [Browsable(false)]
+        public DockState VisibleState
+        {
+            get => DockHandler.VisibleState;
+            set => DockHandler.VisibleState = value;
         }
 
         #endregion
 
-        #region Public methods
-
-        public bool IsDockStateValid(DockState dockState)
-        {
-            return DockHandler.IsDockStateValid(dockState);
-        }
+        #region Public Methods
 
         public new void Activate()
         {
             DockHandler.Activate();
         }
 
+        public void DockTo(DockPane paneTo, DockStyle dockStyle, int contentIndex)
+        {
+            DockHandler.DockTo(paneTo, dockStyle, contentIndex);
+        }
+
+        public void DockTo(DockPanel panel, DockStyle dockStyle)
+        {
+            DockHandler.DockTo(panel, dockStyle);
+        }
+
+        [SuppressMessage("Microsoft.Naming", "CA1720:AvoidTypeNamesInParameters")]
+        public void FloatAt(Rectangle floatWindowBounds)
+        {
+            DockHandler.FloatAt(floatWindowBounds);
+        }
+
         public new void Hide()
         {
             DockHandler.Hide();
+        }
+
+        public bool IsDockStateValid(DockState dockState)
+        {
+            return DockHandler.IsDockStateValid(dockState);
         }
 
         public new void Show()
@@ -257,41 +288,29 @@ namespace WeifenLuo.WinFormsUI.Docking
             DockHandler.Show(previousPane, alignment, proportion);
         }
 
-        [SuppressMessage("Microsoft.Naming", "CA1720:AvoidTypeNamesInParameters")]
-        public void FloatAt(Rectangle floatWindowBounds)
-        {
-            DockHandler.FloatAt(floatWindowBounds);
-        }
+        #endregion
 
-        public void DockTo(DockPane paneTo, DockStyle dockStyle, int contentIndex)
-        {
-            DockHandler.DockTo(paneTo, dockStyle, contentIndex);
-        }
+        #region Event handling Methods
 
-        public void DockTo(DockPanel panel, DockStyle dockStyle)
+        protected virtual void OnDockStateChanged(EventArgs e)
         {
-            DockHandler.DockTo(panel, dockStyle);
+            EventHandler handler = (EventHandler)Events[DockStateChangedEvent];
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
 
         #endregion
 
-        #region Private Methods
+        #region Event raising Methods
 
-        private bool ShouldSerializeTabText()
-        {
-            return m_tabText != null;
-        }
-
-        #endregion
-
-        #region Events handler
-
-        //Suggested as a fix by bensty regarding form resize
+        // Suggested as a fix by bensty regarding form resize
         private void DockContent_ParentChanged(object Sender, EventArgs e)
         {
-            if (this.Parent != null)
+            if (Parent != null)
             {
-                this.Font = this.Parent.Font;
+                Font = Parent.Font;
             }
         }
 
@@ -302,31 +321,17 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
+        #region Private Methods
+
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         protected virtual string GetPersistString()
         {
             return GetType().ToString();
         }
 
-        protected virtual void OnDockStateChanged(EventArgs e)
+        private bool ShouldSerializeTabText()
         {
-            EventHandler handler = (EventHandler) Events[DockStateChangedEvent];
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        #region IDockContent Members
-
-        void IDockContent.OnActivated(EventArgs e)
-        {
-            this.OnActivated(e);
-        }
-
-        void IDockContent.OnDeactivate(EventArgs e)
-        {
-            this.OnDeactivate(e);
+            return m_tabText != null;
         }
 
         #endregion

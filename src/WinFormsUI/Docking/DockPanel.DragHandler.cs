@@ -1,37 +1,90 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.ComponentModel;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking.Win32;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     partial class DockPanel
     {
-        /// <summary>
-        /// DragHandlerBase is the base class for drag handlers. The derived class should:
-        ///   1. Define its public method BeginDrag. From within this public BeginDrag method,
-        ///      DragHandlerBase.BeginDrag should be called to initialize the mouse capture
-        ///      and message filtering.
-        ///   2. Override the OnDragging and OnEndDrag methods.
-        /// </summary>
-        private abstract class DragHandlerBase : NativeWindow, IMessageFilter
+        #region Nested type: DragHandler
+
+        private abstract class DragHandler : DragHandlerBase
         {
-            #region Fields
+            #region Ctor
 
-            #endregion
-
-            #region cTor
-
-            protected DragHandlerBase()
+            protected DragHandler(DockPanel dockPanel)
             {
+                DockPanel = dockPanel;
             }
 
             #endregion
 
-            #region Properties
+            #region Properties / Indexers
+
+            public DockPanel DockPanel { get; }
+
+            protected sealed override Control DragControl => DragSource == null ? null : DragSource.DragControl;
+
+            protected IDragSource DragSource { get; set; }
+
+            #endregion
+
+            #region Overrides
+
+            protected sealed override bool OnPreFilterMessage(ref Message m)
+            {
+                if ((m.Msg == (int)Msgs.WM_KEYDOWN || m.Msg == (int)Msgs.WM_KEYUP) &&
+                    ((int)m.WParam == (int)Keys.ControlKey || (int)m.WParam == (int)Keys.ShiftKey))
+                {
+                    OnDragging();
+                }
+
+                return base.OnPreFilterMessage(ref m);
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: DragHandlerBase
+
+        /// <summary>
+        ///     DragHandlerBase is the base class for drag handlers. The derived class should:
+        ///     1. Define its public method BeginDrag. From within this public BeginDrag method,
+        ///     DragHandlerBase.BeginDrag should be called to initialize the mouse capture
+        ///     and message filtering.
+        ///     2. Override the OnDragging and OnEndDrag methods.
+        /// </summary>
+        private abstract class DragHandlerBase : NativeWindow, IMessageFilter
+        {
+            #region Interface IMessageFilter
+
+            bool IMessageFilter.PreFilterMessage(ref Message m)
+            {
+                if (m.Msg == (int)Msgs.WM_MOUSEMOVE)
+                {
+                    OnDragging();
+                }
+                else if (m.Msg == (int)Msgs.WM_LBUTTONUP)
+                {
+                    EndDrag(false);
+                }
+                else if (m.Msg == (int)Msgs.WM_CAPTURECHANGED)
+                {
+                    EndDrag(true);
+                }
+                else if (m.Msg == (int)Msgs.WM_KEYDOWN && (int)m.WParam == (int)Keys.Escape)
+                {
+                    EndDrag(true);
+                }
+
+                return OnPreFilterMessage(ref m);
+            }
+
+            #endregion
+
+            #region Properties / Indexers
 
             protected abstract Control DragControl { get; }
 
@@ -43,7 +96,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             protected sealed override void WndProc(ref Message m)
             {
-                if (m.Msg == (int) Win32.Msgs.WM_CANCELMODE || m.Msg == (int) Win32.Msgs.WM_CAPTURECHANGED)
+                if (m.Msg == (int)Msgs.WM_CANCELMODE || m.Msg == (int)Msgs.WM_CAPTURECHANGED)
                 {
                     EndDrag(true);
                 }
@@ -53,40 +106,20 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region Private Methods
+            #region Event handling Methods
 
-            private void EndDrag(bool abort)
+            protected abstract void OnDragging();
+
+            protected abstract void OnEndDrag(bool abort);
+
+            protected virtual bool OnPreFilterMessage(ref Message m)
             {
-                ReleaseHandle();
-                Application.RemoveMessageFilter(this);
-                DragControl.FindForm().Capture = false;
-
-                OnEndDrag(abort);
-            }
-
-            bool IMessageFilter.PreFilterMessage(ref Message m)
-            {
-                if (m.Msg == (int) Win32.Msgs.WM_MOUSEMOVE)
-                {
-                    OnDragging();
-                }
-                else if (m.Msg == (int) Win32.Msgs.WM_LBUTTONUP)
-                {
-                    EndDrag(false);
-                }
-                else if (m.Msg == (int) Win32.Msgs.WM_CAPTURECHANGED)
-                {
-                    EndDrag(true);
-                }
-                else if (m.Msg == (int) Win32.Msgs.WM_KEYDOWN && (int) m.WParam == (int) Keys.Escape)
-                {
-                    EndDrag(true);
-                }
-
-                return OnPreFilterMessage(ref m);
+                return false;
             }
 
             #endregion
+
+            #region Private Methods
 
             protected bool BeginDrag()
             {
@@ -98,7 +131,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                         return false;
                     }
 
-                    StartMousePosition = Control.MousePosition;
+                    StartMousePosition = MousePosition;
 
                     if (!NativeMethods.DragDetect(DragControl.Handle, StartMousePosition))
                     {
@@ -112,58 +145,18 @@ namespace WeifenLuo.WinFormsUI.Docking
                 }
             }
 
-            protected abstract void OnDragging();
-
-            protected abstract void OnEndDrag(bool abort);
-
-            protected virtual bool OnPreFilterMessage(ref Message m)
+            private void EndDrag(bool abort)
             {
-                return false;
-            }
-        }
+                ReleaseHandle();
+                Application.RemoveMessageFilter(this);
+                DragControl.FindForm().Capture = false;
 
-        private abstract class DragHandler : DragHandlerBase
-        {
-            #region Fields
-
-            #endregion
-
-            #region cTor
-
-            protected DragHandler(DockPanel dockPanel)
-            {
-                DockPanel = dockPanel;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public DockPanel DockPanel { get; }
-
-            protected IDragSource DragSource { get; set; }
-
-            protected sealed override Control DragControl
-            {
-                get { return DragSource == null ? null : DragSource.DragControl; }
-            }
-
-            #endregion
-
-            #region Overrides
-
-            protected sealed override bool OnPreFilterMessage(ref Message m)
-            {
-                if ((m.Msg == (int) Win32.Msgs.WM_KEYDOWN || m.Msg == (int) Win32.Msgs.WM_KEYUP) &&
-                    ((int) m.WParam == (int) Keys.ControlKey || (int) m.WParam == (int) Keys.ShiftKey))
-                {
-                    OnDragging();
-                }
-
-                return base.OnPreFilterMessage(ref m);
+                OnEndDrag(abort);
             }
 
             #endregion
         }
+
+        #endregion
     }
 }

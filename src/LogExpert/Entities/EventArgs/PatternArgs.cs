@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class PatternArgs
     {
-        #region Fields
+        #region Private Fields
 
         public int endLine = 0;
         public int fuzzy = 6;

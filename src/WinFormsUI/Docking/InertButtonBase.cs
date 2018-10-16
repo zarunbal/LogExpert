@@ -1,21 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     internal abstract class InertButtonBase : Control
     {
-        #region Fields
+        #region Private Fields
 
-        private bool m_isMouseOver = false;
+        private bool m_isMouseOver;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         protected InertButtonBase()
         {
@@ -25,13 +23,15 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public abstract Bitmap Image { get; }
 
+        protected override Size DefaultSize => Resources.DockPane_Close.Size;
+
         protected bool IsMouseOver
         {
-            get { return m_isMouseOver; }
+            get => m_isMouseOver;
             private set
             {
                 if (m_isMouseOver == value)
@@ -44,14 +44,9 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
-        protected override Size DefaultSize
-        {
-            get { return Resources.DockPane_Close.Size; }
-        }
-
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void RefreshChanges()
         {
@@ -60,7 +55,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 return;
             }
 
-            bool mouseOver = ClientRectangle.Contains(PointToClient(Control.MousePosition));
+            bool mouseOver = ClientRectangle.Contains(PointToClient(MousePosition));
             if (mouseOver != IsMouseOver)
             {
                 IsMouseOver = mouseOver;
@@ -72,16 +67,6 @@ namespace WeifenLuo.WinFormsUI.Docking
         #endregion
 
         #region Overrides
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-            bool over = ClientRectangle.Contains(e.X, e.Y);
-            if (IsMouseOver != over)
-            {
-                IsMouseOver = over;
-            }
-        }
 
         protected override void OnMouseEnter(EventArgs e)
         {
@@ -98,6 +83,16 @@ namespace WeifenLuo.WinFormsUI.Docking
             if (IsMouseOver)
             {
                 IsMouseOver = false;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            bool over = ClientRectangle.Contains(e.X, e.Y);
+            if (IsMouseOver != over)
+            {
+                IsMouseOver = over;
             }
         }
 
@@ -138,8 +133,12 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
+        #region Event handling Methods
+
         protected virtual void OnRefreshChanges()
         {
         }
+
+        #endregion
     }
 }

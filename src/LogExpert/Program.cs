@@ -1,33 +1,58 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Threading;
-using System.Runtime.Remoting.Channels.Ipc;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting;
-using System.IO;
 using System.Diagnostics;
-using System.Security;
+using System.IO;
 using System.Reflection;
-using System.Security.Principal;
-using LogExpert.Dialogs;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
+using System.Security;
+using System.Threading;
+using System.Windows.Forms;
 using ITDM;
+using LogExpert.Dialogs;
 using NLog;
 
 namespace LogExpert
 {
     internal static class Program
     {
-        #region Fields
-
         private static readonly ILogger _logger = LogManager.GetLogger("Program");
+
+        #region Event raising Methods
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _logger.Fatal(e);
+
+            object exceptionObject = e.ExceptionObject;
+
+// ShowUnhandledException(exceptionObject);
+            Thread thread = new Thread(ShowUnhandledException);
+            thread.IsBackground = true;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start(exceptionObject);
+            thread.Join();
+        }
 
         #endregion
 
         #region Private Methods
 
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            _logger.Fatal(e);
+
+            // ShowUnhandledException(e.Exception);
+            Thread thread = new Thread(ShowUnhandledException);
+            thread.IsBackground = true;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start(e.Exception);
+            thread.Join();
+        }
+
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
         [STAThread]
         private static void Main(string[] orgArgs)
@@ -44,11 +69,36 @@ namespace LogExpert
             }
         }
 
+        [STAThread]
+        private static void ShowUnhandledException(object exceptionObject)
+        {
+            string errorText = string.Empty;
+            string stackTrace = string.Empty;
+            if (exceptionObject is Exception)
+            {
+                errorText = (exceptionObject as Exception).Message;
+                stackTrace = "\r\n" + (exceptionObject as Exception).GetType().Name + "\r\n" +
+                             (exceptionObject as Exception).StackTrace;
+            }
+            else
+            {
+                stackTrace = exceptionObject.ToString();
+                string[] lines = stackTrace.Split('\n');
+                if (lines != null && lines.Length > 0)
+                {
+                    errorText = lines[0];
+                }
+            }
+
+            ExceptionWindow win = new ExceptionWindow(errorText, stackTrace);
+            win.ShowDialog();
+        }
+
         private static void Sub_Main(string[] orgArgs)
         {
             AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+                CurrentDomain_UnhandledException;
+            Application.ThreadException += Application_ThreadException;
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
@@ -84,6 +134,7 @@ namespace LogExpert
                     argsList.Add(fileArg);
                 }
             }
+
             string[] args = argsList.ToArray();
             if (configFile.Exists)
             {
@@ -104,7 +155,7 @@ namespace LogExpert
             {
                 Settings settings = ConfigManager.Settings;
                 bool isCreated = false;
-                Mutex mutex = new System.Threading.Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out isCreated);
+                Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out isCreated);
                 if (isCreated)
                 {
                     // first application instance
@@ -113,7 +164,7 @@ namespace LogExpert
                     LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
 
                     // first instance
-                    //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                    // WindowsIdentity wi = WindowsIdentity.GetCurrent();
                     IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
                     ChannelServices.RegisterChannel(ipcChannel, false);
                     RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
@@ -138,8 +189,8 @@ namespace LogExpert
                         try
                         {
                             // another instance already exists
-                            //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                            LogExpertProxy proxy = (LogExpertProxy) Activator.GetObject(typeof(LogExpertProxy),
+                            // WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                            LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy),
                                 "ipc://LogExpert" + pId + "/LogExpertProxy");
                             if (settings.preferences.allowOnlyOneInstance)
                             {
@@ -149,6 +200,7 @@ namespace LogExpert
                             {
                                 proxy.NewWindowOrLockedWindow(args);
                             }
+
                             break;
                         }
                         catch (RemotingException e)
@@ -159,12 +211,14 @@ namespace LogExpert
                             Thread.Sleep(500);
                         }
                     }
+
                     if (counter == 0)
                     {
                         _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
                         MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
                 }
+
                 mutex.Close();
             }
             catch (Exception ex)
@@ -172,59 +226,6 @@ namespace LogExpert
                 _logger.Error(ex, "Mutex error, giving up: ");
                 MessageBox.Show($"Cannot open connection to first instance ({ex.Message})", "LogExpert");
             }
-        }
-
-        [STAThread]
-        private static void ShowUnhandledException(object exceptionObject)
-        {
-            string errorText = "";
-            string stackTrace = "";
-            if (exceptionObject is Exception)
-            {
-                errorText = (exceptionObject as Exception).Message;
-                stackTrace = "\r\n" + (exceptionObject as Exception).GetType().Name + "\r\n" +
-                             (exceptionObject as Exception).StackTrace;
-            }
-            else
-            {
-                stackTrace = exceptionObject.ToString();
-                string[] lines = stackTrace.Split(new char[] {'\n'});
-                if (lines != null && lines.Length > 0)
-                {
-                    errorText = lines[0];
-                }
-            }
-            ExceptionWindow win = new ExceptionWindow(errorText, stackTrace);
-            win.ShowDialog();
-        }
-
-        #endregion
-
-        #region Events handler
-
-        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
-        {
-            _logger.Fatal(e);
-
-            //ShowUnhandledException(e.Exception);
-            Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
-            thread.IsBackground = true;
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start(e.Exception);
-            thread.Join();
-        }
-
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            _logger.Fatal(e);
-
-            object exceptionObject = e.ExceptionObject;
-            //ShowUnhandledException(exceptionObject);
-            Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
-            thread.IsBackground = true;
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start(exceptionObject);
-            thread.Join();
         }
 
         #endregion

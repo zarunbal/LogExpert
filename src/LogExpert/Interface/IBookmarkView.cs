@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     /// <summary>
-    /// To be implemented by the bookmark window. Will be informed from LogWindow about changes in bookmarks. 
+    ///     To be implemented by the bookmark window. Will be informed from LogWindow about changes in bookmarks.
     /// </summary>
     internal interface IBookmarkView
     {
-        #region Properties
+        #region Properties / Indexers
 
         bool LineColumnVisible { set; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
-        void UpdateView();
         void BookmarkTextChanged(Bookmark bookmark);
         void SelectBookmark(int lineNum);
         void SetBookmarkData(IBookmarkData bookmarkData);
+
+        void UpdateView();
 
         #endregion
     }

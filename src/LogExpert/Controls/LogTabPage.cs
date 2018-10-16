@@ -1,114 +1,83 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using System.Drawing;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace LogExpert
 {
     internal class LogTabPage : TabPage
     {
-        #region Fields
+        #region Static/Constants
 
         private const int DIFF_MAX = 100;
-        private int diffSum = 0;
-        private readonly object diffSumLock = new object();
-        private readonly Thread ledThread;
-        private bool shouldStop = false;
 
         #endregion
 
-        #region cTor
+        #region Private Fields
+
+        private readonly object diffSumLock = new object();
+        private readonly Thread ledThread;
+        private int diffSum;
+        private bool shouldStop;
+
+        #endregion
+
+        #region Ctor
 
         public LogTabPage(LogWindow logWindow, string title)
             : base("MMi" + (title == null ? Util.GetNameFromPath(logWindow.FileName) : title))
         {
-            this.TabTitle = title;
-            if (this.TabTitle == null)
+            TabTitle = title;
+            if (TabTitle == null)
             {
-                this.TabTitle = Util.GetNameFromPath(logWindow.FileName);
+                TabTitle = Util.GetNameFromPath(logWindow.FileName);
             }
-            this.LogWindow = logWindow;
-            this.LogWindow.FileSizeChanged += FileSizeChanged;
-            this.LogWindow.TailFollowed += TailFollowed;
-            this.ledThread = new Thread(new ThreadStart(this.LedThreadProc));
-            this.ledThread.IsBackground = true;
-            this.ledThread.Start();
+
+            LogWindow = logWindow;
+            LogWindow.FileSizeChanged += FileSizeChanged;
+            LogWindow.TailFollowed += TailFollowed;
+            ledThread = new Thread(LedThreadProc);
+            ledThread.IsBackground = true;
+            ledThread.Start();
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public LogWindow LogWindow { get; }
+        public bool Dirty { get; set; }
+
+        public bool IsActiveTab { get; set; } = false;
 
 
         public int LineDiff
         {
             get
             {
-                lock (this.diffSumLock)
+                lock (diffSumLock)
                 {
-                    return this.diffSum;
+                    return diffSum;
                 }
             }
         }
 
-        public bool Dirty { get; set; } = false;
+        public LogWindow LogWindow { get; }
 
-        public bool IsActiveTab { get; set; } = false;
-
-        public string TabTitle { get; set; } = "";
+        public string TabTitle { get; set; } = string.Empty;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void Delete()
         {
-            this.shouldStop = true;
-            this.ledThread.Interrupt();
-            this.ledThread.Join();
+            shouldStop = true;
+            ledThread.Interrupt();
+            ledThread.Join();
         }
 
         #endregion
 
         #region Private Methods
-
-        private void LedThreadProc()
-        {
-            while (!this.shouldStop)
-            {
-                try
-                {
-                    Thread.Sleep(200);
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-                lock (this.diffSumLock)
-                {
-                    if (this.diffSum > 0)
-                    {
-                        this.diffSum -= 10;
-                        if (this.diffSum < 0)
-                        {
-                            this.diffSum = 0;
-                        }
-                        if (Parent != null)
-                        {
-                            Parent.Invalidate(); // redraw LEDs
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Events handler
 
         private void FileSizeChanged(object sender, LogEventArgs e)
         {
@@ -118,21 +87,55 @@ namespace LogExpert
                 diff = DIFF_MAX;
                 return;
             }
-            lock (this.diffSumLock)
+
+            lock (diffSumLock)
             {
-                this.diffSum = this.diffSum + diff;
-                if (this.diffSum > DIFF_MAX)
+                diffSum = diffSum + diff;
+                if (diffSum > DIFF_MAX)
                 {
-                    this.diffSum = DIFF_MAX;
+                    diffSum = DIFF_MAX;
                 }
             }
+
             Dirty = true;
             Parent.Invalidate();
         }
 
+        private void LedThreadProc()
+        {
+            while (!shouldStop)
+            {
+                try
+                {
+                    Thread.Sleep(200);
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+
+                lock (diffSumLock)
+                {
+                    if (diffSum > 0)
+                    {
+                        diffSum -= 10;
+                        if (diffSum < 0)
+                        {
+                            diffSum = 0;
+                        }
+
+                        if (Parent != null)
+                        {
+                            Parent.Invalidate(); // redraw LEDs
+                        }
+                    }
+                }
+            }
+        }
+
         private void TailFollowed(object sender, EventArgs e)
         {
-            if (this.IsActiveTab)
+            if (IsActiveTab)
             {
                 Dirty = false;
                 Parent.Invalidate();

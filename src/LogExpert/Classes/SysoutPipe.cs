@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 using NLog;
 
@@ -10,62 +9,64 @@ namespace LogExpert
 {
     internal class SysoutPipe
     {
-        #region Fields
-
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #region Private Fields
 
         private readonly StreamReader sysout;
         private StreamWriter writer;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public SysoutPipe(StreamReader sysout)
         {
             this.sysout = sysout;
-            this.FileName = Path.GetTempFileName();
-            _logger.Info("sysoutPipe created temp file: {0}", this.FileName);
-            FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-            this.writer = new StreamWriter(fStream, Encoding.Unicode);
-            Thread thread = new Thread(new ThreadStart(this.ReaderThread));
+            FileName = Path.GetTempFileName();
+            _logger.Info("sysoutPipe created temp file: {0}", FileName);
+            FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+            writer = new StreamWriter(fStream, Encoding.Unicode);
+            Thread thread = new Thread(ReaderThread);
             thread.IsBackground = true;
             thread.Start();
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string FileName { get; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void ClosePipe()
         {
-            this.writer.Close();
-            this.writer = null;
+            writer.Close();
+            writer = null;
         }
 
 
         public void DataReceivedEventHandler(object sender, DataReceivedEventArgs e)
         {
-            this.writer.WriteLine(e.Data);
+            writer.WriteLine(e.Data);
         }
 
-        public void ProcessExitedEventHandler(object sender, System.EventArgs e)
+        public void ProcessExitedEventHandler(object sender, EventArgs e)
         {
-            //ClosePipe();
+            // ClosePipe();
             if (sender.GetType() == typeof(Process))
             {
-                ((Process) sender).Exited -= this.ProcessExitedEventHandler;
-                ((Process) sender).OutputDataReceived -= this.DataReceivedEventHandler;
+                ((Process)sender).Exited -= ProcessExitedEventHandler;
+                ((Process)sender).OutputDataReceived -= DataReceivedEventHandler;
             }
         }
 
         #endregion
+
+        #region Private Methods
 
         protected void ReaderThread()
         {
@@ -74,11 +75,12 @@ namespace LogExpert
             {
                 try
                 {
-                    int read = this.sysout.Read(buff, 0, 256);
+                    int read = sysout.Read(buff, 0, 256);
                     if (read == 0)
                     {
                         break;
                     }
+
                     writer.Write(buff, 0, read);
                 }
                 catch (IOException e)
@@ -87,7 +89,10 @@ namespace LogExpert
                     break;
                 }
             }
+
             ClosePipe();
         }
+
+        #endregion
     }
 }

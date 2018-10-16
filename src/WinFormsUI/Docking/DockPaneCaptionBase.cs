@@ -1,18 +1,13 @@
-using System;
-using System.Windows.Forms;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Security.Permissions;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking.Win32;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public abstract class DockPaneCaptionBase : Control
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         protected internal DockPaneCaptionBase(DockPane pane)
         {
@@ -27,47 +22,17 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
+
+        protected DockPane.AppearanceStyle Appearance => DockPane.Appearance;
 
         protected DockPane DockPane { get; }
 
-        protected DockPane.AppearanceStyle Appearance
-        {
-            get { return DockPane.Appearance; }
-        }
-
-        protected bool HasTabPageContextMenu
-        {
-            get { return DockPane.HasTabPageContextMenu; }
-        }
-
-        #endregion
-
-        #region Internals
-
-        internal void RefreshChanges()
-        {
-            if (IsDisposed)
-            {
-                return;
-            }
-
-            OnRefreshChanges();
-        }
+        protected bool HasTabPageContextMenu => DockPane.HasTabPageContextMenu;
 
         #endregion
 
         #region Overrides
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-
-            if (e.Button == MouseButtons.Right)
-            {
-                ShowTabPageContextMenu(new Point(e.X, e.Y));
-            }
-        }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -83,10 +48,20 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            if (e.Button == MouseButtons.Right)
+            {
+                ShowTabPageContextMenu(new Point(e.X, e.Y));
+            }
+        }
+
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == (int) Win32.Msgs.WM_LBUTTONDBLCLK)
+            if (m.Msg == (int)Msgs.WM_LBUTTONDBLCLK)
             {
                 if (DockHelper.IsDockStateAutoHide(DockPane.DockState))
                 {
@@ -103,22 +78,41 @@ namespace WeifenLuo.WinFormsUI.Docking
                     DockPane.Float();
                 }
             }
+
             base.WndProc(ref m);
         }
 
         #endregion
 
-        protected void ShowTabPageContextMenu(Point position)
+        #region Event handling Methods
+
+        protected virtual void OnRefreshChanges()
         {
-            DockPane.ShowTabPageContextMenu(this, position);
         }
 
         protected virtual void OnRightToLeftLayoutChanged()
         {
         }
 
-        protected virtual void OnRefreshChanges()
+        #endregion
+
+        #region Private Methods
+
+        protected void ShowTabPageContextMenu(Point position)
         {
+            DockPane.ShowTabPageContextMenu(this, position);
+        }
+
+        #endregion
+
+        internal void RefreshChanges()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            OnRefreshChanges();
         }
 
         protected internal abstract int MeasureHeight();

@@ -1,21 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Text;
 
 /*
  * Taken from https://cmdline.codeplex.com/
  * 
  */
-
 namespace ITDM
 {
     /// <summary>
-    /// Represents an error occuring during command line parsing.
+    ///     Represents an error occuring during command line parsing.
     /// </summary>
     public class CmdLineException : Exception
     {
-        #region cTor
+        #region Ctor
 
         public CmdLineException(string parameter, string message)
             :
@@ -33,20 +30,16 @@ namespace ITDM
     }
 
     /// <summary>
-    /// Represents a command line parameter. 
-    /// Parameters are words in the command line beginning with a hyphen (-).
-    /// The value of the parameter is the next word in
+    ///     Represents a command line parameter.
+    ///     Parameters are words in the command line beginning with a hyphen (-).
+    ///     The value of the parameter is the next word in
     /// </summary>
     public class CmdLineParameter
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         /// <summary>
-        /// Creates a new instance of this class.
+        ///     Creates a new instance of this class.
         /// </summary>
         /// <param name="name">Name of parameter.</param>
         /// <param name="required">Require that the parameter is present in the command line.</param>
@@ -60,39 +53,39 @@ namespace ITDM
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         /// <summary>
-        /// Returns the value of the parameter.
+        ///     Returns true if the parameter was found in the command line.
         /// </summary>
-        public string Value { get; private set; } = "";
+        public bool Exists { get; private set; }
 
         /// <summary>
-        /// Returns the help message associated with the parameter.
+        ///     Returns the help message associated with the parameter.
         /// </summary>
-        public string Help { get; } = "";
+        public string Help { get; } = string.Empty;
 
         /// <summary>
-        /// Returns true if the parameter was found in the command line.
-        /// </summary>
-        public bool Exists { get; private set; } = false;
-
-        /// <summary>
-        /// Returns true if the parameter is required in the command line.
-        /// </summary>
-        public bool Required { get; } = false;
-
-        /// <summary>
-        /// Returns the name of the parameter.
+        ///     Returns the name of the parameter.
         /// </summary>
         public string Name { get; }
 
-        #endregion
-
-        #region Public methods
+        /// <summary>
+        ///     Returns true if the parameter is required in the command line.
+        /// </summary>
+        public bool Required { get; }
 
         /// <summary>
-        /// Sets the value of the parameter.
+        ///     Returns the value of the parameter.
+        /// </summary>
+        public string Value { get; private set; } = string.Empty;
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        ///     Sets the value of the parameter.
         /// </summary>
         /// <param name="value">A string containing a integer expression.</param>
         public virtual void SetValue(string value)
@@ -105,21 +98,21 @@ namespace ITDM
     }
 
     /// <summary>
-    /// Represents an integer command line parameter. 
+    ///     Represents an integer command line parameter.
     /// </summary>
     public class CmdLineInt : CmdLineParameter
     {
-        #region Fields
+        #region Private Fields
 
         private readonly int _max = int.MaxValue;
         private readonly int _min = int.MinValue;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         /// <summary>
-        /// Creates a new instance of this class.
+        ///     Creates a new instance of this class.
         /// </summary>
         /// <param name="name">Name of parameter.</param>
         /// <param name="required">Require that the parameter is present in the command line.</param>
@@ -130,7 +123,7 @@ namespace ITDM
         }
 
         /// <summary>
-        /// Creates a new instance of this class.
+        ///     Creates a new instance of this class.
         /// </summary>
         /// <param name="name">Name of parameter.</param>
         /// <param name="required">Require that the parameter is present in the command line.</param>
@@ -146,19 +139,33 @@ namespace ITDM
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         /// <summary>
-        /// Returns the current value of the parameter.
+        ///     Returns the current value of the parameter.
         /// </summary>
-        new public int Value { get; private set; }
+        public new int Value { get; private set; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         /// <summary>
-        /// Sets the value of the parameter.
+        ///     A implicit converion to a int data type.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static implicit operator int(CmdLineInt s)
+        {
+            return s.Value;
+        }
+
+        #endregion
+
+        #region Overrides
+
+        /// <summary>
+        ///     Sets the value of the parameter.
         /// </summary>
         /// <param name="value">A string containing a integer expression.</param>
         public override void SetValue(string value)
@@ -171,38 +178,31 @@ namespace ITDM
             }
             catch (Exception)
             {
-                throw new CmdLineException(base.Name, "Value is not an integer.");
+                throw new CmdLineException(Name, "Value is not an integer.");
             }
+
             if (i < _min)
             {
-                throw new CmdLineException(base.Name, string.Format("Value must be greather or equal to {0}.", _min));
+                throw new CmdLineException(Name, string.Format("Value must be greather or equal to {0}.", _min));
             }
+
             if (i > _max)
             {
-                throw new CmdLineException(base.Name, string.Format("Value must be less or equal to {0}.", _max));
+                throw new CmdLineException(Name, string.Format("Value must be less or equal to {0}.", _max));
             }
-            Value = i;
-        }
 
-        /// <summary>
-        /// A implicit converion to a int data type.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static implicit operator int(CmdLineInt s)
-        {
-            return s.Value;
+            Value = i;
         }
 
         #endregion
     }
 
     /// <summary>
-    /// Represents an string command line parameter.
+    ///     Represents an string command line parameter.
     /// </summary>
     public class CmdLineString : CmdLineParameter
     {
-        #region cTor
+        #region Ctor
 
         public CmdLineString(string name, bool required, string helpMessage)
             : base(name, required, helpMessage)
@@ -211,7 +211,7 @@ namespace ITDM
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public static implicit operator string(CmdLineString s)
         {
@@ -222,32 +222,21 @@ namespace ITDM
     }
 
     /// <summary>
-    /// Provides a simple strongly typed interface to work with command line parameters.
+    ///     Provides a simple strongly typed interface to work with command line parameters.
     /// </summary>
     public class CmdLine
     {
-        #region Fields
+        #region Private Fields
 
         // A private dictonary containing the parameters.
         private readonly Dictionary<string, CmdLineParameter> parameters = new Dictionary<string, CmdLineParameter>();
 
         #endregion
 
-        #region cTor
+        #region Properties / Indexers
 
         /// <summary>
-        /// Creats a new empty command line object.
-        /// </summary>
-        public CmdLine()
-        {
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Returns a command line parameter by the name.
+        ///     Returns a command line parameter by the name.
         /// </summary>
         /// <param name="name">The name of the parameter (the word after the initial hyphen (-).</param>
         /// <returns>A reference to the named comman line object.</returns>
@@ -259,42 +248,45 @@ namespace ITDM
                 {
                     throw new CmdLineException(name, "Not a registered parameter.");
                 }
+
                 return parameters[name];
             }
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         /// <summary>
-        /// Registers a parameter to be used and adds it to the help screen.
+        ///     Generates the help screen.
         /// </summary>
-        /// <param name="p">The parameter to add.</param>
-        public void RegisterParameter(CmdLineParameter parameter)
+        public string HelpScreen()
         {
-            if (parameters.ContainsKey(parameter.Name))
+            int len = 0;
+            foreach (string key in parameters.Keys)
             {
-                throw new CmdLineException(parameter.Name, "Parameter is already registered.");
+                len = Math.Max(len, key.Length);
             }
-            parameters.Add(parameter.Name, parameter);
+
+            string help = "\nParameters:\n\n";
+            foreach (string key in parameters.Keys)
+            {
+                string s = "-" + parameters[key].Name;
+                while (s.Length < len + 3)
+                {
+                    s += " ";
+                }
+
+                s += parameters[key].Help + "\n";
+                help += s;
+            }
+
+            return help;
         }
 
-        /// <summary>
-        /// Registers parameters to be used and adds hem to the help screen.
-        /// </summary>
-        /// <param name="p">The parameter to add.</param>
-        public void RegisterParameter(CmdLineParameter[] parameters)
-        {
-            foreach (CmdLineParameter p in parameters)
-            {
-                RegisterParameter(p);
-            }
-        }
-
 
         /// <summary>
-        /// Parses the command line and sets the value of each registered parmaters.
+        ///     Parses the command line and sets the value of each registered parmaters.
         /// </summary>
         /// <param name="args">The arguments array sent to main()</param>
         /// <returns>Any reminding strings after arguments has been processed.</returns>
@@ -310,7 +302,7 @@ namespace ITDM
                 {
                     // The current string is a parameter name
                     string key = args[i].Substring(1, args[i].Length - 1).ToLower();
-                    string value = "";
+                    string value = string.Empty;
                     i++;
                     if (i < args.Length)
                     {
@@ -325,6 +317,7 @@ namespace ITDM
                             i++;
                         }
                     }
+
                     if (!parameters.ContainsKey(key))
                     {
                         throw new CmdLineException(key, "Parameter is not allowed.");
@@ -358,55 +351,56 @@ namespace ITDM
         }
 
         /// <summary>
-        /// Generates the help screen.
+        ///     Registers a parameter to be used and adds it to the help screen.
         /// </summary>
-        public string HelpScreen()
+        /// <param name="p">The parameter to add.</param>
+        public void RegisterParameter(CmdLineParameter parameter)
         {
-            int len = 0;
-            foreach (string key in parameters.Keys)
+            if (parameters.ContainsKey(parameter.Name))
             {
-                len = Math.Max(len, key.Length);
+                throw new CmdLineException(parameter.Name, "Parameter is already registered.");
             }
 
-            string help = "\nParameters:\n\n";
-            foreach (string key in parameters.Keys)
+            parameters.Add(parameter.Name, parameter);
+        }
+
+        /// <summary>
+        ///     Registers parameters to be used and adds hem to the help screen.
+        /// </summary>
+        /// <param name="p">The parameter to add.</param>
+        public void RegisterParameter(CmdLineParameter[] parameters)
+        {
+            foreach (CmdLineParameter p in parameters)
             {
-                string s = "-" + parameters[key].Name;
-                while (s.Length < len + 3)
-                {
-                    s += " ";
-                }
-                s += parameters[key].Help + "\n";
-                help += s;
+                RegisterParameter(p);
             }
-            return help;
         }
 
         #endregion
     }
 
     /// <summary>
-    /// Represents a CmdLine object to use with console applications.
-    /// The -help parameter will be registered automatically.
-    /// Any errors will be written to the console instead of generating exceptions.
+    ///     Represents a CmdLine object to use with console applications.
+    ///     The -help parameter will be registered automatically.
+    ///     Any errors will be written to the console instead of generating exceptions.
     /// </summary>
     public class ConsoleCmdLine : CmdLine
     {
-        #region cTor
+        #region Ctor
 
         public ConsoleCmdLine()
         {
-            base.RegisterParameter(new CmdLineString("help", false, "Prints the help screen."));
+            RegisterParameter(new CmdLineString("help", false, "Prints the help screen."));
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public new string[] Parse(string[] args)
         {
             string[] ret = null;
-            string error = "";
+            string error = string.Empty;
             try
             {
                 ret = base.Parse(args);
@@ -418,18 +412,19 @@ namespace ITDM
 
             if (this["help"].Exists)
             {
-                //foreach(string s in base.HelpScreen().Split('\n'))
-                //    Console.WriteLine(s);
-                Console.WriteLine(base.HelpScreen());
-                System.Environment.Exit(0);
+                // foreach(string s in base.HelpScreen().Split('\n'))
+                // Console.WriteLine(s);
+                Console.WriteLine(HelpScreen());
+                Environment.Exit(0);
             }
 
-            if (error != "")
+            if (error != string.Empty)
             {
                 Console.WriteLine(error);
                 Console.WriteLine("Use -help for more information.");
-                System.Environment.Exit(1);
+                Environment.Exit(1);
             }
+
             return ret;
         }
 

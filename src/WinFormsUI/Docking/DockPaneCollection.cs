@@ -1,14 +1,11 @@
-using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+using System.Collections.ObjectModel;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public class DockPaneCollection : ReadOnlyCollection<DockPane>
     {
-        #region cTor
+        #region Ctor
 
         internal DockPaneCollection()
             : base(new List<DockPane>())
@@ -16,8 +13,6 @@ namespace WeifenLuo.WinFormsUI.Docking
         }
 
         #endregion
-
-        #region Internals
 
         internal int Add(DockPane pane)
         {
@@ -57,7 +52,5 @@ namespace WeifenLuo.WinFormsUI.Docking
         {
             Items.Remove(pane);
         }
-
-        #endregion
     }
 }

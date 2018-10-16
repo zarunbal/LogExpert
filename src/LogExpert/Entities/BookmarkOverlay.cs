@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace LogExpert
 {
     public class BookmarkOverlay
     {
-        #region Fields
-
-        #endregion
-
-        #region Properties
+        #region Properties / Indexers
 
         public Bookmark Bookmark { get; set; }
 
-        public Point Position { get; set; }
-
         public Rectangle BubbleRect { get; set; }
+
+        public Point Position { get; set; }
 
         #endregion
     }

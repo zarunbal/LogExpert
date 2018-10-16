@@ -1,72 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
     public partial class RegexHelperDialog : Form
     {
-        #region Fields
+        #region Static/Constants
 
         private static readonly int MAX_HISTORY = 30;
-        private bool caseSensitive = false;
 
         #endregion
 
-        #region cTor
+        #region Private Fields
+
+        private bool caseSensitive;
+
+        #endregion
+
+        #region Ctor
 
         public RegexHelperDialog()
         {
             InitializeComponent();
-            this.Load += new EventHandler(RegexHelperDialog_Load);
+            Load += RegexHelperDialog_Load;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public bool CaseSensitive
         {
-            get { return this.caseSensitive; }
+            get => caseSensitive;
             set
             {
-                this.caseSensitive = value;
-                this.caseSensitiveCheckBox.Checked = value;
+                caseSensitive = value;
+                caseSensitiveCheckBox.Checked = value;
             }
         }
 
         public string Pattern
         {
-            get { return this.expressionComboBox.Text; }
-            set { this.expressionComboBox.Text = value; }
+            get => expressionComboBox.Text;
+            set => expressionComboBox.Text = value;
         }
 
         #endregion
 
         #region Private Methods
 
-        private void UpdateMatches()
+        private void button1_Click(object sender, EventArgs e)
         {
-            this.matchesTextBox.Text = "";
-            try
-            {
-                Regex rex = new Regex(this.expressionComboBox.Text,
-                    this.caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                MatchCollection matches = rex.Matches(this.testTextComboBox.Text);
-                foreach (Match match in matches)
-                {
-                    this.matchesTextBox.Text += match.Value + "\r\n";
-                }
-            }
-            catch (ArgumentException)
-            {
-                this.matchesTextBox.Text = "No valid regex pattern";
-            }
+            Help.ShowHelp(this, "LogExpert.chm", HelpNavigator.Topic, "RegEx.htm");
+        }
+
+        private void caseSensitiveCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            caseSensitive = caseSensitiveCheckBox.Checked;
+            UpdateMatches();
+        }
+
+        private void expressionComboBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateMatches();
         }
 
         private void LoadHistory()
@@ -76,74 +73,64 @@ namespace LogExpert.Dialogs
             {
                 return;
             }
-            this.expressionComboBox.Items.Clear();
+
+            expressionComboBox.Items.Clear();
             foreach (string item in history.expressionHistoryList)
             {
-                this.expressionComboBox.Items.Add(item);
+                expressionComboBox.Items.Add(item);
             }
-            this.testTextComboBox.Items.Clear();
+
+            testTextComboBox.Items.Clear();
             foreach (string item in history.testtextHistoryList)
             {
-                this.testTextComboBox.Items.Add(item);
+                testTextComboBox.Items.Add(item);
             }
         }
 
-        private void SaveHistory()
+
+        private void okButton_Click(object sender, EventArgs e)
         {
-            RegexHistory history = new RegexHistory();
-            foreach (string item in this.expressionComboBox.Items)
+            string text = expressionComboBox.Text;
+            expressionComboBox.Items.Remove(text);
+            expressionComboBox.Items.Insert(0, text);
+
+            text = testTextComboBox.Text;
+            testTextComboBox.Items.Remove(text);
+            testTextComboBox.Items.Insert(0, text);
+
+            if (expressionComboBox.Items.Count > MAX_HISTORY)
             {
-                history.expressionHistoryList.Add(item);
+                expressionComboBox.Items.Remove(expressionComboBox.Items.Count - 1);
             }
-            foreach (string item in this.testTextComboBox.Items)
+
+            if (testTextComboBox.Items.Count > MAX_HISTORY)
             {
-                history.testtextHistoryList.Add(item);
+                testTextComboBox.Items.Remove(testTextComboBox.Items.Count - 1);
             }
-            ConfigManager.Settings.regexHistory = history;
-            ConfigManager.Save(SettingsFlags.RegexHistory);
+
+            SaveHistory();
         }
-
-        #endregion
-
-        #region Events handler
 
         private void RegexHelperDialog_Load(object sender, EventArgs e)
         {
             LoadHistory();
         }
 
-        private void caseSensitiveCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void SaveHistory()
         {
-            this.caseSensitive = this.caseSensitiveCheckBox.Checked;
-            UpdateMatches();
-        }
-
-
-        private void okButton_Click(object sender, EventArgs e)
-        {
-            string text = this.expressionComboBox.Text;
-            this.expressionComboBox.Items.Remove(text);
-            this.expressionComboBox.Items.Insert(0, text);
-
-            text = this.testTextComboBox.Text;
-            this.testTextComboBox.Items.Remove(text);
-            this.testTextComboBox.Items.Insert(0, text);
-
-            if (this.expressionComboBox.Items.Count > MAX_HISTORY)
+            RegexHistory history = new RegexHistory();
+            foreach (string item in expressionComboBox.Items)
             {
-                this.expressionComboBox.Items.Remove(this.expressionComboBox.Items.Count - 1);
-            }
-            if (this.testTextComboBox.Items.Count > MAX_HISTORY)
-            {
-                this.testTextComboBox.Items.Remove(this.testTextComboBox.Items.Count - 1);
+                history.expressionHistoryList.Add(item);
             }
 
-            SaveHistory();
-        }
+            foreach (string item in testTextComboBox.Items)
+            {
+                history.testtextHistoryList.Add(item);
+            }
 
-        private void expressionComboBox_TextChanged(object sender, EventArgs e)
-        {
-            UpdateMatches();
+            ConfigManager.Settings.regexHistory = history;
+            ConfigManager.Save(SettingsFlags.RegexHistory);
         }
 
         private void testTextComboBox_TextChanged(object sender, EventArgs e)
@@ -151,9 +138,23 @@ namespace LogExpert.Dialogs
             UpdateMatches();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void UpdateMatches()
         {
-            Help.ShowHelp(this, "LogExpert.chm", HelpNavigator.Topic, "RegEx.htm");
+            matchesTextBox.Text = string.Empty;
+            try
+            {
+                Regex rex = new Regex(expressionComboBox.Text,
+                    caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                MatchCollection matches = rex.Matches(testTextComboBox.Text);
+                foreach (Match match in matches)
+                {
+                    matchesTextBox.Text += match.Value + "\r\n";
+                }
+            }
+            catch (ArgumentException)
+            {
+                matchesTextBox.Text = "No valid regex pattern";
+            }
         }
 
         #endregion

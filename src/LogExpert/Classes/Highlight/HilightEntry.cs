@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-//using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
+// using System.Linq;
 namespace LogExpert
 {
     [Serializable]
     public class HilightEntry
     {
-        #region Fields
+        #region Private Fields
 
         private ActionEntry actionEntry;
         private Color bgColor;
@@ -29,33 +27,33 @@ namespace LogExpert
         private bool isWordMatch;
         private bool noBackground;
 
-        [NonSerialized] private Regex regex = null;
+        [NonSerialized] private Regex regex;
 
-        private string searchText = "";
+        private string searchText = string.Empty;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public HilightEntry(string searchText, Color fgColor, Color bgColor, bool isWordMatch)
         {
             this.searchText = searchText;
             this.fgColor = fgColor;
             this.bgColor = bgColor;
-            this.isRegEx = false;
-            this.isCaseSensitive = false;
-            this.isLedSwitch = false;
-            this.isStopTail = false;
-            this.isSetBookmark = false;
-            this.isActionEntry = false;
-            this.actionEntry = null;
-            this.IsWordMatch = isWordMatch;
+            isRegEx = false;
+            isCaseSensitive = false;
+            isLedSwitch = false;
+            isStopTail = false;
+            isSetBookmark = false;
+            isActionEntry = false;
+            actionEntry = null;
+            IsWordMatch = isWordMatch;
         }
 
 
         public HilightEntry(string searchText, Color fgColor, Color bgColor,
-            bool isRegEx, bool isCaseSensitive, bool isLedSwitch,
-            bool isStopTail, bool isSetBookmark, bool isActionEntry, ActionEntry actionEntry, bool isWordMatch)
+                            bool isRegEx, bool isCaseSensitive, bool isLedSwitch,
+                            bool isStopTail, bool isSetBookmark, bool isActionEntry, ActionEntry actionEntry, bool isWordMatch)
         {
             this.searchText = searchText;
             this.fgColor = fgColor;
@@ -67,131 +65,132 @@ namespace LogExpert
             this.isSetBookmark = isSetBookmark;
             this.isActionEntry = isActionEntry;
             this.actionEntry = actionEntry;
-            this.IsWordMatch = isWordMatch;
+            IsWordMatch = isWordMatch;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public bool IsStopTail
+        public ActionEntry ActionEntry
         {
-            get { return isStopTail; }
-            set { isStopTail = value; }
+            get => actionEntry;
+            set => actionEntry = value;
         }
 
-        public bool IsSetBookmark
+        public Color BackgroundColor
         {
-            get { return isSetBookmark; }
-            set { isSetBookmark = value; }
+            get => bgColor;
+            set => bgColor = value;
         }
 
-        public bool IsRegEx
+        public string BookmarkComment
         {
-            get { return isRegEx; }
-            set { isRegEx = value; }
-        }
-
-        public bool IsCaseSensitive
-        {
-            get { return isCaseSensitive; }
-            set
-            {
-                isCaseSensitive = value;
-                this.regex = null;
-            }
+            get => bookmarkComment;
+            set => bookmarkComment = value;
         }
 
 
         public Color ForegroundColor
         {
-            get { return this.fgColor; }
-            set { this.fgColor = value; }
+            get => fgColor;
+            set => fgColor = value;
         }
 
-        public Color BackgroundColor
+        public bool IsActionEntry
         {
-            get { return this.bgColor; }
-            set { this.bgColor = value; }
+            get => isActionEntry;
+            set => isActionEntry = value;
         }
 
-        public string SearchText
+        public bool IsBold
         {
-            get { return this.searchText; }
+            get => isBold;
+            set => isBold = value;
+        }
+
+        public bool IsCaseSensitive
+        {
+            get => isCaseSensitive;
             set
             {
-                this.searchText = value;
-                this.regex = null;
+                isCaseSensitive = value;
+                regex = null;
             }
         }
 
         public bool IsLedSwitch
         {
-            get { return this.isLedSwitch; }
-            set { this.isLedSwitch = value; }
+            get => isLedSwitch;
+            set => isLedSwitch = value;
         }
 
-        public ActionEntry ActionEntry
+        public bool IsRegEx
         {
-            get { return this.actionEntry; }
-            set { this.actionEntry = value; }
+            get => isRegEx;
+            set => isRegEx = value;
         }
 
-        public bool IsActionEntry
+        public bool IsSearchHit
         {
-            get { return this.isActionEntry; }
-            set { this.isActionEntry = value; }
+            get => isSearchHit;
+            set => isSearchHit = value;
         }
 
-        public string BookmarkComment
+        public bool IsSetBookmark
         {
-            get { return this.bookmarkComment; }
-            set { this.bookmarkComment = value; }
+            get => isSetBookmark;
+            set => isSetBookmark = value;
+        }
+
+        public bool IsStopTail
+        {
+            get => isStopTail;
+            set => isStopTail = value;
+        }
+
+        public bool IsWordMatch
+        {
+            get => isWordMatch;
+            set => isWordMatch = value;
+        }
+
+        public bool NoBackground
+        {
+            get => noBackground;
+            set => noBackground = value;
         }
 
         public Regex Regex
         {
             get
             {
-                if (this.regex == null)
+                if (regex == null)
                 {
-                    if (this.IsRegEx)
+                    if (IsRegEx)
                     {
-                        this.regex = new Regex(this.SearchText,
-                            this.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                        regex = new Regex(SearchText,
+                            IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
                     }
                     else
                     {
-                        this.regex = new Regex(Regex.Escape(this.SearchText),
-                            this.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                        regex = new Regex(Regex.Escape(SearchText),
+                            IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
                     }
                 }
-                return this.regex;
+
+                return regex;
             }
         }
 
-        public bool IsWordMatch
+        public string SearchText
         {
-            get { return this.isWordMatch; }
-            set { this.isWordMatch = value; }
-        }
-
-        public bool IsSearchHit
-        {
-            get { return this.isSearchHit; }
-            set { this.isSearchHit = value; }
-        }
-
-        public bool IsBold
-        {
-            get { return this.isBold; }
-            set { this.isBold = value; }
-        }
-
-        public bool NoBackground
-        {
-            get { return noBackground; }
-            set { noBackground = value; }
+            get => searchText;
+            set
+            {
+                searchText = value;
+                regex = null;
+            }
         }
 
         #endregion

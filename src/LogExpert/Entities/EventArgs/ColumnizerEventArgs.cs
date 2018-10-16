@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class ColumnizerEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public ColumnizerEventArgs(ILogLineColumnizer columnizer)
         {
-            this.Columnizer = columnizer;
+            Columnizer = columnizer;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public ILogLineColumnizer Columnizer { get; }
 

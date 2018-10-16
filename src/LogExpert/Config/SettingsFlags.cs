@@ -19,6 +19,6 @@ namespace LogExpert
               FilterList | RegexHistory | ToolSettings | GuiOrColors |
               FilterHistory,
 
-        Settings = All & ~WindowPosition & ~FileHistory,
+        Settings = All & ~WindowPosition & ~FileHistory
     }
 }

@@ -1,80 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
     public struct ActEntry
     {
+        #region Properties / Indexers
+
         public string Name { get; set; }
 
         public IKeywordAction Plugin { get; set; }
+
+        #endregion
     }
 
 
     public partial class KeywordActionDlg : Form
     {
-        #region Fields
+        #region Private Fields
 
         private readonly IDictionary<string, IKeywordAction> actionDict = new Dictionary<string, IKeywordAction>();
         private IList<IKeywordAction> keywordActionList;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public KeywordActionDlg(ActionEntry entry, IList<IKeywordAction> actionList)
         {
-            this.keywordActionList = actionList;
-            this.ActionEntry = entry;
+            keywordActionList = actionList;
+            ActionEntry = entry;
             InitializeComponent();
-            this.actionComboBox.Items.Clear();
+            actionComboBox.Items.Clear();
             foreach (IKeywordAction action in actionList)
             {
-                this.actionComboBox.Items.Add(action.GetName());
-                this.actionDict[action.GetName()] = action;
+                actionComboBox.Items.Add(action.GetName());
+                actionDict[action.GetName()] = action;
             }
-            if (this.actionComboBox.Items.Count > 0)
+
+            if (actionComboBox.Items.Count > 0)
             {
-                if (this.ActionEntry.pluginName != null && this.actionDict.ContainsKey(this.ActionEntry.pluginName))
+                if (ActionEntry.pluginName != null && actionDict.ContainsKey(ActionEntry.pluginName))
                 {
-                    this.actionComboBox.SelectedItem = this.ActionEntry.pluginName;
+                    actionComboBox.SelectedItem = ActionEntry.pluginName;
                 }
                 else
                 {
-                    this.actionComboBox.SelectedIndex = 0;
+                    actionComboBox.SelectedIndex = 0;
                 }
             }
-            this.parameterTextBox.Text = this.ActionEntry.actionParam;
+
+            parameterTextBox.Text = ActionEntry.actionParam;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public ActionEntry ActionEntry { get; private set; }
 
         #endregion
 
-        #region Events handler
+        #region Private Methods
+
+        private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            commentTextBox.Text = actionDict[(string)actionComboBox.SelectedItem].GetDescription();
+        }
 
         private void okButton_Click(object sender, EventArgs e)
         {
             ActionEntry = new ActionEntry();
-            ActionEntry.actionParam = this.parameterTextBox.Text;
-            if (this.actionDict.ContainsKey((string) this.actionComboBox.SelectedItem))
+            ActionEntry.actionParam = parameterTextBox.Text;
+            if (actionDict.ContainsKey((string)actionComboBox.SelectedItem))
             {
-                ActionEntry.pluginName = (string) this.actionComboBox.SelectedItem;
+                ActionEntry.pluginName = (string)actionComboBox.SelectedItem;
             }
-        }
-
-        private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            this.commentTextBox.Text = this.actionDict[(string) this.actionComboBox.SelectedItem].GetDescription();
         }
 
         #endregion

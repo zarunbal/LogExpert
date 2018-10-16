@@ -1,33 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using NLog;
 
 namespace LogExpert
 {
     internal class BookmarkDataProvider : IBookmarkData
     {
-        #region Fields
-
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
-        #endregion
-
-        #region cTor
-
-        internal BookmarkDataProvider()
-        {
-            BookmarkList = new SortedList<int, Bookmark>();
-        }
-
-        internal BookmarkDataProvider(SortedList<int, Bookmark> bookmarkList)
-        {
-            this.BookmarkList = bookmarkList;
-        }
-
-        #endregion
-
         #region Delegates
 
         public delegate void AllBookmarksRemovedEventHandler(object sender, EventArgs e);
@@ -38,26 +16,49 @@ namespace LogExpert
 
         #endregion
 
-        #region Events
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #region Public Events
+
+        public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
 
         public event BookmarkAddedEventHandler BookmarkAdded;
         public event BookmarkRemovedEventHandler BookmarkRemoved;
-        public event AllBookmarksRemovedEventHandler AllBookmarksRemoved;
 
         #endregion
 
-        #region Properties
+        #region Ctor
 
-        public BookmarkCollection Bookmarks
+        internal BookmarkDataProvider()
         {
-            get { return new BookmarkCollection(this.BookmarkList); }
+            BookmarkList = new SortedList<int, Bookmark>();
         }
 
-        internal SortedList<int, Bookmark> BookmarkList { get; set; }
+        internal BookmarkDataProvider(SortedList<int, Bookmark> bookmarkList)
+        {
+            BookmarkList = bookmarkList;
+        }
 
         #endregion
 
-        #region Public methods
+        #region Interface IBookmarkData
+
+        public BookmarkCollection Bookmarks => new BookmarkCollection(BookmarkList);
+
+        public Bookmark GetBookmarkForLine(int lineNum)
+        {
+            return BookmarkList[lineNum];
+        }
+
+        public int GetBookmarkIndexForLine(int lineNum)
+        {
+            return BookmarkList.IndexOfKey(lineNum);
+        }
+
+        public bool IsBookmarkAtLine(int lineNum)
+        {
+            return BookmarkList.ContainsKey(lineNum);
+        }
 
         public void ToggleBookmark(int lineNum)
         {
@@ -71,96 +72,23 @@ namespace LogExpert
             }
         }
 
-        public bool IsBookmarkAtLine(int lineNum)
-        {
-            return this.BookmarkList.ContainsKey(lineNum);
-        }
+        #endregion
 
-        public int GetBookmarkIndexForLine(int lineNum)
-        {
-            return this.BookmarkList.IndexOfKey(lineNum);
-        }
+        #region Properties / Indexers
 
-        public Bookmark GetBookmarkForLine(int lineNum)
-        {
-            return this.BookmarkList[lineNum];
-        }
+        internal SortedList<int, Bookmark> BookmarkList { get; set; }
 
         #endregion
 
-        #region Internals
+        #region Event handling Methods
 
-        internal void ShiftBookmarks(int offset)
+        protected void OnAllBookmarksRemoved()
         {
-            SortedList<int, Bookmark> newBookmarkList = new SortedList<int, Bookmark>();
-            foreach (Bookmark bookmark in this.BookmarkList.Values)
+            if (AllBookmarksRemoved != null)
             {
-                int line = bookmark.LineNum - offset;
-                if (line >= 0)
-                {
-                    bookmark.LineNum = line;
-                    newBookmarkList.Add(line, bookmark);
-                }
+                AllBookmarksRemoved(this, new EventArgs());
             }
-            this.BookmarkList = newBookmarkList;
         }
-
-        internal int FindPrevBookmarkIndex(int lineNum)
-        {
-            IList<Bookmark> values = this.BookmarkList.Values;
-            for (int i = this.BookmarkList.Count - 1; i >= 0; --i)
-            {
-                if (values[i].LineNum <= lineNum)
-                {
-                    return i;
-                }
-            }
-            return this.BookmarkList.Count - 1;
-        }
-
-        internal int FindNextBookmarkIndex(int lineNum)
-        {
-            IList<Bookmark> values = this.BookmarkList.Values;
-            for (int i = 0; i < this.BookmarkList.Count; ++i)
-            {
-                if (values[i].LineNum >= lineNum)
-                {
-                    return i;
-                }
-            }
-            return 0;
-        }
-
-        internal void RemoveBookmarkForLine(int lineNum)
-        {
-            this.BookmarkList.Remove(lineNum);
-            OnBookmarkRemoved();
-        }
-
-        internal void RemoveBookmarksForLines(List<int> lineNumList)
-        {
-            foreach (int lineNum in lineNumList)
-            {
-                this.BookmarkList.Remove(lineNum);
-            }
-            OnBookmarkRemoved();
-        }
-
-
-        internal void AddBookmark(Bookmark bookmark)
-        {
-            this.BookmarkList.Add(bookmark.LineNum, bookmark);
-            OnBookmarkAdded();
-        }
-
-        internal void ClearAllBookmarks()
-        {
-            _logger.Debug("Removing all bookmarks");
-            this.BookmarkList.Clear();
-            OnAllBookmarksRemoved();
-        }
-
-        #endregion
 
         protected void OnBookmarkAdded()
         {
@@ -178,12 +106,80 @@ namespace LogExpert
             }
         }
 
-        protected void OnAllBookmarksRemoved()
+        #endregion
+
+        internal void ShiftBookmarks(int offset)
         {
-            if (AllBookmarksRemoved != null)
+            SortedList<int, Bookmark> newBookmarkList = new SortedList<int, Bookmark>();
+            foreach (Bookmark bookmark in BookmarkList.Values)
             {
-                AllBookmarksRemoved(this, new EventArgs());
+                int line = bookmark.LineNum - offset;
+                if (line >= 0)
+                {
+                    bookmark.LineNum = line;
+                    newBookmarkList.Add(line, bookmark);
+                }
             }
+
+            BookmarkList = newBookmarkList;
+        }
+
+        internal int FindPrevBookmarkIndex(int lineNum)
+        {
+            IList<Bookmark> values = BookmarkList.Values;
+            for (int i = BookmarkList.Count - 1; i >= 0; --i)
+            {
+                if (values[i].LineNum <= lineNum)
+                {
+                    return i;
+                }
+            }
+
+            return BookmarkList.Count - 1;
+        }
+
+        internal int FindNextBookmarkIndex(int lineNum)
+        {
+            IList<Bookmark> values = BookmarkList.Values;
+            for (int i = 0; i < BookmarkList.Count; ++i)
+            {
+                if (values[i].LineNum >= lineNum)
+                {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+        internal void RemoveBookmarkForLine(int lineNum)
+        {
+            BookmarkList.Remove(lineNum);
+            OnBookmarkRemoved();
+        }
+
+        internal void RemoveBookmarksForLines(List<int> lineNumList)
+        {
+            foreach (int lineNum in lineNumList)
+            {
+                BookmarkList.Remove(lineNum);
+            }
+
+            OnBookmarkRemoved();
+        }
+
+
+        internal void AddBookmark(Bookmark bookmark)
+        {
+            BookmarkList.Add(bookmark.LineNum, bookmark);
+            OnBookmarkAdded();
+        }
+
+        internal void ClearAllBookmarks()
+        {
+            _logger.Debug("Removing all bookmarks");
+            BookmarkList.Clear();
+            OnAllBookmarksRemoved();
         }
     }
 }

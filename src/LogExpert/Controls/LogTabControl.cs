@@ -1,28 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace LogExpert
 {
     internal class LogTabControl : TabControl
     {
-        #region Fields
+        #region Private Fields
 
         private BufferedGraphics myBuffer;
-
-        #endregion
-
-        #region cTor
-
-        public LogTabControl()
-            : base()
-        {
-            //SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            //SetStyle(ControlStyles.UserPaint, true);
-            //SetStyle(ControlStyles.DoubleBuffer, true);
-        }
 
         #endregion
 
@@ -32,7 +17,7 @@ namespace LogExpert
         {
             BufferedGraphicsContext currentContext;
             currentContext = BufferedGraphicsManager.Current;
-            myBuffer = currentContext.Allocate(this.CreateGraphics(), this.DisplayRectangle);
+            myBuffer = currentContext.Allocate(CreateGraphics(), DisplayRectangle);
 
             PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
 

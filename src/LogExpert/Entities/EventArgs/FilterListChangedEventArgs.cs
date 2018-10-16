@@ -1,25 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class FilterListChangedEventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public FilterListChangedEventArgs(LogWindow logWindow)
         {
-            this.LogWindow = logWindow;
+            LogWindow = logWindow;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public LogWindow LogWindow { get; }
 

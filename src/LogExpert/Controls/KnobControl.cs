@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 using NLog;
 
@@ -11,22 +7,33 @@ namespace LogExpert
 {
     public partial class KnobControl : UserControl
     {
-        #region Fields
+        #region Delegates
+
+        public delegate void ValueChangedEventHandler(object sender, EventArgs e);
+
+        #endregion
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
+        #region Private Fields
 
         private readonly StringFormat stringFormat = new StringFormat();
 
-        private bool isShiftPressed = false;
+        private bool isShiftPressed;
 
-        private int oldValue = 0;
-        private int startMouseY = 0;
+        private int oldValue;
+        private int startMouseY;
         private int value;
 
         #endregion
 
-        #region cTor
+        #region Public Events
+
+        public event ValueChangedEventHandler ValueChanged;
+
+        #endregion
+
+        #region Ctor
 
         public KnobControl()
         {
@@ -37,27 +44,20 @@ namespace LogExpert
 
         #endregion
 
-        #region Delegates
+        #region Properties / Indexers
 
-        public delegate void ValueChangedEventHandler(object sender, EventArgs e);
-
-        #endregion
-
-        #region Events
-
-        public event ValueChangedEventHandler ValueChanged;
-
-        #endregion
-
-        #region Properties
-
-        public int MinValue { get; set; }
+        public int DragSensitivity { get; set; } = 3;
 
         public int MaxValue { get; set; }
 
+        public int MinValue { get; set; }
+
+
+        public int Range => MaxValue - MinValue;
+
         public int Value
         {
-            get { return this.value; }
+            get => value;
             set
             {
                 this.value = value;
@@ -65,51 +65,20 @@ namespace LogExpert
             }
         }
 
-
-        public int Range
-        {
-            get { return this.MaxValue - this.MinValue; }
-        }
-
-        public int DragSensitivity { get; set; } = 3;
-
         #endregion
 
         #region Overrides
 
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
         {
-            base.OnPaint(e);
+            isShiftPressed = e.Shift;
+            base.OnKeyDown(e);
+        }
 
-            Color foregroundColor = this.Enabled ? Color.Black : Color.Gray;
-
-            Pen blackPen = new Pen(foregroundColor, 1);
-            Pen greyPen = new Pen(Color.Gray, 1);
-
-            Rectangle rect = this.ClientRectangle;
-            int height = this.Font.Height + 3;
-            if (height > rect.Height)
-            {
-                height = rect.Height + 3;
-            }
-            rect.Inflate(-1, -height / 2);
-            rect.Offset(0, -height / 2);
-            e.Graphics.DrawEllipse(greyPen, rect);
-
-            //rect = this.ClientRectangle;
-            rect.Inflate(-2, -2);
-
-            float startAngle = 135.0F + 270F * ((float) this.value / (float) this.Range);
-            float sweepAngle = 0.1F;
-            e.Graphics.DrawPie(blackPen, rect, startAngle, sweepAngle);
-
-            Brush brush = new SolidBrush(foregroundColor);
-            RectangleF rectF = new RectangleF(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
-            e.Graphics.DrawString("" + this.value, this.Font, brush, rectF, this.stringFormat);
-
-            blackPen.Dispose();
-            greyPen.Dispose();
-            brush.Dispose();
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            isShiftPressed = e.Shift;
+            base.OnKeyUp(e);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -120,22 +89,15 @@ namespace LogExpert
             {
                 Capture = true;
                 startMouseY = e.Y;
-                this.oldValue = this.Value;
+                oldValue = Value;
             }
+
             if (e.Button == MouseButtons.Right)
             {
                 Capture = false;
-                this.Value = this.oldValue;
-                this.Invalidate();
+                Value = oldValue;
+                Invalidate();
             }
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            Capture = false;
-            this.oldValue = this.Value;
-            OnValueChanged(new EventArgs());
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -146,36 +108,72 @@ namespace LogExpert
                 return;
             }
 
-            int sense = this.isShiftPressed ? this.DragSensitivity * 2 : this.DragSensitivity;
+            int sense = isShiftPressed ? DragSensitivity * 2 : DragSensitivity;
 
-            int diff = this.startMouseY - e.Y;
+            int diff = startMouseY - e.Y;
             _logger.Debug("KnobDiff: {0}", diff);
-            int range = this.MaxValue - this.MinValue;
-            this.value = this.oldValue + diff / sense;
-            if (this.value < this.MinValue)
+            int range = MaxValue - MinValue;
+            value = oldValue + diff / sense;
+            if (value < MinValue)
             {
-                this.value = this.MinValue;
+                value = MinValue;
             }
-            if (this.value > this.MaxValue)
+
+            if (value > MaxValue)
             {
-                this.value = this.MaxValue;
+                value = MaxValue;
             }
-            this.Invalidate();
+
+            Invalidate();
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        protected override void OnMouseUp(MouseEventArgs e)
         {
-            this.isShiftPressed = e.Shift;
-            base.OnKeyDown(e);
+            base.OnMouseUp(e);
+            Capture = false;
+            oldValue = Value;
+            OnValueChanged(new EventArgs());
         }
 
-        protected override void OnKeyUp(KeyEventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            this.isShiftPressed = e.Shift;
-            base.OnKeyUp(e);
+            base.OnPaint(e);
+
+            Color foregroundColor = Enabled ? Color.Black : Color.Gray;
+
+            Pen blackPen = new Pen(foregroundColor, 1);
+            Pen greyPen = new Pen(Color.Gray, 1);
+
+            Rectangle rect = ClientRectangle;
+            int height = Font.Height + 3;
+            if (height > rect.Height)
+            {
+                height = rect.Height + 3;
+            }
+
+            rect.Inflate(-1, -height / 2);
+            rect.Offset(0, -height / 2);
+            e.Graphics.DrawEllipse(greyPen, rect);
+
+            // rect = this.ClientRectangle;
+            rect.Inflate(-2, -2);
+
+            float startAngle = 135.0F + 270F * (value / (float)Range);
+            float sweepAngle = 0.1F;
+            e.Graphics.DrawPie(blackPen, rect, startAngle, sweepAngle);
+
+            Brush brush = new SolidBrush(foregroundColor);
+            RectangleF rectF = new RectangleF(0, 0, ClientRectangle.Width, ClientRectangle.Height);
+            e.Graphics.DrawString(string.Empty + value, Font, brush, rectF, stringFormat);
+
+            blackPen.Dispose();
+            greyPen.Dispose();
+            brush.Dispose();
         }
 
         #endregion
+
+        #region Event handling Methods
 
         protected void OnValueChanged(EventArgs e)
         {
@@ -184,5 +182,7 @@ namespace LogExpert
                 ValueChanged(this, e);
             }
         }
+
+        #endregion
     }
 }

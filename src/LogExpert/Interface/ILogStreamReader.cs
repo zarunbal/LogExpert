@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace LogExpert
 {
     public interface ILogStreamReader
     {
-        #region Properties
-
-        long Position { get; set; }
-
-        bool IsBufferComplete { get; }
+        #region Properties / Indexers
 
         Encoding Encoding { get; }
 
+        bool IsBufferComplete { get; }
+
+        long Position { get; set; }
+
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         int ReadChar();
         string ReadLine();

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml;
 
 namespace LogExpert
 {
     public class ProjectPersister
     {
-        #region Public methods
+        #region Public Methods
 
         public static ProjectData LoadProjectData(string projectFileName)
         {
@@ -21,11 +19,13 @@ namespace LogExpert
                 string fileName = fileElement.GetAttribute("fileName");
                 projectData.memberList.Add(fileName);
             }
+
             XmlNodeList layoutElements = xmlDoc.GetElementsByTagName("layout");
             if (layoutElements.Count > 0)
             {
                 projectData.tabLayoutXml = layoutElements[0].InnerXml;
             }
+
             return projectData;
         }
 

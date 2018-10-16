@@ -1,23 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using LogExpert;
 using System.IO;
+using LogExpert;
+using NUnit.Framework;
 
 namespace UnitTests
 {
     [TestFixture]
     internal class LocalFileSystemTest : RolloverHandlerTestBase
     {
-        [TearDown]
-        public void TearDown()
+        #region Public Methods
+
+        [TestFixtureSetUp]
+        public void Boot()
         {
             Cleanup();
         }
 
-        [TestFixtureSetUp]
-        public void Boot()
+        [TearDown]
+        public void TearDown()
         {
             Cleanup();
         }
@@ -36,7 +36,7 @@ namespace UnitTests
         [Test]
         public void testUriToFileStream()
         {
-            DirectoryInfo dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
+            DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
             string fullName = CreateFile(dInfo, "test.log");
 
             LocalFileSystem fs = new LocalFileSystem();
@@ -50,5 +50,7 @@ namespace UnitTests
             Assert.True(line.StartsWith("line number", StringComparison.InvariantCultureIgnoreCase));
             reader.Close();
         }
+
+        #endregion
     }
 }

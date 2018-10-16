@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -18,11 +13,7 @@ namespace LogExpert.Dialogs
 
     public partial class ProjectLoadDlg : Form
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public ProjectLoadDlg()
         {
@@ -31,29 +22,29 @@ namespace LogExpert.Dialogs
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public ProjectLoadDlgResult ProjectLoadResult { get; set; } = ProjectLoadDlgResult.Cancel;
 
         #endregion
 
-        #region Events handler
+        #region Private Methods
 
         private void closeTabsButton_Click(object sender, EventArgs e)
         {
-            this.ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
-            Close();
-        }
-
-        private void newWindowButton_Click(object sender, EventArgs e)
-        {
-            this.ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
+            ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
             Close();
         }
 
         private void ignoreButton_Click(object sender, EventArgs e)
         {
-            this.ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
+            ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
+            Close();
+        }
+
+        private void newWindowButton_Click(object sender, EventArgs e)
+        {
+            ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
             Close();
         }
 

@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     internal class ConfigChangedEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         internal ConfigChangedEventArgs(SettingsFlags changeFlags)
         {
-            this.Flags = changeFlags;
+            Flags = changeFlags;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public SettingsFlags Flags { get; }
 

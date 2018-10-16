@@ -5,7 +5,7 @@ namespace LogExpert
     [Serializable]
     public class ColumnizerMaskEntry
     {
-        #region Fields
+        #region Private Fields
 
         public string columnizerName;
         public string mask;

@@ -1,31 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     partial class DockPanel
     {
-        #region Fields
+        #region Private Fields
 
-        private DockDragHandler m_dockDragHandler = null;
-
-        #endregion
-
-        #region Internals
-
-        internal void BeginDrag(IDockDragSource dragSource)
-        {
-            GetDockDragHandler().BeginDrag(dragSource);
-        }
+        private DockDragHandler m_dockDragHandler;
 
         #endregion
 
-        #region Private Methods
+        #region Event raising Methods
 
         private DockDragHandler GetDockDragHandler()
         {
@@ -33,18 +21,17 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 m_dockDragHandler = new DockDragHandler(this);
             }
+
             return m_dockDragHandler;
         }
 
         #endregion
 
+        #region Nested type: DockDragHandler
+
         private sealed class DockDragHandler : DragHandler
         {
-            #region Fields
-
-            #endregion
-
-            #region cTor
+            #region Ctor
 
             public DockDragHandler(DockPanel panel)
                 : base(panel)
@@ -53,23 +40,23 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region Properties
+            #region Properties / Indexers
 
             public new IDockDragSource DragSource
             {
-                get { return base.DragSource as IDockDragSource; }
-                set { base.DragSource = value; }
+                get => base.DragSource as IDockDragSource;
+                set => base.DragSource = value;
             }
 
             public DockOutlineBase Outline { get; private set; }
 
-            private DockIndicator Indicator { get; set; }
-
             private Rectangle FloatOutlineBounds { get; set; }
+
+            private DockIndicator Indicator { get; set; }
 
             #endregion
 
-            #region Public methods
+            #region Public Methods
 
             public void BeginDrag(IDockDragSource dragSource)
             {
@@ -118,61 +105,6 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #region Private Methods
 
-            private void TestDrop()
-            {
-                Outline.FlagTestDrop = false;
-
-                Indicator.FullPanelEdge = (Control.ModifierKeys & Keys.Shift) != 0;
-
-                if ((Control.ModifierKeys & Keys.Control) == 0)
-                {
-                    Indicator.TestDrop();
-
-                    if (!Outline.FlagTestDrop)
-                    {
-                        DockPane pane = DockHelper.PaneAtPoint(Control.MousePosition, DockPanel);
-                        if (pane != null && DragSource.IsDockStateValid(pane.DockState))
-                        {
-                            pane.TestDrop(DragSource, Outline);
-                        }
-                    }
-
-                    if (!Outline.FlagTestDrop && DragSource.IsDockStateValid(DockState.Float))
-                    {
-                        FloatWindow floatWindow = DockHelper.FloatWindowAtPoint(Control.MousePosition, DockPanel);
-                        if (floatWindow != null)
-                        {
-                            floatWindow.TestDrop(DragSource, Outline);
-                        }
-                    }
-                }
-                else
-                {
-                    Indicator.DockPane = DockHelper.PaneAtPoint(Control.MousePosition, DockPanel);
-                }
-
-                if (!Outline.FlagTestDrop)
-                {
-                    if (DragSource.IsDockStateValid(DockState.Float))
-                    {
-                        Rectangle rect = FloatOutlineBounds;
-                        rect.Offset(Control.MousePosition.X - StartMousePosition.X,
-                            Control.MousePosition.Y - StartMousePosition.Y);
-                        Outline.Show(rect);
-                    }
-                }
-
-                if (!Outline.FlagTestDrop)
-                {
-                    Cursor.Current = Cursors.No;
-                    Outline.Show();
-                }
-                else
-                {
-                    Cursor.Current = DragControl.Cursor;
-                }
-            }
-
             private void EndDrag(bool abort)
             {
                 if (abort)
@@ -197,39 +129,92 @@ namespace WeifenLuo.WinFormsUI.Docking
                 }
             }
 
+            private void TestDrop()
+            {
+                Outline.FlagTestDrop = false;
+
+                Indicator.FullPanelEdge = (ModifierKeys & Keys.Shift) != 0;
+
+                if ((ModifierKeys & Keys.Control) == 0)
+                {
+                    Indicator.TestDrop();
+
+                    if (!Outline.FlagTestDrop)
+                    {
+                        DockPane pane = DockHelper.PaneAtPoint(MousePosition, DockPanel);
+                        if (pane != null && DragSource.IsDockStateValid(pane.DockState))
+                        {
+                            pane.TestDrop(DragSource, Outline);
+                        }
+                    }
+
+                    if (!Outline.FlagTestDrop && DragSource.IsDockStateValid(DockState.Float))
+                    {
+                        FloatWindow floatWindow = DockHelper.FloatWindowAtPoint(MousePosition, DockPanel);
+                        if (floatWindow != null)
+                        {
+                            floatWindow.TestDrop(DragSource, Outline);
+                        }
+                    }
+                }
+                else
+                {
+                    Indicator.DockPane = DockHelper.PaneAtPoint(MousePosition, DockPanel);
+                }
+
+                if (!Outline.FlagTestDrop)
+                {
+                    if (DragSource.IsDockStateValid(DockState.Float))
+                    {
+                        Rectangle rect = FloatOutlineBounds;
+                        rect.Offset(MousePosition.X - StartMousePosition.X,
+                            MousePosition.Y - StartMousePosition.Y);
+                        Outline.Show(rect);
+                    }
+                }
+
+                if (!Outline.FlagTestDrop)
+                {
+                    Cursor.Current = Cursors.No;
+                    Outline.Show();
+                }
+                else
+                {
+                    Cursor.Current = DragControl.Cursor;
+                }
+            }
+
             #endregion
+
+            #region Nested type: DockIndicator
 
             private class DockIndicator : DragForm
             {
-                #region Fields
-
-                #region consts
+                #region Private Fields
 
                 private readonly int _PanelIndicatorMargin = 10;
 
-                #endregion
+                private DockPane m_dockPane;
 
-                private DockPane m_dockPane = null;
+                private bool m_fullPanelEdge;
 
-                private bool m_fullPanelEdge = false;
+                private IHitTest m_hitTest;
 
-                private IHitTest m_hitTest = null;
+                private PaneIndicator m_paneDiamond;
 
-                private PaneIndicator m_paneDiamond = null;
+                private PanelIndicator m_panelBottom;
 
-                private PanelIndicator m_panelBottom = null;
+                private PanelIndicator m_panelFill;
 
-                private PanelIndicator m_panelFill = null;
+                private PanelIndicator m_panelLeft;
 
-                private PanelIndicator m_panelLeft = null;
+                private PanelIndicator m_panelRight;
 
-                private PanelIndicator m_panelRight = null;
-
-                private PanelIndicator m_panelTop = null;
+                private PanelIndicator m_panelTop;
 
                 #endregion
 
-                #region cTor
+                #region Ctor
 
                 public DockIndicator(DockDragHandler dragHandler)
                 {
@@ -248,7 +233,66 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region Properties
+                #region Properties / Indexers
+
+                public DockPane DockPane
+                {
+                    get => m_dockPane;
+                    internal set
+                    {
+                        if (m_dockPane == value)
+                        {
+                            return;
+                        }
+
+                        DockPane oldDisplayingPane = DisplayingPane;
+                        m_dockPane = value;
+                        if (oldDisplayingPane != DisplayingPane)
+                        {
+                            RefreshChanges();
+                        }
+                    }
+                }
+
+                public DockPanel DockPanel => DragHandler.DockPanel;
+
+                public DockDragHandler DragHandler { get; }
+
+                public bool FullPanelEdge
+                {
+                    get => m_fullPanelEdge;
+                    set
+                    {
+                        if (m_fullPanelEdge == value)
+                        {
+                            return;
+                        }
+
+                        m_fullPanelEdge = value;
+                        RefreshChanges();
+                    }
+                }
+
+                private DockPane DisplayingPane => ShouldPaneDiamondVisible() ? DockPane : null;
+
+                private IHitTest HitTestResult
+                {
+                    get => m_hitTest;
+                    set
+                    {
+                        if (m_hitTest == value)
+                        {
+                            return;
+                        }
+
+                        if (m_hitTest != null)
+                        {
+                            m_hitTest.Status = DockStyle.None;
+                        }
+
+                        m_hitTest = value;
+                    }
+                }
 
                 private PaneIndicator PaneDiamond
                 {
@@ -260,6 +304,32 @@ namespace WeifenLuo.WinFormsUI.Docking
                         }
 
                         return m_paneDiamond;
+                    }
+                }
+
+                private PanelIndicator PanelBottom
+                {
+                    get
+                    {
+                        if (m_panelBottom == null)
+                        {
+                            m_panelBottom = new PanelIndicator(DockStyle.Bottom);
+                        }
+
+                        return m_panelBottom;
+                    }
+                }
+
+                private PanelIndicator PanelFill
+                {
+                    get
+                    {
+                        if (m_panelFill == null)
+                        {
+                            m_panelFill = new PanelIndicator(DockStyle.Fill);
+                        }
+
+                        return m_panelFill;
                     }
                 }
 
@@ -302,111 +372,13 @@ namespace WeifenLuo.WinFormsUI.Docking
                     }
                 }
 
-                private PanelIndicator PanelBottom
-                {
-                    get
-                    {
-                        if (m_panelBottom == null)
-                        {
-                            m_panelBottom = new PanelIndicator(DockStyle.Bottom);
-                        }
-
-                        return m_panelBottom;
-                    }
-                }
-
-                private PanelIndicator PanelFill
-                {
-                    get
-                    {
-                        if (m_panelFill == null)
-                        {
-                            m_panelFill = new PanelIndicator(DockStyle.Fill);
-                        }
-
-                        return m_panelFill;
-                    }
-                }
-
-                public bool FullPanelEdge
-                {
-                    get { return m_fullPanelEdge; }
-                    set
-                    {
-                        if (m_fullPanelEdge == value)
-                        {
-                            return;
-                        }
-
-                        m_fullPanelEdge = value;
-                        RefreshChanges();
-                    }
-                }
-
-                public DockDragHandler DragHandler { get; }
-
-                public DockPanel DockPanel
-                {
-                    get { return DragHandler.DockPanel; }
-                }
-
-                public DockPane DockPane
-                {
-                    get { return m_dockPane; }
-                    internal set
-                    {
-                        if (m_dockPane == value)
-                        {
-                            return;
-                        }
-
-                        DockPane oldDisplayingPane = DisplayingPane;
-                        m_dockPane = value;
-                        if (oldDisplayingPane != DisplayingPane)
-                        {
-                            RefreshChanges();
-                        }
-                    }
-                }
-
-                private IHitTest HitTestResult
-                {
-                    get { return m_hitTest; }
-                    set
-                    {
-                        if (m_hitTest == value)
-                        {
-                            return;
-                        }
-
-                        if (m_hitTest != null)
-                        {
-                            m_hitTest.Status = DockStyle.None;
-                        }
-
-                        m_hitTest = value;
-                    }
-                }
-
-                private DockPane DisplayingPane
-                {
-                    get { return ShouldPaneDiamondVisible() ? DockPane : null; }
-                }
-
                 #endregion
 
-                #region Public methods
-
-                public override void Show(bool bActivate)
-                {
-                    base.Show(bActivate);
-                    Bounds = SystemInformation.VirtualScreen;
-                    RefreshChanges();
-                }
+                #region Public Methods
 
                 public void TestDrop()
                 {
-                    Point pt = Control.MousePosition;
+                    Point pt = MousePosition;
                     DockPane = DockHelper.PaneAtPoint(pt, DockPanel);
 
                     if (TestDrop(PanelLeft, pt) != DockStyle.None)
@@ -449,6 +421,17 @@ namespace WeifenLuo.WinFormsUI.Docking
                             DragHandler.Outline.Show(DockPanel, HitTestResult.Status, FullPanelEdge);
                         }
                     }
+                }
+
+                #endregion
+
+                #region Overrides
+
+                public override void Show(bool bActivate)
+                {
+                    base.Show(bActivate);
+                    Bounds = SystemInformation.VirtualScreen;
+                    RefreshChanges();
                 }
 
                 #endregion
@@ -533,7 +516,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                         PaneDiamond.Visible = true;
                         using (GraphicsPath graphicsPath = PaneIndicator.DisplayingGraphicsPath.Clone() as GraphicsPath)
                         {
-                            Point[] pts = new Point[]
+                            Point[] pts =
                             {
                                 new Point(PaneDiamond.Left, PaneDiamond.Top),
                                 new Point(PaneDiamond.Right, PaneDiamond.Top),
@@ -543,6 +526,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                             {
                                 graphicsPath.Transform(matrix);
                             }
+
                             region.Union(graphicsPath);
                         }
                     }
@@ -552,21 +536,6 @@ namespace WeifenLuo.WinFormsUI.Docking
                     }
 
                     Region = region;
-                }
-
-                private bool ShouldPanelIndicatorVisible(DockState dockState)
-                {
-                    if (!Visible)
-                    {
-                        return false;
-                    }
-
-                    if (DockPanel.DockWindows[dockState].Visible)
-                    {
-                        return false;
-                    }
-
-                    return DragHandler.DragSource.IsDockStateValid(dockState);
                 }
 
                 private bool ShouldPaneDiamondVisible()
@@ -584,6 +553,21 @@ namespace WeifenLuo.WinFormsUI.Docking
                     return DragHandler.DragSource.CanDockTo(DockPane);
                 }
 
+                private bool ShouldPanelIndicatorVisible(DockState dockState)
+                {
+                    if (!Visible)
+                    {
+                        return false;
+                    }
+
+                    if (DockPanel.DockWindows[dockState].Visible)
+                    {
+                        return false;
+                    }
+
+                    return DragHandler.DragSource.IsDockStateValid(dockState);
+                }
+
                 private static DockStyle TestDrop(IHitTest hitTest, Point pt)
                 {
                     return hitTest.Status = hitTest.HitTest(pt);
@@ -591,17 +575,17 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region IHitTest
+                #region Nested type: IHitTest
 
                 private interface IHitTest
                 {
-                    #region Properties
+                    #region Properties / Indexers
 
                     DockStyle Status { get; set; }
 
                     #endregion
 
-                    #region Public methods
+                    #region Public Methods
 
                     DockStyle HitTest(Point pt);
 
@@ -610,163 +594,15 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region PanelIndicator
-
-                private class PanelIndicator : PictureBox, IHitTest
-                {
-                    #region Fields
-
-                    private static readonly Image _imagePanelLeft = Resources.DockIndicator_PanelLeft;
-                    private static readonly Image _imagePanelRight = Resources.DockIndicator_PanelRight;
-                    private static readonly Image _imagePanelTop = Resources.DockIndicator_PanelTop;
-                    private static readonly Image _imagePanelBottom = Resources.DockIndicator_PanelBottom;
-                    private static readonly Image _imagePanelFill = Resources.DockIndicator_PanelFill;
-                    private static readonly Image _imagePanelLeftActive = Resources.DockIndicator_PanelLeft_Active;
-                    private static readonly Image _imagePanelRightActive = Resources.DockIndicator_PanelRight_Active;
-                    private static readonly Image _imagePanelTopActive = Resources.DockIndicator_PanelTop_Active;
-                    private static readonly Image _imagePanelBottomActive = Resources.DockIndicator_PanelBottom_Active;
-                    private static readonly Image _imagePanelFillActive = Resources.DockIndicator_PanelFill_Active;
-
-                    private bool m_isActivated = false;
-
-                    private DockStyle m_status;
-
-                    #endregion
-
-                    #region cTor
-
-                    public PanelIndicator(DockStyle dockStyle)
-                    {
-                        DockStyle = dockStyle;
-                        SizeMode = PictureBoxSizeMode.AutoSize;
-                        Image = ImageInactive;
-                    }
-
-                    #endregion
-
-                    #region Properties
-
-                    private DockStyle DockStyle { get; }
-
-                    public DockStyle Status
-                    {
-                        get { return m_status; }
-                        set
-                        {
-                            if (value != DockStyle && value != DockStyle.None)
-                            {
-                                throw new InvalidEnumArgumentException();
-                            }
-
-                            if (m_status == value)
-                            {
-                                return;
-                            }
-
-                            m_status = value;
-                            IsActivated = m_status != DockStyle.None;
-                        }
-                    }
-
-                    private Image ImageInactive
-                    {
-                        get
-                        {
-                            if (DockStyle == DockStyle.Left)
-                            {
-                                return _imagePanelLeft;
-                            }
-                            else if (DockStyle == DockStyle.Right)
-                            {
-                                return _imagePanelRight;
-                            }
-                            else if (DockStyle == DockStyle.Top)
-                            {
-                                return _imagePanelTop;
-                            }
-                            else if (DockStyle == DockStyle.Bottom)
-                            {
-                                return _imagePanelBottom;
-                            }
-                            else if (DockStyle == DockStyle.Fill)
-                            {
-                                return _imagePanelFill;
-                            }
-                            else
-                            {
-                                return null;
-                            }
-                        }
-                    }
-
-                    private Image ImageActive
-                    {
-                        get
-                        {
-                            if (DockStyle == DockStyle.Left)
-                            {
-                                return _imagePanelLeftActive;
-                            }
-                            else if (DockStyle == DockStyle.Right)
-                            {
-                                return _imagePanelRightActive;
-                            }
-                            else if (DockStyle == DockStyle.Top)
-                            {
-                                return _imagePanelTopActive;
-                            }
-                            else if (DockStyle == DockStyle.Bottom)
-                            {
-                                return _imagePanelBottomActive;
-                            }
-                            else if (DockStyle == DockStyle.Fill)
-                            {
-                                return _imagePanelFillActive;
-                            }
-                            else
-                            {
-                                return null;
-                            }
-                        }
-                    }
-
-                    private bool IsActivated
-                    {
-                        get { return m_isActivated; }
-                        set
-                        {
-                            m_isActivated = value;
-                            Image = IsActivated ? ImageActive : ImageInactive;
-                        }
-                    }
-
-                    #endregion
-
-                    #region Public methods
-
-                    public DockStyle HitTest(Point pt)
-                    {
-                        return this.Visible && ClientRectangle.Contains(PointToClient(pt)) ? DockStyle : DockStyle.None;
-                    }
-
-                    #endregion
-                }
-
-                #endregion PanelIndicator
-
-                #region PaneIndicator
+                #region Nested type: PaneIndicator
 
                 private class PaneIndicator : PictureBox, IHitTest
                 {
-                    #region Fields
+                    #region Static/Constants
 
                     private static readonly Bitmap _bitmapPaneDiamond = Resources.DockIndicator_PaneDiamond;
-                    private static readonly Bitmap _bitmapPaneDiamondLeft = Resources.DockIndicator_PaneDiamond_Left;
-                    private static readonly Bitmap _bitmapPaneDiamondRight = Resources.DockIndicator_PaneDiamond_Right;
-                    private static readonly Bitmap _bitmapPaneDiamondTop = Resources.DockIndicator_PaneDiamond_Top;
 
-                    private static readonly Bitmap _bitmapPaneDiamondBottom = Resources.DockIndicator_PaneDiamond_Bottom
-                        ;
+                    private static readonly Bitmap _bitmapPaneDiamondBottom = Resources.DockIndicator_PaneDiamond_Bottom;
 
                     private static readonly Bitmap _bitmapPaneDiamondFill = Resources.DockIndicator_PaneDiamond_Fill;
 
@@ -776,7 +612,11 @@ namespace WeifenLuo.WinFormsUI.Docking
                     private static readonly Bitmap _bitmapPaneDiamondHotSpotIndex =
                         Resources.DockIndicator_PaneDiamond_HotSpotIndex;
 
-                    private static readonly HotSpotIndex[] _hotSpots = new HotSpotIndex[]
+                    private static readonly Bitmap _bitmapPaneDiamondLeft = Resources.DockIndicator_PaneDiamond_Left;
+                    private static readonly Bitmap _bitmapPaneDiamondRight = Resources.DockIndicator_PaneDiamond_Right;
+                    private static readonly Bitmap _bitmapPaneDiamondTop = Resources.DockIndicator_PaneDiamond_Top;
+
+                    private static readonly HotSpotIndex[] _hotSpots =
                     {
                         new HotSpotIndex(1, 0, DockStyle.Top),
                         new HotSpotIndex(0, 1, DockStyle.Left),
@@ -785,11 +625,15 @@ namespace WeifenLuo.WinFormsUI.Docking
                         new HotSpotIndex(1, 2, DockStyle.Bottom)
                     };
 
+                    #endregion
+
+                    #region Private Fields
+
                     private DockStyle m_status = DockStyle.None;
 
                     #endregion
 
-                    #region cTor
+                    #region Ctor
 
                     public PaneIndicator()
                     {
@@ -800,14 +644,11 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                     #endregion
 
-                    #region Properties
-
-                    public static GraphicsPath DisplayingGraphicsPath { get; } =
-                        DrawHelper.CalculateGraphicsPathFromBitmap(_bitmapPaneDiamond);
+                    #region Interface IHitTest
 
                     public DockStyle Status
                     {
-                        get { return m_status; }
+                        get => m_status;
                         set
                         {
                             m_status = value;
@@ -838,10 +679,6 @@ namespace WeifenLuo.WinFormsUI.Docking
                         }
                     }
 
-                    #endregion
-
-                    #region Public methods
-
                     public DockStyle HitTest(Point pt)
                     {
                         if (!Visible)
@@ -869,8 +706,19 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                     #endregion
 
+                    #region Properties / Indexers
+
+                    public static GraphicsPath DisplayingGraphicsPath { get; } =
+                        DrawHelper.CalculateGraphicsPathFromBitmap(_bitmapPaneDiamond);
+
+                    #endregion
+
+                    #region Nested type: HotSpotIndex
+
                     private struct HotSpotIndex
                     {
+                        #region Ctor
+
                         public HotSpotIndex(int x, int y, DockStyle dockStyle)
                         {
                             X = x;
@@ -878,24 +726,185 @@ namespace WeifenLuo.WinFormsUI.Docking
                             DockStyle = dockStyle;
                         }
 
+                        #endregion
+
+                        #region Properties / Indexers
+
+                        public DockStyle DockStyle { get; }
+
                         public int X { get; }
 
                         public int Y { get; }
 
-                        public DockStyle DockStyle { get; }
+                        #endregion
                     }
+
+                    #endregion
                 }
-
-                #endregion PaneIndicator
-            }
-
-            private class DockOutline : DockOutlineBase
-            {
-                #region Fields
 
                 #endregion
 
-                #region cTor
+                #region Nested type: PanelIndicator
+
+                private class PanelIndicator : PictureBox, IHitTest
+                {
+                    #region Static/Constants
+
+                    private static readonly Image _imagePanelBottom = Resources.DockIndicator_PanelBottom;
+                    private static readonly Image _imagePanelBottomActive = Resources.DockIndicator_PanelBottom_Active;
+                    private static readonly Image _imagePanelFill = Resources.DockIndicator_PanelFill;
+                    private static readonly Image _imagePanelFillActive = Resources.DockIndicator_PanelFill_Active;
+
+                    private static readonly Image _imagePanelLeft = Resources.DockIndicator_PanelLeft;
+                    private static readonly Image _imagePanelLeftActive = Resources.DockIndicator_PanelLeft_Active;
+                    private static readonly Image _imagePanelRight = Resources.DockIndicator_PanelRight;
+                    private static readonly Image _imagePanelRightActive = Resources.DockIndicator_PanelRight_Active;
+                    private static readonly Image _imagePanelTop = Resources.DockIndicator_PanelTop;
+                    private static readonly Image _imagePanelTopActive = Resources.DockIndicator_PanelTop_Active;
+
+                    #endregion
+
+                    #region Private Fields
+
+                    private bool m_isActivated;
+
+                    private DockStyle m_status;
+
+                    #endregion
+
+                    #region Ctor
+
+                    public PanelIndicator(DockStyle dockStyle)
+                    {
+                        DockStyle = dockStyle;
+                        SizeMode = PictureBoxSizeMode.AutoSize;
+                        Image = ImageInactive;
+                    }
+
+                    #endregion
+
+                    #region Interface IHitTest
+
+                    public DockStyle Status
+                    {
+                        get => m_status;
+                        set
+                        {
+                            if (value != DockStyle && value != DockStyle.None)
+                            {
+                                throw new InvalidEnumArgumentException();
+                            }
+
+                            if (m_status == value)
+                            {
+                                return;
+                            }
+
+                            m_status = value;
+                            IsActivated = m_status != DockStyle.None;
+                        }
+                    }
+
+                    public DockStyle HitTest(Point pt)
+                    {
+                        return Visible && ClientRectangle.Contains(PointToClient(pt)) ? DockStyle : DockStyle.None;
+                    }
+
+                    #endregion
+
+                    #region Properties / Indexers
+
+                    private DockStyle DockStyle { get; }
+
+                    private Image ImageActive
+                    {
+                        get
+                        {
+                            if (DockStyle == DockStyle.Left)
+                            {
+                                return _imagePanelLeftActive;
+                            }
+
+                            if (DockStyle == DockStyle.Right)
+                            {
+                                return _imagePanelRightActive;
+                            }
+
+                            if (DockStyle == DockStyle.Top)
+                            {
+                                return _imagePanelTopActive;
+                            }
+
+                            if (DockStyle == DockStyle.Bottom)
+                            {
+                                return _imagePanelBottomActive;
+                            }
+
+                            if (DockStyle == DockStyle.Fill)
+                            {
+                                return _imagePanelFillActive;
+                            }
+
+                            return null;
+                        }
+                    }
+
+                    private Image ImageInactive
+                    {
+                        get
+                        {
+                            if (DockStyle == DockStyle.Left)
+                            {
+                                return _imagePanelLeft;
+                            }
+
+                            if (DockStyle == DockStyle.Right)
+                            {
+                                return _imagePanelRight;
+                            }
+
+                            if (DockStyle == DockStyle.Top)
+                            {
+                                return _imagePanelTop;
+                            }
+
+                            if (DockStyle == DockStyle.Bottom)
+                            {
+                                return _imagePanelBottom;
+                            }
+
+                            if (DockStyle == DockStyle.Fill)
+                            {
+                                return _imagePanelFill;
+                            }
+
+                            return null;
+                        }
+                    }
+
+                    private bool IsActivated
+                    {
+                        get => m_isActivated;
+                        set
+                        {
+                            m_isActivated = value;
+                            Image = IsActivated ? ImageActive : ImageInactive;
+                        }
+                    }
+
+                    #endregion
+                }
+
+                #endregion
+            }
+
+            #endregion
+
+            #region Nested type: DockOutline
+
+            private class DockOutline : DockOutlineBase
+            {
+                #region Ctor
 
                 public DockOutline()
                 {
@@ -908,7 +917,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #endregion
 
-                #region Properties
+                #region Properties / Indexers
 
                 private DragForm DragForm { get; }
 
@@ -916,14 +925,14 @@ namespace WeifenLuo.WinFormsUI.Docking
 
                 #region Overrides
 
-                protected override void OnShow()
-                {
-                    CalculateRegion();
-                }
-
                 protected override void OnClose()
                 {
                     DragForm.Close();
+                }
+
+                protected override void OnShow()
+                {
+                    CalculateRegion();
                 }
 
                 #endregion
@@ -953,6 +962,25 @@ namespace WeifenLuo.WinFormsUI.Docking
                     {
                         SetOutline();
                     }
+                }
+
+                private void SetDragForm(Rectangle rect)
+                {
+                    DragForm.Bounds = rect;
+                    if (rect == Rectangle.Empty)
+                    {
+                        DragForm.Region = new Region(Rectangle.Empty);
+                    }
+                    else if (DragForm.Region != null)
+                    {
+                        DragForm.Region = null;
+                    }
+                }
+
+                private void SetDragForm(Rectangle rect, Region region)
+                {
+                    DragForm.Bounds = rect;
+                    DragForm.Region = region;
                 }
 
                 private void SetOutline()
@@ -1007,18 +1035,22 @@ namespace WeifenLuo.WinFormsUI.Docking
                         {
                             rect.X += rect.Width / 2;
                         }
+
                         if (dock == DockStyle.Bottom)
                         {
                             rect.Y += rect.Height / 2;
                         }
+
                         if (dock == DockStyle.Left || dock == DockStyle.Right)
                         {
                             rect.Width -= rect.Width / 2;
                         }
+
                         if (dock == DockStyle.Top || dock == DockStyle.Bottom)
                         {
                             rect.Height -= rect.Height / 2;
                         }
+
                         rect.Location = pane.PointToScreen(rect.Location);
 
                         SetDragForm(rect);
@@ -1034,40 +1066,31 @@ namespace WeifenLuo.WinFormsUI.Docking
                         using (GraphicsPath path = pane.TabStripControl.GetOutline(contentIndex))
                         {
                             RectangleF rectF = path.GetBounds();
-                            Rectangle rect = new Rectangle((int) rectF.X, (int) rectF.Y, (int) rectF.Width,
-                                (int) rectF.Height);
+                            Rectangle rect = new Rectangle((int)rectF.X, (int)rectF.Y, (int)rectF.Width,
+                                (int)rectF.Height);
                             using (Matrix matrix = new Matrix(rect,
-                                new Point[] {new Point(0, 0), new Point(rect.Width, 0), new Point(0, rect.Height)}))
+                                new[] {new Point(0, 0), new Point(rect.Width, 0), new Point(0, rect.Height)}))
                             {
                                 path.Transform(matrix);
                             }
+
                             Region region = new Region(path);
                             SetDragForm(rect, region);
                         }
                     }
                 }
 
-                private void SetDragForm(Rectangle rect)
-                {
-                    DragForm.Bounds = rect;
-                    if (rect == Rectangle.Empty)
-                    {
-                        DragForm.Region = new Region(Rectangle.Empty);
-                    }
-                    else if (DragForm.Region != null)
-                    {
-                        DragForm.Region = null;
-                    }
-                }
-
-                private void SetDragForm(Rectangle rect, Region region)
-                {
-                    DragForm.Bounds = rect;
-                    DragForm.Region = region;
-                }
-
                 #endregion
             }
+
+            #endregion
+        }
+
+        #endregion
+
+        internal void BeginDrag(IDockDragSource dragSource)
+        {
+            GetDockDragHandler().BeginDrag(dragSource);
         }
     }
 }

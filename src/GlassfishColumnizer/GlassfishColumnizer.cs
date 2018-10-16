@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using LogExpert;
 using System.Globalization;
 using System.Linq;
-
+using LogExpert;
 
 namespace GlassfishColumnizer
 {
     internal class XmlConfig : IXmlLogConfiguration
     {
-        #region Properties
+        #region Interface IXmlLogConfiguration
 
-        public string XmlStartTag { get; } = "[#|";
-
-        public string XmlEndTag { get; } = "|#]";
+        public string[] Namespace => null;
 
         public string Stylesheet { get; } = null;
 
-        public string[] Namespace
-        {
-            get { return null; }
-        }
+        public string XmlEndTag { get; } = "|#]";
+
+        public string XmlStartTag { get; } = "[#|";
 
         #endregion
     }
@@ -29,42 +23,40 @@ namespace GlassfishColumnizer
 
     internal class GlassfishColumnizer : ILogLineXmlColumnizer
     {
-        #region Fields
+        #region Static/Constants
 
         public const int COLUMN_COUNT = 2;
         protected const string DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.fffzzzz";
         protected const string DATETIME_FORMAT_OUT = "yyyy-MM-dd HH:mm:ss.fff";
 
         private static readonly XmlConfig xmlConfig = new XmlConfig();
+
+        #endregion
+
+        #region Private Fields
+
         private readonly char separatorChar = '|';
-        private readonly char[] trimChars = new char[] {'|'};
+        private readonly char[] trimChars = {'|'};
         protected CultureInfo cultureInfo = new CultureInfo("en-US");
-        protected int timeOffset = 0;
+        protected int timeOffset;
 
         #endregion
 
-        #region cTor
+        #region Interface ILogLineXmlColumnizer
 
-        public GlassfishColumnizer()
+        public int GetColumnCount()
         {
+            return COLUMN_COUNT;
         }
 
-        #endregion
-
-        #region Properties
-
-        public string Text
+        public string[] GetColumnNames()
         {
-            get { return GetName(); }
+            return new[] {"Date/Time", "Message"};
         }
 
-        #endregion
-
-        #region Public methods
-
-        public IXmlLogConfiguration GetXmlLogConfiguration()
+        public string GetDescription()
         {
-            return xmlConfig;
+            return "Parse the timestamps in Glassfish logfiles.";
         }
 
         public ILogLine GetLineTextForClipboard(ILogLine logLine, ILogLineColumnizerCallback callback)
@@ -83,19 +75,89 @@ namespace GlassfishColumnizer
             return "Classfish";
         }
 
-        public string GetDescription()
+        public int GetTimeOffset()
         {
-            return "Parse the timestamps in Glassfish logfiles.";
+            return timeOffset;
         }
 
-        public int GetColumnCount()
+        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine logLine)
         {
-            return COLUMN_COUNT;
+            string temp = logLine.FullLine;
+
+            // delete '[#|' and '|#]'
+            if (temp.StartsWith("[#|"))
+            {
+                temp = temp.Substring(3);
+            }
+
+            if (temp.EndsWith("|#]"))
+            {
+                temp = temp.Substring(0, temp.Length - 3);
+            }
+
+            if (temp.Length < 28)
+            {
+                return DateTime.MinValue;
+            }
+
+            int endIndex = temp.IndexOf(separatorChar, 1);
+            if (endIndex > 28 || endIndex < 0)
+            {
+                return DateTime.MinValue;
+            }
+
+            string value = temp.Substring(0, endIndex);
+
+            try
+            {
+                // convert glassfish timestamp into a readable format:
+                DateTime timestamp;
+                if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo,
+                    DateTimeStyles.None, out timestamp))
+                {
+                    return timestamp.AddMilliseconds(timeOffset);
+                }
+
+                return DateTime.MinValue;
+            }
+            catch (Exception)
+            {
+                return DateTime.MinValue;
+            }
         }
 
-        public string[] GetColumnNames()
+        public IXmlLogConfiguration GetXmlLogConfiguration()
         {
-            return new string[] {"Date/Time", "Message"};
+            return xmlConfig;
+        }
+
+
+        public bool IsTimeshiftImplemented()
+        {
+            return true;
+        }
+
+        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        {
+            if (column == 0)
+            {
+                try
+                {
+                    DateTime newDateTime = DateTime.ParseExact(value, DATETIME_FORMAT_OUT, cultureInfo);
+                    DateTime oldDateTime = DateTime.ParseExact(oldValue, DATETIME_FORMAT_OUT, cultureInfo);
+                    long mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                    long mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                    timeOffset = (int)(mSecsNew - mSecsOld);
+                }
+                catch (FormatException)
+                {
+                }
+            }
+        }
+
+        public void SetTimeOffset(int msecOffset)
+        {
+            timeOffset = msecOffset;
         }
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
@@ -114,6 +176,7 @@ namespace GlassfishColumnizer
             {
                 temp = temp.Substring(3);
             }
+
             if (temp.EndsWith("|#]"))
             {
                 temp = temp.Substring(0, temp.Length - 3);
@@ -134,6 +197,7 @@ namespace GlassfishColumnizer
                     {
                         columns[1].FullValue = temp;
                     }
+
                     string newDate = dateTime.ToString(DATETIME_FORMAT_OUT);
                     columns[0].FullValue = newDate;
                 }
@@ -145,7 +209,7 @@ namespace GlassfishColumnizer
                 Column timestmp = columns[0];
 
                 string[] cols;
-                cols = temp.Split(this.trimChars, COLUMN_COUNT, StringSplitOptions.None);
+                cols = temp.Split(trimChars, COLUMN_COUNT, StringSplitOptions.None);
 
                 if (cols.Length != COLUMN_COUNT)
                 {
@@ -158,94 +222,23 @@ namespace GlassfishColumnizer
                     columns[1].FullValue = cols[1];
                 }
             }
+
             return cLogLine;
-        }
-
-
-        public bool IsTimeshiftImplemented()
-        {
-            return true;
-        }
-
-        public void SetTimeOffset(int msecOffset)
-        {
-            this.timeOffset = msecOffset;
-        }
-
-        public int GetTimeOffset()
-        {
-            return this.timeOffset;
-        }
-
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine logLine)
-        {
-            string temp = logLine.FullLine;
-
-            // delete '[#|' and '|#]'
-            if (temp.StartsWith("[#|"))
-            {
-                temp = temp.Substring(3);
-            }
-            if (temp.EndsWith("|#]"))
-            {
-                temp = temp.Substring(0, temp.Length - 3);
-            }
-
-            if (temp.Length < 28)
-            {
-                return DateTime.MinValue;
-            }
-
-            int endIndex = temp.IndexOf(separatorChar, 1);
-            if (endIndex > 28 || endIndex < 0)
-            {
-                return DateTime.MinValue;
-            }
-            string value = temp.Substring(0, endIndex);
-
-            try
-            {
-                // convert glassfish timestamp into a readable format:
-                DateTime timestamp;
-                if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo,
-                    System.Globalization.DateTimeStyles.None, out timestamp))
-                {
-                    return timestamp.AddMilliseconds(this.timeOffset);
-                }
-                else
-                {
-                    return DateTime.MinValue;
-                }
-            }
-            catch (Exception)
-            {
-                return DateTime.MinValue;
-            }
-        }
-
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-        {
-            if (column == 0)
-            {
-                try
-                {
-                    DateTime newDateTime = DateTime.ParseExact(value, DATETIME_FORMAT_OUT, this.cultureInfo);
-                    DateTime oldDateTime = DateTime.ParseExact(oldValue, DATETIME_FORMAT_OUT, this.cultureInfo);
-                    long mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                    long mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                    this.timeOffset = (int) (mSecsNew - mSecsOld);
-                }
-                catch (FormatException)
-                {
-                }
-            }
         }
 
         #endregion
 
+        #region Properties / Indexers
+
+        public string Text => GetName();
+
+        #endregion
+
+        #region Nested type: GlassFishLogLine
+
         private class GlassFishLogLine : ILogLine
         {
-            #region Properties
+            #region Interface ILogLine
 
             public string FullLine { get; set; }
 
@@ -255,5 +248,7 @@ namespace GlassfishColumnizer
 
             #endregion
         }
+
+        #endregion
     }
 }

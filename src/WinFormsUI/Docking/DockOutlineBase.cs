@@ -1,4 +1,3 @@
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,11 +5,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     internal abstract class DockOutlineBase
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public DockOutlineBase()
         {
@@ -19,45 +14,41 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
-
-        protected Rectangle OldFloatWindowBounds { get; private set; }
-
-        protected Control OldDockTo { get; private set; }
-
-        protected DockStyle OldDock { get; private set; }
-
-        protected int OldContentIndex { get; private set; }
-
-        protected bool SameAsOldValue
-        {
-            get
-            {
-                return FloatWindowBounds == OldFloatWindowBounds &&
-                       DockTo == OldDockTo &&
-                       Dock == OldDock &&
-                       ContentIndex == OldContentIndex;
-            }
-        }
-
-        public Rectangle FloatWindowBounds { get; private set; }
-
-        public Control DockTo { get; private set; }
-
-        public DockStyle Dock { get; private set; }
+        #region Properties / Indexers
 
         public int ContentIndex { get; private set; }
 
-        public bool FlagFullEdge
-        {
-            get { return ContentIndex != 0; }
-        }
+        public DockStyle Dock { get; private set; }
 
-        public bool FlagTestDrop { get; set; } = false;
+        public Control DockTo { get; private set; }
+
+        public bool FlagFullEdge => ContentIndex != 0;
+
+        public bool FlagTestDrop { get; set; }
+
+        public Rectangle FloatWindowBounds { get; private set; }
+
+        protected int OldContentIndex { get; private set; }
+
+        protected DockStyle OldDock { get; private set; }
+
+        protected Control OldDockTo { get; private set; }
+
+        protected Rectangle OldFloatWindowBounds { get; private set; }
+
+        protected bool SameAsOldValue => FloatWindowBounds == OldFloatWindowBounds &&
+                                         DockTo == OldDockTo &&
+                                         Dock == OldDock &&
+                                         ContentIndex == OldContentIndex;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
+
+        public void Close()
+        {
+            OnClose();
+        }
 
         public void Show()
         {
@@ -94,10 +85,13 @@ namespace WeifenLuo.WinFormsUI.Docking
             TestChange();
         }
 
-        public void Close()
-        {
-            OnClose();
-        }
+        #endregion
+
+        #region Event handling Methods
+
+        protected abstract void OnClose();
+
+        protected abstract void OnShow();
 
         #endregion
 
@@ -138,9 +132,5 @@ namespace WeifenLuo.WinFormsUI.Docking
         }
 
         #endregion
-
-        protected abstract void OnShow();
-
-        protected abstract void OnClose();
     }
 }

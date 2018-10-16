@@ -2,7 +2,7 @@
 {
     public class FilterTabData
     {
-        #region Fields
+        #region Private Fields
 
         public FilterParams filterParams;
         public PersistenceData persistenceData;

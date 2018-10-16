@@ -1,56 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace LogExpert
 {
     /// <summary>
-    /// This class receives Trigger calls and sends an event as soons as no more input triggers calls
-    /// are received for a given time.
+    ///     This class receives Trigger calls and sends an event as soons as no more input triggers calls
+    ///     are received for a given time.
     /// </summary>
     internal class DelayedTrigger
     {
-        #region Fields
-
-        private readonly Thread thread = null;
-        private readonly EventWaitHandle timerEvent = new ManualResetEvent(false);
-        private readonly EventWaitHandle wakeupEvent = new ManualResetEvent(false);
-        private bool shouldCancel = false;
-        private readonly int waitTime = 0;
-
-        #endregion
-
-        #region cTor
-
-        public DelayedTrigger(int waitTimeMs)
-        {
-            this.waitTime = waitTimeMs;
-            this.thread = new Thread(new ThreadStart(worker));
-            this.thread.IsBackground = true;
-            this.thread.Start();
-        }
-
-        #endregion
-
         #region Delegates
 
         public delegate void SignalEventHandler(object sender, EventArgs e);
 
         #endregion
 
-        #region Events
+        #region Private Fields
+
+        private readonly Thread thread;
+        private readonly EventWaitHandle timerEvent = new ManualResetEvent(false);
+        private readonly int waitTime;
+        private readonly EventWaitHandle wakeupEvent = new ManualResetEvent(false);
+        private bool shouldCancel;
+
+        #endregion
+
+        #region Public Events
 
         public event SignalEventHandler Signal;
 
         #endregion
 
-        #region Public methods
+        #region Ctor
+
+        public DelayedTrigger(int waitTimeMs)
+        {
+            waitTime = waitTimeMs;
+            thread = new Thread(worker);
+            thread.IsBackground = true;
+            thread.Start();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Stop()
+        {
+            shouldCancel = true;
+            wakeupEvent.Set();
+        }
 
         public void Trigger()
         {
-            this.timerEvent.Set();
-            this.wakeupEvent.Set();
+            timerEvent.Set();
+            wakeupEvent.Set();
         }
 
         public void TriggerImmediate()
@@ -58,45 +62,9 @@ namespace LogExpert
             OnSignal();
         }
 
-        public void Stop()
-        {
-            this.shouldCancel = true;
-            this.wakeupEvent.Set();
-        }
-
         #endregion
 
-        #region Private Methods
-
-        private void worker()
-        {
-            while (!this.shouldCancel)
-            {
-                this.wakeupEvent.WaitOne();
-                if (this.shouldCancel)
-                {
-                    return;
-                }
-                this.wakeupEvent.Reset();
-
-                while (!this.shouldCancel)
-                {
-                    bool signaled = this.timerEvent.WaitOne(this.waitTime, true);
-                    this.timerEvent.Reset();
-                    if (!signaled)
-                    {
-                        break;
-                    }
-                }
-                // timeout with no new Trigger -> send event
-                if (!this.shouldCancel)
-                {
-                    OnSignal();
-                }
-            }
-        }
-
-        #endregion
+        #region Event handling Methods
 
         protected void OnSignal()
         {
@@ -105,5 +73,41 @@ namespace LogExpert
                 Signal(this, new EventArgs());
             }
         }
+
+        #endregion
+
+        #region Private Methods
+
+        private void worker()
+        {
+            while (!shouldCancel)
+            {
+                wakeupEvent.WaitOne();
+                if (shouldCancel)
+                {
+                    return;
+                }
+
+                wakeupEvent.Reset();
+
+                while (!shouldCancel)
+                {
+                    bool signaled = timerEvent.WaitOne(waitTime, true);
+                    timerEvent.Reset();
+                    if (!signaled)
+                    {
+                        break;
+                    }
+                }
+
+                // timeout with no new Trigger -> send event
+                if (!shouldCancel)
+                {
+                    OnSignal();
+                }
+            }
+        }
+
+        #endregion
     }
 }

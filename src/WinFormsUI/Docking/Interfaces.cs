@@ -6,13 +6,13 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     public interface IDockContent
     {
-        #region Properties
+        #region Properties / Indexers
 
         DockContentHandler DockHandler { get; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         void OnActivated(EventArgs e);
         void OnDeactivate(EventArgs e);
@@ -22,20 +22,21 @@ namespace WeifenLuo.WinFormsUI.Docking
 
     public interface INestedPanesContainer
     {
-        #region Properties
+        #region Properties / Indexers
+
+        Rectangle DisplayingRectangle { get; }
 
         DockState DockState { get; }
-        Rectangle DisplayingRectangle { get; }
+        bool IsFloat { get; }
         NestedPaneCollection NestedPanes { get; }
         VisibleNestedPaneCollection VisibleNestedPanes { get; }
-        bool IsFloat { get; }
 
         #endregion
     }
 
     internal interface IDragSource
     {
-        #region Properties
+        #region Properties / Indexers
 
         Control DragControl { get; }
 
@@ -44,28 +45,29 @@ namespace WeifenLuo.WinFormsUI.Docking
 
     internal interface IDockDragSource : IDragSource
     {
-        #region Public methods
+        #region Public Methods
 
         Rectangle BeginDrag(Point ptMouse);
-        bool IsDockStateValid(DockState dockState);
         bool CanDockTo(DockPane pane);
-        void FloatAt(Rectangle floatWindowBounds);
         void DockTo(DockPane pane, DockStyle dockStyle, int contentIndex);
         void DockTo(DockPanel panel, DockStyle dockStyle);
+        void FloatAt(Rectangle floatWindowBounds);
+        bool IsDockStateValid(DockState dockState);
 
         #endregion
     }
 
     internal interface ISplitterDragSource : IDragSource
     {
-        #region Properties
+        #region Properties / Indexers
+
+        Rectangle DragLimitBounds { get; }
 
         bool IsVertical { get; }
-        Rectangle DragLimitBounds { get; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         void BeginDrag(Rectangle rectSplitter);
         void EndDrag();

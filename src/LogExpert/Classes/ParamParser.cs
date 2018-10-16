@@ -1,36 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 using System.Text;
-using System.IO;
 using System.Text.RegularExpressions;
-
 
 namespace LogExpert
 {
     internal class ParamParser
     {
-        #region Fields
+        #region Private Fields
 
         private readonly string argLine;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public ParamParser(string argTemplate)
         {
-            this.argLine = argTemplate;
+            argLine = argTemplate;
         }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public string ReplaceParams(ILogLine logLine, int lineNum, string fileName)
         {
             FileInfo fileInfo = new FileInfo(fileName);
-            StringBuilder builder = new StringBuilder(this.argLine);
-            builder.Replace("%L", "" + lineNum);
+            StringBuilder builder = new StringBuilder(argLine);
+            builder.Replace("%L", string.Empty + lineNum);
             builder.Replace("%P",
                 fileInfo.DirectoryName.Contains(" ") ? "\"" + fileInfo.DirectoryName + "\"" : fileInfo.DirectoryName);
             builder.Replace("%N", fileInfo.Name.Contains(" ") ? "\"" + fileInfo.Name + "\"" : fileInfo.Name);
@@ -52,7 +49,9 @@ namespace LogExpert
                     string result = Regex.Replace(logLine.FullLine, reg, replace);
                     builder.Insert(sPos, result);
                 }
-            } while (replace != null);
+            }
+ while (replace != null);
+
             return builder.ToString();
         }
 
@@ -63,6 +62,7 @@ namespace LogExpert
             {
                 i = fileName.Length - 1;
             }
+
             return fileName.Substring(0, i);
         }
 
@@ -86,21 +86,26 @@ namespace LogExpert
                         {
                             count++;
                         }
+
                         if (builder[ePos] == '}')
                         {
                             count--;
                         }
+
                         if (count == 0)
                         {
                             string reg = builder.ToString(sPos + 1, ePos - sPos - 1);
                             builder.Remove(sPos, ePos - sPos + 1);
                             return reg;
                         }
+
                         ePos++;
                     }
                 }
+
                 sPos++;
             }
+
             return null;
         }
 

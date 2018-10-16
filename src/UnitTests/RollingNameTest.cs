@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using System.Text.RegularExpressions;
-
+﻿using NUnit.Framework;
 
 namespace LogExpert
 {
     [TestFixture]
     internal class RollingNameTest
     {
+        #region Public Methods
+
         [Test]
         public void testFilename1()
         {
@@ -114,5 +111,7 @@ namespace LogExpert
             name = fnb.BuildFileName();
             Assert.AreEqual("engine_2010-06-12.log.1", name);
         }
+
+        #endregion
     }
 }

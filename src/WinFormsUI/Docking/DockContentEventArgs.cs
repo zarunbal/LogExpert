@@ -4,11 +4,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     public class DockContentEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public DockContentEventArgs(IDockContent content)
         {
@@ -17,7 +13,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public IDockContent Content { get; }
 

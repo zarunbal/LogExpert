@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public interface IColumn : ITextValue
     {
-        #region Properties
+        #region Properties / Indexers
 
-        IColumnizedLogLine Parent { get; }
+        string DisplayValue { get; }
 
         string FullValue { get; }
 
-        string DisplayValue { get; }
+        IColumnizedLogLine Parent { get; }
 
         #endregion
     }

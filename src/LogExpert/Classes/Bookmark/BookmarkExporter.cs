@@ -1,22 +1,20 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace LogExpert
 {
     internal class BookmarkExporter
     {
-        #region Fields
+        #region Static/Constants
 
         private const string replacementForNewLine = @"\n";
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public static void ExportBookmarkList(SortedList<int, Bookmark> bookmarkList, string logfileName,
-            string fileName)
+                                              string fileName)
         {
             FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
             StreamWriter writer = new StreamWriter(fs);
@@ -28,12 +26,13 @@ namespace LogExpert
                                   replacementForNewLine);
                 writer.WriteLine(line);
             }
+
             writer.Close();
             fs.Close();
         }
 
         public static void ImportBookmarkList(string logfileName, string fileName,
-            SortedList<int, Bookmark> bookmarkList)
+                                              SortedList<int, Bookmark> bookmarkList)
         {
             using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
@@ -65,14 +64,10 @@ namespace LogExpert
                                 Bookmark bookmark = new Bookmark(lineNum, comment);
                                 bookmarkList.Add(lineNum, bookmark);
                             }
-                            else
-                            {
-                                //!!!log error: skipping a line entry
-                            }
                         }
                         catch
                         {
-                            //!!!
+                            // !!!
                         }
                     }
                 }

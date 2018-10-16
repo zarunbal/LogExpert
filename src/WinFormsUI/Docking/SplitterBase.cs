@@ -1,14 +1,12 @@
-using System;
-using System.Collections;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking.Win32;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     internal class SplitterBase : Control
     {
-        #region cTor
+        #region Ctor
 
         public SplitterBase()
         {
@@ -17,11 +15,11 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public override DockStyle Dock
         {
-            get { return base.Dock; }
+            get => base.Dock;
             set
             {
                 SuspendLayout();
@@ -57,10 +55,7 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
-        protected virtual int SplitterSize
-        {
-            get { return 0; }
-        }
+        protected virtual int SplitterSize => 0;
 
         #endregion
 
@@ -81,7 +76,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         protected override void WndProc(ref Message m)
         {
             // eat the WM_MOUSEACTIVATE message
-            if (m.Msg == (int) Win32.Msgs.WM_MOUSEACTIVATE)
+            if (m.Msg == (int)Msgs.WM_MOUSEACTIVATE)
             {
                 return;
             }
@@ -91,8 +86,12 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
+        #region Private Methods
+
         protected virtual void StartDrag()
         {
         }
+
+        #endregion
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class LocalFileSystem : IFileSystemPlugin
     {
-        #region IFileSystemPlugin Member
+        #region Interface IFileSystemPlugin
+
+        public string Description => "Access files from normal file system.";
+
+        public string Text => "Local file system";
 
         public bool CanHandleUri(string uriString)
         {
@@ -29,20 +31,8 @@ namespace LogExpert
                 ILogFileInfo logFileInfo = new LogFileInfo(uri);
                 return logFileInfo;
             }
-            else
-            {
-                throw new UriFormatException("Uri " + uriString + " is no file Uri");
-            }
-        }
 
-        public string Text
-        {
-            get { return "Local file system"; }
-        }
-
-        public string Description
-        {
-            get { return "Access files from normal file system."; }
+            throw new UriFormatException("Uri " + uriString + " is no file Uri");
         }
 
         #endregion

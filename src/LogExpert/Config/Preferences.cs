@@ -8,7 +8,7 @@ namespace LogExpert
     [Serializable]
     public class Preferences
     {
-        #region Fields
+        #region Private Fields
 
         public bool allowOnlyOneInstance;
         public bool askForClose = false;

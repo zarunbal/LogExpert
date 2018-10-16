@@ -1,40 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-//using System.Linq;
-using System.Text;
+﻿// using System.Linq;
 
 namespace LogExpert
 {
     public class LoadFileEventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public LoadFileEventArgs(string fileName, long pos, bool finished, long fileSize, bool newFile)
         {
-            this.FileName = fileName;
-            this.ReadPos = pos;
-            this.Finished = finished;
-            this.FileSize = fileSize;
-            this.NewFile = newFile;
+            FileName = fileName;
+            ReadPos = pos;
+            Finished = finished;
+            FileSize = fileSize;
+            NewFile = newFile;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public long ReadPos { get; }
-
-        public bool Finished { get; }
+        public string FileName { get; }
 
         public long FileSize { get; }
 
+        public bool Finished { get; }
+
         public bool NewFile { get; }
 
-        public string FileName { get; }
+        public long ReadPos { get; }
 
         #endregion
     }

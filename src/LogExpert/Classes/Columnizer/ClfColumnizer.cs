@@ -1,62 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-
+using System.Text.RegularExpressions;
 
 namespace LogExpert
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Globalization;
-    using System.Text.RegularExpressions;
-
     public class ClfColumnizer : ILogLineColumnizer
     {
-        #region Fields
+        #region Private Fields
 
         private readonly Regex lineRegex = new Regex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
 
         protected CultureInfo cultureInfo = new CultureInfo("de-DE");
-        protected int timeOffset = 0;
+        protected int timeOffset;
 
         #endregion
 
-        #region cTor
+        #region Interface ILogLineColumnizer
 
-        // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
-
-        public ClfColumnizer()
+        public int GetColumnCount()
         {
+            return 8;
         }
 
-        #endregion
-
-        #region Properties
-
-        public string Text
+        public string[] GetColumnNames()
         {
-            get { return GetName(); }
+            return new[] {"IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"};
         }
 
-        #endregion
-
-        #region Public methods
-
-        public bool IsTimeshiftImplemented()
+        public string GetDescription()
         {
-            return true;
+            return "Common Logfile Format used by webservers.";
         }
 
-        public void SetTimeOffset(int msecOffset)
+        public string GetName()
         {
-            this.timeOffset = msecOffset;
+            return "Webserver CLF Columnizer";
         }
 
         public int GetTimeOffset()
         {
-            return this.timeOffset;
+            return timeOffset;
         }
 
         public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
@@ -66,10 +50,12 @@ namespace LogExpert
             {
                 return DateTime.MinValue;
             }
+
             if (cols.ColumnValues[2].FullValue.Length == 0)
             {
                 return DateTime.MinValue;
             }
+
             try
             {
                 DateTime dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, "dd/MMM/yyyy:HH:mm:ss zzz",
@@ -80,6 +66,11 @@ namespace LogExpert
             {
                 return DateTime.MinValue;
             }
+        }
+
+        public bool IsTimeshiftImplemented()
+        {
+            return true;
         }
 
 
@@ -95,7 +86,7 @@ namespace LogExpert
                         DateTime.ParseExact(oldValue, "dd/MMM/yyyy:HH:mm:ss zzz", new CultureInfo("en-US"));
                     long mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                     long mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                    this.timeOffset = (int) (mSecsNew - mSecsOld);
+                    timeOffset = (int)(mSecsNew - mSecsOld);
                 }
                 catch (FormatException)
                 {
@@ -103,24 +94,9 @@ namespace LogExpert
             }
         }
 
-        public string GetName()
+        public void SetTimeOffset(int msecOffset)
         {
-            return "Webserver CLF Columnizer";
-        }
-
-        public string GetDescription()
-        {
-            return "Common Logfile Format used by webservers.";
-        }
-
-        public int GetColumnCount()
-        {
-            return 8;
-        }
-
-        public string[] GetColumnNames()
-        {
-            return new string[] {"IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"};
+            timeOffset = msecOffset;
         }
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
@@ -157,9 +133,9 @@ namespace LogExpert
             // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
             // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
 
-            if (this.lineRegex.IsMatch(temp))
+            if (lineRegex.IsMatch(temp))
             {
-                Match match = this.lineRegex.Match(temp);
+                Match match = lineRegex.Match(temp);
                 GroupCollection groups = match.Groups;
                 if (groups.Count == 10)
                 {
@@ -176,13 +152,13 @@ namespace LogExpert
                     // dirty probing of date/time format (much faster than DateTime.ParseExact()
                     if (dateTimeStr[2] == '/' && dateTimeStr[6] == '/' && dateTimeStr[11] == ':')
                     {
-                        if (this.timeOffset != 0)
+                        if (timeOffset != 0)
                         {
                             try
                             {
                                 DateTime dateTime = DateTime.ParseExact(dateTimeStr, "dd/MMM/yyyy:HH:mm:ss zzz",
                                     new CultureInfo("en-US"));
-                                dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
+                                dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, timeOffset));
                                 string newDate = dateTime.ToString("dd/MMM/yyyy:HH:mm:ss zzz",
                                     new CultureInfo("en-US"));
                                 columns[2].FullValue = newDate;
@@ -207,9 +183,18 @@ namespace LogExpert
             {
                 columns[3].FullValue = temp;
             }
+
             return cLogLine;
         }
 
         #endregion
+
+        #region Properties / Indexers
+
+        public string Text => GetName();
+
+        #endregion
+
+        // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
     }
 }

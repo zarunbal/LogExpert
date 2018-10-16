@@ -1,54 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert
 {
     public partial class EminusConfigDlg : Form
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public EminusConfigDlg(EminusConfig config)
         {
             InitializeComponent();
-            this.TopLevel = false;
-            this.Config = config;
+            TopLevel = false;
+            Config = config;
 
-            this.hostTextBox.Text = config.host;
-            this.portTextBox.Text = "" + config.port;
-            this.passwordTextBox.Text = config.password;
+            hostTextBox.Text = config.host;
+            portTextBox.Text = string.Empty + config.port;
+            passwordTextBox.Text = config.password;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public EminusConfig Config { get; set; }
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public void ApplyChanges()
         {
-            this.Config.host = this.hostTextBox.Text;
+            Config.host = hostTextBox.Text;
             try
             {
-                this.Config.port = short.Parse(this.portTextBox.Text);
+                Config.port = short.Parse(portTextBox.Text);
             }
             catch (FormatException fe)
             {
-                this.Config.port = 0;
+                Config.port = 0;
             }
-            this.Config.password = this.passwordTextBox.Text;
+
+            Config.password = passwordTextBox.Text;
         }
 
         #endregion

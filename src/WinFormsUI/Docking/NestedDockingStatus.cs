@@ -1,15 +1,10 @@
-using System;
 using System.Drawing;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public sealed class NestedDockingStatus
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         internal NestedDockingStatus(DockPane pane)
         {
@@ -18,38 +13,36 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         #endregion
 
-        #region Properties
-
-        public DockPane DockPane { get; } = null;
-
-        public NestedPaneCollection NestedPanes { get; private set; } = null;
-
-        public DockPane PreviousPane { get; private set; } = null;
+        #region Properties / Indexers
 
         public DockAlignment Alignment { get; private set; } = DockAlignment.Left;
 
-        public double Proportion { get; private set; } = 0.5;
-
-        public bool IsDisplaying { get; private set; } = false;
-
-        public DockPane DisplayingPreviousPane { get; private set; } = null;
-
         public DockAlignment DisplayingAlignment { get; private set; } = DockAlignment.Left;
+
+        public DockPane DisplayingPreviousPane { get; private set; }
 
         public double DisplayingProportion { get; private set; } = 0.5;
 
+        public DockPane DockPane { get; }
+
+        public bool IsDisplaying { get; private set; }
+
         public Rectangle LogicalBounds { get; private set; } = Rectangle.Empty;
 
+        public NestedPaneCollection NestedPanes { get; private set; }
+
         public Rectangle PaneBounds { get; private set; } = Rectangle.Empty;
+
+        public DockPane PreviousPane { get; private set; }
+
+        public double Proportion { get; private set; } = 0.5;
 
         public Rectangle SplitterBounds { get; private set; } = Rectangle.Empty;
 
         #endregion
 
-        #region Internals
-
         internal void SetStatus(NestedPaneCollection nestedPanes, DockPane previousPane, DockAlignment alignment,
-            double proportion)
+                                double proportion)
         {
             NestedPanes = nestedPanes;
             PreviousPane = previousPane;
@@ -58,7 +51,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         }
 
         internal void SetDisplayingStatus(bool isDisplaying, DockPane displayingPreviousPane,
-            DockAlignment displayingAlignment, double displayingProportion)
+                                          DockAlignment displayingAlignment, double displayingProportion)
         {
             IsDisplaying = isDisplaying;
             DisplayingPreviousPane = displayingPreviousPane;
@@ -72,7 +65,5 @@ namespace WeifenLuo.WinFormsUI.Docking
             PaneBounds = paneBounds;
             SplitterBounds = splitterBounds;
         }
-
-        #endregion
     }
 }

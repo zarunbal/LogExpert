@@ -1,11 +1,8 @@
-using System;
-using System.Security.Permissions;
-
 namespace LogExpert
 {
     public interface ILogExpertClient
     {
-        #region Properties
+        #region Properties / Indexers
 
         int Id { get; }
 
@@ -13,7 +10,7 @@ namespace LogExpert
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         void NotifySettingsChanged(ILogExpertProxy server, object cookie);
 

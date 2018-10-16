@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     internal class ColumnCache
     {
-        #region Fields
+        #region Private Fields
 
-        private IColumnizedLogLine cachedColumns = null;
+        private IColumnizedLogLine cachedColumns;
         private ILogLineColumnizer lastColumnizer;
         private int lastLineNumber = -1;
 
         #endregion
 
-        #region Internals
-
         internal IColumnizedLogLine GetColumnsForLine(LogfileReader logFileReader, int lineNumber,
-            ILogLineColumnizer columnizer,
-            LogWindow.ColumnizerCallback columnizerCallback)
+                                                      ILogLineColumnizer columnizer,
+                                                      LogWindow.ColumnizerCallback columnizerCallback)
         {
             if (lastColumnizer != columnizer || lastLineNumber != lineNumber && cachedColumns != null ||
                 columnizerCallback.LineNum != lineNumber)
@@ -37,9 +30,8 @@ namespace LogExpert
                     cachedColumns = null;
                 }
             }
+
             return cachedColumns;
         }
-
-        #endregion
     }
 }

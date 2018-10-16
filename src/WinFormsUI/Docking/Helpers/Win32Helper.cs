@@ -1,4 +1,3 @@
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,7 +5,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     internal static class Win32Helper
     {
-        #region Public methods
+        #region Public Methods
 
         public static Control ControlAtPoint(Point pt)
         {
@@ -15,7 +14,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         public static uint MakeLong(int low, int high)
         {
-            return (uint) ((high << 16) + low);
+            return (uint)((high << 16) + low);
         }
 
         #endregion

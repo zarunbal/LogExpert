@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class RowHeightEntry
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public RowHeightEntry()
         {
@@ -26,11 +18,11 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
-
-        public int LineNum { get; set; }
+        #region Properties / Indexers
 
         public int Height { get; set; }
+
+        public int LineNum { get; set; }
 
         #endregion
     }

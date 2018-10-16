@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     public class SyncModeEventArgs : EventArgs
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public SyncModeEventArgs(bool isSynced)
         {
-            this.IsTimeSynced = isSynced;
+            IsTimeSynced = isSynced;
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public bool IsTimeSynced { get; }
 

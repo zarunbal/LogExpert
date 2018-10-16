@@ -341,14 +341,14 @@ namespace WeifenLuo.WinFormsUI.Docking.Win32
         SB_BOTH = 3
     }
 
-    internal enum GetWindowLongIndex : int
+    internal enum GetWindowLongIndex
     {
         GWL_STYLE = -16,
         GWL_EXSTYLE = -20
     }
 
     // Hook Types  
-    internal enum HookType : int
+    internal enum HookType
     {
         WH_JOURNALRECORD = 0,
         WH_JOURNALPLAYBACK = 1,

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
     internal class LogFileException : ApplicationException
     {
-        #region cTor
+        #region Ctor
 
         internal LogFileException(string msg)
             : base(msg)

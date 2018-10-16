@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 
 namespace LogExpert.Classes.Log
 {
     public abstract class PositionAwareStreamReaderBase : ILogStreamReader
     {
-        #region Fields
+        #region Static/Constants
 
         protected const int MAX_LINE_LEN = 20000;
+
+        #endregion
+
+        #region Private Fields
+
         private readonly int _posIncPrecomputed;
 
-        protected readonly int _preambleLength = 0;
+        protected readonly int _preambleLength;
         protected readonly StreamReader _reader;
         protected readonly Stream _stream;
-        protected int _charBufferPos = 0;
+        protected int _charBufferPos;
 
         private Encoding _detectedEncoding;
         protected long _pos;
@@ -24,7 +26,7 @@ namespace LogExpert.Classes.Log
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         protected PositionAwareStreamReaderBase(Stream stream, EncodingOptions encodingOptions)
         {
@@ -67,15 +69,19 @@ namespace LogExpert.Classes.Log
 
         #endregion
 
-        #region Properties
+        #region Interface ILogStreamReader
+
+        public Encoding Encoding => _reader.CurrentEncoding;
+
+        public bool IsBufferComplete => true;
 
         /// <summary>
-        /// Gets or sets the position.
+        ///     Gets or sets the position.
         /// </summary>
         /// <value>The position.</value>
         public long Position
         {
-            get { return _pos; }
+            get => _pos;
             set
             {
                 /*
@@ -94,25 +100,6 @@ namespace LogExpert.Classes.Log
             }
         }
 
-        public Encoding Encoding
-        {
-            get { return _reader.CurrentEncoding; }
-        }
-
-        public bool IsBufferComplete
-        {
-            get { return true; }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public void Close()
-        {
-            _stream.Close();
-        }
-
         public unsafe int ReadChar()
         {
             int readInt;
@@ -121,7 +108,7 @@ namespace LogExpert.Classes.Log
                 readInt = _reader.Read();
                 if (readInt != -1)
                 {
-                    char readChar = (char) readInt;
+                    char readChar = (char)readInt;
                     int posInc = _posIncPrecomputed != 0
                         ? _posIncPrecomputed
                         : _reader.CurrentEncoding.GetByteCount(&readChar, 1);
@@ -140,10 +127,19 @@ namespace LogExpert.Classes.Log
 
         #endregion
 
+        #region Public Methods
+
+        public void Close()
+        {
+            _stream.Close();
+        }
+
+        #endregion
+
         #region Private Methods
 
         /// <summary>
-        /// Determines the actual number of preamble bytes in the file.
+        ///     Determines the actual number of preamble bytes in the file.
         /// </summary>
         /// <returns></returns>
         private int DetectPreambleLengthAndEncoding()
@@ -164,7 +160,7 @@ namespace LogExpert.Classes.Log
                 return 0;
             }
 
-            Encoding[] encodings = new Encoding[]
+            Encoding[] encodings =
             {
                 Encoding.UTF8,
                 Encoding.Unicode,
@@ -201,7 +197,10 @@ namespace LogExpert.Classes.Log
             return 0;
         }
 
-        #endregion
+        protected void NewBuilder()
+        {
+            _charBufferPos = 0;
+        }
 
         protected void ResetReader()
         {
@@ -210,9 +209,6 @@ namespace LogExpert.Classes.Log
             _reader.DiscardBufferedData();
         }
 
-        protected void NewBuilder()
-        {
-            _charBufferPos = 0;
-        }
+        #endregion
     }
 }

@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading;
 
 namespace LogExpert
 {
     internal class XmlLogReader : ILogStreamReader
     {
-        #region Fields
+        #region Private Fields
 
         private readonly ILogStreamReader reader;
 
-        //private const int MAX_BUFFER_LEN = 4096;
-        //private char[] buffer = new char[MAX_BUFFER_LEN];
-        //private int bufferPos = 0;
+        // private const int MAX_BUFFER_LEN = 4096;
+        // private char[] buffer = new char[MAX_BUFFER_LEN];
+        // private int bufferPos = 0;
         private StringBuilder buffer = new StringBuilder();
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public XmlLogReader(ILogStreamReader reader)
         {
@@ -27,31 +25,17 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
+        #region Interface ILogStreamReader
+
+        public Encoding Encoding => reader.Encoding;
+
+        public bool IsBufferComplete => reader.IsBufferComplete;
 
         public long Position
         {
-            get { return reader.Position; }
-            set { reader.Position = value; }
+            get => reader.Position;
+            set => reader.Position = value;
         }
-
-        public Encoding Encoding
-        {
-            get { return reader.Encoding; }
-        }
-
-        public bool IsBufferComplete
-        {
-            get { return reader.IsBufferComplete; }
-        }
-
-        public string StartTag { get; set; } = "<log4j:event";
-
-        public string EndTag { get; set; } = "</log4j:event>";
-
-        #endregion
-
-        #region Public methods
 
         public int ReadChar()
         {
@@ -79,21 +63,19 @@ namespace LogExpert
                             Thread.Sleep(100);
                             continue;
                         }
-                        else
-                        {
-                            eof = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
+
                         eof = true;
                         break;
                     }
+
+                    eof = true;
+                    break;
                 }
 
-                char readChar = (char) readInt;
-                // state:
+                char readChar = (char)readInt;
+
+
+// state:
                 // 0 = looking for tag start
                 // 1 = reading into buffer as long as the read data matches the start tag
                 // 2 = reading into buffer while waiting for the begin of the end tag
@@ -103,16 +85,16 @@ namespace LogExpert
                     case 0:
                         if (readChar == StartTag[0])
                         {
-                            //_logger.logInfo("state = 1");
+                            // _logger.logInfo("state = 1");
                             state = 1;
                             tagIndex = 1;
                             AddToBuffer(readChar);
                         }
 
-                        //else
-                        //{
-                        //  _logger.logInfo("char: " + readChar);
-                        //}
+                        // else
+                        // {
+                        // _logger.logInfo("char: " + readChar);
+                        // }
                         break;
                     case 1:
                         if (readChar == StartTag[tagIndex])
@@ -120,7 +102,7 @@ namespace LogExpert
                             AddToBuffer(readChar);
                             if (++tagIndex >= StartTag.Length)
                             {
-                                //_logger.logInfo("state = 2");
+                                // _logger.logInfo("state = 2");
                                 state = 2; // start Tag complete
                                 tagIndex = 0;
                             }
@@ -128,7 +110,7 @@ namespace LogExpert
                         else
                         {
                             // tag doesn't match anymore
-                            //_logger.logInfo("state = 0 [" + this.buffer.ToString() + readChar + "]");
+                            // _logger.logInfo("state = 0 [" + this.buffer.ToString() + readChar + "]");
                             state = 0;
                             ResetBuffer();
                         }
@@ -138,7 +120,7 @@ namespace LogExpert
                         AddToBuffer(readChar);
                         if (readChar == EndTag[0])
                         {
-                            //_logger.logInfo("state = 3");
+                            // _logger.logInfo("state = 3");
                             state = 3;
                             tagIndex = 1;
                         }
@@ -152,12 +134,11 @@ namespace LogExpert
                             if (tagIndex >= EndTag.Length)
                             {
                                 blockComplete = true;
-                                break;
                             }
                         }
                         else
                         {
-                            //_logger.logInfo("state = 2");
+                            // _logger.logInfo("state = 2");
                             state = 2;
                         }
 
@@ -170,10 +151,18 @@ namespace LogExpert
                 return null; // EOF
             }
 
-            //string result = new string(this.buffer, 0, this.bufferPos);
+            // string result = new string(this.buffer, 0, this.bufferPos);
             string result = buffer.ToString();
             return result;
         }
+
+        #endregion
+
+        #region Properties / Indexers
+
+        public string EndTag { get; set; } = "</log4j:event>";
+
+        public string StartTag { get; set; } = "<log4j:event";
 
         #endregion
 
@@ -181,13 +170,13 @@ namespace LogExpert
 
         private void AddToBuffer(char readChar)
         {
-            //this.buffer[this.bufferPos++] = readChar;
+            // this.buffer[this.bufferPos++] = readChar;
             buffer.Append(readChar);
         }
 
         private void ResetBuffer()
         {
-            //this.bufferPos = 0;
+            // this.bufferPos = 0;
             buffer = new StringBuilder();
         }
 

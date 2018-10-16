@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     /// <summary>
-    /// Implement this interface to get notified of various global events in LogExpert.
-    /// The interface can be implemented by all currently known type of LogExpert plugins (Columnizers,
-    /// keyword plugins, context menu plugins).
+    ///     Implement this interface to get notified of various global events in LogExpert.
+    ///     The interface can be implemented by all currently known type of LogExpert plugins (Columnizers,
+    ///     keyword plugins, context menu plugins).
     /// </summary>
     public interface ILogExpertPlugin
     {
-        #region Public methods
+        #region Public Methods
 
         /// <summary>
-        /// Called on application exit. May be used for cleanup purposes,
+        ///     Called on application exit. May be used for cleanup purposes,
         /// </summary>
         void AppExiting();
 
         /// <summary>
-        /// Called when the plugin is loaded at plugin registration while LogExpert startup.
+        ///     Called when the plugin is loaded at plugin registration while LogExpert startup.
         /// </summary>
         void PluginLoaded();
 

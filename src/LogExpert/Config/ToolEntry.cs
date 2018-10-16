@@ -5,40 +5,44 @@ namespace LogExpert
     [Serializable]
     public class ToolEntry
     {
-        #region Fields
+        #region Private Fields
 
-        public string args = "";
-        public string cmd = "";
-        public string columnizerName = "";
+        public string args = string.Empty;
+        public string cmd = string.Empty;
+        public string columnizerName = string.Empty;
         public string iconFile;
         public int iconIndex;
         public bool isFavourite;
         public string name;
-        public bool sysout = false;
-        public string workingDir = "";
+        public bool sysout;
+        public string workingDir = string.Empty;
 
         #endregion
 
-        #region Public methods
-
-        public override string ToString()
-        {
-            return Util.IsNull(this.name) ? this.cmd : this.name;
-        }
+        #region Public Methods
 
         public ToolEntry Clone()
         {
             ToolEntry clone = new ToolEntry();
-            clone.cmd = this.cmd;
-            clone.args = this.args;
-            clone.name = this.name;
-            clone.sysout = this.sysout;
-            clone.columnizerName = this.columnizerName;
-            clone.isFavourite = this.isFavourite;
-            clone.iconFile = this.iconFile;
-            clone.iconIndex = this.iconIndex;
-            clone.workingDir = this.workingDir;
+            clone.cmd = cmd;
+            clone.args = args;
+            clone.name = name;
+            clone.sysout = sysout;
+            clone.columnizerName = columnizerName;
+            clone.isFavourite = isFavourite;
+            clone.iconFile = iconFile;
+            clone.iconIndex = iconIndex;
+            clone.workingDir = workingDir;
             return clone;
+        }
+
+        #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            return Util.IsNull(name) ? cmd : name;
         }
 
         #endregion

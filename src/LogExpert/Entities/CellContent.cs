@@ -1,30 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert
 {
     public class CellContent
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public CellContent(string value, int x)
         {
-            this.Value = value;
-            this.CellPosX = x;
+            Value = value;
+            CellPosX = x;
         }
 
         #endregion
 
-        #region Properties
-
-        public string Value { get; set; }
+        #region Properties / Indexers
 
         public int CellPosX { get; set; }
+
+        public string Value { get; set; }
 
         #endregion
     }

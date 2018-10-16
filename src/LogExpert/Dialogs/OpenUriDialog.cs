@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
     public partial class OpenUriDialog : Form
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
+        #region Ctor
 
         public OpenUriDialog()
         {
@@ -23,46 +15,45 @@ namespace LogExpert.Dialogs
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        public string Uri
-        {
-            get { return this.uriComboBox.Text; }
-        }
+        public string Uri => uriComboBox.Text;
 
         public IList<string> UriHistory { get; set; }
 
         #endregion
 
-        #region Events handler
-
-        private void OpenUriDialog_Load(object sender, EventArgs e)
-        {
-            if (this.UriHistory != null)
-            {
-                this.uriComboBox.Items.Clear();
-                foreach (string uri in this.UriHistory)
-                {
-                    this.uriComboBox.Items.Add(uri);
-                }
-            }
-        }
+        #region Private Methods
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            this.UriHistory = new List<string>();
-            foreach (object item in this.uriComboBox.Items)
+            UriHistory = new List<string>();
+            foreach (object item in uriComboBox.Items)
             {
-                this.UriHistory.Add(item.ToString());
+                UriHistory.Add(item.ToString());
             }
-            if (this.UriHistory.Contains(this.uriComboBox.Text))
+
+            if (UriHistory.Contains(uriComboBox.Text))
             {
-                this.UriHistory.Remove(this.uriComboBox.Text);
+                UriHistory.Remove(uriComboBox.Text);
             }
-            this.UriHistory.Insert(0, this.uriComboBox.Text);
-            while (this.UriHistory.Count > 20)
+
+            UriHistory.Insert(0, uriComboBox.Text);
+            while (UriHistory.Count > 20)
             {
-                this.UriHistory.RemoveAt(this.UriHistory.Count - 1);
+                UriHistory.RemoveAt(UriHistory.Count - 1);
+            }
+        }
+
+        private void OpenUriDialog_Load(object sender, EventArgs e)
+        {
+            if (UriHistory != null)
+            {
+                uriComboBox.Items.Clear();
+                foreach (string uri in UriHistory)
+                {
+                    uriComboBox.Items.Add(uri);
+                }
             }
         }
 

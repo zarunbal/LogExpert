@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using LogExpert;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using LogExpert;
 
 namespace FlashIconHighlighter
 {
     internal class FlashIconPlugin : IKeywordAction
     {
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
-        }
-
-        #endregion
+        #region Delegates
 
         private delegate void FlashWindowFx(Form form);
 
-        #region IKeywordAction Member
+        #endregion
+
+        #region Interface IKeywordAction
 
         public void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
         {
@@ -30,10 +23,30 @@ namespace FlashIconHighlighter
                 if (form.TopLevel && form.Name.Equals("LogTabWindow") && form.Text.Contains(callback.GetFileName()))
                 {
                     FlashWindowFx fx = FlashWindow;
-                    form.BeginInvoke(fx, new object[] {form});
+                    form.BeginInvoke(fx, form);
                 }
             }
         }
+
+        public string GetDescription()
+        {
+            return "Let the taskbar icon flash ";
+        }
+
+        public string GetName()
+        {
+            return "Flash Icon";
+        }
+
+        #endregion
+
+        #region Properties / Indexers
+
+        public string Text => GetName();
+
+        #endregion
+
+        #region Private Methods
 
         private void FlashWindow(Form form)
         {
@@ -45,16 +58,6 @@ namespace FlashIconHighlighter
             fw.uCount = 0;
 
             Win32Stuff.FlashWindowEx(ref fw);
-        }
-
-        public string GetDescription()
-        {
-            return "Let the taskbar icon flash ";
-        }
-
-        public string GetName()
-        {
-            return "Flash Icon";
         }
 
         #endregion

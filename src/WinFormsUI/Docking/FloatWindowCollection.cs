@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
     public class FloatWindowCollection : ReadOnlyCollection<FloatWindow>
     {
-        #region cTor
+        #region Ctor
 
         internal FloatWindowCollection()
             : base(new List<FloatWindow>())
@@ -16,8 +13,6 @@ namespace WeifenLuo.WinFormsUI.Docking
         }
 
         #endregion
-
-        #region Internals
 
         internal int Add(FloatWindow fw)
         {
@@ -48,7 +43,5 @@ namespace WeifenLuo.WinFormsUI.Docking
             Items.Remove(fw);
             Items.Add(fw);
         }
-
-        #endregion
     }
 }

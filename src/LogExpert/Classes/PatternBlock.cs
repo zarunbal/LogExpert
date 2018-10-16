@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace LogExpert
 {
     public class QualityInfo
     {
-        #region Fields
+        #region Private Fields
 
         public int quality;
 
@@ -15,7 +13,7 @@ namespace LogExpert
 
     public class PatternBlock
     {
-        #region Fields
+        #region Private Fields
 
         public int blockId;
 
@@ -33,7 +31,7 @@ namespace LogExpert
 
         #endregion
 
-        #region Public methods
+        #region Overrides
 
         public override string ToString()
         {

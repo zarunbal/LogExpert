@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NLog;
+﻿using NLog;
 
 namespace LogExpert
 {
     internal class FilterCancelHandler : BackgroundProcessCancelHandler
     {
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        #region Fields
+
+        #region Private Fields
 
         private readonly FilterStarter filterStarter;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public FilterCancelHandler(FilterStarter filterStarter)
         {
@@ -23,12 +21,12 @@ namespace LogExpert
 
         #endregion
 
-        #region Public methods
+        #region Interface BackgroundProcessCancelHandler
 
         public void EscapePressed()
         {
             _logger.Info("FilterCancelHandler called.");
-            this.filterStarter.CancelFilter();
+            filterStarter.CancelFilter();
         }
 
         #endregion

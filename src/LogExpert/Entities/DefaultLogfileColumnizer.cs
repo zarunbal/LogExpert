@@ -1,23 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 
 namespace LogExpert
 {
     internal class DefaultLogfileColumnizer : ILogLineColumnizer
     {
-        #region ILogLineColumnizer Members
-
-        public string GetName()
-        {
-            return "Default (single line)";
-        }
-
-        public string GetDescription()
-        {
-            return "No column splitting. The whole line is displayed in a single column.";
-        }
+        #region Interface ILogLineColumnizer
 
         public int GetColumnCount()
         {
@@ -26,7 +13,41 @@ namespace LogExpert
 
         public string[] GetColumnNames()
         {
-            return new string[] {"Text"};
+            return new[] {"Text"};
+        }
+
+        public string GetDescription()
+        {
+            return "No column splitting. The whole line is displayed in a single column.";
+        }
+
+        public string GetName()
+        {
+            return "Default (single line)";
+        }
+
+        public int GetTimeOffset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsTimeshiftImplemented()
+        {
+            return false;
+        }
+
+        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        {
+        }
+
+        public void SetTimeOffset(int msecOffset)
+        {
+            throw new NotImplementedException();
         }
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
@@ -46,38 +67,11 @@ namespace LogExpert
             return cLogLine;
         }
 
-        public string Text
-        {
-            get { return GetName(); }
-        }
-
         #endregion
 
-        #region ILogLineColumnizer Not implemented Members
+        #region Properties / Indexers
 
-        public bool IsTimeshiftImplemented()
-        {
-            return false;
-        }
-
-        public void SetTimeOffset(int msecOffset)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetTimeOffset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-        {
-        }
+        public string Text => GetName();
 
         #endregion
     }

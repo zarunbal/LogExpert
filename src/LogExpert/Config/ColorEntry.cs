@@ -6,14 +6,14 @@ namespace LogExpert
     [Serializable]
     public class ColorEntry
     {
-        #region Fields
+        #region Private Fields
 
         public Color color;
         public string fileName;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public ColorEntry(string fileName, Color color)
         {

@@ -9,40 +9,42 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     internal class DockAreasEditor : UITypeEditor
     {
-        #region Fields
+        #region Private Fields
 
-        private DockAreasEditor.DockAreasEditorControl m_ui = null;
+        private DockAreasEditorControl m_ui;
 
         #endregion
 
-        #region Public methods
+        #region Overrides
+
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider sp, object value)
+        {
+            if (m_ui == null)
+            {
+                m_ui = new DockAreasEditorControl();
+            }
+
+            m_ui.SetStates((DockAreas)value);
+
+            IWindowsFormsEditorService edSvc =
+                (IWindowsFormsEditorService)sp.GetService(typeof(IWindowsFormsEditorService));
+            edSvc.DropDownControl(m_ui);
+
+            return m_ui.DockAreas;
+        }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
             return UITypeEditorEditStyle.DropDown;
         }
 
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider sp, object value)
-        {
-            if (m_ui == null)
-            {
-                m_ui = new DockAreasEditor.DockAreasEditorControl();
-            }
-
-            m_ui.SetStates((DockAreas) value);
-
-            IWindowsFormsEditorService edSvc =
-                (IWindowsFormsEditorService) sp.GetService(typeof(IWindowsFormsEditorService));
-            edSvc.DropDownControl(m_ui);
-
-            return m_ui.DockAreas;
-        }
-
         #endregion
 
-        private class DockAreasEditorControl : System.Windows.Forms.UserControl
+        #region Nested type: DockAreasEditorControl
+
+        private class DockAreasEditorControl : UserControl
         {
-            #region Fields
+            #region Private Fields
 
             private readonly CheckBox checkBoxDockBottom;
             private readonly CheckBox checkBoxDockFill;
@@ -54,7 +56,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
 
-            #region cTor
+            #region Ctor
 
             public DockAreasEditorControl()
             {
@@ -74,31 +76,31 @@ namespace WeifenLuo.WinFormsUI.Docking
                 checkBoxFloat.TextAlign = ContentAlignment.MiddleCenter;
                 checkBoxFloat.FlatStyle = FlatStyle.System;
 
-                checkBoxDockLeft.Appearance = System.Windows.Forms.Appearance.Button;
-                checkBoxDockLeft.Dock = System.Windows.Forms.DockStyle.Left;
+                checkBoxDockLeft.Appearance = Appearance.Button;
+                checkBoxDockLeft.Dock = DockStyle.Left;
                 checkBoxDockLeft.Width = 24;
                 checkBoxDockLeft.FlatStyle = FlatStyle.System;
 
-                checkBoxDockRight.Appearance = System.Windows.Forms.Appearance.Button;
-                checkBoxDockRight.Dock = System.Windows.Forms.DockStyle.Right;
+                checkBoxDockRight.Appearance = Appearance.Button;
+                checkBoxDockRight.Dock = DockStyle.Right;
                 checkBoxDockRight.Width = 24;
                 checkBoxDockRight.FlatStyle = FlatStyle.System;
 
-                checkBoxDockTop.Appearance = System.Windows.Forms.Appearance.Button;
-                checkBoxDockTop.Dock = System.Windows.Forms.DockStyle.Top;
+                checkBoxDockTop.Appearance = Appearance.Button;
+                checkBoxDockTop.Dock = DockStyle.Top;
                 checkBoxDockTop.Height = 24;
                 checkBoxDockTop.FlatStyle = FlatStyle.System;
 
-                checkBoxDockBottom.Appearance = System.Windows.Forms.Appearance.Button;
-                checkBoxDockBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+                checkBoxDockBottom.Appearance = Appearance.Button;
+                checkBoxDockBottom.Dock = DockStyle.Bottom;
                 checkBoxDockBottom.Height = 24;
                 checkBoxDockBottom.FlatStyle = FlatStyle.System;
 
-                checkBoxDockFill.Appearance = System.Windows.Forms.Appearance.Button;
-                checkBoxDockFill.Dock = System.Windows.Forms.DockStyle.Fill;
+                checkBoxDockFill.Appearance = Appearance.Button;
+                checkBoxDockFill.Dock = DockStyle.Fill;
                 checkBoxDockFill.FlatStyle = FlatStyle.System;
 
-                this.Controls.AddRange(new Control[]
+                Controls.AddRange(new Control[]
                 {
                     checkBoxDockFill,
                     checkBoxDockBottom,
@@ -108,14 +110,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                     checkBoxFloat
                 });
 
-                Size = new System.Drawing.Size(160, 144);
+                Size = new Size(160, 144);
                 BackColor = SystemColors.Control;
                 ResumeLayout();
             }
 
             #endregion
 
-            #region Properties
+            #region Properties / Indexers
 
             public DockAreas DockAreas
             {
@@ -126,22 +128,27 @@ namespace WeifenLuo.WinFormsUI.Docking
                     {
                         dockAreas |= DockAreas.Float;
                     }
+
                     if (checkBoxDockLeft.Checked)
                     {
                         dockAreas |= DockAreas.DockLeft;
                     }
+
                     if (checkBoxDockRight.Checked)
                     {
                         dockAreas |= DockAreas.DockRight;
                     }
+
                     if (checkBoxDockTop.Checked)
                     {
                         dockAreas |= DockAreas.DockTop;
                     }
+
                     if (checkBoxDockBottom.Checked)
                     {
                         dockAreas |= DockAreas.DockBottom;
                     }
+
                     if (checkBoxDockFill.Checked)
                     {
                         dockAreas |= DockAreas.Document;
@@ -151,16 +158,14 @@ namespace WeifenLuo.WinFormsUI.Docking
                     {
                         return m_oldDockAreas;
                     }
-                    else
-                    {
-                        return dockAreas;
-                    }
+
+                    return dockAreas;
                 }
             }
 
             #endregion
 
-            #region Public methods
+            #region Public Methods
 
             public void SetStates(DockAreas dockAreas)
             {
@@ -169,26 +174,32 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     checkBoxDockLeft.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.DockRight) != 0)
                 {
                     checkBoxDockRight.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.DockTop) != 0)
                 {
                     checkBoxDockTop.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.DockTop) != 0)
                 {
                     checkBoxDockTop.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.DockBottom) != 0)
                 {
                     checkBoxDockBottom.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.Document) != 0)
                 {
                     checkBoxDockFill.Checked = true;
                 }
+
                 if ((dockAreas & DockAreas.Float) != 0)
                 {
                     checkBoxFloat.Checked = true;
@@ -197,5 +208,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             #endregion
         }
+
+        #endregion
     }
 }

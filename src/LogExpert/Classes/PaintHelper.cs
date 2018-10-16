@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Windows.Forms;
 using LogExpert.Dialogs;
 using NLog;
 
@@ -10,33 +9,118 @@ namespace LogExpert
 {
     internal class PaintHelper
     {
-        #region Fields
-
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #region Private Fields
 
         private Color bookmarkColor = Color.FromArgb(165, 200, 225);
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
-        private static Preferences Preferences
-        {
-            get { return ConfigManager.Settings.preferences; }
-        }
+        private static Preferences Preferences => ConfigManager.Settings.preferences;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
+
+        public static void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
+        {
+            if (dataGridView.Columns.Count > 1)
+            {
+                if (prefs.setLastColumnWidth)
+                {
+                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
+                }
+                else
+                {
+                    // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
+                    dataGridView.FirstDisplayedScrollingColumnIndex = 0;
+
+                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5; // default
+                }
+            }
+
+            if (dataGridView.RowCount > 0)
+            {
+                dataGridView.UpdateRowHeightInfo(0, true);
+            }
+
+            dataGridView.Invalidate();
+            dataGridView.Refresh();
+            AutoResizeColumns(dataGridView);
+        }
+
+        public static void AutoResizeColumns(DataGridView gridView)
+        {
+            try
+            {
+                gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                if (gridView.Columns.Count > 1 && Preferences.setLastColumnWidth &&
+                    gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.lastColumnWidth
+                )
+                {
+                    // It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
+                    // gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
+                    gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = Preferences.lastColumnWidth;
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+                // There are some rare situations with null ref exceptions when resizing columns and on filter finished
+                // So catch them here. Better than crashing.
+                _logger.Error(e, "Error while resizing columns: ");
+            }
+        }
+
+        public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
+        {
+            Rectangle rect = new Rectangle();
+
+            rect.X = advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
+            if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+                advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+            {
+                rect.X++;
+            }
+
+            rect.Y = advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
+            if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+                advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+            {
+                rect.Y++;
+            }
+
+            rect.Width = advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
+            if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+                advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+            {
+                rect.Width++;
+            }
+
+            rect.Height = advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
+            if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
+                advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+            {
+                rect.Height++;
+            }
+
+            // rect.Width += this.owningColumn.DividerWidth;
+            // rect.Height += this.owningRow.DividerHeight;
+            return rect;
+        }
 
         public static void CellPainting(ILogPaintContext logPaintCtx, DataGridView gridView, int rowIndex,
-            DataGridViewCellPaintingEventArgs e)
+                                        DataGridViewCellPaintingEventArgs e)
         {
             if (rowIndex < 0 || e.ColumnIndex < 0)
             {
                 e.Handled = false;
                 return;
             }
+
             ILogLine line = logPaintCtx.GetLogLine(rowIndex);
             if (line != null)
             {
@@ -55,6 +139,7 @@ namespace LogExpert
                         Color color = Color.FromArgb(255, 170, 170, 170);
                         brush = new SolidBrush(color);
                     }
+
                     e.Graphics.FillRectangle(brush, e.CellBounds);
                     brush.Dispose();
                 }
@@ -75,6 +160,7 @@ namespace LogExpert
                             bgColor = entry.BackgroundColor;
                         }
                     }
+
                     e.CellStyle.BackColor = bgColor;
                     e.PaintBackground(e.ClipBounds, false);
                 }
@@ -137,12 +223,14 @@ namespace LogExpert
             }
 
             DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
-            markerColumn.HeaderText = "";
+            markerColumn.HeaderText = string.Empty;
             markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
             markerColumn.Resizable = DataGridViewTriState.False;
             markerColumn.DividerWidth = 1;
             markerColumn.ReadOnly = true;
-            // markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+
+
+// markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
             gridView.Columns.Add(markerColumn);
 
             DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
@@ -151,7 +239,9 @@ namespace LogExpert
             lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
             lineNumberColumn.DividerWidth = 1;
             lineNumberColumn.ReadOnly = true;
-            // lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+
+
+// lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
             gridView.Columns.Add(lineNumberColumn);
 
             foreach (string colName in columnizer.GetColumnNames())
@@ -161,7 +251,9 @@ namespace LogExpert
                 titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
                 titleColumn.Resizable = DataGridViewTriState.NotSet;
                 titleColumn.DividerWidth = 1;
-                //titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
+
+
+// titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
                 gridView.Columns.Add(titleColumn);
             }
 
@@ -170,117 +262,104 @@ namespace LogExpert
             {
                 gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
             }
+
             if (currFirstLine != -1)
             {
                 gridView.FirstDisplayedScrollingRowIndex = currFirstLine;
             }
-            //gridView.Refresh();
-            //AutoResizeColumns(gridView);
-        }
 
-        public static void AutoResizeColumns(DataGridView gridView)
-        {
-            try
-            {
-                gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-                if (gridView.Columns.Count > 1 && Preferences.setLastColumnWidth &&
-                    gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.lastColumnWidth
-                )
-                {
-                    // It seems that using 'MinimumWidth' instead of 'Width' prevents the DataGridView's NullReferenceExceptions
-                    //gridView.Columns[gridView.Columns.Count - 1].Width = this.Preferences.lastColumnWidth;
-                    gridView.Columns[gridView.Columns.Count - 1].MinimumWidth = Preferences.lastColumnWidth;
-                }
-            }
-            catch (NullReferenceException e)
-            {
-                // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
-                // There are some rare situations with null ref exceptions when resizing columns and on filter finished
-                // So catch them here. Better than crashing.
-                _logger.Error(e, "Error while resizing columns: ");
-            }
-        }
-
-        public static void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
-        {
-            if (dataGridView.Columns.Count > 1)
-            {
-                if (prefs.setLastColumnWidth)
-                {
-                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
-                }
-                else
-                {
-                    // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions). 
-                    dataGridView.FirstDisplayedScrollingColumnIndex = 0;
-
-                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5; // default
-                }
-            }
-            if (dataGridView.RowCount > 0)
-            {
-                dataGridView.UpdateRowHeightInfo(0, true);
-            }
-            dataGridView.Invalidate();
-            dataGridView.Refresh();
-            AutoResizeColumns(dataGridView);
-        }
-
-        public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
-        {
-            Rectangle rect = new Rectangle();
-
-            rect.X = advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.X++;
-            }
-
-            rect.Y = advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Y++;
-            }
-
-            rect.Width = advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Width++;
-            }
-
-            rect.Height = advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
-            if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
-            {
-                rect.Height++;
-            }
-
-            //rect.Width += this.owningColumn.DividerWidth;
-            //rect.Height += this.owningRow.DividerHeight;
-
-            return rect;
+            // gridView.Refresh();
+            // AutoResizeColumns(gridView);
         }
 
         #endregion
 
         #region Private Methods
 
+        /// <summary>
+        ///     Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same
+        ///     foreground and
+        ///     background colors.
+        ///     All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry).
+        ///     This is either the
+        ///     first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+        /// </summary>
+        /// <param name="matchList">List of all highlight matches for the current cell</param>
+        /// <param name="groundEntry">The entry that is used as the default.</param>
+        /// <returns>
+        ///     List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every
+        ///     substring.
+        /// </returns>
+        private static IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList,
+                                                                           HilightMatchEntry groundEntry)
+        {
+            // Fill an area with lenth of whole text with a default hilight entry
+            HilightEntry[] entryArray = new HilightEntry[groundEntry.Length];
+            for (int i = 0; i < entryArray.Length; ++i)
+            {
+                entryArray[i] = groundEntry.HilightEntry;
+            }
+
+            // "overpaint" with all matching word match enries
+            // Non-word-mode matches will not overpaint because they use the groundEntry
+            foreach (HilightMatchEntry me in matchList)
+            {
+                int endPos = me.StartPos + me.Length;
+                for (int i = me.StartPos; i < endPos; ++i)
+                {
+                    if (me.HilightEntry.IsWordMatch)
+                    {
+                        entryArray[i] = me.HilightEntry;
+                    }
+                }
+            }
+
+            // collect areas with same hilight entry and build new highlight match entries for it
+            IList<HilightMatchEntry> mergedList = new List<HilightMatchEntry>();
+            if (entryArray.Length > 0)
+            {
+                HilightEntry currentEntry = entryArray[0];
+                int lastStartPos = 0;
+                int pos = 0;
+                for (; pos < entryArray.Length; ++pos)
+                {
+                    if (entryArray[pos] != currentEntry)
+                    {
+                        HilightMatchEntry me = new HilightMatchEntry();
+                        me.StartPos = lastStartPos;
+                        me.Length = pos - lastStartPos;
+                        me.HilightEntry = currentEntry;
+                        mergedList.Add(me);
+                        currentEntry = entryArray[pos];
+                        lastStartPos = pos;
+                    }
+                }
+
+                HilightMatchEntry me2 = new HilightMatchEntry();
+                me2.StartPos = lastStartPos;
+                me2.Length = pos - lastStartPos;
+                me2.HilightEntry = currentEntry;
+                mergedList.Add(me2);
+            }
+
+            return mergedList;
+        }
+
         private static void PaintCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e,
-            DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
+                                      DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
         {
             PaintHighlightedCell(logPaintCtx, e, gridView, noBackgroundFill, groundEntry);
         }
 
 
         private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e,
-            DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
+                                                 DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
         {
-            object value = e.Value != null ? e.Value : "";
+            object value = e.Value != null ? e.Value : string.Empty;
             IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as ILogLine);
-            // too many entries per line seem to cause problems with the GDI 
+
+
+// too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
             {
                 matchList.RemoveAt(50);
@@ -321,13 +400,12 @@ namespace LogExpert
                     | TextFormatFlags.TextBoxControl
                 ;
 
-            //          | TextFormatFlags.VerticalCenter
-            //          | TextFormatFlags.TextBoxControl
-            //          TextFormatFlags.SingleLine
+            // | TextFormatFlags.VerticalCenter
+            // | TextFormatFlags.TextBoxControl
+            // TextFormatFlags.SingleLine
 
 
-            //TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-
+            // TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
             Point wordPos = valBounds.Location;
             Size proposedSize = new Size(valBounds.Width, valBounds.Height);
 
@@ -362,6 +440,7 @@ namespace LogExpert
                         foreColor = Color.White;
                     }
                 }
+
                 TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
                     foreColor, flags);
 
@@ -371,73 +450,6 @@ namespace LogExpert
                     bgBrush.Dispose();
                 }
             }
-        }
-
-
-        /// <summary>
-        /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and 
-        /// background colors.
-        /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the 
-        /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
-        /// </summary>
-        /// <param name="matchList">List of all highlight matches for the current cell</param>
-        /// <param name="groundEntry">The entry that is used as the default.</param>
-        /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
-        private static IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList,
-            HilightMatchEntry groundEntry)
-        {
-            // Fill an area with lenth of whole text with a default hilight entry
-            HilightEntry[] entryArray = new HilightEntry[groundEntry.Length];
-            for (int i = 0; i < entryArray.Length; ++i)
-            {
-                entryArray[i] = groundEntry.HilightEntry;
-            }
-
-            // "overpaint" with all matching word match enries
-            // Non-word-mode matches will not overpaint because they use the groundEntry
-            foreach (HilightMatchEntry me in matchList)
-            {
-                int endPos = me.StartPos + me.Length;
-                for (int i = me.StartPos; i < endPos; ++i)
-                {
-                    if (me.HilightEntry.IsWordMatch)
-                    {
-                        entryArray[i] = me.HilightEntry;
-                    }
-                    else
-                    {
-                        //entryArray[i].ForegroundColor = me.HilightEntry.ForegroundColor;
-                    }
-                }
-            }
-
-            // collect areas with same hilight entry and build new highlight match entries for it
-            IList<HilightMatchEntry> mergedList = new List<HilightMatchEntry>();
-            if (entryArray.Length > 0)
-            {
-                HilightEntry currentEntry = entryArray[0];
-                int lastStartPos = 0;
-                int pos = 0;
-                for (; pos < entryArray.Length; ++pos)
-                {
-                    if (entryArray[pos] != currentEntry)
-                    {
-                        HilightMatchEntry me = new HilightMatchEntry();
-                        me.StartPos = lastStartPos;
-                        me.Length = pos - lastStartPos;
-                        me.HilightEntry = currentEntry;
-                        mergedList.Add(me);
-                        currentEntry = entryArray[pos];
-                        lastStartPos = pos;
-                    }
-                }
-                HilightMatchEntry me2 = new HilightMatchEntry();
-                me2.StartPos = lastStartPos;
-                me2.Length = pos - lastStartPos;
-                me2.HilightEntry = currentEntry;
-                mergedList.Add(me2);
-            }
-            return mergedList;
         }
 
         #endregion

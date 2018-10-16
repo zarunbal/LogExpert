@@ -1,4 +1,3 @@
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,7 +5,21 @@ namespace WeifenLuo.WinFormsUI.Docking
 {
     internal static class DockHelper
     {
-        #region Public methods
+        #region Public Methods
+
+        public static FloatWindow FloatWindowAtPoint(Point pt, DockPanel dockPanel)
+        {
+            for (Control control = Win32Helper.ControlAtPoint(pt); control != null; control = control.Parent)
+            {
+                FloatWindow floatWindow = control as FloatWindow;
+                if (floatWindow != null && floatWindow.DockPanel == dockPanel)
+                {
+                    return floatWindow;
+                }
+            }
+
+            return null;
+        }
 
         public static bool IsDockStateAutoHide(DockState dockState)
         {
@@ -17,10 +30,8 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public static bool IsDockStateValid(DockState dockState, DockAreas dockableAreas)
@@ -30,35 +41,38 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 return false;
             }
-            else if ((dockableAreas & DockAreas.Document) == 0 &&
-                     dockState == DockState.Document)
+
+            if ((dockableAreas & DockAreas.Document) == 0 &&
+                dockState == DockState.Document)
             {
                 return false;
             }
-            else if ((dockableAreas & DockAreas.DockLeft) == 0 &&
-                     (dockState == DockState.DockLeft || dockState == DockState.DockLeftAutoHide))
+
+            if ((dockableAreas & DockAreas.DockLeft) == 0 &&
+                (dockState == DockState.DockLeft || dockState == DockState.DockLeftAutoHide))
             {
                 return false;
             }
-            else if ((dockableAreas & DockAreas.DockRight) == 0 &&
-                     (dockState == DockState.DockRight || dockState == DockState.DockRightAutoHide))
+
+            if ((dockableAreas & DockAreas.DockRight) == 0 &&
+                (dockState == DockState.DockRight || dockState == DockState.DockRightAutoHide))
             {
                 return false;
             }
-            else if ((dockableAreas & DockAreas.DockTop) == 0 &&
-                     (dockState == DockState.DockTop || dockState == DockState.DockTopAutoHide))
+
+            if ((dockableAreas & DockAreas.DockTop) == 0 &&
+                (dockState == DockState.DockTop || dockState == DockState.DockTopAutoHide))
             {
                 return false;
             }
-            else if ((dockableAreas & DockAreas.DockBottom) == 0 &&
-                     (dockState == DockState.DockBottom || dockState == DockState.DockBottomAutoHide))
+
+            if ((dockableAreas & DockAreas.DockBottom) == 0 &&
+                (dockState == DockState.DockBottom || dockState == DockState.DockBottomAutoHide))
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         public static bool IsDockWindowState(DockState state)
@@ -68,50 +82,8 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
-        }
 
-        public static DockState ToggleAutoHideState(DockState state)
-        {
-            if (state == DockState.DockLeft)
-            {
-                return DockState.DockLeftAutoHide;
-            }
-            else if (state == DockState.DockRight)
-            {
-                return DockState.DockRightAutoHide;
-            }
-            else if (state == DockState.DockTop)
-            {
-                return DockState.DockTopAutoHide;
-            }
-            else if (state == DockState.DockBottom)
-            {
-                return DockState.DockBottomAutoHide;
-            }
-            else if (state == DockState.DockLeftAutoHide)
-            {
-                return DockState.DockLeft;
-            }
-            else if (state == DockState.DockRightAutoHide)
-            {
-                return DockState.DockRight;
-            }
-            else if (state == DockState.DockTopAutoHide)
-            {
-                return DockState.DockTop;
-            }
-            else if (state == DockState.DockBottomAutoHide)
-            {
-                return DockState.DockBottom;
-            }
-            else
-            {
-                return state;
-            }
+            return false;
         }
 
         public static DockPane PaneAtPoint(Point pt, DockPanel dockPanel)
@@ -134,18 +106,49 @@ namespace WeifenLuo.WinFormsUI.Docking
             return null;
         }
 
-        public static FloatWindow FloatWindowAtPoint(Point pt, DockPanel dockPanel)
+        public static DockState ToggleAutoHideState(DockState state)
         {
-            for (Control control = Win32Helper.ControlAtPoint(pt); control != null; control = control.Parent)
+            if (state == DockState.DockLeft)
             {
-                FloatWindow floatWindow = control as FloatWindow;
-                if (floatWindow != null && floatWindow.DockPanel == dockPanel)
-                {
-                    return floatWindow;
-                }
+                return DockState.DockLeftAutoHide;
             }
 
-            return null;
+            if (state == DockState.DockRight)
+            {
+                return DockState.DockRightAutoHide;
+            }
+
+            if (state == DockState.DockTop)
+            {
+                return DockState.DockTopAutoHide;
+            }
+
+            if (state == DockState.DockBottom)
+            {
+                return DockState.DockBottomAutoHide;
+            }
+
+            if (state == DockState.DockLeftAutoHide)
+            {
+                return DockState.DockLeft;
+            }
+
+            if (state == DockState.DockRightAutoHide)
+            {
+                return DockState.DockRight;
+            }
+
+            if (state == DockState.DockTopAutoHide)
+            {
+                return DockState.DockTop;
+            }
+
+            if (state == DockState.DockBottomAutoHide)
+            {
+                return DockState.DockBottom;
+            }
+
+            return state;
         }
 
         #endregion

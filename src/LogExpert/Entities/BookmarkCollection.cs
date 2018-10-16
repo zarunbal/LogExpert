@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace LogExpert
 {
     public class BookmarkCollection : ReadOnlyCollection<Bookmark>
     {
-        #region Fields
+        #region Private Fields
 
         private SortedList<int, Bookmark> bookmarkList;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         internal BookmarkCollection(SortedList<int, Bookmark> bookmarkList)
             : base(bookmarkList.Values)

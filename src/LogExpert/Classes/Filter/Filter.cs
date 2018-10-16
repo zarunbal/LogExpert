@@ -1,65 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 using NLog;
-
 
 namespace LogExpert
 {
     internal delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines,
-        List<int> lastFilterResultLines, List<int> filterHitList);
+                                    List<int> lastFilterResultLines, List<int> filterHitList);
 
     public class Filter
     {
-        #region Fields
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        #region Static/Constants
 
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int SPREAD_MAX = 50;
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
-        private readonly LogExpert.LogWindow.ColumnizerCallback callback;
 
         #endregion
 
-        #region cTor
+        #region Private Fields
 
-        public Filter(LogExpert.LogWindow.ColumnizerCallback callback)
+        private readonly LogWindow.ColumnizerCallback callback;
+
+        #endregion
+
+        #region Ctor
+
+        public Filter(LogWindow.ColumnizerCallback callback)
         {
             this.callback = callback;
-            this.FilterResultLines = new List<int>();
-            this.LastFilterLinesList = new List<int>();
-            this.FilterHitList = new List<int>();
+            FilterResultLines = new List<int>();
+            LastFilterLinesList = new List<int>();
+            FilterHitList = new List<int>();
         }
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
+
+        public List<int> FilterHitList { get; }
 
         public List<int> FilterResultLines { get; }
 
         public List<int> LastFilterLinesList { get; }
 
-        public List<int> FilterHitList { get; }
-
         public bool ShouldCancel { get; set; } = false;
 
         #endregion
 
-        #region Public methods
+        #region Public Methods
 
         public int DoFilter(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            return DoFilter(filterParams, startLine, maxCount, this.FilterResultLines, this.LastFilterLinesList,
-                this.FilterHitList, progressCallback);
+            return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList,
+                FilterHitList, progressCallback);
         }
 
         #endregion
 
-        #region Private Methods
+        #region Event raising Methods
 
         private int DoFilter(FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines,
-            List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback)
+                             List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback)
         {
             int lineNum = startLine;
             int count = 0;
@@ -68,23 +71,26 @@ namespace LogExpert
             try
             {
                 filterParams.Reset();
-                while ((count++ < maxCount || filterParams.isInRange) && !this.ShouldCancel)
+                while ((count++ < maxCount || filterParams.isInRange) && !ShouldCancel)
                 {
-                    if (lineNum >= this.callback.GetLineCount())
+                    if (lineNum >= callback.GetLineCount())
                     {
                         return count;
                     }
-                    ILogLine line = this.callback.GetLogLine(lineNum);
+
+                    ILogLine line = callback.GetLogLine(lineNum);
                     if (line == null)
                     {
                         return count;
                     }
-                    this.callback.LineNum = lineNum;
+
+                    callback.LineNum = lineNum;
                     if (Util.TestFilterCondition(filterParams, line, callback))
                     {
                         AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList,
                             filterHitList);
                     }
+
                     lineNum++;
                     callbackCounter++;
                     if (lineNum % PROGRESS_BAR_MODULO == 0)
@@ -101,11 +107,16 @@ namespace LogExpert
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");
             }
+
             return count;
         }
 
+        #endregion
+
+        #region Private Methods
+
         private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines,
-            List<int> lastFilterLinesList, List<int> filterHitList)
+                                   List<int> lastFilterLinesList, List<int> filterHitList)
         {
             int count;
             filterHitList.Add(lineNum);
@@ -121,9 +132,9 @@ namespace LogExpert
 
 
         /// <summary>
-        ///  Returns a list with 'additional filter results'. This is the given line number 
-        ///  and (if back spread and/or fore spread is enabled) some additional lines.
-        ///  This function doesn't check the filter condition! 
+        ///     Returns a list with 'additional filter results'. This is the given line number
+        ///     and (if back spread and/or fore spread is enabled) some additional lines.
+        ///     This function doesn't check the filter condition!
         /// </summary>
         /// <param name="filterParams"></param>
         /// <param name="lineNum"></param>
@@ -150,15 +161,17 @@ namespace LogExpert
                     }
                 }
             }
+
             // direct filter hit
             if (!resultList.Contains(lineNum) && !checkList.Contains(lineNum))
             {
                 resultList.Add(lineNum);
             }
+
             // after spread
             for (int i = 1; i <= filterParams.spreadBehind; ++i)
             {
-                if (lineNum + i < this.callback.GetLineCount())
+                if (lineNum + i < callback.GetLineCount())
                 {
                     if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
                     {
@@ -166,6 +179,7 @@ namespace LogExpert
                     }
                 }
             }
+
             return resultList;
         }
 
