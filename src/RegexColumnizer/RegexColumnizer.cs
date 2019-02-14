@@ -35,6 +35,7 @@ namespace RegexColumnizer
 
         #region Public methods
 
+        public string Text => GetType().Name;
         public string GetName() => "Regex";
         public string GetDescription() => "Columns are filled by regular expression named capture groups";
         public int GetColumnCount() => columns.Length;

@@ -165,7 +165,26 @@ namespace LogExpert
 
         private void dataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
+            int startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
+
             e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
+
+            // The new column could be find dynamically.
+            // Only support add new columns for now.
+            // TODO: Support reload all columns?
+            if (CurrentColumnizer != null && CurrentColumnizer.GetColumnCount() > startCount)
+            {
+                for (int i = startCount; i < CurrentColumnizer.GetColumnCount(); i++)
+                {
+                    var colName = CurrentColumnizer.GetColumnNames()[i];
+                    DataGridViewColumn titleColumn = new LogTextColumn();
+                    titleColumn.HeaderText = colName;
+                    titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+                    titleColumn.Resizable = DataGridViewTriState.NotSet;
+                    titleColumn.DividerWidth = 1;
+                    dataGridView.Columns.Add(titleColumn);
+                }
+            }
         }
 
         private void dataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)

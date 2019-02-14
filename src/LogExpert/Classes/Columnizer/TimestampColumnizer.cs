@@ -127,14 +127,7 @@ namespace LogExpert
 
             string temp = line.FullLine;
 
-
-            if (temp.Length < 21)
-            {
-                columns[2].FullValue = temp;
-                return clogLine;
-            }
-
-            FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
+            FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(temp);
             if (formatInfo == null)
             {
                 columns[2].FullValue = temp;

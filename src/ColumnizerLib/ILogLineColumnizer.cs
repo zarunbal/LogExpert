@@ -118,6 +118,11 @@ namespace LogExpert
         /// <param name="oldValue">The old value.</param>
         void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue);
 
+
+        /// <summary>
+        /// Text for this plugin.
+        /// </summary>
+        string Text { get;  }
         #endregion
     }
 }

@@ -12,11 +12,11 @@ namespace LogExpert
 
     public class AutoColumnizer : ILogLineColumnizer
     {
+        protected int timeOffset = 0;
+        private readonly TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
 
         #region ILogLineColumnizer implementation
-
-        protected int timeOffset = 0;
-        private TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
+        public string Text => GetName();
 
         public bool IsTimeshiftImplemented()
         {
@@ -65,16 +65,18 @@ namespace LogExpert
             var timeDeterminer = new TimeFormatDeterminer();
             int maxBracketNumbers = 1;
 
-            List<ILogLine> loglines = new List<ILogLine>();
-            // Sampling a few lines to select the correct columnizer
-            loglines.Add(logFileReader.GetLogLine(1));
-            loglines.Add(logFileReader.GetLogLine(5));
-            loglines.Add(logFileReader.GetLogLine(25));
-            loglines.Add(logFileReader.GetLogLine(100));
-            loglines.Add(logFileReader.GetLogLine(200));
-            loglines.Add(logFileReader.GetLogLine(300));
-            loglines.Add(logFileReader.GetLogLine(400));
-            loglines.Add(logFileReader.GetLogLine(500));
+            List<ILogLine> loglines = new List<ILogLine>
+            {
+                // Sampling a few lines to select the correct columnizer
+                logFileReader.GetLogLine(1),
+                logFileReader.GetLogLine(5),
+                logFileReader.GetLogLine(25),
+                logFileReader.GetLogLine(100),
+                logFileReader.GetLogLine(200),
+                logFileReader.GetLogLine(300),
+                logFileReader.GetLogLine(400),
+                logFileReader.GetLogLine(500)
+            };
 
             foreach (var line in loglines)
             {

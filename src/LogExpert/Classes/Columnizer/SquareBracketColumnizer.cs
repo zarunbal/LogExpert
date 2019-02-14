@@ -159,8 +159,10 @@ namespace LogExpert
             // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
             // 03.01.2008 14:48:00.066 <rest of line>
 
-            ColumnizedLogLine clogLine = new ColumnizedLogLine();
-            clogLine.LogLine = line;
+            ColumnizedLogLine clogLine = new ColumnizedLogLine
+            {
+                LogLine = line
+            };
 
             Column[] columns = new Column[]
             {

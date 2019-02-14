@@ -1,0 +1,2 @@
+{"time":"2019-02-13T02:55:35.5186240Z","@m":"Hosting starting"}
+{"time":"2019-02-13T02:55:35.5186240Z","level":"Debug","@m":"Hosting starting"}

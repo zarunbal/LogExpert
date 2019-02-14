@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogExpert.Tests</RootNamespace>
     <AssemblyName>LogExpert.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -19,6 +19,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoColumnizerTest.cs" />
+    <Compile Include="JsonColumnizerTest.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +66,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestData\JsonColumnizerTest_01.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\SquareBracketColumnizerTest_05.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -84,6 +89,10 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
       <Name>ColumnizerLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj">
+      <Project>{4c899885-e361-410a-b6ac-c2f236c436fa}</Project>
+      <Name>JsonColumnizer</Name>
     </ProjectReference>
     <ProjectReference Include="..\LogExpert\LogExpert.csproj">
       <Project>{f0c0d370-f416-44ed-939a-b4827d15ac14}</Project>

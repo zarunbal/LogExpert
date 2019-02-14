@@ -63,6 +63,11 @@ namespace LogExpert
 
         public FormatInfo DetermineDateTimeFormatInfo(string line)
         {
+            if (line.Length < 21)
+            {
+                return null;
+            }
+
             string temp = line;
             bool ignoreFirst = false;
 
