@@ -8,7 +8,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using NLog;
 
-// using System.Linq;
 namespace LogExpert
 {
     public class ConfigManager
@@ -47,15 +46,7 @@ namespace LogExpert
 
         #region Properties / Indexers
 
-        public static string ConfigDir
-        {
-            get
-            {
-                string tmp = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string tmp2 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
-            }
-        }
+        public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
 
         public static ConfigManager Instance
         {
@@ -92,9 +83,10 @@ namespace LogExpert
 
         public static void Import(FileInfo fileInfo, ExportImportFlags flags)
         {
-            Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
-            Import(fs, flags);
-            fs.Close();
+            using (Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read))
+            {
+                Import(fs, flags);
+            }
         }
 
         public static void Save(SettingsFlags flags)
@@ -121,7 +113,7 @@ namespace LogExpert
         #region Private Methods
 
         /// <summary>
-        ///     Convert settings loaded from previous versions.
+        /// Convert settings loaded from previous versions.
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="currentBuildNumber"></param>
@@ -174,8 +166,8 @@ namespace LogExpert
 
 
         /// <summary>
-        ///     Imports all or some of the settings/prefs stored in the inpute stream.
-        ///     This will overwrite appropriate parts of the current (own) settings with the imported ones.
+        /// Imports all or some of the settings/prefs stored in the inpute stream.
+        /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
         /// </summary>
         /// <param name="fs"></param>
         /// <param name="flags">Flags to indicate which parts shall be imported</param>
@@ -237,14 +229,17 @@ namespace LogExpert
                 return LoadOrCreateNew(null);
             }
 
-            Stream fs = File.OpenRead(dir + "\\settings.dat");
-            try
+            using (Stream fs = File.OpenRead(dir + "\\settings.dat"))
             {
-                return LoadOrCreateNew(fs);
-            }
-            finally
-            {
-                fs.Close();
+                try
+                {
+                    return LoadOrCreateNew(fs);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error($"Error loading settings: {e}");
+                    return LoadOrCreateNew(null);
+                }
             }
         }
 
@@ -349,8 +344,7 @@ namespace LogExpert
                 if (settings.hilightGroupList == null)
                 {
                     settings.hilightGroupList = new List<HilightGroup>();
-
-// migrate old non-grouped entries
+                    // migrate old non-grouped entries
                     HilightGroup defaultGroup = new HilightGroup();
                     defaultGroup.GroupName = "[Default]";
                     defaultGroup.HilightEntryList = settings.hilightEntryList;
@@ -396,9 +390,10 @@ namespace LogExpert
                         Directory.CreateDirectory(dir);
                     }
 
-                    Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write);
-                    Save(fs, settings, flags);
-                    fs.Close();
+                    using (Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write))
+                    {
+                        Save(fs, settings, flags);
+                    }
                 }
 
                 OnConfigChanged(flags);
