@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NLog;
 
 namespace LogExpert.Dialogs
 {
@@ -8,6 +15,7 @@ namespace LogExpert.Dialogs
         #region Static/Constants
 
         private static readonly int MAX_HISTORY = 30;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         #endregion
 
@@ -16,7 +24,7 @@ namespace LogExpert.Dialogs
         public SearchDialog()
         {
             InitializeComponent();
-            Load += SearchDialog_Load;
+            Load += new EventHandler(SearchDialog_Load);
         }
 
         #endregion
@@ -30,35 +38,6 @@ namespace LogExpert.Dialogs
         #region Private Methods
 
         private void okButton_Click(object sender, EventArgs e)
-        {
-            SearchParams.searchText = searchComboBox.Text;
-            SearchParams.isCaseSensitive = caseSensitiveCheckBox.Checked;
-            SearchParams.isForward = forwardRadioButton.Checked;
-            SearchParams.isFromTop = fromTopRadioButton.Checked;
-            SearchParams.isRegex = regexCheckBox.Checked;
-            SearchParams.historyList.Remove(searchComboBox.Text);
-            SearchParams.historyList.Insert(0, searchComboBox.Text);
-            if (SearchParams.historyList.Count > MAX_HISTORY)
-            {
-                SearchParams.historyList.RemoveAt(SearchParams.historyList.Count - 1);
-            }
-        }
-
-        private void regexHelperButton_Click(object sender, EventArgs e)
-        {
-            RegexHelperDialog dlg = new RegexHelperDialog();
-            dlg.Owner = this;
-            dlg.CaseSensitive = caseSensitiveCheckBox.Checked;
-            dlg.Pattern = searchComboBox.Text;
-            DialogResult res = dlg.ShowDialog();
-            if (res == DialogResult.OK)
-            {
-                caseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-                searchComboBox.Text = dlg.Pattern;
-            }
-        }
-
-        private void SearchDialog_Load(object sender, EventArgs e)
         {
             if (SearchParams != null)
             {
@@ -97,6 +76,54 @@ namespace LogExpert.Dialogs
                 fromSelectedRadioButton.Checked = true;
                 forwardRadioButton.Checked = true;
                 SearchParams = new SearchParams();
+            }
+        }
+
+        private void regexHelperButton_Click(object sender, EventArgs e)
+        {
+            RegexHelperDialog dlg = new RegexHelperDialog();
+            dlg.Owner = this;
+            dlg.CaseSensitive = caseSensitiveCheckBox.Checked;
+            dlg.Pattern = searchComboBox.Text;
+            DialogResult res = dlg.ShowDialog();
+            if (res == DialogResult.OK)
+            {
+                caseSensitiveCheckBox.Checked = dlg.CaseSensitive;
+                searchComboBox.Text = dlg.Pattern;
+            }
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (regexCheckBox.Checked)
+                {
+                    if (string.IsNullOrWhiteSpace(searchComboBox.Text))
+                    {
+                        throw new ArgumentException("Search text is empty");
+                    }
+
+                    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+                    Regex.IsMatch("", searchComboBox.Text);
+                }
+
+                SearchParams.searchText = searchComboBox.Text;
+                SearchParams.isCaseSensitive = caseSensitiveCheckBox.Checked;
+                SearchParams.isForward = forwardRadioButton.Checked;
+                SearchParams.isFromTop = fromTopRadioButton.Checked;
+                SearchParams.isRegex = regexCheckBox.Checked;
+                SearchParams.historyList.Remove(searchComboBox.Text);
+                SearchParams.historyList.Insert(0, searchComboBox.Text);
+                if (SearchParams.historyList.Count > MAX_HISTORY)
+                {
+                    SearchParams.historyList.RemoveAt(SearchParams.historyList.Count - 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during ok click");
+                MessageBox.Show($"Error during creation of search parameter\r\n{ex.Message}");
             }
         }
 

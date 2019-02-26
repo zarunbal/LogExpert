@@ -52,76 +52,102 @@ namespace LogExpert.Dialogs
 
         #region Event raising Methods
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-        }
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private extern static bool DestroyIcon(IntPtr handle);
 
         private void toolDownButton_Click(object sender, EventArgs e)
         {
-            int i = toolListBox.SelectedIndex;
-            if (i < toolListBox.Items.Count - 1)
+            if (Preferences == null)
             {
-                bool isChecked = toolListBox.GetItemChecked(i);
-                object item = toolListBox.Items[i];
-                toolListBox.Items.RemoveAt(i);
-                i++;
-                toolListBox.Items.Insert(i, item);
-                toolListBox.SelectedIndex = i;
-                toolListBox.SetItemChecked(i, isChecked);
-            }
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void addButton_Click(object sender, EventArgs e)
-        {
-            columnizerDataGridView.Rows.Add();
-        }
-
-        private void argButtonA_Click(object sender, EventArgs e)
-        {
-            ArgsButtonClick(argsTextBox);
-        }
-
-        private void ArgsButtonClick(TextBox textBox)
-        {
-            ToolArgsDialog dlg = new ToolArgsDialog(logTabWin, this);
-            dlg.Arg = textBox.Text;
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                textBox.Text = dlg.Arg;
-            }
-        }
-
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            selectedPlugin?.HideConfigForm();
-        }
-
-        private void changeFontButton_Click(object sender, EventArgs e)
-        {
-            FontDialog dlg = new FontDialog();
-            dlg.ShowEffects = false;
-            dlg.AllowVerticalFonts = false;
-            dlg.AllowScriptChange = false;
-            dlg.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                Preferences.fontSize = dlg.Font.Size;
-                Preferences.fontName = dlg.Font.FontFamily.Name;
+                Preferences = new Preferences();
             }
 
+            if (Preferences.fontName == null)
+            {
+                Preferences.fontName = "Courier New";
+            }
+
+            if (Preferences.fontSize == 0.0)
+            {
+                Preferences.fontSize = 9.0f;
+            }
+
+            timestampCheckBox.Checked = Preferences.timestampControl;
+            syncFilterCheckBox.Checked = Preferences.filterSync;
+            filterTailCheckBox.Checked = Preferences.filterTail;
+            followTailCheckBox.Checked = Preferences.followTail;
+            horizRadioButton.Checked = Preferences.timestampControlDragOrientation ==
+                                       DateTimeDragControl.DragOrientations.Horizontal;
+            verticalRadioButton.Checked = Preferences.timestampControlDragOrientation ==
+                                          DateTimeDragControl.DragOrientations.Vertical;
+            verticalInvRadioButton.Checked = Preferences.timestampControlDragOrientation ==
+                                             DateTimeDragControl.DragOrientations.InvertedVertical;
+
+            singleInstanceCheckBox.Checked = Preferences.allowOnlyOneInstance;
+            openLastFilesCheckBox.Checked = Preferences.openLastFiles;
+            tailStateCheckBox.Checked = Preferences.showTailState;
+            columnSizeCheckBox.Checked = Preferences.setLastColumnWidth;
+            columnWidthUpDown.Enabled = Preferences.setLastColumnWidth;
+            if (Preferences.lastColumnWidth != 0)
+            {
+                if (Preferences.lastColumnWidth < columnWidthUpDown.Minimum)
+                {
+                    Preferences.lastColumnWidth = (int) columnWidthUpDown.Minimum;
+                }
+
+                if (Preferences.lastColumnWidth > columnWidthUpDown.Maximum)
+                {
+                    Preferences.lastColumnWidth = (int) columnWidthUpDown.Maximum;
+                }
+
+                columnWidthUpDown.Value = Preferences.lastColumnWidth;
+            }
+
+            timeSpreadCheckBox.Checked = Preferences.showTimeSpread;
+            reverseAlphaCheckBox.Checked = Preferences.reverseAlpha;
+            timeViewRadioButton.Checked = Preferences.timeSpreadTimeMode;
+            lineViewRadioButton.Checked = !Preferences.timeSpreadTimeMode;
+
+            saveSessionsCheckBox.Checked = Preferences.saveSessions;
+            switch (Preferences.saveLocation)
+            {
+                case SessionSaveLocation.OwnDir:
+                    sessionSaveRadioOwn.Checked = true;
+                    break;
+                case SessionSaveLocation.SameDir:
+                    sessionRadioSameDir.Checked = true;
+                    break;
+                case SessionSaveLocation.DocumentsDir:
+                    sessionSaveRadioDocuments.Checked = true;
+                    break;
+            }
+
+            sessionSaveOwnDirLabel.Text =
+                Preferences.saveDirectory != null ? Preferences.saveDirectory : "";
+            saveFilterCheckBox.Checked = Preferences.saveFilters;
+            blockCountUpDown.Value = Preferences.bufferCount;
+            linesPerBlockUpDown.Value = Preferences.linesPerBuffer;
+            pollingIntervalUpDown.Value = Preferences.pollingInterval;
+            multiThreadCheckBox.Checked = Preferences.multiThreadFilter;
+
+            columnizerDataGridView.DataError +=
+                new DataGridViewDataErrorEventHandler(columnizerDataGridView_DataError);
+
+            FillColumnizerList();
+            FillPluginList();
             DisplayFontName();
+            FillHighlightMaskList();
+            FillToolListbox();
+            FillMultifileSettings();
+            FillEncodingList();
+            encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
+            maskPrioCheckBox.Checked = Preferences.maskPrio;
+            askCloseTabsCheckBox.Checked = Preferences.askForClose;
+            columnFinderCheckBox.Checked = Preferences.showColumnFinder;
+            legacyReaderCheckBox.Checked = Preferences.useLegacyReader;
         }
 
-        private void columnizerDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            e.Cancel = true;
-        }
-
-        private void columnizerDataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        private string NotNull(string text)
         {
             DataGridViewComboBoxCell comboCell =
                 (DataGridViewComboBoxCell)columnizerDataGridView.Rows[e.RowIndex].Cells[1];
@@ -133,28 +159,32 @@ namespace LogExpert.Dialogs
 
         private void columnSizeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            columnWidthUpDown.Enabled = columnSizeCheckBox.Checked;
+            fontLabel.Text = Preferences.fontName + " " + (int) Preferences.fontSize;
+            fontLabel.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
         }
 
         private void configPluginButton_Click(object sender, EventArgs e)
         {
-            if (!selectedPlugin.HasEmbeddedForm())
+            if (multiOpenRadioButton1.Checked)
             {
-                selectedPlugin.ShowConfigDialog(this);
+                Preferences.multiFileOption = MultiFileOption.SingleFiles;
             }
+
+            if (multiOpenRadioButton2.Checked)
+            {
+                Preferences.multiFileOption = MultiFileOption.MultiFile;
+            }
+
+            if (multiOpenRadioButton3.Checked)
+            {
+                Preferences.multiFileOption = MultiFileOption.Ask;
+            }
+
+            Preferences.multifileOptions.FormatPattern = multifilePattern.Text;
+            Preferences.multifileOptions.MaxDayTry = (int) multifileDays.Value;
         }
 
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
-            if (columnizerDataGridView.CurrentRow != null && !columnizerDataGridView.CurrentRow.IsNewRow)
-            {
-                int index = columnizerDataGridView.CurrentRow.Index;
-                columnizerDataGridView.EndEdit();
-                columnizerDataGridView.Rows.RemoveAt(index);
-            }
-        }
-
-        private void DisplayCurrentIcon()
+        private void ToolButtonClick(TextBox textBox)
         {
             if (selectedTool != null)
             {
@@ -166,17 +196,22 @@ namespace LogExpert.Dialogs
                     DestroyIcon(icon.Handle);
                     icon.Dispose();
                 }
-                else
-                {
-                    iconButton.Image = emptyImage;
-                }
+            }
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                textBox.Text = dlg.FileName;
             }
         }
 
         private void DisplayFontName()
         {
-            fontLabel.Text = Preferences.fontName + @" " + (int)Preferences.fontSize;
-            fontLabel.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
+            ToolArgsDialog dlg = new ToolArgsDialog(logTabWin, this);
+            dlg.Arg = textBox.Text;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                textBox.Text = dlg.Arg;
+            }
         }
 
         private void exportButton_Click(object sender, EventArgs e)
@@ -193,6 +228,11 @@ namespace LogExpert.Dialogs
                 {
                     ConfigManager.Export(fs);
                 }
+            }
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                textBox.Text = dlg.SelectedPath;
             }
         }
 
@@ -229,10 +269,10 @@ namespace LogExpert.Dialogs
             columnizerDataGridView.Rows.Clear();
 
             DataGridViewComboBoxColumn
-                comboColumn = (DataGridViewComboBoxColumn)columnizerDataGridView.Columns[1];
+                comboColumn = (DataGridViewComboBoxColumn) columnizerDataGridView.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn)columnizerDataGridView.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) columnizerDataGridView.Columns[0];
 
             IList<ILogLineColumnizer> columnizers = PluginRegistry.GetInstance().RegisteredColumnizers;
             foreach (ILogLineColumnizer columnizer in columnizers)
@@ -270,7 +310,7 @@ namespace LogExpert.Dialogs
             if (count > 0 && !columnizerDataGridView.Rows[count - 1].IsNewRow)
             {
                 DataGridViewComboBoxCell comboCell =
-                    (DataGridViewComboBoxCell)columnizerDataGridView.Rows[count - 1].Cells[1];
+                    (DataGridViewComboBoxCell) columnizerDataGridView.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
@@ -389,10 +429,10 @@ namespace LogExpert.Dialogs
         {
             highlightMaskGridView.Rows.Clear();
 
-            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn)highlightMaskGridView.Columns[1];
+            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) highlightMaskGridView.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn)highlightMaskGridView.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) highlightMaskGridView.Columns[0];
 
             IList<HilightGroup> groups = logTabWin.HilightGroupList;
             foreach (HilightGroup group in groups)
@@ -413,7 +453,16 @@ namespace LogExpert.Dialogs
 
                 row.Cells.Add(cell);
                 row.Cells[0].Value = maskEntry.mask;
-                HilightGroup currentGroup = (logTabWin.FindHighlightGroup(maskEntry.highlightGroupName) ?? groups[0]) ?? new HilightGroup();
+                HilightGroup currentGroup = logTabWin.FindHighlightGroup(maskEntry.highlightGroupName);
+                if (currentGroup == null)
+                {
+                    currentGroup = groups[0];
+                }
+
+                if (currentGroup == null)
+                {
+                    currentGroup = new HilightGroup();
+                }
 
                 row.Cells[1].Value = currentGroup.GroupName;
                 highlightMaskGridView.Rows.Add(row);
@@ -423,28 +472,39 @@ namespace LogExpert.Dialogs
             if (count > 0 && !highlightMaskGridView.Rows[count - 1].IsNewRow)
             {
                 DataGridViewComboBoxCell comboCell =
-                    (DataGridViewComboBoxCell)highlightMaskGridView.Rows[count - 1].Cells[1];
+                    (DataGridViewComboBoxCell) highlightMaskGridView.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
 
-        private void FillMultifileSettings()
+        private void SaveColumnizerList()
         {
-            switch (Preferences.multiFileOption)
+            Preferences.columnizerMaskList.Clear();
+            foreach (DataGridViewRow row in columnizerDataGridView.Rows)
             {
-                case MultiFileOption.SingleFiles:
-                    multiOpenRadioButton1.Checked = true;
-                    break;
-                case MultiFileOption.MultiFile:
-                    multiOpenRadioButton2.Checked = true;
-                    break;
-                case MultiFileOption.Ask:
-                    multiOpenRadioButton3.Checked = true;
-                    break;
+                if (!row.IsNewRow)
+                {
+                    ColumnizerMaskEntry entry = new ColumnizerMaskEntry();
+                    entry.mask = (string) row.Cells[0].Value;
+                    entry.columnizerName = (string) row.Cells[1].Value;
+                    Preferences.columnizerMaskList.Add(entry);
+                }
             }
+        }
 
-            multifilePattern.Text = Preferences.multifileOptions.FormatPattern;
-            multifileDays.Value = Preferences.multifileOptions.MaxDayTry;
+        private void SaveHighlightMaskList()
+        {
+            Preferences.highlightMaskList.Clear();
+            foreach (DataGridViewRow row in highlightMaskGridView.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    HighlightMaskEntry entry = new HighlightMaskEntry();
+                    entry.mask = (string) row.Cells[0].Value;
+                    entry.highlightGroupName = (string) row.Cells[1].Value;
+                    Preferences.highlightMaskList.Add(entry);
+                }
+            }
         }
 
         private void FillPluginList()
@@ -453,22 +513,55 @@ namespace LogExpert.Dialogs
             foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
             {
                 pluginListBox.Items.Add(entry);
-                (entry as ILogExpertPluginConfigurator)?.StartConfig();
+                if (entry is ILogExpertPluginConfigurator)
+                {
+                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                }
             }
 
             foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
             {
                 pluginListBox.Items.Add(entry);
-                (entry as ILogExpertPluginConfigurator)?.StartConfig();
+                if (entry is ILogExpertPluginConfigurator)
+                {
+                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                }
             }
 
             foreach (IFileSystemPlugin entry in PluginRegistry.GetInstance().RegisteredFileSystemPlugins)
             {
                 pluginListBox.Items.Add(entry);
-                (entry as ILogExpertPluginConfigurator)?.StartConfig();
+                if (entry is ILogExpertPluginConfigurator)
+                {
+                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                }
             }
 
             configPluginButton.Enabled = false;
+        }
+
+        private void FillToolListbox()
+        {
+            if (selectedPlugin != null)
+            {
+                selectedPlugin.HideConfigForm();
+            }
+
+            foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
+            {
+                if (entry is ILogExpertPluginConfigurator)
+                {
+                    (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
+                }
+            }
+
+            foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
+            {
+                if (entry is ILogExpertPluginConfigurator)
+                {
+                    (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
+                }
+            }
         }
 
         private void FillToolListbox()
@@ -487,16 +580,21 @@ namespace LogExpert.Dialogs
 
         private void GetCurrentToolValues()
         {
-            if (selectedTool != null)
+            switch (Preferences.multiFileOption)
             {
-                selectedTool.name =
-                    Util.IsNullOrSpaces(toolName.Text) ? cmdTextBox.Text : toolName.Text;
-                selectedTool.cmd = cmdTextBox.Text;
-                selectedTool.args = argsTextBox.Text;
-                selectedTool.columnizerName = columnizerComboBox.Text;
-                selectedTool.sysout = sysoutCheckBox.Checked;
-                selectedTool.workingDir = workingDirTextBox.Text;
+                case MultiFileOption.SingleFiles:
+                    multiOpenRadioButton1.Checked = true;
+                    break;
+                case MultiFileOption.MultiFile:
+                    multiOpenRadioButton2.Checked = true;
+                    break;
+                case MultiFileOption.Ask:
+                    multiOpenRadioButton3.Checked = true;
+                    break;
             }
+
+            multifilePattern.Text = Preferences.multifileOptions.FormatPattern;
+            multifileDays.Value = Preferences.multifileOptions.MaxDayTry;
         }
 
         private void GetToolListBoxData()
@@ -510,40 +608,70 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void iconButton_Click(object sender, EventArgs e)
+        private void GetCurrentToolValues()
         {
             if (selectedTool != null)
             {
-                string iconFile = selectedTool.iconFile;
-                if (Util.IsNullOrSpaces(iconFile))
-                {
-                    iconFile = cmdTextBox.Text;
-                }
+                selectedTool.name =
+                    Util.IsNullOrSpaces(toolName.Text) ? cmdTextBox.Text : toolName.Text;
+                selectedTool.cmd = cmdTextBox.Text;
+                selectedTool.args = argsTextBox.Text;
+                selectedTool.columnizerName = columnizerComboBox.Text;
+                selectedTool.sysout = sysoutCheckBox.Checked;
+                selectedTool.workingDir = workingDirTextBox.Text;
+            }
+        }
 
-                ChooseIconDlg dlg = new ChooseIconDlg(iconFile);
-                if (dlg.ShowDialog() == DialogResult.OK)
+        private void ShowCurrentToolValues()
+        {
+            if (selectedTool != null)
+            {
+                toolName.Text = selectedTool.name;
+                cmdTextBox.Text = selectedTool.cmd;
+                argsTextBox.Text = selectedTool.args;
+                columnizerComboBox.Text = selectedTool.columnizerName;
+                sysoutCheckBox.Checked = selectedTool.sysout;
+                columnizerComboBox.Enabled = selectedTool.sysout;
+                workingDirTextBox.Text = selectedTool.workingDir;
+            }
+        }
+
+        private void DisplayCurrentIcon()
+        {
+            if (selectedTool != null)
+            {
+                Icon icon = Win32.LoadIconFromExe(selectedTool.iconFile, selectedTool.iconIndex);
+                if (icon != null)
                 {
-                    selectedTool.iconFile = dlg.FileName;
-                    selectedTool.iconIndex = dlg.IconIndex;
-                    DisplayCurrentIcon();
+                    Image image = icon.ToBitmap();
+                    iconButton.Image = image;
+                    DestroyIcon(icon.Handle);
+                    icon.Dispose();
+                }
+                else
+                {
+                    iconButton.Image = emptyImage;
                 }
             }
         }
 
-        private void importButton_Click(object sender, EventArgs e)
+        private void FillEncodingList()
         {
-            ImportSettingsDialog dlg = new ImportSettingsDialog();
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                using (Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read))
-                {
-                    ConfigManager.Import(fs, dlg.ImportFlags);
-                }
+            encodingComboBox.Items.Clear();
 
-                Preferences = ConfigManager.Settings.preferences;
-                FillDialog();
-                MessageBox.Show(this, "Settings imported", "LogExpert");
-            }
+            //this.encodingComboBox.Items.Add(Encoding.ASCII.BodyName);
+            //this.encodingComboBox.Items.Add(Encoding.Default.BodyName);
+            //this.encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1").BodyName);
+            //this.encodingComboBox.Items.Add(Encoding.UTF8.BodyName);
+            //this.encodingComboBox.Items.Add(Encoding.Unicode.BodyName);
+
+            encodingComboBox.Items.Add(Encoding.ASCII);
+            encodingComboBox.Items.Add(Encoding.Default);
+            encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+            encodingComboBox.Items.Add(Encoding.UTF8);
+            encodingComboBox.Items.Add(Encoding.Unicode);
+
+            encodingComboBox.ValueMember = "HeaderName";
         }
 
         private void multifilePattern_TextChanged(object sender, EventArgs e)
@@ -552,14 +680,20 @@ namespace LogExpert.Dialogs
             multifileDays.Enabled = pattern.Contains("$D");
         }
 
-        private string NotNull(string text)
+        private void changeFontButton_Click(object sender, EventArgs e)
         {
-            if (text == null)
+            FontDialog dlg = new FontDialog();
+            dlg.ShowEffects = false;
+            dlg.AllowVerticalFonts = false;
+            dlg.AllowScriptChange = false;
+            dlg.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
-                return "";
+                Preferences.fontSize = dlg.Font.Size;
+                Preferences.fontName = dlg.Font.FontFamily.Name;
             }
 
-            return text;
+            DisplayFontName();
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -589,7 +723,7 @@ namespace LogExpert.Dialogs
             Preferences.openLastFiles = openLastFilesCheckBox.Checked;
             Preferences.showTailState = tailStateCheckBox.Checked;
             Preferences.setLastColumnWidth = columnSizeCheckBox.Checked;
-            Preferences.lastColumnWidth = (int)columnWidthUpDown.Value;
+            Preferences.lastColumnWidth = (int) columnWidthUpDown.Value;
             Preferences.showTimeSpread = timeSpreadCheckBox.Checked;
             Preferences.reverseAlpha = reverseAlphaCheckBox.Checked;
             Preferences.timeSpreadTimeMode = timeViewRadioButton.Checked;
@@ -610,9 +744,9 @@ namespace LogExpert.Dialogs
             }
 
             Preferences.saveFilters = saveFilterCheckBox.Checked;
-            Preferences.bufferCount = (int)blockCountUpDown.Value;
-            Preferences.linesPerBuffer = (int)linesPerBlockUpDown.Value;
-            Preferences.pollingInterval = (int)pollingIntervalUpDown.Value;
+            Preferences.bufferCount = (int) blockCountUpDown.Value;
+            Preferences.linesPerBuffer = (int) linesPerBlockUpDown.Value;
+            Preferences.pollingInterval = (int) pollingIntervalUpDown.Value;
             Preferences.multiThreadFilter = multiThreadCheckBox.Checked;
             Preferences.defaultEncoding = encodingComboBox.SelectedItem != null
                 ? (encodingComboBox.SelectedItem as Encoding).HeaderName
@@ -625,9 +759,82 @@ namespace LogExpert.Dialogs
             SaveMultifileData();
         }
 
+        private void toolButtonA_Click(object sender, EventArgs e)
+        {
+            ToolButtonClick(cmdTextBox);
+        }
+
+        private void argButtonA_Click(object sender, EventArgs e)
+        {
+            ArgsButtonClick(argsTextBox);
+        }
+
+        private void addButton_Click(object sender, EventArgs e)
+        {
+            columnizerDataGridView.Rows.Add();
+        }
+
+        private void columnizerDataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            DataGridViewComboBoxCell comboCell =
+                (DataGridViewComboBoxCell) columnizerDataGridView.Rows[e.RowIndex].Cells[1];
+            if (comboCell.Items.Count > 0)
+            {
+//        comboCell.Value = comboCell.Items[0];
+            }
+        }
+
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+            if (columnizerDataGridView.CurrentRow != null && !columnizerDataGridView.CurrentRow.IsNewRow)
+            {
+                int index = columnizerDataGridView.CurrentRow.Index;
+                columnizerDataGridView.EndEdit();
+                columnizerDataGridView.Rows.RemoveAt(index);
+            }
+        }
+
+        private void columnizerDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        private void sysoutCheckBoxA_CheckedChanged(object sender, EventArgs e)
+        {
+            columnizerComboBox.Enabled = sysoutCheckBox.Checked;
+        }
+
+        private void tailColorButton_Click(object sender, EventArgs e)
+        {
+            ColorDialog dlg = new ColorDialog();
+            dlg.Color = Preferences.showTailColor;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Preferences.showTailColor = dlg.Color;
+            }
+        }
+
+        private void columnSizeCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            columnWidthUpDown.Enabled = columnSizeCheckBox.Checked;
+        }
+
+        private void timespreadColorButton_Click(object sender, EventArgs e)
+        {
+            ColorDialog dlg = new ColorDialog();
+            dlg.Color = Preferences.timeSpreadColor;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Preferences.timeSpreadColor = dlg.Color;
+            }
+        }
+
         private void pluginListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedPlugin?.HideConfigForm();
+            if (selectedPlugin != null)
+            {
+                selectedPlugin.HideConfigForm();
+            }
 
             object o = pluginListBox.SelectedItem;
             if (o != null)
@@ -655,72 +862,6 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void SaveColumnizerList()
-        {
-            Preferences.columnizerMaskList.Clear();
-            foreach (DataGridViewRow row in columnizerDataGridView.Rows)
-            {
-                if (!row.IsNewRow)
-                {
-                    ColumnizerMaskEntry entry = new ColumnizerMaskEntry();
-                    entry.mask = (string)row.Cells[0].Value;
-                    entry.columnizerName = (string)row.Cells[1].Value;
-                    Preferences.columnizerMaskList.Add(entry);
-                }
-            }
-        }
-
-        private void SaveHighlightMaskList()
-        {
-            Preferences.highlightMaskList.Clear();
-            foreach (DataGridViewRow row in highlightMaskGridView.Rows)
-            {
-                if (!row.IsNewRow)
-                {
-                    HighlightMaskEntry entry = new HighlightMaskEntry();
-                    entry.mask = (string)row.Cells[0].Value;
-                    entry.highlightGroupName = (string)row.Cells[1].Value;
-                    Preferences.highlightMaskList.Add(entry);
-                }
-            }
-        }
-
-        private void SaveMultifileData()
-        {
-            if (multiOpenRadioButton1.Checked)
-            {
-                Preferences.multiFileOption = MultiFileOption.SingleFiles;
-            }
-
-            if (multiOpenRadioButton2.Checked)
-            {
-                Preferences.multiFileOption = MultiFileOption.MultiFile;
-            }
-
-            if (multiOpenRadioButton3.Checked)
-            {
-                Preferences.multiFileOption = MultiFileOption.Ask;
-            }
-
-            Preferences.multifileOptions.FormatPattern = multifilePattern.Text;
-            Preferences.multifileOptions.MaxDayTry = (int)multifileDays.Value;
-        }
-
-        private void SavePluginSettings()
-        {
-            selectedPlugin?.HideConfigForm();
-
-            foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
-            {
-                (entry as ILogExpertPluginConfigurator)?.SaveConfig(ConfigManager.ConfigDir);
-            }
-
-            foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
-            {
-                (entry as ILogExpertPluginConfigurator)?.SaveConfig(ConfigManager.ConfigDir);
-            }
-        }
-
         private void sessionSaveDirButton_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
@@ -737,47 +878,11 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void SettingsDialog_Load(object sender, EventArgs e)
-        {
-            FillDialog();
-        }
-
-        private void ShowCurrentToolValues()
-        {
-            if (selectedTool != null)
-            {
-                toolName.Text = selectedTool.name;
-                cmdTextBox.Text = selectedTool.cmd;
-                argsTextBox.Text = selectedTool.args;
-                columnizerComboBox.Text = selectedTool.columnizerName;
-                sysoutCheckBox.Checked = selectedTool.sysout;
-                columnizerComboBox.Enabled = selectedTool.sysout;
-                workingDirTextBox.Text = selectedTool.workingDir;
-            }
-        }
-
-        private void sysoutCheckBoxA_CheckedChanged(object sender, EventArgs e)
-        {
-            columnizerComboBox.Enabled = sysoutCheckBox.Checked;
-        }
-
-        private void tailColorButton_Click(object sender, EventArgs e)
-        {
-            ColorDialog dlg = new ColorDialog();
-            dlg.Color = Preferences.showTailColor;
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                Preferences.showTailColor = dlg.Color;
-            }
-        }
-
         private void timespreadColorButton_Click(object sender, EventArgs e)
         {
-            ColorDialog dlg = new ColorDialog();
-            dlg.Color = Preferences.timeSpreadColor;
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (!selectedPlugin.HasEmbeddedForm())
             {
-                Preferences.timeSpreadColor = dlg.Color;
+                selectedPlugin.ShowConfigDialog(this);
             }
         }
 
@@ -785,50 +890,6 @@ namespace LogExpert.Dialogs
         {
             toolListBox.Items.Add(new ToolEntry());
             toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
-        }
-
-        private void toolButtonA_Click(object sender, EventArgs e)
-        {
-            ToolButtonClick(cmdTextBox);
-        }
-
-        private void ToolButtonClick(TextBox textBox)
-        {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (!string.IsNullOrEmpty(textBox.Text))
-            {
-                FileInfo info = new FileInfo(textBox.Text);
-                if (info.Directory.Exists)
-                {
-                    dlg.InitialDirectory = info.DirectoryName;
-                }
-            }
-
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                textBox.Text = dlg.FileName;
-            }
-        }
-
-        private void toolDeleteButton_Click(object sender, EventArgs e)
-        {
-            int i = toolListBox.SelectedIndex;
-            if (i < toolListBox.Items.Count && i >= 0)
-            {
-                toolListBox.Items.RemoveAt(i);
-                if (i < toolListBox.Items.Count)
-                {
-                    toolListBox.SelectedIndex = i;
-                }
-                else
-                {
-                    if (toolListBox.Items.Count > 0)
-                    {
-                        toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
-                    }
-                }
-            }
         }
 
         private void toolListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -856,6 +917,75 @@ namespace LogExpert.Dialogs
             }
         }
 
+        private void toolDownButton_Click(object sender, EventArgs e)
+        {
+            int i = toolListBox.SelectedIndex;
+            if (i < toolListBox.Items.Count - 1)
+            {
+                bool isChecked = toolListBox.GetItemChecked(i);
+                object item = toolListBox.Items[i];
+                toolListBox.Items.RemoveAt(i);
+                i++;
+                toolListBox.Items.Insert(i, item);
+                toolListBox.SelectedIndex = i;
+                toolListBox.SetItemChecked(i, isChecked);
+            }
+        }
+
+        private void toolAddButton_Click(object sender, EventArgs e)
+        {
+            toolListBox.Items.Add(new ToolEntry());
+            toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
+        }
+
+        private void toolDeleteButton_Click(object sender, EventArgs e)
+        {
+            int i = toolListBox.SelectedIndex;
+            if (i < toolListBox.Items.Count && i >= 0)
+            {
+                toolListBox.Items.RemoveAt(i);
+                if (i < toolListBox.Items.Count)
+                {
+                    toolListBox.SelectedIndex = i;
+                }
+                else
+                {
+                    if (toolListBox.Items.Count > 0)
+                    {
+                        toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
+                    }
+                }
+            }
+        }
+
+        private void iconButton_Click(object sender, EventArgs e)
+        {
+            if (selectedTool != null)
+            {
+                string iconFile = selectedTool.iconFile;
+                if (Util.IsNullOrSpaces(iconFile))
+                {
+                    iconFile = cmdTextBox.Text;
+                }
+
+                ChooseIconDlg dlg = new ChooseIconDlg(iconFile);
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    selectedTool.iconFile = dlg.FileName;
+                    selectedTool.iconIndex = dlg.IconIndex;
+                    DisplayCurrentIcon();
+                }
+            }
+        }
+
+        private void toolUpButton_Click(object sender, EventArgs e)
+        {
+            if (selectedPlugin != null)
+            {
+                selectedPlugin.HideConfigForm();
+            }
+        }
+
         private void workingDirButton_Click(object sender, EventArgs e)
         {
             WorkingDirButtonClick(workingDirTextBox);
@@ -863,21 +993,34 @@ namespace LogExpert.Dialogs
 
         private void WorkingDirButtonClick(TextBox textBox)
         {
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.RootFolder = Environment.SpecialFolder.MyComputer;
-            dlg.Description = "Select a working directory";
-            if (!string.IsNullOrEmpty(textBox.Text))
+            string pattern = multifilePattern.Text;
+            multifileDays.Enabled = pattern.Contains("$D");
+        }
+
+        private void exportButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Title = "Export Settings to file";
+            dlg.DefaultExt = "dat";
+            dlg.AddExtension = true;
+            dlg.Filter = "Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            DialogResult result = dlg.ShowDialog();
+            if (result == DialogResult.OK)
             {
-                DirectoryInfo info = new DirectoryInfo(textBox.Text);
-                if (info.Exists)
-                {
-                    dlg.SelectedPath = info.FullName;
-                }
+                Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
+                ConfigManager.Export(fs);
+                fs.Close();
             }
+        }
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                textBox.Text = dlg.SelectedPath;
+                Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read);
+                ConfigManager.Import(fs, dlg.ImportFlags);
+                fs.Close();
+                Preferences = ConfigManager.Settings.preferences;
+                FillDialog();
+                MessageBox.Show(this, "Settings imported", "LogExpert");
             }
         }
 
@@ -887,7 +1030,7 @@ namespace LogExpert.Dialogs
 
         private class ColumnizerEntry
         {
-            #region Ctor
+            #region cTor
 
             public ColumnizerEntry(ILogLineColumnizer columnizer)
             {
@@ -896,7 +1039,12 @@ namespace LogExpert.Dialogs
 
             #endregion
 
-            #region Properties / Indexers
+            #region Properties
+
+            public string Name
+            {
+                get { return Columnizer.GetName(); }
+            }
 
             public ILogLineColumnizer Columnizer { get; }
 

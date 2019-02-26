@@ -21,15 +21,20 @@ namespace LogExpert
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
 
-        #endregion
+                using (FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode))
+                {
+                    writer.Write(text);
+                    writer.Close();
+                }
 
-        #region Event handling Methods
-
-        private void OnHighlightSettingsChanged()
-        {
-            if (HighlightSettingsChanged != null)
-            {
-                HighlightSettingsChanged(this, new EventArgs());
+                string title = "Clipboard";
+                LogWindow logWindow = AddTempFileTab(fileName, title);
+                LogWindowData data = logWindow.Tag as LogWindowData;
+                if (data != null)
+                {
+                    SetTooltipText(logWindow, "Pasted on " + DateTime.Now);
+                }
             }
         }
 
@@ -55,6 +60,16 @@ namespace LogExpert
 
                 _logger.Warn("Layout data contains non-existing LogWindow for {0}", fileName);
             }
+            else
+            {
+                ConfigManager.Settings.appBoundsFullscreen = Bounds;
+                ConfigManager.Settings.isMaximized = true;
+                WindowState = FormWindowState.Normal;
+                ConfigManager.Settings.appBounds = Bounds;
+            }
+
+            ResumeLayout();
+        }
 
             return null;
         }
@@ -140,37 +155,248 @@ namespace LogExpert
             string groupName = highlightGroupsComboBox.Text;
             if (CurrentLogWindow != null)
             {
-                CurrentLogWindow.SetCurrentHighlightGroup(groupName);
+                foreach (LogWindow logWindow in logWindowList)
+                {
+                    if (logWindow.FileName.ToLower().Equals(fileName.ToLower()))
+                    {
+                        return logWindow;
+                    }
+                }
             }
+
+            return null;
         }
 
         private void ApplySettings(Settings settings, SettingsFlags flags)
         {
             if ((flags & SettingsFlags.WindowPosition) == SettingsFlags.WindowPosition)
             {
-                TopMost = alwaysOnTopToolStripMenuItem.Checked = settings.alwaysOnTop;
-                dateTimeDragControl.DragOrientation = settings.preferences.timestampControlDragOrientation;
-                hideLineColumnToolStripMenuItem.Checked = settings.hideLineColumn;
+                PersistenceData persistenceData = Persister.LoadOptionsOnly(fileName);
+                if (persistenceData == null)
+                {
+                    return fileName;
+                }
+
+                if (persistenceData.fileName != null && persistenceData.fileName.Length > 0)
+                {
+                    IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(persistenceData.fileName);
+                    if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
+                    {
+                        return persistenceData.fileName;
+                    }
+
+                    // On relative paths the URI check (and therefore the file system plugin check) will fail.
+                    // So fs == null and fs == LocalFileSystem are handled here like normal files.
+                    if (Path.IsPathRooted(persistenceData.fileName))
+                    {
+                        return persistenceData.fileName;
+                    }
+                    else
+                    {
+                        // handle relative paths in .lxp files
+                        string dir = Path.GetDirectoryName(fileName);
+                        return Path.Combine(dir, persistenceData.fileName);
+                    }
+                }
             }
+
+            return fileName;
+        }
 
             if ((flags & SettingsFlags.FileHistory) == SettingsFlags.FileHistory)
             {
                 FillHistoryMenu();
             }
 
+            strip.ItemClicked += history_ItemClicked;
+            strip.MouseUp += strip_MouseUp;
+            lastUsedToolStripMenuItem.DropDown = strip;
+        }
+
             if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
             {
                 SetTabIcons(settings.preferences);
             }
+
+            DisconnectEventHandlers(logWindow);
+        }
 
             if ((flags & SettingsFlags.ToolSettings) == SettingsFlags.ToolSettings)
             {
                 FillToolLauncherBar();
             }
 
+            lock (logWindowList)
+            {
+                logWindowList.Remove(logWindow);
+            }
+
+            logWindow.Close(dontAsk);
+        }
+
             if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
             {
                 FillHighlightComboBox();
+            }
+        }
+
+        private void FillHighlightComboBox()
+        {
+            string currentGroupName = highlightGroupsComboBox.Text;
+            highlightGroupsComboBox.Items.Clear();
+            foreach (HilightGroup group in HilightGroupList)
+            {
+                highlightGroupsComboBox.Items.Add(group.GroupName);
+                if (group.GroupName.Equals(currentGroupName))
+                {
+                    highlightGroupsComboBox.Text = group.GroupName;
+                }
+            }
+        }
+
+        private void OpenFileDialog()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            if (CurrentLogWindow != null)
+            {
+                FileInfo info = new FileInfo(CurrentLogWindow.FileName);
+                openFileDialog.InitialDirectory = info.DirectoryName;
+            }
+            else
+            {
+                if (ConfigManager.Settings.lastDirectory != null && ConfigManager.Settings.lastDirectory.Length > 0)
+                {
+                    openFileDialog.InitialDirectory = ConfigManager.Settings.lastDirectory;
+                }
+                else
+                {
+                    try
+                    {
+                        openFileDialog.InitialDirectory =
+                            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    }
+                    catch (SecurityException e)
+                    {
+                        _logger.Warn(e, "Insufficient rights for GetFolderPath(): ");
+                        // no initial directory if insufficient rights
+                    }
+                }
+            }
+
+            openFileDialog.Multiselect = true;
+
+            if (DialogResult.OK == openFileDialog.ShowDialog(this))
+            {
+                FileInfo info = new FileInfo(openFileDialog.FileName);
+                if (info.Directory.Exists)
+                {
+                    ConfigManager.Settings.lastDirectory = info.DirectoryName;
+                    ConfigManager.Save(SettingsFlags.FileHistory);
+                }
+
+                if (info.Exists)
+                {
+                    LoadFiles(openFileDialog.FileNames, false);
+                }
+            }
+        }
+
+        private void LoadFiles(string[] names, bool invertLogic)
+        {
+            if (names.Length == 1)
+            {
+                if (names[0].EndsWith(".lxj"))
+                {
+                    LoadProject(names[0], true);
+                    return;
+                }
+                else
+                {
+                    AddFileTab(names[0], false, null, false, null);
+                    return;
+                }
+            }
+
+            MultiFileOption option = ConfigManager.Settings.preferences.multiFileOption;
+            if (option == MultiFileOption.Ask)
+            {
+                MultiLoadRequestDialog dlg = new MultiLoadRequestDialog();
+                DialogResult res = dlg.ShowDialog();
+                if (res == DialogResult.Yes)
+                {
+                    option = MultiFileOption.SingleFiles;
+                }
+                else if (res == DialogResult.No)
+                {
+                    option = MultiFileOption.MultiFile;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (invertLogic)
+                {
+                    if (option == MultiFileOption.SingleFiles)
+                    {
+                        option = MultiFileOption.MultiFile;
+                    }
+                    else
+                    {
+                        option = MultiFileOption.SingleFiles;
+                    }
+                }
+            }
+
+            if (option == MultiFileOption.SingleFiles)
+            {
+                AddFileTabs(names);
+            }
+            else
+            {
+                AddMultiFileTab(names);
+            }
+        }
+
+        private void setColumnizerHistoryEntry(string fileName, ILogLineColumnizer columnizer)
+        {
+            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
+            if (entry != null)
+            {
+                ConfigManager.Settings.columnizerHistoryList.Remove(entry);
+            }
+
+            ConfigManager.Settings.columnizerHistoryList.Add(new ColumnizerHistoryEntry(fileName,
+                columnizer.GetName()));
+            if (ConfigManager.Settings.columnizerHistoryList.Count > MAX_COLUMNIZER_HISTORY)
+            {
+                ConfigManager.Settings.columnizerHistoryList.RemoveAt(0);
+            }
+        }
+
+        private ColumnizerHistoryEntry findColumnizerHistoryEntry(string fileName)
+        {
+            foreach (ColumnizerHistoryEntry entry in ConfigManager.Settings.columnizerHistoryList)
+            {
+                if (entry.fileName.Equals(fileName))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        private void ToggleMultiFile()
+        {
+            if (CurrentLogWindow != null)
+            {
+                CurrentLogWindow.SwitchMultiFile(!CurrentLogWindow.IsMultiFile);
+                multiFileToolStripMenuItem.Checked = CurrentLogWindow.IsMultiFile;
+                multiFileEnabledStripMenuItem.Checked = CurrentLogWindow.IsMultiFile;
             }
         }
 
@@ -267,7 +493,15 @@ namespace LogExpert
             {
                 form.Close();
             }
-        }
+            else
+            {
+                dateTimeDragControl.Visible = false;
+                dateTimeDragControl.Enabled = false;
+            }
+
+            toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
+            highlightGroupsComboBox.Text = e.HighlightGroupName;
+            columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
 
         private void ConnectBookmarkWindow(LogWindow logWindow)
         {
@@ -278,7 +512,22 @@ namespace LogExpert
 
         private void ConnectToolWindows(LogWindow logWindow)
         {
-            ConnectBookmarkWindow(logWindow);
+            if (e.Value <= e.MaxValue && e.Value >= e.MinValue)
+            {
+                try
+                {
+                    loadProgessBar.Minimum = e.MinValue;
+                    loadProgessBar.Maximum = e.MaxValue;
+                    loadProgessBar.Value = e.Value;
+                    loadProgessBar.Visible = e.Visible;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error during ProgressBarUpdateWorker value {0}, min {1}, max {2}, visible {3}", e.Value, e.MinValue, e.MaxValue, e.Visible);
+                }
+
+                Invoke(new MethodInvoker(statusStrip1.Refresh));
+            }
         }
 
         private void CreateIcons()
@@ -295,7 +544,20 @@ namespace LogExpert
 
                     for (int i = 0; i < 6; ++i)
                     {
-                        ledIcons[i, 1, tailMode, syncMode] = CreateLedIcon(i, true, tailMode, syncMode);
+                        timeSum = 0;
+                        try
+                        {
+                            StatusLineEventArgs e;
+                            lock (statusLineLock)
+                            {
+                                e = lastStatusLineEvent.Clone();
+                            }
+
+                            BeginInvoke(new StatusLineEventFx(StatusLineEventWorker), e);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
                     }
                 }
             }
@@ -379,54 +641,21 @@ namespace LogExpert
 
         private void DestroyBookmarkWindow()
         {
-            bookmarkWindow.HideOnClose = false;
-            bookmarkWindow.Close();
-        }
-
-        private void DestroyToolWindows()
-        {
-            DestroyBookmarkWindow();
-        }
-
-        private void DisconnectBookmarkWindow(LogWindow logWindow)
-        {
-            bookmarkWindow.SetBookmarkData(null);
-            bookmarkWindow.SetCurrentFile(null);
-        }
-
-        private void DisconnectEventHandlers(LogWindow logWindow)
-        {
-            logWindow.FileSizeChanged -= FileSizeChanged;
-            logWindow.TailFollowed -= TailFollowed;
-            logWindow.Disposed -= logWindow_Disposed;
-            logWindow.FileNotFound -= logWindow_FileNotFound;
-            logWindow.FileRespawned -= logWindow_FileRespawned;
-            logWindow.FilterListChanged -= logWindow_FilterListChanged;
-            logWindow.CurrentHighlightGroupChanged -= logWindow_CurrentHighlightGroupChanged;
-            logWindow.SyncModeChanged -= logWindow_SyncModeChanged;
-
-            LogWindowData data = logWindow.Tag as LogWindowData;
-
-// data.tabPage.MouseClick -= tabPage_MouseClick;
-            // data.tabPage.TabDoubleClick -= tabPage_TabDoubleClick;
-            // data.tabPage.ContextMenuStrip = null;
-            // data.tabPage = null;
-        }
-
-        private void DisconnectToolWindows(LogWindow logWindow)
-        {
-            DisconnectBookmarkWindow(logWindow);
-        }
-
-        private void dumpGCInfo()
-        {
-            _logger.Info("-------- GC info -----------\r\nUsed mem: {0:N0}", GC.GetTotalMemory(false));
-            for (int i = 0; i < GC.MaxGeneration; ++i)
+            for (int syncMode = 0; syncMode <= 1; syncMode++) // LED indicating time synced tabs
             {
-                _logger.Info("Generation {0} collect count: {1}", i, GC.CollectionCount(i));
-            }
+                for (int tailMode = 0; tailMode < 4; tailMode++)
+                {
+                    for (int i = 0; i < 6; ++i)
+                    {
+                        ledIcons[i, 0, tailMode, syncMode] = CreateLedIcon(i, false, tailMode, syncMode);
+                    }
 
-            _logger.Info("----------------------------");
+                    for (int i = 0; i < 6; ++i)
+                    {
+                        ledIcons[i, 1, tailMode, syncMode] = CreateLedIcon(i, true, tailMode, syncMode);
+                    }
+                }
+            }
         }
 
         private void FileNotFound(LogWindow logWin)
@@ -443,164 +672,16 @@ namespace LogExpert
             BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
         }
 
-        private void FillDefaultEncodingFromSettings(EncodingOptions encodingOptions)
+        private void ShowLedPeak(LogWindow logWin)
         {
-            if (ConfigManager.Settings.preferences.defaultEncoding != null)
+            LogWindowData data = logWin.Tag as LogWindowData;
+            lock (data)
             {
-                try
-                {
-                    encodingOptions.DefaultEncoding =
-                        Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
-                }
-                catch (ArgumentException)
-                {
-                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
-                                 " is not a valid encoding");
-                    encodingOptions.DefaultEncoding = null;
-                }
-            }
-        }
-
-        private void FillHighlightComboBox()
-        {
-            string currentGroupName = highlightGroupsComboBox.Text;
-            highlightGroupsComboBox.Items.Clear();
-            foreach (HilightGroup group in HilightGroupList)
-            {
-                highlightGroupsComboBox.Items.Add(group.GroupName);
-                if (group.GroupName.Equals(currentGroupName))
-                {
-                    highlightGroupsComboBox.Text = group.GroupName;
-                }
-            }
-        }
-
-        private void FillHistoryMenu()
-        {
-            ToolStripDropDown strip = new ToolStripDropDownMenu();
-            foreach (string file in ConfigManager.Settings.fileHistoryList)
-            {
-                ToolStripItem item = new ToolStripMenuItem(file);
-                strip.Items.Add(item);
+                data.diffSum = DIFF_MAX;
             }
 
-            strip.ItemClicked += history_ItemClicked;
-            strip.MouseUp += strip_MouseUp;
-            lastUsedToolStripMenuItem.DropDown = strip;
-        }
-
-        private void FillToolLauncherBar()
-        {
-            char[] labels =
-            {
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                'U', 'V', 'W', 'X', 'Y', 'Z'
-            };
-            toolsToolStripMenuItem.DropDownItems.Clear();
-            toolsToolStripMenuItem.DropDownItems.Add(configureToolStripMenuItem);
-            toolsToolStripMenuItem.DropDownItems.Add(configureToolStripSeparator);
-            externalToolsToolStrip.Items.Clear();
-            int num = 0;
-            externalToolsToolStrip.SuspendLayout();
-            foreach (ToolEntry tool in Preferences.toolEntries)
-            {
-                if (tool.isFavourite)
-                {
-                    ToolStripButton button = new ToolStripButton(string.Empty + labels[num % 26]);
-                    button.Tag = tool;
-                    SetToolIcon(tool, button);
-                    externalToolsToolStrip.Items.Add(button);
-                }
-
-                num++;
-                ToolStripMenuItem menuItem = new ToolStripMenuItem(tool.name);
-                menuItem.Tag = tool;
-                SetToolIcon(tool, menuItem);
-                toolsToolStripMenuItem.DropDownItems.Add(menuItem);
-            }
-
-            externalToolsToolStrip.ResumeLayout();
-
-            externalToolsToolStrip.Visible = num > 0; // do not show bar if no tool uses it
-        }
-
-        private ColumnizerHistoryEntry findColumnizerHistoryEntry(string fileName)
-        {
-            foreach (ColumnizerHistoryEntry entry in ConfigManager.Settings.columnizerHistoryList)
-            {
-                if (entry.fileName.Equals(fileName))
-                {
-                    return entry;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///     Checks if the file name is a settings file. If so, the contained logfile name
-        ///     is returned. If not, the given file name is returned unchanged.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        private string FindFilenameForSettings(string fileName)
-        {
-            if (fileName.EndsWith(".lxp"))
-            {
-                PersistenceData persistenceData = Persister.LoadOptionsOnly(fileName);
-                if (persistenceData == null)
-                {
-                    return fileName;
-                }
-
-                if (persistenceData.fileName != null && persistenceData.fileName.Length > 0)
-                {
-                    IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(persistenceData.fileName);
-                    if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
-                    {
-                        return persistenceData.fileName;
-                    }
-
-                    // On relative paths the URI check (and therefore the file system plugin check) will fail.
-                    // So fs == null and fs == LocalFileSystem are handled here like normal files.
-                    if (Path.IsPathRooted(persistenceData.fileName))
-                    {
-                        return persistenceData.fileName;
-                    }
-
-                    // handle relative paths in .lxp files
-                    string dir = Path.GetDirectoryName(fileName);
-                    return Path.Combine(dir, persistenceData.fileName);
-                }
-            }
-
-            return fileName;
-        }
-
-        private LogWindow FindWindowForFile(string fileName)
-        {
-            lock (logWindowList)
-            {
-                foreach (LogWindow logWindow in logWindowList)
-                {
-                    if (logWindow.FileName.ToLower().Equals(fileName.ToLower()))
-                    {
-                        return logWindow;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private Icon GetIcon(int diff, LogWindowData data)
-        {
-            Icon icon =
-                ledIcons[
-                    GetLevelFromDiff(diff), data.dirty ? 1 : 0, Preferences.showTailState ? data.tailState : 3,
-                    data.syncMode
-                ];
-            return icon;
+            Icon icon = GetIcon(data.diffSum, data);
+            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
         }
 
         private int GetLevelFromDiff(int diff)
@@ -1023,21 +1104,15 @@ namespace LogExpert
             _logger.Info("GC done.    Used mem after:  {0:N0}", GC.GetTotalMemory(true));
         }
 
-        private void SaveLastOpenFilesList()
-        {
-            ConfigManager.Settings.lastOpenFilesList.Clear();
-            foreach (DockContent content in dockPanel.Contents)
+            lock (logWindowList)
             {
-                if (content is LogWindow)
+                foreach (LogWindow logWindow in logWindowList)
                 {
-                    LogWindow logWin = content as LogWindow;
-                    if (!logWin.IsTempFile)
-                    {
-                        ConfigManager.Settings.lastOpenFilesList.Add(logWin.GivenFileName);
-                    }
+                    logWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
                 }
             }
-        }
+
+            bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
 
         private string SaveLayout()
         {
@@ -1068,50 +1143,29 @@ namespace LogExpert
             }
             else
             {
-                ConfigManager.Settings.appBoundsFullscreen = Bounds;
-                ConfigManager.Settings.isMaximized = true;
-                WindowState = FormWindowState.Normal;
-                ConfigManager.Settings.appBounds = Bounds;
+                TopMost = alwaysOnTopToolStripMenuItem.Checked = settings.alwaysOnTop;
+                dateTimeDragControl.DragOrientation = settings.preferences.timestampControlDragOrientation;
+                hideLineColumnToolStripMenuItem.Checked = settings.hideLineColumn;
             }
 
-            ResumeLayout();
-        }
-
-        private void setColumnizerHistoryEntry(string fileName, ILogLineColumnizer columnizer)
-        {
-            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
-            if (entry != null)
+            if ((flags & SettingsFlags.FileHistory) == SettingsFlags.FileHistory)
             {
                 ConfigManager.Settings.columnizerHistoryList.Remove(entry);
             }
 
-            ConfigManager.Settings.columnizerHistoryList.Add(new ColumnizerHistoryEntry(fileName,
-                columnizer.GetName()));
-            if (ConfigManager.Settings.columnizerHistoryList.Count > MAX_COLUMNIZER_HISTORY)
+            if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
             {
-                ConfigManager.Settings.columnizerHistoryList.RemoveAt(0);
+                SetTabIcons(settings.preferences);
             }
-        }
 
-        private void setTabColor(LogWindow logWindow, Color color)
-        {
-            // tabPage.BackLowColor = color;
-            // tabPage.BackLowColorDisabled = Color.FromArgb(255,
-            // Math.Max(0, color.R - 50),
-            // Math.Max(0, color.G - 50),
-            // Math.Max(0, color.B - 50)
-            // );
-        }
-
-        private void SetTabIcon(LogWindow logWindow, Icon icon)
-        {
-            if (logWindow != null)
+            if ((flags & SettingsFlags.ToolSettings) == SettingsFlags.ToolSettings)
             {
-                logWindow.Icon = icon;
-                if (logWindow.DockHandler.Pane != null)
-                {
-                    logWindow.DockHandler.Pane.TabStripControl.Invalidate(false);
-                }
+                FillToolLauncherBar();
+            }
+
+            if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
+            {
+                FillHighlightComboBox();
             }
         }
 
@@ -1155,36 +1209,28 @@ namespace LogExpert
             }
         }
 
-        private void SetTooltipText(LogWindow logWindow, string logFileName)
+        private void ToolButtonClick(ToolEntry toolEntry)
         {
-            logWindow.ToolTipText = logFileName;
-        }
-
-        private void ShowHighlightSettingsDialog()
-        {
-            HilightDialog dlg = new HilightDialog();
-            dlg.KeywordActionList = PluginRegistry.GetInstance().RegisteredKeywordActions;
-            dlg.Owner = this;
-            dlg.TopMost = TopMost;
-            dlg.HilightGroupList = HilightGroupList;
-            dlg.PreSelectedGroupName = highlightGroupsComboBox.Text;
-            DialogResult res = dlg.ShowDialog();
-            if (res == DialogResult.OK)
+            if (string.IsNullOrEmpty(toolEntry.cmd))
             {
-                HilightGroupList = dlg.HilightGroupList;
-                FillHighlightComboBox();
-                ConfigManager.Settings.hilightGroupList = HilightGroupList;
-                ConfigManager.Save(SettingsFlags.HighlightSettings);
-                OnHighlightSettingsChanged();
+                OpenSettings(2);
+                return;
             }
-        }
 
-        private void ShowLedPeak(LogWindow logWin)
-        {
-            LogWindowData data = logWin.Tag as LogWindowData;
-            lock (data)
+            if (CurrentLogWindow != null)
             {
-                data.diffSum = DIFF_MAX;
+                ILogLine line = CurrentLogWindow.GetCurrentLine();
+                ILogFileInfo info = CurrentLogWindow.GetCurrentFileInfo();
+                if (line != null && info != null)
+                {
+                    ArgParser parser = new ArgParser(toolEntry.args);
+                    string argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
+                    if (argLine != null)
+                    {
+                        StartTool(toolEntry.cmd, argLine, toolEntry.sysout, toolEntry.columnizerName,
+                            toolEntry.workingDir);
+                    }
+                }
             }
 
             Icon icon = GetIcon(data.diffSum, data);
@@ -1259,6 +1305,26 @@ namespace LogExpert
             }
         }
 
+        private void CloseAllTabs()
+        {
+            IList<Form> closeList = new List<Form>();
+            lock (logWindowList)
+            {
+                foreach (DockContent content in dockPanel.Contents)
+                {
+                    if (content is LogWindow)
+                    {
+                        closeList.Add(content as Form);
+                    }
+                }
+            }
+
+            foreach (Form form in closeList)
+            {
+                form.Close();
+            }
+        }
+
         private void StatusLineEventWorker(StatusLineEventArgs e)
         {
             // _logger.logDebug("StatusLineEvent: text = " + e.StatusText);
@@ -1299,14 +1365,66 @@ namespace LogExpert
                                 e = lastStatusLineEvent.Clone();
                             }
 
-                            BeginInvoke(new StatusLineEventFx(StatusLineEventWorker), e);
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                        }
-                    }
-                }
+        private void ApplySelectedHighlightGroup()
+        {
+            string groupName = highlightGroupsComboBox.Text;
+            if (CurrentLogWindow != null)
+            {
+                CurrentLogWindow.SetCurrentHighlightGroup(groupName);
             }
+        }
+
+        private void FillToolLauncherBar()
+        {
+            char[] labels = new char[]
+            {
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z'
+            };
+            toolsToolStripMenuItem.DropDownItems.Clear();
+            toolsToolStripMenuItem.DropDownItems.Add(configureToolStripMenuItem);
+            toolsToolStripMenuItem.DropDownItems.Add(configureToolStripSeparator);
+            externalToolsToolStrip.Items.Clear();
+            int num = 0;
+            externalToolsToolStrip.SuspendLayout();
+            foreach (ToolEntry tool in Preferences.toolEntries)
+            {
+                if (tool.isFavourite)
+                {
+                    ToolStripButton button = new ToolStripButton("" + labels[num % 26]);
+                    button.Tag = tool;
+                    SetToolIcon(tool, button);
+                    externalToolsToolStrip.Items.Add(button);
+                }
+
+                num++;
+                ToolStripMenuItem menuItem = new ToolStripMenuItem(tool.name);
+                menuItem.Tag = tool;
+                SetToolIcon(tool, menuItem);
+                toolsToolStripMenuItem.DropDownItems.Add(menuItem);
+            }
+
+            externalToolsToolStrip.ResumeLayout();
+
+            externalToolsToolStrip.Visible = num > 0; // do not show bar if no tool uses it
+        }
+
+        private void runGC()
+        {
+            _logger.Info("Running GC. Used mem before: {0:N0}", GC.GetTotalMemory(false));
+            GC.Collect();
+            _logger.Info("GC done.    Used mem after:  {0:N0}", GC.GetTotalMemory(true));
+        }
+
+        private void dumpGCInfo()
+        {
+            _logger.Info("-------- GC info -----------\r\nUsed mem: {0:N0}", GC.GetTotalMemory(false));
+            for (int i = 0; i < GC.MaxGeneration; ++i)
+            {
+                _logger.Info("Generation {0} collect count: {1}", i, GC.CollectionCount(i));
+            }
+
+            _logger.Info("----------------------------");
         }
 
         private void throwExceptionFx()
@@ -1343,14 +1461,22 @@ namespace LogExpert
                 ILogFileInfo info = CurrentLogWindow.GetCurrentFileInfo();
                 if (line != null && info != null)
                 {
-                    ArgParser parser = new ArgParser(toolEntry.args);
-                    string argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
-                    if (argLine != null)
-                    {
-                        StartTool(toolEntry.cmd, argLine, toolEntry.sysout, toolEntry.columnizerName,
-                            toolEntry.workingDir);
-                    }
+                    return win;
                 }
+                else
+                {
+                    _logger.Warn("Layout data contains non-existing LogWindow for {0}", fileName);
+                }
+            }
+
+            return null;
+        }
+
+        private void OnHighlightSettingsChanged()
+        {
+            if (HighlightSettingsChanged != null)
+            {
+                HighlightSettingsChanged(this, new EventArgs());
             }
         }
 

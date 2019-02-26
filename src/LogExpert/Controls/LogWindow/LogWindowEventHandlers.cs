@@ -411,48 +411,35 @@ namespace LogExpert
                 moveRightToolStripMenuItem.Enabled = colRight != null && colRight.Frozen == col.Frozen;
             }
 
-            if (selectedCol > 0)
+        private void selectionChangedTrigger_Signal(object sender, EventArgs e)
+        {
+            int selCount = 0;
+            try
             {
-                // DataGridViewColumn colLeft = gridView.Columns[this.selectedCol - 1];
-                DataGridViewColumn colLeft = gridView.Columns.GetPreviousColumn(col, DataGridViewElementStates.None,
-                    DataGridViewElementStates.None);
-
-                moveLeftToolStripMenuItem.Enabled = colLeft != null && colLeft.Frozen == col.Frozen;
-            }
-
-            DataGridViewColumn colLast = gridView.Columns[gridView.Columns.Count - 1];
-            moveToLastColumnToolStripMenuItem.Enabled = colLast != null && colLast.Frozen == col.Frozen;
-
-            // Fill context menu with column names 
-            EventHandler ev = HandleColumnItemContextMenu;
-            allColumnsToolStripMenuItem.DropDownItems.Clear();
-            foreach (DataGridViewColumn column in gridView.Columns)
-            {
-                if (column.HeaderText.Length > 0)
+                _logger.Debug("Selection changed trigger");
+                selCount = dataGridView.SelectedRows.Count;
+                if (selCount > 1)
                 {
-                    ToolStripMenuItem item =
-                        allColumnsToolStripMenuItem.DropDownItems.Add(column.HeaderText, null, ev) as ToolStripMenuItem;
-                    item.Tag = column;
-                    item.Enabled = !column.Frozen;
+                    StatusLineText(selCount + " selected lines");
+                }
+                else
+                {
+                    if (IsMultiFile)
+                    {
+                        MethodInvoker invoker = new MethodInvoker(DisplayCurrentFileOnStatusline);
+                        invoker.BeginInvoke(null, null);
+                    }
+                    else
+                    {
+                        StatusLineText("");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error in selectionChangedTrigger_Signal selcount {0}", selCount);
+            }
         }
-
-        // ======================= Bookmark list ====================================
-        private void columnRestrictCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            columnButton.Enabled = columnRestrictCheckBox.Checked;
-            if (columnRestrictCheckBox.Checked)
-            {
-// disable when nothing to filter
-                columnNamesLabel.Visible = true;
-                filterParams.columnRestrict = true;
-                columnNamesLabel.Text = CalculateColumnNames(filterParams);
-            }
-            else
-            {
-                columnNamesLabel.Visible = false;
-            }
 
             CheckForFilterDirty();
         }
@@ -1416,19 +1403,16 @@ namespace LogExpert
             SetCurrentHighlightGroup(groupName);
         }
 
-        private void pipe_Disconnected(object sender, EventArgs e)
+        private void LogWindow_Enter(object sender, EventArgs e)
         {
-            if (sender.GetType() == typeof(FilterPipe))
+            InvalidateCurrentRow();
+        }
+
+        private void dataGridView_RowUnshared(object sender, DataGridViewRowEventArgs e)
+        {
+            if (_logger.IsTraceEnabled)
             {
-                lock (filterPipeList)
-                {
-                    filterPipeList.Remove((FilterPipe)sender);
-                    if (filterPipeList.Count == 0)
-                    {
-                        // reset naming counter to 0 if no more open filter tabs for this source window
-                        filterPipeNameCounter = 0;
-                    }
-                }
+                _logger.Trace("Row unshared line {0}", e.Row.Cells[1].Value);
             }
         }
 

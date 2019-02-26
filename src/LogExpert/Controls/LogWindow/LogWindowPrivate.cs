@@ -2019,8 +2019,7 @@ namespace LogExpert
             }
 
             IList<HilightMatchEntry> matchList = FindHilightMatches(column);
-
-// too many entries per line seem to cause problems with the GDI 
+            // too many entries per line seem to cause problems with the GDI
             while (matchList.Count > 50)
             {
                 matchList.RemoveAt(50);
@@ -2035,6 +2034,12 @@ namespace LogExpert
                     : Color.FromKnownColor(KnownColor.Black),
                 groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
                 false);
+
+            if (groundEntry != null)
+            {
+                hme.HilightEntry.IsBold = groundEntry.IsBold;
+            }
+
             matchList = MergeHighlightMatchEntries(matchList, hme);
 
             int leftPad = e.CellStyle.Padding.Left;
@@ -2111,7 +2116,17 @@ namespace LogExpert
             }
         }
 
-        private void PositionAfterReload(ReloadMemento reloadMemento)
+        /// <summary>
+        /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
+        /// background colors.
+        /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
+        /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+        /// </summary>
+        /// <param name="matchList">List of all highlight matches for the current cell</param>
+        /// <param name="groundEntry">The entry that is used as the default.</param>
+        /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
+        private IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList,
+            HilightMatchEntry groundEntry)
         {
             if (this.reloadMemento.currentLine < dataGridView.RowCount && this.reloadMemento.currentLine >= 0)
             {
@@ -2635,7 +2650,7 @@ namespace LogExpert
                 if (line == -1)
                 {
                     MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?  
+                        "Search result"); // Hmm... is that experimental code from early days?
                     return;
                 }
 
@@ -2899,7 +2914,16 @@ namespace LogExpert
             OnColumnizerChanged(CurrentColumnizer);
         }
 
-        private void SetDefaultHighlightGroup()
+        /// <summary>
+        ///  Returns a list with 'additional filter results'. This is the given line number
+        ///  and (if back spread and/or fore spread is enabled) some additional lines.
+        ///  This function doesn't check the filter condition!
+        /// </summary>
+        /// <param name="filterParams"></param>
+        /// <param name="lineNum"></param>
+        /// <param name="checkList"></param>
+        /// <returns></returns>
+        private IList<int> GetAdditionalFilterResults(FilterParams filterParams, int lineNum, IList<int> checkList)
         {
             HilightGroup group = parentLogTabWin.FindHighlightGroupByFileMask(FileName);
             if (group != null)
@@ -3084,8 +3108,20 @@ namespace LogExpert
             {
                 foreach (FilterPipe pipe in filterPipeList)
                 {
-                    pipe.ShiftLineNums(offset);
+                    // TODO: handle this concurrent situation better:
+                    // this.dataGridView.CurrentRow may be null even if checked before.
+                    // This can happen when MultiFile shift deselects the current row because there
+                    // are less lines after rollover than before.
+                    // access to dataGridView-Rows should be locked
                 }
+            }
+        }
+
+        private void UpdateSelectionDisplay()
+        {
+            if (noSelectionUpdates)
+            {
+                return;
             }
         }
 
@@ -3253,8 +3289,14 @@ namespace LogExpert
                 {
                     SyncTimestampDisplay(dataGridView.CurrentRow.Index);
                 }
+                else
+                {
+                    // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions).
+                    dataGridView.FirstDisplayedScrollingColumnIndex = 0;
+
+                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5; // default
+                }
             }
-        }
 
         private void SyncTimestampDisplay(int lineNum)
         {

@@ -10,7 +10,7 @@ namespace RegexColumnizer
 {
     public class RegexColumnizerConfig
     {
-        #region Properties / Indexers
+        #region Properties
 
         public string Expression { get; set; } = "(?<text>.*)";
 
@@ -19,95 +19,26 @@ namespace RegexColumnizer
 
     public class Regex1Columnizer : ILogLineColumnizer, IColumnizerConfigurator
     {
-        #region Private Fields
+        #region Fields
 
         private readonly XmlSerializer xml = new XmlSerializer(typeof(RegexColumnizerConfig));
         private string[] columns;
 
         #endregion
 
-        #region Interface IColumnizerConfigurator
+        #region Properties
 
-        public void Configure(ILogLineColumnizerCallback callback, string configDir)
-        {
-            RegexColumnizerConfigDialog d = new RegexColumnizerConfigDialog {Config = Config};
-            if (d.ShowDialog() == DialogResult.OK)
-            {
-                string configFile = GetConfigFile(configDir);
-                using (FileStream w = new FileStream(configFile, FileMode.Create))
-                {
-                    xml.Serialize(w, d.Config);
-                }
-            }
-        }
-
-        public void LoadConfig(string configDir)
-        {
-            string configFile = GetConfigFile(configDir);
-            RegexColumnizerConfig config;
-            if (!File.Exists(configFile))
-            {
-                config = new RegexColumnizerConfig();
-            }
-            else
-            {
-                using (StreamReader reader = new StreamReader(configFile))
-                {
-                    config = xml.Deserialize(reader) as RegexColumnizerConfig;
-                }
-            }
-
-            Init(config);
-        }
+        public RegexColumnizerConfig Config { get; private set; }
+        public Regex Regex { get; private set; }
 
         #endregion
 
-        #region Interface ILogLineColumnizer
+        #region Public methods
 
-        public int GetColumnCount()
-        {
-            return columns.Length;
-        }
-
-        public string[] GetColumnNames()
-        {
-            return columns;
-        }
-
-        public string GetDescription()
-        {
-            return "Columns are filled by regular expression named capture groups";
-        }
-
-        public string GetName()
-        {
-            return "Regex";
-        }
-
-        public int GetTimeOffset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsTimeshiftImplemented()
-        {
-            return false;
-        }
-
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetTimeOffset(int msecOffset)
-        {
-            throw new NotImplementedException();
-        }
+        public string GetName() => "Regex";
+        public string GetDescription() => "Columns are filled by regular expression named capture groups";
+        public int GetColumnCount() => columns.Length;
+        public string[] GetColumnNames() => columns;
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
@@ -116,13 +47,26 @@ namespace RegexColumnizer
             logLine.ColumnValues = new IColumn[columns.Length];
             if (Regex != null)
             {
-                Match m = Regex.Match(line.FullLine);
-                for (int i = m.Groups.Count - 1; i > 0; i--)
+                var m = Regex.Match(line.FullLine);
+
+                if (m.Success)
                 {
-                    logLine.ColumnValues[i - 1] = new Column
+                    for (int i = m.Groups.Count - 1; i > 0; i--)
+                    {
+                        logLine.ColumnValues[i - 1] = new Column
+                        {
+                            Parent = logLine,
+                            FullValue = m.Groups[i].Value
+                        };
+                    }
+                }
+                else
+                {
+                    //Move non matching lines in the last column
+                    logLine.ColumnValues[columns.Length - 1] = new Column
                     {
                         Parent = logLine,
-                        FullValue = m.Groups[i].Value
+                        FullValue = line.FullLine
                     };
                 }
             }
@@ -141,20 +85,65 @@ namespace RegexColumnizer
             return logLine;
         }
 
-        #endregion
+        public bool IsTimeshiftImplemented() => false;
 
-        #region Properties / Indexers
+        public void SetTimeOffset(int msecOffset)
+        {
+            throw new NotImplementedException();
+        }
 
-        public RegexColumnizerConfig Config { get; private set; }
-        public Regex Regex { get; private set; }
+        public int GetTimeOffset()
+        {
+            throw new NotImplementedException();
+        }
 
-        #endregion
+        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+        {
+            throw new NotImplementedException();
+        }
 
-        #region Public Methods
+        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Configure(ILogLineColumnizerCallback callback, string configDir)
+        {
+            RegexColumnizerConfigDialog d = new RegexColumnizerConfigDialog {Config = Config};
+            if (d.ShowDialog() == DialogResult.OK)
+            {
+                var configFile = GetConfigFile(configDir);
+                using (var w = new FileStream(configFile, FileMode.Create))
+                {
+                    xml.Serialize(w, d.Config);
+                }
+
+                Init(d.Config);
+            }
+        }
+
+        public void LoadConfig(string configDir)
+        {
+            var configFile = GetConfigFile(configDir);
+            RegexColumnizerConfig config;
+            if (!File.Exists(configFile))
+            {
+                config = new RegexColumnizerConfig();
+            }
+            else
+            {
+                using (var reader = new StreamReader(configFile))
+                {
+                    config = xml.Deserialize(reader) as RegexColumnizerConfig;
+                }
+            }
+
+            Init(config);
+        }
 
         public string GetConfigFile(string configDir)
         {
-            string name = GetType().Name;
+            var name = GetType().Name;
             string configPath = Path.Combine(configDir, name);
             configPath = Path.ChangeExtension(configPath, "xml");
             return configPath;

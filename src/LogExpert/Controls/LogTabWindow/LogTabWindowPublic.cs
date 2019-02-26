@@ -17,7 +17,25 @@ namespace LogExpert
         [DllImport("User32.dll")]
         public static extern int SetForegroundWindow(IntPtr hWnd);
 
-        #endregion
+        public LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
+        {
+            LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
+            if (pipe.FilterParams.searchText.Length > 0)
+            {
+                ToolTip tip = new ToolTip(components);
+                tip.SetToolTip(logWin,
+                    "Filter: \"" + pipe.FilterParams.searchText + "\"" +
+                    (pipe.FilterParams.isInvert ? " (Invert match)" : "") +
+                    (pipe.FilterParams.columnRestrict ? "\nColumn restrict" : "")
+                );
+                tip.AutomaticDelay = 10;
+                tip.AutoPopDelay = 5000;
+                LogWindowData data = logWin.Tag as LogWindowData;
+                data.toolTip = tip;
+            }
+
+            return logWin;
+        }
 
         #region Public Methods
 
@@ -73,8 +91,7 @@ namespace LogExpert
             LogWindowData data = logWindow.Tag as LogWindowData;
             data.color = defaultTabColor;
             setTabColor(logWindow, defaultTabColor);
-
-// data.tabPage.BorderColor = this.defaultTabBorderColor;
+            //data.tabPage.BorderColor = this.defaultTabBorderColor;
             if (!isTempFile)
             {
                 foreach (ColorEntry colorEntry in ConfigManager.Settings.fileColors)
@@ -145,39 +162,37 @@ namespace LogExpert
             multiFileEnabledStripMenuItem.Checked = true;
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
+            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti),
+                new object[] {fileNames, encodingOptions});
             AddToFileHistory(fileNames[0]);
             return logWindow;
         }
 
         public LogWindow AddTempFileTab(string fileName, string title)
         {
-            return AddFileTab(fileName, true, title, false, null);
+            Invoke(new AddFileTabsDelegate(AddFileTabs), new object[] {fileNames});
         }
 
         public ILogLineColumnizer FindColumnizerByFileMask(string fileName)
         {
-            foreach (ColumnizerMaskEntry entry in ConfigManager.Settings.preferences.columnizerMaskList)
+            if (CurrentLogWindow == null)
             {
-                if (entry.mask != null)
-                {
-                    try
-                    {
-                        if (Regex.IsMatch(fileName, entry.mask))
-                        {
-                            ILogLineColumnizer columnizer = Util.FindColumnizerByName(entry.columnizerName,
-                                PluginRegistry.GetInstance().RegisteredColumnizers);
-                            return columnizer;
-                        }
-                    }
-                    catch (ArgumentException e)
-                    {
-                        _logger.Error(e, "RegEx-error while finding columnizer: ");
-
-// occurs on invalid regex patterns
-                    }
-                }
+                return;
             }
+
+            SearchDialog dlg = new SearchDialog();
+            AddOwnedForm(dlg);
+            dlg.TopMost = TopMost;
+            SearchParams.historyList = ConfigManager.Settings.searchHistoryList;
+            dlg.SearchParams = SearchParams;
+            DialogResult res = dlg.ShowDialog();
+            if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.searchText))
+            {
+                SearchParams = dlg.SearchParams;
+                SearchParams.isFindNext = false;
+                CurrentLogWindow.StartSearch();
+            }
+        }
 
             return null;
         }
@@ -190,19 +205,11 @@ namespace LogExpert
                 {
                     try
                     {
-                        if (Regex.IsMatch(fileName, entry.mask))
-                        {
-                            HilightGroup group = FindHighlightGroup(entry.highlightGroupName);
-                            return group;
-                        }
-                    }
-                    catch (ArgumentException e)
-                    {
-                        _logger.Error(e, "RegEx-error while finding columnizer: ");
-
-// occurs on invalid regex patterns
+                        return columnizer;
                     }
                 }
+
+                ConfigManager.Settings.columnizerHistoryList.Remove(entry); // no valid name -> remove entry
             }
 
             return null;
@@ -211,38 +218,47 @@ namespace LogExpert
         // called from LogWindow when follow tail was changed
         public void FollowTailChanged(LogWindow logWindow, bool isEnabled, bool offByTrigger)
         {
-            LogWindowData data = logWindow.Tag as LogWindowData;
-            if (data == null)
+            int index = dockPanel.Contents.IndexOf(dockPanel.ActiveContent);
+            if (shiftPressed)
             {
-                return;
-            }
+                index--;
+                if (index < 0)
+                {
+                    index = dockPanel.Contents.Count - 1;
+                }
 
-            if (isEnabled)
-            {
-                data.tailState = 0;
+                if (index < 0)
+                {
+                    return;
+                }
             }
             else
             {
-                data.tailState = offByTrigger ? 2 : 1;
+                index++;
+                if (index >= dockPanel.Contents.Count)
+                {
+                    index = 0;
+                }
             }
 
-            if (Preferences.showTailState)
+            if (index < dockPanel.Contents.Count)
             {
-                Icon icon = GetIcon(data.diffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+                (dockPanel.Contents[index] as DockContent).Activate();
             }
         }
 
-        public ILogLineColumnizer GetColumnizerHistoryEntry(string fileName)
+        public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow senderWindow)
         {
-            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
-            if (entry != null)
+            lock (logWindowList)
             {
-                foreach (ILogLineColumnizer columnizer in PluginRegistry.GetInstance().RegisteredColumnizers)
+                foreach (LogWindow logWindow in logWindowList)
                 {
-                    if (columnizer.GetName().Equals(entry.columnizerName))
+                    if (logWindow != senderWindow)
                     {
-                        return columnizer;
+                        if (logWindow.ScrollToTimestamp(timestamp, false, false))
+                        {
+                            ShowLedPeak(logWindow);
+                        }
                     }
                 }
 
@@ -298,6 +314,8 @@ namespace LogExpert
                 SearchParams.isFindNext = false;
                 CurrentLogWindow.StartSearch();
             }
+
+            return null;
         }
 
         public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow senderWindow)
@@ -315,6 +333,8 @@ namespace LogExpert
                     }
                 }
             }
+
+            return null;
         }
 
         public void SelectTab(LogWindow logWindow)
@@ -338,35 +358,54 @@ namespace LogExpert
             }
         }
 
-        public void SwitchTab(bool shiftPressed)
-        {
-            int index = dockPanel.Contents.IndexOf(dockPanel.ActiveContent);
-            if (shiftPressed)
-            {
-                index--;
-                if (index < 0)
-                {
-                    index = dockPanel.Contents.Count - 1;
-                }
+        [DllImport("User32.dll")]
+        public static extern int SetForegroundWindow(IntPtr hWnd);
 
-                if (index < 0)
-                {
-                    return;
-                }
+        // called from LogWindow when follow tail was changed
+        public void FollowTailChanged(LogWindow logWindow, bool isEnabled, bool offByTrigger)
+        {
+            LogWindowData data = logWindow.Tag as LogWindowData;
+            if (data == null)
+            {
+                return;
+            }
+
+            if (isEnabled)
+            {
+                data.tailState = 0;
             }
             else
             {
-                index++;
-                if (index >= dockPanel.Contents.Count)
+                data.tailState = offByTrigger ? 2 : 1;
+            }
+
+            if (Preferences.showTailState)
+            {
+                Icon icon = GetIcon(data.diffSum, data);
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+            }
+        }
+
+        public void NotifySettingsChanged(object cookie, SettingsFlags flags)
+        {
+            if (cookie != this)
+            {
+                NotifyWindowsForChangedPrefs(flags);
+            }
+        }
+
+        public IList<WindowFileEntry> GetListOfOpenFiles()
+        {
+            IList<WindowFileEntry> list = new List<WindowFileEntry>();
+            lock (logWindowList)
+            {
+                foreach (LogWindow logWindow in logWindowList)
                 {
-                    index = 0;
+                    list.Add(new WindowFileEntry(logWindow));
                 }
             }
 
-            if (index < dockPanel.Contents.Count)
-            {
-                (dockPanel.Contents[index] as DockContent).Activate();
-            }
+            return list;
         }
 
         #endregion

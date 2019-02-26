@@ -7,7 +7,10 @@
     <authors>Zarunbal Previous:Hagen Raab</authors>
     <owners>Zarunbal</owners>
     <licenseUrl>https://cdn.rawgit.com/zarunbal/LogExpert/v##version##/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
+    <projectSourceUrl>https://github.com/zarunbal/LogExpert</projectSourceUrl>
+    <packageSourceUrl>https://github.com/zarunbal/LogExpert/tree/master/chocolatey</packageSourceUrl>
+    <bugTrackerUrl>https://github.com/zarunbal/LogExpert/issues</bugTrackerUrl>
+    <releaseNotes>https://github.com/zarunbal/LogExpert/releases/tag/v##version##</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
       <dependency id="chocolatey" version="0.10.8" />
