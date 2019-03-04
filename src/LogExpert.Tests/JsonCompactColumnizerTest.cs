@@ -1,23 +1,21 @@
-﻿
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace LogExpert
+namespace LogExpert.Tests
 {
     [TestFixture]
-    public class SquareBracketColumnizerTest
+    public class JsonCompactColumnizerTest
     {
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_01.txt", 5)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3)]
-        public void GetPriority_HappyFile_ColumnCountMatches(string fileName, int count)
+        [TestCase(@".\TestData\JsonCompactColumnizerTest_01.json", Priority.PerfectlySupport)]
+        // As long as the json file contains one of the pre-defined key, it's perfectly supported.
+        [TestCase(@".\TestData\JsonCompactColumnizerTest_02.json", Priority.PerfectlySupport)]
+        [TestCase(@".\TestData\JsonCompactColumnizerTest_03.json", Priority.WellSupport)]
+        public void GetPriority_HappyFile_PriorityMatches(string fileName, Priority priority)
         {
-            SquareBracketColumnizer squareBracketColumnizer = new SquareBracketColumnizer();
+            var jsonCompactColumnizer = new JsonColumnizer.JsonCompactColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-
             LogfileReader logFileReader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultifileOptions());
             logFileReader.ReadFiles();
             List<ILogLine> loglines = new List<ILogLine>
@@ -35,9 +33,8 @@ namespace LogExpert
                 logFileReader.GetLogLine(400)
             };
 
-            squareBracketColumnizer.GetPriority(path, loglines);
-            Assert.AreEqual(squareBracketColumnizer.GetColumnCount(), count);
+            var result = jsonCompactColumnizer.GetPriority(path, loglines);
+            Assert.AreEqual(result, priority);
         }
-
     }
 }

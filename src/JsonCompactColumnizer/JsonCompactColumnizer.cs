@@ -34,6 +34,37 @@ namespace JsonColumnizer
             }
         }
 
+        public override Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.WellSupport;
+            }
+
+            if (samples != null && samples.Count() > 0)
+            {
+                try
+                {
+                    var line = samples.First();
+                    JObject json = ParseJson(line);
+                    if (json != null)
+                    {
+                        var columns = SplitJsonLine(samples.First(), json);
+                        if (columns.ColumnValues.Count() > 0 && Array.Exists(columns.ColumnValues, x => !string.IsNullOrEmpty(x.FullValue)))
+                        {
+                            result = Priority.PerfectlySupport;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Ignore errors when determine priority.
+                }
+            }
+            return result;
+        }
+
         #endregion
 
         #region Private Methods

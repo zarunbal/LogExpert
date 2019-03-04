@@ -9,7 +9,7 @@ namespace LogExpert
     using System.Text.RegularExpressions;
     using static LogExpert.TimeFormatDeterminer;
 
-    public class SquareBracketColumnizer : ILogLineColumnizer, IPrepare
+    public class SquareBracketColumnizer : ILogLineColumnizer
     {
 
         #region ILogLineColumnizer implementation
@@ -19,7 +19,7 @@ namespace LogExpert
 
         // TODO: need preparing this columnizer with sample log lines before use it.
         private int _columnCount = 5;
-        private bool _isTimeExists = true;
+        private bool _isTimeExists = false;
 
         public SquareBracketColumnizer()
         {
@@ -185,41 +185,43 @@ namespace LogExpert
             if (formatInfo == null)
             {
                 columns[2].FullValue = temp;
-                return clogLine;
+                SquareSplit(ref columns, temp, 0, 0, 0, clogLine);
             }
-            int endPos = formatInfo.DateTimeFormat.Length;
-            int timeLen = formatInfo.TimeFormat.Length;
-            int dateLen = formatInfo.DateFormat.Length;
-            try
+            else
             {
-                if (this.timeOffset != 0)
+                int endPos = formatInfo.DateTimeFormat.Length;
+                int timeLen = formatInfo.TimeFormat.Length;
+                int dateLen = formatInfo.DateFormat.Length;
+                try
                 {
-                    DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
-                        formatInfo.CultureInfo);
-                    dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
-                    string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
+                    if (this.timeOffset != 0)
+                    {
+                        DateTime dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
+                            formatInfo.CultureInfo);
+                        dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, this.timeOffset));
+                        string newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
 
-                    SquareSplit(ref columns, newDate, dateLen, timeLen, clogLine);
+                        SquareSplit(ref columns, newDate, dateLen, timeLen, endPos, clogLine);
+                    }
+                    else
+                    {
+
+                        SquareSplit(ref columns, temp, dateLen, timeLen, endPos, clogLine);
+                    }
                 }
-                else
+                catch (Exception)
                 {
-
-                    SquareSplit(ref columns, temp, dateLen, timeLen, clogLine);
+                    columns[0].FullValue = "n/a";
+                    columns[1].FullValue = "n/a";
+                    columns[2].FullValue = temp;
                 }
             }
-            catch (Exception)
-            {
-                columns[0].FullValue = "n/a";
-                columns[1].FullValue = "n/a";
-                columns[2].FullValue = temp;
-            }
-
             clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
 
             return clogLine;
         }
 
-        void SquareSplit(ref Column[] columns, string line, int dateLen, int timeLen, ColumnizedLogLine clogLine)
+        void SquareSplit(ref Column[] columns, string line, int dateLen, int timeLen, int dateTimeEndPos, ColumnizedLogLine clogLine)
         {
             List<Column> columnList = new List<Column>();
             int restColumn = _columnCount;
@@ -229,7 +231,7 @@ namespace LogExpert
                 columnList.Add(new Column { FullValue = line.Substring(dateLen + 1, timeLen), Parent = clogLine });
                 restColumn -= 2;
             }
-            int nextPos = dateLen + timeLen + 1;
+            int nextPos = dateTimeEndPos;
 
             string rest = line;
 
@@ -256,44 +258,44 @@ namespace LogExpert
             columns = columnList.ToArray();
 
         }
-        #endregion
 
-        public void Prepare(string fileName)
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
         {
-            string line;
-            int counter = 0;
+            Priority result = Priority.NotSupport;
             TimeFormatDeterminer timeDeterminer = new TimeFormatDeterminer();
             int timeStampExistsCount = 0;
+            int bracketsExistsCount = 0;
             int maxBracketNumbers = 1;
 
-            using (StreamReader reader = new StreamReader(fileName))
+            foreach(var logline in samples)
             {
-                while (counter < 100)
+                string line = logline?.FullLine;
+                if (string.IsNullOrEmpty(line))
                 {
-                    line = reader.ReadLine();
-                    counter++;
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        continue;
-                    }
-
-                    int bracketNumbers = 1;
-                    if (null != timeDeterminer.DetermineDateTimeFormatInfo(line))
-                    {
-                        timeStampExistsCount++;
-                    }
-                    else
-                    {
-                        timeStampExistsCount--;
-                    }
-                    string noSpaceLine = line.Replace(" ", string.Empty);
-                    if (noSpaceLine.IndexOf('[') >= 0 && noSpaceLine.IndexOf(']') >= 0
-                        && noSpaceLine.IndexOf('[') < noSpaceLine.IndexOf(']'))
-                    {
-                        bracketNumbers += Regex.Matches(noSpaceLine, @"\]\[").Count;
-                    }
-                    maxBracketNumbers = Math.Max(bracketNumbers, maxBracketNumbers);
+                    continue;
                 }
+
+                int bracketNumbers = 1;
+                if (null != timeDeterminer.DetermineDateTimeFormatInfo(line))
+                {
+                    timeStampExistsCount++;
+                }
+                else
+                {
+                    timeStampExistsCount--;
+                }
+                string noSpaceLine = line.Replace(" ", string.Empty);
+                if (noSpaceLine.IndexOf('[') >= 0 && noSpaceLine.IndexOf(']') >= 0
+                    && noSpaceLine.IndexOf('[') < noSpaceLine.IndexOf(']'))
+                {
+                    bracketNumbers += Regex.Matches(noSpaceLine, @"\]\[").Count;
+                    bracketsExistsCount++;
+                }
+                else
+                {
+                    bracketsExistsCount--;
+                }
+                maxBracketNumbers = Math.Max(bracketNumbers, maxBracketNumbers);
             }
 
             // Add message
@@ -303,7 +305,20 @@ namespace LogExpert
             {
                 _columnCount += 2;
             }
+
+            if (maxBracketNumbers > 1)
+            {
+                result = Priority.WellSupport;
+                if (bracketsExistsCount > 0)
+                {
+                    result = Priority.PerfectlySupport;
+                }
+            }
+
+            return result;
         }
+
+        #endregion
 
 
         #region internal stuff

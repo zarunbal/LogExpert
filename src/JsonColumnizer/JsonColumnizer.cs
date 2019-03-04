@@ -233,6 +233,16 @@ namespace JsonColumnizer
             return cLogLine;
         }
 
+        public virtual Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.WellSupport;
+            }
+            return result;
+        }
+
         #endregion
     }
 }

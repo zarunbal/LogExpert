@@ -8,7 +8,7 @@ namespace LogExpert.Tests
     public class JsonColumnizerTest
     {
         [TestCase(@".\TestData\JsonColumnizerTest_01.txt", "time @m level")]
-        public void FindColumnizer_HappyFile_ReturnCorrectColumnizer(string fileName, string expectedHeaders)
+        public void GetColumnNames_HappyFile_ColumnNameMatches(string fileName, string expectedHeaders)
         {
             var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);

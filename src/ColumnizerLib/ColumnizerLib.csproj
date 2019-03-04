@@ -65,7 +65,6 @@
     <Compile Include="ILogFileInfo.cs" />
     <Compile Include="ILogLine.cs" />
     <Compile Include="IColumnizedLogLine.cs" />
-    <Compile Include="IPrepare.cs" />
     <Compile Include="IPreProcessColumnizer.cs" />
     <Compile Include="IKeywordAction.cs" />
     <Compile Include="ILogExpertPlugin.cs" />
@@ -77,6 +76,7 @@
     <Compile Include="ITextValue.cs" />
     <Compile Include="IXmlLogConfiguration.cs" />
     <Compile Include="LineEntry.cs" />
+    <Compile Include="Priority.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

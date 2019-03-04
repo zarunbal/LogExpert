@@ -296,6 +296,16 @@ namespace CsvColumnizer
             }
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("csv", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.CanSupport;
+            }
+            return result;
+        }
+
         #endregion
 
         #region Private Methods

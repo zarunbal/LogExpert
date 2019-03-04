@@ -892,11 +892,6 @@ namespace LogExpert
         {
             if (columnizer != null)
             {
-                // TODO: it's better to have a preparation stage for all columnizers instead of doing this.
-                if (columnizer is IPrepare)
-                {
-                    ((IPrepare)columnizer).Prepare(FileName);
-                }
                 CurrentColumnizer = forcedColumnizerForLoading = columnizer;
             }
             else

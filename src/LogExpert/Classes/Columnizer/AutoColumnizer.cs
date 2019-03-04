@@ -40,85 +40,24 @@ namespace LogExpert
                 return new DefaultLogfileColumnizer();
             }
 
-            if (fileName.EndsWith("xml", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return PluginRegistry.GetInstance().RegisteredColumnizers.First(
-                    x => x.GetName().IndexOf("xml", 0, StringComparison.CurrentCultureIgnoreCase) != -1);
-            }
-
-            if (fileName.EndsWith("json", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return PluginRegistry.GetInstance().RegisteredColumnizers.First(
-                    x => x.GetName().IndexOf("json", 0, StringComparison.CurrentCultureIgnoreCase) != -1);
-            }
-
-            if (fileName.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return PluginRegistry.GetInstance().RegisteredColumnizers.First(
-                    x => x.GetName().IndexOf("csv", 0, StringComparison.CurrentCultureIgnoreCase) != -1);
-            }
-
-
-            int timeStampExistsCount = 0;
-            int squareBracketsExistsCount = 0;
             ILogLineColumnizer lineColumnizer = null;
             var timeDeterminer = new TimeFormatDeterminer();
-            int maxBracketNumbers = 1;
-
             List<ILogLine> loglines = new List<ILogLine>
             {
                 // Sampling a few lines to select the correct columnizer
+                logFileReader.GetLogLine(0),
                 logFileReader.GetLogLine(1),
+                logFileReader.GetLogLine(2),
+                logFileReader.GetLogLine(3),
+                logFileReader.GetLogLine(4),
                 logFileReader.GetLogLine(5),
                 logFileReader.GetLogLine(25),
                 logFileReader.GetLogLine(100),
                 logFileReader.GetLogLine(200),
-                logFileReader.GetLogLine(300),
-                logFileReader.GetLogLine(400),
-                logFileReader.GetLogLine(500)
+                logFileReader.GetLogLine(400)
             };
 
-            foreach (var line in loglines)
-            {
-                if (line == null || string.IsNullOrEmpty(line.FullLine))
-                {
-                    continue;
-                }
-                int bracketNumbers = 1;
-                if (null != timeDeterminer.DetermineDateTimeFormatInfo(line.FullLine))
-                {
-                    timeStampExistsCount++;
-                }
-                else
-                {
-                    timeStampExistsCount--;
-                }
-                string noSpaceLine = line.FullLine.Replace(" ", string.Empty);
-                if (noSpaceLine.IndexOf('[') >= 0 && noSpaceLine.IndexOf(']') >= 0
-                    && noSpaceLine.IndexOf('[') < noSpaceLine.IndexOf(']'))
-                {
-                    bracketNumbers += Regex.Matches(noSpaceLine, @"\]\[").Count;
-                    squareBracketsExistsCount++;
-                }
-                else
-                {
-                    squareBracketsExistsCount--;
-                }
-                maxBracketNumbers = Math.Max(bracketNumbers, maxBracketNumbers);
-            }
-
-            if (squareBracketsExistsCount > 0)
-            {
-                lineColumnizer = new SquareBracketColumnizer(maxBracketNumbers, timeStampExistsCount > 0);
-            }
-            else if (timeStampExistsCount > 0)
-            {
-                lineColumnizer = new TimestampColumnizer();
-            }
-            else
-            {
-                lineColumnizer = new DefaultLogfileColumnizer();
-            }
+            lineColumnizer = PluginRegistry.GetInstance().RegisteredColumnizers.OrderByDescending(x => x.GetPriority(fileName, loglines)).First();
 
             return lineColumnizer;
         }
@@ -155,6 +94,11 @@ namespace LogExpert
 
         public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
+        }
+
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.NotSupport;
         }
 
         #endregion ILogLineColumnizer implementation

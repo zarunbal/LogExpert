@@ -1,5 +1,6 @@
 ﻿using LogExpert;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -148,6 +149,11 @@ namespace RegexColumnizer
             string configPath = Path.Combine(configDir, name);
             configPath = Path.ChangeExtension(configPath, "xml");
             return configPath;
+        }
+
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.NotSupport;
         }
 
         #endregion

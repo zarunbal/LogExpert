@@ -188,6 +188,36 @@ namespace LogExpert
             return clogLine;
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+
+            int timeStampCount = 0;
+            foreach (var line in samples)
+            {
+                if (line == null || string.IsNullOrEmpty(line.FullLine))
+                {
+                    continue;
+                }
+                var timeDeterminer = new TimeFormatDeterminer();
+                if (null != timeDeterminer.DetermineDateTimeFormatInfo(line.FullLine))
+                {
+                    timeStampCount++;
+                }
+                else
+                {
+                    timeStampCount--;
+                }
+            }
+
+            if (timeStampCount > 0)
+            {
+                result = Priority.WellSupport;
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region internal stuff
