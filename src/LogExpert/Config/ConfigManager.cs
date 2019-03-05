@@ -19,9 +19,9 @@ namespace LogExpert
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private static readonly object monitor = new object();
-        private static ConfigManager instance = null;
+        private static ConfigManager instance;
         private readonly object loadSaveLock = new object();
-        private Settings settings = null;
+        private Settings settings;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace LogExpert
 
         private ConfigManager()
         {
-            this.settings = this.Load();
+            settings = Load();
         }
 
         #endregion
@@ -56,22 +56,10 @@ namespace LogExpert
                 return instance;
             }
         }
+        
+        public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
 
-
-        public static string ConfigDir
-        {
-            get
-            {
-                string tmp = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string tmp2 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
-            }
-        }
-
-        public static Settings Settings
-        {
-            get { return Instance.settings; }
-        }
+        public static Settings Settings => Instance.settings;
 
         #endregion
 
@@ -118,21 +106,24 @@ namespace LogExpert
             }
             else
             {
-                Stream fs = File.OpenRead(dir + "\\settings.dat");
-                try
+                using (Stream fs = File.OpenRead(dir + "\\settings.dat"))
                 {
-                    return LoadOrCreateNew(fs);
-                }
-                finally
-                {
-                    fs.Close();
+                    try
+                    {
+                        return LoadOrCreateNew(fs);
+                    }   
+                    catch (Exception e)
+                    {
+                        _logger.Error($"Error loading settings: {e}");
+                        return LoadOrCreateNew(null);
+                    }
                 }
             }
         }
 
         private Settings LoadOrCreateNew(Stream fs)
         {
-            lock (this.loadSaveLock)
+            lock (loadSaveLock)
             {
                 Settings settings;
                 if (fs == null)
@@ -246,7 +237,7 @@ namespace LogExpert
 
         private void Save(Settings settings, SettingsFlags flags)
         {
-            lock (this.loadSaveLock)
+            lock (loadSaveLock)
             {
                 _logger.Info("Saving settings");
                 lock (this)
@@ -256,9 +247,11 @@ namespace LogExpert
                     {
                         Directory.CreateDirectory(dir);
                     }
-                    Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write);
-                    Save(fs, settings, flags);
-                    fs.Close();
+
+                    using (Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write))
+                    {
+                        Save(fs, settings, flags);
+                    }
                 }
                 OnConfigChanged(flags);
             }

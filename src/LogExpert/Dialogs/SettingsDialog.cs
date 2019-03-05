@@ -48,7 +48,7 @@ namespace LogExpert.Dialogs
         #region Private Methods
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private extern static bool DestroyIcon(IntPtr handle);
+        private static extern bool DestroyIcon(IntPtr handle);
 
         private void FillDialog()
         {
@@ -118,15 +118,14 @@ namespace LogExpert.Dialogs
             }
 
             sessionSaveOwnDirLabel.Text =
-                Preferences.saveDirectory != null ? Preferences.saveDirectory : "";
+                Preferences.saveDirectory ?? "";
             saveFilterCheckBox.Checked = Preferences.saveFilters;
             blockCountUpDown.Value = Preferences.bufferCount;
             linesPerBlockUpDown.Value = Preferences.linesPerBuffer;
             pollingIntervalUpDown.Value = Preferences.pollingInterval;
             multiThreadCheckBox.Checked = Preferences.multiThreadFilter;
 
-            columnizerDataGridView.DataError +=
-                new DataGridViewDataErrorEventHandler(columnizerDataGridView_DataError);
+            columnizerDataGridView.DataError += columnizerDataGridView_DataError;
 
             FillColumnizerList();
             FillPluginList();
@@ -148,10 +147,8 @@ namespace LogExpert.Dialogs
             {
                 return "";
             }
-            else
-            {
-                return text;
-            }
+
+            return text;
         }
 
         private void DisplayFontName()
@@ -185,7 +182,7 @@ namespace LogExpert.Dialogs
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (textBox.Text != null && textBox.Text.Length > 0)
+            if (!string.IsNullOrEmpty(textBox.Text))
             {
                 FileInfo info = new FileInfo(textBox.Text);
                 if (info.Directory.Exists)
@@ -215,7 +212,7 @@ namespace LogExpert.Dialogs
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.RootFolder = Environment.SpecialFolder.MyComputer;
             dlg.Description = "Select a working directory";
-            if (textBox.Text != null && textBox.Text.Length > 0)
+            if (!string.IsNullOrEmpty(textBox.Text))
             {
                 DirectoryInfo info = new DirectoryInfo(textBox.Text);
                 if (info.Exists)
@@ -397,27 +394,27 @@ namespace LogExpert.Dialogs
             foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
             {
                 pluginListBox.Items.Add(entry);
-                if (entry is ILogExpertPluginConfigurator)
+                if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                    configurator.StartConfig();
                 }
             }
 
             foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
             {
                 pluginListBox.Items.Add(entry);
-                if (entry is ILogExpertPluginConfigurator)
+                if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                    configurator.StartConfig();
                 }
             }
 
             foreach (IFileSystemPlugin entry in PluginRegistry.GetInstance().RegisteredFileSystemPlugins)
             {
                 pluginListBox.Items.Add(entry);
-                if (entry is ILogExpertPluginConfigurator)
+                if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    (entry as ILogExpertPluginConfigurator).StartConfig();
+                    configurator.StartConfig();
                 }
             }
 
@@ -426,24 +423,21 @@ namespace LogExpert.Dialogs
 
         private void SavePluginSettings()
         {
-            if (selectedPlugin != null)
-            {
-                selectedPlugin.HideConfigForm();
-            }
+            selectedPlugin?.HideConfigForm();
 
             foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
             {
-                if (entry is ILogExpertPluginConfigurator)
+                if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(ConfigManager.ConfigDir);
                 }
             }
 
             foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
             {
-                if (entry is ILogExpertPluginConfigurator)
+                if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    (entry as ILogExpertPluginConfigurator).SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(ConfigManager.ConfigDir);
                 }
             }
         }
@@ -718,10 +712,7 @@ namespace LogExpert.Dialogs
 
         private void pluginListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (selectedPlugin != null)
-            {
-                selectedPlugin.HideConfigForm();
-            }
+            selectedPlugin?.HideConfigForm();
 
             object o = pluginListBox.SelectedItem;
             if (o != null)
@@ -758,7 +749,7 @@ namespace LogExpert.Dialogs
             }
 
             dlg.ShowNewFolderButton = true;
-            dlg.Description = "Choose folder for LogExpert's session files";
+            dlg.Description = @"Choose folder for LogExpert's session files";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 sessionSaveOwnDirLabel.Text = dlg.SelectedPath;
@@ -865,10 +856,7 @@ namespace LogExpert.Dialogs
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            if (selectedPlugin != null)
-            {
-                selectedPlugin.HideConfigForm();
-            }
+            selectedPlugin?.HideConfigForm();
         }
 
         private void workingDirButton_Click(object sender, EventArgs e)
@@ -892,9 +880,10 @@ namespace LogExpert.Dialogs
             DialogResult result = dlg.ShowDialog();
             if (result == DialogResult.OK)
             {
-                Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
-                ConfigManager.Export(fs);
-                fs.Close();
+                using (Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
+                {
+                    ConfigManager.Export(fs);
+                }
             }
         }
 
@@ -927,10 +916,7 @@ namespace LogExpert.Dialogs
 
             #region Properties
 
-            public string Name
-            {
-                get { return Columnizer.GetName(); }
-            }
+            public string Name => Columnizer.GetName();
 
             public ILogLineColumnizer Columnizer { get; }
 
