@@ -24,7 +24,6 @@ namespace LogExpert
     {
         #region Fields
 
-        private const int MAX_HISTORY = 30;
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
         private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
@@ -184,6 +183,9 @@ namespace LogExpert
             {
                 filterComboBox.Items.Add(item);
             }
+
+            filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;
+
             filterRegexCheckBox.Checked = filterParams.isRegex;
             filterCaseSensitiveCheckBox.Checked = filterParams.isCaseSensitive;
             filterTailCheckBox.Checked = filterParams.isFilterTail;

@@ -126,6 +126,7 @@ namespace LogExpert
             lock (loadSaveLock)
             {
                 Settings settings;
+
                 if (fs == null)
                 {
                     settings = new Settings();
@@ -143,66 +144,82 @@ namespace LogExpert
                         settings = new Settings();
                     }
                 }
+
                 if (settings.preferences == null)
                 {
                     settings.preferences = new Preferences();
                 }
+
                 if (settings.preferences.toolEntries == null)
                 {
                     settings.preferences.toolEntries = new List<ToolEntry>();
                 }
+
                 if (settings.preferences.columnizerMaskList == null)
                 {
                     settings.preferences.columnizerMaskList = new List<ColumnizerMaskEntry>();
                 }
+
                 if (settings.fileHistoryList == null)
                 {
                     settings.fileHistoryList = new List<string>();
                 }
+
                 if (settings.lastOpenFilesList == null)
                 {
                     settings.lastOpenFilesList = new List<string>();
                 }
+
                 if (settings.fileColors == null)
                 {
                     settings.fileColors = new List<ColorEntry>();
                 }
+
                 if (settings.preferences.showTailColor == Color.Empty)
                 {
                     settings.preferences.showTailColor = Color.FromKnownColor(KnownColor.Blue);
                 }
+
                 if (settings.preferences.timeSpreadColor == Color.Empty)
                 {
                     settings.preferences.timeSpreadColor = Color.Gray;
                 }
+
                 if (settings.preferences.bufferCount < 10)
                 {
                     settings.preferences.bufferCount = 100;
                 }
+
                 if (settings.preferences.linesPerBuffer < 1)
                 {
                     settings.preferences.linesPerBuffer = 500;
                 }
+
                 if (settings.filterList == null)
                 {
                     settings.filterList = new List<FilterParams>();
                 }
+
                 if (settings.searchHistoryList == null)
                 {
                     settings.searchHistoryList = new List<string>();
                 }
+
                 if (settings.filterHistoryList == null)
                 {
                     settings.filterHistoryList = new List<string>();
                 }
+
                 if (settings.filterRangeHistoryList == null)
                 {
                     settings.filterRangeHistoryList = new List<string>();
                 }
+
                 foreach (FilterParams filterParams in settings.filterList)
                 {
                     filterParams.Init();
                 }
+
                 if (settings.hilightGroupList == null)
                 {
                     settings.hilightGroupList = new List<HilightGroup>();
@@ -212,21 +229,35 @@ namespace LogExpert
                     defaultGroup.HilightEntryList = settings.hilightEntryList;
                     settings.hilightGroupList.Add(defaultGroup);
                 }
+
                 if (settings.preferences.highlightMaskList == null)
                 {
                     settings.preferences.highlightMaskList = new List<HighlightMaskEntry>();
                 }
+
                 if (settings.preferences.pollingInterval < 20)
                 {
                     settings.preferences.pollingInterval = 250;
                 }
+
                 if (settings.preferences.multifileOptions == null)
                 {
                     settings.preferences.multifileOptions = new MultifileOptions();
                 }
+
                 if (settings.preferences.defaultEncoding == null)
                 {
                     settings.preferences.defaultEncoding = Encoding.Default.HeaderName;
+                }
+
+                if (settings.preferences.maximumFilterEntriesDisplayed == 0)
+                {
+                    settings.preferences.maximumFilterEntriesDisplayed = 20;
+                }
+
+                if (settings.preferences.maximumFilterEntries == 0)
+                {
+                    settings.preferences.maximumFilterEntries = 30;
                 }
 
                 ConvertSettings(settings, Assembly.GetExecutingAssembly().GetName().Version.Build);
