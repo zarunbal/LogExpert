@@ -325,14 +325,14 @@ namespace LogExpert
         private Settings Import(Settings currentSettings, Stream fs, ExportImportFlags flags)
         {
             Settings importSettings = LoadOrCreateNew(fs);
-            Settings ownSettings = ObjectClone.Clone<Settings>(currentSettings);
+            Settings ownSettings = ObjectClone.Clone(currentSettings);
             Settings newSettings;
 
             // at first check for 'Other' as this are the most options.
             if ((flags & ExportImportFlags.Other) == ExportImportFlags.Other)
             {
                 newSettings = ownSettings;
-                newSettings.preferences = ObjectClone.Clone<Preferences>(importSettings.preferences);
+                newSettings.preferences = ObjectClone.Clone(importSettings.preferences);
                 newSettings.preferences.columnizerMaskList = ownSettings.preferences.columnizerMaskList;
                 newSettings.preferences.highlightMaskList = ownSettings.preferences.highlightMaskList;
                 newSettings.hilightGroupList = ownSettings.hilightGroupList;
