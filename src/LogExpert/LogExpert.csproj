@@ -63,6 +63,10 @@
     </Compile>
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
+    <Compile Include="Classes\DateTimeParser\Parser.cs" />
+    <Compile Include="Classes\DateTimeParser\Section.cs" />
+    <Compile Include="Classes\DateTimeParser\Token.cs" />
+    <Compile Include="Classes\DateTimeParser\Tokenizer.cs" />
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
