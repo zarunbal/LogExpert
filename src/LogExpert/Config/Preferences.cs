@@ -25,6 +25,8 @@ namespace LogExpert
         public bool isFilterOnLoad;
         public int lastColumnWidth = 2000;
         public int linesPerBuffer = 500;
+        public int maximumFilterEntries = 30;
+        public int maximumFilterEntriesDisplayed = 20;
         public bool maskPrio;
         public MultiFileOption multiFileOption;
         public MultifileOptions multifileOptions;
