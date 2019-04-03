@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-//using System.Linq;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NLog;
 
 namespace LogExpert.Dialogs
 {
@@ -13,11 +15,13 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
-        private readonly Image applyButtonImage;
-        private string bookmarkComment;
-        private ActionEntry currentActionEntry = new ActionEntry();
-        private HilightGroup currentGroup = null;
-        private List<HilightGroup> hilightGroupList;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        private readonly Image _applyButtonImage;
+        private string _bookmarkComment;
+        private ActionEntry _currentActionEntry = new ActionEntry();
+        private HilightGroup _currentGroup = null;
+        private List<HilightGroup> _hilightGroupList;
 
         #endregion
 
@@ -26,10 +30,10 @@ namespace LogExpert.Dialogs
         public HilightDialog()
         {
             InitializeComponent();
-            this.Load += new EventHandler(HilightDialog_Load);
-            this.hilightListBox.DrawItem += new DrawItemEventHandler(hilightListBox_DrawItem);
-            applyButtonImage = this.applyButton.Image;
-            this.applyButton.Image = null;
+            Load += new EventHandler(HilightDialog_Load);
+            hilightListBox.DrawItem += new DrawItemEventHandler(hilightListBox_DrawItem);
+            _applyButtonImage = applyButton.Image;
+            applyButton.Image = null;
         }
 
         #endregion
@@ -38,18 +42,15 @@ namespace LogExpert.Dialogs
 
         public List<HilightGroup> HilightGroupList
         {
-            get { return this.hilightGroupList; }
-            set { this.hilightGroupList = ObjectClone.Clone<List<HilightGroup>>(value); }
+            get => _hilightGroupList;
+            set => _hilightGroupList = ObjectClone.Clone<List<HilightGroup>>(value);
         }
 
         public IList<IKeywordAction> KeywordActionList { get; set; }
 
         public string PreSelectedGroupName { get; set; } = null;
 
-        private bool IsDirty
-        {
-            get { return this.applyButton.Image == this.applyButtonImage; }
-        }
+        private bool IsDirty => applyButton.Image == _applyButtonImage;
 
         #endregion
 
@@ -57,55 +58,74 @@ namespace LogExpert.Dialogs
 
         private void AddNewEntry()
         {
-            if (this.searchStringTextBox.Text.Length > 0)
             {
-                // Create a new entry
-                HilightEntry entry = new HilightEntry(this.searchStringTextBox.Text,
-                    this.foregroundColorBox.SelectedColor,
-                    this.backgroundColorBox.SelectedColor,
-                    this.regexCheckBox.Checked,
-                    this.caseSensitiveCheckBox.Checked,
-                    this.ledCheckBox.Checked,
-                    this.stopTailCheckBox.Checked,
-                    this.bookmarkCheckBox.Checked,
-                    this.pluginCheckBox.Checked,
-                    this.currentActionEntry,
-                    this.wordMatchCheckBox.Checked);
-                entry.IsBold = this.boldCheckBox.Checked;
-                entry.NoBackground = this.noBackgroundCheckBox.Checked;
-                this.hilightListBox.Items.Add(entry);
+                try
+                {
+                    CheckRegex();
 
-                // Select the newly created item
-                this.currentGroup.HilightEntryList.Add(entry);
-                this.hilightListBox.SelectedItem = entry;
+                    // Create a new entry
+                    HilightEntry entry = new HilightEntry(searchStringTextBox.Text,
+                        foregroundColorBox.SelectedColor,
+                        backgroundColorBox.SelectedColor,
+                        regexCheckBox.Checked,
+                        caseSensitiveCheckBox.Checked,
+                        ledCheckBox.Checked,
+                        stopTailCheckBox.Checked,
+                        bookmarkCheckBox.Checked,
+                        pluginCheckBox.Checked,
+                        _currentActionEntry,
+                        wordMatchCheckBox.Checked);
+                    entry.IsBold = boldCheckBox.Checked;
+                    entry.NoBackground = noBackgroundCheckBox.Checked;
+                    hilightListBox.Items.Add(entry);
+
+                    // Select the newly created item
+                    _currentGroup.HilightEntryList.Add(entry);
+                    hilightListBox.SelectedItem = entry;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error during add of highlight entry");
+                    MessageBox.Show($"Error during add of entry.\r\n{ex.Message}");
+                }
             }
         }
 
         private void InitData()
         {
             const string def = "[Default]";
-            if (this.HilightGroupList == null || this.HilightGroupList.Count == 0)
+            if (HilightGroupList == null)
             {
-                this.HilightGroupList.Add(new HilightGroup());
-                this.HilightGroupList[0].GroupName = def;
-                this.HilightGroupList[0].HilightEntryList = new List<HilightEntry>();
+                HilightGroupList = new List<HilightGroup>();
             }
+
+            if (HilightGroupList.Count == 0)
+            {
+                HilightGroup hilightGroup = new HilightGroup
+                {
+                    GroupName = def,
+                    HilightEntryList = new List<HilightEntry>()
+                };
+
+                HilightGroupList.Add(hilightGroup);
+            }
+
             FillGroupComboBox();
 
-            this.currentGroup = null;
-            string groupToSelect = this.PreSelectedGroupName;
+            _currentGroup = null;
+            string groupToSelect = PreSelectedGroupName;
             if (string.IsNullOrEmpty(groupToSelect))
             {
                 groupToSelect = def;
             }
 
-            foreach (HilightGroup group in this.HilightGroupList)
+            foreach (HilightGroup group in HilightGroupList)
             {
                 if (group.GroupName.Equals(groupToSelect))
                 {
-                    this.currentGroup = group;
-                    this.groupComboBox.SelectedValue = group;
-                    this.groupComboBox.SelectedIndex = this.HilightGroupList.IndexOf(group);
+                    _currentGroup = group;
+                    groupComboBox.SelectedValue = group;
+                    groupComboBox.SelectedIndex = HilightGroupList.IndexOf(group);
                     break;
                 }
             }
@@ -117,84 +137,114 @@ namespace LogExpert.Dialogs
 
         private void FillHilightListBox()
         {
-            this.hilightListBox.Items.Clear();
-            if (this.currentGroup != null)
+            hilightListBox.Items.Clear();
+            if (_currentGroup != null)
             {
-                foreach (HilightEntry entry in this.currentGroup.HilightEntryList)
+                foreach (HilightEntry entry in _currentGroup.HilightEntryList)
                 {
-                    this.hilightListBox.Items.Add(entry);
+                    hilightListBox.Items.Add(entry);
                 }
             }
         }
 
         private void SaveEntry()
         {
-            HilightEntry entry = (HilightEntry) this.hilightListBox.SelectedItem;
-            //if (entry == null)
-            //{
-            //  AddNewEntry();
-            //  return;
-            //}
+            try
+            {
+                CheckRegex();
 
-            entry.ForegroundColor = (Color) this.foregroundColorBox.SelectedItem;
-            entry.BackgroundColor = (Color) this.backgroundColorBox.SelectedItem;
-            entry.SearchText = this.searchStringTextBox.Text;
-            entry.IsRegEx = this.regexCheckBox.Checked;
-            entry.IsCaseSensitive = this.caseSensitiveCheckBox.Checked;
-            this.applyButton.Enabled = false;
-            this.applyButton.Image = null;
-            entry.IsLedSwitch = this.ledCheckBox.Checked;
-            entry.IsSetBookmark = this.bookmarkCheckBox.Checked;
-            entry.IsStopTail = this.stopTailCheckBox.Checked;
-            entry.IsActionEntry = this.pluginCheckBox.Checked;
-            entry.ActionEntry = this.currentActionEntry.Copy();
-            entry.BookmarkComment = this.bookmarkComment;
-            entry.IsWordMatch = this.wordMatchCheckBox.Checked;
-            entry.IsBold = this.boldCheckBox.Checked;
-            entry.NoBackground = this.noBackgroundCheckBox.Checked;
-            this.hilightListBox.Refresh();
+                HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
+
+                entry.ForegroundColor = (Color) foregroundColorBox.SelectedItem;
+                entry.BackgroundColor = (Color) backgroundColorBox.SelectedItem;
+                entry.SearchText = searchStringTextBox.Text;
+                entry.IsRegEx = regexCheckBox.Checked;
+                entry.IsCaseSensitive = caseSensitiveCheckBox.Checked;
+                applyButton.Enabled = false;
+                applyButton.Image = null;
+                entry.IsLedSwitch = ledCheckBox.Checked;
+                entry.IsSetBookmark = bookmarkCheckBox.Checked;
+                entry.IsStopTail = stopTailCheckBox.Checked;
+                entry.IsActionEntry = pluginCheckBox.Checked;
+                entry.ActionEntry = _currentActionEntry.Copy();
+                entry.BookmarkComment = _bookmarkComment;
+                entry.IsWordMatch = wordMatchCheckBox.Checked;
+                entry.IsBold = boldCheckBox.Checked;
+                entry.NoBackground = noBackgroundCheckBox.Checked;
+                hilightListBox.Refresh();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during save of save highlight entry");
+                MessageBox.Show($"Error during save of entry.\r\n{ex.Message}");
+            }
+        }
+
+        private void CheckRegex()
+        {
+            if (regexCheckBox.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(searchStringTextBox.Text))
+                {
+                    throw new ArgumentException("Regex value is null or whitespace");
+                }
+
+                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+                Regex.IsMatch("", searchStringTextBox.Text);
+            }
         }
 
         private void StartEditEntry()
         {
-            HilightEntry entry = (HilightEntry) this.hilightListBox.SelectedItem;
+            HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
             if (entry != null)
             {
-                this.searchStringTextBox.Text = entry.SearchText;
-                this.foregroundColorBox.CustomColor = entry.ForegroundColor;
-                this.backgroundColorBox.CustomColor = entry.BackgroundColor;
-                this.foregroundColorBox.SelectedItem = entry.ForegroundColor;
-                this.backgroundColorBox.SelectedItem = entry.BackgroundColor;
-                this.regexCheckBox.Checked = entry.IsRegEx;
-                this.caseSensitiveCheckBox.Checked = entry.IsCaseSensitive;
-                this.ledCheckBox.Checked = entry.IsLedSwitch;
-                this.bookmarkCheckBox.Checked = entry.IsSetBookmark;
-                this.stopTailCheckBox.Checked = entry.IsStopTail;
-                this.pluginCheckBox.Checked = entry.IsActionEntry;
+                searchStringTextBox.Text = entry.SearchText;
+
+                foregroundColorBox.CustomColor = entry.ForegroundColor;
+                backgroundColorBox.CustomColor = entry.BackgroundColor;
+
+                if (foregroundColorBox.Items.Contains(entry.ForegroundColor))
+                    foregroundColorBox.SelectedIndex = foregroundColorBox.Items.Cast<Color>().ToList().LastIndexOf(entry.ForegroundColor);
+                else
+                    foregroundColorBox.SelectedItem = entry.ForegroundColor;
+
+                if (foregroundColorBox.Items.Contains(entry.ForegroundColor))
+                    backgroundColorBox.SelectedIndex = backgroundColorBox.Items.Cast<Color>().ToList().LastIndexOf(entry.BackgroundColor);
+                else
+                    backgroundColorBox.SelectedItem = entry.BackgroundColor;
+
+                regexCheckBox.Checked = entry.IsRegEx;
+                caseSensitiveCheckBox.Checked = entry.IsCaseSensitive;
+                ledCheckBox.Checked = entry.IsLedSwitch;
+                bookmarkCheckBox.Checked = entry.IsSetBookmark;
+                stopTailCheckBox.Checked = entry.IsStopTail;
+                pluginCheckBox.Checked = entry.IsActionEntry;
                 pluginButton.Enabled = pluginCheckBox.Checked;
-                this.bookmarkCommentButton.Enabled = this.bookmarkCheckBox.Checked;
-                this.currentActionEntry = entry.ActionEntry != null ? entry.ActionEntry.Copy() : new ActionEntry();
-                this.bookmarkComment = entry.BookmarkComment;
-                this.wordMatchCheckBox.Checked = entry.IsWordMatch;
-                this.boldCheckBox.Checked = entry.IsBold;
-                this.noBackgroundCheckBox.Checked = entry.NoBackground;
+                bookmarkCommentButton.Enabled = bookmarkCheckBox.Checked;
+                _currentActionEntry = entry.ActionEntry != null ? entry.ActionEntry.Copy() : new ActionEntry();
+                _bookmarkComment = entry.BookmarkComment;
+                wordMatchCheckBox.Checked = entry.IsWordMatch;
+                boldCheckBox.Checked = entry.IsBold;
+                noBackgroundCheckBox.Checked = entry.NoBackground;
             }
-            this.applyButton.Enabled = false;
-            this.applyButton.Image = null;
+
+            applyButton.Enabled = false;
+            applyButton.Image = null;
 
             ReEvaluateHilightButtonStates();
         }
 
         private void Dirty()
         {
-            int index = this.hilightListBox.SelectedIndex;
+            int index = hilightListBox.SelectedIndex;
             if (index > -1)
             {
-                this.applyButton.Enabled = true;
-                this.applyButton.Image = this.applyButtonImage;
+                applyButton.Enabled = true;
+                applyButton.Image = _applyButtonImage;
             }
 
-            this.addButton.Enabled = this.searchStringTextBox.Text.Length > 0;
+            addButton.Enabled = searchStringTextBox.Text.Length > 0;
         }
 
         private void ChooseColor(ColorComboBox comboBox)
@@ -212,19 +262,19 @@ namespace LogExpert.Dialogs
 
         private void SelectGroup(int index)
         {
-            if (index >= 0 && index < this.HilightGroupList.Count)
+            if (index >= 0 && index < HilightGroupList.Count)
             {
-                this.currentGroup = this.HilightGroupList[index];
-                this.groupComboBox.Items[index] = this.currentGroup;
-                this.groupComboBox.SelectedIndex = index;
+                _currentGroup = HilightGroupList[index];
+                groupComboBox.Items[index] = _currentGroup;
+                groupComboBox.SelectedIndex = index;
                 //this.groupComboBox.Text = this.currentGroup.GroupName;
-                this.groupComboBox.SelectedItem = this.currentGroup;
+                groupComboBox.SelectedItem = _currentGroup;
                 FillHilightListBox();
             }
             else
             {
-                this.currentGroup = null;
-                this.hilightListBox.Items.Clear();
+                _currentGroup = null;
+                hilightListBox.Items.Clear();
             }
 
             ReEvaluateHilightButtonStates();
@@ -233,41 +283,42 @@ namespace LogExpert.Dialogs
 
         private void FillGroupComboBox()
         {
-            this.groupComboBox.Items.Clear();
-            foreach (HilightGroup group in this.HilightGroupList)
+            groupComboBox.Items.Clear();
+            foreach (HilightGroup group in HilightGroupList)
             {
-                this.groupComboBox.Items.Add(group);
+                groupComboBox.Items.Add(group);
             }
+
             ReEvaluateGroupButtonStates();
         }
 
         private void ReEvaluateHilightButtonStates()
         {
             // Refresh button states based on the selection in the combobox
-            bool atLeastOneSelected = this.hilightListBox.SelectedItem != null;
-            bool moreThanOne = this.hilightListBox.Items.Count > 1;
-            bool firstSelected = atLeastOneSelected && this.hilightListBox.SelectedIndex == 0;
+            bool atLeastOneSelected = hilightListBox.SelectedItem != null;
+            bool moreThanOne = hilightListBox.Items.Count > 1;
+            bool firstSelected = atLeastOneSelected && hilightListBox.SelectedIndex == 0;
             bool lastSelected = atLeastOneSelected &&
-                                this.hilightListBox.SelectedIndex == this.hilightListBox.Items.Count - 1;
+                                hilightListBox.SelectedIndex == hilightListBox.Items.Count - 1;
 
-            this.deleteButton.Enabled = atLeastOneSelected;
-            this.moveUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
-            this.moveDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+            deleteButton.Enabled = atLeastOneSelected;
+            moveUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+            moveDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
         }
 
         private void ReEvaluateGroupButtonStates()
         {
             // Refresh button states based on the selection in the combobox
-            bool atLeastOneSelected = this.groupComboBox.SelectedItem != null;
-            bool moreThanOne = this.groupComboBox.Items.Count > 1;
-            bool firstSelected = atLeastOneSelected && this.groupComboBox.SelectedIndex == 0;
+            bool atLeastOneSelected = groupComboBox.SelectedItem != null;
+            bool moreThanOne = groupComboBox.Items.Count > 1;
+            bool firstSelected = atLeastOneSelected && groupComboBox.SelectedIndex == 0;
             bool lastSelected = atLeastOneSelected &&
-                                this.groupComboBox.SelectedIndex == this.groupComboBox.Items.Count - 1;
+                                groupComboBox.SelectedIndex == groupComboBox.Items.Count - 1;
 
-            this.delGroupButton.Enabled = atLeastOneSelected;
-            this.copyGroupButton.Enabled = atLeastOneSelected;
-            this.groupUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
-            this.groupDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+            delGroupButton.Enabled = atLeastOneSelected;
+            copyGroupButton.Enabled = atLeastOneSelected;
+            groupUpButton.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+            groupDownButton.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
         }
 
         #endregion
@@ -276,12 +327,12 @@ namespace LogExpert.Dialogs
 
         private void HilightDialog_Load(object sender, EventArgs e)
         {
-            this.foregroundColorBox.SelectedIndex = 1;
-            this.backgroundColorBox.SelectedIndex = 2;
-            this.applyButton.Enabled = false;
-            this.applyButton.Image = null;
-            this.bookmarkCommentButton.Enabled = false;
-            this.pluginButton.Enabled = false;
+            foregroundColorBox.SelectedIndex = 1;
+            backgroundColorBox.SelectedIndex = 2;
+            applyButton.Enabled = false;
+            applyButton.Image = null;
+            bookmarkCommentButton.Enabled = false;
+            pluginButton.Enabled = false;
 
             ReEvaluateHilightButtonStates();
         }
@@ -304,25 +355,27 @@ namespace LogExpert.Dialogs
         private void AddButton_Click(object sender, EventArgs e)
         {
             AddNewEntry();
+            Dirty();
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if (this.hilightListBox.SelectedIndex >= 0)
+            if (hilightListBox.SelectedIndex >= 0)
             {
-                int removeIndex = this.hilightListBox.SelectedIndex;
-                this.currentGroup.HilightEntryList.RemoveAt(removeIndex);
-                this.hilightListBox.Items.RemoveAt(removeIndex);
+                int removeIndex = hilightListBox.SelectedIndex;
+                _currentGroup.HilightEntryList.RemoveAt(removeIndex);
+                hilightListBox.Items.RemoveAt(removeIndex);
 
                 // Select previous (or first if none before)
                 int nextSelectIndex = removeIndex;
-                if (nextSelectIndex >= this.hilightListBox.Items.Count)
+                if (nextSelectIndex >= hilightListBox.Items.Count)
                 {
                     nextSelectIndex--; // if last item was removed, go one up
                 }
+
                 if (nextSelectIndex >= 0)
                 {
-                    this.hilightListBox.SelectedIndex = nextSelectIndex; // if still some item, select it
+                    hilightListBox.SelectedIndex = nextSelectIndex; // if still some item, select it
                 }
 
                 ReEvaluateHilightButtonStates();
@@ -334,7 +387,7 @@ namespace LogExpert.Dialogs
             e.DrawBackground();
             if (e.Index >= 0)
             {
-                HilightEntry entry = (HilightEntry) this.hilightListBox.Items[e.Index];
+                HilightEntry entry = (HilightEntry) hilightListBox.Items[e.Index];
                 Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 if ((e.State & DrawItemState.Selected) != DrawItemState.Selected)
@@ -361,39 +414,39 @@ namespace LogExpert.Dialogs
 
         private void moveUpButton_Click(object sender, EventArgs e)
         {
-            int index = this.hilightListBox.SelectedIndex;
+            int index = hilightListBox.SelectedIndex;
             if (index > 0)
             {
-                object item = this.hilightListBox.SelectedItem;
-                this.hilightListBox.Items.RemoveAt(index); // will also clear the selection
-                this.hilightListBox.Items.Insert(index - 1, item);
-                this.hilightListBox.SelectedIndex = index - 1; // restore the selection
-                this.currentGroup.HilightEntryList.Reverse(index - 1, 2);
+                object item = hilightListBox.SelectedItem;
+                hilightListBox.Items.RemoveAt(index); // will also clear the selection
+                hilightListBox.Items.Insert(index - 1, item);
+                hilightListBox.SelectedIndex = index - 1; // restore the selection
+                _currentGroup.HilightEntryList.Reverse(index - 1, 2);
             }
         }
 
         private void moveDownButton_Click(object sender, EventArgs e)
         {
-            int index = this.hilightListBox.SelectedIndex;
-            if (index > -1 && index < this.hilightListBox.Items.Count - 1)
+            int index = hilightListBox.SelectedIndex;
+            if (index > -1 && index < hilightListBox.Items.Count - 1)
             {
-                object item = this.hilightListBox.SelectedItem;
-                this.hilightListBox.Items.RemoveAt(index);
-                this.hilightListBox.Items.Insert(index + 1, item);
-                this.hilightListBox.SelectedIndex = index + 1;
-                this.currentGroup.HilightEntryList.Reverse(index, 2);
+                object item = hilightListBox.SelectedItem;
+                hilightListBox.Items.RemoveAt(index);
+                hilightListBox.Items.Insert(index + 1, item);
+                hilightListBox.SelectedIndex = index + 1;
+                _currentGroup.HilightEntryList.Reverse(index, 2);
             }
         }
 
         private void customForeColorButton_Click(object sender, EventArgs e)
         {
-            ChooseColor(this.foregroundColorBox);
+            ChooseColor(foregroundColorBox);
             Dirty();
         }
 
         private void customBackColorButton_Click(object sender, EventArgs e)
         {
-            ChooseColor(this.backgroundColorBox);
+            ChooseColor(backgroundColorBox);
             Dirty();
         }
 
@@ -403,53 +456,18 @@ namespace LogExpert.Dialogs
             {
                 RegexHelperDialog dlg = new RegexHelperDialog();
                 dlg.Owner = this;
-                dlg.CaseSensitive = this.caseSensitiveCheckBox.Checked;
-                dlg.Pattern = this.searchStringTextBox.Text;
+                dlg.CaseSensitive = caseSensitiveCheckBox.Checked;
+                dlg.Pattern = searchStringTextBox.Text;
                 DialogResult res = dlg.ShowDialog();
                 if (res == DialogResult.OK)
                 {
-                    this.caseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-                    this.searchStringTextBox.Text = dlg.Pattern;
+                    caseSensitiveCheckBox.Checked = dlg.CaseSensitive;
+                    searchStringTextBox.Text = dlg.Pattern;
                 }
             }
         }
 
-        private void searchStringTextBox_TextChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void caseSensitiveCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void regexCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void ledCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void foregroundColorBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Dirty();
-        }
-
-        private void backgroundColorBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void ChangeToDirty(object sender, EventArgs e)
         {
             Dirty();
         }
@@ -462,10 +480,10 @@ namespace LogExpert.Dialogs
 
         private void pluginButton_Click(object sender, EventArgs e)
         {
-            KeywordActionDlg dlg = new KeywordActionDlg(this.currentActionEntry, this.KeywordActionList);
+            KeywordActionDlg dlg = new KeywordActionDlg(_currentActionEntry, KeywordActionList);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                this.currentActionEntry = dlg.ActionEntry;
+                _currentActionEntry = dlg.ActionEntry;
                 Dirty();
             }
         }
@@ -473,10 +491,10 @@ namespace LogExpert.Dialogs
         private void bookmarkCommentButton_Click(object sender, EventArgs e)
         {
             BookmarkCommentDlg dlg = new BookmarkCommentDlg();
-            dlg.Comment = this.bookmarkComment;
+            dlg.Comment = _bookmarkComment;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                this.bookmarkComment = dlg.Comment;
+                _bookmarkComment = dlg.Comment;
                 Dirty();
             }
         }
@@ -484,23 +502,23 @@ namespace LogExpert.Dialogs
         private void delGroupButton_Click(object sender, EventArgs e)
         {
             // the last group cannot be deleted
-            if (this.HilightGroupList.Count == 1)
+            if (HilightGroupList.Count == 1)
             {
                 return;
             }
 
-            if (this.groupComboBox.SelectedIndex >= 0 && this.groupComboBox.SelectedIndex < this.HilightGroupList.Count)
+            if (groupComboBox.SelectedIndex >= 0 && groupComboBox.SelectedIndex < HilightGroupList.Count)
             {
-                int index = this.groupComboBox.SelectedIndex;
-                this.HilightGroupList.RemoveAt(this.groupComboBox.SelectedIndex);
+                int index = groupComboBox.SelectedIndex;
+                HilightGroupList.RemoveAt(groupComboBox.SelectedIndex);
                 FillGroupComboBox();
-                if (index < this.HilightGroupList.Count)
+                if (index < HilightGroupList.Count)
                 {
                     SelectGroup(index);
                 }
                 else
                 {
-                    SelectGroup(this.HilightGroupList.Count - 1);
+                    SelectGroup(HilightGroupList.Count - 1);
                 }
             }
         }
@@ -514,30 +532,30 @@ namespace LogExpert.Dialogs
             int i = 1;
             while (!uniqueName)
             {
-                uniqueName = this.HilightGroupList.FindIndex(delegate(HilightGroup g) { return g.GroupName == name; }) <
+                uniqueName = HilightGroupList.FindIndex(delegate(HilightGroup g) { return g.GroupName == name; }) <
                              0;
                 if (!uniqueName)
                 {
-                    name = string.Format("{0} #{1}", baseName, i++);
+                    name = $"{baseName} #{i++}";
                 }
             }
 
             HilightGroup newGroup = new HilightGroup() {GroupName = name};
-            this.HilightGroupList.Add(newGroup);
+            HilightGroupList.Add(newGroup);
             FillGroupComboBox();
-            SelectGroup(this.HilightGroupList.Count - 1);
+            SelectGroup(HilightGroupList.Count - 1);
         }
 
         private void copyGroupButton_Click(object sender, EventArgs e)
         {
-            if (this.groupComboBox.SelectedIndex >= 0 && this.groupComboBox.SelectedIndex < this.HilightGroupList.Count)
+            if (groupComboBox.SelectedIndex >= 0 && groupComboBox.SelectedIndex < HilightGroupList.Count)
             {
                 HilightGroup newGroup =
-                    ObjectClone.Clone<HilightGroup>(this.HilightGroupList[this.groupComboBox.SelectedIndex]);
+                    ObjectClone.Clone(HilightGroupList[groupComboBox.SelectedIndex]);
                 newGroup.GroupName = "Copy of " + newGroup.GroupName;
-                this.HilightGroupList.Add(newGroup);
+                HilightGroupList.Add(newGroup);
                 FillGroupComboBox();
-                SelectGroup(this.HilightGroupList.Count - 1);
+                SelectGroup(HilightGroupList.Count - 1);
             }
         }
 
@@ -546,7 +564,7 @@ namespace LogExpert.Dialogs
             e.DrawBackground();
             if (e.Index >= 0)
             {
-                HilightGroup group = this.HilightGroupList[e.Index];
+                HilightGroup group = HilightGroupList[e.Index];
                 Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 Brush brush = new SolidBrush(SystemColors.ControlText);
@@ -558,21 +576,21 @@ namespace LogExpert.Dialogs
 
         private void groupComboBox_TextUpdate(object sender, EventArgs e)
         {
-            this.currentGroup.GroupName = this.groupComboBox.Text;
+            _currentGroup.GroupName = groupComboBox.Text;
         }
 
         private void groupComboBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            SelectGroup(this.groupComboBox.SelectedIndex);
+            SelectGroup(groupComboBox.SelectedIndex);
         }
 
         private void groupUpButton_Click(object sender, EventArgs e)
         {
-            int index = this.groupComboBox.SelectedIndex;
+            int index = groupComboBox.SelectedIndex;
             if (index > 0)
             {
-                this.hilightGroupList.Reverse(index - 1, 2);
-                this.groupComboBox.Refresh();
+                _hilightGroupList.Reverse(index - 1, 2);
+                groupComboBox.Refresh();
                 FillGroupComboBox();
                 SelectGroup(index - 1);
             }
@@ -580,11 +598,11 @@ namespace LogExpert.Dialogs
 
         private void groupDownButton_Click(object sender, EventArgs e)
         {
-            int index = this.groupComboBox.SelectedIndex;
-            if (index > -1 && index < this.hilightGroupList.Count - 1)
+            int index = groupComboBox.SelectedIndex;
+            if (index > -1 && index < _hilightGroupList.Count - 1)
             {
-                this.hilightGroupList.Reverse(index, 2);
-                this.groupComboBox.Refresh();
+                _hilightGroupList.Reverse(index, 2);
+                groupComboBox.Refresh();
                 FillGroupComboBox();
                 SelectGroup(index + 1);
             }
@@ -593,21 +611,20 @@ namespace LogExpert.Dialogs
         private void wordMatchCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Dirty();
-            this.noBackgroundCheckBox.Enabled = this.wordMatchCheckBox.Checked;
+            noBackgroundCheckBox.Enabled = wordMatchCheckBox.Checked;
+        }
+
+        private void noBackgroundCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            backgroundColorBox.Enabled = !noBackgroundCheckBox.Checked;
+            customBackColorButton.Enabled = !noBackgroundCheckBox.Checked;
+            Dirty();
         }
 
         private void boldCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Dirty();
         }
-
-        private void noBackgroundCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            this.backgroundColorBox.Enabled = !this.noBackgroundCheckBox.Checked;
-            this.customBackColorButton.Enabled = !this.noBackgroundCheckBox.Checked;
-            Dirty();
-        }
-
         #endregion
     }
 }

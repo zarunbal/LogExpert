@@ -19,9 +19,9 @@ namespace LogExpert
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private static readonly object monitor = new object();
-        private static ConfigManager instance = null;
+        private static ConfigManager instance;
         private readonly object loadSaveLock = new object();
-        private Settings settings = null;
+        private Settings settings;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace LogExpert
 
         private ConfigManager()
         {
-            this.settings = this.Load();
+            settings = Load();
         }
 
         #endregion
@@ -56,22 +56,10 @@ namespace LogExpert
                 return instance;
             }
         }
+        
+        public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
 
-
-        public static string ConfigDir
-        {
-            get
-            {
-                string tmp = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string tmp2 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
-            }
-        }
-
-        public static Settings Settings
-        {
-            get { return Instance.settings; }
-        }
+        public static Settings Settings => Instance.settings;
 
         #endregion
 
@@ -118,23 +106,27 @@ namespace LogExpert
             }
             else
             {
-                Stream fs = File.OpenRead(dir + "\\settings.dat");
-                try
+                using (Stream fs = File.OpenRead(dir + "\\settings.dat"))
                 {
-                    return LoadOrCreateNew(fs);
-                }
-                finally
-                {
-                    fs.Close();
+                    try
+                    {
+                        return LoadOrCreateNew(fs);
+                    }   
+                    catch (Exception e)
+                    {
+                        _logger.Error(e,"Error loading settings: {0}");
+                        return LoadOrCreateNew(null);
+                    }
                 }
             }
         }
 
         private Settings LoadOrCreateNew(Stream fs)
         {
-            lock (this.loadSaveLock)
+            lock (loadSaveLock)
             {
                 Settings settings;
+
                 if (fs == null)
                 {
                     settings = new Settings();
@@ -152,66 +144,82 @@ namespace LogExpert
                         settings = new Settings();
                     }
                 }
+
                 if (settings.preferences == null)
                 {
                     settings.preferences = new Preferences();
                 }
+
                 if (settings.preferences.toolEntries == null)
                 {
                     settings.preferences.toolEntries = new List<ToolEntry>();
                 }
+
                 if (settings.preferences.columnizerMaskList == null)
                 {
                     settings.preferences.columnizerMaskList = new List<ColumnizerMaskEntry>();
                 }
+
                 if (settings.fileHistoryList == null)
                 {
                     settings.fileHistoryList = new List<string>();
                 }
+
                 if (settings.lastOpenFilesList == null)
                 {
                     settings.lastOpenFilesList = new List<string>();
                 }
+
                 if (settings.fileColors == null)
                 {
                     settings.fileColors = new List<ColorEntry>();
                 }
+
                 if (settings.preferences.showTailColor == Color.Empty)
                 {
                     settings.preferences.showTailColor = Color.FromKnownColor(KnownColor.Blue);
                 }
+
                 if (settings.preferences.timeSpreadColor == Color.Empty)
                 {
                     settings.preferences.timeSpreadColor = Color.Gray;
                 }
+
                 if (settings.preferences.bufferCount < 10)
                 {
                     settings.preferences.bufferCount = 100;
                 }
+
                 if (settings.preferences.linesPerBuffer < 1)
                 {
                     settings.preferences.linesPerBuffer = 500;
                 }
+
                 if (settings.filterList == null)
                 {
                     settings.filterList = new List<FilterParams>();
                 }
+
                 if (settings.searchHistoryList == null)
                 {
                     settings.searchHistoryList = new List<string>();
                 }
+
                 if (settings.filterHistoryList == null)
                 {
                     settings.filterHistoryList = new List<string>();
                 }
+
                 if (settings.filterRangeHistoryList == null)
                 {
                     settings.filterRangeHistoryList = new List<string>();
                 }
+
                 foreach (FilterParams filterParams in settings.filterList)
                 {
                     filterParams.Init();
                 }
+
                 if (settings.hilightGroupList == null)
                 {
                     settings.hilightGroupList = new List<HilightGroup>();
@@ -221,21 +229,35 @@ namespace LogExpert
                     defaultGroup.HilightEntryList = settings.hilightEntryList;
                     settings.hilightGroupList.Add(defaultGroup);
                 }
+
                 if (settings.preferences.highlightMaskList == null)
                 {
                     settings.preferences.highlightMaskList = new List<HighlightMaskEntry>();
                 }
+
                 if (settings.preferences.pollingInterval < 20)
                 {
                     settings.preferences.pollingInterval = 250;
                 }
+
                 if (settings.preferences.multifileOptions == null)
                 {
                     settings.preferences.multifileOptions = new MultifileOptions();
                 }
+
                 if (settings.preferences.defaultEncoding == null)
                 {
                     settings.preferences.defaultEncoding = Encoding.Default.HeaderName;
+                }
+
+                if (settings.preferences.maximumFilterEntriesDisplayed == 0)
+                {
+                    settings.preferences.maximumFilterEntriesDisplayed = 20;
+                }
+
+                if (settings.preferences.maximumFilterEntries == 0)
+                {
+                    settings.preferences.maximumFilterEntries = 30;
                 }
 
                 ConvertSettings(settings, Assembly.GetExecutingAssembly().GetName().Version.Build);
@@ -246,7 +268,7 @@ namespace LogExpert
 
         private void Save(Settings settings, SettingsFlags flags)
         {
-            lock (this.loadSaveLock)
+            lock (loadSaveLock)
             {
                 _logger.Info("Saving settings");
                 lock (this)
@@ -256,9 +278,11 @@ namespace LogExpert
                     {
                         Directory.CreateDirectory(dir);
                     }
-                    Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write);
-                    Save(fs, settings, flags);
-                    fs.Close();
+
+                    using (Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write))
+                    {
+                        Save(fs, settings, flags);
+                    }
                 }
                 OnConfigChanged(flags);
             }
@@ -332,14 +356,14 @@ namespace LogExpert
         private Settings Import(Settings currentSettings, Stream fs, ExportImportFlags flags)
         {
             Settings importSettings = LoadOrCreateNew(fs);
-            Settings ownSettings = ObjectClone.Clone<Settings>(currentSettings);
+            Settings ownSettings = ObjectClone.Clone(currentSettings);
             Settings newSettings;
 
             // at first check for 'Other' as this are the most options.
             if ((flags & ExportImportFlags.Other) == ExportImportFlags.Other)
             {
                 newSettings = ownSettings;
-                newSettings.preferences = ObjectClone.Clone<Preferences>(importSettings.preferences);
+                newSettings.preferences = ObjectClone.Clone(importSettings.preferences);
                 newSettings.preferences.columnizerMaskList = ownSettings.preferences.columnizerMaskList;
                 newSettings.preferences.highlightMaskList = ownSettings.preferences.highlightMaskList;
                 newSettings.hilightGroupList = ownSettings.hilightGroupList;

@@ -28,10 +28,7 @@ namespace LogExpert
         {
             waitingForClose = true;
             parentLogTabWin.HighlightSettingsChanged -= parent_HighlightSettingsChanged;
-            if (logFileReader != null)
-            {
-                logFileReader.DeleteAllContent();
-            }
+            logFileReader?.DeleteAllContent();
 
             FreeFromTimeSync();
         }
@@ -551,23 +548,31 @@ namespace LogExpert
 
         private void selectionChangedTrigger_Signal(object sender, EventArgs e)
         {
-            _logger.Debug("Selection changed trigger");
-            int selCount = dataGridView.SelectedRows.Count;
-            if (selCount > 1)
+            int selCount = 0;
+            try
             {
-                StatusLineText(selCount + " selected lines");
-            }
-            else
-            {
-                if (IsMultiFile)
+                _logger.Debug("Selection changed trigger");
+                selCount = dataGridView.SelectedRows.Count;
+                if (selCount > 1)
                 {
-                    MethodInvoker invoker = new MethodInvoker(DisplayCurrentFileOnStatusline);
-                    invoker.BeginInvoke(null, null);
+                    StatusLineText(selCount + " selected lines");
                 }
                 else
                 {
-                    StatusLineText("");
+                    if (IsMultiFile)
+                    {
+                        MethodInvoker invoker = new MethodInvoker(DisplayCurrentFileOnStatusline);
+                        invoker.BeginInvoke(null, null);
+                    }
+                    else
+                    {
+                        StatusLineText("");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error in selectionChangedTrigger_Signal selcount {0}", selCount);
             }
         }
 
@@ -1458,7 +1463,7 @@ namespace LogExpert
         {
             if (_logger.IsTraceEnabled)
             {
-                _logger.Trace("Row unshared line {0}", e.Row.Cells[1].Value); 
+                _logger.Trace("Row unshared line {0}", e.Row.Cells[1].Value);
             }
         }
 
@@ -1467,101 +1472,64 @@ namespace LogExpert
         protected void OnProgressBarUpdate(ProgressEventArgs e)
         {
             ProgressBarEventHandler handler = ProgressBarUpdate;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnStatusLine(StatusLineEventArgs e)
         {
             StatusLineEventHandler handler = StatusLineEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnGuiState(GuiStateArgs e)
         {
             GuiStateEventHandler handler = GuiStateUpdate;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnTailFollowed(EventArgs e)
         {
-            if (TailFollowed != null)
-            {
-                TailFollowed(this, e);
-            }
+            TailFollowed?.Invoke(this, e);
         }
 
         protected void OnFileNotFound(EventArgs e)
         {
-            if (FileNotFound != null)
-            {
-                FileNotFound(this, e);
-            }
+            FileNotFound?.Invoke(this, e);
         }
 
         protected void OnFileRespawned(EventArgs e)
         {
-            if (FileRespawned != null)
-            {
-                FileRespawned(this, e);
-            }
+            FileRespawned?.Invoke(this, e);
         }
 
         protected void OnFilterListChanged(LogWindow source)
         {
-            if (FilterListChanged != null)
-            {
-                FilterListChanged(this, new FilterListChangedEventArgs(source));
-            }
+            FilterListChanged?.Invoke(this, new FilterListChangedEventArgs(source));
         }
 
         protected void OnCurrentHighlightListChanged()
         {
-            if (CurrentHighlightGroupChanged != null)
-            {
-                CurrentHighlightGroupChanged(this,
-                    new CurrentHighlightGroupChangedEventArgs(this, currentHighlightGroup));
-            }
+            CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, currentHighlightGroup));
         }
 
         protected void OnBookmarkAdded()
         {
-            if (BookmarkAdded != null)
-            {
-                BookmarkAdded(this, new EventArgs());
-            }
+            BookmarkAdded?.Invoke(this, new EventArgs());
         }
 
         protected void OnBookmarkRemoved()
         {
-            if (BookmarkRemoved != null)
-            {
-                BookmarkRemoved(this, new EventArgs());
-            }
+            BookmarkRemoved?.Invoke(this, new EventArgs());
         }
 
         protected void OnBookmarkTextChanged(Bookmark bookmark)
         {
-            if (BookmarkTextChanged != null)
-            {
-                BookmarkTextChanged(this, new BookmarkEventArgs(bookmark));
-            }
+            BookmarkTextChanged?.Invoke(this, new BookmarkEventArgs(bookmark));
         }
 
         protected void OnColumnizerChanged(ILogLineColumnizer columnizer)
         {
-            if (ColumnizerChanged != null)
-            {
-                ColumnizerChanged(this, new ColumnizerEventArgs(columnizer));
-            }
+            ColumnizerChanged?.Invoke(this, new ColumnizerEventArgs(columnizer));
         }
 
         protected void RegisterCancelHandler(BackgroundProcessCancelHandler handler)
