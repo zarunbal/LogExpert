@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-//using System.Linq;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -203,10 +203,20 @@ namespace LogExpert.Dialogs
             if (entry != null)
             {
                 searchStringTextBox.Text = entry.SearchText;
+
                 foregroundColorBox.CustomColor = entry.ForegroundColor;
                 backgroundColorBox.CustomColor = entry.BackgroundColor;
-                foregroundColorBox.SelectedItem = entry.ForegroundColor;
-                backgroundColorBox.SelectedItem = entry.BackgroundColor;
+
+                if (foregroundColorBox.Items.Contains(entry.ForegroundColor))
+                    foregroundColorBox.SelectedIndex = foregroundColorBox.Items.Cast<Color>().ToList().LastIndexOf(entry.ForegroundColor);
+                else
+                    foregroundColorBox.SelectedItem = entry.ForegroundColor;
+
+                if (foregroundColorBox.Items.Contains(entry.ForegroundColor))
+                    backgroundColorBox.SelectedIndex = backgroundColorBox.Items.Cast<Color>().ToList().LastIndexOf(entry.BackgroundColor);
+                else
+                    backgroundColorBox.SelectedItem = entry.BackgroundColor;
+
                 regexCheckBox.Checked = entry.IsRegEx;
                 caseSensitiveCheckBox.Checked = entry.IsCaseSensitive;
                 ledCheckBox.Checked = entry.IsLedSwitch;
