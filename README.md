@@ -50,3 +50,8 @@ This is a continous integration build. So always the latest and greates changes.
 
 # Pull Request
 - Use Development branch as target
+
+# FAQ / HELP / Informations / Examples
+Please checkout the wiki for FAQ / HELP / Informations / Examples
+
+https://github.com/zarunbal/LogExpert/wiki
