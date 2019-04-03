@@ -241,6 +241,11 @@ namespace GlassfishColumnizer
             }
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.NotSupport;
+        }
+
         #endregion
 
         private class GlassFishLogLine : ILogLine

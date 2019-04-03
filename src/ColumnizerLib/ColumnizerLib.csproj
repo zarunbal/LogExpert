@@ -76,6 +76,7 @@
     <Compile Include="ITextValue.cs" />
     <Compile Include="IXmlLogConfiguration.cs" />
     <Compile Include="LineEntry.cs" />
+    <Compile Include="Priority.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

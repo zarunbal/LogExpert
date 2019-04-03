@@ -1,0 +1,5 @@
+no bracket 1
+[][]no bracket 2
+[TRACE]    with bracket 1
+[TRACE]    with bracket 2
+no bracket 3

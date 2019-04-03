@@ -210,6 +210,11 @@ namespace LogExpert
             return cLogLine;
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.NotSupport;
+        }
+
         #endregion
     }
 }
