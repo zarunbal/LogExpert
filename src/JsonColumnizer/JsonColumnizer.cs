@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace JsonColumnizer
 {
-    internal class JsonColumn
+    public class JsonColumn
     {
         #region cTor
 
@@ -34,7 +34,7 @@ namespace JsonColumnizer
 
         private static readonly JsonColumn _initialColumn = new JsonColumn("Text");
 
-        private readonly IList<JsonColumn> _columnList = new List<JsonColumn>(new[] {_initialColumn});
+        private readonly IList<JsonColumn> _columnList = new List<JsonColumn>(new[] {InitialColumn});
 
         #endregion
 
@@ -42,13 +42,21 @@ namespace JsonColumnizer
 
         public string Text => GetName();
 
+        protected List<string> ColumnNameList { get; set; } = new List<string>();
+        public HashSet<string> ColumnSet { get; set; } = new HashSet<string>();
+
+        protected IList<JsonColumn> ColumnList => _columnList;
+
+        protected static JsonColumn InitialColumn => _initialColumn;
+
         #endregion
 
         #region Public methods
 
-        public void Selected(ILogLineColumnizerCallback callback)
+        public virtual void Selected(ILogLineColumnizerCallback callback)
         {
-            _columnList.Clear();
+            ColumnList.Clear();
+            ColumnSet.Clear();
 
             var line = callback.GetLogLine(0);
 
@@ -61,45 +69,54 @@ namespace JsonColumnizer
 
                     for (var i = 0; i < fieldCount; ++i)
                     {
-                        _columnList.Add(new JsonColumn(json.Properties().ToArray()[i].Name));
+                        var columeName = json.Properties().ToArray()[i].Name;
+                        if (!ColumnSet.Contains(columeName))
+                        {
+                            ColumnSet.Add(columeName);
+                            ColumnList.Add(new JsonColumn(columeName));
+                        }
+
                     }
                 }
                 else
                 {
-                    _columnList.Add(_initialColumn);
+                    ColumnSet.Add("Text");
+                    ColumnList.Add(InitialColumn);
                 }
             }
-            else
+
+            if (ColumnList.Count() == 0)
             {
-                _columnList.Add(_initialColumn);
+                ColumnSet.Add("Text");
+                ColumnList.Add(InitialColumn);
             }
         }
 
-        public void DeSelected(ILogLineColumnizerCallback callback)
+        public virtual void DeSelected(ILogLineColumnizerCallback callback)
         {
             // nothing to do 
         }
 
-        public string GetName()
+        public virtual string GetName()
         {
             return "JSON Columnizer";
         }
 
-        public string GetDescription()
+        public virtual string GetDescription()
         {
             return "Splits JSON files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the Newtonsoft json package.\r\n\r\nFirst line must be valid or else only one column will be displayed and the other values dropped!";
         }
 
-        public int GetColumnCount()
+        public virtual int GetColumnCount()
         {
-            return _columnList.Count;
+            return ColumnList.Count;
         }
 
-        public string[] GetColumnNames()
+        public virtual string[] GetColumnNames()
         {
             string[] names = new string[GetColumnCount()];
             int i = 0;
-            foreach (var column in _columnList)
+            foreach (var column in ColumnList)
             {
                 names[i++] = column.Name;
             }
@@ -107,7 +124,7 @@ namespace JsonColumnizer
             return names;
         }
 
-        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public virtual IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
             JObject json = ParseJson(line);
 
@@ -118,7 +135,7 @@ namespace JsonColumnizer
 
             var cLogLine = new ColumnizedLogLine {LogLine = line};
 
-            var columns = Column.CreateColumns(_columnList.Count, cLogLine);
+            var columns = Column.CreateColumns(ColumnList.Count, cLogLine);
 
             columns.Last().FullValue = line.FullLine;
 
@@ -127,27 +144,27 @@ namespace JsonColumnizer
             return cLogLine;
         }
 
-        public bool IsTimeshiftImplemented()
+        public virtual bool IsTimeshiftImplemented()
         {
             return false;
         }
 
-        public void SetTimeOffset(int msecOffset)
+        public virtual void SetTimeOffset(int msecOffset)
         {
             throw new NotImplementedException();
         }
 
-        public int GetTimeOffset()
+        public virtual int GetTimeOffset()
         {
             throw new NotImplementedException();
         }
 
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+        public virtual DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
         {
             throw new NotImplementedException();
         }
 
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        public virtual void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
             throw new NotImplementedException();
         }
@@ -156,7 +173,7 @@ namespace JsonColumnizer
 
         #region Private Methods
 
-        private static JObject ParseJson(ILogLine line)
+        protected static JObject ParseJson(ILogLine line)
         {
             return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings()
             {
@@ -164,15 +181,66 @@ namespace JsonColumnizer
             });
         }
 
-        private IColumnizedLogLine SplitJsonLine(ILogLine line, JObject json)
+        public class ColumnWithName : Column
+        {
+            public string ColumneName { get; set; }
+        }
+
+        //
+        // Following two log lines should be loaded and displayed in correct grid.
+        // {"time":"2019-02-13T02:55:35.5186240Z","message":"Hosting starting"}
+        // {"time":"2019-02-13T02:55:35.5186240Z","level":"warning", "message":"invalid host."}
+        //
+        protected virtual IColumnizedLogLine SplitJsonLine(ILogLine line, JObject json)
         {
             var cLogLine = new ColumnizedLogLine {LogLine = line};
 
-            var columns = json.Properties().Select(property => new Column {FullValue = property.Value.ToString(), Parent = cLogLine}).ToList();
+            var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString(), ColumneName = property.Name.ToString(), Parent = cLogLine}).ToList();
 
-            cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+            foreach (var jsonColumn in columns)
+            {
+                // When find new column in a log line, add a new column in the end of the list.
+                if (!ColumnSet.Contains(jsonColumn.ColumneName))
+                {
+                    if (ColumnList.Count == 1 && !ColumnSet.Contains(ColumnList[0].Name))
+                    {
+                        ColumnList.Clear();
+                    }
+                    ColumnSet.Add(jsonColumn.ColumneName);
+                    ColumnList.Add(new JsonColumn(jsonColumn.ColumneName));
+                }
+            }
+
+            //
+            // Always rearrage the order of all json fields within a line to follow the sequence of columnNameList.
+            // This will make sure the log line displayed correct even the order of json fields changed.
+            //
+            List<IColumn> returnColumns = new List<IColumn>();
+            foreach (var column in ColumnList)
+            {
+                var existingColumn = columns.Find(x => x.ColumneName == column.Name);
+                if (existingColumn != null)
+                {
+                    returnColumns.Add(new Column() { FullValue = existingColumn.FullValue, Parent = cLogLine });
+                    continue;
+                }
+                // Fields that is missing in current line should be shown as empty.
+                returnColumns.Add(new Column() { FullValue = "", Parent = cLogLine});
+            }
+
+            cLogLine.ColumnValues = returnColumns.ToArray();
 
             return cLogLine;
+        }
+
+        public virtual Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.WellSupport;
+            }
+            return result;
         }
 
         #endregion

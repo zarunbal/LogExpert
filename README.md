@@ -19,6 +19,8 @@ Summary of (most) features:
 * log4j XML file support
 * 3rd party plugin support
 * Plugin API for more log file data sources
+* Automatical determine columnizer with given file name and content (Experimental)
+* Serilog.Formatting.Compact format support (Experimental)
 
 # Download
 Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application.

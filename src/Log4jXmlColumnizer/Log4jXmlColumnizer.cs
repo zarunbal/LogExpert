@@ -410,6 +410,16 @@ namespace LogExpert
             }
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("xml", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.CanSupport;
+            }
+            return result;
+        }
+
         #endregion
 
         #region Private Methods

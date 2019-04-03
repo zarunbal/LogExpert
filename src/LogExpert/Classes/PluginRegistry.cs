@@ -76,8 +76,10 @@ namespace LogExpert
         {
             _logger.Info("Loading plugins...");
             this.RegisteredColumnizers = new List<ILogLineColumnizer>();
+            this.RegisteredColumnizers.Add(new AutoColumnizer());
             this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
             this.RegisteredColumnizers.Add(new TimestampColumnizer());
+            this.RegisteredColumnizers.Add(new SquareBracketColumnizer());
             this.RegisteredColumnizers.Add(new ClfColumnizer());
             this.RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 

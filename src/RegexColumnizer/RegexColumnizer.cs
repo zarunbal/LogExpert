@@ -1,5 +1,6 @@
 ﻿using LogExpert;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -35,6 +36,7 @@ namespace RegexColumnizer
 
         #region Public methods
 
+        public string Text => GetType().Name;
         public string GetName() => "Regex";
         public string GetDescription() => "Columns are filled by regular expression named capture groups";
         public int GetColumnCount() => columns.Length;
@@ -147,6 +149,11 @@ namespace RegexColumnizer
             string configPath = Path.Combine(configDir, name);
             configPath = Path.ChangeExtension(configPath, "xml");
             return configPath;
+        }
+
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.NotSupport;
         }
 
         #endregion

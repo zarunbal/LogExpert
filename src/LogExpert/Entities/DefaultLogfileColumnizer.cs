@@ -51,6 +51,10 @@ namespace LogExpert
             get { return GetName(); }
         }
 
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            return Priority.CanSupport;
+        }
         #endregion
 
         #region ILogLineColumnizer Not implemented Members

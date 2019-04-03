@@ -118,6 +118,20 @@ namespace LogExpert
         /// <param name="oldValue">The old value.</param>
         void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue);
 
+
+        /// <summary>
+        /// Text for this plugin.
+        /// </summary>
+        string Text { get;  }
+
+        /// <summary>
+        /// Get the priority for this columnizer so the up layer can decide which columnizer is the best fitted one.
+        /// </summary>
+        /// <param name="samples"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        Priority GetPriority(string fileName, IEnumerable<ILogLine> samples);
+
         #endregion
     }
 }
