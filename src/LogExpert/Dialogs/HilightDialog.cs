@@ -42,18 +42,15 @@ namespace LogExpert.Dialogs
 
         public List<HilightGroup> HilightGroupList
         {
-            get { return _hilightGroupList; }
-            set { _hilightGroupList = ObjectClone.Clone<List<HilightGroup>>(value); }
+            get => _hilightGroupList;
+            set => _hilightGroupList = ObjectClone.Clone<List<HilightGroup>>(value);
         }
 
         public IList<IKeywordAction> KeywordActionList { get; set; }
 
         public string PreSelectedGroupName { get; set; } = null;
 
-        private bool IsDirty
-        {
-            get { return applyButton.Image == _applyButtonImage; }
-        }
+        private bool IsDirty => applyButton.Image == _applyButtonImage;
 
         #endregion
 
@@ -539,7 +536,7 @@ namespace LogExpert.Dialogs
                              0;
                 if (!uniqueName)
                 {
-                    name = string.Format("{0} #{1}", baseName, i++);
+                    name = $"{baseName} #{i++}";
                 }
             }
 
@@ -554,7 +551,7 @@ namespace LogExpert.Dialogs
             if (groupComboBox.SelectedIndex >= 0 && groupComboBox.SelectedIndex < HilightGroupList.Count)
             {
                 HilightGroup newGroup =
-                    ObjectClone.Clone<HilightGroup>(HilightGroupList[groupComboBox.SelectedIndex]);
+                    ObjectClone.Clone(HilightGroupList[groupComboBox.SelectedIndex]);
                 newGroup.GroupName = "Copy of " + newGroup.GroupName;
                 HilightGroupList.Add(newGroup);
                 FillGroupComboBox();

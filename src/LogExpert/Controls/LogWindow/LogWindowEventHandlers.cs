@@ -28,10 +28,7 @@ namespace LogExpert
         {
             waitingForClose = true;
             parentLogTabWin.HighlightSettingsChanged -= parent_HighlightSettingsChanged;
-            if (logFileReader != null)
-            {
-                logFileReader.DeleteAllContent();
-            }
+            logFileReader?.DeleteAllContent();
 
             FreeFromTimeSync();
         }
@@ -1475,101 +1472,64 @@ namespace LogExpert
         protected void OnProgressBarUpdate(ProgressEventArgs e)
         {
             ProgressBarEventHandler handler = ProgressBarUpdate;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnStatusLine(StatusLineEventArgs e)
         {
             StatusLineEventHandler handler = StatusLineEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnGuiState(GuiStateArgs e)
         {
             GuiStateEventHandler handler = GuiStateUpdate;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         protected void OnTailFollowed(EventArgs e)
         {
-            if (TailFollowed != null)
-            {
-                TailFollowed(this, e);
-            }
+            TailFollowed?.Invoke(this, e);
         }
 
         protected void OnFileNotFound(EventArgs e)
         {
-            if (FileNotFound != null)
-            {
-                FileNotFound(this, e);
-            }
+            FileNotFound?.Invoke(this, e);
         }
 
         protected void OnFileRespawned(EventArgs e)
         {
-            if (FileRespawned != null)
-            {
-                FileRespawned(this, e);
-            }
+            FileRespawned?.Invoke(this, e);
         }
 
         protected void OnFilterListChanged(LogWindow source)
         {
-            if (FilterListChanged != null)
-            {
-                FilterListChanged(this, new FilterListChangedEventArgs(source));
-            }
+            FilterListChanged?.Invoke(this, new FilterListChangedEventArgs(source));
         }
 
         protected void OnCurrentHighlightListChanged()
         {
-            if (CurrentHighlightGroupChanged != null)
-            {
-                CurrentHighlightGroupChanged(this,
-                    new CurrentHighlightGroupChangedEventArgs(this, currentHighlightGroup));
-            }
+            CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, currentHighlightGroup));
         }
 
         protected void OnBookmarkAdded()
         {
-            if (BookmarkAdded != null)
-            {
-                BookmarkAdded(this, new EventArgs());
-            }
+            BookmarkAdded?.Invoke(this, new EventArgs());
         }
 
         protected void OnBookmarkRemoved()
         {
-            if (BookmarkRemoved != null)
-            {
-                BookmarkRemoved(this, new EventArgs());
-            }
+            BookmarkRemoved?.Invoke(this, new EventArgs());
         }
 
         protected void OnBookmarkTextChanged(Bookmark bookmark)
         {
-            if (BookmarkTextChanged != null)
-            {
-                BookmarkTextChanged(this, new BookmarkEventArgs(bookmark));
-            }
+            BookmarkTextChanged?.Invoke(this, new BookmarkEventArgs(bookmark));
         }
 
         protected void OnColumnizerChanged(ILogLineColumnizer columnizer)
         {
-            if (ColumnizerChanged != null)
-            {
-                ColumnizerChanged(this, new ColumnizerEventArgs(columnizer));
-            }
+            ColumnizerChanged?.Invoke(this, new ColumnizerEventArgs(columnizer));
         }
 
         protected void RegisterCancelHandler(BackgroundProcessCancelHandler handler)
