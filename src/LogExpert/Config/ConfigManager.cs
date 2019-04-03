@@ -114,7 +114,7 @@ namespace LogExpert
                     }   
                     catch (Exception e)
                     {
-                        _logger.Error($"Error loading settings: {e}");
+                        _logger.Error(e,"Error loading settings: {0}");
                         return LoadOrCreateNew(null);
                     }
                 }

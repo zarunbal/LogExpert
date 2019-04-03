@@ -1463,7 +1463,7 @@ namespace LogExpert
         {
             if (_logger.IsTraceEnabled)
             {
-                _logger.Trace($"Row unshared line {e.Row.Cells[1].Value}");
+                _logger.Trace("Row unshared line {0}", e.Row.Cells[1].Value);
             }
         }
 

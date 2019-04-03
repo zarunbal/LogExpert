@@ -335,7 +335,7 @@ namespace LogExpert
                 lock (currentColumnizerLock)
                 {
                     currentColumnizer = value;
-                    _logger.Debug($"Setting columnizer {currentColumnizer.GetName()} ");
+                    _logger.Debug("Setting columnizer {0} ", currentColumnizer.GetName());
                 }
             }
         }
