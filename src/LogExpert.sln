@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28809.33
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -42,6 +42,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Tests", "LogExpert.Tests\LogExpert.Tests.csproj", "{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonCompactColumnizer", "JsonCompactColumnizer\JsonCompactColumnizer.csproj", "{003535EC-4186-4958-9DD9-C641F089AEED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureLogColumnizer", "AzureLogColumnizer\AzureLogColumnizer.csproj", "{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,6 +300,24 @@ Global
 		{003535EC-4186-4958-9DD9-C641F089AEED}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{003535EC-4186-4958-9DD9-C641F089AEED}.Release|Win32.ActiveCfg = Release|Any CPU
 		{003535EC-4186-4958-9DD9-C641F089AEED}.Release|Win32.Build.0 = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Debug|Win32.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.DebugNoTimeout|Win32.Build.0 = Debug|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4B1E1893-CA1F-46D1-BB21-FA3D3831B7C0}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
