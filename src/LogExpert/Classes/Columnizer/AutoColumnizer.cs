@@ -3,19 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace LogExpert
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     public class AutoColumnizer : ILogLineColumnizer
     {
         protected int timeOffset = 0;
         private readonly TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
 
         #region ILogLineColumnizer implementation
+
         public string Text => GetName();
 
         public bool IsTimeshiftImplemented()
