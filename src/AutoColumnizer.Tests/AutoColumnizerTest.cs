@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using LogExpert;
 using Moq;
 using NUnit.Framework;
 
-namespace LogExpert.Tests
+namespace AutoColumnizer.Tests
 {
     /// <summary>
     /// Summary description for AutoColumnizerTest
@@ -15,10 +16,10 @@ namespace LogExpert.Tests
         [TestCase("Square Bracket Columnizer", "30/08/2018 08:51:42.712 [TRACE]    [a] hello", "30/08/2018 08:51:42.712 [DATAIO]   [b] world", null, null, null)]
         [TestCase("Square Bracket Columnizer", "30/08/2018 08:51:42.712 [TRACE]     hello", "30/08/2018 08:51:42.712 [DATAIO][]    world", null, null, null)]
         [TestCase("Square Bracket Columnizer", "", "30/08/2018 08:51:42.712 [TRACE]    hello", "30/08/2018 08:51:42.712 [TRACE]    hello", "[DATAIO][b][c] world", null)]
-        [TestCase("Square Bracket Columnizer", "30/08/2018 08:51:42.712 no bracket 1", "30/08/2018 08:51:42.712 no bracket 2", "30/08/2018 08:51:42.712 [TRACE]    with bracket 1", "30/08/2018 08:51:42.712 [TRACE]    with bracket 2", "no bracket 3")]
+        [TestCase("Timestamp Columnizer", "30/08/2018 08:51:42.712 no bracket 1", "30/08/2018 08:51:42.712 no bracket 2", "30/08/2018 08:51:42.712 [TRACE]    with bracket 1", "30/08/2018 08:51:42.712 [TRACE]    with bracket 2", "no bracket 3")]
         public void FindColumnizer_ReturnCorrectColumnizer(string expectedColumnizerName, string line0, string line1, string line2, string line3, string line4)
         {
-            AutoColumnizer autoColumnizer = new AutoColumnizer();
+            LogExpert.AutoColumnizer autoColumnizer = new LogExpert.AutoColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test");
 
             Mock<IAutoLogLineColumnizerCallback> autoLogLineColumnizerCallbackMock = new Mock<IAutoLogLineColumnizerCallback>();
@@ -61,7 +62,7 @@ namespace LogExpert.Tests
 
             var result = autoColumnizer.FindColumnizer(path, autoLogLineColumnizerCallbackMock.Object);
 
-            Assert.AreEqual(result.GetName(), expectedColumnizerName);
+            Assert.AreEqual(expectedColumnizerName, result.GetName());
         }
 
         private class TestLogLine : ILogLine
