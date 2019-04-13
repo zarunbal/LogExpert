@@ -543,9 +543,11 @@ namespace LogExpert
         {
             _logger.Info("File loading complete.");
 
-            if (currentColumnizer is AutoColumnizer)
+            IAutoColumnizer autoColumnizer = currentColumnizer as IAutoColumnizer;
+
+            if (autoColumnizer != null)
             {
-                currentColumnizer = ((AutoColumnizer)currentColumnizer).FindColumnizer(FileName, logFileReader);
+                currentColumnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
             }
 
             StatusLineText("");
@@ -910,11 +912,12 @@ namespace LogExpert
         {
             _logger.Info("SetColumnizerInternal(): {0}", columnizer.GetName());
 
-            if (columnizer is AutoColumnizer)
-            {
-                columnizer = ((AutoColumnizer)columnizer).FindColumnizer(FileName, logFileReader);
-            }
+            IAutoColumnizer autoColumnizer = columnizer as IAutoColumnizer;
 
+            if (autoColumnizer != null)
+            {
+                columnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
+            }
 
             ILogLineColumnizer oldColumnizer = CurrentColumnizer;
             bool oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;

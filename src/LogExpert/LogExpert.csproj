@@ -61,7 +61,6 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
-    <Compile Include="Classes\Columnizer\AutoColumnizer.cs" />
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
     <Compile Include="Classes\Highlight\ActionEntry.cs" />

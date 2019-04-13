@@ -43,7 +43,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoColumnizerTest.cs" />
     <Compile Include="JsonCompactColumnizerTest.cs" />
     <Compile Include="JsonColumnizerTest.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />

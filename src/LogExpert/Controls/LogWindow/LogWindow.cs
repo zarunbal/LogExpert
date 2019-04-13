@@ -374,7 +374,7 @@ namespace LogExpert
                 {
                     return TempTitleName;
                 }
-                
+
                 return FileName;
             }
         }
@@ -481,6 +481,7 @@ namespace LogExpert
             {
                 dataGridView.Focus();
             }
+
             tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
         }
 
@@ -494,7 +495,6 @@ namespace LogExpert
         }
 
         #endregion
-
 
         // used for external wait fx WaitForLoadFinished()
 
@@ -540,7 +540,7 @@ namespace LogExpert
 
         // =================== ILogLineColumnizerCallback ============================
 
-        public class ColumnizerCallback : ILogLineColumnizerCallback
+        public class ColumnizerCallback : ILogLineColumnizerCallback, IAutoLogLineColumnizerCallback
         {
             #region Fields
 
@@ -589,6 +589,16 @@ namespace LogExpert
             public ILogLine GetLogLine(int lineNum)
             {
                 return logWindow.GetLine(lineNum);
+            }
+
+            public IList<ILogLineColumnizer> GetRegisteredColumnizers()
+            {
+                return PluginRegistry.GetInstance().RegisteredColumnizers;
+            }
+
+            public ILogLineColumnizer GetDefaultColumnizer()
+            {
+                return new DefaultLogfileColumnizer();
             }
 
             public int GetLineCount()

@@ -28,7 +28,7 @@ namespace JsonColumnizer
     /// <summary>
     ///     This Columnizer can parse JSON files.
     /// </summary>
-    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer
+    public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPriority
     {
         #region Fields
 
@@ -40,9 +40,6 @@ namespace JsonColumnizer
 
         #region Properties
 
-        public string Text => GetName();
-
-        protected List<string> ColumnNameList { get; set; } = new List<string>();
         public HashSet<string> ColumnSet { get; set; } = new HashSet<string>();
 
         protected IList<JsonColumn> ColumnList => _columnList;
@@ -75,7 +72,6 @@ namespace JsonColumnizer
                             ColumnSet.Add(columeName);
                             ColumnList.Add(new JsonColumn(columeName));
                         }
-
                     }
                 }
                 else
@@ -169,6 +165,17 @@ namespace JsonColumnizer
             throw new NotImplementedException();
         }
 
+        public virtual Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.WellSupport;
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Private Methods
@@ -195,7 +202,7 @@ namespace JsonColumnizer
         {
             var cLogLine = new ColumnizedLogLine {LogLine = line};
 
-            var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString(), ColumneName = property.Name.ToString(), Parent = cLogLine}).ToList();
+            var columns = json.Properties().Select(property => new ColumnWithName {FullValue = property.Value.ToString(), ColumneName = property.Name.ToString(), Parent = cLogLine}).ToList();
 
             foreach (var jsonColumn in columns)
             {
@@ -206,6 +213,7 @@ namespace JsonColumnizer
                     {
                         ColumnList.Clear();
                     }
+
                     ColumnSet.Add(jsonColumn.ColumneName);
                     ColumnList.Add(new JsonColumn(jsonColumn.ColumneName));
                 }
@@ -221,26 +229,17 @@ namespace JsonColumnizer
                 var existingColumn = columns.Find(x => x.ColumneName == column.Name);
                 if (existingColumn != null)
                 {
-                    returnColumns.Add(new Column() { FullValue = existingColumn.FullValue, Parent = cLogLine });
+                    returnColumns.Add(new Column() {FullValue = existingColumn.FullValue, Parent = cLogLine});
                     continue;
                 }
+
                 // Fields that is missing in current line should be shown as empty.
-                returnColumns.Add(new Column() { FullValue = "", Parent = cLogLine});
+                returnColumns.Add(new Column() {FullValue = "", Parent = cLogLine});
             }
 
             cLogLine.ColumnValues = returnColumns.ToArray();
 
             return cLogLine;
-        }
-
-        public virtual Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
-        {
-            Priority result = Priority.NotSupport;
-            if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
-            {
-                result = Priority.WellSupport;
-            }
-            return result;
         }
 
         #endregion
