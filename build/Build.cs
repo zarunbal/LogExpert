@@ -35,11 +35,6 @@ class Build : NukeBuild
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
 
-    //[PackageExecutable(
-    //    packageId: "NUnit.ConsoleRunner",
-    //    packageExecutable: "nunit3-console.exe")]
-    //readonly Tool NUnit;
-
     AbsolutePath SourceDirectory => RootDirectory / "src";
 
     Target Clean => _ => _
@@ -65,6 +60,7 @@ class Build : NukeBuild
             MSBuild(s => s
                 .SetTargetPath(Solution)
                 .SetTargets("Rebuild")
+                .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
                 .SetConfiguration(Configuration)
                 .SetMaxCpuCount(Environment.ProcessorCount)
                 .SetNodeReuse(IsLocalBuild));
