@@ -11,3 +11,4 @@ temp.txt
 .vs/
 *.scgdat
 /Data
+/.tmp
