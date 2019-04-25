@@ -79,12 +79,10 @@ class Build : NukeBuild
             {
                 DotNetTest(c =>
                 {
-                    c = c.SetProjectFile(path);
+                    c = c.SetProjectFile(path)
+                        .EnableNoBuild();
                     return c;
                 });
             });
-
-
-
         });
 }
