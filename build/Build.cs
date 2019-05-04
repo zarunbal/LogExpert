@@ -38,7 +38,6 @@ class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
 
     Target Clean => _ => _
-        .Before(Restore)
         .Executes(() =>
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
@@ -46,6 +45,7 @@ class Build : NukeBuild
         });
 
     Target Restore => _ => _
+        .DependsOn(Clean)
         .Executes(() =>
         {
             MSBuild(s => s
