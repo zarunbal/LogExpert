@@ -2,13 +2,13 @@ using System;
 using System.Linq;
 using Microsoft.Build.Execution;
 using Nuke.Common;
+using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.NUnit;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
@@ -34,7 +34,6 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    [GitVersion] readonly Nuke.Common.Tools.GitVersion.GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath OutputDirectory => RootDirectory / "bin" / Configuration;
@@ -42,6 +41,27 @@ class Build : NukeBuild
     AbsolutePath PackageDirectory => RootDirectory / "bin" / "Package";
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
+
+    Version Version
+    {
+        get
+        {
+            int patch = 0;
+
+            if (AppVeyor.Instance != null)
+            {
+                patch = AppVeyor.Instance.BuildNumber;
+            }
+
+            return new Version(1, 6, patch);
+        }
+    }
+
+    [Parameter("Version string")]
+    string VersionString => $"{Version.Major}.{Version.Minor}.{Version.Build}";
+
+    [Parameter("Version Information string")]
+    string VersionInformationString => $"{VersionString}.{GitRepository.Head}";
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -55,7 +75,10 @@ class Build : NukeBuild
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             DeleteDirectory(OutputDirectory);
+            DeleteDirectory(PackageDirectory);
+
             EnsureCleanDirectory(OutputDirectory);
+            EnsureCleanDirectory(PackageDirectory);
         });
 
     Target Restore => _ => _
@@ -71,9 +94,13 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
+            string version = $"{Version.Major}.{Version.Minor}.{Version.Build}";
+
             MSBuild(s => s
                 .SetTargetPath(Solution)
                 .SetTargets("Rebuild")
+                .SetAssemblyVersion(VersionString)
+                .SetInformationalVersion(VersionInformationString)
                 .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
                 .SetConfiguration(Configuration)
                 .SetMaxCpuCount(Environment.ProcessorCount)
@@ -96,17 +123,22 @@ class Build : NukeBuild
         });
 
     Target PrepareChocolateyTemplates => _ => _
-        .DependsOn(Test)
+        .DependsOn()
         .Executes(() =>
         {
-            ChocolateyTemplateFiles.GlobFiles("**/*.template").ForEach(path =>
+            CopyDirectoryRecursively(ChocolateyTemplateFiles, PackageDirectory);
+
+            PackageDirectory.GlobFiles("**/*.template").ForEach(path =>
             {
                 string text = ReadAllText(path);
+                text = text.Replace("##version##", VersionString);
+
+                WriteAllText(path, text);
             });
         });
 
     Target BuildChocolateyPackage => _ => _
-        .DependsOn(PrepareChocolateyTemplates)
+        .DependsOn(PrepareChocolateyTemplates, Compile, Test)
         .Executes(() =>
         {
         });
