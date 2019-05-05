@@ -96,7 +96,7 @@ class Build : NukeBuild
 
             DeleteDirectory(BinDirectory);
 
-            //EnsureCleanDirectory(BinDirectory);
+            EnsureCleanDirectory(BinDirectory);
         });
 
     Target Restore => _ => _
@@ -170,30 +170,17 @@ class Build : NukeBuild
             Chocolatey("pack", WorkingDirectory = ChocolateyDirectory);
         });
 
-    Target CopyOutputForPackage => _ => _
+    Target CreatePackage => _ => _
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, PackageDirectory, DirectoryExistsPolicy.Merge);
             PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
-        });
 
-    Target CreatePackage => _ => _
-        .DependsOn(CopyOutputForPackage)
-        .Executes(() =>
-        {
             Compress(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage);
 
-    Target PushPackagesToAppveyor => _ => _
-        .DependsOn(Pack)
-        .OnlyWhenDynamic(() => AppVeyor.Instance != null)
-        .Executes(() =>
-        {
-            Process proc = new Process();
-            proc.StartInfo = new ProcessStartInfo("Appveyor", $"PushArtifacts");
-        });
 }
