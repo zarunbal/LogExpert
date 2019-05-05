@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Microsoft.Build.Execution;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
@@ -21,6 +23,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.IO.TextTasks;
+using static Nuke.Common.IO.CompressionTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -39,9 +42,14 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath OutputDirectory => RootDirectory / "bin" / Configuration;
 
-    AbsolutePath PackageDirectory => RootDirectory / "bin" / "Package";
+    AbsolutePath BinDirectory => RootDirectory / "bin";
+
+    AbsolutePath OutputDirectory => BinDirectory / Configuration;
+
+    AbsolutePath PackageDirectory => BinDirectory / "Package";
+
+    AbsolutePath ChocolateyDirectory => BinDirectory / "chocolatey";
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
@@ -66,10 +74,10 @@ class Build : NukeBuild
     [Parameter("Version Information string")]
     string VersionInformationString => $"{VersionString}.{GitRepository.Head}";
 
-    [PackageExecutable(
-        packageId: "chocolatey",
-        packageExecutable: "choco.exe")]
-    readonly Tool Chocolatey;
+    [Parameter("Exclude file globs")]
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
+
+    [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -82,11 +90,13 @@ class Build : NukeBuild
         .Executes(() =>
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            DeleteDirectory(OutputDirectory);
-            DeleteDirectory(PackageDirectory);
 
-            EnsureCleanDirectory(OutputDirectory);
-            EnsureCleanDirectory(PackageDirectory);
+            BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
+            BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+
+            DeleteDirectory(BinDirectory);
+
+            //EnsureCleanDirectory(BinDirectory);
         });
 
     Target Restore => _ => _
@@ -111,8 +121,7 @@ class Build : NukeBuild
                 .SetInformationalVersion(VersionInformationString)
                 .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
                 .SetConfiguration(Configuration)
-                .SetMaxCpuCount(Environment.ProcessorCount)
-                .SetNodeReuse(IsLocalBuild));
+                .SetMaxCpuCount(Environment.ProcessorCount));
         });
 
     Target Test => _ => _
@@ -134,9 +143,9 @@ class Build : NukeBuild
         .DependsOn(Clean)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(ChocolateyTemplateFiles, PackageDirectory, DirectoryExistsPolicy.Merge);
+            CopyDirectoryRecursively(ChocolateyTemplateFiles, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
 
-            PackageDirectory.GlobFiles("**/*.template").ForEach(path =>
+            ChocolateyDirectory.GlobFiles("**/*.template").ForEach(path =>
             {
                 string text = ReadAllText(path);
                 text = text.Replace("##version##", VersionString);
@@ -150,15 +159,41 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, PackageDirectory);
-            PackageDirectory.GlobFiles("**/*.xml", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll").ForEach(DeleteFile);
-
+            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory);
+            ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
         });
 
     Target BuildChocolateyPackage => _ => _
         .DependsOn(PrepareChocolateyTemplates, CopyOutputForChocolatey)
         .Executes(() =>
         {
-            Chocolatey("pack", WorkingDirectory = PackageDirectory);
+            Chocolatey("pack", WorkingDirectory = ChocolateyDirectory);
+        });
+
+    Target CopyOutputForPackage => _ => _
+        .DependsOn(Compile, Test)
+        .Executes(() =>
+        {
+            CopyDirectoryRecursively(OutputDirectory, PackageDirectory, DirectoryExistsPolicy.Merge);
+            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+        });
+
+    Target CreatePackage => _ => _
+        .DependsOn(CopyOutputForPackage)
+        .Executes(() =>
+        {
+            Compress(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
+        });
+
+    Target Pack => _ => _
+        .DependsOn(BuildChocolateyPackage, CreatePackage);
+
+    Target PushPackagesToAppveyor => _ => _
+        .DependsOn(Pack)
+        .OnlyWhenDynamic(() => AppVeyor.Instance != null)
+        .Executes(() =>
+        {
+            Process proc = new Process();
+            proc.StartInfo = new ProcessStartInfo("Appveyor", $"PushArtifacts");
         });
 }
