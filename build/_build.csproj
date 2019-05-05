@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="0.18.0" />
+    <PackageReference Include="GitVersion" Version="3.6.5" />
+    <PackageReference Include="GitVersion.CommandLine" Version="4.0.0" />
+    <PackageReference Include="Nuke.Common" Version="0.19.1" />
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.10.0" />
   </ItemGroup>
 

@@ -8,6 +8,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.NUnit;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
@@ -16,6 +17,7 @@ using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.IO.TextTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -26,26 +28,38 @@ class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
+    public static int Main() => Execute<Build>(x => x.Test);
 
-    public static int Main () => Execute<Build>(x => x.Test );
-
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")] private readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
+    [GitVersion] readonly Nuke.Common.Tools.GitVersion.GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
+    AbsolutePath OutputDirectory => RootDirectory / "bin" / Configuration;
+
+    AbsolutePath PackageDirectory => RootDirectory / "bin" / "Package";
+
+    AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
+
+    Target Initialize => _ => _
+        .Executes(() =>
+        {
+            SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+        });
 
     Target Clean => _ => _
-        .Before(Restore)
+        .DependsOn(Initialize)
         .Executes(() =>
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            RootDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            DeleteDirectory(OutputDirectory);
+            EnsureCleanDirectory(OutputDirectory);
         });
 
     Target Restore => _ => _
+        .DependsOn(Clean)
         .Executes(() =>
         {
             MSBuild(s => s
@@ -70,7 +84,6 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            Logger.Info("Test");
             SourceDirectory.GlobFiles("**/*Tests.csproj").ForEach(path =>
             {
                 DotNetTest(c =>
@@ -80,5 +93,21 @@ class Build : NukeBuild
                     return c;
                 });
             });
+        });
+
+    Target PrepareChocolateyTemplates => _ => _
+        .DependsOn(Test)
+        .Executes(() =>
+        {
+            ChocolateyTemplateFiles.GlobFiles("**/*.template").ForEach(path =>
+            {
+                string text = ReadAllText(path);
+            });
+        });
+
+    Target BuildChocolateyPackage => _ => _
+        .DependsOn(PrepareChocolateyTemplates)
+        .Executes(() =>
+        {
         });
 }
