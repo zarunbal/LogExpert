@@ -34,6 +34,8 @@ build:
 artifacts:
 - path: bin\Release\
   name: ci-Development
+- path: bin\**\*.zip
+- path: bin\**\*.nupkg
 deploy_script:
 
 - ps: >-
