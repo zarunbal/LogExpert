@@ -19,6 +19,8 @@
     <NukeMetadata Include="**\*.json" Exclude="bin\**;obj\**" />
     <NukeExternalFiles Include="**\*.*.ext" Exclude="bin\**;obj\**" />
     <None Remove="*.csproj.DotSettings;*.ref.*.txt" />
+    <None Include="..\Build-DebugPack.ps1" Link="Build-DebugPack.ps1" />
+    <None Include="..\Build-ReleasePack.ps1" Link="Build-ReleasePack.ps1" />
 
     <!-- Common build related files -->
     <None Include="..\build.ps1" />

@@ -77,12 +77,24 @@ class Build : NukeBuild
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
 
+    [Parameter("My signing key", Name = "my_signing_key")]
+    string MySigningKey => null;
+
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
     Target Initialize => _ => _
         .Executes(() =>
         {
             SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+
+            if (!string.IsNullOrWhiteSpace(MySigningKey))
+            {
+                Logger.Info("Replace signing key");
+                byte[] bytes = Convert.FromBase64String(MySigningKey);
+                AbsolutePath signingKey = SourceDirectory / "Solution Items" / "Key.snk";
+                DeleteFile(signingKey);
+                WriteAllBytes(signingKey, bytes);
+            }
         });
 
     Target Clean => _ => _
@@ -133,6 +145,7 @@ class Build : NukeBuild
                 DotNetTest(c =>
                 {
                     c = c.SetProjectFile(path)
+                        .SetConfiguration(Configuration)
                         .EnableNoBuild();
                     return c;
                 });
@@ -182,5 +195,4 @@ class Build : NukeBuild
 
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage);
-
 }
