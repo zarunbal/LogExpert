@@ -77,8 +77,7 @@ class Build : NukeBuild
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
 
-    [Parameter("My signing key", Name = "my_signing_key")]
-    string MySigningKey => null;
+    [Parameter("My signing key", Name = "my_signing_key")] string MySigningKey = null;
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
