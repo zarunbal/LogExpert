@@ -102,12 +102,15 @@ class Build : NukeBuild
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
 
-            BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
-            BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+            if (DirectoryExists(BinDirectory))
+            {
+                BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
+                BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
 
-            DeleteDirectory(BinDirectory);
+                DeleteDirectory(BinDirectory);
 
-            EnsureCleanDirectory(BinDirectory);
+                EnsureCleanDirectory(BinDirectory);
+            }
         });
 
     Target Restore => _ => _
