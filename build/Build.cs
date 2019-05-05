@@ -1,10 +1,13 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Execution;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
@@ -62,6 +65,11 @@ class Build : NukeBuild
 
     [Parameter("Version Information string")]
     string VersionInformationString => $"{VersionString}.{GitRepository.Head}";
+
+    [PackageExecutable(
+        packageId: "chocolatey",
+        packageExecutable: "choco.exe")]
+    readonly Tool Chocolatey;
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -123,23 +131,34 @@ class Build : NukeBuild
         });
 
     Target PrepareChocolateyTemplates => _ => _
-        .DependsOn()
+        .DependsOn(Clean)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(ChocolateyTemplateFiles, PackageDirectory);
+            CopyDirectoryRecursively(ChocolateyTemplateFiles, PackageDirectory, DirectoryExistsPolicy.Merge);
 
             PackageDirectory.GlobFiles("**/*.template").ForEach(path =>
             {
                 string text = ReadAllText(path);
                 text = text.Replace("##version##", VersionString);
 
-                WriteAllText(path, text);
+                WriteAllText($"{Regex.Replace(path, "\\.template$", "")}", text);
+                DeleteFile(path);
             });
         });
 
-    Target BuildChocolateyPackage => _ => _
-        .DependsOn(PrepareChocolateyTemplates, Compile, Test)
+    Target CopyOutputForChocolatey => _ => _
+        .DependsOn(Compile, Test)
         .Executes(() =>
         {
+            CopyDirectoryRecursively(OutputDirectory, PackageDirectory);
+            PackageDirectory.GlobFiles("**/*.xml", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll").ForEach(DeleteFile);
+
+        });
+
+    Target BuildChocolateyPackage => _ => _
+        .DependsOn(PrepareChocolateyTemplates, CopyOutputForChocolatey)
+        .Executes(() =>
+        {
+            Chocolatey("pack", WorkingDirectory = PackageDirectory);
         });
 }
