@@ -71,10 +71,10 @@ deploy_script:
 
     choco pack $chocodir\logexpert.portable.nuspec
 
-    Push-AppveyorArtifact "logexpert.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
+    #Push-AppveyorArtifact "logexpert.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
 
     cd $packagedir
 
     7z a LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip LogExpert
 
-    Push-AppveyorArtifact "LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip"
+    #Push-AppveyorArtifact "LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip"
