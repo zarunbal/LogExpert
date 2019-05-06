@@ -6,7 +6,7 @@ environment:
 build_script:
 - ps:  >-
     ./build.ps1 Pack --Configuration Release
-    if($LastErrorCode != 0) {exit 1}
+    if($LastErrorCode -ne 0) {exit 1}
     exit 0
 test: off
 artifacts:
