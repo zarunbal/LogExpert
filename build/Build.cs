@@ -126,7 +126,7 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            string version = $"{Version.Major}.{Version.Minor}.{Version.Build}";
+            Logger.Info($"Version: '{VersionString}'");
 
             MSBuild(s => s
                 .SetTargetPath(Solution)
