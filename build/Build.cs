@@ -84,6 +84,7 @@ class Build : NukeBuild
     Target Initialize => _ => _
         .Executes(() =>
         {
+            throw new Exception("test ex");
             SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
 
             if (!string.IsNullOrWhiteSpace(MySigningKey))
