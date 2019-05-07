@@ -209,11 +209,11 @@ class Build : NukeBuild
             string text = ReadAllText(assemblyVersion);
             Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")(\d+\.\d+\.\d+)(""\)\])");
             Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")(\d+\.\d+\.\d+)(""\)\])");
-            Regex AssemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")(\d+\.\d+\.\d+)(""\)\])");
+            Regex assemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")(\d+\.\d+\.\d+)(""\)\])");
 
             text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
             text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
-            text = AssemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
+            text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
 
             WriteAllText(assemblyVersion, text);
         });
