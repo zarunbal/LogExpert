@@ -14,6 +14,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.NUnit;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
@@ -40,6 +41,7 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
+    [GitVersion] readonly GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
 
@@ -72,7 +74,10 @@ class Build : NukeBuild
     string VersionString => $"{Version.Major}.{Version.Minor}.{Version.Build}";
 
     [Parameter("Version Information string")]
-    string VersionInformationString => $"{VersionString}.{GitRepository.Head}";
+    string VersionInformationString => $"{VersionString}.Branch.{GitVersion.BranchName}.{GitVersion.Sha} {Configuration}";
+
+    [Parameter("Version file string")]
+    string VersionFileString => $"{VersionString}.0";
 
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
@@ -195,6 +200,29 @@ class Build : NukeBuild
             Compress(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
+    Target ChangeVersionNumber => _ => _
+        .Before(Compile)
+        .Executes(() =>
+        {
+            AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
+
+            string text = ReadAllText(assemblyVersion);
+            Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")(\d+\.\d+\.\d+)(""\)\])");
+            Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")(\d+\.\d+\.\d+)(""\)\])");
+            Regex AssemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")(\d+\.\d+\.\d+)(""\)\])");
+
+            text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
+            text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
+            text = AssemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
+
+            WriteAllText(assemblyVersion, text);
+        });
+
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage);
+
+    private string ReplaceVersionMatch(Match match, string replacement)
+    {
+        return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
+    }
 }
