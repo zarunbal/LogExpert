@@ -110,7 +110,7 @@ class Build : NukeBuild
             if (DirectoryExists(BinDirectory))
             {
                 BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
-                BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+                BinDirectory.GlobDirectories("**/*").ForEach(DeleteDirectory);
 
                 DeleteDirectory(BinDirectory);
 
