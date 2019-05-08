@@ -15,6 +15,7 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Tools.NUnit;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
@@ -80,7 +81,7 @@ class Build : NukeBuild
     string VersionInformationString => $"{VersionString}.Branch.{GitVersion.BranchName}.{GitVersion.Sha} {Configuration}";
 
     [Parameter("Version file string")]
-    string VersionFileString => $"{VersionString}.0";
+    string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
@@ -172,15 +173,9 @@ class Build : NukeBuild
         {
             CopyDirectoryRecursively(ChocolateyTemplateFiles, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
 
-            ChocolateyDirectory.GlobFiles("**/*.template").ForEach(path =>
-            {
-                string text = ReadAllText(path);
-                text = text.Replace("##version##", VersionString);
-
-                WriteAllText($"{Regex.Replace(path, "\\.template$", "")}", text);
-                DeleteFile(path);
-            });
+            ChocolateyDirectory.GlobFiles("**/*.template").ForEach(path => TransformTemplateFile(path, true));
         });
+
 
     Target CopyOutputForChocolatey => _ => _
         .DependsOn(Compile, Test)
@@ -218,10 +213,12 @@ class Build : NukeBuild
             AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
 
             string text = ReadAllText(assemblyVersion);
-            Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")(\d+\.\d+\.\d+)(""\)\])");
-            Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")(\d+\.\d+\.\d+)(""\)\])");
-            Regex assemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")(\d+\.\d+\.\d+)(""\)\])");
+            Regex configurationRegex = new Regex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])");
+            Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])");
+            Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])");
+            Regex assemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])");
 
+            text = configurationRegex.Replace(text, (match) => ReplaceVersionMatch(match, $"\"{Configuration}\""));
             text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
             text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
             text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
@@ -262,11 +259,43 @@ class Build : NukeBuild
             Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
         });
 
+
+    Target ColumnizerLibCreateNuget => _ => _
+        .DependsOn(Compile, Test)
+        .Executes(() =>
+        {
+            var columnizerFolder = SourceDirectory / "ColumnizerLib";
+
+            NuGetTasks.NuGetPack(s =>
+            {
+                s = s.SetTargetPath(columnizerFolder / "ColumnizerLib.csproj")
+                    .DisableBuild()
+                    .EnableSymbols()
+                    .SetConfiguration(Configuration)
+                    .SetProperty("version", VersionString)
+                    .SetOutputDirectory(BinDirectory);
+
+                return s;
+            });
+        });
+
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
 
     private string ReplaceVersionMatch(Match match, string replacement)
     {
         return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
+    }
+
+    private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
+    {
+        string text = ReadAllText(path);
+        text = text.Replace("##version##", VersionString);
+
+        WriteAllText($"{Regex.Replace(path, "\\.template$", "")}", text);
+        if (deleteTemplate)
+        {
+            DeleteFile(path);
+        }
     }
 }
