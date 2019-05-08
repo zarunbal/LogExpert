@@ -228,7 +228,7 @@ class Build : NukeBuild
 
             WriteAllText(assemblyVersion, text);
 
-            SourceDirectory.GlobFiles("**/*.cs").ForEach(file =>
+            SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
             {
                 if (string.IsNullOrWhiteSpace(MyVariable))
                 {
@@ -238,7 +238,7 @@ class Build : NukeBuild
                 Logger.Info("My variable execute");
                 string fileText = ReadAllText(file);
 
-                Regex reg = new Regex(@"\w\w{2}[_]p?[tso]{2}?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
+                Regex reg = new Regex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
 
                 if (reg.IsMatch(fileText))
                 {
@@ -254,8 +254,8 @@ class Build : NukeBuild
         .Executes(() =>
         {
             string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll"};
-            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex64));
-            OutputDirectory.GlobFiles(files.Select(a => $"plugins86/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex86));
+            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite, createDirectories: true));
+            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite, createDirectories: true));
 
             Compress(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
             Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
