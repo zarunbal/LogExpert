@@ -55,8 +55,8 @@ class Build : NukeBuild
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
-    AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86";
-    AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64";
+    AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
+    AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
     Version Version
     {
@@ -250,12 +250,13 @@ class Build : NukeBuild
         });
 
     Target PackageSftpFileSystem => _ => _
-        .After(Compile)
+        .DependsOn(Compile, Test)
         .Executes(() =>
         {
             string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll"};
-            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite, createDirectories: true));
-            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite, createDirectories: true));
+
+            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
+            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));
 
             Compress(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
             Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
