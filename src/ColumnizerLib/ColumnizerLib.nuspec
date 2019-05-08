@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>LogExpert.ColumnizerLib</id>
+    <version>$version$</version>
+    <title>LogExpert ColumnizerLib</title>
+    <authors>Zarunbal Previous:Hagen Raab</authors>
+    <owners>Zarunbal</owners>
+    <licenseUrl>https://cdn.rawgit.com/zarunbal/LogExpert/v$version$/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Columnizer Lib for Logexpert plugins</description>
+    <releaseNotes>See https://github.com/zarunbal/LogExpert/releases/tag/v$version$</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>LogExpert Columnizer</tags>
+  </metadata>
+</package>
