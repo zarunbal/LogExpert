@@ -258,7 +258,7 @@ class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem);
 
     private string ReplaceVersionMatch(Match match, string replacement)
     {
