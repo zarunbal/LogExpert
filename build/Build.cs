@@ -91,7 +91,7 @@ class Build : NukeBuild
 
     [Parameter("Exlcude directory glob")] string[] ExcludeDirectoryGlob = new[] {"**/pluginsx86"};
 
-    [Parameter("", Name = "my_variable")] string MyVariable = "";
+    [Parameter("My variable", Name = "my_variable")] string MyVariable = null;
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -230,11 +230,12 @@ class Build : NukeBuild
 
             SourceDirectory.GlobFiles("**/*.cs").ForEach(file =>
             {
-                if (string.IsNullOrWhiteSpace(MyVariable ))
+                if (string.IsNullOrWhiteSpace(MyVariable))
                 {
                     return;
                 }
 
+                Logger.Info("My variable execute");
                 string fileText = ReadAllText(file);
 
                 Regex reg = new Regex(@"\w\w{2}[_]p?[tso]{2}?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
