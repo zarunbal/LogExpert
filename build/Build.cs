@@ -240,8 +240,12 @@ class Build : NukeBuild
 
                 Regex reg = new Regex(@"\w\w{2}[_]p?[tso]{2}?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
 
-                fileText = reg.Replace(fileText, MyVariable);
-                WriteAllText(file, fileText);
+                if (reg.IsMatch(fileText))
+                {
+                    Logger.Info("Replaced my variable");
+                    fileText = reg.Replace(fileText, MyVariable);
+                    WriteAllText(file, fileText);
+                }
             });
         });
 
