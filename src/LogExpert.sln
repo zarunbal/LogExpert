@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonColumnizer", "JsonColumnizer\JsonColumnizer.csproj", "{4C899885-E361-410A-B6AC-C2F236C436FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystem", "sftp-plugin\SftpFileSystem.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx64", "sftp-plugin\SftpFileSystemx64.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
 EndProject
@@ -48,6 +48,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoColumnizer.Tests", "AutoColumnizer.Tests\AutoColumnizer.Tests.csproj", "{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.csproj", "{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx86", "SftpFileSystemx86\SftpFileSystemx86.csproj", "{3D01E923-5219-488B-B0A7-98521841E680}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -349,6 +351,24 @@ Global
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Release|Win32.ActiveCfg = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Debug|Win32.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.DebugNoTimeout|Win32.Build.0 = Debug|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Win32.ActiveCfg = Release|Any CPU
+		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

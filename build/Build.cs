@@ -55,6 +55,9 @@ class Build : NukeBuild
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
+    AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86";
+    AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64";
+
     Version Version
     {
         get
@@ -85,6 +88,10 @@ class Build : NukeBuild
     [Parameter("My signing key", Name = "my_signing_key")] string MySigningKey = null;
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
+
+    [Parameter("Exlcude directory glob")] string[] ExcludeDirectoryGlob = new[] {"**/pluginsx86"};
+
+    [Parameter("", Name = "my_variable")] string MyVariable = "";
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -197,6 +204,8 @@ class Build : NukeBuild
             CopyDirectoryRecursively(OutputDirectory, PackageDirectory, DirectoryExistsPolicy.Merge);
             PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
 
+            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+
             Compress(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
@@ -204,6 +213,8 @@ class Build : NukeBuild
         .Before(Compile)
         .Executes(() =>
         {
+            Logger.Info($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
+
             AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
 
             string text = ReadAllText(assemblyVersion);
@@ -216,6 +227,33 @@ class Build : NukeBuild
             text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
 
             WriteAllText(assemblyVersion, text);
+
+            SourceDirectory.GlobFiles("**/*.cs").ForEach(file =>
+            {
+                if (string.IsNullOrWhiteSpace(MyVariable ))
+                {
+                    return;
+                }
+
+                string fileText = ReadAllText(file);
+
+                Regex reg = new Regex(@"\w\w{2}[_]p?[tso]{2}?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
+
+                fileText = reg.Replace(fileText, MyVariable);
+                WriteAllText(file, fileText);
+            });
+        });
+
+    Target PackageSftpFileSystem => _ => _
+        .After(Compile)
+        .Executes(() =>
+        {
+            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll"};
+            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex64));
+            OutputDirectory.GlobFiles(files.Select(a => $"plugins86/{a}").ToArray()).ForEach(file => CopyFile(file, SftpFileSystemPackagex86));
+
+            Compress(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
+            Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
         });
 
     Target Pack => _ => _
