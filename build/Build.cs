@@ -128,6 +128,8 @@ class Build : NukeBuild
             {
                 BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
                 BinDirectory.GlobDirectories("**/*").ForEach(DeleteDirectory);
+                DirectoryInfo info = new DirectoryInfo(BinDirectory);
+                info.GetDirectories().ForEach(a => a.Delete(true));
 
                 DeleteDirectory(BinDirectory);
 
@@ -293,7 +295,7 @@ class Build : NukeBuild
 
     Target PublishColumnizerNuget => _ => _
         .DependsOn(ColumnizerLibCreateNuget)
-        .Requires(()=> NugetApiKey)
+        .Requires(() => NugetApiKey)
         //.OnlyWhenDynamic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
         .Executes(() =>
         {
@@ -324,7 +326,7 @@ class Build : NukeBuild
             var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
 
             PublishRelease(s => s
-                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a=> a.ToString()).ToArray())
+                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a => a.ToString()).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +
@@ -339,8 +341,6 @@ class Build : NukeBuild
                 .SetName(VersionString)
                 .SetPrerelease(true)
             );
-
-            
         });
 
     Target Publish => _ => _
