@@ -16,7 +16,7 @@ environment:
   GitHubApiKey:
     secure: N83nQZ/QQVqpRnl0D6F/xSbKjn062y07JdskpUpbWryMY2JDo4Be9lUXmob+xcOO
 build_script:
-- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Pack ChangeVersionNumber --Configuration Release"
+- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Publish ChangeVersionNumber --Configuration Release"
 test: off
 artifacts:
 - path: bin\Release\
