@@ -346,10 +346,9 @@ class Build : NukeBuild
                                  $"It might be necessary to unblock the Executables / Dlls to get everything working, especially Plugins (see #55, #13, #8).")
                 .SetRepositoryName(repositoryInfo.repositoryName)
                 .SetRepositoryOwner(repositoryInfo.gitHubOwner)
-                .SetTag($"v{VersionString}-beta")
+                .SetTag($"v{VersionString}")
                 .SetToken(GitHubApiKey)
                 .SetName(VersionString)
-                .SetPrerelease(true)
             );
         });
 
