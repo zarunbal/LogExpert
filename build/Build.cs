@@ -280,7 +280,6 @@ class Build : NukeBuild
             {
                 s = s.SetTargetPath(columnizerFolder / "ColumnizerLib.csproj")
                     .DisableBuild()
-                    .EnableSymbols()
                     .SetConfiguration(Configuration)
                     .SetProperty("version", VersionString)
                     .SetOutputDirectory(BinDirectory);
