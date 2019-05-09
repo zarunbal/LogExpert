@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Build.Execution;
 using Nuke.Common;
@@ -166,7 +167,7 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            SourceDirectory.GlobFiles("**/*Tests.csproj").ForEach(path =>
+            Parallel.ForEach(SourceDirectory.GlobFiles("**/*Tests.csproj"), path =>
             {
                 DotNetTest(c =>
                 {
@@ -186,7 +187,6 @@ class Build : NukeBuild
 
             ChocolateyDirectory.GlobFiles("**/*.template").ForEach(path => TransformTemplateFile(path, true));
         });
-
 
     Target CopyOutputForChocolatey => _ => _
         .DependsOn(Compile, Test)
@@ -269,7 +269,6 @@ class Build : NukeBuild
             Compress(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
             Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
         });
-
 
     Target ColumnizerLibCreateNuget => _ => _
         .DependsOn(Compile, Test)
