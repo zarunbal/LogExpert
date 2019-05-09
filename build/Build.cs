@@ -297,15 +297,22 @@ class Build : NukeBuild
         //.OnlyWhenDynamic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
         .Executes(() =>
         {
-            NuGetTasks.NuGetPush(s =>
+            BinDirectory.GlobFiles("**/LogExpert.ColumnizerLib.*.nupkg").ForEach(file =>
             {
-                s = s.SetApiKey(NugetApiKey)
-                    .SetSource("https://api.nuget.org/v3/index.json")
-                    .SetApiKey(NugetApiKey)
-                    .SetTargetPath(BinDirectory / "LogExpert.ColumnizerLib.*.nupkg");
+                Logger.Normal($"Publish nuget {file}");
 
-                return s;
+                NuGetTasks.NuGetPush(s =>
+                {
+                    s = s.SetApiKey(NugetApiKey)
+                        .SetSource("https://api.nuget.org/v3/index.json")
+                        .SetApiKey(NugetApiKey)
+                        .SetTargetPath(file);
+
+                    return s;
+                });
             });
+
+           
         });
 
     Target PublishChocolatey => _ => _
@@ -315,6 +322,8 @@ class Build : NukeBuild
         {
             ChocolateyDirectory.GlobFiles("**/*.nupkg").ForEach(file =>
             {
+                Logger.Normal($"Publish chocolatey package {file}");
+
                 Chocolatey($"push {file} --key {ChocolateyApiKey} --source https://push.chocolatey.org/", WorkingDirectory = ChocolateyDirectory);
             });
         });
@@ -332,7 +341,7 @@ class Build : NukeBuild
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +
                                  $"# Contributors\r\n" +
-                                 $"Thanks to the contributors!" +
+                                 $"Thanks to the contributors!\r\n" +
                                  $"# Infos\r\n" +
                                  $"It might be necessary to unblock the Executables / Dlls to get everything working, especially Plugins (see #55, #13, #8).")
                 .SetRepositoryName(repositoryInfo.repositoryName)
