@@ -48,6 +48,9 @@ This is a continous integration build. So always the latest and greates changes.
 - Build
 - The output is under bin/(Debug/Release)/
 
+Nuke.build Requirements
+- Chocolatey must be installed
+
 # Pull Request
 - Use Development branch as target
 
