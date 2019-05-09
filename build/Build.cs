@@ -314,7 +314,10 @@ class Build : NukeBuild
         .Requires(() => ChocolateyApiKey)
         .Executes(() =>
         {
-            Chocolatey($"push logexpert.*.nupkg --key {ChocolateyApiKey} --source https://push.chocolatey.org/", WorkingDirectory = ChocolateyDirectory);
+            ChocolateyDirectory.GlobFiles("**/*.nupkg").ForEach(file =>
+            {
+                Chocolatey($"push {file} --key {ChocolateyApiKey} --source https://push.chocolatey.org/", WorkingDirectory = ChocolateyDirectory);
+            });
         });
 
     Target PublishGithub => _ => _
