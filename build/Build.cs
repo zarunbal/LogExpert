@@ -19,6 +19,7 @@ using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Tools.NUnit;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
+using Nuke.GitHub;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
@@ -26,6 +27,8 @@ using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.IO.TextTasks;
 using static Nuke.Common.IO.CompressionTasks;
+using static Nuke.GitHub.GitHubTasks;
+using static Nuke.GitHub.ChangeLogExtensions;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -70,7 +73,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 6, patch);
+            return new Version(1, 7, patch);
         }
     }
 
@@ -93,6 +96,12 @@ class Build : NukeBuild
     [Parameter("Exlcude directory glob")] string[] ExcludeDirectoryGlob = new[] {"**/pluginsx86"};
 
     [Parameter("My variable", Name = "my_variable")] string MyVariable = null;
+
+    [Parameter("Nuget api key")] string NugetApiKey = null;
+
+    [Parameter("Chocolatey api key")] string ChocolateyApiKey = null;
+
+    [Parameter("GitHub Api key")] string GitHubApiKey = null;
 
     Target Initialize => _ => _
         .Executes(() =>
@@ -281,6 +290,61 @@ class Build : NukeBuild
 
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
+
+    Target PublishColumnizerNuget => _ => _
+        .DependsOn(ColumnizerLibCreateNuget)
+        .Requires(()=> NugetApiKey)
+        //.OnlyWhenDynamic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
+        .Executes(() =>
+        {
+            NuGetTasks.NuGetPush(s =>
+            {
+                s = s.SetApiKey(NugetApiKey)
+                    .SetSource("https://api.nuget.org/v3/index.json")
+                    .SetApiKey(NugetApiKey)
+                    .SetTargetPath(BinDirectory / "LogExpert.ColumnizerLib.*.nupkg");
+
+                return s;
+            });
+        });
+
+    Target PublishChocolatey => _ => _
+        .DependsOn(BuildChocolateyPackage)
+        .Requires(() => ChocolateyApiKey)
+        .Executes(() =>
+        {
+            Chocolatey($"push logexpert.*.nupkg --key {ChocolateyApiKey} --source https://push.chocolatey.org/", WorkingDirectory = ChocolateyDirectory);
+        });
+
+    Target PublishGithub => _ => _
+        .DependsOn(Pack)
+        .Requires(() => GitHubApiKey)
+        .Executes(() =>
+        {
+            var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
+
+            PublishRelease(s => s
+                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a=> a.ToString()).ToArray())
+                .SetCommitSha(GitVersion.Sha)
+                .SetReleaseNotes($"# Changes\r\n" +
+                                 $"# Bugfixes\r\n" +
+                                 $"# Contributors\r\n" +
+                                 $"Thanks to the contributors!" +
+                                 $"# Infos\r\n" +
+                                 $"It might be necessary to unblock the Executables / Dlls to get everything working, especially Plugins (see #55, #13, #8).")
+                .SetRepositoryName(repositoryInfo.repositoryName)
+                .SetRepositoryOwner(repositoryInfo.gitHubOwner)
+                .SetTag($"v{VersionString}-beta")
+                .SetToken(GitHubApiKey)
+                .SetName(VersionString)
+                .SetPrerelease(true)
+            );
+
+            
+        });
+
+    Target Publish => _ => _
+        .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub);
 
     private string ReplaceVersionMatch(Match match, string replacement)
     {
