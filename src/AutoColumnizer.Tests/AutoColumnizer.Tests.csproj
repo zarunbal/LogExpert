@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}</ProjectGuid>
+    <ProjectGuid>{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LogExpert.Tests</RootNamespace>
-    <AssemblyName>LogExpert.Tests</AssemblyName>
+    <RootNamespace>AutoColumnizer.Tests</RootNamespace>
+    <AssemblyName>AutoColumnizer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -30,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,73 +39,55 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonCompactColumnizerTest.cs" />
-    <Compile Include="JsonColumnizerTest.cs" />
-    <Compile Include="SquareBracketColumnizerTest.cs" />
+    <Compile Include="AutoColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Moq">
+      <Version>4.10.1</Version>
+    </PackageReference>
     <PackageReference Include="NUnit">
-      <Version>3.10.1</Version>
+      <Version>3.11.0</Version>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter">
-      <Version>3.10.0</Version>
+      <Version>3.13.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestData\JsonColumnizerTest_01.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SquareBracketColumnizerTest_05.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SquareBracketColumnizerTest_04.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SquareBracketColumnizerTest_03.txt">
+    <Content Include="TestData\SquareBracketColumnizerTest_01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\SquareBracketColumnizerTest_02.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\SquareBracketColumnizerTest_01.txt">
+    <Content Include="TestData\SquareBracketColumnizerTest_03.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SquareBracketColumnizerTest_04.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AutoColumnizer\AutoColumnizer.csproj">
+      <Project>{b57259a3-4ed7-4f8b-a252-29e799a56b9e}</Project>
+      <Name>AutoColumnizer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
-      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
+      <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
       <Name>ColumnizerLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj">
-      <Project>{4c899885-e361-410a-b6ac-c2f236c436fa}</Project>
-      <Name>JsonColumnizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj">
-      <Project>{003535ec-4186-4958-9dd9-c641f089aeed}</Project>
-      <Name>JsonCompactColumnizer</Name>
     </ProjectReference>
     <ProjectReference Include="..\LogExpert\LogExpert.csproj">
       <Project>{f0c0d370-f416-44ed-939a-b4827d15ac14}</Project>
       <Name>LogExpert</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TestData\JsonCompactColumnizerTest_01.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\JsonCompactColumnizerTest_02.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\JsonCompactColumnizerTest_03.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

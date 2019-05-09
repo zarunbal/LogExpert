@@ -9,6 +9,7 @@
     <licenseUrl>https://cdn.rawgit.com/zarunbal/LogExpert/v##version##/LICENSE</licenseUrl>
     <projectSourceUrl>https://github.com/zarunbal/LogExpert</projectSourceUrl>
     <packageSourceUrl>https://github.com/zarunbal/LogExpert/tree/master/chocolatey</packageSourceUrl>
+    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
     <bugTrackerUrl>https://github.com/zarunbal/LogExpert/issues</bugTrackerUrl>
     <releaseNotes>https://github.com/zarunbal/LogExpert/releases/tag/v##version##</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

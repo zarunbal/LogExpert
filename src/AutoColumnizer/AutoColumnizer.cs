@@ -3,19 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace LogExpert
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
-    public class AutoColumnizer : ILogLineColumnizer
+    public class AutoColumnizer : ILogLineColumnizer, IAutoColumnizer
     {
-        protected int timeOffset = 0;
-        private readonly TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
-
         #region ILogLineColumnizer implementation
+
         public string Text => GetName();
 
         public bool IsTimeshiftImplemented()
@@ -33,15 +26,13 @@ namespace LogExpert
             return "Automatically find the right columnizer for any file";
         }
 
-        public ILogLineColumnizer FindColumnizer(string fileName, LogfileReader logFileReader)
+        public ILogLineColumnizer FindColumnizer(string fileName, IAutoLogLineColumnizerCallback logFileReader)
         {
             if (logFileReader == null || string.IsNullOrEmpty(fileName))
             {
-                return new DefaultLogfileColumnizer();
+                return logFileReader.GetDefaultColumnizer();
             }
 
-            ILogLineColumnizer lineColumnizer = null;
-            var timeDeterminer = new TimeFormatDeterminer();
             List<ILogLine> loglines = new List<ILogLine>
             {
                 // Sampling a few lines to select the correct columnizer
@@ -57,7 +48,23 @@ namespace LogExpert
                 logFileReader.GetLogLine(400)
             };
 
-            lineColumnizer = PluginRegistry.GetInstance().RegisteredColumnizers.OrderByDescending(x => x.GetPriority(fileName, loglines)).First();
+            var registeredColumnizer = logFileReader.GetRegisteredColumnizers();
+
+            List<Tuple<Priority, ILogLineColumnizer>> priorityListOfColumnizers = new List<Tuple<Priority, ILogLineColumnizer>>();
+
+            foreach (ILogLineColumnizer logLineColumnizer in registeredColumnizer)
+            {
+                var columnizerPriority = logLineColumnizer as IColumnizerPriority;
+                Priority priority = default(Priority);
+                if (columnizerPriority != null)
+                {
+                    priority = columnizerPriority.GetPriority(fileName, loglines);
+                }
+
+                priorityListOfColumnizers.Add(new Tuple<Priority, ILogLineColumnizer>(priority, logLineColumnizer));
+            }
+
+            ILogLineColumnizer lineColumnizer = priorityListOfColumnizers.OrderByDescending(a => a.Item1).Select(a => a.Item2).First();
 
             return lineColumnizer;
         }
@@ -94,11 +101,6 @@ namespace LogExpert
 
         public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
-        }
-
-        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
-        {
-            return Priority.NotSupport;
         }
 
         #endregion ILogLineColumnizer implementation

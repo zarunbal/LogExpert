@@ -9,7 +9,7 @@ namespace LogExpert
     using System;
     using static LogExpert.TimeFormatDeterminer;
 
-    public class TimestampColumnizer : ILogLineColumnizer
+    public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
     {
 
         #region ILogLineColumnizer implementation
@@ -216,15 +216,6 @@ namespace LogExpert
             }
 
             return result;
-        }
-
-        #endregion
-
-        #region internal stuff
-
-        public string Text
-        {
-            get { return GetName(); }
         }
 
         #endregion

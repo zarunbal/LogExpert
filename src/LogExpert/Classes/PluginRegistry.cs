@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using System.IO;
 using NLog;
 
-
 namespace LogExpert
 {
     /// <summary>
@@ -64,6 +63,7 @@ namespace LogExpert
                 {
                     instance = new PluginRegistry();
                 }
+
                 return instance;
             }
         }
@@ -76,7 +76,6 @@ namespace LogExpert
         {
             _logger.Info("Loading plugins...");
             this.RegisteredColumnizers = new List<ILogLineColumnizer>();
-            this.RegisteredColumnizers.Add(new AutoColumnizer());
             this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
             this.RegisteredColumnizers.Add(new TimestampColumnizer());
             this.RegisteredColumnizers.Add(new SquareBracketColumnizer());
@@ -106,6 +105,7 @@ namespace LogExpert
                                 {
                                     continue;
                                 }
+
                                 if (type.Name.EndsWith("Columnizer"))
                                 {
                                     Type t = typeof(ILogLineColumnizer);
@@ -121,11 +121,13 @@ namespace LogExpert
                                             {
                                                 ((IColumnizerConfigurator) o).LoadConfig(ConfigManager.ConfigDir);
                                             }
+
                                             if (o is ILogExpertPlugin)
                                             {
                                                 this.pluginList.Add(o as ILogExpertPlugin);
                                                 (o as ILogExpertPlugin).PluginLoaded();
                                             }
+
                                             _logger.Info("Added columnizer {0}", type.Name);
                                         }
                                     }
@@ -136,10 +138,12 @@ namespace LogExpert
                                     {
                                         continue;
                                     }
+
                                     if (TryAsKeywordAction(type))
                                     {
                                         continue;
                                     }
+
                                     if (TryAsFileSystem(type))
                                     {
                                         continue;
@@ -160,6 +164,7 @@ namespace LogExpert
                     }
                 }
             }
+
             _logger.Info("Plugin loading complete.");
         }
 
@@ -184,21 +189,25 @@ namespace LogExpert
             {
                 _logger.Debug("Trying to find file system plugin for uri {0}", uriString);
             }
+
             foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
             {
                 if (_logger.IsDebugEnabled)
                 {
                     _logger.Debug("Checking {0}", fs.Text);
                 }
+
                 if (fs.CanHandleUri(uriString))
                 {
                     if (_logger.IsDebugEnabled)
                     {
                         _logger.Debug("Found match {0}", fs.Text);
                     }
+
                     return fs;
                 }
             }
+
             _logger.Error("No file system plugin found for uri {0}", uriString);
             return null;
         }
@@ -217,14 +226,17 @@ namespace LogExpert
                 {
                     ((ILogExpertPluginConfigurator) me).LoadConfig(ConfigManager.ConfigDir);
                 }
+
                 if (me is ILogExpertPlugin)
                 {
                     this.pluginList.Add(me as ILogExpertPlugin);
                     (me as ILogExpertPlugin).PluginLoaded();
                 }
+
                 _logger.Info("Added context menu plugin {0}", type);
                 return true;
             }
+
             return false;
         }
 
@@ -239,14 +251,17 @@ namespace LogExpert
                 {
                     ((ILogExpertPluginConfigurator) ka).LoadConfig(ConfigManager.ConfigDir);
                 }
+
                 if (ka is ILogExpertPlugin)
                 {
                     this.pluginList.Add(ka as ILogExpertPlugin);
                     (ka as ILogExpertPlugin).PluginLoaded();
                 }
+
                 _logger.Info("Added keyword plugin {0}", type);
                 return true;
             }
+
             return false;
         }
 
@@ -258,6 +273,7 @@ namespace LogExpert
             {
                 fs = TryInstantiate<IFileSystemPlugin>(type);
             }
+
             if (fs != null)
             {
                 this.RegisteredFileSystemPlugins.Add(fs);
@@ -265,17 +281,19 @@ namespace LogExpert
                 {
                     ((ILogExpertPluginConfigurator) fs).LoadConfig(ConfigManager.ConfigDir);
                 }
+
                 if (fs is ILogExpertPlugin)
                 {
                     this.pluginList.Add(fs as ILogExpertPlugin);
                     (fs as ILogExpertPlugin).PluginLoaded();
                 }
+
                 _logger.Info("Added file system plugin {0}", type);
                 return true;
             }
+
             return false;
         }
-
 
         private T TryInstantiate<T>(Type loadedType) where T : class
         {
@@ -290,6 +308,7 @@ namespace LogExpert
                     return o as T;
                 }
             }
+
             return default(T);
         }
 
@@ -306,6 +325,7 @@ namespace LogExpert
                     return o as T;
                 }
             }
+
             return default(T);
         }
 

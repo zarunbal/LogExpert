@@ -1,78 +1,15 @@
 version: 0.0.{build}
 image: Visual Studio 2017
-configuration: Release
-platform: Any CPU
 environment:
   my_signing_key:
     secure: 5+tJAGXhhYmF4qwybdyR9Au9ebFGsRzEXEPGCjsM8dFVhm85V5aqvInGtw9MIr9g4/F+neEH4yHwDIDSIiFNkmRJkOPaR1p2WxWVMNF4q1DlOWXUym72a8Dn5DUoE17x0J5zLVioM5Sdi5cJuNlC+lkYMNj9EU91QZEHp34HfUHXlxqKIoTM/XsnfqyDGTnRPuFATp2aHdDy47q7vjZRg1yqAxTRm3S1JIC9vkLgDdbUR0Q+e2ngPEuDZWqhqbnxRdXU3tgi8fyCcZxmOB+2uJvscBzD33xH0ZOqWcp0ucivECbPz0HLTS2gUIE+ekA6Dc/frZU7uAQ4/zDa/nz9edyG+E8kucZZBkUG66avUU24baiabI1L1JWqO0YtxE+MdxFKD8MQTu7j8cbJ+xI9Nc9AeEQsm4si4ZAVNvKJyEDlK2MVdlS+QguhYKmHIskPkdihnVQzz+U9XB+hk5UC8saWp57G0q/ixTn3QTdPKLxFJIMHaYDaoLrmUsPm6+GyUK05WdRl8KbM9p1T74RbvgJE7P2o7NRwTF72tTQadtm/9qXWW6bHCYhxkEIVlfldi2siqGDRUPoMsZH7cuPTKhx4z9HmE5l+H3bg++u6pcKWjWYFOh7LS69eMmsuK3xzks7WD2p9XlNsfHkg0zqYMCFcBB6NHRD9zHi5RZn086ew5LsShByQRwTuLuIBrykdGxZxCNb9us2SaZ9vFxHJRfKgOS9smBMDTLEIdOVl5kOManQwvukglxveJcOJciFc4EfuPvXIlfsDbtX9bmqKmNGXH9hS36Z9i/09x2T9ct0RXgWPiwxQlKDFa6190g8WxFhDJoiu46INF+MbaDQsYxff2CwkWeHcwqzrHHONG0iGu45/YsjIyOIFhKYHNRFQ0aOrBduXth8ZbkLO3SwDG7MLXtHIobk2MWdFjqT8bh1NX95ISsH+dNNHLxA9x24jqbWH5jBmFQTC7KvQFRSS+vy4VeLMah+YcZD/DheE66kZL7s3CWsBHo4P11R8ibQdGOv6B97Pejmj4OHyPivxbSyNvM4RUM0yh2nN7KpUsXs=
-before_build:
-- ps: >-
-    $base64Str = $env:my_signing_key
-
-    $keyFile = $env:APPVEYOR_BUILD_FOLDER + "/src/Solution Items/Key.snk"
-
-    Write-Host "Got " + $base64Str.Length + " of base 64"
-
-    if($base64Str.Length -ne 0) 
-    {
-
-    $bytes = [System.Convert]::FromBase64String($base64Str)
-
-    Write-Host "Got " + $base64Str.Length + " of bytes"
-
-    [System.IO.File]::Delete($keyFile)
-
-    [System.IO.File]::WriteAllBytes($keyFile, $bytes)
-
-    }
-
-- cmd: nuget restore src/LogExpert.sln
-build:
-  project: src/LogExpert.sln
-  parallel: true
-  verbosity: minimal
+  my_variable:
+    secure: Qpq/4cyuTUzmt/r4HsQxioG6WXrZSK3mzVq5iUJC2RI=
+build_script:
+- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Pack ChangeVersionNumber --Configuration Release"
+test: off
 artifacts:
 - path: bin\Release\
   name: ci-Development
-deploy_script:
-
-- ps: >-
-    $packagedir = ".\bin\package"
-
-    $chocodir = ".\chocolatey"
-
-    New-Item -ItemType Directory -Force -Path $packagedir\LogExpert\
-
-    New-Item -ItemType Directory -Force -Path $chocodir\tools\
-
-    (Get-Content "$($chocodir)\logexpert.portable.nuspec.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\logexpert.portable.nuspec"
-
-    (Get-Content "$($chocodir)\tools\LICENSE.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\LICENSE.txt"
-
-    (Get-Content "$($chocodir)\tools\VERIFICATION.txt.template" -Raw).Replace("##version##", "$($env:APPVEYOR_BUILD_VERSION)") | Out-File "$($chocodir)\tools\VERIFICATION.txt"
-
-    remove-item $chocodir\tools\LICENSE.txt.template
-
-    remove-item $chocodir\tools\VERIFICATION.txt.template
-
-    Copy-Item -Path .\bin\Release\* -Destination $packagedir\LogExpert\ –Recurse
-
-    get-childitem $packagedir\LogExpert -include *.xml -recurse | remove-item
-
-    get-childitem $packagedir\LogExpert -include *.pdb -recurse | remove-item
-
-    remove-item $packagedir\LogExpert\plugins\SftpFileSystem.dll
-
-    remove-item $packagedir\LogExpert\plugins\ChilkatDotNet4.dll
-
-    Copy-Item -Path $packagedir\LogExpert\* -Destination $chocodir\tools\ –Recurse
-
-    choco pack $chocodir\logexpert.portable.nuspec
-
-    Push-AppveyorArtifact "logexpert.$($ENV:APPVEYOR_BUILD_VERSION).nupkg"
-
-    cd $packagedir
-
-    7z a LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip LogExpert
-
-    Push-AppveyorArtifact "LogExpert-$($ENV:APPVEYOR_BUILD_VERSION).zip"
+- path: bin\**\*.zip
+- path: bin\**\*.nupkg

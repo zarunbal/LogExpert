@@ -55,8 +55,11 @@
     </Compile>
     <Compile Include="Column.cs" />
     <Compile Include="ColumnizedLogLine.cs" />
+    <Compile Include="IAutoColumnizer.cs" />
+    <Compile Include="IAutoLogLineColumnizerCallback.cs" />
     <Compile Include="IColumn.cs" />
     <Compile Include="IColumnizerConfigurator.cs" />
+    <Compile Include="IColumnizerPriority.cs" />
     <Compile Include="IContextMenuEntry.cs" />
     <Compile Include="IFileSystemCallback.cs" />
     <Compile Include="IFileSystemPlugin.cs" />
@@ -83,6 +86,7 @@
     <None Include="..\Solution Items\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <None Include="ColumnizerLib.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
