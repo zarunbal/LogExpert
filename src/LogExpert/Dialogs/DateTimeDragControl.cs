@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -22,11 +23,8 @@ namespace LogExpert.Dialogs
         private const int NO_DIGIT_DRAGGED = -1;
         private int addedValue = 0;
 
-        private string dateSeparator = ".";
-
         private DateTime dateTime = new DateTime();
-        private int dayIndex = 0;
-        private readonly Rectangle[] digitRects = new Rectangle[6];
+        private readonly IList<Rectangle> digitRects = new List<Rectangle>();
         private readonly StringFormat digitsFormat = new StringFormat();
         private int draggedDigit = NO_DIGIT_DRAGGED;
 
@@ -36,16 +34,12 @@ namespace LogExpert.Dialogs
         private readonly ToolStripItem item2 = new ToolStripMenuItem();
         private readonly ToolStripItem item3 = new ToolStripMenuItem();
 
-        private int monthIndex = 1;
         private int oldValue = 0;
 
-        private Components[] rectContents = new Components[6]
-            ; // for now, only the first three components may change position
+        private string[] dateParts;
 
         private int startMouseX = 0;
-
         private int startMouseY = 0;
-        private int yearIndex = 2;
 
         #endregion
 
@@ -126,9 +120,9 @@ namespace LogExpert.Dialogs
         // Returns the index of the rectangle (digitRects) under the mouse cursor
         private int DetermineDraggedDigit(MouseEventArgs e)
         {
-            for (int i = 0; i < this.digitRects.Length; ++i)
+            for (int i = 0; i < this.digitRects.Count; ++i)
             {
-                if (this.digitRects[i].Contains(e.Location))
+                if (this.digitRects[i].Contains(e.Location) && Token.IsDatePart(this.dateParts[i]))
                 {
                     return i;
                 }
@@ -140,46 +134,46 @@ namespace LogExpert.Dialogs
         // Return the value corresponding to current dragged digit
         private int GetDraggedValue()
         {
-            switch (this.rectContents[this.draggedDigit])
-            {
-                case Components.Day: return this.dateTime.Day;
-                case Components.Month: return this.dateTime.Month;
-                case Components.Year: return this.dateTime.Year;
-                case Components.Hours: return this.dateTime.Hour;
-                case Components.Minutes: return this.dateTime.Minute;
-                case Components.Seconds: return this.dateTime.Second;
-                default:
-                    return NO_DIGIT_DRAGGED;
-            }
+            var datePart = this.dateParts[this.draggedDigit];
+
+            if (datePart.StartsWith("y", StringComparison.OrdinalIgnoreCase))
+                return this.dateTime.Year;
+            else if (datePart.StartsWith("M"))
+                return this.dateTime.Month;
+            else if (datePart.StartsWith("d", StringComparison.OrdinalIgnoreCase))
+                return this.dateTime.Day;
+            else if (datePart.StartsWith("h", StringComparison.OrdinalIgnoreCase))
+                return this.dateTime.Hour;
+            else if (datePart.StartsWith("m"))
+                return this.dateTime.Minute;
+            else if (datePart.StartsWith("s", StringComparison.OrdinalIgnoreCase))
+                return this.dateTime.Second;
+            else
+                return NO_DIGIT_DRAGGED;
         }
 
         private bool SetDraggedValue(int delta)
         {
+            if (this.draggedDigit == NO_DIGIT_DRAGGED)
+                return false;
+
             bool changed = true;
             try
             {
-                switch (this.rectContents[this.draggedDigit])
-                {
-                    case Components.Day:
-                        this.dateTime = this.dateTime.AddDays(delta);
-                        break;
-                    case Components.Month:
-                        this.dateTime = this.dateTime.AddMonths(delta);
-                        break;
-                    case Components.Year:
-                        this.dateTime = this.dateTime.AddYears(delta);
-                        break;
+                var datePart = this.dateParts[this.draggedDigit];
 
-                    case Components.Hours:
-                        this.dateTime = this.dateTime.AddHours(delta);
-                        break;
-                    case Components.Minutes:
-                        this.dateTime = this.dateTime.AddMinutes(delta);
-                        break;
-                    case Components.Seconds:
-                        this.dateTime = this.dateTime.AddSeconds(delta);
-                        break;
-                }
+                if (datePart.StartsWith("y", StringComparison.OrdinalIgnoreCase))
+                    this.dateTime = this.dateTime.AddYears(delta);
+                else if (datePart.StartsWith("M"))
+                    this.dateTime = this.dateTime.AddMonths(delta);
+                else if (datePart.StartsWith("d", StringComparison.OrdinalIgnoreCase))
+                    this.dateTime = this.dateTime.AddDays(delta);
+                else if (datePart.StartsWith("h", StringComparison.OrdinalIgnoreCase))
+                    this.dateTime = this.dateTime.AddHours(delta);
+                else if (datePart.StartsWith("m"))
+                    this.dateTime = this.dateTime.AddMinutes(delta);
+                else if (datePart.StartsWith("s", StringComparison.OrdinalIgnoreCase))
+                    this.dateTime = this.dateTime.AddSeconds(delta);
             }
             catch (Exception)
             {
@@ -198,150 +192,72 @@ namespace LogExpert.Dialogs
             }
 
             return changed;
-        }
+        }        
 
-        private int IndexOf(Components component)
+        private void InitCustomRects(Section dateSection)
         {
-            for (int i = 0; i < this.rectContents.Length; i++)
-            {
-                if (this.rectContents[i] == component)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        private void InitGermanRects()
-        {
-            this.dateSeparator = ".";
-            this.rectContents = new Components[]
-            {
-                Components.Day, Components.Month, Components.Year, Components.Hours, Components.Minutes,
-                Components.Seconds
-            };
+            this.dateParts = dateSection
+                .GeneralTextDateDurationParts
+                .Select(p => AdjustDateTimeFormatPart(p))
+                .ToArray();
 
             Rectangle rect = this.ClientRectangle;
-            int oneCharWidth = rect.Width / 19;
-            int step = (rect.Width - oneCharWidth) /
-                       7; // separate the 19 characters into seven pieces: dd., MM., yyyy, " ", HH:, mm:, ss
+            int oneCharWidth = rect.Width / dateParts.Sum(s => s.Length);
             int left = rect.Left;
-            for (int i = 0; i < this.digitRects.Length; ++i)
+
+            this.digitRects.Clear();
+            for (var i = 0; i < dateParts.Length; i++)
             {
-                int s = step;
-                if (i == 2) // the year is 4 chars instead of 3
-                {
-                    s = step + oneCharWidth;
-                }
-                else if (i == 5) // seconds are 2 chars instead of 3
-                {
-                    s = step - oneCharWidth + 2;
-                }
-
-                if (i == 3)
-                {
-                    left += step; // skip space
-                }
-
-                this.digitRects[i] = new Rectangle(left, rect.Top, s, rect.Height);
+                var datePart = dateParts[i];
+                var s = datePart.Length * oneCharWidth;
+                this.digitRects.Add(new Rectangle(left, rect.Top, s, rect.Height));
                 left += s;
             }
-        }
 
-        private void InitFrenchRects()
-        {
-            this.dateSeparator = "-";
-            this.rectContents = new Components[]
-            {
-                Components.Year, Components.Month, Components.Day, Components.Hours, Components.Minutes,
-                Components.Seconds
-            };
-
-            Rectangle rect = this.ClientRectangle;
-            int oneCharWidth = rect.Width / 19;
-            int step = (rect.Width - oneCharWidth) /
-                       7; // separate the 19 characters into seven pieces: yyyy-, MM-, dd, " ", HH:, mm:, ss
-            int left = rect.Left;
-            for (int i = 0; i < this.digitRects.Length; ++i)
-            {
-                int s = step;
-                if (i == 0) // the year is 5 chars instead of 3
-                {
-                    s = step + 2 * oneCharWidth;
-                }
-                else if (i == 2 || i == 5) // day and seconds are 2 chars instead of 3
-                {
-                    s = step - oneCharWidth + 2;
-                }
-
-                if (i == 3)
-                {
-                    left += step; // skip space
-                }
-
-                this.digitRects[i] = new Rectangle(left, rect.Top, s, rect.Height);
-                left += s;
-            }
-        }
-
-        private void InitAmericanRects()
-        {
-            this.dateSeparator = "/";
-            this.rectContents = new Components[]
-            {
-                Components.Month, Components.Day, Components.Year, Components.Hours, Components.Minutes,
-                Components.Seconds
-            };
-
-            Rectangle rect = this.ClientRectangle;
-            int oneCharWidth = rect.Width / 19;
-            int step = (rect.Width - oneCharWidth) /
-                       7; // separate the 19 characters into seven pieces: MM/, dd/, yyyy, " ", HH:, mm:, ss
-            int left = rect.Left;
-            for (int i = 0; i < this.digitRects.Length; ++i)
-            {
-                int s = step;
-                if (i == 2) // the year is 4 chars instead of 3
-                {
-                    s = step + oneCharWidth;
-                }
-                else if (i == 5) // seconds are 2 chars instead of 3
-                {
-                    s = step - oneCharWidth + 2;
-                }
-
-                if (i == 3)
-                {
-                    left += step; // skip space
-                }
-
-                this.digitRects[i] = new Rectangle(left, rect.Top, s, rect.Height);
-                left += s;
-            }
         }
 
         private void InitDigiRects()
         {
-            CultureInfo culture = System.Threading.Thread.CurrentThread.CurrentUICulture;
-            string cultureName = culture.Parent != null ? culture.Parent.Name : "";
+            CultureInfo culture = System.Threading.Thread.CurrentThread.CurrentCulture;
 
-            if (cultureName == "fr")
+            var datePattern = string.Concat(
+                culture.DateTimeFormat.ShortDatePattern,
+                " ",
+                culture.DateTimeFormat.LongTimePattern
+            );
+
+            var sections = Parser.ParseSections(datePattern, out bool syntaxError);
+            var dateSection = sections.FirstOrDefault();
+
+            if (dateSection == null)
             {
-                InitFrenchRects();
+                sections = Parser.ParseSections("dd.MM.yyyy HH:mm:ss", out bool _);
+                dateSection = sections.Single();
             }
-            else if (cultureName == "en")
-            {
-                InitAmericanRects();
-            }
+
+            InitCustomRects(dateSection);
+        }
+
+        private static IDictionary<string, string> dateTimePartReplacements = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["y"] = "yyy",
+            ["yyy"] = "yyyy",
+            ["m"] = "mm",
+            ["d"] = "dd",
+            ["h"] = "hh",
+            ["s"] = "ss"
+        };
+
+        private static string AdjustDateTimeFormatPart(string part)
+        {
+            if (!dateTimePartReplacements.TryGetValue(part, out string adjustedPart))
+                return part;
+
+
+            if (char.IsUpper(part[0]))
+                return adjustedPart.ToUpper();
             else
-            {
-                InitGermanRects(); // default
-            }
-
-            this.yearIndex = IndexOf(Components.Year);
-            this.monthIndex = IndexOf(Components.Month);
-            this.dayIndex = IndexOf(Components.Day);
+                return adjustedPart.ToLower();
         }
 
         #endregion
@@ -372,16 +288,6 @@ namespace LogExpert.Dialogs
                 ValueDragged(this, e);
             }
         }
-
-        private enum Components
-        {
-            Year,
-            Month,
-            Day,
-            Hours,
-            Minutes,
-            Seconds
-        };
 
         public enum DragOrientations
         {
@@ -470,32 +376,30 @@ namespace LogExpert.Dialogs
             // Display current value with user-defined date format and fixed time format ("HH:mm:ss")
             using (Brush brush = new SolidBrush(Color.Black))
             {
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[dayIndex],
-                    FormatDigitLeadingZeros(this.dateTime.Day, 2, dayIndex < 2 ? this.dateSeparator : ""));
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[monthIndex],
-                    FormatDigitLeadingZeros(this.dateTime.Month, 2, monthIndex < 2 ? this.dateSeparator : ""));
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[yearIndex],
-                    FormatDigitLeadingZeros(this.dateTime.Year, 4, yearIndex < 2 ? this.dateSeparator : ""));
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[3],
-                    FormatDigitLeadingZeros(this.dateTime.Hour, 2, ":"));
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[4],
-                    FormatDigitLeadingZeros(this.dateTime.Minute, 2, ":"));
-                DrawDigit(e.Graphics, brush, e.ClipRectangle, this.digitRects[5],
-                    FormatDigitLeadingZeros(this.dateTime.Second, 2, ""));
+                for (var i = 0; i < dateParts.Length; i++)
+                {
+                    var datePart = dateParts[i];
+                    var rect = digitRects[i];
+                    string value;
+
+                    if (Token.IsDatePart(datePart))
+                    {
+                        try
+                        {
+                            value = this.dateTime.ToString("-" + datePart + "-");
+                            value = value.Substring(1, value.Length - 2);
+                        }
+                        catch
+                        {
+                            value = datePart;
+                        }
+                    }
+                    else
+                        value = datePart;
+
+                    e.Graphics.DrawString(value, this.Font, brush, rect, this.digitsFormat);
+                }
             }
-        }
-
-        private static string FormatDigitLeadingZeros(int number, int length, string postSeparator)
-        {
-            return number.ToString("D" + length.ToString()) + postSeparator;
-        }
-
-        private void DrawDigit(Graphics g, Brush brush, Rectangle clip, Rectangle r, string value)
-        {
-            g.DrawString(value, this.Font, brush, r, this.digitsFormat);
-
-            //using (Pen pen = new Pen(brush))
-            //  g.DrawRectangle(pen, r);
         }
 
         private void DateTimeDragControl_Resize(object sender, EventArgs e)
