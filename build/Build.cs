@@ -345,6 +345,26 @@ class Build : NukeBuild
     Target Publish => _ => _
         .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub);
 
+    Target CleanupAppDataLogExpert => _ => _
+        .Executes(() =>
+        {
+            AbsolutePath logExpertApplicationData = ((AbsolutePath) SpecialFolder(SpecialFolders.ApplicationData)) / "LogExpert";
+
+            DirectoryInfo info = new DirectoryInfo(logExpertApplicationData);
+            info.GetDirectories().ForEach(a => a.Delete(true));
+            DeleteDirectory(logExpertApplicationData);
+        });
+
+    Target CleanupDocumentsLogExpert => _ => _
+        .Executes(() =>
+        {
+            AbsolutePath logExpertDocuments = (AbsolutePath) SpecialFolder(SpecialFolders.UserProfile) / "Documents" / "LogExpert";
+
+            DirectoryInfo info = new DirectoryInfo(logExpertDocuments);
+            info.GetDirectories().ForEach(a => a.Delete(true));
+            DeleteDirectory(logExpertDocuments);
+        });
+
     private string ReplaceVersionMatch(Match match, string replacement)
     {
         return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
