@@ -374,38 +374,6 @@ namespace LogExpert
             return i;
         }
 
-
-        public static ILogLineColumnizer FindColumnizerByName(string name, IList<ILogLineColumnizer> list)
-        {
-            foreach (ILogLineColumnizer columnizer in list)
-            {
-                if (columnizer.GetName().Equals(name))
-                {
-                    return columnizer;
-                }
-            }
-            return null;
-        }
-
-        public static ILogLineColumnizer CloneColumnizer(ILogLineColumnizer columnizer)
-        {
-            if (columnizer == null)
-            {
-                return null;
-            }
-            ConstructorInfo cti = columnizer.GetType().GetConstructor(Type.EmptyTypes);
-            if (cti != null)
-            {
-                object o = cti.Invoke(new object[] { });
-                if (o is IColumnizerConfigurator)
-                {
-                    ((IColumnizerConfigurator) o).LoadConfig(ConfigManager.ConfigDir);
-                }
-                return (ILogLineColumnizer) o;
-            }
-            return null;
-        }
-
         /// <summary>
         /// Returns true, if the given string is null or empty
         /// </summary>
@@ -552,7 +520,7 @@ namespace LogExpert
             }
         }
 
-        // 
+        //
         private static bool TestMatchSub(FilterParams filterParams, string line, string lowerSearchText,
             string searchText, Regex rex, bool exactMatch)
         {

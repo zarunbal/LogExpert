@@ -1,5 +1,0 @@
-30/08/2018 08:51:42.712 no bracket 1
-30/08/2018 08:51:42.712 no bracket 2
-30/08/2018 08:51:42.712 [TRACE]    with bracket 1
-30/08/2018 08:51:42.712 [TRACE]    with bracket 2
-no bracket 3
