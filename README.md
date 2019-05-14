@@ -2,6 +2,9 @@
 
 Clone from https://logexpert.codeplex.com/
 
+# Important
+Please participate on this [#81](https://github.com/zarunbal/LogExpert/issues/81) which .NET version should be used in the future
+
 # Overview
 LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
@@ -45,5 +48,13 @@ This is a continous integration build. So always the latest and greates changes.
 - Build
 - The output is under bin/(Debug/Release)/
 
+Nuke.build Requirements
+- Chocolatey must be installed
+
 # Pull Request
 - Use Development branch as target
+
+# FAQ / HELP / Informations / Examples
+Please checkout the wiki for FAQ / HELP / Informations / Examples
+
+https://github.com/zarunbal/LogExpert/wiki
