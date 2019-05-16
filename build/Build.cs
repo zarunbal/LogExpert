@@ -120,21 +120,13 @@ class Build : NukeBuild
         });
 
     Target Clean => _ => _
-        .DependsOn(Initialize)
+        .Before(Compile, Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(dir =>
-            {
-                new DirectoryInfo(dir).GetDirectories().ForEach(a => a.Delete(true));
-            });
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
 
             if (DirectoryExists(BinDirectory))
             {
-                DirectoryInfo info = new DirectoryInfo(BinDirectory);
-                info.GetDirectories().ForEach(a => a.Delete(true));
-
-                info.Delete(true);
-
                 DeleteDirectory(BinDirectory);
 
                 EnsureCleanDirectory(BinDirectory);
@@ -142,7 +134,7 @@ class Build : NukeBuild
         });
 
     Target Restore => _ => _
-        .DependsOn(Clean)
+        .DependsOn(Initialize)
         .Executes(() =>
         {
             MSBuild(s => s

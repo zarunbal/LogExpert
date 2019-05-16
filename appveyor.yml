@@ -6,7 +6,7 @@ environment:
   my_variable:
     secure: Qpq/4cyuTUzmt/r4HsQxioG6WXrZSK3mzVq5iUJC2RI=
 build_script:
-- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Pack ChangeVersionNumber --Configuration Release"
+- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Pack ChangeVersionNumber --Configuration Release"
 test: off
 artifacts:
 - path: bin\Release\
