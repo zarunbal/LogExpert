@@ -162,6 +162,20 @@ namespace LogExpert
                         // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
                         _logger.Error(e, dllName);
                     }
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        if (!ex.LoaderExceptions.IsEmpty())
+                        {
+                            foreach (Exception loaderException in ex.LoaderExceptions)
+                            {
+                                _logger.Error(loaderException, "Plugin load failed with '{0}'", dllName);
+                            }
+                        }
+
+                        _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
+
+                        throw;
+                    }
                 }
             }
 
