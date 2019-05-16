@@ -127,8 +127,6 @@ class Build : NukeBuild
 
             if (DirectoryExists(BinDirectory))
             {
-                BinDirectory.GlobFiles("**/*.*").ForEach(DeleteFile);
-                BinDirectory.GlobDirectories("**/*").ForEach(DeleteDirectory);
                 DirectoryInfo info = new DirectoryInfo(BinDirectory);
                 info.GetDirectories().ForEach(a => a.Delete(true));
 
@@ -311,8 +309,6 @@ class Build : NukeBuild
                     return s;
                 });
             });
-
-           
         });
 
     Target PublishChocolatey => _ => _
