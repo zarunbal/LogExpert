@@ -53,7 +53,7 @@ namespace LogExpert.Tests.Extensions
         [Test]
         public void Extensions_IsEmpty_FilledIEnumerable()
         {
-            IEnumerable<object> arrayObject = new List<object>();
+            IEnumerable<object> arrayObject = new List<object>(new []{new object()});
 
             Assert.IsFalse(arrayObject.IsEmpty());
         }
