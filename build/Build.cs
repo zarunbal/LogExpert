@@ -104,11 +104,16 @@ class Build : NukeBuild
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
 
+    protected override void OnBuildInitialized()
+    {
+        SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+
+        base.OnBuildInitialized();
+    }
+
     Target Initialize => _ => _
         .Executes(() =>
         {
-            SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
-
             if (!string.IsNullOrWhiteSpace(MySigningKey))
             {
                 Logger.Info("Replace signing key");
