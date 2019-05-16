@@ -123,12 +123,17 @@ class Build : NukeBuild
         .DependsOn(Initialize)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(dir =>
+            {
+                new DirectoryInfo(dir).GetDirectories().ForEach(a => a.Delete(true));
+            });
 
             if (DirectoryExists(BinDirectory))
             {
                 DirectoryInfo info = new DirectoryInfo(BinDirectory);
                 info.GetDirectories().ForEach(a => a.Delete(true));
+
+                info.Delete(true);
 
                 DeleteDirectory(BinDirectory);
 
