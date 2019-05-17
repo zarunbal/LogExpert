@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
+    <Compile Include="Classes\DateTimeParser\DateFormatPartAdjuster.cs" />
     <Compile Include="Classes\DateTimeParser\Parser.cs" />
     <Compile Include="Classes\DateTimeParser\Section.cs" />
     <Compile Include="Classes\DateTimeParser\Token.cs" />
