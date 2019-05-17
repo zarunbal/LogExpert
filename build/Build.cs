@@ -240,6 +240,10 @@ class Build : NukeBuild
             text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
             text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
 
+            Logger.Trace("Content of AssemblyVersion file");
+            Logger.Trace(text);
+            Logger.Trace("End of Content");
+
             WriteAllText(assemblyVersion, text);
 
             SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
@@ -249,14 +253,12 @@ class Build : NukeBuild
                     return;
                 }
 
-                Logger.Info("My variable execute");
                 string fileText = ReadAllText(file);
 
                 Regex reg = new Regex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
 
                 if (reg.IsMatch(fileText))
                 {
-                    Logger.Info("Replaced my variable");
                     fileText = reg.Replace(fileText, MyVariable);
                     WriteAllText(file, fileText);
                 }
