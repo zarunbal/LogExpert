@@ -50,6 +50,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateFormatParserTest.cs" />
     <Compile Include="Extensions\EnumerableTests.cs" />
     <Compile Include="JsonCompactColumnizerTest.cs" />
     <Compile Include="JsonColumnizerTest.cs" />
