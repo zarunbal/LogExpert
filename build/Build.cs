@@ -90,8 +90,6 @@ class Build : NukeBuild
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
 
-    [Parameter("My signing key", Name = "my_signing_key")] string MySigningKey = null;
-
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
     [Parameter("Exlcude directory glob")] string[] ExcludeDirectoryGlob = new[] {"**/pluginsx86"};
@@ -111,19 +109,6 @@ class Build : NukeBuild
         base.OnBuildInitialized();
     }
 
-    Target Initialize => _ => _
-        .Executes(() =>
-        {
-            if (!string.IsNullOrWhiteSpace(MySigningKey))
-            {
-                Logger.Info("Replace signing key");
-                byte[] bytes = Convert.FromBase64String(MySigningKey);
-                AbsolutePath signingKey = SourceDirectory / "Solution Items" / "Key.snk";
-                DeleteFile(signingKey);
-                WriteAllBytes(signingKey, bytes);
-            }
-        });
-
     Target Clean => _ => _
         .Before(Compile, Restore)
         .Executes(() =>
@@ -138,8 +123,28 @@ class Build : NukeBuild
             }
         });
 
+    Target CleanPackage => _ => _
+        .Before(Compile, Restore)
+        .Executes(() =>
+        {
+            BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(DeleteFile);
+
+            if (DirectoryExists(PackageDirectory))
+            {
+                DeleteDirectory(PackageDirectory);
+
+                EnsureCleanDirectory(PackageDirectory);
+            }
+
+            if (DirectoryExists(ChocolateyDirectory))
+            {
+                DeleteDirectory(ChocolateyDirectory);
+
+                EnsureCleanDirectory(ChocolateyDirectory);
+            }
+        });
+
     Target Restore => _ => _
-        .DependsOn(Initialize)
         .Executes(() =>
         {
             MSBuild(s => s
@@ -180,7 +185,7 @@ class Build : NukeBuild
         });
 
     Target PrepareChocolateyTemplates => _ => _
-        .DependsOn(Clean)
+        .DependsOn(CleanPackage)
         .Executes(() =>
         {
             CopyDirectoryRecursively(ChocolateyTemplateFiles, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
@@ -192,7 +197,7 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory);
+            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
             ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
         });
 
