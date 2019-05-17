@@ -125,6 +125,7 @@ class Build : NukeBuild
 
     Target CleanPackage => _ => _
         .Before(Compile, Restore)
+        .OnlyWhenDynamic(() => DirectoryExists(BinDirectory))
         .Executes(() =>
         {
             BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(DeleteFile);
