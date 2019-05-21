@@ -1682,9 +1682,10 @@ namespace LogExpert
             }
             catch (NotSupportedException e)
             {
-                // Bug#11: "Lesevorgänge werden vom Stream nicht unterstützt"
-                // Nicht reproduzierbar. Wahrscheinlich, wenn File in ungünstigem Moment (nach dem Öffnen)
-                // gelöscht wird (rolling). Wird hier als EOF behandelt.
+                // Bug#11: "Reading operations are not supported by the stream"
+                // Currently not reproducible. Probably happens at an unlucky time interval (after opening the file)
+                // when the file is being deleted (rolling)
+                // This will be handled as EOF.
                 _logger.Warn(e);
             }
 
