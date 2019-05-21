@@ -5,7 +5,6 @@ using LogExpert;
 using System.Globalization;
 using System.Linq;
 
-
 namespace GlassfishColumnizer
 {
     internal class XmlConfig : IXmlLogConfiguration
@@ -25,7 +24,6 @@ namespace GlassfishColumnizer
 
         #endregion
     }
-
 
     internal class GlassfishColumnizer : ILogLineXmlColumnizer
     {
@@ -47,15 +45,6 @@ namespace GlassfishColumnizer
 
         public GlassfishColumnizer()
         {
-        }
-
-        #endregion
-
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
         }
 
         #endregion
@@ -108,12 +97,12 @@ namespace GlassfishColumnizer
             Column[] columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
             cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
 
-
             // delete '[#|' and '|#]'
             if (temp.StartsWith("[#|"))
             {
                 temp = temp.Substring(3);
             }
+
             if (temp.EndsWith("|#]"))
             {
                 temp = temp.Substring(0, temp.Length - 3);
@@ -134,6 +123,7 @@ namespace GlassfishColumnizer
                     {
                         columns[1].FullValue = temp;
                     }
+
                     string newDate = dateTime.ToString(DATETIME_FORMAT_OUT);
                     columns[0].FullValue = newDate;
                 }
@@ -158,9 +148,9 @@ namespace GlassfishColumnizer
                     columns[1].FullValue = cols[1];
                 }
             }
+
             return cLogLine;
         }
-
 
         public bool IsTimeshiftImplemented()
         {
@@ -186,6 +176,7 @@ namespace GlassfishColumnizer
             {
                 temp = temp.Substring(3);
             }
+
             if (temp.EndsWith("|#]"))
             {
                 temp = temp.Substring(0, temp.Length - 3);
@@ -201,6 +192,7 @@ namespace GlassfishColumnizer
             {
                 return DateTime.MinValue;
             }
+
             string value = temp.Substring(0, endIndex);
 
             try

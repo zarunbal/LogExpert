@@ -63,7 +63,7 @@ namespace CsvColumnizer
     /// The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
     /// the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
     /// </summary>
-    public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer
+    public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer, IColumnizerPriority
     {
         #region Fields
 
@@ -74,15 +74,6 @@ namespace CsvColumnizer
 
         // if CSV is detected to be 'invalid' the columnizer will behave like a default columnizer
         private bool isValidCsv;
-
-        #endregion
-
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
-        }
 
         #endregion
 
@@ -294,6 +285,17 @@ namespace CsvColumnizer
                     fs.Close();
                 }
             }
+        }
+
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("csv", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.CanSupport;
+            }
+
+            return result;
         }
 
         #endregion

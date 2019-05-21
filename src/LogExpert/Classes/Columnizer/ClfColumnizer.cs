@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace LogExpert
 {
     using System;
@@ -33,15 +32,6 @@ namespace LogExpert
 
         #endregion
 
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
-        }
-
-        #endregion
-
         #region Public methods
 
         public bool IsTimeshiftImplemented()
@@ -66,10 +56,12 @@ namespace LogExpert
             {
                 return DateTime.MinValue;
             }
+
             if (cols.ColumnValues[2].FullValue.Length == 0)
             {
                 return DateTime.MinValue;
             }
+
             try
             {
                 DateTime dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, "dd/MMM/yyyy:HH:mm:ss zzz",
@@ -81,7 +73,6 @@ namespace LogExpert
                 return DateTime.MinValue;
             }
         }
-
 
         public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
@@ -142,9 +133,7 @@ namespace LogExpert
                 new Column {FullValue = "", Parent = cLogLine}
             };
 
-
             cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
-
 
             string temp = line.FullLine;
             if (temp.Length > 1024)
@@ -207,6 +196,7 @@ namespace LogExpert
             {
                 columns[3].FullValue = temp;
             }
+
             return cLogLine;
         }
 

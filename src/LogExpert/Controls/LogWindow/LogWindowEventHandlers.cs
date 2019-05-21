@@ -162,7 +162,26 @@ namespace LogExpert
 
         private void dataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
+            int startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
+
             e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
+
+            // The new column could be find dynamically.
+            // Only support add new columns for now.
+            // TODO: Support reload all columns?
+            if (CurrentColumnizer != null && CurrentColumnizer.GetColumnCount() > startCount)
+            {
+                for (int i = startCount; i < CurrentColumnizer.GetColumnCount(); i++)
+                {
+                    var colName = CurrentColumnizer.GetColumnNames()[i];
+                    DataGridViewColumn titleColumn = new LogTextColumn();
+                    titleColumn.HeaderText = colName;
+                    titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+                    titleColumn.Resizable = DataGridViewTriState.NotSet;
+                    titleColumn.DividerWidth = 1;
+                    dataGridView.Columns.Add(titleColumn);
+                }
+            }
         }
 
         private void dataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
@@ -1463,7 +1482,7 @@ namespace LogExpert
         {
             if (_logger.IsTraceEnabled)
             {
-                _logger.Trace($"Row unshared line {e.Row.Cells[1].Value}");
+                _logger.Trace("Row unshared line {0}", e.Row.Cells[1].Value);
             }
         }
 

@@ -152,7 +152,7 @@ namespace LogExpert
     }
 
 
-    public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
+    public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator, IColumnizerPriority
     {
         #region Fields
 
@@ -173,15 +173,6 @@ namespace LogExpert
         public Log4jXmlColumnizer()
         {
             config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
-        }
-
-        #endregion
-
-        #region Properties
-
-        public string Text
-        {
-            get { return GetName(); }
         }
 
         #endregion
@@ -408,6 +399,16 @@ namespace LogExpert
                     fs.Close();
                 }
             }
+        }
+
+        public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+        {
+            Priority result = Priority.NotSupport;
+            if (fileName.EndsWith("xml", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Priority.CanSupport;
+            }
+            return result;
         }
 
         #endregion

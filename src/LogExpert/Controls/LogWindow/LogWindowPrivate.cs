@@ -74,7 +74,7 @@ namespace LogExpert
 
                 if (persistenceData == null)
                 {
-                    _logger.Info($"No persistence data for {FileName} found.");
+                    _logger.Info("No persistence data for {0} found.", FileName);
                     return false;
                 }
 
@@ -172,7 +172,7 @@ namespace LogExpert
                 {
                     // outdated persistence data (logfile rollover)
                     // MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
-                    _logger.Info($"Persistence data for {FileName} is outdated. It was discarded.");
+                    _logger.Info("Persistence data for {0} is outdated. It was discarded.", FileName);
                     LoadPersistenceOptions();
                     return;
                 }
@@ -457,7 +457,7 @@ namespace LogExpert
             lock (reloadLock)
             {
                 reloadOverloadCounter++;
-                _logger.Info($"ReloadNewFile(): counter = {reloadOverloadCounter}");
+                _logger.Info("ReloadNewFile(): counter = {0}", reloadOverloadCounter);
                 if (reloadOverloadCounter <= 1)
                 {
                     SavePersistenceData(false);
@@ -542,6 +542,14 @@ namespace LogExpert
         private void LoadingFinished()
         {
             _logger.Info("File loading complete.");
+
+            IAutoColumnizer autoColumnizer = currentColumnizer as IAutoColumnizer;
+
+            if (autoColumnizer != null)
+            {
+                currentColumnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
+            }
+
             StatusLineText("");
             logFileReader.FileSizeChanged += FileSizeChangedHandler;
             isLoading = false;
@@ -584,7 +592,7 @@ namespace LogExpert
                     int lastLineCount = 0;
                     lock (logEventArgsList)
                     {
-                        _logger.Info($"{logEventArgsList.Count} events in queue");
+                        _logger.Info("{0} events in queue", logEventArgsList.Count);
                         if (logEventArgsList.Count == 0)
                         {
                             logEventArgsEvent.Reset();
@@ -606,7 +614,7 @@ namespace LogExpert
                     {
                         if (e.LineCount < lastLineCount)
                         {
-                            _logger.Error($"Line count of event is: {e.LineCount}, should be greater than last line count: {lastLineCount}");
+                            _logger.Error("Line count of event is: {0}, should be greater than last line count: {1}", e.LineCount, lastLineCount);
                         }
                     }
 
@@ -663,7 +671,7 @@ namespace LogExpert
                     dataGridView.RowCount = e.LineCount;
                 }
 
-                _logger.Debug($"UpdateGrid(): new RowCount={dataGridView.RowCount}");
+                _logger.Debug("UpdateGrid(): new RowCount={0}", dataGridView.RowCount);
                 if (e.IsRollover)
                 {
                     // Multifile rollover
@@ -677,7 +685,7 @@ namespace LogExpert
                             currentLineNum = 0;
                         }
 
-                        _logger.Debug($"UpdateGrid(): Rollover=true, Rollover offset={e.RolloverOffset}, currLineNum was {dataGridView.CurrentCellAddress.Y}, new currLineNum={currentLineNum}");
+                        _logger.Debug("UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}", e.RolloverOffset, dataGridView.CurrentCellAddress.Y, currentLineNum);
                         firstDisplayedLine -= e.RolloverOffset;
                         if (firstDisplayedLine < 0)
                         {
@@ -902,7 +910,14 @@ namespace LogExpert
 
         private void SetColumnizerInternal(ILogLineColumnizer columnizer)
         {
-            _logger.Info($"SetColumnizerInternal(): {columnizer.GetName()}");
+            _logger.Info("SetColumnizerInternal(): {0}", columnizer.GetName());
+
+            IAutoColumnizer autoColumnizer = columnizer as IAutoColumnizer;
+
+            if (autoColumnizer != null)
+            {
+                columnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
+            }
 
             ILogLineColumnizer oldColumnizer = CurrentColumnizer;
             bool oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;
@@ -1748,7 +1763,7 @@ namespace LogExpert
             {
                 int pos = editControl.SelectionStart + editControl.SelectionLength;
                 StatusLineText("   " + pos);
-                _logger.Debug($"SelStart: {editControl.SelectionStart}, SelLen: {editControl.SelectionLength}");
+                _logger.Debug("SelStart: {0}, SelLen: {1}", editControl.SelectionStart, editControl.SelectionLength);
             }
         }
 
@@ -2035,7 +2050,7 @@ namespace LogExpert
 
             long endTime = Environment.TickCount;
 
-            _logger.Debug($"Multi threaded filter duration: {endTime - startTime} ms.");
+            _logger.Debug("Multi threaded filter duration: {0} ms.", endTime - startTime);
 
             DeRegisterCancelHandler(cancelHandler);
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
@@ -2093,7 +2108,7 @@ namespace LogExpert
 
             long endTime = Environment.TickCount;
 
-            _logger.Info($"Single threaded filter duration: {endTime - startTime} ms.");
+            _logger.Info("Single threaded filter duration: {0} ms.", endTime - startTime);
 
             StatusLineText("Filter duration: " + (endTime - startTime) + " ms.");
         }
@@ -2652,7 +2667,7 @@ namespace LogExpert
         private void WritePipeToTab(FilterPipe pipe, IList<int> lineNumberList, string name,
             PersistenceData persistenceData)
         {
-            _logger.Info($"WritePipeToTab(): {lineNumberList.Count} lines.");
+            _logger.Info("WritePipeToTab(): {0} lines.", lineNumberList.Count);
             StatusLineText("Writing to temp file... Press ESC to cancel.");
             guiStateArgs.MenuEnabled = false;
             SendGuiStateUpdate();
@@ -2773,7 +2788,7 @@ namespace LogExpert
             }
             else
             {
-                _logger.Warn($"FilterRestore(): Columnizer {persistenceData.columnizerName} not found");
+                _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
 
             newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
@@ -3085,7 +3100,7 @@ namespace LogExpert
                 PatternBlock block;
                 int maxBlockLen = patternArgs.endLine - patternArgs.startLine;
                 //int searchLine = i + 1;
-                _logger.Debug($"TestStatistic(): i={i} searchLine={searchLine}");
+                _logger.Debug("TestStatistic(): i={0} searchLine={1}", i, searchLine);
                 //bool firstBlock = true;
                 searchLine++;
                 UpdateProgressBar(searchLine);
@@ -3095,7 +3110,7 @@ namespace LogExpert
                                this.patternArgs.maxMisses,
                                processedLinesDict)) != null)
                 {
-                    _logger.Debug($"Found block: {block}");
+                    _logger.Debug("Found block: {0}", block);
                     if (block.weigth >= this.patternArgs.minWeight)
                     {
                         //PatternBlock existingBlock = FindExistingBlock(block, blockList);
