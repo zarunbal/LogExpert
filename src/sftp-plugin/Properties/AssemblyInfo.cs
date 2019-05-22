@@ -5,5 +5,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCulture("")]
 
-// Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
+// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6d67894f-87fd-40ad-bbce-0923fd38d0ff")]
