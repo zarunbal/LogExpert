@@ -6,7 +6,7 @@ namespace LogExpert
     // Ensures we have constant width (number of characters) date formats
     internal static class DateFormatPartAdjuster
     {
-        private static IDictionary<string, string> dateTimePartReplacements = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly IDictionary<string, string> _dateTimePartReplacements = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["y"] = "yyy",
             ["yyy"] = "yyyy",
@@ -18,19 +18,19 @@ namespace LogExpert
 
         public static string AdjustDateTimeFormatPart(string part)
         {
-            if (!dateTimePartReplacements.TryGetValue(part, out string adjustedPart))
+            if (!_dateTimePartReplacements.TryGetValue(part, out string adjustedPart))
+            {
                 return part;
+            }
 
             if (char.IsUpper(part[0]))
+            {
                 return adjustedPart.ToUpper();
+            }
             else
+            {
                 return adjustedPart.ToLower();
-        }
-
-        public static IEnumerable<string> AdjustDateTimeFormatParts(params string[] parts)
-        {
-            foreach (var part in parts)
-                yield return AdjustDateTimeFormatPart(part);
+            }
         }
     }
 }
