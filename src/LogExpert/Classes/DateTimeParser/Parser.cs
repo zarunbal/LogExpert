@@ -143,6 +143,10 @@ namespace LogExpert
             {
                 return true;
             }
+            else if (reader.ReadEnclosed('\'', '\''))
+            {
+                return true;
+            }
 
             return false;
         }

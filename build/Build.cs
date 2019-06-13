@@ -92,7 +92,8 @@ class Build : NukeBuild
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
-    [Parameter("Exlcude directory glob")] string[] ExcludeDirectoryGlob = new[] {"**/pluginsx86"};
+    [Parameter("Exlcude directory glob")]
+    string[] ExcludeDirectoryGlob => new[] {"**/pluginsx86"};
 
     [Parameter("My variable", Name = "my_variable")] string MyVariable = null;
 
@@ -198,8 +199,9 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
+            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory / "tools", DirectoryExistsPolicy.Merge);
             ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+            ChocolateyDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
         });
 
     Target BuildChocolateyPackage => _ => _
