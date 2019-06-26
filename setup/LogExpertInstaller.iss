@@ -29,8 +29,8 @@ DefaultGroupName={#AppName}
 AllowNoIcons=yes
 
 LicenseFile=..\LICENSE
-InfoBeforeFile=..\CHANGELOG.md
-InfoAfterFile=..\README.md
+;InfoBeforeFile=..\CHANGELOG.md
+;InfoAfterFile=..\README.md
 OutputDir=..\setup
 
 OutputBaseFilename={#SetupName}.{#SetupSetting("AppVersion")}
@@ -58,19 +58,15 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "..\bin\Release\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\Licenses\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\Release\plugins\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\Release\pluginsx86\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\ColumnizerLib.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\LogExpert.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Release\WeifenLuo.WinFormsUI.Docking.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\Licenses\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\SetupFiles\plugins\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\SetupFiles\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\SetupFiles\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
