@@ -87,7 +87,7 @@ var
 begin
     //check for .net Version 4+ before the installation starts
     dotNetInstalled:=true;
-    if not(IsDotNetDetected('v4\Full',0)) or not(IsDotNetDetected('v4\Client',0)) then
+    if not(IsDotNetDetected('v4.7.2',0)) then
     begin
        MsgBox('Microsoft .NET Framework 4.0 or higher is required.'#13#13
               'Please update your .net Framework installation!', mbInformation, MB_OK);
