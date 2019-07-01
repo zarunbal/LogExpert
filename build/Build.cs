@@ -56,12 +56,21 @@ class Build : NukeBuild
 
     AbsolutePath PackageDirectory => BinDirectory / "Package";
 
+
     AbsolutePath ChocolateyDirectory => BinDirectory / "chocolatey";
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
     AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
+
+    AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
+
+    AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\Compil32.exe";
+
+    AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\Compil32.exe";
+
+    AbsolutePath InnoSetupScript => RootDirectory / "setup" / "LogExpertInstaller.iss";
 
     Version Version
     {
@@ -102,6 +111,8 @@ class Build : NukeBuild
     [Parameter("Chocolatey api key")] string ChocolateyApiKey = null;
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
+
+    [Parameter("Setup command line parameter")] string SetupCommandLineParameter = "/cc";
 
     protected override void OnBuildInitialized()
     {
@@ -301,6 +312,60 @@ class Build : NukeBuild
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
 
+    Target CopyFilesForSetup => _ => _
+        .After(Compile)
+        .Executes(() =>
+        {
+            CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
+            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+
+            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+        });
+
+    Target CreateSetupProgramfiles => _ => _
+        .DependsOn(CopyFilesForSetup)
+        .OnlyWhenDynamic(() => FileExists(InnoSetupProgramFiles))
+        .Executes(() =>
+        {
+            Process proc = new Process();
+            proc.StartInfo = new ProcessStartInfo(InnoSetupProgramFiles, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
+            if (!proc.Start())
+            {
+                throw new Exception($"Failed to start {InnoSetupProgramFiles} ");
+            }
+
+            proc.WaitForExit();
+
+            if (proc.ExitCode != 0)
+            {
+                throw new Exception($"Error during execution of {InnoSetupProgramFiles}");
+            }
+        });
+
+    Target CreateSetupLocalApplication => _ => _
+        .DependsOn(CopyFilesForSetup)
+        .OnlyWhenDynamic(() => FileExists(InnoSetupLocalApplication))
+        .Executes(() =>
+        {
+            Process proc = new Process();
+            proc.StartInfo = new ProcessStartInfo(InnoSetupLocalApplication, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
+            if (!proc.Start())
+            {
+                throw new Exception($"Failed to start {InnoSetupLocalApplication} ");
+            }
+
+            proc.WaitForExit();
+
+            if (proc.ExitCode != 0)
+            {
+                throw new Exception($"Error during execution of {InnoSetupLocalApplication}");
+            }
+        });
+
+    Target CreateSetup => _ => _
+        .DependsOn(CreateSetupLocalApplication, CreateSetupProgramfiles);
+
+
     Target PublishColumnizerNuget => _ => _
         .DependsOn(ColumnizerLibCreateNuget)
         .Requires(() => NugetApiKey)
@@ -343,7 +408,7 @@ class Build : NukeBuild
         {
             var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
 
-            PublishRelease(s => s
+            Task task = PublishRelease(s => s
                 .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a => a.ToString()).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
@@ -358,6 +423,8 @@ class Build : NukeBuild
                 .SetToken(GitHubApiKey)
                 .SetName(VersionString)
             );
+
+            task.Wait();
         });
 
     Target Publish => _ => _
