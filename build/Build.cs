@@ -55,7 +55,6 @@ class Build : NukeBuild
 
     AbsolutePath PackageDirectory => BinDirectory / "Package";
 
-
     AbsolutePath ChocolateyDirectory => BinDirectory / "chocolatey";
 
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
@@ -66,6 +65,8 @@ class Build : NukeBuild
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
     AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\iscc.exe";
+
+    AbsolutePath InnoSetup5ProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 5\\iscc.exe";
 
     AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\iscc.exe";
 
@@ -98,7 +99,7 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll" , "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
@@ -113,7 +114,7 @@ class Build : NukeBuild
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
 
-    AbsolutePath[] AppveyorArtifacts =>new []
+    AbsolutePath[] AppveyorArtifacts => new[]
     {
         (BinDirectory / $"LogExpert-Setup-{VersionString}.exe"),
         BinDirectory / $"LogExpert-CI-{VersionString}.zip",
@@ -337,19 +338,7 @@ class Build : NukeBuild
         .OnlyWhenDynamic(() => FileExists(InnoSetupProgramFiles))
         .Executes(() =>
         {
-            Process proc = new Process();
-            proc.StartInfo = new ProcessStartInfo(InnoSetupProgramFiles, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
-            if (!proc.Start())
-            {
-                throw new Exception($"Failed to start {InnoSetupProgramFiles} ");
-            }
-
-            proc.WaitForExit();
-
-            if (proc.ExitCode != 0)
-            {
-                throw new Exception($"Error during execution of {InnoSetupProgramFiles}");
-            }
+            ExecuteInnoSetup(InnoSetupProgramFiles);
         });
 
     Target CreateSetupLocalApplication => _ => _
@@ -357,23 +346,19 @@ class Build : NukeBuild
         .OnlyWhenDynamic(() => FileExists(InnoSetupLocalApplication))
         .Executes(() =>
         {
-            Process proc = new Process();
-            proc.StartInfo = new ProcessStartInfo(InnoSetupLocalApplication, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
-            if (!proc.Start())
-            {
-                throw new Exception($"Failed to start {InnoSetupLocalApplication} ");
-            }
+            ExecuteInnoSetup(InnoSetupLocalApplication);
+        });
 
-            proc.WaitForExit();
-
-            if (proc.ExitCode != 0)
-            {
-                throw new Exception($"Error during execution of {InnoSetupLocalApplication}");
-            }
+    Target CreateSetupOldProgramfiles => _ => _
+        .DependsOn(CopyFilesForSetup)
+        .OnlyWhenDynamic(() => FileExists(InnoSetup5ProgramFiles))
+        .Executes(() =>
+        {
+            ExecuteInnoSetup(InnoSetup5ProgramFiles);
         });
 
     Target CreateSetup => _ => _
-        .DependsOn(CreateSetupLocalApplication, CreateSetupProgramfiles);
+        .DependsOn(CreateSetupLocalApplication, CreateSetupProgramfiles, CreateSetupOldProgramfiles);
 
     Target PublishColumnizerNuget => _ => _
         .DependsOn(ColumnizerLibCreateNuget)
@@ -444,7 +429,7 @@ class Build : NukeBuild
         .OnlyWhenDynamic(() => AppVeyor.Instance != null)
         .Executes(() =>
         {
-             CompressZip(BinDirectory / Configuration, BinDirectory / $"LogExpert-CI-{VersionString}.zip");
+            CompressZip(BinDirectory / Configuration, BinDirectory / $"LogExpert-CI-{VersionString}.zip");
 
             AppveyorArtifacts.ForEach((artifact) =>
             {
@@ -478,11 +463,28 @@ class Build : NukeBuild
         .Executes(() =>
         {
             AbsolutePath logExpertDocuments = (AbsolutePath) SpecialFolder(SpecialFolders.UserProfile) / "Documents" / "LogExpert";
-            
+
             DirectoryInfo info = new DirectoryInfo(logExpertDocuments);
             info.GetDirectories().ForEach(a => a.Delete(true));
             DeleteDirectory(logExpertDocuments);
         });
+
+    private void ExecuteInnoSetup(AbsolutePath innoPath)
+    {
+        Process proc = new Process();
+        proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
+        if (!proc.Start())
+        {
+            throw new Exception($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+        }
+
+        proc.WaitForExit();
+
+        if (proc.ExitCode != 0)
+        {
+            throw new Exception($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+        }
+    }
 
     private string ReplaceVersionMatch(Match match, string replacement)
     {
