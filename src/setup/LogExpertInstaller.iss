@@ -24,18 +24,18 @@ AppVerName={#AppName} {#AppVersion}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
-DefaultDirName={pf}\{#AppName}
+DefaultDirName={commonpf}\{#AppName}
 DefaultGroupName={#AppName}
 AllowNoIcons=yes
 
-LicenseFile=..\LICENSE
-;InfoBeforeFile=..\CHANGELOG.md
-;InfoAfterFile=..\README.md
-OutputDir=..\setup
+LicenseFile=..\..\LICENSE
+;InfoBeforeFile=..\..\CHANGELOG.md
+;InfoAfterFile=..\..\README.md
+OutputDir=..\..\bin\
 
 OutputBaseFilename={#SetupName}.{#SetupSetting("AppVersion")}
-SetupIconFile={#AppPath}..\src\LogExpert\Resources\logexpert.ico
-Compression=lzma2/ultra64
+SetupIconFile={#AppPath}..\LogExpert\Resources\logexpert.ico
+Compression=lzma2/normal
 SolidCompression=yes
 
 ; GUI Style, classic or modern
@@ -55,25 +55,23 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "..\bin\SetupFiles\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\Licenses\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\SetupFiles\plugins\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\SetupFiles\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\SetupFiles\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\Licenses\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\SetupFiles\plugins\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\SetupFiles\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\SetupFiles\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: quicklaunchicon
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
