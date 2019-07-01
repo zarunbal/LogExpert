@@ -53,8 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx86", "SftpFi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2-AF15-4C40-8C35-3E166D46F939}"
 	ProjectSection(SolutionItems) = preProject
-		..\setup\ExtraFunctions.iss = ..\setup\ExtraFunctions.iss
-		..\setup\LogExpertInstaller.iss = ..\setup\LogExpertInstaller.iss
+		setup\ExtraFunctions.iss = setup\ExtraFunctions.iss
+		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
 	EndProjectSection
 EndProject
 Global

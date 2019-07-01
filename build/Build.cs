@@ -66,11 +66,11 @@ class Build : NukeBuild
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
-    AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\Compil32.exe";
+    AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\iscc.exe";
 
-    AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\Compil32.exe";
+    AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\iscc.exe";
 
-    AbsolutePath InnoSetupScript => RootDirectory / "setup" / "LogExpertInstaller.iss";
+    AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
 
     Version Version
     {
@@ -97,7 +97,7 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll" , "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
@@ -112,7 +112,7 @@ class Build : NukeBuild
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
 
-    [Parameter("Setup command line parameter")] string SetupCommandLineParameter = "/cc";
+    string SetupCommandLineParameter => $"/O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
 
     protected override void OnBuildInitialized()
     {
@@ -317,9 +317,9 @@ class Build : NukeBuild
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
-            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
 
-            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
         });
 
     Target CreateSetupProgramfiles => _ => _
