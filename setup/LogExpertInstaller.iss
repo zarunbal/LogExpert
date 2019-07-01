@@ -89,7 +89,7 @@ begin
     dotNetInstalled:=true;
     if not(IsDotNetDetected('v4.7.2',0)) then
     begin
-       MsgBox('Microsoft .NET Framework 4.0 or higher is required.'#13#13
+       MsgBox('Microsoft .NET Framework 4.7.2 or higher is required.'#13#13
               'Please update your .net Framework installation!', mbInformation, MB_OK);
        dotNetInstalled := false;
     end;
