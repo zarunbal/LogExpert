@@ -51,6 +51,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx86", "SftpFileSystemx86\SftpFileSystemx86.csproj", "{3D01E923-5219-488B-B0A7-98521841E680}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2-AF15-4C40-8C35-3E166D46F939}"
+	ProjectSection(SolutionItems) = preProject
+		setup\ExtraFunctions.iss = setup\ExtraFunctions.iss
+		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -372,6 +378,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C625E7C2-AF15-4C40-8C35-3E166D46F939} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15924D5F-B90B-4BC7-9E7D-BCCB62EBABAD}
