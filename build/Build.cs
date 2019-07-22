@@ -140,6 +140,9 @@ class Build : NukeBuild
 
             if (DirectoryExists(BinDirectory))
             {
+                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(DeleteFile);
+                BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+
                 DeleteDirectory(BinDirectory);
 
                 EnsureCleanDirectory(BinDirectory);
@@ -324,7 +327,8 @@ class Build : NukeBuild
         .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
 
     Target CopyFilesForSetup => _ => _
-        .After(Compile)
+        .DependsOn(Compile)
+        .After(Test)
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
@@ -333,32 +337,27 @@ class Build : NukeBuild
             SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
         });
 
-    Target CreateSetupProgramfiles => _ => _
-        .DependsOn(CopyFilesForSetup)
-        .OnlyWhenDynamic(() => FileExists(InnoSetupProgramFiles))
-        .Executes(() =>
-        {
-            ExecuteInnoSetup(InnoSetupProgramFiles);
-        });
-
-    Target CreateSetupLocalApplication => _ => _
-        .DependsOn(CopyFilesForSetup)
-        .OnlyWhenDynamic(() => FileExists(InnoSetupLocalApplication))
-        .Executes(() =>
-        {
-            ExecuteInnoSetup(InnoSetupLocalApplication);
-        });
-
-    Target CreateSetupOldProgramfiles => _ => _
-        .DependsOn(CopyFilesForSetup)
-        .OnlyWhenDynamic(() => FileExists(InnoSetup5ProgramFiles))
-        .Executes(() =>
-        {
-            ExecuteInnoSetup(InnoSetup5ProgramFiles);
-        });
-
     Target CreateSetup => _ => _
-        .DependsOn(CreateSetupLocalApplication, CreateSetupProgramfiles, CreateSetupOldProgramfiles);
+        .DependsOn(CopyFilesForSetup)
+        .OnlyWhenStatic(() => Configuration == "Release")
+        .Executes(() =>
+        {
+            var publishCombinations =
+                from framework in new[] {(AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86), (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs"}
+                from version in new[] {"5", "6"}
+                select framework / $"Inno Setup {version}" / "iscc.exe";
+
+            foreach (var setupCombinations in publishCombinations)
+            {
+                if (!FileExists(setupCombinations))
+                {
+                    //Search for next combination
+                    continue;
+                }
+
+                ExecuteInnoSetup(setupCombinations);
+            }
+        });
 
     Target PublishColumnizerNuget => _ => _
         .DependsOn(ColumnizerLibCreateNuget)
@@ -472,6 +471,9 @@ class Build : NukeBuild
     private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
         Process proc = new Process();
+
+        Logger.Info($"Start '{innoPath}' {SetupCommandLineParameter} \"{InnoSetupScript}\"");
+
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
         {
@@ -479,6 +481,8 @@ class Build : NukeBuild
         }
 
         proc.WaitForExit();
+
+        Logger.Info($"Executed '{innoPath}' with exit code {proc.ExitCode}");
 
         if (proc.ExitCode != 0)
         {
