@@ -10,8 +10,10 @@ using System.Diagnostics;
 using System.Security;
 using System.Reflection;
 using System.Security.Principal;
+using Autofac;
 using LogExpert.Dialogs;
 using ITDM;
+using LogExpert.Classes;
 using NLog;
 
 namespace LogExpert
@@ -84,6 +86,7 @@ namespace LogExpert
                     argsList.Add(fileArg);
                 }
             }
+
             string[] args = argsList.ToArray();
             if (configFile.Exists)
             {
@@ -107,25 +110,38 @@ namespace LogExpert
                 Mutex mutex = new System.Threading.Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out isCreated);
                 if (isCreated)
                 {
-                    // first application instance
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
+                    ContainerBuilder builder = new ContainerBuilder();
 
-                    // first instance
-                    //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                    IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
-                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
-                        "LogExpertProxy",
-                        WellKnownObjectMode.Singleton);
-                    LogExpertProxy proxy = new LogExpertProxy(logWin);
-                    RemotingServices.Marshal(proxy, "LogExpertProxy");
+                    builder.RegisterModule<AutofacLogExpertModule>();
 
-                    LogExpertApplicationContext context = new LogExpertApplicationContext(proxy, logWin);
-                    Application.Run(context);
+                    using (IContainer rooContainer = builder.Build())
+                    using (ILifetimeScope rootScope = rooContainer.BeginLifetimeScope())
+                    {
+                        // first application instance
+                        Application.EnableVisualStyles();
+                        Application.SetCompatibleTextRenderingDefault(false);
 
-                    ChannelServices.UnregisterChannel(ipcChannel);
+                        LogTabWindow logWin = rootScope.Resolve<LogTabWindow>(
+                            new TypedParameter(typeof(string[]), args.Length > 0 ? args : null),
+                            new TypedParameter(typeof(int), 1),
+                            new TypedParameter(typeof(bool), false));
+
+                        // first instance
+                        //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                        IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
+                        ChannelServices.RegisterChannel(ipcChannel, false);
+                        RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
+                            "LogExpertProxy",
+                            WellKnownObjectMode.Singleton);
+
+                        LogExpertProxy proxy = rootScope.Resolve<LogExpertProxy>();
+                        RemotingServices.Marshal(proxy, "LogExpertProxy");
+
+                        LogExpertApplicationContext context = rootScope.Resolve<LogExpertApplicationContext>();
+                        Application.Run(context);
+
+                        ChannelServices.UnregisterChannel(ipcChannel);
+                    }
                 }
                 else
                 {
@@ -149,6 +165,7 @@ namespace LogExpert
                             {
                                 proxy.NewWindowOrLockedWindow(args);
                             }
+
                             break;
                         }
                         catch (RemotingException e)
@@ -159,12 +176,14 @@ namespace LogExpert
                             Thread.Sleep(500);
                         }
                     }
+
                     if (counter == 0)
                     {
                         _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
                         MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
                 }
+
                 mutex.Close();
             }
             catch (Exception ex)
@@ -194,6 +213,7 @@ namespace LogExpert
                     errorText = lines[0];
                 }
             }
+
             ExceptionWindow win = new ExceptionWindow(errorText, stackTrace);
             win.ShowDialog();
         }

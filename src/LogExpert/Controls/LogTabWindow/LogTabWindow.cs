@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security;
+using Autofac;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -45,6 +46,7 @@ namespace LogExpert
         private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
         private readonly Brush offLedBrush;
         private readonly bool showInstanceNumbers = false;
+        private readonly ILifetimeScope _scope;
 
         private readonly string[] startupFileNames;
 
@@ -77,8 +79,10 @@ namespace LogExpert
 
         #region cTor
 
-        public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
+        public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers, ILifetimeScope scope)
         {
+            _scope = scope;
+
             InitializeComponent();
             this.startupFileNames = fileNames;
             this.instanceNumber = instanceNumber;
@@ -95,6 +99,7 @@ namespace LogExpert
                 this.leds[i] = led;
                 led.Offset(0, led.Height + 0);
             }
+
             int grayAlpha = 50;
             this.ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 220, 0, 0));
             this.ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
@@ -216,6 +221,7 @@ namespace LogExpert
                         return group;
                     }
                 }
+
                 return null;
             }
         }
