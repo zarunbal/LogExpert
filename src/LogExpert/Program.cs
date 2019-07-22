@@ -134,10 +134,10 @@ namespace LogExpert
                             "LogExpertProxy",
                             WellKnownObjectMode.Singleton);
 
-                        LogExpertProxy proxy = rootScope.Resolve<LogExpertProxy>();
+                        LogExpertProxy proxy = rootScope.Resolve<LogExpertProxy>(new TypedParameter(typeof(LogTabWindow), logWin));
                         RemotingServices.Marshal(proxy, "LogExpertProxy");
 
-                        LogExpertApplicationContext context = rootScope.Resolve<LogExpertApplicationContext>();
+                        LogExpertApplicationContext context = rootScope.Resolve<LogExpertApplicationContext>(new TypedParameter(typeof(LogTabWindow), logWin));
                         Application.Run(context);
 
                         ChannelServices.UnregisterChannel(ipcChannel);
