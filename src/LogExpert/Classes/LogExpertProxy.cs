@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
+using Autofac;
 using NLog;
 
 namespace LogExpert
@@ -17,6 +18,7 @@ namespace LogExpert
         [NonSerialized] private readonly List<LogTabWindow> windowList = new List<LogTabWindow>();
 
         [NonSerialized] private LogTabWindow firstLogTabWindow;
+        private readonly ILifetimeScope _scope;
 
         [NonSerialized] private int logWindowIndex = 1;
 
@@ -24,11 +26,12 @@ namespace LogExpert
 
         #region cTor
 
-        public LogExpertProxy(LogTabWindow logTabWindow)
+        public LogExpertProxy(LogTabWindow logTabWindow, ILifetimeScope scope)
         {
             AddWindow(logTabWindow);
             logTabWindow.LogExpertProxy = this;
             firstLogTabWindow = logTabWindow;
+            _scope = scope;
         }
 
         #endregion
@@ -45,7 +48,6 @@ namespace LogExpert
         //    }
         //  }
         //}
-
 
         public delegate void LastWindowClosedEventHandler(object sender, EventArgs e);
 
@@ -103,21 +105,25 @@ namespace LogExpert
                     return;
                 }
             }
+
             // No locked window was found --> create a new one
             NewWindow(fileNames);
         }
 
-
         public void NewWindowWorker(string[] fileNames)
         {
             _logger.Info("Creating new LogTabWindow");
-            LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, logWindowIndex++, true);
+            ILifetimeScope scope = _scope.BeginLifetimeScope();
+            LogTabWindow logWin = scope.Resolve<LogTabWindow>(
+                new TypedParameter(typeof(string[]), fileNames.Length > 0 ? fileNames : null),
+                new TypedParameter(typeof(int), logWindowIndex++),
+                new TypedParameter(typeof(bool), true));
+            //LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, logWindowIndex++, true);
             logWin.LogExpertProxy = this;
             AddWindow(logWin);
             logWin.Show();
             logWin.Activate();
         }
-
 
         public void WindowClosed(LogTabWindow logWin)
         {

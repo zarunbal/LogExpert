@@ -11,7 +11,7 @@ namespace LogExpert.Classes
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<LogTabWindow>().SingleInstance();
+            builder.RegisterType<LogTabWindow>().InstancePerLifetimeScope();
             builder.RegisterType<LogExpertProxy>().SingleInstance();
             builder.RegisterType<LogExpertApplicationContext>().SingleInstance();
             builder.RegisterType<LogWindow>().InstancePerLifetimeScope();
