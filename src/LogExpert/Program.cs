@@ -115,7 +115,7 @@ namespace LogExpert
                     builder.RegisterModule<AutofacLogExpertModule>();
 
                     using (IContainer rooContainer = builder.Build())
-                    using (ILifetimeScope rootScope = rooContainer.BeginLifetimeScope())
+                    using (ILifetimeScope rootScope = rooContainer.BeginLifetimeScope("RootScope"))
                     {
                         // first application instance
                         Application.EnableVisualStyles();

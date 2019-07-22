@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -113,10 +114,12 @@ namespace LogExpert
         public void NewWindowWorker(string[] fileNames)
         {
             _logger.Info("Creating new LogTabWindow");
-            ILifetimeScope scope = _scope.BeginLifetimeScope();
+            int counter = logWindowIndex++;
+
+            ILifetimeScope scope = _scope.BeginLifetimeScope($"LogTabWindowScope{counter}");
             LogTabWindow logWin = scope.Resolve<LogTabWindow>(
                 new TypedParameter(typeof(string[]), fileNames.Length > 0 ? fileNames : null),
-                new TypedParameter(typeof(int), logWindowIndex++),
+                new TypedParameter(typeof(int), counter),
                 new TypedParameter(typeof(bool), true));
             //LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, logWindowIndex++, true);
             logWin.LogExpertProxy = this;
