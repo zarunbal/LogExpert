@@ -134,6 +134,7 @@ namespace LogExpert
                             "LogExpertProxy",
                             WellKnownObjectMode.Singleton);
 
+                        //TODO check why typedParamter LogTabWindo is needed
                         LogExpertProxy proxy = rootScope.Resolve<LogExpertProxy>(new TypedParameter(typeof(LogTabWindow), logWin));
                         RemotingServices.Marshal(proxy, "LogExpertProxy");
 
