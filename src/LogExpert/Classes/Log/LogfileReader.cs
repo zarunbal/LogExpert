@@ -11,7 +11,7 @@ using NLog;
 
 namespace LogExpert
 {
-    public class LogfileReader
+    public class LogfileReader : IAutoLogLineColumnizerCallback
     {
         #region Fields
 

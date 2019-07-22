@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using LogExpert.Classes.Columnizer;
 
 namespace LogExpert.Dialogs
 {
@@ -283,12 +284,8 @@ namespace LogExpert.Dialogs
 
                 row.Cells.Add(cell);
                 row.Cells[0].Value = maskEntry.mask;
-                ILogLineColumnizer columnizer = Util.FindColumnizerByName(maskEntry.columnizerName,
+                ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.columnizerName,
                     PluginRegistry.GetInstance().RegisteredColumnizers);
-                if (columnizer == null)
-                {
-                    columnizer = PluginRegistry.GetInstance().RegisteredColumnizers[0];
-                }
 
                 row.Cells[1].Value = columnizer.GetName();
                 columnizerDataGridView.Rows.Add(row);

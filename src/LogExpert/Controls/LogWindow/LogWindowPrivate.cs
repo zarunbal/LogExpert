@@ -17,6 +17,7 @@ using System.Collections;
 using System.Linq;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
+using LogExpert.Classes.Columnizer;
 
 namespace LogExpert
 {
@@ -393,13 +394,13 @@ namespace LogExpert
                     {
                         if (reloadMemento == null)
                         {
-                            columnizer = Util.CloneColumnizer(columnizer);
+                            columnizer = ColumnizerPicker.CloneColumnizer(columnizer);
                         }
                     }
                     else
                     {
                         // Default Columnizers
-                        columnizer = Util.CloneColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
+                        columnizer = ColumnizerPicker.CloneColumnizer(ColumnizerPicker.FindColumnizer(FileName, logFileReader));
                     }
                 }
 
@@ -543,11 +544,10 @@ namespace LogExpert
         {
             _logger.Info("File loading complete.");
 
-            IAutoColumnizer autoColumnizer = currentColumnizer as IAutoColumnizer;
-
-            if (autoColumnizer != null)
+            var newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
+            if (newColumnizer != null)
             {
-                currentColumnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
+                PreSelectColumnizer(newColumnizer);
             }
 
             StatusLineText("");
@@ -888,12 +888,14 @@ namespace LogExpert
             else
             {
                 CurrentColumnizer = forcedColumnizerForLoading =
-                    PluginRegistry.GetInstance().RegisteredColumnizers[0];
+                    ColumnizerPicker.FindColumnizer(FileName, logFileReader);
             }
         }
 
         private void SetColumnizer(ILogLineColumnizer columnizer)
         {
+            columnizer = ColumnizerPicker.FindReplacementForAutoColumnizer(FileName, logFileReader, columnizer);
+
             int timeDiff = 0;
             if (CurrentColumnizer != null && CurrentColumnizer.IsTimeshiftImplemented())
             {
@@ -911,13 +913,6 @@ namespace LogExpert
         private void SetColumnizerInternal(ILogLineColumnizer columnizer)
         {
             _logger.Info("SetColumnizerInternal(): {0}", columnizer.GetName());
-
-            IAutoColumnizer autoColumnizer = columnizer as IAutoColumnizer;
-
-            if (autoColumnizer != null)
-            {
-                columnizer = autoColumnizer.FindColumnizer(FileName, new ColumnizerCallback(this));
-            }
 
             ILogLineColumnizer oldColumnizer = CurrentColumnizer;
             bool oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;
@@ -2779,7 +2774,7 @@ namespace LogExpert
         private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
         {
             newWin.WaitForLoadingFinished();
-            ILogLineColumnizer columnizer = Util.FindColumnizerByName(persistenceData.columnizerName,
+            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.columnizerName,
                 PluginRegistry.GetInstance().RegisteredColumnizers);
             if (columnizer != null)
             {
