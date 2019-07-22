@@ -586,6 +586,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Autofac">
+      <Version>4.9.2</Version>
+    </PackageReference>
     <PackageReference Include="NLog.Config">
       <Version>4.4.12</Version>
     </PackageReference>
