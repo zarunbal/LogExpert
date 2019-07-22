@@ -15,7 +15,7 @@ namespace LogExpert
     /// It all has started with Columnizers only. So the different types of plugins have no common super interface. I didn't change it
     /// to keep existing plugin API stable. In a future version this may change.
     /// </remarks>
-    internal class PluginRegistry
+    public class PluginRegistry
     {
         #region Fields
 

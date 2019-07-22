@@ -13,9 +13,5 @@ namespace LogExpert
         /// <param name="lineNum">Number of the line to be retrieved</param>
         /// <returns>A string with line content or null if line number is out of range</returns>
         ILogLine GetLogLine(int lineNum);
-
-        IList<ILogLineColumnizer> GetRegisteredColumnizers();
-
-        ILogLineColumnizer GetDefaultColumnizer();
     }
 }

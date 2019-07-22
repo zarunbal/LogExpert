@@ -17,6 +17,7 @@ using System.Collections;
 using System.Linq;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
+using LogExpert.Classes.Columnizer;
 
 namespace LogExpert
 {
@@ -165,8 +166,7 @@ namespace LogExpert
             tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
             parentLogTabWin.HighlightSettingsChanged += parent_HighlightSettingsChanged;
-
-            SetColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
+            SetColumnizer(null);
 
             patternArgs.maxMisses = 5;
             patternArgs.minWeight = 1;
@@ -594,11 +594,6 @@ namespace LogExpert
             public IList<ILogLineColumnizer> GetRegisteredColumnizers()
             {
                 return PluginRegistry.GetInstance().RegisteredColumnizers;
-            }
-
-            public ILogLineColumnizer GetDefaultColumnizer()
-            {
-                return new DefaultLogfileColumnizer();
             }
 
             public int GetLineCount()

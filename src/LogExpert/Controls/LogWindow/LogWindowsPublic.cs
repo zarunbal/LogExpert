@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Collections;
 using System.Linq;
 using WeifenLuo.WinFormsUI.Docking;
+using LogExpert.Classes.Columnizer;
 
 namespace LogExpert
 {
@@ -46,7 +47,7 @@ namespace LogExpert
                         {
                             if (this.reloadMemento == null)
                             {
-                                columnizer = Util.CloneColumnizer(columnizer);
+                                columnizer = ColumnizerPicker.CloneColumnizer(columnizer);
                             }
                         }
                         PreSelectColumnizer(columnizer);
@@ -272,20 +273,20 @@ namespace LogExpert
 
         public void ForceColumnizer(ILogLineColumnizer columnizer)
         {
-            this.forcedColumnizer = Util.CloneColumnizer(columnizer);
+            this.forcedColumnizer = ColumnizerPicker.CloneColumnizer(columnizer);
             SetColumnizer(this.forcedColumnizer);
         }
 
         public void ForceColumnizerForLoading(ILogLineColumnizer columnizer)
         {
-            this.forcedColumnizerForLoading = Util.CloneColumnizer(columnizer);
+            this.forcedColumnizerForLoading = ColumnizerPicker.CloneColumnizer(columnizer);
         }
 
         public void PreselectColumnizer(string columnizerName)
         {
-            ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName,
+            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(columnizerName,
                 PluginRegistry.GetInstance().RegisteredColumnizers);
-            PreSelectColumnizer(Util.CloneColumnizer(columnizer));
+            PreSelectColumnizer(ColumnizerPicker.CloneColumnizer(columnizer));
         }
 
         public void ColumnizerConfigChanged()
@@ -883,7 +884,7 @@ namespace LogExpert
                 }
                 catch (ArgumentException)
                 {
-                    // occurs on invalid regex 
+                    // occurs on invalid regex
                 }
                 if (this.bookmarkProvider.IsBookmarkAtLine(lineNum))
                 {
@@ -1480,7 +1481,7 @@ namespace LogExpert
 
         public ILogLine GetLine(int lineNum)
         {
-            if (lineNum < 0 || lineNum >= this.logFileReader.LineCount)
+            if (lineNum < 0 || logFileReader == null || lineNum >= this.logFileReader.LineCount)
             {
                 return null;
             }
