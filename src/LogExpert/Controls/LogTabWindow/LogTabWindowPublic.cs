@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Autofac;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Dialogs;
 using WeifenLuo.WinFormsUI.Docking;
@@ -76,8 +77,8 @@ namespace LogExpert
 
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            LogWindow logWindow =
-                new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
+
+            LogWindow logWindow = CreateLogWindow(logFileName, isTempFile, forcePersistenceLoading);
 
             logWindow.GivenFileName = givenFileName;
 
@@ -138,7 +139,7 @@ namespace LogExpert
                 return null;
             }
 
-            LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, false);
+            LogWindow logWindow = CreateLogWindow(fileNames[fileNames.Length - 1], false, false);
             AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
             multiFileToolStripMenuItem.Checked = true;
             multiFileEnabledStripMenuItem.Checked = true;

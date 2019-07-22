@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
+using Autofac;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 using LogExpert.Classes.Columnizer;
@@ -60,6 +61,7 @@ namespace LogExpert
 
         private readonly Image panelOpenButtonImage;
         private readonly LogTabWindow parentLogTabWin;
+        private readonly ILifetimeScope _scope;
 
         private readonly ProgressEventArgs progressEventArgs = new ProgressEventArgs();
         private readonly object reloadLock = new object();
@@ -132,7 +134,7 @@ namespace LogExpert
         #region cTor
 
         public LogWindow(LogTabWindow parent, string fileName, bool isTempFile,
-            bool forcePersistenceLoading)
+            bool forcePersistenceLoading, ILifetimeScope scope)
         {
             SuspendLayout();
 
@@ -141,6 +143,7 @@ namespace LogExpert
             columnNamesLabel.Text = ""; // no filtering on columns by default
 
             parentLogTabWin = parent;
+            _scope = scope;
             IsTempFile = isTempFile;
             //Thread.CurrentThread.Name = "LogWindowThread";
             ColumnizerCallbackObject = new ColumnizerCallback(this);

@@ -10,6 +10,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Autofac;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Dialogs;
 using WeifenLuo.WinFormsUI.Docking;
@@ -19,6 +20,17 @@ namespace LogExpert
     public partial class LogTabWindow
     {
         #region Private Methods
+
+        private LogWindow CreateLogWindow(string logFileName, bool isTempFile, bool forcePersistenceLoading)
+        {
+            ILifetimeScope scope = _scope.BeginLifetimeScope($"LogWindowScope-{logFileName}");
+            LogWindow logWindow = scope.Resolve<LogWindow>(
+                new PositionalParameter(0, this),
+                new PositionalParameter(1, logFileName),
+                new PositionalParameter(2, isTempFile),
+                new PositionalParameter(3, forcePersistenceLoading));
+            return logWindow;
+        }
 
         /// <summary>
         /// Creates a temp file with the text content of the clipboard and opens the temp file in a new tab.
