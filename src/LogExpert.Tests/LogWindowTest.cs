@@ -17,5 +17,17 @@ namespace LogExpert.Tests
 
             Assert.AreEqual(columnizerType, logWindow.CurrentColumnizer.GetType());
         }
+
+        [TestCase(@".\TestData\XmlTest_01.xml")]
+        public void Instantiate_AnyFile_NotCrash(string fileName)
+        {
+            PluginRegistry.GetInstance().RegisteredColumnizers.Add(new Log4jXmlColumnizer());
+
+            LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
+            LogWindow logWindow =
+                new LogWindow(logTabWindow, fileName, false, false);
+
+            Assert.True(true);
+        }
     }
 }
