@@ -23,6 +23,10 @@ namespace LogExpert
     public partial class LogWindow
     {
         #region Events handler
+        private void LogWindow_Load(object sender, EventArgs e)
+        {
+            PreferencesChanged(parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
+        }
 
         private void LogWindow_Disposed(object sender, EventArgs e)
         {

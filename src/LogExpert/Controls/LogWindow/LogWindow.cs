@@ -247,11 +247,6 @@ namespace LogExpert
             selectionChangedTrigger.Signal += selectionChangedTrigger_Signal;
         }
 
-        private void LogWindow_Load(object sender, EventArgs e)
-        {
-            PreferencesChanged(parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
-        }
-
         #endregion
 
         #region Delegates
