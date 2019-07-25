@@ -104,6 +104,10 @@
       <Project>{003535ec-4186-4958-9dd9-c641f089aeed}</Project>
       <Name>JsonCompactColumnizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj">
+      <Project>{c41a517b-7502-4b17-9119-55d5716fad65}</Project>
+      <Name>Log4jXmlColumnizer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogExpert\LogExpert.csproj">
       <Project>{f0c0d370-f416-44ed-939a-b4827d15ac14}</Project>
       <Name>LogExpert</Name>
