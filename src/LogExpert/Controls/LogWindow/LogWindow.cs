@@ -156,6 +156,7 @@ namespace LogExpert
 
             Closing += LogWindow_Closing;
             Disposed += LogWindow_Disposed;
+            Load += LogWindow_Load;
 
             timeSpreadCalc = new TimeSpreadCalculator(this);
             timeSpreadingControl1.TimeSpreadCalc = timeSpreadCalc;
@@ -244,8 +245,6 @@ namespace LogExpert
 
             statusLineTrigger.Signal += statusLineTrigger_Signal;
             selectionChangedTrigger.Signal += selectionChangedTrigger_Signal;
-
-            PreferencesChanged(parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
         }
 
         #endregion
