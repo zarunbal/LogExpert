@@ -58,8 +58,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\..\bin\SetupFiles\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\Licenses\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\SetupFiles\plugins\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\SetupFiles\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\SetupFiles\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\SetupFiles\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\SetupFiles\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\SetupFiles\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
