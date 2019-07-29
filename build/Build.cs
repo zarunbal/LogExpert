@@ -404,7 +404,7 @@ class Build : NukeBuild
             var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
 
             Task task = PublishRelease(s => s
-                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a => a.ToString()).ToArray())
+                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg", "**/LogExpert-Setup*.exe").Select(a => a.ToString()).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +
