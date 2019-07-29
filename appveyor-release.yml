@@ -13,5 +13,5 @@ environment:
   GitHubApiKey:
     secure: N83nQZ/QQVqpRnl0D6F/xSbKjn062y07JdskpUpbWryMY2JDo4Be9lUXmob+xcOO
 build_script:
-- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Publish CreateSetup PublishToAppveyor ChangeVersionNumber --Configuration Release"
+- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Pack Publish CreateSetup PublishToAppveyor ChangeVersionNumber --Configuration Release"
 test: off
