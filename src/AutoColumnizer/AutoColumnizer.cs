@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LogExpert
 {
-    public class AutoColumnizer : ILogLineColumnizer, IAutoColumnizer
+    public class AutoColumnizer : ILogLineColumnizer
     {
         #region ILogLineColumnizer implementation
 
@@ -26,48 +26,6 @@ namespace LogExpert
             return "Automatically find the right columnizer for any file";
         }
 
-        public ILogLineColumnizer FindColumnizer(string fileName, IAutoLogLineColumnizerCallback logFileReader)
-        {
-            if (logFileReader == null || string.IsNullOrEmpty(fileName))
-            {
-                return logFileReader.GetDefaultColumnizer();
-            }
-
-            List<ILogLine> loglines = new List<ILogLine>
-            {
-                // Sampling a few lines to select the correct columnizer
-                logFileReader.GetLogLine(0),
-                logFileReader.GetLogLine(1),
-                logFileReader.GetLogLine(2),
-                logFileReader.GetLogLine(3),
-                logFileReader.GetLogLine(4),
-                logFileReader.GetLogLine(5),
-                logFileReader.GetLogLine(25),
-                logFileReader.GetLogLine(100),
-                logFileReader.GetLogLine(200),
-                logFileReader.GetLogLine(400)
-            };
-
-            var registeredColumnizer = logFileReader.GetRegisteredColumnizers();
-
-            List<Tuple<Priority, ILogLineColumnizer>> priorityListOfColumnizers = new List<Tuple<Priority, ILogLineColumnizer>>();
-
-            foreach (ILogLineColumnizer logLineColumnizer in registeredColumnizer)
-            {
-                var columnizerPriority = logLineColumnizer as IColumnizerPriority;
-                Priority priority = default(Priority);
-                if (columnizerPriority != null)
-                {
-                    priority = columnizerPriority.GetPriority(fileName, loglines);
-                }
-
-                priorityListOfColumnizers.Add(new Tuple<Priority, ILogLineColumnizer>(priority, logLineColumnizer));
-            }
-
-            ILogLineColumnizer lineColumnizer = priorityListOfColumnizers.OrderByDescending(a => a.Item1).Select(a => a.Item2).First();
-
-            return lineColumnizer;
-        }
 
         public int GetColumnCount()
         {

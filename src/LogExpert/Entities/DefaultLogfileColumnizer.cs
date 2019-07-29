@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LogExpert
 {
-    internal class DefaultLogfileColumnizer : ILogLineColumnizer
+    public class DefaultLogfileColumnizer : ILogLineColumnizer
     {
         #region ILogLineColumnizer Members
 

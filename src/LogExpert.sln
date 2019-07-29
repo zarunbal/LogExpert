@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -45,11 +45,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonCompactColumnizer", "Js
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoColumnizer", "AutoColumnizer\AutoColumnizer.csproj", "{B57259A3-4ED7-4F8B-A252-29E799A56B9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoColumnizer.Tests", "AutoColumnizer.Tests\AutoColumnizer.Tests.csproj", "{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.csproj", "{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx86", "SftpFileSystemx86\SftpFileSystemx86.csproj", "{3D01E923-5219-488B-B0A7-98521841E680}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2-AF15-4C40-8C35-3E166D46F939}"
+	ProjectSection(SolutionItems) = preProject
+		setup\ExtraFunctions.iss = setup\ExtraFunctions.iss
+		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -324,24 +328,6 @@ Global
 		{B57259A3-4ED7-4F8B-A252-29E799A56B9E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B57259A3-4ED7-4F8B-A252-29E799A56B9E}.Release|Win32.ActiveCfg = Release|Any CPU
 		{B57259A3-4ED7-4F8B-A252-29E799A56B9E}.Release|Win32.Build.0 = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Debug|Win32.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.DebugNoTimeout|Win32.Build.0 = Debug|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Win32.ActiveCfg = Release|Any CPU
-		{BCD44C89-636F-4BC9-9097-25FA56BFD6E3}.Release|Win32.Build.0 = Release|Any CPU
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}.Debug|Win32.ActiveCfg = Debug|Any CPU
@@ -372,6 +358,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C625E7C2-AF15-4C40-8C35-3E166D46F939} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15924D5F-B90B-4BC7-9E7D-BCCB62EBABAD}

@@ -10,6 +10,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using LogExpert.Classes.Columnizer;
 using LogExpert.Dialogs;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -699,7 +700,7 @@ namespace LogExpert
         }
 
         // tailState: 0,1,2 = on/off/off by Trigger
-        // syncMode: 0 = normal (no), 1 = time synced 
+        // syncMode: 0 = normal (no), 1 = time synced
         private Icon CreateLedIcon(int level, bool dirty, int tailState, int syncMode)
         {
             Rectangle iconRect = leds[0];
@@ -1082,12 +1083,8 @@ namespace LogExpert
 
             if (sysoutPipe)
             {
-                ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName,
+                ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(columnizerName,
                     PluginRegistry.GetInstance().RegisteredColumnizers);
-                if (columnizer == null)
-                {
-                    columnizer = PluginRegistry.GetInstance().RegisteredColumnizers[0];
-                }
 
                 _logger.Info("Starting external tool with sysout redirection: {0} {1}", cmd, args);
                 startInfo.UseShellExecute = false;
