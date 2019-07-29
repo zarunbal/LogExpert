@@ -72,7 +72,7 @@ class Build : NukeBuild
 
     AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
 
-    string SetupCommandLineParameter => $"/O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
+    string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
 
     Version Version
     {
@@ -85,7 +85,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 7, patch);
+            return new Version(1, 8, patch);
         }
     }
 
@@ -356,6 +356,8 @@ class Build : NukeBuild
                 }
 
                 ExecuteInnoSetup(setupCombinations);
+
+                return;
             }
         });
 
