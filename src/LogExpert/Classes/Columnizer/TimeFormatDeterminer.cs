@@ -1,6 +1,7 @@
 ﻿
 namespace LogExpert
 {
+    using System;
     using System.Globalization;
 
     internal class TimeFormatDeterminer
@@ -59,6 +60,8 @@ namespace LogExpert
         protected FormatInfo formatInfo17 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo18 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss.fff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo19 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss:fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo20 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss.ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo21 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss,ffff", new CultureInfo("en-US"));
 
 
         public FormatInfo DetermineDateTimeFormatInfo(string line)
@@ -151,13 +154,29 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo10.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo10;
+                    if (temp.Length > 23 && Char.IsDigit(temp[23]))
+                    {
+                        this.formatInfo20.IgnoreFirstChar = ignoreFirst;
+                        return this.formatInfo20;
+                    }
+                    else
+                    {
+                        this.formatInfo10.IgnoreFirstChar = ignoreFirst;
+                        return this.formatInfo10;
+                    }
                 }
                 else if (temp[19] == ',')
                 {
-                    this.formatInfo11.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo11;
+                    if (temp.Length > 23 && Char.IsDigit(temp[23]))
+                    {
+                        this.formatInfo21.IgnoreFirstChar = ignoreFirst;
+                        return this.formatInfo21;
+                    }
+                    else
+                    {
+                        this.formatInfo11.IgnoreFirstChar = ignoreFirst;
+                        return this.formatInfo11;
+                    }
                 }
                 else if (temp[19] == ':')
                 {
