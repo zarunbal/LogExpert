@@ -1657,15 +1657,26 @@ namespace LogExpert
 
         private ILogStreamReader GetLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useNewReader)
         {
+            ILogStreamReader reader = this.CreateLogStreamReader(stream, encodingOptions, useNewReader);
+
             if (IsXmlMode)
             {
-                return new XmlBlockSplitter(
-                    new XmlLogReader(PositionAwareStreamReaderFactory.CreateStreamReader(stream, encodingOptions, useNewReader)),
-                    XmlLogConfig);
+                return new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig);
             }
             else
             {
-                return PositionAwareStreamReaderFactory.CreateStreamReader(stream, encodingOptions, useNewReader);
+                return reader;
+            }
+        }
+        private ILogStreamReader CreateLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useSystemReader)
+        {
+            if (useSystemReader)
+            {
+                return new PositionAwareStreamReaderSystem(stream, encodingOptions);
+            }
+            else
+            {
+                return new PositionAwareStreamReaderLegacy(stream, encodingOptions);
             }
         }
 
