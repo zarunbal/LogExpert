@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-//using System.Linq;
-using System.Text;
-using System.IO;
-using LogExpert.Classes.Log;
+﻿using System.IO;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     /// <summary>
     /// This class is responsible for reading line from the log file. It also decodes characters with the appropriate charset encoding.

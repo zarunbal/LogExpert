@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace LogExpert.Classes.Log
 {
@@ -13,6 +9,7 @@ namespace LogExpert.Classes.Log
         private readonly char[] charBuffer = new char[MAX_LINE_LEN];
 
         private int _charBufferPos = 0;
+        private bool _crDetect = false;
 
         #endregion
 
@@ -31,7 +28,6 @@ namespace LogExpert.Classes.Log
         public override string ReadLine()
         {
             int readInt;
-            bool crDetect = false;
 
             while (-1 != (readInt = this.ReadChar()))
             {
@@ -40,30 +36,40 @@ namespace LogExpert.Classes.Log
                 switch (readChar)
                 {
                     case '\n':
+                        this._crDetect = false;
                         return this.getLineAndResetCharBufferPos();
                     case '\r':
-                        if (crDetect)
+                        if (this._crDetect)
                         {
-                            // double \r\r should return line ???
                             return this.getLineAndResetCharBufferPos();
                         }
                         else
                         {
-                            crDetect = true;
+                            this._crDetect = true;
                         }
                         break;
                     default:
-                        this.appendToCharBuffer(readChar);
-                        crDetect = false;
+                        if (this._crDetect)
+                        {
+                            this._crDetect = false;
+                            string line = this.getLineAndResetCharBufferPos();
+                            this.appendToCharBuffer(readChar);
+                            return line;
+                        }
+                        else
+                        {
+                            this.appendToCharBuffer(readChar);
+                        }
                         break;
                 }
             }
 
             string result = this.getLineAndResetCharBufferPos();
-            if (readInt == -1 && result.Length == 0)
+            if (readInt == -1 && result.Length == 0 && !this._crDetect)
             {
                 return null; // EOF
             }
+            this._crDetect = false;
             return result;
         }
 
