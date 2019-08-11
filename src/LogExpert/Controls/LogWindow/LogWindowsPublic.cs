@@ -38,8 +38,20 @@ namespace LogExpert
                     this.logFileReader.StopMonitoringAsync();
                     UnRegisterLogFileReaderEvents();
                 }
+
+                //
+                // beenLoadedBefore is used for automatically find the best columnizer.
+                // When a new log file is opened, this feature will try to find a columnizer instead of the
+                // default one.
+                // Current solution is not elegant.
+                // Since the refactory will involving a lot of work, we can plan it in the future.
+                // One possible solution is, using raw file stream to read the sample lines to help 
+                // the ColumnizerPicker to determine the priority.
+                //
+                bool beenLoadedBefore = true;
                 if (!LoadPersistenceOptions())
                 {
+                    beenLoadedBefore = false;
                     if (!this.IsTempFile)
                     {
                         ILogLineColumnizer columnizer = FindColumnizer();
@@ -101,6 +113,14 @@ namespace LogExpert
                 RegisterLogFileReaderEvents();
                 _logger.Info("Loading logfile: {0}", fileName);
                 this.logFileReader.startMonitoring();
+                if (!beenLoadedBefore)
+                {
+                    var newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
+                    if (newColumnizer != null)
+                    {
+                        PreSelectColumnizer(newColumnizer);
+                    }
+                }
             }
         }
 

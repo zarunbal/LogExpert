@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -40,6 +40,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColumnizerLib.UnitTests", "ColumnizerLib.UnitTests\ColumnizerLib.UnitTests.csproj", "{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Tests", "LogExpert.Tests\LogExpert.Tests.csproj", "{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2563526E-4566-40CB-AA27-587B904FD25B} = {2563526E-4566-40CB-AA27-587B904FD25B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonCompactColumnizer", "JsonCompactColumnizer\JsonCompactColumnizer.csproj", "{003535EC-4186-4958-9DD9-C641F089AEED}"
 EndProject

@@ -47,7 +47,7 @@ namespace CsvColumnizer
 
         public void InitDefaults()
         {
-            delimiterChar = ';';
+            delimiterChar = ',';
             escapeChar = '"';
             quoteChar = '"';
             commentChar = '#';

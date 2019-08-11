@@ -544,12 +544,6 @@ namespace LogExpert
         {
             _logger.Info("File loading complete.");
 
-            var newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
-            if (newColumnizer != null)
-            {
-                PreSelectColumnizer(newColumnizer);
-            }
-
             StatusLineText("");
             logFileReader.FileSizeChanged += FileSizeChangedHandler;
             isLoading = false;
