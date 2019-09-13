@@ -90,11 +90,18 @@
     <Content Include="TestData\SquareBracketColumnizerTest_01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="TestData\XmlTest_01.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
       <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
       <Name>ColumnizerLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj">
+      <Project>{2563526E-4566-40CB-AA27-587B904FD25B}</Project>
+      <Name>CsvColumnizer</Name>
     </ProjectReference>
     <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj">
       <Project>{4c899885-e361-410a-b6ac-c2f236c436fa}</Project>
@@ -122,6 +129,11 @@
     </Content>
     <Content Include="TestData\JsonCompactColumnizerTest_03.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestData\CsvTest_01.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
