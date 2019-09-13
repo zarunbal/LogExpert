@@ -26,7 +26,7 @@ Summary of (most) features:
 * Serilog.Formatting.Compact format support (Experimental)
 
 # Download
-Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application.
+Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
 
 Or Install via chocolatey
 
