@@ -64,12 +64,6 @@ class Build : NukeBuild
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
-    AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\iscc.exe";
-
-    AbsolutePath InnoSetup5ProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 5\\iscc.exe";
-
-    AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\iscc.exe";
-
     AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
 
     string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
