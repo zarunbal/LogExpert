@@ -33,7 +33,7 @@ Or Install via chocolatey
 ```choco install logexpert```
 
 Requirements
-- .NET 4.0
+- .NET 4.7.2
 
 ## CI
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
