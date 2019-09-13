@@ -199,16 +199,11 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            Parallel.ForEach(SourceDirectory.GlobFiles("**/*Tests.csproj"), path =>
-            {
-                DotNetTest(c =>
-                {
-                    c = c.SetProjectFile(path)
-                        .SetConfiguration(Configuration)
-                        .EnableNoBuild();
-                    return c;
-                });
-            });
+            DotNetTest(c =>c
+                    .SetConfiguration(Configuration)
+                    .EnableNoBuild()
+                    .CombineWith(SourceDirectory.GlobFiles("**/*Tests.csproj"), (settings, path) => 
+                        settings.SetProjectFile(path)), degreeOfParallelism: 4, completeOnFailure: true);
         });
 
     Target PrepareChocolateyTemplates => _ => _
