@@ -1,7 +1,9 @@
-﻿
-using CsvColumnizerType=CsvColumnizer.CsvColumnizer;
+﻿using CsvColumnizerType = CsvColumnizer.CsvColumnizer;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using Autofac;
+using Autofac.Core;
 
 namespace LogExpert.Tests
 {
@@ -12,9 +14,7 @@ namespace LogExpert.Tests
         [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(DefaultLogfileColumnizer))]
         public void Instantiate_JsonFile_BuildCorrectColumnizer(string fileName, Type columnizerType)
         {
-            LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
-            LogWindow logWindow =
-                new LogWindow(logTabWindow, fileName, false, false);
+            LogWindow logWindow = Create(fileName);
 
             Assert.AreEqual(columnizerType, logWindow.CurrentColumnizer.GetType());
         }
@@ -26,11 +26,38 @@ namespace LogExpert.Tests
             PluginRegistry.GetInstance().RegisteredColumnizers.Add(new Log4jXmlColumnizer());
             PluginRegistry.GetInstance().RegisteredColumnizers.Add(new CsvColumnizerType());
 
-            LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
-            LogWindow logWindow =
-                new LogWindow(logTabWindow, fileName, false, false);
+            LogWindow logWindow = Create(fileName);
 
             Assert.True(true);
+        }
+
+        private LogWindow Create(string fileName)
+        {
+            ContainerBuilder builder = new ContainerBuilder();
+            builder.RegisterType<LogTabWindow>();
+            builder.RegisterType<LogWindow>();
+
+            IContainer rootContainer = builder.Build();
+            ILifetimeScope scope = rootContainer.BeginLifetimeScope();
+
+            LogTabWindow logTabWindow = scope.Resolve<LogTabWindow>(new List<Parameter>(
+                new[]
+                {
+                    new PositionalParameter(0, null),
+                    new PositionalParameter(1, 0),
+                    new PositionalParameter(2, false)
+                }));
+
+            LogWindow logWindow = scope.Resolve<LogWindow>(new List<Parameter>(
+                new[]
+                {
+                    new PositionalParameter(0, logTabWindow),
+                    new PositionalParameter(1, fileName),
+                    new PositionalParameter(2, false),
+                    new PositionalParameter(3, false)
+                }));
+
+            return logWindow;
         }
     }
 }
