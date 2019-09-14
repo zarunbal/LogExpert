@@ -64,15 +64,9 @@ class Build : NukeBuild
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
-    AbsolutePath InnoSetupProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 6\\iscc.exe";
-
-    AbsolutePath InnoSetup5ProgramFiles => (AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86) / "Inno Setup 5\\iscc.exe";
-
-    AbsolutePath InnoSetupLocalApplication => (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs\\Inno Setup 6\\iscc.exe";
-
     AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
 
-    string SetupCommandLineParameter => $"/O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
+    string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
 
     Version Version
     {
@@ -85,7 +79,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 7, patch);
+            return new Version(1, 8, patch);
         }
     }
 
@@ -199,16 +193,11 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            Parallel.ForEach(SourceDirectory.GlobFiles("**/*Tests.csproj"), path =>
-            {
-                DotNetTest(c =>
-                {
-                    c = c.SetProjectFile(path)
-                        .SetConfiguration(Configuration)
-                        .EnableNoBuild();
-                    return c;
-                });
-            });
+            DotNetTest(c =>c
+                    .SetConfiguration(Configuration)
+                    .EnableNoBuild()
+                    .CombineWith(SourceDirectory.GlobFiles("**/*Tests.csproj"), (settings, path) => 
+                        settings.SetProjectFile(path)), degreeOfParallelism: 4, completeOnFailure: true);
         });
 
     Target PrepareChocolateyTemplates => _ => _
@@ -356,6 +345,8 @@ class Build : NukeBuild
                 }
 
                 ExecuteInnoSetup(setupCombinations);
+
+                return;
             }
         });
 
@@ -402,7 +393,7 @@ class Build : NukeBuild
             var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
 
             Task task = PublishRelease(s => s
-                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a => a.ToString()).ToArray())
+                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg", "**/LogExpert-Setup*.exe").Select(a => a.ToString()).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +

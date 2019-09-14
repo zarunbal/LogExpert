@@ -39,7 +39,6 @@ namespace LogExpert.Tests
 
         [Test]
         [TestCase("en-US", "MM", "dd", "yyyy", "hh", "mm", "ss", "tt")]
-        [TestCase("en-ZA", "yyyy", "MM", "dd", "hh", "mm", "ss", "tt")]
         [TestCase("fr-FR", "dd", "MM", "yyyy", "HH", "mm", "ss")]
         [TestCase("de-DE", "dd", "MM", "yyyy", "HH", "mm", "ss")]
         [TestCase("ar-TN", "dd", "MM", "yyyy", "HH", "mm", "ss")]

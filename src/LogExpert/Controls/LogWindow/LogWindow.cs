@@ -170,7 +170,7 @@ namespace LogExpert
             tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
             parentLogTabWin.HighlightSettingsChanged += parent_HighlightSettingsChanged;
-            SetColumnizer(null);
+            SetColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
 
             patternArgs.maxMisses = 5;
             patternArgs.minWeight = 1;
