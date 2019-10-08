@@ -179,12 +179,7 @@ namespace LogExpert
                 for (int i = startCount; i < CurrentColumnizer.GetColumnCount(); i++)
                 {
                     var colName = CurrentColumnizer.GetColumnNames()[i];
-                    DataGridViewColumn titleColumn = new LogTextColumn();
-                    titleColumn.HeaderText = colName;
-                    titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-                    titleColumn.Resizable = DataGridViewTriState.NotSet;
-                    titleColumn.DividerWidth = 1;
-                    dataGridView.Columns.Add(titleColumn);
+                    dataGridView.Columns.Add(PaintHelper.CreateTitleColumn(colName));
                 }
             }
         }

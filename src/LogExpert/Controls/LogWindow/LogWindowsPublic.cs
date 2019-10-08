@@ -318,55 +318,8 @@ namespace LogExpert
 
         public void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
         {
-            int rowCount = gridView.RowCount;
-            int currLine = gridView.CurrentCellAddress.Y;
-            int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
+            PaintHelper.SetColumnizer(columnizer,gridView);
 
-            gridView.Columns.Clear();
-
-            DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
-            markerColumn.HeaderText = "";
-            markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            markerColumn.Resizable = DataGridViewTriState.False;
-            markerColumn.DividerWidth = 1;
-            markerColumn.ReadOnly = true;
-            markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(markerColumn);
-
-            DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
-            lineNumberColumn.HeaderText = "Line";
-            lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
-            lineNumberColumn.DividerWidth = 1;
-            lineNumberColumn.ReadOnly = true;
-            lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(lineNumberColumn);
-
-            foreach (string colName in columnizer.GetColumnNames())
-            {
-                DataGridViewColumn titleColumn = new LogTextColumn();
-                titleColumn.HeaderText = colName;
-                titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-                titleColumn.Resizable = DataGridViewTriState.NotSet;
-                titleColumn.DividerWidth = 1;
-                titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-                gridView.Columns.Add(titleColumn);
-            }
-
-            this.columnNamesLabel.Text = CalculateColumnNames(this.filterParams);
-
-            //gridView.Columns[gridView.Columns.Count - 1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            //gridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
-
-            gridView.RowCount = rowCount;
-            if (currLine != -1)
-            {
-                gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
-            }
-            if (currFirstLine != -1)
-            {
-                gridView.FirstDisplayedScrollingRowIndex = currFirstLine;
-            }
             gridView.Refresh();
             AutoResizeColumns(gridView);
             ApplyFrozenState(gridView);
