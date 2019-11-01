@@ -72,8 +72,8 @@
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Classes\Log\LogStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReaderFactory.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
     <Compile Include="Classes\Persister\FilterTabData.cs" />
     <Compile Include="Classes\Persister\ProjectData.cs" />
@@ -353,7 +353,7 @@
       <DependentUpon>PatternWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\PluginRegistry.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReader.cs" />
+    <Compile Include="Classes\Log\PositionAwareStreamReaderSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
     <Compile Include="Classes\Persister\ProjectPersister.cs" />

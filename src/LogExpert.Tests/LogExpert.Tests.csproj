@@ -59,6 +59,7 @@
     <Compile Include="LogWindowTest.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LogStreamReaderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">

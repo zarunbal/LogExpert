@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace LogExpert.Classes.Log
 {
-    public abstract class PositionAwareStreamReaderBase : ILogStreamReader
+    public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
     {
         #region Fields
 
         protected const int MAX_LINE_LEN = 20000;
+
+        private static readonly Encoding[] _preambleEncodings = new Encoding[] { Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32 };
+
+        private readonly BufferedStream _stream;
+        private readonly StreamReader _reader;
+
+        private readonly int _preambleLength;
         private readonly int _posIncPrecomputed;
 
-        protected readonly int _preambleLength = 0;
-        protected readonly StreamReader _reader;
-        protected readonly Stream _stream;
-        protected int _charBufferPos = 0;
-
-        private Encoding _detectedEncoding;
-        protected long _pos;
-        protected int _state;
+        private long _position;
 
         #endregion
 
@@ -29,39 +27,15 @@ namespace LogExpert.Classes.Log
         protected PositionAwareStreamReaderBase(Stream stream, EncodingOptions encodingOptions)
         {
             _stream = new BufferedStream(stream);
-            _preambleLength = DetectPreambleLengthAndEncoding();
 
-            Encoding usedEncoding;
-            if (_detectedEncoding != null && encodingOptions.Encoding == null)
-            {
-                usedEncoding = _detectedEncoding;
-            }
-            else if (encodingOptions.Encoding != null)
-            {
-                usedEncoding = encodingOptions.Encoding;
-            }
-            else
-            {
-                usedEncoding = encodingOptions.DefaultEncoding != null
-                    ? encodingOptions.DefaultEncoding
-                    : Encoding.Default;
-            }
+            Encoding detectedEncoding;
+            _preambleLength = DetectPreambleLengthAndEncoding(out detectedEncoding);
 
-            if (usedEncoding is UTF8Encoding)
-            {
-                _posIncPrecomputed = 0;
-            }
-            else if (usedEncoding is UnicodeEncoding)
-            {
-                _posIncPrecomputed = 2;
-            }
-            else
-            {
-                _posIncPrecomputed = 1;
-            }
+            Encoding usedEncoding = getUsedEncoding(encodingOptions, detectedEncoding);
+            _posIncPrecomputed = getPosIncPrecomputed(usedEncoding);
 
             _reader = new StreamReader(_stream, usedEncoding, true);
-            ResetReader();
+            
             Position = 0;
         }
 
@@ -70,73 +44,94 @@ namespace LogExpert.Classes.Log
         #region Properties
 
         /// <summary>
-        /// Gets or sets the position.
+        /// Current position in the stream.
         /// </summary>
-        /// <value>The position.</value>
-        public long Position
+        public sealed override long Position
         {
-            get { return _pos; }
+            get { return _position; }
             set
             {
                 /*
-                 * 1: Irgendwann mal auskommentiert (+this.Encoding.GetPreamble().Length)
+                 * 1: Irgendwann mal auskommentiert (+Encoding.GetPreamble().Length)
                  * 2: Stand bei 1.1 3207
                  * 3: Stand nach Fehlermeldung von Piet wegen Unicode-Bugs. 
                  *    Keihne Ahnung, ob das jetzt endgültig OK ist.
                  * 4: 27.07.09: Preamble-Length wird jetzt im CT ermittelt, da Encoding.GetPreamble().Length
                  *    immer eine fixe Länge liefert (unabhängig vom echtem Dateiinhalt)
                  */
-                _pos = value; //  +this.Encoding.GetPreamble().Length;      // 1
-                //this.stream.Seek(this.pos, SeekOrigin.Begin);     // 2
-                //this.stream.Seek(this.pos + this.Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
-                _stream.Seek(_pos + _preambleLength, SeekOrigin.Begin); // 4
+                _position = value; //  +Encoding.GetPreamble().Length;      // 1
+                //stream.Seek(pos, SeekOrigin.Begin);     // 2
+                //stream.Seek(pos + Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
+                _stream.Seek(_position + _preambleLength, SeekOrigin.Begin); // 4
+
                 ResetReader();
             }
         }
 
-        public Encoding Encoding
-        {
-            get { return _reader.CurrentEncoding; }
-        }
+        public sealed override Encoding Encoding => _reader.CurrentEncoding;
 
-        public bool IsBufferComplete
-        {
-            get { return true; }
-        }
+        public sealed override bool IsBufferComplete => true;
 
         #endregion
 
         #region Public methods
 
-        public void Close()
+        /// <summary>
+        /// Destroy and release the current stream reader.
+        /// </summary>
+        /// <param name="disposing">Specifies whether or not the managed objects should be released.</param>
+        protected override void Dispose(bool disposing)
         {
-            _stream.Close();
+            if (disposing)
+            {
+                _stream.Dispose();
+                _reader.Dispose();
+            }
         }
 
-        public unsafe int ReadChar()
+        public override unsafe int ReadChar()
         {
-            int readInt;
+            if (IsDisposed) throw new ObjectDisposedException(ToString());
+
             try
             {
-                readInt = _reader.Read();
+                int readInt = _reader.Read();
                 if (readInt != -1)
                 {
-                    char readChar = (char) readInt;
-                    int posInc = _posIncPrecomputed != 0
-                        ? _posIncPrecomputed
-                        : _reader.CurrentEncoding.GetByteCount(&readChar, 1);
-                    _pos += posInc;
+                    char readChar = (char)readInt;
+                    if (_posIncPrecomputed != 0)
+                    {
+                        _position += _posIncPrecomputed;
+                    }
+                    else
+                    {
+                        _position += _reader.CurrentEncoding.GetByteCount(&readChar, 1);
+                    }
                 }
+                return readInt;
             }
             catch (IOException)
             {
-                readInt = -1;
+                return -1;
             }
-
-            return readInt;
         }
 
-        public abstract string ReadLine();
+        protected virtual void ResetReader()
+        {
+            _reader.DiscardBufferedData();
+        }
+
+        protected StreamReader GetStreamReader()
+        {
+            if (IsDisposed) throw new ObjectDisposedException(ToString());
+
+            return _reader;
+        }
+
+        protected void MovePosition(int offset)
+        {
+            _position += offset;
+        }
 
         #endregion
 
@@ -145,8 +140,8 @@ namespace LogExpert.Classes.Log
         /// <summary>
         /// Determines the actual number of preamble bytes in the file.
         /// </summary>
-        /// <returns></returns>
-        private int DetectPreambleLengthAndEncoding()
+        /// <returns>Number of preamble bytes in the file</returns>
+        private int DetectPreambleLengthAndEncoding(out Encoding detectedEncoding)
         {
             /*
             UTF-8:                                EF BB BF 
@@ -156,63 +151,70 @@ namespace LogExpert.Classes.Log
             UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00 
             */
 
-            _detectedEncoding = null;
             byte[] readPreamble = new byte[4];
             int readLen = _stream.Read(readPreamble, 0, 4);
-            if (readLen < 2)
+            if (readLen >= 2)
+            {
+                foreach (Encoding encoding in PositionAwareStreamReaderBase._preambleEncodings)
+                {
+                    byte[] preamble = encoding.GetPreamble();
+                    bool fail = false;
+                    for (int i = 0; i < readLen && i < preamble.Length; ++i)
+                    {
+                        if (readPreamble[i] != preamble[i])
+                        {
+                            fail = true;
+                            break;
+                        }
+                    }
+
+                    if (!fail)
+                    {
+                        detectedEncoding = encoding;
+                        return preamble.Length;
+                    }
+                }
+            }
+
+            // not found or less than 2 byte read
+            detectedEncoding = null;
+            return 0;
+        }
+
+        private Encoding getUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
+        {
+            if (encodingOptions.Encoding != null)
+            {
+                return encodingOptions.Encoding;
+            }
+
+            if (detectedEncoding != null)
+            {
+                return detectedEncoding;
+            }
+
+            if (encodingOptions.DefaultEncoding != null)
+            {
+                return encodingOptions.DefaultEncoding;
+            }
+
+            return Encoding.Default;
+        }
+        private int getPosIncPrecomputed(Encoding usedEncoding)
+        {
+            if (usedEncoding is UTF8Encoding)
             {
                 return 0;
             }
 
-            Encoding[] encodings = new Encoding[]
+            if (usedEncoding is UnicodeEncoding)
             {
-                Encoding.UTF8,
-                Encoding.Unicode,
-                Encoding.BigEndianUnicode,
-                Encoding.UTF32
-            };
-            byte[][] preambles = new byte[4][]
-            {
-                Encoding.UTF8.GetPreamble(),
-                Encoding.Unicode.GetPreamble(),
-                Encoding.BigEndianUnicode.GetPreamble(),
-                Encoding.UTF32.GetPreamble()
-            };
-            foreach (Encoding encoding in encodings)
-            {
-                byte[] preamble = encoding.GetPreamble();
-                bool fail = false;
-                for (int i = 0; i < readLen && i < preamble.Length; ++i)
-                {
-                    if (readPreamble[i] != preamble[i])
-                    {
-                        fail = true;
-                        break;
-                    }
-                }
-
-                if (!fail)
-                {
-                    _detectedEncoding = encoding;
-                    return preamble.Length;
-                }
+                return 2;
             }
 
-            return 0;
+            return 1;
         }
 
         #endregion
-
-        protected void ResetReader()
-        {
-            _state = 0;
-            NewBuilder();
-            _reader.DiscardBufferedData();
-        }
-
-        protected void NewBuilder()
-        {
-            _charBufferPos = 0;
-        }
     }
 }
