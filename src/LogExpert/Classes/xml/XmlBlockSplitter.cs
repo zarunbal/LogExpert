@@ -35,7 +35,7 @@ namespace LogExpert
             this.reader.StartTag = xmlLogConfig.XmlStartTag;
             this.reader.EndTag = xmlLogConfig.XmlEndTag;
 
-            this.Stylesheet = xmlLogConfig.Stylesheet;
+            Stylesheet = xmlLogConfig.Stylesheet;
 
             // Create the XmlNamespaceManager.
             NameTable nt = new NameTable();
@@ -45,9 +45,9 @@ namespace LogExpert
                 nsmgr.AddNamespace(xmlLogConfig.Namespace[0], xmlLogConfig.Namespace[1]);
             }
             // Create the XmlParserContext.
-            this.context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
-            this.settings = new XmlReaderSettings();
-            this.settings.ConformanceLevel = ConformanceLevel.Fragment;
+            context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
+            settings = new XmlReaderSettings();
+            settings.ConformanceLevel = ConformanceLevel.Fragment;
         }
 
         #endregion
@@ -56,30 +56,30 @@ namespace LogExpert
 
         public override long Position
         {
-            get => this.reader.Position;
-            set => this.reader.Position = value;
+            get => reader.Position;
+            set => reader.Position = value;
         }
 
-        public override Encoding Encoding => this.reader.Encoding;
+        public override Encoding Encoding => reader.Encoding;
 
-        public override bool IsBufferComplete => this.lineList.Count == 0;
+        public override bool IsBufferComplete => lineList.Count == 0;
 
         public string Stylesheet
         {
-            get { return this.stylesheet; }
+            get { return stylesheet; }
             set
             {
-                this.stylesheet = value;
-                if (this.stylesheet != null)
+                stylesheet = value;
+                if (stylesheet != null)
                 {
-                    XmlReader stylesheetReader = XmlReader.Create(new StringReader(this.stylesheet));
+                    XmlReader stylesheetReader = XmlReader.Create(new StringReader(stylesheet));
 
-                    this.xslt = new XslCompiledTransform();
-                    this.xslt.Load(stylesheetReader);
+                    xslt = new XslCompiledTransform();
+                    xslt.Load(stylesheetReader);
                 }
                 else
                 {
-                    this.xslt = null;
+                    xslt = null;
                 }
             }
         }
@@ -90,22 +90,22 @@ namespace LogExpert
 
         private void ParseXmlBlock(string block)
         {
-            if (this.stylesheet != null)
+            if (stylesheet != null)
             {
-                XmlReader xmlReader = XmlReader.Create(new StringReader(block), this.settings, this.context);
+                XmlReader xmlReader = XmlReader.Create(new StringReader(block), settings, context);
 
                 xmlReader.Read();
                 xmlReader.MoveToContent();
                 //xmlReader.MoveToContent();
                 StringWriter textWriter = new StringWriter();
 
-                this.xslt.Transform(xmlReader, null, textWriter);
+                xslt.Transform(xmlReader, null, textWriter);
                 string message = textWriter.ToString();
-                this.SplitToLinesList(message);
+                SplitToLinesList(message);
             }
             else
             {
-                this.SplitToLinesList(block);
+                SplitToLinesList(block);
                 //this.lineList.Add(block);   // TODO: make configurable, if block has to be splitted
             }
         }
@@ -113,7 +113,7 @@ namespace LogExpert
         private void SplitToLinesList(string message)
         {
             const int MAX_LEN = 3000;
-            string[] lines = message.Split(XmlBlockSplitter.splitStrings, StringSplitOptions.None);
+            string[] lines = message.Split(splitStrings, StringSplitOptions.None);
             foreach (string theLine in lines)
             {
                 string line = theLine.Trim(newLineChar);
@@ -121,9 +121,9 @@ namespace LogExpert
                 {
                     string part = line.Substring(0, MAX_LEN);
                     line = line.Substring(MAX_LEN);
-                    this.lineList.Enqueue(part);
+                    lineList.Enqueue(part);
                 }
-                this.lineList.Enqueue(line);
+                lineList.Enqueue(line);
             }
         }
 
@@ -135,20 +135,20 @@ namespace LogExpert
         {
             if (disposing)
             {
-                this.reader.Dispose();
+                reader.Dispose();
             }
         }
 
         public override int ReadChar()
         {
-            return this.reader.ReadChar();
+            return reader.ReadChar();
         }
 
         public override string ReadLine()
         {
-            if (this.lineList.Count == 0)
+            if (lineList.Count == 0)
             {
-                string block = this.reader.ReadLine();
+                string block = reader.ReadLine();
                 if (block == null)
                 {
                     return null;
@@ -156,14 +156,14 @@ namespace LogExpert
 
                 try
                 {
-                    this.ParseXmlBlock(block);
+                    ParseXmlBlock(block);
                 }
                 catch (XmlException)
                 {
-                    this.lineList.Enqueue("[XML Parser error] " + block);
+                    lineList.Enqueue("[XML Parser error] " + block);
                 }
             }
-            return this.lineList.Dequeue();
+            return lineList.Dequeue();
         }
 
         #endregion

@@ -17,7 +17,7 @@ namespace LogExpert.Classes.Log
 
         ~LogStreamReaderBase()
         {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         #endregion
@@ -49,12 +49,12 @@ namespace LogExpert.Classes.Log
         {
             try
             {
-                this.Dispose(true);
+                Dispose(true);
                 GC.SuppressFinalize(this);
             }
             finally
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
             }
         }
         /// <summary>

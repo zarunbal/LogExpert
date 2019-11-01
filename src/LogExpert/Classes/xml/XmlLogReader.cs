@@ -25,13 +25,13 @@ namespace LogExpert
 
         public override long Position
         {
-            get => this.reader.Position;
-            set => this.reader.Position = value;
+            get => reader.Position;
+            set => reader.Position = value;
         }
 
-        public override Encoding Encoding => this.reader.Encoding;
+        public override Encoding Encoding => reader.Encoding;
 
-        public override bool IsBufferComplete => this.reader.IsBufferComplete;
+        public override bool IsBufferComplete => reader.IsBufferComplete;
 
         public string StartTag { get; set; } = "<log4j:event";
 
@@ -45,13 +45,13 @@ namespace LogExpert
         {
             if (disposing)
             {
-                this.reader.Dispose();
+                reader.Dispose();
             }
         }
 
         public override int ReadChar()
         {
-            return this.reader.ReadChar();
+            return reader.ReadChar();
         }
 
         public override string ReadLine()
@@ -66,7 +66,7 @@ namespace LogExpert
 
             while (!eof && !blockComplete)
             {
-                int readInt = this.ReadChar();
+                int readInt = ReadChar();
                 if (readInt == -1)
                 {
                     // if eof before the block is complete, wait some msecs for the logger to flush the complete xml struct
@@ -99,7 +99,7 @@ namespace LogExpert
                 switch (state)
                 {
                     case 0:
-                        if (readChar == this.StartTag[0])
+                        if (readChar == StartTag[0])
                         {
                             //_logger.logInfo("state = 1");
                             state = 1;
@@ -112,11 +112,11 @@ namespace LogExpert
                         //}
                         break;
                     case 1:
-                        if (readChar == this.StartTag[tagIndex])
+                        if (readChar == StartTag[tagIndex])
                         {
                             builder.Append(readChar);
 
-                            if (++tagIndex >= this.StartTag.Length)
+                            if (++tagIndex >= StartTag.Length)
                             {
                                 //_logger.logInfo("state = 2");
                                 state = 2; // start Tag complete
@@ -126,7 +126,7 @@ namespace LogExpert
                         else
                         {
                             // tag doesn't match anymore
-                            //_logger.logInfo("state = 0 [" + this.buffer.ToString() + readChar + "]");
+                            //_logger.logInfo("state = 0 [" + buffer.ToString() + readChar + "]");
                             state = 0;
                             builder.Clear();
                         }
@@ -134,7 +134,7 @@ namespace LogExpert
                     case 2:
                         builder.Append(readChar);
 
-                        if (readChar == this.EndTag[0])
+                        if (readChar == EndTag[0])
                         {
                             //_logger.logInfo("state = 3");
                             state = 3;
@@ -144,10 +144,10 @@ namespace LogExpert
                     case 3:
                         builder.Append(readChar);
 
-                        if (readChar == this.EndTag[tagIndex])
+                        if (readChar == EndTag[tagIndex])
                         {
                             tagIndex++;
-                            if (tagIndex >= this.EndTag.Length)
+                            if (tagIndex >= EndTag.Length)
                             {
                                 blockComplete = true;
                                 break;

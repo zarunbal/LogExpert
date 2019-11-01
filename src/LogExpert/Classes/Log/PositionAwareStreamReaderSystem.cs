@@ -33,18 +33,18 @@ namespace LogExpert.Classes.Log
 
         public override string ReadLine()
         {
-            StreamReader reader = this.GetStreamReader();
+            StreamReader reader = GetStreamReader();
 
-            if (this._newLineSequenceLength == 0)
+            if (_newLineSequenceLength == 0)
             {
-                this._newLineSequenceLength = this.guessNewLineSequenceLength(reader);
+                _newLineSequenceLength = guessNewLineSequenceLength(reader);
             }
 
             string line = reader.ReadLine();
 
             if (line != null)
             {
-                this.MovePosition(this.Encoding.GetByteCount(line) + this._newLineSequenceLength);
+                MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
 
                 if (line.Length > MAX_LINE_LEN)
                 {
@@ -61,7 +61,7 @@ namespace LogExpert.Classes.Log
 
         private int guessNewLineSequenceLength(StreamReader reader)
         {
-            long currentPos = this.Position;
+            long currentPos = Position;
 
             try
             {
@@ -69,7 +69,7 @@ namespace LogExpert.Classes.Log
 
                 if (line != null)
                 {
-                    this.Position += this.Encoding.GetByteCount(line);
+                    Position += Encoding.GetByteCount(line);
                     
                     int firstChar = reader.Read();
                     if (firstChar == CHAR_CR) // check \r
@@ -77,17 +77,17 @@ namespace LogExpert.Classes.Log
                         int secondChar = reader.Read();
                         if (secondChar == CHAR_LF) // check \n
                         {
-                            return this.Encoding.GetByteCount("\r\n");
+                            return Encoding.GetByteCount("\r\n");
                         }
                     }
-                    return this.Encoding.GetByteCount(((char)firstChar).ToString());
+                    return Encoding.GetByteCount(((char)firstChar).ToString());
                 }
 
                 return 0;
             }
             finally
             {
-                this.Position = currentPos;
+                Position = currentPos;
             }
         }
 

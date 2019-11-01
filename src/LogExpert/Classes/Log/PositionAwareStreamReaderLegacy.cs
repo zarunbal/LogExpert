@@ -29,53 +29,53 @@ namespace LogExpert.Classes.Log
         {
             int readInt;
 
-            while (-1 != (readInt = this.ReadChar()))
+            while (-1 != (readInt = ReadChar()))
             {
                 char readChar = (char)readInt;
 
                 switch (readChar)
                 {
                     case '\n':
-                        this._crDetect = false;
-                        return this.getLineAndResetCharBufferPos();
+                        _crDetect = false;
+                        return getLineAndResetCharBufferPos();
                     case '\r':
-                        if (this._crDetect)
+                        if (_crDetect)
                         {
-                            return this.getLineAndResetCharBufferPos();
+                            return getLineAndResetCharBufferPos();
                         }
                         else
                         {
-                            this._crDetect = true;
+                            _crDetect = true;
                         }
                         break;
                     default:
-                        if (this._crDetect)
+                        if (_crDetect)
                         {
-                            this._crDetect = false;
-                            string line = this.getLineAndResetCharBufferPos();
-                            this.appendToCharBuffer(readChar);
+                            _crDetect = false;
+                            string line = getLineAndResetCharBufferPos();
+                            appendToCharBuffer(readChar);
                             return line;
                         }
                         else
                         {
-                            this.appendToCharBuffer(readChar);
+                            appendToCharBuffer(readChar);
                         }
                         break;
                 }
             }
 
-            string result = this.getLineAndResetCharBufferPos();
-            if (readInt == -1 && result.Length == 0 && !this._crDetect)
+            string result = getLineAndResetCharBufferPos();
+            if (readInt == -1 && result.Length == 0 && !_crDetect)
             {
                 return null; // EOF
             }
-            this._crDetect = false;
+            _crDetect = false;
             return result;
         }
 
         protected override void ResetReader()
         {
-            this.resetCharBufferPos();
+            resetCharBufferPos();
 
             base.ResetReader();
         }
@@ -86,22 +86,22 @@ namespace LogExpert.Classes.Log
 
         private string getLineAndResetCharBufferPos()
         {
-            string result = new string(this.charBuffer, 0, this._charBufferPos);
-            this.resetCharBufferPos();
+            string result = new string(charBuffer, 0, _charBufferPos);
+            resetCharBufferPos();
             return result;
         }
 
         private void appendToCharBuffer(char readChar)
         {
-            if (this._charBufferPos < MAX_LINE_LEN)
+            if (_charBufferPos < MAX_LINE_LEN)
             {
-                this.charBuffer[this._charBufferPos++] = readChar;
+                charBuffer[_charBufferPos++] = readChar;
             }
         }
 
         private void resetCharBufferPos()
         {
-            this._charBufferPos = 0;
+            _charBufferPos = 0;
         }
 
         #endregion
