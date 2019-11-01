@@ -144,6 +144,7 @@ namespace LogExpert.Dialogs
 
             encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
             maskPrioCheckBox.Checked = Preferences.maskPrio;
+            autoPickCheckBox.Checked = Preferences.autoPick;
             askCloseTabsCheckBox.Checked = Preferences.askForClose;
             columnFinderCheckBox.Checked = Preferences.showColumnFinder;
             legacyReaderCheckBox.Checked = Preferences.useLegacyReader;
@@ -584,6 +585,7 @@ namespace LogExpert.Dialogs
 
             SaveColumnizerList();
             Preferences.maskPrio = maskPrioCheckBox.Checked;
+            Preferences.autoPick = autoPickCheckBox.Checked;
             Preferences.askForClose = askCloseTabsCheckBox.Checked;
             Preferences.allowOnlyOneInstance = singleInstanceCheckBox.Checked;
             Preferences.openLastFiles = openLastFilesCheckBox.Checked;

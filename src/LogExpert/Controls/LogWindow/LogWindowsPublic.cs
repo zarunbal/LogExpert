@@ -118,12 +118,15 @@ namespace LogExpert
                 this.logFileReader.startMonitoring();
                 if (isUsingDefaultColumnizer)
                 {
-                    ILogLineColumnizer newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
-                    if (newColumnizer != null)
+                    if (Preferences.autoPick)
                     {
-                        _logger.Debug("Picked new columnizer '{0}'", newColumnizer);
+                        ILogLineColumnizer newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
+                        if (newColumnizer != null)
+                        {
+                            _logger.Debug("Picked new columnizer '{0}'", newColumnizer);
 
-                        PreSelectColumnizer(newColumnizer);
+                            PreSelectColumnizer(newColumnizer);
+                        }
                     }
                 }
             }
