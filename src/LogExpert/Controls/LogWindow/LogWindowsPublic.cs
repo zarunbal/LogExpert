@@ -40,18 +40,17 @@ namespace LogExpert
                 }
 
                 //
-                // beenLoadedBefore is used for automatically find the best columnizer.
-                // When a new log file is opened, this feature will try to find a columnizer instead of the
-                // default one.
+                // isUsingDefaultColumnizer is to enable automatically find the best columnizer.
+                // When a new log file is opened, and no Columnizer can be chose by file mask,
+                // this flag will enable find a columnizer automatically.
                 // Current solution is not elegant.
                 // Since the refactory will involving a lot of work, we can plan it in the future.
                 // One possible solution is, using raw file stream to read the sample lines to help 
                 // the ColumnizerPicker to determine the priority.
                 //
-                bool beenLoadedBefore = true;
+                bool isUsingDefaultColumnizer = false;
                 if (!LoadPersistenceOptions())
                 {
-                    beenLoadedBefore = false;
                     if (!this.IsTempFile)
                     {
                         ILogLineColumnizer columnizer = FindColumnizer();
@@ -61,6 +60,10 @@ namespace LogExpert
                             {
                                 columnizer = ColumnizerPicker.CloneColumnizer(columnizer);
                             }
+                        }
+                        else
+                        {
+                            isUsingDefaultColumnizer = true;
                         }
                         PreSelectColumnizer(columnizer);
                     }
@@ -113,7 +116,7 @@ namespace LogExpert
                 RegisterLogFileReaderEvents();
                 _logger.Info("Loading logfile: {0}", fileName);
                 this.logFileReader.startMonitoring();
-                if (!beenLoadedBefore)
+                if (isUsingDefaultColumnizer)
                 {
                     ILogLineColumnizer newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
                     if (newColumnizer != null)
