@@ -108,6 +108,7 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Interface\IEncodingOptions.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
@@ -195,6 +196,7 @@
     <Compile Include="Interface\IBookmarkView.cs" />
     <Compile Include="Interface\ILogExpertClient.cs" />
     <Compile Include="Interface\ILogExpertProxy.cs" />
+    <Compile Include="Interface\ILogReaderOptions.cs" />
     <Compile Include="Interface\ILogStreamReader.cs" />
     <Compile Include="Interface\ILogPaintContext.cs" />
     <Compile Include="Interface\ILogView.cs" />
@@ -593,6 +595,9 @@
     <PackageReference Include="NLog.Config">
       <Version>4.6.7</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classes\Ioc\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

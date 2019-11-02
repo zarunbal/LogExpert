@@ -21,7 +21,7 @@ namespace LogExpert.Classes.Log
 
         #region cTor
 
-        public PositionAwareStreamReaderSystem(Stream stream, EncodingOptions encodingOptions)
+        public PositionAwareStreamReaderSystem(Stream stream, IEncodingOptions encodingOptions)
             : base(stream, encodingOptions)
         {
             

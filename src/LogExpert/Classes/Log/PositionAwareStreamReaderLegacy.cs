@@ -15,7 +15,7 @@ namespace LogExpert.Classes.Log
 
         #region cTor
 
-        public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) 
+        public PositionAwareStreamReaderLegacy(Stream stream, IEncodingOptions encodingOptions) 
             : base(stream, encodingOptions)
         {
 

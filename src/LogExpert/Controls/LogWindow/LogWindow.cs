@@ -425,8 +425,7 @@ namespace LogExpert
 
         internal IColumnizedLogLine GetColumnsForLine(int lineNumber)
         {
-            return columnCache.GetColumnsForLine(logFileReader, lineNumber, CurrentColumnizer,
-                ColumnizerCallbackObject);
+            return columnCache.GetColumnsForLine(logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 
             //string line = this.logFileReader.GetLogLine(lineNumber);
             //if (line != null)

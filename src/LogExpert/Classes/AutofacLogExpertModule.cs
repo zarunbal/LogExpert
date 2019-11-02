@@ -15,6 +15,8 @@ namespace LogExpert.Classes
             builder.RegisterType<LogExpertProxy>().SingleInstance();
             builder.RegisterType<LogExpertApplicationContext>().SingleInstance();
             builder.RegisterType<LogWindow>().InstancePerLifetimeScope();
+
+            builder.RegisterType<LogWindow.ColumnizerCallback>().InstancePerLifetimeScope();
         }
     }
 }

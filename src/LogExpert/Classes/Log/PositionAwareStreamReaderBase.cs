@@ -24,7 +24,7 @@ namespace LogExpert.Classes.Log
 
         #region cTor
 
-        protected PositionAwareStreamReaderBase(Stream stream, EncodingOptions encodingOptions)
+        protected PositionAwareStreamReaderBase(Stream stream, IEncodingOptions encodingOptions)
         {
             _stream = new BufferedStream(stream);
 
@@ -181,7 +181,7 @@ namespace LogExpert.Classes.Log
             return 0;
         }
 
-        private Encoding getUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
+        private Encoding getUsedEncoding(IEncodingOptions encodingOptions, Encoding detectedEncoding)
         {
             if (encodingOptions.Encoding != null)
             {

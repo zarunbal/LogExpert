@@ -187,7 +187,7 @@ namespace LogExpert
 
         public IPreProcessColumnizer PreProcessColumnizer { get; set; } = null;
 
-        public EncodingOptions EncodingOptions
+        public IEncodingOptions EncodingOptions
         {
             get { return encodingOptions; }
             set
@@ -1649,7 +1649,7 @@ namespace LogExpert
             }
         }
 
-        private ILogStreamReader GetLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useNewReader)
+        private ILogStreamReader GetLogStreamReader(Stream stream, IEncodingOptions encodingOptions, bool useNewReader)
         {
             ILogStreamReader reader = this.CreateLogStreamReader(stream, encodingOptions, useNewReader);
 
@@ -1662,7 +1662,7 @@ namespace LogExpert
                 return reader;
             }
         }
-        private ILogStreamReader CreateLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useSystemReader)
+        private ILogStreamReader CreateLogStreamReader(Stream stream, IEncodingOptions encodingOptions, bool useSystemReader)
         {
             if (useSystemReader)
             {
