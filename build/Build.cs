@@ -285,7 +285,7 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll"};
+            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll", "ChilkatDotNet47.dll" };
 
             OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
             OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));

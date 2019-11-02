@@ -14,7 +14,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
       <dependency id="chocolatey" version="0.10.8" />
-      <dependency id="dotnet4.7.2" version="4.7.2.20180712" />
     </dependencies>
     <description>LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 

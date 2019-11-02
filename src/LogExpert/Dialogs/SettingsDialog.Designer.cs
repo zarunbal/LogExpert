@@ -92,6 +92,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.argsTextBox = new System.Windows.Forms.TextBox();
             this.columnizersPage = new System.Windows.Forms.TabPage();
+            this.autoPickCheckBox = new System.Windows.Forms.CheckBox();
             this.maskPrioCheckBox = new System.Windows.Forms.CheckBox();
             this.deleteButton = new System.Windows.Forms.Button();
             this.columnizerDataGridView = new System.Windows.Forms.DataGridView();
@@ -868,6 +869,7 @@
             // 
             // columnizersPage
             // 
+            this.columnizersPage.Controls.Add(this.autoPickCheckBox);
             this.columnizersPage.Controls.Add(this.maskPrioCheckBox);
             this.columnizersPage.Controls.Add(this.deleteButton);
             this.columnizersPage.Controls.Add(this.columnizerDataGridView);
@@ -878,6 +880,18 @@
             this.columnizersPage.TabIndex = 3;
             this.columnizersPage.Text = "Columnizers";
             this.columnizersPage.UseVisualStyleBackColor = true;
+            // 
+            // autoPickCheckBox
+            // 
+            this.autoPickCheckBox.AutoSize = true;
+            this.autoPickCheckBox.Checked = true;
+            this.autoPickCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.autoPickCheckBox.Location = new System.Drawing.Point(353, 251);
+            this.autoPickCheckBox.Name = "autoPickCheckBox";
+            this.autoPickCheckBox.Size = new System.Drawing.Size(170, 17);
+            this.autoPickCheckBox.TabIndex = 5;
+            this.autoPickCheckBox.Text = "Automatically pick for new files";
+            this.autoPickCheckBox.UseVisualStyleBackColor = true;
             // 
             // maskPrioCheckBox
             // 
@@ -1689,5 +1703,6 @@
         private System.Windows.Forms.NumericUpDown maximumFilterEntriesUpDown;
         private System.Windows.Forms.NumericUpDown maximumFilterEntriesDisplayedUpDown;
         private System.Windows.Forms.Label labelMaximumFilterEntriesDisplayed;
+        private System.Windows.Forms.CheckBox autoPickCheckBox;
     }
 }

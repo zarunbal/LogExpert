@@ -40,18 +40,17 @@ namespace LogExpert
                 }
 
                 //
-                // beenLoadedBefore is used for automatically find the best columnizer.
-                // When a new log file is opened, this feature will try to find a columnizer instead of the
-                // default one.
+                // isUsingDefaultColumnizer is to enable automatically find the best columnizer.
+                // When a new log file is opened, and no Columnizer can be chose by file mask,
+                // this flag will enable find a columnizer automatically.
                 // Current solution is not elegant.
                 // Since the refactory will involving a lot of work, we can plan it in the future.
                 // One possible solution is, using raw file stream to read the sample lines to help 
                 // the ColumnizerPicker to determine the priority.
                 //
-                bool beenLoadedBefore = true;
+                bool isUsingDefaultColumnizer = false;
                 if (!LoadPersistenceOptions())
                 {
-                    beenLoadedBefore = false;
                     if (!this.IsTempFile)
                     {
                         ILogLineColumnizer columnizer = FindColumnizer();
@@ -61,6 +60,10 @@ namespace LogExpert
                             {
                                 columnizer = ColumnizerPicker.CloneColumnizer(columnizer);
                             }
+                        }
+                        else
+                        {
+                            isUsingDefaultColumnizer = true;
                         }
                         PreSelectColumnizer(columnizer);
                     }
@@ -113,14 +116,17 @@ namespace LogExpert
                 RegisterLogFileReaderEvents();
                 _logger.Info("Loading logfile: {0}", fileName);
                 this.logFileReader.startMonitoring();
-                if (!beenLoadedBefore)
+                if (isUsingDefaultColumnizer)
                 {
-                    ILogLineColumnizer newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
-                    if (newColumnizer != null)
+                    if (Preferences.autoPick)
                     {
-                        _logger.Debug("Picked new columnizer '{0}'", newColumnizer);
+                        ILogLineColumnizer newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, logFileReader, CurrentColumnizer);
+                        if (newColumnizer != null)
+                        {
+                            _logger.Debug("Picked new columnizer '{0}'", newColumnizer);
 
-                        PreSelectColumnizer(newColumnizer);
+                            PreSelectColumnizer(newColumnizer);
+                        }
                     }
                 }
             }
@@ -318,55 +324,8 @@ namespace LogExpert
 
         public void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
         {
-            int rowCount = gridView.RowCount;
-            int currLine = gridView.CurrentCellAddress.Y;
-            int currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
+            PaintHelper.SetColumnizer(columnizer,gridView);
 
-            gridView.Columns.Clear();
-
-            DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
-            markerColumn.HeaderText = "";
-            markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            markerColumn.Resizable = DataGridViewTriState.False;
-            markerColumn.DividerWidth = 1;
-            markerColumn.ReadOnly = true;
-            markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(markerColumn);
-
-            DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
-            lineNumberColumn.HeaderText = "Line";
-            lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
-            lineNumberColumn.DividerWidth = 1;
-            lineNumberColumn.ReadOnly = true;
-            lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(lineNumberColumn);
-
-            foreach (string colName in columnizer.GetColumnNames())
-            {
-                DataGridViewColumn titleColumn = new LogTextColumn();
-                titleColumn.HeaderText = colName;
-                titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-                titleColumn.Resizable = DataGridViewTriState.NotSet;
-                titleColumn.DividerWidth = 1;
-                titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-                gridView.Columns.Add(titleColumn);
-            }
-
-            this.columnNamesLabel.Text = CalculateColumnNames(this.filterParams);
-
-            //gridView.Columns[gridView.Columns.Count - 1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            //gridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
-
-            gridView.RowCount = rowCount;
-            if (currLine != -1)
-            {
-                gridView.CurrentCell = gridView.Rows[currLine].Cells[0];
-            }
-            if (currFirstLine != -1)
-            {
-                gridView.FirstDisplayedScrollingRowIndex = currFirstLine;
-            }
             gridView.Refresh();
             AutoResizeColumns(gridView);
             ApplyFrozenState(gridView);

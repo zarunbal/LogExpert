@@ -1,6 +1,7 @@
 ﻿
 namespace LogExpert
 {
+    using System;
     using System.Globalization;
 
     internal class TimeFormatDeterminer
@@ -13,9 +14,9 @@ namespace LogExpert
 
             public FormatInfo(string dateFormat, string timeFormat, CultureInfo cultureInfo)
             {
-                this.DateFormat = dateFormat;
-                this.TimeFormat = timeFormat;
-                this.CultureInfo = cultureInfo;
+                DateFormat = dateFormat;
+                TimeFormat = timeFormat;
+                CultureInfo = cultureInfo;
             }
 
             #endregion
@@ -30,7 +31,7 @@ namespace LogExpert
 
             public string DateTimeFormat
             {
-                get { return this.DateFormat + " " + this.TimeFormat; }
+                get { return DateFormat + " " + TimeFormat; }
             }
 
             public bool IgnoreFirstChar { get; set; }
@@ -59,6 +60,8 @@ namespace LogExpert
         protected FormatInfo formatInfo17 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo18 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss.fff", new CultureInfo("en-US"));
         protected FormatInfo formatInfo19 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss:fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo20 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss.ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo21 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss,ffff", new CultureInfo("en-US"));
 
 
         public FormatInfo DetermineDateTimeFormatInfo(string line)
@@ -84,30 +87,30 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo1.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo1;
+                    formatInfo1.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo1;
                 }
                 else if (temp[19] == ',')
                 {
-                    this.formatInfo7.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo7;
+                    formatInfo7.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo7;
                 }
                 else
                 {
-                    this.formatInfo2.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo2;
+                    formatInfo2.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo2;
                 }
             }
             else if (temp[2] == '/' && temp[5] == '/' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo18.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo18;
+                    formatInfo18.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo18;
                 }
                 else if (temp[19] == ':')
                 {
-                    this.formatInfo19.IgnoreFirstChar = ignoreFirst;
+                    formatInfo19.IgnoreFirstChar = ignoreFirst;
                     return formatInfo19;
                 }
             }
@@ -115,84 +118,100 @@ namespace LogExpert
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo3.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo3;
+                    formatInfo3.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo3;
                 }
                 else if (temp[19] == ',')
                 {
-                    this.formatInfo8.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo8;
+                    formatInfo8.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo8;
                 }
                 else
                 {
-                    this.formatInfo4.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo4;
+                    formatInfo4.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo4;
                 }
             }
             else if (temp[4] == '.' && temp[7] == '.' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo5.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo5;
+                    formatInfo5.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo5;
                 }
                 else if (temp[19] == ',')
                 {
-                    this.formatInfo9.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo9;
+                    formatInfo9.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo9;
                 }
                 else
                 {
-                    this.formatInfo6.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo6;
+                    formatInfo6.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo6;
                 }
             }
             else if (temp[4] == '-' && temp[7] == '-' && temp[13] == ':' && temp[16] == ':')
             {
                 if (temp[19] == '.')
                 {
-                    this.formatInfo10.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo10;
+                    if (temp.Length > 23 && char.IsDigit(temp[23]))
+                    {
+                        formatInfo20.IgnoreFirstChar = ignoreFirst;
+                        return formatInfo20;
+                    }
+                    else
+                    {
+                        formatInfo10.IgnoreFirstChar = ignoreFirst;
+                        return formatInfo10;
+                    }
                 }
                 else if (temp[19] == ',')
                 {
-                    this.formatInfo11.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo11;
+                    if (temp.Length > 23 && char.IsDigit(temp[23]))
+                    {
+                        formatInfo21.IgnoreFirstChar = ignoreFirst;
+                        return formatInfo21;
+                    }
+                    else
+                    {
+                        formatInfo11.IgnoreFirstChar = ignoreFirst;
+                        return formatInfo11;
+                    }
                 }
                 else if (temp[19] == ':')
                 {
-                    this.formatInfo17.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo17;
+                    formatInfo17.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo17;
                 }
                 else
                 {
-                    this.formatInfo12.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo12;
+                    formatInfo12.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo12;
                 }
             }
             else if (temp[2] == ' ' && temp[6] == ' ' && temp[14] == ':' && temp[17] == ':')
             {
                 if (temp[20] == ',')
                 {
-                    this.formatInfo13.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo13;
+                    formatInfo13.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo13;
                 }
                 else if (temp[20] == '.')
                 {
-                    this.formatInfo14.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo14;
+                    formatInfo14.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo14;
                 }
                 else
                 {
-                    this.formatInfo15.IgnoreFirstChar = ignoreFirst;
-                    return this.formatInfo15;
+                    formatInfo15.IgnoreFirstChar = ignoreFirst;
+                    return formatInfo15;
                 }
             }
             //dd.MM.yy HH:mm:ss.fff
             else if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
             {
-                this.formatInfo16.IgnoreFirstChar = ignoreFirst;
-                return this.formatInfo16;
+                formatInfo16.IgnoreFirstChar = ignoreFirst;
+                return formatInfo16;
             }
 
             return null;
@@ -207,16 +226,16 @@ namespace LogExpert
                 {
                     if (field[8] == '.')
                     {
-                        return this.formatInfo1;
+                        return formatInfo1;
                     }
                     else if (field[8] == ',')
                     {
-                        return this.formatInfo7;
+                        return formatInfo7;
                     }
                 }
                 else
                 {
-                    return this.formatInfo2;
+                    return formatInfo2;
                 }
             }
             return null;

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace LogExpert
 {
-    public interface ILogStreamReader
+    public interface ILogStreamReader : IDisposable
     {
         #region Properties
 

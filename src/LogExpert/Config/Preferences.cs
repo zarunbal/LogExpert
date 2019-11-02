@@ -28,6 +28,7 @@ namespace LogExpert
         public int maximumFilterEntries = 30;
         public int maximumFilterEntriesDisplayed = 20;
         public bool maskPrio;
+        public bool autoPick;
         public MultiFileOption multiFileOption;
         public MultifileOptions multifileOptions;
         public bool multiThreadFilter = true;

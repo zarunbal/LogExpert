@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace LogExpert.Classes.Log
 {
@@ -12,12 +8,17 @@ namespace LogExpert.Classes.Log
 
         private readonly char[] charBuffer = new char[MAX_LINE_LEN];
 
+        private int _charBufferPos = 0;
+        private bool _crDetect = false;
+
         #endregion
 
         #region cTor
 
-        public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
+        public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) 
+            : base(stream, encodingOptions)
         {
+
         }
 
         #endregion
@@ -26,114 +27,81 @@ namespace LogExpert.Classes.Log
 
         public override string ReadLine()
         {
-            string result;
             int readInt;
 
             while (-1 != (readInt = ReadChar()))
             {
-                char readChar = (char) readInt;
+                char readChar = (char)readInt;
 
-                // state: 0: looking for \r or \n, 
-                //        1: looking for \n after \r
-                //        2: looking for 
                 switch (readChar)
                 {
-                    case '\r':
-                        switch (_state)
-                        {
-                            case 0:
-                                _state = 1;
-                                break;
-                            case 1:
-                                result = GetLineAndResetBuilder();
-                                return result;
-                        }
-
-                        break;
                     case '\n':
-                        switch (_state)
+                        _crDetect = false;
+                        return getLineAndResetCharBufferPos();
+                    case '\r':
+                        if (_crDetect)
                         {
-                            case 0:
-                            // fall through
-                            case 1:
-                                result = GetLineAndResetBuilder();
-                                return result;
+                            return getLineAndResetCharBufferPos();
                         }
-
+                        else
+                        {
+                            _crDetect = true;
+                        }
                         break;
                     default:
-                        switch (_state)
+                        if (_crDetect)
                         {
-                            case 0:
-                                appendToBuilder(readChar);
-                                break;
-                            case 1:
-                                appendToBuilder(readChar);
-                                _state = 0;
-                                break;
+                            _crDetect = false;
+                            string line = getLineAndResetCharBufferPos();
+                            appendToCharBuffer(readChar);
+                            return line;
                         }
-
+                        else
+                        {
+                            appendToCharBuffer(readChar);
+                        }
                         break;
                 }
-
-                //if (this.builder.Length > MAX_LINE_LEN)
-                //  break;
             }
 
-            //if (builder.Length == 0)
-            //  return null;  // EOF
-            result = GetLineAndResetBuilder();
-            //if (result.Length == 0)
-            //  return null;  // EOF
-            if (readInt == -1 && result.Length == 0)
+            string result = getLineAndResetCharBufferPos();
+            if (readInt == -1 && result.Length == 0 && !_crDetect)
             {
                 return null; // EOF
             }
-
+            _crDetect = false;
             return result;
+        }
+
+        protected override void ResetReader()
+        {
+            resetCharBufferPos();
+
+            base.ResetReader();
         }
 
         #endregion
 
         #region Private Methods
 
-        //private string GetLineAndResetBuilder()
-        //{
-        //  string result;
-        //  result = this.builder.ToString();
-        //  this.state = 0;
-        //  if (this.builder.Length > MAX_LINE_LEN)
-        //    result = result.Substring(0, MAX_LINE_LEN);
-        //  NewBuilder();
-        //  return result;
-        //}
-
-        //private void appendToBuilder(char[] readChar)
-        //{
-        //  this.builder.Append(Char.ToString(readChar[0]));
-        //}
-
-        //private void NewBuilder()
-        //{
-        //  this.builder = new StringBuilder(400);
-        //}
-
-        private string GetLineAndResetBuilder()
+        private string getLineAndResetCharBufferPos()
         {
             string result = new string(charBuffer, 0, _charBufferPos);
-            NewBuilder();
-            _state = 0;
+            resetCharBufferPos();
             return result;
         }
 
-        private void appendToBuilder(char readChar)
+        private void appendToCharBuffer(char readChar)
         {
-            if (_charBufferPos >= MAX_LINE_LEN)
+            if (_charBufferPos < MAX_LINE_LEN)
             {
-                return;
+                charBuffer[_charBufferPos++] = readChar;
             }
+        }
 
-            charBuffer[_charBufferPos++] = readChar;
+        private void resetCharBufferPos()
+        {
+            _charBufferPos = 0;
         }
 
         #endregion
