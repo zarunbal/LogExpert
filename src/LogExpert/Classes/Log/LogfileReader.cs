@@ -37,7 +37,6 @@ namespace LogExpert
         private bool _isFailModeCheckCallPending = false;
         private bool _isFastFailOnGetLogLine = false;
         private bool _isLineCountDirty = true;
-        private IList<ILogFileInfo> _logFileInfoList = new List<ILogFileInfo>();
         private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
 
         private ReaderWriterLock _lruCacheDictLock;
@@ -53,7 +52,8 @@ namespace LogExpert
         public LogfileReader(ILogReaderOptions logReaderOptions)
         {
             LogReaderOptions = logReaderOptions;
-            _logLineFx = GetLogLineInternal;
+            _logLineFx = GetLogLine;
+            LogFileInfoList = new List<ILogFileInfo>();
 
             if (!string.IsNullOrWhiteSpace(logReaderOptions.FileName))
             {
@@ -191,6 +191,7 @@ namespace LogExpert
 
         public ILogReaderOptions LogReaderOptions { get; set; }
 
+        public IList<ILogFileInfo> LogFileInfoList { get; set; }
         #endregion
 
         #region Public methods
@@ -212,15 +213,15 @@ namespace LogExpert
             ReleaseBufferListWriterLock();
             try
             {
-                foreach (ILogFileInfo info in _logFileInfoList)
+                foreach (ILogFileInfo info in LogFileInfoList)
                 {
                     //info.OpenFile();
                     ReadToBufferList(info, 0, LineCount);
                 }
 
-                if (_logFileInfoList.Count > 0)
+                if (LogFileInfoList.Count > 0)
                 {
-                    ILogFileInfo info = _logFileInfoList[_logFileInfoList.Count - 1];
+                    ILogFileInfo info = LogFileInfoList[LogFileInfoList.Count - 1];
                     _fileLength = info.Length;
                     _watchedILogFileInfo = info;
                 }
@@ -261,7 +262,7 @@ namespace LogExpert
                 IList<ILogFileInfo> lostILogFileInfoList = new List<ILogFileInfo>();
                 IList<ILogFileInfo> readNewILogFileInfoList = new List<ILogFileInfo>();
                 IList<ILogFileInfo> newFileInfoList = new List<ILogFileInfo>();
-                IEnumerator<ILogFileInfo> enumerator = _logFileInfoList.GetEnumerator();
+                IEnumerator<ILogFileInfo> enumerator = LogFileInfoList.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     ILogFileInfo logFileInfo = enumerator.Current;
@@ -374,9 +375,9 @@ namespace LogExpert
                 }
 
                 //this.watchedILogFileInfo = this.ILogFileInfoList[this.ILogFileInfoList.Count - 1];
-                _logFileInfoList = newFileInfoList;
+                LogFileInfoList = newFileInfoList;
                 _watchedILogFileInfo = GetLogFileInfo(_watchedILogFileInfo.FullName);
-                _logFileInfoList.Add(_watchedILogFileInfo);
+                LogFileInfoList.Add(_watchedILogFileInfo);
                 _logger.Info("Reading watched file");
                 ReadToBufferList(_watchedILogFileInfo, 0, LineCount);
             }
@@ -388,7 +389,41 @@ namespace LogExpert
 
         public ILogLine GetLogLine(int lineNum)
         {
-            return GetLogLineInternal(lineNum);
+            if (_isDeleted)
+            {
+                _logger.Debug("Returning null for line {0} because file is deleted.", lineNum);
+
+                // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
+                return null;
+            }
+
+            AcquireBufferListReaderLock();
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
+            if (logBuffer == null)
+            {
+                ReleaseBufferListReaderLock();
+                _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, LogReaderOptions.IsMultiFile ? " (MultiFile)" : "");
+                return null;
+            }
+
+            // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
+            _disposeLock.AcquireReaderLock(Timeout.Infinite);
+            if (logBuffer.IsDisposed)
+            {
+                LockCookie cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                lock (logBuffer.FileInfo)
+                {
+                    ReReadBuffer(logBuffer);
+                }
+
+                _disposeLock.DowngradeFromWriterLock(ref cookie);
+            }
+
+            ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+            _disposeLock.ReleaseReaderLock();
+            ReleaseBufferListReaderLock();
+
+            return line;
         }
 
         /// <summary>
@@ -654,16 +689,7 @@ namespace LogExpert
             ResetBufferCache();
             ClearLru();
         }
-
-        /// <summary>
-        /// For unit tests only.
-        /// </summary>
-        /// <returns></returns>
-        public IList<ILogFileInfo> GetLogFileInfoList()
-        {
-            return _logFileInfoList;
-        }
-
+        
         /// <summary>
         /// For unit tests only 
         /// </summary>
@@ -748,50 +774,11 @@ namespace LogExpert
         {
             _logger.Info("Adding file to ILogFileInfoList: " + fileName);
             ILogFileInfo info = GetLogFileInfo(fileName);
-            _logFileInfoList.Add(info);
+            LogFileInfoList.Add(info);
             return info;
         }
 
-        private ILogLine GetLogLineInternal(int lineNum)
-        {
-            if (_isDeleted)
-            {
-                _logger.Debug("Returning null for line {0} because file is deleted.", lineNum);
-
-                // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
-                return null;
-            }
-
-            AcquireBufferListReaderLock();
-            LogBuffer logBuffer = GetBufferForLine(lineNum);
-            if (logBuffer == null)
-            {
-                ReleaseBufferListReaderLock();
-                _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, LogReaderOptions.IsMultiFile ? " (MultiFile)" : "");
-                return null;
-            }
-
-            // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-            _disposeLock.AcquireReaderLock(Timeout.Infinite);
-            if (logBuffer.IsDisposed)
-            {
-                LockCookie cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
-                lock (logBuffer.FileInfo)
-                {
-                    ReReadBuffer(logBuffer);
-                }
-
-                _disposeLock.DowngradeFromWriterLock(ref cookie);
-            }
-
-            ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
-            _disposeLock.ReleaseReaderLock();
-            ReleaseBufferListReaderLock();
-
-            return line;
-        }
-
-        private void InitLruBuffers()
+       private void InitLruBuffers()
         {
             _bufferList = new List<LogBuffer>();
             _bufferLru = new List<LogBuffer>(LogReaderOptions.MaxBuffers + 1);

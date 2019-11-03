@@ -43,7 +43,7 @@ namespace UnitTests
 
             reader.ReadFiles();
 
-            IList<ILogFileInfo> lil = reader.GetLogFileInfoList();
+            IList<ILogFileInfo> lil = reader.LogFileInfoList;
             Assert.AreEqual(files.Count, lil.Count);
             LinkedList<string>.Enumerator enumerator = files.GetEnumerator();
             enumerator.MoveNext();
@@ -63,7 +63,7 @@ namespace UnitTests
             //
             reader.ShiftBuffers();
 
-            lil = reader.GetLogFileInfoList();
+            lil = reader.LogFileInfoList;
             Assert.AreEqual(oldCount + 1, lil.Count);
 
             Assert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
@@ -127,7 +127,7 @@ namespace UnitTests
             // Simulate rollover detection 
             //
             reader.ShiftBuffers();
-            lil = reader.GetLogFileInfoList();
+            lil = reader.LogFileInfoList;
 
             Assert.AreEqual(oldCount, lil.Count); // same count because oldest file is deleted
             Assert.AreEqual(files.Count, lil.Count);
