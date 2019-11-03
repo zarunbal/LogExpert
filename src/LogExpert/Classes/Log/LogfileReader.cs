@@ -1690,19 +1690,11 @@ namespace LogExpert
             try
             {
                 _bufferListLock.AcquireReaderLock(10000);
-#if DEBUG && TRACE_LOCKS
-        StackTrace st = new StackTrace(true);
-        StackFrame callerFrame = st.GetFrame(2);
-        this.bufferListLockInfo =
-"Read lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-#endif
             }
             catch (ApplicationException e)
             {
                 _logger.Warn(e, "Reader lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG && TRACE_LOCKS
-        _logger.logInfo(this.bufferListLockInfo);
-#endif
+
                 _bufferListLock.AcquireReaderLock(Timeout.Infinite);
             }
         }
@@ -1717,20 +1709,11 @@ namespace LogExpert
             try
             {
                 _bufferListLock.AcquireWriterLock(10000);
-#if DEBUG && TRACE_LOCKS
-        StackTrace st = new StackTrace(true);
-        StackFrame callerFrame = st.GetFrame(1);
-        this.bufferListLockInfo =
-"Write lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-        callerFrame.GetFileName();
-#endif
             }
             catch (ApplicationException e)
             {
                 _logger.Warn(e, "Writer lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG && TRACE_LOCKS
-        _logger.logInfo(this.bufferListLockInfo);
-#endif
+
                 _bufferListLock.AcquireWriterLock(Timeout.Infinite);
             }
         }
@@ -1745,20 +1728,11 @@ namespace LogExpert
             try
             {
                 LockCookie cookie = _bufferListLock.UpgradeToWriterLock(10000);
-#if DEBUG && TRACE_LOCKS
-        StackTrace st = new StackTrace(true);
-        StackFrame callerFrame = st.GetFrame(2);
-        this.bufferListLockInfo +=
-", upgraded to writer from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-#endif
                 return cookie;
             }
             catch (ApplicationException e)
             {
                 _logger.Warn(e, "Writer lock update wait for bufferList timed out. Now trying infinite.");
-#if DEBUG && TRACE_LOCKS
-        _logger.logInfo(this.bufferListLockInfo);
-#endif
                 return _bufferListLock.UpgradeToWriterLock(Timeout.Infinite);
             }
         }
@@ -1766,12 +1740,6 @@ namespace LogExpert
         private void DowngradeBufferListLockFromWriter(ref LockCookie cookie)
         {
             _bufferListLock.DowngradeFromWriterLock(ref cookie);
-#if DEBUG && TRACE_LOCKS
-      StackTrace st = new StackTrace(true);
-      StackFrame callerFrame = st.GetFrame(2);
-      this.bufferListLockInfo +=
-", downgraded to reader from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-#endif
         }
 
 #if DEBUG
