@@ -590,9 +590,12 @@ namespace LogExpert
         public void StartMonitoring()
         {
             _logger.Info("startMonitoring()");
-            _monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
+            _monitorThread = new Thread(MonitorThreadProc);
+            _monitorThread.Name = "MonitorThread";
             _monitorThread.IsBackground = true;
+
             _shouldStop = false;
+
             _monitorThread.Start();
         }
 
@@ -1456,7 +1459,6 @@ namespace LogExpert
 
         private void MonitorThreadProc()
         {
-            Thread.CurrentThread.Name = "MonitorThread";
             //IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(this.watchedILogFileInfo.FullName);
             _logger.Info("MonitorThreadProc() for file {0}", _watchedILogFileInfo.FullName);
 
@@ -1481,12 +1483,7 @@ namespace LogExpert
                 try
                 {
                     int pollInterval = _watchedILogFileInfo.PollInterval;
-                    //#if DEBUG
-                    //          if (_logger.IsDebug)
-                    //          {
-                    //            _logger.logDebug("Poll interval for " + this.fileName + ": " + pollInterval);
-                    //          }
-                    //#endif
+
                     Thread.Sleep(pollInterval);
                 }
                 catch (Exception e)
