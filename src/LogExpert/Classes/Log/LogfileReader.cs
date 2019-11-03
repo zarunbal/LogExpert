@@ -27,7 +27,6 @@ namespace LogExpert
 
         private IList<LogBuffer> _bufferList;
         private ReaderWriterLock _bufferListLock;
-        private IList<LogBuffer> _bufferLru;
         private bool _contentDeleted = false;
         private int _currLineCount = 0;
         private ReaderWriterLock _disposeLock;
@@ -781,7 +780,6 @@ namespace LogExpert
        private void InitLruBuffers()
         {
             _bufferList = new List<LogBuffer>();
-            _bufferLru = new List<LogBuffer>(LogReaderOptions.MaxBuffers + 1);
             //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
             _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(LogReaderOptions.MaxBuffers + 1);
             _lruCacheDictLock = new ReaderWriterLock();
