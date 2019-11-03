@@ -105,9 +105,8 @@ namespace LogExpert
                 ILogLineXmlColumnizer xmlColumnizer = CurrentColumnizer as ILogLineXmlColumnizer;
                 if (xmlColumnizer != null)
                 {
-                    logFileReader.IsXmlMode = true;
-                    logFileReader.XmlLogConfig =
-                        xmlColumnizer.GetXmlLogConfiguration();
+                    logFileReader.LogReaderOptions.IsXmlReader = true;
+                    logFileReader.LogReaderOptions.XmlLogConfiguration = xmlColumnizer.GetXmlLogConfiguration();
                 }
                 if (forcedColumnizerForLoading != null)
                 {

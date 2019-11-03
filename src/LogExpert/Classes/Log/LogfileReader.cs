@@ -169,23 +169,10 @@ namespace LogExpert
             }
             set { _currLineCount = value; }
         }
-
-
+        
         public Encoding CurrentEncoding { get; private set; }
 
         public long FileSize { get; private set; } = 0;
-
-        public bool IsXmlMode
-        {
-            get => LogReaderOptions.IsXmlReader;
-            set => LogReaderOptions.IsXmlReader = value;
-        }
-
-        public IXmlLogConfiguration XmlLogConfig
-        {
-            get => LogReaderOptions.XmlLogConfiguration;
-            set => LogReaderOptions.XmlLogConfiguration = value;
-        }
 
         public IPreProcessColumnizer PreProcessColumnizer { get; set; } = null;
 
@@ -1655,9 +1642,9 @@ namespace LogExpert
         {
             ILogStreamReader reader = this.CreateLogStreamReader(stream, encodingOptions, useNewReader);
 
-            if (IsXmlMode)
+            if (LogReaderOptions.IsXmlReader)
             {
-                return new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig);
+                return new XmlBlockSplitter(new XmlLogReader(reader), LogReaderOptions.XmlLogConfiguration);
             }
             else
             {

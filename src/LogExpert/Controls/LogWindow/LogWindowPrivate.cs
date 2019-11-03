@@ -976,7 +976,8 @@ namespace LogExpert
                 if (logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) &&
                     oldColumnizerIsXmlType)
                 {
-                    logFileReader.IsXmlMode = false;
+                    logFileReader.LogReaderOptions.IsXmlReader = false;
+                    
                     //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
                     mustReload = true;
                 }
