@@ -124,7 +124,7 @@ namespace LogExpert
                 }
                 RegisterLogFileReaderEvents();
                 _logger.Info("Loading logfile: {0}", fileName);
-                logFileReader.startMonitoring();
+                logFileReader.StartMonitoring();
                 if (isUsingDefaultColumnizer)
                 {
                     if (Preferences.autoPick)
@@ -173,7 +173,7 @@ namespace LogExpert
             }
             if (logFileReader != null)
             {
-                logFileReader.stopMonitoring();
+                logFileReader.StopMonitoring();
                 UnRegisterLogFileReaderEvents();
             }
             EncodingOptions = encodingOptions;
@@ -186,7 +186,7 @@ namespace LogExpert
  
             logFileReader.UseNewReader = !Preferences.useLegacyReader;
             RegisterLogFileReaderEvents();
-            logFileReader.startMonitoring();
+            logFileReader.StartMonitoring();
             FileName = fileNames[fileNames.Length - 1];
             IsMultiFile = true;
             //if (this.isTempFile)
