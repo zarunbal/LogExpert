@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using LogExpert.Enteties;
 
 namespace LogExpert.Tests
 {
@@ -16,7 +17,17 @@ namespace LogExpert.Tests
         {
             var jsonCompactColumnizer = new JsonColumnizer.JsonCompactColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-            LogfileReader logFileReader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultifileOptions());
+            LogReaderOptions options = new LogReaderOptions()
+            {
+                EncodingOptions = new EncodingOptions(),
+                IsMultiFile = true,
+                MaxBuffers = 40,
+                MaxLinerPerBuffer = 50,
+                MultiFileOptions = new MultifileOptions(),
+                FileName = path
+            };
+
+            LogfileReader logFileReader = new LogfileReader(options);
             logFileReader.ReadFiles();
             List<ILogLine> loglines = new List<ILogLine>
             {

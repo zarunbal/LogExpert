@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using LogExpert.Interface;
 
 namespace LogExpert
 {
     [Serializable]
-    public class MultifileOptions
+    public class MultifileOptions : IMultifileOptions
     {
         #region Fields
 

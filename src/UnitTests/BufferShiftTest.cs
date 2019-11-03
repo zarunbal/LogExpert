@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using LogExpert;
+using LogExpert.Enteties;
 
 namespace UnitTests
 {
@@ -26,13 +27,20 @@ namespace UnitTests
         public void testShiftBuffers1()
         {
             int linesPerFile = 10;
-            MultifileOptions options = new MultifileOptions();
-            options.MaxDayTry = 0;
-            options.FormatPattern = "*$J(.)";
             LinkedList<string> files = CreateTestfilesWithoutDate();
-            EncodingOptions encodingOptions = new EncodingOptions();
-            encodingOptions.Encoding = Encoding.Default;
-            LogfileReader reader = new LogfileReader(files.Last.Value, encodingOptions, true, 40, 50, options);
+
+            LogReaderOptions options = new LogReaderOptions()
+            {
+                EncodingOptions = new EncodingOptions { Encoding = Encoding.Default },
+                IsMultiFile = true,
+                MaxBuffers = 40,
+                MaxLinerPerBuffer = 50,
+                MultiFileOptions = new MultifileOptions { MaxDayTry = 0, FormatPattern = "*$J(.)" },
+                FileName = files.Last.Value
+            };
+
+            LogfileReader reader = new LogfileReader(options);
+
             reader.ReadFiles();
 
             IList<ILogFileInfo> lil = reader.GetLogFileInfoList();

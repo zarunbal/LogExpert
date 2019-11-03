@@ -13,5 +13,19 @@ namespace LogExpert.Interface
         bool IsXmlReader { get; set; }
 
         IEncodingOptions EncodingOptions { get; set; }
+
+        IXmlLogConfiguration XmlLogConfiguration { get; set; }
+
+        int MaxBuffers { get; set; }
+
+        int MaxLinerPerBuffer { get; set; }
+
+        IMultifileOptions MultiFileOptions { get; set; }
+
+        bool IsMultiFile { get; set; }
+
+        string FileName { get; set; }
+
+        string[] FileNames { get; set; }
     }
 }

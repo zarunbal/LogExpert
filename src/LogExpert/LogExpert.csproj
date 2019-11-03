@@ -45,6 +45,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="Castle.Core">
+      <HintPath>C:\Users\thomas\.nuget\packages\castle.core\4.3.1\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.4.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\CookComputing.XmlRpcV2.dll</HintPath>
@@ -108,6 +111,8 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Enteties\LogReaderOptions.cs" />
+    <Compile Include="Interface\IMultifileOptions.cs" />
     <Compile Include="Interface\IEncodingOptions.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
@@ -591,6 +596,9 @@
   <ItemGroup>
     <PackageReference Include="Autofac">
       <Version>4.9.4</Version>
+    </PackageReference>
+    <PackageReference Include="Castle.Core">
+      <Version>4.3.1</Version>
     </PackageReference>
     <PackageReference Include="NLog.Config">
       <Version>4.6.7</Version>

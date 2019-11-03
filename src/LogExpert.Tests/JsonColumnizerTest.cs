@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.IO;
+using LogExpert.Enteties;
 
 namespace LogExpert.Tests
 {
@@ -12,7 +13,17 @@ namespace LogExpert.Tests
         {
             var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-            LogfileReader reader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultifileOptions());
+            LogReaderOptions options = new LogReaderOptions()
+            {
+                EncodingOptions = new EncodingOptions(),
+                IsMultiFile = true,
+                MaxBuffers = 40,
+                MaxLinerPerBuffer = 50,
+                MultiFileOptions = new MultifileOptions(),
+                FileName = path
+            };
+
+            LogfileReader reader = new LogfileReader(options);
             reader.ReadFiles();
 
             ILogLine line = reader.GetLogLineWithWait(0);

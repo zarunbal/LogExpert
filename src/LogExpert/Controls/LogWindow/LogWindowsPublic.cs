@@ -15,8 +15,11 @@ using System.Globalization;
 using System.Reflection;
 using System.Collections;
 using System.Linq;
+using Autofac;
+using Autofac.Core.Activators.Reflection;
 using WeifenLuo.WinFormsUI.Docking;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Interface;
 
 namespace LogExpert
 {
@@ -79,11 +82,15 @@ namespace LogExpert
                 columnCache = new ColumnCache();
                 try
                 {
+                    SetLogReaderOptions(true);
 
+                    
 
-                    logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
-                        Preferences.bufferCount, Preferences.linesPerBuffer,
-                        multifileOptions);
+                    logFileReader = _scope.Resolve<LogfileReader>();
+
+                    //logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
+                    //    Preferences.bufferCount, Preferences.linesPerBuffer,
+                    //    multifileOptions);
                     logFileReader.UseNewReader = !Preferences.useLegacyReader;
                 }
                 catch (LogFileException lfe)
@@ -134,6 +141,26 @@ namespace LogExpert
             }
         }
 
+        private void SetLogReaderOptions(bool useSingleFileName)
+        {
+            ILogReaderOptions logReaderOptions = _scope.Resolve<ILogReaderOptions>();
+            logReaderOptions.UseSystemReader = !Preferences.useLegacyReader;
+            logReaderOptions.EncodingOptions = EncodingOptions;
+            logReaderOptions.MaxBuffers = Preferences.bufferCount;
+            logReaderOptions.MaxLinerPerBuffer = Preferences.linesPerBuffer;
+            logReaderOptions.MultiFileOptions = multifileOptions;
+            logReaderOptions.IsMultiFile = IsMultiFile;
+
+            if (useSingleFileName)
+            {
+                logReaderOptions.FileName = FileName;
+            }
+            else
+            {
+                logReaderOptions.FileNames = fileNames;
+            }
+        }
+
         public void LoadFilesAsMulti(string[] fileNames, EncodingOptions encodingOptions)
         {
             _logger.Info("Loading given files as MultiFile:");
@@ -151,13 +178,16 @@ namespace LogExpert
             }
             EncodingOptions = encodingOptions;
             columnCache = new ColumnCache();
-            logFileReader = new LogfileReader(fileNames, EncodingOptions, Preferences.bufferCount,
-                Preferences.linesPerBuffer, multifileOptions);
+            this.fileNames = fileNames;
+            SetLogReaderOptions(false);
+
+            logFileReader = _scope.Resolve<LogfileReader>();
+
+ 
             logFileReader.UseNewReader = !Preferences.useLegacyReader;
             RegisterLogFileReaderEvents();
             logFileReader.startMonitoring();
             FileName = fileNames[fileNames.Length - 1];
-            this.fileNames = fileNames;
             IsMultiFile = true;
             //if (this.isTempFile)
             //  this.Text = this.tempTitleName;

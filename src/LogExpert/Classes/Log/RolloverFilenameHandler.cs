@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using LogExpert.Interface;
 
 namespace LogExpert
 {
@@ -18,7 +19,7 @@ namespace LogExpert
 
         private readonly RolloverFilenameBuilder filenameBuilder;
         private readonly ILogFileInfo logFileInfo;
-        private readonly MultifileOptions options;
+        private readonly IMultifileOptions options;
 
         #endregion
 
@@ -29,7 +30,7 @@ namespace LogExpert
         /// </summary>
         /// <param name="filePath">The complete path of the logfile</param>
         /// <param name="options">Multifile option (e.g. format pattern)</param>
-        public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultifileOptions options)
+        public RolloverFilenameHandler(ILogFileInfo logFileInfo, IMultifileOptions options)
         {
             this.options = options;
             this.logFileInfo = logFileInfo;

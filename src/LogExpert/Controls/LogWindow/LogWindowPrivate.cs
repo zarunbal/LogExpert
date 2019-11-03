@@ -2511,7 +2511,7 @@ namespace LogExpert
 
         private void DisplayCurrentFileOnStatusline()
         {
-            if (logFileReader.IsMultiFile)
+            if (logFileReader.LogReaderOptions.IsMultiFile)
             {
                 try
                 {
@@ -2525,8 +2525,9 @@ namespace LogExpert
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.Warn(ex, "Error during DisplayCurrentFileOnStatusline with multifile");
                     // TODO: handle this concurrent situation better:
                     // this.dataGridView.CurrentRow may be null even if checked before.
                     // This can happen when MultiFile shift deselects the current row because there
