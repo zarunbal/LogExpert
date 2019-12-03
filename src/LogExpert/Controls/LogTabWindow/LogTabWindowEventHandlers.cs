@@ -813,6 +813,12 @@ namespace LogExpert.Controls.LogTabWindow
             explorer.Start();
         }
 
+        private void truncateFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
+            File.WriteAllText(logWindow.Title, "");
+        }
+
         private void OnExportBookmarksToolStripMenuItemClick(object sender, EventArgs e)
         {
             CurrentLogWindow?.ExportBookmarkList();

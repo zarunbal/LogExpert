@@ -157,6 +157,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
             this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.truncateFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dragControlDateTime = new LogExpert.Dialogs.DateTimeDragControl();
             this.statusStrip.SuspendLayout();
             this.mainMenuStrip.SuspendLayout();
@@ -1153,7 +1154,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.tabRenameToolStripMenuItem,
             this.toolStripSeparator16,
             this.copyPathToClipboardToolStripMenuItem,
-            this.findInExplorerToolStripMenuItem});
+            this.findInExplorerToolStripMenuItem,
+	    this.truncateFileToolStripMenuItem});
             this.tabContextMenuStrip.Name = "tabContextMenuStrip";
             this.tabContextMenuStrip.Size = new System.Drawing.Size(270, 240);
             // 
@@ -1221,6 +1223,17 @@ namespace LogExpert.Controls.LogTabWindow
             this.findInExplorerToolStripMenuItem.Text = "Find in Explorer";
             this.findInExplorerToolStripMenuItem.ToolTipText = "Opens an Explorer window and selects the log file";
             this.findInExplorerToolStripMenuItem.Click += new System.EventHandler(this.OnFindInExplorerToolStripMenuItemClick);
+
+            // 
+            // truncateFileToolStripMenuItem
+            // 
+            this.truncateFileToolStripMenuItem.Name = "truncateFileToolStripMenuItem";
+            this.truncateFileToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.truncateFileToolStripMenuItem.Text = "Truncate File";
+            this.truncateFileToolStripMenuItem.ToolTipText = "Truncates the file opened in tab";
+            this.truncateFileToolStripMenuItem.Click += new System.EventHandler(this.truncateFileToolStripMenuItem_Click);
+
+
             // 
             // dragControlDateTime
             // 
@@ -1239,6 +1252,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.dragControlDateTime.TabIndex = 14;
             this.dragControlDateTime.ValueChanged += new LogExpert.Dialogs.DateTimeDragControl.ValueChangedEventHandler(this.OnDateTimeDragControlValueChanged);
             this.dragControlDateTime.ValueDragged += new LogExpert.Dialogs.DateTimeDragControl.ValueDraggedEventHandler(this.OnDateTimeDragControlValueDragged);
+
             // 
             // LogTabWindow
             // 
@@ -1361,6 +1375,7 @@ namespace LogExpert.Controls.LogTabWindow
         private ToolStripSeparator toolStripSeparator16;
         private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
         private ToolStripMenuItem findInExplorerToolStripMenuItem;
+	private ToolStripMenuItem truncateFileToolStripMenuItem;
         private ToolStripMenuItem exportBookmarksToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator17;
         private ToolStripComboBox groupsComboBoxHighlightGroups;
