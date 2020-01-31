@@ -165,6 +165,10 @@ namespace RegexColumnizer
 
         #endregion
 
+        /// <summary>
+        /// ToString, this is displayed in the columnizer picker combobox only in the FilterSelectionDialog
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return GetName();
