@@ -18,7 +18,7 @@ namespace RegexColumnizer
         #endregion
     }
 
-    public class Regex1Columnizer : ILogLineColumnizer, IColumnizerConfigurator
+    public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfigurator
     {
         #region Fields
 
@@ -36,7 +36,7 @@ namespace RegexColumnizer
 
         #region Public methods
 
-        public string GetName() => "Regex";
+        public abstract string GetName();
         public string GetDescription() => "Columns are filled by regular expression named capture groups";
         public int GetColumnCount() => columns.Length;
         public string[] GetColumnNames() => columns;
@@ -173,35 +173,48 @@ namespace RegexColumnizer
         #endregion
     }
 
-    public class Regex2Columnizer : Regex1Columnizer
+    public class Regex1Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex1";
     }
 
-    public class Regex3Columnizer : Regex1Columnizer
+    public class Regex2Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex2";
     }
 
-    public class Regex4Columnizer : Regex1Columnizer
+    public class Regex3Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex3";
     }
 
-    public class Regex5Columnizer : Regex1Columnizer
+    public class Regex4Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex4";
     }
 
-    public class Regex6Columnizer : Regex1Columnizer
+    public class Regex5Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex5";
     }
 
-    public class Regex7Columnizer : Regex1Columnizer
+    public class Regex6Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex6";
     }
 
-    public class Regex8Columnizer : Regex1Columnizer
+    public class Regex7Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex7";
     }
 
-    public class Regex9Columnizer : Regex1Columnizer
+    public class Regex8Columnizer : BaseRegexColumnizer
     {
+        public override string GetName() => "Regex8";
+    }
+
+    public class Regex9Columnizer : BaseRegexColumnizer
+    {
+        public override string GetName() => "Regex9";
     }
 }
