@@ -165,6 +165,11 @@ namespace RegexColumnizer
 
         #endregion
 
+        public override string ToString()
+        {
+            return GetName();
+        }
+
         #region Private Methods
 
         protected abstract string GetNameInternal();
