@@ -29,6 +29,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.IO.TextTasks;
 using static Nuke.Common.IO.CompressionTasks;
 using static Nuke.GitHub.GitHubTasks;
+using static Nuke.Common.ControlFlow;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -328,6 +329,7 @@ class Build : NukeBuild
 
     Target CreateSetup => _ => _
         .DependsOn(CopyFilesForSetup)
+        .Before(Publish)
         .OnlyWhenStatic(() => Configuration == "Release")
         .Executes(() =>
         {
@@ -335,7 +337,7 @@ class Build : NukeBuild
                 from framework in new[] {(AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86), (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs"}
                 from version in new[] {"5", "6"}
                 select framework / $"Inno Setup {version}" / "iscc.exe";
-
+            bool executed = false;
             foreach (var setupCombinations in publishCombinations)
             {
                 if (!FileExists(setupCombinations))
@@ -345,8 +347,13 @@ class Build : NukeBuild
                 }
 
                 ExecuteInnoSetup(setupCombinations);
+                executed = true;
+                break;
+            }
 
-                return;
+            if (!executed)
+            {
+                Fail("Inno setup was not found");
             }
         });
 
@@ -427,14 +434,14 @@ class Build : NukeBuild
                 proc.StartInfo = new ProcessStartInfo("appveyor", $"PushArtifact \"{artifact}\"");
                 if (!proc.Start())
                 {
-                    throw new Exception("Failed to start appveyor pushartifact");
+                    Fail("Failed to start appveyor pushartifact");
                 }
 
                 proc.WaitForExit();
 
                 if (proc.ExitCode != 0)
                 {
-                    throw new Exception($"Exit code is {proc.ExitCode}");
+                    Fail($"Exit code is {proc.ExitCode}");
                 }
             });
         });
@@ -468,7 +475,7 @@ class Build : NukeBuild
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
         {
-            throw new Exception($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+            Fail($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
         }
 
         proc.WaitForExit();
@@ -477,7 +484,7 @@ class Build : NukeBuild
 
         if (proc.ExitCode != 0)
         {
-            throw new Exception($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+            Fail($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
         }
     }
 
