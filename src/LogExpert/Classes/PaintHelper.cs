@@ -119,6 +119,44 @@ namespace LogExpert
         }
 
 
+        public static DataGridViewTextBoxColumn CreateMarkerColumn()
+        {
+            DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
+            markerColumn.HeaderText = "";
+            markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+            markerColumn.Resizable = DataGridViewTriState.False;
+            markerColumn.DividerWidth = 1;
+            markerColumn.ReadOnly = true;
+            markerColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+
+            return markerColumn;
+        }
+
+        public static DataGridViewTextBoxColumn CreateLineNumberColumn()
+        {
+            DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
+            lineNumberColumn.HeaderText = "Line";
+            lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+            lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
+            lineNumberColumn.DividerWidth = 1;
+            lineNumberColumn.ReadOnly = true;
+            lineNumberColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+
+            return lineNumberColumn;
+        }
+
+        public static DataGridViewColumn CreateTitleColumn(string colName)
+        {
+            DataGridViewColumn titleColumn = new LogTextColumn();
+            titleColumn.HeaderText = colName;
+            titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+            titleColumn.Resizable = DataGridViewTriState.NotSet;
+            titleColumn.DividerWidth = 1;
+            titleColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+
+            return titleColumn;
+        }
+
         public static void SetColumnizer(ILogLineColumnizer columnizer, DataGridView gridView)
         {
             int rowCount = gridView.RowCount;
@@ -136,33 +174,13 @@ namespace LogExpert
                 _logger.Error(ae);
             }
 
-            DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
-            markerColumn.HeaderText = "";
-            markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            markerColumn.Resizable = DataGridViewTriState.False;
-            markerColumn.DividerWidth = 1;
-            markerColumn.ReadOnly = true;
-            // markerColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(markerColumn);
+            gridView.Columns.Add(CreateMarkerColumn());
 
-            DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
-            lineNumberColumn.HeaderText = "Line";
-            lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-            lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
-            lineNumberColumn.DividerWidth = 1;
-            lineNumberColumn.ReadOnly = true;
-            // lineNumberColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-            gridView.Columns.Add(lineNumberColumn);
+            gridView.Columns.Add(CreateLineNumberColumn());
 
             foreach (string colName in columnizer.GetColumnNames())
             {
-                DataGridViewColumn titleColumn = new LogTextColumn();
-                titleColumn.HeaderText = colName;
-                titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-                titleColumn.Resizable = DataGridViewTriState.NotSet;
-                titleColumn.DividerWidth = 1;
-                //titleColumn.HeaderCell.ContextMenuStrip = this.columnContextMenuStrip;
-                gridView.Columns.Add(titleColumn);
+                gridView.Columns.Add(CreateTitleColumn(colName));
             }
 
             gridView.RowCount = rowCount;

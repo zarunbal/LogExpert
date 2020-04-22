@@ -17,6 +17,7 @@ using System.Collections;
 using System.Linq;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
+using LogExpert.Classes.Columnizer;
 
 namespace LogExpert
 {
@@ -155,6 +156,7 @@ namespace LogExpert
 
             Closing += LogWindow_Closing;
             Disposed += LogWindow_Disposed;
+            Load += LogWindow_Load;
 
             timeSpreadCalc = new TimeSpreadCalculator(this);
             timeSpreadingControl1.TimeSpreadCalc = timeSpreadCalc;
@@ -165,7 +167,6 @@ namespace LogExpert
             tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
             parentLogTabWin.HighlightSettingsChanged += parent_HighlightSettingsChanged;
-
             SetColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
 
             patternArgs.maxMisses = 5;
@@ -244,8 +245,6 @@ namespace LogExpert
 
             statusLineTrigger.Signal += statusLineTrigger_Signal;
             selectionChangedTrigger.Signal += selectionChangedTrigger_Signal;
-
-            PreferencesChanged(parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
         }
 
         #endregion
@@ -594,11 +593,6 @@ namespace LogExpert
             public IList<ILogLineColumnizer> GetRegisteredColumnizers()
             {
                 return PluginRegistry.GetInstance().RegisteredColumnizers;
-            }
-
-            public ILogLineColumnizer GetDefaultColumnizer()
-            {
-                return new DefaultLogfileColumnizer();
             }
 
             public int GetLineCount()

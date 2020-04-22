@@ -15,10 +15,12 @@ namespace RegexColumnizer
 
         public string Expression { get; set; } = "(?<text>.*)";
 
+        public string Name { get; set; }
+
         #endregion
     }
 
-    public class Regex1Columnizer : ILogLineColumnizer, IColumnizerConfigurator
+    public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfigurator
     {
         #region Fields
 
@@ -36,7 +38,15 @@ namespace RegexColumnizer
 
         #region Public methods
 
-        public string GetName() => "Regex";
+        public string GetName()
+        {
+            if (Config == null || string.IsNullOrWhiteSpace(Config.Name))
+            {
+                return GetNameInternal();
+            }
+
+            return Config.Name;
+        }
         public string GetDescription() => "Columns are filled by regular expression named capture groups";
         public int GetColumnCount() => columns.Length;
         public string[] GetColumnNames() => columns;
@@ -129,7 +139,10 @@ namespace RegexColumnizer
             RegexColumnizerConfig config;
             if (!File.Exists(configFile))
             {
-                config = new RegexColumnizerConfig();
+                config = new RegexColumnizerConfig()
+                {
+                    Name = GetName()
+                };
             }
             else
             {
@@ -152,7 +165,18 @@ namespace RegexColumnizer
 
         #endregion
 
+        /// <summary>
+        /// ToString, this is displayed in the columnizer picker combobox only in the FilterSelectionDialog
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return GetName();
+        }
+
         #region Private Methods
+
+        protected abstract string GetNameInternal();
 
         private void Init(RegexColumnizerConfig config)
         {
@@ -173,35 +197,48 @@ namespace RegexColumnizer
         #endregion
     }
 
-    public class Regex2Columnizer : Regex1Columnizer
+    public class Regex1Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex1";
     }
 
-    public class Regex3Columnizer : Regex1Columnizer
+    public class Regex2Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex2";
     }
 
-    public class Regex4Columnizer : Regex1Columnizer
+    public class Regex3Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex3";
     }
 
-    public class Regex5Columnizer : Regex1Columnizer
+    public class Regex4Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex4";
     }
 
-    public class Regex6Columnizer : Regex1Columnizer
+    public class Regex5Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex5";
     }
 
-    public class Regex7Columnizer : Regex1Columnizer
+    public class Regex6Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex6";
     }
 
-    public class Regex8Columnizer : Regex1Columnizer
+    public class Regex7Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex7";
     }
 
-    public class Regex9Columnizer : Regex1Columnizer
+    public class Regex8Columnizer : BaseRegexColumnizer
     {
+        protected override string GetNameInternal() => "Regex8";
+    }
+
+    public class Regex9Columnizer : BaseRegexColumnizer
+    {
+        protected override string GetNameInternal() => "Regex9";
     }
 }

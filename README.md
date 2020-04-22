@@ -2,9 +2,6 @@
 
 Clone from https://logexpert.codeplex.com/
 
-# Important
-Please participate on this [#81](https://github.com/zarunbal/LogExpert/issues/81) which .NET version should be used in the future
-
 # Overview
 LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
@@ -26,14 +23,14 @@ Summary of (most) features:
 * Serilog.Formatting.Compact format support (Experimental)
 
 # Download
-Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application.
+Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
 
 Or Install via chocolatey
 
 ```choco install logexpert```
 
 Requirements
-- .NET 4.0
+- .NET 4.7.2
 
 ## CI
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
@@ -50,6 +47,7 @@ This is a continous integration build. So always the latest and greates changes.
 
 Nuke.build Requirements
 - Chocolatey must be installed
+- Optional for Setup Inno Script 5 or 6
 
 # Pull Request
 - Use Development branch as target

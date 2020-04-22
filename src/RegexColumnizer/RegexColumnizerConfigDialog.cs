@@ -20,14 +20,16 @@ namespace RegexColumnizer
 			if (Check())
 			{
 				Config.Expression = tbExpression.Text;
-			}
+                Config.Name = tbName.Text;
+            }
 
 		}
 
 		private void RegexColumnizerConfigDialog_Load(object sender, EventArgs e)
 		{
 			tbExpression.Text = Config.Expression;
-		}
+            tbName.Text = Config.Name;
+        }
 
 		private void tbCheck_Click(object sender, EventArgs e)
 		{

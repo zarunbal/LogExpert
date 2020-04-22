@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using LogExpert.Classes.Columnizer;
 using LogExpert.Dialogs;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -252,7 +253,7 @@ namespace LogExpert
                     {
                         if (Regex.IsMatch(fileName, entry.mask))
                         {
-                            ILogLineColumnizer columnizer = Util.FindColumnizerByName(entry.columnizerName,
+                            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(entry.columnizerName,
                                 PluginRegistry.GetInstance().RegisteredColumnizers);
                             return columnizer;
                         }

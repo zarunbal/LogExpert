@@ -29,7 +29,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.IO.TextTasks;
 using static Nuke.Common.IO.CompressionTasks;
 using static Nuke.GitHub.GitHubTasks;
-using static Nuke.GitHub.ChangeLogExtensions;
+using static Nuke.Common.ControlFlow;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -63,6 +63,12 @@ class Build : NukeBuild
     AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
+    AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
+
+    AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
+
+    string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
+
     Version Version
     {
         get
@@ -74,7 +80,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 7, patch);
+            return new Version(1, 8, patch);
         }
     }
 
@@ -88,7 +94,7 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/SftpFileSystem.dll"};
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
@@ -102,6 +108,17 @@ class Build : NukeBuild
     [Parameter("Chocolatey api key")] string ChocolateyApiKey = null;
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
+
+    AbsolutePath[] AppveyorArtifacts => new[]
+    {
+        (BinDirectory / $"LogExpert-Setup-{VersionString}.exe"),
+        BinDirectory / $"LogExpert-CI-{VersionString}.zip",
+        BinDirectory / $"LogExpert.{VersionString}.zip",
+        BinDirectory / $"LogExpert.ColumnizerLib.{VersionString}.nupkg",
+        BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip",
+        BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip",
+        ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
+    };
 
     protected override void OnBuildInitialized()
     {
@@ -118,6 +135,9 @@ class Build : NukeBuild
 
             if (DirectoryExists(BinDirectory))
             {
+                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(DeleteFile);
+                BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+
                 DeleteDirectory(BinDirectory);
 
                 EnsureCleanDirectory(BinDirectory);
@@ -174,16 +194,11 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            Parallel.ForEach(SourceDirectory.GlobFiles("**/*Tests.csproj"), path =>
-            {
-                DotNetTest(c =>
-                {
-                    c = c.SetProjectFile(path)
-                        .SetConfiguration(Configuration)
-                        .EnableNoBuild();
-                    return c;
-                });
-            });
+            DotNetTest(c =>c
+                    .SetConfiguration(Configuration)
+                    .EnableNoBuild()
+                    .CombineWith(SourceDirectory.GlobFiles("**/*Tests.csproj"), (settings, path) => 
+                        settings.SetProjectFile(path)), degreeOfParallelism: 4, completeOnFailure: true);
         });
 
     Target PrepareChocolateyTemplates => _ => _
@@ -271,7 +286,7 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll"};
+            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll", "ChilkatDotNet47.dll" };
 
             OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
             OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));
@@ -300,6 +315,47 @@ class Build : NukeBuild
 
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
+
+    Target CopyFilesForSetup => _ => _
+        .DependsOn(Compile)
+        .After(Test)
+        .Executes(() =>
+        {
+            CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
+            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+
+            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+        });
+
+    Target CreateSetup => _ => _
+        .DependsOn(CopyFilesForSetup)
+        .Before(Publish)
+        .OnlyWhenStatic(() => Configuration == "Release")
+        .Executes(() =>
+        {
+            var publishCombinations =
+                from framework in new[] {(AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86), (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs"}
+                from version in new[] {"5", "6"}
+                select framework / $"Inno Setup {version}" / "iscc.exe";
+            bool executed = false;
+            foreach (var setupCombinations in publishCombinations)
+            {
+                if (!FileExists(setupCombinations))
+                {
+                    //Search for next combination
+                    continue;
+                }
+
+                ExecuteInnoSetup(setupCombinations);
+                executed = true;
+                break;
+            }
+
+            if (!executed)
+            {
+                Fail("Inno setup was not found");
+            }
+        });
 
     Target PublishColumnizerNuget => _ => _
         .DependsOn(ColumnizerLibCreateNuget)
@@ -343,8 +399,8 @@ class Build : NukeBuild
         {
             var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
 
-            PublishRelease(s => s
-                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").Select(a => a.ToString()).ToArray())
+            Task task = PublishRelease(s => s
+                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg", "**/LogExpert-Setup*.exe").Select(a => a.ToString()).ToArray())
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +
@@ -358,10 +414,37 @@ class Build : NukeBuild
                 .SetToken(GitHubApiKey)
                 .SetName(VersionString)
             );
+
+            task.Wait();
         });
 
     Target Publish => _ => _
         .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub);
+
+    Target PublishToAppveyor => _ => _
+        .After(Publish, CreateSetup)
+        .OnlyWhenDynamic(() => AppVeyor.Instance != null)
+        .Executes(() =>
+        {
+            CompressZip(BinDirectory / Configuration, BinDirectory / $"LogExpert-CI-{VersionString}.zip");
+
+            AppveyorArtifacts.ForEach((artifact) =>
+            {
+                Process proc = new Process();
+                proc.StartInfo = new ProcessStartInfo("appveyor", $"PushArtifact \"{artifact}\"");
+                if (!proc.Start())
+                {
+                    Fail("Failed to start appveyor pushartifact");
+                }
+
+                proc.WaitForExit();
+
+                if (proc.ExitCode != 0)
+                {
+                    Fail($"Exit code is {proc.ExitCode}");
+                }
+            });
+        });
 
     Target CleanupAppDataLogExpert => _ => _
         .Executes(() =>
@@ -382,6 +465,28 @@ class Build : NukeBuild
             info.GetDirectories().ForEach(a => a.Delete(true));
             DeleteDirectory(logExpertDocuments);
         });
+
+    private void ExecuteInnoSetup(AbsolutePath innoPath)
+    {
+        Process proc = new Process();
+
+        Logger.Info($"Start '{innoPath}' {SetupCommandLineParameter} \"{InnoSetupScript}\"");
+
+        proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
+        if (!proc.Start())
+        {
+            Fail($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+        }
+
+        proc.WaitForExit();
+
+        Logger.Info($"Executed '{innoPath}' with exit code {proc.ExitCode}");
+
+        if (proc.ExitCode != 0)
+        {
+            Fail($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+        }
+    }
 
     private string ReplaceVersionMatch(Match match, string replacement)
     {

@@ -1,4 +1,4 @@
-version: 1.7.{build}
+version: 1.8.{build}
 branches:
   only:
   - master
@@ -9,14 +9,9 @@ environment:
   NugetApiKey:
     secure: Ar6IQ+BxCwH6r8SgUB+6wzlWRD0Y+pkW+eFhZUTsF/yb5SyfEcDV7RNzzbGGe26Y
   ChocolateyApiKey:
-    secure: klwi3/bn7RRe4vsqMat7GNNaD1kToVyewIAD5MPSptorqJZbySOF6wio/KW9SYza
+    secure: mXmzLqgFyDEjGRcE4UpqwqOXmdiCm9HwJ2V3LzSAz06GL1OaBDoTzidw7Rly+UHk
   GitHubApiKey:
     secure: N83nQZ/QQVqpRnl0D6F/xSbKjn062y07JdskpUpbWryMY2JDo4Be9lUXmob+xcOO
 build_script:
-- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Publish ChangeVersionNumber --Configuration Release"
+- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Pack Publish CreateSetup PublishToAppveyor ChangeVersionNumber --Configuration Release"
 test: off
-artifacts:
-- path: bin\Release\
-  name: Release-files
-- path: bin\**\*.zip
-- path: bin\**\*.nupkg

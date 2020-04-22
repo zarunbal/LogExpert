@@ -24,6 +24,11 @@ namespace LogExpert
     {
         #region Events handler
 
+        private void LogWindow_Load(object sender, EventArgs e)
+        {
+            PreferencesChanged(parentLogTabWin.Preferences, true, SettingsFlags.GuiOrColors);
+        }
+
         private void LogWindow_Disposed(object sender, EventArgs e)
         {
             waitingForClose = true;
@@ -174,12 +179,7 @@ namespace LogExpert
                 for (int i = startCount; i < CurrentColumnizer.GetColumnCount(); i++)
                 {
                     var colName = CurrentColumnizer.GetColumnNames()[i];
-                    DataGridViewColumn titleColumn = new LogTextColumn();
-                    titleColumn.HeaderText = colName;
-                    titleColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
-                    titleColumn.Resizable = DataGridViewTriState.NotSet;
-                    titleColumn.DividerWidth = 1;
-                    dataGridView.Columns.Add(titleColumn);
+                    dataGridView.Columns.Add(PaintHelper.CreateTitleColumn(colName));
                 }
             }
         }

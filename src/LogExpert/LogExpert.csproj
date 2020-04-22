@@ -8,8 +8,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogExpert</RootNamespace>
     <AssemblyName>LogExpert</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <ApplicationIcon>Resources\logexpert.ico</ApplicationIcon>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +25,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -58,6 +61,7 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
+    <Compile Include="Classes\Columnizer\ColumnizerPicker.cs" />
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
     <Compile Include="Classes\DateTimeParser\DateFormatPartAdjuster.cs" />
@@ -68,8 +72,8 @@
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Classes\Log\LogStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReaderFactory.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
     <Compile Include="Classes\Persister\FilterTabData.cs" />
     <Compile Include="Classes\Persister\ProjectData.cs" />
@@ -349,7 +353,7 @@
       <DependentUpon>PatternWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\PluginRegistry.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReader.cs" />
+    <Compile Include="Classes\Log\PositionAwareStreamReaderSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
     <Compile Include="Classes\Persister\ProjectPersister.cs" />
@@ -583,7 +587,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NLog.Config">
-      <Version>4.4.12</Version>
+      <Version>4.6.7</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
