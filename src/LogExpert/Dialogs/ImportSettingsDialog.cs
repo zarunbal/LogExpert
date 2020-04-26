@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -35,11 +30,11 @@ namespace LogExpert.Dialogs
 
         private void ImportSettingsDialog_Load(object sender, EventArgs e)
         {
-            foreach (Control ctl in this.optionsGroupBox.Controls)
+            foreach (Control ctl in groupBoxImportOptions.Controls)
             {
                 if (ctl.Tag != null)
                 {
-                    (ctl as CheckBox).Checked = true;
+                    ((CheckBox)ctl).Checked = true;
                 }
             }
         }
@@ -51,23 +46,25 @@ namespace LogExpert.Dialogs
             dlg.DefaultExt = "dat";
             dlg.AddExtension = false;
             dlg.Filter = "Settings (*.dat)|*.dat|All files (*.*)|*.*";
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                this.fileNameTextBox.Text = dlg.FileName;
+                textBoxFileName.Text = dlg.FileName;
             }
         }
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            this.ImportFlags = ExportImportFlags.None;
-            this.FileName = this.fileNameTextBox.Text;
-            foreach (Control ctl in this.optionsGroupBox.Controls)
+            ImportFlags = ExportImportFlags.None;
+            FileName = textBoxFileName.Text;
+
+            foreach (Control ctl in groupBoxImportOptions.Controls)
             {
                 if (ctl.Tag != null)
                 {
-                    if ((ctl as CheckBox).Checked)
+                    if (((CheckBox)ctl).Checked)
                     {
-                        this.ImportFlags = this.ImportFlags | (ExportImportFlags) long.Parse(ctl.Tag as string);
+                        ImportFlags = ImportFlags | (ExportImportFlags) long.Parse(ctl.Tag as string ?? string.Empty);
                     }
                 }
             }

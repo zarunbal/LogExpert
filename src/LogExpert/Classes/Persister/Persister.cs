@@ -41,6 +41,8 @@ namespace LogExpert
         public bool showBookmarkCommentColumn;
         public string tabName = null;
 
+        public string settingsSaveLoadLocation;
+
         #endregion
     }
 
@@ -54,10 +56,10 @@ namespace LogExpert
 
         #region Public methods
 
-        public static string SavePersistenceData(string logFileName, PersistenceData persistenceData,
-            Preferences preferences)
+        public static string SavePersistenceData(string logFileName, PersistenceData persistenceData, Preferences preferences)
         {
             string fileName;
+
             if (persistenceData.sessionFileName != null)
             {
                 fileName = persistenceData.sessionFileName;
@@ -72,6 +74,7 @@ namespace LogExpert
                 string filePart = Path.GetFileName(persistenceData.fileName);
                 persistenceData.fileName = filePart;
             }
+
             Save(fileName, persistenceData);
             return fileName;
         }
@@ -158,7 +161,7 @@ namespace LogExpert
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
                 case SessionSaveLocation.OwnDir:
-                    dir = preferences.saveDirectory;
+                    dir = preferences.sessionSaveDirectory;
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
             }

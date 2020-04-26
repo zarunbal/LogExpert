@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -15,11 +13,11 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
-        private readonly Image emptyImage = new Bitmap(16, 16);
-        private readonly LogTabWindow logTabWin;
+        private readonly Image _emptyImage = new Bitmap(16, 16);
+        private readonly LogTabWindow _logTabWin;
 
-        private ILogExpertPluginConfigurator selectedPlugin;
-        private ToolEntry selectedTool;
+        private ILogExpertPluginConfigurator _selectedPlugin;
+        private ToolEntry _selectedTool;
 
         #endregion
 
@@ -28,14 +26,13 @@ namespace LogExpert.Dialogs
         public SettingsDialog(Preferences prefs, LogTabWindow logTabWin)
         {
             Preferences = prefs;
-            this.logTabWin = logTabWin;
+            _logTabWin = logTabWin;
             InitializeComponent();
         }
 
-        public SettingsDialog(Preferences prefs, LogTabWindow logTabWin, int tabToOpen)
-            : this(prefs, logTabWin)
+        public SettingsDialog(Preferences prefs, LogTabWindow logTabWin, int tabToOpen) : this(prefs, logTabWin)
         {
-            tabControl1.SelectedIndex = tabToOpen;
+            tabControlSettings.SelectedIndex = tabToOpen;
         }
 
         #endregion
@@ -68,71 +65,75 @@ namespace LogExpert.Dialogs
                 Preferences.fontSize = 9.0f;
             }
 
-            timestampCheckBox.Checked = Preferences.timestampControl;
-            syncFilterCheckBox.Checked = Preferences.filterSync;
-            filterTailCheckBox.Checked = Preferences.filterTail;
-            followTailCheckBox.Checked = Preferences.followTail;
-            horizRadioButton.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizontal;
-            verticalRadioButton.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Vertical;
-            verticalInvRadioButton.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.InvertedVertical;
+            FillPortableMode();
 
-            singleInstanceCheckBox.Checked = Preferences.allowOnlyOneInstance;
-            openLastFilesCheckBox.Checked = Preferences.openLastFiles;
-            tailStateCheckBox.Checked = Preferences.showTailState;
-            columnSizeCheckBox.Checked = Preferences.setLastColumnWidth;
-            columnWidthUpDown.Enabled = Preferences.setLastColumnWidth;
+            checkBoxTimestamp.Checked = Preferences.timestampControl;
+            checkBoxSyncFilter.Checked = Preferences.filterSync;
+            checkBoxFilterTail.Checked = Preferences.filterTail;
+            checkBoxFollowTail.Checked = Preferences.followTail;
+
+            radioButtonHorizMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizontal;
+            radioButtonVerticalMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Vertical;
+            radioButtonVerticalMouseDragInverted.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.InvertedVertical;
+
+            checkBoxSingleInstance.Checked = Preferences.allowOnlyOneInstance;
+            checkBoxOpenLastFiles.Checked = Preferences.openLastFiles;
+            checkBoxTailState.Checked = Preferences.showTailState;
+            checkBoxColumnSize.Checked = Preferences.setLastColumnWidth;
+            cpDownColumnWidth.Enabled = Preferences.setLastColumnWidth;
 
             if (Preferences.lastColumnWidth != 0)
             {
-                if (Preferences.lastColumnWidth < columnWidthUpDown.Minimum)
+                if (Preferences.lastColumnWidth < cpDownColumnWidth.Minimum)
                 {
-                    Preferences.lastColumnWidth = (int) columnWidthUpDown.Minimum;
+                    Preferences.lastColumnWidth = (int) cpDownColumnWidth.Minimum;
                 }
 
-                if (Preferences.lastColumnWidth > columnWidthUpDown.Maximum)
+                if (Preferences.lastColumnWidth > cpDownColumnWidth.Maximum)
                 {
-                    Preferences.lastColumnWidth = (int) columnWidthUpDown.Maximum;
+                    Preferences.lastColumnWidth = (int) cpDownColumnWidth.Maximum;
                 }
 
-                columnWidthUpDown.Value = Preferences.lastColumnWidth;
+                cpDownColumnWidth.Value = Preferences.lastColumnWidth;
             }
 
-            timeSpreadCheckBox.Checked = Preferences.showTimeSpread;
-            reverseAlphaCheckBox.Checked = Preferences.reverseAlpha;
-            timeViewRadioButton.Checked = Preferences.timeSpreadTimeMode;
-            lineViewRadioButton.Checked = !Preferences.timeSpreadTimeMode;
+            checkBoxTimeSpread.Checked = Preferences.showTimeSpread;
+            checkBoxReverseAlpha.Checked = Preferences.reverseAlpha;
+            radioButtonTimeView.Checked = Preferences.timeSpreadTimeMode;
+            radioButtonLineView.Checked = !Preferences.timeSpreadTimeMode;
 
-            saveSessionsCheckBox.Checked = Preferences.saveSessions;
+            checkBoxSaveSessions.Checked = Preferences.saveSessions;
+
             switch (Preferences.saveLocation)
             {
                 case SessionSaveLocation.OwnDir:
                 {
-                    sessionSaveRadioOwn.Checked = true;
+                    radioButtonSessionSaveOwn.Checked = true;
                 }
                 break;
                 case SessionSaveLocation.SameDir:
                 {
-                    sessionRadioSameDir.Checked = true;
+                    radioButtonSessionSameDir.Checked = true;
                 }
                 break;
                 case SessionSaveLocation.DocumentsDir:
                 {
-                    sessionSaveRadioDocuments.Checked = true;
+                    radioButtonsessionSaveDocuments.Checked = true;
                 }
                 break;
             }
 
-            maximumFilterEntriesDisplayedUpDown.Value = Preferences.maximumFilterEntriesDisplayed;
-            maximumFilterEntriesUpDown.Value = Preferences.maximumFilterEntries;
+            upDownMaximumFilterEntriesDisplayed.Value = Preferences.maximumFilterEntriesDisplayed;
+            upDownMaximumFilterEntries.Value = Preferences.maximumFilterEntries;
 
-            sessionSaveOwnDirLabel.Text = Preferences.saveDirectory ?? "";
-            saveFilterCheckBox.Checked = Preferences.saveFilters;
-            blockCountUpDown.Value = Preferences.bufferCount;
-            linesPerBlockUpDown.Value = Preferences.linesPerBuffer;
-            pollingIntervalUpDown.Value = Preferences.pollingInterval;
-            multiThreadCheckBox.Checked = Preferences.multiThreadFilter;
+            labelSessionSaveOwnDir.Text = Preferences.sessionSaveDirectory ?? string.Empty;
+            checkBoxSaveFilter.Checked = Preferences.saveFilters;
+            upDownBlockCount.Value = Preferences.bufferCount;
+            upDownLinesPerBlock.Value = Preferences.linesPerBuffer;
+            upDownPollingInterval.Value = Preferences.pollingInterval;
+            checkBoxMultiThread.Checked = Preferences.multiThreadFilter;
 
-            columnizerDataGridView.DataError += columnizerDataGridView_DataError;
+            dataGridViewColumnizer.DataError += columnizerDataGridView_DataError;
 
             FillColumnizerList();
             FillPluginList();
@@ -143,38 +144,50 @@ namespace LogExpert.Dialogs
             FillEncodingList();
 
             encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
-            maskPrioCheckBox.Checked = Preferences.maskPrio;
-            autoPickCheckBox.Checked = Preferences.autoPick;
-            askCloseTabsCheckBox.Checked = Preferences.askForClose;
-            columnFinderCheckBox.Checked = Preferences.showColumnFinder;
-            legacyReaderCheckBox.Checked = Preferences.useLegacyReader;
+            checkBoxMaskPrio.Checked = Preferences.maskPrio;
+            checkBoxAutoPick.Checked = Preferences.autoPick;
+            checkBoxAskCloseTabs.Checked = Preferences.askForClose;
+            checkBoxColumnFinder.Checked = Preferences.showColumnFinder;
+            checkBoxLegacyReader.Checked = Preferences.useLegacyReader;
+        }
+
+        private void FillPortableMode()
+        {
+            if (File.Exists(ConfigManager.PortableMode))
+            {
+                checkBoxPortableMode.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                checkBoxPortableMode.CheckState = CheckState.Unchecked;
+            }
         }
 
         private void DisplayFontName()
         {
-            fontLabel.Text = Preferences.fontName + @" " + (int) Preferences.fontSize;
-            fontLabel.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
+            labelFont.Text = Preferences.fontName + @" " + (int) Preferences.fontSize;
+            labelFont.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
         }
 
         private void SaveMultifileData()
         {
-            if (multiOpenRadioButton1.Checked)
+            if (radioButtonLoadEveryFileIntoSeperatedTab.Checked)
             {
                 Preferences.multiFileOption = MultiFileOption.SingleFiles;
             }
 
-            if (multiOpenRadioButton2.Checked)
+            if (radioButtonTreatAllFilesAsOneMultifile.Checked)
             {
                 Preferences.multiFileOption = MultiFileOption.MultiFile;
             }
 
-            if (multiOpenRadioButton3.Checked)
+            if (radioButtonAskWhatToDo.Checked)
             {
                 Preferences.multiFileOption = MultiFileOption.Ask;
             }
 
-            Preferences.multifileOptions.FormatPattern = multifilePattern.Text;
-            Preferences.multifileOptions.MaxDayTry = (int) multifileDays.Value;
+            Preferences.multifileOptions.FormatPattern = textBoxMultifilePattern.Text;
+            Preferences.multifileOptions.MaxDayTry = (int) upDownMultifileDays.Value;
         }
 
         private void ToolButtonClick(TextBox textBox)
@@ -198,7 +211,7 @@ namespace LogExpert.Dialogs
 
         private void ArgsButtonClick(TextBox textBox)
         {
-            ToolArgsDialog dlg = new ToolArgsDialog(logTabWin, this);
+            ToolArgsDialog dlg = new ToolArgsDialog(_logTabWin, this);
             dlg.Arg = textBox.Text;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -228,9 +241,9 @@ namespace LogExpert.Dialogs
 
         private void FillColumnizerForToolsList()
         {
-            if (selectedTool != null)
+            if (_selectedTool != null)
             {
-                FillColumnizerForToolsList(columnizerComboBox, selectedTool.columnizerName);
+                FillColumnizerForToolsList(comboBoxColumnizer, _selectedTool.columnizerName);
             }
         }
 
@@ -256,18 +269,17 @@ namespace LogExpert.Dialogs
 
         private void FillColumnizerList()
         {
-            columnizerDataGridView.Rows.Clear();
+            dataGridViewColumnizer.Rows.Clear();
 
-            DataGridViewComboBoxColumn
-                comboColumn = (DataGridViewComboBoxColumn) columnizerDataGridView.Columns[1];
+            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) dataGridViewColumnizer.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) columnizerDataGridView.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) dataGridViewColumnizer.Columns[0];
 
             IList<ILogLineColumnizer> columnizers = PluginRegistry.GetInstance().RegisteredColumnizers;
             foreach (ILogLineColumnizer columnizer in columnizers)
             {
-                int index = comboColumn.Items.Add(columnizer.GetName());
+                comboColumn.Items.Add(columnizer.GetName());
             }
             //comboColumn.DisplayMember = "Name";
             //comboColumn.ValueMember = "Columnizer";
@@ -280,7 +292,7 @@ namespace LogExpert.Dialogs
 
                 foreach (ILogLineColumnizer logColumnizer in columnizers)
                 {
-                    int index = cell.Items.Add(logColumnizer.GetName());
+                    cell.Items.Add(logColumnizer.GetName());
                 }
 
                 row.Cells.Add(cell);
@@ -289,30 +301,30 @@ namespace LogExpert.Dialogs
                     PluginRegistry.GetInstance().RegisteredColumnizers);
 
                 row.Cells[1].Value = columnizer.GetName();
-                columnizerDataGridView.Rows.Add(row);
+                dataGridViewColumnizer.Rows.Add(row);
             }
 
-            int count = columnizerDataGridView.RowCount;
-            if (count > 0 && !columnizerDataGridView.Rows[count - 1].IsNewRow)
+            int count = dataGridViewColumnizer.RowCount;
+            if (count > 0 && !dataGridViewColumnizer.Rows[count - 1].IsNewRow)
             {
-                DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) columnizerDataGridView.Rows[count - 1].Cells[1];
+                DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) dataGridViewColumnizer.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
 
         private void FillHighlightMaskList()
         {
-            highlightMaskGridView.Rows.Clear();
+            dataGridViewHighlightMask.Rows.Clear();
 
-            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) highlightMaskGridView.Columns[1];
+            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) dataGridViewHighlightMask.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) highlightMaskGridView.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) dataGridViewHighlightMask.Columns[0];
 
-            IList<HilightGroup> groups = logTabWin.HilightGroupList;
+            IList<HilightGroup> groups = _logTabWin.HilightGroupList;
             foreach (HilightGroup group in groups)
             {
-                int index = comboColumn.Items.Add(group.GroupName);
+                comboColumn.Items.Add(group.GroupName);
             }
 
             foreach (HighlightMaskEntry maskEntry in Preferences.highlightMaskList)
@@ -323,12 +335,12 @@ namespace LogExpert.Dialogs
 
                 foreach (HilightGroup group in groups)
                 {
-                    int index = cell.Items.Add(group.GroupName);
+                    cell.Items.Add(group.GroupName);
                 }
 
                 row.Cells.Add(cell);
                 row.Cells[0].Value = maskEntry.mask;
-                HilightGroup currentGroup = logTabWin.FindHighlightGroup(maskEntry.highlightGroupName);
+                HilightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.highlightGroupName);
                 if (currentGroup == null)
                 {
                     currentGroup = groups[0];
@@ -340,14 +352,14 @@ namespace LogExpert.Dialogs
                 }
 
                 row.Cells[1].Value = currentGroup.GroupName;
-                highlightMaskGridView.Rows.Add(row);
+                dataGridViewHighlightMask.Rows.Add(row);
             }
 
-            int count = highlightMaskGridView.RowCount;
-            if (count > 0 && !highlightMaskGridView.Rows[count - 1].IsNewRow)
+            int count = dataGridViewHighlightMask.RowCount;
+            if (count > 0 && !dataGridViewHighlightMask.Rows[count - 1].IsNewRow)
             {
                 DataGridViewComboBoxCell comboCell =
-                    (DataGridViewComboBoxCell) highlightMaskGridView.Rows[count - 1].Cells[1];
+                    (DataGridViewComboBoxCell) dataGridViewHighlightMask.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
@@ -355,7 +367,7 @@ namespace LogExpert.Dialogs
         private void SaveColumnizerList()
         {
             Preferences.columnizerMaskList.Clear();
-            foreach (DataGridViewRow row in columnizerDataGridView.Rows)
+            foreach (DataGridViewRow row in dataGridViewColumnizer.Rows)
             {
                 if (!row.IsNewRow)
                 {
@@ -370,7 +382,7 @@ namespace LogExpert.Dialogs
         private void SaveHighlightMaskList()
         {
             Preferences.highlightMaskList.Clear();
-            foreach (DataGridViewRow row in highlightMaskGridView.Rows)
+            foreach (DataGridViewRow row in dataGridViewHighlightMask.Rows)
             {
                 if (!row.IsNewRow)
                 {
@@ -384,10 +396,10 @@ namespace LogExpert.Dialogs
 
         private void FillPluginList()
         {
-            pluginListBox.Items.Clear();
+            listBoxPlugin.Items.Clear();
             foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
             {
-                pluginListBox.Items.Add(entry);
+                listBoxPlugin.Items.Add(entry);
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
                     configurator.StartConfig();
@@ -396,7 +408,7 @@ namespace LogExpert.Dialogs
 
             foreach (IKeywordAction entry in PluginRegistry.GetInstance().RegisteredKeywordActions)
             {
-                pluginListBox.Items.Add(entry);
+                listBoxPlugin.Items.Add(entry);
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
                     configurator.StartConfig();
@@ -405,19 +417,19 @@ namespace LogExpert.Dialogs
 
             foreach (IFileSystemPlugin entry in PluginRegistry.GetInstance().RegisteredFileSystemPlugins)
             {
-                pluginListBox.Items.Add(entry);
+                listBoxPlugin.Items.Add(entry);
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
                     configurator.StartConfig();
                 }
             }
 
-            configPluginButton.Enabled = false;
+            buttonConfigPlugin.Enabled = false;
         }
 
         private void SavePluginSettings()
         {
-            selectedPlugin?.HideConfigForm();
+            _selectedPlugin?.HideConfigForm();
 
             foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
             {
@@ -438,15 +450,15 @@ namespace LogExpert.Dialogs
 
         private void FillToolListbox()
         {
-            toolListBox.Items.Clear();
+            listBoxTools.Items.Clear();
             foreach (ToolEntry tool in Preferences.toolEntries)
             {
-                toolListBox.Items.Add(tool.Clone(), tool.isFavourite);
+                listBoxTools.Items.Add(tool.Clone(), tool.isFavourite);
             }
 
-            if (toolListBox.Items.Count > 0)
+            if (listBoxTools.Items.Count > 0)
             {
-                toolListBox.SelectedIndex = 0;
+                listBoxTools.SelectedIndex = 0;
             }
         }
 
@@ -455,73 +467,73 @@ namespace LogExpert.Dialogs
             switch (Preferences.multiFileOption)
             {
                 case MultiFileOption.SingleFiles:
-                    multiOpenRadioButton1.Checked = true;
+                    radioButtonLoadEveryFileIntoSeperatedTab.Checked = true;
                     break;
                 case MultiFileOption.MultiFile:
-                    multiOpenRadioButton2.Checked = true;
+                    radioButtonTreatAllFilesAsOneMultifile.Checked = true;
                     break;
                 case MultiFileOption.Ask:
-                    multiOpenRadioButton3.Checked = true;
+                    radioButtonAskWhatToDo.Checked = true;
                     break;
             }
 
-            multifilePattern.Text = Preferences.multifileOptions.FormatPattern;
-            multifileDays.Value = Preferences.multifileOptions.MaxDayTry;
+            textBoxMultifilePattern.Text = Preferences.multifileOptions.FormatPattern;
+            upDownMultifileDays.Value = Preferences.multifileOptions.MaxDayTry;
         }
 
         private void GetToolListBoxData()
         {
             GetCurrentToolValues();
             Preferences.toolEntries.Clear();
-            for (int i = 0; i < toolListBox.Items.Count; ++i)
+            for (int i = 0; i < listBoxTools.Items.Count; ++i)
             {
-                Preferences.toolEntries.Add(toolListBox.Items[i] as ToolEntry);
-                (toolListBox.Items[i] as ToolEntry).isFavourite = toolListBox.GetItemChecked(i);
+                Preferences.toolEntries.Add(listBoxTools.Items[i] as ToolEntry);
+                (listBoxTools.Items[i] as ToolEntry).isFavourite = listBoxTools.GetItemChecked(i);
             }
         }
 
         private void GetCurrentToolValues()
         {
-            if (selectedTool != null)
+            if (_selectedTool != null)
             {
-                selectedTool.name = Util.IsNullOrSpaces(toolName.Text) ? cmdTextBox.Text : toolName.Text;
-                selectedTool.cmd = cmdTextBox.Text;
-                selectedTool.args = argsTextBox.Text;
-                selectedTool.columnizerName = columnizerComboBox.Text;
-                selectedTool.sysout = sysoutCheckBox.Checked;
-                selectedTool.workingDir = workingDirTextBox.Text;
+                _selectedTool.name = Util.IsNullOrSpaces(textBoxToolName.Text) ? textBoxTool.Text : textBoxToolName.Text;
+                _selectedTool.cmd = textBoxTool.Text;
+                _selectedTool.args = textBoxArguments.Text;
+                _selectedTool.columnizerName = comboBoxColumnizer.Text;
+                _selectedTool.sysout = checkBoxSysout.Checked;
+                _selectedTool.workingDir = textBoxWorkingDir.Text;
             }
         }
 
         private void ShowCurrentToolValues()
         {
-            if (selectedTool != null)
+            if (_selectedTool != null)
             {
-                toolName.Text = selectedTool.name;
-                cmdTextBox.Text = selectedTool.cmd;
-                argsTextBox.Text = selectedTool.args;
-                columnizerComboBox.Text = selectedTool.columnizerName;
-                sysoutCheckBox.Checked = selectedTool.sysout;
-                columnizerComboBox.Enabled = selectedTool.sysout;
-                workingDirTextBox.Text = selectedTool.workingDir;
+                textBoxToolName.Text = _selectedTool.name;
+                textBoxTool.Text = _selectedTool.cmd;
+                textBoxArguments.Text = _selectedTool.args;
+                comboBoxColumnizer.Text = _selectedTool.columnizerName;
+                checkBoxSysout.Checked = _selectedTool.sysout;
+                comboBoxColumnizer.Enabled = _selectedTool.sysout;
+                textBoxWorkingDir.Text = _selectedTool.workingDir;
             }
         }
 
         private void DisplayCurrentIcon()
         {
-            if (selectedTool != null)
+            if (_selectedTool != null)
             {
-                Icon icon = Win32.LoadIconFromExe(selectedTool.iconFile, selectedTool.iconIndex);
+                Icon icon = Win32.LoadIconFromExe(_selectedTool.iconFile, _selectedTool.iconIndex);
                 if (icon != null)
                 {
                     Image image = icon.ToBitmap();
-                    iconButton.Image = image;
+                    buttonIcon.Image = image;
                     DestroyIcon(icon.Handle);
                     icon.Dispose();
                 }
                 else
                 {
-                    iconButton.Image = emptyImage;
+                    buttonIcon.Image = _emptyImage;
                 }
             }
         }
@@ -555,6 +567,7 @@ namespace LogExpert.Dialogs
             dlg.AllowVerticalFonts = false;
             dlg.AllowScriptChange = false;
             dlg.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 Preferences.fontSize = dlg.Font.Size;
@@ -566,15 +579,16 @@ namespace LogExpert.Dialogs
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            Preferences.timestampControl = timestampCheckBox.Checked;
-            Preferences.filterSync = syncFilterCheckBox.Checked;
-            Preferences.filterTail = filterTailCheckBox.Checked;
-            Preferences.followTail = followTailCheckBox.Checked;
-            if (verticalRadioButton.Checked)
+            Preferences.timestampControl = checkBoxTimestamp.Checked;
+            Preferences.filterSync = checkBoxSyncFilter.Checked;
+            Preferences.filterTail = checkBoxFilterTail.Checked;
+            Preferences.followTail = checkBoxFollowTail.Checked;
+
+            if (radioButtonVerticalMouseDrag.Checked)
             {
                 Preferences.timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Vertical;
             }
-            else if (verticalInvRadioButton.Checked)
+            else if (radioButtonVerticalMouseDragInverted.Checked)
             {
                 Preferences.timestampControlDragOrientation = DateTimeDragControl.DragOrientations.InvertedVertical;
             }
@@ -584,25 +598,27 @@ namespace LogExpert.Dialogs
             }
 
             SaveColumnizerList();
-            Preferences.maskPrio = maskPrioCheckBox.Checked;
-            Preferences.autoPick = autoPickCheckBox.Checked;
-            Preferences.askForClose = askCloseTabsCheckBox.Checked;
-            Preferences.allowOnlyOneInstance = singleInstanceCheckBox.Checked;
-            Preferences.openLastFiles = openLastFilesCheckBox.Checked;
-            Preferences.showTailState = tailStateCheckBox.Checked;
-            Preferences.setLastColumnWidth = columnSizeCheckBox.Checked;
-            Preferences.lastColumnWidth = (int) columnWidthUpDown.Value;
-            Preferences.showTimeSpread = timeSpreadCheckBox.Checked;
-            Preferences.reverseAlpha = reverseAlphaCheckBox.Checked;
-            Preferences.timeSpreadTimeMode = timeViewRadioButton.Checked;
+            
+            Preferences.maskPrio = checkBoxMaskPrio.Checked;
+            Preferences.autoPick = checkBoxAutoPick.Checked;
+            Preferences.askForClose = checkBoxAskCloseTabs.Checked;
+            Preferences.allowOnlyOneInstance = checkBoxSingleInstance.Checked;
+            Preferences.openLastFiles = checkBoxOpenLastFiles.Checked;
+            Preferences.showTailState = checkBoxTailState.Checked;
+            Preferences.setLastColumnWidth = checkBoxColumnSize.Checked;
+            Preferences.lastColumnWidth = (int) cpDownColumnWidth.Value;
+            Preferences.showTimeSpread = checkBoxTimeSpread.Checked;
+            Preferences.reverseAlpha = checkBoxReverseAlpha.Checked;
+            Preferences.timeSpreadTimeMode = radioButtonTimeView.Checked;
 
-            Preferences.saveSessions = saveSessionsCheckBox.Checked;
-            Preferences.saveDirectory = sessionSaveOwnDirLabel.Text;
-            if (sessionSaveRadioDocuments.Checked)
+            Preferences.saveSessions = checkBoxSaveSessions.Checked;
+            Preferences.sessionSaveDirectory = labelSessionSaveOwnDir.Text;
+
+            if (radioButtonsessionSaveDocuments.Checked)
             {
                 Preferences.saveLocation = SessionSaveLocation.DocumentsDir;
             }
-            else if (sessionSaveRadioOwn.Checked)
+            else if (radioButtonSessionSaveOwn.Checked)
             {
                 Preferences.saveLocation = SessionSaveLocation.OwnDir;
             }
@@ -611,17 +627,17 @@ namespace LogExpert.Dialogs
                 Preferences.saveLocation = SessionSaveLocation.SameDir;
             }
 
-            Preferences.saveFilters = saveFilterCheckBox.Checked;
-            Preferences.bufferCount = (int) blockCountUpDown.Value;
-            Preferences.linesPerBuffer = (int) linesPerBlockUpDown.Value;
-            Preferences.pollingInterval = (int) pollingIntervalUpDown.Value;
-            Preferences.multiThreadFilter = multiThreadCheckBox.Checked;
+            Preferences.saveFilters = checkBoxSaveFilter.Checked;
+            Preferences.bufferCount = (int) upDownBlockCount.Value;
+            Preferences.linesPerBuffer = (int) upDownLinesPerBlock.Value;
+            Preferences.pollingInterval = (int) upDownPollingInterval.Value;
+            Preferences.multiThreadFilter = checkBoxMultiThread.Checked;
             Preferences.defaultEncoding = encodingComboBox.SelectedItem != null ? (encodingComboBox.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
-            Preferences.showColumnFinder = columnFinderCheckBox.Checked;
-            Preferences.useLegacyReader = legacyReaderCheckBox.Checked;
+            Preferences.showColumnFinder = checkBoxColumnFinder.Checked;
+            Preferences.useLegacyReader = checkBoxLegacyReader.Checked;
 
-            Preferences.maximumFilterEntries = (int) maximumFilterEntriesUpDown.Value;
-            Preferences.maximumFilterEntriesDisplayed = (int) maximumFilterEntriesDisplayedUpDown.Value;
+            Preferences.maximumFilterEntries = (int) upDownMaximumFilterEntries.Value;
+            Preferences.maximumFilterEntriesDisplayed = (int) upDownMaximumFilterEntriesDisplayed.Value;
 
             SavePluginSettings();
             SaveHighlightMaskList();
@@ -631,22 +647,18 @@ namespace LogExpert.Dialogs
 
         private void toolButtonA_Click(object sender, EventArgs e)
         {
-            ToolButtonClick(cmdTextBox);
+            ToolButtonClick(textBoxTool);
         }
 
         private void argButtonA_Click(object sender, EventArgs e)
         {
-            ArgsButtonClick(argsTextBox);
+            ArgsButtonClick(textBoxArguments);
         }
 
-        private void addButton_Click(object sender, EventArgs e)
-        {
-            columnizerDataGridView.Rows.Add();
-        }
-
+        //TODO Remove or refactor this function
         private void columnizerDataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) columnizerDataGridView.Rows[e.RowIndex].Cells[1];
+            DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
             if (comboCell.Items.Count > 0)
             {
 //        comboCell.Value = comboCell.Items[0];
@@ -655,11 +667,11 @@ namespace LogExpert.Dialogs
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if (columnizerDataGridView.CurrentRow != null && !columnizerDataGridView.CurrentRow.IsNewRow)
+            if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
             {
-                int index = columnizerDataGridView.CurrentRow.Index;
-                columnizerDataGridView.EndEdit();
-                columnizerDataGridView.Rows.RemoveAt(index);
+                int index = dataGridViewColumnizer.CurrentRow.Index;
+                dataGridViewColumnizer.EndEdit();
+                dataGridViewColumnizer.Rows.RemoveAt(index);
             }
         }
 
@@ -670,13 +682,14 @@ namespace LogExpert.Dialogs
 
         private void sysoutCheckBoxA_CheckedChanged(object sender, EventArgs e)
         {
-            columnizerComboBox.Enabled = sysoutCheckBox.Checked;
+            comboBoxColumnizer.Enabled = checkBoxSysout.Checked;
         }
 
         private void tailColorButton_Click(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.showTailColor;
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 Preferences.showTailColor = dlg.Color;
@@ -685,13 +698,14 @@ namespace LogExpert.Dialogs
 
         private void columnSizeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            columnWidthUpDown.Enabled = columnSizeCheckBox.Checked;
+            cpDownColumnWidth.Enabled = checkBoxColumnSize.Checked;
         }
 
         private void timespreadColorButton_Click(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.timeSpreadColor;
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 Preferences.timeSpreadColor = dlg.Color;
@@ -700,123 +714,156 @@ namespace LogExpert.Dialogs
 
         private void pluginListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedPlugin?.HideConfigForm();
+            _selectedPlugin?.HideConfigForm();
 
-            object o = pluginListBox.SelectedItem;
+            object o = listBoxPlugin.SelectedItem;
+            
             if (o != null)
             {
-                selectedPlugin = o as ILogExpertPluginConfigurator;
+                _selectedPlugin = o as ILogExpertPluginConfigurator;
+                
                 if (o is ILogExpertPluginConfigurator)
                 {
-                    if (selectedPlugin.HasEmbeddedForm())
+                    if (_selectedPlugin.HasEmbeddedForm())
                     {
-                        configPluginButton.Enabled = false;
-                        configPluginButton.Visible = false;
-                        selectedPlugin.ShowConfigForm(pluginPanel);
+                        buttonConfigPlugin.Enabled = false;
+                        buttonConfigPlugin.Visible = false;
+                        _selectedPlugin.ShowConfigForm(panelPlugin);
                     }
                     else
                     {
-                        configPluginButton.Enabled = true;
-                        configPluginButton.Visible = true;
+                        buttonConfigPlugin.Enabled = true;
+                        buttonConfigPlugin.Visible = true;
                     }
                 }
             }
             else
             {
-                configPluginButton.Enabled = false;
-                configPluginButton.Visible = true;
+                buttonConfigPlugin.Enabled = false;
+                buttonConfigPlugin.Visible = true;
             }
         }
 
         private void sessionSaveDirButton_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            if (Preferences.saveDirectory != null)
+
+            if (Preferences.sessionSaveDirectory != null)
             {
-                dlg.SelectedPath = Preferences.saveDirectory;
+                dlg.SelectedPath = Preferences.sessionSaveDirectory;
             }
 
             dlg.ShowNewFolderButton = true;
             dlg.Description = @"Choose folder for LogExpert's session files";
+            
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                sessionSaveOwnDirLabel.Text = dlg.SelectedPath;
+                labelSessionSaveOwnDir.Text = dlg.SelectedPath;
             }
+        }
+
+        private void OnPortableModeCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                switch (checkBoxPortableMode.CheckState)
+                {
+                    case CheckState.Checked when !File.Exists(ConfigManager.PortableMode):
+                    {
+                        File.Create(ConfigManager.PortableMode);
+                        break;
+                    }
+                    case CheckState.Unchecked when File.Exists(ConfigManager.PortableMode):
+                    {
+                        File.Delete(ConfigManager.PortableMode);
+                        break;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
+            }
+          
         }
 
         private void configPluginButton_Click(object sender, EventArgs e)
         {
-            if (!selectedPlugin.HasEmbeddedForm())
+            if (!_selectedPlugin.HasEmbeddedForm())
             {
-                selectedPlugin.ShowConfigDialog(this);
+                _selectedPlugin.ShowConfigDialog(this);
             }
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-        }
+            //TODO implement
+        }   
 
         private void toolListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             GetCurrentToolValues();
-            selectedTool = toolListBox.SelectedItem as ToolEntry;
+            _selectedTool = listBoxTools.SelectedItem as ToolEntry;
             ShowCurrentToolValues();
-            toolListBox.Refresh();
+            listBoxTools.Refresh();
             FillColumnizerForToolsList();
             DisplayCurrentIcon();
         }
 
         private void toolUpButton_Click(object sender, EventArgs e)
         {
-            int i = toolListBox.SelectedIndex;
+            int i = listBoxTools.SelectedIndex;
+        
             if (i > 0)
             {
-                bool isChecked = toolListBox.GetItemChecked(i);
-                object item = toolListBox.Items[i];
-                toolListBox.Items.RemoveAt(i);
+                bool isChecked = listBoxTools.GetItemChecked(i);
+                object item = listBoxTools.Items[i];
+                listBoxTools.Items.RemoveAt(i);
                 i--;
-                toolListBox.Items.Insert(i, item);
-                toolListBox.SelectedIndex = i;
-                toolListBox.SetItemChecked(i, isChecked);
+                listBoxTools.Items.Insert(i, item);
+                listBoxTools.SelectedIndex = i;
+                listBoxTools.SetItemChecked(i, isChecked);
             }
         }
 
         private void toolDownButton_Click(object sender, EventArgs e)
         {
-            int i = toolListBox.SelectedIndex;
-            if (i < toolListBox.Items.Count - 1)
+            int i = listBoxTools.SelectedIndex;
+            
+            if (i < listBoxTools.Items.Count - 1)
             {
-                bool isChecked = toolListBox.GetItemChecked(i);
-                object item = toolListBox.Items[i];
-                toolListBox.Items.RemoveAt(i);
+                bool isChecked = listBoxTools.GetItemChecked(i);
+                object item = listBoxTools.Items[i];
+                listBoxTools.Items.RemoveAt(i);
                 i++;
-                toolListBox.Items.Insert(i, item);
-                toolListBox.SelectedIndex = i;
-                toolListBox.SetItemChecked(i, isChecked);
+                listBoxTools.Items.Insert(i, item);
+                listBoxTools.SelectedIndex = i;
+                listBoxTools.SetItemChecked(i, isChecked);
             }
         }
 
         private void toolAddButton_Click(object sender, EventArgs e)
         {
-            toolListBox.Items.Add(new ToolEntry());
-            toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
+            listBoxTools.Items.Add(new ToolEntry());
+            listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
         }
 
         private void toolDeleteButton_Click(object sender, EventArgs e)
         {
-            int i = toolListBox.SelectedIndex;
-            if (i < toolListBox.Items.Count && i >= 0)
+            int i = listBoxTools.SelectedIndex;
+            
+            if (i < listBoxTools.Items.Count && i >= 0)
             {
-                toolListBox.Items.RemoveAt(i);
-                if (i < toolListBox.Items.Count)
+                listBoxTools.Items.RemoveAt(i);
+                if (i < listBoxTools.Items.Count)
                 {
-                    toolListBox.SelectedIndex = i;
+                    listBoxTools.SelectedIndex = i;
                 }
                 else
                 {
-                    if (toolListBox.Items.Count > 0)
+                    if (listBoxTools.Items.Count > 0)
                     {
-                        toolListBox.SelectedIndex = toolListBox.Items.Count - 1;
+                        listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
                     }
                 }
             }
@@ -824,19 +871,21 @@ namespace LogExpert.Dialogs
 
         private void iconButton_Click(object sender, EventArgs e)
         {
-            if (selectedTool != null)
+            if (_selectedTool != null)
             {
-                string iconFile = selectedTool.iconFile;
+                string iconFile = _selectedTool.iconFile;
+            
                 if (Util.IsNullOrSpaces(iconFile))
                 {
-                    iconFile = cmdTextBox.Text;
+                    iconFile = textBoxTool.Text;
                 }
 
                 ChooseIconDlg dlg = new ChooseIconDlg(iconFile);
+                
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    selectedTool.iconFile = dlg.FileName;
-                    selectedTool.iconIndex = dlg.IconIndex;
+                    _selectedTool.iconFile = dlg.FileName;
+                    _selectedTool.iconIndex = dlg.IconIndex;
                     DisplayCurrentIcon();
                 }
             }
@@ -844,28 +893,30 @@ namespace LogExpert.Dialogs
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            selectedPlugin?.HideConfigForm();
+            _selectedPlugin?.HideConfigForm();
         }
 
         private void workingDirButton_Click(object sender, EventArgs e)
         {
-            WorkingDirButtonClick(workingDirTextBox);
+            WorkingDirButtonClick(textBoxWorkingDir);
         }
 
         private void multifilePattern_TextChanged(object sender, EventArgs e)
         {
-            string pattern = multifilePattern.Text;
-            multifileDays.Enabled = pattern.Contains("$D");
+            string pattern = textBoxMultifilePattern.Text;
+            upDownMultifileDays.Enabled = pattern.Contains("$D");
         }
 
         private void exportButton_Click(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Title = "Export Settings to file";
+            dlg.Title = @"Export Settings to file";
             dlg.DefaultExt = "dat";
             dlg.AddExtension = true;
-            dlg.Filter = "Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            dlg.Filter = @"Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            
             DialogResult result = dlg.ShowDialog();
+            
             if (result == DialogResult.OK)
             {
                 using (Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
@@ -875,11 +926,22 @@ namespace LogExpert.Dialogs
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importButton_Click(object sender, EventArgs e)
         {
             ImportSettingsDialog dlg = new ImportSettingsDialog();
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                if (string.IsNullOrWhiteSpace(dlg.FileName))
+                {
+                    return;
+                }
+
                 Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read);
                 ConfigManager.Import(fs, dlg.ImportFlags);
                 fs.Close();
@@ -891,6 +953,8 @@ namespace LogExpert.Dialogs
 
         #endregion
 
+        //TODO why is this class here, its not referenced anywhere and not used!
+        //TODO Refactor or DELTE
         private class ColumnizerEntry
         {
             #region cTor
@@ -910,5 +974,6 @@ namespace LogExpert.Dialogs
 
             #endregion
         }
+
     }
 }
