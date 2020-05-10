@@ -33,7 +33,7 @@
             this.labelVersion = new System.Windows.Forms.Label();
             this.labelCopyright = new System.Windows.Forms.Label();
             this.textBoxDescription = new System.Windows.Forms.TextBox();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.linkLabelURL = new System.Windows.Forms.LinkLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.okButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel.SuspendLayout();
@@ -51,7 +51,7 @@
             this.tableLayoutPanel.Controls.Add(this.labelVersion, 1, 1);
             this.tableLayoutPanel.Controls.Add(this.labelCopyright, 1, 2);
             this.tableLayoutPanel.Controls.Add(this.textBoxDescription, 1, 4);
-            this.tableLayoutPanel.Controls.Add(this.linkLabel1, 1, 3);
+            this.tableLayoutPanel.Controls.Add(this.linkLabelURL, 1, 3);
             this.tableLayoutPanel.Controls.Add(this.panel1, 1, 5);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(9, 9);
@@ -128,18 +128,18 @@
             this.textBoxDescription.TabStop = false;
             this.textBoxDescription.Text = "Description";
             // 
-            // linkLabel1
+            // linkLabelURL
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.linkLabel1.Location = new System.Drawing.Point(211, 121);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(396, 49);
-            this.linkLabel1.TabIndex = 25;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "http://www.log-expert.de";
-            this.linkLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.linkLabelURL.AutoSize = true;
+            this.linkLabelURL.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.linkLabelURL.Location = new System.Drawing.Point(211, 121);
+            this.linkLabelURL.Name = "linkLabelURL";
+            this.linkLabelURL.Size = new System.Drawing.Size(396, 49);
+            this.linkLabelURL.TabIndex = 25;
+            this.linkLabelURL.TabStop = true;
+            this.linkLabelURL.Text = "https://github.com/zarunbal/LogExpert/";
+            this.linkLabelURL.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.linkLabelURL.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // panel1
             // 
@@ -192,7 +192,7 @@
 		private System.Windows.Forms.Label labelVersion;
 		private System.Windows.Forms.Label labelCopyright;
 		private System.Windows.Forms.TextBox textBoxDescription;
-		private System.Windows.Forms.LinkLabel linkLabel1;
+		private System.Windows.Forms.LinkLabel linkLabelURL;
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Button okButton;
 	}

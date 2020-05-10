@@ -82,17 +82,19 @@ namespace LogExpert
                 statusLineThread.Join();
 
                 IList<LogWindow> deleteLogWindowList = new List<LogWindow>();
-                ConfigManager.Settings.alwaysOnTop =
-                    TopMost && ConfigManager.Settings.preferences.allowOnlyOneInstance;
+                ConfigManager.Settings.alwaysOnTop = TopMost && ConfigManager.Settings.preferences.allowOnlyOneInstance;
                 SaveLastOpenFilesList();
+
                 foreach (LogWindow logWindow in logWindowList)
                 {
                     deleteLogWindowList.Add(logWindow);
                 }
+
                 foreach (LogWindow logWindow in deleteLogWindowList)
                 {
                     RemoveAndDisposeLogWindow(logWindow, true);
                 }
+
                 DestroyBookmarkWindow();
 
                 ConfigManager.Instance.ConfigChanged -= ConfigChanged;

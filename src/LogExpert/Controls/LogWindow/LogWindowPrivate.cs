@@ -108,12 +108,12 @@ namespace LogExpert
                 if (persistenceData.multiFileNames.Count > 0)
                 {
                     _logger.Info("Detected MultiFile name list in persistence options");
-                    fileNames = new string[persistenceData.multiFileNames.Count];
-                    persistenceData.multiFileNames.CopyTo(fileNames);
+                    _fileNames = new string[persistenceData.multiFileNames.Count];
+                    persistenceData.multiFileNames.CopyTo(_fileNames);
                 }
                 else
                 {
-                    fileNames = null;
+                    _fileNames = null;
                 }
 
                 //this.bookmarkWindow.ShowBookmarkCommentColumn = persistenceData.showBookmarkCommentColumn;
