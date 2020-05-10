@@ -19,7 +19,7 @@ namespace LogExpert
 
         public WindowFileEntry(LogWindow logWindow)
         {
-            this.LogWindow = logWindow;
+            LogWindow = logWindow;
         }
 
         #endregion
@@ -30,7 +30,7 @@ namespace LogExpert
         {
             get
             {
-                string title = this.LogWindow.Text;
+                string title = LogWindow.Text;
                 if (title.Length > MAX_LEN)
                 {
                     title = "..." + title.Substring(title.Length - MAX_LEN);
@@ -39,10 +39,7 @@ namespace LogExpert
             }
         }
 
-        public string FileName
-        {
-            get { return this.LogWindow.FileName; }
-        }
+        public string FileName => LogWindow.FileName;
 
 
         public LogWindow LogWindow { get; }

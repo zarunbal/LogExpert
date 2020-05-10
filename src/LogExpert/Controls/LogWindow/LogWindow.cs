@@ -1,23 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
-//using System.Linq;
 using System.Windows.Forms;
 using LogExpert.Dialogs;
-using System.Text.RegularExpressions;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
-using System.IO;
-using System.Globalization;
-using System.Reflection;
-using System.Collections;
-using System.Linq;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
-using LogExpert.Classes.Columnizer;
 
 namespace LogExpert
 {
@@ -87,7 +75,7 @@ namespace LogExpert
 
         private SearchParams currentSearchParams;
 
-        private string[] fileNames;
+        private string[] _fileNames;
         private List<int> filterHitList = new List<int>();
         private FilterParams filterParams = new FilterParams();
         private int filterPipeNameCounter = 0;
