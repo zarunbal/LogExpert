@@ -185,7 +185,6 @@
     <Compile Include="Classes\Filter\Filter.cs" />
     <Compile Include="Classes\Filter\FilterCancelHandler.cs" />
     <Compile Include="Classes\Filter\FilterStarter.cs" />
-    <Compile Include="Entities\EventArgs\HighlightEventArgs.cs" />
     <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
     <Compile Include="Entities\HilightGroup.cs" />
     <Compile Include="Interface\IBookmarkData.cs" />

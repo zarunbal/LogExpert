@@ -52,7 +52,7 @@ namespace LogExpert
         {
             if (InvokeRequired)
             {
-                return (bool) Invoke(new BoolReturnDelegate(LoadPersistenceOptions));
+                return (bool)Invoke(new BoolReturnDelegate(LoadPersistenceOptions));
             }
 
             if (!Preferences.saveSessions && ForcedPersistenceFileName == null)
@@ -511,8 +511,8 @@ namespace LogExpert
 
                 statusEventArgs.FileSize = e.ReadPos;
                 //this.progressEventArgs.Visible = true;
-                progressEventArgs.MaxValue = (int) e.FileSize;
-                progressEventArgs.Value = (int) e.ReadPos;
+                progressEventArgs.MaxValue = (int)e.FileSize;
+                progressEventArgs.Value = (int)e.ReadPos;
                 SendProgressBarUpdate();
                 SendStatusLineUpdate();
             }
@@ -529,8 +529,8 @@ namespace LogExpert
                 statusEventArgs.FileSize = e.ReadPos;
                 statusEventArgs.StatusText = "Loading " + Util.GetNameFromPath(e.FileName);
                 progressEventArgs.Visible = true;
-                progressEventArgs.MaxValue = (int) e.FileSize;
-                progressEventArgs.Value = (int) e.ReadPos;
+                progressEventArgs.MaxValue = (int)e.FileSize;
+                progressEventArgs.Value = (int)e.ReadPos;
                 SendProgressBarUpdate();
                 SendStatusLineUpdate();
             }
@@ -613,7 +613,7 @@ namespace LogExpert
                     }
 
                     UpdateGridCallback callback = UpdateGrid;
-                    Invoke(callback, new object[] {e});
+                    Invoke(callback, new object[] { e });
                     CheckFilterAndHighlight(e);
                     timeSpreadCalc.SetLineCount(e.LineCount);
                 }
@@ -785,7 +785,7 @@ namespace LogExpert
                         FollowTailChanged(false, true);
                         if (firstStopTail && wasFollow)
                         {
-                            Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] {i, false});
+                            Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] { i, false });
                             firstStopTail = false;
                         }
                     }
@@ -834,7 +834,7 @@ namespace LogExpert
                             FollowTailChanged(false, true);
                             if (firstStopTail && wasFollow)
                             {
-                                Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] {i, false});
+                                Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] { i, false });
                                 firstStopTail = false;
                             }
                         }
@@ -957,7 +957,7 @@ namespace LogExpert
                 {
                     if (CurrentColumnizer is IPreProcessColumnizer)
                     {
-                        logFileReader.PreProcessColumnizer = (IPreProcessColumnizer) CurrentColumnizer;
+                        logFileReader.PreProcessColumnizer = (IPreProcessColumnizer)CurrentColumnizer;
                     }
                     else
                     {
@@ -1380,7 +1380,7 @@ namespace LogExpert
                 }
             }
 
-            bookmarkComment.TrimEnd(new char[] {'\r', '\n'});
+            bookmarkComment.TrimEnd(new char[] { '\r', '\n' });
         }
 
         private void StopTimespreadThread()
@@ -1638,7 +1638,7 @@ namespace LogExpert
                     {
                         if (!Disposing)
                         {
-                            Invoke(progressFx, new object[] {count});
+                            Invoke(progressFx, new object[] { count });
                         }
                     }
                     catch (ObjectDisposedException ex) // can occur when closing the app while searching
@@ -1659,8 +1659,8 @@ namespace LogExpert
             try
             {
                 Invoke(new MethodInvoker(ResetProgressBar));
-                AsyncResult ar = (AsyncResult) result;
-                SearchFx fx = (SearchFx) ar.AsyncDelegate;
+                AsyncResult ar = (AsyncResult)result;
+                SearchFx fx = (SearchFx)ar.AsyncDelegate;
                 int line = fx.EndInvoke(result);
                 guiStateArgs.MenuEnabled = true;
                 GuiStateUpdate(this, guiStateArgs);
@@ -1669,7 +1669,7 @@ namespace LogExpert
                     return;
                 }
 
-                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
+                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] { line, true });
             }
             catch (Exception ex) // in the case the windows is already destroyed
             {
@@ -2703,7 +2703,7 @@ namespace LogExpert
             pipe.CloseFile();
             _logger.Info("WritePipeToTab(): finished");
             Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished),
-                new object[] {pipe, name, persistenceData});
+                new object[] { pipe, name, persistenceData });
         }
 
         private void WriteFilterToTabFinished(FilterPipe pipe, string name, PersistenceData persistenceData)
@@ -2762,7 +2762,7 @@ namespace LogExpert
             }
 
             pipe.CloseFile();
-            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), new object[] {pipe, title, null});
+            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), new object[] { pipe, title, null });
         }
 
         private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
@@ -2773,14 +2773,14 @@ namespace LogExpert
             if (columnizer != null)
             {
                 SetColumnizerFx fx = newWin.ForceColumnizer;
-                newWin.Invoke(fx, new object[] {columnizer});
+                newWin.Invoke(fx, new object[] { columnizer });
             }
             else
             {
                 _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
 
-            newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] {persistenceData});
+            newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] { persistenceData });
         }
 
         private void ProcessFilterPipes(int lineNum)
@@ -3538,25 +3538,6 @@ namespace LogExpert
             }
 
             RefreshAllGrids();
-        }
-
-        /// <summary>
-        /// Highlights the done event worker.
-        /// </summary>
-        /// <param name="e">The <see cref="LogExpert.HighlightEventArgs"/> instance containing the event data.</param>
-        private void HighlightDoneEventWorker(HighlightEventArgs e)
-        {
-            if (dataGridView.FirstDisplayedScrollingRowIndex > e.StartLine
-                && dataGridView.FirstDisplayedScrollingRowIndex < e.StartLine + e.Count
-                ||
-                dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(true)
-                > e.StartLine
-                &&
-                dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(true) <
-                e.StartLine + e.Count)
-            {
-                BeginInvoke(new MethodInvoker(RefreshAllGrids));
-            }
         }
 
         private void ToggleHighlightPanel(bool open)

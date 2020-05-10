@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace LogExpert
 {
-    internal class Win32
+    internal static class Win32
     {
         #region Fields
 
@@ -28,7 +28,7 @@ namespace LogExpert
             //IntPtr[] largeIcons = new IntPtr[1];
             IntPtr smallIcons = new IntPtr();
             IntPtr largeIcons = new IntPtr();
-            int num = (int) ExtractIconEx(fileName, index, ref largeIcons, ref smallIcons, 1);
+            int num = (int)ExtractIconEx(fileName, index, ref largeIcons, ref smallIcons, 1);
             if (num > 0 && smallIcons.ToInt32() != 0)
             {
                 Icon icon = Icon.FromHandle(smallIcons).Clone() as Icon;
@@ -49,7 +49,7 @@ namespace LogExpert
         {
             IntPtr smallIcon = IntPtr.Zero;
             IntPtr largeIcon = IntPtr.Zero;
-            int iconCount = (int) ExtractIconEx(fileName, -1, ref largeIcon, ref smallIcon, 0);
+            int iconCount = (int)ExtractIconEx(fileName, -1, ref largeIcon, ref smallIcon, 0);
             if (iconCount <= 0)
             {
                 return null;
@@ -61,7 +61,7 @@ namespace LogExpert
 
             for (int i = 0; i < iconCount; ++i)
             {
-                int num = (int) ExtractIconEx(fileName, i, ref largeIcons, ref smallIcons, 1);
+                int num = (int)ExtractIconEx(fileName, i, ref largeIcons, ref smallIcons, 1);
                 if (smallIcons.ToInt32() != 0)
                 {
                     result[0, i] = Icon.FromHandle(smallIcons).Clone() as Icon;

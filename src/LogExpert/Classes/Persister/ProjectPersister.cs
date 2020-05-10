@@ -5,7 +5,7 @@ using System.Xml;
 
 namespace LogExpert
 {
-    public class ProjectPersister
+    public static class ProjectPersister
     {
         #region Public methods
 

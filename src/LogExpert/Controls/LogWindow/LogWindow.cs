@@ -517,8 +517,6 @@ namespace LogExpert
         private delegate void ActionPluginExecuteFx(
             string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
 
-        private delegate void HighlightEventFx(HighlightEventArgs e);
-
         private delegate void PositionAfterReloadFx(ReloadMemento reloadMemento);
 
         private delegate void AutoResizeColumnsFx(DataGridView gridView);

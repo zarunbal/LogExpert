@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LogExpert
 {
-    internal class BookmarkExporter
+    internal static class BookmarkExporter
     {
         #region Fields
 
