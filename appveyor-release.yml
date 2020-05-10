@@ -11,7 +11,7 @@ environment:
   ChocolateyApiKey:
     secure: mXmzLqgFyDEjGRcE4UpqwqOXmdiCm9HwJ2V3LzSAz06GL1OaBDoTzidw7Rly+UHk
   GitHubApiKey:
-    secure: N83nQZ/QQVqpRnl0D6F/xSbKjn062y07JdskpUpbWryMY2JDo4Be9lUXmob+xcOO
+    secure: wvIhRcMUX/CvZjPhzCk7fBowLUSFcILbfomGr+rl8iBv0sdBn4cAuv/CAHJda9BQ
 build_script:
 - cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Pack Publish CreateSetup PublishToAppveyor ChangeVersionNumber --Configuration Release"
 test: off
