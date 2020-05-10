@@ -116,7 +116,6 @@
     <Compile Include="Classes\Bookmark\BookmarkExporter.cs" />
     <Compile Include="Entities\BookmarkOverlay.cs" />
     <Compile Include="Classes\Bookmark\BookmarkView.cs" />
-    <Compile Include="Entities\CellContent.cs" />
     <Compile Include="Classes\CmdLine.cs" />
     <Compile Include="Classes\ColumnCache.cs" />
     <Compile Include="Entities\EventArgs\ColumnizerEventArgs.cs" />
@@ -188,11 +187,9 @@
     <Compile Include="Classes\Filter\FilterStarter.cs" />
     <Compile Include="Entities\EventArgs\HighlightEventArgs.cs" />
     <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
-    <Compile Include="Entities\HighlightResults.cs" />
     <Compile Include="Entities\HilightGroup.cs" />
     <Compile Include="Interface\IBookmarkData.cs" />
     <Compile Include="Interface\IBookmarkView.cs" />
-    <Compile Include="Interface\ILogExpertClient.cs" />
     <Compile Include="Interface\ILogExpertProxy.cs" />
     <Compile Include="Interface\ILogStreamReader.cs" />
     <Compile Include="Interface\ILogPaintContext.cs" />
@@ -461,7 +458,6 @@
     <Compile Include="Entities\EventArgs\StatusEventArgs.cs" />
     <Compile Include="Entities\EventArgs\SyncModeEventArgs.cs" />
     <Compile Include="Classes\SysoutPipe.cs" />
-    <Compile Include="Classes\SystemInfo.cs" />
     <Compile Include="Classes\TimeSpreadCalculator.cs" />
     <Compile Include="Classes\Columnizer\TimestampColumnizer.cs">
       <SubType>Code</SubType>
