@@ -1,33 +1,33 @@
 ﻿namespace LogExpert.Dialogs
 {
-  partial class HilightDialog
-  {
-    /// <summary>
-    /// Required designer variable.
-    /// </summary>
-    private System.ComponentModel.IContainer components = null;
-
-    /// <summary>
-    /// Clean up any resources being used.
-    /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
+    partial class HilightDialog
     {
-      if (disposing && (components != null))
-      {
-        components.Dispose();
-      }
-      base.Dispose(disposing);
-    }
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-    #region Windows Form Designer generated code
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
-    /// <summary>
-    /// Required method for Designer support - do not modify
-    /// the contents of this method with the code editor.
-    /// </summary>
-    private void InitializeComponent()
-    {
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HilightDialog));
             this.hilightListBox = new System.Windows.Forms.ListBox();
@@ -78,8 +78,8 @@
             // 
             // hilightListBox
             // 
-            this.hilightListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.hilightListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.hilightListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.hilightListBox.FormattingEnabled = true;
@@ -180,7 +180,7 @@
             // 
             // searchStringTextBox
             // 
-            this.searchStringTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.searchStringTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.searchStringTextBox.Location = new System.Drawing.Point(6, 36);
             this.searchStringTextBox.Name = "searchStringTextBox";
@@ -275,7 +275,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.searchStringTextBox);
             this.groupBox1.Controls.Add(this.label3);
@@ -290,7 +290,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.noBackgroundCheckBox);
             this.groupBox2.Controls.Add(this.boldCheckBox);
@@ -347,7 +347,7 @@
             // 
             // foregroundColorBox
             // 
-            this.foregroundColorBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.foregroundColorBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.foregroundColorBox.CustomColor = System.Drawing.Color.Black;
             this.foregroundColorBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -361,7 +361,7 @@
             // 
             // backgroundColorBox
             // 
-            this.backgroundColorBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.backgroundColorBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.backgroundColorBox.CustomColor = System.Drawing.Color.Black;
             this.backgroundColorBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -454,7 +454,7 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.groupDownButton);
             this.groupBox4.Controls.Add(this.groupUpButton);
@@ -541,7 +541,7 @@
             // 
             // groupComboBox
             // 
-            this.groupComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupComboBox.DisplayMember = "GroupName";
             this.groupComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -585,7 +585,7 @@
             this.Name = "HilightDialog";
             this.helpProvider1.SetShowHelp(this, true);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Hilighting and action triggers";
+            this.Text = "Highlighting and action triggers";
             this.Shown += new System.EventHandler(this.HilightDialog_Shown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -597,49 +597,49 @@
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
+        }
+
+        #endregion
+
+        private System.Windows.Forms.ListBox hilightListBox;
+        private System.Windows.Forms.Button addButton;
+        private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.Button moveUpButton;
+        private System.Windows.Forms.Button moveDownButton;
+        private ColorComboBox foregroundColorBox;
+        private System.Windows.Forms.Label label1;
+        private ColorComboBox backgroundColorBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.TextBox searchStringTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button applyButton;
+        private System.Windows.Forms.Button customForeColorButton;
+        private System.Windows.Forms.Button customBackColorButton;
+        private System.Windows.Forms.CheckBox regexCheckBox;
+        private System.Windows.Forms.CheckBox caseSensitiveCheckBox;
+        private System.Windows.Forms.CheckBox ledCheckBox;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox bookmarkCheckBox;
+        private System.Windows.Forms.CheckBox stopTailCheckBox;
+        private System.Windows.Forms.HelpProvider helpProvider1;
+        private System.Windows.Forms.CheckBox pluginCheckBox;
+        private System.Windows.Forms.Button pluginButton;
+        private System.Windows.Forms.Button bookmarkCommentButton;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.ComboBox groupComboBox;
+        private System.Windows.Forms.Button delGroupButton;
+        private System.Windows.Forms.Button newGroupButton;
+        private System.Windows.Forms.Button copyGroupButton;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button groupUpButton;
+        private System.Windows.Forms.Button groupDownButton;
+        private System.Windows.Forms.CheckBox wordMatchCheckBox;
+        private System.Windows.Forms.CheckBox boldCheckBox;
+        private System.Windows.Forms.CheckBox noBackgroundCheckBox;
     }
-
-    #endregion
-
-    private System.Windows.Forms.ListBox hilightListBox;
-    private System.Windows.Forms.Button addButton;
-    private System.Windows.Forms.Button deleteButton;
-    private System.Windows.Forms.Button moveUpButton;
-    private System.Windows.Forms.Button moveDownButton;
-    private ColorComboBox foregroundColorBox;
-    private System.Windows.Forms.Label label1;
-    private ColorComboBox backgroundColorBox;
-    private System.Windows.Forms.Label label2;
-    private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Button cancelButton;
-    private System.Windows.Forms.TextBox searchStringTextBox;
-    private System.Windows.Forms.Label label3;
-    private System.Windows.Forms.Button applyButton;
-    private System.Windows.Forms.Button customForeColorButton;
-    private System.Windows.Forms.Button customBackColorButton;
-    private System.Windows.Forms.CheckBox regexCheckBox;
-    private System.Windows.Forms.CheckBox caseSensitiveCheckBox;
-    private System.Windows.Forms.CheckBox ledCheckBox;
-    private System.Windows.Forms.GroupBox groupBox1;
-    private System.Windows.Forms.GroupBox groupBox2;
-    private System.Windows.Forms.GroupBox groupBox3;
-    private System.Windows.Forms.CheckBox bookmarkCheckBox;
-    private System.Windows.Forms.CheckBox stopTailCheckBox;
-    private System.Windows.Forms.HelpProvider helpProvider1;
-    private System.Windows.Forms.CheckBox pluginCheckBox;
-    private System.Windows.Forms.Button pluginButton;
-    private System.Windows.Forms.Button bookmarkCommentButton;
-    private System.Windows.Forms.GroupBox groupBox4;
-    private System.Windows.Forms.ComboBox groupComboBox;
-    private System.Windows.Forms.Button delGroupButton;
-    private System.Windows.Forms.Button newGroupButton;
-    private System.Windows.Forms.Button copyGroupButton;
-    private System.Windows.Forms.ToolTip toolTip1;
-    private System.Windows.Forms.Label label4;
-    private System.Windows.Forms.Button groupUpButton;
-    private System.Windows.Forms.Button groupDownButton;
-    private System.Windows.Forms.CheckBox wordMatchCheckBox;
-    private System.Windows.Forms.CheckBox boldCheckBox;
-    private System.Windows.Forms.CheckBox noBackgroundCheckBox;
-  }
 }
