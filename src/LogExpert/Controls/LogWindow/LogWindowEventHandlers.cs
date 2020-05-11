@@ -867,10 +867,14 @@ namespace LogExpert
         private void dataGridView_CellContextMenuStripNeeded(object sender,
             DataGridViewCellContextMenuStripNeededEventArgs e)
         {
-            if (e.RowIndex > 0 && e.RowIndex < dataGridView.RowCount
+            if (e.RowIndex >= 0 && e.RowIndex < dataGridView.RowCount
                                && !dataGridView.Rows[e.RowIndex].Selected)
             {
                 SelectLine(e.RowIndex, false, true);
+            }
+            else if (e.RowIndex < 0)
+            {
+                e.ContextMenuStrip = columnContextMenuStrip;
             }
 
             if (e.ContextMenuStrip == columnContextMenuStrip)
