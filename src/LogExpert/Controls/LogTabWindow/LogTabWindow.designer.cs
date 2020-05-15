@@ -157,6 +157,7 @@ namespace LogExpert
             this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
             this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+	    this.truncateFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dateTimeDragControl = new LogExpert.Dialogs.DateTimeDragControl();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -1146,7 +1147,8 @@ namespace LogExpert
             this.tabRenameToolStripMenuItem,
             this.toolStripSeparator16,
             this.copyPathToClipboardToolStripMenuItem,
-            this.findInExplorerToolStripMenuItem});
+            this.findInExplorerToolStripMenuItem,
+	    this.truncateFileToolStripMenuItem});
             this.tabContextMenuStrip.Name = "tabContextMenuStrip";
             this.tabContextMenuStrip.Size = new System.Drawing.Size(197, 170);
             // 
@@ -1215,6 +1217,14 @@ namespace LogExpert
             this.findInExplorerToolStripMenuItem.ToolTipText = "Opens an Explorer window and selects the log file";
             this.findInExplorerToolStripMenuItem.Click += new System.EventHandler(this.findInExplorerToolStripMenuItem_Click);
             // 
+            // truncateFileToolStripMenuItem
+            // 
+            this.truncateFileToolStripMenuItem.Name = "truncateFileToolStripMenuItem";
+            this.truncateFileToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.truncateFileToolStripMenuItem.Text = "Truncate File";
+            this.truncateFileToolStripMenuItem.ToolTipText = "Truncates the file opened in tab";
+            this.truncateFileToolStripMenuItem.Click += new System.EventHandler(this.truncateFileToolStripMenuItem_Click);
+            //
             // dateTimeDragControl
             // 
             this.dateTimeDragControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1353,6 +1363,7 @@ namespace LogExpert
         private ToolStripSeparator toolStripSeparator16;
         private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
         private ToolStripMenuItem findInExplorerToolStripMenuItem;
+	private ToolStripMenuItem truncateFileToolStripMenuItem;
         private ToolStripMenuItem exportBookmarksToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator17;
         private ToolStripComboBox highlightGroupsComboBox;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -919,6 +920,12 @@ namespace LogExpert
             explorer.StartInfo.Arguments = "/e,/select," + logWindow.Title;
             explorer.StartInfo.UseShellExecute = false;
             explorer.Start();
+        }
+
+        private void truncateFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
+            File.WriteAllText(logWindow.Title,"");
         }
 
         private void exportBookmarksToolStripMenuItem_Click(object sender, EventArgs e)
