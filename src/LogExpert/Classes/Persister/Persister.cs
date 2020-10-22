@@ -165,7 +165,7 @@ namespace LogExpert
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
             }
-            if (!Directory.Exists(dir))
+            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             {
                 try
                 {
