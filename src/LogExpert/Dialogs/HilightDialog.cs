@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -153,10 +154,10 @@ namespace LogExpert.Dialogs
             {
                 CheckRegex();
 
-                HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
+                HilightEntry entry = (HilightEntry)hilightListBox.SelectedItem;
 
-                entry.ForegroundColor = (Color) foregroundColorBox.SelectedItem;
-                entry.BackgroundColor = (Color) backgroundColorBox.SelectedItem;
+                entry.ForegroundColor = (Color)foregroundColorBox.SelectedItem;
+                entry.BackgroundColor = (Color)backgroundColorBox.SelectedItem;
                 entry.SearchText = searchStringTextBox.Text;
                 entry.IsRegEx = regexCheckBox.Checked;
                 entry.IsCaseSensitive = caseSensitiveCheckBox.Checked;
@@ -196,7 +197,7 @@ namespace LogExpert.Dialogs
 
         private void StartEditEntry()
         {
-            HilightEntry entry = (HilightEntry) hilightListBox.SelectedItem;
+            HilightEntry entry = (HilightEntry)hilightListBox.SelectedItem;
             if (entry != null)
             {
                 searchStringTextBox.Text = entry.SearchText;
@@ -267,12 +268,12 @@ namespace LogExpert.Dialogs
                 _currentGroup = HilightGroupList[index];
                 groupComboBox.Items[index] = _currentGroup;
                 groupComboBox.SelectedIndex = index;
-                //this.groupComboBox.Text = this.currentGroup.GroupName;
                 groupComboBox.SelectedItem = _currentGroup;
                 FillHilightListBox();
             }
             else
             {
+                groupComboBox.SelectedItem = null;
                 _currentGroup = null;
                 hilightListBox.Items.Clear();
             }
@@ -283,7 +284,10 @@ namespace LogExpert.Dialogs
 
         private void FillGroupComboBox()
         {
+            SelectGroup(-1);
+
             groupComboBox.Items.Clear();
+
             foreach (HilightGroup group in HilightGroupList)
             {
                 groupComboBox.Items.Add(group);
@@ -387,7 +391,7 @@ namespace LogExpert.Dialogs
             e.DrawBackground();
             if (e.Index >= 0)
             {
-                HilightEntry entry = (HilightEntry) hilightListBox.Items[e.Index];
+                HilightEntry entry = (HilightEntry)hilightListBox.Items[e.Index];
                 Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 if ((e.State & DrawItemState.Selected) != DrawItemState.Selected)
@@ -523,6 +527,45 @@ namespace LogExpert.Dialogs
             }
         }
 
+        private void importGroupButton_Click(object sender, EventArgs e)
+        {
+            ImportSettingsDialog dlg = new ImportSettingsDialog();
+
+            foreach (Control ctl in dlg.groupBoxImportOptions.Controls)
+            {
+                if (ctl.Tag != null)
+                {
+                    ((CheckBox)ctl).Checked = false;
+                }
+            }
+
+            dlg.checkBoxHighlightSettings.Checked = true;
+            dlg.checkBoxKeepExistingSettings.Checked = true;
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                if (string.IsNullOrWhiteSpace(dlg.FileName))
+                {
+                    return;
+                }
+
+                Cursor.Current = Cursors.WaitCursor;
+
+                using (var fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read))
+                {
+                    ConfigManager.Import(fs, dlg.ImportFlags);
+                }
+
+                Cursor.Current = Cursors.Default;
+
+                _hilightGroupList = ConfigManager.Settings.hilightGroupList;
+
+                FillGroupComboBox();
+
+                MessageBox.Show(this, "Settings imported", "LogExpert");
+            }
+        }
+
         private void newGroupButton_Click(object sender, EventArgs e)
         {
             // Propose a unique name
@@ -532,7 +575,7 @@ namespace LogExpert.Dialogs
             int i = 1;
             while (!uniqueName)
             {
-                uniqueName = HilightGroupList.FindIndex(delegate(HilightGroup g) { return g.GroupName == name; }) <
+                uniqueName = HilightGroupList.FindIndex(delegate (HilightGroup g) { return g.GroupName == name; }) <
                              0;
                 if (!uniqueName)
                 {
@@ -540,7 +583,7 @@ namespace LogExpert.Dialogs
                 }
             }
 
-            HilightGroup newGroup = new HilightGroup() {GroupName = name};
+            HilightGroup newGroup = new HilightGroup() { GroupName = name };
             HilightGroupList.Add(newGroup);
             FillGroupComboBox();
             SelectGroup(HilightGroupList.Count - 1);
@@ -626,5 +669,6 @@ namespace LogExpert.Dialogs
             Dirty();
         }
         #endregion
+
     }
 }

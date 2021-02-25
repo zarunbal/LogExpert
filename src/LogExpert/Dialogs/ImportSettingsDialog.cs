@@ -30,13 +30,6 @@ namespace LogExpert.Dialogs
 
         private void ImportSettingsDialog_Load(object sender, EventArgs e)
         {
-            foreach (Control ctl in groupBoxImportOptions.Controls)
-            {
-                if (ctl.Tag != null)
-                {
-                    ((CheckBox)ctl).Checked = true;
-                }
-            }
         }
 
         private void fileButton_Click(object sender, EventArgs e)

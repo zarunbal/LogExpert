@@ -11,6 +11,8 @@ namespace LogExpert
         HighlightMasks = 4,
         ToolEntries = 8,
         Other = 16,
-        All = HighlightSettings | ColumnizerMasks | HighlightMasks | ToolEntries | Other
+        KeepExisting = 32,
+        All = HighlightSettings | ColumnizerMasks | HighlightMasks | ToolEntries | Other,
+        AllKeepExisting = All | KeepExisting 
     }
 }
