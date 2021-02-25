@@ -407,6 +407,8 @@ namespace LogExpert
 
         private void LoadFiles(string[] names, bool invertLogic)
         {
+            Array.Sort(names);
+
             if (names.Length == 1)
             {
                 if (names[0].EndsWith(".lxj"))
