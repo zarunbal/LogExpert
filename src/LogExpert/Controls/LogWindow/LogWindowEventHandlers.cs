@@ -639,30 +639,31 @@ namespace LogExpert
 
         private void filterSplitContainer_MouseMove(object sender, MouseEventArgs e)
         {
-            if (((SplitContainer)sender).IsSplitterFixed)
+            var splitContainer = (SplitContainer)sender;
+            if (splitContainer.IsSplitterFixed)
             {
                 if (e.Button.Equals(MouseButtons.Left))
                 {
-                    if (((SplitContainer)sender).Orientation.Equals(Orientation.Vertical))
+                    if (splitContainer.Orientation.Equals(Orientation.Vertical))
                     {
-                        if (e.X > 0 && e.X < ((SplitContainer)sender).Width)
+                        if (e.X > 0 && e.X < (splitContainer.Width)
                         {
-                            ((SplitContainer)sender).SplitterDistance = e.X;
-                            ((SplitContainer)sender).Refresh();
+                            splitContainer.SplitterDistance = e.X;
+                            splitContainer.Refresh();
                         }
                     }
                     else
                     {
-                        if (e.Y > 0 && e.Y < ((SplitContainer)sender).Height)
+                        if (e.Y > 0 && e.Y < splitContainer.Height)
                         {
-                            ((SplitContainer)sender).SplitterDistance = e.Y;
-                            ((SplitContainer)sender).Refresh();
+                            splitContainer.SplitterDistance = e.Y;
+                            splitContainer.Refresh();
                         }
                     }
                 }
                 else
                 {
-                    ((SplitContainer)sender).IsSplitterFixed = false;
+                    splitContainer.IsSplitterFixed = false;
                 }
             }
         }
