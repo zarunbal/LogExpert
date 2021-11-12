@@ -646,7 +646,7 @@ namespace LogExpert
                 {
                     if (splitContainer.Orientation.Equals(Orientation.Vertical))
                     {
-                        if (e.X > 0 && e.X < (splitContainer.Width)
+                        if (e.X > 0 && e.X < splitContainer.Width)
                         {
                             splitContainer.SplitterDistance = e.X;
                             splitContainer.Refresh();
