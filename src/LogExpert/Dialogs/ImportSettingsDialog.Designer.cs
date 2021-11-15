@@ -33,6 +33,7 @@
             this.textBoxFileName = new System.Windows.Forms.TextBox();
             this.labelSettingsFileToImport = new System.Windows.Forms.Label();
             this.groupBoxImportOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxKeepExistingSettings = new System.Windows.Forms.CheckBox();
             this.checkBoxOther = new System.Windows.Forms.CheckBox();
             this.checkBoxExternalTools = new System.Windows.Forms.CheckBox();
             this.checkBoxColumnizerFileMasks = new System.Windows.Forms.CheckBox();
@@ -71,6 +72,7 @@
             // 
             // groupBoxImportOptions
             // 
+            this.groupBoxImportOptions.Controls.Add(this.checkBoxKeepExistingSettings);
             this.groupBoxImportOptions.Controls.Add(this.checkBoxOther);
             this.groupBoxImportOptions.Controls.Add(this.checkBoxExternalTools);
             this.groupBoxImportOptions.Controls.Add(this.checkBoxColumnizerFileMasks);
@@ -83,9 +85,22 @@
             this.groupBoxImportOptions.TabStop = false;
             this.groupBoxImportOptions.Text = "Import options";
             // 
+            // checkBoxKeepExistingSettings
+            // 
+            this.checkBoxKeepExistingSettings.AutoSize = true;
+            this.checkBoxKeepExistingSettings.Location = new System.Drawing.Point(141, 20);
+            this.checkBoxKeepExistingSettings.Name = "checkBoxKeepExistingSettings";
+            this.checkBoxKeepExistingSettings.Size = new System.Drawing.Size(128, 17);
+            this.checkBoxKeepExistingSettings.TabIndex = 1;
+            this.checkBoxKeepExistingSettings.Tag = "32";
+            this.checkBoxKeepExistingSettings.Text = "Keep existing settings";
+            this.checkBoxKeepExistingSettings.UseVisualStyleBackColor = true;
+            // 
             // checkBoxOther
             // 
             this.checkBoxOther.AutoSize = true;
+            this.checkBoxOther.Checked = true;
+            this.checkBoxOther.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxOther.Location = new System.Drawing.Point(7, 112);
             this.checkBoxOther.Name = "checkBoxOther";
             this.checkBoxOther.Size = new System.Drawing.Size(52, 17);
@@ -97,6 +112,8 @@
             // checkBoxExternalTools
             // 
             this.checkBoxExternalTools.AutoSize = true;
+            this.checkBoxExternalTools.Checked = true;
+            this.checkBoxExternalTools.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxExternalTools.Location = new System.Drawing.Point(7, 89);
             this.checkBoxExternalTools.Name = "checkBoxExternalTools";
             this.checkBoxExternalTools.Size = new System.Drawing.Size(89, 17);
@@ -108,6 +125,8 @@
             // checkBoxColumnizerFileMasks
             // 
             this.checkBoxColumnizerFileMasks.AutoSize = true;
+            this.checkBoxColumnizerFileMasks.Checked = true;
+            this.checkBoxColumnizerFileMasks.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxColumnizerFileMasks.Location = new System.Drawing.Point(7, 66);
             this.checkBoxColumnizerFileMasks.Name = "checkBoxColumnizerFileMasks";
             this.checkBoxColumnizerFileMasks.Size = new System.Drawing.Size(126, 17);
@@ -119,6 +138,8 @@
             // checkBoxHighlightFileMasks
             // 
             this.checkBoxHighlightFileMasks.AutoSize = true;
+            this.checkBoxHighlightFileMasks.Checked = true;
+            this.checkBoxHighlightFileMasks.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxHighlightFileMasks.Location = new System.Drawing.Point(7, 43);
             this.checkBoxHighlightFileMasks.Name = "checkBoxHighlightFileMasks";
             this.checkBoxHighlightFileMasks.Size = new System.Drawing.Size(116, 17);
@@ -130,6 +151,8 @@
             // checkBoxHighlightSettings
             // 
             this.checkBoxHighlightSettings.AutoSize = true;
+            this.checkBoxHighlightSettings.Checked = true;
+            this.checkBoxHighlightSettings.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxHighlightSettings.Location = new System.Drawing.Point(7, 20);
             this.checkBoxHighlightSettings.Name = "checkBoxHighlightSettings";
             this.checkBoxHighlightSettings.Size = new System.Drawing.Size(106, 17);
@@ -192,13 +215,14 @@
     private System.Windows.Forms.Button buttonFile;
     private System.Windows.Forms.TextBox textBoxFileName;
     private System.Windows.Forms.Label labelSettingsFileToImport;
-    private System.Windows.Forms.GroupBox groupBoxImportOptions;
     private System.Windows.Forms.Button buttonOk;
     private System.Windows.Forms.Button buttonCancel;
-    private System.Windows.Forms.CheckBox checkBoxExternalTools;
-    private System.Windows.Forms.CheckBox checkBoxColumnizerFileMasks;
-    private System.Windows.Forms.CheckBox checkBoxHighlightFileMasks;
-    private System.Windows.Forms.CheckBox checkBoxHighlightSettings;
-    private System.Windows.Forms.CheckBox checkBoxOther;
-  }
+        public System.Windows.Forms.CheckBox checkBoxExternalTools;
+        public System.Windows.Forms.CheckBox checkBoxColumnizerFileMasks;
+        public System.Windows.Forms.CheckBox checkBoxHighlightFileMasks;
+        public System.Windows.Forms.CheckBox checkBoxHighlightSettings;
+        public System.Windows.Forms.CheckBox checkBoxOther;
+        public System.Windows.Forms.CheckBox checkBoxKeepExistingSettings;
+        public System.Windows.Forms.GroupBox groupBoxImportOptions;
+    }
 }
