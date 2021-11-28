@@ -31,7 +31,6 @@ namespace LogExpert
             string token;
             List<string> tokens = new List<string>();
 
-            syntaxError = false;
             while ((token = ReadToken(reader, out syntaxError)) != null)
             {
                 if (token == ";")
@@ -104,29 +103,38 @@ namespace LogExpert
         private static string ReadToken(Tokenizer reader, out bool syntaxError)
         {
             var offset = reader.Position;
-            if (
-                ReadLiteral(reader) ||
-
-                // Symbols
-                reader.ReadOneOf("#?,!&%+-$€£0123456789{}():;/.@ ") ||
-
-                // Date
-                reader.ReadString("tt", true) ||
-                reader.ReadOneOrMore('y') ||
-                reader.ReadOneOrMore('Y') ||
-                reader.ReadOneOrMore('m') ||
-                reader.ReadOneOrMore('M') ||
-                reader.ReadOneOrMore('d') ||
-                reader.ReadOneOrMore('D') ||
-                reader.ReadOneOrMore('h') ||
-                reader.ReadOneOrMore('H') ||
-                reader.ReadOneOrMore('s') ||
-                reader.ReadOneOrMore('S'))
+            if (ReadLiteral(reader))
             {
                 syntaxError = false;
                 var length = reader.Position - offset;
                 return reader.Substring(offset, length);
             }
+
+            if (
+                // Symbols
+                reader.ReadOneOf("#?,!&%+-$€£0123456789{}():;/.@ ") ||
+
+                // Date
+                reader.ReadString("tt", true) || 
+                reader.ReadOneOrMore('y') || 
+                reader.ReadOneOrMore('Y') || 
+                reader.ReadOneOrMore('m') || 
+                reader.ReadOneOrMore('M') || 
+                reader.ReadOneOrMore('d') || 
+                reader.ReadOneOrMore('D') || 
+                reader.ReadOneOrMore('h') || 
+                reader.ReadOneOrMore('H') || 
+                reader.ReadOneOrMore('s') || 
+                reader.ReadOneOrMore('S') ||
+                //Latin Date String: (a.C.n.  ante Christum natum) 
+                reader.ReadString("gg"))
+            {
+                syntaxError = false;
+                var length = reader.Position - offset;
+                return reader.Substring(offset, length);
+            }
+
+            // Symbols
 
             syntaxError = reader.Position < reader.Length;
             return null;
@@ -139,11 +147,13 @@ namespace LogExpert
                 reader.Advance(2);
                 return true;
             }
-            else if (reader.ReadEnclosed('"', '"'))
+
+            if (reader.ReadEnclosed('"', '"'))
             {
                 return true;
             }
-            else if (reader.ReadEnclosed('\'', '\''))
+
+            if (reader.ReadEnclosed('\'', '\''))
             {
                 return true;
             }
