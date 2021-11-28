@@ -1706,6 +1706,12 @@ namespace LogExpert
                     return;
                 }
 
+                // Prevent ArgumentOutOfRangeException
+                else if (line >= dataGridView.Rows.Count)
+                {
+                    line = dataGridView.Rows.Count - 1;
+                }
+
                 dataGridView.Rows[line].Selected = true;
 
                 if (shouldScroll)
@@ -1713,6 +1719,10 @@ namespace LogExpert
                     dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
                     dataGridView.Focus();
                 }
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.Error(e, "Error while selecting line: ");
             }
             catch (IndexOutOfRangeException e)
             {

@@ -173,8 +173,9 @@ namespace LogExpert
                 filterComboBox.Items.Add(item);
             }
 
-            filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;
-
+            filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;            
+            AutoResizeFilterBox();
+            
             filterRegexCheckBox.Checked = filterParams.isRegex;
             filterCaseSensitiveCheckBox.Checked = filterParams.isCaseSensitive;
             filterTailCheckBox.Checked = filterParams.isFilterTail;

@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using NLog;
+using System.Linq;
 
 namespace LogExpert
 {
@@ -390,22 +391,34 @@ namespace LogExpert
 
             if ((flags & ExportImportFlags.ColumnizerMasks) == ExportImportFlags.ColumnizerMasks)
             {
-                newSettings.preferences.columnizerMaskList = importSettings.preferences.columnizerMaskList;
+                newSettings.preferences.columnizerMaskList = ReplaceOrKeepExisting(flags, ownSettings.preferences.columnizerMaskList, importSettings.preferences.columnizerMaskList);
             }
             if ((flags & ExportImportFlags.HighlightMasks) == ExportImportFlags.HighlightMasks)
             {
-                newSettings.preferences.highlightMaskList = importSettings.preferences.highlightMaskList;
+                newSettings.preferences.highlightMaskList = ReplaceOrKeepExisting(flags, ownSettings.preferences.highlightMaskList, importSettings.preferences.highlightMaskList);
             }
             if ((flags & ExportImportFlags.HighlightSettings) == ExportImportFlags.HighlightSettings)
             {
-                newSettings.hilightGroupList = importSettings.hilightGroupList;
+               newSettings.hilightGroupList = ReplaceOrKeepExisting(flags, ownSettings.hilightGroupList, importSettings.hilightGroupList);
             }
             if ((flags & ExportImportFlags.ToolEntries) == ExportImportFlags.ToolEntries)
             {
-                newSettings.preferences.toolEntries = importSettings.preferences.toolEntries;
+                newSettings.preferences.toolEntries = ReplaceOrKeepExisting(flags, ownSettings.preferences.toolEntries, importSettings.preferences.toolEntries);
             }
 
             return newSettings;
+        }
+
+        private static List<T> ReplaceOrKeepExisting<T>(ExportImportFlags flags, List<T> existingList, List<T> newList)
+        {
+            if ((flags & ExportImportFlags.KeepExisting) == ExportImportFlags.KeepExisting)
+            {
+                return existingList.Union(newList).ToList();                
+            }
+            else
+            {
+                return newList;
+            }
         }
 
         #endregion

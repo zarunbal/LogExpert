@@ -1283,6 +1283,11 @@ namespace LogExpert
             if ((flags & SettingsFlags.FilterHistory) == SettingsFlags.FilterHistory)
             {
                 UpdateFilterHistoryFromSettings();
+
+                if(isLoadTime)
+                {
+                    AutoResizeFilterBox();
+                }
             }
         }
 

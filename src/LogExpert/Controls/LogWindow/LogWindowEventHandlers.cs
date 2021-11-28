@@ -627,6 +627,57 @@ namespace LogExpert
             ShowAdvancedFilterPanel(showAdvanced);
         }
 
+        private void filterSplitContainer_MouseDown(object sender, MouseEventArgs e)
+        {
+            ((SplitContainer)sender).IsSplitterFixed = true;
+        }
+
+        private void filterSplitContainer_MouseUp(object sender, MouseEventArgs e)
+        {
+            ((SplitContainer)sender).IsSplitterFixed = false;
+        }
+
+        private void filterSplitContainer_MouseMove(object sender, MouseEventArgs e)
+        {
+            var splitContainer = (SplitContainer)sender;
+            if (splitContainer.IsSplitterFixed)
+            {
+                if (e.Button.Equals(MouseButtons.Left))
+                {
+                    if (splitContainer.Orientation.Equals(Orientation.Vertical))
+                    {
+                        if (e.X > 0 && e.X < splitContainer.Width)
+                        {
+                            splitContainer.SplitterDistance = e.X;
+                            splitContainer.Refresh();
+                        }
+                    }
+                    else
+                    {
+                        if (e.Y > 0 && e.Y < splitContainer.Height)
+                        {
+                            splitContainer.SplitterDistance = e.Y;
+                            splitContainer.Refresh();
+                        }
+                    }
+                }
+                else
+                {
+                    splitContainer.IsSplitterFixed = false;
+                }
+            }
+        }
+
+        private void filterSplitContainer_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            AutoResizeFilterBox();
+        }
+
+        private void AutoResizeFilterBox()
+        {
+            filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        }
+
         /*========================================================================
        * Context menu stuff
        *========================================================================*/
@@ -867,10 +918,14 @@ namespace LogExpert
         private void dataGridView_CellContextMenuStripNeeded(object sender,
             DataGridViewCellContextMenuStripNeededEventArgs e)
         {
-            if (e.RowIndex > 0 && e.RowIndex < dataGridView.RowCount
+            if (e.RowIndex >= 0 && e.RowIndex < dataGridView.RowCount
                                && !dataGridView.Rows[e.RowIndex].Selected)
             {
                 SelectLine(e.RowIndex, false, true);
+            }
+            else if (e.RowIndex < 0)
+            {
+                e.ContextMenuStrip = columnContextMenuStrip;
             }
 
             if (e.ContextMenuStrip == columnContextMenuStrip)
