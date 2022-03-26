@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using LogExpert.Classes.ILogLineColumnizerCallback;
 
 namespace LogExpert
 {
@@ -9,35 +6,32 @@ namespace LogExpert
     {
         #region Fields
 
-        private IColumnizedLogLine cachedColumns = null;
-        private ILogLineColumnizer lastColumnizer;
-        private int lastLineNumber = -1;
+        private IColumnizedLogLine _cachedColumns;
+        private ILogLineColumnizer _lastColumnizer;
+        private int _lastLineNumber = -1;
 
         #endregion
 
         #region Internals
 
-        internal IColumnizedLogLine GetColumnsForLine(LogfileReader logFileReader, int lineNumber,
-            ILogLineColumnizer columnizer,
-            LogWindow.ColumnizerCallback columnizerCallback)
+        internal IColumnizedLogLine GetColumnsForLine(LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, ColumnizerCallback columnizerCallback)
         {
-            if (lastColumnizer != columnizer || lastLineNumber != lineNumber && cachedColumns != null ||
-                columnizerCallback.LineNum != lineNumber)
+            if (_lastColumnizer != columnizer || _lastLineNumber != lineNumber && _cachedColumns != null || columnizerCallback.LineNum != lineNumber)
             {
-                lastColumnizer = columnizer;
-                lastLineNumber = lineNumber;
+                _lastColumnizer = columnizer;
+                _lastLineNumber = lineNumber;
                 ILogLine line = logFileReader.GetLogLineWithWait(lineNumber);
                 if (line != null)
                 {
                     columnizerCallback.LineNum = lineNumber;
-                    cachedColumns = columnizer.SplitLine(columnizerCallback, line);
+                    _cachedColumns = columnizer.SplitLine(columnizerCallback, line);
                 }
                 else
                 {
-                    cachedColumns = null;
+                    _cachedColumns = null;
                 }
             }
-            return cachedColumns;
+            return _cachedColumns;
         }
 
         #endregion

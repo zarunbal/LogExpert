@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
 namespace LogExpert
@@ -15,33 +15,33 @@ namespace LogExpert
         private const int MAX_CONTRAST = 1300;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly EventWaitHandle calcEvent = new ManualResetEvent(false);
-        private readonly Thread calcThread = null;
-        private readonly LogWindow.ColumnizerCallback callback;
+        private readonly EventWaitHandle _calcEvent = new ManualResetEvent(false);
+        private readonly Thread _calcThread;
+        private readonly ColumnizerCallback _callback;
 
-        private readonly object diffListLock = new object();
-        private readonly EventWaitHandle lineCountEvent = new ManualResetEvent(false);
+        private readonly object _diffListLock = new object();
+        private readonly EventWaitHandle _lineCountEvent = new ManualResetEvent(false);
 
-        private readonly LogWindow logWindow;
+        private readonly LogWindow _logWindow;
 
         // for DoCalc_via_Time
-        private double average;
+        private double _average;
 
-        private int contrast = 400;
-        private int displayHeight = 0;
-        private bool enabled;
-        private DateTime endTimestamp;
-        private int lineCount = 0;
-        private int maxDiff;
-        private TimeSpan maxSpan;
-        private bool shouldStop = false;
+        private int _contrast = 400;
+        private int _displayHeight = 0;
+        private bool _enabled;
+        private DateTime _endTimestamp;
+        private int _lineCount = 0;
+        private int _maxDiff;
+        private TimeSpan _maxSpan;
+        private bool _shouldStop;
 
-        private DateTime startTimestamp;
+        private DateTime _startTimestamp;
 
-        private bool timeMode = true;
+        private bool _timeMode = true;
 
         // for DoCalc
-        private int timePerLine;
+        private int _timePerLine;
 
         #endregion
 
@@ -49,11 +49,11 @@ namespace LogExpert
 
         public TimeSpreadCalculator(LogWindow logWindow)
         {
-            this.logWindow = logWindow;
-            this.callback = new LogWindow.ColumnizerCallback(this.logWindow);
-            calcThread = new Thread(new ThreadStart(WorkerFx));
-            calcThread.IsBackground = true;
-            calcThread.Start();
+            _logWindow = logWindow;
+            _callback = new ColumnizerCallback(_logWindow);
+            _calcThread = new Thread(WorkerFx);
+            _calcThread.IsBackground = true;
+            _calcThread.Start();
         }
 
         #endregion
@@ -77,31 +77,28 @@ namespace LogExpert
 
         public bool Enabled
         {
-            get { return enabled; }
+            get => _enabled;
             set
             {
-                enabled = value;
-                if (enabled)
+                _enabled = value;
+                if (_enabled)
                 {
-                    this.calcEvent.Set();
-                    this.lineCountEvent.Set();
-                }
-                else
-                {
+                    _calcEvent.Set();
+                    _lineCountEvent.Set();
                 }
             }
         }
 
         public bool TimeMode
         {
-            get { return timeMode; }
+            get => _timeMode;
             set
             {
-                timeMode = value;
-                if (enabled)
+                _timeMode = value;
+                if (_enabled)
                 {
-                    this.calcEvent.Set();
-                    this.lineCountEvent.Set();
+                    _calcEvent.Set();
+                    _lineCountEvent.Set();
                 }
             }
         }
@@ -110,28 +107,28 @@ namespace LogExpert
         {
             set
             {
-                this.contrast = value;
-                if (this.contrast < 0)
+                _contrast = value;
+                if (_contrast < 0)
                 {
-                    this.contrast = 0;
+                    _contrast = 0;
                 }
-                else if (this.contrast > MAX_CONTRAST)
+                else if (_contrast > MAX_CONTRAST)
                 {
-                    this.contrast = MAX_CONTRAST;
+                    _contrast = MAX_CONTRAST;
                 }
 
                 if (TimeMode)
                 {
-                    CalcValuesViaTime(this.maxDiff, this.average);
+                    CalcValuesViaTime(_maxDiff, _average);
                 }
                 else
                 {
-                    CalcValuesViaLines(this.timePerLine, this.maxSpan);
+                    CalcValuesViaLines(_timePerLine, _maxSpan);
                 }
-                OnCalcDone(new EventArgs());
+                OnCalcDone(EventArgs.Empty);
             }
 
-            get { return this.contrast; }
+            get => _contrast;
         }
 
         public List<SpreadEntry> DiffList { get; set; } = new List<SpreadEntry>();
@@ -142,30 +139,30 @@ namespace LogExpert
 
         public void Stop()
         {
-            this.shouldStop = true;
-            this.lineCountEvent.Set();
-            this.calcThread.Join(300);
-            this.calcThread.Abort();
-            this.calcThread.Join();
+            _shouldStop = true;
+            _lineCountEvent.Set();
+            _calcThread.Join(300);
+            _calcThread.Abort();
+            _calcThread.Join();
         }
 
         public void SetLineCount(int count)
         {
-            this.lineCount = count;
+            _lineCount = count;
             if (Enabled)
             {
-                this.calcEvent.Set();
-                this.lineCountEvent.Set();
+                _calcEvent.Set();
+                _lineCountEvent.Set();
             }
         }
 
         public void SetDisplayHeight(int height)
         {
-            this.displayHeight = height;
+            _displayHeight = height;
             if (Enabled)
             {
-                this.calcEvent.Set();
-                this.lineCountEvent.Set();
+                _calcEvent.Set();
+                _lineCountEvent.Set();
             }
         }
 
@@ -178,17 +175,17 @@ namespace LogExpert
             Thread.CurrentThread.Name = "TimeSpreadCalculator Worker";
             Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
-            while (!this.shouldStop)
+            while (!_shouldStop)
             {
                 // wait for wakeup
-                this.lineCountEvent.WaitOne();
+                _lineCountEvent.WaitOne();
 
-                while (!this.shouldStop)
+                while (!_shouldStop)
                 {
                     // wait for unbusy moments
                     _logger.Debug("TimeSpreadCalculator: wait for unbusy moments");
-                    bool signalled = this.calcEvent.WaitOne(INACTIVITY_TIME, false);
-                    if (!signalled)
+                    bool signaled = _calcEvent.WaitOne(INACTIVITY_TIME, false);
+                    if (signaled == false)
                     {
                         _logger.Debug("TimeSpreadCalculator: unbusy. starting calc.");
                         if (TimeMode)
@@ -201,43 +198,41 @@ namespace LogExpert
                         }
                         break;
                     }
-                    else
-                    {
-                        _logger.Debug("TimeSpreadCalculator: signalled. no calc.");
-                    }
-                    this.calcEvent.Reset();
+
+                    _logger.Debug("TimeSpreadCalculator: signalled. no calc.");
+                    _calcEvent.Reset();
                 }
-                this.lineCountEvent.Reset();
+                _lineCountEvent.Reset();
             }
         }
 
         private void DoCalc()
         {
-            OnStartCalc(new EventArgs());
+            OnStartCalc(EventArgs.Empty);
             _logger.Debug("TimeSpreadCalculator.DoCalc() begin");
-            if (this.callback.GetLineCount() < 1)
+            if (_callback.GetLineCount() < 1)
             {
-                OnCalcDone(new EventArgs());
+                OnCalcDone(EventArgs.Empty);
                 _logger.Debug("TimeSpreadCalculator.DoCalc() end because of line count < 1");
                 return;
             }
             int lineNum = 0;
-            int lastLineNum = this.callback.GetLineCount() - 1;
-            this.startTimestamp = this.logWindow.GetTimestampForLineForward(ref lineNum, false);
-            this.endTimestamp = this.logWindow.GetTimestampForLine(ref lastLineNum, false);
+            int lastLineNum = _callback.GetLineCount() - 1;
+            _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
+            _endTimestamp = _logWindow.GetTimestampForLine(ref lastLineNum, false);
 
             int timePerLineSum = 0;
 
-            if (this.startTimestamp != DateTime.MinValue && this.endTimestamp != DateTime.MinValue)
+            if (_startTimestamp != DateTime.MinValue && _endTimestamp != DateTime.MinValue)
             {
-                TimeSpan overallSpan = this.endTimestamp - this.startTimestamp;
+                TimeSpan overallSpan = _endTimestamp - _startTimestamp;
                 int overallSpanMillis = (int) (overallSpan.Ticks / TimeSpan.TicksPerMillisecond);
-                this.timePerLine = (int) Math.Round((double) overallSpanMillis / (double) this.lineCount);
-                DateTime oldTime = this.logWindow.GetTimestampForLineForward(ref lineNum, false);
+                _timePerLine = (int) Math.Round(overallSpanMillis / (double) _lineCount);
+                DateTime oldTime = _logWindow.GetTimestampForLineForward(ref lineNum, false);
                 int step;
-                if (this.lineCount > this.displayHeight)
+                if (_lineCount > _displayHeight)
                 {
-                    step = (int) Math.Round((double) this.lineCount / (double) this.displayHeight);
+                    step = (int) Math.Round(_lineCount / (double) _displayHeight);
                 }
                 else
                 {
@@ -252,7 +247,7 @@ namespace LogExpert
                 for (int i = lineNum; i < lastLineNum; i += step)
                 {
                     int currLineNum = i;
-                    DateTime time = this.logWindow.GetTimestampForLineForward(ref currLineNum, false);
+                    DateTime time = _logWindow.GetTimestampForLineForward(ref currLineNum, false);
                     if (time != DateTime.MinValue)
                     {
                         TimeSpan span = time - oldTime;
@@ -266,14 +261,14 @@ namespace LogExpert
                 if (maxList.Count > 3)
                 {
                     maxList.Sort();
-                    this.maxSpan = maxList[maxList.Count - 3];
+                    _maxSpan = maxList[maxList.Count - 3];
                 }
-                lock (this.diffListLock)
+                lock (_diffListLock)
                 {
-                    this.DiffList = newDiffList;
-                    timePerLine = (int) Math.Round((double) timePerLineSum / ((double) (lastLineNum + 1) / step));
-                    CalcValuesViaLines(timePerLine, this.maxSpan);
-                    OnCalcDone(new EventArgs());
+                    DiffList = newDiffList;
+                    _timePerLine = (int) Math.Round(timePerLineSum / ((double) (lastLineNum + 1) / step));
+                    CalcValuesViaLines(_timePerLine, _maxSpan);
+                    OnCalcDone(EventArgs.Empty);
                     _logger.Debug("TimeSpreadCalculator.DoCalc() end");
                 }
             }
@@ -281,29 +276,29 @@ namespace LogExpert
 
         private void DoCalc_via_Time()
         {
-            OnStartCalc(new EventArgs());
+            OnStartCalc(EventArgs.Empty);
             _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() begin");
-            if (this.callback.GetLineCount() < 1)
+            if (_callback.GetLineCount() < 1)
             {
-                OnCalcDone(new EventArgs());
+                OnCalcDone(EventArgs.Empty);
                 _logger.Debug("TimeSpreadCalculator.DoCalc() end because of line count < 1");
                 return;
             }
             int lineNum = 0;
-            int lastLineNum = this.callback.GetLineCount() - 1;
-            this.startTimestamp = this.logWindow.GetTimestampForLineForward(ref lineNum, false);
-            this.endTimestamp = this.logWindow.GetTimestampForLine(ref lastLineNum, false);
+            int lastLineNum = _callback.GetLineCount() - 1;
+            _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
+            _endTimestamp = _logWindow.GetTimestampForLine(ref lastLineNum, false);
 
-            if (this.startTimestamp != DateTime.MinValue && this.endTimestamp != DateTime.MinValue)
+            if (_startTimestamp != DateTime.MinValue && _endTimestamp != DateTime.MinValue)
             {
-                TimeSpan overallSpan = this.endTimestamp - this.startTimestamp;
-                long overallSpanMillis = (long) (overallSpan.Ticks / TimeSpan.TicksPerMillisecond);
+                TimeSpan overallSpan = _endTimestamp - _startTimestamp;
+                long overallSpanMillis = overallSpan.Ticks / TimeSpan.TicksPerMillisecond;
                 //int timePerLine = (int)Math.Round((double)overallSpanMillis / (double)this.lineCount);
-                DateTime oldTime = this.logWindow.GetTimestampForLineForward(ref lineNum, false);
+                DateTime oldTime = _logWindow.GetTimestampForLineForward(ref lineNum, false);
                 long step;
-                if (overallSpanMillis > this.displayHeight)
+                if (overallSpanMillis > _displayHeight)
                 {
-                    step = (long) Math.Round((double) overallSpanMillis / (double) this.displayHeight);
+                    step = (long) Math.Round(overallSpanMillis / (double) _displayHeight);
                 }
                 else
                 {
@@ -313,18 +308,17 @@ namespace LogExpert
                 _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() time range is {0} ms", overallSpanMillis);
 
                 lineNum = 0;
-                DateTime searchTimeStamp = this.startTimestamp;
+                DateTime searchTimeStamp = _startTimestamp;
                 int oldLineNum = lineNum;
                 int loopCount = 0;
                 int lineDiffSum = 0;
                 int minDiff = int.MaxValue;
-                this.maxDiff = 0;
+                _maxDiff = 0;
                 List<int> maxList = new List<int>();
                 List<SpreadEntry> newDiffList = new List<SpreadEntry>();
-                while (searchTimeStamp.CompareTo(this.endTimestamp) <= 0)
+                while (searchTimeStamp.CompareTo(_endTimestamp) <= 0)
                 {
-                    lineNum = this.logWindow.FindTimestampLine_Internal(lineNum, lineNum, lastLineNum, searchTimeStamp,
-                        false);
+                    lineNum = _logWindow.FindTimestampLine_Internal(lineNum, lineNum, lastLineNum, searchTimeStamp, false);
                     if (lineNum < 0)
                     {
                         lineNum = -lineNum;
@@ -341,9 +335,9 @@ namespace LogExpert
                         {
                             minDiff = lineDiff;
                         }
-                        if (lineDiff > maxDiff)
+                        if (lineDiff > _maxDiff)
                         {
-                            maxDiff = lineDiff;
+                            _maxDiff = lineDiff;
                         }
                         maxList.Add(lineDiff);
                         loopCount++;
@@ -355,12 +349,12 @@ namespace LogExpert
                 if (maxList.Count > 3)
                 {
                     maxList.Sort();
-                    maxDiff = maxList[maxList.Count - 3];
+                    _maxDiff = maxList[maxList.Count - 3];
                 }
-                this.average = (double) lineDiffSum / (double) loopCount;
+                _average = lineDiffSum / (double) loopCount;
                 //double average = maxList[maxList.Count / 2];
-                _logger.Debug("Average diff={0} minDiff={1} maxDiff={2}", average, minDiff, maxDiff);
-                lock (this.diffListLock)
+                _logger.Debug("Average diff={0} minDiff={1} maxDiff={2}", _average, minDiff, _maxDiff);
+                lock (_diffListLock)
                 {
                     if (newDiffList.Count > 0)
                     {
@@ -370,15 +364,14 @@ namespace LogExpert
                     {
                         newDiffList.RemoveAt(0);
                     }
-                    this.DiffList = newDiffList;
-                    CalcValuesViaTime(maxDiff, average);
-                    OnCalcDone(new EventArgs());
+                    DiffList = newDiffList;
+                    CalcValuesViaTime(_maxDiff, _average);
+                    OnCalcDone(EventArgs.Empty);
                     _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() end");
                 }
             }
         }
-
-
+        
         private DateTime CalcValuesViaLines(int timePerLine, TimeSpan maxSpan)
         {
             DateTime oldTime = DateTime.MinValue;
@@ -393,8 +386,8 @@ namespace LogExpert
                     {
                         diffFromAverage = 0;
                     }
-                    int value = (int) (diffFromAverage / (double) (timePerLine / TimeSpan.TicksPerMillisecond)
-                                       * (double) this.contrast);
+                    int value = (int) (diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond)
+                                       * _contrast);
                     entry.value = 255 - value;
                     oldTime = entry.timestamp;
                 }
@@ -407,12 +400,12 @@ namespace LogExpert
             foreach (SpreadEntry entry in DiffList)
             {
                 int lineDiff = entry.diff;
-                double diffFromAverage = (double) entry.diff - average;
+                double diffFromAverage = entry.diff - average;
                 if (diffFromAverage < 0)
                 {
                     diffFromAverage = 0;
                 }
-                int value = (int) (diffFromAverage / (double) maxDiff * (double) this.contrast);
+                int value = (int) (diffFromAverage / maxDiff * _contrast);
                 entry.value = 255 - value;
                 _logger.Debug("TimeSpreadCalculator.DoCalc() test time {0:HH:mm:ss.fff} line diff={1} value={2}", entry.timestamp, lineDiff, value);
             }
@@ -420,18 +413,12 @@ namespace LogExpert
 
         private void OnCalcDone(EventArgs e)
         {
-            if (CalcDone != null)
-            {
-                CalcDone(this, e);
-            }
+            CalcDone?.Invoke(this, e);
         }
 
         private void OnStartCalc(EventArgs e)
         {
-            if (StartCalc != null)
-            {
-                StartCalc(this, e);
-            }
+            StartCalc?.Invoke(this, e);
         }
 
         #endregion

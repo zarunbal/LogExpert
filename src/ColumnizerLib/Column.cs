@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Windows.Forms;
 
 namespace LogExpert
 {
@@ -70,7 +66,7 @@ namespace LogExpert
 
         public string FullValue
         {
-            get { return _fullValue; }
+            get => _fullValue;
             set
             {
                 _fullValue = value;
@@ -113,7 +109,7 @@ namespace LogExpert
 
         public override string ToString()
         {
-            return DisplayValue ?? "";
+            return DisplayValue ?? string.Empty;
         }
 
         #endregion

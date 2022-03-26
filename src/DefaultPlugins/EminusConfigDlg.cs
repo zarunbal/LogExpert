@@ -19,12 +19,12 @@ namespace LogExpert
         public EminusConfigDlg(EminusConfig config)
         {
             InitializeComponent();
-            this.TopLevel = false;
-            this.Config = config;
+            TopLevel = false;
+            Config = config;
 
-            this.hostTextBox.Text = config.host;
-            this.portTextBox.Text = "" + config.port;
-            this.passwordTextBox.Text = config.password;
+            hostTextBox.Text = config.host;
+            portTextBox.Text = "" + config.port;
+            passwordTextBox.Text = config.password;
         }
 
         #endregion
@@ -39,16 +39,16 @@ namespace LogExpert
 
         public void ApplyChanges()
         {
-            this.Config.host = this.hostTextBox.Text;
+            Config.host = hostTextBox.Text;
             try
             {
-                this.Config.port = short.Parse(this.portTextBox.Text);
+                Config.port = short.Parse(portTextBox.Text);
             }
-            catch (FormatException fe)
+            catch (FormatException)
             {
-                this.Config.port = 0;
+                Config.port = 0;
             }
-            this.Config.password = this.passwordTextBox.Text;
+            Config.password = passwordTextBox.Text;
         }
 
         #endregion
