@@ -153,14 +153,7 @@ namespace LogExpert.Dialogs
 
         private void FillPortableMode()
         {
-            if (File.Exists(ConfigManager.PortableMode))
-            {
-                checkBoxPortableMode.CheckState = CheckState.Checked;
-            }
-            else
-            {
-                checkBoxPortableMode.CheckState = CheckState.Unchecked;
-            }
+            checkBoxPortableMode.CheckState = File.Exists(ConfigManager.PortableMode) ? CheckState.Checked : CheckState.Unchecked;
         }
 
         private void DisplayFontName()
@@ -187,7 +180,7 @@ namespace LogExpert.Dialogs
             }
 
             Preferences.multifileOptions.FormatPattern = textBoxMultifilePattern.Text;
-            Preferences.multifileOptions.MaxDayTry = (int) upDownMultifileDays.Value;
+            Preferences.multifileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
         }
 
         private void ToolButtonClick(TextBox textBox)
@@ -367,13 +360,14 @@ namespace LogExpert.Dialogs
         private void SaveColumnizerList()
         {
             Preferences.columnizerMaskList.Clear();
+
             foreach (DataGridViewRow row in dataGridViewColumnizer.Rows)
             {
                 if (!row.IsNewRow)
                 {
                     ColumnizerMaskEntry entry = new ColumnizerMaskEntry();
-                    entry.mask = (string) row.Cells[0].Value;
-                    entry.columnizerName = (string) row.Cells[1].Value;
+                    entry.mask = (string)row.Cells[0].Value;
+                    entry.columnizerName = (string)row.Cells[1].Value;
                     Preferences.columnizerMaskList.Add(entry);
                 }
             }
@@ -382,13 +376,14 @@ namespace LogExpert.Dialogs
         private void SaveHighlightMaskList()
         {
             Preferences.highlightMaskList.Clear();
+
             foreach (DataGridViewRow row in dataGridViewHighlightMask.Rows)
             {
                 if (!row.IsNewRow)
                 {
                     HighlightMaskEntry entry = new HighlightMaskEntry();
-                    entry.mask = (string) row.Cells[0].Value;
-                    entry.highlightGroupName = (string) row.Cells[1].Value;
+                    entry.mask = (string)row.Cells[0].Value;
+                    entry.highlightGroupName = (string)row.Cells[1].Value;
                     Preferences.highlightMaskList.Add(entry);
                 }
             }
@@ -467,14 +462,20 @@ namespace LogExpert.Dialogs
             switch (Preferences.multiFileOption)
             {
                 case MultiFileOption.SingleFiles:
+                {
                     radioButtonLoadEveryFileIntoSeperatedTab.Checked = true;
                     break;
+                }
                 case MultiFileOption.MultiFile:
+                {
                     radioButtonTreatAllFilesAsOneMultifile.Checked = true;
                     break;
+                }
                 case MultiFileOption.Ask:
+                {
                     radioButtonAskWhatToDo.Checked = true;
                     break;
+                }
             }
 
             textBoxMultifilePattern.Text = Preferences.multifileOptions.FormatPattern;
@@ -636,8 +637,8 @@ namespace LogExpert.Dialogs
             Preferences.showColumnFinder = checkBoxColumnFinder.Checked;
             Preferences.useLegacyReader = checkBoxLegacyReader.Checked;
 
-            Preferences.maximumFilterEntries = (int) upDownMaximumFilterEntries.Value;
-            Preferences.maximumFilterEntriesDisplayed = (int) upDownMaximumFilterEntriesDisplayed.Value;
+            Preferences.maximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
+            Preferences.maximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
 
             SavePluginSettings();
             SaveHighlightMaskList();

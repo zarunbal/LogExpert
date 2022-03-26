@@ -253,8 +253,7 @@ namespace LogExpert
                     {
                         if (Regex.IsMatch(fileName, entry.mask))
                         {
-                            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(entry.columnizerName,
-                                PluginRegistry.GetInstance().RegisteredColumnizers);
+                            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(entry.columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
                             return columnizer;
                         }
                     }
