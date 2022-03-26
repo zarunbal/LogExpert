@@ -5,12 +5,12 @@ using System.Text;
 namespace LogExpert
 {
     [Serializable]
-    public class MultifileOptions
+    public class MultiFileOptions
     {
         #region Fields
 
-        private string formatPattern = "*$J(.)";
-        private int maxDayTry = 3;
+        private string _formatPattern = "*$J(.)";
+        private int _maxDayTry = 3;
 
         #endregion
 
@@ -18,14 +18,14 @@ namespace LogExpert
 
         public int MaxDayTry
         {
-            get { return maxDayTry; }
-            set { maxDayTry = value; }
+            get => _maxDayTry;
+            set => _maxDayTry = value;
         }
 
         public string FormatPattern
         {
-            get { return formatPattern; }
-            set { formatPattern = value; }
+            get => _formatPattern;
+            set => _formatPattern = value;
         }
 
         #endregion

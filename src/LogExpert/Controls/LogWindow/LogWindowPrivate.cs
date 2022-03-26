@@ -75,13 +75,13 @@ namespace LogExpert
                 }
 
                 IsMultiFile = persistenceData.multiFile;
-                _multiFileOptions = new MultifileOptions();
+                _multiFileOptions = new MultiFileOptions();
                 _multiFileOptions.FormatPattern = persistenceData.multiFilePattern;
                 _multiFileOptions.MaxDayTry = persistenceData.multiFileMaxDays;
                 
                 if (string.IsNullOrEmpty(_multiFileOptions.FormatPattern))
                 {
-                    _multiFileOptions = ObjectClone.Clone(Preferences.multifileOptions);
+                    _multiFileOptions = ObjectClone.Clone(Preferences.multiFileOptions);
                 }
 
                 splitContainerLogWindow.SplitterDistance = persistenceData.filterPosition;
@@ -130,7 +130,7 @@ namespace LogExpert
             filterTailCheckBox.Checked = Preferences.filterTail;
             syncFilterCheckBox.Checked = Preferences.filterSync;
             FollowTailChanged(Preferences.followTail, false);
-            _multiFileOptions = ObjectClone.Clone(Preferences.multifileOptions);
+            _multiFileOptions = ObjectClone.Clone(Preferences.multiFileOptions);
         }
 
         private void LoadPersistenceData()

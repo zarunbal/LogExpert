@@ -50,7 +50,7 @@ namespace LogExpert
 
         public MultiFileOption multiFileOption;
         
-        public MultifileOptions multifileOptions;
+        public MultiFileOptions multiFileOptions;
         
         public bool multiThreadFilter = true;
         

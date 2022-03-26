@@ -179,8 +179,8 @@ namespace LogExpert.Dialogs
                 Preferences.multiFileOption = MultiFileOption.Ask;
             }
 
-            Preferences.multifileOptions.FormatPattern = textBoxMultifilePattern.Text;
-            Preferences.multifileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
+            Preferences.multiFileOptions.FormatPattern = textBoxMultifilePattern.Text;
+            Preferences.multiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
         }
 
         private void ToolButtonClick(TextBox textBox)
@@ -478,8 +478,8 @@ namespace LogExpert.Dialogs
                 }
             }
 
-            textBoxMultifilePattern.Text = Preferences.multifileOptions.FormatPattern;
-            upDownMultifileDays.Value = Preferences.multifileOptions.MaxDayTry;
+            textBoxMultifilePattern.Text = Preferences.multiFileOptions.FormatPattern;
+            upDownMultifileDays.Value = Preferences.multiFileOptions.MaxDayTry;
         }
 
         private void GetToolListBoxData()
