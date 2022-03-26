@@ -9,7 +9,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Security;
 using System.Reflection;
-using System.Security.Principal;
 using LogExpert.Dialogs;
 using ITDM;
 using NLog;
@@ -46,14 +45,12 @@ namespace LogExpert
 
         private static void Sub_Main(string[] orgArgs)
         {
-            AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Application.ThreadException += Application_ThreadException;
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================",
-                Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
+            _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
 
             CmdLine cmdLine = new CmdLine();
             CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
@@ -70,14 +67,7 @@ namespace LogExpert
                 try
                 {
                     FileInfo info = new FileInfo(fileArg);
-                    if (info.Exists)
-                    {
-                        argsList.Add(info.FullName);
-                    }
-                    else
-                    {
-                        argsList.Add(fileArg);
-                    }
+                    argsList.Add(info.Exists ? info.FullName : fileArg);
                 }
                 catch (Exception)
                 {
@@ -88,13 +78,14 @@ namespace LogExpert
             if (configFile.Exists)
             {
                 FileInfo cfgFileInfo = new FileInfo(configFile.Value);
+
                 if (cfgFileInfo.Exists)
                 {
                     ConfigManager.Import(cfgFileInfo, ExportImportFlags.All);
                 }
                 else
                 {
-                    MessageBox.Show("Config file not found", "LogExpert");
+                    MessageBox.Show(@"Config file not found", @"LogExpert");
                 }
             }
 
@@ -103,8 +94,7 @@ namespace LogExpert
             try
             {
                 Settings settings = ConfigManager.Settings;
-                bool isCreated = false;
-                Mutex mutex = new System.Threading.Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out isCreated);
+                Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
                 if (isCreated)
                 {
                     // first application instance
@@ -114,11 +104,10 @@ namespace LogExpert
 
                     // first instance
                     //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+
                     IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
                     ChannelServices.RegisterChannel(ipcChannel, false);
-                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy),
-                        "LogExpertProxy",
-                        WellKnownObjectMode.Singleton);
+                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
                     LogExpertProxy proxy = new LogExpertProxy(logWin);
                     RemotingServices.Marshal(proxy, "LogExpertProxy");
 
@@ -133,14 +122,14 @@ namespace LogExpert
                     Exception errMsg = null;
                     IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
                     ChannelServices.RegisterChannel(ipcChannel, false);
+
                     while (counter > 0)
                     {
                         try
                         {
                             // another instance already exists
                             //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                            LogExpertProxy proxy = (LogExpertProxy) Activator.GetObject(typeof(LogExpertProxy),
-                                "ipc://LogExpert" + pId + "/LogExpertProxy");
+                            LogExpertProxy proxy = (LogExpertProxy) Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
                             if (settings.preferences.allowOnlyOneInstance)
                             {
                                 proxy.LoadFiles(args);
@@ -159,12 +148,14 @@ namespace LogExpert
                             Thread.Sleep(500);
                         }
                     }
+
                     if (counter == 0)
                     {
                         _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
                         MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
                 }
+
                 mutex.Close();
             }
             catch (Exception ex)
@@ -177,18 +168,18 @@ namespace LogExpert
         [STAThread]
         private static void ShowUnhandledException(object exceptionObject)
         {
-            string errorText = "";
-            string stackTrace = "";
-            if (exceptionObject is Exception)
+            string errorText = string.Empty;
+            string stackTrace = string.Empty;
+            if (exceptionObject is Exception exception)
             {
-                errorText = (exceptionObject as Exception).Message;
-                stackTrace = "\r\n" + (exceptionObject as Exception).GetType().Name + "\r\n" +
-                             (exceptionObject as Exception).StackTrace;
+                errorText = exception.Message;
+                stackTrace = "\r\n" + exception.GetType().Name + "\r\n" +
+                             exception.StackTrace;
             }
             else
             {
                 stackTrace = exceptionObject.ToString();
-                string[] lines = stackTrace.Split(new char[] {'\n'});
+                string[] lines = stackTrace.Split('\n');
                 if (lines != null && lines.Length > 0)
                 {
                     errorText = lines[0];
@@ -207,7 +198,7 @@ namespace LogExpert
             _logger.Fatal(e);
 
             //ShowUnhandledException(e.Exception);
-            Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
+            Thread thread = new Thread(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(e.Exception);
@@ -220,7 +211,7 @@ namespace LogExpert
 
             object exceptionObject = e.ExceptionObject;
             //ShowUnhandledException(exceptionObject);
-            Thread thread = new Thread(new ParameterizedThreadStart(ShowUnhandledException));
+            Thread thread = new Thread(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(exceptionObject);

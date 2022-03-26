@@ -90,7 +90,7 @@ namespace LogExpert
                 {
                     _logger.Error(lfe);
                     MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
-                    BeginInvoke(new FunctionWith1BoolParam(Close), new object[] {true});
+                    BeginInvoke(new FunctionWith1BoolParam(Close), true);
                     isLoadError = true;
                     return;
                 }

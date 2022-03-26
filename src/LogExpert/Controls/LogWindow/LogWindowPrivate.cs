@@ -918,8 +918,8 @@ namespace LogExpert
             {
                 string[] newColumns = columnizer != null ? columnizer.GetColumnNames() : new string[0];
                 bool colChanged = false;
-                if (dataGridView.ColumnCount - 2 == newColumns.Length
-                ) // two first columns are 'marker' and 'line number'
+
+                if (dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
                 {
                     for (int i = 0; i < newColumns.Length; i++)
                     {
@@ -949,7 +949,7 @@ namespace LogExpert
                 filterParams.columnList.Clear();
             }
 
-            if (CurrentColumnizer == null || !CurrentColumnizer.GetType().Equals(columnizer.GetType()))
+            if (CurrentColumnizer == null || CurrentColumnizer.GetType() != columnizer.GetType())
             {
                 CurrentColumnizer = columnizer;
                 freezeStateMap.Clear();
@@ -973,8 +973,7 @@ namespace LogExpert
                 }
 
                 // Reload when choosing no XML columnizer but previous columnizer was XML
-                if (logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) &&
-                    oldColumnizerIsXmlType)
+                if (logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
                 {
                     logFileReader.IsXmlMode = false;
                     //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -984,8 +983,7 @@ namespace LogExpert
                 // Reload when previous columnizer was PreProcess and current is not, and vice versa.
                 // When the current columnizer is a preProcess columnizer, reload in every case.
                 if (CurrentColumnizer is IPreProcessColumnizer != oldColumnizerIsPreProcess ||
-                    CurrentColumnizer is IPreProcessColumnizer
-                )
+                    CurrentColumnizer is IPreProcessColumnizer)
                 {
                     //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
                     mustReload = true;
@@ -1040,6 +1038,7 @@ namespace LogExpert
             }
 
             columnComboBox.Items.Clear();
+
             foreach (string columnName in columnizer.GetColumnNames())
             {
                 columnComboBox.Items.Add(columnName);

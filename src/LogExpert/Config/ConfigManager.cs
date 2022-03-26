@@ -363,7 +363,7 @@ namespace LogExpert
 
 
         /// <summary>
-        /// Imports all or some of the settings/prefs stored in the inpute stream.
+        /// Imports all or some of the settings/prefs stored in the input stream.
         /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
         /// </summary>
         /// <param name="fs"></param>

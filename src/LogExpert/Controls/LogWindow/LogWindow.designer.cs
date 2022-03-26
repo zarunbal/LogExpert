@@ -38,6 +38,7 @@ namespace LogExpert
             this.columnFinderPanel = new System.Windows.Forms.Panel();
             this.columnComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.dataGridView = new LogExpert.Dialogs.BufferedDataGridView();
             this.dataGridContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,6 +57,7 @@ namespace LogExpert
             this.makePermanentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.markCurrentFilterRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pluginSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.timeSpreadingControl1 = new LogExpert.Dialogs.TimeSpreadingControl();
             this.advancedBackPanel = new System.Windows.Forms.Panel();
             this.advancedFilterSplitContainer = new System.Windows.Forms.SplitContainer();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -65,13 +67,17 @@ namespace LogExpert
             this.filterRangeComboBox = new System.Windows.Forms.ComboBox();
             this.columnNamesLabel = new System.Windows.Forms.Label();
             this.fuzzyLabel = new System.Windows.Forms.Label();
+            this.fuzzyKnobControl = new LogExpert.KnobControl();
             this.invertFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.label6 = new System.Windows.Forms.Label();
+            this.filterKnobControl1 = new LogExpert.KnobControl();
             this.label2 = new System.Windows.Forms.Label();
+            this.filterKnobControl2 = new LogExpert.KnobControl();
             this.filterToTabButton = new System.Windows.Forms.Button();
             this.toggleHighlightPanelButton = new System.Windows.Forms.Button();
             this.highlightSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.filterGridView = new LogExpert.Dialogs.BufferedDataGridView();
             this.filterContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.setBookmarksOnSelectedLinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.filterToTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -117,18 +123,13 @@ namespace LogExpert
             this.filterForSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.dataGridView = new LogExpert.Dialogs.BufferedDataGridView();
-            this.timeSpreadingControl1 = new LogExpert.Dialogs.TimeSpreadingControl();
-            this.fuzzyKnobControl = new LogExpert.KnobControl();
-            this.filterKnobControl1 = new LogExpert.KnobControl();
-            this.filterKnobControl2 = new LogExpert.KnobControl();
-            this.filterGridView = new LogExpert.Dialogs.BufferedDataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.columnFinderPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.dataGridContextMenuStrip.SuspendLayout();
             this.advancedBackPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.advancedFilterSplitContainer)).BeginInit();
@@ -140,6 +141,7 @@ namespace LogExpert
             this.highlightSplitContainer.Panel1.SuspendLayout();
             this.highlightSplitContainer.Panel2.SuspendLayout();
             this.highlightSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.filterGridView)).BeginInit();
             this.filterContextMenuStrip.SuspendLayout();
             this.panel3.SuspendLayout();
             this.filterListContextMenuStrip.SuspendLayout();
@@ -151,8 +153,6 @@ namespace LogExpert
             this.bookmarkContextMenuStrip.SuspendLayout();
             this.columnContextMenuStrip.SuspendLayout();
             this.editModeContextMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.filterGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -184,7 +184,7 @@ namespace LogExpert
             this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 179F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 180F));
             this.tableLayoutPanel1.Controls.Add(this.columnFinderPanel, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.dataGridView, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl1, 1, 1);
@@ -219,8 +219,9 @@ namespace LogExpert
             this.columnComboBox.TabIndex = 1;
             this.helpToolTip.SetToolTip(this.columnComboBox, "Select column to scroll to");
             this.columnComboBox.SelectionChangeCommitted += new System.EventHandler(this.columnComboBox_SelectionChangeCommitted);
-      this.columnComboBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.columnComboBox_PreviewKeyDown);
-      this.columnComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.columnComboBox_KeyDown);            // 
+            this.columnComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.columnComboBox_KeyDown);
+            this.columnComboBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.columnComboBox_PreviewKeyDown);
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -229,6 +230,63 @@ namespace LogExpert
             this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 0;
             this.label3.Text = "Column name:";
+            // 
+            // dataGridView
+            // 
+            this.dataGridView.AllowUserToAddRows = false;
+            this.dataGridView.AllowUserToDeleteRows = false;
+            this.dataGridView.AllowUserToOrderColumns = true;
+            this.dataGridView.AllowUserToResizeRows = false;
+            this.dataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.dataGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView.ContextMenuStrip = this.dataGridContextMenuStrip;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dataGridView.EditModeMenuStrip = null;
+            this.dataGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.dataGridView.Location = new System.Drawing.Point(1, 30);
+            this.dataGridView.Margin = new System.Windows.Forms.Padding(0);
+            this.dataGridView.Name = "dataGridView";
+            this.dataGridView.PaintWithOverlays = false;
+            this.dataGridView.RowHeadersVisible = false;
+            this.dataGridView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.dataGridView.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
+            this.dataGridView.RowTemplate.Height = 15;
+            this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView.ShowCellErrors = false;
+            this.dataGridView.ShowCellToolTips = false;
+            this.dataGridView.ShowEditingIcon = false;
+            this.dataGridView.ShowRowErrors = false;
+            this.dataGridView.Size = new System.Drawing.Size(847, 331);
+            this.dataGridView.TabIndex = 0;
+            this.dataGridView.VirtualMode = true;
+            this.dataGridView.OverlayDoubleClicked += new LogExpert.Dialogs.BufferedDataGridView.OverlayDoubleClickedEventHandler(this.dataGridView_OverlayDoubleClicked);
+            this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
+            this.dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellContentDoubleClick);
+            this.dataGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridView_CellContextMenuStripNeeded);
+            this.dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellDoubleClick);
+            this.dataGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView_CellValuePushed);
+            this.dataGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.dataGridView_RowHeightInfoNeeded);
+            this.dataGridView.RowUnshared += new System.Windows.Forms.DataGridViewRowEventHandler(this.dataGridView_RowUnshared);
+            this.dataGridView.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView_Scroll);
+            this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
+            this.dataGridView.Paint += new System.Windows.Forms.PaintEventHandler(this.dataGridView_Paint);
+            this.dataGridView.Enter += new System.EventHandler(this.dataGridView_Enter);
+            this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
+            this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
+            this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
+            this.dataGridView.Resize += new System.EventHandler(this.dataGridView_Resize);
             // 
             // dataGridContextMenuStrip
             // 
@@ -376,6 +434,19 @@ namespace LogExpert
             this.pluginSeparator.Name = "pluginSeparator";
             this.pluginSeparator.Size = new System.Drawing.Size(283, 6);
             // 
+            // timeSpreadingControl1
+            // 
+            this.timeSpreadingControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.timeSpreadingControl1.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeSpreadingControl1.ForeColor = System.Drawing.Color.Teal;
+            this.timeSpreadingControl1.Location = new System.Drawing.Point(1012, 30);
+            this.timeSpreadingControl1.Margin = new System.Windows.Forms.Padding(2, 0, 1, 0);
+            this.timeSpreadingControl1.Name = "timeSpreadingControl1";
+            this.timeSpreadingControl1.ReverseAlpha = false;
+            this.timeSpreadingControl1.Size = new System.Drawing.Size(16, 331);
+            this.timeSpreadingControl1.TabIndex = 1;
+            // 
             // advancedBackPanel
             // 
             this.advancedBackPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -501,6 +572,21 @@ namespace LogExpert
             this.fuzzyLabel.TabIndex = 11;
             this.fuzzyLabel.Text = "Fuzzyness";
             // 
+            // fuzzyKnobControl
+            // 
+            this.fuzzyKnobControl.DragSensitivity = 6;
+            this.fuzzyKnobControl.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fuzzyKnobControl.Location = new System.Drawing.Point(454, 7);
+            this.fuzzyKnobControl.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.fuzzyKnobControl.MaxValue = 0;
+            this.fuzzyKnobControl.MinValue = 0;
+            this.fuzzyKnobControl.Name = "fuzzyKnobControl";
+            this.fuzzyKnobControl.Size = new System.Drawing.Size(17, 29);
+            this.fuzzyKnobControl.TabIndex = 10;
+            this.helpToolTip.SetToolTip(this.fuzzyKnobControl, "Fuzzy search level (0 = fuzzy off)");
+            this.fuzzyKnobControl.Value = 0;
+            this.fuzzyKnobControl.ValueChanged += new LogExpert.KnobControl.ValueChangedEventHandler(this.fuzzyKnobControl_ValueChanged);
+            // 
             // invertFilterCheckBox
             // 
             this.invertFilterCheckBox.AutoSize = true;
@@ -531,6 +617,20 @@ namespace LogExpert
             this.label6.TabIndex = 6;
             this.label6.Text = "Back Spread ";
             // 
+            // filterKnobControl1
+            // 
+            this.filterKnobControl1.DragSensitivity = 3;
+            this.filterKnobControl1.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.filterKnobControl1.Location = new System.Drawing.Point(299, 7);
+            this.filterKnobControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.filterKnobControl1.MaxValue = 0;
+            this.filterKnobControl1.MinValue = 0;
+            this.filterKnobControl1.Name = "filterKnobControl1";
+            this.filterKnobControl1.Size = new System.Drawing.Size(17, 29);
+            this.filterKnobControl1.TabIndex = 5;
+            this.helpToolTip.SetToolTip(this.filterKnobControl1, "Add preceding lines to search result (Drag up/down, press Shift for finer pitch)");
+            this.filterKnobControl1.Value = 0;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -539,6 +639,20 @@ namespace LogExpert
             this.label2.Size = new System.Drawing.Size(65, 13);
             this.label2.TabIndex = 2;
             this.label2.Text = "Fore Spread";
+            // 
+            // filterKnobControl2
+            // 
+            this.filterKnobControl2.DragSensitivity = 3;
+            this.filterKnobControl2.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.filterKnobControl2.Location = new System.Drawing.Point(365, 7);
+            this.filterKnobControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.filterKnobControl2.MaxValue = 0;
+            this.filterKnobControl2.MinValue = 0;
+            this.filterKnobControl2.Name = "filterKnobControl2";
+            this.filterKnobControl2.Size = new System.Drawing.Size(17, 29);
+            this.filterKnobControl2.TabIndex = 1;
+            this.helpToolTip.SetToolTip(this.filterKnobControl2, "Add following lines to search result (Drag up/down, press Shift for finer pitch)");
+            this.filterKnobControl2.Value = 0;
             // 
             // filterToTabButton
             // 
@@ -582,9 +696,57 @@ namespace LogExpert
             // 
             this.highlightSplitContainer.Panel2.Controls.Add(this.panel3);
             this.highlightSplitContainer.Panel2MinSize = 30;
-            this.highlightSplitContainer.Size = new System.Drawing.Size(981, 197);
+            this.highlightSplitContainer.Size = new System.Drawing.Size(981, 173);
             this.highlightSplitContainer.SplitterDistance = 612;
             this.highlightSplitContainer.TabIndex = 2;
+            // 
+            // filterGridView
+            // 
+            this.filterGridView.AllowUserToAddRows = false;
+            this.filterGridView.AllowUserToDeleteRows = false;
+            this.filterGridView.AllowUserToOrderColumns = true;
+            this.filterGridView.AllowUserToResizeRows = false;
+            this.filterGridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.filterGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.filterGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.filterGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this.filterGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.filterGridView.ContextMenuStrip = this.filterContextMenuStrip;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.filterGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            this.filterGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.filterGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.filterGridView.EditModeMenuStrip = null;
+            this.filterGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.filterGridView.Location = new System.Drawing.Point(0, 0);
+            this.filterGridView.Margin = new System.Windows.Forms.Padding(0);
+            this.filterGridView.Name = "filterGridView";
+            this.filterGridView.PaintWithOverlays = false;
+            this.filterGridView.ReadOnly = true;
+            this.filterGridView.RowHeadersVisible = false;
+            this.filterGridView.RowTemplate.Height = 15;
+            this.filterGridView.RowTemplate.ReadOnly = true;
+            this.filterGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.filterGridView.ShowCellErrors = false;
+            this.filterGridView.ShowCellToolTips = false;
+            this.filterGridView.ShowEditingIcon = false;
+            this.filterGridView.ShowRowErrors = false;
+            this.filterGridView.Size = new System.Drawing.Size(610, 171);
+            this.filterGridView.TabIndex = 1;
+            this.filterGridView.VirtualMode = true;
+            this.filterGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.filterGridView_CellContextMenuStripNeeded);
+            this.filterGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.filterGridView_CellDoubleClick);
+            this.filterGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.filterGridView_ColumnDividerDoubleClick);
+            this.filterGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.filterGridView_RowHeightInfoNeeded);
+            this.filterGridView.Enter += new System.EventHandler(this.filterGridView_Enter);
+            this.filterGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.filterGridView_KeyDown);
+            this.filterGridView.Leave += new System.EventHandler(this.filterGridView_Leave);
             // 
             // filterContextMenuStrip
             // 
@@ -630,7 +792,7 @@ namespace LogExpert
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(363, 195);
+            this.panel3.Size = new System.Drawing.Size(363, 171);
             this.panel3.TabIndex = 1;
             // 
             // hideFilterListOnLoadCheckBox
@@ -713,7 +875,7 @@ namespace LogExpert
             this.filterListBox.IntegralHeight = false;
             this.filterListBox.Location = new System.Drawing.Point(3, 3);
             this.filterListBox.Name = "filterListBox";
-            this.filterListBox.Size = new System.Drawing.Size(278, 190);
+            this.filterListBox.Size = new System.Drawing.Size(278, 166);
             this.filterListBox.TabIndex = 0;
             this.helpToolTip.SetToolTip(this.filterListBox, "Doubleclick to load a saved filter");
             this.filterListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.filterListBox_DrawItem);
@@ -1028,167 +1190,6 @@ namespace LogExpert
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Text = "Set selected text as bookmark comment";
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Click += new System.EventHandler(this.setSelectedTextAsBookmarkCommentToolStripMenuItem_Click);
             // 
-            // dataGridView
-            // 
-            this.dataGridView.AllowUserToAddRows = false;
-            this.dataGridView.AllowUserToDeleteRows = false;
-            this.dataGridView.AllowUserToOrderColumns = true;
-            this.dataGridView.AllowUserToResizeRows = false;
-            this.dataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.dataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.ContextMenuStrip = this.dataGridContextMenuStrip;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView.DefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dataGridView.EditModeMenuStrip = null;
-            this.dataGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.dataGridView.Location = new System.Drawing.Point(1, 30);
-            this.dataGridView.Margin = new System.Windows.Forms.Padding(0);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.PaintWithOverlays = false;
-            this.dataGridView.RowHeadersVisible = false;
-            this.dataGridView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.dataGridView.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-            this.dataGridView.RowTemplate.Height = 15;
-            this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView.ShowCellErrors = false;
-            this.dataGridView.ShowCellToolTips = false;
-            this.dataGridView.ShowEditingIcon = false;
-            this.dataGridView.ShowRowErrors = false;
-            this.dataGridView.Size = new System.Drawing.Size(847, 331);
-            this.dataGridView.TabIndex = 0;
-            this.dataGridView.VirtualMode = true;
-            this.dataGridView.OverlayDoubleClicked += new LogExpert.Dialogs.BufferedDataGridView.OverlayDoubleClickedEventHandler(this.dataGridView_OverlayDoubleClicked);
-            this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
-            this.dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellContentDoubleClick);
-            this.dataGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridView_CellContextMenuStripNeeded);
-            this.dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellDoubleClick);
-            this.dataGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView_CellValuePushed);
-            this.dataGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.dataGridView_RowHeightInfoNeeded);
-            this.dataGridView.RowUnshared += new System.Windows.Forms.DataGridViewRowEventHandler(this.dataGridView_RowUnshared);
-            this.dataGridView.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView_Scroll);
-            this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
-            this.dataGridView.Paint += new System.Windows.Forms.PaintEventHandler(this.dataGridView_Paint);
-            this.dataGridView.Enter += new System.EventHandler(this.dataGridView_Enter);
-            this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
-            this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
-            this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
-            this.dataGridView.Resize += new System.EventHandler(this.dataGridView_Resize);
-            // 
-            // timeSpreadingControl1
-            // 
-            this.timeSpreadingControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.timeSpreadingControl1.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.timeSpreadingControl1.ForeColor = System.Drawing.Color.Teal;
-            this.timeSpreadingControl1.Location = new System.Drawing.Point(1011, 30);
-            this.timeSpreadingControl1.Margin = new System.Windows.Forms.Padding(2, 0, 1, 0);
-            this.timeSpreadingControl1.Name = "timeSpreadingControl1";
-            this.timeSpreadingControl1.ReverseAlpha = false;
-            this.timeSpreadingControl1.Size = new System.Drawing.Size(16, 331);
-            this.timeSpreadingControl1.TabIndex = 1;
-            // 
-            // fuzzyKnobControl
-            // 
-            this.fuzzyKnobControl.DragSensitivity = 6;
-            this.fuzzyKnobControl.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fuzzyKnobControl.Location = new System.Drawing.Point(454, 7);
-            this.fuzzyKnobControl.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.fuzzyKnobControl.MaxValue = 0;
-            this.fuzzyKnobControl.MinValue = 0;
-            this.fuzzyKnobControl.Name = "fuzzyKnobControl";
-            this.fuzzyKnobControl.Size = new System.Drawing.Size(17, 29);
-            this.fuzzyKnobControl.TabIndex = 10;
-            this.helpToolTip.SetToolTip(this.fuzzyKnobControl, "Fuzzy search level (0 = fuzzy off)");
-            this.fuzzyKnobControl.Value = 0;
-            this.fuzzyKnobControl.ValueChanged += new LogExpert.KnobControl.ValueChangedEventHandler(this.fuzzyKnobControl_ValueChanged);
-            // 
-            // filterKnobControl1
-            // 
-            this.filterKnobControl1.DragSensitivity = 3;
-            this.filterKnobControl1.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterKnobControl1.Location = new System.Drawing.Point(299, 7);
-            this.filterKnobControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.filterKnobControl1.MaxValue = 0;
-            this.filterKnobControl1.MinValue = 0;
-            this.filterKnobControl1.Name = "filterKnobControl1";
-            this.filterKnobControl1.Size = new System.Drawing.Size(17, 29);
-            this.filterKnobControl1.TabIndex = 5;
-            this.helpToolTip.SetToolTip(this.filterKnobControl1, "Add preceding lines to search result (Drag up/down, press Shift for finer pitch)");
-            this.filterKnobControl1.Value = 0;
-            // 
-            // filterKnobControl2
-            // 
-            this.filterKnobControl2.DragSensitivity = 3;
-            this.filterKnobControl2.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterKnobControl2.Location = new System.Drawing.Point(365, 7);
-            this.filterKnobControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.filterKnobControl2.MaxValue = 0;
-            this.filterKnobControl2.MinValue = 0;
-            this.filterKnobControl2.Name = "filterKnobControl2";
-            this.filterKnobControl2.Size = new System.Drawing.Size(17, 29);
-            this.filterKnobControl2.TabIndex = 1;
-            this.helpToolTip.SetToolTip(this.filterKnobControl2, "Add following lines to search result (Drag up/down, press Shift for finer pitch)");
-            this.filterKnobControl2.Value = 0;
-            // 
-            // filterGridView
-            // 
-            this.filterGridView.AllowUserToAddRows = false;
-            this.filterGridView.AllowUserToDeleteRows = false;
-            this.filterGridView.AllowUserToOrderColumns = true;
-            this.filterGridView.AllowUserToResizeRows = false;
-            this.filterGridView.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.filterGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.filterGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.filterGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.filterGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.filterGridView.ContextMenuStrip = this.filterContextMenuStrip;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.filterGridView.DefaultCellStyle = dataGridViewCellStyle2;
-            this.filterGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.filterGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.filterGridView.EditModeMenuStrip = null;
-            this.filterGridView.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.filterGridView.Location = new System.Drawing.Point(0, 0);
-            this.filterGridView.Margin = new System.Windows.Forms.Padding(0);
-            this.filterGridView.Name = "filterGridView";
-            this.filterGridView.PaintWithOverlays = false;
-            this.filterGridView.ReadOnly = true;
-            this.filterGridView.RowHeadersVisible = false;
-            this.filterGridView.RowTemplate.Height = 15;
-            this.filterGridView.RowTemplate.ReadOnly = true;
-            this.filterGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.filterGridView.ShowCellErrors = false;
-            this.filterGridView.ShowCellToolTips = false;
-            this.filterGridView.ShowEditingIcon = false;
-            this.filterGridView.ShowRowErrors = false;
-            this.filterGridView.Size = new System.Drawing.Size(610, 195);
-            this.filterGridView.TabIndex = 1;
-            this.filterGridView.VirtualMode = true;
-            this.filterGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.filterGridView_CellContextMenuStripNeeded);
-            this.filterGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.filterGridView_CellDoubleClick);
-            this.filterGridView.ColumnDividerDoubleClick += new System.Windows.Forms.DataGridViewColumnDividerDoubleClickEventHandler(this.filterGridView_ColumnDividerDoubleClick);
-            this.filterGridView.RowHeightInfoNeeded += new System.Windows.Forms.DataGridViewRowHeightInfoNeededEventHandler(this.filterGridView_RowHeightInfoNeeded);
-            this.filterGridView.Enter += new System.EventHandler(this.filterGridView_Enter);
-            this.filterGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.filterGridView_KeyDown);
-            this.filterGridView.Leave += new System.EventHandler(this.filterGridView_Leave);
-            // 
             // LogWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1218,6 +1219,7 @@ namespace LogExpert
             this.tableLayoutPanel1.ResumeLayout(false);
             this.columnFinderPanel.ResumeLayout(false);
             this.columnFinderPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.dataGridContextMenuStrip.ResumeLayout(false);
             this.advancedBackPanel.ResumeLayout(false);
             this.advancedFilterSplitContainer.Panel1.ResumeLayout(false);
@@ -1230,6 +1232,7 @@ namespace LogExpert
             this.highlightSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.highlightSplitContainer)).EndInit();
             this.highlightSplitContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.filterGridView)).EndInit();
             this.filterContextMenuStrip.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
@@ -1244,8 +1247,6 @@ namespace LogExpert
             this.bookmarkContextMenuStrip.ResumeLayout(false);
             this.columnContextMenuStrip.ResumeLayout(false);
             this.editModeContextMenuStrip.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.filterGridView)).EndInit();
             this.ResumeLayout(false);
 
 		}
