@@ -26,7 +26,7 @@ namespace UnitTests
         public void testShiftBuffers1()
         {
             int linesPerFile = 10;
-            MultifileOptions options = new MultifileOptions();
+            MultiFileOptions options = new MultiFileOptions();
             options.MaxDayTry = 0;
             options.FormatPattern = "*$J(.)";
             LinkedList<string> files = CreateTestfilesWithoutDate();

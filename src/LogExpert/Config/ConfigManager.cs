@@ -253,9 +253,9 @@ namespace LogExpert
                     settings.preferences.pollingInterval = 250;
                 }
 
-                if (settings.preferences.multifileOptions == null)
+                if (settings.preferences.multiFileOptions == null)
                 {
-                    settings.preferences.multifileOptions = new MultifileOptions();
+                    settings.preferences.multiFileOptions = new MultiFileOptions();
                 }
 
                 if (settings.preferences.defaultEncoding == null)

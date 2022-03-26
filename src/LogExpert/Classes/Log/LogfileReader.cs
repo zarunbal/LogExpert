@@ -22,7 +22,7 @@ namespace LogExpert
         private readonly int _MAX_LINES_PER_BUFFER = 100;
 
         private readonly object _monitor = new object();
-        private readonly MultifileOptions _multiFileOptions;
+        private readonly MultiFileOptions _multiFileOptions;
 
         private IList<LogBuffer> _bufferList;
         private ReaderWriterLock _bufferListLock;
@@ -50,7 +50,7 @@ namespace LogExpert
 
         #region cTor
 
-        public LogfileReader(string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultifileOptions multiFileOptions)
+        public LogfileReader(string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
         {
             if (fileName == null)
             {
@@ -88,7 +88,7 @@ namespace LogExpert
             StartGCThread();
         }
 
-        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultifileOptions multiFileOptions)
+        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
         {
             if (fileNames == null || fileNames.Length < 1)
             {

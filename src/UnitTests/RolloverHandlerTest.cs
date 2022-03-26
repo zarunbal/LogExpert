@@ -15,7 +15,7 @@ namespace LogExpert
         [Test]
         public void testFilenameListWithAppendedIndex()
         {
-            MultifileOptions options = new MultifileOptions();
+            MultiFileOptions options = new MultiFileOptions();
             options.FormatPattern = "*$J(.)";
             options.MaxDayTry = 66;
             LinkedList<string> files = CreateTestfilesWithoutDate();
@@ -30,7 +30,7 @@ namespace LogExpert
         [Test]
         public void testFilenameListWithDate()
         {
-            MultifileOptions options = new MultifileOptions();
+            MultiFileOptions options = new MultiFileOptions();
             options.FormatPattern = "*$D(YYYY-mm-DD)_$I.log";
             options.MaxDayTry = 3;
             LinkedList<string> files = CreateTestfilesWithDate();

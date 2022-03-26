@@ -12,7 +12,7 @@ namespace LogExpert.Tests
         {
             var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-            LogfileReader reader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultifileOptions());
+            LogfileReader reader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions());
             reader.ReadFiles();
 
             ILogLine line = reader.GetLogLineWithWait(0);

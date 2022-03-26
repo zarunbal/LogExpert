@@ -97,7 +97,7 @@ namespace LogExpert
         private int _lineHeight = 0;
 
         internal LogfileReader _logFileReader;
-        private MultifileOptions _multiFileOptions = new MultifileOptions();
+        private MultiFileOptions _multiFileOptions = new MultiFileOptions();
         private bool _noSelectionUpdates;
         private PatternArgs _patternArgs = new PatternArgs();
         private PatternWindow _patternWindow;

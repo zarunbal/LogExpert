@@ -204,7 +204,7 @@
     <Compile Include="Classes\Log\LogBufferCacheEntry.cs" />
     <Compile Include="Classes\LogExpertApplicationContext.cs" />
     <Compile Include="Entities\LogFileException.cs" />
-    <Compile Include="Entities\MultifileOptions.cs" />
+    <Compile Include="Entities\MultiFileOptions.cs" />
     <Compile Include="Classes\ObjectClone.cs" />
     <Compile Include="Classes\PaintHelper.cs" />
     <Compile Include="Classes\ParamParser.cs" />
