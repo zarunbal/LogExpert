@@ -70,9 +70,7 @@ namespace LogExpert
                 
                 try
                 {
-                    _logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile,
-                        Preferences.bufferCount, Preferences.linesPerBuffer,
-                        _multiFileOptions);
+                    _logFileReader = new LogfileReader(fileName, EncodingOptions, IsMultiFile, Preferences.bufferCount, Preferences.linesPerBuffer, _multiFileOptions);
                     _logFileReader.UseNewReader = !Preferences.useLegacyReader;
                 }
                 catch (LogFileException lfe)
@@ -87,8 +85,7 @@ namespace LogExpert
                 if (CurrentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
                 {
                     _logFileReader.IsXmlMode = true;
-                    _logFileReader.XmlLogConfig =
-                        xmlColumnizer.GetXmlLogConfiguration();
+                    _logFileReader.XmlLogConfig = xmlColumnizer.GetXmlLogConfiguration();
                 }
                 if (_forcedColumnizerForLoading != null)
                 {
@@ -361,18 +358,13 @@ namespace LogExpert
                         }
                         return value;
                     }
-                    else
+
+                    if (columnIndex == 2)
                     {
-                        if (columnIndex == 2)
-                        {
-                            return cols.ColumnValues[cols.ColumnValues.Length - 1];
-                        }
-                        else
-                        {
-                            return Column.EmptyColumn;
-                            ;
-                        }
+                        return cols.ColumnValues[cols.ColumnValues.Length - 1];
                     }
+
+                    return Column.EmptyColumn;
                 }
             }
             catch
@@ -612,7 +604,7 @@ namespace LogExpert
 
         public void SelectLogLine(int line)
         {
-            Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] {line, true});
+            Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
         }
 
         public void SelectAndEnsureVisible(int line, bool triggerSyncCall)
@@ -622,26 +614,17 @@ namespace LogExpert
                 SelectLine(line, triggerSyncCall, false);
 
                 //if (!this.dataGridView.CurrentRow.Displayed)
-                if (line < dataGridView.FirstDisplayedScrollingRowIndex ||
-                    line > dataGridView.FirstDisplayedScrollingRowIndex +
-                    dataGridView.DisplayedRowCount(false))
+                if (line < dataGridView.FirstDisplayedScrollingRowIndex || line > dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
                 {
                     dataGridView.FirstDisplayedScrollingRowIndex = line;
-                    for (int i = 0;
-                        i < 8 && dataGridView.FirstDisplayedScrollingRowIndex > 0 &&
-                        line < dataGridView.FirstDisplayedScrollingRowIndex +
-                        dataGridView.DisplayedRowCount(false);
-                        ++i)
+                    for (int i = 0; i < 8 && dataGridView.FirstDisplayedScrollingRowIndex > 0 && line < dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false); ++i)
                     {
-                        dataGridView.FirstDisplayedScrollingRowIndex =
-                            dataGridView.FirstDisplayedScrollingRowIndex - 1;
+                        dataGridView.FirstDisplayedScrollingRowIndex -= 1;
                     }
 
-                    if (line >= dataGridView.FirstDisplayedScrollingRowIndex +
-                        dataGridView.DisplayedRowCount(false))
+                    if (line >= dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
                     {
-                        dataGridView.FirstDisplayedScrollingRowIndex =
-                            dataGridView.FirstDisplayedScrollingRowIndex + 1;
+                        dataGridView.FirstDisplayedScrollingRowIndex += 1;
                     }
                 }
                 dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
@@ -796,8 +779,7 @@ namespace LogExpert
                         }
                         else
                         {
-                            r = dataGridView.GetCellDisplayRectangle(0,
-                                dataGridView.FirstDisplayedScrollingRowIndex, false);
+                            r = dataGridView.GetCellDisplayRectangle(0, dataGridView.FirstDisplayedScrollingRowIndex, false);
                             //int count = i - this.dataGridView.FirstDisplayedScrollingRowIndex;
                             int heightSum = 0;
                             if (dataGridView.FirstDisplayedScrollingRowIndex < i)
@@ -846,6 +828,7 @@ namespace LogExpert
                 {
                     return;
                 }
+
                 lineNum = _filterResultList[gridView.CurrentCellAddress.Y];
             }
             else
@@ -867,11 +850,9 @@ namespace LogExpert
             {
                 Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
 
-                if (bookmark.Text != null && bookmark.Text.Length > 0)
+                if (string.IsNullOrEmpty(bookmark.Text) == false)
                 {
-                    if (DialogResult.No ==
-                        MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?",
-                            "LogExpert", MessageBoxButtons.YesNo))
+                    if (DialogResult.No == MessageBox.Show("There's a comment attached to the bookmark. Really remove the bookmark?", "LogExpert", MessageBoxButtons.YesNo))
                     {
                         return;
                     }
@@ -1100,7 +1081,7 @@ namespace LogExpert
         {
             if (_guiStateArgs.FollowTail && !_isDeadFile)
             {
-                OnTailFollowed(new EventArgs());
+                OnTailFollowed(EventArgs.Empty);
             }
             if (Preferences.timestampControl)
             {
@@ -1228,8 +1209,7 @@ namespace LogExpert
                 MonospacedFont = new Font("Courier New", Preferences.fontSize, FontStyle.Bold);
 
                 int lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
-                float lineSpacingPixel =
-                    NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);
+                float lineSpacingPixel = NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);
 
                 dataGridView.DefaultCellStyle.Font = NormalFont;
                 filterGridView.DefaultCellStyle.Font = NormalFont;
@@ -1284,14 +1264,11 @@ namespace LogExpert
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new ScrollToTimestampFx(ScrollToTimestampWorker),
-                    new object[] {timestamp, roundToSeconds, triggerSyncCall});
+                BeginInvoke(new ScrollToTimestampFx(ScrollToTimestampWorker), timestamp, roundToSeconds, triggerSyncCall);
                 return true;
             }
-            else
-            {
-                return ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall);
-            }
+
+            return ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall);
         }
 
         public bool ScrollToTimestampWorker(DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
@@ -1335,12 +1312,10 @@ namespace LogExpert
                 {
                     return 0;
                 }
-                else
-                {
-                    foundLine++;
-                    GetTimestampForLineForward(ref foundLine, roundToSeconds); // fwd to next valid timestamp
-                    return foundLine;
-                }
+
+                foundLine++;
+                GetTimestampForLineForward(ref foundLine, roundToSeconds); // fwd to next valid timestamp
+                return foundLine;
             }
             return -foundLine;
         }

@@ -500,10 +500,7 @@ namespace LogExpert
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
 
-        private delegate void WriteFilterToTabFinishedFx(
-            FilterPipe pipe, string namePrefix,
-            PersistenceData persistenceData
-        );
+        private delegate void WriteFilterToTabFinishedFx(FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
 
         private delegate void SetBookmarkFx(int lineNum, string comment);
 
@@ -511,8 +508,7 @@ namespace LogExpert
 
         private delegate void PatternStatisticFx(PatternArgs patternArgs);
 
-        private delegate void ActionPluginExecuteFx(
-            string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
+        private delegate void ActionPluginExecuteFx(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
 
         private delegate void PositionAfterReloadFx(ReloadMemento reloadMemento);
 

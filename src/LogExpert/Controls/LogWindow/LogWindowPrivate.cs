@@ -2524,8 +2524,7 @@ namespace LogExpert
                 {
                     if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index > -1)
                     {
-                        string fileName =
-                            _logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
+                        string fileName = _logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
                         if (fileName != null)
                         {
                             StatusLineText(Util.GetNameFromPath(fileName));
@@ -2660,8 +2659,7 @@ namespace LogExpert
             }
         }
 
-        private void WritePipeToTab(FilterPipe pipe, IList<int> lineNumberList, string name,
-            PersistenceData persistenceData)
+        private void WritePipeToTab(FilterPipe pipe, IList<int> lineNumberList, string name, PersistenceData persistenceData)
         {
             _logger.Info("WritePipeToTab(): {0} lines.", lineNumberList.Count);
             StatusLineText("Writing to temp file... Press ESC to cancel.");
@@ -2695,8 +2693,7 @@ namespace LogExpert
                 if (CurrentColumnizer is ILogLineXmlColumnizer)
                 {
                     callback.LineNum = i;
-                    line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line,
-                        callback);
+                    line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
                 }
 
                 pipe.WriteToPipe(line, i);
@@ -2709,8 +2706,7 @@ namespace LogExpert
 
             pipe.CloseFile();
             _logger.Info("WritePipeToTab(): finished");
-            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished),
-                new object[] { pipe, name, persistenceData });
+            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), pipe, name, persistenceData);
         }
 
         private void WriteFilterToTabFinished(FilterPipe pipe, string name, PersistenceData persistenceData)
@@ -2733,14 +2729,6 @@ namespace LogExpert
                 {
                     FilterRestoreFx fx = FilterRestore;
                     fx.BeginInvoke(newWin, persistenceData, null, null);
-                }
-                else
-                {
-                    //// dont force XML columnizers because the Tab window isn't XML
-                    //if (!(this.CurrentColumnizer is ILogLineXmlColumnizer))
-                    //{
-                    //  newWin.ForceColumnizerForLoading(this.CurrentColumnizer);
-                    //}
                 }
             }
 

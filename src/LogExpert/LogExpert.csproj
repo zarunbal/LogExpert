@@ -109,6 +109,9 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Dialogs\LogCellEditingControl.cs" />
+    <Compile Include="Dialogs\LogGridCell.cs" />
+    <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
