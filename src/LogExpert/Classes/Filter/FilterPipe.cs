@@ -13,8 +13,8 @@ namespace LogExpert
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private IList<int> lineMappingList = new List<int>();
-        private StreamWriter writer;
+        private IList<int> _lineMappingList = new List<int>();
+        private StreamWriter _writer;
 
         #endregion
 
@@ -22,12 +22,12 @@ namespace LogExpert
 
         public FilterPipe(FilterParams filterParams, LogWindow logWindow)
         {
-            this.FilterParams = filterParams;
-            this.LogWindow = logWindow;
-            this.IsStopped = false;
-            this.FileName = Path.GetTempFileName();
+            FilterParams = filterParams;
+            LogWindow = logWindow;
+            IsStopped = false;
+            FileName = Path.GetTempFileName();
 
-            _logger.Info("Created temp file: {0}", this.FileName);
+            _logger.Info("Created temp file: {0}", FileName);
         }
 
         #endregion
@@ -64,16 +64,16 @@ namespace LogExpert
 
         public void OpenFile()
         {
-            FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-            this.writer = new StreamWriter(fStream, new UnicodeEncoding(false, false));
+            FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+            _writer = new StreamWriter(fStream, new UnicodeEncoding(false, false));
         }
 
         public void CloseFile()
         {
-            if (this.writer != null)
+            if (_writer != null)
             {
-                this.writer.Close();
-                this.writer = null;
+                _writer.Close();
+                _writer = null;
             }
         }
 
@@ -81,14 +81,14 @@ namespace LogExpert
         {
             try
             {
-                lock (this.FileName)
+                lock (FileName)
                 {
-                    lock (this.lineMappingList)
+                    lock (_lineMappingList)
                     {
                         try
                         {
-                            this.writer.WriteLine(textLine.FullLine);
-                            this.lineMappingList.Add(orgLineNum);
+                            _writer.WriteLine(textLine.FullLine);
+                            _lineMappingList.Add(orgLineNum);
                             return true;
                         }
                         catch (IOException e)
@@ -108,16 +108,14 @@ namespace LogExpert
 
         public int GetOriginalLineNum(int lineNum)
         {
-            lock (this.lineMappingList)
+            lock (_lineMappingList)
             {
-                if (this.lineMappingList.Count > lineNum)
+                if (_lineMappingList.Count > lineNum)
                 {
-                    return this.lineMappingList[lineNum];
+                    return _lineMappingList[lineNum];
                 }
-                else
-                {
-                    return -1;
-                }
+
+                return -1;
             }
         }
 
@@ -125,9 +123,9 @@ namespace LogExpert
         {
             _logger.Debug("FilterPipe.ShiftLineNums() offset={0}", offset);
             List<int> newList = new List<int>();
-            lock (this.lineMappingList)
+            lock (_lineMappingList)
             {
-                foreach (int lineNum in this.lineMappingList)
+                foreach (int lineNum in _lineMappingList)
                 {
                     int line = lineNum - offset;
                     if (line >= 0)
@@ -139,41 +137,41 @@ namespace LogExpert
                         newList.Add(-1);
                     }
                 }
-                this.lineMappingList = newList;
+                _lineMappingList = newList;
             }
         }
 
         public void ClearLineNums()
         {
             _logger.Debug("FilterPipe.ClearLineNums()");
-            lock (this.lineMappingList)
+            lock (_lineMappingList)
             {
-                for (int i = 0; i < this.lineMappingList.Count; ++i)
+                for (int i = 0; i < _lineMappingList.Count; ++i)
                 {
-                    this.lineMappingList[i] = -1;
+                    _lineMappingList[i] = -1;
                 }
             }
         }
 
         public void ClearLineList()
         {
-            lock (this.lineMappingList)
+            lock (_lineMappingList)
             {
-                this.lineMappingList.Clear();
+                _lineMappingList.Clear();
             }
         }
 
         public void RecreateTempFile()
         {
-            lock (this.lineMappingList)
+            lock (_lineMappingList)
             {
-                this.lineMappingList = new List<int>();
+                _lineMappingList = new List<int>();
             }
-            lock (this.FileName)
+            lock (FileName)
             {
                 CloseFile();
                 // trunc file
-                FileStream fStream = new FileStream(this.FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read);
+                FileStream fStream = new FileStream(FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read);
                 fStream.SetLength(0);
                 fStream.Close();
             }
@@ -191,10 +189,7 @@ namespace LogExpert
 
         private void OnClosed()
         {
-            if (Closed != null)
-            {
-                Closed(this, new EventArgs());
-            }
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion

@@ -376,8 +376,7 @@ namespace LogExpert
                 {
                     try
                     {
-                        openFileDialog.InitialDirectory =
-                            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                        openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                     }
                     catch (SecurityException e)
                     {
@@ -416,11 +415,9 @@ namespace LogExpert
                     LoadProject(names[0], true);
                     return;
                 }
-                else
-                {
-                    AddFileTab(names[0], false, null, false, null);
-                    return;
-                }
+
+                AddFileTab(names[0], false, null, false, null);
+                return;
             }
 
             MultiFileOption option = ConfigManager.Settings.preferences.multiFileOption;
@@ -1324,7 +1321,8 @@ namespace LogExpert
             {
                 return bookmarkWindow;
             }
-            else if (persistString.StartsWith(WindowTypes.LogWindow.ToString()))
+
+            if (persistString.StartsWith(WindowTypes.LogWindow.ToString()))
             {
                 string fileName = persistString.Substring(WindowTypes.LogWindow.ToString().Length + 1);
                 LogWindow win = FindWindowForFile(fileName);
@@ -1332,10 +1330,8 @@ namespace LogExpert
                 {
                     return win;
                 }
-                else
-                {
-                    _logger.Warn("Layout data contains non-existing LogWindow for {0}", fileName);
-                }
+
+                _logger.Warn("Layout data contains non-existing LogWindow for {0}", fileName);
             }
 
             return null;

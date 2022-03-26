@@ -13,12 +13,12 @@ namespace LogExpert
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
 #if DEBUG
-        private readonly IList<long> filePositions = new List<long>(); // file position for every line
+        private readonly IList<long> _filePositions = new List<long>(); // file position for every line
 #endif
 
-        private readonly IList<ILogLine> logLines = new List<ILogLine>();
+        private readonly IList<ILogLine> _logLines = new List<ILogLine>();
         private int MAX_LINES = 500;
-        private long size = 0;
+        private long _size;
 
         #endregion
 
@@ -28,8 +28,8 @@ namespace LogExpert
 
         public LogBuffer(ILogFileInfo fileInfo, int maxLines)
         {
-            this.FileInfo = fileInfo;
-            this.MAX_LINES = maxLines;
+            FileInfo = fileInfo;
+            MAX_LINES = maxLines;
         }
 
         #endregion
@@ -42,25 +42,25 @@ namespace LogExpert
         {
             set
             {
-                this.size = value;
+                _size = value;
 #if DEBUG
-                if (this.filePositions.Count > 0)
+                if (_filePositions.Count > 0)
                 {
-                    if (this.size < this.filePositions[this.filePositions.Count - 1] - this.StartPos)
+                    if (_size < _filePositions[_filePositions.Count - 1] - StartPos)
                     {
                         _logger.Error("LogBuffer overall Size must be greater than last line file position!");
                     }
                 }
 #endif
             }
-            get { return this.size; }
+            get => _size;
         }
 
         public int StartLine { set; get; } = 0;
 
-        public int LineCount { get; private set; } = 0;
+        public int LineCount { get; private set; }
 
-        public bool IsDisposed { get; private set; } = false;
+        public bool IsDisposed { get; private set; }
 
         public ILogFileInfo FileInfo { get; set; }
 
@@ -74,23 +74,23 @@ namespace LogExpert
 
         public void AddLine(ILogLine line, long filePos)
         {
-            this.logLines.Add(line);
+            _logLines.Add(line);
 #if DEBUG
-            this.filePositions.Add(filePos);
+            _filePositions.Add(filePos);
 #endif
-            this.LineCount++;
+            LineCount++;
             IsDisposed = false;
         }
 
         public void ClearLines()
         {
-            this.logLines.Clear();
-            this.LineCount = 0;
+            _logLines.Clear();
+            LineCount = 0;
         }
 
         public void DisposeContent()
         {
-            this.logLines.Clear();
+            _logLines.Clear();
             IsDisposed = true;
 #if DEBUG
             DisposeCount++;
@@ -99,32 +99,28 @@ namespace LogExpert
 
         public ILogLine GetLineOfBlock(int num)
         {
-            if (num < this.logLines.Count && num >= 0)
+            if (num < _logLines.Count && num >= 0)
             {
-                return this.logLines[num];
+                return _logLines[num];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         #endregion
 
 #if DEBUG
-        public long DisposeCount { get; private set; } = 0;
+        public long DisposeCount { get; private set; }
 
 
         public long GetFilePosForLineOfBlock(int line)
         {
-            if (line >= 0 && line < this.filePositions.Count)
+            if (line >= 0 && line < _filePositions.Count)
             {
-                return this.filePositions[line];
+                return _filePositions[line];
             }
-            else
-            {
-                return -1;
-            }
+
+            return -1;
         }
 
 #endif

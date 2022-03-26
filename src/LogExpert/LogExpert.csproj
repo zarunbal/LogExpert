@@ -61,6 +61,7 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
+    <Compile Include="Classes\ILogLineColumnizerCallback\ColumnizerCallback.cs" />
     <Compile Include="Classes\Columnizer\ColumnizerPicker.cs" />
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Classes\ILogLineColumnizerCallback\LogExpertCallback.cs" />
     <Compile Include="Classes\Log\LogStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
@@ -107,6 +109,9 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Dialogs\LogCellEditingControl.cs" />
+    <Compile Include="Dialogs\LogGridCell.cs" />
+    <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
@@ -586,6 +591,7 @@
       <Version>4.6.7</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
