@@ -990,8 +990,7 @@ namespace LogExpert
                             int droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                             filePos = reader.Position;
 
-                            while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount,
-                                logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
+                            while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
                             {
                                 LogLine logLine = new LogLine();
                                 if (_shouldStop)
@@ -1645,6 +1644,7 @@ namespace LogExpert
 
             return IsXmlMode ? new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig) : reader;
         }
+
         private ILogStreamReader CreateLogStreamReader(Stream stream, EncodingOptions encodingOptions, bool useSystemReader)
         {
             if (useSystemReader)
