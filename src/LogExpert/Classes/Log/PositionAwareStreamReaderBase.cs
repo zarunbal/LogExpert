@@ -28,8 +28,7 @@ namespace LogExpert.Classes.Log
         {
             _stream = new BufferedStream(stream);
 
-            Encoding detectedEncoding;
-            _preambleLength = DetectPreambleLengthAndEncoding(out detectedEncoding);
+            _preambleLength = DetectPreambleLengthAndEncoding(out Encoding detectedEncoding);
 
             Encoding usedEncoding = getUsedEncoding(encodingOptions, detectedEncoding);
             _posIncPrecomputed = getPosIncPrecomputed(usedEncoding);
@@ -48,16 +47,16 @@ namespace LogExpert.Classes.Log
         /// </summary>
         public sealed override long Position
         {
-            get { return _position; }
+            get => _position;
             set
             {
                 /*
-                 * 1: Irgendwann mal auskommentiert (+Encoding.GetPreamble().Length)
-                 * 2: Stand bei 1.1 3207
-                 * 3: Stand nach Fehlermeldung von Piet wegen Unicode-Bugs. 
-                 *    Keihne Ahnung, ob das jetzt endgültig OK ist.
-                 * 4: 27.07.09: Preamble-Length wird jetzt im CT ermittelt, da Encoding.GetPreamble().Length
-                 *    immer eine fixe Länge liefert (unabhängig vom echtem Dateiinhalt)
+                 * 1: Sometime commented (+Encoding.GetPreamble().Length)
+                 * 2: Date 1.1 3207
+                 * 3: Error Message from Piet because of Unicode-Bugs. 
+                 *    No Idea, if this is OK.
+                 * 4: 27.07.09: Preamble-Length is now calculated in CT, because Encoding.GetPreamble().Length
+                 *    always delivers a fixed length (does not mater what kind of data)
                  */
                 _position = value; //  +Encoding.GetPreamble().Length;      // 1
                 //stream.Seek(pos, SeekOrigin.Begin);     // 2
@@ -144,11 +143,11 @@ namespace LogExpert.Classes.Log
         private int DetectPreambleLengthAndEncoding(out Encoding detectedEncoding)
         {
             /*
-            UTF-8:                                EF BB BF 
-            UTF-16-Big-Endian-Bytereihenfolge:    FE FF 
-            UTF-16-Little-Endian-Bytereihenfolge: FF FE 
-            UTF-32-Big-Endian-Bytereihenfolge:    00 00 FE FF 
-            UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00 
+            UTF-8:                          EF BB BF 
+            UTF-16-Big-Endian-Byteorder:    FE FF 
+            UTF-16-Little-Endian-Byteorder: FF FE 
+            UTF-32-Big-Endian-Byteorder:    00 00 FE FF 
+            UTF-32-Little-Endian-Byteorder: FF FE 00 00 
             */
 
             byte[] readPreamble = new byte[4];

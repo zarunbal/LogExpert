@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using LogExpert.Dialogs;
 using System.Threading;
+using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -15,112 +16,110 @@ namespace LogExpert
 
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
-        private const int FILTER_ADCANCED_SPLITTER_DISTANCE = 54;
+        private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 54;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Image advancedButtonImage;
+        private readonly Image _advancedButtonImage;
 
-        private readonly object bookmarkLock = new object();
-        private readonly BookmarkDataProvider bookmarkProvider = new BookmarkDataProvider();
+        private readonly object _bookmarkLock = new object();
+        private readonly BookmarkDataProvider _bookmarkProvider = new BookmarkDataProvider();
 
-        private readonly IList<BackgroundProcessCancelHandler> cancelHandlerList =
-            new List<BackgroundProcessCancelHandler>();
+        private readonly IList<BackgroundProcessCancelHandler> _cancelHandlerList = new List<BackgroundProcessCancelHandler>();
 
-        private readonly object currentColumnizerLock = new object();
+        private readonly object _currentColumnizerLock = new object();
 
-        private readonly object currentHighlightGroupLock = new object();
+        private readonly object _currentHighlightGroupLock = new object();
 
-        private readonly EventWaitHandle externaLoadingFinishedEvent = new ManualResetEvent(false);
+        private readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false);
 
-        private readonly IList<FilterPipe> filterPipeList = new List<FilterPipe>();
-        private readonly Dictionary<Control, bool> freezeStateMap = new Dictionary<Control, bool>();
-        private readonly GuiStateArgs guiStateArgs = new GuiStateArgs();
+        private readonly IList<FilterPipe> _filterPipeList = new List<FilterPipe>();
+        private readonly Dictionary<Control, bool> _freezeStateMap = new Dictionary<Control, bool>();
+        private readonly GuiStateArgs _guiStateArgs = new GuiStateArgs();
 
-        private readonly List<int> lineHashList = new List<int>();
+        private readonly List<int> _lineHashList = new List<int>();
 
-        private readonly EventWaitHandle loadingFinishedEvent = new ManualResetEvent(false);
+        private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 
-        private readonly EventWaitHandle logEventArgsEvent = new ManualResetEvent(false);
+        private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
 
-        private readonly List<LogEventArgs> logEventArgsList = new List<LogEventArgs>();
-        private readonly Thread logEventHandlerThread;
-        private readonly Image panelCloseButtonImage;
+        private readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
+        private readonly Thread _logEventHandlerThread;
+        private readonly Image _panelCloseButtonImage;
 
-        private readonly Image panelOpenButtonImage;
-        private readonly LogTabWindow parentLogTabWin;
+        private readonly Image _panelOpenButtonImage;
+        private readonly LogTabWindow _parentLogTabWin;
 
-        private readonly ProgressEventArgs progressEventArgs = new ProgressEventArgs();
-        private readonly object reloadLock = new object();
-        private readonly Image searchButtonImage;
-        private readonly DelayedTrigger selectionChangedTrigger = new DelayedTrigger(200);
-        private readonly StatusLineEventArgs statusEventArgs = new StatusLineEventArgs();
+        private readonly ProgressEventArgs _progressEventArgs = new ProgressEventArgs();
+        private readonly object _reloadLock = new object();
+        private readonly Image _searchButtonImage;
+        private readonly DelayedTrigger _selectionChangedTrigger = new DelayedTrigger(200);
+        private readonly StatusLineEventArgs _statusEventArgs = new StatusLineEventArgs();
 
-        private readonly DelayedTrigger statusLineTrigger = new DelayedTrigger(200);
-        private readonly object tempHilightEntryListLock = new object();
+        private readonly DelayedTrigger _statusLineTrigger = new DelayedTrigger(200);
+        private readonly object _tempHighlightEntryListLock = new object();
 
-        private readonly Thread timeshiftSyncThread;
-        private readonly EventWaitHandle timeshiftSyncTimerEvent = new ManualResetEvent(false);
-        private readonly EventWaitHandle timeshiftSyncWakeupEvent = new ManualResetEvent(false);
+        private readonly Thread _timeShiftSyncThread;
+        private readonly EventWaitHandle _timeShiftSyncTimerEvent = new ManualResetEvent(false);
+        private readonly EventWaitHandle _timeShiftSyncWakeupEvent = new ManualResetEvent(false);
 
-        private readonly TimeSpreadCalculator timeSpreadCalc;
+        private readonly TimeSpreadCalculator _timeSpreadCalc;
 
-        private readonly object timeSyncListLock = new object();
+        private readonly object _timeSyncListLock = new object();
 
-        private ColumnCache columnCache = new ColumnCache();
+        private ColumnCache _columnCache = new ColumnCache();
 
-        private ILogLineColumnizer currentColumnizer;
+        private ILogLineColumnizer _currentColumnizer;
 
         //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
-        private HilightGroup currentHighlightGroup = new HilightGroup();
+        private HilightGroup _currentHighlightGroup = new HilightGroup();
 
-        private SearchParams currentSearchParams;
+        private SearchParams _currentSearchParams;
 
         private string[] _fileNames;
-        private List<int> filterHitList = new List<int>();
-        private FilterParams filterParams = new FilterParams();
-        private int filterPipeNameCounter = 0;
-        private List<int> filterResultList = new List<int>();
+        private List<int> _filterHitList = new List<int>();
+        private FilterParams _filterParams = new FilterParams();
+        private int _filterPipeNameCounter = 0;
+        private List<int> _filterResultList = new List<int>();
 
-        private EventWaitHandle filterUpdateEvent = new ManualResetEvent(false);
+        private EventWaitHandle _filterUpdateEvent = new ManualResetEvent(false);
 
-        private ILogLineColumnizer forcedColumnizer;
-        private ILogLineColumnizer forcedColumnizerForLoading;
-        private bool isDeadFile;
-        private bool isErrorShowing;
-        private bool isLoadError;
-        private bool isLoading;
-        private bool isMultiFile;
-        private bool isSearching;
-        private bool isTimestampDisplaySyncing;
-        private List<int> lastFilterLinesList = new List<int>();
+        private ILogLineColumnizer _forcedColumnizer;
+        private ILogLineColumnizer _forcedColumnizerForLoading;
+        private bool _isDeadFile;
+        private bool _isErrorShowing;
+        private bool _isLoadError;
+        private bool _isLoading;
+        private bool _isMultiFile;
+        private bool _isSearching;
+        private bool _isTimestampDisplaySyncing;
+        private List<int> _lastFilterLinesList = new List<int>();
 
-        private int lineHeight = 0;
+        private int _lineHeight = 0;
 
-        private LogfileReader logFileReader;
-        private MultifileOptions multifileOptions = new MultifileOptions();
-        private bool noSelectionUpdates;
-        private PatternArgs patternArgs = new PatternArgs();
-        private PatternWindow patternWindow;
+        internal LogfileReader _logFileReader;
+        private MultiFileOptions _multiFileOptions = new MultiFileOptions();
+        private bool _noSelectionUpdates;
+        private PatternArgs _patternArgs = new PatternArgs();
+        private PatternWindow _patternWindow;
 
-        private ReloadMemento reloadMemento;
-        private int reloadOverloadCounter = 0;
-        private SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
-        private int selectedCol = 0; // set by context menu event for column headers only
-        private bool shouldCallTimeSync;
-        private bool shouldCancel;
-        private bool shouldTimestampDisplaySyncingCancel;
-        private bool showAdvanced;
-        private List<HilightEntry> tempHilightEntryList = new List<HilightEntry>();
-        private int timeshiftSyncLine = 0;
+        private ReloadMemento _reloadMemento;
+        private int _reloadOverloadCounter = 0;
+        private SortedList<int, RowHeightEntry> _rowHeightList = new SortedList<int, RowHeightEntry>();
+        private int _selectedCol = 0; // set by context menu event for column headers only
+        private bool _shouldCallTimeSync;
+        private bool _shouldCancel;
+        private bool _shouldTimestampDisplaySyncingCancel;
+        private bool _showAdvanced;
+        private List<HilightEntry> _tempHighlightEntryList = new List<HilightEntry>();
+        private int _timeShiftSyncLine = 0;
 
-        private bool waitingForClose;
+        private bool _waitingForClose;
 
         #endregion
 
         #region cTor
 
-        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile,
-            bool forcePersistenceLoading)
+        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading)
         {
             SuspendLayout();
 
@@ -128,7 +127,7 @@ namespace LogExpert
 
             columnNamesLabel.Text = ""; // no filtering on columns by default
 
-            parentLogTabWin = parent;
+            _parentLogTabWin = parent;
             IsTempFile = isTempFile;
             //Thread.CurrentThread.Name = "LogWindowThread";
             ColumnizerCallbackObject = new ColumnizerCallback(this);
@@ -136,38 +135,38 @@ namespace LogExpert
             FileName = fileName;
             ForcePersistenceLoading = forcePersistenceLoading;
 
-            dataGridView.CellValueNeeded += dataGridView_CellValueNeeded;
+            dataGridView.CellValueNeeded += OnDataGridViewCellValueNeeded;
             dataGridView.CellPainting += dataGridView_CellPainting;
 
-            filterGridView.CellValueNeeded += filterGridView_CellValueNeeded;
-            filterGridView.CellPainting += filterGridView_CellPainting;
+            filterGridView.CellValueNeeded += OnFilterGridViewCellValueNeeded;
+            filterGridView.CellPainting += OnFilterGridViewCellPainting;
 
-            Closing += LogWindow_Closing;
-            Disposed += LogWindow_Disposed;
-            Load += LogWindow_Load;
+            Closing += OnLogWindowClosing;
+            Disposed += OnLogWindowDisposed;
+            Load += OnLogWindowLoad;
 
-            timeSpreadCalc = new TimeSpreadCalculator(this);
-            timeSpreadingControl1.TimeSpreadCalc = timeSpreadCalc;
-            timeSpreadingControl1.LineSelected += timeSpreadingControl1_LineSelected;
+            _timeSpreadCalc = new TimeSpreadCalculator(this);
+            timeSpreadingControl.TimeSpreadCalc = _timeSpreadCalc;
+            timeSpreadingControl.LineSelected += OnTimeSpreadingControlLineSelected;
             tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Absolute;
             tableLayoutPanel1.ColumnStyles[1].Width = 20;
             tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
             tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
-            parentLogTabWin.HighlightSettingsChanged += parent_HighlightSettingsChanged;
+            _parentLogTabWin.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
             SetColumnizer(PluginRegistry.GetInstance().RegisteredColumnizers[0]);
 
-            patternArgs.maxMisses = 5;
-            patternArgs.minWeight = 1;
-            patternArgs.maxDiffInBlock = 5;
-            patternArgs.fuzzy = 5;
+            _patternArgs.maxMisses = 5;
+            _patternArgs.minWeight = 1;
+            _patternArgs.maxDiffInBlock = 5;
+            _patternArgs.fuzzy = 5;
 
             //InitPatternWindow();
 
             //this.toolwinTabControl.TabPages.Add(this.patternWindow);
             //this.toolwinTabControl.TabPages.Add(this.bookmarkWindow);
 
-            filterParams = new FilterParams();
+            _filterParams = new FilterParams();
             foreach (string item in ConfigManager.Settings.filterHistoryList)
             {
                 filterComboBox.Items.Add(item);
@@ -176,33 +175,33 @@ namespace LogExpert
             filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;            
             AutoResizeFilterBox();
             
-            filterRegexCheckBox.Checked = filterParams.isRegex;
-            filterCaseSensitiveCheckBox.Checked = filterParams.isCaseSensitive;
-            filterTailCheckBox.Checked = filterParams.isFilterTail;
+            filterRegexCheckBox.Checked = _filterParams.isRegex;
+            filterCaseSensitiveCheckBox.Checked = _filterParams.isCaseSensitive;
+            filterTailCheckBox.Checked = _filterParams.isFilterTail;
 
-            splitContainer1.Panel2Collapsed = true;
-            advancedFilterSplitContainer.SplitterDistance = FILTER_ADCANCED_SPLITTER_DISTANCE;
+            splitContainerLogWindow.Panel2Collapsed = true;
+            advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
-            timeshiftSyncThread = new Thread(SyncTimestampDisplayWorker);
-            timeshiftSyncThread.IsBackground = true;
-            timeshiftSyncThread.Start();
+            _timeShiftSyncThread = new Thread(SyncTimestampDisplayWorker);
+            _timeShiftSyncThread.IsBackground = true;
+            _timeShiftSyncThread.Start();
 
-            logEventHandlerThread = new Thread(LogEventWorker);
-            logEventHandlerThread.IsBackground = true;
-            logEventHandlerThread.Start();
+            _logEventHandlerThread = new Thread(LogEventWorker);
+            _logEventHandlerThread.IsBackground = true;
+            _logEventHandlerThread.Start();
 
             //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
             //this.filterUpdateThread.Start();
 
-            advancedButtonImage = advancedButton.Image;
-            searchButtonImage = filterSearchButton.Image;
+            _advancedButtonImage = advancedButton.Image;
+            _searchButtonImage = filterSearchButton.Image;
             filterSearchButton.Image = null;
 
             dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
             markEditModeToolStripMenuItem.Enabled = true;
 
-            panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
-            panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
+            _panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
+            _panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
 
             Settings settings = ConfigManager.Settings;
             if (settings.appBounds != null && settings.appBounds.Right > 0)
@@ -210,30 +209,30 @@ namespace LogExpert
                 Bounds = settings.appBounds;
             }
 
-            waitingForClose = false;
+            _waitingForClose = false;
             dataGridView.Enabled = false;
-            dataGridView.ColumnDividerDoubleClick += dataGridView_ColumnDividerDoubleClick;
+            dataGridView.ColumnDividerDoubleClick += OnDataGridViewColumnDividerDoubleClick;
             ShowAdvancedFilterPanel(false);
-            filterKnobControl1.MinValue = 0;
-            filterKnobControl1.MaxValue = SPREAD_MAX;
-            filterKnobControl1.ValueChanged += filterKnobControl1_ValueChanged;
-            filterKnobControl2.MinValue = 0;
-            filterKnobControl2.MaxValue = SPREAD_MAX;
-            filterKnobControl2.ValueChanged += filterKnobControl1_ValueChanged;
+            filterKnobBackSpread.MinValue = 0;
+            filterKnobBackSpread.MaxValue = SPREAD_MAX;
+            filterKnobBackSpread.ValueChanged += OnFilterKnobControlValueChanged;
+            filterKnobForeSpread.MinValue = 0;
+            filterKnobForeSpread.MaxValue = SPREAD_MAX;
+            filterKnobForeSpread.ValueChanged += OnFilterKnobControlValueChanged;
             fuzzyKnobControl.MinValue = 0;
             fuzzyKnobControl.MaxValue = 10;
             //PreferencesChanged(settings.preferences, true);
             AdjustHighlightSplitterWidth();
             ToggleHighlightPanel(false); // hidden
 
-            bookmarkProvider.BookmarkAdded += bookmarkProvider_BookmarkAdded;
-            bookmarkProvider.BookmarkRemoved += bookmarkProvider_BookmarkRemoved;
-            bookmarkProvider.AllBookmarksRemoved += bookmarkProvider_AllBookmarksRemoved;
+            _bookmarkProvider.BookmarkAdded += OnBookmarkProviderBookmarkAdded;
+            _bookmarkProvider.BookmarkRemoved += OnBookmarkProviderBookmarkRemoved;
+            _bookmarkProvider.AllBookmarksRemoved += OnBookmarkProviderAllBookmarksRemoved;
 
             ResumeLayout();
 
-            statusLineTrigger.Signal += statusLineTrigger_Signal;
-            selectionChangedTrigger.Signal += selectionChangedTrigger_Signal;
+            _statusLineTrigger.Signal += OnStatusLineTriggerSignal;
+            _selectionChangedTrigger.Signal += OnSelectionChangedTriggerSignal;
         }
 
         #endregion
@@ -248,9 +247,7 @@ namespace LogExpert
 
         public delegate void ColumnizerChangedEventHandler(object sender, ColumnizerEventArgs e);
 
-        public delegate void CurrentHighlightGroupChangedEventHandler(object sender,
-            CurrentHighlightGroupChangedEventArgs e
-        );
+        public delegate void CurrentHighlightGroupChangedEventHandler(object sender, CurrentHighlightGroupChangedEventArgs e);
 
         public delegate void FileNotFoundEventHandler(object sender, EventArgs e);
 
@@ -317,23 +314,23 @@ namespace LogExpert
 
         public ILogLineColumnizer CurrentColumnizer
         {
-            get => currentColumnizer;
-            set
+            get => _currentColumnizer;
+            private set
             {
-                lock (currentColumnizerLock)
+                lock (_currentColumnizerLock)
                 {
-                    currentColumnizer = value;
-                    _logger.Debug("Setting columnizer {0} ", currentColumnizer.GetName());
+                    _currentColumnizer = value;
+                    _logger.Debug($"Setting columnizer {_currentColumnizer.GetName()} ");
                 }
             }
         }
 
         public bool ShowBookmarkBubbles
         {
-            get => guiStateArgs.ShowBookmarkBubbles;
+            get => _guiStateArgs.ShowBookmarkBubbles;
             set
             {
-                guiStateArgs.ShowBookmarkBubbles = dataGridView.PaintWithOverlays = value;
+                _guiStateArgs.ShowBookmarkBubbles = dataGridView.PaintWithOverlays = value;
                 dataGridView.Refresh();
             }
         }
@@ -344,8 +341,8 @@ namespace LogExpert
 
         public bool IsMultiFile
         {
-            get => isMultiFile;
-            set => guiStateArgs.IsMultiFileActive = isMultiFile = value;
+            get => _isMultiFile;
+            private set => _guiStateArgs.IsMultiFileActive = _isMultiFile = value;
         }
 
         public bool IsTempFile { get; }
@@ -383,7 +380,7 @@ namespace LogExpert
 
         protected EncodingOptions EncodingOptions { get; set; }
 
-        public IBookmarkData BookmarkData => bookmarkProvider;
+        public IBookmarkData BookmarkData => _bookmarkProvider;
 
         public Font MonospacedFont { get; private set; }
 
@@ -397,12 +394,12 @@ namespace LogExpert
 
         public ILogLine GetLogLine(int lineNum)
         {
-            return logFileReader.GetLogLine(lineNum);
+            return _logFileReader.GetLogLine(lineNum);
         }
 
         public Bookmark GetBookmarkForLine(int lineNum)
         {
-            return bookmarkProvider.GetBookmarkForLine(lineNum);
+            return _bookmarkProvider.GetBookmarkForLine(lineNum);
         }
 
         #endregion
@@ -411,8 +408,7 @@ namespace LogExpert
 
         internal IColumnizedLogLine GetColumnsForLine(int lineNumber)
         {
-            return columnCache.GetColumnsForLine(logFileReader, lineNumber, CurrentColumnizer,
-                ColumnizerCallbackObject);
+            return _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 
             //string line = this.logFileReader.GetLogLine(lineNumber);
             //if (line != null)
@@ -438,12 +434,12 @@ namespace LogExpert
         {
             MultiFileMaskDialog dlg = new MultiFileMaskDialog(this, FileName);
             dlg.Owner = this;
-            dlg.MaxDays = multifileOptions.MaxDayTry;
-            dlg.FileNamePattern = multifileOptions.FormatPattern;
+            dlg.MaxDays = _multiFileOptions.MaxDayTry;
+            dlg.FileNamePattern = _multiFileOptions.FormatPattern;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                multifileOptions.FormatPattern = dlg.FileNamePattern;
-                multifileOptions.MaxDayTry = dlg.MaxDays;
+                _multiFileOptions.FormatPattern = dlg.FileNamePattern;
+                _multiFileOptions.MaxDayTry = dlg.MaxDays;
                 if (IsMultiFile)
                 {
                     Reload();
@@ -453,7 +449,7 @@ namespace LogExpert
 
         internal void ToggleColumnFinder(bool show, bool setFocus)
         {
-            guiStateArgs.ColumnFinderVisible = show;
+            _guiStateArgs.ColumnFinderVisible = show;
             if (show)
             {
                 columnComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
@@ -504,10 +500,7 @@ namespace LogExpert
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
 
-        private delegate void WriteFilterToTabFinishedFx(
-            FilterPipe pipe, string namePrefix,
-            PersistenceData persistenceData
-        );
+        private delegate void WriteFilterToTabFinishedFx(FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
 
         private delegate void SetBookmarkFx(int lineNum, string comment);
 
@@ -515,8 +508,7 @@ namespace LogExpert
 
         private delegate void PatternStatisticFx(PatternArgs patternArgs);
 
-        private delegate void ActionPluginExecuteFx(
-            string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
+        private delegate void ActionPluginExecuteFx(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
 
         private delegate void PositionAfterReloadFx(ReloadMemento reloadMemento);
 
@@ -526,111 +518,16 @@ namespace LogExpert
 
         // =================== ILogLineColumnizerCallback ============================
 
-        public class ColumnizerCallback : ILogLineColumnizerCallback, IAutoLogLineColumnizerCallback
-        {
-            #region Fields
-
-            protected LogWindow logWindow;
-
-            #endregion
-
-            #region cTor
-
-            public ColumnizerCallback(LogWindow logWindow)
-            {
-                this.logWindow = logWindow;
-            }
-
-            private ColumnizerCallback(ColumnizerCallback original)
-            {
-                logWindow = original.logWindow;
-                LineNum = original.LineNum;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public int LineNum { get; set; }
-
-            #endregion
-
-            #region Public methods
-
-            public ColumnizerCallback createCopy()
-            {
-                return new ColumnizerCallback(this);
-            }
-
-            public int GetLineNum()
-            {
-                return LineNum;
-            }
-
-            public string GetFileName()
-            {
-                return logWindow.GetCurrentFileName(LineNum);
-            }
-
-            public ILogLine GetLogLine(int lineNum)
-            {
-                return logWindow.GetLine(lineNum);
-            }
-
-            public IList<ILogLineColumnizer> GetRegisteredColumnizers()
-            {
-                return PluginRegistry.GetInstance().RegisteredColumnizers;
-            }
-
-            public int GetLineCount()
-            {
-                return logWindow.logFileReader.LineCount;
-            }
-
-            #endregion
-        }
-
-        public class LogExpertCallback : ColumnizerCallback, ILogExpertCallback
-        {
-            #region cTor
-
-            public LogExpertCallback(LogWindow logWindow)
-                : base(logWindow)
-            {
-            }
-
-            #endregion
-
-            #region Public methods
-
-            public void AddTempFileTab(string fileName, string title)
-            {
-                logWindow.AddTempFileTab(fileName, title);
-            }
-
-            public void AddPipedTab(IList<LineEntry> lineEntryList, string title)
-            {
-                logWindow.WritePipeTab(lineEntryList, title);
-            }
-
-            public string GetTabTitle()
-            {
-                return logWindow.Text;
-            }
-
-            #endregion
-        }
-
 #if DEBUG
         internal void DumpBufferInfo()
         {
             int currentLineNum = dataGridView.CurrentCellAddress.Y;
-            logFileReader.LogBufferInfoForLine(currentLineNum);
+            _logFileReader.LogBufferInfoForLine(currentLineNum);
         }
 
         internal void DumpBufferDiagnostic()
         {
-            logFileReader.LogBufferDiagnostic();
+            _logFileReader.LogBufferDiagnostic();
         }
 #endif
     }

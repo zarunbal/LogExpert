@@ -4,7 +4,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
-//using System.Linq;
+
+// using System.Linq;
 using System.Windows.Forms;
 
 namespace LogExpert
@@ -13,46 +14,39 @@ namespace LogExpert
     {
         #region Fields
 
-        private readonly ILogLineColumnizerCallback callback = null;
-        private readonly IList<ILogLineColumnizer> columnizerList;
+        private readonly ILogLineColumnizerCallback _callback;
+        private readonly IList<ILogLineColumnizer> _columnizerList;
 
         #endregion
 
         #region cTor
 
-        public FilterSelectorForm(IList<ILogLineColumnizer> existingColumnizerList,
-            ILogLineColumnizer currentColumnizer, ILogLineColumnizerCallback callback)
+        public FilterSelectorForm(IList<ILogLineColumnizer> existingColumnizerList, ILogLineColumnizer currentColumnizer, ILogLineColumnizerCallback callback)
         {
-            this.SelectedColumnizer = currentColumnizer;
-            this.callback = callback;
+            SelectedColumnizer = currentColumnizer;
+            _callback = callback;
             InitializeComponent();
-            this.filterComboBox.SelectedIndexChanged += new EventHandler(filterComboBox_SelectedIndexChanged);
+            filterComboBox.SelectedIndexChanged += filterComboBox_SelectedIndexChanged;
 
             // for the currently selected columnizer use the current instance and not the template instance from
             // columnizer registry. This ensures that changes made in columnizer config dialogs
             // will apply to the current instance
-            this.columnizerList = new List<ILogLineColumnizer>();
+            _columnizerList = new List<ILogLineColumnizer>();
             foreach (ILogLineColumnizer col in existingColumnizerList)
             {
-                if (col.GetType().Equals(this.SelectedColumnizer.GetType()))
-                {
-                    this.columnizerList.Add(this.SelectedColumnizer);
-                }
-                else
-                {
-                    this.columnizerList.Add(col);
-                }
-            }
-            foreach (ILogLineColumnizer col in this.columnizerList)
-            {
-                this.filterComboBox.Items.Add(col);
+                _columnizerList.Add(col.GetType() == SelectedColumnizer.GetType() ? SelectedColumnizer : col);
             }
 
-            foreach (ILogLineColumnizer columnizer in this.columnizerList)
+            foreach (ILogLineColumnizer col in _columnizerList)
             {
-                if (columnizer.GetType().Equals(this.SelectedColumnizer.GetType()))
+                filterComboBox.Items.Add(col);
+            }
+
+            foreach (ILogLineColumnizer columnizer in _columnizerList)
+            {
+                if (columnizer.GetType() == SelectedColumnizer.GetType())
                 {
-                    this.filterComboBox.SelectedItem = columnizer;
+                    filterComboBox.SelectedItem = columnizer;
                     break;
                 }
             }
@@ -62,14 +56,11 @@ namespace LogExpert
 
         #region Properties
 
-        public ILogLineColumnizer SelectedColumnizer { get; private set; } = null;
+        public ILogLineColumnizer SelectedColumnizer { get; private set; }
 
-        public bool ApplyToAll
-        {
-            get { return this.applyToAllCheckBox.Checked; }
-        }
+        public bool ApplyToAll => applyToAllCheckBox.Checked;
 
-        public bool IsConfigPressed { get; private set; } = false;
+        public bool IsConfigPressed { get; private set; }
 
         #endregion
 
@@ -77,22 +68,21 @@ namespace LogExpert
 
         private void filterComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ILogLineColumnizer col = columnizerList[this.filterComboBox.SelectedIndex];
-            this.SelectedColumnizer = col;
+            ILogLineColumnizer col = _columnizerList[filterComboBox.SelectedIndex];
+            SelectedColumnizer = col;
             string description = col.GetDescription();
-            description += "\r\nSupports timeshift: " +
-                           (this.SelectedColumnizer.IsTimeshiftImplemented() ? "Yes" : "No");
-            this.commentTextBox.Text = description;
-            this.configButton.Enabled = this.SelectedColumnizer is IColumnizerConfigurator;
+            description += "\r\nSupports timeshift: " + (SelectedColumnizer.IsTimeshiftImplemented() ? "Yes" : "No");
+            commentTextBox.Text = description;
+            configButton.Enabled = SelectedColumnizer is IColumnizerConfigurator;
         }
 
 
         private void configButton_Click(object sender, EventArgs e)
         {
-            if (this.SelectedColumnizer is IColumnizerConfigurator)
+            if (SelectedColumnizer is IColumnizerConfigurator)
             {
-                ((IColumnizerConfigurator) this.SelectedColumnizer).Configure(this.callback, ConfigManager.ConfigDir);
-                this.IsConfigPressed = true;
+                ((IColumnizerConfigurator) SelectedColumnizer).Configure(_callback, ConfigManager.ConfigDir);
+                IsConfigPressed = true;
             }
         }
 

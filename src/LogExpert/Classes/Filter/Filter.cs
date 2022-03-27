@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
 
 namespace LogExpert
 {
-    internal delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines,
-        List<int> lastFilterResultLines, List<int> filterHitList);
+    internal delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
     public class Filter
     {
@@ -18,18 +18,18 @@ namespace LogExpert
         private const int SPREAD_MAX = 50;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly LogExpert.LogWindow.ColumnizerCallback callback;
+        private readonly ColumnizerCallback _callback;
 
         #endregion
 
         #region cTor
 
-        public Filter(LogExpert.LogWindow.ColumnizerCallback callback)
+        public Filter(ColumnizerCallback callback)
         {
-            this.callback = callback;
-            this.FilterResultLines = new List<int>();
-            this.LastFilterLinesList = new List<int>();
-            this.FilterHitList = new List<int>();
+            _callback = callback;
+            FilterResultLines = new List<int>();
+            LastFilterLinesList = new List<int>();
+            FilterHitList = new List<int>();
         }
 
         #endregion
@@ -50,8 +50,7 @@ namespace LogExpert
 
         public int DoFilter(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            return DoFilter(filterParams, startLine, maxCount, this.FilterResultLines, this.LastFilterLinesList,
-                this.FilterHitList, progressCallback);
+            return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback);
         }
 
         #endregion
@@ -68,19 +67,19 @@ namespace LogExpert
             try
             {
                 filterParams.Reset();
-                while ((count++ < maxCount || filterParams.isInRange) && !this.ShouldCancel)
+                while ((count++ < maxCount || filterParams.isInRange) && !ShouldCancel)
                 {
-                    if (lineNum >= this.callback.GetLineCount())
+                    if (lineNum >= _callback.GetLineCount())
                     {
                         return count;
                     }
-                    ILogLine line = this.callback.GetLogLine(lineNum);
+                    ILogLine line = _callback.GetLogLine(lineNum);
                     if (line == null)
                     {
                         return count;
                     }
-                    this.callback.LineNum = lineNum;
-                    if (Util.TestFilterCondition(filterParams, line, callback))
+                    _callback.LineNum = lineNum;
+                    if (Util.TestFilterCondition(filterParams, line, _callback))
                     {
                         AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList,
                             filterHitList);
@@ -104,8 +103,7 @@ namespace LogExpert
             return count;
         }
 
-        private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines,
-            List<int> lastFilterLinesList, List<int> filterHitList)
+        private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
         {
             int count;
             filterHitList.Add(lineNum);
@@ -158,7 +156,7 @@ namespace LogExpert
             // after spread
             for (int i = 1; i <= filterParams.spreadBehind; ++i)
             {
-                if (lineNum + i < this.callback.GetLineCount())
+                if (lineNum + i < _callback.GetLineCount())
                 {
                     if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
                     {

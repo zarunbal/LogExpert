@@ -27,7 +27,7 @@ namespace LogExpert.Dialogs
 
         private BookmarkOverlay _draggedOverlay;
         private Point _dragStartPoint;
-        private bool _isDrag = false;
+        private bool _isDrag;
         private Size _oldOverlayOffset;
 
         #endregion
@@ -109,8 +109,8 @@ namespace LogExpert.Dialogs
         protected override void OnEditingControlShowing(DataGridViewEditingControlShowingEventArgs e)
         {
             base.OnEditingControlShowing(e);
-            e.Control.KeyDown -= Control_KeyDown;
-            e.Control.KeyDown += Control_KeyDown;
+            e.Control.KeyDown -= OnControlKeyDown;
+            e.Control.KeyDown += OnControlKeyDown;
             DataGridViewTextBoxEditingControl editControl = (DataGridViewTextBoxEditingControl) e.Control;
             e.Control.PreviewKeyDown -= Control_PreviewKeyDown;
             e.Control.PreviewKeyDown += Control_PreviewKeyDown;
@@ -130,7 +130,6 @@ namespace LogExpert.Dialogs
                         _isDrag = false;
                         overlay.Bookmark.OverlayOffset = _oldOverlayOffset;
                         Refresh();
-                        return;
                     }
                 }
                 else
@@ -237,7 +236,7 @@ namespace LogExpert.Dialogs
 
                 myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
 
-                // Spaltenheader aus Clipbereich rausnehmen
+                // Remove Columnheader from Clippingarea
                 Rectangle rectTableHeader = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, DisplayRectangle.Width, ColumnHeadersHeight);
                 myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
 
@@ -252,7 +251,7 @@ namespace LogExpert.Dialogs
                             new Size((int) textSize.Width, (int) textSize.Height));
                         rectBubble.Offset(60, -(rectBubble.Height + 40));
                         rectBubble.Inflate(3, 3);
-                        rectBubble.Location = rectBubble.Location + overlay.Bookmark.OverlayOffset;
+                        rectBubble.Location += overlay.Bookmark.OverlayOffset;
                         overlay.BubbleRect = rectBubble;
                         myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
                         myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
@@ -289,15 +288,13 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void Control_KeyDown(object sender, KeyEventArgs e)
+        private void OnControlKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
             {
                 if (EditingControl != null)
                 {
-                    LogCellEditingControl editControl = EditingControl as LogCellEditingControl;
-
-                    if (editControl != null)
+                    if (EditingControl is LogCellEditingControl editControl)
                     {
                         editControl.EditingControlDataGridView.EndEdit();
                         int line = editControl.EditingControlDataGridView.CurrentCellAddress.Y;
@@ -339,82 +336,7 @@ namespace LogExpert.Dialogs
 
         protected virtual void OnOverlayDoubleClicked(OverlayEventArgs e)
         {
-            if (OverlayDoubleClicked != null)
-            {
-                OverlayDoubleClicked(this, e);
-            }
+            OverlayDoubleClicked?.Invoke(this, e);
         }
-    }
-
-    public class LogGridCell : DataGridViewTextBoxCell
-    {
-        #region cTor
-
-        public LogGridCell()
-            : base()
-        {
-        }
-
-        #endregion
-
-        #region Properties
-
-        public override Type EditType
-        {
-            get { return typeof(LogCellEditingControl); }
-        }
-
-        #endregion
-    }
-
-    public class LogCellEditingControl : DataGridViewTextBoxEditingControl, IDataGridViewEditingControl
-    {
-        #region cTor
-
-        //bool valueChanged = false;
-        //DataGridView dataGridView;
-        //int rowIndex;
-
-        public LogCellEditingControl()
-            : base()
-        {
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public override bool EditingControlWantsInputKey(
-            Keys key, bool dataGridViewWantsInputKey)
-        {
-            switch (key & Keys.KeyCode)
-            {
-                case Keys.Left:
-                case Keys.Up:
-                case Keys.Down:
-                case Keys.Right:
-                case Keys.Home:
-                case Keys.End:
-                case Keys.PageDown:
-                case Keys.PageUp:
-                    return true;
-            }
-
-            return !dataGridViewWantsInputKey;
-        }
-
-        #endregion
-    }
-
-    public class LogTextColumn : DataGridViewColumn
-    {
-        #region cTor
-
-        public LogTextColumn()
-            : base(new LogGridCell())
-        {
-        }
-
-        #endregion
     }
 }

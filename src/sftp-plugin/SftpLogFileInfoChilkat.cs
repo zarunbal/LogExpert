@@ -257,7 +257,7 @@ namespace SftpFileSystem
                 {
                     return new SftpStreamChilkat(_sftp, _remoteFileName);
                 }
-                catch (IOException fe)
+                catch (IOException)
                 {
                     if (--retry <= 0)
                     {

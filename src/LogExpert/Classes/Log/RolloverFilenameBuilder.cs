@@ -29,21 +29,21 @@ namespace LogExpert
     {
         #region Fields
 
-        private string condContent;
-        private Group condGroup;
-        private string currentFileName;
+        private string _condContent;
+        private Group _condGroup;
+        private string _currentFileName;
 
-        private Group dateGroup;
+        private Group _dateGroup;
 
         //private Regex regexCond;
-        private DateTime dateTime;
+        private DateTime _dateTime;
 
         //private DateTimeFormatInfo dateFormat;
-        private string dateTimeFormat = null;
+        private string _dateTimeFormat;
 
-        private bool hideZeroIndex;
-        private Group indexGroup;
-        private Regex regex;
+        private bool _hideZeroIndex;
+        private Group _indexGroup;
+        private Regex _regex;
 
         #endregion
 
@@ -60,15 +60,9 @@ namespace LogExpert
 
         public int Index { get; set; }
 
-        public bool IsDatePattern
-        {
-            get { return this.dateGroup != null && this.dateGroup.Success; }
-        }
+        public bool IsDatePattern => _dateGroup != null && _dateGroup.Success;
 
-        public bool IsIndexPattern
-        {
-            get { return this.indexGroup != null && this.indexGroup.Success; }
-        }
+        public bool IsIndexPattern => _indexGroup != null && _indexGroup.Success;
 
         #endregion
 
@@ -76,60 +70,60 @@ namespace LogExpert
 
         public void SetFileName(string fileName)
         {
-            this.currentFileName = fileName;
-            Match match = this.regex.Match(fileName);
+            _currentFileName = fileName;
+            Match match = _regex.Match(fileName);
             if (match.Success)
             {
-                this.dateGroup = match.Groups["date"];
-                if (this.dateGroup.Success)
+                _dateGroup = match.Groups["date"];
+                if (_dateGroup.Success)
                 {
-                    string date = fileName.Substring(dateGroup.Index, dateGroup.Length);
-                    if (DateTime.TryParseExact(date, this.dateTimeFormat, DateTimeFormatInfo.InvariantInfo,
+                    string date = fileName.Substring(_dateGroup.Index, _dateGroup.Length);
+                    if (DateTime.TryParseExact(date, _dateTimeFormat, DateTimeFormatInfo.InvariantInfo,
                         DateTimeStyles.None,
-                        out this.dateTime))
+                        out _dateTime))
                     {
                     }
                 }
-                this.indexGroup = match.Groups["index"];
-                if (this.indexGroup.Success)
+                _indexGroup = match.Groups["index"];
+                if (_indexGroup.Success)
                 {
-                    this.Index = this.indexGroup.Value.Length > 0 ? int.Parse(indexGroup.Value) : 0;
+                    Index = _indexGroup.Value.Length > 0 ? int.Parse(_indexGroup.Value) : 0;
                 }
-                this.condGroup = match.Groups["cond"];
+                _condGroup = match.Groups["cond"];
             }
         }
 
         public void IncrementDate()
         {
-            this.dateTime = dateTime.AddDays(1);
+            _dateTime = _dateTime.AddDays(1);
         }
 
         public void DecrementDate()
         {
-            this.dateTime = dateTime.AddDays(-1);
+            _dateTime = _dateTime.AddDays(-1);
         }
 
 
         public string BuildFileName()
         {
-            string fileName = this.currentFileName;
-            if (this.dateGroup != null && this.dateGroup.Success)
+            string fileName = _currentFileName;
+            if (_dateGroup != null && _dateGroup.Success)
             {
-                string newDate = dateTime.ToString(this.dateTimeFormat, DateTimeFormatInfo.InvariantInfo);
-                fileName = fileName.Remove(this.dateGroup.Index, this.dateGroup.Length);
-                fileName = fileName.Insert(this.dateGroup.Index, newDate);
+                string newDate = _dateTime.ToString(_dateTimeFormat, DateTimeFormatInfo.InvariantInfo);
+                fileName = fileName.Remove(_dateGroup.Index, _dateGroup.Length);
+                fileName = fileName.Insert(_dateGroup.Index, newDate);
             }
-            if (this.indexGroup != null && this.indexGroup.Success)
+            if (_indexGroup != null && _indexGroup.Success)
             {
-                fileName = fileName.Remove(this.indexGroup.Index, this.indexGroup.Length);
+                fileName = fileName.Remove(_indexGroup.Index, _indexGroup.Length);
                 string fileNameBak = fileName;
-                if (!this.hideZeroIndex || this.Index > 0)
+                if (!_hideZeroIndex || Index > 0)
                 {
-                    string format = "D" + this.indexGroup.Length;
-                    fileName = fileName.Insert(this.indexGroup.Index, this.Index.ToString(format));
-                    if (this.hideZeroIndex && this.condContent != null)
+                    string format = "D" + _indexGroup.Length;
+                    fileName = fileName.Insert(_indexGroup.Index, Index.ToString(format));
+                    if (_hideZeroIndex && _condContent != null)
                     {
-                        fileName = fileName.Insert(this.indexGroup.Index, this.condContent);
+                        fileName = fileName.Insert(_indexGroup.Index, _condContent);
                     }
                 }
             }
@@ -144,24 +138,24 @@ namespace LogExpert
 
         private void ParseFormatString(string formatString)
         {
-            string fmt = escapeNonvarRegions(formatString);
+            string fmt = EscapeNonvarRegions(formatString);
             int datePos = formatString.IndexOf("$D(");
             if (datePos != -1)
             {
                 int endPos = formatString.IndexOf(')', datePos);
                 if (endPos != -1)
                 {
-                    this.dateTimeFormat = formatString.Substring(datePos + 3, endPos - datePos - 3);
-                    this.dateTimeFormat = this.dateTimeFormat.ToUpper();
-                    this.dateTimeFormat = this.dateTimeFormat.Replace('D', 'd').Replace('Y', 'y');
+                    _dateTimeFormat = formatString.Substring(datePos + 3, endPos - datePos - 3);
+                    _dateTimeFormat = _dateTimeFormat.ToUpper();
+                    _dateTimeFormat = _dateTimeFormat.Replace('D', 'd').Replace('Y', 'y');
 
-                    string dtf = this.dateTimeFormat;
+                    string dtf = _dateTimeFormat;
                     dtf = dtf.ToUpper();
                     dtf = dtf.Replace("D", "\\d");
                     dtf = dtf.Replace("Y", "\\d");
                     dtf = dtf.Replace("M", "\\d");
                     fmt = fmt.Remove(datePos, 2); // remove $D
-                    fmt = fmt.Remove(datePos + 1, this.dateTimeFormat.Length); // replace with regex version of format
+                    fmt = fmt.Remove(datePos + 1, _dateTimeFormat.Length); // replace with regex version of format
                     fmt = fmt.Insert(datePos + 1, dtf);
                     fmt = fmt.Insert(datePos + 1, "?'date'"); // name the regex group 
                 }
@@ -173,20 +167,20 @@ namespace LogExpert
                 int endPos = fmt.IndexOf(')', condPos);
                 if (endPos != -1)
                 {
-                    this.condContent = fmt.Substring(condPos + 3, endPos - condPos - 3);
+                    _condContent = fmt.Substring(condPos + 3, endPos - condPos - 3);
                     fmt = fmt.Remove(condPos + 2, endPos - condPos - 1);
                 }
             }
 
             fmt = fmt.Replace("*", ".*");
-            this.hideZeroIndex = fmt.Contains("$J");
+            _hideZeroIndex = fmt.Contains("$J");
             fmt = fmt.Replace("$I", "(?'index'[\\d]+)");
             fmt = fmt.Replace("$J", "(?'index'[\\d]*)");
 
-            this.regex = new Regex(fmt);
+            _regex = new Regex(fmt);
         }
 
-        private string escapeNonvarRegions(string formatString)
+        private string EscapeNonvarRegions(string formatString)
         {
             string fmt = formatString.Replace('*', '\xFFFD');
             StringBuilder result = new StringBuilder();

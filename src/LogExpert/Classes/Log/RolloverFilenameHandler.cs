@@ -16,9 +16,9 @@ namespace LogExpert
     {
         #region Fields
 
-        private readonly RolloverFilenameBuilder filenameBuilder;
-        private readonly ILogFileInfo logFileInfo;
-        private readonly MultifileOptions options;
+        private readonly RolloverFilenameBuilder _filenameBuilder;
+        private readonly ILogFileInfo _logFileInfo;
+        private readonly MultiFileOptions _options;
 
         #endregion
 
@@ -27,14 +27,14 @@ namespace LogExpert
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="filePath">The complete path of the logfile</param>
+        /// <param name="logFileInfo">The complete path of the logfile</param>
         /// <param name="options">Multifile option (e.g. format pattern)</param>
-        public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultifileOptions options)
+        public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultiFileOptions options)
         {
-            this.options = options;
-            this.logFileInfo = logFileInfo;
-            this.filenameBuilder = new RolloverFilenameBuilder(this.options.FormatPattern);
-            this.filenameBuilder.SetFileName(logFileInfo.FileName);
+            _options = options;
+            _logFileInfo = logFileInfo;
+            _filenameBuilder = new RolloverFilenameBuilder(_options.FormatPattern);
+            _filenameBuilder.SetFileName(logFileInfo.FileName);
         }
 
         #endregion
@@ -51,19 +51,19 @@ namespace LogExpert
         public LinkedList<string> GetNameList()
         {
             LinkedList<string> fileList = new LinkedList<string>();
-            string fileName = filenameBuilder.BuildFileName();
-            string filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
+            string fileName = _filenameBuilder.BuildFileName();
+            string filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;
             fileList.AddFirst(filePath);
             bool found = true;
             while (found)
             {
                 found = false;
                 // increment index and check if file exists
-                if (this.filenameBuilder.IsIndexPattern)
+                if (_filenameBuilder.IsIndexPattern)
                 {
-                    this.filenameBuilder.Index = this.filenameBuilder.Index + 1;
-                    fileName = filenameBuilder.BuildFileName();
-                    filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
+                    _filenameBuilder.Index += 1;
+                    fileName = _filenameBuilder.BuildFileName();
+                    filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;
                     if (FileExists(filePath))
                     {
                         fileList.AddFirst(filePath);
@@ -72,25 +72,23 @@ namespace LogExpert
                     }
                 }
                 // if file with index isn't found or no index is in format pattern, decrement the current date
-                if (this.filenameBuilder.IsDatePattern)
+                if (_filenameBuilder.IsDatePattern)
                 {
                     int tryCounter = 0;
-                    this.filenameBuilder.Index = 0;
-                    while (tryCounter < this.options.MaxDayTry)
+                    _filenameBuilder.Index = 0;
+                    while (tryCounter < _options.MaxDayTry)
                     {
-                        this.filenameBuilder.DecrementDate();
-                        fileName = filenameBuilder.BuildFileName();
-                        filePath = this.logFileInfo.DirectoryName + this.logFileInfo.DirectorySeparatorChar + fileName;
+                        _filenameBuilder.DecrementDate();
+                        fileName = _filenameBuilder.BuildFileName();
+                        filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;
                         if (FileExists(filePath))
                         {
                             fileList.AddFirst(filePath);
                             found = true;
                             break;
                         }
-                        else
-                        {
-                            tryCounter++;
-                        }
+
+                        tryCounter++;
                     }
                 }
             }
