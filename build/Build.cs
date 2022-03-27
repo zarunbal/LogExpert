@@ -48,7 +48,7 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    [GitVersion] readonly GitVersion GitVersion;
+    [GitVersion] readonly Nuke.Common.Tools.GitVersion.GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
 
