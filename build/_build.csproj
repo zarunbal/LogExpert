@@ -30,6 +30,7 @@
     <NukeExternalFiles Include="**\*.*.ext" Exclude="bin\**;obj\**" />
     <None Remove="*.csproj.DotSettings;*.ref.*.txt" />
     <None Include="..\appveyor-release.yml" Link="appveyor-release.yml" />
+    <None Include="..\appveyor.gitversion.yml" Link="appveyor.gitversion.yml" />
     <None Include="..\Build-DebugPack.ps1" Link="Build-DebugPack.ps1" />
     <None Include="..\Build-ReleasePack.ps1" Link="Build-ReleasePack.ps1" />
 

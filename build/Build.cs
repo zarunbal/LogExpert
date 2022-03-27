@@ -82,7 +82,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 8, patch);
+            return new Version(1, 8, 8, patch);
         }
     }
 
