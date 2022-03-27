@@ -91,7 +91,8 @@ class Build : NukeBuild
     string VersionString => $"{Version.Major}.{Version.Minor}.{Version.Build}";
 
     [Parameter("Version Information string")]
-    string VersionInformationString => $"{VersionString}.Branch.{GitVersion.BranchName}.{GitVersion.Sha} {Configuration}";
+    //.Branch.{GitVersion.BranchName}.{GitVersion.Sha} removed for testing purpose
+    string VersionInformationString => $"{VersionString} {Configuration}";
 
     [Parameter("Version file string")]
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
