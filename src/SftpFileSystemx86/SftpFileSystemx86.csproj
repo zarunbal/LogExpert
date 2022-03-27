@@ -111,7 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="chilkat-win32">
-      <Version>9.5.0.77</Version>
+      <Version>9.5.0.90</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
