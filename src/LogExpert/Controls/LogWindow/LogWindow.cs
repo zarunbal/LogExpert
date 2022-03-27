@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using LogExpert.Dialogs;
 using System.Threading;
+using LogExpert.Classes.Bookmark;
 using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
