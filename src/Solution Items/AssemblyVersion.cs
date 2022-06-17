@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("LogExpert")]
 [assembly: AssemblyCopyright("Original work Copyright (c) 2008-2011 Hagen Raab\r\nModified work Copyright (c) 2017 Zarunbal")]
 
-[assembly: AssemblyVersion("1.8.0")]
+[assembly: AssemblyVersion("1.8.7")]
 [assembly: AssemblyFileVersion("1.8.0")]
-[assembly: AssemblyInformationalVersion("1.8.0")]
+[assembly: AssemblyInformationalVersion("1.8.7")]
 
 [assembly: ComVisible(false)]

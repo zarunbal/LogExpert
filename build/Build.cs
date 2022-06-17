@@ -73,7 +73,7 @@ class Build : NukeBuild
     {
         get
         {
-            int patch = 0;
+            int patch = 7;
 
             if (AppVeyor.Instance != null)
             {
