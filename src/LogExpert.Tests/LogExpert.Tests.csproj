@@ -56,6 +56,7 @@
     <Compile Include="Extensions\EnumerableTests.cs" />
     <Compile Include="JsonCompactColumnizerTest.cs" />
     <Compile Include="JsonColumnizerTest.cs" />
+    <Compile Include="JSONSaveTest.cs" />
     <Compile Include="LogWindowTest.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
