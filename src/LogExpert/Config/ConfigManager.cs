@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using NLog;
 
 namespace LogExpert
@@ -308,8 +309,22 @@ namespace LogExpert
             settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(fs, settings);
+
+            SaveJson(fs, settings);
         }
 
+        private static void SaveJson(Stream fs, Settings settings)
+        {
+            FileInfo fi = new FileInfo(((FileStream)fs).Name);
+            string newFile = Path.ChangeExtension(fi.Name, "json");
+            string newPath = Path.Combine(fi.DirectoryName, newFile);
+
+            using (StreamWriter sw = new StreamWriter(newPath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(sw, settings);
+            }
+        }
 
         /// <summary>
         /// Convert settings loaded from previous versions.
