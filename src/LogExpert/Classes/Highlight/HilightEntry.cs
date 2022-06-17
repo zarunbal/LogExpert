@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace LogExpert
 {
@@ -36,6 +37,12 @@ namespace LogExpert
         #endregion
 
         #region cTor
+
+        [JsonConstructor]
+        public HilightEntry()
+        {
+
+        }
 
         public HilightEntry(string searchText, Color fgColor, Color bgColor, bool isWordMatch)
         {

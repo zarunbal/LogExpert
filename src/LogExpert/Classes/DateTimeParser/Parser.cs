@@ -121,7 +121,8 @@ namespace LogExpert
                 reader.ReadOneOrMore('h') ||
                 reader.ReadOneOrMore('H') ||
                 reader.ReadOneOrMore('s') ||
-                reader.ReadOneOrMore('S'))
+                reader.ReadOneOrMore('S') ||
+                reader.ReadString("gg"))
             {
                 syntaxError = false;
                 var length = reader.Position - offset;
