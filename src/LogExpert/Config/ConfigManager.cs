@@ -86,7 +86,7 @@ namespace LogExpert
         public static void Import(FileInfo fileInfo, ExportImportFlags flags)
         {
             Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
-            ConfigManager.Import(fs, flags);
+            Import(fs, flags);
             fs.Close();
         }
 
@@ -149,6 +149,7 @@ namespace LogExpert
                     BinaryFormatter formatter = new BinaryFormatter();
                     try
                     {
+                        
                         settings = (Settings) formatter.Deserialize(fs);
                     }
                     catch (SerializationException e)
