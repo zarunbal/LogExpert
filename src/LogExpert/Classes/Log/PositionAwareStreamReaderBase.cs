@@ -8,9 +8,9 @@ namespace LogExpert.Classes.Log
     {
         #region Fields
 
-        protected const int MAX_LINE_LEN = 20000;
+        private const int MAX_LINE_LEN = 20000;
 
-        private static readonly Encoding[] _preambleEncodings = new Encoding[] { Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32 };
+        private static readonly Encoding[] _preambleEncodings = { Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32 };
 
         private readonly BufferedStream _stream;
         private readonly StreamReader _reader;
@@ -28,11 +28,10 @@ namespace LogExpert.Classes.Log
         {
             _stream = new BufferedStream(stream);
 
-            Encoding detectedEncoding;
-            _preambleLength = DetectPreambleLengthAndEncoding(out detectedEncoding);
+            _preambleLength = DetectPreambleLengthAndEncoding(out Encoding detectedEncoding);
 
-            Encoding usedEncoding = getUsedEncoding(encodingOptions, detectedEncoding);
-            _posIncPrecomputed = getPosIncPrecomputed(usedEncoding);
+            Encoding usedEncoding = GetUsedEncoding(encodingOptions, detectedEncoding);
+            _posIncPrecomputed = GetPosIncPrecomputed(usedEncoding);
 
             _reader = new StreamReader(_stream, usedEncoding, true);
             
@@ -48,16 +47,16 @@ namespace LogExpert.Classes.Log
         /// </summary>
         public sealed override long Position
         {
-            get { return _position; }
+            get => _position;
             set
             {
                 /*
-                 * 1: Irgendwann mal auskommentiert (+Encoding.GetPreamble().Length)
-                 * 2: Stand bei 1.1 3207
-                 * 3: Stand nach Fehlermeldung von Piet wegen Unicode-Bugs. 
-                 *    Keihne Ahnung, ob das jetzt endgültig OK ist.
-                 * 4: 27.07.09: Preamble-Length wird jetzt im CT ermittelt, da Encoding.GetPreamble().Length
-                 *    immer eine fixe Länge liefert (unabhängig vom echtem Dateiinhalt)
+                 * 1: Sometime commented (+Encoding.GetPreamble().Length)
+                 * 2: Date 1.1 3207
+                 * 3: Error Message from Piet because of Unicode-Bugs. 
+                 *    No Idea, if this is OK.
+                 * 4: 27.07.09: Preamble-Length is now calculated in CT, because Encoding.GetPreamble().Length
+                 *    always delivers a fixed length (does not mater what kind of data)
                  */
                 _position = value; //  +Encoding.GetPreamble().Length;      // 1
                 //stream.Seek(pos, SeekOrigin.Begin);     // 2
@@ -71,6 +70,8 @@ namespace LogExpert.Classes.Log
         public sealed override Encoding Encoding => _reader.CurrentEncoding;
 
         public sealed override bool IsBufferComplete => true;
+
+        protected static int MaxLineLen => MAX_LINE_LEN;
 
         #endregion
 
@@ -91,7 +92,10 @@ namespace LogExpert.Classes.Log
 
         public override unsafe int ReadChar()
         {
-            if (IsDisposed) throw new ObjectDisposedException(ToString());
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(ToString());
+            }
 
             try
             {
@@ -144,18 +148,18 @@ namespace LogExpert.Classes.Log
         private int DetectPreambleLengthAndEncoding(out Encoding detectedEncoding)
         {
             /*
-            UTF-8:                                EF BB BF 
-            UTF-16-Big-Endian-Bytereihenfolge:    FE FF 
-            UTF-16-Little-Endian-Bytereihenfolge: FF FE 
-            UTF-32-Big-Endian-Bytereihenfolge:    00 00 FE FF 
-            UTF-32-Little-Endian-Bytereihenfolge: FF FE 00 00 
+            UTF-8:                          EF BB BF 
+            UTF-16-Big-Endian-Byteorder:    FE FF 
+            UTF-16-Little-Endian-Byteorder: FF FE 
+            UTF-32-Big-Endian-Byteorder:    00 00 FE FF 
+            UTF-32-Little-Endian-Byteorder: FF FE 00 00 
             */
 
             byte[] readPreamble = new byte[4];
             int readLen = _stream.Read(readPreamble, 0, 4);
             if (readLen >= 2)
             {
-                foreach (Encoding encoding in PositionAwareStreamReaderBase._preambleEncodings)
+                foreach (Encoding encoding in _preambleEncodings)
                 {
                     byte[] preamble = encoding.GetPreamble();
                     bool fail = false;
@@ -181,7 +185,7 @@ namespace LogExpert.Classes.Log
             return 0;
         }
 
-        private Encoding getUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
+        private Encoding GetUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
         {
             if (encodingOptions.Encoding != null)
             {
@@ -193,26 +197,25 @@ namespace LogExpert.Classes.Log
                 return detectedEncoding;
             }
 
-            if (encodingOptions.DefaultEncoding != null)
-            {
-                return encodingOptions.DefaultEncoding;
-            }
-
-            return Encoding.Default;
+            return encodingOptions.DefaultEncoding ?? Encoding.Default;
         }
-        private int getPosIncPrecomputed(Encoding usedEncoding)
+        private int GetPosIncPrecomputed(Encoding usedEncoding)
         {
-            if (usedEncoding is UTF8Encoding)
+            switch (usedEncoding)
             {
-                return 0;
+                case UTF8Encoding _:
+                {
+                    return 0;
+                }
+                case UnicodeEncoding _:
+                {
+                    return 2;
+                }
+                default:
+                {
+                    return 1;
+                }
             }
-
-            if (usedEncoding is UnicodeEncoding)
-            {
-                return 2;
-            }
-
-            return 1;
         }
 
         #endregion

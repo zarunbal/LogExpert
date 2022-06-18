@@ -66,7 +66,7 @@ namespace LogExpert
 
         public string Stylesheet
         {
-            get { return stylesheet; }
+            get => stylesheet;
             set
             {
                 stylesheet = value;

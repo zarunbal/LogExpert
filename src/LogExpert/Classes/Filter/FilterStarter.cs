@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
 namespace LogExpert
@@ -14,37 +15,36 @@ namespace LogExpert
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly LogExpert.LogWindow.ColumnizerCallback callback;
-        private readonly SortedDictionary<int, int> filterHitDict;
-        private readonly List<Filter> filterReadyList;
-        private readonly SortedDictionary<int, int> filterResultDict;
+        private readonly ColumnizerCallback _callback;
+        private readonly SortedDictionary<int, int> _filterHitDict;
+        private readonly List<Filter> _filterReadyList;
+        private readonly SortedDictionary<int, int> _filterResultDict;
 
-        private readonly List<Filter> filterWorkerList;
-        private readonly SortedDictionary<int, int> lastFilterLinesDict;
+        private readonly List<Filter> _filterWorkerList;
+        private readonly SortedDictionary<int, int> _lastFilterLinesDict;
 
-        private ProgressCallback progressCallback;
-        private int progressLineCount;
-        private bool shouldStop;
+        private ProgressCallback _progressCallback;
+        private int _progressLineCount;
+        private bool _shouldStop;
 
         #endregion
 
         #region cTor
 
-        public FilterStarter(LogExpert.LogWindow.ColumnizerCallback callback, int minThreads)
+        public FilterStarter(ColumnizerCallback callback, int minThreads)
         {
-            this.callback = callback;
-            this.FilterResultLines = new List<int>();
-            this.LastFilterLinesList = new List<int>();
-            this.FilterHitList = new List<int>();
-            this.filterReadyList = new List<Filter>();
-            this.filterWorkerList = new List<Filter>();
-            this.filterHitDict = new SortedDictionary<int, int>();
-            this.filterResultDict = new SortedDictionary<int, int>();
-            this.lastFilterLinesDict = new SortedDictionary<int, int>();
-            this.ThreadCount = Environment.ProcessorCount * 4;
-            this.ThreadCount = minThreads;
-            int worker, completion;
-            ThreadPool.GetMinThreads(out worker, out completion);
+            _callback = callback;
+            FilterResultLines = new List<int>();
+            LastFilterLinesList = new List<int>();
+            FilterHitList = new List<int>();
+            _filterReadyList = new List<Filter>();
+            _filterWorkerList = new List<Filter>();
+            _filterHitDict = new SortedDictionary<int, int>();
+            _filterResultDict = new SortedDictionary<int, int>();
+            _lastFilterLinesDict = new SortedDictionary<int, int>();
+            ThreadCount = Environment.ProcessorCount * 4;
+            ThreadCount = minThreads;
+            ThreadPool.GetMinThreads(out var worker, out var completion);
             ThreadPool.SetMinThreads(minThreads, completion);
             ThreadPool.GetMaxThreads(out worker, out completion);
         }
@@ -67,26 +67,26 @@ namespace LogExpert
 
         public void DoFilter(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            this.FilterResultLines.Clear();
-            this.LastFilterLinesList.Clear();
-            this.FilterHitList.Clear();
-            this.filterHitDict.Clear();
-            this.filterReadyList.Clear();
-            this.filterResultDict.Clear();
-            this.lastFilterLinesDict.Clear();
-            this.filterReadyList.Clear();
-            this.filterWorkerList.Clear();
-            this.shouldStop = false;
+            FilterResultLines.Clear();
+            LastFilterLinesList.Clear();
+            FilterHitList.Clear();
+            _filterHitDict.Clear();
+            _filterReadyList.Clear();
+            _filterResultDict.Clear();
+            _lastFilterLinesDict.Clear();
+            _filterReadyList.Clear();
+            _filterWorkerList.Clear();
+            _shouldStop = false;
 
-            int interval = maxCount / this.ThreadCount;
+            int interval = maxCount / ThreadCount;
             if (interval < 1)
             {
                 interval = 1;
             }
             int workStartLine = startLine;
             List<WaitHandle> handleList = new List<WaitHandle>();
-            progressLineCount = 0;
-            this.progressCallback = progressCallback;
+            _progressLineCount = 0;
+            _progressCallback = progressCallback;
             while (workStartLine < startLine + maxCount)
             {
                 if (workStartLine + interval > maxCount)
@@ -98,12 +98,13 @@ namespace LogExpert
                     }
                 }
                 _logger.Info("FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
-                WorkerFx workerFx = new WorkerFx(this.DoWork);
+                WorkerFx workerFx = DoWork;
                 IAsyncResult ar = workerFx.BeginInvoke(filterParams, workStartLine, interval, ThreadProgressCallback,
                     FilterDoneCallback, workerFx);
                 workStartLine += interval;
                 handleList.Add(ar.AsyncWaitHandle);
             }
+
             WaitHandle[] handles = handleList.ToArray();
             // wait for worker threads completion
             if (handles.Length > 0)
@@ -121,11 +122,11 @@ namespace LogExpert
         /// </summary>
         public void CancelFilter()
         {
-            this.shouldStop = true;
-            lock (this.filterWorkerList)
+            _shouldStop = true;
+            lock (_filterWorkerList)
             {
-                _logger.Info("Filter cancel requested. Stopping all {0} threads.", this.filterWorkerList.Count);
-                foreach (Filter filter in this.filterWorkerList)
+                _logger.Info("Filter cancel requested. Stopping all {0} threads.", _filterWorkerList.Count);
+                foreach (Filter filter in _filterWorkerList)
                 {
                     filter.ShouldCancel = true;
                 }
@@ -138,8 +139,8 @@ namespace LogExpert
 
         private void ThreadProgressCallback(int lineCount)
         {
-            int count = Interlocked.Add(ref this.progressLineCount, lineCount);
-            this.progressCallback(count);
+            int count = Interlocked.Add(ref _progressLineCount, lineCount);
+            _progressCallback(count);
         }
 
         private Filter DoWork(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
@@ -148,22 +149,22 @@ namespace LogExpert
 
             // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
             FilterParams threadFilterParams = filterParams.CreateCopy2();
-            LogExpert.LogWindow.ColumnizerCallback threadColumnizerCallback = this.callback.createCopy();
+            ColumnizerCallback threadColumnizerCallback = _callback.CreateCopy();
 
             Filter filter = new Filter(threadColumnizerCallback);
-            lock (this.filterWorkerList)
+            lock (_filterWorkerList)
             {
-                this.filterWorkerList.Add(filter);
+                _filterWorkerList.Add(filter);
             }
-            if (this.shouldStop)
+            if (_shouldStop)
             {
                 return filter;
             }
             int realCount = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
             _logger.Info("Filter worker [{0}] for line {1} has completed.", Thread.CurrentThread.ManagedThreadId, startLine);
-            lock (this.filterReadyList)
+            lock (_filterReadyList)
             {
-                this.filterReadyList.Add(filter);
+                _filterReadyList.Add(filter);
             }
             return filter;
         }
@@ -184,33 +185,33 @@ namespace LogExpert
         private void MergeResults()
         {
             _logger.Info("Merging filter results.");
-            foreach (Filter filter in this.filterReadyList)
+            foreach (Filter filter in _filterReadyList)
             {
                 foreach (int lineNum in filter.FilterHitList)
                 {
-                    if (!this.filterHitDict.ContainsKey(lineNum))
+                    if (!_filterHitDict.ContainsKey(lineNum))
                     {
-                        this.filterHitDict.Add(lineNum, lineNum);
+                        _filterHitDict.Add(lineNum, lineNum);
                     }
                 }
                 foreach (int lineNum in filter.FilterResultLines)
                 {
-                    if (!this.filterResultDict.ContainsKey(lineNum))
+                    if (!_filterResultDict.ContainsKey(lineNum))
                     {
-                        this.filterResultDict.Add(lineNum, lineNum);
+                        _filterResultDict.Add(lineNum, lineNum);
                     }
                 }
                 foreach (int lineNum in filter.LastFilterLinesList)
                 {
-                    if (!this.lastFilterLinesDict.ContainsKey(lineNum))
+                    if (!_lastFilterLinesDict.ContainsKey(lineNum))
                     {
-                        this.lastFilterLinesDict.Add(lineNum, lineNum);
+                        _lastFilterLinesDict.Add(lineNum, lineNum);
                     }
                 }
             }
-            this.FilterHitList.AddRange(this.filterHitDict.Keys);
-            this.FilterResultLines.AddRange(this.filterResultDict.Keys);
-            this.LastFilterLinesList.AddRange(this.lastFilterLinesDict.Keys);
+            FilterHitList.AddRange(_filterHitDict.Keys);
+            FilterResultLines.AddRange(_filterResultDict.Keys);
+            LastFilterLinesList.AddRange(_lastFilterLinesDict.Keys);
             _logger.Info("Merging done.");
         }
 

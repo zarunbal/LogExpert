@@ -253,9 +253,9 @@ namespace LogExpert
                     settings.preferences.pollingInterval = 250;
                 }
 
-                if (settings.preferences.multifileOptions == null)
+                if (settings.preferences.multiFileOptions == null)
                 {
-                    settings.preferences.multifileOptions = new MultifileOptions();
+                    settings.preferences.multiFileOptions = new MultiFileOptions();
                 }
 
                 if (settings.preferences.defaultEncoding == null)
@@ -363,7 +363,7 @@ namespace LogExpert
 
 
         /// <summary>
-        /// Imports all or some of the settings/prefs stored in the inpute stream.
+        /// Imports all or some of the settings/prefs stored in the input stream.
         /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
         /// </summary>
         /// <param name="fs"></param>

@@ -44,14 +44,8 @@
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accessibility" />
-    <Reference Include="CookComputing.XmlRpcV2, Version=2.4.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\CookComputing.XmlRpcV2.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
@@ -61,6 +55,7 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
+    <Compile Include="Classes\ILogLineColumnizerCallback\ColumnizerCallback.cs" />
     <Compile Include="Classes\Columnizer\ColumnizerPicker.cs" />
     <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
     <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
@@ -72,6 +67,7 @@
     <Compile Include="Classes\Highlight\ActionEntry.cs" />
     <Compile Include="Classes\ArgParser.cs" />
     <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
+    <Compile Include="Classes\ILogLineColumnizerCallback\LogExpertCallback.cs" />
     <Compile Include="Classes\Log\LogStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
     <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
@@ -107,6 +103,9 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Dialogs\LogCellEditingControl.cs" />
+    <Compile Include="Dialogs\LogGridCell.cs" />
+    <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
@@ -199,7 +198,7 @@
     <Compile Include="Classes\Log\LogBufferCacheEntry.cs" />
     <Compile Include="Classes\LogExpertApplicationContext.cs" />
     <Compile Include="Entities\LogFileException.cs" />
-    <Compile Include="Entities\MultifileOptions.cs" />
+    <Compile Include="Entities\MultiFileOptions.cs" />
     <Compile Include="Classes\ObjectClone.cs" />
     <Compile Include="Classes\PaintHelper.cs" />
     <Compile Include="Classes\ParamParser.cs" />
@@ -581,9 +580,10 @@
       <Name>WinFormsUI</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="NLog.Config">
-      <Version>4.6.7</Version>
+      <Version>4.7.15</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

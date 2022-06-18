@@ -41,25 +41,12 @@ namespace LogExpert
             return logWin;
         }
 
-        public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title,
-            bool forcePersistenceLoading,
-            ILogLineColumnizer preProcessColumnizer)
+        public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
         {
-            return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
-                preProcessColumnizer, true);
+            return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, true);
         }
-
-        public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
-            bool forcePersistenceLoading,
-            ILogLineColumnizer preProcessColumnizer)
-        {
-            return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading,
-                preProcessColumnizer, false);
-        }
-
-        public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title,
-            bool forcePersistenceLoading,
-            ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel)
+        
+        public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
         {
             string logFileName = FindFilenameForSettings(givenFileName);
             LogWindow win = FindWindowForFile(logFileName);
@@ -76,8 +63,7 @@ namespace LogExpert
 
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            LogWindow logWindow =
-                new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
+            LogWindow logWindow = new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
 
             logWindow.GivenFileName = givenFileName;
 
@@ -126,7 +112,7 @@ namespace LogExpert
             }
 
             // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
-            LoadFileDelegate loadFileFx = new LoadFileDelegate(logWindow.LoadFile);
+            LoadFileDelegate loadFileFx = logWindow.LoadFile;
             loadFileFx.BeginInvoke(logFileName, encodingOptions, null, null);
             return logWindow;
         }
@@ -253,8 +239,7 @@ namespace LogExpert
                     {
                         if (Regex.IsMatch(fileName, entry.mask))
                         {
-                            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(entry.columnizerName,
-                                PluginRegistry.GetInstance().RegisteredColumnizers);
+                            ILogLineColumnizer columnizer = ColumnizerPicker.FindColumnizerByName(entry.columnizerName, PluginRegistry.GetInstance().RegisteredColumnizers);
                             return columnizer;
                         }
                     }

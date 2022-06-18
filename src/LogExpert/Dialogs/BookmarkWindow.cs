@@ -25,8 +25,8 @@ namespace LogExpert.Dialogs
         public BookmarkWindow()
         {
             InitializeComponent();
-            this.bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
-            this.bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
+            bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
+            bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
         }
 
         #endregion
@@ -35,15 +35,15 @@ namespace LogExpert.Dialogs
 
         public bool LineColumnVisible
         {
-            set { this.bookmarkDataGridView.Columns[2].Visible = value; }
+            set => bookmarkDataGridView.Columns[2].Visible = value;
         }
 
         public bool ShowBookmarkCommentColumn
         {
-            get { return this.commentColumnCheckBox.Checked; }
+            get => commentColumnCheckBox.Checked;
             set
             {
-                this.commentColumnCheckBox.Checked = value;
+                commentColumnCheckBox.Checked = value;
                 ShowCommentColumn(value);
             }
         }
@@ -54,10 +54,11 @@ namespace LogExpert.Dialogs
 
         public void SetColumnizer(ILogLineColumnizer columnizer)
         {
-            PaintHelper.SetColumnizer(columnizer, this.bookmarkDataGridView);
-            if (this.bookmarkDataGridView.ColumnCount > 0)
+            PaintHelper.SetColumnizer(columnizer, bookmarkDataGridView);
+
+            if (bookmarkDataGridView.ColumnCount > 0)
             {
-                this.bookmarkDataGridView.Columns[0].Width = 20;
+                bookmarkDataGridView.Columns[0].Width = 20;
             }
 
             DataGridViewTextBoxColumn commentColumn = new DataGridViewTextBoxColumn();
@@ -68,8 +69,8 @@ namespace LogExpert.Dialogs
             commentColumn.ReadOnly = true;
             commentColumn.Width = 250;
             commentColumn.MinimumWidth = 130;
-            this.bookmarkDataGridView.Columns.Insert(1, commentColumn);
-            ShowCommentColumn(this.commentColumnCheckBox.Checked);
+            bookmarkDataGridView.Columns.Insert(1, commentColumn);
+            ShowCommentColumn(commentColumnCheckBox.Checked);
             ResizeColumns();
         }
 
@@ -78,18 +79,18 @@ namespace LogExpert.Dialogs
         /// </summary>
         public void ResizeColumns()
         {
-            //this.bookmarkDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-            for (int i = 2; i < this.bookmarkDataGridView.ColumnCount; ++i)
+            // this.bookmarkDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            for (int i = 2; i < bookmarkDataGridView.ColumnCount; ++i)
             {
-                this.bookmarkDataGridView.AutoResizeColumn(i, DataGridViewAutoSizeColumnMode.DisplayedCells);
+                bookmarkDataGridView.AutoResizeColumn(i, DataGridViewAutoSizeColumnMode.DisplayedCells);
             }
         }
 
         public void UpdateView()
         {
-            this.bookmarkDataGridView.RowCount = this.bookmarkData != null ? this.bookmarkData.Bookmarks.Count : 0;
-            this.ResizeColumns();
-            this.bookmarkDataGridView.Refresh();
+            bookmarkDataGridView.RowCount = bookmarkData?.Bookmarks.Count ?? 0;
+            ResizeColumns();
+            bookmarkDataGridView.Refresh();
         }
 
         /// <summary>
@@ -98,36 +99,39 @@ namespace LogExpert.Dialogs
         /// <param name="bookmark"></param>
         public void BookmarkTextChanged(Bookmark bookmark)
         {
-            int rowIndex = this.bookmarkDataGridView.CurrentCellAddress.Y;
+            int rowIndex = bookmarkDataGridView.CurrentCellAddress.Y;
             if (rowIndex == -1)
             {
                 return;
             }
-            if (this.bookmarkData.Bookmarks[rowIndex] == bookmark)
+
+            if (bookmarkData.Bookmarks[rowIndex] == bookmark)
             {
-                this.bookmarkTextBox.Text = bookmark.Text;
+                bookmarkTextBox.Text = bookmark.Text;
             }
-            this.bookmarkDataGridView.Refresh();
+
+            bookmarkDataGridView.Refresh();
         }
 
         public void SelectBookmark(int lineNum)
         {
-            if (this.bookmarkData.IsBookmarkAtLine(lineNum))
+            if (bookmarkData.IsBookmarkAtLine(lineNum))
             {
-                if (this.bookmarkDataGridView.Rows.Count < this.bookmarkData.Bookmarks.Count)
+                if (bookmarkDataGridView.Rows.Count < bookmarkData.Bookmarks.Count)
                 {
                     // just for the case... There was an exception but I cannot find the cause
-                    this.UpdateView();
+                    UpdateView();
                 }
-                int row = this.bookmarkData.GetBookmarkIndexForLine(lineNum);
-                this.bookmarkDataGridView.CurrentCell = this.bookmarkDataGridView.Rows[row].Cells[0];
+
+                int row = bookmarkData.GetBookmarkIndexForLine(lineNum);
+                bookmarkDataGridView.CurrentCell = bookmarkDataGridView.Rows[row].Cells[0];
             }
         }
 
         public void SetBookmarkData(IBookmarkData bookmarkData)
         {
             this.bookmarkData = bookmarkData;
-            this.bookmarkDataGridView.RowCount = this.bookmarkData != null ? this.bookmarkData.Bookmarks.Count : 0;
+            bookmarkDataGridView.RowCount = bookmarkData?.Bookmarks.Count ?? 0;
             HideIfNeeded();
         }
 
@@ -136,12 +140,13 @@ namespace LogExpert.Dialogs
             if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
             {
                 SetFont(newPreferences.fontName, newPreferences.fontSize);
-                if (this.bookmarkDataGridView.Columns.Count > 1 && newPreferences.setLastColumnWidth)
+                if (bookmarkDataGridView.Columns.Count > 1 && newPreferences.setLastColumnWidth)
                 {
-                    this.bookmarkDataGridView.Columns[this.bookmarkDataGridView.Columns.Count - 1].MinimumWidth =
+                    bookmarkDataGridView.Columns[bookmarkDataGridView.Columns.Count - 1].MinimumWidth =
                         newPreferences.lastColumnWidth;
                 }
-                PaintHelper.ApplyDataGridViewPrefs(this.bookmarkDataGridView, newPreferences);
+
+                PaintHelper.ApplyDataGridViewPrefs(bookmarkDataGridView, newPreferences);
             }
         }
 
@@ -150,18 +155,20 @@ namespace LogExpert.Dialogs
             if (ctx != null)
             {
                 _logger.Debug("Current file changed to {0}", ctx.LogView.FileName);
-                lock (this.paintLock)
+                lock (paintLock)
                 {
-                    this.logView = ctx.LogView;
-                    this.logPaintContext = ctx.LogPaintContext;
+                    logView = ctx.LogView;
+                    logPaintContext = ctx.LogPaintContext;
                 }
-                this.SetColumnizer(ctx.LogView.CurrentColumnizer);
+
+                SetColumnizer(ctx.LogView.CurrentColumnizer);
             }
             else
             {
-                this.logView = null;
-                this.logPaintContext = null;
+                logView = null;
+                logPaintContext = null;
             }
+
             UpdateView();
         }
 
@@ -181,16 +188,15 @@ namespace LogExpert.Dialogs
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (!this.splitContainer1.Visible)
+            if (!splitContainer1.Visible)
             {
-                Rectangle r = this.ClientRectangle;
+                Rectangle r = ClientRectangle;
                 e.Graphics.FillRectangle(SystemBrushes.ControlLight, r);
                 RectangleF rect = r;
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;
-                e.Graphics.DrawString("No bookmarks in current file", SystemFonts.DialogFont, SystemBrushes.WindowText,
-                    r, sf);
+                e.Graphics.DrawString("No bookmarks in current file", SystemFonts.DialogFont, SystemBrushes.WindowText, r, sf);
             }
             else
             {
@@ -205,9 +211,9 @@ namespace LogExpert.Dialogs
         private void SetFont(string fontName, float fontSize)
         {
             Font font = new Font(new FontFamily(fontName), fontSize);
-            this.bookmarkDataGridView.DefaultCellStyle.Font = font;
-            this.bookmarkDataGridView.RowTemplate.Height = font.Height + 4;
-            this.bookmarkDataGridView.Refresh();
+            bookmarkDataGridView.DefaultCellStyle.Font = font;
+            bookmarkDataGridView.RowTemplate.Height = font.Height + 4;
+            bookmarkDataGridView.Refresh();
         }
 
 
@@ -215,46 +221,44 @@ namespace LogExpert.Dialogs
         {
             if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
             {
-                /**/
                 Color backColor = e.CellStyle.SelectionBackColor;
                 Brush brush;
                 if (gridView.Focused)
                 {
-                    //_logger.logDebug("CellPaint Focus");
+                    // _logger.logDebug("CellPaint Focus");
                     brush = new SolidBrush(e.CellStyle.SelectionBackColor);
                 }
                 else
                 {
-                    //_logger.logDebug("CellPaint No Focus");
+                    // _logger.logDebug("CellPaint No Focus");
                     Color color = Color.FromArgb(255, 170, 170, 170);
                     brush = new SolidBrush(color);
                 }
+
                 e.Graphics.FillRectangle(brush, e.CellBounds);
                 brush.Dispose();
-                /**/
             }
             else
             {
                 e.CellStyle.BackColor = Color.White;
                 e.PaintBackground(e.CellBounds, false);
             }
+
             e.PaintContent(e.CellBounds);
         }
 
         private void DeleteSelectedBookmarks()
         {
             List<int> lineNumList = new List<int>();
-            foreach (DataGridViewRow row in this.bookmarkDataGridView.SelectedRows)
+            foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
             {
                 if (row.Index != -1)
                 {
-                    lineNumList.Add(this.bookmarkData.Bookmarks[row.Index].LineNum);
+                    lineNumList.Add(bookmarkData.Bookmarks[row.Index].LineNum);
                 }
             }
-            if (this.logView != null)
-            {
-                this.logView.DeleteBookmarks(lineNumList);
-            }
+
+            logView?.DeleteBookmarks(lineNumList);
         }
 
         private static void InvalidateCurrentRow(DataGridView gridView)
@@ -270,27 +274,28 @@ namespace LogExpert.Dialogs
             if (rowIndex == -1)
             {
                 // multiple selection or no selection at all
-                this.bookmarkTextBox.Enabled = false;
-                // disable the control first so that changes made to it won't propagate to the bookmark item
-                this.bookmarkTextBox.Text = "";
+                bookmarkTextBox.Enabled = false;
+
+// disable the control first so that changes made to it won't propagate to the bookmark item
+                bookmarkTextBox.Text = string.Empty;
             }
             else
             {
-                Bookmark bookmark = this.bookmarkData.Bookmarks[rowIndex];
-                this.bookmarkTextBox.Text = bookmark.Text;
-                this.bookmarkTextBox.Enabled = true;
+                Bookmark bookmark = bookmarkData.Bookmarks[rowIndex];
+                bookmarkTextBox.Text = bookmark.Text;
+                bookmarkTextBox.Enabled = true;
             }
         }
 
 
         private void ShowCommentColumn(bool show)
         {
-            this.bookmarkDataGridView.Columns[1].Visible = show;
+            bookmarkDataGridView.Columns[1].Visible = show;
         }
 
         private void HideIfNeeded()
         {
-            this.splitContainer1.Visible = this.bookmarkDataGridView.RowCount > 0;
+            splitContainer1.Visible = bookmarkDataGridView.RowCount > 0;
         }
 
         #endregion
@@ -299,29 +304,30 @@ namespace LogExpert.Dialogs
 
         private void boomarkDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (this.bookmarkData == null)
+            if (bookmarkData == null)
             {
                 return;
             }
 
-            lock (this.paintLock)
+            lock (paintLock)
             {
                 try
                 {
-                    if (e.RowIndex < 0 || e.ColumnIndex < 0 || this.bookmarkData.Bookmarks.Count <= e.RowIndex)
+                    if (e.RowIndex < 0 || e.ColumnIndex < 0 || bookmarkData.Bookmarks.Count <= e.RowIndex)
                     {
                         e.Handled = false;
                         return;
                     }
-                    int lineNum = this.bookmarkData.Bookmarks[e.RowIndex].LineNum;
 
-                    //if (e.ColumnIndex == 1)
-                    //{
-                    //  CommentPainting(this.bookmarkDataGridView, lineNum, e);
-                    //}
-                    //else
+                    int lineNum = bookmarkData.Bookmarks[e.RowIndex].LineNum;
+
+                    // if (e.ColumnIndex == 1)
+                    // {
+                    // CommentPainting(this.bookmarkDataGridView, lineNum, e);
+                    // }
                     {
-                        PaintHelper.CellPainting(this.logPaintContext, this.bookmarkDataGridView, lineNum, e);
+// else
+                        PaintHelper.CellPainting(logPaintContext, bookmarkDataGridView, lineNum, e);
                     }
                 }
                 catch (Exception ex)
@@ -333,39 +339,38 @@ namespace LogExpert.Dialogs
 
         private void boomarkDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
-            if (this.bookmarkData == null)
+            if (bookmarkData == null)
             {
                 return;
             }
 
-            if (e.RowIndex < 0 || e.ColumnIndex < 0 || this.bookmarkData.Bookmarks.Count <= e.RowIndex)
+            if (e.RowIndex < 0 || e.ColumnIndex < 0 || bookmarkData.Bookmarks.Count <= e.RowIndex)
             {
-                e.Value = "";
+                e.Value = string.Empty;
                 return;
             }
-            Bookmark bookmarkForLine = this.bookmarkData.Bookmarks[e.RowIndex];
+
+            Bookmark bookmarkForLine = bookmarkData.Bookmarks[e.RowIndex];
             int lineNum = bookmarkForLine.LineNum;
             if (e.ColumnIndex == 1)
             {
-                e.Value = bookmarkForLine.Text != null
-                    ? bookmarkForLine.Text.Replace('\n', ' ').Replace('\r', ' ')
-                    : null;
+                e.Value = bookmarkForLine.Text?.Replace('\n', ' ').Replace('\r', ' ');
             }
             else
             {
                 int columnIndex = e.ColumnIndex > 1 ? e.ColumnIndex - 1 : e.ColumnIndex;
-                e.Value = this.logPaintContext.GetCellValue(lineNum, columnIndex);
+                e.Value = logPaintContext.GetCellValue(lineNum, columnIndex);
             }
         }
 
 
         private void boomarkDataGridView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            //if (this.bookmarkDataGridView.CurrentRow != null)
-            //{
-            //  int lineNum = this.BookmarkList.Values[this.bookmarkDataGridView.CurrentRow.Index].LineNum;
-            //  this.logWindow.SelectLogLine(lineNum);
-            //}
+            // if (this.bookmarkDataGridView.CurrentRow != null)
+            // {
+            // int lineNum = this.BookmarkList.Values[this.bookmarkDataGridView.CurrentRow.Index].LineNum;
+            // this.logWindow.SelectLogLine(lineNum);
+            // }
         }
 
         private void boomarkDataGridView_ColumnDividerDoubleClick(object sender,
@@ -379,23 +384,26 @@ namespace LogExpert.Dialogs
         {
             if (e.KeyCode == Keys.Enter)
             {
-                if (this.bookmarkDataGridView.CurrentCellAddress.Y >= 0 &&
-                    this.bookmarkDataGridView.CurrentCellAddress.Y < this.bookmarkData.Bookmarks.Count)
+                if (bookmarkDataGridView.CurrentCellAddress.Y >= 0 &&
+                    bookmarkDataGridView.CurrentCellAddress.Y < bookmarkData.Bookmarks.Count)
                 {
-                    int lineNum = this.bookmarkData.Bookmarks[this.bookmarkDataGridView.CurrentCellAddress.Y].LineNum;
-                    this.logView.SelectLogLine(lineNum);
+                    int lineNum = bookmarkData.Bookmarks[bookmarkDataGridView.CurrentCellAddress.Y].LineNum;
+                    logView.SelectLogLine(lineNum);
                 }
+
                 e.Handled = true;
             }
+
             if (e.KeyCode == Keys.Delete && e.Modifiers == Keys.None)
             {
                 DeleteSelectedBookmarks();
             }
+
             if (e.KeyCode == Keys.Tab)
             {
-                if (this.bookmarkDataGridView.Focused)
+                if (bookmarkDataGridView.Focused)
                 {
-                    this.bookmarkTextBox.Focus();
+                    bookmarkTextBox.Focus();
                     e.Handled = true;
                 }
             }
@@ -403,12 +411,12 @@ namespace LogExpert.Dialogs
 
         private void bookmarkGridView_Enter(object sender, EventArgs e)
         {
-            InvalidateCurrentRow(this.bookmarkDataGridView);
+            InvalidateCurrentRow(bookmarkDataGridView);
         }
 
         private void bookmarkGridView_Leave(object sender, EventArgs e)
         {
-            InvalidateCurrentRow(this.bookmarkDataGridView);
+            InvalidateCurrentRow(bookmarkDataGridView);
         }
 
         private void deleteBookmarksToolStripMenuItem_Click(object sender, EventArgs e)
@@ -423,35 +431,32 @@ namespace LogExpert.Dialogs
                 return; // ignore all changes done while the control is disabled
             }
 
-            int rowIndex = this.bookmarkDataGridView.CurrentCellAddress.Y;
+            int rowIndex = bookmarkDataGridView.CurrentCellAddress.Y;
             if (rowIndex == -1)
             {
                 return;
             }
 
-            if (this.bookmarkData.Bookmarks.Count <= rowIndex)
+            if (bookmarkData.Bookmarks.Count <= rowIndex)
             {
                 return;
             }
 
-            Bookmark bookmark = this.bookmarkData.Bookmarks[rowIndex];
-            bookmark.Text = this.bookmarkTextBox.Text;
-            if (this.logView != null)
-            {
-                this.logView.RefreshLogView();
-            }
+            Bookmark bookmark = bookmarkData.Bookmarks[rowIndex];
+            bookmark.Text = bookmarkTextBox.Text;
+            logView?.RefreshLogView();
         }
 
-        private void bookmarkDataGridView_SelectionChanged(object sender, System.EventArgs e)
+        private void bookmarkDataGridView_SelectionChanged(object sender, EventArgs e)
         {
-            if (this.bookmarkDataGridView.SelectedRows.Count != 1
-                || this.bookmarkDataGridView.SelectedRows[0].Index >= this.bookmarkData.Bookmarks.Count)
+            if (bookmarkDataGridView.SelectedRows.Count != 1
+                || bookmarkDataGridView.SelectedRows[0].Index >= bookmarkData.Bookmarks.Count)
             {
                 CurrentRowChanged(-1);
             }
             else
             {
-                CurrentRowChanged(this.bookmarkDataGridView.SelectedRows[0].Index);
+                CurrentRowChanged(bookmarkDataGridView.SelectedRows[0].Index);
             }
         }
 
@@ -466,11 +471,12 @@ namespace LogExpert.Dialogs
         private void bookmarkDataGridView_CellToolTipTextNeeded(object sender,
             DataGridViewCellToolTipTextNeededEventArgs e)
         {
-            if (e.ColumnIndex != 0 || e.RowIndex <= -1 || e.RowIndex >= this.bookmarkData.Bookmarks.Count)
+            if (e.ColumnIndex != 0 || e.RowIndex <= -1 || e.RowIndex >= bookmarkData.Bookmarks.Count)
             {
                 return;
             }
-            Bookmark bookmark = this.bookmarkData.Bookmarks[e.RowIndex];
+
+            Bookmark bookmark = bookmarkData.Bookmarks[e.RowIndex];
             if (!string.IsNullOrEmpty(bookmark.Text))
             {
                 e.ToolTipText = bookmark.Text;
@@ -481,28 +487,29 @@ namespace LogExpert.Dialogs
         private void bookmarkDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             // Toggle bookmark when double-clicking on the first column
-            if (e.ColumnIndex == 0 && e.RowIndex >= 0 && this.bookmarkDataGridView.CurrentRow != null)
+            if (e.ColumnIndex == 0 && e.RowIndex >= 0 && bookmarkDataGridView.CurrentRow != null)
             {
-                int index = this.bookmarkDataGridView.CurrentRow.Index;
-                int lineNum = this.bookmarkData.Bookmarks[this.bookmarkDataGridView.CurrentRow.Index].LineNum;
-                this.bookmarkData.ToggleBookmark(lineNum);
-                // we don't ask for confirmation if the bookmark has an associated comment...
+                int index = bookmarkDataGridView.CurrentRow.Index;
+                int lineNum = bookmarkData.Bookmarks[bookmarkDataGridView.CurrentRow.Index].LineNum;
+                bookmarkData.ToggleBookmark(lineNum);
 
-                int boomarkCount = this.bookmarkData.Bookmarks.Count;
-                this.bookmarkDataGridView.RowCount = boomarkCount;
+// we don't ask for confirmation if the bookmark has an associated comment...
+                int boomarkCount = bookmarkData.Bookmarks.Count;
+                bookmarkDataGridView.RowCount = boomarkCount;
 
                 if (index < boomarkCount)
                 {
-                    this.bookmarkDataGridView.CurrentCell = this.bookmarkDataGridView.Rows[index].Cells[0];
+                    bookmarkDataGridView.CurrentCell = bookmarkDataGridView.Rows[index].Cells[0];
                 }
                 else
                 {
                     if (boomarkCount > 0)
                     {
-                        this.bookmarkDataGridView.CurrentCell =
-                            this.bookmarkDataGridView.Rows[boomarkCount - 1].Cells[0];
+                        bookmarkDataGridView.CurrentCell =
+                            bookmarkDataGridView.Rows[boomarkCount - 1].Cells[0];
                     }
                 }
+
                 if (boomarkCount > index)
                 {
                     CurrentRowChanged(index);
@@ -511,20 +518,21 @@ namespace LogExpert.Dialogs
                 {
                     if (boomarkCount > 0)
                     {
-                        CurrentRowChanged(this.bookmarkDataGridView.RowCount - 1);
+                        CurrentRowChanged(bookmarkDataGridView.RowCount - 1);
                     }
                     else
                     {
                         CurrentRowChanged(-1);
                     }
                 }
+
                 return;
             }
 
-            if (this.bookmarkDataGridView.CurrentRow != null && e.RowIndex >= 0)
+            if (bookmarkDataGridView.CurrentRow != null && e.RowIndex >= 0)
             {
-                int lineNum = this.bookmarkData.Bookmarks[this.bookmarkDataGridView.CurrentRow.Index].LineNum;
-                this.logView.SelectAndEnsureVisible(lineNum, true);
+                int lineNum = bookmarkData.Bookmarks[bookmarkDataGridView.CurrentRow.Index].LineNum;
+                logView.SelectAndEnsureVisible(lineNum, true);
             }
         }
 
@@ -536,23 +544,23 @@ namespace LogExpert.Dialogs
                 DialogResult.Yes)
             {
                 List<int> lineNumList = new List<int>();
-                foreach (DataGridViewRow row in this.bookmarkDataGridView.SelectedRows)
+                foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
                 {
                     if (row.Index != -1)
                     {
-                        this.bookmarkData.Bookmarks[row.Index].Text = "";
+                        bookmarkData.Bookmarks[row.Index].Text = string.Empty;
                     }
                 }
 
-                this.bookmarkTextBox.Text = "";
-                this.bookmarkDataGridView.Refresh();
-                this.logView.RefreshLogView();
+                bookmarkTextBox.Text = string.Empty;
+                bookmarkDataGridView.Refresh();
+                logView.RefreshLogView();
             }
         }
 
         private void commentColumnCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            ShowCommentColumn(this.commentColumnCheckBox.Checked);
+            ShowCommentColumn(commentColumnCheckBox.Checked);
         }
 
         private void BookmarkWindow_ClientSizeChanged(object sender, EventArgs e)
@@ -561,22 +569,23 @@ namespace LogExpert.Dialogs
             {
                 if (Width > Height)
                 {
-                    this.splitContainer1.Orientation = Orientation.Vertical;
+                    splitContainer1.Orientation = Orientation.Vertical;
                     int distance = Width - 200;
-                    this.splitContainer1.SplitterDistance = distance > this.splitContainer1.Panel1MinSize
+                    splitContainer1.SplitterDistance = distance > splitContainer1.Panel1MinSize
                         ? distance
-                        : this.splitContainer1.Panel1MinSize;
+                        : splitContainer1.Panel1MinSize;
                 }
                 else
                 {
-                    this.splitContainer1.Orientation = Orientation.Horizontal;
+                    splitContainer1.Orientation = Orientation.Horizontal;
                     int distance = Height - 200;
-                    this.splitContainer1.SplitterDistance = distance > this.splitContainer1.Panel1MinSize
+                    splitContainer1.SplitterDistance = distance > splitContainer1.Panel1MinSize
                         ? distance
-                        : this.splitContainer1.Panel1MinSize;
+                        : splitContainer1.Panel1MinSize;
                 }
             }
-            if (!this.splitContainer1.Visible)
+
+            if (!splitContainer1.Visible)
             {
                 // redraw the "no bookmarks" display
                 Invalidate();
@@ -595,11 +604,11 @@ namespace LogExpert.Dialogs
 
         private void BookmarkWindow_SizeChanged(object sender, EventArgs e)
         {
-            //if (!this.splitContainer1.Visible)
-            //{
-            //  // redraw the "no bookmarks" display
-            //  Invalidate();
-            //} 
+            // if (!this.splitContainer1.Visible)
+            // {
+            // // redraw the "no bookmarks" display
+            // Invalidate();
+            // } 
         }
 
         #endregion
