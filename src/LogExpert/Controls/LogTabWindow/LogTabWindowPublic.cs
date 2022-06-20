@@ -86,16 +86,16 @@ namespace LogExpert
 
             LogWindowData data = logWindow.Tag as LogWindowData;
             data.color = defaultTabColor;
-            setTabColor(logWindow, defaultTabColor);
+            SetTabColor(logWindow, defaultTabColor);
             //data.tabPage.BorderColor = this.defaultTabBorderColor;
             if (!isTempFile)
             {
                 foreach (ColorEntry colorEntry in ConfigManager.Settings.fileColors)
                 {
-                    if (colorEntry.fileName.ToLower().Equals(logFileName.ToLower()))
+                    if (colorEntry.FileName.ToLower().Equals(logFileName.ToLower()))
                     {
-                        data.color = colorEntry.color;
-                        setTabColor(logWindow, colorEntry.color);
+                        data.color = colorEntry.Color;
+                        SetTabColor(logWindow, colorEntry.Color);
                         break;
                     }
                 }
@@ -130,8 +130,7 @@ namespace LogExpert
             multiFileEnabledStripMenuItem.Checked = true;
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti),
-                new object[] {fileNames, encodingOptions});
+            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
             AddToFileHistory(fileNames[0]);
             return logWindow;
         }
@@ -164,12 +163,12 @@ namespace LogExpert
 
         public ILogLineColumnizer GetColumnizerHistoryEntry(string fileName)
         {
-            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
+            ColumnizerHistoryEntry entry = FindColumnizerHistoryEntry(fileName);
             if (entry != null)
             {
                 foreach (ILogLineColumnizer columnizer in PluginRegistry.GetInstance().RegisteredColumnizers)
                 {
-                    if (columnizer.GetName().Equals(entry.columnizerName))
+                    if (columnizer.GetName().Equals(entry.ColumnizerName))
                     {
                         return columnizer;
                     }
@@ -324,7 +323,7 @@ namespace LogExpert
             if (Preferences.showTailState)
             {
                 Icon icon = GetIcon(data.diffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
             }
         }
 

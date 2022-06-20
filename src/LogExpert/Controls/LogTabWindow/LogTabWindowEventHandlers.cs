@@ -171,7 +171,7 @@ namespace LogExpert
                                 //logWindow.SetColumnizer(form.SelectedColumnizer);
                                 SetColumnizerFx fx = logWindow.ForceColumnizer;
                                 logWindow.Invoke(fx, form.SelectedColumnizer);
-                                setColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
+                                SetColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
                             }
                             else
                             {
@@ -189,7 +189,7 @@ namespace LogExpert
                     {
                         SetColumnizerFx fx = CurrentLogWindow.ForceColumnizer;
                         CurrentLogWindow.Invoke(fx, form.SelectedColumnizer);
-                        setColumnizerHistoryEntry(CurrentLogWindow.FileName, form.SelectedColumnizer);
+                        SetColumnizerHistoryEntry(CurrentLogWindow.FileName, form.SelectedColumnizer);
                     }
 
                     if (form.IsConfigPressed)
@@ -741,12 +741,12 @@ namespace LogExpert
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 data.color = dlg.Color;
-                setTabColor(logWindow, data.color);
+                SetTabColor(logWindow, data.color);
             }
             List<ColorEntry> delList = new List<ColorEntry>();
             foreach (ColorEntry entry in ConfigManager.Settings.fileColors)
             {
-                if (entry.fileName.ToLower().Equals(logWindow.FileName.ToLower()))
+                if (entry.FileName.ToLower().Equals(logWindow.FileName.ToLower()))
                 {
                     delList.Add(entry);
                 }
@@ -893,12 +893,12 @@ namespace LogExpert
 
         private void runGCToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            runGC();
+            RunGC();
         }
 
         private void gCInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dumpGCInfo();
+            DumpGCInfo();
         }
 
         private void toolsToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -926,13 +926,13 @@ namespace LogExpert
 
         private void throwExceptionbackgroundThToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExceptionFx fx = throwExceptionFx;
+            ExceptionFx fx = ThrowExceptionFx;
             fx.BeginInvoke(null, null);
         }
 
         private void throwExceptionbackgroundThreadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Thread thread = new Thread(throwExceptionThreadFx);
+            Thread thread = new Thread(ThrowExceptionThreadFx);
             thread.IsBackground = true;
             thread.Start();
         }

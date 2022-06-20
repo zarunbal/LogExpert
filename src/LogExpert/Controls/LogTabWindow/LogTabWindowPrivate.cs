@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -464,27 +463,27 @@ namespace LogExpert
             }
         }
 
-        private void setColumnizerHistoryEntry(string fileName, ILogLineColumnizer columnizer)
+        private void SetColumnizerHistoryEntry(string fileName, ILogLineColumnizer columnizer)
         {
-            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
+            ColumnizerHistoryEntry entry = FindColumnizerHistoryEntry(fileName);
             if (entry != null)
             {
                 ConfigManager.Settings.columnizerHistoryList.Remove(entry);
             }
 
-            ConfigManager.Settings.columnizerHistoryList.Add(new ColumnizerHistoryEntry(fileName,
-                columnizer.GetName()));
+            ConfigManager.Settings.columnizerHistoryList.Add(new ColumnizerHistoryEntry(fileName, columnizer.GetName()));
+
             if (ConfigManager.Settings.columnizerHistoryList.Count > MAX_COLUMNIZER_HISTORY)
             {
                 ConfigManager.Settings.columnizerHistoryList.RemoveAt(0);
             }
         }
 
-        private ColumnizerHistoryEntry findColumnizerHistoryEntry(string fileName)
+        private ColumnizerHistoryEntry FindColumnizerHistoryEntry(string fileName)
         {
             foreach (ColumnizerHistoryEntry entry in ConfigManager.Settings.columnizerHistoryList)
             {
-                if (entry.fileName.Equals(fileName))
+                if (entry.FileName.Equals(fileName))
                 {
                     return entry;
                 }
@@ -1156,7 +1155,7 @@ namespace LogExpert
             }
         }
 
-        private void setTabColor(LogWindow logWindow, Color color)
+        private void SetTabColor(LogWindow logWindow, Color color)
         {
             //tabPage.BackLowColor = color;
             //tabPage.BackLowColorDisabled = Color.FromArgb(255,
@@ -1223,7 +1222,7 @@ namespace LogExpert
 
         private void FillToolLauncherBar()
         {
-            char[] labels = new char[]
+            char[] labels = 
             {
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                 'U', 'V', 'W', 'X', 'Y', 'Z'
@@ -1256,14 +1255,14 @@ namespace LogExpert
             externalToolsToolStrip.Visible = num > 0; // do not show bar if no tool uses it
         }
 
-        private void runGC()
+        private void RunGC()
         {
             _logger.Info("Running GC. Used mem before: {0:N0}", GC.GetTotalMemory(false));
             GC.Collect();
             _logger.Info("GC done.    Used mem after:  {0:N0}", GC.GetTotalMemory(true));
         }
 
-        private void dumpGCInfo()
+        private void DumpGCInfo()
         {
             _logger.Info("-------- GC info -----------\r\nUsed mem: {0:N0}", GC.GetTotalMemory(false));
             for (int i = 0; i < GC.MaxGeneration; ++i)
@@ -1274,12 +1273,12 @@ namespace LogExpert
             _logger.Info("----------------------------");
         }
 
-        private void throwExceptionFx()
+        private void ThrowExceptionFx()
         {
             throw new Exception("This is a test exception thrown by an async delegate");
         }
 
-        private void throwExceptionThreadFx()
+        private void ThrowExceptionThreadFx()
         {
             throw new Exception("This is a test exception thrown by a background thread");
         }
@@ -1339,7 +1338,7 @@ namespace LogExpert
 
         private void OnHighlightSettingsChanged()
         {
-            HighlightSettingsChanged?.Invoke(this, new EventArgs());
+            HighlightSettingsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
