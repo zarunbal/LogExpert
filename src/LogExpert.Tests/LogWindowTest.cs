@@ -27,8 +27,7 @@ namespace LogExpert.Tests
             PluginRegistry.GetInstance().RegisteredColumnizers.Add(new CsvColumnizerType());
 
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
-            LogWindow logWindow =
-                new LogWindow(logTabWindow, fileName, false, false);
+            LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
             Assert.True(true);
         }
