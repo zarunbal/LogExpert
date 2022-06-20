@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -75,7 +73,7 @@ namespace LogExpert
 
         public static void Export(FileInfo fileInfo)
         {
-            Instance.Save(fileInfo, Settings, SettingsFlags.None);
+            Instance.Save(fileInfo, Settings);
         }
 
         public static void Import(FileInfo fileInfo, ExportImportFlags flags)
@@ -109,6 +107,7 @@ namespace LogExpert
             {
                 Directory.CreateDirectory(dir);
             }
+
             if (!File.Exists(dir + "\\settings.json"))
             {
                 return LoadOrCreateNew(null);
@@ -141,7 +140,7 @@ namespace LogExpert
                 {
                     try
                     {
-                        settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText($"{fileInfo.DirectoryName}{fileInfo.Name}"));
+                        settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText($"{fileInfo.FullName}"));
                     }
                     catch (Exception e)
                     {
@@ -271,6 +270,11 @@ namespace LogExpert
             }
         }
 
+        /// <summary>
+        /// Saves the Settings to file, fires OnConfigChanged Event so LogTabWindow is updated
+        /// </summary>
+        /// <param name="settings">Settings to be saved</param>
+        /// <param name="flags">Settings that "changed"</param>
         private void Save(Settings settings, SettingsFlags flags)
         {
             lock (_loadSaveLock)
@@ -286,7 +290,7 @@ namespace LogExpert
                     }
 
                     FileInfo fileInfo = new FileInfo(dir + "\\settings.json");
-                    Save(fileInfo, settings, flags);
+                    Save(fileInfo, settings);
                 }
 
                 OnConfigChanged(flags);
@@ -299,7 +303,7 @@ namespace LogExpert
         /// <param name="fileInfo">FileInfo for creating the file (if exists will be overwritten)</param>
         /// <param name="settings">Current Settings</param>
         /// <param name="flags"></param>
-        private void Save(FileInfo fileInfo, Settings settings, SettingsFlags flags)
+        private void Save(FileInfo fileInfo, Settings settings)
         {
             SaveAsJSON(fileInfo, settings);
         }
