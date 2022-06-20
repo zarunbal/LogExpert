@@ -3,7 +3,6 @@ using LogExpert.Classes.Columnizer;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace LogExpert.Tests
