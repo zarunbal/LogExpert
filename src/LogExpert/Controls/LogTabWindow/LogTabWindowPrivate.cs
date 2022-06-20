@@ -324,18 +324,18 @@ namespace LogExpert
 
         private void ShowHighlightSettingsDialog()
         {
-            HilightDialog dlg = new HilightDialog();
+            HighlightDialog dlg = new HighlightDialog();
             dlg.KeywordActionList = PluginRegistry.GetInstance().RegisteredKeywordActions;
             dlg.Owner = this;
             dlg.TopMost = TopMost;
-            dlg.HilightGroupList = HilightGroupList;
+            dlg.HighlightGroupList = HilightGroupList;
             dlg.PreSelectedGroupName = highlightGroupsComboBox.Text;
             
             DialogResult res = dlg.ShowDialog();
             
             if (res == DialogResult.OK)
             {
-                HilightGroupList = dlg.HilightGroupList;
+                HilightGroupList = dlg.HighlightGroupList;
                 FillHighlightComboBox();
                 ConfigManager.Settings.hilightGroupList = HilightGroupList;
                 ConfigManager.Save(SettingsFlags.HighlightSettings);
