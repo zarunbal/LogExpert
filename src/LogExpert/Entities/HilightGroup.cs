@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
@@ -18,14 +17,14 @@ namespace LogExpert
 
         public string GroupName
         {
-            get { return this.groupName; }
-            set { this.groupName = value; }
+            get => groupName;
+            set => groupName = value;
         }
 
         public List<HilightEntry> HilightEntryList
         {
-            get { return this.hilightEntryList; }
-            set { this.hilightEntryList = value; }
+            get => hilightEntryList;
+            set => hilightEntryList = value;
         }
 
         #endregion

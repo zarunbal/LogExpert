@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
@@ -14,7 +12,7 @@ namespace LogExpert
 
         internal ConfigChangedEventArgs(SettingsFlags changeFlags)
         {
-            this.Flags = changeFlags;
+            Flags = changeFlags;
         }
 
         #endregion
