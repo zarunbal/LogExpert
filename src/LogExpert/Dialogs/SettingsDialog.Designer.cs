@@ -751,7 +751,7 @@
             this.buttonWorkingDir.TabIndex = 10;
             this.buttonWorkingDir.Text = "...";
             this.buttonWorkingDir.UseVisualStyleBackColor = true;
-            this.buttonWorkingDir.Click += new System.EventHandler(this.workingDirButton_Click);
+            this.buttonWorkingDir.Click += new System.EventHandler(this.OnWorkingDirButtonClick);
             // 
             // textBoxWorkingDir
             // 
@@ -1048,7 +1048,7 @@
             this.textBoxMultifilePattern.Name = "textBoxMultifilePattern";
             this.textBoxMultifilePattern.Size = new System.Drawing.Size(187, 20);
             this.textBoxMultifilePattern.TabIndex = 0;
-            this.textBoxMultifilePattern.TextChanged += new System.EventHandler(this.multifilePattern_TextChanged);
+            this.textBoxMultifilePattern.TextChanged += new System.EventHandler(this.OnMultiFilePatternTextChanged);
             // 
             // labelHintMultiFile
             // 
@@ -1470,7 +1470,7 @@
             this.buttonCancel.TabIndex = 1;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.cancelButton_Click);
+            this.buttonCancel.Click += new System.EventHandler(this.OnCancelButtonClick);
             // 
             // buttonOk
             // 
@@ -1495,7 +1495,7 @@
             this.buttonExport.TabIndex = 2;
             this.buttonExport.Text = "Export...";
             this.buttonExport.UseVisualStyleBackColor = true;
-            this.buttonExport.Click += new System.EventHandler(this.exportButton_Click);
+            this.buttonExport.Click += new System.EventHandler(this.OnExportButtonClick);
             // 
             // buttonImport
             // 
@@ -1505,7 +1505,7 @@
             this.buttonImport.TabIndex = 3;
             this.buttonImport.Text = "Import...";
             this.buttonImport.UseVisualStyleBackColor = true;
-            this.buttonImport.Click += new System.EventHandler(this.importButton_Click);
+            this.buttonImport.Click += new System.EventHandler(this.OnImportButtonClick);
             // 
             // dataGridViewTextBoxColumn1
             // 

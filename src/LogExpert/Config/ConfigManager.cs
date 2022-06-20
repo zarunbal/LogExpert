@@ -60,7 +60,7 @@ namespace LogExpert
         
         public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
 
-        public static string PortableMode => Application.StartupPath + "\\portableMode.dat";
+        public static string PortableMode => Application.StartupPath + "\\portableMode.json";
 
         public static Settings Settings => Instance._settings;
 
@@ -73,24 +73,17 @@ namespace LogExpert
             Instance.Save(Settings, flags);
         }
 
-        public static void Export(Stream fs)
+        public static void Export(FileInfo fileInfo)
         {
-            Instance.Save(fs, Settings, SettingsFlags.None);
-        }
-
-        public static void Import(Stream fs, ExportImportFlags flags)
-        {
-            Instance._settings = Instance.Import(Instance._settings, fs, flags);
-            Save(SettingsFlags.All);
+            Instance.Save(fileInfo, Settings, SettingsFlags.None);
         }
 
         public static void Import(FileInfo fileInfo, ExportImportFlags flags)
         {
-            Stream fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
-            Import(fs, flags);
-            fs.Close();
+            Instance._settings = Instance.Import(Instance._settings, fileInfo, flags);
+            Save(SettingsFlags.All);
         }
-
+        
         #endregion
 
         #region Private Methods
@@ -116,46 +109,43 @@ namespace LogExpert
             {
                 Directory.CreateDirectory(dir);
             }
-            if (!File.Exists(dir + "\\settings.dat"))
+            if (!File.Exists(dir + "\\settings.json"))
             {
                 return LoadOrCreateNew(null);
             }
 
-            using (Stream fs = File.OpenRead(dir + "\\settings.dat"))
+            try
             {
-                try
-                {
-                    return LoadOrCreateNew(fs);
-                }   
-                catch (Exception e)
-                {
-                    _logger.Error(e,"Error loading settings: {0}");
-                    return LoadOrCreateNew(null);
-                }
+                FileInfo fileInfo = new FileInfo(dir + "\\settings.json");
+                return LoadOrCreateNew(fileInfo);
             }
+            catch (Exception e)
+            {
+                _logger.Error($"Error loading settings: {e}");
+                return LoadOrCreateNew(null);
+            }
+
         }
 
-        private Settings LoadOrCreateNew(Stream fs)
+        private Settings LoadOrCreateNew(FileInfo fileInfo)
         {
             lock (_loadSaveLock)
             {
                 Settings settings;
 
-                if (fs == null)
+                if (fileInfo == null)
                 {
                     settings = new Settings();
                 }
                 else
                 {
-                    BinaryFormatter formatter = new BinaryFormatter();
                     try
                     {
-                        
-                        settings = (Settings) formatter.Deserialize(fs);
+                        settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText($"{fileInfo.DirectoryName}{fileInfo.Name}"));
                     }
-                    catch (SerializationException e)
+                    catch (Exception e)
                     {
-                        _logger.Error(e, "Error while deserializing config data: ");
+                        _logger.Error($"Error while deserializing config data: {e}");
                         settings = new Settings();
                     }
                 }
@@ -295,33 +285,30 @@ namespace LogExpert
                         Directory.CreateDirectory(dir);
                     }
 
-                    using (Stream fs = new FileStream(dir + "\\settings.dat", FileMode.Create, FileAccess.Write))
-                    {
-                        Save(fs, settings, flags);
-                    }
+                    FileInfo fileInfo = new FileInfo(dir + "\\settings.json");
+                    Save(fileInfo, settings, flags);
                 }
 
                 OnConfigChanged(flags);
             }
         }
 
-        private void Save(Stream fs, Settings settings, SettingsFlags flags)
+        /// <summary>
+        /// Saves the file in any defined format
+        /// </summary>
+        /// <param name="fileInfo">FileInfo for creating the file (if exists will be overwritten)</param>
+        /// <param name="settings">Current Settings</param>
+        /// <param name="flags"></param>
+        private void Save(FileInfo fileInfo, Settings settings, SettingsFlags flags)
         {
-            //TODO SettingsFlags is currently not used => why does it exist
-            settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
-            BinaryFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(fs, settings);
-
-            SaveJson(fs, settings);
+            SaveAsJSON(fileInfo, settings);
         }
 
-        private static void SaveJson(Stream fs, Settings settings)
+        private void SaveAsJSON(FileInfo fileInfo, Settings settings)
         {
-            FileInfo fi = new FileInfo(((FileStream)fs).Name);
-            string newFile = Path.ChangeExtension(fi.Name, "json");
-            string newPath = Path.Combine(fi.DirectoryName, newFile);
+            settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
 
-            using (StreamWriter sw = new StreamWriter(newPath))
+            using (StreamWriter sw = new StreamWriter(fileInfo.Create()))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(sw, settings);
@@ -382,11 +369,12 @@ namespace LogExpert
         /// Imports all or some of the settings/prefs stored in the input stream.
         /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
         /// </summary>
-        /// <param name="fs"></param>
+        /// <param name="currentSettings"></param>
+        /// <param name="fileInfo"></param>
         /// <param name="flags">Flags to indicate which parts shall be imported</param>
-        private Settings Import(Settings currentSettings, Stream fs, ExportImportFlags flags)
+        private Settings Import(Settings currentSettings, FileInfo fileInfo, ExportImportFlags flags)
         {
-            Settings importSettings = LoadOrCreateNew(fs);
+            Settings importSettings = LoadOrCreateNew(fileInfo);
             Settings ownSettings = ObjectClone.Clone(currentSettings);
             Settings newSettings;
 
@@ -431,10 +419,8 @@ namespace LogExpert
             {
                 return existingList.Union(newList).ToList();                
             }
-            else
-            {
-                return newList;
-            }
+
+            return newList;
         }
 
         #endregion

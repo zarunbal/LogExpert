@@ -183,7 +183,7 @@ namespace LogExpert.Dialogs
             Preferences.multiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
         }
 
-        private void ToolButtonClick(TextBox textBox)
+        private void OnToolButtonClick(TextBox textBox)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
@@ -648,7 +648,7 @@ namespace LogExpert.Dialogs
 
         private void toolButtonA_Click(object sender, EventArgs e)
         {
-            ToolButtonClick(textBoxTool);
+            OnToolButtonClick(textBoxTool);
         }
 
         private void argButtonA_Click(object sender, EventArgs e)
@@ -892,38 +892,36 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void OnCancelButtonClick(object sender, EventArgs e)
         {
             _selectedPlugin?.HideConfigForm();
         }
 
-        private void workingDirButton_Click(object sender, EventArgs e)
+        private void OnWorkingDirButtonClick(object sender, EventArgs e)
         {
             WorkingDirButtonClick(textBoxWorkingDir);
         }
 
-        private void multifilePattern_TextChanged(object sender, EventArgs e)
+        private void OnMultiFilePatternTextChanged(object sender, EventArgs e)
         {
             string pattern = textBoxMultifilePattern.Text;
             upDownMultifileDays.Enabled = pattern.Contains("$D");
         }
 
-        private void exportButton_Click(object sender, EventArgs e)
+        private void OnExportButtonClick(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Title = @"Export Settings to file";
-            dlg.DefaultExt = "dat";
+            dlg.DefaultExt = "json";
             dlg.AddExtension = true;
-            dlg.Filter = @"Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            dlg.Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*";
             
             DialogResult result = dlg.ShowDialog();
             
             if (result == DialogResult.OK)
             {
-                using (Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
-                {
-                    ConfigManager.Export(fs);
-                }
+                FileInfo fileInfo = new FileInfo(dlg.FileName);
+                ConfigManager.Export(fileInfo);
             }
         }
 
@@ -932,7 +930,7 @@ namespace LogExpert.Dialogs
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void importButton_Click(object sender, EventArgs e)
+        private void OnImportButtonClick(object sender, EventArgs e)
         {
             ImportSettingsDialog dlg = new ImportSettingsDialog();
 
@@ -943,38 +941,24 @@ namespace LogExpert.Dialogs
                     return;
                 }
 
-                Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read);
-                ConfigManager.Import(fs, dlg.ImportFlags);
-                fs.Close();
+                FileInfo fileInfo;
+                try
+                {
+                    fileInfo = new FileInfo(dlg.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                    return;
+                }
+
+                ConfigManager.Import(fileInfo, dlg.ImportFlags);
                 Preferences = ConfigManager.Settings.preferences;
                 FillDialog();
-                MessageBox.Show(this, "Settings imported", "LogExpert");
+                MessageBox.Show(this, @"Settings imported", @"LogExpert");
             }
         }
 
         #endregion
-
-        //TODO why is this class here, its not referenced anywhere and not used!
-        //TODO Refactor or DELTE
-        private class ColumnizerEntry
-        {
-            #region cTor
-
-            public ColumnizerEntry(ILogLineColumnizer columnizer)
-            {
-                Columnizer = columnizer;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public string Name => Columnizer.GetName();
-
-            public ILogLineColumnizer Columnizer { get; }
-
-            #endregion
-        }
-
     }
 }
