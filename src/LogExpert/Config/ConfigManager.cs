@@ -126,13 +126,18 @@ namespace LogExpert
 
         }
 
-        private Settings LoadOrCreateNew(FileInfo fileInfo)
+        /// <summary>
+        /// Loads Settings of a given file or creates new settings if the file does not exist
+        /// </summary>
+        /// <param name="fileInfo">file that has settings saved</param>
+        /// <returns>loaded or created settings</returns>
+        private Settings LoadOrCreateNew(FileSystemInfo fileInfo)
         {
             lock (_loadSaveLock)
             {
                 Settings settings;
 
-                if (fileInfo == null)
+                if (fileInfo == null ||  fileInfo.Exists == false)
                 {
                     settings = new Settings();
                 }
@@ -302,9 +307,9 @@ namespace LogExpert
         /// </summary>
         /// <param name="fileInfo">FileInfo for creating the file (if exists will be overwritten)</param>
         /// <param name="settings">Current Settings</param>
-        /// <param name="flags"></param>
         private void Save(FileInfo fileInfo, Settings settings)
         {
+            //Currently only fileFormat, maybe add some other formats later (YAML or XML?)
             SaveAsJSON(fileInfo, settings);
         }
 
