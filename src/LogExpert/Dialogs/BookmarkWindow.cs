@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Config;
+using LogExpert.Entities;
+using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 

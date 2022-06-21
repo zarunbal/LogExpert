@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Controls.LogWindow;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class TimeSpreadCalculator
     {

@@ -1,7 +1,7 @@
-﻿using LogExpert.Dialogs;
-using System.Windows.Forms;
-using System.Drawing;
-namespace LogExpert
+﻿using System.Windows.Forms;
+using LogExpert.Dialogs;
+
+namespace LogExpert.Controls.LogTabWindow
 {
 	partial class LogTabWindow
 	{

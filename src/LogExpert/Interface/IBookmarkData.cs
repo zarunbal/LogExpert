@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections.ObjectModel;
+﻿using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     public interface IBookmarkData
     {

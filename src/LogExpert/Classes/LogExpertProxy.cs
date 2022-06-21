@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
+using LogExpert.Controls.LogTabWindow;
+using LogExpert.Interface;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class LogExpertProxy : MarshalByRefObject, ILogExpertProxy
     {

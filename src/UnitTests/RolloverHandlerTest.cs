@@ -5,6 +5,8 @@ using NUnit.Framework;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections;
+using LogExpert.Classes.Log;
+using LogExpert.Entities;
 
 
 namespace LogExpert

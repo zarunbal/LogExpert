@@ -5,7 +5,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Config;
+using LogExpert.Controls.LogTabWindow;
+using LogExpert.Entities;
 
 namespace LogExpert.Dialogs
 {

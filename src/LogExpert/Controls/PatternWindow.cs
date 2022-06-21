@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Entities.EventArgs;
 
-namespace LogExpert
+namespace LogExpert.Controls
 {
     public partial class PatternWindow : Form
     {
@@ -16,7 +15,7 @@ namespace LogExpert
         private PatternBlock currentBlock;
         private List<PatternBlock> currentList;
 
-        private readonly LogWindow logWindow;
+        private readonly LogWindow.LogWindow logWindow;
         private PatternArgs patternArgs = new PatternArgs();
 
         #endregion
@@ -28,7 +27,7 @@ namespace LogExpert
             InitializeComponent();
         }
 
-        public PatternWindow(LogWindow logWindow)
+        public PatternWindow(LogWindow.LogWindow logWindow)
         {
             this.logWindow = logWindow;
             InitializeComponent();

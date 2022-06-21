@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Interface;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     internal class FilterCancelHandler : BackgroundProcessCancelHandler
     {

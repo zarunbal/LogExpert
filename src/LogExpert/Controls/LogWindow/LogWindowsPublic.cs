@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
-//using System.Linq;
-using System.Windows.Forms;
 using System.IO;
+using System.Text;
+using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Bookmark;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
+using LogExpert.Classes.Log;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+//using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogWindow
 {
     public partial class LogWindow
     {

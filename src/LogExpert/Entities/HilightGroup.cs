@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using LogExpert.Classes.Highlight;
 
-namespace LogExpert
+namespace LogExpert.Entities
 {
     [Serializable]
     public class HilightGroup

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     /* Needed info:
      * - Date/time mask

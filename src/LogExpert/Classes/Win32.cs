@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal static class Win32
     {

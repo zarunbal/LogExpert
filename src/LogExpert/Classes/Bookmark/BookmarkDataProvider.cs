@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using LogExpert.Entities;
+using LogExpert.Interface;
 using NLog;
 
 namespace LogExpert.Classes.Bookmark
@@ -16,10 +18,10 @@ namespace LogExpert.Classes.Bookmark
 
         internal BookmarkDataProvider()
         {
-            BookmarkList = new SortedList<int, LogExpert.Bookmark>();
+            BookmarkList = new SortedList<int, Entities.Bookmark>();
         }
 
-        internal BookmarkDataProvider(SortedList<int, LogExpert.Bookmark> bookmarkList)
+        internal BookmarkDataProvider(SortedList<int, Entities.Bookmark> bookmarkList)
         {
             BookmarkList = bookmarkList;
         }
@@ -48,7 +50,7 @@ namespace LogExpert.Classes.Bookmark
         
         public BookmarkCollection Bookmarks => new BookmarkCollection(BookmarkList);
 
-        internal SortedList<int, LogExpert.Bookmark> BookmarkList { get; set; }
+        internal SortedList<int, Entities.Bookmark> BookmarkList { get; set; }
 
         #endregion
 
@@ -62,7 +64,7 @@ namespace LogExpert.Classes.Bookmark
             }
             else
             {
-                AddBookmark(new LogExpert.Bookmark(lineNum));
+                AddBookmark(new Entities.Bookmark(lineNum));
             }
         }
 
@@ -76,7 +78,7 @@ namespace LogExpert.Classes.Bookmark
             return BookmarkList.IndexOfKey(lineNum);
         }
 
-        public LogExpert.Bookmark GetBookmarkForLine(int lineNum)
+        public Entities.Bookmark GetBookmarkForLine(int lineNum)
         {
             return BookmarkList[lineNum];
         }
@@ -87,8 +89,8 @@ namespace LogExpert.Classes.Bookmark
 
         internal void ShiftBookmarks(int offset)
         {
-            SortedList<int, LogExpert.Bookmark> newBookmarkList = new SortedList<int, LogExpert.Bookmark>();
-            foreach (LogExpert.Bookmark bookmark in BookmarkList.Values)
+            SortedList<int, Entities.Bookmark> newBookmarkList = new SortedList<int, Entities.Bookmark>();
+            foreach (Entities.Bookmark bookmark in BookmarkList.Values)
             {
                 int line = bookmark.LineNum - offset;
                 if (line >= 0)
@@ -102,7 +104,7 @@ namespace LogExpert.Classes.Bookmark
 
         internal int FindPrevBookmarkIndex(int lineNum)
         {
-            IList<LogExpert.Bookmark> values = BookmarkList.Values;
+            IList<Entities.Bookmark> values = BookmarkList.Values;
             for (int i = BookmarkList.Count - 1; i >= 0; --i)
             {
                 if (values[i].LineNum <= lineNum)
@@ -115,7 +117,7 @@ namespace LogExpert.Classes.Bookmark
 
         internal int FindNextBookmarkIndex(int lineNum)
         {
-            IList<LogExpert.Bookmark> values = BookmarkList.Values;
+            IList<Entities.Bookmark> values = BookmarkList.Values;
             for (int i = 0; i < BookmarkList.Count; ++i)
             {
                 if (values[i].LineNum >= lineNum)
@@ -142,7 +144,7 @@ namespace LogExpert.Classes.Bookmark
         }
 
 
-        internal void AddBookmark(LogExpert.Bookmark bookmark)
+        internal void AddBookmark(Entities.Bookmark bookmark)
         {
             BookmarkList.Add(bookmark.LineNum, bookmark);
             OnBookmarkAdded();

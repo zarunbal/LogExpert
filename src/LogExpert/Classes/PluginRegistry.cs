@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using System.IO;
+using LogExpert.Classes.Columnizer;
+using LogExpert.Config;
+using LogExpert.Entities;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     /// <summary>
     /// Holds all registered plugins.

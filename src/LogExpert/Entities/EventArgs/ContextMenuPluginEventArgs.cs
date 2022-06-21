@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Entities.EventArgs
 {
-    public class ContextMenuPluginEventArgs : EventArgs
+    public class ContextMenuPluginEventArgs : System.EventArgs
     {
         #region Fields
 

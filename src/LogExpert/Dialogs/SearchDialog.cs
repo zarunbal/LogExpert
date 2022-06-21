@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using LogExpert.Entities;
 using NLog;
 
 namespace LogExpert.Dialogs

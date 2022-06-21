@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogTabWindow
 {
     public partial class LogTabWindow
     {
@@ -81,16 +85,16 @@ namespace LogExpert
                 ledThread.Join();
                 statusLineThread.Join();
 
-                IList<LogWindow> deleteLogWindowList = new List<LogWindow>();
+                IList<LogWindow.LogWindow> deleteLogWindowList = new List<LogWindow.LogWindow>();
                 ConfigManager.Settings.alwaysOnTop = TopMost && ConfigManager.Settings.preferences.allowOnlyOneInstance;
                 SaveLastOpenFilesList();
 
-                foreach (LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in logWindowList)
                 {
                     deleteLogWindowList.Add(logWindow);
                 }
 
-                foreach (LogWindow logWindow in deleteLogWindowList)
+                foreach (LogWindow.LogWindow logWindow in deleteLogWindowList)
                 {
                     RemoveAndDisposeLogWindow(logWindow, true);
                 }
@@ -131,7 +135,7 @@ namespace LogExpert
 
         private void logWindow_Disposed(object sender, EventArgs e)
         {
-            LogWindow logWindow = sender as LogWindow;
+            LogWindow.LogWindow logWindow = sender as LogWindow.LogWindow;
             if (sender == CurrentLogWindow)
             {
                 ChangeCurrentLogWindow(null);
@@ -164,7 +168,7 @@ namespace LogExpert
                 {
                     lock (logWindowList)
                     {
-                        foreach (LogWindow logWindow in logWindowList)
+                        foreach (LogWindow.LogWindow logWindow in logWindowList)
                         {
                             if (logWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
                             {
@@ -196,7 +200,7 @@ namespace LogExpert
                     {
                         lock (logWindowList)
                         {
-                            foreach (LogWindow logWindow in logWindowList)
+                            foreach (LogWindow.LogWindow logWindow in logWindowList)
                             {
                                 if (logWindow.CurrentColumnizer.GetType() == form.SelectedColumnizer.GetType())
                                 {
@@ -435,14 +439,14 @@ namespace LogExpert
 
         private void FileSizeChanged(object sender, LogEventArgs e)
         {
-            if (sender.GetType().IsAssignableFrom(typeof(LogWindow)))
+            if (sender.GetType().IsAssignableFrom(typeof(LogWindow.LogWindow)))
             {
                 int diff = e.LineCount - e.PrevLineCount;
                 if (diff < 0)
                 {
                     return;
                 }
-                LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
+                LogWindowData data = ((LogWindow.LogWindow) sender).Tag as LogWindowData;
                 if (data != null)
                 {
                     lock (data)
@@ -462,7 +466,7 @@ namespace LogExpert
                         data.dirty = true;
                     }
                     Icon icon = GetIcon(diff, data);
-                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
+                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow) sender, icon);
                 }
             }
         }
@@ -481,7 +485,7 @@ namespace LogExpert
         {
             lock (logWindowList)
             {
-                foreach (LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in logWindowList)
                 {
                     if (logWindow != e.LogWindow)
                     {
@@ -505,14 +509,14 @@ namespace LogExpert
             {
                 return;
             }
-            if (sender.GetType().IsAssignableFrom(typeof(LogWindow)))
+            if (sender.GetType().IsAssignableFrom(typeof(LogWindow.LogWindow)))
             {
                 if (dockPanel.ActiveContent == sender)
                 {
-                    LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
+                    LogWindowData data = ((LogWindow.LogWindow) sender).Tag as LogWindowData;
                     data.dirty = false;
                     Icon icon = GetIcon(data.diffSum, data);
-                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
+                    BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow) sender, icon);
                 }
             }
         }
@@ -521,10 +525,10 @@ namespace LogExpert
         {
             if (!Disposing)
             {
-                LogWindowData data = ((LogWindow) sender).Tag as LogWindowData;
+                LogWindowData data = ((LogWindow.LogWindow) sender).Tag as LogWindowData;
                 data.syncMode = e.IsTimeSynced ? 1 : 0;
                 Icon icon = GetIcon(data.diffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow) sender, icon);
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow) sender, icon);
             }
             else
             {
@@ -685,7 +689,7 @@ namespace LogExpert
             ConfigManager.Settings.hideLineColumn = hideLineColumnToolStripMenuItem.Checked;
             lock (logWindowList)
             {
-                foreach (LogWindow logWin in logWindowList)
+                foreach (LogWindow.LogWindow logWin in logWindowList)
                 {
                     logWin.ShowLineColumn(!ConfigManager.Settings.hideLineColumn);
                 }
@@ -699,7 +703,7 @@ namespace LogExpert
 
         private void closeThisTabToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            (dockPanel.ActiveContent as LogWindow).Close();
+            (dockPanel.ActiveContent as LogWindow.LogWindow).Close();
         }
 
         private void closeOtherTabsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -709,7 +713,7 @@ namespace LogExpert
             {
                 foreach (DockContent content in dockPanel.Contents)
                 {
-                    if (content != dockPanel.ActiveContent && content is LogWindow)
+                    if (content != dockPanel.ActiveContent && content is LogWindow.LogWindow)
                     {
                         closeList.Add(content as Form);
                     }
@@ -728,7 +732,7 @@ namespace LogExpert
 
         private void tabColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
+            LogWindow.LogWindow logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
 
             LogWindowData data = logWindow.Tag as LogWindowData;
             if (data == null)
@@ -789,7 +793,7 @@ namespace LogExpert
                 {
                     foreach (DockContent content in dockPanel.Contents)
                     {
-                        LogWindow logWindow = content as LogWindow;
+                        LogWindow.LogWindow logWindow = content as LogWindow.LogWindow;
                         string persistenceFileName = logWindow?.SavePersistenceData(true);
                         if (persistenceFileName != null)
                         {
@@ -826,13 +830,13 @@ namespace LogExpert
 
         private void copyPathToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
+            LogWindow.LogWindow logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
             Clipboard.SetText(logWindow.Title);
         }
 
         private void findInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
+            LogWindow.LogWindow logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
 
             Process explorer = new Process();
             explorer.StartInfo.FileName = "explorer.exe";
@@ -1033,9 +1037,9 @@ namespace LogExpert
 
         private void dockPanel_ActiveContentChanged(object sender, EventArgs e)
         {
-            if (dockPanel.ActiveContent is LogWindow)
+            if (dockPanel.ActiveContent is LogWindow.LogWindow)
             {
-                CurrentLogWindow = dockPanel.ActiveContent as LogWindow;
+                CurrentLogWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
                 CurrentLogWindow.LogWindowActivated();
                 ConnectToolWindows(CurrentLogWindow);
             }

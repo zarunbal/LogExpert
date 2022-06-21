@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Config;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     /// <summary>
     /// Interface to be implemented by tools windows that are shared across multiple log files.

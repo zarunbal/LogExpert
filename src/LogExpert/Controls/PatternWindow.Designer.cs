@@ -1,4 +1,4 @@
-﻿namespace LogExpert
+﻿namespace LogExpert.Controls
 {
   partial class PatternWindow
   {
@@ -47,10 +47,10 @@
       this.label4 = new System.Windows.Forms.Label();
       this.label3 = new System.Windows.Forms.Label();
       this.rangeLabel = new System.Windows.Forms.Label();
-      this.weigthKnobControl = new LogExpert.KnobControl();
-      this.maxMissesKnobControl = new LogExpert.KnobControl();
-      this.maxDiffKnobControl = new LogExpert.KnobControl();
-      this.fuzzyKnobControl = new LogExpert.KnobControl();
+      this.weigthKnobControl = new KnobControl();
+      this.maxMissesKnobControl = new KnobControl();
+      this.maxDiffKnobControl = new KnobControl();
+      this.fuzzyKnobControl = new KnobControl();
       this.patternHitsDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
       this.contentDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
       this.splitContainer1.Panel1.SuspendLayout();

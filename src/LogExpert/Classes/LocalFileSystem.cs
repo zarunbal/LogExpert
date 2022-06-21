@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using LogExpert.Classes.Log;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     public class LocalFileSystem : IFileSystemPlugin
     {

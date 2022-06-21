@@ -5,7 +5,7 @@ using System.Drawing;
 
 #endregion
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class ColorEntry

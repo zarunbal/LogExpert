@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
+using LogExpert.Controls.LogTabWindow;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class LogExpertApplicationContext : ApplicationContext
     {

@@ -5,6 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Highlight;
+using LogExpert.Config;
+using LogExpert.Entities;
 using NLog;
 
 namespace LogExpert.Dialogs

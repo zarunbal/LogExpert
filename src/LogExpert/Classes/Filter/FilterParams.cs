@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     [Serializable]
     public class FilterParams

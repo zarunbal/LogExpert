@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using NLog;
 
-
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     public class LogBuffer
     {

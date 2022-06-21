@@ -1,4 +1,6 @@
-﻿namespace LogExpert
+﻿using LogExpert.Classes.Filter;
+
+namespace LogExpert.Classes.Persister
 {
     public class FilterTabData
     {

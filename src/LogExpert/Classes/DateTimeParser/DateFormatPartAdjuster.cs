@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Classes.DateTimeParser
 {
     // Ensures we have constant width (number of characters) date formats
     internal static class DateFormatPartAdjuster

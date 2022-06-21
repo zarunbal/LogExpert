@@ -1,6 +1,7 @@
 using System;
+using LogExpert.Classes;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class ToolEntry

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert.Entities.EventArgs
 {
-    public class ColumnizerEventArgs : EventArgs
+    public class ColumnizerEventArgs : System.EventArgs
     {
         #region Fields
 

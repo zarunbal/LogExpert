@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Controls.LogWindow;
 
-namespace LogExpert
+namespace LogExpert.Entities
 {
     /// <summary>
     /// Represents a log file and its window. Used as a kind of handle for menus or list of open files.

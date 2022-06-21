@@ -6,6 +6,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using LogExpert.Entities;
 using NLog;
 
 namespace LogExpert.Dialogs

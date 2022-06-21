@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LogExpert.Config;
 using Newtonsoft.Json;
 using NUnit.Framework;
 

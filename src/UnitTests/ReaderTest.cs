@@ -6,6 +6,8 @@ using LogExpert;
 using System.IO;
 using System.Windows.Forms;
 using LogExpert.Classes.Log;
+using LogExpert.Entities;
+using LogExpert.Interface;
 
 namespace UnitTests
 {

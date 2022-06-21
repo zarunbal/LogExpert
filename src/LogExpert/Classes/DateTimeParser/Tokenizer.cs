@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogExpert
+namespace LogExpert.Classes.DateTimeParser
 {
     internal class Tokenizer
     {

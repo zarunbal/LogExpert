@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class Settings

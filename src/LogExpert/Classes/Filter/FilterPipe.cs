@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
+using LogExpert.Controls.LogWindow;
 using NLog;
 
-
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     public class FilterPipe
     {

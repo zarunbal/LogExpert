@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using LogExpert;
+using LogExpert.Classes.Log;
+using LogExpert.Entities;
 
 namespace UnitTests
 {

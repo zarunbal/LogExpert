@@ -1,6 +1,7 @@
 ﻿using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Classes.Log;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class ColumnCache
     {

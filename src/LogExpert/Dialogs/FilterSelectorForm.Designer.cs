@@ -1,4 +1,4 @@
-﻿namespace LogExpert
+﻿namespace LogExpert.Dialogs
 {
   partial class FilterSelectorForm
   {

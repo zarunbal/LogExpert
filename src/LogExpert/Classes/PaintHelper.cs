@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Windows.Forms;
+using LogExpert.Classes.Highlight;
+using LogExpert.Config;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Interface;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class PaintHelper
     {
@@ -90,7 +93,7 @@ namespace LogExpert
 
                 if (e.ColumnIndex == 0)
                 {
-                    Bookmark bookmark = logPaintCtx.GetBookmarkForLine(rowIndex);
+                    Entities.Bookmark bookmark = logPaintCtx.GetBookmarkForLine(rowIndex);
                     if (bookmark != null)
                     {
                         Rectangle r; // = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);

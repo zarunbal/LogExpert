@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class RegexHistory

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using LogExpert.Config;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Columnizer
 {

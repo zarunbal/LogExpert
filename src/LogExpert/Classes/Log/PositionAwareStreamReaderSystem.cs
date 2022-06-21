@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Log
 {

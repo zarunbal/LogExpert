@@ -1,26 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
-//using System.Linq;
-using System.Windows.Forms;
-using LogExpert.Dialogs;
-using System.Text.RegularExpressions;
-using System.Runtime.Remoting.Messaging;
-using System.Threading;
-using System.IO;
-using System.Globalization;
 using System.Reflection;
-using System.Diagnostics;
-using System.Resources;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.Threading;
+using System.Windows.Forms;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
 using NLog;
-using WeifenLuo.WinFormsUI.Docking;
+//using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogTabWindow
 {
     public partial class LogTabWindow : Form
     {
@@ -42,7 +34,7 @@ namespace LogExpert
 
         private readonly Rectangle[] leds = new Rectangle[5];
 
-        private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
+        private readonly IList<LogWindow.LogWindow> logWindowList = new List<LogWindow.LogWindow>();
         private readonly Brush offLedBrush;
         private readonly bool showInstanceNumbers = false;
 
@@ -57,7 +49,7 @@ namespace LogExpert
 
         private BookmarkWindow bookmarkWindow;
 
-        private LogWindow currentLogWindow = null;
+        private LogWindow.LogWindow currentLogWindow = null;
         private bool firstBookmarkWindowShow = true;
 
         private StatusLineEventArgs lastStatusLineEvent = null;
@@ -147,9 +139,9 @@ namespace LogExpert
 
         private delegate void ExceptionFx();
 
-        private delegate void FileNotFoundDelegate(LogWindow logWin);
+        private delegate void FileNotFoundDelegate(LogWindow.LogWindow logWin);
 
-        private delegate void FileRespawnedDelegate(LogWindow logWin);
+        private delegate void FileRespawnedDelegate(LogWindow.LogWindow logWin);
 
         private delegate void GuiStateUpdateWorkerDelegate(GuiStateArgs e);
 
@@ -163,7 +155,7 @@ namespace LogExpert
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
 
-        private delegate void SetTabIconDelegate(LogWindow logWindow, Icon icon);
+        private delegate void SetTabIconDelegate(LogWindow.LogWindow logWindow, Icon icon);
 
         private delegate void StatusLineEventFx(StatusLineEventArgs e);
 
@@ -177,7 +169,7 @@ namespace LogExpert
 
         #region Properties
 
-        public LogWindow CurrentLogWindow
+        public LogWindow.LogWindow CurrentLogWindow
         {
             get { return this.currentLogWindow; }
             set { ChangeCurrentLogWindow(value); }

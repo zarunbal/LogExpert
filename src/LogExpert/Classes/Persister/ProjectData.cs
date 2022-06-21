@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Classes.Persister
 {
     public class ProjectData
     {
