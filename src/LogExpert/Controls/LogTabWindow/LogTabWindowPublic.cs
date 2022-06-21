@@ -88,8 +88,8 @@ namespace LogExpert.Controls.LogTabWindow
             }
 
             LogWindowData data = logWindow.Tag as LogWindowData;
-            data.color = defaultTabColor;
-            SetTabColor(logWindow, defaultTabColor);
+            data.color = _defaultTabColor;
+            SetTabColor(logWindow, _defaultTabColor);
             //data.tabPage.BorderColor = this.defaultTabBorderColor;
             if (!isTempFile)
             {
@@ -216,9 +216,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow.LogWindow senderWindow)
         {
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow.LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     if (logWindow != senderWindow)
                     {
@@ -291,7 +291,7 @@ namespace LogExpert.Controls.LogTabWindow
             SetForegroundWindow(Handle);
             if (WindowState == FormWindowState.Minimized)
             {
-                if (wasMaximized)
+                if (_wasMaximized)
                 {
                     WindowState = FormWindowState.Maximized;
                 }
@@ -341,9 +341,9 @@ namespace LogExpert.Controls.LogTabWindow
         public IList<WindowFileEntry> GetListOfOpenFiles()
         {
             IList<WindowFileEntry> list = new List<WindowFileEntry>();
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow.LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     list.Add(new WindowFileEntry(logWindow));
                 }

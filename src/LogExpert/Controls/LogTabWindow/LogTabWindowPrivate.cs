@@ -63,18 +63,18 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void InitBookmarkWindow()
         {
-            bookmarkWindow = new BookmarkWindow();
-            bookmarkWindow.HideOnClose = true;
-            bookmarkWindow.ShowHint = DockState.DockBottom;
-            bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, SettingsFlags.All);
-            bookmarkWindow.VisibleChanged += bookmarkWindow_VisibleChanged;
-            firstBookmarkWindowShow = true;
+            _bookmarkWindow = new BookmarkWindow();
+            _bookmarkWindow.HideOnClose = true;
+            _bookmarkWindow.ShowHint = DockState.DockBottom;
+            _bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, SettingsFlags.All);
+            _bookmarkWindow.VisibleChanged += OnBookmarkWindowVisibleChanged;
+            _firstBookmarkWindowShow = true;
         }
 
         private void DestroyBookmarkWindow()
         {
-            bookmarkWindow.HideOnClose = false;
-            bookmarkWindow.Close();
+            _bookmarkWindow.HideOnClose = false;
+            _bookmarkWindow.Close();
         }
 
         private void SaveLastOpenFilesList()
@@ -169,33 +169,33 @@ namespace LogExpert.Controls.LogTabWindow
             LogWindowData data = new LogWindowData();
             data.diffSum = 0;
             logWindow.Tag = data;
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                logWindowList.Add(logWindow);
+                _logWindowList.Add(logWindow);
             }
 
-            logWindow.FileSizeChanged += FileSizeChanged;
-            logWindow.TailFollowed += TailFollowed;
-            logWindow.Disposed += logWindow_Disposed;
-            logWindow.FileNotFound += logWindow_FileNotFound;
-            logWindow.FileRespawned += logWindow_FileRespawned;
-            logWindow.FilterListChanged += logWindow_FilterListChanged;
-            logWindow.CurrentHighlightGroupChanged += logWindow_CurrentHighlightGroupChanged;
-            logWindow.SyncModeChanged += logWindow_SyncModeChanged;
+            logWindow.FileSizeChanged += OnFileSizeChanged;
+            logWindow.TailFollowed += OnTailFollowed;
+            logWindow.Disposed += OnLogWindowDisposed;
+            logWindow.FileNotFound += OnLogWindowFileNotFound;
+            logWindow.FileRespawned += OnLogWindowFileRespawned;
+            logWindow.FilterListChanged += OnLogWindowFilterListChanged;
+            logWindow.CurrentHighlightGroupChanged += OnLogWindowCurrentHighlightGroupChanged;
+            logWindow.SyncModeChanged += OnLogWindowSyncModeChanged;
 
             logWindow.Visible = true;
         }
 
         private void DisconnectEventHandlers(LogWindow.LogWindow logWindow)
         {
-            logWindow.FileSizeChanged -= FileSizeChanged;
-            logWindow.TailFollowed -= TailFollowed;
-            logWindow.Disposed -= logWindow_Disposed;
-            logWindow.FileNotFound -= logWindow_FileNotFound;
-            logWindow.FileRespawned -= logWindow_FileRespawned;
-            logWindow.FilterListChanged -= logWindow_FilterListChanged;
-            logWindow.CurrentHighlightGroupChanged -= logWindow_CurrentHighlightGroupChanged;
-            logWindow.SyncModeChanged -= logWindow_SyncModeChanged;
+            logWindow.FileSizeChanged -= OnFileSizeChanged;
+            logWindow.TailFollowed -= OnTailFollowed;
+            logWindow.Disposed -= OnLogWindowDisposed;
+            logWindow.FileNotFound -= OnLogWindowFileNotFound;
+            logWindow.FileRespawned -= OnLogWindowFileRespawned;
+            logWindow.FilterListChanged -= OnLogWindowFilterListChanged;
+            logWindow.CurrentHighlightGroupChanged -= OnLogWindowCurrentHighlightGroupChanged;
+            logWindow.SyncModeChanged -= OnLogWindowSyncModeChanged;
 
             LogWindowData data = logWindow.Tag as LogWindowData;
             //data.tabPage.MouseClick -= tabPage_MouseClick;
@@ -232,9 +232,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         private LogWindow.LogWindow FindWindowForFile(string fileName)
         {
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow.LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     if (logWindow.FileName.ToLower().Equals(fileName.ToLower()))
                     {
@@ -296,16 +296,16 @@ namespace LogExpert.Controls.LogTabWindow
                 strip.Items.Add(item);
             }
 
-            strip.ItemClicked += history_ItemClicked;
-            strip.MouseUp += strip_MouseUp;
+            strip.ItemClicked += OnHistoryItemClicked;
+            strip.MouseUp += OnStripMouseUp;
             lastUsedToolStripMenuItem.DropDown = strip;
         }
 
         private void RemoveLogWindow(LogWindow.LogWindow logWindow)
         {
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                logWindowList.Remove(logWindow);
+                _logWindowList.Remove(logWindow);
             }
 
             DisconnectEventHandlers(logWindow);
@@ -318,9 +318,9 @@ namespace LogExpert.Controls.LogTabWindow
                 ChangeCurrentLogWindow(null);
             }
 
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                logWindowList.Remove(logWindow);
+                _logWindowList.Remove(logWindow);
             }
 
             logWindow.Close(dontAsk);
@@ -509,36 +509,36 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ChangeCurrentLogWindow(LogWindow.LogWindow newLogWindow)
         {
-            if (newLogWindow == currentLogWindow)
+            if (newLogWindow == _currentLogWindow)
             {
                 return; // do nothing if wishing to set the same window
             }
 
-            LogWindow.LogWindow oldLogWindow = currentLogWindow;
-            currentLogWindow = newLogWindow;
-            string titleName = showInstanceNumbers ? "LogExpert #" + instanceNumber : "LogExpert";
+            LogWindow.LogWindow oldLogWindow = _currentLogWindow;
+            _currentLogWindow = newLogWindow;
+            string titleName = _showInstanceNumbers ? "LogExpert #" + _instanceNumber : "LogExpert";
 
             if (oldLogWindow != null)
             {
-                oldLogWindow.StatusLineEvent -= StatusLineEvent;
-                oldLogWindow.ProgressBarUpdate -= ProgressBarUpdate;
-                oldLogWindow.GuiStateUpdate -= GuiStateUpdate;
-                oldLogWindow.ColumnizerChanged -= ColumnizerChanged;
-                oldLogWindow.BookmarkAdded -= BookmarkAdded;
-                oldLogWindow.BookmarkRemoved -= BookmarkRemoved;
-                oldLogWindow.BookmarkTextChanged -= BookmarkTextChanged;
+                oldLogWindow.StatusLineEvent -= OnStatusLineEvent;
+                oldLogWindow.ProgressBarUpdate -= OnProgressBarUpdate;
+                oldLogWindow.GuiStateUpdate -= OnGuiStateUpdate;
+                oldLogWindow.ColumnizerChanged -= OnColumnizerChanged;
+                oldLogWindow.BookmarkAdded -= OnBookmarkAdded;
+                oldLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
+                oldLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
                 DisconnectToolWindows(oldLogWindow);
             }
 
             if (newLogWindow != null)
             {
-                newLogWindow.StatusLineEvent += StatusLineEvent;
-                newLogWindow.ProgressBarUpdate += ProgressBarUpdate;
-                newLogWindow.GuiStateUpdate += GuiStateUpdate;
-                newLogWindow.ColumnizerChanged += ColumnizerChanged;
-                newLogWindow.BookmarkAdded += BookmarkAdded;
-                newLogWindow.BookmarkRemoved += BookmarkRemoved;
-                newLogWindow.BookmarkTextChanged += BookmarkTextChanged;
+                newLogWindow.StatusLineEvent += OnStatusLineEvent;
+                newLogWindow.ProgressBarUpdate += OnProgressBarUpdate;
+                newLogWindow.GuiStateUpdate += OnGuiStateUpdate;
+                newLogWindow.ColumnizerChanged += OnColumnizerChanged;
+                newLogWindow.BookmarkAdded += OnBookmarkAdded;
+                newLogWindow.BookmarkRemoved += OnBookmarkRemoved;
+                newLogWindow.BookmarkTextChanged += OnBookmarkTextChanged;
 
                 if (newLogWindow.IsTempFile)
                 {
@@ -566,7 +566,7 @@ namespace LogExpert.Controls.LogTabWindow
                 multiFileToolStripMenuItem.Checked = false;
                 multiFileEnabledStripMenuItem.Checked = false;
                 followTailCheckBox.Checked = false;
-                menuStrip1.Enabled = true;
+                mainMenuStrip.Enabled = true;
                 timeshiftToolStripMenuItem.Enabled = false;
                 timeshiftToolStripMenuItem.Checked = false;
                 timeshiftMenuTextBox.Text = "";
@@ -590,8 +590,8 @@ namespace LogExpert.Controls.LogTabWindow
         private void ConnectBookmarkWindow(LogWindow.LogWindow logWindow)
         {
             FileViewContext ctx = new FileViewContext(logWindow, logWindow);
-            bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
-            bookmarkWindow.SetCurrentFile(ctx);
+            _bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
+            _bookmarkWindow.SetCurrentFile(ctx);
         }
 
         private void DisconnectToolWindows(LogWindow.LogWindow logWindow)
@@ -601,15 +601,15 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void DisconnectBookmarkWindow(LogWindow.LogWindow logWindow)
         {
-            bookmarkWindow.SetBookmarkData(null);
-            bookmarkWindow.SetCurrentFile(null);
+            _bookmarkWindow.SetBookmarkData(null);
+            _bookmarkWindow.SetCurrentFile(null);
         }
 
         private void GuiStateUpdateWorker(GuiStateArgs e)
         {
-            skipEvents = true;
+            _skipEvents = true;
             followTailCheckBox.Checked = e.FollowTail;
-            menuStrip1.Enabled = e.MenuEnabled;
+            mainMenuStrip.Enabled = e.MenuEnabled;
             timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
             timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;
             timeshiftMenuTextBox.Text = e.TimeshiftText;
@@ -639,7 +639,7 @@ namespace LogExpert.Controls.LogTabWindow
             highlightGroupsComboBox.Text = e.HighlightGroupName;
             columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
 
-            skipEvents = false;
+            _skipEvents = false;
         }
 
         private void ProgressBarUpdateWorker(ProgressEventArgs e)
@@ -658,7 +658,7 @@ namespace LogExpert.Controls.LogTabWindow
                     _logger.Error(ex, "Error during ProgressBarUpdateWorker value {0}, min {1}, max {2}, visible {3}", e.Value, e.MinValue, e.MaxValue, e.Visible);
                 }
 
-                Invoke(new MethodInvoker(statusStrip1.Refresh));
+                Invoke(new MethodInvoker(statusStrip.Refresh));
             }
         }
 
@@ -666,29 +666,29 @@ namespace LogExpert.Controls.LogTabWindow
         {
             int timeSum = 0;
             int waitTime = 30;
-            while (!shouldStop)
+            while (!_shouldStop)
             {
-                statusLineEventWakeupHandle.WaitOne();
-                statusLineEventWakeupHandle.Reset();
-                if (!shouldStop)
+                _statusLineEventWakeupHandle.WaitOne();
+                _statusLineEventWakeupHandle.Reset();
+                if (!_shouldStop)
                 {
                     bool signaled = false;
                     do
                     {
                         //this.statusLineEventHandle.Reset();
-                        signaled = statusLineEventHandle.WaitOne(waitTime, true);
+                        signaled = _statusLineEventHandle.WaitOne(waitTime, true);
                         timeSum += waitTime;
-                    } while (signaled && timeSum < 900 && !shouldStop);
+                    } while (signaled && timeSum < 900 && !_shouldStop);
 
-                    if (!shouldStop)
+                    if (!_shouldStop)
                     {
                         timeSum = 0;
                         try
                         {
                             StatusLineEventArgs e;
-                            lock (statusLineLock)
+                            lock (_statusLineLock)
                             {
-                                e = lastStatusLineEvent.Clone();
+                                e = _lastStatusLineEvent.Clone();
                             }
 
                             BeginInvoke(new StatusLineEventFx(StatusLineEventWorker), e);
@@ -709,14 +709,14 @@ namespace LogExpert.Controls.LogTabWindow
             linesLabel.Text = "" + e.LineCount + " lines";
             sizeLabel.Text = Util.GetFileSizeAsText(e.FileSize);
             currentLineLabel.Text = "" + e.CurrentLineNum;
-            statusStrip1.Refresh();
+            statusStrip.Refresh();
         }
 
         // tailState: 0,1,2 = on/off/off by Trigger
         // syncMode: 0 = normal (no), 1 = time synced
         private Icon CreateLedIcon(int level, bool dirty, int tailState, int syncMode)
         {
-            Rectangle iconRect = leds[0];
+            Rectangle iconRect = _leds[0];
             iconRect.Height = 16; // (DockPanel's damn hardcoded height) // this.leds[this.leds.Length - 1].Bottom;
             iconRect.Width = iconRect.Right + 6;
             Bitmap bmp = new Bitmap(iconRect.Width, iconRect.Height);
@@ -724,24 +724,24 @@ namespace LogExpert.Controls.LogTabWindow
 
             int offsetFromTop = 4;
 
-            for (int i = 0; i < leds.Length; ++i)
+            for (int i = 0; i < _leds.Length; ++i)
             {
-                Rectangle ledRect = leds[i];
+                Rectangle ledRect = _leds[i];
                 ledRect.Offset(0, offsetFromTop);
                 
-                if (level >= leds.Length - i)
+                if (level >= _leds.Length - i)
                 {
-                    gfx.FillRectangle(ledBrushes[i], ledRect);
+                    gfx.FillRectangle(_ledBrushes[i], ledRect);
                 }
                 else
                 {
-                    gfx.FillRectangle(offLedBrush, ledRect);
+                    gfx.FillRectangle(_offLedBrush, ledRect);
                 }
             }
 
             int ledSize = 3;
             int ledGap = 1;
-            Rectangle lastLed = leds[leds.Length - 1];
+            Rectangle lastLed = _leds[_leds.Length - 1];
             Rectangle dirtyLed = new Rectangle(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
             Rectangle tailLed = new Rectangle(dirtyLed.Location, dirtyLed.Size);
             tailLed.Offset(0, -(ledSize + ledGap));
@@ -754,22 +754,22 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (dirty)
             {
-                gfx.FillRectangle(dirtyLedBrush, dirtyLed);
+                gfx.FillRectangle(_dirtyLedBrush, dirtyLed);
             }
             else
             {
-                gfx.FillRectangle(offLedBrush, dirtyLed);
+                gfx.FillRectangle(_offLedBrush, dirtyLed);
             }
 
             // tailMode 4 means: don't show
             if (tailState < 3)
             {
-                gfx.FillRectangle(tailLedBrush[tailState], tailLed);
+                gfx.FillRectangle(_tailLedBrush[tailState], tailLed);
             }
 
             if (syncMode == 1)
             {
-                gfx.FillRectangle(syncLedBrush, syncLed);
+                gfx.FillRectangle(_syncLedBrush, syncLed);
             }
             //else
             //{
@@ -796,12 +796,12 @@ namespace LogExpert.Controls.LogTabWindow
                 {
                     for (int i = 0; i < 6; ++i)
                     {
-                        ledIcons[i, 0, tailMode, syncMode] = CreateLedIcon(i, false, tailMode, syncMode);
+                        _ledIcons[i, 0, tailMode, syncMode] = CreateLedIcon(i, false, tailMode, syncMode);
                     }
 
                     for (int i = 0; i < 6; ++i)
                     {
-                        ledIcons[i, 1, tailMode, syncMode] = CreateLedIcon(i, true, tailMode, syncMode);
+                        _ledIcons[i, 1, tailMode, syncMode] = CreateLedIcon(i, true, tailMode, syncMode);
                     }
                 }
             }
@@ -810,7 +810,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void FileNotFound(LogWindow.LogWindow logWin)
         {
             LogWindowData data = logWin.Tag as LogWindowData;
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, deadIcon);
+            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, _deadIcon);
             dateTimeDragControl.Visible = false;
         }
 
@@ -856,7 +856,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void LedThreadProc()
         {
             Thread.CurrentThread.Name = "LED Thread";
-            while (!shouldStop)
+            while (!_shouldStop)
             {
                 try
                 {
@@ -867,9 +867,9 @@ namespace LogExpert.Controls.LogTabWindow
                     return;
                 }
 
-                lock (logWindowList)
+                lock (_logWindowList)
                 {
-                    foreach (LogWindow.LogWindow logWindow in logWindowList)
+                    foreach (LogWindow.LogWindow logWindow in _logWindowList)
                     {
                         LogWindowData data = logWindow.Tag as LogWindowData;
                         if (data.diffSum > 0)
@@ -900,7 +900,7 @@ namespace LogExpert.Controls.LogTabWindow
         private Icon GetIcon(int diff, LogWindowData data)
         {
             Icon icon =
-                ledIcons[
+                _ledIcons[
                     GetLevelFromDiff(diff), data.dirty ? 1 : 0, Preferences.showTailState ? data.tailState : 3,
                     data.syncMode
                 ];
@@ -962,15 +962,15 @@ namespace LogExpert.Controls.LogTabWindow
             _logger.Info("The preferences have changed");
             ApplySettings(ConfigManager.Settings, flags);
 
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow.LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     logWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
                 }
             }
 
-            bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
+            _bookmarkWindow.PreferencesChanged(ConfigManager.Settings.preferences, false, flags);
 
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
             if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
@@ -1011,11 +1011,11 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void SetTabIcons(Preferences preferences)
         {
-            tailLedBrush[0] = new SolidBrush(preferences.showTailColor);
+            _tailLedBrush[0] = new SolidBrush(preferences.showTailColor);
             CreateIcons();
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow.LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     LogWindowData data = logWindow.Tag as LogWindowData;
                     Icon icon = GetIcon(data.diffSum, data);
@@ -1143,7 +1143,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void CloseAllTabs()
         {
             IList<Form> closeList = new List<Form>();
-            lock (logWindowList)
+            lock (_logWindowList)
             {
                 foreach (DockContent content in dockPanel.Contents)
                 {
@@ -1175,7 +1175,7 @@ namespace LogExpert.Controls.LogTabWindow
             ProjectData projectData = ProjectPersister.LoadProjectData(projectFileName);
             bool hasLayoutData = projectData.tabLayoutXml != null;
 
-            if (hasLayoutData && restoreLayout && logWindowList.Count > 0)
+            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
             {
                 ProjectLoadDlg dlg = new ProjectLoadDlg();
                 if (DialogResult.Cancel != dlg.ShowDialog())
@@ -1323,7 +1323,7 @@ namespace LogExpert.Controls.LogTabWindow
         {
             if (persistString.Equals(WindowTypes.BookmarkWindow.ToString()))
             {
-                return bookmarkWindow;
+                return _bookmarkWindow;
             }
 
             if (persistString.StartsWith(WindowTypes.LogWindow.ToString()))

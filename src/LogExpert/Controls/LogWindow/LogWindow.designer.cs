@@ -669,7 +669,7 @@ namespace LogExpert.Controls.LogWindow
             // btnToggleHighlightPanel
             // 
             this.btnToggleHighlightPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnToggleHighlightPanel.Image = global::LogExpert.Properties.Resources.PanelOpen1;
+            this.btnToggleHighlightPanel.Image = global::LogExpert.Properties.Resources.PanelOpen;
             this.btnToggleHighlightPanel.Location = new System.Drawing.Point(984, 1);
             this.btnToggleHighlightPanel.Name = "btnToggleHighlightPanel";
             this.btnToggleHighlightPanel.Size = new System.Drawing.Size(20, 21);
@@ -1211,7 +1211,7 @@ namespace LogExpert.Controls.LogWindow
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.SizeChanged += new System.EventHandler(this.OnLogWindowSizeChanged);
             this.Enter += new System.EventHandler(this.OnLogWindowEnter);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LogWindow_KeyDown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnLogWindowKeyDown);
             this.Leave += new System.EventHandler(this.OnLogWindowLeave);
             this.splitContainerLogWindow.Panel1.ResumeLayout(false);
             this.splitContainerLogWindow.Panel2.ResumeLayout(false);

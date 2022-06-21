@@ -646,7 +646,7 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        public void LogWindow_KeyDown(object sender, KeyEventArgs e)
+        public void OnLogWindowKeyDown(object sender, KeyEventArgs e)
         {
             if (_isErrorShowing)
             {
