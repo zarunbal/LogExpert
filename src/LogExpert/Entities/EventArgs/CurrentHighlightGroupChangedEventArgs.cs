@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Controls.LogWindow;
 
-namespace LogExpert
+namespace LogExpert.Entities.EventArgs
 {
     public class CurrentHighlightGroupChangedEventArgs
     {

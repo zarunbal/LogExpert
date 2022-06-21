@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class ColumnizerHistoryEntry

@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using LogExpert;
 using System.IO;
+using LogExpert.Classes;
 
 namespace UnitTests
 {

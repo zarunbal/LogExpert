@@ -1,8 +1,8 @@
-﻿using System;
+﻿using LogExpert.Config;
 
-namespace LogExpert
+namespace LogExpert.Entities.EventArgs
 {
-    internal class ConfigChangedEventArgs : EventArgs
+    internal class ConfigChangedEventArgs : System.EventArgs
     {
         #region Fields
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using LogExpert.Controls.LogWindow;
 
-
-namespace LogExpert
+namespace LogExpert.Classes
 {
     /// <summary>
     /// Holds all windows which are in sync via timestamp

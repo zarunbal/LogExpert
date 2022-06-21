@@ -1,8 +1,9 @@
-﻿using LogExpert.Classes.Log;
-using System.Text;
+﻿using System.Text;
 using System.Threading;
+using LogExpert.Classes.Log;
+using LogExpert.Interface;
 
-namespace LogExpert
+namespace LogExpert.Classes.xml
 {
     internal class XmlLogReader : LogStreamReaderBase
     {

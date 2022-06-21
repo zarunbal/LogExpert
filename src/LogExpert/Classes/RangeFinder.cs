@@ -1,8 +1,9 @@
-﻿using LogExpert.Classes.ILogLineColumnizerCallback;
+﻿using LogExpert.Classes.Filter;
+using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Entities;
 using NLog;
 
-
-namespace LogExpert
+namespace LogExpert.Classes
 {
     /// <summary>
     /// Delivers the range (from..to) that matches the current range filter settings starting from a given line.

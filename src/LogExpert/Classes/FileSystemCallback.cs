@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NLog;
+﻿using NLog;
 
-
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class FileSystemCallback : IFileSystemCallback
     {

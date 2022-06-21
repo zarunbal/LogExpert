@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Drawing;
+using LogExpert.Classes.Highlight;
+using LogExpert.Entities;
 
-
-namespace LogExpert
+namespace LogExpert.Interface
 {
     /// <summary>
     /// Declares methods that are needed for drawing log lines. Used by PaintHelper.

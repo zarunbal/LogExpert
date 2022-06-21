@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using LogExpert.Classes.Log;
+using LogExpert.Classes.xml;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     public class LogfileReader : IAutoLogLineColumnizerCallback
     {

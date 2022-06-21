@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Filter;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
 using Newtonsoft.Json;
 using NLog;
-using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     public class ConfigManager
     {

@@ -9,8 +9,10 @@ using System.IO;
 using System.Diagnostics;
 using System.Security;
 using System.Reflection;
+using LogExpert.Classes;
+using LogExpert.Config;
+using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
-using ITDM;
 using NLog;
 
 namespace LogExpert

@@ -1,9 +1,12 @@
-﻿internal class ReloadMemento
+﻿namespace LogExpert.Entities
 {
-    #region Fields
+    internal class ReloadMemento
+    {
+        #region Fields
 
-    internal int currentLine;
-    internal int firstDisplayedLine;
+        internal int currentLine;
+        internal int firstDisplayedLine;
 
-    #endregion
+        #endregion
+    }
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Interface;
 
-namespace LogExpert
+namespace LogExpert.Entities
 {
     public class FileViewContext
     {

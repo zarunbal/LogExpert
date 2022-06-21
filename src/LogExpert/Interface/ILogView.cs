@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     /// <summary>
     /// Methods to control the LogWindow from other views. 

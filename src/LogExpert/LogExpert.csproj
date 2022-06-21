@@ -421,11 +421,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Resource1.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -447,11 +442,6 @@
     <Compile Include="Entities\Range.cs" />
     <Compile Include="Classes\RangeFinder.cs" />
     <Compile Include="Entities\ReloadMemento.cs" />
-    <Compile Include="Resources\Resource1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource1.resx</DependentUpon>
-    </Compile>
     <Compile Include="Classes\Log\RolloverFilenameBuilder.cs" />
     <Compile Include="Classes\Log\RolloverFilenameHandler.cs" />
     <Compile Include="Entities\RowHeightEntry.cs" />

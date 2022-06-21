@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-//using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+//using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Classes.Highlight
 {
     [Serializable]
     public class HilightEntry

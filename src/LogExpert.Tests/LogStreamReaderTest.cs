@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.IO;
 using System.Text;
+using LogExpert.Entities;
 
 namespace LogExpert.Tests
 {

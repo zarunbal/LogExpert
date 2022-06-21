@@ -1,9 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace LogExpert
+namespace LogExpert.Classes.Bookmark
 {
     internal static class BookmarkExporter
     {
@@ -15,13 +13,13 @@ namespace LogExpert
 
         #region Public methods
 
-        public static void ExportBookmarkList(SortedList<int, Bookmark> bookmarkList, string logfileName,
+        public static void ExportBookmarkList(SortedList<int, Entities.Bookmark> bookmarkList, string logfileName,
             string fileName)
         {
             FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
             StreamWriter writer = new StreamWriter(fs);
             writer.WriteLine("Log file name;Line number;Comment");
-            foreach (Bookmark bookmark in bookmarkList.Values)
+            foreach (Entities.Bookmark bookmark in bookmarkList.Values)
             {
                 string line = logfileName + ";" + bookmark.LineNum + ";" +
                               bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",
@@ -33,7 +31,7 @@ namespace LogExpert
         }
 
         public static void ImportBookmarkList(string logfileName, string fileName,
-            SortedList<int, Bookmark> bookmarkList)
+            SortedList<int, Entities.Bookmark> bookmarkList)
         {
             using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
@@ -62,7 +60,7 @@ namespace LogExpert
                             int lineNum;
                             if (int.TryParse(lineStr, out lineNum))
                             {
-                                Bookmark bookmark = new Bookmark(lineNum, comment);
+                                Entities.Bookmark bookmark = new Entities.Bookmark(lineNum, comment);
                                 bookmarkList.Add(lineNum, bookmark);
                             }
                             else

@@ -2,6 +2,10 @@
 using CsvColumnizerType=CsvColumnizer.CsvColumnizer;
 using NUnit.Framework;
 using System;
+using LogExpert.Classes;
+using LogExpert.Controls.LogTabWindow;
+using LogExpert.Controls.LogWindow;
+using LogExpert.Entities;
 
 namespace LogExpert.Tests
 {

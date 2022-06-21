@@ -1,6 +1,6 @@
 using System;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public enum MultiFileOption

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     /// <summary>
     /// To be implemented by the bookmark window. Will be informed from LogWindow about changes in bookmarks. 

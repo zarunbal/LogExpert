@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using LogExpert.Interface;
 
 namespace LogExpert.Classes.Log
 {

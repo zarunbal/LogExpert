@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class Preferences

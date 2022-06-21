@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 using System.Text;
-using System.IO;
 using System.Text.RegularExpressions;
 
-
-namespace LogExpert
+namespace LogExpert.Classes
 {
     internal class ParamParser
     {

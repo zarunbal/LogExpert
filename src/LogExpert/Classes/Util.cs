@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Reflection;
-using System.Windows.Forms;
 using System.Diagnostics;
 using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using LogExpert.Classes.Filter;
 
-
-namespace LogExpert
+namespace LogExpert.Classes
 {
     public class Util
     {
@@ -69,7 +67,7 @@ namespace LogExpert
         }
 
         public static bool TestFilterCondition(FilterParams filterParams, ILogLine line,
-            ILogLineColumnizerCallback columnizerCallback)
+            LogExpert.ILogLineColumnizerCallback columnizerCallback)
         {
             if (filterParams.lastLine.Equals(line.FullLine))
             {
@@ -449,7 +447,7 @@ namespace LogExpert
         #region Private Methods
 
         private static bool TestFilterMatch(FilterParams filterParams, ILogLine line,
-            ILogLineColumnizerCallback columnizerCallback)
+            LogExpert.ILogLineColumnizerCallback columnizerCallback)
         {
             string lowerSearchText;
             string searchText;

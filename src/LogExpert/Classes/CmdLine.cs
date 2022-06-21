@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Text;
 
 /*
  * Taken from https://cmdline.codeplex.com/
  * 
  */
 
-namespace ITDM
+namespace LogExpert.Classes
 {
     /// <summary>
     /// Represents an error occuring during command line parsing.

@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
-//using System.Linq;
-using System.Windows.Forms;
-using LogExpert.Dialogs;
-using System.Text.RegularExpressions;
-using System.Runtime.Remoting.Messaging;
-using System.Threading;
-using System.IO;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
+using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
 using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
+//using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogWindow
 {
     public partial class LogWindow
     {
