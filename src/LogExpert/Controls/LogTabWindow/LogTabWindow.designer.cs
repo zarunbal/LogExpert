@@ -560,7 +560,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.timeshiftToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.timeshiftToolStripMenuItem.Text = "Timeshift";
             this.timeshiftToolStripMenuItem.ToolTipText = "If supported by the columnizer, you can set an offset to the displayed log time";
-            this.timeshiftToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.OnTimeshiftToolStripMenuItemCheckStateChanged);
+            this.timeshiftToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.OnTimeShiftToolStripMenuItemCheckStateChanged);
             // 
             // timeshiftMenuTextBox
             // 
