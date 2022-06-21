@@ -210,8 +210,8 @@ namespace LogExpert.Controls.LogWindow
             dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
             markEditModeToolStripMenuItem.Enabled = true;
 
-            _panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
-            _panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
+            _panelOpenButtonImage = Properties.Resources.PanelOpen;
+            _panelCloseButtonImage = Properties.Resources.PanelClose;
 
             Settings settings = ConfigManager.Settings;
             if (settings.appBounds != null && settings.appBounds.Right > 0)
