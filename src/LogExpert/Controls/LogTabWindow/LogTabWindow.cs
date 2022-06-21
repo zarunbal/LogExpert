@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using LogExpert.Config;
@@ -112,20 +113,26 @@ namespace LogExpert.Controls.LogTabWindow
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
-            ToolStripControlHost host = new ToolStripControlHost(followTailCheckBox);
+            ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
             
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
             
             int index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
-            
+
+            toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
+            toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
+            toolStripEncodingISO88591Item.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
+            toolStripEncodingUTF8Item.Text = Encoding.UTF8.HeaderName;
+            toolStripEncodingUTF16Item.Text = Encoding.Unicode.HeaderName;
+
             if (index != -1)
             {
                 buttonToolStrip.Items.RemoveAt(index);
                 buttonToolStrip.Items.Insert(index, host);
             }
 
-            dateTimeDragControl.Visible = false;
+            dragControlDateTime.Visible = false;
             loadProgessBar.Visible = false;
 
             // get a reference to the current assembly

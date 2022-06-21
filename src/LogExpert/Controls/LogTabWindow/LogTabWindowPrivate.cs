@@ -122,13 +122,11 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 try
                 {
-                    encodingOptions.DefaultEncoding =
-                        Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
+                    encodingOptions.DefaultEncoding = Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
                 }
                 catch (ArgumentException)
                 {
-                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
-                                 " is not a valid encoding");
+                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
                     encodingOptions.DefaultEncoding = null;
                 }
             }
@@ -333,7 +331,7 @@ namespace LogExpert.Controls.LogTabWindow
             dlg.Owner = this;
             dlg.TopMost = TopMost;
             dlg.HighlightGroupList = HilightGroupList;
-            dlg.PreSelectedGroupName = highlightGroupsComboBox.Text;
+            dlg.PreSelectedGroupName = groupsComboBoxHighlightGroups.Text;
             
             DialogResult res = dlg.ShowDialog();
             
@@ -349,14 +347,14 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void FillHighlightComboBox()
         {
-            string currentGroupName = highlightGroupsComboBox.Text;
-            highlightGroupsComboBox.Items.Clear();
+            string currentGroupName = groupsComboBoxHighlightGroups.Text;
+            groupsComboBoxHighlightGroups.Items.Clear();
             foreach (HilightGroup group in HilightGroupList)
             {
-                highlightGroupsComboBox.Items.Add(group.GroupName);
+                groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
                 if (group.GroupName.Equals(currentGroupName))
                 {
-                    highlightGroupsComboBox.Text = group.GroupName;
+                    groupsComboBoxHighlightGroups.Text = group.GroupName;
                 }
             }
         }
@@ -565,7 +563,7 @@ namespace LogExpert.Controls.LogTabWindow
                 Text = titleName;
                 multiFileToolStripMenuItem.Checked = false;
                 multiFileEnabledStripMenuItem.Checked = false;
-                followTailCheckBox.Checked = false;
+                checkBoxFollowTail.Checked = false;
                 mainMenuStrip.Enabled = true;
                 timeshiftToolStripMenuItem.Enabled = false;
                 timeshiftToolStripMenuItem.Checked = false;
@@ -578,7 +576,7 @@ namespace LogExpert.Controls.LogTabWindow
                 searchToolStripMenuItem.Enabled = false;
                 filterToolStripMenuItem.Enabled = false;
                 goToLineToolStripMenuItem.Enabled = false;
-                dateTimeDragControl.Visible = false;
+                dragControlDateTime.Visible = false;
             }
         }
 
@@ -608,7 +606,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void GuiStateUpdateWorker(GuiStateArgs e)
         {
             _skipEvents = true;
-            followTailCheckBox.Checked = e.FollowTail;
+            checkBoxFollowTail.Checked = e.FollowTail;
             mainMenuStrip.Enabled = e.MenuEnabled;
             timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
             timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;
@@ -622,21 +620,21 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (e.TimeshiftPossible && ConfigManager.Settings.preferences.timestampControl)
             {
-                dateTimeDragControl.MinDateTime = e.MinTimestamp;
-                dateTimeDragControl.MaxDateTime = e.MaxTimestamp;
-                dateTimeDragControl.DateTime = e.Timestamp;
-                dateTimeDragControl.Visible = true;
-                dateTimeDragControl.Enabled = true;
-                dateTimeDragControl.Refresh();
+                dragControlDateTime.MinDateTime = e.MinTimestamp;
+                dragControlDateTime.MaxDateTime = e.MaxTimestamp;
+                dragControlDateTime.DateTime = e.Timestamp;
+                dragControlDateTime.Visible = true;
+                dragControlDateTime.Enabled = true;
+                dragControlDateTime.Refresh();
             }
             else
             {
-                dateTimeDragControl.Visible = false;
-                dateTimeDragControl.Enabled = false;
+                dragControlDateTime.Visible = false;
+                dragControlDateTime.Enabled = false;
             }
 
             toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
-            highlightGroupsComboBox.Text = e.HighlightGroupName;
+            groupsComboBoxHighlightGroups.Text = e.HighlightGroupName;
             columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
 
             _skipEvents = false;
@@ -705,10 +703,10 @@ namespace LogExpert.Controls.LogTabWindow
         private void StatusLineEventWorker(StatusLineEventArgs e)
         {
             //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
-            statusLabel.Text = e.StatusText;
-            linesLabel.Text = "" + e.LineCount + " lines";
-            sizeLabel.Text = Util.GetFileSizeAsText(e.FileSize);
-            currentLineLabel.Text = "" + e.CurrentLineNum;
+            labelStatus.Text = e.StatusText;
+            labelLines.Text = "" + e.LineCount + " lines";
+            labelSize.Text = Util.GetFileSizeAsText(e.FileSize);
+            labelCurrentLine.Text = "" + e.CurrentLineNum;
             statusStrip.Refresh();
         }
 
@@ -811,7 +809,7 @@ namespace LogExpert.Controls.LogTabWindow
         {
             LogWindowData data = logWin.Tag as LogWindowData;
             BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, _deadIcon);
-            dateTimeDragControl.Visible = false;
+            dragControlDateTime.Visible = false;
         }
 
         private void FileRespawned(LogWindow.LogWindow logWin)
@@ -909,11 +907,11 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void RefreshEncodingMenuBar(Encoding encoding)
         {
-            aSCIIToolStripMenuItem.Checked = false;
-            aNSIToolStripMenuItem.Checked = false;
-            uTF8ToolStripMenuItem.Checked = false;
-            uTF16ToolStripMenuItem.Checked = false;
-            iSO88591ToolStripMenuItem.Checked = false;
+            toolStripEncodingASCIIItem.Checked = false;
+            toolStripEncodingANSIItem.Checked = false;
+            toolStripEncodingUTF8Item.Checked = false;
+            toolStripEncodingUTF16Item.Checked = false;
+            toolStripEncodingISO88591Item.Checked = false;
 
             if (encoding == null)
             {
@@ -922,26 +920,26 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (encoding is ASCIIEncoding)
             {
-                aSCIIToolStripMenuItem.Checked = true;
+                toolStripEncodingASCIIItem.Checked = true;
             }
             else if (encoding.Equals(Encoding.Default))
             {
-                aNSIToolStripMenuItem.Checked = true;
+                toolStripEncodingANSIItem.Checked = true;
             }
             else if (encoding is UTF8Encoding)
             {
-                uTF8ToolStripMenuItem.Checked = true;
+                toolStripEncodingUTF8Item.Checked = true;
             }
             else if (encoding is UnicodeEncoding)
             {
-                uTF16ToolStripMenuItem.Checked = true;
+                toolStripEncodingUTF16Item.Checked = true;
             }
             else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
             {
-                iSO88591ToolStripMenuItem.Checked = true;
+                toolStripEncodingISO88591Item.Checked = true;
             }
 
-            aNSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
+            toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
         }
 
         private void OpenSettings(int tabToOpen)
@@ -984,7 +982,7 @@ namespace LogExpert.Controls.LogTabWindow
             if ((flags & SettingsFlags.WindowPosition) == SettingsFlags.WindowPosition)
             {
                 TopMost = alwaysOnTopToolStripMenuItem.Checked = settings.alwaysOnTop;
-                dateTimeDragControl.DragOrientation = settings.preferences.timestampControlDragOrientation;
+                dragControlDateTime.DragOrientation = settings.preferences.timestampControlDragOrientation;
                 hideLineColumnToolStripMenuItem.Checked = settings.hideLineColumn;
             }
 
@@ -1221,7 +1219,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ApplySelectedHighlightGroup()
         {
-            string groupName = highlightGroupsComboBox.Text;
+            string groupName = groupsComboBoxHighlightGroups.Text;
             CurrentLogWindow?.SetCurrentHighlightGroup(groupName);
         }
 
