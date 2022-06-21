@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Config;
 using LogExpert.Entities;
+using LogExpert.Extensions;
 using NLog;
 
 namespace LogExpert.Classes

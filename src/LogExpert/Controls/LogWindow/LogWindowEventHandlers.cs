@@ -13,6 +13,7 @@ using LogExpert.Config;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions;
 using LogExpert.Interface;
 
 #endregion
