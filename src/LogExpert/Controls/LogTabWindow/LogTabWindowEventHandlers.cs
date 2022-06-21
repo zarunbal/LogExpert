@@ -589,7 +589,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OnDateTimeDragControlValueChanged(object sender, EventArgs e)
         {
-            CurrentLogWindow?.ScrollToTimestamp(dateTimeDragControl.DateTime, true, true);
+            CurrentLogWindow?.ScrollToTimestamp(dragControlDateTime.DateTime, true, true);
         }
 
         private void OnLogTabWindowDeactivate(object sender, EventArgs e)
