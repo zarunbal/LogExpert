@@ -113,7 +113,7 @@ namespace LogExpert.Controls.LogTabWindow
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
-            ToolStripControlHost host = new ToolStripControlHost(followTailCheckBox);
+            ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
             
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
@@ -132,7 +132,7 @@ namespace LogExpert.Controls.LogTabWindow
                 buttonToolStrip.Items.Insert(index, host);
             }
 
-            dateTimeDragControl.Visible = false;
+            dragControlDateTime.Visible = false;
             loadProgessBar.Visible = false;
 
             // get a reference to the current assembly

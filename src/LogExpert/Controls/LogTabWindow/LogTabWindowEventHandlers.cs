@@ -371,7 +371,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OnFollowTailCheckBoxClick(object sender, EventArgs e)
         {
-            CurrentLogWindow?.FollowTailChanged(followTailCheckBox.Checked, false);
+            CurrentLogWindow?.FollowTailChanged(checkBoxFollowTail.Checked, false);
         }
         
         private void OnLogTabWindowKeyDown(object sender, KeyEventArgs e)

@@ -563,7 +563,7 @@ namespace LogExpert.Controls.LogTabWindow
                 Text = titleName;
                 multiFileToolStripMenuItem.Checked = false;
                 multiFileEnabledStripMenuItem.Checked = false;
-                followTailCheckBox.Checked = false;
+                checkBoxFollowTail.Checked = false;
                 mainMenuStrip.Enabled = true;
                 timeshiftToolStripMenuItem.Enabled = false;
                 timeshiftToolStripMenuItem.Checked = false;
@@ -606,7 +606,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void GuiStateUpdateWorker(GuiStateArgs e)
         {
             _skipEvents = true;
-            followTailCheckBox.Checked = e.FollowTail;
+            checkBoxFollowTail.Checked = e.FollowTail;
             mainMenuStrip.Enabled = e.MenuEnabled;
             timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
             timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;

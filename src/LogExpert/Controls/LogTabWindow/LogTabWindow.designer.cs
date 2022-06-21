@@ -32,28 +32,28 @@ namespace LogExpert.Controls.LogTabWindow
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            WeifenLuo.WinFormsUI.Docking.DockPanelSkin dockPanelSkin2 = new WeifenLuo.WinFormsUI.Docking.DockPanelSkin();
-            WeifenLuo.WinFormsUI.Docking.AutoHideStripSkin autoHideStripSkin2 = new WeifenLuo.WinFormsUI.Docking.AutoHideStripSkin();
-            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient4 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient8 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.DockPaneStripSkin dockPaneStripSkin2 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripSkin();
-            WeifenLuo.WinFormsUI.Docking.DockPaneStripGradient dockPaneStripGradient2 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient9 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient5 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient10 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.DockPaneStripToolWindowGradient dockPaneStripToolWindowGradient2 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripToolWindowGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient11 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient12 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient6 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient13 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
-            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient14 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.DockPanelSkin dockPanelSkin1 = new WeifenLuo.WinFormsUI.Docking.DockPanelSkin();
+            WeifenLuo.WinFormsUI.Docking.AutoHideStripSkin autoHideStripSkin1 = new WeifenLuo.WinFormsUI.Docking.AutoHideStripSkin();
+            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient1 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient1 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.DockPaneStripSkin dockPaneStripSkin1 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripSkin();
+            WeifenLuo.WinFormsUI.Docking.DockPaneStripGradient dockPaneStripGradient1 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient2 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient2 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient3 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.DockPaneStripToolWindowGradient dockPaneStripToolWindowGradient1 = new WeifenLuo.WinFormsUI.Docking.DockPaneStripToolWindowGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient4 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient5 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.DockPanelGradient dockPanelGradient3 = new WeifenLuo.WinFormsUI.Docking.DockPanelGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient6 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
+            WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient7 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogTabWindow));
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.linesLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sizeLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.currentLineLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelLines = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelSize = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelCurrentLine = new System.Windows.Forms.ToolStripStatusLabel();
             this.loadProgessBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -143,10 +143,10 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonTail = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator17 = new System.Windows.Forms.ToolStripSeparator();
-            this.highlightGroupsComboBox = new System.Windows.Forms.ToolStripComboBox();
+            this.groupsComboBoxHighlightGroups = new System.Windows.Forms.ToolStripComboBox();
             this.externalToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
-            this.followTailCheckBox = new System.Windows.Forms.CheckBox();
+            this.checkBoxFollowTail = new System.Windows.Forms.CheckBox();
             this.tabContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.closeThisTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeOtherTabsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -157,7 +157,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
             this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dateTimeDragControl = new LogExpert.Dialogs.DateTimeDragControl();
+            this.dragControlDateTime = new LogExpert.Dialogs.DateTimeDragControl();
             this.statusStrip.SuspendLayout();
             this.mainMenuStrip.SuspendLayout();
             this.toolStripContainer.ContentPanel.SuspendLayout();
@@ -172,11 +172,11 @@ namespace LogExpert.Controls.LogTabWindow
             this.statusStrip.AutoSize = false;
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.linesLabel,
-            this.sizeLabel,
-            this.currentLineLabel,
+            this.labelLines,
+            this.labelSize,
+            this.labelCurrentLine,
             this.loadProgessBar,
-            this.statusLabel});
+            this.labelStatus});
             this.statusStrip.Location = new System.Drawing.Point(0, 779);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
@@ -185,49 +185,49 @@ namespace LogExpert.Controls.LogTabWindow
             this.statusStrip.TabIndex = 5;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // linesLabel
+            // labelLines
             // 
-            this.linesLabel.AutoSize = false;
-            this.linesLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            this.labelLines.AutoSize = false;
+            this.labelLines.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.linesLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
-            this.linesLabel.Name = "linesLabel";
-            this.linesLabel.Size = new System.Drawing.Size(90, 28);
-            this.linesLabel.Text = "0";
+            this.labelLines.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
+            this.labelLines.Name = "labelLines";
+            this.labelLines.Size = new System.Drawing.Size(90, 28);
+            this.labelLines.Text = "0";
             // 
-            // sizeLabel
+            // labelSize
             // 
-            this.sizeLabel.AutoSize = false;
-            this.sizeLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            this.labelSize.AutoSize = false;
+            this.labelSize.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sizeLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
-            this.sizeLabel.Name = "sizeLabel";
-            this.sizeLabel.Size = new System.Drawing.Size(90, 28);
-            this.sizeLabel.Text = "0";
+            this.labelSize.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
+            this.labelSize.Name = "labelSize";
+            this.labelSize.Size = new System.Drawing.Size(90, 28);
+            this.labelSize.Text = "0";
             // 
-            // currentLineLabel
+            // labelCurrentLine
             // 
-            this.currentLineLabel.AutoSize = false;
-            this.currentLineLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            this.labelCurrentLine.AutoSize = false;
+            this.labelCurrentLine.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.currentLineLabel.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
-            this.currentLineLabel.Name = "currentLineLabel";
-            this.currentLineLabel.Size = new System.Drawing.Size(90, 28);
-            this.currentLineLabel.Text = "L:";
+            this.labelCurrentLine.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter;
+            this.labelCurrentLine.Name = "labelCurrentLine";
+            this.labelCurrentLine.Size = new System.Drawing.Size(90, 28);
+            this.labelCurrentLine.Text = "L:";
             // 
             // loadProgessBar
             // 
             this.loadProgessBar.Name = "loadProgessBar";
             this.loadProgessBar.Size = new System.Drawing.Size(75, 27);
             // 
-            // statusLabel
+            // labelStatus
             // 
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(60, 28);
-            this.statusLabel.Text = "Ready";
+            this.labelStatus.Name = "labelStatus";
+            this.labelStatus.Size = new System.Drawing.Size(60, 28);
+            this.labelStatus.Text = "Ready";
             // 
             // mainMenuStrip
             // 
@@ -514,7 +514,7 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripEncodingASCIIItem
             // 
             this.toolStripEncodingASCIIItem.Name = "toolStripEncodingASCIIItem";
-            this.toolStripEncodingASCIIItem.Size = new System.Drawing.Size(270, 34);
+            this.toolStripEncodingASCIIItem.Size = new System.Drawing.Size(207, 34);
             this.toolStripEncodingASCIIItem.Tag = "";
             this.toolStripEncodingASCIIItem.Text = "ASCII";
             this.toolStripEncodingASCIIItem.Click += new System.EventHandler(this.OnASCIIToolStripMenuItemClick);
@@ -522,7 +522,7 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripEncodingANSIItem
             // 
             this.toolStripEncodingANSIItem.Name = "toolStripEncodingANSIItem";
-            this.toolStripEncodingANSIItem.Size = new System.Drawing.Size(270, 34);
+            this.toolStripEncodingANSIItem.Size = new System.Drawing.Size(207, 34);
             this.toolStripEncodingANSIItem.Tag = "";
             this.toolStripEncodingANSIItem.Text = "ANSI";
             this.toolStripEncodingANSIItem.Click += new System.EventHandler(this.OnANSIToolStripMenuItemClick);
@@ -530,21 +530,21 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripEncodingISO88591Item
             // 
             this.toolStripEncodingISO88591Item.Name = "toolStripEncodingISO88591Item";
-            this.toolStripEncodingISO88591Item.Size = new System.Drawing.Size(270, 34);
+            this.toolStripEncodingISO88591Item.Size = new System.Drawing.Size(207, 34);
             this.toolStripEncodingISO88591Item.Text = "ISO-8859-1";
             this.toolStripEncodingISO88591Item.Click += new System.EventHandler(this.OnISO88591ToolStripMenuItemClick);
             // 
             // toolStripEncodingUTF8Item
             // 
             this.toolStripEncodingUTF8Item.Name = "toolStripEncodingUTF8Item";
-            this.toolStripEncodingUTF8Item.Size = new System.Drawing.Size(270, 34);
+            this.toolStripEncodingUTF8Item.Size = new System.Drawing.Size(207, 34);
             this.toolStripEncodingUTF8Item.Text = "UTF8";
             this.toolStripEncodingUTF8Item.Click += new System.EventHandler(this.OnUTF8ToolStripMenuItemClick);
             // 
             // toolStripEncodingUTF16Item
             // 
             this.toolStripEncodingUTF16Item.Name = "toolStripEncodingUTF16Item";
-            this.toolStripEncodingUTF16Item.Size = new System.Drawing.Size(270, 34);
+            this.toolStripEncodingUTF16Item.Size = new System.Drawing.Size(207, 34);
             this.toolStripEncodingUTF16Item.Text = "Unicode";
             this.toolStripEncodingUTF16Item.Click += new System.EventHandler(this.OnUTF16ToolStripMenuItemClick);
             // 
@@ -904,52 +904,52 @@ namespace LogExpert.Controls.LogTabWindow
             this.dockPanel.Name = "dockPanel";
             this.dockPanel.ShowDocumentIcon = true;
             this.dockPanel.Size = new System.Drawing.Size(1443, 712);
-            dockPanelGradient4.EndColor = System.Drawing.SystemColors.ControlLight;
-            dockPanelGradient4.StartColor = System.Drawing.SystemColors.ControlLight;
-            autoHideStripSkin2.DockStripGradient = dockPanelGradient4;
-            tabGradient8.EndColor = System.Drawing.SystemColors.Control;
-            tabGradient8.StartColor = System.Drawing.SystemColors.Control;
-            tabGradient8.TextColor = System.Drawing.SystemColors.ControlDarkDark;
-            autoHideStripSkin2.TabGradient = tabGradient8;
-            autoHideStripSkin2.TextFont = new System.Drawing.Font("Segoe UI", 9F);
-            dockPanelSkin2.AutoHideStripSkin = autoHideStripSkin2;
-            tabGradient9.EndColor = System.Drawing.SystemColors.ControlLightLight;
-            tabGradient9.StartColor = System.Drawing.SystemColors.ControlLightLight;
-            tabGradient9.TextColor = System.Drawing.SystemColors.ControlText;
-            dockPaneStripGradient2.ActiveTabGradient = tabGradient9;
-            dockPanelGradient5.EndColor = System.Drawing.SystemColors.Control;
-            dockPanelGradient5.StartColor = System.Drawing.SystemColors.Control;
-            dockPaneStripGradient2.DockStripGradient = dockPanelGradient5;
-            tabGradient10.EndColor = System.Drawing.SystemColors.ControlLight;
-            tabGradient10.StartColor = System.Drawing.SystemColors.ControlLight;
-            tabGradient10.TextColor = System.Drawing.SystemColors.ControlText;
-            dockPaneStripGradient2.InactiveTabGradient = tabGradient10;
-            dockPaneStripSkin2.DocumentGradient = dockPaneStripGradient2;
-            dockPaneStripSkin2.TextFont = new System.Drawing.Font("Segoe UI", 9F);
-            tabGradient11.EndColor = System.Drawing.SystemColors.ActiveCaption;
-            tabGradient11.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            tabGradient11.StartColor = System.Drawing.SystemColors.GradientActiveCaption;
-            tabGradient11.TextColor = System.Drawing.SystemColors.ActiveCaptionText;
-            dockPaneStripToolWindowGradient2.ActiveCaptionGradient = tabGradient11;
-            tabGradient12.EndColor = System.Drawing.SystemColors.Control;
-            tabGradient12.StartColor = System.Drawing.SystemColors.Control;
-            tabGradient12.TextColor = System.Drawing.SystemColors.ControlText;
-            dockPaneStripToolWindowGradient2.ActiveTabGradient = tabGradient12;
-            dockPanelGradient6.EndColor = System.Drawing.SystemColors.ControlLight;
-            dockPanelGradient6.StartColor = System.Drawing.SystemColors.ControlLight;
-            dockPaneStripToolWindowGradient2.DockStripGradient = dockPanelGradient6;
-            tabGradient13.EndColor = System.Drawing.SystemColors.InactiveCaption;
-            tabGradient13.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            tabGradient13.StartColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            tabGradient13.TextColor = System.Drawing.SystemColors.InactiveCaptionText;
-            dockPaneStripToolWindowGradient2.InactiveCaptionGradient = tabGradient13;
-            tabGradient14.EndColor = System.Drawing.Color.Transparent;
-            tabGradient14.StartColor = System.Drawing.Color.Transparent;
-            tabGradient14.TextColor = System.Drawing.SystemColors.ControlDarkDark;
-            dockPaneStripToolWindowGradient2.InactiveTabGradient = tabGradient14;
-            dockPaneStripSkin2.ToolWindowGradient = dockPaneStripToolWindowGradient2;
-            dockPanelSkin2.DockPaneStripSkin = dockPaneStripSkin2;
-            this.dockPanel.Skin = dockPanelSkin2;
+            dockPanelGradient1.EndColor = System.Drawing.SystemColors.ControlLight;
+            dockPanelGradient1.StartColor = System.Drawing.SystemColors.ControlLight;
+            autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
+            tabGradient1.EndColor = System.Drawing.SystemColors.Control;
+            tabGradient1.StartColor = System.Drawing.SystemColors.Control;
+            tabGradient1.TextColor = System.Drawing.SystemColors.ControlDarkDark;
+            autoHideStripSkin1.TabGradient = tabGradient1;
+            autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
+            dockPanelSkin1.AutoHideStripSkin = autoHideStripSkin1;
+            tabGradient2.EndColor = System.Drawing.SystemColors.ControlLightLight;
+            tabGradient2.StartColor = System.Drawing.SystemColors.ControlLightLight;
+            tabGradient2.TextColor = System.Drawing.SystemColors.ControlText;
+            dockPaneStripGradient1.ActiveTabGradient = tabGradient2;
+            dockPanelGradient2.EndColor = System.Drawing.SystemColors.Control;
+            dockPanelGradient2.StartColor = System.Drawing.SystemColors.Control;
+            dockPaneStripGradient1.DockStripGradient = dockPanelGradient2;
+            tabGradient3.EndColor = System.Drawing.SystemColors.ControlLight;
+            tabGradient3.StartColor = System.Drawing.SystemColors.ControlLight;
+            tabGradient3.TextColor = System.Drawing.SystemColors.ControlText;
+            dockPaneStripGradient1.InactiveTabGradient = tabGradient3;
+            dockPaneStripSkin1.DocumentGradient = dockPaneStripGradient1;
+            dockPaneStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
+            tabGradient4.EndColor = System.Drawing.SystemColors.ActiveCaption;
+            tabGradient4.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            tabGradient4.StartColor = System.Drawing.SystemColors.GradientActiveCaption;
+            tabGradient4.TextColor = System.Drawing.SystemColors.ActiveCaptionText;
+            dockPaneStripToolWindowGradient1.ActiveCaptionGradient = tabGradient4;
+            tabGradient5.EndColor = System.Drawing.SystemColors.Control;
+            tabGradient5.StartColor = System.Drawing.SystemColors.Control;
+            tabGradient5.TextColor = System.Drawing.SystemColors.ControlText;
+            dockPaneStripToolWindowGradient1.ActiveTabGradient = tabGradient5;
+            dockPanelGradient3.EndColor = System.Drawing.SystemColors.ControlLight;
+            dockPanelGradient3.StartColor = System.Drawing.SystemColors.ControlLight;
+            dockPaneStripToolWindowGradient1.DockStripGradient = dockPanelGradient3;
+            tabGradient6.EndColor = System.Drawing.SystemColors.InactiveCaption;
+            tabGradient6.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            tabGradient6.StartColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            tabGradient6.TextColor = System.Drawing.SystemColors.InactiveCaptionText;
+            dockPaneStripToolWindowGradient1.InactiveCaptionGradient = tabGradient6;
+            tabGradient7.EndColor = System.Drawing.Color.Transparent;
+            tabGradient7.StartColor = System.Drawing.Color.Transparent;
+            tabGradient7.TextColor = System.Drawing.SystemColors.ControlDarkDark;
+            dockPaneStripToolWindowGradient1.InactiveTabGradient = tabGradient7;
+            dockPaneStripSkin1.ToolWindowGradient = dockPaneStripToolWindowGradient1;
+            dockPanelSkin1.DockPaneStripSkin = dockPaneStripSkin1;
+            this.dockPanel.Skin = dockPanelSkin1;
             this.dockPanel.TabIndex = 14;
             this.dockPanel.ActiveContentChanged += new System.EventHandler(this.OnDockPanelActiveContentChanged);
             // 
@@ -973,7 +973,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator15,
             this.toolStripButtonTail,
             this.toolStripSeparator17,
-            this.highlightGroupsComboBox});
+            this.groupsComboBoxHighlightGroups});
             this.buttonToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.buttonToolStrip.Location = new System.Drawing.Point(4, 0);
             this.buttonToolStrip.Name = "buttonToolStrip";
@@ -1098,18 +1098,18 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator17.Name = "toolStripSeparator17";
             this.toolStripSeparator17.Size = new System.Drawing.Size(6, 23);
             // 
-            // highlightGroupsComboBox
+            // groupsComboBoxHighlightGroups
             // 
-            this.highlightGroupsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.highlightGroupsComboBox.DropDownWidth = 250;
-            this.highlightGroupsComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
-            this.highlightGroupsComboBox.Name = "highlightGroupsComboBox";
-            this.highlightGroupsComboBox.Size = new System.Drawing.Size(150, 33);
-            this.highlightGroupsComboBox.ToolTipText = "Select the current highlight settings for the log file (right-click to open highl" +
+            this.groupsComboBoxHighlightGroups.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.groupsComboBoxHighlightGroups.DropDownWidth = 250;
+            this.groupsComboBoxHighlightGroups.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
+            this.groupsComboBoxHighlightGroups.Name = "groupsComboBoxHighlightGroups";
+            this.groupsComboBoxHighlightGroups.Size = new System.Drawing.Size(150, 33);
+            this.groupsComboBoxHighlightGroups.ToolTipText = "Select the current highlight settings for the log file (right-click to open highl" +
     "ight settings)";
-            this.highlightGroupsComboBox.DropDownClosed += new System.EventHandler(this.OnHighlightGroupsComboBoxDropDownClosed);
-            this.highlightGroupsComboBox.SelectedIndexChanged += new System.EventHandler(this.OnHighlightGroupsComboBoxSelectedIndexChanged);
-            this.highlightGroupsComboBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnHighlightGroupsComboBoxMouseUp);
+            this.groupsComboBoxHighlightGroups.DropDownClosed += new System.EventHandler(this.OnHighlightGroupsComboBoxDropDownClosed);
+            this.groupsComboBoxHighlightGroups.SelectedIndexChanged += new System.EventHandler(this.OnHighlightGroupsComboBoxSelectedIndexChanged);
+            this.groupsComboBoxHighlightGroups.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnHighlightGroupsComboBoxMouseUp);
             // 
             // externalToolsToolStrip
             // 
@@ -1129,17 +1129,17 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator9.Name = "toolStripSeparator9";
             this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
             // 
-            // followTailCheckBox
+            // checkBoxFollowTail
             // 
-            this.followTailCheckBox.AutoSize = true;
-            this.followTailCheckBox.Location = new System.Drawing.Point(596, 788);
-            this.followTailCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.followTailCheckBox.Name = "followTailCheckBox";
-            this.followTailCheckBox.Size = new System.Drawing.Size(104, 24);
-            this.followTailCheckBox.TabIndex = 14;
-            this.followTailCheckBox.Text = "Follow tail";
-            this.followTailCheckBox.UseVisualStyleBackColor = true;
-            this.followTailCheckBox.Click += new System.EventHandler(this.OnFollowTailCheckBoxClick);
+            this.checkBoxFollowTail.AutoSize = true;
+            this.checkBoxFollowTail.Location = new System.Drawing.Point(596, 788);
+            this.checkBoxFollowTail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxFollowTail.Name = "checkBoxFollowTail";
+            this.checkBoxFollowTail.Size = new System.Drawing.Size(104, 24);
+            this.checkBoxFollowTail.TabIndex = 14;
+            this.checkBoxFollowTail.Text = "Follow tail";
+            this.checkBoxFollowTail.UseVisualStyleBackColor = true;
+            this.checkBoxFollowTail.Click += new System.EventHandler(this.OnFollowTailCheckBoxClick);
             // 
             // tabContextMenuStrip
             // 
@@ -1222,23 +1222,23 @@ namespace LogExpert.Controls.LogTabWindow
             this.findInExplorerToolStripMenuItem.ToolTipText = "Opens an Explorer window and selects the log file";
             this.findInExplorerToolStripMenuItem.Click += new System.EventHandler(this.OnFindInExplorerToolStripMenuItemClick);
             // 
-            // dateTimeDragControl
+            // dragControlDateTime
             // 
-            this.dateTimeDragControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.dateTimeDragControl.BackColor = System.Drawing.SystemColors.Control;
-            this.dateTimeDragControl.DateTime = new System.DateTime(((long)(0)));
-            this.dateTimeDragControl.DragOrientation = LogExpert.Dialogs.DateTimeDragControl.DragOrientations.Vertical;
-            this.dateTimeDragControl.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dateTimeDragControl.HoverColor = System.Drawing.Color.LightGray;
-            this.dateTimeDragControl.Location = new System.Drawing.Point(916, 782);
-            this.dateTimeDragControl.Margin = new System.Windows.Forms.Padding(0);
-            this.dateTimeDragControl.MaxDateTime = new System.DateTime(9999, 12, 31, 23, 59, 59, 999);
-            this.dateTimeDragControl.MinDateTime = new System.DateTime(((long)(0)));
-            this.dateTimeDragControl.Name = "dateTimeDragControl";
-            this.dateTimeDragControl.Size = new System.Drawing.Size(282, 31);
-            this.dateTimeDragControl.TabIndex = 14;
-            this.dateTimeDragControl.ValueChanged += new LogExpert.Dialogs.DateTimeDragControl.ValueChangedEventHandler(this.OnDateTimeDragControlValueChanged);
-            this.dateTimeDragControl.ValueDragged += new LogExpert.Dialogs.DateTimeDragControl.ValueDraggedEventHandler(this.OnDateTimeDragControlValueDragged);
+            this.dragControlDateTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.dragControlDateTime.BackColor = System.Drawing.SystemColors.Control;
+            this.dragControlDateTime.DateTime = new System.DateTime(((long)(0)));
+            this.dragControlDateTime.DragOrientation = LogExpert.Dialogs.DateTimeDragControl.DragOrientations.Vertical;
+            this.dragControlDateTime.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dragControlDateTime.HoverColor = System.Drawing.Color.LightGray;
+            this.dragControlDateTime.Location = new System.Drawing.Point(916, 782);
+            this.dragControlDateTime.Margin = new System.Windows.Forms.Padding(0);
+            this.dragControlDateTime.MaxDateTime = new System.DateTime(9999, 12, 31, 23, 59, 59, 999);
+            this.dragControlDateTime.MinDateTime = new System.DateTime(((long)(0)));
+            this.dragControlDateTime.Name = "dragControlDateTime";
+            this.dragControlDateTime.Size = new System.Drawing.Size(282, 31);
+            this.dragControlDateTime.TabIndex = 14;
+            this.dragControlDateTime.ValueChanged += new LogExpert.Dialogs.DateTimeDragControl.ValueChangedEventHandler(this.OnDateTimeDragControlValueChanged);
+            this.dragControlDateTime.ValueDragged += new LogExpert.Dialogs.DateTimeDragControl.ValueDraggedEventHandler(this.OnDateTimeDragControlValueDragged);
             // 
             // LogTabWindow
             // 
@@ -1246,8 +1246,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1443, 814);
-            this.Controls.Add(this.followTailCheckBox);
-            this.Controls.Add(this.dateTimeDragControl);
+            this.Controls.Add(this.checkBoxFollowTail);
+            this.Controls.Add(this.dragControlDateTime);
             this.Controls.Add(this.toolStripContainer);
             this.Controls.Add(this.statusStrip);
             this.DoubleBuffered = true;
@@ -1284,15 +1284,15 @@ namespace LogExpert.Controls.LogTabWindow
         #endregion
 
         private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel linesLabel;
-        private System.Windows.Forms.ToolStripStatusLabel sizeLabel;
+        private System.Windows.Forms.ToolStripStatusLabel labelLines;
+        private System.Windows.Forms.ToolStripStatusLabel labelSize;
         private System.Windows.Forms.MenuStrip mainMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewNavigateToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel currentLineLabel;
+        private System.Windows.Forms.ToolStripStatusLabel labelCurrentLine;
         private System.Windows.Forms.ToolStripProgressBar loadProgessBar;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel labelStatus;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
@@ -1324,7 +1324,7 @@ namespace LogExpert.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem columnizerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
-        private DateTimeDragControl dateTimeDragControl;
+        private DateTimeDragControl dragControlDateTime;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem showBookmarkListToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
@@ -1341,7 +1341,7 @@ namespace LogExpert.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripButton toolStripButtonDown;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private CheckBox host;
-        private CheckBox followTailCheckBox;
+        private CheckBox checkBoxFollowTail;
         private ToolStripButton toolStripButtonTail;
         private ToolStripMenuItem showHelpToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator5;
@@ -1363,7 +1363,7 @@ namespace LogExpert.Controls.LogTabWindow
         private ToolStripMenuItem findInExplorerToolStripMenuItem;
         private ToolStripMenuItem exportBookmarksToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator17;
-        private ToolStripComboBox highlightGroupsComboBox;
+        private ToolStripComboBox groupsComboBoxHighlightGroups;
         private ToolStripMenuItem debugToolStripMenuItem;
         private ToolStripMenuItem dumpLogBufferInfoToolStripMenuItem;
         private ToolStripMenuItem dumpBufferDiagnosticToolStripMenuItem;
