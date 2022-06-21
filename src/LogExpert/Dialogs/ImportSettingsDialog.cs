@@ -29,11 +29,11 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void ImportSettingsDialog_Load(object sender, EventArgs e)
+        private void OnImportSettingsDialogLoad(object sender, EventArgs e)
         {
         }
 
-        private void fileButton_Click(object sender, EventArgs e)
+        private void OnFileButtonClick(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "Load Settings from file";
