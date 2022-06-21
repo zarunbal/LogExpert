@@ -122,13 +122,11 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 try
                 {
-                    encodingOptions.DefaultEncoding =
-                        Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
+                    encodingOptions.DefaultEncoding = Encoding.GetEncoding(ConfigManager.Settings.preferences.defaultEncoding);
                 }
                 catch (ArgumentException)
                 {
-                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding +
-                                 " is not a valid encoding");
+                    _logger.Warn("Encoding " + ConfigManager.Settings.preferences.defaultEncoding + " is not a valid encoding");
                     encodingOptions.DefaultEncoding = null;
                 }
             }
@@ -909,11 +907,11 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void RefreshEncodingMenuBar(Encoding encoding)
         {
-            aSCIIToolStripMenuItem.Checked = false;
-            aNSIToolStripMenuItem.Checked = false;
-            uTF8ToolStripMenuItem.Checked = false;
-            uTF16ToolStripMenuItem.Checked = false;
-            iSO88591ToolStripMenuItem.Checked = false;
+            toolStripEncodingASCIIItem.Checked = false;
+            toolStripEncodingANSIItem.Checked = false;
+            toolStripEncodingUTF8Item.Checked = false;
+            toolStripEncodingUTF16Item.Checked = false;
+            toolStripEncodingISO88591Item.Checked = false;
 
             if (encoding == null)
             {
@@ -922,26 +920,26 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (encoding is ASCIIEncoding)
             {
-                aSCIIToolStripMenuItem.Checked = true;
+                toolStripEncodingASCIIItem.Checked = true;
             }
             else if (encoding.Equals(Encoding.Default))
             {
-                aNSIToolStripMenuItem.Checked = true;
+                toolStripEncodingANSIItem.Checked = true;
             }
             else if (encoding is UTF8Encoding)
             {
-                uTF8ToolStripMenuItem.Checked = true;
+                toolStripEncodingUTF8Item.Checked = true;
             }
             else if (encoding is UnicodeEncoding)
             {
-                uTF16ToolStripMenuItem.Checked = true;
+                toolStripEncodingUTF16Item.Checked = true;
             }
             else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
             {
-                iSO88591ToolStripMenuItem.Checked = true;
+                toolStripEncodingISO88591Item.Checked = true;
             }
 
-            aNSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
+            toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
         }
 
         private void OpenSettings(int tabToOpen)

@@ -147,7 +147,7 @@ namespace LogExpert.Dialogs
             FillMultifileSettings();
             FillEncodingList();
 
-            encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
+            comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
             checkBoxMaskPrio.Checked = Preferences.maskPrio;
             checkBoxAutoPick.Checked = Preferences.autoPick;
             checkBoxAskCloseTabs.Checked = Preferences.askForClose;
@@ -545,15 +545,15 @@ namespace LogExpert.Dialogs
 
         private void FillEncodingList()
         {
-            encodingComboBox.Items.Clear();
+            comboBoxEncoding.Items.Clear();
 
-            encodingComboBox.Items.Add(Encoding.ASCII);
-            encodingComboBox.Items.Add(Encoding.Default);
-            encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-            encodingComboBox.Items.Add(Encoding.UTF8);
-            encodingComboBox.Items.Add(Encoding.Unicode);
+            comboBoxEncoding.Items.Add(Encoding.ASCII);
+            comboBoxEncoding.Items.Add(Encoding.Default);
+            comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+            comboBoxEncoding.Items.Add(Encoding.UTF8);
+            comboBoxEncoding.Items.Add(Encoding.Unicode);
 
-            encodingComboBox.ValueMember = "HeaderName";
+            comboBoxEncoding.ValueMember = "HeaderName";
         }
 
         #endregion
@@ -637,7 +637,7 @@ namespace LogExpert.Dialogs
             Preferences.linesPerBuffer = (int) upDownLinesPerBlock.Value;
             Preferences.pollingInterval = (int) upDownPollingInterval.Value;
             Preferences.multiThreadFilter = checkBoxMultiThread.Checked;
-            Preferences.defaultEncoding = encodingComboBox.SelectedItem != null ? (encodingComboBox.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
+            Preferences.defaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
             Preferences.showColumnFinder = checkBoxColumnFinder.Checked;
             Preferences.useLegacyReader = checkBoxLegacyReader.Checked;
 
