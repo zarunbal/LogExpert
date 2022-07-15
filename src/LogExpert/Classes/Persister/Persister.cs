@@ -147,28 +147,42 @@ namespace LogExpert.Classes.Persister
 
         private static string BuildPersisterFileName(string logFileName, Preferences preferences)
         {
-            string dir = null;
-            string file = null;
+            string dir;
+            string file;
+
             switch (preferences.saveLocation)
             {
                 case SessionSaveLocation.SameDir:
                 default:
+                {
                     FileInfo fileInfo = new FileInfo(logFileName);
                     dir = fileInfo.DirectoryName;
                     file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
                     break;
+                }
                 case SessionSaveLocation.DocumentsDir:
+                {
                     dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                           Path.DirectorySeparatorChar +
                           "LogExpert";
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
+                }
                 case SessionSaveLocation.OwnDir:
+                {
                     dir = preferences.sessionSaveDirectory;
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
+                }
+                case SessionSaveLocation.ApplicationStartupDir:
+                {
+                    dir = Application.StartupPath;
+                    file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
+                    break;
+                }
             }
-            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+
+            if (string.IsNullOrWhiteSpace(dir) == false && Directory.Exists(dir) == false)
             {
                 try
                 {

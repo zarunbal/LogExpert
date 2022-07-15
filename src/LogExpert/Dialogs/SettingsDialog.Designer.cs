@@ -121,14 +121,15 @@
             this.panelPlugin = new System.Windows.Forms.Panel();
             this.buttonConfigPlugin = new System.Windows.Forms.Button();
             this.tabPageSessions = new System.Windows.Forms.TabPage();
+            this.checkBoxPortableMode = new System.Windows.Forms.CheckBox();
             this.checkBoxSaveFilter = new System.Windows.Forms.CheckBox();
             this.groupBoxPersistantFileLocation = new System.Windows.Forms.GroupBox();
-            this.checkBoxPortableMode = new System.Windows.Forms.CheckBox();
             this.labelSessionSaveOwnDir = new System.Windows.Forms.Label();
             this.buttonSessionSaveDir = new System.Windows.Forms.Button();
             this.radioButtonSessionSaveOwn = new System.Windows.Forms.RadioButton();
             this.radioButtonsessionSaveDocuments = new System.Windows.Forms.RadioButton();
             this.radioButtonSessionSameDir = new System.Windows.Forms.RadioButton();
+            this.radioButtonSessionApplicationStartupDir = new System.Windows.Forms.RadioButton();
             this.checkBoxSaveSessions = new System.Windows.Forms.CheckBox();
             this.tabPageMemory = new System.Windows.Forms.TabPage();
             this.groupBoxCPUAndStuff = new System.Windows.Forms.GroupBox();
@@ -399,9 +400,9 @@
             this.checkBoxSingleInstance.Location = new System.Drawing.Point(9, 66);
             this.checkBoxSingleInstance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxSingleInstance.Name = "checkBoxSingleInstance";
-            this.checkBoxSingleInstance.Size = new System.Drawing.Size(173, 24);
+            this.checkBoxSingleInstance.Size = new System.Drawing.Size(183, 24);
             this.checkBoxSingleInstance.TabIndex = 1;
-            this.checkBoxSingleInstance.Text = "Allow only 1 window";
+            this.checkBoxSingleInstance.Text = "Allow only 1 Instance";
             this.checkBoxSingleInstance.UseVisualStyleBackColor = true;
             // 
             // checkBoxAskCloseTabs
@@ -1289,6 +1290,7 @@
             // 
             // tabPageSessions
             // 
+            this.tabPageSessions.Controls.Add(this.checkBoxPortableMode);
             this.tabPageSessions.Controls.Add(this.checkBoxSaveFilter);
             this.tabPageSessions.Controls.Add(this.groupBoxPersistantFileLocation);
             this.tabPageSessions.Controls.Add(this.checkBoxSaveSessions);
@@ -1300,6 +1302,20 @@
             this.tabPageSessions.TabIndex = 6;
             this.tabPageSessions.Text = "Persistence";
             this.tabPageSessions.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxPortableMode
+            // 
+            this.checkBoxPortableMode.AutoSize = true;
+            this.checkBoxPortableMode.Location = new System.Drawing.Point(34, 377);
+            this.checkBoxPortableMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxPortableMode.Name = "checkBoxPortableMode";
+            this.checkBoxPortableMode.Size = new System.Drawing.Size(199, 24);
+            this.checkBoxPortableMode.TabIndex = 3;
+            this.checkBoxPortableMode.Text = "Activate Portable Mode";
+            this.toolTip.SetToolTip(this.checkBoxPortableMode, "If this mode is activated, the save file will be loaded from the Executable Locat" +
+        "ion");
+            this.checkBoxPortableMode.UseVisualStyleBackColor = true;
+            this.checkBoxPortableMode.CheckedChanged += new System.EventHandler(this.OnPortableModeCheckedChanged);
             // 
             // checkBoxSaveFilter
             // 
@@ -1314,12 +1330,12 @@
             // 
             // groupBoxPersistantFileLocation
             // 
-            this.groupBoxPersistantFileLocation.Controls.Add(this.checkBoxPortableMode);
             this.groupBoxPersistantFileLocation.Controls.Add(this.labelSessionSaveOwnDir);
             this.groupBoxPersistantFileLocation.Controls.Add(this.buttonSessionSaveDir);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionSaveOwn);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonsessionSaveDocuments);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionSameDir);
+            this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionApplicationStartupDir);
             this.groupBoxPersistantFileLocation.Location = new System.Drawing.Point(34, 134);
             this.groupBoxPersistantFileLocation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxPersistantFileLocation.Name = "groupBoxPersistantFileLocation";
@@ -1328,20 +1344,6 @@
             this.groupBoxPersistantFileLocation.TabIndex = 1;
             this.groupBoxPersistantFileLocation.TabStop = false;
             this.groupBoxPersistantFileLocation.Text = "Persistence file location";
-            // 
-            // checkBoxPortableMode
-            // 
-            this.checkBoxPortableMode.AutoSize = true;
-            this.checkBoxPortableMode.Location = new System.Drawing.Point(10, 172);
-            this.checkBoxPortableMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxPortableMode.Name = "checkBoxPortableMode";
-            this.checkBoxPortableMode.Size = new System.Drawing.Size(199, 24);
-            this.checkBoxPortableMode.TabIndex = 3;
-            this.checkBoxPortableMode.Text = "Activate Portable Mode";
-            this.toolTip.SetToolTip(this.checkBoxPortableMode, "If this mode is activated, the save file will be loaded from the Executable Locat" +
-        "ion");
-            this.checkBoxPortableMode.UseVisualStyleBackColor = true;
-            this.checkBoxPortableMode.CheckedChanged += new System.EventHandler(this.OnPortableModeCheckedChanged);
             // 
             // labelSessionSaveOwnDir
             // 
@@ -1398,6 +1400,19 @@
             this.radioButtonSessionSameDir.TabStop = true;
             this.radioButtonSessionSameDir.Text = "Same directory as log file";
             this.radioButtonSessionSameDir.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonSessionApplicationStartupDir
+            // 
+            this.radioButtonSessionApplicationStartupDir.AutoSize = true;
+            this.radioButtonSessionApplicationStartupDir.Location = new System.Drawing.Point(8, 177);
+            this.radioButtonSessionApplicationStartupDir.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioButtonSessionApplicationStartupDir.Name = "radioButtonSessionApplicationStartupDir";
+            this.radioButtonSessionApplicationStartupDir.Size = new System.Drawing.Size(230, 24);
+            this.radioButtonSessionApplicationStartupDir.TabIndex = 5;
+            this.radioButtonSessionApplicationStartupDir.TabStop = true;
+            this.radioButtonSessionApplicationStartupDir.Text = "Application startup directory";
+            this.toolTip.SetToolTip(this.radioButtonSessionApplicationStartupDir, "This path is based on the executable and where it has been started from.");
+            this.radioButtonSessionApplicationStartupDir.UseVisualStyleBackColor = true;
             // 
             // checkBoxSaveSessions
             // 
@@ -1609,7 +1624,7 @@
             this.buttonOk.TabIndex = 0;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.okButton_Click);
+            this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
             // 
             // helpProvider
             // 
@@ -1851,5 +1866,6 @@
         private System.Windows.Forms.Label labelMaximumFilterEntriesDisplayed;
         private System.Windows.Forms.CheckBox checkBoxAutoPick;
         private System.Windows.Forms.CheckBox checkBoxPortableMode;
+        private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
     }
 }
