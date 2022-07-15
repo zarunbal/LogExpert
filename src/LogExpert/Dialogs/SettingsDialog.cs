@@ -169,7 +169,7 @@ namespace LogExpert.Dialogs
 
         private void FillPortableMode()
         {
-            checkBoxPortableMode.CheckState = File.Exists(ConfigManager.PortableMode) ? CheckState.Checked : CheckState.Unchecked;
+            checkBoxPortableMode.CheckState = Preferences.PortableMode ? CheckState.Checked : CheckState.Unchecked;
         }
 
         private void DisplayFontName()
@@ -446,7 +446,7 @@ namespace LogExpert.Dialogs
             {
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    configurator.SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                 }
             }
 
@@ -454,7 +454,7 @@ namespace LogExpert.Dialogs
             {
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    configurator.SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                 }
             }
         }
@@ -789,14 +789,19 @@ namespace LogExpert.Dialogs
             {
                 switch (checkBoxPortableMode.CheckState)
                 {
-                    case CheckState.Checked when !File.Exists(ConfigManager.PortableMode):
+                    case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        using (File.Create(ConfigManager.PortableMode)) 
+                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                        {
+                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                        }
+
+                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName)) 
                             break;
                     }
-                    case CheckState.Unchecked when File.Exists(ConfigManager.PortableMode):
+                    case CheckState.Unchecked when File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        File.Delete(ConfigManager.PortableMode);
+                        File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
                         break;
                     }
                 }
@@ -804,11 +809,18 @@ namespace LogExpert.Dialogs
                 switch (checkBoxPortableMode.CheckState)
                 {
                     case CheckState.Unchecked:
+                    {
                         checkBoxPortableMode.Text = @"Activate Portable Mode";
+                        Preferences.PortableMode = false;
                         break;
+                    }
+
                     case CheckState.Checked:
+                    {
+                        Preferences.PortableMode = true;
                         checkBoxPortableMode.Text = @"Deactivate Portable Mode";
                         break;
+                    }
                 }
             }
             catch (Exception exception)

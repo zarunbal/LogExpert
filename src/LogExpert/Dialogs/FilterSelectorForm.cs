@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using LogExpert.Config;
-// using System.Linq;
 
 namespace LogExpert.Dialogs
 {
@@ -22,7 +21,7 @@ namespace LogExpert.Dialogs
             SelectedColumnizer = currentColumnizer;
             _callback = callback;
             InitializeComponent();
-            filterComboBox.SelectedIndexChanged += filterComboBox_SelectedIndexChanged;
+            filterComboBox.SelectedIndexChanged += OnFilterComboBoxSelectedIndexChanged;
 
             // for the currently selected columnizer use the current instance and not the template instance from
             // columnizer registry. This ensures that changes made in columnizer config dialogs
@@ -62,7 +61,7 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void filterComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void OnFilterComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             ILogLineColumnizer col = _columnizerList[filterComboBox.SelectedIndex];
             SelectedColumnizer = col;
@@ -73,11 +72,18 @@ namespace LogExpert.Dialogs
         }
 
 
-        private void configButton_Click(object sender, EventArgs e)
+        private void OnConfigButtonClick(object sender, EventArgs e)
         {
-            if (SelectedColumnizer is IColumnizerConfigurator)
+            if (SelectedColumnizer is IColumnizerConfigurator configurator)
             {
-                ((IColumnizerConfigurator) SelectedColumnizer).Configure(_callback, ConfigManager.ConfigDir);
+                string configDir = ConfigManager.ConfigDir;
+
+                if (ConfigManager.Settings.preferences.PortableMode)
+                {
+                    configDir = ConfigManager.PortableModeDir;
+                }
+
+                configurator.Configure(_callback, configDir);
                 IsConfigPressed = true;
             }
         }

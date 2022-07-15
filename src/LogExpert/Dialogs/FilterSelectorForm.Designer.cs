@@ -110,7 +110,7 @@
       this.configButton.TabIndex = 7;
       this.configButton.Text = "Config...";
       this.configButton.UseVisualStyleBackColor = true;
-      this.configButton.Click += new System.EventHandler(this.configButton_Click);
+      this.configButton.Click += new System.EventHandler(this.OnConfigButtonClick);
       // 
       // FilterSelectorForm
       // 

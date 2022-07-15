@@ -63,9 +63,14 @@ namespace LogExpert.Config
         public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "LogExpert";
 
         /// <summary>
-        /// Application.StartupPath + portableMode.json
+        /// Application.StartupPath + portable
         /// </summary>
-        public static string PortableMode => Application.StartupPath + Path.DirectorySeparatorChar + "portableMode.json";
+        public static string PortableModeDir => Application.StartupPath + Path.DirectorySeparatorChar + "portable";
+
+        /// <summary>
+        /// portableMode.json
+        /// </summary>
+        public static string PortableModeSettingsFileName => "portableMode.json";
 
         public static Settings Settings => Instance._settings;
 
@@ -99,7 +104,7 @@ namespace LogExpert.Config
 
             string dir;
 
-            if (!File.Exists(PortableMode))
+            if (File.Exists(PortableModeDir + Path.DirectorySeparatorChar + PortableModeSettingsFileName) == false)
             {
                 _logger.Info("Load settings standard mode");
                dir = ConfigDir;
@@ -294,7 +299,7 @@ namespace LogExpert.Config
                 _logger.Info("Saving settings");
                 lock (this)
                 {
-                    string dir = File.Exists(PortableMode) ? Application.StartupPath : ConfigDir;
+                    string dir = Settings.preferences.PortableMode ? Application.StartupPath : ConfigDir;
 
                     if (!Directory.Exists(dir))
                     {
