@@ -121,14 +121,15 @@
             this.panelPlugin = new System.Windows.Forms.Panel();
             this.buttonConfigPlugin = new System.Windows.Forms.Button();
             this.tabPageSessions = new System.Windows.Forms.TabPage();
+            this.checkBoxPortableMode = new System.Windows.Forms.CheckBox();
             this.checkBoxSaveFilter = new System.Windows.Forms.CheckBox();
             this.groupBoxPersistantFileLocation = new System.Windows.Forms.GroupBox();
-            this.checkBoxPortableMode = new System.Windows.Forms.CheckBox();
             this.labelSessionSaveOwnDir = new System.Windows.Forms.Label();
             this.buttonSessionSaveDir = new System.Windows.Forms.Button();
             this.radioButtonSessionSaveOwn = new System.Windows.Forms.RadioButton();
             this.radioButtonsessionSaveDocuments = new System.Windows.Forms.RadioButton();
             this.radioButtonSessionSameDir = new System.Windows.Forms.RadioButton();
+            this.radioButtonSessionApplicationStartupDir = new System.Windows.Forms.RadioButton();
             this.checkBoxSaveSessions = new System.Windows.Forms.CheckBox();
             this.tabPageMemory = new System.Windows.Forms.TabPage();
             this.groupBoxCPUAndStuff = new System.Windows.Forms.GroupBox();
@@ -150,7 +151,6 @@
             this.buttonImport = new System.Windows.Forms.Button();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.radioButtonSessionApplicationStartupDir = new System.Windows.Forms.RadioButton();
             this.tabControlSettings.SuspendLayout();
             this.tabPageViewSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.upDownMaximumFilterEntriesDisplayed)).BeginInit();
@@ -1303,6 +1303,20 @@
             this.tabPageSessions.Text = "Persistence";
             this.tabPageSessions.UseVisualStyleBackColor = true;
             // 
+            // checkBoxPortableMode
+            // 
+            this.checkBoxPortableMode.AutoSize = true;
+            this.checkBoxPortableMode.Location = new System.Drawing.Point(34, 377);
+            this.checkBoxPortableMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxPortableMode.Name = "checkBoxPortableMode";
+            this.checkBoxPortableMode.Size = new System.Drawing.Size(199, 24);
+            this.checkBoxPortableMode.TabIndex = 3;
+            this.checkBoxPortableMode.Text = "Activate Portable Mode";
+            this.toolTip.SetToolTip(this.checkBoxPortableMode, "If this mode is activated, the save file will be loaded from the Executable Locat" +
+        "ion");
+            this.checkBoxPortableMode.UseVisualStyleBackColor = true;
+            this.checkBoxPortableMode.CheckedChanged += new System.EventHandler(this.OnPortableModeCheckedChanged);
+            // 
             // checkBoxSaveFilter
             // 
             this.checkBoxSaveFilter.AutoSize = true;
@@ -1330,20 +1344,6 @@
             this.groupBoxPersistantFileLocation.TabIndex = 1;
             this.groupBoxPersistantFileLocation.TabStop = false;
             this.groupBoxPersistantFileLocation.Text = "Persistence file location";
-            // 
-            // checkBoxPortableMode
-            // 
-            this.checkBoxPortableMode.AutoSize = true;
-            this.checkBoxPortableMode.Location = new System.Drawing.Point(34, 377);
-            this.checkBoxPortableMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxPortableMode.Name = "checkBoxPortableMode";
-            this.checkBoxPortableMode.Size = new System.Drawing.Size(199, 24);
-            this.checkBoxPortableMode.TabIndex = 3;
-            this.checkBoxPortableMode.Text = "Activate Portable Mode";
-            this.toolTip.SetToolTip(this.checkBoxPortableMode, "If this mode is activated, the save file will be loaded from the Executable Locat" +
-        "ion");
-            this.checkBoxPortableMode.UseVisualStyleBackColor = true;
-            this.checkBoxPortableMode.CheckedChanged += new System.EventHandler(this.OnPortableModeCheckedChanged);
             // 
             // labelSessionSaveOwnDir
             // 
@@ -1400,6 +1400,19 @@
             this.radioButtonSessionSameDir.TabStop = true;
             this.radioButtonSessionSameDir.Text = "Same directory as log file";
             this.radioButtonSessionSameDir.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonSessionApplicationStartupDir
+            // 
+            this.radioButtonSessionApplicationStartupDir.AutoSize = true;
+            this.radioButtonSessionApplicationStartupDir.Location = new System.Drawing.Point(8, 177);
+            this.radioButtonSessionApplicationStartupDir.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioButtonSessionApplicationStartupDir.Name = "radioButtonSessionApplicationStartupDir";
+            this.radioButtonSessionApplicationStartupDir.Size = new System.Drawing.Size(230, 24);
+            this.radioButtonSessionApplicationStartupDir.TabIndex = 5;
+            this.radioButtonSessionApplicationStartupDir.TabStop = true;
+            this.radioButtonSessionApplicationStartupDir.Text = "Application startup directory";
+            this.toolTip.SetToolTip(this.radioButtonSessionApplicationStartupDir, "This path is based on the executable and where it has been started from.");
+            this.radioButtonSessionApplicationStartupDir.UseVisualStyleBackColor = true;
             // 
             // checkBoxSaveSessions
             // 
@@ -1652,18 +1665,6 @@
             this.dataGridViewTextBoxColumn2.MinimumWidth = 40;
             this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             this.dataGridViewTextBoxColumn2.Width = 259;
-            // 
-            // radioButtonSessionApplicationStartupDir
-            // 
-            this.radioButtonSessionApplicationStartupDir.AutoSize = true;
-            this.radioButtonSessionApplicationStartupDir.Location = new System.Drawing.Point(8, 177);
-            this.radioButtonSessionApplicationStartupDir.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonSessionApplicationStartupDir.Name = "radioButtonSessionApplicationStartupDir";
-            this.radioButtonSessionApplicationStartupDir.Size = new System.Drawing.Size(210, 24);
-            this.radioButtonSessionApplicationStartupDir.TabIndex = 5;
-            this.radioButtonSessionApplicationStartupDir.TabStop = true;
-            this.radioButtonSessionApplicationStartupDir.Text = "Same directory as log file";
-            this.radioButtonSessionApplicationStartupDir.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
