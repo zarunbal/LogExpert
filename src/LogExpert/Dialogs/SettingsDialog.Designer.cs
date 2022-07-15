@@ -150,6 +150,7 @@
             this.buttonImport = new System.Windows.Forms.Button();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.radioButtonSessionApplicationStartupDir = new System.Windows.Forms.RadioButton();
             this.tabControlSettings.SuspendLayout();
             this.tabPageViewSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.upDownMaximumFilterEntriesDisplayed)).BeginInit();
@@ -399,9 +400,9 @@
             this.checkBoxSingleInstance.Location = new System.Drawing.Point(9, 66);
             this.checkBoxSingleInstance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxSingleInstance.Name = "checkBoxSingleInstance";
-            this.checkBoxSingleInstance.Size = new System.Drawing.Size(173, 24);
+            this.checkBoxSingleInstance.Size = new System.Drawing.Size(183, 24);
             this.checkBoxSingleInstance.TabIndex = 1;
-            this.checkBoxSingleInstance.Text = "Allow only 1 window";
+            this.checkBoxSingleInstance.Text = "Allow only 1 Instance";
             this.checkBoxSingleInstance.UseVisualStyleBackColor = true;
             // 
             // checkBoxAskCloseTabs
@@ -1289,6 +1290,7 @@
             // 
             // tabPageSessions
             // 
+            this.tabPageSessions.Controls.Add(this.checkBoxPortableMode);
             this.tabPageSessions.Controls.Add(this.checkBoxSaveFilter);
             this.tabPageSessions.Controls.Add(this.groupBoxPersistantFileLocation);
             this.tabPageSessions.Controls.Add(this.checkBoxSaveSessions);
@@ -1314,12 +1316,12 @@
             // 
             // groupBoxPersistantFileLocation
             // 
-            this.groupBoxPersistantFileLocation.Controls.Add(this.checkBoxPortableMode);
             this.groupBoxPersistantFileLocation.Controls.Add(this.labelSessionSaveOwnDir);
             this.groupBoxPersistantFileLocation.Controls.Add(this.buttonSessionSaveDir);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionSaveOwn);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonsessionSaveDocuments);
             this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionSameDir);
+            this.groupBoxPersistantFileLocation.Controls.Add(this.radioButtonSessionApplicationStartupDir);
             this.groupBoxPersistantFileLocation.Location = new System.Drawing.Point(34, 134);
             this.groupBoxPersistantFileLocation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxPersistantFileLocation.Name = "groupBoxPersistantFileLocation";
@@ -1332,7 +1334,7 @@
             // checkBoxPortableMode
             // 
             this.checkBoxPortableMode.AutoSize = true;
-            this.checkBoxPortableMode.Location = new System.Drawing.Point(10, 172);
+            this.checkBoxPortableMode.Location = new System.Drawing.Point(34, 377);
             this.checkBoxPortableMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxPortableMode.Name = "checkBoxPortableMode";
             this.checkBoxPortableMode.Size = new System.Drawing.Size(199, 24);
@@ -1609,7 +1611,7 @@
             this.buttonOk.TabIndex = 0;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.okButton_Click);
+            this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
             // 
             // helpProvider
             // 
@@ -1650,6 +1652,18 @@
             this.dataGridViewTextBoxColumn2.MinimumWidth = 40;
             this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             this.dataGridViewTextBoxColumn2.Width = 259;
+            // 
+            // radioButtonSessionApplicationStartupDir
+            // 
+            this.radioButtonSessionApplicationStartupDir.AutoSize = true;
+            this.radioButtonSessionApplicationStartupDir.Location = new System.Drawing.Point(8, 177);
+            this.radioButtonSessionApplicationStartupDir.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioButtonSessionApplicationStartupDir.Name = "radioButtonSessionApplicationStartupDir";
+            this.radioButtonSessionApplicationStartupDir.Size = new System.Drawing.Size(210, 24);
+            this.radioButtonSessionApplicationStartupDir.TabIndex = 5;
+            this.radioButtonSessionApplicationStartupDir.TabStop = true;
+            this.radioButtonSessionApplicationStartupDir.Text = "Same directory as log file";
+            this.radioButtonSessionApplicationStartupDir.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -1851,5 +1865,6 @@
         private System.Windows.Forms.Label labelMaximumFilterEntriesDisplayed;
         private System.Windows.Forms.CheckBox checkBoxAutoPick;
         private System.Windows.Forms.CheckBox checkBoxPortableMode;
+        private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
     }
 }

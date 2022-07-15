@@ -60,9 +60,12 @@ namespace LogExpert.Config
             }
         }
         
-        public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\LogExpert";
+        public static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "LogExpert";
 
-        public static string PortableMode => Application.StartupPath + "\\portableMode.json";
+        /// <summary>
+        /// Application.StartupPath + portableMode.json
+        /// </summary>
+        public static string PortableMode => Application.StartupPath + Path.DirectorySeparatorChar + "portableMode.json";
 
         public static Settings Settings => Instance._settings;
 
@@ -112,14 +115,14 @@ namespace LogExpert.Config
                 Directory.CreateDirectory(dir);
             }
 
-            if (!File.Exists(dir + "\\settings.json"))
+            if (!File.Exists(dir + Path.DirectorySeparatorChar + "settings.json"))
             {
                 return LoadOrCreateNew(null);
             }
 
             try
             {
-                FileInfo fileInfo = new FileInfo(dir + "\\settings.json");
+                FileInfo fileInfo = new FileInfo(dir + Path.DirectorySeparatorChar + "settings.json");
                 return LoadOrCreateNew(fileInfo);
             }
             catch (Exception e)
@@ -298,7 +301,7 @@ namespace LogExpert.Config
                         Directory.CreateDirectory(dir);
                     }
 
-                    FileInfo fileInfo = new FileInfo(dir + "\\settings.json");
+                    FileInfo fileInfo = new FileInfo(dir + Path.DirectorySeparatorChar + "settings.json");
                     Save(fileInfo, settings);
                 }
 

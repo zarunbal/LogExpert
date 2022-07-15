@@ -103,6 +103,7 @@ namespace LogExpert.Dialogs
 
             checkBoxTimeSpread.Checked = Preferences.showTimeSpread;
             checkBoxReverseAlpha.Checked = Preferences.reverseAlpha;
+
             radioButtonTimeView.Checked = Preferences.timeSpreadTimeMode;
             radioButtonLineView.Checked = !Preferences.timeSpreadTimeMode;
 
@@ -123,8 +124,19 @@ namespace LogExpert.Dialogs
                 case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
+                    break;
                 }
-                break;
+                case SessionSaveLocation.ApplicationStartupDir:
+                {
+                    radioButtonSessionApplicationStartupDir.Checked = true;
+                    break;
+                }
+            }
+            
+            //overwrite preferences save location in portable mode to always be application startup directory
+            if (checkBoxPortableMode.Checked)
+            {
+                radioButtonSessionApplicationStartupDir.Checked = true;
             }
 
             upDownMaximumFilterEntriesDisplayed.Value = Preferences.maximumFilterEntriesDisplayed;
@@ -582,7 +594,7 @@ namespace LogExpert.Dialogs
             DisplayFontName();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             Preferences.timestampControl = checkBoxTimestamp.Checked;
             Preferences.filterSync = checkBoxSyncFilter.Checked;
@@ -626,6 +638,10 @@ namespace LogExpert.Dialogs
             else if (radioButtonSessionSaveOwn.Checked)
             {
                 Preferences.saveLocation = SessionSaveLocation.OwnDir;
+            }
+            else if (radioButtonSessionApplicationStartupDir.Checked)
+            {
+                Preferences.saveLocation = SessionSaveLocation.ApplicationStartupDir;
             }
             else
             {
@@ -775,14 +791,24 @@ namespace LogExpert.Dialogs
                 {
                     case CheckState.Checked when !File.Exists(ConfigManager.PortableMode):
                     {
-                        File.Create(ConfigManager.PortableMode);
-                        break;
+                        using (File.Create(ConfigManager.PortableMode)) 
+                            break;
                     }
                     case CheckState.Unchecked when File.Exists(ConfigManager.PortableMode):
                     {
                         File.Delete(ConfigManager.PortableMode);
                         break;
                     }
+                }
+
+                switch (checkBoxPortableMode.CheckState)
+                {
+                    case CheckState.Unchecked:
+                        checkBoxPortableMode.Text = @"Activate Portable Mode";
+                        break;
+                    case CheckState.Checked:
+                        checkBoxPortableMode.Text = @"Deactivate Portable Mode";
+                        break;
                 }
             }
             catch (Exception exception)
