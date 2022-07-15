@@ -24,14 +24,13 @@ namespace LogExpert.Classes
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly object lockObject = new object();
-        private static PluginRegistry instance = null;
+        private static readonly object _lockObject = new object();
+        private static PluginRegistry _instance;
 
-        private readonly IFileSystemCallback fileSystemCallback = new FileSystemCallback();
-        private readonly IList<ILogExpertPlugin> pluginList = new List<ILogExpertPlugin>();
+        private readonly IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
+        private readonly IList<ILogExpertPlugin> _pluginList = new List<ILogExpertPlugin>();
 
-        private readonly IDictionary<string, IKeywordAction> registeredKeywordsDict =
-            new Dictionary<string, IKeywordAction>();
+        private readonly IDictionary<string, IKeywordAction> _registeredKeywordsDict = new Dictionary<string, IKeywordAction>();
 
         #endregion
 
@@ -60,14 +59,14 @@ namespace LogExpert.Classes
 
         public static PluginRegistry GetInstance()
         {
-            lock (lockObject)
+            lock (_lockObject)
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new PluginRegistry();
+                    _instance = new PluginRegistry();
                 }
 
-                return instance;
+                return _instance;
             }
         }
 
@@ -78,16 +77,19 @@ namespace LogExpert.Classes
         internal void LoadPlugins()
         {
             _logger.Info("Loading plugins...");
-            this.RegisteredColumnizers = new List<ILogLineColumnizer>();
-            this.RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
-            this.RegisteredColumnizers.Add(new TimestampColumnizer());
-            this.RegisteredColumnizers.Add(new SquareBracketColumnizer());
-            this.RegisteredColumnizers.Add(new ClfColumnizer());
-            this.RegisteredFileSystemPlugins.Add(new LocalFileSystem());
+
+            RegisteredColumnizers = new List<ILogLineColumnizer>();
+            RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
+            RegisteredColumnizers.Add(new TimestampColumnizer());
+            RegisteredColumnizers.Add(new SquareBracketColumnizer());
+            RegisteredColumnizers.Add(new ClfColumnizer());
+            RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 
             string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins";
+            
             AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.AssemblyResolve += new ResolveEventHandler(ColumnizerResolveEventHandler);
+            currentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
+
             if (Directory.Exists(pluginDir))
             {
                 string[] dllNames = Directory.GetFiles(pluginDir, "*.dll");
@@ -119,16 +121,17 @@ namespace LogExpert.Classes
                                         if (cti != null)
                                         {
                                             object o = cti.Invoke(new object[] { });
-                                            this.RegisteredColumnizers.Add((ILogLineColumnizer) o);
-                                            if (o is IColumnizerConfigurator)
+                                            RegisteredColumnizers.Add((ILogLineColumnizer) o);
+                                            
+                                            if (o is IColumnizerConfigurator configurator)
                                             {
-                                                ((IColumnizerConfigurator) o).LoadConfig(ConfigManager.ConfigDir);
+                                                configurator.LoadConfig(ConfigManager.Settings.preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                                             }
 
-                                            if (o is ILogExpertPlugin)
+                                            if (o is ILogExpertPlugin plugin)
                                             {
-                                                this.pluginList.Add(o as ILogExpertPlugin);
-                                                (o as ILogExpertPlugin).PluginLoaded();
+                                                _pluginList.Add(plugin);
+                                                plugin.PluginLoaded();
                                             }
 
                                             _logger.Info("Added columnizer {0}", type.Name);
@@ -188,13 +191,13 @@ namespace LogExpert.Classes
         internal IKeywordAction FindKeywordActionPluginByName(string name)
         {
             IKeywordAction action = null;
-            this.registeredKeywordsDict.TryGetValue(name, out action);
+            _registeredKeywordsDict.TryGetValue(name, out action);
             return action;
         }
 
         internal void CleanupPlugins()
         {
-            foreach (ILogExpertPlugin plugin in this.pluginList)
+            foreach (ILogExpertPlugin plugin in _pluginList)
             {
                 plugin.AppExiting();
             }
@@ -207,7 +210,7 @@ namespace LogExpert.Classes
                 _logger.Debug("Trying to find file system plugin for uri {0}", uriString);
             }
 
-            foreach (IFileSystemPlugin fs in this.RegisteredFileSystemPlugins)
+            foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
             {
                 if (_logger.IsDebugEnabled)
                 {
@@ -238,7 +241,7 @@ namespace LogExpert.Classes
             IContextMenuEntry me = TryInstantiate<IContextMenuEntry>(type);
             if (me != null)
             {
-                this.RegisteredContextMenuPlugins.Add(me);
+                RegisteredContextMenuPlugins.Add(me);
                 if (me is ILogExpertPluginConfigurator)
                 {
                     ((ILogExpertPluginConfigurator) me).LoadConfig(ConfigManager.ConfigDir);
@@ -246,7 +249,7 @@ namespace LogExpert.Classes
 
                 if (me is ILogExpertPlugin)
                 {
-                    this.pluginList.Add(me as ILogExpertPlugin);
+                    _pluginList.Add(me as ILogExpertPlugin);
                     (me as ILogExpertPlugin).PluginLoaded();
                 }
 
@@ -262,8 +265,8 @@ namespace LogExpert.Classes
             IKeywordAction ka = TryInstantiate<IKeywordAction>(type);
             if (ka != null)
             {
-                this.RegisteredKeywordActions.Add(ka);
-                this.registeredKeywordsDict.Add(ka.GetName(), ka);
+                RegisteredKeywordActions.Add(ka);
+                _registeredKeywordsDict.Add(ka.GetName(), ka);
                 if (ka is ILogExpertPluginConfigurator)
                 {
                     ((ILogExpertPluginConfigurator) ka).LoadConfig(ConfigManager.ConfigDir);
@@ -271,7 +274,7 @@ namespace LogExpert.Classes
 
                 if (ka is ILogExpertPlugin)
                 {
-                    this.pluginList.Add(ka as ILogExpertPlugin);
+                    _pluginList.Add(ka as ILogExpertPlugin);
                     (ka as ILogExpertPlugin).PluginLoaded();
                 }
 
@@ -285,7 +288,7 @@ namespace LogExpert.Classes
         private bool TryAsFileSystem(Type type)
         {
             // file system plugins can have optional constructor with IFileSystemCallback argument
-            IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, this.fileSystemCallback);
+            IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, _fileSystemCallback);
             if (fs == null)
             {
                 fs = TryInstantiate<IFileSystemPlugin>(type);
@@ -293,7 +296,7 @@ namespace LogExpert.Classes
 
             if (fs != null)
             {
-                this.RegisteredFileSystemPlugins.Add(fs);
+                RegisteredFileSystemPlugins.Add(fs);
                 if (fs is ILogExpertPluginConfigurator)
                 {
                     ((ILogExpertPluginConfigurator) fs).LoadConfig(ConfigManager.ConfigDir);
@@ -301,7 +304,7 @@ namespace LogExpert.Classes
 
                 if (fs is ILogExpertPlugin)
                 {
-                    this.pluginList.Add(fs as ILogExpertPlugin);
+                    _pluginList.Add(fs as ILogExpertPlugin);
                     (fs as ILogExpertPlugin).PluginLoaded();
                 }
 

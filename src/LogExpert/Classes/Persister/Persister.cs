@@ -176,7 +176,7 @@ namespace LogExpert.Classes.Persister
                 }
                 case SessionSaveLocation.ApplicationStartupDir:
                 {
-                    dir = Application.StartupPath;
+                    dir = Application.StartupPath + Path.DirectorySeparatorChar + "sessionfiles";
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
                 }
