@@ -60,7 +60,9 @@ namespace LogExpert.Config
         public int pollingInterval = 250;
         
         public bool reverseAlpha = false;
-        
+
+        public bool PortableMode { get; set; }
+
         /// <summary>
         /// Save Directory of the last logfile
         /// </summary>
@@ -75,7 +77,7 @@ namespace LogExpert.Config
         public bool setLastColumnWidth;
         
         public bool showBubbles = true;
-        
+
         public bool showColumnFinder;
         
         public Color showTailColor = Color.FromKnownColor(KnownColor.Blue);
