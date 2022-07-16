@@ -20,7 +20,6 @@ using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
 using LogExpert.Interface;
-//using System.Linq;
 
 namespace LogExpert.Controls.LogWindow
 {
@@ -1501,7 +1500,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     if (!IsMultiFile && dataGridView.SelectedRows.Count == 1)
                     {
-                        StatusLineText("");
+                        StatusLineText(string.Empty);
                     }
                 }
             }
@@ -1523,7 +1522,7 @@ namespace LogExpert.Controls.LogWindow
                         }
                     }
 
-                    if (filterGridView.Rows.Count > 0) // exception no rows
+                    if (filterGridView.Rows.GetRowCount(DataGridViewElementStates.None) > 0) // exception no rows
                     {
                         filterGridView.CurrentCell = filterGridView.Rows[index].Cells[0];
                     }
@@ -2940,9 +2939,9 @@ namespace LogExpert.Controls.LogWindow
             return new List<int>();
         }
 
-        /* ========================================================================
-       * Timestamp stuff
-       * =======================================================================*/
+       /* ========================================================================
+        * Timestamp stuff
+        * =======================================================================*/
 
         private void SetTimestampLimits()
         {
