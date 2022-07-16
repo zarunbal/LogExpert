@@ -213,6 +213,7 @@ namespace LogExpert.Classes
             catch (NullReferenceException e)
             {
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+                // possible solution => https://stackoverflow.com/questions/36287553/nullreferenceexception-when-trying-to-set-datagridview-column-width-brings-th
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
                 _logger.Error(e, "Error while resizing columns: ");
