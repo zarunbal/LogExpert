@@ -296,6 +296,7 @@ namespace LogExpert.Classes
         private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
         {
             object value = e.Value ?? string.Empty;
+            
             IList<HilightMatchEntry> matchList = logPaintCtx.FindHighlightMatches(value as ILogLine);
             // too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
@@ -303,18 +304,20 @@ namespace LogExpert.Classes
                 matchList.RemoveAt(50);
             }
 
-            HilightMatchEntry hme = new HilightMatchEntry();
-            hme.StartPos = 0;
-            hme.Length = (value as string).Length; //ignore possible null reference, because object will be string.Empty if e.value was NULL
-            hme.HilightEntry = new HilightEntry(value as string,
-                groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
-                groundEntry?.BackgroundColor ?? Color.Empty,
-                false);
-            matchList = MergeHighlightMatchEntries(matchList, hme);
+            if (value is Column column)
+            {
+                if (string.IsNullOrEmpty(column.FullValue) == false)
+                {
+                    HilightMatchEntry hme = new HilightMatchEntry();
+                    hme.StartPos = 0;
+                    hme.Length = column.FullValue.Length;
+                    hme.HilightEntry = new HilightEntry(column.FullValue, groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black), groundEntry?.BackgroundColor ?? Color.Empty, false);
+                    matchList = MergeHighlightMatchEntries(matchList, hme);
+                }
+            }
 
             int leftPad = e.CellStyle.Padding.Left;
-            RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width,
-                e.CellBounds.Height);
+            RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
             Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
             Rectangle valBounds = e.CellBounds;
             valBounds.Offset(borderWidths.X, borderWidths.Y);
@@ -335,14 +338,11 @@ namespace LogExpert.Classes
                     | TextFormatFlags.PreserveGraphicsClipping
                     | TextFormatFlags.NoPadding
                     | TextFormatFlags.VerticalCenter
-                    | TextFormatFlags.TextBoxControl
-                ;
+                    | TextFormatFlags.TextBoxControl;
 
             //          | TextFormatFlags.VerticalCenter
             //          | TextFormatFlags.TextBoxControl
             //          TextFormatFlags.SingleLine
-
-
             //TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
 
             Point wordPos = valBounds.Location;
@@ -356,10 +356,20 @@ namespace LogExpert.Classes
                 Font font = matchEntry != null && matchEntry.HilightEntry.IsBold
                     ? logPaintCtx.BoldFont
                     : logPaintCtx.NormalFont;
+
                 Brush bgBrush = matchEntry.HilightEntry.BackgroundColor != Color.Empty
                     ? new SolidBrush(matchEntry.HilightEntry.BackgroundColor)
                     : null;
-                string matchWord = (value as string).Substring(matchEntry.StartPos, matchEntry.Length);
+
+                string matchWord = string.Empty;
+                if (value is Column again)
+                {
+                    if (string.IsNullOrEmpty(again.FullValue) == false)
+                    {
+                        matchWord = again.FullValue.Substring(matchEntry.StartPos, matchEntry.Length);
+                    }
+                }
+
                 Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
                 wordSize.Height = e.CellBounds.Height;
                 Rectangle wordRect = new Rectangle(wordPos, wordSize);
@@ -379,8 +389,7 @@ namespace LogExpert.Classes
                         foreColor = Color.White;
                     }
                 }
-                TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
-                    foreColor, flags);
+                TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect, foreColor, flags);
 
                 wordPos.Offset(wordSize.Width, 0);
                 bgBrush?.Dispose();
@@ -397,8 +406,7 @@ namespace LogExpert.Classes
         /// <param name="matchList">List of all highlight matches for the current cell</param>
         /// <param name="groundEntry">The entry that is used as the default.</param>
         /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
-        private static IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList,
-            HilightMatchEntry groundEntry)
+        private static IList<HilightMatchEntry> MergeHighlightMatchEntries(IList<HilightMatchEntry> matchList, HilightMatchEntry groundEntry)
         {
             // Fill an area with lenth of whole text with a default hilight entry
             HilightEntry[] entryArray = new HilightEntry[groundEntry.Length];
