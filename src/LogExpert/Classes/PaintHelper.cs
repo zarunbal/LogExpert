@@ -17,16 +17,13 @@ namespace LogExpert.Classes
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private Color bookmarkColor = Color.FromArgb(165, 200, 225);
+        private Color _bookmarkColor = Color.FromArgb(165, 200, 225);
 
         #endregion
 
         #region Properties
 
-        private static Preferences Preferences
-        {
-            get { return ConfigManager.Settings.preferences; }
-        }
+        private static Preferences Preferences => ConfigManager.Settings.preferences;
 
         #endregion
 
@@ -43,7 +40,7 @@ namespace LogExpert.Classes
             ILogLine line = logPaintCtx.GetLogLine(rowIndex);
             if (line != null)
             {
-                HilightEntry entry = logPaintCtx.FindHilightEntry(line, true);
+                HilightEntry entry = logPaintCtx.FindHighlightEntry(line, true);
                 e.Graphics.SetClip(e.CellBounds);
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
@@ -289,18 +286,16 @@ namespace LogExpert.Classes
 
         #region Private Methods
 
-        private static void PaintCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e,
-            DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
+        private static void PaintCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
         {
             PaintHighlightedCell(logPaintCtx, e, gridView, noBackgroundFill, groundEntry);
         }
 
 
-        private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e,
-            DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
+        private static void PaintHighlightedCell(ILogPaintContext logPaintCtx, DataGridViewCellPaintingEventArgs e, DataGridView gridView, bool noBackgroundFill, HilightEntry groundEntry)
         {
-            object value = e.Value != null ? e.Value : "";
-            IList<HilightMatchEntry> matchList = logPaintCtx.FindHilightMatches(value as ILogLine);
+            object value = e.Value ?? string.Empty;
+            IList<HilightMatchEntry> matchList = logPaintCtx.FindHighlightMatches(value as ILogLine);
             // too many entries per line seem to cause problems with the GDI 
             while (matchList.Count > 50)
             {
@@ -309,10 +304,10 @@ namespace LogExpert.Classes
 
             HilightMatchEntry hme = new HilightMatchEntry();
             hme.StartPos = 0;
-            hme.Length = (value as string).Length;
+            hme.Length = (value as string).Length; //ignore possible null reference, because object will be string.Empty if e.value was NULL
             hme.HilightEntry = new HilightEntry(value as string,
-                groundEntry != null ? groundEntry.ForegroundColor : Color.FromKnownColor(KnownColor.Black),
-                groundEntry != null ? groundEntry.BackgroundColor : Color.Empty,
+                groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
+                groundEntry?.BackgroundColor ?? Color.Empty,
                 false);
             matchList = MergeHighlightMatchEntries(matchList, hme);
 
@@ -387,10 +382,7 @@ namespace LogExpert.Classes
                     foreColor, flags);
 
                 wordPos.Offset(wordSize.Width, 0);
-                if (bgBrush != null)
-                {
-                    bgBrush.Dispose();
-                }
+                bgBrush?.Dispose();
             }
         }
 
@@ -425,10 +417,10 @@ namespace LogExpert.Classes
                     {
                         entryArray[i] = me.HilightEntry;
                     }
-                    else
-                    {
-                        //entryArray[i].ForegroundColor = me.HilightEntry.ForegroundColor;
-                    }
+                    //else
+                    //{
+                    //    //entryArray[i].ForegroundColor = me.HilightEntry.ForegroundColor;
+                    //}
                 }
             }
 
