@@ -819,7 +819,7 @@ namespace LogExpert.Controls.LogWindow
                             _logger.Debug("AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}", r.Location.X, r.Width, dataGridView.HorizontalScrollingOffset);
                         }
                         overlay.Position = r.Location - new Size(dataGridView.HorizontalScrollingOffset, 0);
-                        overlay.Position = overlay.Position + new Size(10, r.Height / 2);
+                        overlay.Position += new Size(10, r.Height / 2);
                         dataGridView.AddOverlay(overlay);
                     }
                 }
