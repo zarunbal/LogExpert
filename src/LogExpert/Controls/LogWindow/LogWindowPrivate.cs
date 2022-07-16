@@ -327,8 +327,7 @@ namespace LogExpert.Controls.LogWindow
                 dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.currentLine].Cells[0];
             }
 
-            if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount &&
-                _reloadMemento.firstDisplayedLine >= 0)
+            if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount && _reloadMemento.firstDisplayedLine >= 0)
             {
                 dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.firstDisplayedLine;
             }
@@ -656,7 +655,7 @@ namespace LogExpert.Controls.LogWindow
                     int currentLineNum = dataGridView.CurrentCellAddress.Y;
                     dataGridView.RowCount = 0;
                     dataGridView.RowCount = e.LineCount;
-                    if (!_guiStateArgs.FollowTail)
+                    if (_guiStateArgs.FollowTail == false)
                     {
                         if (currentLineNum >= dataGridView.RowCount)
                         {
@@ -672,6 +671,7 @@ namespace LogExpert.Controls.LogWindow
                 }
 
                 _logger.Debug("UpdateGrid(): new RowCount={0}", dataGridView.RowCount);
+
                 if (e.IsRollover)
                 {
                     // Multifile rollover
@@ -950,6 +950,7 @@ namespace LogExpert.Controls.LogWindow
 
             Type oldColType = _filterParams.currentColumnizer?.GetType();
             Type newColType = columnizer?.GetType();
+            
             if (oldColType != newColType && _filterParams.columnRestrict && _filterParams.isFilterTail)
             {
                 _filterParams.columnList.Clear();
@@ -1072,6 +1073,7 @@ namespace LogExpert.Controls.LogWindow
             catch (NullReferenceException e)
             {
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+                // possible solution => https://stackoverflow.com/questions/36287553/nullreferenceexception-when-trying-to-set-datagridview-column-width-brings-th
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
                 _logger.Error(e, "Error while resizing columns: ");
@@ -1095,7 +1097,7 @@ namespace LogExpert.Controls.LogWindow
                 column = Column.EmptyColumn;
             }
 
-            IList<HilightMatchEntry> matchList = FindHilightMatches(column);
+            IList<HilightMatchEntry> matchList = FindHighlightMatches(column);
             // too many entries per line seem to cause problems with the GDI
             while (matchList.Count > 50)
             {
@@ -1263,12 +1265,12 @@ namespace LogExpert.Controls.LogWindow
 
         private HilightEntry FindHilightEntry(ITextValue line)
         {
-            return FindHilightEntry(line, false);
+            return FindHighlightEntry(line, false);
         }
 
         private HilightEntry FindFirstNoWordMatchHilightEntry(ITextValue line)
         {
-            return FindHilightEntry(line, true);
+            return FindHighlightEntry(line, true);
         }
 
         private bool CheckHighlightEntryMatch(HilightEntry entry, ITextValue column)
@@ -1706,15 +1708,15 @@ namespace LogExpert.Controls.LogWindow
 
                 if (line == -1)
                 {
-                    MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?
+                    // Hmm... is that experimental code from early days?
+                    MessageBox.Show(this, "Not found:", "Search result");
                     return;
                 }
 
                 // Prevent ArgumentOutOfRangeException
-                else if (line >= dataGridView.Rows.Count)
+                if (line >= dataGridView.Rows.GetRowCount(DataGridViewElementStates.None))
                 {
-                    line = dataGridView.Rows.Count - 1;
+                    line = dataGridView.Rows.GetRowCount(DataGridViewElementStates.None) - 1;
                 }
 
                 dataGridView.Rows[line].Selected = true;
@@ -3709,8 +3711,7 @@ namespace LogExpert.Controls.LogWindow
                 int currentLine = dataGridView.CurrentCellAddress.Y;
                 if (currentLine >= 0)
                 {
-                    dataGridView.CurrentCell =
-                        dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
+                    dataGridView.CurrentCell = dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
                 }
             }
         }

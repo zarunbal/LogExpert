@@ -96,6 +96,7 @@ namespace LogExpert.Controls.LogWindow
                     _logFileReader.IsXmlMode = true;
                     _logFileReader.XmlLogConfig = xmlColumnizer.GetXmlLogConfiguration();
                 }
+
                 if (_forcedColumnizerForLoading != null)
                 {
                     CurrentColumnizer = _forcedColumnizerForLoading;
@@ -492,7 +493,7 @@ namespace LogExpert.Controls.LogWindow
         /// <param name="line"></param>
         /// <param name="noWordMatches"></param>
         /// <returns></returns>
-        public HilightEntry FindHilightEntry(ITextValue line, bool noWordMatches)
+        public HilightEntry FindHighlightEntry(ITextValue line, bool noWordMatches)
         {
             // first check the temp entries
             lock (_tempHighlightEntryListLock)
@@ -527,7 +528,7 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        public IList<HilightMatchEntry> FindHilightMatches(ITextValue column)
+        public IList<HilightMatchEntry> FindHighlightMatches(ITextValue column)
         {
             IList<HilightMatchEntry> resultList = new List<HilightMatchEntry>();
             if (column != null)
@@ -604,7 +605,7 @@ namespace LogExpert.Controls.LogWindow
             _progressEventArgs.Visible = true;
             SendProgressBarUpdate();
 
-            SearchFx searchFx = new SearchFx(Search);
+            SearchFx searchFx = Search;
             searchFx.BeginInvoke(searchParams, SearchComplete, null);
 
             RemoveAllSearchHighlightEntries();
