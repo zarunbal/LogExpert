@@ -1327,8 +1327,7 @@ namespace LogExpert.Controls.LogWindow
             return resultList;
         }
 
-        private void GetHighlightEntryMatches(ITextValue line, IList<HilightEntry> hilightEntryList,
-            IList<HilightMatchEntry> resultList)
+        private void GetHighlightEntryMatches(ITextValue line, IList<HilightEntry> hilightEntryList, IList<HilightMatchEntry> resultList)
         {
             foreach (HilightEntry entry in hilightEntryList)
             {
