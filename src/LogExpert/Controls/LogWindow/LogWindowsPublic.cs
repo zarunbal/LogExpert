@@ -1109,12 +1109,14 @@ namespace LogExpert.Controls.LogWindow
         {
             if (isCellMode)
             {
+                //possible performance issue, see => https://docs.microsoft.com/en-us/dotnet/desktop/winforms/controls/best-practices-for-scaling-the-windows-forms-datagridview-control?view=netframeworkdesktop-4.8#using-the-selected-cells-rows-and-columns-collections-efficiently
                 dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
             }
             else
             {
                 dataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             }
+
             _guiStateArgs.CellSelectMode = isCellMode;
         }
 
