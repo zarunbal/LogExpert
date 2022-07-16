@@ -328,7 +328,10 @@ namespace LogExpert.Controls.LogWindow
 
         private void OnDataGridViewPaint(object sender, PaintEventArgs e)
         {
-            if (ShowBookmarkBubbles) AddBookmarkOverlays();
+            if (ShowBookmarkBubbles)
+            {
+                AddBookmarkOverlays();
+            }
         }
 
         // ======================================================================================
