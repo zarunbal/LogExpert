@@ -39,9 +39,7 @@ namespace LogExpert
             }
             catch (SecurityException se)
             {
-                MessageBox.Show(
-                    "Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" +
-                    se.Message + ")", "LogExpert Error");
+                MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
             }
         }
 
@@ -50,6 +48,7 @@ namespace LogExpert
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.ThreadException += Application_ThreadException;
 
+            Application.EnableVisualStyles();
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
             _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
@@ -96,7 +95,9 @@ namespace LogExpert
             try
             {
                 Settings settings = ConfigManager.Settings;
+
                 Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
+
                 if (isCreated)
                 {
                     // first application instance
@@ -131,7 +132,7 @@ namespace LogExpert
                         {
                             // another instance already exists
                             //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                            LogExpertProxy proxy = (LogExpertProxy) Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
+                            LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
                             if (settings.preferences.allowOnlyOneInstance)
                             {
                                 proxy.LoadFiles(args);
@@ -140,6 +141,7 @@ namespace LogExpert
                             {
                                 proxy.NewWindowOrLockedWindow(args);
                             }
+
                             break;
                         }
                         catch (RemotingException e)
