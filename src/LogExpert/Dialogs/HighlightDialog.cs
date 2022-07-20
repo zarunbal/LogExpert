@@ -32,6 +32,10 @@ namespace LogExpert.Dialogs
         public HighlightDialog()
         {
             InitializeComponent();
+            
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             Load += OnHighlightDialogLoad;
             listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
             _applyButtonImage = buttonApply.Image;

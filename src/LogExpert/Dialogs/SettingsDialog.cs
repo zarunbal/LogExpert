@@ -32,6 +32,8 @@ namespace LogExpert.Dialogs
             Preferences = prefs;
             _logTabWin = logTabWin;
             InitializeComponent();
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         public SettingsDialog(Preferences prefs, LogTabWindow logTabWin, int tabToOpen) : this(prefs, logTabWin)

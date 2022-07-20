@@ -81,6 +81,9 @@ namespace LogExpert.Classes
             }
             return result;
         }
+        
+        [DllImport("user32.dll")]
+        public static extern long GetSystemMetricsForDpi(long index);
 
 
         [DllImport("user32.dll")]

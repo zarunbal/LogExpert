@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 using LogExpert.Classes;
 using NLog;
@@ -15,15 +12,15 @@ namespace LogExpert.Dialogs
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
-        private Bitmap bmp = new Bitmap(1, 1);
-        private int displayHeight = 1;
-        private readonly int EDGE_OFFSET = (int) Win32.GetSystemMetrics(Win32.SM_CYVSCROLL);
-        private int lastMouseY = 0;
-        private readonly object monitor = new object();
-        private int rectHeight = 1;
+        private Bitmap _bitmap = new Bitmap(1, 1);
+        private int _displayHeight = 1;
+        private readonly int _edgeOffset = (int) Win32.GetSystemMetricsForDpi(Win32.SM_CYVSCROLL);
+        private int _lastMouseY = 0;
+        private readonly object _monitor = new object();
+        private int _rectHeight = 1;
 
-        private TimeSpreadCalculator timeSpreadCalc;
-        private readonly ToolTip toolTip;
+        private TimeSpreadCalculator _timeSpreadCalc;
+        private readonly ToolTip _toolTip;
 
         #endregion
 
@@ -32,11 +29,11 @@ namespace LogExpert.Dialogs
         public TimeSpreadingControl()
         {
             InitializeComponent();
-            this.toolTip = new ToolTip();
-            this.toolTip.InitialDelay = 0;
-            this.toolTip.ReshowDelay = 0;
-            this.toolTip.ShowAlways = true;
-            this.DoubleBuffered = false;
+            _toolTip = new ToolTip();
+            _toolTip.InitialDelay = 0;
+            _toolTip.ReshowDelay = 0;
+            _toolTip.ShowAlways = true;
+            DoubleBuffered = false;
         }
 
         #endregion
@@ -59,13 +56,13 @@ namespace LogExpert.Dialogs
 
         internal TimeSpreadCalculator TimeSpreadCalc
         {
-            get { return timeSpreadCalc; }
+            get => _timeSpreadCalc;
             set
             {
                 //timeSpreadCalc.CalcDone -= timeSpreadCalc_CalcDone;
-                timeSpreadCalc = value;
-                timeSpreadCalc.CalcDone += timeSpreadCalc_CalcDone;
-                timeSpreadCalc.StartCalc += timeSpreadCalc_StartCalc;
+                _timeSpreadCalc = value;
+                _timeSpreadCalc.CalcDone += timeSpreadCalc_CalcDone;
+                _timeSpreadCalc.StartCalc += timeSpreadCalc_StartCalc;
             }
         }
 
@@ -76,19 +73,19 @@ namespace LogExpert.Dialogs
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            lock (this.monitor)
+            lock (_monitor)
             {
                 if (DesignMode)
                 {
                     Brush bgBrush = new SolidBrush(Color.FromKnownColor(KnownColor.LightSkyBlue));
                     Rectangle rect = ClientRectangle;
-                    rect.Inflate(0, -EDGE_OFFSET);
+                    rect.Inflate(0, -_edgeOffset);
                     e.Graphics.FillRectangle(bgBrush, rect);
                     bgBrush.Dispose();
                 }
                 else
                 {
-                    e.Graphics.DrawImage(this.bmp, 0, EDGE_OFFSET);
+                    e.Graphics.DrawImage(_bitmap, 0, _edgeOffset);
                 }
             }
         }
@@ -100,21 +97,21 @@ namespace LogExpert.Dialogs
         private TimeSpreadCalculator.SpreadEntry GetEntryForMouse(MouseEventArgs e)
         {
             List<TimeSpreadCalculator.SpreadEntry> list = TimeSpreadCalc.DiffList;
-            int y = e.Y - EDGE_OFFSET;
+            int y = e.Y - _edgeOffset;
             if (y < 0)
             {
                 y = 0;
             }
-            else if (y >= ClientRectangle.Height - EDGE_OFFSET * 3)
+            else if (y >= ClientRectangle.Height - _edgeOffset * 3)
             {
                 y = list.Count - 1;
             }
             else
             {
-                y = y / this.rectHeight;
+                y /= _rectHeight;
             }
 
-            lock (this.monitor)
+            lock (_monitor)
             {
                 if (y >= list.Count || y < 0)
                 {
@@ -126,13 +123,13 @@ namespace LogExpert.Dialogs
 
         private void DragContrast(MouseEventArgs e)
         {
-            if (this.lastMouseY == 0)
+            if (_lastMouseY == 0)
             {
-                this.lastMouseY = this.lastMouseY = e.Y;
+                _lastMouseY = _lastMouseY = e.Y;
                 return;
             }
-            this.timeSpreadCalc.Contrast = this.timeSpreadCalc.Contrast + (this.lastMouseY - e.Y) * 5;
-            this.lastMouseY = e.Y;
+            _timeSpreadCalc.Contrast += (_lastMouseY - e.Y) * 5;
+            _lastMouseY = e.Y;
         }
 
         private void OnLineSelected(SelectLineEventArgs e)
@@ -150,34 +147,34 @@ namespace LogExpert.Dialogs
         private void timeSpreadCalc_CalcDone(object sender, EventArgs e)
         {
             _logger.Debug("timeSpreadCalc_CalcDone()");
-            lock (this.monitor)
+            lock (_monitor)
             {
-                this.Invalidate();
-                Rectangle rect = this.ClientRectangle;
-                rect.Size = new Size(rect.Width, rect.Height - EDGE_OFFSET * 3);
+                Invalidate();
+                Rectangle rect = ClientRectangle;
+                rect.Size = new Size(rect.Width, rect.Height - _edgeOffset * 3);
                 if (rect.Height < 1)
                 {
                     return;
                 }
-                this.bmp = new Bitmap(rect.Width, rect.Height);
-                Graphics gfx = Graphics.FromImage(bmp);
-                Brush bgBrush = new SolidBrush(this.BackColor);
+                _bitmap = new Bitmap(rect.Width, rect.Height);
+                Graphics gfx = Graphics.FromImage(_bitmap);
+                Brush bgBrush = new SolidBrush(BackColor);
                 gfx.FillRectangle(bgBrush, rect);
                 bgBrush.Dispose();
 
                 List<TimeSpreadCalculator.SpreadEntry> list = TimeSpreadCalc.DiffList;
                 int step;
-                if (list.Count >= this.displayHeight)
+                if (list.Count >= _displayHeight)
                 {
-                    step = (int) Math.Round((double) list.Count / (double) this.displayHeight);
-                    this.rectHeight = 1;
+                    step = (int) Math.Round(list.Count / (double) _displayHeight);
+                    _rectHeight = 1;
                 }
                 else
                 {
                     step = 1;
-                    this.rectHeight = (int) Math.Round((double) this.displayHeight / (double) list.Count);
+                    _rectHeight = (int) Math.Round(_displayHeight / (double) list.Count);
                 }
-                Rectangle fillRect = new Rectangle(0, 0, rect.Width, this.rectHeight);
+                Rectangle fillRect = new Rectangle(0, 0, rect.Width, _rectHeight);
 
                 lock (list)
                 {
@@ -193,55 +190,57 @@ namespace LogExpert.Dialogs
                         {
                             color = 0;
                         }
-                        Brush brush = new SolidBrush(Color.FromArgb(color, this.ForeColor));
+                        Brush brush = new SolidBrush(Color.FromArgb(color, ForeColor));
                         //Brush brush = new SolidBrush(Color.FromArgb(color, color, color, color));
                         gfx.FillRectangle(brush, fillRect);
                         brush.Dispose();
-                        fillRect.Offset(0, this.rectHeight);
+                        fillRect.Offset(0, _rectHeight);
                     }
                 }
             }
-            this.BeginInvoke(new MethodInvoker(Refresh));
+            BeginInvoke(new MethodInvoker(Refresh));
         }
 
 
         private void timeSpreadCalc_StartCalc(object sender, EventArgs e)
         {
-            lock (this.monitor)
+            lock (_monitor)
             {
-                this.Invalidate();
-                Rectangle rect = this.ClientRectangle;
-                rect.Size = new Size(rect.Width, rect.Height - EDGE_OFFSET * 3);
+                Invalidate();
+                Rectangle rect = ClientRectangle;
+                rect.Size = new Size(rect.Width, rect.Height - _edgeOffset * 3);
                 if (rect.Height < 1)
                 {
                     return;
                 }
                 //this.bmp = new Bitmap(rect.Width, rect.Height);
-                Graphics gfx = Graphics.FromImage(this.bmp);
-                Brush bgBrush = new SolidBrush(this.BackColor);
-                Brush fgBrush = new SolidBrush(this.ForeColor);
+                Graphics gfx = Graphics.FromImage(_bitmap);
+
+                Brush bgBrush = new SolidBrush(BackColor);
+                Brush fgBrush = new SolidBrush(ForeColor);
                 //gfx.FillRectangle(bgBrush, rect);
-                StringFormat format = new StringFormat(
-                    StringFormatFlags.DirectionVertical |
-                    StringFormatFlags.NoWrap
-                );
+                
+                StringFormat format = new StringFormat(StringFormatFlags.DirectionVertical | StringFormatFlags.NoWrap);
                 format.LineAlignment = StringAlignment.Center;
                 format.Alignment = StringAlignment.Center;
+                
                 RectangleF rectf = new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height);
-                gfx.DrawString("Calculating time spread view...", this.Font, fgBrush, rectf, format);
+                
+                gfx.DrawString("Calculating time spread view...", Font, fgBrush, rectf, format);
+                
                 bgBrush.Dispose();
                 fgBrush.Dispose();
             }
-            this.BeginInvoke(new MethodInvoker(Refresh));
+            BeginInvoke(new MethodInvoker(Refresh));
         }
 
 
         private void TimeSpreadingControl_SizeChanged(object sender, EventArgs e)
         {
-            if (this.TimeSpreadCalc != null)
+            if (TimeSpreadCalc != null)
             {
-                this.displayHeight = this.ClientRectangle.Height - EDGE_OFFSET * 3;
-                this.TimeSpreadCalc.SetDisplayHeight(this.displayHeight);
+                _displayHeight = ClientRectangle.Height - _edgeOffset * 3;
+                TimeSpreadCalc.SetDisplayHeight(_displayHeight);
             }
         }
 
@@ -264,17 +263,17 @@ namespace LogExpert.Dialogs
 
         private void TimeSpreadingControl_MouseEnter(object sender, EventArgs e)
         {
-            this.toolTip.Active = true;
+            _toolTip.Active = true;
         }
 
         private void TimeSpreadingControl_MouseLeave(object sender, EventArgs e)
         {
-            this.toolTip.Active = false;
+            _toolTip.Active = false;
         }
 
         private void TimeSpreadingControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Y == this.lastMouseY)
+            if (e.Y == _lastMouseY)
             {
                 return;
             }
@@ -290,9 +289,9 @@ namespace LogExpert.Dialogs
             {
                 return;
             }
-            this.lastMouseY = e.Y;
+            _lastMouseY = e.Y;
             string dts = entry.timestamp.ToString("dd.MM.yyyy HH:mm:ss");
-            this.toolTip.SetToolTip(this, "Line " + (entry.lineNum + 1) + "\n" + dts);
+            _toolTip.SetToolTip(this, "Line " + (entry.lineNum + 1) + "\n" + dts);
         }
 
         #endregion

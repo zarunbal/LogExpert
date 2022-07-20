@@ -704,8 +704,6 @@
             // HighlightDialog
             // 
             this.AcceptButton = this.buttonOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(855, 912);
             this.Controls.Add(this.groupBox4);
