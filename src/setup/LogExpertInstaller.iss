@@ -62,6 +62,7 @@ Source: "..\..\bin\Release\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignor
 Source: "..\..\bin\Release\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\pluginsx86\*"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
