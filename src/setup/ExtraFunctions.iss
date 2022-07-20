@@ -57,6 +57,7 @@ begin
     if (IsUpgrade()) then
     begin
       UnInstallOldVersion();
+      Sleep(2000); //wait two seconds here so uninstaller releases lnk files
     end;
   end;
 end;
