@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Log
 {
@@ -21,8 +22,7 @@ namespace LogExpert.Classes.Log
 
         #region cTor
 
-        public PositionAwareStreamReaderSystem(Stream stream, EncodingOptions encodingOptions)
-            : base(stream, encodingOptions)
+        public PositionAwareStreamReaderSystem(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
         {
             
         }
@@ -37,7 +37,7 @@ namespace LogExpert.Classes.Log
 
             if (_newLineSequenceLength == 0)
             {
-                _newLineSequenceLength = guessNewLineSequenceLength(reader);
+                _newLineSequenceLength = GuessNewLineSequenceLength(reader);
             }
 
             string line = reader.ReadLine();
@@ -46,9 +46,9 @@ namespace LogExpert.Classes.Log
             {
                 MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
 
-                if (line.Length > MAX_LINE_LEN)
+                if (line.Length > MaxLineLen)
                 {
-                    line = line.Remove(MAX_LINE_LEN);
+                    line = line.Remove(MaxLineLen);
                 }
             }
 
@@ -59,7 +59,7 @@ namespace LogExpert.Classes.Log
 
         #region Private Methods
 
-        private int guessNewLineSequenceLength(StreamReader reader)
+        private int GuessNewLineSequenceLength(StreamReader reader)
         {
             long currentPos = Position;
 

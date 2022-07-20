@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     public delegate void ProgressCallback(int lineCount);
 

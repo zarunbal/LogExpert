@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     public interface ILogStreamReader : IDisposable
     {

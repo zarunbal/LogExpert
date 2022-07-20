@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using LogExpert.Interface;
 
-namespace LogExpert
+namespace LogExpert.Classes.Bookmark
 {
     internal class BookmarkView : IBookmarkView
     {
@@ -18,7 +17,7 @@ namespace LogExpert
             throw new NotImplementedException();
         }
 
-        public void BookmarkTextChanged(Bookmark bookmark)
+        public void BookmarkTextChanged(Entities.Bookmark bookmark)
         {
             throw new NotImplementedException();
         }

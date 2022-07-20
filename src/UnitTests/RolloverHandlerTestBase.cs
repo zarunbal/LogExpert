@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using LogExpert.Classes.Log;
 
 namespace LogExpert
 {
@@ -85,14 +86,17 @@ namespace LogExpert
         {
             int lineCount = 10;
             string fullName = dInfo == null ? fileName : dInfo.FullName + Path.DirectorySeparatorChar + fileName;
-            FileStream stream = File.Create(fullName);
-            StreamWriter writer = new StreamWriter(stream);
-            for (int i = 1; i <= lineCount; ++i)
+
+            using (StreamWriter writer = new StreamWriter(File.Create(fullName)))
             {
-                writer.WriteLine("Line number " + i.ToString("D3") + " of File " + fullName);
+                for (int i = 1; i <= lineCount; ++i)
+                {
+                    writer.WriteLine("Line number " + i.ToString("D3") + " of File " + fullName);
+                }
+
+                writer.Flush();
             }
-            writer.Flush();
-            writer.Close();
+
             return fullName;
         }
     }

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 
-namespace LogExpert
+namespace LogExpert.Classes.Columnizer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Globalization;
-    using System.Text.RegularExpressions;
-
     public class ClfColumnizer : ILogLineColumnizer
     {
         #region Fields
@@ -49,7 +43,7 @@ namespace LogExpert
             return this.timeOffset;
         }
 
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+        public DateTime GetTimestamp(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
         {
             IColumnizedLogLine cols = SplitLine(callback, line);
             if (cols == null || cols.ColumnValues.Length < 8)
@@ -74,7 +68,7 @@ namespace LogExpert
             }
         }
 
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        public void PushValue(LogExpert.ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
             if (column == 2)
             {
@@ -114,7 +108,7 @@ namespace LogExpert
             return new string[] {"IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"};
         }
 
-        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
         {
             ColumnizedLogLine cLogLine = new ColumnizedLogLine
             {

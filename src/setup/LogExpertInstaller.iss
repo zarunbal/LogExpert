@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "LogExpert"
-#define AppVersion "1.8"
+#define AppVersion "1.8.8-PRERelease"
 #define AppURL "https://github.com/zarunbal/LogExpert"
 #define AppExeName "LogExpert.exe"
 
@@ -57,15 +57,15 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\bin\SetupFiles\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\SetupFiles\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\SetupFiles\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\CookComputing.XmlRpcV2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\SetupFiles\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\pluginsx86\*"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

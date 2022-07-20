@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert.Interface
 {
     /// <summary>
     /// Interface which can register at the LogWindow to be informed of pressing ESC.

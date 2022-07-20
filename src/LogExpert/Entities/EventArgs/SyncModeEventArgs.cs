@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+﻿namespace LogExpert.Entities.EventArgs
 {
-    public class SyncModeEventArgs : EventArgs
+    public class SyncModeEventArgs : System.EventArgs
     {
         #region Fields
 

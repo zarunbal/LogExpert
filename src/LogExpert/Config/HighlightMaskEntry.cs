@@ -1,6 +1,6 @@
 using System;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class HighlightMaskEntry

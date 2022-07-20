@@ -1,4 +1,4 @@
-﻿namespace LogExpert
+﻿namespace LogExpert.Classes.Highlight
 {
     /// <summary>
     /// Class for storing word-wise hilight matches. Used for colouring different matches on one line.

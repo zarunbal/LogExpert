@@ -1,6 +1,6 @@
 using System;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Flags]
     public enum SettingsFlags : long

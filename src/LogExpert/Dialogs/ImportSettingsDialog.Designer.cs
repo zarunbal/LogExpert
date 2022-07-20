@@ -52,7 +52,7 @@
             this.buttonFile.TabIndex = 0;
             this.buttonFile.Text = "Choose file...";
             this.buttonFile.UseVisualStyleBackColor = true;
-            this.buttonFile.Click += new System.EventHandler(this.fileButton_Click);
+            this.buttonFile.Click += new System.EventHandler(this.OnFileButtonClick);
             // 
             // textBoxFileName
             // 
@@ -170,7 +170,7 @@
             this.buttonOk.TabIndex = 4;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.okButton_Click);
+            this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
             // 
             // buttonCancel
             // 
@@ -202,7 +202,7 @@
             this.Name = "ImportSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Import Settings";
-            this.Load += new System.EventHandler(this.ImportSettingsDialog_Load);
+            this.Load += new System.EventHandler(this.OnImportSettingsDialogLoad);
             this.groupBoxImportOptions.ResumeLayout(false);
             this.groupBoxImportOptions.PerformLayout();
             this.ResumeLayout(false);

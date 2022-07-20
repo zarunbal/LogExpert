@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
+using LogExpert.Classes.Filter;
+using LogExpert.Config;
+using LogExpert.Entities;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes.Persister
 {
     public class PersistenceData
     {
         #region Fields
 
-        public SortedList<int, Bookmark> bookmarkList = new SortedList<int, Bookmark>();
+        public SortedList<int, Entities.Bookmark> bookmarkList = new SortedList<int, Entities.Bookmark>();
         public int bookmarkListPosition = 300;
         public bool bookmarkListVisible = false;
         public string columnizerName;
@@ -144,28 +147,42 @@ namespace LogExpert
 
         private static string BuildPersisterFileName(string logFileName, Preferences preferences)
         {
-            string dir = null;
-            string file = null;
+            string dir;
+            string file;
+
             switch (preferences.saveLocation)
             {
                 case SessionSaveLocation.SameDir:
                 default:
+                {
                     FileInfo fileInfo = new FileInfo(logFileName);
                     dir = fileInfo.DirectoryName;
                     file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
                     break;
+                }
                 case SessionSaveLocation.DocumentsDir:
+                {
                     dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                           Path.DirectorySeparatorChar +
                           "LogExpert";
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
+                }
                 case SessionSaveLocation.OwnDir:
+                {
                     dir = preferences.sessionSaveDirectory;
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
+                }
+                case SessionSaveLocation.ApplicationStartupDir:
+                {
+                    dir = Application.StartupPath + Path.DirectorySeparatorChar + "sessionfiles";
+                    file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
+                    break;
+                }
             }
-            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+
+            if (string.IsNullOrWhiteSpace(dir) == false && Directory.Exists(dir) == false)
             {
                 try
                 {
@@ -319,11 +336,11 @@ namespace LogExpert
 
 
         private static void WriteBookmarks(XmlDocument xmlDoc, XmlElement rootElement,
-            SortedList<int, Bookmark> bookmarkList)
+            SortedList<int, Entities.Bookmark> bookmarkList)
         {
             XmlElement bookmarksElement = xmlDoc.CreateElement("bookmarks");
             rootElement.AppendChild(bookmarksElement);
-            foreach (Bookmark bookmark in bookmarkList.Values)
+            foreach (Entities.Bookmark bookmark in bookmarkList.Values)
             {
                 XmlElement bookmarkElement = xmlDoc.CreateElement("bookmark");
                 bookmarkElement.SetAttribute("line", "" + bookmark.LineNum);
@@ -399,9 +416,9 @@ namespace LogExpert
         }
 
 
-        private static SortedList<int, Bookmark> ReadBookmarks(XmlElement startNode)
+        private static SortedList<int, Entities.Bookmark> ReadBookmarks(XmlElement startNode)
         {
-            SortedList<int, Bookmark> bookmarkList = new SortedList<int, Bookmark>();
+            SortedList<int, Entities.Bookmark> bookmarkList = new SortedList<int, Entities.Bookmark>();
             XmlNode boomarksNode = startNode.SelectSingleNode("bookmarks");
             if (boomarksNode != null)
             {
@@ -440,7 +457,7 @@ namespace LogExpert
                         continue;
                     }
                     int lineNum = int.Parse(line);
-                    Bookmark bookmark = new Bookmark(lineNum);
+                    Entities.Bookmark bookmark = new Entities.Bookmark(lineNum);
                     bookmark.OverlayOffset = new Size(int.Parse(posX), int.Parse(posY));
                     if (text != null)
                     {

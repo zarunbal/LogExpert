@@ -5,12 +5,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
 using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Config;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions;
+using LogExpert.Interface;
 
 #endregion
 
-namespace LogExpert
+namespace LogExpert.Controls.LogWindow
 {
     public partial class LogWindow
     {
@@ -320,7 +328,10 @@ namespace LogExpert
 
         private void OnDataGridViewPaint(object sender, PaintEventArgs e)
         {
-            if (ShowBookmarkBubbles) AddBookmarkOverlays();
+            if (ShowBookmarkBubbles)
+            {
+                AddBookmarkOverlays();
+            }
         }
 
         // ======================================================================================

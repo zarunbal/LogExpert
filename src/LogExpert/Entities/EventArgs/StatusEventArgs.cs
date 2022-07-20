@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LogExpert
+namespace LogExpert.Entities.EventArgs
 {
-    public class StatusLineEventArgs : EventArgs
+    public class StatusLineEventArgs : System.EventArgs
     {
         #region Fields
 

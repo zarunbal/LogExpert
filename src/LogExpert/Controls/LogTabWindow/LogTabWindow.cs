@@ -1,26 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
-//using System.Linq;
-using System.Windows.Forms;
-using LogExpert.Dialogs;
-using System.Text.RegularExpressions;
-using System.Runtime.Remoting.Messaging;
-using System.Threading;
-using System.IO;
-using System.Globalization;
 using System.Reflection;
-using System.Diagnostics;
-using System.Resources;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
 using NLog;
-using WeifenLuo.WinFormsUI.Docking;
+//using System.Linq;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogTabWindow
 {
     public partial class LogTabWindow : Form
     {
@@ -31,47 +24,47 @@ namespace LogExpert
         private const int DIFF_MAX = 100;
         private const int MAX_FILE_HISTORY = 10;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly Icon deadIcon;
+        private readonly Icon _deadIcon;
 
-        private readonly Color defaultTabColor = Color.FromArgb(255, 192, 192, 192);
-        private readonly Brush dirtyLedBrush;
+        private readonly Color _defaultTabColor = Color.FromArgb(255, 192, 192, 192);
+        private readonly Brush _dirtyLedBrush;
 
-        private readonly int instanceNumber = 0;
-        private readonly Brush[] ledBrushes = new Brush[5];
-        private readonly Icon[,,,] ledIcons = new Icon[6, 2, 4, 2];
+        private readonly int _instanceNumber;
+        private readonly Brush[] _ledBrushes = new Brush[5];
+        private readonly Icon[,,,] _ledIcons = new Icon[6, 2, 4, 2];
 
-        private readonly Rectangle[] leds = new Rectangle[5];
+        private readonly Rectangle[] _leds = new Rectangle[5];
 
-        private readonly IList<LogWindow> logWindowList = new List<LogWindow>();
-        private readonly Brush offLedBrush;
-        private readonly bool showInstanceNumbers = false;
+        private readonly IList<LogWindow.LogWindow> _logWindowList = new List<LogWindow.LogWindow>();
+        private readonly Brush _offLedBrush;
+        private readonly bool _showInstanceNumbers;
 
-        private readonly string[] startupFileNames;
+        private readonly string[] _startupFileNames;
 
-        private readonly EventWaitHandle statusLineEventHandle = new AutoResetEvent(false);
-        private readonly EventWaitHandle statusLineEventWakeupHandle = new ManualResetEvent(false);
-        private readonly object statusLineLock = new object();
-        private readonly Brush syncLedBrush;
-        private readonly StringFormat tabStringFormat = new StringFormat();
-        private readonly Brush[] tailLedBrush = new Brush[3];
+        private readonly EventWaitHandle _statusLineEventHandle = new AutoResetEvent(false);
+        private readonly EventWaitHandle _statusLineEventWakeupHandle = new ManualResetEvent(false);
+        private readonly object _statusLineLock = new object();
+        private readonly Brush _syncLedBrush;
+        private readonly StringFormat _tabStringFormat = new StringFormat();
+        private readonly Brush[] _tailLedBrush = new Brush[3];
 
-        private BookmarkWindow bookmarkWindow;
+        private BookmarkWindow _bookmarkWindow;
 
-        private LogWindow currentLogWindow = null;
-        private bool firstBookmarkWindowShow = true;
+        private LogWindow.LogWindow _currentLogWindow;
+        private bool _firstBookmarkWindowShow = true;
 
-        private StatusLineEventArgs lastStatusLineEvent = null;
+        private StatusLineEventArgs _lastStatusLineEvent;
 
-        private Thread ledThread;
+        private Thread _ledThread;
 
         //Settings settings;
 
-        private bool shouldStop = false;
+        private bool _shouldStop;
 
-        private bool skipEvents = false;
+        private bool _skipEvents;
 
-        private Thread statusLineThread;
-        private bool wasMaximized = false;
+        private Thread _statusLineThread;
+        private bool _wasMaximized;
 
         #endregion
 
@@ -80,50 +73,67 @@ namespace LogExpert
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
             InitializeComponent();
-            this.startupFileNames = fileNames;
-            this.instanceNumber = instanceNumber;
-            this.showInstanceNumbers = showInstanceNumbers;
+            _startupFileNames = fileNames;
+            this._instanceNumber = instanceNumber;
+            this._showInstanceNumbers = showInstanceNumbers;
 
-            this.Load += LogTabWindow_Load;
+            Load += OnLogTabWindowLoad;
 
             ConfigManager.Instance.ConfigChanged += ConfigChanged;
-            this.HilightGroupList = ConfigManager.Settings.hilightGroupList;
+            HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
             Rectangle led = new Rectangle(0, 0, 8, 2);
-            for (int i = 0; i < leds.Length; ++i)
+            
+            for (int i = 0; i < _leds.Length; ++i)
             {
-                this.leds[i] = led;
+                _leds[i] = led;
                 led.Offset(0, led.Height + 0);
             }
-            int grayAlpha = 50;
-            this.ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 220, 0, 0));
-            this.ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
-            this.ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            this.ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            this.ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            this.offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
-            this.dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-            this.tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
-            this.tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
-            this.tailLedBrush[2] =
-                new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
-            this.syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
-            CreateIcons();
-            tabStringFormat.LineAlignment = StringAlignment.Center;
-            tabStringFormat.Alignment = StringAlignment.Near;
 
-            ToolStripControlHost host = new ToolStripControlHost(this.followTailCheckBox);
+            int grayAlpha = 50;
+
+            _ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 220, 0, 0));
+            _ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
+            _ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
+            _ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
+            _ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
+            
+            _offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
+            
+            _dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
+            
+            _tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
+            _tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
+            _tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
+            
+            _syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
+            
+            CreateIcons();
+            
+            _tabStringFormat.LineAlignment = StringAlignment.Center;
+            _tabStringFormat.Alignment = StringAlignment.Near;
+
+            ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
+            
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
-            int index = this.toolStrip4.Items.IndexOfKey("toolStripButtonTail");
+            
+            int index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
+
+            toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
+            toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
+            toolStripEncodingISO88591Item.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
+            toolStripEncodingUTF8Item.Text = Encoding.UTF8.HeaderName;
+            toolStripEncodingUTF16Item.Text = Encoding.Unicode.HeaderName;
+
             if (index != -1)
             {
-                this.toolStrip4.Items.RemoveAt(index);
-                this.toolStrip4.Items.Insert(index, host);
+                buttonToolStrip.Items.RemoveAt(index);
+                buttonToolStrip.Items.Insert(index, host);
             }
 
-            this.dateTimeDragControl.Visible = false;
-            this.loadProgessBar.Visible = false;
+            dragControlDateTime.Visible = false;
+            loadProgessBar.Visible = false;
 
             // get a reference to the current assembly
             Assembly a = Assembly.GetExecutingAssembly();
@@ -131,10 +141,10 @@ namespace LogExpert
             // get a list of resource names from the manifest
             string[] resNames = a.GetManifestResourceNames();
 
-            Bitmap bmp = new Bitmap(GetType(), "Resources.delete-page-red.gif");
-            this.deadIcon = System.Drawing.Icon.FromHandle(bmp.GetHicon());
+            Bitmap bmp = Properties.Resources.delete_page_red;
+            _deadIcon = Icon.FromHandle(bmp.GetHicon());
             bmp.Dispose();
-            this.Closing += LogTabWindow_Closing;
+            Closing += OnLogTabWindowClosing;
 
             InitToolWindows();
         }
@@ -147,9 +157,9 @@ namespace LogExpert
 
         private delegate void ExceptionFx();
 
-        private delegate void FileNotFoundDelegate(LogWindow logWin);
+        private delegate void FileNotFoundDelegate(LogWindow.LogWindow logWin);
 
-        private delegate void FileRespawnedDelegate(LogWindow logWin);
+        private delegate void FileRespawnedDelegate(LogWindow.LogWindow logWin);
 
         private delegate void GuiStateUpdateWorkerDelegate(GuiStateArgs e);
 
@@ -163,7 +173,7 @@ namespace LogExpert
 
         private delegate void SetColumnizerFx(ILogLineColumnizer columnizer);
 
-        private delegate void SetTabIconDelegate(LogWindow logWindow, Icon icon);
+        private delegate void SetTabIconDelegate(LogWindow.LogWindow logWindow, Icon icon);
 
         private delegate void StatusLineEventFx(StatusLineEventArgs e);
 
@@ -177,18 +187,15 @@ namespace LogExpert
 
         #region Properties
 
-        public LogWindow CurrentLogWindow
+        public LogWindow.LogWindow CurrentLogWindow
         {
-            get { return this.currentLogWindow; }
-            set { ChangeCurrentLogWindow(value); }
+            get => _currentLogWindow;
+            set => ChangeCurrentLogWindow(value);
         }
 
         public SearchParams SearchParams { get; private set; } = new SearchParams();
 
-        public Preferences Preferences
-        {
-            get { return ConfigManager.Settings.preferences; }
-        }
+        public Preferences Preferences => ConfigManager.Settings.preferences;
 
         public List<HilightGroup> HilightGroupList { get; private set; } = new List<HilightGroup>();
 
@@ -207,9 +214,9 @@ namespace LogExpert
 
         internal HilightGroup FindHighlightGroup(string groupName)
         {
-            lock (this.HilightGroupList)
+            lock (HilightGroupList)
             {
-                foreach (HilightGroup group in this.HilightGroupList)
+                foreach (HilightGroup group in HilightGroupList)
                 {
                     if (group.GroupName.Equals(groupName))
                     {
@@ -232,7 +239,7 @@ namespace LogExpert
             public int diffSum;
             public bool dirty;
             public int syncMode; // 0 = off, 1 = timeSynced
-            public int tailState = 0; // tailState: 0,1,2 = on/off/off by Trigger
+            public int tailState; // tailState: 0,1,2 = on/off/off by Trigger
             public ToolTip toolTip;
 
             #endregion

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LogExpert.Extensions;
 using NUnit.Framework;
 
 namespace LogExpert.Tests.Extensions
@@ -21,7 +19,7 @@ namespace LogExpert.Tests.Extensions
         [Test]
         public void Extensions_IsEmpty_EmptyArray()
         {
-            object[] arrayObject = new object[0];
+            object[] arrayObject = Array.Empty<object>();
 
             Assert.IsTrue(arrayObject.IsEmpty());
         }
@@ -29,7 +27,7 @@ namespace LogExpert.Tests.Extensions
         [Test]
         public void Extensions_IsEmpty_FilledArray()
         {
-            object[] arrayObject = new[] {new object()};
+            object[] arrayObject = {new object()};
 
             Assert.IsFalse(arrayObject.IsEmpty());
         }

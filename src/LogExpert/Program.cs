@@ -9,8 +9,10 @@ using System.IO;
 using System.Diagnostics;
 using System.Security;
 using System.Reflection;
+using LogExpert.Classes;
+using LogExpert.Config;
+using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
-using ITDM;
 using NLog;
 
 namespace LogExpert
@@ -153,6 +155,11 @@ namespace LogExpert
                     {
                         _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
                         MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
+                    }
+
+                    if (settings.preferences.allowOnlyOneInstance)
+                    {
+                        MessageBox.Show($"Only one instance allowed, uncheck \"View Settings => Allow only 1 Instances\" to start multiple instances!", "Logexpert");
                     }
                 }
 

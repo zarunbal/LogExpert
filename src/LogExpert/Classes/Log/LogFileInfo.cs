@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Threading;
+using LogExpert.Config;
 using NLog;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     public class LogFileInfo : ILogFileInfo
     {

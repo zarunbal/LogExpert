@@ -44,14 +44,8 @@
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accessibility" />
-    <Reference Include="CookComputing.XmlRpcV2, Version=2.4.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\CookComputing.XmlRpcV2.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
@@ -109,7 +103,9 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\LogCellEditingControl.cs" />
+    <Compile Include="Dialogs\LogCellEditingControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Dialogs\LogGridCell.cs" />
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
@@ -309,11 +305,11 @@
     <Compile Include="Dialogs\GotoLineDialog.Designer.cs">
       <DependentUpon>GotoLineDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\HilightDialog.cs">
+    <Compile Include="Dialogs\HighlightDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\HilightDialog.Designer.cs">
-      <DependentUpon>HilightDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\HighlightDialog.Designer.cs">
+      <DependentUpon>HighlightDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\RegexHelperDialog.cs">
       <SubType>Form</SubType>
@@ -400,8 +396,8 @@
       <DependentUpon>GotoLineDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\HilightDialog.resx">
-      <DependentUpon>HilightDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\HighlightDialog.resx">
+      <DependentUpon>HighlightDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\RegexHelperDialog.resx">
@@ -425,11 +421,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Resource1.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -451,11 +442,6 @@
     <Compile Include="Entities\Range.cs" />
     <Compile Include="Classes\RangeFinder.cs" />
     <Compile Include="Entities\ReloadMemento.cs" />
-    <Compile Include="Resources\Resource1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource1.resx</DependentUpon>
-    </Compile>
     <Compile Include="Classes\Log\RolloverFilenameBuilder.cs" />
     <Compile Include="Classes\Log\RolloverFilenameHandler.cs" />
     <Compile Include="Entities\RowHeightEntry.cs" />
@@ -586,12 +572,15 @@
       <Name>WinFormsUI</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
     <PackageReference Include="NLog.Config">
-      <Version>4.6.7</Version>
+      <Version>4.7.15</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

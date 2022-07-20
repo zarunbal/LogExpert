@@ -1,4 +1,4 @@
-namespace LogExpert
+namespace LogExpert.Controls
 {
   partial class KnobControl
   {

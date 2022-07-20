@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using System.Drawing;
 using System.Threading;
+using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Controls
 {
     internal class LogTabPage : TabPage
     {
@@ -21,7 +20,7 @@ namespace LogExpert
 
         #region cTor
 
-        public LogTabPage(LogWindow logWindow, string title)
+        public LogTabPage(LogWindow.LogWindow logWindow, string title)
             : base("MMi" + (title == null ? Util.GetNameFromPath(logWindow.FileName) : title))
         {
             this.TabTitle = title;
@@ -41,7 +40,7 @@ namespace LogExpert
 
         #region Properties
 
-        public LogWindow LogWindow { get; }
+        public LogWindow.LogWindow LogWindow { get; }
 
 
         public int LineDiff

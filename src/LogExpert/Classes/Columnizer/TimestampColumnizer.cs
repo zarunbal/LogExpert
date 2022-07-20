@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-
-namespace LogExpert
+namespace LogExpert.Classes.Columnizer
 {
-    using System;
-    using static LogExpert.TimeFormatDeterminer;
+    using static TimeFormatDeterminer;
 
     public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
     {
@@ -33,7 +30,7 @@ namespace LogExpert
         }
 
 
-        public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+        public DateTime GetTimestamp(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
         {
             IColumnizedLogLine cols = SplitLine(callback, line);
             if (cols == null || cols.ColumnValues  == null || cols.ColumnValues.Length < 2)
@@ -64,7 +61,7 @@ namespace LogExpert
         }
 
 
-        public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+        public void PushValue(LogExpert.ILogLineColumnizerCallback callback, int column, string value, string oldValue)
         {
             if (column == 1)
             {
@@ -107,7 +104,7 @@ namespace LogExpert
             return new string[] {"Date", "Time", "Message"};
         }
 
-        public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+        public IColumnizedLogLine SplitLine(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
         {
             // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
             // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789

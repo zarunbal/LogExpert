@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-// ReSharper disable once CheckNamespace
-namespace LogExpert
+namespace LogExpert.Extensions
 {
     public static class Extensions
     {
@@ -15,12 +12,7 @@ namespace LogExpert
                 return true;
             }
 
-            if (!collection.Any())
-            {
-                return true;
-            }
-
-            return false;
+            return !collection.Any();
         }
 
         public static bool IsEmpty<T>(this IList<T> list)
@@ -30,12 +22,7 @@ namespace LogExpert
                 return true;
             }
 
-            if (list.Count == 0)
-            {
-                return true;
-            }
-
-            return false;
+            return list.Count == 0;
         }
     }
 }

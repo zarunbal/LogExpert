@@ -1,5 +1,6 @@
 ﻿using LogExpert.Dialogs;
-namespace LogExpert
+
+namespace LogExpert.Controls.LogWindow
 {
 	partial class LogWindow
 	{
@@ -67,13 +68,13 @@ namespace LogExpert
             this.filterRangeComboBox = new System.Windows.Forms.ComboBox();
             this.columnNamesLabel = new System.Windows.Forms.Label();
             this.fuzzyLabel = new System.Windows.Forms.Label();
-            this.fuzzyKnobControl = new LogExpert.KnobControl();
+            this.fuzzyKnobControl = new KnobControl();
             this.invertFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.pnlProFilterLabel = new System.Windows.Forms.Panel();
             this.lblBackSpread = new System.Windows.Forms.Label();
-            this.filterKnobBackSpread = new LogExpert.KnobControl();
+            this.filterKnobBackSpread = new KnobControl();
             this.lblForeSpread = new System.Windows.Forms.Label();
-            this.filterKnobForeSpread = new LogExpert.KnobControl();
+            this.filterKnobForeSpread = new KnobControl();
             this.btnFilterToTab = new System.Windows.Forms.Button();
             this.btnToggleHighlightPanel = new System.Windows.Forms.Button();
             this.highlightSplitContainer = new System.Windows.Forms.SplitContainer();
@@ -585,7 +586,7 @@ namespace LogExpert
             this.fuzzyKnobControl.TabIndex = 10;
             this.helpToolTip.SetToolTip(this.fuzzyKnobControl, "Fuzzy search level (0 = fuzzy off)");
             this.fuzzyKnobControl.Value = 0;
-            this.fuzzyKnobControl.ValueChanged += new LogExpert.KnobControl.ValueChangedEventHandler(this.OnFuzzyKnobControlValueChanged);
+            this.fuzzyKnobControl.ValueChanged += new KnobControl.ValueChangedEventHandler(this.OnFuzzyKnobControlValueChanged);
             // 
             // invertFilterCheckBox
             // 
@@ -668,7 +669,7 @@ namespace LogExpert
             // btnToggleHighlightPanel
             // 
             this.btnToggleHighlightPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnToggleHighlightPanel.Image = global::LogExpert.Properties.Resources.PanelOpen1;
+            this.btnToggleHighlightPanel.Image = global::LogExpert.Properties.Resources.PanelOpen;
             this.btnToggleHighlightPanel.Location = new System.Drawing.Point(984, 1);
             this.btnToggleHighlightPanel.Name = "btnToggleHighlightPanel";
             this.btnToggleHighlightPanel.Size = new System.Drawing.Size(20, 21);
@@ -1210,7 +1211,7 @@ namespace LogExpert
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.SizeChanged += new System.EventHandler(this.OnLogWindowSizeChanged);
             this.Enter += new System.EventHandler(this.OnLogWindowEnter);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LogWindow_KeyDown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnLogWindowKeyDown);
             this.Leave += new System.EventHandler(this.OnLogWindowLeave);
             this.splitContainerLogWindow.Panel1.ResumeLayout(false);
             this.splitContainerLogWindow.Panel2.ResumeLayout(false);

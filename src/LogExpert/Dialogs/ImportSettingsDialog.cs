@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using LogExpert.Config;
 
 namespace LogExpert.Dialogs
 {
@@ -28,17 +29,17 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void ImportSettingsDialog_Load(object sender, EventArgs e)
+        private void OnImportSettingsDialogLoad(object sender, EventArgs e)
         {
         }
 
-        private void fileButton_Click(object sender, EventArgs e)
+        private void OnFileButtonClick(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "Load Settings from file";
-            dlg.DefaultExt = "dat";
+            dlg.DefaultExt = "json";
             dlg.AddExtension = false;
-            dlg.Filter = "Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            dlg.Filter = "Settings (*.json)|*.json|All files (*.*)|*.*";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -46,7 +47,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             ImportFlags = ExportImportFlags.None;
             FileName = textBoxFileName.Text;
@@ -57,7 +58,7 @@ namespace LogExpert.Dialogs
                 {
                     if (((CheckBox)ctl).Checked)
                     {
-                        ImportFlags = ImportFlags | (ExportImportFlags) long.Parse(ctl.Tag as string ?? string.Empty);
+                        ImportFlags |= (ExportImportFlags) long.Parse(ctl.Tag as string ?? string.Empty);
                     }
                 }
             }

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Config
 {
     [Serializable]
     public class Preferences
@@ -59,7 +60,9 @@ namespace LogExpert
         public int pollingInterval = 250;
         
         public bool reverseAlpha = false;
-        
+
+        public bool PortableMode { get; set; }
+
         /// <summary>
         /// Save Directory of the last logfile
         /// </summary>
@@ -74,7 +77,7 @@ namespace LogExpert
         public bool setLastColumnWidth;
         
         public bool showBubbles = true;
-        
+
         public bool showColumnFinder;
         
         public Color showTailColor = Color.FromKnownColor(KnownColor.Blue);

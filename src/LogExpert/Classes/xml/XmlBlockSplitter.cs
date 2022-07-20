@@ -1,12 +1,12 @@
-﻿using LogExpert.Classes.Log;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Xsl;
+using LogExpert.Classes.Log;
 
-namespace LogExpert
+namespace LogExpert.Classes.xml
 {
     internal class XmlBlockSplitter : LogStreamReaderBase
     {
@@ -66,7 +66,7 @@ namespace LogExpert
 
         public string Stylesheet
         {
-            get { return stylesheet; }
+            get => stylesheet;
             set
             {
                 stylesheet = value;

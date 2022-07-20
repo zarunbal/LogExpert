@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     internal class LogBufferCacheEntry
     {

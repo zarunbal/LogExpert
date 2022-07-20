@@ -1,29 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Filter;
+using LogExpert.Config;
 using LogExpert.Dialogs;
+using LogExpert.Entities;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogTabWindow
 {
     public partial class LogTabWindow
     {
         #region Public methods
 
-        public LogWindow AddTempFileTab(string fileName, string title)
+        public LogWindow.LogWindow AddTempFileTab(string fileName, string title)
         {
             return AddFileTab(fileName, true, title, false, null);
         }
 
-        public LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
+        public LogWindow.LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
         {
-            LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
+            LogWindow.LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
             if (pipe.FilterParams.searchText.Length > 0)
             {
                 ToolTip tip = new ToolTip(components);
@@ -41,15 +44,15 @@ namespace LogExpert
             return logWin;
         }
 
-        public LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+        public LogWindow.LogWindow AddFileTabDeferred(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
         {
             return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, true);
         }
         
-        public LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
+        public LogWindow.LogWindow AddFileTab(string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
         {
             string logFileName = FindFilenameForSettings(givenFileName);
-            LogWindow win = FindWindowForFile(logFileName);
+            LogWindow.LogWindow win = FindWindowForFile(logFileName);
             if (win != null)
             {
                 if (!isTempFile)
@@ -63,7 +66,7 @@ namespace LogExpert
 
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            LogWindow logWindow = new LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
+            LogWindow.LogWindow logWindow = new LogWindow.LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
 
             logWindow.GivenFileName = givenFileName;
 
@@ -85,17 +88,17 @@ namespace LogExpert
             }
 
             LogWindowData data = logWindow.Tag as LogWindowData;
-            data.color = defaultTabColor;
-            setTabColor(logWindow, defaultTabColor);
+            data.color = _defaultTabColor;
+            SetTabColor(logWindow, _defaultTabColor);
             //data.tabPage.BorderColor = this.defaultTabBorderColor;
             if (!isTempFile)
             {
                 foreach (ColorEntry colorEntry in ConfigManager.Settings.fileColors)
                 {
-                    if (colorEntry.fileName.ToLower().Equals(logFileName.ToLower()))
+                    if (colorEntry.FileName.ToLower().Equals(logFileName.ToLower()))
                     {
-                        data.color = colorEntry.color;
-                        setTabColor(logWindow, colorEntry.color);
+                        data.color = colorEntry.Color;
+                        SetTabColor(logWindow, colorEntry.Color);
                         break;
                     }
                 }
@@ -117,21 +120,20 @@ namespace LogExpert
             return logWindow;
         }
 
-        public LogWindow AddMultiFileTab(string[] fileNames)
+        public LogWindow.LogWindow AddMultiFileTab(string[] fileNames)
         {
             if (fileNames.Length < 1)
             {
                 return null;
             }
 
-            LogWindow logWindow = new LogWindow(this, fileNames[fileNames.Length - 1], false, false);
+            LogWindow.LogWindow logWindow = new LogWindow.LogWindow(this, fileNames[fileNames.Length - 1], false, false);
             AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
             multiFileToolStripMenuItem.Checked = true;
             multiFileEnabledStripMenuItem.Checked = true;
             EncodingOptions encodingOptions = new EncodingOptions();
             FillDefaultEncodingFromSettings(encodingOptions);
-            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti),
-                new object[] {fileNames, encodingOptions});
+            BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
             AddToFileHistory(fileNames[0]);
             return logWindow;
         }
@@ -164,12 +166,12 @@ namespace LogExpert
 
         public ILogLineColumnizer GetColumnizerHistoryEntry(string fileName)
         {
-            ColumnizerHistoryEntry entry = findColumnizerHistoryEntry(fileName);
+            ColumnizerHistoryEntry entry = FindColumnizerHistoryEntry(fileName);
             if (entry != null)
             {
                 foreach (ILogLineColumnizer columnizer in PluginRegistry.GetInstance().RegisteredColumnizers)
                 {
-                    if (columnizer.GetName().Equals(entry.columnizerName))
+                    if (columnizer.GetName().Equals(entry.ColumnizerName))
                     {
                         return columnizer;
                     }
@@ -212,11 +214,11 @@ namespace LogExpert
             }
         }
 
-        public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow senderWindow)
+        public void ScrollAllTabsToTimestamp(DateTime timestamp, LogWindow.LogWindow senderWindow)
         {
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     if (logWindow != senderWindow)
                     {
@@ -279,7 +281,7 @@ namespace LogExpert
             return null;
         }
 
-        public void SelectTab(LogWindow logWindow)
+        public void SelectTab(LogWindow.LogWindow logWindow)
         {
             logWindow.Activate();
         }
@@ -289,7 +291,7 @@ namespace LogExpert
             SetForegroundWindow(Handle);
             if (WindowState == FormWindowState.Minimized)
             {
-                if (wasMaximized)
+                if (_wasMaximized)
                 {
                     WindowState = FormWindowState.Maximized;
                 }
@@ -304,7 +306,7 @@ namespace LogExpert
         public static extern int SetForegroundWindow(IntPtr hWnd);
 
         // called from LogWindow when follow tail was changed
-        public void FollowTailChanged(LogWindow logWindow, bool isEnabled, bool offByTrigger)
+        public void FollowTailChanged(LogWindow.LogWindow logWindow, bool isEnabled, bool offByTrigger)
         {
             LogWindowData data = logWindow.Tag as LogWindowData;
             if (data == null)
@@ -324,7 +326,7 @@ namespace LogExpert
             if (Preferences.showTailState)
             {
                 Icon icon = GetIcon(data.diffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), new object[] {logWindow, icon});
+                BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
             }
         }
 
@@ -339,9 +341,9 @@ namespace LogExpert
         public IList<WindowFileEntry> GetListOfOpenFiles()
         {
             IList<WindowFileEntry> list = new List<WindowFileEntry>();
-            lock (logWindowList)
+            lock (_logWindowList)
             {
-                foreach (LogWindow logWindow in logWindowList)
+                foreach (LogWindow.LogWindow logWindow in _logWindowList)
                 {
                     list.Add(new WindowFileEntry(logWindow));
                 }

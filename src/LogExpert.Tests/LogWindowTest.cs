@@ -2,6 +2,10 @@
 using CsvColumnizerType=CsvColumnizer.CsvColumnizer;
 using NUnit.Framework;
 using System;
+using LogExpert.Classes;
+using LogExpert.Controls.LogTabWindow;
+using LogExpert.Controls.LogWindow;
+using LogExpert.Entities;
 
 namespace LogExpert.Tests
 {
@@ -27,8 +31,7 @@ namespace LogExpert.Tests
             PluginRegistry.GetInstance().RegisteredColumnizers.Add(new CsvColumnizerType());
 
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
-            LogWindow logWindow =
-                new LogWindow(logTabWindow, fileName, false, false);
+            LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
             Assert.True(true);
         }

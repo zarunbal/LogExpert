@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Log
 {
@@ -8,9 +9,9 @@ namespace LogExpert.Classes.Log
     {
         #region Fields
 
-        protected const int MAX_LINE_LEN = 20000;
+        private const int MAX_LINE_LEN = 20000;
 
-        private static readonly Encoding[] _preambleEncodings = new Encoding[] { Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32 };
+        private static readonly Encoding[] _preambleEncodings = { Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32 };
 
         private readonly BufferedStream _stream;
         private readonly StreamReader _reader;
@@ -30,8 +31,8 @@ namespace LogExpert.Classes.Log
 
             _preambleLength = DetectPreambleLengthAndEncoding(out Encoding detectedEncoding);
 
-            Encoding usedEncoding = getUsedEncoding(encodingOptions, detectedEncoding);
-            _posIncPrecomputed = getPosIncPrecomputed(usedEncoding);
+            Encoding usedEncoding = GetUsedEncoding(encodingOptions, detectedEncoding);
+            _posIncPrecomputed = GetPosIncPrecomputed(usedEncoding);
 
             _reader = new StreamReader(_stream, usedEncoding, true);
             
@@ -71,6 +72,8 @@ namespace LogExpert.Classes.Log
 
         public sealed override bool IsBufferComplete => true;
 
+        protected static int MaxLineLen => MAX_LINE_LEN;
+
         #endregion
 
         #region Public methods
@@ -90,7 +93,10 @@ namespace LogExpert.Classes.Log
 
         public override unsafe int ReadChar()
         {
-            if (IsDisposed) throw new ObjectDisposedException(ToString());
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(ToString());
+            }
 
             try
             {
@@ -154,7 +160,7 @@ namespace LogExpert.Classes.Log
             int readLen = _stream.Read(readPreamble, 0, 4);
             if (readLen >= 2)
             {
-                foreach (Encoding encoding in PositionAwareStreamReaderBase._preambleEncodings)
+                foreach (Encoding encoding in _preambleEncodings)
                 {
                     byte[] preamble = encoding.GetPreamble();
                     bool fail = false;
@@ -180,7 +186,7 @@ namespace LogExpert.Classes.Log
             return 0;
         }
 
-        private Encoding getUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
+        private Encoding GetUsedEncoding(EncodingOptions encodingOptions, Encoding detectedEncoding)
         {
             if (encodingOptions.Encoding != null)
             {
@@ -192,26 +198,25 @@ namespace LogExpert.Classes.Log
                 return detectedEncoding;
             }
 
-            if (encodingOptions.DefaultEncoding != null)
-            {
-                return encodingOptions.DefaultEncoding;
-            }
-
-            return Encoding.Default;
+            return encodingOptions.DefaultEncoding ?? Encoding.Default;
         }
-        private int getPosIncPrecomputed(Encoding usedEncoding)
+        private int GetPosIncPrecomputed(Encoding usedEncoding)
         {
-            if (usedEncoding is UTF8Encoding)
+            switch (usedEncoding)
             {
-                return 0;
+                case UTF8Encoding _:
+                {
+                    return 0;
+                }
+                case UnicodeEncoding _:
+                {
+                    return 2;
+                }
+                default:
+                {
+                    return 1;
+                }
             }
-
-            if (usedEncoding is UnicodeEncoding)
-            {
-                return 2;
-            }
-
-            return 1;
         }
 
         #endregion

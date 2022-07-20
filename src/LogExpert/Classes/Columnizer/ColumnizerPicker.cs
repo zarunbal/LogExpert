@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using LogExpert.Config;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Columnizer
 {
@@ -40,12 +42,13 @@ namespace LogExpert.Classes.Columnizer
                 return null;
             }
             ConstructorInfo cti = columnizer.GetType().GetConstructor(Type.EmptyTypes);
+
             if (cti != null)
             {
                 object o = cti.Invoke(new object[] { });
-                if (o is IColumnizerConfigurator)
+                if (o is IColumnizerConfigurator configurator)
                 {
-                    ((IColumnizerConfigurator)o).LoadConfig(ConfigManager.ConfigDir);
+                    configurator.LoadConfig(ConfigManager.Settings.preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                 }
                 return (ILogLineColumnizer)o;
             }

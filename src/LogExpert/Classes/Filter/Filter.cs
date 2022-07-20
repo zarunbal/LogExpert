@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
-
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     internal delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 

@@ -1,14 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-using LogExpert.Dialogs;
 using System.Threading;
+using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Classes.Bookmark;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
 using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Classes.Log;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert
+namespace LogExpert.Controls.LogWindow
 {
     public partial class LogWindow : DockContent, ILogPaintContext, ILogView
     {
@@ -47,7 +57,7 @@ namespace LogExpert
         private readonly Image _panelCloseButtonImage;
 
         private readonly Image _panelOpenButtonImage;
-        private readonly LogTabWindow _parentLogTabWin;
+        private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
 
         private readonly ProgressEventArgs _progressEventArgs = new ProgressEventArgs();
         private readonly object _reloadLock = new object();
@@ -119,7 +129,7 @@ namespace LogExpert
 
         #region cTor
 
-        public LogWindow(LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading)
+        public LogWindow(LogTabWindow.LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading)
         {
             SuspendLayout();
 
@@ -200,8 +210,8 @@ namespace LogExpert
             dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
             markEditModeToolStripMenuItem.Enabled = true;
 
-            _panelOpenButtonImage = new Bitmap(GetType(), "Resources.PanelOpen.gif");
-            _panelCloseButtonImage = new Bitmap(GetType(), "Resources.PanelClose.gif");
+            _panelOpenButtonImage = Properties.Resources.PanelOpen;
+            _panelCloseButtonImage = Properties.Resources.PanelClose;
 
             Settings settings = ConfigManager.Settings;
             if (settings.appBounds != null && settings.appBounds.Right > 0)

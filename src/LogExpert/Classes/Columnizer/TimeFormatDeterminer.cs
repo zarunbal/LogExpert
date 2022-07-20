@@ -1,9 +1,7 @@
-﻿
-namespace LogExpert
-{
-    using System;
-    using System.Globalization;
+﻿using System.Globalization;
 
+namespace LogExpert.Classes.Columnizer
+{
     internal class TimeFormatDeterminer
     {
         #region FormatInfo helper class

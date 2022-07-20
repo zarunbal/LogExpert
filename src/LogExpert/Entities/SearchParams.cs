@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace LogExpert
+namespace LogExpert.Entities
 {
     [Serializable]
     public class SearchParams

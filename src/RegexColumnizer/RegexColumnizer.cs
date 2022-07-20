@@ -9,17 +9,6 @@ using System.Xml.Serialization;
 
 namespace RegexColumnizer
 {
-    public class RegexColumnizerConfig
-    {
-        #region Properties
-
-        public string Expression { get; set; } = "(?<text>.*)";
-
-        public string Name { get; set; }
-
-        #endregion
-    }
-
     public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfigurator
     {
         #region Fields
@@ -32,6 +21,7 @@ namespace RegexColumnizer
         #region Properties
 
         public RegexColumnizerConfig Config { get; private set; }
+        
         public Regex Regex { get; private set; }
 
         #endregion
@@ -48,7 +38,9 @@ namespace RegexColumnizer
             return Config.Name;
         }
         public string GetDescription() => "Columns are filled by regular expression named capture groups";
+        
         public int GetColumnCount() => columns.Length;
+
         public string[] GetColumnNames() => columns;
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
@@ -139,7 +131,7 @@ namespace RegexColumnizer
             RegexColumnizerConfig config;
             if (!File.Exists(configFile))
             {
-                config = new RegexColumnizerConfig()
+                config = new RegexColumnizerConfig
                 {
                     Name = GetName()
                 };
@@ -159,7 +151,7 @@ namespace RegexColumnizer
         {
             var name = GetType().Name;
             string configPath = Path.Combine(configDir, name);
-            configPath = Path.ChangeExtension(configPath, "xml");
+            configPath = Path.ChangeExtension(configPath, "xml"); //todo change to json
             return configPath;
         }
 

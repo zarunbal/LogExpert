@@ -56,6 +56,7 @@
     <Compile Include="Extensions\EnumerableTests.cs" />
     <Compile Include="JsonCompactColumnizerTest.cs" />
     <Compile Include="JsonColumnizerTest.cs" />
+    <Compile Include="JSONSaveTest.cs" />
     <Compile Include="LogWindowTest.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,13 +64,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
-      <Version>4.13.0</Version>
+      <Version>4.18.1</Version>
     </PackageReference>
     <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
+      <Version>3.13.3</Version>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter">
-      <Version>3.15.1</Version>
+      <Version>4.2.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using System.Text.RegularExpressions;
+using LogExpert.Classes.Log;
 
 
 namespace LogExpert

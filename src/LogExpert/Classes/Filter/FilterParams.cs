@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
-namespace LogExpert
+namespace LogExpert.Classes.Filter
 {
     [Serializable]
     public class FilterParams
@@ -66,28 +65,25 @@ namespace LogExpert
 
         public string searchText
         {
-            get { return this._searchText; }
+            get => _searchText;
             set
             {
-                this._searchText = value;
-                this.lowerSearchText = this._searchText.ToLower();
+                _searchText = value;
+                lowerSearchText = _searchText.ToLower();
             }
         }
 
         public string rangeSearchText
         {
-            get { return this._rangeSearchText; }
+            get => _rangeSearchText;
             set
             {
-                this._rangeSearchText = value;
-                this.lowerRangeSearchText = this._rangeSearchText.ToLower();
+                _rangeSearchText = value;
+                lowerRangeSearchText = _rangeSearchText.ToLower();
             }
         }
 
-        public bool SpreadEnabled
-        {
-            get { return this.spreadBefore > 0 || this.spreadBehind > 0; }
-        }
+        public bool SpreadEnabled => spreadBefore > 0 || spreadBehind > 0;
 
         #endregion
 
@@ -99,17 +95,17 @@ namespace LogExpert
             newParams.Init();
             // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
             // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
-            newParams.currentColumnizer = this.currentColumnizer;
+            newParams.currentColumnizer = currentColumnizer;
             return newParams;
         }
 
         // call after deserialization!
         public void Init()
         {
-            this.lastNonEmptyCols = new Hashtable();
-            this.lowerRangeSearchText = this._rangeSearchText.ToLower();
-            this.lowerSearchText = this._searchText.ToLower();
-            this.lastLine = "";
+            lastNonEmptyCols = new Hashtable();
+            lowerRangeSearchText = _rangeSearchText.ToLower();
+            lowerSearchText = _searchText.ToLower();
+            lastLine = "";
         }
 
         // Reset before a new search
@@ -121,21 +117,21 @@ namespace LogExpert
 
         public void CreateRegex()
         {
-            if (this._searchText != null)
+            if (_searchText != null)
             {
-                this.rex = new Regex(this._searchText,
-                    this.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                rex = new Regex(_searchText,
+                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             }
-            if (this._rangeSearchText != null && this.isRangeSearch)
+            if (_rangeSearchText != null && isRangeSearch)
             {
-                this.rangeRex = new Regex(this._rangeSearchText,
-                    this.isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                rangeRex = new Regex(_rangeSearchText,
+                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             }
         }
 
         public FilterParams CreateCopy()
         {
-            return (FilterParams) this.MemberwiseClone();
+            return (FilterParams) MemberwiseClone();
         }
 
         #endregion

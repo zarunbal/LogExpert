@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.Collections.Generic;
+using LogExpert.Entities;
 
-namespace LogExpert
+namespace LogExpert.Classes.Log
 {
     /// <summary>
     /// Handles rollover naming. The names built by the RolloverFilenameBuilder will be used

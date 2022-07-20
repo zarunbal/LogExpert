@@ -1,25 +1,30 @@
+#region
+
 using System;
 using System.Drawing;
 
-namespace LogExpert
+#endregion
+
+namespace LogExpert.Config
 {
     [Serializable]
     public class ColorEntry
     {
-        #region Fields
-
-        public Color color;
-        public string fileName;
-
-        #endregion
-
         #region cTor
 
         public ColorEntry(string fileName, Color color)
         {
-            this.fileName = fileName;
-            this.color = color;
+            FileName = fileName;
+            Color = color;
         }
+
+        #endregion
+
+        public Color Color { get; }
+
+        public string FileName { get; }
+
+        #region Fields
 
         #endregion
     }

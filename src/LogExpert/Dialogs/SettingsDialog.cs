@@ -5,7 +5,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Config;
+using LogExpert.Controls.LogTabWindow;
+using LogExpert.Entities;
 
 namespace LogExpert.Dialogs
 {
@@ -99,6 +103,7 @@ namespace LogExpert.Dialogs
 
             checkBoxTimeSpread.Checked = Preferences.showTimeSpread;
             checkBoxReverseAlpha.Checked = Preferences.reverseAlpha;
+
             radioButtonTimeView.Checked = Preferences.timeSpreadTimeMode;
             radioButtonLineView.Checked = !Preferences.timeSpreadTimeMode;
 
@@ -119,8 +124,19 @@ namespace LogExpert.Dialogs
                 case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
+                    break;
                 }
-                break;
+                case SessionSaveLocation.ApplicationStartupDir:
+                {
+                    radioButtonSessionApplicationStartupDir.Checked = true;
+                    break;
+                }
+            }
+            
+            //overwrite preferences save location in portable mode to always be application startup directory
+            if (checkBoxPortableMode.Checked)
+            {
+                radioButtonSessionApplicationStartupDir.Checked = true;
             }
 
             upDownMaximumFilterEntriesDisplayed.Value = Preferences.maximumFilterEntriesDisplayed;
@@ -143,7 +159,7 @@ namespace LogExpert.Dialogs
             FillMultifileSettings();
             FillEncodingList();
 
-            encodingComboBox.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
+            comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
             checkBoxMaskPrio.Checked = Preferences.maskPrio;
             checkBoxAutoPick.Checked = Preferences.autoPick;
             checkBoxAskCloseTabs.Checked = Preferences.askForClose;
@@ -153,7 +169,7 @@ namespace LogExpert.Dialogs
 
         private void FillPortableMode()
         {
-            checkBoxPortableMode.CheckState = File.Exists(ConfigManager.PortableMode) ? CheckState.Checked : CheckState.Unchecked;
+            checkBoxPortableMode.CheckState = Preferences.PortableMode ? CheckState.Checked : CheckState.Unchecked;
         }
 
         private void DisplayFontName()
@@ -183,7 +199,7 @@ namespace LogExpert.Dialogs
             Preferences.multiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
         }
 
-        private void ToolButtonClick(TextBox textBox)
+        private void OnToolButtonClick(TextBox textBox)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
@@ -430,7 +446,7 @@ namespace LogExpert.Dialogs
             {
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    configurator.SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                 }
             }
 
@@ -438,7 +454,7 @@ namespace LogExpert.Dialogs
             {
                 if (entry is ILogExpertPluginConfigurator configurator)
                 {
-                    configurator.SaveConfig(ConfigManager.ConfigDir);
+                    configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                 }
             }
         }
@@ -541,15 +557,15 @@ namespace LogExpert.Dialogs
 
         private void FillEncodingList()
         {
-            encodingComboBox.Items.Clear();
+            comboBoxEncoding.Items.Clear();
 
-            encodingComboBox.Items.Add(Encoding.ASCII);
-            encodingComboBox.Items.Add(Encoding.Default);
-            encodingComboBox.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-            encodingComboBox.Items.Add(Encoding.UTF8);
-            encodingComboBox.Items.Add(Encoding.Unicode);
+            comboBoxEncoding.Items.Add(Encoding.ASCII);
+            comboBoxEncoding.Items.Add(Encoding.Default);
+            comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+            comboBoxEncoding.Items.Add(Encoding.UTF8);
+            comboBoxEncoding.Items.Add(Encoding.Unicode);
 
-            encodingComboBox.ValueMember = "HeaderName";
+            comboBoxEncoding.ValueMember = "HeaderName";
         }
 
         #endregion
@@ -578,7 +594,7 @@ namespace LogExpert.Dialogs
             DisplayFontName();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             Preferences.timestampControl = checkBoxTimestamp.Checked;
             Preferences.filterSync = checkBoxSyncFilter.Checked;
@@ -623,6 +639,10 @@ namespace LogExpert.Dialogs
             {
                 Preferences.saveLocation = SessionSaveLocation.OwnDir;
             }
+            else if (radioButtonSessionApplicationStartupDir.Checked)
+            {
+                Preferences.saveLocation = SessionSaveLocation.ApplicationStartupDir;
+            }
             else
             {
                 Preferences.saveLocation = SessionSaveLocation.SameDir;
@@ -633,7 +653,7 @@ namespace LogExpert.Dialogs
             Preferences.linesPerBuffer = (int) upDownLinesPerBlock.Value;
             Preferences.pollingInterval = (int) upDownPollingInterval.Value;
             Preferences.multiThreadFilter = checkBoxMultiThread.Checked;
-            Preferences.defaultEncoding = encodingComboBox.SelectedItem != null ? (encodingComboBox.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
+            Preferences.defaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
             Preferences.showColumnFinder = checkBoxColumnFinder.Checked;
             Preferences.useLegacyReader = checkBoxLegacyReader.Checked;
 
@@ -648,7 +668,7 @@ namespace LogExpert.Dialogs
 
         private void toolButtonA_Click(object sender, EventArgs e)
         {
-            ToolButtonClick(textBoxTool);
+            OnToolButtonClick(textBoxTool);
         }
 
         private void argButtonA_Click(object sender, EventArgs e)
@@ -769,14 +789,36 @@ namespace LogExpert.Dialogs
             {
                 switch (checkBoxPortableMode.CheckState)
                 {
-                    case CheckState.Checked when !File.Exists(ConfigManager.PortableMode):
+                    case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        File.Create(ConfigManager.PortableMode);
+                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                        {
+                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                        }
+
+                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName)) 
+                            break;
+                    }
+                    case CheckState.Unchecked when File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
+                    {
+                        File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
                         break;
                     }
-                    case CheckState.Unchecked when File.Exists(ConfigManager.PortableMode):
+                }
+
+                switch (checkBoxPortableMode.CheckState)
+                {
+                    case CheckState.Unchecked:
                     {
-                        File.Delete(ConfigManager.PortableMode);
+                        checkBoxPortableMode.Text = @"Activate Portable Mode";
+                        Preferences.PortableMode = false;
+                        break;
+                    }
+
+                    case CheckState.Checked:
+                    {
+                        Preferences.PortableMode = true;
+                        checkBoxPortableMode.Text = @"Deactivate Portable Mode";
                         break;
                     }
                 }
@@ -892,38 +934,36 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void OnCancelButtonClick(object sender, EventArgs e)
         {
             _selectedPlugin?.HideConfigForm();
         }
 
-        private void workingDirButton_Click(object sender, EventArgs e)
+        private void OnWorkingDirButtonClick(object sender, EventArgs e)
         {
             WorkingDirButtonClick(textBoxWorkingDir);
         }
 
-        private void multifilePattern_TextChanged(object sender, EventArgs e)
+        private void OnMultiFilePatternTextChanged(object sender, EventArgs e)
         {
             string pattern = textBoxMultifilePattern.Text;
             upDownMultifileDays.Enabled = pattern.Contains("$D");
         }
 
-        private void exportButton_Click(object sender, EventArgs e)
+        private void OnExportButtonClick(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Title = @"Export Settings to file";
-            dlg.DefaultExt = "dat";
+            dlg.DefaultExt = "json";
             dlg.AddExtension = true;
-            dlg.Filter = @"Settings (*.dat)|*.dat|All files (*.*)|*.*";
+            dlg.Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*";
             
             DialogResult result = dlg.ShowDialog();
             
             if (result == DialogResult.OK)
             {
-                using (Stream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
-                {
-                    ConfigManager.Export(fs);
-                }
+                FileInfo fileInfo = new FileInfo(dlg.FileName);
+                ConfigManager.Export(fileInfo);
             }
         }
 
@@ -932,7 +972,7 @@ namespace LogExpert.Dialogs
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void importButton_Click(object sender, EventArgs e)
+        private void OnImportButtonClick(object sender, EventArgs e)
         {
             ImportSettingsDialog dlg = new ImportSettingsDialog();
 
@@ -943,38 +983,24 @@ namespace LogExpert.Dialogs
                     return;
                 }
 
-                Stream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read);
-                ConfigManager.Import(fs, dlg.ImportFlags);
-                fs.Close();
+                FileInfo fileInfo;
+                try
+                {
+                    fileInfo = new FileInfo(dlg.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                    return;
+                }
+
+                ConfigManager.Import(fileInfo, dlg.ImportFlags);
                 Preferences = ConfigManager.Settings.preferences;
                 FillDialog();
-                MessageBox.Show(this, "Settings imported", "LogExpert");
+                MessageBox.Show(this, @"Settings imported", @"LogExpert");
             }
         }
 
         #endregion
-
-        //TODO why is this class here, its not referenced anywhere and not used!
-        //TODO Refactor or DELTE
-        private class ColumnizerEntry
-        {
-            #region cTor
-
-            public ColumnizerEntry(ILogLineColumnizer columnizer)
-            {
-                Columnizer = columnizer;
-            }
-
-            #endregion
-
-            #region Properties
-
-            public string Name => Columnizer.GetName();
-
-            public ILogLineColumnizer Columnizer { get; }
-
-            #endregion
-        }
-
     }
 }

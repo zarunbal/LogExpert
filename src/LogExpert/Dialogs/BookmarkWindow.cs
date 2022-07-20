@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using LogExpert.Classes;
+using LogExpert.Config;
+using LogExpert.Entities;
+using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -117,7 +121,7 @@ namespace LogExpert.Dialogs
         {
             if (bookmarkData.IsBookmarkAtLine(lineNum))
             {
-                if (bookmarkDataGridView.Rows.Count < bookmarkData.Bookmarks.Count)
+                if (bookmarkDataGridView.Rows.GetRowCount(DataGridViewElementStates.None) < bookmarkData.Bookmarks.Count)
                 {
                     // just for the case... There was an exception but I cannot find the cause
                     UpdateView();

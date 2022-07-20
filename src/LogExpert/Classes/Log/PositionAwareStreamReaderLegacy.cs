@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LogExpert.Entities;
 
 namespace LogExpert.Classes.Log
 {
@@ -6,17 +7,16 @@ namespace LogExpert.Classes.Log
     {
         #region Fields
 
-        private readonly char[] charBuffer = new char[MAX_LINE_LEN];
+        private readonly char[] _charBuffer = new char[MaxLineLen];
 
-        private int _charBufferPos = 0;
-        private bool _crDetect = false;
+        private int _charBufferPos;
+        private bool _crDetect;
 
         #endregion
 
         #region cTor
 
-        public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) 
-            : base(stream, encodingOptions)
+        public PositionAwareStreamReaderLegacy(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
         {
 
         }
@@ -36,35 +36,37 @@ namespace LogExpert.Classes.Log
                 switch (readChar)
                 {
                     case '\n':
+                    {
                         _crDetect = false;
-                        return getLineAndResetCharBufferPos();
+                        return GetLineAndResetCharBufferPos();
+                    }
                     case '\r':
+                    {
                         if (_crDetect)
                         {
-                            return getLineAndResetCharBufferPos();
+                            return GetLineAndResetCharBufferPos();
                         }
-                        else
-                        {
-                            _crDetect = true;
-                        }
+
+                        _crDetect = true;
                         break;
+                    }
                     default:
+                    {
                         if (_crDetect)
                         {
                             _crDetect = false;
-                            string line = getLineAndResetCharBufferPos();
-                            appendToCharBuffer(readChar);
+                            string line = GetLineAndResetCharBufferPos();
+                            AppendToCharBuffer(readChar);
                             return line;
                         }
-                        else
-                        {
-                            appendToCharBuffer(readChar);
-                        }
+
+                        AppendToCharBuffer(readChar);
                         break;
+                    }
                 }
             }
 
-            string result = getLineAndResetCharBufferPos();
+            string result = GetLineAndResetCharBufferPos();
             if (readInt == -1 && result.Length == 0 && !_crDetect)
             {
                 return null; // EOF
@@ -75,7 +77,7 @@ namespace LogExpert.Classes.Log
 
         protected override void ResetReader()
         {
-            resetCharBufferPos();
+            ResetCharBufferPos();
 
             base.ResetReader();
         }
@@ -84,22 +86,22 @@ namespace LogExpert.Classes.Log
 
         #region Private Methods
 
-        private string getLineAndResetCharBufferPos()
+        private string GetLineAndResetCharBufferPos()
         {
-            string result = new string(charBuffer, 0, _charBufferPos);
-            resetCharBufferPos();
+            string result = new string(_charBuffer, 0, _charBufferPos);
+            ResetCharBufferPos();
             return result;
         }
 
-        private void appendToCharBuffer(char readChar)
+        private void AppendToCharBuffer(char readChar)
         {
-            if (_charBufferPos < MAX_LINE_LEN)
+            if (_charBufferPos < MaxLineLen)
             {
-                charBuffer[_charBufferPos++] = readChar;
+                _charBuffer[_charBufferPos++] = readChar;
             }
         }
 
-        private void resetCharBufferPos()
+        private void ResetCharBufferPos()
         {
             _charBufferPos = 0;
         }

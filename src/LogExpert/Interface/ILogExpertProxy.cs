@@ -1,7 +1,6 @@
-using System;
-using System.Security.Permissions;
+using LogExpert.Controls.LogTabWindow;
 
-namespace LogExpert
+namespace LogExpert.Interface
 {
     public interface ILogExpertProxy
     {

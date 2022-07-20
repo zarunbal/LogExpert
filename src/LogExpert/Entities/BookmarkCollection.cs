@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace LogExpert
+namespace LogExpert.Entities
 {
     public class BookmarkCollection : ReadOnlyCollection<Bookmark>
     {
