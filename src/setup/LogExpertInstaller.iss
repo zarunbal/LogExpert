@@ -59,8 +59,18 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\..\bin\Release\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\Release\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\Release\pluginsx86\*"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\AutoColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\ColumnizerLib.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\CsvColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\DefaultPlugins.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\FlashIconHighlighter.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\GlassfishColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\JsonColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\JsonCompactColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Log4jXmlColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\LumenWorks.Framework.IO.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\RegexColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
