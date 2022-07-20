@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "LogExpert"
-#define AppVersion "1.8.8-PRERelease"
+#define AppVersion "1.9.0"
 #define AppURL "https://github.com/zarunbal/LogExpert"
 #define AppExeName "LogExpert.exe"
 
