@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "LogExpert"
-#define AppVersion "1.8.8-PRERelease"
+#define AppVersion "1.9.0"
 #define AppURL "https://github.com/zarunbal/LogExpert"
 #define AppExeName "LogExpert.exe"
 
@@ -59,9 +59,20 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\..\bin\Release\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\Release\plugins\*"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\Release\pluginsx86\*"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\AutoColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\ColumnizerLib.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\CsvColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\DefaultPlugins.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\FlashIconHighlighter.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\GlassfishColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\JsonColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\JsonCompactColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Log4jXmlColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\LumenWorks.Framework.IO.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\RegexColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
@@ -71,7 +82,7 @@ Source: "..\..\bin\Release\WeifenLuo.WinFormsUI.Docking.dll"; DestDir: "{app}"; 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
