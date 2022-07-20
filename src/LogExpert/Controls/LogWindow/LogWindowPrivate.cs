@@ -20,7 +20,6 @@ using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
 using LogExpert.Interface;
-//using System.Linq;
 
 namespace LogExpert.Controls.LogWindow
 {
@@ -327,8 +326,7 @@ namespace LogExpert.Controls.LogWindow
                 dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.currentLine].Cells[0];
             }
 
-            if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount &&
-                _reloadMemento.firstDisplayedLine >= 0)
+            if (_reloadMemento.firstDisplayedLine < dataGridView.RowCount && _reloadMemento.firstDisplayedLine >= 0)
             {
                 dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.firstDisplayedLine;
             }
@@ -656,7 +654,7 @@ namespace LogExpert.Controls.LogWindow
                     int currentLineNum = dataGridView.CurrentCellAddress.Y;
                     dataGridView.RowCount = 0;
                     dataGridView.RowCount = e.LineCount;
-                    if (!_guiStateArgs.FollowTail)
+                    if (_guiStateArgs.FollowTail == false)
                     {
                         if (currentLineNum >= dataGridView.RowCount)
                         {
@@ -672,6 +670,7 @@ namespace LogExpert.Controls.LogWindow
                 }
 
                 _logger.Debug("UpdateGrid(): new RowCount={0}", dataGridView.RowCount);
+
                 if (e.IsRollover)
                 {
                     // Multifile rollover
@@ -922,7 +921,7 @@ namespace LogExpert.Controls.LogWindow
             // Check if the filtered columns disappeared, if so must refresh the UI
             if (_filterParams.columnRestrict)
             {
-                string[] newColumns = columnizer != null ? columnizer.GetColumnNames() : new string[0];
+                string[] newColumns = columnizer != null ? columnizer.GetColumnNames() : Array.Empty<string>();
                 bool colChanged = false;
 
                 if (dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
@@ -950,6 +949,7 @@ namespace LogExpert.Controls.LogWindow
 
             Type oldColType = _filterParams.currentColumnizer?.GetType();
             Type newColType = columnizer?.GetType();
+            
             if (oldColType != newColType && _filterParams.columnRestrict && _filterParams.isFilterTail)
             {
                 _filterParams.columnList.Clear();
@@ -1072,6 +1072,7 @@ namespace LogExpert.Controls.LogWindow
             catch (NullReferenceException e)
             {
                 // See https://connect.microsoft.com/VisualStudio/feedback/details/366943/autoresizecolumns-in-datagridview-throws-nullreferenceexception
+                // possible solution => https://stackoverflow.com/questions/36287553/nullreferenceexception-when-trying-to-set-datagridview-column-width-brings-th
                 // There are some rare situations with null ref exceptions when resizing columns and on filter finished
                 // So catch them here. Better than crashing.
                 _logger.Error(e, "Error while resizing columns: ");
@@ -1095,7 +1096,7 @@ namespace LogExpert.Controls.LogWindow
                 column = Column.EmptyColumn;
             }
 
-            IList<HilightMatchEntry> matchList = FindHilightMatches(column);
+            IList<HilightMatchEntry> matchList = FindHighlightMatches(column);
             // too many entries per line seem to cause problems with the GDI
             while (matchList.Count > 50)
             {
@@ -1263,12 +1264,12 @@ namespace LogExpert.Controls.LogWindow
 
         private HilightEntry FindHilightEntry(ITextValue line)
         {
-            return FindHilightEntry(line, false);
+            return FindHighlightEntry(line, false);
         }
 
         private HilightEntry FindFirstNoWordMatchHilightEntry(ITextValue line)
         {
-            return FindHilightEntry(line, true);
+            return FindHighlightEntry(line, true);
         }
 
         private bool CheckHighlightEntryMatch(HilightEntry entry, ITextValue column)
@@ -1326,8 +1327,7 @@ namespace LogExpert.Controls.LogWindow
             return resultList;
         }
 
-        private void GetHighlightEntryMatches(ITextValue line, IList<HilightEntry> hilightEntryList,
-            IList<HilightMatchEntry> resultList)
+        private void GetHighlightEntryMatches(ITextValue line, IList<HilightEntry> hilightEntryList, IList<HilightMatchEntry> resultList)
         {
             foreach (HilightEntry entry in hilightEntryList)
             {
@@ -1499,7 +1499,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     if (!IsMultiFile && dataGridView.SelectedRows.Count == 1)
                     {
-                        StatusLineText("");
+                        StatusLineText(string.Empty);
                     }
                 }
             }
@@ -1521,7 +1521,7 @@ namespace LogExpert.Controls.LogWindow
                         }
                     }
 
-                    if (filterGridView.Rows.Count > 0) // exception no rows
+                    if (filterGridView.Rows.GetRowCount(DataGridViewElementStates.None) > 0) // exception no rows
                     {
                         filterGridView.CurrentCell = filterGridView.Rows[index].Cells[0];
                     }
@@ -1674,7 +1674,7 @@ namespace LogExpert.Controls.LogWindow
                     return;
                 }
 
-                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), new object[] { line, true });
+                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
             }
             catch (Exception ex) // in the case the windows is already destroyed
             {
@@ -1706,15 +1706,15 @@ namespace LogExpert.Controls.LogWindow
 
                 if (line == -1)
                 {
-                    MessageBox.Show(this, "Not found:",
-                        "Search result"); // Hmm... is that experimental code from early days?
+                    // Hmm... is that experimental code from early days?
+                    MessageBox.Show(this, "Not found:", "Search result");
                     return;
                 }
 
                 // Prevent ArgumentOutOfRangeException
-                else if (line >= dataGridView.Rows.Count)
+                if (line >= dataGridView.Rows.GetRowCount(DataGridViewElementStates.None))
                 {
-                    line = dataGridView.Rows.Count - 1;
+                    line = dataGridView.Rows.GetRowCount(DataGridViewElementStates.None) - 1;
                 }
 
                 dataGridView.Rows[line].Selected = true;
@@ -2502,10 +2502,8 @@ namespace LogExpert.Controls.LogWindow
                 if (diff > 0)
                 {
                     diff -= dataGridView.RowHeadersWidth / 2;
-                    dataGridView.Columns[dataGridView.Columns.Count - 1].Width =
-                        dataGridView.Columns[dataGridView.Columns.Count - 1].Width + diff;
-                    filterGridView.Columns[filterGridView.Columns.Count - 1].Width =
-                        filterGridView.Columns[filterGridView.Columns.Count - 1].Width + diff;
+                    dataGridView.Columns[dataGridView.Columns.GetColumnCount(DataGridViewElementStates.None) - 1].Width += diff;
+                    filterGridView.Columns[filterGridView.Columns.GetColumnCount(DataGridViewElementStates.None) - 1].Width += diff;
                 }
             }
         }
@@ -2893,18 +2891,18 @@ namespace LogExpert.Controls.LogWindow
 
         private void ApplyDataGridViewPrefs(DataGridView dataGridView, Preferences prefs)
         {
-            if (dataGridView.Columns.Count > 1)
+            if (dataGridView.Columns.GetColumnCount(DataGridViewElementStates.None) > 1)
             {
                 if (prefs.setLastColumnWidth)
                 {
-                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = prefs.lastColumnWidth;
+                    dataGridView.Columns[dataGridView.Columns.GetColumnCount(DataGridViewElementStates.None) - 1].MinimumWidth = prefs.lastColumnWidth;
                 }
                 else
                 {
                     // Workaround for a .NET bug which brings the DataGridView into an unstable state (causing lots of NullReferenceExceptions).
                     dataGridView.FirstDisplayedScrollingColumnIndex = 0;
 
-                    dataGridView.Columns[dataGridView.Columns.Count - 1].MinimumWidth = 5; // default
+                    dataGridView.Columns[dataGridView.Columns.GetColumnCount(DataGridViewElementStates.None) - 1].MinimumWidth = 5; // default
                 }
             }
 
@@ -2938,9 +2936,9 @@ namespace LogExpert.Controls.LogWindow
             return new List<int>();
         }
 
-        /* ========================================================================
-       * Timestamp stuff
-       * =======================================================================*/
+       /* ========================================================================
+        * Timestamp stuff
+        * =======================================================================*/
 
         private void SetTimestampLimits()
         {
@@ -2990,7 +2988,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 foreach (int colIndex in filter.columnList)
                 {
-                    if (colIndex < dataGridView.Columns.Count - 2)
+                    if (colIndex < dataGridView.Columns.GetColumnCount(DataGridViewElementStates.None) - 2)
                     {
                         if (names.Length > 0)
                         {
@@ -3429,7 +3427,7 @@ namespace LogExpert.Controls.LogWindow
                 else
                 {
                     RowHeightEntry entry = _rowHeightList[rowNum];
-                    entry.Height = entry.Height - _lineHeight;
+                    entry.Height -= _lineHeight;
                     if (entry.Height <= _lineHeight)
                     {
                         _rowHeightList.Remove(rowNum);
@@ -3451,7 +3449,7 @@ namespace LogExpert.Controls.LogWindow
                     entry = _rowHeightList[rowNum];
                 }
 
-                entry.Height = entry.Height + _lineHeight;
+                entry.Height += _lineHeight;
             }
 
             dataGridView.UpdateRowHeightInfo(rowNum, false);
@@ -3507,7 +3505,7 @@ namespace LogExpert.Controls.LogWindow
                 bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
             }
 
-            bookmark.Text = bookmark.Text + text;
+            bookmark.Text += text;
             dataGridView.Refresh();
             filterGridView.Refresh();
             OnBookmarkTextChanged(bookmark);
@@ -3709,8 +3707,7 @@ namespace LogExpert.Controls.LogWindow
                 int currentLine = dataGridView.CurrentCellAddress.Y;
                 if (currentLine >= 0)
                 {
-                    dataGridView.CurrentCell =
-                        dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
+                    dataGridView.CurrentCell = dataGridView.Rows[dataGridView.CurrentCellAddress.Y].Cells[col.Index];
                 }
             }
         }
