@@ -56,3 +56,13 @@ Nuke.build Requirements
 Please checkout the wiki for FAQ / HELP / Informations / Examples
 
 https://github.com/zarunbal/LogExpert/wiki
+
+## Credits
+### Contributors
+
+This project exists thanks to all the people who contribute.
+<a href="https://github.com/zarunbal/LogExpert/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zarunbal/LogExpert" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
