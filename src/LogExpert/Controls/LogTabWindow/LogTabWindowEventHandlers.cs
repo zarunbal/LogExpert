@@ -99,7 +99,7 @@ namespace LogExpert.Controls.LogTabWindow
 
                 DestroyBookmarkWindow();
 
-                ConfigManager.Instance.ConfigChanged -= ConfigChanged;
+                ConfigManager.Instance.ConfigChanged -= OnConfigChanged;
 
                 SaveWindowPosition();
                 ConfigManager.Save(SettingsFlags.WindowPosition | SettingsFlags.FileHistory);
@@ -707,6 +707,7 @@ namespace LogExpert.Controls.LogTabWindow
             LogWindow.LogWindow logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
 
             LogWindowData data = logWindow.Tag as LogWindowData;
+            
             if (data == null)
             {
                 return;
@@ -720,6 +721,7 @@ namespace LogExpert.Controls.LogTabWindow
                 SetTabColor(logWindow, data.color);
             }
             List<ColorEntry> delList = new List<ColorEntry>();
+
             foreach (ColorEntry entry in ConfigManager.Settings.fileColors)
             {
                 if (entry.FileName.ToLower().Equals(logWindow.FileName.ToLower()))
@@ -727,11 +729,13 @@ namespace LogExpert.Controls.LogTabWindow
                     delList.Add(entry);
                 }
             }
+
             foreach (ColorEntry entry in delList)
             {
                 ConfigManager.Settings.fileColors.Remove(entry);
             }
             ConfigManager.Settings.fileColors.Add(new ColorEntry(logWindow.FileName, dlg.Color));
+
             while (ConfigManager.Settings.fileColors.Count > MAX_COLOR_HISTORY)
             {
                 ConfigManager.Settings.fileColors.RemoveAt(0);
@@ -751,6 +755,7 @@ namespace LogExpert.Controls.LogTabWindow
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.DefaultExt = "lxj";
             dlg.Filter = @"LogExpert session (*.lxj)|*.lxj";
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 string fileName = dlg.FileName;
@@ -768,6 +773,7 @@ namespace LogExpert.Controls.LogTabWindow
                         }
                     }
                 }
+
                 ProjectData projectData = new ProjectData();
                 projectData.memberList = fileNames;
                 projectData.tabLayoutXml = SaveLayout();
@@ -836,7 +842,8 @@ namespace LogExpert.Controls.LogTabWindow
             }
         }
 
-        private void ConfigChanged(object sender, ConfigChangedEventArgs e)
+
+        private void OnConfigChanged(object sender, ConfigChangedEventArgs e)
         {
             if (LogExpertProxy != null)
             {

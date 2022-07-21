@@ -1114,17 +1114,20 @@ namespace LogExpert.Controls.LogTabWindow
                 }
 
                 SysoutPipe pipe = new SysoutPipe(process.StandardOutput);
+
                 LogWindow.LogWindow logWin = AddTempFileTab(pipe.FileName,
                     CurrentLogWindow.IsTempFile
                         ? CurrentLogWindow.TempTitleName
                         : Util.GetNameFromPath(CurrentLogWindow.FileName) + "->E");
                 logWin.ForceColumnizer(columnizer);
+                
                 process.Exited += pipe.ProcessExitedEventHandler;
                 //process.BeginOutputReadLine();
             }
             else
             {
                 _logger.Info("Starting external tool: {0} {1}", cmd, args);
+
                 try
                 {
                     startInfo.UseShellExecute = false;
@@ -1187,7 +1190,7 @@ namespace LogExpert.Controls.LogTabWindow
                             CloseAllTabs();
                             break;
                         case ProjectLoadDlgResult.NewWindow:
-                            LogExpertProxy.NewWindow(new string[] {projectFileName});
+                            LogExpertProxy.NewWindow(new[] {projectFileName});
                             return;
                     }
                 }
@@ -1288,32 +1291,35 @@ namespace LogExpert.Controls.LogTabWindow
 
         private string SaveLayout()
         {
-            ;
             using (MemoryStream memStream = new MemoryStream(2000))
-            using (StreamReader r = new StreamReader(memStream))
             {
-                dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
+                using (StreamReader r = new StreamReader(memStream))
+                {
+                    dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
 
-                memStream.Seek(0, SeekOrigin.Begin);
-                string resultXml = r.ReadToEnd();
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    string resultXml = r.ReadToEnd();
 
-                r.Close();
+                    r.Close();
 
-                return resultXml;
+                    return resultXml;
+                }
             }
         }
 
         private void RestoreLayout(string layoutXml)
         {
             using (MemoryStream memStream = new MemoryStream(2000))
-            using (StreamWriter w = new StreamWriter(memStream))
             {
-                w.Write(layoutXml);
-                w.Flush();
+                using (StreamWriter w = new StreamWriter(memStream))
+                {
+                    w.Write(layoutXml);
+                    w.Flush();
 
-                memStream.Seek(0, SeekOrigin.Begin);
+                    memStream.Seek(0, SeekOrigin.Begin);
 
-                dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+                    dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+                }
             }
         }
 
