@@ -19,6 +19,9 @@ namespace LogExpert.Dialogs
         public ParamRequesterDialog()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
@@ -37,20 +40,21 @@ namespace LogExpert.Dialogs
 
         private void ParamRequesterDialog_Shown(object sender, EventArgs e)
         {
-            this.paramLabel.Text = ParamName;
-            if (this.Values != null)
+            labelValueForParameter.Text = ParamName;
+
+            if (Values != null)
             {
-                foreach (string value in this.Values)
+                foreach (string value in Values)
                 {
-                    this.valueComboBox.Items.Add(value);
+                    comboBoxValue.Items.Add(value);
                 }
-                this.valueComboBox.SelectedIndex = 0;
+                comboBoxValue.SelectedIndex = 0;
             }
         }
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            this.ParamValue = this.valueComboBox.Text;
+            ParamValue = comboBoxValue.Text;
         }
 
         #endregion

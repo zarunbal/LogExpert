@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -15,6 +10,8 @@ namespace LogExpert.Dialogs
         public BookmarkCommentDlg()
         {
             InitializeComponent();
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
@@ -23,8 +20,8 @@ namespace LogExpert.Dialogs
 
         public string Comment
         {
-            set { this.commentTextBox.Text = value; }
-            get { return this.commentTextBox.Text; }
+            set => commentTextBox.Text = value;
+            get => commentTextBox.Text;
         }
 
         #endregion

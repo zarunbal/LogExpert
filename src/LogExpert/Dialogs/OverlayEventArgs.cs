@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using LogExpert.Entities;
 
 namespace LogExpert.Dialogs
@@ -15,7 +13,7 @@ namespace LogExpert.Dialogs
 
         public OverlayEventArgs(BookmarkOverlay overlay)
         {
-            this.BookmarkOverlay = overlay;
+            BookmarkOverlay = overlay;
         }
 
         #endregion

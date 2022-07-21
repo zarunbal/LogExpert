@@ -18,7 +18,9 @@ namespace LogExpert.Dialogs
                 case Keys.End:
                 case Keys.PageDown:
                 case Keys.PageUp:
+                {
                     return true;
+                }
             }
 
             return !dataGridViewWantsInputKey;

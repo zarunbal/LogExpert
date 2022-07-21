@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -15,6 +10,9 @@ namespace LogExpert.Dialogs
         public TabRenameDlg()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
@@ -23,15 +21,15 @@ namespace LogExpert.Dialogs
 
         public string TabName
         {
-            get { return this.tabNameTextBox.Text; }
-            set { this.tabNameTextBox.Text = value; }
+            get => textBoxTabName.Text;
+            set => textBoxTabName.Text = value;
         }
 
         #endregion
 
         #region Events handler
 
-        private void TabRenameDlg_KeyDown(object sender, KeyEventArgs e)
+        private void OnTabRenameDlgKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {

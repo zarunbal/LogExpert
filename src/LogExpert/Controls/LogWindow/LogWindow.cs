@@ -135,6 +135,9 @@ namespace LogExpert.Controls.LogWindow
 
             InitializeComponent();
 
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             columnNamesLabel.Text = ""; // no filtering on columns by default
 
             _parentLogTabWin = parent;
@@ -502,9 +505,7 @@ namespace LogExpert.Controls.LogWindow
 
         private delegate void SelectLineFx(int line, bool triggerSyncCall);
 
-        private delegate void FilterFx(
-            FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines,
-            List<int> filterHitList);
+        private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
         private delegate void UpdateProgressBarFx(int lineNum);
 

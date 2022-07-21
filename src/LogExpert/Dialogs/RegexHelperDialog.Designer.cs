@@ -28,170 +28,168 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.cancelButton = new System.Windows.Forms.Button();
-      this.okButton = new System.Windows.Forms.Button();
-      this.label1 = new System.Windows.Forms.Label();
-      this.label2 = new System.Windows.Forms.Label();
-      this.label3 = new System.Windows.Forms.Label();
-      this.matchesTextBox = new System.Windows.Forms.TextBox();
-      this.caseSensitiveCheckBox = new System.Windows.Forms.CheckBox();
-      this.expressionComboBox = new System.Windows.Forms.ComboBox();
-      this.testTextComboBox = new System.Windows.Forms.ComboBox();
-      this.helpProvider1 = new System.Windows.Forms.HelpProvider();
-      this.button1 = new System.Windows.Forms.Button();
-      this.SuspendLayout();
-      // 
-      // cancelButton
-      // 
-      this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(345, 277);
-      this.cancelButton.Name = "cancelButton";
-      this.cancelButton.Size = new System.Drawing.Size(75, 23);
-      this.cancelButton.TabIndex = 0;
-      this.cancelButton.Text = "Cancel";
-      this.cancelButton.UseVisualStyleBackColor = true;
-      // 
-      // okButton
-      // 
-      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(264, 277);
-      this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 1;
-      this.okButton.Text = "OK";
-      this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(9, 14);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(61, 13);
-      this.label1.TabIndex = 3;
-      this.label1.Text = "Expression:";
-      // 
-      // label2
-      // 
-      this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(9, 88);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(51, 13);
-      this.label2.TabIndex = 5;
-      this.label2.Text = "Test text:";
-      // 
-      // label3
-      // 
-      this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(9, 141);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(51, 13);
-      this.label3.TabIndex = 6;
-      this.label3.Text = "Matches:";
-      // 
-      // matchesTextBox
-      // 
-      this.matchesTextBox.Location = new System.Drawing.Point(12, 157);
-      this.matchesTextBox.Multiline = true;
-      this.matchesTextBox.Name = "matchesTextBox";
-      this.matchesTextBox.ReadOnly = true;
-      this.matchesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-      this.matchesTextBox.Size = new System.Drawing.Size(408, 73);
-      this.matchesTextBox.TabIndex = 7;
-      // 
-      // caseSensitiveCheckBox
-      // 
-      this.caseSensitiveCheckBox.AutoSize = true;
-      this.caseSensitiveCheckBox.Location = new System.Drawing.Point(13, 57);
-      this.caseSensitiveCheckBox.Name = "caseSensitiveCheckBox";
-      this.caseSensitiveCheckBox.Size = new System.Drawing.Size(94, 17);
-      this.caseSensitiveCheckBox.TabIndex = 8;
-      this.caseSensitiveCheckBox.Text = "Case sensitive";
-      this.caseSensitiveCheckBox.UseVisualStyleBackColor = true;
-      this.caseSensitiveCheckBox.CheckedChanged += new System.EventHandler(this.caseSensitiveCheckBox_CheckedChanged);
-      // 
-      // expressionComboBox
-      // 
-      this.expressionComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-      this.expressionComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-      this.expressionComboBox.FormattingEnabled = true;
-      this.expressionComboBox.Location = new System.Drawing.Point(13, 28);
-      this.expressionComboBox.Name = "expressionComboBox";
-      this.expressionComboBox.Size = new System.Drawing.Size(407, 21);
-      this.expressionComboBox.TabIndex = 10;
-      this.expressionComboBox.TextChanged += new System.EventHandler(this.expressionComboBox_TextChanged);
-      // 
-      // testTextComboBox
-      // 
-      this.testTextComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-      this.testTextComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-      this.testTextComboBox.FormattingEnabled = true;
-      this.testTextComboBox.Location = new System.Drawing.Point(13, 104);
-      this.testTextComboBox.Name = "testTextComboBox";
-      this.testTextComboBox.Size = new System.Drawing.Size(407, 21);
-      this.testTextComboBox.TabIndex = 11;
-      this.testTextComboBox.TextChanged += new System.EventHandler(this.testTextComboBox_TextChanged);
-      // 
-      // helpProvider1
-      // 
-      this.helpProvider1.HelpNamespace = "LogExpert.chm";
-      // 
-      // button1
-      // 
-      this.helpProvider1.SetHelpKeyword(this.button1, "RegEx.htm");
-      this.helpProvider1.SetHelpNavigator(this.button1, System.Windows.Forms.HelpNavigator.Topic);
-      this.button1.Location = new System.Drawing.Point(13, 277);
-      this.button1.Name = "button1";
-      this.helpProvider1.SetShowHelp(this.button1, true);
-      this.button1.Size = new System.Drawing.Size(75, 23);
-      this.button1.TabIndex = 12;
-      this.button1.Text = "Help";
-      this.button1.UseVisualStyleBackColor = true;
-      this.button1.Click += new System.EventHandler(this.button1_Click);
-      // 
-      // RegexHelperDialog
-      // 
-      this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.CancelButton = this.cancelButton;
-      this.ClientSize = new System.Drawing.Size(433, 312);
-      this.Controls.Add(this.button1);
-      this.Controls.Add(this.testTextComboBox);
-      this.Controls.Add(this.expressionComboBox);
-      this.Controls.Add(this.caseSensitiveCheckBox);
-      this.Controls.Add(this.matchesTextBox);
-      this.Controls.Add(this.label3);
-      this.Controls.Add(this.label2);
-      this.Controls.Add(this.label1);
-      this.Controls.Add(this.okButton);
-      this.Controls.Add(this.cancelButton);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.helpProvider1.SetHelpKeyword(this, "RegEx.htm");
-      this.helpProvider1.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
-      this.Name = "RegexHelperDialog";
-      this.helpProvider1.SetShowHelp(this, true);
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-      this.Text = "Regex-Helper";
-      this.ResumeLayout(false);
-      this.PerformLayout();
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonOk = new System.Windows.Forms.Button();
+            this.labelRegex = new System.Windows.Forms.Label();
+            this.labelTestText = new System.Windows.Forms.Label();
+            this.labelMatches = new System.Windows.Forms.Label();
+            this.textBoxMatches = new System.Windows.Forms.TextBox();
+            this.checkBoxCaseSensitive = new System.Windows.Forms.CheckBox();
+            this.comboBoxRegex = new System.Windows.Forms.ComboBox();
+            this.comboBoxTestText = new System.Windows.Forms.ComboBox();
+            this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+            this.buttonHelp = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttonCancel.Location = new System.Drawing.Point(365, 371);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonCancel.TabIndex = 0;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            // 
+            // buttonOk
+            // 
+            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonOk.Location = new System.Drawing.Point(284, 371);
+            this.buttonOk.Name = "buttonOk";
+            this.buttonOk.Size = new System.Drawing.Size(75, 23);
+            this.buttonOk.TabIndex = 1;
+            this.buttonOk.Text = "OK";
+            this.buttonOk.UseVisualStyleBackColor = true;
+            this.buttonOk.Click += new System.EventHandler(this.OnButtonOkClick);
+            // 
+            // labelRegex
+            // 
+            this.labelRegex.AutoSize = true;
+            this.labelRegex.Location = new System.Drawing.Point(14, 14);
+            this.labelRegex.Name = "labelRegex";
+            this.labelRegex.Size = new System.Drawing.Size(151, 20);
+            this.labelRegex.TabIndex = 3;
+            this.labelRegex.Text = "Regular Expression:";
+            // 
+            // labelTestText
+            // 
+            this.labelTestText.AutoSize = true;
+            this.labelTestText.Location = new System.Drawing.Point(14, 98);
+            this.labelTestText.Name = "labelTestText";
+            this.labelTestText.Size = new System.Drawing.Size(74, 20);
+            this.labelTestText.TabIndex = 5;
+            this.labelTestText.Text = "Test text:";
+            // 
+            // labelMatches
+            // 
+            this.labelMatches.AutoSize = true;
+            this.labelMatches.Location = new System.Drawing.Point(14, 152);
+            this.labelMatches.Name = "labelMatches";
+            this.labelMatches.Size = new System.Drawing.Size(74, 20);
+            this.labelMatches.TabIndex = 6;
+            this.labelMatches.Text = "Matches:";
+            // 
+            // textBoxMatches
+            // 
+            this.textBoxMatches.Location = new System.Drawing.Point(12, 175);
+            this.textBoxMatches.Multiline = true;
+            this.textBoxMatches.Name = "textBoxMatches";
+            this.textBoxMatches.ReadOnly = true;
+            this.textBoxMatches.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBoxMatches.Size = new System.Drawing.Size(428, 190);
+            this.textBoxMatches.TabIndex = 7;
+            // 
+            // checkBoxCaseSensitive
+            // 
+            this.checkBoxCaseSensitive.AutoSize = true;
+            this.checkBoxCaseSensitive.Location = new System.Drawing.Point(12, 71);
+            this.checkBoxCaseSensitive.Name = "checkBoxCaseSensitive";
+            this.checkBoxCaseSensitive.Size = new System.Drawing.Size(137, 24);
+            this.checkBoxCaseSensitive.TabIndex = 8;
+            this.checkBoxCaseSensitive.Text = "Case sensitive";
+            this.checkBoxCaseSensitive.UseVisualStyleBackColor = true;
+            this.checkBoxCaseSensitive.CheckedChanged += new System.EventHandler(this.OnCaseSensitiveCheckBoxCheckedChanged);
+            // 
+            // comboBoxRegex
+            // 
+            this.comboBoxRegex.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.comboBoxRegex.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.comboBoxRegex.FormattingEnabled = true;
+            this.comboBoxRegex.Location = new System.Drawing.Point(12, 37);
+            this.comboBoxRegex.Name = "comboBoxRegex";
+            this.comboBoxRegex.Size = new System.Drawing.Size(428, 28);
+            this.comboBoxRegex.TabIndex = 10;
+            this.comboBoxRegex.TextChanged += new System.EventHandler(this.OnComboBoxRegexTextChanged);
+            // 
+            // comboBoxTestText
+            // 
+            this.comboBoxTestText.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.comboBoxTestText.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.comboBoxTestText.FormattingEnabled = true;
+            this.comboBoxTestText.Location = new System.Drawing.Point(12, 121);
+            this.comboBoxTestText.Name = "comboBoxTestText";
+            this.comboBoxTestText.Size = new System.Drawing.Size(428, 28);
+            this.comboBoxTestText.TabIndex = 11;
+            this.comboBoxTestText.TextChanged += new System.EventHandler(this.OnComboBoxTestTextTextChanged);
+            // 
+            // helpProvider1
+            // 
+            this.helpProvider1.HelpNamespace = "LogExpert.chm";
+            // 
+            // buttonHelp
+            // 
+            this.helpProvider1.SetHelpKeyword(this.buttonHelp, "RegEx.htm");
+            this.helpProvider1.SetHelpNavigator(this.buttonHelp, System.Windows.Forms.HelpNavigator.Topic);
+            this.buttonHelp.Location = new System.Drawing.Point(13, 371);
+            this.buttonHelp.Name = "buttonHelp";
+            this.helpProvider1.SetShowHelp(this.buttonHelp, true);
+            this.buttonHelp.Size = new System.Drawing.Size(75, 23);
+            this.buttonHelp.TabIndex = 12;
+            this.buttonHelp.Text = "Help";
+            this.buttonHelp.UseVisualStyleBackColor = true;
+            this.buttonHelp.Click += new System.EventHandler(this.OnButtonHelpClick);
+            // 
+            // RegexHelperDialog
+            // 
+            this.AcceptButton = this.buttonOk;
+            this.CancelButton = this.buttonCancel;
+            this.ClientSize = new System.Drawing.Size(452, 403);
+            this.Controls.Add(this.buttonHelp);
+            this.Controls.Add(this.comboBoxTestText);
+            this.Controls.Add(this.comboBoxRegex);
+            this.Controls.Add(this.checkBoxCaseSensitive);
+            this.Controls.Add(this.textBoxMatches);
+            this.Controls.Add(this.labelMatches);
+            this.Controls.Add(this.labelTestText);
+            this.Controls.Add(this.labelRegex);
+            this.Controls.Add(this.buttonOk);
+            this.Controls.Add(this.buttonCancel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.helpProvider1.SetHelpKeyword(this, "RegEx.htm");
+            this.helpProvider1.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "RegexHelperDialog";
+            this.helpProvider1.SetShowHelp(this, true);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Regex-Helper";
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button cancelButton;
-    private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.Label label2;
-    private System.Windows.Forms.Label label3;
-    private System.Windows.Forms.TextBox matchesTextBox;
-    private System.Windows.Forms.CheckBox caseSensitiveCheckBox;
-    private System.Windows.Forms.ComboBox expressionComboBox;
-    private System.Windows.Forms.ComboBox testTextComboBox;
+    private System.Windows.Forms.Button buttonCancel;
+    private System.Windows.Forms.Button buttonOk;
+    private System.Windows.Forms.Label labelRegex;
+    private System.Windows.Forms.Label labelTestText;
+    private System.Windows.Forms.Label labelMatches;
+    private System.Windows.Forms.TextBox textBoxMatches;
+    private System.Windows.Forms.CheckBox checkBoxCaseSensitive;
+    private System.Windows.Forms.ComboBox comboBoxRegex;
+    private System.Windows.Forms.ComboBox comboBoxTestText;
     private System.Windows.Forms.HelpProvider helpProvider1;
-    private System.Windows.Forms.Button button1;
+    private System.Windows.Forms.Button buttonHelp;
   }
 }

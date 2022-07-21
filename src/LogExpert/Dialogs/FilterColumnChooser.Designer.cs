@@ -68,7 +68,7 @@
       this.okButton.TabIndex = 2;
       this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
+      this.okButton.Click += new System.EventHandler(this.OnOkButtonClick);
       // 
       // toolTipEmptyColumnNoHit
       // 
@@ -172,8 +172,6 @@
       // FilterColumnChooser
       // 
       this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
       this.ClientSize = new System.Drawing.Size(157, 319);
       this.Controls.Add(this.cancelButton);

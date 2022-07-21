@@ -19,16 +19,16 @@ namespace LogExpert.Dialogs
         public OpenUriDialog()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
 
         #region Properties
 
-        public string Uri
-        {
-            get { return this.uriComboBox.Text; }
-        }
+        public string Uri => comboBoxUri.Text;
 
         public IList<string> UriHistory { get; set; }
 
@@ -38,31 +38,35 @@ namespace LogExpert.Dialogs
 
         private void OpenUriDialog_Load(object sender, EventArgs e)
         {
-            if (this.UriHistory != null)
+            if (UriHistory != null)
             {
-                this.uriComboBox.Items.Clear();
-                foreach (string uri in this.UriHistory)
+                comboBoxUri.Items.Clear();
+                foreach (string uri in UriHistory)
                 {
-                    this.uriComboBox.Items.Add(uri);
+                    comboBoxUri.Items.Add(uri);
                 }
             }
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnButtonOkClick(object sender, EventArgs e)
         {
-            this.UriHistory = new List<string>();
-            foreach (object item in this.uriComboBox.Items)
+            UriHistory = new List<string>();
+
+            foreach (object item in comboBoxUri.Items)
             {
-                this.UriHistory.Add(item.ToString());
+                UriHistory.Add(item.ToString());
             }
-            if (this.UriHistory.Contains(this.uriComboBox.Text))
+
+            if (UriHistory.Contains(comboBoxUri.Text))
             {
-                this.UriHistory.Remove(this.uriComboBox.Text);
+                UriHistory.Remove(comboBoxUri.Text);
             }
-            this.UriHistory.Insert(0, this.uriComboBox.Text);
-            while (this.UriHistory.Count > 20)
+
+            UriHistory.Insert(0, comboBoxUri.Text);
+
+            while (UriHistory.Count > 20)
             {
-                this.UriHistory.RemoveAt(this.UriHistory.Count - 1);
+                UriHistory.RemoveAt(UriHistory.Count - 1);
             }
         }
 

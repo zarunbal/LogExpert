@@ -16,6 +16,10 @@ namespace LogExpert.Dialogs
         public AboutBox()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             _assembly = Assembly.GetExecutingAssembly();
 
             Text = $@"About {AssemblyTitle}";
@@ -101,7 +105,7 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void OnLinkLabelURLClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             string target = e.Link.LinkData as string;
             System.Diagnostics.Process.Start(target);

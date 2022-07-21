@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -12,8 +8,9 @@ namespace LogExpert.Dialogs
     {
         #region Fields
 
-        private readonly string errorText;
-        private readonly string stackTrace;
+        private readonly string _errorText;
+        
+        private readonly string _stackTrace;
 
         #endregion
 
@@ -22,10 +19,15 @@ namespace LogExpert.Dialogs
         public ExceptionWindow(string errorText, string stackTrace)
         {
             InitializeComponent();
-            this.errorText = errorText;
-            this.stackTrace = stackTrace;
-            this.stackTraceTextBox.Text = this.errorText + "\n\n" + this.stackTrace;
-            this.stackTraceTextBox.Select(0, 0);
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            _errorText = errorText;
+            _stackTrace = stackTrace;
+            
+            stackTraceTextBox.Text = _errorText + @"\n\n" + _stackTrace;
+            stackTraceTextBox.Select(0, 0);
         }
 
         #endregion
@@ -34,7 +36,7 @@ namespace LogExpert.Dialogs
 
         private void CopyToClipboard()
         {
-            Clipboard.SetText(this.errorText + "\n\n" + this.stackTrace);
+            Clipboard.SetText(_errorText + @"\n\n" + _stackTrace);
         }
 
         #endregion

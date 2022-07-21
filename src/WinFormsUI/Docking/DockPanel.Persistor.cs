@@ -270,6 +270,7 @@ namespace WeifenLuo.WinFormsUI.Docking
             {
                 if (dockPanel.Contents.Count != 0)
                 {
+                    //TODO this happens if a session is loaded and the dialog is just closed, this needs to be adressed
                     throw new InvalidOperationException(Strings.DockPanel_LoadFromXml_AlreadyInitialized);
                 }
 

@@ -29,6 +29,9 @@ namespace LogExpert.Dialogs
         public BookmarkWindow()
         {
             InitializeComponent();
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
             bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
         }

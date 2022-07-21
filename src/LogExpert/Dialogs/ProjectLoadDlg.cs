@@ -27,6 +27,9 @@ namespace LogExpert.Dialogs
         public ProjectLoadDlg()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
@@ -39,21 +42,21 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void closeTabsButton_Click(object sender, EventArgs e)
+        private void OnButtonCloseTabsClick(object sender, EventArgs e)
         {
-            this.ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
+            ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
             Close();
         }
 
-        private void newWindowButton_Click(object sender, EventArgs e)
+        private void OnButtonNewWindowClick(object sender, EventArgs e)
         {
-            this.ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
+            ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
             Close();
         }
 
-        private void ignoreButton_Click(object sender, EventArgs e)
+        private void OnButtonIgnoreClick(object sender, EventArgs e)
         {
-            this.ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
+            ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
             Close();
         }
 

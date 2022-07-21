@@ -73,13 +73,17 @@ namespace LogExpert.Controls.LogTabWindow
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             _startupFileNames = fileNames;
-            this._instanceNumber = instanceNumber;
-            this._showInstanceNumbers = showInstanceNumbers;
+            _instanceNumber = instanceNumber;
+            _showInstanceNumbers = showInstanceNumbers;
 
             Load += OnLogTabWindowLoad;
 
-            ConfigManager.Instance.ConfigChanged += ConfigChanged;
+            ConfigManager.Instance.ConfigChanged += OnConfigChanged;
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
             Rectangle led = new Rectangle(0, 0, 8, 2);

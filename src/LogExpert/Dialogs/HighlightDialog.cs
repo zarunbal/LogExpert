@@ -32,6 +32,10 @@ namespace LogExpert.Dialogs
         public HighlightDialog()
         {
             InitializeComponent();
+            
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             Load += OnHighlightDialogLoad;
             listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
             _applyButtonImage = buttonApply.Image;
@@ -497,6 +501,7 @@ namespace LogExpert.Dialogs
         private void OnPluginButtonClick(object sender, EventArgs e)
         {
             KeywordActionDlg dlg = new KeywordActionDlg(_currentActionEntry, KeywordActionList);
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 _currentActionEntry = dlg.ActionEntry;
