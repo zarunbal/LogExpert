@@ -22,8 +22,7 @@ namespace LogExpert.Classes.Bookmark
             foreach (Entities.Bookmark bookmark in bookmarkList.Values)
             {
                 string line = logfileName + ";" + bookmark.LineNum + ";" +
-                              bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",
-                                  replacementForNewLine);
+                              bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",                                  replacementForNewLine);
                 writer.WriteLine(line);
             }
             writer.Close();

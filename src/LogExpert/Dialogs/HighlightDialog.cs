@@ -501,6 +501,7 @@ namespace LogExpert.Dialogs
         private void OnPluginButtonClick(object sender, EventArgs e)
         {
             KeywordActionDlg dlg = new KeywordActionDlg(_currentActionEntry, KeywordActionList);
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 _currentActionEntry = dlg.ActionEntry;
