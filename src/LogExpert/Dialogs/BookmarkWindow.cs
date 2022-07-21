@@ -30,7 +30,7 @@ namespace LogExpert.Dialogs
         {
             InitializeComponent();
             AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Inherit;
+            AutoScaleMode = AutoScaleMode.Dpi;
 
             bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
             bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
