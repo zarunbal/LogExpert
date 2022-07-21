@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using LogExpert.Config;
 
@@ -21,12 +22,17 @@ namespace LogExpert.Dialogs
             SelectedColumnizer = currentColumnizer;
             _callback = callback;
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             filterComboBox.SelectedIndexChanged += OnFilterComboBoxSelectedIndexChanged;
 
             // for the currently selected columnizer use the current instance and not the template instance from
             // columnizer registry. This ensures that changes made in columnizer config dialogs
             // will apply to the current instance
             _columnizerList = new List<ILogLineColumnizer>();
+            
             foreach (ILogLineColumnizer col in existingColumnizerList)
             {
                 _columnizerList.Add(col.GetType() == SelectedColumnizer.GetType() ? SelectedColumnizer : col);

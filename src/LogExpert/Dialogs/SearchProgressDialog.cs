@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -19,7 +15,11 @@ namespace LogExpert.Dialogs
         public SearchProgressDialog()
         {
             InitializeComponent();
-            this.ShouldStop = false;
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            ShouldStop = false;
         }
 
         #endregion
@@ -32,9 +32,9 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void OnButtonCancelClick(object sender, EventArgs e)
         {
-            this.ShouldStop = true;
+            ShouldStop = true;
         }
 
         #endregion

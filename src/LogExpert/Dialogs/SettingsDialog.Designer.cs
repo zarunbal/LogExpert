@@ -359,7 +359,7 @@
             this.checkBoxColumnSize.TabIndex = 5;
             this.checkBoxColumnSize.Text = "Set last column width";
             this.checkBoxColumnSize.UseVisualStyleBackColor = true;
-            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.columnSizeCheckBox_CheckedChanged);
+            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.OnCheckBoxColumnSizeCheckedChanged);
             // 
             // buttonTailColor
             // 
@@ -497,7 +497,7 @@
             this.buttonChangeFont.TabIndex = 1;
             this.buttonChangeFont.Text = "Change...";
             this.buttonChangeFont.UseVisualStyleBackColor = true;
-            this.buttonChangeFont.Click += new System.EventHandler(this.changeFontButton_Click);
+            this.buttonChangeFont.Click += new System.EventHandler(this.OnButtonChangeFontClick);
             // 
             // labelFont
             // 
@@ -594,7 +594,7 @@
             this.buttonTimespreadColor.TabIndex = 7;
             this.buttonTimespreadColor.Text = "Color...";
             this.buttonTimespreadColor.UseVisualStyleBackColor = true;
-            this.buttonTimespreadColor.Click += new System.EventHandler(this.timespreadColorButton_Click);
+            this.buttonTimespreadColor.Click += new System.EventHandler(this.OnButtonTimespreadColorClick);
             // 
             // checkBoxTimeSpread
             // 
@@ -718,7 +718,7 @@
             this.buttonToolDelete.TabIndex = 2;
             this.buttonToolDelete.Text = "Remove";
             this.buttonToolDelete.UseVisualStyleBackColor = true;
-            this.buttonToolDelete.Click += new System.EventHandler(this.toolDeleteButton_Click);
+            this.buttonToolDelete.Click += new System.EventHandler(this.OnButtonToolDeleteClick);
             // 
             // buttonToolAdd
             // 
@@ -729,7 +729,7 @@
             this.buttonToolAdd.TabIndex = 1;
             this.buttonToolAdd.Text = "Add new";
             this.buttonToolAdd.UseVisualStyleBackColor = true;
-            this.buttonToolAdd.Click += new System.EventHandler(this.toolAddButton_Click);
+            this.buttonToolAdd.Click += new System.EventHandler(this.OnButtonToolAddClick);
             // 
             // buttonToolDown
             // 
@@ -740,7 +740,7 @@
             this.buttonToolDown.TabIndex = 4;
             this.buttonToolDown.Text = "Down";
             this.buttonToolDown.UseVisualStyleBackColor = true;
-            this.buttonToolDown.Click += new System.EventHandler(this.toolDownButton_Click);
+            this.buttonToolDown.Click += new System.EventHandler(this.OnButtonToolDownClick);
             // 
             // buttonToolUp
             // 
@@ -751,7 +751,7 @@
             this.buttonToolUp.TabIndex = 3;
             this.buttonToolUp.Text = "Up";
             this.buttonToolUp.UseVisualStyleBackColor = true;
-            this.buttonToolUp.Click += new System.EventHandler(this.toolUpButton_Click);
+            this.buttonToolUp.Click += new System.EventHandler(this.OnButtonToolUpClick);
             // 
             // listBoxTools
             // 
@@ -761,7 +761,7 @@
             this.listBoxTools.Name = "listBoxTools";
             this.listBoxTools.Size = new System.Drawing.Size(406, 165);
             this.listBoxTools.TabIndex = 0;
-            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.toolListBox_SelectedIndexChanged);
+            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.OnListBoxToolsSelectedIndexChanged);
             // 
             // groupBoxToolSettings
             // 
@@ -829,7 +829,7 @@
             this.buttonIcon.Text = "   Icon...";
             this.buttonIcon.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonIcon.UseVisualStyleBackColor = true;
-            this.buttonIcon.Click += new System.EventHandler(this.iconButton_Click);
+            this.buttonIcon.Click += new System.EventHandler(this.OnButtonIconClick);
             // 
             // labelToolName
             // 
@@ -878,7 +878,7 @@
             this.checkBoxSysout.TabIndex = 6;
             this.checkBoxSysout.Text = "Pipe sysout to tab";
             this.checkBoxSysout.UseVisualStyleBackColor = true;
-            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.sysoutCheckBoxA_CheckedChanged);
+            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.OnCheckBoxSysoutCheckedChanged);
             // 
             // buttonArguments
             // 
@@ -889,7 +889,7 @@
             this.buttonArguments.TabIndex = 5;
             this.buttonArguments.Text = "...";
             this.buttonArguments.UseVisualStyleBackColor = true;
-            this.buttonArguments.Click += new System.EventHandler(this.argButtonA_Click);
+            this.buttonArguments.Click += new System.EventHandler(this.OnButtonArgumentsClick);
             // 
             // labelTool
             // 
@@ -910,7 +910,7 @@
             this.buttonTool.TabIndex = 3;
             this.buttonTool.Text = "...";
             this.buttonTool.UseVisualStyleBackColor = true;
-            this.buttonTool.Click += new System.EventHandler(this.toolButtonA_Click);
+            this.buttonTool.Click += new System.EventHandler(this.OnButtonToolClick);
             // 
             // textBoxTool
             // 
@@ -986,7 +986,7 @@
             this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.deleteButton_Click);
+            this.buttonDelete.Click += new System.EventHandler(this.OnButtonDeleteClick);
             // 
             // dataGridViewColumnizer
             // 
@@ -1005,7 +1005,7 @@
             this.dataGridViewColumnizer.RowHeadersWidth = 62;
             this.dataGridViewColumnizer.Size = new System.Drawing.Size(934, 365);
             this.dataGridViewColumnizer.TabIndex = 2;
-            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.columnizerDataGridView_RowsAdded);
+            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.OnDataGridViewColumnizerRowsAdded);
             // 
             // columnFileMask
             // 
@@ -1247,7 +1247,7 @@
             this.listBoxPlugin.Size = new System.Drawing.Size(322, 344);
             this.listBoxPlugin.TabIndex = 0;
             this.listBoxPlugin.ValueMember = "Text";
-            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.pluginListBox_SelectedIndexChanged);
+            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.OnListBoxPluginSelectedIndexChanged);
             // 
             // groupBoxSettings
             // 
@@ -1286,7 +1286,7 @@
             this.buttonConfigPlugin.TabIndex = 0;
             this.buttonConfigPlugin.Text = "Configure...";
             this.buttonConfigPlugin.UseVisualStyleBackColor = true;
-            this.buttonConfigPlugin.Click += new System.EventHandler(this.configPluginButton_Click);
+            this.buttonConfigPlugin.Click += new System.EventHandler(this.OnButtonConfigPluginClick);
             // 
             // tabPageSessions
             // 
@@ -1363,7 +1363,7 @@
             this.buttonSessionSaveDir.TabIndex = 3;
             this.buttonSessionSaveDir.Text = "...";
             this.buttonSessionSaveDir.UseVisualStyleBackColor = true;
-            this.buttonSessionSaveDir.Click += new System.EventHandler(this.sessionSaveDirButton_Click);
+            this.buttonSessionSaveDir.Click += new System.EventHandler(this.OnButtonSessionSaveDirClick);
             // 
             // radioButtonSessionSaveOwn
             // 
@@ -1567,7 +1567,7 @@
             0,
             0,
             0});
-            this.upDownLinesPerBlock.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.upDownLinesPerBlock.ValueChanged += new System.EventHandler(this.OnUpDownLinesPerBlockValueChanged);
             // 
             // upDownBlockCount
             // 
@@ -1687,7 +1687,7 @@
             this.helpProvider.SetShowHelp(this, true);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
-            this.Load += new System.EventHandler(this.SettingsDialog_Load);
+            this.Load += new System.EventHandler(this.OnSettingsDialogLoad);
             this.tabControlSettings.ResumeLayout(false);
             this.tabPageViewSettings.ResumeLayout(false);
             this.tabPageViewSettings.PerformLayout();

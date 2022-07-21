@@ -28,64 +28,75 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.tabNameTextBox = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
-      this.okButton = new System.Windows.Forms.Button();
-      this.SuspendLayout();
-      // 
-      // tabNameTextBox
-      // 
-      this.tabNameTextBox.Location = new System.Drawing.Point(12, 34);
-      this.tabNameTextBox.Name = "tabNameTextBox";
-      this.tabNameTextBox.Size = new System.Drawing.Size(193, 20);
-      this.tabNameTextBox.TabIndex = 0;
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(13, 15);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(38, 13);
-      this.label1.TabIndex = 1;
-      this.label1.Text = "Name:";
-      // 
-      // okButton
-      // 
-      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(130, 73);
-      this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 2;
-      this.okButton.Text = "OK";
-      this.okButton.UseVisualStyleBackColor = true;
-      // 
-      // TabRenameDlg
-      // 
-      this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(219, 108);
-      this.Controls.Add(this.okButton);
-      this.Controls.Add(this.label1);
-      this.Controls.Add(this.tabNameTextBox);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-      this.KeyPreview = true;
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
-      this.Name = "TabRenameDlg";
-      this.ShowIcon = false;
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-      this.Text = "Rename Tab";
-      this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TabRenameDlg_KeyDown);
-      this.ResumeLayout(false);
-      this.PerformLayout();
+            this.textBoxTabName = new System.Windows.Forms.TextBox();
+            this.labelName = new System.Windows.Forms.Label();
+            this.buttonOk = new System.Windows.Forms.Button();
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // textBoxTabName
+            // 
+            this.textBoxTabName.Location = new System.Drawing.Point(12, 34);
+            this.textBoxTabName.Name = "textBoxTabName";
+            this.textBoxTabName.Size = new System.Drawing.Size(193, 26);
+            this.textBoxTabName.TabIndex = 0;
+            // 
+            // labelName
+            // 
+            this.labelName.AutoSize = true;
+            this.labelName.Location = new System.Drawing.Point(13, 11);
+            this.labelName.Name = "labelName";
+            this.labelName.Size = new System.Drawing.Size(55, 20);
+            this.labelName.TabIndex = 1;
+            this.labelName.Text = "Name:";
+            // 
+            // buttonOk
+            // 
+            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonOk.Location = new System.Drawing.Point(49, 73);
+            this.buttonOk.Name = "buttonOk";
+            this.buttonOk.Size = new System.Drawing.Size(75, 23);
+            this.buttonOk.TabIndex = 2;
+            this.buttonOk.Text = "OK";
+            this.buttonOk.UseVisualStyleBackColor = true;
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttonCancel.Location = new System.Drawing.Point(130, 73);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonCancel.TabIndex = 3;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            // 
+            // TabRenameDlg
+            // 
+            this.AcceptButton = this.buttonOk;
+            this.ClientSize = new System.Drawing.Size(219, 108);
+            this.Controls.Add(this.buttonCancel);
+            this.Controls.Add(this.buttonOk);
+            this.Controls.Add(this.labelName);
+            this.Controls.Add(this.textBoxTabName);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.KeyPreview = true;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "TabRenameDlg";
+            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Rename Tab";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTabRenameDlgKeyDown);
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.TextBox tabNameTextBox;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.Button okButton;
-  }
+    private System.Windows.Forms.TextBox textBoxTabName;
+    private System.Windows.Forms.Label labelName;
+    private System.Windows.Forms.Button buttonOk;
+        private System.Windows.Forms.Button buttonCancel;
+    }
 }

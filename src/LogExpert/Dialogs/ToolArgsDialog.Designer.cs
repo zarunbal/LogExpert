@@ -28,126 +28,124 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.okButton = new System.Windows.Forms.Button();
-      this.regexHelpButton = new System.Windows.Forms.Button();
-      this.argsTextBox = new System.Windows.Forms.TextBox();
-      this.testButton = new System.Windows.Forms.Button();
-      this.label1 = new System.Windows.Forms.Label();
-      this.helpLabel = new System.Windows.Forms.Label();
-      this.button2 = new System.Windows.Forms.Button();
-      this.testResultLabel = new System.Windows.Forms.TextBox();
-      this.SuspendLayout();
-      // 
-      // okButton
-      // 
-      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(429, 292);
-      this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 1;
-      this.okButton.Text = "OK";
-      this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.button1_Click);
-      // 
-      // regexHelpButton
-      // 
-      this.regexHelpButton.Location = new System.Drawing.Point(429, 59);
-      this.regexHelpButton.Name = "regexHelpButton";
-      this.regexHelpButton.Size = new System.Drawing.Size(75, 21);
-      this.regexHelpButton.TabIndex = 2;
-      this.regexHelpButton.Text = "RegEx Help";
-      this.regexHelpButton.UseVisualStyleBackColor = true;
-      this.regexHelpButton.Click += new System.EventHandler(this.regexHelpButton_Click);
-      // 
-      // argsTextBox
-      // 
-      this.argsTextBox.Location = new System.Drawing.Point(12, 30);
-      this.argsTextBox.Name = "argsTextBox";
-      this.argsTextBox.Size = new System.Drawing.Size(395, 20);
-      this.argsTextBox.TabIndex = 8;
-      // 
-      // testButton
-      // 
-      this.testButton.Location = new System.Drawing.Point(429, 30);
-      this.testButton.Name = "testButton";
-      this.testButton.Size = new System.Drawing.Size(75, 23);
-      this.testButton.TabIndex = 9;
-      this.testButton.Text = "Test";
-      this.testButton.UseVisualStyleBackColor = true;
-      this.testButton.Click += new System.EventHandler(this.testButton_Click);
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(12, 13);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(103, 13);
-      this.label1.TabIndex = 11;
-      this.label1.Text = "Enter command line:";
-      // 
-      // helpLabel
-      // 
-      this.helpLabel.Location = new System.Drawing.Point(15, 113);
-      this.helpLabel.Name = "helpLabel";
-      this.helpLabel.Size = new System.Drawing.Size(392, 157);
-      this.helpLabel.TabIndex = 12;
-      this.helpLabel.Text = "label2";
-      // 
-      // button2
-      // 
-      this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.button2.Location = new System.Drawing.Point(429, 261);
-      this.button2.Name = "button2";
-      this.button2.Size = new System.Drawing.Size(75, 23);
-      this.button2.TabIndex = 13;
-      this.button2.Text = "Cancel";
-      this.button2.UseVisualStyleBackColor = true;
-      // 
-      // testResultLabel
-      // 
-      this.testResultLabel.Location = new System.Drawing.Point(12, 56);
-      this.testResultLabel.Multiline = true;
-      this.testResultLabel.Name = "testResultLabel";
-      this.testResultLabel.ReadOnly = true;
-      this.testResultLabel.Size = new System.Drawing.Size(395, 48);
-      this.testResultLabel.TabIndex = 14;
-      // 
-      // ToolArgsDialog
-      // 
-      this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.CancelButton = this.button2;
-      this.ClientSize = new System.Drawing.Size(516, 327);
-      this.Controls.Add(this.testResultLabel);
-      this.Controls.Add(this.button2);
-      this.Controls.Add(this.helpLabel);
-      this.Controls.Add(this.label1);
-      this.Controls.Add(this.testButton);
-      this.Controls.Add(this.argsTextBox);
-      this.Controls.Add(this.regexHelpButton);
-      this.Controls.Add(this.okButton);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
-      this.Name = "ToolArgsDialog";
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-      this.Text = "Tool Arguments Help";
-      this.Load += new System.EventHandler(this.ToolArgsDialog_Load);
-      this.ResumeLayout(false);
-      this.PerformLayout();
+            this.buttonOk = new System.Windows.Forms.Button();
+            this.buttonRegexHelp = new System.Windows.Forms.Button();
+            this.textBoxArguments = new System.Windows.Forms.TextBox();
+            this.buttonTest = new System.Windows.Forms.Button();
+            this.labelEnterArguments = new System.Windows.Forms.Label();
+            this.labelHelp = new System.Windows.Forms.Label();
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.labelTestResult = new System.Windows.Forms.TextBox();
+            this.SuspendLayout();
+            // 
+            // buttonOk
+            // 
+            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonOk.Location = new System.Drawing.Point(348, 292);
+            this.buttonOk.Name = "buttonOk";
+            this.buttonOk.Size = new System.Drawing.Size(75, 23);
+            this.buttonOk.TabIndex = 1;
+            this.buttonOk.Text = "OK";
+            this.buttonOk.UseVisualStyleBackColor = true;
+            this.buttonOk.Click += new System.EventHandler(this.OnButtonOkClick);
+            // 
+            // buttonRegexHelp
+            // 
+            this.buttonRegexHelp.Location = new System.Drawing.Point(429, 59);
+            this.buttonRegexHelp.Name = "buttonRegexHelp";
+            this.buttonRegexHelp.Size = new System.Drawing.Size(75, 21);
+            this.buttonRegexHelp.TabIndex = 2;
+            this.buttonRegexHelp.Text = "RegEx Help";
+            this.buttonRegexHelp.UseVisualStyleBackColor = true;
+            this.buttonRegexHelp.Click += new System.EventHandler(this.OnButtonRegexHelpClick);
+            // 
+            // textBoxArguments
+            // 
+            this.textBoxArguments.Location = new System.Drawing.Point(12, 36);
+            this.textBoxArguments.Name = "textBoxArguments";
+            this.textBoxArguments.Size = new System.Drawing.Size(395, 26);
+            this.textBoxArguments.TabIndex = 8;
+            // 
+            // buttonTest
+            // 
+            this.buttonTest.Location = new System.Drawing.Point(429, 30);
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(75, 23);
+            this.buttonTest.TabIndex = 9;
+            this.buttonTest.Text = "Test";
+            this.buttonTest.UseVisualStyleBackColor = true;
+            this.buttonTest.Click += new System.EventHandler(this.OnButtonTestClick);
+            // 
+            // labelEnterArguments
+            // 
+            this.labelEnterArguments.AutoSize = true;
+            this.labelEnterArguments.Location = new System.Drawing.Point(12, 13);
+            this.labelEnterArguments.Name = "labelEnterArguments";
+            this.labelEnterArguments.Size = new System.Drawing.Size(154, 20);
+            this.labelEnterArguments.TabIndex = 11;
+            this.labelEnterArguments.Text = "Enter command line:";
+            // 
+            // labelHelp
+            // 
+            this.labelHelp.Location = new System.Drawing.Point(15, 124);
+            this.labelHelp.Name = "labelHelp";
+            this.labelHelp.Size = new System.Drawing.Size(392, 157);
+            this.labelHelp.TabIndex = 12;
+            this.labelHelp.Text = "Help";
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttonCancel.Location = new System.Drawing.Point(429, 292);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonCancel.TabIndex = 13;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            // 
+            // labelTestResult
+            // 
+            this.labelTestResult.Location = new System.Drawing.Point(12, 68);
+            this.labelTestResult.Multiline = true;
+            this.labelTestResult.Name = "labelTestResult";
+            this.labelTestResult.ReadOnly = true;
+            this.labelTestResult.Size = new System.Drawing.Size(395, 48);
+            this.labelTestResult.TabIndex = 14;
+            // 
+            // ToolArgsDialog
+            // 
+            this.AcceptButton = this.buttonOk;
+            this.CancelButton = this.buttonCancel;
+            this.ClientSize = new System.Drawing.Size(516, 327);
+            this.Controls.Add(this.labelTestResult);
+            this.Controls.Add(this.buttonCancel);
+            this.Controls.Add(this.labelHelp);
+            this.Controls.Add(this.labelEnterArguments);
+            this.Controls.Add(this.buttonTest);
+            this.Controls.Add(this.textBoxArguments);
+            this.Controls.Add(this.buttonRegexHelp);
+            this.Controls.Add(this.buttonOk);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "ToolArgsDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Tool Arguments Help";
+            this.Load += new System.EventHandler(this.OnToolArgsDialogLoad);
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Button regexHelpButton;
-    private System.Windows.Forms.TextBox argsTextBox;
-    private System.Windows.Forms.Button testButton;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.Label helpLabel;
-    private System.Windows.Forms.Button button2;
-    private System.Windows.Forms.TextBox testResultLabel;
+    private System.Windows.Forms.Button buttonOk;
+    private System.Windows.Forms.Button buttonRegexHelp;
+    private System.Windows.Forms.TextBox textBoxArguments;
+    private System.Windows.Forms.Button buttonTest;
+    private System.Windows.Forms.Label labelEnterArguments;
+    private System.Windows.Forms.Label labelHelp;
+    private System.Windows.Forms.Button buttonCancel;
+    private System.Windows.Forms.TextBox labelTestResult;
   }
 }

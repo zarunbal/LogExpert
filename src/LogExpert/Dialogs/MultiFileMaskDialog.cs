@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using System.IO;
 
 namespace LogExpert.Dialogs
 {
@@ -20,7 +15,14 @@ namespace LogExpert.Dialogs
         public MultiFileMaskDialog(Form parent, string fileName)
         {
             InitializeComponent();
-            this.syntaxHelpLabel.Text = "" +
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            syntaxHelpLabel.Text = "" +
                                         "Pattern syntax:\n\n" +
                                         "* = any characters (wildcard)\n" +
                                         "$D(<date>) = Date pattern\n" +
@@ -32,9 +34,8 @@ namespace LogExpert.Dialogs
                                         "DD = day\n" +
                                         "MM = month\n" +
                                         "YY[YY] = year\n" +
-                                        "all other chars will be used as given"
-                ;
-            this.fileNameLabel.Text = fileName;
+                                        "all other chars will be used as given";
+            labelFileName.Text = fileName;
         }
 
         #endregion
@@ -49,16 +50,16 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void buttonOK_Click(object sender, EventArgs e)
+        private void OnButtonOKClick(object sender, EventArgs e)
         {
-            this.FileNamePattern = this.fileNamePatternTextBox.Text;
-            this.MaxDays = (int) this.maxDaysUpDown.Value;
+            FileNamePattern = fileNamePatternTextBox.Text;
+            MaxDays = (int) upDownMaxDays.Value;
         }
 
-        private void MultiFileMaskDialog_Load(object sender, EventArgs e)
+        private void OnMultiFileMaskDialogLoad(object sender, EventArgs e)
         {
-            this.fileNamePatternTextBox.Text = this.FileNamePattern;
-            this.maxDaysUpDown.Value = this.MaxDays;
+            fileNamePatternTextBox.Text = FileNamePattern;
+            upDownMaxDays.Value = MaxDays;
         }
 
         #endregion
