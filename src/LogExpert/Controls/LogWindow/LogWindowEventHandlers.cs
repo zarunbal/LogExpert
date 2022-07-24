@@ -901,7 +901,7 @@ namespace LogExpert.Controls.LogWindow
             CheckForFilterDirty();
         }
 
-        private void OncolumnButtonClick(object sender, EventArgs e)
+        private void OnColumnButtonClick(object sender, EventArgs e)
         {
             _filterParams.currentColumnizer = _currentColumnizer;
             FilterColumnChooser chooser = new FilterColumnChooser(_filterParams);
@@ -1497,5 +1497,10 @@ namespace LogExpert.Controls.LogWindow
         #endregion
 
         #endregion
+        
+        private void MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            e.ItemHeight = filterListBox.Font.Height;
+        }
     }
 }

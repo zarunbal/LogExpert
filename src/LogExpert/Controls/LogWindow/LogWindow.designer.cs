@@ -74,6 +74,7 @@ namespace LogExpert.Controls.LogWindow
             this.lblForeSpread = new System.Windows.Forms.Label();
             this.filterKnobForeSpread = new LogExpert.Controls.KnobControl();
             this.btnFilterToTab = new System.Windows.Forms.Button();
+            this.panelBackgroundAdvancedFilterSplitContainer = new System.Windows.Forms.Panel();
             this.btnToggleHighlightPanel = new System.Windows.Forms.Button();
             this.highlightSplitContainer = new System.Windows.Forms.SplitContainer();
             this.filterGridView = new LogExpert.Dialogs.BufferedDataGridView();
@@ -93,8 +94,8 @@ namespace LogExpert.Controls.LogWindow
             this.colorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlFilterInput = new System.Windows.Forms.Panel();
             this.filterSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.lblTextFilter = new System.Windows.Forms.Label();
             this.filterComboBox = new System.Windows.Forms.ComboBox();
+            this.lblTextFilter = new System.Windows.Forms.Label();
             this.advancedButton = new System.Windows.Forms.Button();
             this.syncFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.lblFilterCount = new System.Windows.Forms.Label();
@@ -136,6 +137,7 @@ namespace LogExpert.Controls.LogWindow
             this.advancedFilterSplitContainer.Panel2.SuspendLayout();
             this.advancedFilterSplitContainer.SuspendLayout();
             this.pnlProFilter.SuspendLayout();
+            this.panelBackgroundAdvancedFilterSplitContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.highlightSplitContainer)).BeginInit();
             this.highlightSplitContainer.Panel1.SuspendLayout();
             this.highlightSplitContainer.Panel2.SuspendLayout();
@@ -211,7 +213,7 @@ namespace LogExpert.Controls.LogWindow
             // columnComboBox
             // 
             this.columnComboBox.FormattingEnabled = true;
-            this.columnComboBox.Location = new System.Drawing.Point(88, 1);
+            this.columnComboBox.Location = new System.Drawing.Point(125, 1);
             this.columnComboBox.MaxDropDownItems = 15;
             this.columnComboBox.Name = "columnComboBox";
             this.columnComboBox.Size = new System.Drawing.Size(181, 28);
@@ -467,8 +469,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             // advancedFilterSplitContainer.Panel2
             // 
-            this.advancedFilterSplitContainer.Panel2.Controls.Add(this.btnToggleHighlightPanel);
-            this.advancedFilterSplitContainer.Panel2.Controls.Add(this.highlightSplitContainer);
+            this.advancedFilterSplitContainer.Panel2.Controls.Add(this.panelBackgroundAdvancedFilterSplitContainer);
             this.advancedFilterSplitContainer.Panel2MinSize = 50;
             this.advancedFilterSplitContainer.Size = new System.Drawing.Size(1138, 471);
             this.advancedFilterSplitContainer.SplitterDistance = 105;
@@ -509,7 +510,7 @@ namespace LogExpert.Controls.LogWindow
             this.columnButton.Text = "Columns...";
             this.helpToolTip.SetToolTip(this.columnButton, "Choose columns for \'Column restrict\'");
             this.columnButton.UseVisualStyleBackColor = true;
-            this.columnButton.Click += new System.EventHandler(this.OncolumnButtonClick);
+            this.columnButton.Click += new System.EventHandler(this.OnColumnButtonClick);
             // 
             // columnRestrictCheckBox
             // 
@@ -658,6 +659,16 @@ namespace LogExpert.Controls.LogWindow
             this.btnFilterToTab.UseVisualStyleBackColor = true;
             this.btnFilterToTab.Click += new System.EventHandler(this.OnFilterToTabButtonClick);
             // 
+            // panelBackgroundAdvancedFilterSplitContainer
+            // 
+            this.panelBackgroundAdvancedFilterSplitContainer.Controls.Add(this.btnToggleHighlightPanel);
+            this.panelBackgroundAdvancedFilterSplitContainer.Controls.Add(this.highlightSplitContainer);
+            this.panelBackgroundAdvancedFilterSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelBackgroundAdvancedFilterSplitContainer.Location = new System.Drawing.Point(0, 0);
+            this.panelBackgroundAdvancedFilterSplitContainer.Name = "panelBackgroundAdvancedFilterSplitContainer";
+            this.panelBackgroundAdvancedFilterSplitContainer.Size = new System.Drawing.Size(1138, 364);
+            this.panelBackgroundAdvancedFilterSplitContainer.TabIndex = 7;
+            // 
             // btnToggleHighlightPanel
             // 
             this.btnToggleHighlightPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -678,7 +689,7 @@ namespace LogExpert.Controls.LogWindow
             this.highlightSplitContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.highlightSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.highlightSplitContainer.IsSplitterFixed = true;
-            this.highlightSplitContainer.Location = new System.Drawing.Point(0, 0);
+            this.highlightSplitContainer.Location = new System.Drawing.Point(0, 3);
             this.highlightSplitContainer.Name = "highlightSplitContainer";
             // 
             // highlightSplitContainer.Panel1
@@ -689,7 +700,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.highlightSplitContainer.Panel2.Controls.Add(this.highlightSplitContainerBackPanel);
             this.highlightSplitContainer.Panel2MinSize = 30;
-            this.highlightSplitContainer.Size = new System.Drawing.Size(1112, 454);
+            this.highlightSplitContainer.Size = new System.Drawing.Size(1112, 361);
             this.highlightSplitContainer.SplitterDistance = 743;
             this.highlightSplitContainer.TabIndex = 2;
             // 
@@ -723,7 +734,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterGridView.ShowCellToolTips = false;
             this.filterGridView.ShowEditingIcon = false;
             this.filterGridView.ShowRowErrors = false;
-            this.filterGridView.Size = new System.Drawing.Size(741, 452);
+            this.filterGridView.Size = new System.Drawing.Size(741, 359);
             this.filterGridView.TabIndex = 1;
             this.filterGridView.VirtualMode = true;
             this.filterGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.OnFilterGridViewCellContextMenuStripNeeded);
@@ -779,7 +790,7 @@ namespace LogExpert.Controls.LogWindow
             this.highlightSplitContainerBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.highlightSplitContainerBackPanel.Location = new System.Drawing.Point(0, 0);
             this.highlightSplitContainerBackPanel.Name = "highlightSplitContainerBackPanel";
-            this.highlightSplitContainerBackPanel.Size = new System.Drawing.Size(363, 452);
+            this.highlightSplitContainerBackPanel.Size = new System.Drawing.Size(363, 359);
             this.highlightSplitContainerBackPanel.TabIndex = 1;
             // 
             // hideFilterListOnLoadCheckBox
@@ -858,11 +869,13 @@ namespace LogExpert.Controls.LogWindow
             | System.Windows.Forms.AnchorStyles.Right)));
             this.filterListBox.ContextMenuStrip = this.filterListContextMenuStrip;
             this.filterListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.filterListBox.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.filterListBox.FormattingEnabled = true;
             this.filterListBox.IntegralHeight = false;
+            this.filterListBox.ItemHeight = 25;
             this.filterListBox.Location = new System.Drawing.Point(3, 3);
             this.filterListBox.Name = "filterListBox";
-            this.filterListBox.Size = new System.Drawing.Size(278, 411);
+            this.filterListBox.Size = new System.Drawing.Size(278, 353);
             this.filterListBox.TabIndex = 0;
             this.helpToolTip.SetToolTip(this.filterListBox, "Doubleclick to load a saved filter");
             this.filterListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnFilterListBoxDrawItem);
@@ -923,28 +936,28 @@ namespace LogExpert.Controls.LogWindow
             this.filterSplitContainer.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnFilterSplitContainerMouseMove);
             this.filterSplitContainer.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnFilterSplitContainerMouseUp);
             // 
-            // lblTextFilter
-            // 
-            this.lblTextFilter.AutoSize = true;
-            this.lblTextFilter.Location = new System.Drawing.Point(5, 9);
-            this.lblTextFilter.Name = "lblTextFilter";
-            this.lblTextFilter.Size = new System.Drawing.Size(84, 20);
-            this.lblTextFilter.TabIndex = 3;
-            this.lblTextFilter.Text = "Text &filter:";
-            // 
             // filterComboBox
             // 
             this.filterComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.filterComboBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.filterComboBox.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.filterComboBox.FormattingEnabled = true;
             this.filterComboBox.Location = new System.Drawing.Point(89, 5);
             this.filterComboBox.Name = "filterComboBox";
-            this.filterComboBox.Size = new System.Drawing.Size(226, 28);
+            this.filterComboBox.Size = new System.Drawing.Size(226, 35);
             this.filterComboBox.TabIndex = 4;
             this.helpToolTip.SetToolTip(this.filterComboBox, "Search string for the filter");
             this.filterComboBox.TextChanged += new System.EventHandler(this.OnFilterComboBoxTextChanged);
             this.filterComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnFilterComboBoxKeyDown);
+            // 
+            // lblTextFilter
+            // 
+            this.lblTextFilter.AutoSize = true;
+            this.lblTextFilter.Location = new System.Drawing.Point(5, 5);
+            this.lblTextFilter.Name = "lblTextFilter";
+            this.lblTextFilter.Size = new System.Drawing.Size(84, 20);
+            this.lblTextFilter.TabIndex = 3;
+            this.lblTextFilter.Text = "Text &filter:";
             // 
             // advancedButton
             // 
@@ -963,7 +976,7 @@ namespace LogExpert.Controls.LogWindow
             // syncFilterCheckBox
             // 
             this.syncFilterCheckBox.AutoSize = true;
-            this.syncFilterCheckBox.Location = new System.Drawing.Point(423, 7);
+            this.syncFilterCheckBox.Location = new System.Drawing.Point(423, 5);
             this.syncFilterCheckBox.Name = "syncFilterCheckBox";
             this.syncFilterCheckBox.Size = new System.Drawing.Size(72, 24);
             this.syncFilterCheckBox.TabIndex = 16;
@@ -987,7 +1000,7 @@ namespace LogExpert.Controls.LogWindow
             // filterTailCheckBox
             // 
             this.filterTailCheckBox.AutoSize = true;
-            this.filterTailCheckBox.Location = new System.Drawing.Point(323, 7);
+            this.filterTailCheckBox.Location = new System.Drawing.Point(323, 5);
             this.filterTailCheckBox.Name = "filterTailCheckBox";
             this.filterTailCheckBox.Size = new System.Drawing.Size(100, 24);
             this.filterTailCheckBox.TabIndex = 14;
@@ -998,7 +1011,7 @@ namespace LogExpert.Controls.LogWindow
             // filterRegexCheckBox
             // 
             this.filterRegexCheckBox.AutoSize = true;
-            this.filterRegexCheckBox.Location = new System.Drawing.Point(239, 7);
+            this.filterRegexCheckBox.Location = new System.Drawing.Point(239, 5);
             this.filterRegexCheckBox.Name = "filterRegexCheckBox";
             this.filterRegexCheckBox.Size = new System.Drawing.Size(82, 24);
             this.filterRegexCheckBox.TabIndex = 13;
@@ -1011,7 +1024,7 @@ namespace LogExpert.Controls.LogWindow
             // filterCaseSensitiveCheckBox
             // 
             this.filterCaseSensitiveCheckBox.AutoSize = true;
-            this.filterCaseSensitiveCheckBox.Location = new System.Drawing.Point(93, 7);
+            this.filterCaseSensitiveCheckBox.Location = new System.Drawing.Point(93, 5);
             this.filterCaseSensitiveCheckBox.Name = "filterCaseSensitiveCheckBox";
             this.filterCaseSensitiveCheckBox.Size = new System.Drawing.Size(145, 24);
             this.filterCaseSensitiveCheckBox.TabIndex = 12;
@@ -1217,6 +1230,7 @@ namespace LogExpert.Controls.LogWindow
             this.advancedFilterSplitContainer.ResumeLayout(false);
             this.pnlProFilter.ResumeLayout(false);
             this.pnlProFilter.PerformLayout();
+            this.panelBackgroundAdvancedFilterSplitContainer.ResumeLayout(false);
             this.highlightSplitContainer.Panel1.ResumeLayout(false);
             this.highlightSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.highlightSplitContainer)).EndInit();
@@ -1333,5 +1347,6 @@ namespace LogExpert.Controls.LogWindow
         private System.Windows.Forms.CheckBox filterRegexCheckBox;
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
         private System.Windows.Forms.Button filterSearchButton;
+        private System.Windows.Forms.Panel panelBackgroundAdvancedFilterSplitContainer;
     }
 }

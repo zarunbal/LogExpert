@@ -135,6 +135,8 @@ namespace LogExpert.Controls.LogWindow
 
             InitializeComponent();
 
+            CreateDefaultViewStyle();
+
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
 
@@ -153,6 +155,8 @@ namespace LogExpert.Controls.LogWindow
 
             filterGridView.CellValueNeeded += OnFilterGridViewCellValueNeeded;
             filterGridView.CellPainting += OnFilterGridViewCellPainting;
+            filterListBox.DrawMode = DrawMode.OwnerDrawVariable;
+            filterListBox.MeasureItem += MeasureItem;
 
             Closing += OnLogWindowClosing;
             Disposed += OnLogWindowDisposed;

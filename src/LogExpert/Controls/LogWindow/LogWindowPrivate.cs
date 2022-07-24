@@ -50,6 +50,30 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
+        private void CreateDefaultViewStyle()
+        {
+            DataGridViewCellStyle dataGridViewCellStyleMainGrid = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyleFilterGrid = new DataGridViewCellStyle();
+
+            dataGridViewCellStyleMainGrid.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyleMainGrid.BackColor = SystemColors.Window;
+            dataGridViewCellStyleMainGrid.Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyleMainGrid.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyleMainGrid.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyleMainGrid.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyleMainGrid.WrapMode = DataGridViewTriState.False;
+            dataGridView.DefaultCellStyle = dataGridViewCellStyleMainGrid;
+
+            dataGridViewCellStyleFilterGrid.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyleFilterGrid.BackColor = SystemColors.Window;
+            dataGridViewCellStyleFilterGrid.Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyleFilterGrid.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyleFilterGrid.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyleFilterGrid.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyleFilterGrid.WrapMode = DataGridViewTriState.False;
+            filterGridView.DefaultCellStyle = dataGridViewCellStyleFilterGrid;
+        }
+        
         private bool LoadPersistenceOptions()
         {
             if (InvokeRequired)
