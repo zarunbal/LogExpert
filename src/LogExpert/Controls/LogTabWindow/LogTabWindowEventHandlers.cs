@@ -815,8 +815,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void truncateFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LogWindow logWindow = dockPanel.ActiveContent as LogWindow;
-            File.WriteAllText(logWindow.Title, "");
+            CurrentLogWindow?.TryToTruncate();
         }
 
         private void OnExportBookmarksToolStripMenuItemClick(object sender, EventArgs e)

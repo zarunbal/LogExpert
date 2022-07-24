@@ -1230,7 +1230,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.truncateFileToolStripMenuItem.Name = "truncateFileToolStripMenuItem";
             this.truncateFileToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.truncateFileToolStripMenuItem.Text = "Truncate File";
-            this.truncateFileToolStripMenuItem.ToolTipText = "Truncates the file opened in tab";
+            this.truncateFileToolStripMenuItem.ToolTipText = "Try to truncate the file opened in tab";
             this.truncateFileToolStripMenuItem.Click += new System.EventHandler(this.truncateFileToolStripMenuItem_Click);
 
 
@@ -1375,7 +1375,7 @@ namespace LogExpert.Controls.LogTabWindow
         private ToolStripSeparator toolStripSeparator16;
         private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
         private ToolStripMenuItem findInExplorerToolStripMenuItem;
-	private ToolStripMenuItem truncateFileToolStripMenuItem;
+        private ToolStripMenuItem truncateFileToolStripMenuItem;
         private ToolStripMenuItem exportBookmarksToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator17;
         private ToolStripComboBox groupsComboBoxHighlightGroups;
