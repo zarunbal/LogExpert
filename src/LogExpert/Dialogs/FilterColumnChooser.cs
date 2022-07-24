@@ -23,6 +23,8 @@ namespace LogExpert.Dialogs
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
 
+            columnListBox.ItemHeight = columnListBox.Font.Height;
+
             _columnizer = filterParams.currentColumnizer;
             _filterParams = filterParams;
 
@@ -46,7 +48,7 @@ namespace LogExpert.Dialogs
             emptyColumnUsePrevRadioButton.Checked = _filterParams.emptyColumnUsePrev;
             emptyColumnHitRadioButton.Checked = _filterParams.emptyColumnHit;
             emptyColumnNoHitRadioButton.Checked = _filterParams.emptyColumnHit == false && _filterParams.emptyColumnUsePrev == false;
-            exactMatchCheckBox.Checked = _filterParams.exactColumnMatch;
+            checkBoxExactMatch.Checked = _filterParams.exactColumnMatch;
         }
 
         #endregion
@@ -62,7 +64,7 @@ namespace LogExpert.Dialogs
             }
             _filterParams.emptyColumnUsePrev = emptyColumnUsePrevRadioButton.Checked;
             _filterParams.emptyColumnHit = emptyColumnHitRadioButton.Checked;
-            _filterParams.exactColumnMatch = exactMatchCheckBox.Checked;
+            _filterParams.exactColumnMatch = checkBoxExactMatch.Checked;
         }
 
         #endregion
