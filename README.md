@@ -58,6 +58,9 @@ Please checkout the wiki for FAQ / HELP / Informations / Examples
 
 https://github.com/zarunbal/LogExpert/wiki
 
+# Discord Server
+https://discord.gg/SjxkuckRe9
+
 ## Credits
 ### Contributors
 
