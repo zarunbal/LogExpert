@@ -403,6 +403,7 @@ namespace LogExpert.Controls.LogWindow
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
                     Color backColor = LogExpert.Config.ColorMode.BackgroundColor;
+
                     Brush brush;
                 
                     if (gridView.Focused)
@@ -437,8 +438,9 @@ namespace LogExpert.Controls.LogWindow
                             bgColor = entry.BackgroundColor;
                         }
                     }
+
                     e.CellStyle.BackColor = bgColor;
-                    e.CellStyle.ForeColor = foreColor;
+                    e.CellStyle.ForeColor = foreColor;  // Not working?               
                     
                     e.PaintBackground(e.ClipBounds, false);
                 }

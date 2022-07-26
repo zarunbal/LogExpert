@@ -42,28 +42,10 @@ namespace LogExpert.Dialogs
 
             InitializeComponent();
             DoubleBuffered = true;
-            VirtualMode = true;
-
-            DefaultColors();
-            this.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            VirtualMode = true;          
         }
 
         #endregion
-
-        private void DefaultColors()
-        {
-            for (var x = 0; x < this.Rows.Count; x++)
-            {
-                var row = this.Rows[x];
-
-                for (var y = 0; y < row.Cells.Count; y++)
-                {
-                    var cell = row.Cells[y];
-                    cell.Style.BackColor = System.Drawing.Color.Black;
-                }
-            }
-
-        }
 
         #region Delegates
 

@@ -268,9 +268,17 @@ namespace LogExpert.Controls.LogWindow
                 }
 
             }
-            #endregion
+            #endregion            
 
-            // Colors for selected menus
+            #region DataGridView
+
+            // Main DataGridView
+            this.dataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            this.dataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            this.dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            this.dataGridView.EnableHeadersVisualStyles = false;
+
+            // Colors for menu
             this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
 
             for (var y = 0; y < this.dataGridContextMenuStrip.Items.Count; y++)
@@ -280,8 +288,20 @@ namespace LogExpert.Controls.LogWindow
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            // Dock special color
-            this.dataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            // Filter dataGridView
+            this.filterGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
+            // Colors for menu
+            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+
+            for (var y = 0; y < this.filterContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.filterContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            #endregion DataGridView
         }
 
         #endregion
