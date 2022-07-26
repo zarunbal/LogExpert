@@ -77,9 +77,6 @@
     <Compile Include="Config\ColumnizerHistoryEntry.cs" />
     <Compile Include="Config\ColumnizerMaskEntry.cs" />
     <Compile Include="Config\ExportImportFlags.cs" />
-    <Compile Include="Config\FormsExtenders.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Config\HighlightMaskEntry.cs" />
     <Compile Include="Config\MultiFileOption.cs" />
     <Compile Include="Config\Preferences.cs" />
@@ -112,6 +109,10 @@
     <Compile Include="Dialogs\LogGridCell.cs" />
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
+    <Compile Include="Extensions\MenuItemExtension.cs" />
+    <Compile Include="Extensions\ToolStripSeparatorExtenstion.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\IEnumerable.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
