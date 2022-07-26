@@ -160,9 +160,7 @@ namespace LogExpert.Controls.LogTabWindow
             LogExpert.Config.ColorMode.LoadColorMode();
             LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
 
-            // Colors for selected menus
-            this.mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
-
+            #region ApplyColorToAllControls
             foreach (Control component in container)
             {
                 if (component.Controls != null && component.Controls.Count > 0)
@@ -213,6 +211,8 @@ namespace LogExpert.Controls.LogTabWindow
                     }
                 }
 
+               
+
                 #region ContextMenuStripForTabs
                 // Does not seem to detect any ContextMenuStrip, it is used by the library WeifenLuo.WinFormsUI.Docking?
                 if (component is ContextMenuStrip)
@@ -240,6 +240,13 @@ namespace LogExpert.Controls.LogTabWindow
                 }
                 #endregion ContextMenuStripForTabs
             }
+            #endregion
+
+            // Colors for selected menus
+            this.mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+
+            // Dock special color
+            this.dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
         }
         #endregion
 

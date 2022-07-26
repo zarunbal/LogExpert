@@ -43,9 +43,27 @@ namespace LogExpert.Dialogs
             InitializeComponent();
             DoubleBuffered = true;
             VirtualMode = true;
+
+            DefaultColors();
+            this.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
         }
 
         #endregion
+
+        private void DefaultColors()
+        {
+            for (var x = 0; x < this.Rows.Count; x++)
+            {
+                var row = this.Rows[x];
+
+                for (var y = 0; y < row.Cells.Count; y++)
+                {
+                    var cell = row.Cells[y];
+                    cell.Style.BackColor = System.Drawing.Color.Black;
+                }
+            }
+
+        }
 
         #region Delegates
 
@@ -94,7 +112,7 @@ namespace LogExpert.Dialogs
             {
                 if (PaintWithOverlays)
                 {
-                    PaintOverlays(e);
+                    PaintOverlays(e);                    
                 }
                 else
                 {
@@ -104,7 +122,7 @@ namespace LogExpert.Dialogs
             catch (Exception ex)
             {
                 _logger.Error(ex);
-            }
+            }            
         }
 
         protected override void OnEditingControlShowing(DataGridViewEditingControlShowingEventArgs e)
@@ -227,7 +245,7 @@ namespace LogExpert.Dialogs
                 myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
                 e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
 
-                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
+                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);                
 
                 base.OnPaint(args);
 

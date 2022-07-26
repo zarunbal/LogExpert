@@ -135,6 +135,8 @@ namespace LogExpert.Controls.LogWindow
 
             InitializeComponent();
 
+            
+
             columnNamesLabel.Text = ""; // no filtering on columns by default
 
             _parentLogTabWin = parent;
@@ -243,6 +245,51 @@ namespace LogExpert.Controls.LogWindow
 
             _statusLineTrigger.Signal += OnStatusLineTriggerSignal;
             _selectionChangedTrigger.Signal += OnSelectionChangedTriggerSignal;
+
+            ChangeTheme(this.Controls);
+        }
+
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+            LogExpert.Config.ColorMode.LoadColorMode();
+            LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
+
+            #region ApplyColorToAllControls
+            foreach (Control component in container)
+            {
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+                else
+                {
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+
+            }
+            #endregion
+
+            // Colors for selected menus
+            this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+
+            for (var y = 0; y < this.dataGridContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.dataGridContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+
+                var type = item.GetType();
+                if(type == typeof(System.Windows.Forms.ToolStripSeparator))
+                {
+                    
+                }
+            }
+
+            // Dock special color
+            this.dataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
         }
 
         #endregion

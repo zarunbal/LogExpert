@@ -439,11 +439,10 @@
             this.checkBoxDarkMode.Location = new System.Drawing.Point(7, 141);
             this.checkBoxDarkMode.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxDarkMode.Name = "checkBoxDarkMode";
-            this.checkBoxDarkMode.Size = new System.Drawing.Size(264, 26);
+            this.checkBoxDarkMode.Size = new System.Drawing.Size(374, 26);
             this.checkBoxDarkMode.TabIndex = 6;
-            this.checkBoxDarkMode.Text = "Dark Mode (restart required)";
+            this.checkBoxDarkMode.Text = "Dark Mode (experimental, restart required)";
             this.checkBoxDarkMode.UseVisualStyleBackColor = true;
-
             // 
             // checkBoxFollowTail
             // 
@@ -455,7 +454,6 @@
             this.checkBoxFollowTail.TabIndex = 3;
             this.checkBoxFollowTail.Text = "Follow tail enabled";
             this.checkBoxFollowTail.UseVisualStyleBackColor = true;
-
             // 
             // checkBoxColumnFinder
             // 
