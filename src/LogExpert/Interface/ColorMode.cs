@@ -19,7 +19,7 @@ namespace LogExpert.Interface
         private static System.Drawing.Color whiteForeColor = System.Drawing.SystemColors.ControlDarkDark;
 
         private static System.Drawing.Color darkBackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
-        private static System.Drawing.Color darkForeColor = LogExpert.Interface.ColorMode.foreColor;
+        private static System.Drawing.Color darkForeColor = System.Drawing.SystemColors.ControlLightLight;
 
         public static void LoadColorMode()
         {
