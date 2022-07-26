@@ -7,23 +7,24 @@ using System.Threading.Tasks;
 
 namespace LogExpert.Config
 {
-    //LogExpert.Config.ColorMode.backgroundColor  System.Drawing.SystemColors.ControlDarkDark
-    //LogExpert.Config.ColorMode.foreColor LogExpert.Config.ColorMode.foreColor
-
     public static class ColorMode
     {
+        // Default
         public static System.Drawing.Color BackgroundColor = System.Drawing.SystemColors.Control;
         public static System.Drawing.Color ForeColor = System.Drawing.SystemColors.ControlText;
+        public static System.Drawing.Color MenuBackgroundColor = System.Drawing.SystemColors.ControlLight;
 
-        public static System.Drawing.Color MenuBackgroundColor = System.Drawing.SystemColors.ControlLight;        
+        // Bright Theme
+        // https://paletton.com/#uid=15-0u0k00sH00kJ0pq+00RL00RL
+        private static System.Drawing.Color BrightBackgroundColor = System.Drawing.Color.FromArgb(221, 221, 221);
+        private static System.Drawing.Color BrightForeColor = System.Drawing.Color.FromArgb(0,0,0);
+        private static System.Drawing.Color BrighterBackgroundColor = System.Drawing.Color.FromArgb(253, 253, 253);
 
-        private static System.Drawing.Color WhiteBackgroundColor = System.Drawing.SystemColors.Control;
-        private static System.Drawing.Color WhiteForeColor = System.Drawing.SystemColors.ControlText;
-        private static System.Drawing.Color WhiterBackgroundColor = System.Drawing.SystemColors.ControlLightLight;
-
-        private static System.Drawing.Color DarkBackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
-        private static System.Drawing.Color DarkForeColor = System.Drawing.SystemColors.ControlLightLight;
-        private static System.Drawing.Color DarkerBackgroundColor = System.Drawing.SystemColors.InfoText;
+        // Dark Theme
+        // https://paletton.com/#uid=15-0u0k005U0670008J003Y003Y
+        private static System.Drawing.Color DarkBackgroundColor =  System.Drawing.Color.FromArgb(45, 45, 45);
+        private static System.Drawing.Color DarkForeColor = System.Drawing.Color.FromArgb(255,255,255);
+        private static System.Drawing.Color DarkerBackgroundColor = System.Drawing.Color.FromArgb(30, 30, 30);
 
         public static bool DarkModeEnabled = false;
 
@@ -37,7 +38,7 @@ namespace LogExpert.Config
             }
             else
             {
-                SetDefaultMode();
+                SetBrightMode();
             }
         }
 
@@ -49,14 +50,15 @@ namespace LogExpert.Config
             DarkModeEnabled = true;
         }
 
-        private static void SetDefaultMode()
+        private static void SetBrightMode()
         {
-            BackgroundColor = WhiteBackgroundColor;
-            ForeColor = WhiteForeColor;
-            MenuBackgroundColor = WhiterBackgroundColor;
+            BackgroundColor = BrightBackgroundColor;
+            ForeColor = BrightForeColor;
+            MenuBackgroundColor = BrighterBackgroundColor;
             DarkModeEnabled = false;
         }
 
+        #region TitleBarDarkMode
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
@@ -81,6 +83,8 @@ namespace LogExpert.Config
         {
             return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
         }
+
+        #endregion TitleBarDarkMode
 
     }
 }

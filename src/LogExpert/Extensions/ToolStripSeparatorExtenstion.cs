@@ -24,9 +24,9 @@ namespace LogExpert.Extensions
 
             // Choose the colors for drawing.
             // I've used Color.White as the foreColor.
-            Color foreColor = Color.FromName(Config.ColorMode.ForeColor.Name);
+            Color foreColor = Config.ColorMode.ForeColor;
             // Color.Teal as the backColor.
-            Color backColor = Color.FromName(Config.ColorMode.BackgroundColor.Name);
+            Color backColor = Config.ColorMode.BackgroundColor;
 
             // Fill the background.
             e.Graphics.FillRectangle(new SolidBrush(backColor), 0, 0, width, height);
