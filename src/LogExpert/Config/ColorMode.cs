@@ -24,8 +24,8 @@ namespace LogExpert.Config
         private static System.Drawing.Color DarkForeColor = System.Drawing.Color.FromArgb(255,255,255);
 
         // Default
-        public static System.Drawing.Color BackgroundColor = BrightBackgroundColor;
-        public static System.Drawing.Color DockBackgroundColor = LessBrightBackgroundColor;
+        public static System.Drawing.Color BackgroundColor = LessBrightBackgroundColor;
+        public static System.Drawing.Color DockBackgroundColor = BrighterBackgroundColor;
         public static System.Drawing.Color ForeColor = BrightForeColor;
         public static System.Drawing.Color MenuBackgroundColor = BrighterBackgroundColor;
 
@@ -57,10 +57,10 @@ namespace LogExpert.Config
 
         private static void SetBrightMode()
         {
-            BackgroundColor = BrightBackgroundColor;
+            BackgroundColor = LessBrightBackgroundColor;
             ForeColor = BrightForeColor;
             MenuBackgroundColor = BrighterBackgroundColor;
-            DockBackgroundColor = LessBrightBackgroundColor;
+            DockBackgroundColor = BrighterBackgroundColor;
             DarkModeEnabled = false;
         }
 

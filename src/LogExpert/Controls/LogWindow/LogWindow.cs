@@ -135,8 +135,6 @@ namespace LogExpert.Controls.LogWindow
 
             InitializeComponent();
 
-            
-
             columnNamesLabel.Text = ""; // no filtering on columns by default
 
             _parentLogTabWin = parent;
@@ -280,12 +278,6 @@ namespace LogExpert.Controls.LogWindow
                 var item = this.dataGridContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
-
-                var type = item.GetType();
-                if(type == typeof(System.Windows.Forms.ToolStripSeparator))
-                {
-                    
-                }
             }
 
             // Dock special color
