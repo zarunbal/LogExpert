@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace LogExpert.Config
+namespace LogExpert.Extensions
 {
-    public class ExtendedToolStripSeparator : ToolStripSeparator
+    public class ToolStripSeparatorExtension : ToolStripSeparator
     {
-        public ExtendedToolStripSeparator()
+        public ToolStripSeparatorExtension()
         {
             this.Paint += ExtendedToolStripSeparator_Paint;
         }
@@ -34,25 +34,5 @@ namespace LogExpert.Config
             // Draw the line.
             e.Graphics.DrawLine(new Pen(foreColor), 4, height / 2, width - 4, height / 2);
         }
-    }
-
-    
-    public class ExtendedMenuItemRenderer : ToolStripProfessionalRenderer
-    {
-        public ExtendedMenuItemRenderer() : base(new MenuSelectedColors()) { }
-    }
-
-    public class MenuSelectedColors : ProfessionalColorTable
-    {
-        public override Color MenuItemPressedGradientBegin
-        {
-            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
-        }
-
-        public override Color MenuItemPressedGradientEnd
-        {
-            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
-        }
-    }
-  
+    }  
 }

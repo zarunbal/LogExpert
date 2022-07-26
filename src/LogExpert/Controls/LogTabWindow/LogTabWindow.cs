@@ -161,7 +161,7 @@ namespace LogExpert.Controls.LogTabWindow
             LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
 
             // Colors for selected menus
-            this.mainMenuStrip.Renderer = new LogExpert.Config.ExtendedMenuItemRenderer();
+            this.mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
 
             foreach (Control component in container)
             {
