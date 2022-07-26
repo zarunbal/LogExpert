@@ -180,7 +180,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
+            this.tableLayoutPanel1.BackColor = LogExpert.Config.ColorMode.backgroundColor;
             this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -189,7 +189,7 @@ namespace LogExpert.Controls.LogWindow
             this.tableLayoutPanel1.Controls.Add(this.dataGridView, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl, 1, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.tableLayoutPanel1.ForeColor = LogExpert.Config.ColorMode.foreColor;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -237,7 +237,7 @@ namespace LogExpert.Controls.LogWindow
             this.dataGridView.AllowUserToDeleteRows = false;
             this.dataGridView.AllowUserToOrderColumns = true;
             this.dataGridView.AllowUserToResizeRows = false;
-            this.dataGridView.BackgroundColor = LogExpert.Interface.ColorMode.backgroundColor;
+            this.dataGridView.BackgroundColor = LogExpert.Config.ColorMode.backgroundColor;
             this.dataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -700,8 +700,8 @@ namespace LogExpert.Controls.LogWindow
             this.filterGridView.AllowUserToDeleteRows = false;
             this.filterGridView.AllowUserToOrderColumns = true;
             this.filterGridView.AllowUserToResizeRows = false;
-            this.filterGridView.BackgroundColor = LogExpert.Interface.ColorMode.backgroundColor;
-            this.filterGridView.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.filterGridView.BackgroundColor = LogExpert.Config.ColorMode.backgroundColor;
+            this.filterGridView.ForeColor = LogExpert.Config.ColorMode.foreColor;
             this.filterGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.filterGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.filterGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -903,15 +903,15 @@ namespace LogExpert.Controls.LogWindow
             // 
             // filterSplitContainer.Panel1
             // 
-            this.filterSplitContainer.Panel1.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
+            this.filterSplitContainer.Panel1.BackColor = LogExpert.Config.ColorMode.backgroundColor;
             this.filterSplitContainer.Panel1.Controls.Add(this.lblTextFilter);
             this.filterSplitContainer.Panel1.Controls.Add(this.filterComboBox);
-            this.filterSplitContainer.Panel1.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.filterSplitContainer.Panel1.ForeColor = LogExpert.Config.ColorMode.foreColor;
             this.filterSplitContainer.Panel1MinSize = 200;
             // 
             // filterSplitContainer.Panel2
             // 
-            this.filterSplitContainer.Panel2.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
+            this.filterSplitContainer.Panel2.BackColor = LogExpert.Config.ColorMode.backgroundColor;
             this.filterSplitContainer.Panel2.Controls.Add(this.advancedButton);
             this.filterSplitContainer.Panel2.Controls.Add(this.syncFilterCheckBox);
             this.filterSplitContainer.Panel2.Controls.Add(this.lblFilterCount);
@@ -919,7 +919,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterSplitContainer.Panel2.Controls.Add(this.filterRegexCheckBox);
             this.filterSplitContainer.Panel2.Controls.Add(this.filterCaseSensitiveCheckBox);
             this.filterSplitContainer.Panel2.Controls.Add(this.filterSearchButton);
-            this.filterSplitContainer.Panel2.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.filterSplitContainer.Panel2.ForeColor = LogExpert.Config.ColorMode.foreColor;
             this.filterSplitContainer.Panel2MinSize = 550;
             this.filterSplitContainer.Size = new System.Drawing.Size(1007, 32);
             this.filterSplitContainer.SplitterDistance = 282;
@@ -1191,8 +1191,8 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
-            this.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+            this.ForeColor = LogExpert.Config.ColorMode.foreColor;
             this.ClientSize = new System.Drawing.Size(1014, 656);
             this.ControlBox = false;
             this.Controls.Add(this.splitContainerLogWindow);

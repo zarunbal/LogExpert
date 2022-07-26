@@ -254,6 +254,5 @@ namespace LogExpert.Controls.LogTabWindow
 
             #endregion
         }
-
     }
 }

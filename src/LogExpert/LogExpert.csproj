@@ -189,7 +189,7 @@
     <Compile Include="Classes\Filter\FilterStarter.cs" />
     <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
     <Compile Include="Entities\HilightGroup.cs" />
-    <Compile Include="Interface\ColorMode.cs" />
+    <Compile Include="Config\ColorMode.cs" />
     <Compile Include="Interface\IBookmarkData.cs" />
     <Compile Include="Interface\IBookmarkView.cs" />
     <Compile Include="Interface\ILogExpertProxy.cs" />

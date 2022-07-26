@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LogExpert.Interface
+namespace LogExpert.Config
 {
-    //LogExpert.Interface.ColorMode.backgroundColor  System.Drawing.SystemColors.ControlDarkDark
-    //LogExpert.Interface.ColorMode.foreColor LogExpert.Interface.ColorMode.foreColor
+    //LogExpert.Config.ColorMode.backgroundColor  System.Drawing.SystemColors.ControlDarkDark
+    //LogExpert.Config.ColorMode.foreColor LogExpert.Config.ColorMode.foreColor
 
     public static class ColorMode
     {
