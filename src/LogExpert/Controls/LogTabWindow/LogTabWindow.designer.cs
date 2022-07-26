@@ -170,7 +170,7 @@ namespace LogExpert.Controls.LogTabWindow
             // statusStrip
             // 
             this.statusStrip.AutoSize = false;
-            this.statusStrip.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.statusStrip.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.labelLines,
@@ -233,7 +233,7 @@ namespace LogExpert.Controls.LogTabWindow
             // mainMenuStrip
             // 
             this.mainMenuStrip.AllowMerge = false;
-            this.mainMenuStrip.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.mainMenuStrip.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.mainMenuStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.mainMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -864,18 +864,18 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // toolStripContainer.ContentPanel
             // 
-            this.toolStripContainer.ContentPanel.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.toolStripContainer.ContentPanel.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.toolStripContainer.ContentPanel.Controls.Add(this.dockPanel);
-            this.toolStripContainer.ContentPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripContainer.ContentPanel.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.toolStripContainer.ContentPanel.Margin = new System.Windows.Forms.Padding(0);
             this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(1283, 564);
             this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // toolStripContainer.LeftToolStripPanel
             // 
-            this.toolStripContainer.LeftToolStripPanel.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.toolStripContainer.LeftToolStripPanel.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.toolStripContainer.LeftToolStripPanel.Enabled = false;
-            this.toolStripContainer.LeftToolStripPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripContainer.LeftToolStripPanel.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.toolStripContainer.LeftToolStripPanelVisible = false;
             this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer.Margin = new System.Windows.Forms.Padding(0);
@@ -883,9 +883,9 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // toolStripContainer.RightToolStripPanel
             // 
-            this.toolStripContainer.RightToolStripPanel.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.toolStripContainer.RightToolStripPanel.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.toolStripContainer.RightToolStripPanel.Enabled = false;
-            this.toolStripContainer.RightToolStripPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripContainer.RightToolStripPanel.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.toolStripContainer.RightToolStripPanelVisible = false;
             this.toolStripContainer.Size = new System.Drawing.Size(1283, 623);
             this.toolStripContainer.TabIndex = 13;
@@ -893,21 +893,21 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // toolStripContainer.TopToolStripPanel
             // 
-            this.toolStripContainer.TopToolStripPanel.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.toolStripContainer.TopToolStripPanel.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buttonToolStrip);
             this.toolStripContainer.TopToolStripPanel.Controls.Add(this.mainMenuStrip);
             this.toolStripContainer.TopToolStripPanel.Controls.Add(this.externalToolsToolStrip);
-            this.toolStripContainer.TopToolStripPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripContainer.TopToolStripPanel.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             // 
             // dockPanel
             // 
             this.dockPanel.ActiveAutoHideContent = null;
-            this.dockPanel.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.dockPanel.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.dockPanel.DefaultFloatWindowSize = new System.Drawing.Size(600, 400);
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel.DockBackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.dockPanel.DockBackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.dockPanel.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
-            this.dockPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.dockPanel.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.dockPanel.Location = new System.Drawing.Point(0, 0);
             this.dockPanel.Margin = new System.Windows.Forms.Padding(0);
             this.dockPanel.Name = "dockPanel";
@@ -918,12 +918,12 @@ namespace LogExpert.Controls.LogTabWindow
             autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
             tabGradient1.EndColor = System.Drawing.SystemColors.Control;
             tabGradient1.StartColor = System.Drawing.SystemColors.Control;
-            tabGradient1.TextColor = System.Drawing.SystemColors.ControlDarkDark;
+            tabGradient1.TextColor = LogExpert.Interface.ColorMode.backgroundColor;
             autoHideStripSkin1.TabGradient = tabGradient1;
             autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
             dockPanelSkin1.AutoHideStripSkin = autoHideStripSkin1;
-            tabGradient2.EndColor = System.Drawing.SystemColors.ControlLightLight;
-            tabGradient2.StartColor = System.Drawing.SystemColors.ControlLightLight;
+            tabGradient2.EndColor = LogExpert.Interface.ColorMode.foreColor;
+            tabGradient2.StartColor = LogExpert.Interface.ColorMode.foreColor;
             tabGradient2.TextColor = System.Drawing.SystemColors.ControlText;
             dockPaneStripGradient1.ActiveTabGradient = tabGradient2;
             dockPanelGradient2.EndColor = System.Drawing.SystemColors.Control;
@@ -954,7 +954,7 @@ namespace LogExpert.Controls.LogTabWindow
             dockPaneStripToolWindowGradient1.InactiveCaptionGradient = tabGradient6;
             tabGradient7.EndColor = System.Drawing.Color.Transparent;
             tabGradient7.StartColor = System.Drawing.Color.Transparent;
-            tabGradient7.TextColor = System.Drawing.SystemColors.ControlDarkDark;
+            tabGradient7.TextColor = LogExpert.Interface.ColorMode.backgroundColor;
             dockPaneStripToolWindowGradient1.InactiveTabGradient = tabGradient7;
             dockPaneStripSkin1.ToolWindowGradient = dockPaneStripToolWindowGradient1;
             dockPanelSkin1.DockPaneStripSkin = dockPaneStripSkin1;
@@ -965,7 +965,7 @@ namespace LogExpert.Controls.LogTabWindow
             // buttonToolStrip
             // 
             this.buttonToolStrip.AllowMerge = false;
-            this.buttonToolStrip.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.buttonToolStrip.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.buttonToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.buttonToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.buttonToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1234,11 +1234,11 @@ namespace LogExpert.Controls.LogTabWindow
             // dragControlDateTime
             // 
             this.dragControlDateTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.dragControlDateTime.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.dragControlDateTime.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.dragControlDateTime.DateTime = new System.DateTime(((long)(0)));
             this.dragControlDateTime.DragOrientation = LogExpert.Dialogs.DateTimeDragControl.DragOrientations.Vertical;
             this.dragControlDateTime.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dragControlDateTime.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.dragControlDateTime.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.dragControlDateTime.HoverColor = System.Drawing.Color.LightGray;
             this.dragControlDateTime.Location = new System.Drawing.Point(814, 626);
             this.dragControlDateTime.Margin = new System.Windows.Forms.Padding(0);
@@ -1255,14 +1255,14 @@ namespace LogExpert.Controls.LogTabWindow
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             this.ClientSize = new System.Drawing.Size(1283, 651);
             this.Controls.Add(this.checkBoxFollowTail);
             this.Controls.Add(this.dragControlDateTime);
             this.Controls.Add(this.toolStripContainer);
             this.Controls.Add(this.statusStrip);
             this.DoubleBuffered = true;
-            this.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ForeColor = LogExpert.Interface.ColorMode.foreColor;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenuStrip;

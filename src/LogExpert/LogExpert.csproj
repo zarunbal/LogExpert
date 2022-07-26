@@ -85,7 +85,6 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\SettingsFlags.cs" />
     <Compile Include="Config\ToolEntry.cs" />
-    <Compile Include="Controls\DarkTitleBar.cs" />
     <Compile Include="Controls\LogTabWindow\LogTabWindowEventHandlers.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -190,6 +189,7 @@
     <Compile Include="Classes\Filter\FilterStarter.cs" />
     <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
     <Compile Include="Entities\HilightGroup.cs" />
+    <Compile Include="Interface\ColorMode.cs" />
     <Compile Include="Interface\IBookmarkData.cs" />
     <Compile Include="Interface\IBookmarkView.cs" />
     <Compile Include="Interface\ILogExpertProxy.cs" />

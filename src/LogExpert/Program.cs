@@ -97,6 +97,9 @@ namespace LogExpert
             {
                 Settings settings = ConfigManager.Settings;
                 Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
+
+                LogExpert.Interface.ColorMode.LoadColorMode();
+
                 if (isCreated)
                 {
                     // first application instance
