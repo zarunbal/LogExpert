@@ -15,11 +15,15 @@ namespace LogExpert.Config
         public static System.Drawing.Color BackgroundColor = System.Drawing.SystemColors.Control;
         public static System.Drawing.Color ForeColor = System.Drawing.SystemColors.ControlText;
 
+        public static System.Drawing.Color MenuBackgroundColor = System.Drawing.SystemColors.ControlLight;        
+
         private static System.Drawing.Color WhiteBackgroundColor = System.Drawing.SystemColors.Control;
         private static System.Drawing.Color WhiteForeColor = System.Drawing.SystemColors.ControlText;
+        private static System.Drawing.Color WhiterBackgroundColor = System.Drawing.SystemColors.ControlLightLight;
 
         private static System.Drawing.Color DarkBackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
         private static System.Drawing.Color DarkForeColor = System.Drawing.SystemColors.ControlLightLight;
+        private static System.Drawing.Color DarkerBackgroundColor = System.Drawing.SystemColors.InfoText;
 
         public static bool DarkModeEnabled = false;
 
@@ -41,6 +45,7 @@ namespace LogExpert.Config
         {
             BackgroundColor = DarkBackgroundColor;
             ForeColor = DarkForeColor;
+            MenuBackgroundColor = DarkerBackgroundColor;
             DarkModeEnabled = true;
         }
 
@@ -48,6 +53,7 @@ namespace LogExpert.Config
         {
             BackgroundColor = WhiteBackgroundColor;
             ForeColor = WhiteForeColor;
+            MenuBackgroundColor = WhiterBackgroundColor;
             DarkModeEnabled = false;
         }
 

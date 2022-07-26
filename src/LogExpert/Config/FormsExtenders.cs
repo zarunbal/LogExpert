@@ -35,4 +35,24 @@ namespace LogExpert.Config
             e.Graphics.DrawLine(new Pen(foreColor), 4, height / 2, width - 4, height / 2);
         }
     }
+
+    
+    public class ExtendedMenuItemRenderer : ToolStripProfessionalRenderer
+    {
+        public ExtendedMenuItemRenderer() : base(new MenuSelectedColors()) { }
+    }
+
+    public class MenuSelectedColors : ProfessionalColorTable
+    {
+        public override Color MenuItemPressedGradientBegin
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
+        public override Color MenuItemPressedGradientEnd
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+    }
+  
 }

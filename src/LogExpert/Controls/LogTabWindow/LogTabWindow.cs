@@ -160,32 +160,11 @@ namespace LogExpert.Controls.LogTabWindow
             LogExpert.Config.ColorMode.LoadColorMode();
             LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
 
+            // Colors for selected menus
+            this.mainMenuStrip.Renderer = new LogExpert.Config.ExtendedMenuItemRenderer();
+
             foreach (Control component in container)
             {
-                if (component is MenuStrip)
-                {
-                    var menu = (MenuStrip)component;
-
-                    foreach (ToolStripMenuItem item in menu.Items)
-                    {
-                        item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-                        item.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-
-                        try
-                        {
-                            foreach (dynamic children in item.DropDownItems)
-                            {
-                                children.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-                                children.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-                            }
-                        }
-                        catch
-                        {
-                            // Ignore
-                        }
-                    }
-                }
-
                 if (component.Controls != null && component.Controls.Count > 0)
                 {
                     ChangeTheme(component.Controls);
@@ -197,6 +176,69 @@ namespace LogExpert.Controls.LogTabWindow
                     component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
                     component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 }
+
+                if (component is MenuStrip)
+                {
+                    var menu = (MenuStrip)component;
+
+                    foreach (ToolStripMenuItem item in menu.Items)
+                    {
+                        item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                        item.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+
+                        try
+                        {
+                            for(var x = 0; x< item.DropDownItems.Count; x++)
+                            {
+                                var children = item.DropDownItems[x];
+                                children.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                                children.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+
+
+                                if(children is ToolStripDropDownItem) { 
+
+                                    for (var y = 0; y < ((ToolStripDropDownItem)children).DropDownItems.Count; y++)
+                                    {
+                                        var subChildren = ((ToolStripDropDownItem)children).DropDownItems[y];
+                                        subChildren.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                                        subChildren.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
+
+                #region ContextMenuStripForTabs
+                // Does not seem to detect any ContextMenuStrip, it is used by the library WeifenLuo.WinFormsUI.Docking?
+                if (component is ContextMenuStrip)
+                {
+                    var menu = (ContextMenuStrip)component;
+
+                    foreach (ToolStripMenuItem item in menu.Items)
+                    {
+                        item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                        item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+
+                        try
+                        {
+                            foreach (dynamic children in item.DropDownItems)
+                            {
+                                children.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                                children.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+                    }
+                }
+                #endregion ContextMenuStripForTabs
             }
         }
         #endregion
