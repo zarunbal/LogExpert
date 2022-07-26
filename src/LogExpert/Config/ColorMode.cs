@@ -12,14 +12,16 @@ namespace LogExpert.Config
 
     public static class ColorMode
     {
-        public static System.Drawing.Color backgroundColor = System.Drawing.SystemColors.Control;
-        public static System.Drawing.Color foreColor = System.Drawing.SystemColors.ControlDarkDark;
+        public static System.Drawing.Color BackgroundColor = System.Drawing.SystemColors.Control;
+        public static System.Drawing.Color ForeColor = System.Drawing.SystemColors.ControlText;
 
-        private static System.Drawing.Color whiteBackgroundColor = System.Drawing.SystemColors.Control;
-        private static System.Drawing.Color whiteForeColor = System.Drawing.SystemColors.ControlDarkDark;
+        private static System.Drawing.Color WhiteBackgroundColor = System.Drawing.SystemColors.Control;
+        private static System.Drawing.Color WhiteForeColor = System.Drawing.SystemColors.ControlText;
 
-        private static System.Drawing.Color darkBackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
-        private static System.Drawing.Color darkForeColor = System.Drawing.SystemColors.ControlLightLight;
+        private static System.Drawing.Color DarkBackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
+        private static System.Drawing.Color DarkForeColor = System.Drawing.SystemColors.ControlLightLight;
+
+        public static bool DarkModeEnabled = false;
 
         public static void LoadColorMode()
         {
@@ -37,14 +39,16 @@ namespace LogExpert.Config
 
         private static void SetDarkMode()
         {
-            backgroundColor = darkBackgroundColor;
-            foreColor = darkForeColor;
+            BackgroundColor = DarkBackgroundColor;
+            ForeColor = DarkForeColor;
+            DarkModeEnabled = true;
         }
 
         private static void SetDefaultMode()
         {
-            backgroundColor = whiteBackgroundColor;
-            foreColor = whiteForeColor;
+            BackgroundColor = WhiteBackgroundColor;
+            ForeColor = WhiteForeColor;
+            DarkModeEnabled = false;
         }
 
         [DllImport("dwmapi.dll")]

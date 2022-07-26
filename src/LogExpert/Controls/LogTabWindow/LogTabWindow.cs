@@ -72,7 +72,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
-            InitializeComponent();
+            InitializeComponent();            
 
             ChangeTheme(this.Controls);
 
@@ -157,6 +157,8 @@ namespace LogExpert.Controls.LogTabWindow
         #region ColorTheme
         public void ChangeTheme(Control.ControlCollection container)
         {
+            LogExpert.Config.ColorMode.LoadColorMode();
+            LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
 
             foreach (Control component in container)
             {
@@ -166,15 +168,15 @@ namespace LogExpert.Controls.LogTabWindow
 
                     foreach (ToolStripMenuItem item in menu.Items)
                     {
-                        item.ForeColor = LogExpert.Config.ColorMode.foreColor;
-                        item.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+                        item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                        item.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
 
                         try
                         {
                             foreach (dynamic children in item.DropDownItems)
                             {
-                                children.ForeColor = LogExpert.Config.ColorMode.foreColor;
-                                children.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+                                children.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                                children.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
                             }
                         }
                         catch
@@ -187,13 +189,13 @@ namespace LogExpert.Controls.LogTabWindow
                 if (component.Controls != null && component.Controls.Count > 0)
                 {
                     ChangeTheme(component.Controls);
-                    component.BackColor = LogExpert.Config.ColorMode.backgroundColor;
-                    component.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 }
                 else
                 {
-                    component.BackColor = LogExpert.Config.ColorMode.backgroundColor;
-                    component.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 }
             }
         }
