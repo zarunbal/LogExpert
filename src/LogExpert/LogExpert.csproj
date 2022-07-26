@@ -85,6 +85,7 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\SettingsFlags.cs" />
     <Compile Include="Config\ToolEntry.cs" />
+    <Compile Include="Controls\DarkTitleBar.cs" />
     <Compile Include="Controls\LogTabWindow\LogTabWindowEventHandlers.cs">
       <SubType>Form</SubType>
     </Compile>

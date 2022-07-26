@@ -1497,5 +1497,6 @@ namespace LogExpert.Controls.LogWindow
         #endregion
 
         #endregion
+        
     }
 }

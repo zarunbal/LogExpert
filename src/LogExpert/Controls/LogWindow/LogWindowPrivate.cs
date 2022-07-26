@@ -3713,5 +3713,6 @@ namespace LogExpert.Controls.LogWindow
         }
 
         #endregion
+        
     }
 }
