@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using LogExpert.Config;
 using LogExpert.Dialogs;
 
 namespace LogExpert.Controls.LogTabWindow
@@ -138,7 +139,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripButtonBookmark = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonUp = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDown = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator1 = new LogExpert.Config.ExtendedToolStripSeparator();
             this.toolStripButtonBubbles = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonTail = new System.Windows.Forms.ToolStripButton();
@@ -170,7 +171,7 @@ namespace LogExpert.Controls.LogTabWindow
             // statusStrip
             // 
             this.statusStrip.AutoSize = false;
-            this.statusStrip.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+            this.statusStrip.BackColor = System.Drawing.SystemColors.Control;
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.labelLines,
@@ -233,7 +234,7 @@ namespace LogExpert.Controls.LogTabWindow
             // mainMenuStrip
             // 
             this.mainMenuStrip.AllowMerge = false;
-            this.mainMenuStrip.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+            this.mainMenuStrip.BackColor = System.Drawing.SystemColors.Control;
             this.mainMenuStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.mainMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -252,7 +253,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+            this.fileToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.openURIToolStripMenuItem,
@@ -268,7 +269,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator14,
             this.lastUsedToolStripMenuItem,
             this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.ForeColor = LogExpert.Config.ColorMode.foreColor;
+            this.fileToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
@@ -281,7 +282,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.openToolStripMenuItem.Image = global::LogExpert.Properties.Resources.folder_blue;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OnOpenToolStripMenuItemClick);
             // 
@@ -291,7 +292,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.openURIToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.openURIToolStripMenuItem.Name = "openURIToolStripMenuItem";
             this.openURIToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
-            this.openURIToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.openURIToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.openURIToolStripMenuItem.Text = "Open URL...";
             this.openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
             this.openURIToolStripMenuItem.Click += new System.EventHandler(this.OnOpenURIToolStripMenuItemClick);
@@ -302,7 +303,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.closeFileToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
             this.closeFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.closeFileToolStripMenuItem.Text = "Close File";
             this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.OnCloseFileToolStripMenuItemClick);
             // 
@@ -312,7 +313,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.reloadToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
             this.reloadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.reloadToolStripMenuItem.Text = "Reload";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.OnReloadToolStripMenuItemClick);
             // 
@@ -322,7 +323,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.newFromClipboardToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.newFromClipboardToolStripMenuItem.Name = "newFromClipboardToolStripMenuItem";
             this.newFromClipboardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newFromClipboardToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.newFromClipboardToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
             this.newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
             this.newFromClipboardToolStripMenuItem.Click += new System.EventHandler(this.OnNewFromClipboardToolStripMenuItemClick);
@@ -332,7 +333,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripSeparator8.BackColor = System.Drawing.SystemColors.Control;
             this.toolStripSeparator8.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(302, 6);
+            this.toolStripSeparator8.Size = new System.Drawing.Size(306, 6);
             // 
             // multiFileToolStripMenuItem
             // 
@@ -343,7 +344,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.multifileMaskToolStripMenuItem});
             this.multiFileToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.multiFileToolStripMenuItem.Name = "multiFileToolStripMenuItem";
-            this.multiFileToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.multiFileToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.multiFileToolStripMenuItem.Text = "MultiFile";
             this.multiFileToolStripMenuItem.ToolTipText = "Treat multiple files as one large file (e.g. data.log, data.log.1, data.log.2,..." +
     ")";
@@ -371,14 +372,14 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(302, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(306, 6);
             // 
             // loadProjectToolStripMenuItem
             // 
             this.loadProjectToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.loadProjectToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.loadProjectToolStripMenuItem.Name = "loadProjectToolStripMenuItem";
-            this.loadProjectToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.loadProjectToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.loadProjectToolStripMenuItem.Text = "Load session...";
             this.loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
             this.loadProjectToolStripMenuItem.Click += new System.EventHandler(this.OnLoadProjectToolStripMenuItemClick);
@@ -388,7 +389,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.saveProjectToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.saveProjectToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.saveProjectToolStripMenuItem.Name = "saveProjectToolStripMenuItem";
-            this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.saveProjectToolStripMenuItem.Text = "Save session...";
             this.saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
             this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.OnSaveProjectToolStripMenuItemClick);
@@ -398,7 +399,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.exportBookmarksToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.exportBookmarksToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.exportBookmarksToolStripMenuItem.Name = "exportBookmarksToolStripMenuItem";
-            this.exportBookmarksToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.exportBookmarksToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.exportBookmarksToolStripMenuItem.Text = "Export bookmarks...";
             this.exportBookmarksToolStripMenuItem.ToolTipText = "Write a list of bookmarks and their comments to a CSV file";
             this.exportBookmarksToolStripMenuItem.Click += new System.EventHandler(this.OnExportBookmarksToolStripMenuItemClick);
@@ -406,14 +407,14 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripSeparator14
             // 
             this.toolStripSeparator14.Name = "toolStripSeparator14";
-            this.toolStripSeparator14.Size = new System.Drawing.Size(302, 6);
+            this.toolStripSeparator14.Size = new System.Drawing.Size(306, 6);
             // 
             // lastUsedToolStripMenuItem
             // 
             this.lastUsedToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.lastUsedToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.lastUsedToolStripMenuItem.Name = "lastUsedToolStripMenuItem";
-            this.lastUsedToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.lastUsedToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.lastUsedToolStripMenuItem.Text = "Last used";
             // 
             // exitToolStripMenuItem
@@ -422,7 +423,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.exitToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(309, 30);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExitToolStripMenuItemClick);
             // 
@@ -780,7 +781,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.configureToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.configureToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
-            this.configureToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.configureToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
             this.configureToolStripMenuItem.Text = "Configure...";
             this.configureToolStripMenuItem.Click += new System.EventHandler(this.OnConfigureToolStripMenuItemClick);
             // 
@@ -789,8 +790,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.configureToolStripSeparator.BackColor = System.Drawing.SystemColors.Control;
             this.configureToolStripSeparator.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.configureToolStripSeparator.Name = "configureToolStripSeparator";
-            this.configureToolStripSeparator.Size = new System.Drawing.Size(221, 6);
- 
+            this.configureToolStripSeparator.Size = new System.Drawing.Size(163, 6);
             // 
             // helpToolStripMenuItem
             // 
@@ -1488,7 +1488,6 @@ namespace LogExpert.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripButton toolStripButtonBookmark;
         private System.Windows.Forms.ToolStripButton toolStripButtonUp;
         private System.Windows.Forms.ToolStripButton toolStripButtonDown;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private CheckBox host;
         private CheckBox checkBoxFollowTail;
         private ToolStripButton toolStripButtonTail;
@@ -1542,6 +1541,7 @@ namespace LogExpert.Controls.LogTabWindow
         private ToolStripMenuItem columnFinderToolStripMenuItem;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private ToolStripMenuItem tabRenameToolStripMenuItem;
+        private ExtendedToolStripSeparator toolStripSeparator1;
     }
 }
 

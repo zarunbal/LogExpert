@@ -77,6 +77,9 @@
     <Compile Include="Config\ColumnizerHistoryEntry.cs" />
     <Compile Include="Config\ColumnizerMaskEntry.cs" />
     <Compile Include="Config\ExportImportFlags.cs" />
+    <Compile Include="Config\ExtendedToolStripSeparator.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Config\HighlightMaskEntry.cs" />
     <Compile Include="Config\MultiFileOption.cs" />
     <Compile Include="Config\Preferences.cs" />

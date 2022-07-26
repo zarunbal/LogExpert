@@ -73,6 +73,9 @@ namespace LogExpert.Controls.LogTabWindow
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
             InitializeComponent();
+
+            ChangeTheme(this.Controls);
+
             _startupFileNames = fileNames;
             this._instanceNumber = instanceNumber;
             this._showInstanceNumbers = showInstanceNumbers;
@@ -83,7 +86,7 @@ namespace LogExpert.Controls.LogTabWindow
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
             Rectangle led = new Rectangle(0, 0, 8, 2);
-            
+
             for (int i = 0; i < _leds.Length; ++i)
             {
                 _leds[i] = led;
@@ -97,27 +100,27 @@ namespace LogExpert.Controls.LogTabWindow
             _ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            
+
             _offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
-            
+
             _dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-            
+
             _tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
             _tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
             _tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
-            
+
             _syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
-            
+
             CreateIcons();
-            
+
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
             ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
-            
+
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
-            
+
             int index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
             toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
@@ -149,6 +152,51 @@ namespace LogExpert.Controls.LogTabWindow
             InitToolWindows();
         }
 
+        #endregion
+
+        #region ColorTheme
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+
+            foreach (Control component in container)
+            {
+                if (component is MenuStrip)
+                {
+                    var menu = (MenuStrip)component;
+
+                    foreach (ToolStripMenuItem item in menu.Items)
+                    {
+                        item.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                        item.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+
+                        try
+                        {
+                            foreach (dynamic children in item.DropDownItems)
+                            {
+                                children.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                                children.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+                    }
+                }
+
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                }
+                else
+                {
+                    component.BackColor = LogExpert.Config.ColorMode.backgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.foreColor;
+                }
+            }
+        }
         #endregion
 
         #region Delegates
