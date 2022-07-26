@@ -63,15 +63,15 @@ namespace LogExpert.Controls.LogTabWindow
             this.closeFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newFromClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator8 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.multiFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.multiFileEnabledStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.multifileMaskToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator7 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.loadProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportBookmarksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator14 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator14 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.lastUsedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewNavigateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,45 +84,45 @@ namespace LogExpert.Controls.LogTabWindow
             this.jumpToPrevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showBookmarkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.columnFinderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator2 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.toolStripEncodingMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEncodingASCIIItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEncodingANSIItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEncodingISO88591Item = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEncodingUTF8Item = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripEncodingUTF16Item = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator4 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.timeshiftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timeshiftMenuTextBox = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripSeparator3 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator3 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.copyMarkedLinesIntoNewTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.columnizerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hilightingToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator6 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.cellSelectModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.alwaysOnTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hideLineColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator19 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator19 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.lockInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.configureToolStripSeparator = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.configureToolStripSeparator = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator5 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpLogBufferInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpBufferDiagnosticToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runGCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gCInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator18 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator18 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.throwExceptionGUIThreadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.throwExceptionbackgroundThToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.throwExceptionBackgroundThreadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator12 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator12 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.loglevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.warnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.infoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -133,30 +133,30 @@ namespace LogExpert.Controls.LogTabWindow
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.buttonToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonOpen = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator10 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator10 = new LogExpert.Extensions.LineToolStripSeparatorExtension();
             this.toolStripButtonSearch = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonFilter = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator11 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator11 = new LogExpert.Extensions.LineToolStripSeparatorExtension();
             this.toolStripButtonBookmark = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonUp = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDown = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator1 = new LogExpert.Extensions.LineToolStripSeparatorExtension();
             this.toolStripButtonBubbles = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator15 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator15 = new LogExpert.Extensions.LineToolStripSeparatorExtension();
             this.toolStripButtonTail = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator17 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator17 = new LogExpert.Extensions.LineToolStripSeparatorExtension();
             this.groupsComboBoxHighlightGroups = new System.Windows.Forms.ToolStripComboBox();
             this.externalToolsToolStrip = new System.Windows.Forms.ToolStrip();
-            this.toolStripSeparator9 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator9 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.checkBoxFollowTail = new System.Windows.Forms.CheckBox();
             this.tabContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.closeThisTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeOtherTabsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllTabsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator13 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator13 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.tabColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabRenameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator16 = new LogExpert.Extensions.ToolStripSeparatorExtension();
+            this.toolStripSeparator16 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
             this.copyPathToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dragControlDateTime = new LogExpert.Dialogs.DateTimeDragControl();
@@ -241,8 +241,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.viewNavigateToolStripMenuItem,
-            this.optionToolStripMenuItem,
             this.toolsToolStripMenuItem,
+            this.optionToolStripMenuItem,
             this.helpToolStripMenuItem,
             this.debugToolStripMenuItem});
             this.mainMenuStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
@@ -636,6 +636,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.timeshiftMenuTextBox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.timeshiftMenuTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.timeshiftMenuTextBox.Enabled = false;
+            this.timeshiftMenuTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.timeshiftMenuTextBox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.timeshiftMenuTextBox.Name = "timeshiftMenuTextBox";
             this.timeshiftMenuTextBox.Size = new System.Drawing.Size(100, 27);
@@ -781,7 +782,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.configureToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.configureToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
-            this.configureToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.configureToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.configureToolStripMenuItem.Text = "Configure...";
             this.configureToolStripMenuItem.Click += new System.EventHandler(this.OnConfigureToolStripMenuItemClick);
             // 
@@ -790,7 +791,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.configureToolStripSeparator.BackColor = System.Drawing.SystemColors.Control;
             this.configureToolStripSeparator.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.configureToolStripSeparator.Name = "configureToolStripSeparator";
-            this.configureToolStripSeparator.Size = new System.Drawing.Size(163, 6);
+            this.configureToolStripSeparator.Size = new System.Drawing.Size(221, 6);
             // 
             // helpToolStripMenuItem
             // 
@@ -1526,26 +1527,26 @@ namespace LogExpert.Controls.LogTabWindow
         private ToolStripMenuItem columnFinderToolStripMenuItem;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private ToolStripMenuItem tabRenameToolStripMenuItem;
-        private ToolStripSeparatorExtension toolStripSeparator1;
-        private ToolStripSeparatorExtension toolStripSeparator2;
-        private ToolStripSeparatorExtension toolStripSeparator3;
-        private ToolStripSeparatorExtension toolStripSeparator4;
-        private ToolStripSeparatorExtension toolStripSeparator6;
-        private ToolStripSeparatorExtension toolStripSeparator8;
-        private ToolStripSeparatorExtension toolStripSeparator7;
-        private ToolStripSeparatorExtension toolStripSeparator9;
-        private ToolStripSeparatorExtension toolStripSeparator10;
-        private ToolStripSeparatorExtension toolStripSeparator11;
-        private ToolStripSeparatorExtension toolStripSeparator5;
-        private ToolStripSeparatorExtension toolStripSeparator13;
-        private ToolStripSeparatorExtension toolStripSeparator14;
-        private ToolStripSeparatorExtension toolStripSeparator15;
-        private ToolStripSeparatorExtension toolStripSeparator16;
-        private ToolStripSeparatorExtension toolStripSeparator17;
-        private ToolStripSeparatorExtension configureToolStripSeparator;
-        private ToolStripSeparatorExtension toolStripSeparator12;
-        private ToolStripSeparatorExtension toolStripSeparator18;
-        private ToolStripSeparatorExtension toolStripSeparator19;
+        private LineToolStripSeparatorExtension toolStripSeparator1;
+        private MenuToolStripSeparatorExtension toolStripSeparator2;
+        private MenuToolStripSeparatorExtension toolStripSeparator3;
+        private MenuToolStripSeparatorExtension toolStripSeparator4;
+        private MenuToolStripSeparatorExtension toolStripSeparator6;
+        private MenuToolStripSeparatorExtension toolStripSeparator8;
+        private MenuToolStripSeparatorExtension toolStripSeparator7;
+        private MenuToolStripSeparatorExtension toolStripSeparator9;
+        private LineToolStripSeparatorExtension toolStripSeparator10;
+        private LineToolStripSeparatorExtension toolStripSeparator11;
+        private MenuToolStripSeparatorExtension toolStripSeparator5;
+        private MenuToolStripSeparatorExtension toolStripSeparator13;
+        private MenuToolStripSeparatorExtension toolStripSeparator14;
+        private LineToolStripSeparatorExtension toolStripSeparator15;
+        private MenuToolStripSeparatorExtension toolStripSeparator16;
+        private LineToolStripSeparatorExtension toolStripSeparator17;
+        private MenuToolStripSeparatorExtension configureToolStripSeparator;
+        private MenuToolStripSeparatorExtension toolStripSeparator12;
+        private MenuToolStripSeparatorExtension toolStripSeparator18;
+        private MenuToolStripSeparatorExtension toolStripSeparator19;
     }
 }
 

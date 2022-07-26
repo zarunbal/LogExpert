@@ -57,7 +57,7 @@ namespace LogExpert.Config
 
         private static void SetBrightMode()
         {
-            BackgroundColor = LessBrightBackgroundColor;
+            BackgroundColor = BrightBackgroundColor;
             ForeColor = BrightForeColor;
             MenuBackgroundColor = BrighterBackgroundColor;
             DockBackgroundColor = BrighterBackgroundColor;

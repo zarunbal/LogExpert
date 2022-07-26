@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace LogExpert.Extensions
 {
-    public class ToolStripSeparatorExtension : ToolStripSeparator
+    public class MenuToolStripSeparatorExtension : ToolStripSeparator
     {
-        public ToolStripSeparatorExtension()
+        public MenuToolStripSeparatorExtension()
         {
             this.Paint += ExtendedToolStripSeparator_Paint;
         }
@@ -26,7 +26,7 @@ namespace LogExpert.Extensions
             // I've used Color.White as the foreColor.
             Color foreColor = Config.ColorMode.ForeColor;
             // Color.Teal as the backColor.
-            Color backColor = Config.ColorMode.BackgroundColor;
+            Color backColor = Config.ColorMode.MenuBackgroundColor;
 
             // Fill the background.
             e.Graphics.FillRectangle(new SolidBrush(backColor), 0, 0, width, height);

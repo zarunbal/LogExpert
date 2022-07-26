@@ -249,9 +249,6 @@ namespace LogExpert.Controls.LogWindow
 
         public void ChangeTheme(Control.ControlCollection container)
         {
-            LogExpert.Config.ColorMode.LoadColorMode();
-            LogExpert.Config.ColorMode.UseImmersiveDarkMode(this.Handle, LogExpert.Config.ColorMode.DarkModeEnabled);
-
             #region ApplyColorToAllControls
             foreach (Control component in container)
             {

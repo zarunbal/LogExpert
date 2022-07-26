@@ -110,7 +110,10 @@
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
     <Compile Include="Extensions\MenuItemExtension.cs" />
-    <Compile Include="Extensions\ToolStripSeparatorExtenstion.cs">
+    <Compile Include="Extensions\LineToolStripSeparatorExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\MenuToolStripSeparatorExtension.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Extensions\IEnumerable.cs" />
