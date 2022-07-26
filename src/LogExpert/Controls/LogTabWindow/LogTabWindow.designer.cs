@@ -271,6 +271,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
             this.fileToolStripMenuItem.DropDownOpening += new System.EventHandler(this.OnFileToolStripMenuItemDropDownOpening);
+            this.fileToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.fileToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // openToolStripMenuItem
             // 
@@ -280,6 +282,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.openToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OnOpenToolStripMenuItemClick);
+            this.openToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.openToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // openURIToolStripMenuItem
             // 
@@ -289,6 +293,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.openURIToolStripMenuItem.Text = "Open URL...";
             this.openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
             this.openURIToolStripMenuItem.Click += new System.EventHandler(this.OnOpenURIToolStripMenuItemClick);
+            this.openURIToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.openURIToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // closeFileToolStripMenuItem
             // 
@@ -297,6 +303,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
             this.closeFileToolStripMenuItem.Text = "Close File";
             this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.OnCloseFileToolStripMenuItemClick);
+            this.closeFileToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.closeFileToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // reloadToolStripMenuItem
             // 
@@ -305,6 +313,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.reloadToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
             this.reloadToolStripMenuItem.Text = "Reload";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.OnReloadToolStripMenuItemClick);
+            this.reloadToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.reloadToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // newFromClipboardToolStripMenuItem
             // 
@@ -314,11 +324,15 @@ namespace LogExpert.Controls.LogTabWindow
             this.newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
             this.newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
             this.newFromClipboardToolStripMenuItem.Click += new System.EventHandler(this.OnNewFromClipboardToolStripMenuItemClick);
+            this.newFromClipboardToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.newFromClipboardToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
             this.toolStripSeparator8.Size = new System.Drawing.Size(302, 6);
+            this.toolStripSeparator8.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripSeparator8.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // multiFileToolStripMenuItem
             // 
@@ -332,6 +346,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.multiFileToolStripMenuItem.ToolTipText = "Treat multiple files as one large file (e.g. data.log, data.log.1, data.log.2,..." +
     ")";
             this.multiFileToolStripMenuItem.Click += new System.EventHandler(this.OnMultiFileToolStripMenuItemClick);
+            this.multiFileToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.multiFileToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // multiFileEnabledStripMenuItem
             // 
@@ -340,6 +356,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.multiFileEnabledStripMenuItem.Size = new System.Drawing.Size(203, 26);
             this.multiFileEnabledStripMenuItem.Text = "Enable MultiFile";
             this.multiFileEnabledStripMenuItem.Click += new System.EventHandler(this.OnMultiFileEnabledStripMenuItemClick);
+            this.multiFileEnabledStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.multiFileEnabledStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // multifileMaskToolStripMenuItem
             // 
@@ -347,6 +365,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.multifileMaskToolStripMenuItem.Size = new System.Drawing.Size(203, 26);
             this.multifileMaskToolStripMenuItem.Text = "File name mask...";
             this.multifileMaskToolStripMenuItem.Click += new System.EventHandler(this.OnMultiFileMaskToolStripMenuItemClick);
+            this.multifileMaskToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.multifileMaskToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripSeparator7
             // 
@@ -360,6 +380,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.loadProjectToolStripMenuItem.Text = "Load session...";
             this.loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
             this.loadProjectToolStripMenuItem.Click += new System.EventHandler(this.OnLoadProjectToolStripMenuItemClick);
+            this.loadProjectToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.loadProjectToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // saveProjectToolStripMenuItem
             // 
@@ -368,6 +390,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.saveProjectToolStripMenuItem.Text = "Save session...";
             this.saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
             this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.OnSaveProjectToolStripMenuItemClick);
+            this.saveProjectToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.saveProjectToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // exportBookmarksToolStripMenuItem
             // 
@@ -376,6 +400,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.exportBookmarksToolStripMenuItem.Text = "Export bookmarks...";
             this.exportBookmarksToolStripMenuItem.ToolTipText = "Write a list of bookmarks and their comments to a CSV file";
             this.exportBookmarksToolStripMenuItem.Click += new System.EventHandler(this.OnExportBookmarksToolStripMenuItemClick);
+            this.exportBookmarksToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.exportBookmarksToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripSeparator14
             // 
@@ -387,6 +413,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.lastUsedToolStripMenuItem.Name = "lastUsedToolStripMenuItem";
             this.lastUsedToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
             this.lastUsedToolStripMenuItem.Text = "Last used";
+            this.lastUsedToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.lastUsedToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // exitToolStripMenuItem
             // 
@@ -395,6 +423,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(305, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExitToolStripMenuItemClick);
+            this.exitToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.exitToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // viewNavigateToolStripMenuItem
             // 
@@ -414,6 +444,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.viewNavigateToolStripMenuItem.Name = "viewNavigateToolStripMenuItem";
             this.viewNavigateToolStripMenuItem.Size = new System.Drawing.Size(121, 24);
             this.viewNavigateToolStripMenuItem.Text = "View/Navigate";
+            this.viewNavigateToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.viewNavigateToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // goToLineToolStripMenuItem
             // 
@@ -422,6 +454,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.goToLineToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.goToLineToolStripMenuItem.Text = "Go to line...";
             this.goToLineToolStripMenuItem.Click += new System.EventHandler(this.OnGoToLineToolStripMenuItemClick);
+            this.goToLineToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.goToLineToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // searchToolStripMenuItem
             // 
@@ -430,6 +464,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.searchToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.searchToolStripMenuItem.Text = "Search...";
             this.searchToolStripMenuItem.Click += new System.EventHandler(this.OnSearchToolStripMenuItemClick);
+            this.searchToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.searchToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // filterToolStripMenuItem
             // 
@@ -439,6 +475,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.filterToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.filterToolStripMenuItem.Text = "Filter";
             this.filterToolStripMenuItem.Click += new System.EventHandler(this.OnFilterToolStripMenuItemClick);
+            this.filterToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.filterToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // bookmarksToolStripMenuItem
             // 
@@ -450,6 +488,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.bookmarksToolStripMenuItem.Name = "bookmarksToolStripMenuItem";
             this.bookmarksToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.bookmarksToolStripMenuItem.Text = "Bookmarks";
+            this.bookmarksToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.bookmarksToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toggleBookmarkToolStripMenuItem
             // 
@@ -459,6 +499,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size(266, 26);
             this.toggleBookmarkToolStripMenuItem.Text = "Toggle Bookmark";
             this.toggleBookmarkToolStripMenuItem.Click += new System.EventHandler(this.OnToggleBookmarkToolStripMenuItemClick);
+            this.toggleBookmarkToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toggleBookmarkToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // jumpToNextToolStripMenuItem
             // 
@@ -468,6 +510,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.jumpToNextToolStripMenuItem.Size = new System.Drawing.Size(266, 26);
             this.jumpToNextToolStripMenuItem.Text = "Jump to next";
             this.jumpToNextToolStripMenuItem.Click += new System.EventHandler(this.OnJumpToNextToolStripMenuItemClick);
+            this.jumpToNextToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.jumpToNextToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // jumpToPrevToolStripMenuItem
             // 
@@ -477,6 +521,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.jumpToPrevToolStripMenuItem.Size = new System.Drawing.Size(266, 26);
             this.jumpToPrevToolStripMenuItem.Text = "Jump to prev";
             this.jumpToPrevToolStripMenuItem.Click += new System.EventHandler(this.OnJumpToPrevToolStripMenuItemClick);
+            this.jumpToPrevToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.jumpToPrevToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // showBookmarkListToolStripMenuItem
             // 
@@ -485,6 +531,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.showBookmarkListToolStripMenuItem.Size = new System.Drawing.Size(266, 26);
             this.showBookmarkListToolStripMenuItem.Text = "Bookmark list";
             this.showBookmarkListToolStripMenuItem.Click += new System.EventHandler(this.OnShowBookmarkListToolStripMenuItemClick);
+            this.showBookmarkListToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.showBookmarkListToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // columnFinderToolStripMenuItem
             // 
@@ -494,6 +542,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.columnFinderToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.columnFinderToolStripMenuItem.Text = "Column finder";
             this.columnFinderToolStripMenuItem.Click += new System.EventHandler(this.OnColumnFinderToolStripMenuItemClick);
+            this.columnFinderToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.columnFinderToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripSeparator2
             // 
@@ -511,6 +561,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingMenuItem.Name = "toolStripEncodingMenuItem";
             this.toolStripEncodingMenuItem.Size = new System.Drawing.Size(221, 26);
             this.toolStripEncodingMenuItem.Text = "Encoding";
+            this.toolStripEncodingMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripEncodingASCIIItem
             // 
@@ -519,6 +571,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingASCIIItem.Tag = "";
             this.toolStripEncodingASCIIItem.Text = "ASCII";
             this.toolStripEncodingASCIIItem.Click += new System.EventHandler(this.OnASCIIToolStripMenuItemClick);
+            this.toolStripEncodingASCIIItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingASCIIItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripEncodingANSIItem
             // 
@@ -527,6 +581,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingANSIItem.Tag = "";
             this.toolStripEncodingANSIItem.Text = "ANSI";
             this.toolStripEncodingANSIItem.Click += new System.EventHandler(this.OnANSIToolStripMenuItemClick);
+            this.toolStripEncodingANSIItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingANSIItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripEncodingISO88591Item
             // 
@@ -534,6 +590,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingISO88591Item.Size = new System.Drawing.Size(167, 26);
             this.toolStripEncodingISO88591Item.Text = "ISO-8859-1";
             this.toolStripEncodingISO88591Item.Click += new System.EventHandler(this.OnISO88591ToolStripMenuItemClick);
+            this.toolStripEncodingISO88591Item.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingISO88591Item.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripEncodingUTF8Item
             // 
@@ -541,6 +599,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingUTF8Item.Size = new System.Drawing.Size(167, 26);
             this.toolStripEncodingUTF8Item.Text = "UTF8";
             this.toolStripEncodingUTF8Item.Click += new System.EventHandler(this.OnUTF8ToolStripMenuItemClick);
+            this.toolStripEncodingUTF8Item.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingUTF8Item.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripEncodingUTF16Item
             // 
@@ -548,6 +608,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.toolStripEncodingUTF16Item.Size = new System.Drawing.Size(167, 26);
             this.toolStripEncodingUTF16Item.Text = "Unicode";
             this.toolStripEncodingUTF16Item.Click += new System.EventHandler(this.OnUTF16ToolStripMenuItemClick);
+            this.toolStripEncodingUTF16Item.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.toolStripEncodingUTF16Item.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // toolStripSeparator4
             // 
@@ -883,6 +945,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.warnToolStripMenuItem.Size = new System.Drawing.Size(137, 26);
             this.warnToolStripMenuItem.Text = "Warn";
             this.warnToolStripMenuItem.Click += new System.EventHandler(this.OnWarnToolStripMenuItemClick);
+            this.warnToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.warnToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // infoToolStripMenuItem
             // 
@@ -890,6 +954,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.infoToolStripMenuItem.Size = new System.Drawing.Size(137, 26);
             this.infoToolStripMenuItem.Text = "Info";
             this.infoToolStripMenuItem.Click += new System.EventHandler(this.OnInfoToolStripMenuItemClick);
+            this.infoToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.infoToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // debugToolStripMenuItem1
             // 
@@ -897,6 +963,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.debugToolStripMenuItem1.Size = new System.Drawing.Size(137, 26);
             this.debugToolStripMenuItem1.Text = "Debug";
             this.debugToolStripMenuItem1.Click += new System.EventHandler(this.OnDebugToolStripMenuItemClick);
+            this.debugToolStripMenuItem1.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.debugToolStripMenuItem1.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // disableWordHighlightModeToolStripMenuItem
             // 
@@ -905,6 +973,8 @@ namespace LogExpert.Controls.LogTabWindow
             this.disableWordHighlightModeToolStripMenuItem.Size = new System.Drawing.Size(342, 26);
             this.disableWordHighlightModeToolStripMenuItem.Text = "Disable word highlight mode";
             this.disableWordHighlightModeToolStripMenuItem.Click += new System.EventHandler(this.OnDisableWordHighlightModeToolStripMenuItemClick);
+            this.disableWordHighlightModeToolStripMenuItem.ForeColor = LogExpert.Interface.ColorMode.foreColor;
+            this.disableWordHighlightModeToolStripMenuItem.BackColor = LogExpert.Interface.ColorMode.backgroundColor;
             // 
             // host
             // 
