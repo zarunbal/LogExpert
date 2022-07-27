@@ -219,6 +219,9 @@ namespace LogExpert.Controls.LogTabWindow
             // Dock special color
             this.dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
 
+            // Remove toolstrip bottom border
+            this.buttonToolStrip.Renderer = new LogExpert.Extensions.ToolStripRendererExtension();
+
             #region Tabs
             this.tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
