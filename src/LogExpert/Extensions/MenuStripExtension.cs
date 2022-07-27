@@ -15,7 +15,26 @@ namespace LogExpert.Extensions
 
     public class MenuSelectedColors : ProfessionalColorTable
     {
-        // Not doing anything?
+        public override Color ImageMarginGradientBegin
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
+        public override Color ImageMarginGradientMiddle
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
+        public override Color ImageMarginGradientEnd
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
+        public override Color ToolStripDropDownBackground
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
         public override Color MenuBorder 
         {
             get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
