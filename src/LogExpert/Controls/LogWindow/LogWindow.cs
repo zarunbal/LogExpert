@@ -277,10 +277,50 @@ namespace LogExpert.Controls.LogWindow
 
             // Colors for menu
             this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            this.bookmarkContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            this.columnContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            this.editModeContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            this.filterListContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             for (var y = 0; y < this.dataGridContextMenuStrip.Items.Count; y++)
             {
                 var item = this.dataGridContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            for (var y = 0; y < this.bookmarkContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.bookmarkContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            for (var y = 0; y < this.columnContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.columnContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            for (var y = 0; y < this.editModeContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.editModeContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            for (var y = 0; y < this.filterContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.filterContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
+
+            for (var y = 0; y < this.filterListContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.filterListContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
