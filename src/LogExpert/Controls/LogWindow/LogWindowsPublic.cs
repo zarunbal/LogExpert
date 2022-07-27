@@ -422,7 +422,6 @@ namespace LogExpert.Controls.LogWindow
                 else
                 {
                     Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
-                    Color foreColor = LogExpert.Config.ColorMode.ForeColor;
 
                     if (!DebugOptions.disableWordHighlight)
                     {
@@ -439,8 +438,7 @@ namespace LogExpert.Controls.LogWindow
                         }
                     }
 
-                    e.CellStyle.BackColor = bgColor;
-                    e.CellStyle.ForeColor = foreColor;  // Not working?               
+                    e.CellStyle.BackColor = bgColor;             
                     
                     e.PaintBackground(e.ClipBounds, false);
                 }
