@@ -64,7 +64,7 @@ namespace LogExpert.Dialogs
             this.bookmarkDataGridView.EnableHeadersVisualStyles = false;            
 
             // Colors for menu
-            this.contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+            this.contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             for (var y = 0; y < this.contextMenuStrip1.Items.Count; y++)
             {

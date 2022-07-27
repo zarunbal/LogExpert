@@ -276,7 +276,7 @@ namespace LogExpert.Controls.LogWindow
             this.dataGridView.EnableHeadersVisualStyles = false;
 
             // Colors for menu
-            this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+            this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             for (var y = 0; y < this.dataGridContextMenuStrip.Items.Count; y++)
             {
@@ -292,7 +292,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterGridView.EnableHeadersVisualStyles = false;
 
             // Colors for menu
-            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             for (var y = 0; y < this.filterContextMenuStrip.Items.Count; y++)
             {

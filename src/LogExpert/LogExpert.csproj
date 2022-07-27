@@ -109,7 +109,7 @@
     <Compile Include="Dialogs\LogGridCell.cs" />
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
-    <Compile Include="Extensions\MenuItemExtension.cs" />
+    <Compile Include="Extensions\MenuStripExtension.cs" />
     <Compile Include="Extensions\LineToolStripSeparatorExtension.cs">
       <SubType>Component</SubType>
     </Compile>

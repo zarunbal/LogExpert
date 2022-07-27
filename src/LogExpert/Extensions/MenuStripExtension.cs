@@ -8,13 +8,23 @@ using System.Windows.Forms;
 
 namespace LogExpert.Extensions
 {
-    public class ExtendedMenuItemRenderer : ToolStripProfessionalRenderer
+    public class ExtendedMenuStripRenderer : ToolStripProfessionalRenderer
     {
-        public ExtendedMenuItemRenderer() : base(new MenuSelectedColors()) { }
+        public ExtendedMenuStripRenderer() : base(new MenuSelectedColors()) { }
     }
 
     public class MenuSelectedColors : ProfessionalColorTable
     {
+        // Not doing anything?
+        public override Color MenuBorder 
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
+
+        public override Color MenuItemBorder
+        {
+            get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }
+        }
 
         public override Color MenuItemSelected
         {
