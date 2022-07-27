@@ -345,6 +345,8 @@ namespace LogExpert.Controls.LogWindow
 
             this.proFiltersRichTextBox.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
             this.proFiltersRichTextBox.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+
+            this.filterComboBox.BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
         }
 
         #endregion
