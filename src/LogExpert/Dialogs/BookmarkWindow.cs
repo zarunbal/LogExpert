@@ -31,6 +31,49 @@ namespace LogExpert.Dialogs
             InitializeComponent();
             bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
             bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
+
+            ChangeTheme(this.Controls);
+        }
+
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+            #region ApplyColorToAllControls
+            foreach (Control component in container)
+            {
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+                else
+                {
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+
+            }
+            #endregion            
+
+            #region DataGridView
+
+            // Main DataGridView
+            this.bookmarkDataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            this.bookmarkDataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            this.bookmarkDataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            this.bookmarkDataGridView.EnableHeadersVisualStyles = false;            
+
+            // Colors for menu
+            this.contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();
+
+            for (var y = 0; y < this.contextMenuStrip1.Items.Count; y++)
+            {
+                var item = this.contextMenuStrip1.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }            
+
+            #endregion DataGridView
         }
 
         #endregion

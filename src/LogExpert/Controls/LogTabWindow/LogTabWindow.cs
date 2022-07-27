@@ -210,35 +210,6 @@ namespace LogExpert.Controls.LogTabWindow
                         }
                     }
                 }
-
-               
-
-                #region ContextMenuStripForTabs
-                // Does not seem to detect any ContextMenuStrip, it is used by the library WeifenLuo.WinFormsUI.Docking?
-                if (component is ContextMenuStrip)
-                {
-                    var menu = (ContextMenuStrip)component;
-
-                    foreach (ToolStripMenuItem item in menu.Items)
-                    {
-                        item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-                        item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
-
-                        try
-                        {
-                            foreach (dynamic children in item.DropDownItems)
-                            {
-                                children.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-                                children.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
-                            }
-                        }
-                        catch
-                        {
-                            // Ignore
-                        }
-                    }
-                }
-                #endregion ContextMenuStripForTabs
             }
             #endregion
 
@@ -247,6 +218,14 @@ namespace LogExpert.Controls.LogTabWindow
 
             // Dock special color
             this.dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
+            // Tabs menu
+            for (var y = 0; y < this.tabContextMenuStrip.Items.Count; y++)
+            {
+                var item = this.tabContextMenuStrip.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }
         }
         #endregion
 

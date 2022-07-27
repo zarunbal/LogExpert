@@ -287,6 +287,9 @@ namespace LogExpert.Controls.LogWindow
 
             // Filter dataGridView
             this.filterGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            this.filterGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            this.filterGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            this.filterGridView.EnableHeadersVisualStyles = false;
 
             // Colors for menu
             this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuItemRenderer();

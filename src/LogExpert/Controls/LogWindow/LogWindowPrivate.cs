@@ -1174,10 +1174,9 @@ namespace LogExpert.Controls.LogWindow
                         e.Graphics.FillRectangle(bgBrush, wordRect);
                     }
                 }
-                else
-                {
+
+                if (foreColor == System.Drawing.Color.Black)
                     foreColor = LogExpert.Config.ColorMode.ForeColor;
-                }
 
                 TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect,
                     foreColor, flags);
