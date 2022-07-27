@@ -342,6 +342,9 @@ namespace LogExpert.Controls.LogWindow
             }
 
             #endregion DataGridView
+
+            this.proFiltersRichTextBox.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            this.proFiltersRichTextBox.ForeColor = LogExpert.Config.ColorMode.ForeColor;
         }
 
         #endregion
