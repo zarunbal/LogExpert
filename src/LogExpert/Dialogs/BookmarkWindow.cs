@@ -57,6 +57,8 @@ namespace LogExpert.Dialogs
 
             #region DataGridView
 
+            this.BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
             // Main DataGridView
             this.bookmarkDataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
             this.bookmarkDataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
@@ -238,7 +240,7 @@ namespace LogExpert.Dialogs
             if (!splitContainer1.Visible)
             {
                 Rectangle r = ClientRectangle;
-                e.Graphics.FillRectangle(SystemBrushes.ControlLight, r);
+                e.Graphics.FillRectangle(SystemBrushes.FromSystemColor(LogExpert.Config.ColorMode.BookmarksDefaultBackgroundColor), r);
                 RectangleF rect = r;
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;

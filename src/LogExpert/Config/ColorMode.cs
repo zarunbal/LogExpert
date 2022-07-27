@@ -11,6 +11,7 @@ namespace LogExpert.Config
     {
         // Bright Theme
         // https://paletton.com/#uid=15-0u0k00sH00kJ0pq+00RL00RL
+        private static System.Drawing.Color BrightBookmarkDefaultSystemColor = System.Drawing.SystemColors.Control; // Important: only supports SystemColors
         private static System.Drawing.Color LessBrightBackgroundColor = System.Drawing.Color.FromArgb(208, 205, 206);
         private static System.Drawing.Color BrightBackgroundColor = System.Drawing.Color.FromArgb(221, 221, 221);
         private static System.Drawing.Color BrighterBackgroundColor = System.Drawing.Color.FromArgb(253, 253, 253);
@@ -18,7 +19,7 @@ namespace LogExpert.Config
 
         // Dark Theme
         // https://paletton.com/#uid=15-0u0k005U0670008J003Y003Y
-        private static System.Drawing.Color NearBlackColor = System.Drawing.Color.Black;
+        private static System.Drawing.Color DarkBookmarkDefaultSystemColor = System.Drawing.SystemColors.ControlDarkDark; // Important: only supports SystemColors
         private static System.Drawing.Color LessLessDarkBackgroundColor = System.Drawing.Color.FromArgb(90, 90, 90);
         private static System.Drawing.Color LessDarkBackgroundColor = System.Drawing.Color.FromArgb(67, 67, 67);
         private static System.Drawing.Color DarkBackgroundColor = System.Drawing.Color.FromArgb(45, 45, 45);
@@ -28,6 +29,7 @@ namespace LogExpert.Config
         // Default
         public static System.Drawing.Color BackgroundColor = LessBrightBackgroundColor;
         public static System.Drawing.Color DockBackgroundColor = BrighterBackgroundColor;
+        public static System.Drawing.Color BookmarksDefaultBackgroundColor = BrightBookmarkDefaultSystemColor;
         public static System.Drawing.Color ForeColor = BrightForeColor;
         public static System.Drawing.Color MenuBackgroundColor = BrighterBackgroundColor;
         public static System.Drawing.Color HoverMenuBackgroundColor = LessBrightBackgroundColor;
@@ -59,6 +61,7 @@ namespace LogExpert.Config
             MenuBackgroundColor = DarkerBackgroundColor;
             DockBackgroundColor = LessDarkBackgroundColor;
             HoverMenuBackgroundColor = LessDarkBackgroundColor;
+            BookmarksDefaultBackgroundColor = DarkBookmarkDefaultSystemColor;
             TabsBackgroundStripColor = LessDarkBackgroundColor;
             ActiveTabColor = LessLessDarkBackgroundColor;
             InactiveTabColor = LessDarkBackgroundColor;
@@ -71,6 +74,7 @@ namespace LogExpert.Config
             ForeColor = BrightForeColor;
             MenuBackgroundColor = BrighterBackgroundColor;
             DockBackgroundColor = BrighterBackgroundColor;
+            BookmarksDefaultBackgroundColor = BrightBookmarkDefaultSystemColor;
             HoverMenuBackgroundColor = LessBrightBackgroundColor;
             TabsBackgroundStripColor = BrighterBackgroundColor;
             ActiveTabColor = BrighterBackgroundColor;
