@@ -28,6 +28,7 @@ namespace LogExpert.Config
         public static System.Drawing.Color DockBackgroundColor = BrighterBackgroundColor;
         public static System.Drawing.Color ForeColor = BrightForeColor;
         public static System.Drawing.Color MenuBackgroundColor = BrighterBackgroundColor;
+        public static System.Drawing.Color HoverMenuBackgroundColor = LessBrightBackgroundColor;
 
 
         public static bool DarkModeEnabled = false;
@@ -52,6 +53,7 @@ namespace LogExpert.Config
             ForeColor = DarkForeColor;
             MenuBackgroundColor = DarkerBackgroundColor;
             DockBackgroundColor = LessDarkBackgroundColor;
+            HoverMenuBackgroundColor = LessDarkBackgroundColor;
             DarkModeEnabled = true;
         }
 
@@ -61,6 +63,7 @@ namespace LogExpert.Config
             ForeColor = BrightForeColor;
             MenuBackgroundColor = BrighterBackgroundColor;
             DockBackgroundColor = BrighterBackgroundColor;
+            HoverMenuBackgroundColor = LessBrightBackgroundColor;
             DarkModeEnabled = false;
         }
 

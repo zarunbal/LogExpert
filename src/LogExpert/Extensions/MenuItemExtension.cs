@@ -15,6 +15,22 @@ namespace LogExpert.Extensions
 
     public class MenuSelectedColors : ProfessionalColorTable
     {
+
+        public override Color MenuItemSelected
+        {
+            get { return LogExpert.Config.ColorMode.HoverMenuBackgroundColor; }
+        }
+
+        public override Color MenuItemSelectedGradientBegin
+        {
+            get { return LogExpert.Config.ColorMode.HoverMenuBackgroundColor; }
+        }
+
+        public override Color MenuItemSelectedGradientEnd
+        {
+            get { return LogExpert.Config.ColorMode.HoverMenuBackgroundColor; }
+        }
+
         public override Color MenuItemPressedGradientBegin
         {
             get { return LogExpert.Config.ColorMode.MenuBackgroundColor; }

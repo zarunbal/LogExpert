@@ -639,7 +639,7 @@ namespace LogExpert.Controls.LogTabWindow
             this.timeshiftMenuTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.timeshiftMenuTextBox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.timeshiftMenuTextBox.Name = "timeshiftMenuTextBox";
-            this.timeshiftMenuTextBox.Size = new System.Drawing.Size(100, 27);
+            this.timeshiftMenuTextBox.Size = new System.Drawing.Size(150, 27);
             this.timeshiftMenuTextBox.Text = "+00:00:00.000";
             this.timeshiftMenuTextBox.ToolTipText = "Time offset (hh:mm:ss.fff)";
             this.timeshiftMenuTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTimeShiftMenuTextBoxKeyDown);
