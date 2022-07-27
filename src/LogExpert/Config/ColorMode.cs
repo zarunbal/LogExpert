@@ -14,14 +14,16 @@ namespace LogExpert.Config
         private static System.Drawing.Color LessBrightBackgroundColor = System.Drawing.Color.FromArgb(208, 205, 206);
         private static System.Drawing.Color BrightBackgroundColor = System.Drawing.Color.FromArgb(221, 221, 221);
         private static System.Drawing.Color BrighterBackgroundColor = System.Drawing.Color.FromArgb(253, 253, 253);
-        private static System.Drawing.Color BrightForeColor = System.Drawing.Color.FromArgb(0,0,0);        
+        private static System.Drawing.Color BrightForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
 
         // Dark Theme
         // https://paletton.com/#uid=15-0u0k005U0670008J003Y003Y
+        private static System.Drawing.Color NearBlackColor = System.Drawing.Color.Black;
+        private static System.Drawing.Color LessLessDarkBackgroundColor = System.Drawing.Color.FromArgb(90, 90, 90);
         private static System.Drawing.Color LessDarkBackgroundColor = System.Drawing.Color.FromArgb(67, 67, 67);
-        private static System.Drawing.Color DarkBackgroundColor =  System.Drawing.Color.FromArgb(45, 45, 45);
+        private static System.Drawing.Color DarkBackgroundColor = System.Drawing.Color.FromArgb(45, 45, 45);
         private static System.Drawing.Color DarkerBackgroundColor = System.Drawing.Color.FromArgb(30, 30, 30);
-        private static System.Drawing.Color DarkForeColor = System.Drawing.Color.FromArgb(255,255,255);
+        private static System.Drawing.Color DarkForeColor = System.Drawing.Color.FromArgb(255, 255, 255);
 
         // Default
         public static System.Drawing.Color BackgroundColor = LessBrightBackgroundColor;
@@ -29,6 +31,9 @@ namespace LogExpert.Config
         public static System.Drawing.Color ForeColor = BrightForeColor;
         public static System.Drawing.Color MenuBackgroundColor = BrighterBackgroundColor;
         public static System.Drawing.Color HoverMenuBackgroundColor = LessBrightBackgroundColor;
+        public static System.Drawing.Color ActiveTabColor = BrighterBackgroundColor;
+        public static System.Drawing.Color InactiveTabColor = LessBrightBackgroundColor;
+        public static System.Drawing.Color TabsBackgroundStripColor = LessBrightBackgroundColor;
 
 
         public static bool DarkModeEnabled = false;
@@ -54,6 +59,9 @@ namespace LogExpert.Config
             MenuBackgroundColor = DarkerBackgroundColor;
             DockBackgroundColor = LessDarkBackgroundColor;
             HoverMenuBackgroundColor = LessDarkBackgroundColor;
+            TabsBackgroundStripColor = LessDarkBackgroundColor;
+            ActiveTabColor = LessLessDarkBackgroundColor;
+            InactiveTabColor = LessDarkBackgroundColor;
             DarkModeEnabled = true;
         }
 
@@ -64,6 +72,9 @@ namespace LogExpert.Config
             MenuBackgroundColor = BrighterBackgroundColor;
             DockBackgroundColor = BrighterBackgroundColor;
             HoverMenuBackgroundColor = LessBrightBackgroundColor;
+            TabsBackgroundStripColor = BrighterBackgroundColor;
+            ActiveTabColor = BrighterBackgroundColor;
+            InactiveTabColor = LessBrightBackgroundColor;
             DarkModeEnabled = false;
         }
 

@@ -226,6 +226,55 @@ namespace LogExpert.Controls.LogTabWindow
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
+
+            #region Tabs
+            // Tabs line
+            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+
+            // Tabs
+            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
+
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
+
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = LogExpert.Config.ColorMode.InactiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = LogExpert.Config.ColorMode.InactiveTabColor;
+            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
+
+            //autoHideStripSkin1.TabGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //autoHideStripSkin1.TabGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //autoHideStripSkin1.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //autoHideStripSkin1.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPaneStripSkin1.ToolWindowGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPaneStripSkin1.ToolWindowGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPaneStripSkin1.DocumentGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPaneStripSkin1.DocumentGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPaneStripToolWindowGradient1.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPaneStripToolWindowGradient1.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPaneStripGradient1.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPaneStripGradient1.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPanelGradient1.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPanelGradient1.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPanelGradient2.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPanelGradient3.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+
+            //dockPanelGradient3.StartColor = LogExpert.Config.ColorMode.TabsBarColor;
+            //dockPanelGradient3.EndColor = LogExpert.Config.ColorMode.TabsBarColor;
+            #endregion Tabs
         }
         #endregion
 

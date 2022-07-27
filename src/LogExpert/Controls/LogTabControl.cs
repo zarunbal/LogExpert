@@ -19,6 +19,12 @@ namespace LogExpert.Controls
             //SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             //SetStyle(ControlStyles.UserPaint, true);
             //SetStyle(ControlStyles.DoubleBuffer, true);
+
+            //foreach(TabPage tabPage in base.TabPages)
+            //{
+            //    tabPage.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            //    tabPage.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            //}
         }
 
         #endregion

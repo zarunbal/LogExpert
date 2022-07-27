@@ -50,6 +50,9 @@ namespace LogExpert.Controls.LogTabWindow
             WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient6 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
             WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient7 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogTabWindow));
+
+            
+
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.labelLines = new System.Windows.Forms.ToolStripStatusLabel();
             this.labelSize = new System.Windows.Forms.ToolStripStatusLabel();

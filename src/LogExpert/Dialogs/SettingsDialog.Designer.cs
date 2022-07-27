@@ -441,7 +441,7 @@
             this.checkBoxDarkMode.Name = "checkBoxDarkMode";
             this.checkBoxDarkMode.Size = new System.Drawing.Size(374, 26);
             this.checkBoxDarkMode.TabIndex = 6;
-            this.checkBoxDarkMode.Text = "Dark Mode (experimental, restart required)";
+            this.checkBoxDarkMode.Text = "Dark Mode (restart required)";
             this.checkBoxDarkMode.UseVisualStyleBackColor = true;
             // 
             // checkBoxFollowTail
