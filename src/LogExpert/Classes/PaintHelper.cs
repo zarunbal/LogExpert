@@ -60,7 +60,7 @@ namespace LogExpert.Classes
                 }
                 else
                 {
-                    Color bgColor = Color.White;
+                    Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
                     if (!DebugOptions.disableWordHighlight)
                     {
                         if (entry != null)

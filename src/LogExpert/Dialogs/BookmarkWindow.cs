@@ -268,14 +268,15 @@ namespace LogExpert.Dialogs
 
         private void CommentPainting(DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
         {
+            Color backColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
             if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
-            {
-                Color backColor = e.CellStyle.SelectionBackColor;
+            {                
                 Brush brush;
                 if (gridView.Focused)
                 {
                     // _logger.logDebug("CellPaint Focus");
-                    brush = new SolidBrush(e.CellStyle.SelectionBackColor);
+                    brush = new SolidBrush(backColor);
                 }
                 else
                 {
@@ -289,7 +290,7 @@ namespace LogExpert.Dialogs
             }
             else
             {
-                e.CellStyle.BackColor = Color.White;
+                e.CellStyle.BackColor = backColor;
                 e.PaintBackground(e.CellBounds, false);
             }
 
