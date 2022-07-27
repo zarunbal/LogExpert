@@ -215,10 +215,12 @@ namespace LogExpert.Controls.LogTabWindow
 
             // Colors for selected menus
             this.mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-
+            
             // Dock special color
             this.dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
+            #region Tabs
+            this.tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             // Tabs menu
             for (var y = 0; y < this.tabContextMenuStrip.Items.Count; y++)
@@ -228,7 +230,6 @@ namespace LogExpert.Controls.LogTabWindow
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            #region Tabs
             // Tabs line
             this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
             this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
