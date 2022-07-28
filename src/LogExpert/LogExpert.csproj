@@ -109,7 +109,15 @@
     <Compile Include="Dialogs\LogGridCell.cs" />
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
+    <Compile Include="Extensions\Forms\MenuStripExtension.cs" />
+    <Compile Include="Extensions\Forms\LineToolStripSeparatorExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\Forms\MenuToolStripSeparatorExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\IEnumerable.cs" />
+    <Compile Include="Extensions\Forms\ToolStripRendererExtension.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\BookmarkCollection.cs" />
@@ -189,6 +197,7 @@
     <Compile Include="Classes\Filter\FilterStarter.cs" />
     <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
     <Compile Include="Entities\HilightGroup.cs" />
+    <Compile Include="Config\ColorMode.cs" />
     <Compile Include="Interface\IBookmarkData.cs" />
     <Compile Include="Interface\IBookmarkView.cs" />
     <Compile Include="Interface\ILogExpertProxy.cs" />
