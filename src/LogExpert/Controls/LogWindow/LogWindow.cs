@@ -244,9 +244,12 @@ namespace LogExpert.Controls.LogWindow
             _statusLineTrigger.Signal += OnStatusLineTriggerSignal;
             _selectionChangedTrigger.Signal += OnSelectionChangedTriggerSignal;
 
-            ChangeTheme(this.Controls);
+            ChangeTheme(Controls);
         }
 
+        #endregion
+
+        #region ColorTheme
         public void ChangeTheme(Control.ControlCollection container)
         {
             #region ApplyColorToAllControls
@@ -270,83 +273,83 @@ namespace LogExpert.Controls.LogWindow
             #region DataGridView
 
             // Main DataGridView
-            this.dataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
-            this.dataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-            this.dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-            this.dataGridView.EnableHeadersVisualStyles = false;
+            dataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            dataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            dataGridView.EnableHeadersVisualStyles = false;
 
             // Colors for menu
-            this.dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.bookmarkContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.columnContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.editModeContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
-            this.filterListContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            dataGridContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            bookmarkContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            columnContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            editModeContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            filterListContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
-            for (var y = 0; y < this.dataGridContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < dataGridContextMenuStrip.Items.Count; y++)
             {
-                var item = this.dataGridContextMenuStrip.Items[y];
+                var item = dataGridContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            for (var y = 0; y < this.bookmarkContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < bookmarkContextMenuStrip.Items.Count; y++)
             {
-                var item = this.bookmarkContextMenuStrip.Items[y];
+                var item = bookmarkContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            for (var y = 0; y < this.columnContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < columnContextMenuStrip.Items.Count; y++)
             {
-                var item = this.columnContextMenuStrip.Items[y];
+                var item = columnContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            for (var y = 0; y < this.editModeContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < editModeContextMenuStrip.Items.Count; y++)
             {
-                var item = this.editModeContextMenuStrip.Items[y];
+                var item = editModeContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            for (var y = 0; y < this.filterContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < filterContextMenuStrip.Items.Count; y++)
             {
-                var item = this.filterContextMenuStrip.Items[y];
+                var item = filterContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
-            for (var y = 0; y < this.filterListContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < filterListContextMenuStrip.Items.Count; y++)
             {
-                var item = this.filterListContextMenuStrip.Items[y];
+                var item = filterListContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
             // Filter dataGridView
-            this.filterGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
-            this.filterGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-            this.filterGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-            this.filterGridView.EnableHeadersVisualStyles = false;
+            filterGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            filterGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            filterGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            filterGridView.EnableHeadersVisualStyles = false;
 
             // Colors for menu
-            this.filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            filterContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
-            for (var y = 0; y < this.filterContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < filterContextMenuStrip.Items.Count; y++)
             {
-                var item = this.filterContextMenuStrip.Items[y];
+                var item = filterContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
             #endregion DataGridView
 
-            this.proFiltersRichTextBox.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-            this.proFiltersRichTextBox.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            proFiltersRichTextBox.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            proFiltersRichTextBox.ForeColor = LogExpert.Config.ColorMode.ForeColor;
 
-            this.filterComboBox.BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            filterComboBox.BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
         }
 
         #endregion

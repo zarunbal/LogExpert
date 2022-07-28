@@ -74,7 +74,7 @@ namespace LogExpert.Controls.LogTabWindow
         {
             InitializeComponent();            
 
-            ChangeTheme(this.Controls);
+            ChangeTheme(Controls);
 
             _startupFileNames = fileNames;
             this._instanceNumber = instanceNumber;
@@ -206,7 +206,7 @@ namespace LogExpert.Controls.LogTabWindow
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            _logger.Error(ex, "An error occured while applying style dynamically to all Controls under LogTabWindow:");
                         }
                     }
                 }
@@ -214,44 +214,44 @@ namespace LogExpert.Controls.LogTabWindow
             #endregion
 
             // Colors for selected menus
-            this.mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
             
             // Dock special color
-            this.dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
 
             // Remove toolstrip bottom border
-            this.buttonToolStrip.Renderer = new LogExpert.Extensions.ToolStripRendererExtension();
+            buttonToolStrip.Renderer = new LogExpert.Extensions.ToolStripRendererExtension();
 
             #region Tabs
-            this.tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
             // Tabs menu
-            for (var y = 0; y < this.tabContextMenuStrip.Items.Count; y++)
+            for (var y = 0; y < tabContextMenuStrip.Items.Count; y++)
             {
-                var item = this.tabContextMenuStrip.Items[y];
+                var item = tabContextMenuStrip.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }
 
             // Tabs line
-            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
-            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
 
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = LogExpert.Config.ColorMode.TabsBackgroundStripColor;
 
             // Tabs
-            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
 
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = LogExpert.Config.ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;
 
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = LogExpert.Config.ColorMode.InactiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = LogExpert.Config.ColorMode.InactiveTabColor;
-            this.dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;            
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = LogExpert.Config.ColorMode.InactiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = LogExpert.Config.ColorMode.InactiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = LogExpert.Config.ColorMode.ForeColor;            
             #endregion Tabs
         }
         #endregion

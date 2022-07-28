@@ -32,8 +32,12 @@ namespace LogExpert.Dialogs
             bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
             bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
 
-            ChangeTheme(this.Controls);
+            ChangeTheme(Controls);
         }
+
+        #endregion
+
+        #region ColorTheme
 
         public void ChangeTheme(Control.ControlCollection container)
         {
@@ -57,20 +61,20 @@ namespace LogExpert.Dialogs
 
             #region DataGridView
 
-            this.BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
 
             // Main DataGridView
-            this.bookmarkDataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
-            this.bookmarkDataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
-            this.bookmarkDataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
-            this.bookmarkDataGridView.EnableHeadersVisualStyles = false;            
+            bookmarkDataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            bookmarkDataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            bookmarkDataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            bookmarkDataGridView.EnableHeadersVisualStyles = false;            
 
             // Colors for menu
-            this.contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
 
-            for (var y = 0; y < this.contextMenuStrip1.Items.Count; y++)
+            for (var y = 0; y < contextMenuStrip1.Items.Count; y++)
             {
-                var item = this.contextMenuStrip1.Items[y];
+                var item = contextMenuStrip1.Items[y];
                 item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
                 item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
             }            

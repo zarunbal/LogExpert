@@ -109,15 +109,15 @@
     <Compile Include="Dialogs\LogGridCell.cs" />
     <Compile Include="Dialogs\LogTextColumn.cs" />
     <Compile Include="Extensions\ComboBoxExtensions.cs" />
-    <Compile Include="Extensions\MenuStripExtension.cs" />
-    <Compile Include="Extensions\LineToolStripSeparatorExtension.cs">
+    <Compile Include="Extensions\Forms\MenuStripExtension.cs" />
+    <Compile Include="Extensions\Forms\LineToolStripSeparatorExtension.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Extensions\MenuToolStripSeparatorExtension.cs">
+    <Compile Include="Extensions\Forms\MenuToolStripSeparatorExtension.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Extensions\IEnumerable.cs" />
-    <Compile Include="Extensions\ToolStripRendererExtension.cs" />
+    <Compile Include="Extensions\Forms\ToolStripRendererExtension.cs" />
     <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\BookmarkCollection.cs" />
