@@ -2,6 +2,7 @@
 using CsvColumnizerType=CsvColumnizer.CsvColumnizer;
 using NUnit.Framework;
 using System;
+using System.Threading;
 using LogExpert.Classes;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Controls.LogWindow;
@@ -10,6 +11,7 @@ using LogExpert.Entities;
 namespace LogExpert.Tests
 {
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class LogWindowTest
     {
         // TODO: Add more tests when DI container is ready.
