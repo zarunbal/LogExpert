@@ -77,7 +77,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 9, 0, patch);
+            return new Version(1, 9, 1, patch);
         }
     }
 
