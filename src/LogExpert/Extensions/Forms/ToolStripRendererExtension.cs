@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
-namespace LogExpert.Extensions
+namespace LogExpert.Extensions.Forms
 {
     public class ToolStripRendererExtension : ToolStripSystemRenderer
     {

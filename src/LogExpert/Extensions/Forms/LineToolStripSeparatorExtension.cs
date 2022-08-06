@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace LogExpert.Extensions
+namespace LogExpert.Extensions.Forms
 {
     public class LineToolStripSeparatorExtension : ToolStripSeparator
     {
         public LineToolStripSeparatorExtension()
         {
-            this.Paint += ExtendedToolStripSeparator_Paint;
+            Paint += OnExtendedToolStripSeparatorPaint;
         }
 
-        private void ExtendedToolStripSeparator_Paint(object sender, PaintEventArgs e)
+        private void OnExtendedToolStripSeparatorPaint(object sender, PaintEventArgs e)
         {
             // Get the separator's width and height.
             ToolStripSeparator toolStripSeparator = (ToolStripSeparator)sender;
