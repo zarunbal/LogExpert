@@ -1,4 +1,5 @@
 ﻿using LogExpert.Dialogs;
+using LogExpert.Extensions.Forms;
 
 namespace LogExpert.Controls.LogWindow
 {
@@ -41,21 +42,21 @@ namespace LogExpert.Controls.LogWindow
             this.dataGridContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToTabToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator1 = new MenuToolStripSeparatorExtension();
             this.scrollAllTabsToTimestampToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.syncTimestampsToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.freeThisWindowFromTimeSyncToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.locateLineInOriginalFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator2 = new MenuToolStripSeparatorExtension();
             this.toggleBoomarkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bookmarkCommentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator4 = new MenuToolStripSeparatorExtension();
             this.markEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tempHighlightsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.makePermanentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.markCurrentFilterRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pluginSeparator = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.pluginSeparator = new MenuToolStripSeparatorExtension();
             this.timeSpreadingControl = new LogExpert.Dialogs.TimeSpreadingControl();
             this.advancedBackPanel = new System.Windows.Forms.Panel();
             this.advancedFilterSplitContainer = new System.Windows.Forms.SplitContainer();
@@ -63,7 +64,6 @@ namespace LogExpert.Controls.LogWindow
             this.columnButton = new System.Windows.Forms.Button();
             this.columnRestrictCheckBox = new System.Windows.Forms.CheckBox();
             this.rangeCheckBox = new System.Windows.Forms.CheckBox();
-            this.proFiltersRichTextBox = new System.Windows.Forms.RichTextBox();
             this.filterRangeComboBox = new System.Windows.Forms.ComboBox();
             this.columnNamesLabel = new System.Windows.Forms.Label();
             this.fuzzyLabel = new System.Windows.Forms.Label();
@@ -107,14 +107,14 @@ namespace LogExpert.Controls.LogWindow
             this.deleteBookmarksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.columnContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.freezeLeftColumnsUntilHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator3 = new MenuToolStripSeparatorExtension();
             this.moveToLastColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveLeftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveRightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator5 = new MenuToolStripSeparatorExtension();
             this.hideColumnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.restoreColumnsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new LogExpert.Extensions.MenuToolStripSeparatorExtension();
+            this.toolStripSeparator6 = new MenuToolStripSeparatorExtension();
             this.allColumnsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editModeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editModecopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -184,7 +184,7 @@ namespace LogExpert.Controls.LogWindow
             this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 197F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 181F));
             this.tableLayoutPanel1.Controls.Add(this.columnFinderPanel, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.dataGridView, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.timeSpreadingControl, 1, 1);
@@ -214,7 +214,7 @@ namespace LogExpert.Controls.LogWindow
             this.columnComboBox.Location = new System.Drawing.Point(88, 1);
             this.columnComboBox.MaxDropDownItems = 15;
             this.columnComboBox.Name = "columnComboBox";
-            this.columnComboBox.Size = new System.Drawing.Size(181, 25);
+            this.columnComboBox.Size = new System.Drawing.Size(181, 21);
             this.columnComboBox.TabIndex = 1;
             this.helpToolTip.SetToolTip(this.columnComboBox, "Select column to scroll to");
             this.columnComboBox.SelectionChangeCommitted += new System.EventHandler(this.OnColumnComboBoxSelectionChangeCommitted);
@@ -226,7 +226,7 @@ namespace LogExpert.Controls.LogWindow
             this.lblColumnName.AutoSize = true;
             this.lblColumnName.Location = new System.Drawing.Point(8, 4);
             this.lblColumnName.Name = "lblColumnName";
-            this.lblColumnName.Size = new System.Drawing.Size(98, 17);
+            this.lblColumnName.Size = new System.Drawing.Size(74, 13);
             this.lblColumnName.TabIndex = 0;
             this.lblColumnName.Text = "Column name:";
             // 
@@ -251,7 +251,6 @@ namespace LogExpert.Controls.LogWindow
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.PaintWithOverlays = false;
             this.dataGridView.RowHeadersVisible = false;
-            this.dataGridView.RowHeadersWidth = 51;
             this.dataGridView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
             this.dataGridView.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
             this.dataGridView.RowTemplate.Height = 15;
@@ -282,7 +281,6 @@ namespace LogExpert.Controls.LogWindow
             // 
             // dataGridContextMenuStrip
             // 
-            this.dataGridContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.dataGridContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.copyToolStripMenuItem,
             this.copyToTabToolStripMenuItem,
@@ -300,14 +298,14 @@ namespace LogExpert.Controls.LogWindow
             this.markCurrentFilterRangeToolStripMenuItem,
             this.pluginSeparator});
             this.dataGridContextMenuStrip.Name = "dataGridContextMenuStrip";
-            this.dataGridContextMenuStrip.Size = new System.Drawing.Size(348, 292);
+            this.dataGridContextMenuStrip.Size = new System.Drawing.Size(287, 270);
             this.dataGridContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.OnDataGridContextMenuStripOpening);
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.copyToolStripMenuItem.Text = "Copy to clipboard";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.OnCopyToolStripMenuItemClick);
             // 
@@ -315,7 +313,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.copyToTabToolStripMenuItem.Name = "copyToTabToolStripMenuItem";
             this.copyToTabToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.copyToTabToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.copyToTabToolStripMenuItem.Size = new System.Drawing.Size(286, 22); 
             this.copyToTabToolStripMenuItem.Text = "Copy to new tab";
             this.copyToTabToolStripMenuItem.ToolTipText = "Copy marked lines into a new tab window";
             this.copyToTabToolStripMenuItem.Click += new System.EventHandler(this.OnCopyToTabToolStripMenuItemClick);
@@ -323,12 +321,12 @@ namespace LogExpert.Controls.LogWindow
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(344, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(283, 6);
             // 
             // scrollAllTabsToTimestampToolStripMenuItem
             // 
             this.scrollAllTabsToTimestampToolStripMenuItem.Name = "scrollAllTabsToTimestampToolStripMenuItem";
-            this.scrollAllTabsToTimestampToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.scrollAllTabsToTimestampToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.scrollAllTabsToTimestampToolStripMenuItem.Text = "Scroll all tabs to current timestamp";
             this.scrollAllTabsToTimestampToolStripMenuItem.ToolTipText = "Scolls all open tabs to the selected timestamp, if possible";
             this.scrollAllTabsToTimestampToolStripMenuItem.Click += new System.EventHandler(this.OnScrollAllTabsToTimestampToolStripMenuItemClick);
@@ -336,13 +334,13 @@ namespace LogExpert.Controls.LogWindow
             // syncTimestampsToToolStripMenuItem
             // 
             this.syncTimestampsToToolStripMenuItem.Name = "syncTimestampsToToolStripMenuItem";
-            this.syncTimestampsToToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.syncTimestampsToToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.syncTimestampsToToolStripMenuItem.Text = "Time synced files";
             // 
             // freeThisWindowFromTimeSyncToolStripMenuItem
             // 
             this.freeThisWindowFromTimeSyncToolStripMenuItem.Name = "freeThisWindowFromTimeSyncToolStripMenuItem";
-            this.freeThisWindowFromTimeSyncToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.freeThisWindowFromTimeSyncToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.freeThisWindowFromTimeSyncToolStripMenuItem.Text = "Free this window from time sync";
             this.freeThisWindowFromTimeSyncToolStripMenuItem.Click += new System.EventHandler(this.OnFreeThisWindowFromTimeSyncToolStripMenuItemClick);
             // 
@@ -350,20 +348,20 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.locateLineInOriginalFileToolStripMenuItem.Name = "locateLineInOriginalFileToolStripMenuItem";
             this.locateLineInOriginalFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.locateLineInOriginalFileToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.locateLineInOriginalFileToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.locateLineInOriginalFileToolStripMenuItem.Text = "Locate filtered line in original file";
             this.locateLineInOriginalFileToolStripMenuItem.Click += new System.EventHandler(this.OnLocateLineInOriginalFileToolStripMenuItemClick);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(344, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(283, 6);
             // 
             // toggleBoomarkToolStripMenuItem
             // 
             this.toggleBoomarkToolStripMenuItem.Name = "toggleBoomarkToolStripMenuItem";
             this.toggleBoomarkToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F2)));
-            this.toggleBoomarkToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.toggleBoomarkToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.toggleBoomarkToolStripMenuItem.Text = "Toggle Boomark";
             this.toggleBoomarkToolStripMenuItem.Click += new System.EventHandler(this.OnToggleBoomarkToolStripMenuItemClick);
             // 
@@ -371,7 +369,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.bookmarkCommentToolStripMenuItem.Name = "bookmarkCommentToolStripMenuItem";
             this.bookmarkCommentToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
-            this.bookmarkCommentToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.bookmarkCommentToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.bookmarkCommentToolStripMenuItem.Text = "Bookmark comment...";
             this.bookmarkCommentToolStripMenuItem.ToolTipText = "Edit the comment for a bookmark";
             this.bookmarkCommentToolStripMenuItem.Click += new System.EventHandler(this.OnBookmarkCommentToolStripMenuItemClick);
@@ -379,13 +377,13 @@ namespace LogExpert.Controls.LogWindow
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(344, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(283, 6);
             // 
             // markEditModeToolStripMenuItem
             // 
             this.markEditModeToolStripMenuItem.Name = "markEditModeToolStripMenuItem";
             this.markEditModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.markEditModeToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.markEditModeToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.markEditModeToolStripMenuItem.Text = "Mark/Edit-Mode";
             this.markEditModeToolStripMenuItem.Click += new System.EventHandler(this.OnMarkEditModeToolStripMenuItemClick);
             // 
@@ -395,7 +393,7 @@ namespace LogExpert.Controls.LogWindow
             this.removeAllToolStripMenuItem,
             this.makePermanentToolStripMenuItem});
             this.tempHighlightsToolStripMenuItem.Name = "tempHighlightsToolStripMenuItem";
-            this.tempHighlightsToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.tempHighlightsToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.tempHighlightsToolStripMenuItem.Text = "Temp Highlights";
             // 
             // removeAllToolStripMenuItem
@@ -403,14 +401,14 @@ namespace LogExpert.Controls.LogWindow
             this.removeAllToolStripMenuItem.Name = "removeAllToolStripMenuItem";
             this.removeAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.H)));
-            this.removeAllToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
+            this.removeAllToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.removeAllToolStripMenuItem.Text = "Remove all";
             this.removeAllToolStripMenuItem.Click += new System.EventHandler(this.OnRemoveAllToolStripMenuItemClick);
             // 
             // makePermanentToolStripMenuItem
             // 
             this.makePermanentToolStripMenuItem.Name = "makePermanentToolStripMenuItem";
-            this.makePermanentToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
+            this.makePermanentToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.makePermanentToolStripMenuItem.Text = "Make all permanent";
             this.makePermanentToolStripMenuItem.Click += new System.EventHandler(this.OnMakePermanentToolStripMenuItemClick);
             // 
@@ -418,14 +416,14 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.markCurrentFilterRangeToolStripMenuItem.Name = "markCurrentFilterRangeToolStripMenuItem";
             this.markCurrentFilterRangeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.markCurrentFilterRangeToolStripMenuItem.Size = new System.Drawing.Size(347, 24);
+            this.markCurrentFilterRangeToolStripMenuItem.Size = new System.Drawing.Size(286, 22);
             this.markCurrentFilterRangeToolStripMenuItem.Text = "Mark current filter range";
             this.markCurrentFilterRangeToolStripMenuItem.Click += new System.EventHandler(this.OnMarkCurrentFilterRangeToolStripMenuItemClick);
             // 
             // pluginSeparator
             // 
             this.pluginSeparator.Name = "pluginSeparator";
-            this.pluginSeparator.Size = new System.Drawing.Size(344, 6);
+            this.pluginSeparator.Size = new System.Drawing.Size(283, 6);
             // 
             // timeSpreadingControl
             // 
@@ -433,7 +431,7 @@ namespace LogExpert.Controls.LogWindow
             | System.Windows.Forms.AnchorStyles.Right)));
             this.timeSpreadingControl.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.timeSpreadingControl.ForeColor = System.Drawing.Color.Teal;
-            this.timeSpreadingControl.Location = new System.Drawing.Point(1029, 30);
+            this.timeSpreadingControl.Location = new System.Drawing.Point(1013, 30);
             this.timeSpreadingControl.Margin = new System.Windows.Forms.Padding(2, 0, 1, 0);
             this.timeSpreadingControl.Name = "timeSpreadingControl";
             this.timeSpreadingControl.ReverseAlpha = false;
@@ -483,7 +481,6 @@ namespace LogExpert.Controls.LogWindow
             this.pnlProFilter.Controls.Add(this.columnButton);
             this.pnlProFilter.Controls.Add(this.columnRestrictCheckBox);
             this.pnlProFilter.Controls.Add(this.rangeCheckBox);
-            this.pnlProFilter.Controls.Add(this.proFiltersRichTextBox);
             this.pnlProFilter.Controls.Add(this.filterRangeComboBox);
             this.pnlProFilter.Controls.Add(this.columnNamesLabel);
             this.pnlProFilter.Controls.Add(this.fuzzyLabel);
@@ -495,18 +492,18 @@ namespace LogExpert.Controls.LogWindow
             this.pnlProFilter.Controls.Add(this.lblForeSpread);
             this.pnlProFilter.Controls.Add(this.filterKnobForeSpread);
             this.pnlProFilter.Controls.Add(this.btnFilterToTab);
-            this.pnlProFilter.Location = new System.Drawing.Point(0, 1);
+            this.pnlProFilter.Location = new System.Drawing.Point(0, 3);
             this.pnlProFilter.Name = "pnlProFilter";
-            this.pnlProFilter.Size = new System.Drawing.Size(1004, 71);
+            this.pnlProFilter.Size = new System.Drawing.Size(1004, 69);
             this.pnlProFilter.TabIndex = 0;
             // 
             // columnButton
             // 
             this.columnButton.Enabled = false;
             this.columnButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.columnButton.Location = new System.Drawing.Point(683, 30);
+            this.columnButton.Location = new System.Drawing.Point(655, 30);
             this.columnButton.Name = "columnButton";
-            this.columnButton.Size = new System.Drawing.Size(100, 23);
+            this.columnButton.Size = new System.Drawing.Size(71, 23);
             this.columnButton.TabIndex = 15;
             this.columnButton.Text = "Columns...";
             this.helpToolTip.SetToolTip(this.columnButton, "Choose columns for \'Column restrict\'");
@@ -516,9 +513,9 @@ namespace LogExpert.Controls.LogWindow
             // columnRestrictCheckBox
             // 
             this.columnRestrictCheckBox.AutoSize = true;
-            this.columnRestrictCheckBox.Location = new System.Drawing.Point(555, 37);
+            this.columnRestrictCheckBox.Location = new System.Drawing.Point(527, 37);
             this.columnRestrictCheckBox.Name = "columnRestrictCheckBox";
-            this.columnRestrictCheckBox.Size = new System.Drawing.Size(124, 21);
+            this.columnRestrictCheckBox.Size = new System.Drawing.Size(95, 17);
             this.columnRestrictCheckBox.TabIndex = 14;
             this.columnRestrictCheckBox.Text = "Column restrict";
             this.helpToolTip.SetToolTip(this.columnRestrictCheckBox, "Restrict search to columns");
@@ -530,7 +527,7 @@ namespace LogExpert.Controls.LogWindow
             this.rangeCheckBox.AutoSize = true;
             this.rangeCheckBox.Location = new System.Drawing.Point(75, 36);
             this.rangeCheckBox.Name = "rangeCheckBox";
-            this.rangeCheckBox.Size = new System.Drawing.Size(119, 21);
+            this.rangeCheckBox.Size = new System.Drawing.Size(93, 17);
             this.rangeCheckBox.TabIndex = 13;
             this.rangeCheckBox.Text = "Range search";
             this.helpToolTip.SetToolTip(this.rangeCheckBox, "Enable a special search mode which filters all content between the 2 given search" +
@@ -538,23 +535,13 @@ namespace LogExpert.Controls.LogWindow
             this.rangeCheckBox.UseVisualStyleBackColor = true;
             this.rangeCheckBox.CheckedChanged += new System.EventHandler(this.OnRangeCheckBoxCheckedChanged);
             // 
-            // proFiltersRichTextBox
-            // 
-            this.proFiltersRichTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.proFiltersRichTextBox.Location = new System.Drawing.Point(3, 7);
-            this.proFiltersRichTextBox.Name = "proFiltersRichTextBox";
-            this.proFiltersRichTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.proFiltersRichTextBox.Size = new System.Drawing.Size(66, 61);
-            this.proFiltersRichTextBox.TabIndex = 3;
-            this.proFiltersRichTextBox.Text = "  Pro\nFilters";
-            // 
             // filterRangeComboBox
             // 
             this.filterRangeComboBox.Enabled = false;
             this.filterRangeComboBox.FormattingEnabled = true;
             this.filterRangeComboBox.Location = new System.Drawing.Point(73, 11);
             this.filterRangeComboBox.Name = "filterRangeComboBox";
-            this.filterRangeComboBox.Size = new System.Drawing.Size(207, 25);
+            this.filterRangeComboBox.Size = new System.Drawing.Size(207, 21);
             this.filterRangeComboBox.TabIndex = 12;
             this.helpToolTip.SetToolTip(this.filterRangeComboBox, "2nd search string (\'end string\') when using the range search");
             this.filterRangeComboBox.TextChanged += new System.EventHandler(this.OnFilterRangeComboBoxTextChanged);
@@ -562,18 +549,18 @@ namespace LogExpert.Controls.LogWindow
             // columnNamesLabel
             // 
             this.columnNamesLabel.AutoSize = true;
-            this.columnNamesLabel.Location = new System.Drawing.Point(787, 34);
+            this.columnNamesLabel.Location = new System.Drawing.Point(732, 35);
             this.columnNamesLabel.Name = "columnNamesLabel";
-            this.columnNamesLabel.Size = new System.Drawing.Size(99, 17);
+            this.columnNamesLabel.Size = new System.Drawing.Size(75, 13);
             this.columnNamesLabel.TabIndex = 11;
             this.columnNamesLabel.Text = "column names";
             // 
             // fuzzyLabel
             // 
             this.fuzzyLabel.AutoSize = true;
-            this.fuzzyLabel.Location = new System.Drawing.Point(463, 38);
+            this.fuzzyLabel.Location = new System.Drawing.Point(435, 38);
             this.fuzzyLabel.Name = "fuzzyLabel";
-            this.fuzzyLabel.Size = new System.Drawing.Size(75, 17);
+            this.fuzzyLabel.Size = new System.Drawing.Size(56, 13);
             this.fuzzyLabel.TabIndex = 11;
             this.fuzzyLabel.Text = "Fuzzyness";
             // 
@@ -581,7 +568,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.fuzzyKnobControl.DragSensitivity = 6;
             this.fuzzyKnobControl.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fuzzyKnobControl.Location = new System.Drawing.Point(488, 7);
+            this.fuzzyKnobControl.Location = new System.Drawing.Point(454, 7);
             this.fuzzyKnobControl.Margin = new System.Windows.Forms.Padding(2);
             this.fuzzyKnobControl.MaxValue = 0;
             this.fuzzyKnobControl.MinValue = 0;
@@ -595,9 +582,9 @@ namespace LogExpert.Controls.LogWindow
             // invertFilterCheckBox
             // 
             this.invertFilterCheckBox.AutoSize = true;
-            this.invertFilterCheckBox.Location = new System.Drawing.Point(555, 13);
+            this.invertFilterCheckBox.Location = new System.Drawing.Point(527, 13);
             this.invertFilterCheckBox.Name = "invertFilterCheckBox";
-            this.invertFilterCheckBox.Size = new System.Drawing.Size(107, 21);
+            this.invertFilterCheckBox.Size = new System.Drawing.Size(86, 17);
             this.invertFilterCheckBox.TabIndex = 8;
             this.invertFilterCheckBox.Text = "Invert Match";
             this.helpToolTip.SetToolTip(this.invertFilterCheckBox, "Invert the search result");
@@ -612,14 +599,14 @@ namespace LogExpert.Controls.LogWindow
             this.pnlProFilterLabel.Name = "pnlProFilterLabel";
             this.pnlProFilterLabel.Size = new System.Drawing.Size(60, 44);
             this.pnlProFilterLabel.TabIndex = 7;
-            this.pnlProFilterLabel.Visible = false;
+            this.pnlProFilterLabel.Visible = true;
             // 
             // lblBackSpread
             // 
             this.lblBackSpread.AutoSize = true;
-            this.lblBackSpread.Location = new System.Drawing.Point(280, 38);
+            this.lblBackSpread.Location = new System.Drawing.Point(273, 38);
             this.lblBackSpread.Name = "lblBackSpread";
-            this.lblBackSpread.Size = new System.Drawing.Size(93, 17);
+            this.lblBackSpread.Size = new System.Drawing.Size(72, 13);
             this.lblBackSpread.TabIndex = 6;
             this.lblBackSpread.Text = "Back Spread ";
             // 
@@ -627,7 +614,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.filterKnobBackSpread.DragSensitivity = 3;
             this.filterKnobBackSpread.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterKnobBackSpread.Location = new System.Drawing.Point(315, 7);
+            this.filterKnobBackSpread.Location = new System.Drawing.Point(299, 7);
             this.filterKnobBackSpread.Margin = new System.Windows.Forms.Padding(2);
             this.filterKnobBackSpread.MaxValue = 0;
             this.filterKnobBackSpread.MinValue = 0;
@@ -640,9 +627,9 @@ namespace LogExpert.Controls.LogWindow
             // lblForeSpread
             // 
             this.lblForeSpread.AutoSize = true;
-            this.lblForeSpread.Location = new System.Drawing.Point(370, 38);
+            this.lblForeSpread.Location = new System.Drawing.Point(342, 38);
             this.lblForeSpread.Name = "lblForeSpread";
-            this.lblForeSpread.Size = new System.Drawing.Size(87, 17);
+            this.lblForeSpread.Size = new System.Drawing.Size(65, 13);
             this.lblForeSpread.TabIndex = 2;
             this.lblForeSpread.Text = "Fore Spread";
             // 
@@ -650,7 +637,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.filterKnobForeSpread.DragSensitivity = 3;
             this.filterKnobForeSpread.Font = new System.Drawing.Font("Verdana", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterKnobForeSpread.Location = new System.Drawing.Point(401, 7);
+            this.filterKnobForeSpread.Location = new System.Drawing.Point(365, 7);
             this.filterKnobForeSpread.Margin = new System.Windows.Forms.Padding(2);
             this.filterKnobForeSpread.MaxValue = 0;
             this.filterKnobForeSpread.MinValue = 0;
@@ -662,10 +649,9 @@ namespace LogExpert.Controls.LogWindow
             // 
             // btnFilterToTab
             // 
-            this.btnFilterToTab.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnFilterToTab.Location = new System.Drawing.Point(683, 3);
+            this.btnFilterToTab.Location = new System.Drawing.Point(655, 3);
             this.btnFilterToTab.Name = "btnFilterToTab";
-            this.btnFilterToTab.Size = new System.Drawing.Size(100, 23);
+            this.btnFilterToTab.Size = new System.Drawing.Size(71, 23);
             this.btnFilterToTab.TabIndex = 0;
             this.btnFilterToTab.Text = "Filter to Tab";
             this.helpToolTip.SetToolTip(this.btnFilterToTab, "Launch a new tab with filtered content");
@@ -703,7 +689,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.highlightSplitContainer.Panel2.Controls.Add(this.highlightSplitContainerBackPanel);
             this.highlightSplitContainer.Panel2MinSize = 30;
-            this.highlightSplitContainer.Size = new System.Drawing.Size(981, 207);
+            this.highlightSplitContainer.Size = new System.Drawing.Size(981, 175);
             this.highlightSplitContainer.SplitterDistance = 612;
             this.highlightSplitContainer.TabIndex = 2;
             // 
@@ -729,7 +715,6 @@ namespace LogExpert.Controls.LogWindow
             this.filterGridView.PaintWithOverlays = false;
             this.filterGridView.ReadOnly = true;
             this.filterGridView.RowHeadersVisible = false;
-            this.filterGridView.RowHeadersWidth = 51;
             this.filterGridView.RowTemplate.Height = 15;
             this.filterGridView.RowTemplate.ReadOnly = true;
             this.filterGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -737,7 +722,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterGridView.ShowCellToolTips = false;
             this.filterGridView.ShowEditingIcon = false;
             this.filterGridView.ShowRowErrors = false;
-            this.filterGridView.Size = new System.Drawing.Size(610, 205);
+            this.filterGridView.Size = new System.Drawing.Size(610, 173);
             this.filterGridView.TabIndex = 1;
             this.filterGridView.VirtualMode = true;
             this.filterGridView.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.OnFilterGridViewCellContextMenuStripNeeded);
@@ -750,18 +735,17 @@ namespace LogExpert.Controls.LogWindow
             // 
             // filterContextMenuStrip
             // 
-            this.filterContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.filterContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setBookmarksOnSelectedLinesToolStripMenuItem,
             this.filterToTabToolStripMenuItem,
             this.markFilterHitsInLogViewToolStripMenuItem});
             this.filterContextMenuStrip.Name = "filterContextMenuStrip";
-            this.filterContextMenuStrip.Size = new System.Drawing.Size(291, 76);
+            this.filterContextMenuStrip.Size = new System.Drawing.Size(243, 70);
             // 
             // setBookmarksOnSelectedLinesToolStripMenuItem
             // 
             this.setBookmarksOnSelectedLinesToolStripMenuItem.Name = "setBookmarksOnSelectedLinesToolStripMenuItem";
-            this.setBookmarksOnSelectedLinesToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.setBookmarksOnSelectedLinesToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
             this.setBookmarksOnSelectedLinesToolStripMenuItem.Text = "Set bookmarks on selected lines";
             this.setBookmarksOnSelectedLinesToolStripMenuItem.Click += new System.EventHandler(this.OnSetBookmarksOnSelectedLinesToolStripMenuItemClick);
             // 
@@ -770,14 +754,14 @@ namespace LogExpert.Controls.LogWindow
             this.filterToTabToolStripMenuItem.Name = "filterToTabToolStripMenuItem";
             this.filterToTabToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.T)));
-            this.filterToTabToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.filterToTabToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
             this.filterToTabToolStripMenuItem.Text = "Filter to new tab";
             this.filterToTabToolStripMenuItem.Click += new System.EventHandler(this.OnFilterToTabToolStripMenuItemClick);
             // 
             // markFilterHitsInLogViewToolStripMenuItem
             // 
             this.markFilterHitsInLogViewToolStripMenuItem.Name = "markFilterHitsInLogViewToolStripMenuItem";
-            this.markFilterHitsInLogViewToolStripMenuItem.Size = new System.Drawing.Size(290, 24);
+            this.markFilterHitsInLogViewToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
             this.markFilterHitsInLogViewToolStripMenuItem.Text = "Mark filter hits in log view";
             this.markFilterHitsInLogViewToolStripMenuItem.Click += new System.EventHandler(this.OnMarkFilterHitsInLogViewToolStripMenuItemClick);
             // 
@@ -793,7 +777,7 @@ namespace LogExpert.Controls.LogWindow
             this.highlightSplitContainerBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.highlightSplitContainerBackPanel.Location = new System.Drawing.Point(0, 0);
             this.highlightSplitContainerBackPanel.Name = "highlightSplitContainerBackPanel";
-            this.highlightSplitContainerBackPanel.Size = new System.Drawing.Size(363, 205);
+            this.highlightSplitContainerBackPanel.Size = new System.Drawing.Size(363, 173);
             this.highlightSplitContainerBackPanel.TabIndex = 1;
             // 
             // hideFilterListOnLoadCheckBox
@@ -801,7 +785,7 @@ namespace LogExpert.Controls.LogWindow
             this.hideFilterListOnLoadCheckBox.AutoSize = true;
             this.hideFilterListOnLoadCheckBox.Location = new System.Drawing.Point(287, 134);
             this.hideFilterListOnLoadCheckBox.Name = "hideFilterListOnLoadCheckBox";
-            this.hideFilterListOnLoadCheckBox.Size = new System.Drawing.Size(90, 21);
+            this.hideFilterListOnLoadCheckBox.Size = new System.Drawing.Size(71, 17);
             this.hideFilterListOnLoadCheckBox.TabIndex = 20;
             this.hideFilterListOnLoadCheckBox.Text = "Auto hide";
             this.helpToolTip.SetToolTip(this.hideFilterListOnLoadCheckBox, "Hides the filter list after loading a filter");
@@ -835,7 +819,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterOnLoadCheckBox.AutoSize = true;
             this.filterOnLoadCheckBox.Location = new System.Drawing.Point(287, 110);
             this.filterOnLoadCheckBox.Name = "filterOnLoadCheckBox";
-            this.filterOnLoadCheckBox.Size = new System.Drawing.Size(91, 21);
+            this.filterOnLoadCheckBox.Size = new System.Drawing.Size(71, 17);
             this.filterOnLoadCheckBox.TabIndex = 17;
             this.filterOnLoadCheckBox.Text = "Auto start";
             this.helpToolTip.SetToolTip(this.filterOnLoadCheckBox, "Start immediate filtering after loading a saved filter");
@@ -876,7 +860,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterListBox.IntegralHeight = false;
             this.filterListBox.Location = new System.Drawing.Point(3, 3);
             this.filterListBox.Name = "filterListBox";
-            this.filterListBox.Size = new System.Drawing.Size(278, 200);
+            this.filterListBox.Size = new System.Drawing.Size(278, 168);
             this.filterListBox.TabIndex = 0;
             this.helpToolTip.SetToolTip(this.filterListBox, "Doubleclick to load a saved filter");
             this.filterListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnFilterListBoxDrawItem);
@@ -884,16 +868,15 @@ namespace LogExpert.Controls.LogWindow
             // 
             // filterListContextMenuStrip
             // 
-            this.filterListContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.filterListContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.colorToolStripMenuItem});
             this.filterListContextMenuStrip.Name = "filterListContextMenuStrip";
-            this.filterListContextMenuStrip.Size = new System.Drawing.Size(124, 28);
+            this.filterListContextMenuStrip.Size = new System.Drawing.Size(113, 26);
             // 
             // colorToolStripMenuItem
             // 
             this.colorToolStripMenuItem.Name = "colorToolStripMenuItem";
-            this.colorToolStripMenuItem.Size = new System.Drawing.Size(123, 24);
+            this.colorToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.colorToolStripMenuItem.Text = "Color...";
             this.colorToolStripMenuItem.Click += new System.EventHandler(this.OnColorToolStripMenuItemClick);
             // 
@@ -930,7 +913,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterSplitContainer.Panel2.Controls.Add(this.filterSearchButton);
             this.filterSplitContainer.Panel2MinSize = 550;
             this.filterSplitContainer.Size = new System.Drawing.Size(1007, 32);
-            this.filterSplitContainer.SplitterDistance = 282;
+            this.filterSplitContainer.SplitterDistance = 324;
             this.filterSplitContainer.TabIndex = 11;
             this.filterSplitContainer.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.OnFilterSplitContainerMouseDoubleClick);
             this.filterSplitContainer.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnFilterSplitContainerMouseDown);
@@ -942,16 +925,19 @@ namespace LogExpert.Controls.LogWindow
             this.lblTextFilter.AutoSize = true;
             this.lblTextFilter.Location = new System.Drawing.Point(5, 9);
             this.lblTextFilter.Name = "lblTextFilter";
-            this.lblTextFilter.Size = new System.Drawing.Size(70, 17);
+            this.lblTextFilter.Size = new System.Drawing.Size(53, 13);
             this.lblTextFilter.TabIndex = 3;
             this.lblTextFilter.Text = "Text &filter:";
             // 
             // filterComboBox
             // 
+            this.filterComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.filterComboBox.FormattingEnabled = true;
             this.filterComboBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterComboBox.Location = new System.Drawing.Point(73, 5);
+            this.filterComboBox.Location = new System.Drawing.Point(93, 3);
             this.filterComboBox.Name = "filterComboBox";
-            this.filterComboBox.Size = new System.Drawing.Size(206, 22);
+            this.filterComboBox.Size = new System.Drawing.Size(213, 28);
             this.filterComboBox.TabIndex = 4;
             this.helpToolTip.SetToolTip(this.filterComboBox, "Search string for the filter");
             this.filterComboBox.TextChanged += new System.EventHandler(this.OnFilterComboBoxTextChanged);
@@ -960,12 +946,11 @@ namespace LogExpert.Controls.LogWindow
             // advancedButton
             // 
             this.advancedButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.advancedButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.advancedButton.Image = global::LogExpert.Properties.Resources.AdvancedIcon2;
             this.advancedButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.advancedButton.Location = new System.Drawing.Point(411, 5);
+            this.advancedButton.Location = new System.Drawing.Point(363, 5);
             this.advancedButton.Name = "advancedButton";
-            this.advancedButton.Size = new System.Drawing.Size(134, 21);
+            this.advancedButton.Size = new System.Drawing.Size(110, 21);
             this.advancedButton.TabIndex = 17;
             this.advancedButton.Text = "Show advanced...";
             this.helpToolTip.SetToolTip(this.advancedButton, "Togge the advanced filter options panel");
@@ -975,9 +960,9 @@ namespace LogExpert.Controls.LogWindow
             // syncFilterCheckBox
             // 
             this.syncFilterCheckBox.AutoSize = true;
-            this.syncFilterCheckBox.Location = new System.Drawing.Point(349, 7);
+            this.syncFilterCheckBox.Location = new System.Drawing.Point(306, 7);
             this.syncFilterCheckBox.Name = "syncFilterCheckBox";
-            this.syncFilterCheckBox.Size = new System.Drawing.Size(61, 21);
+            this.syncFilterCheckBox.Size = new System.Drawing.Size(50, 17);
             this.syncFilterCheckBox.TabIndex = 16;
             this.syncFilterCheckBox.Text = "Sync";
             this.helpToolTip.SetToolTip(this.syncFilterCheckBox, "Sync the current selected line in the filter view to the selection in the log fil" +
@@ -989,7 +974,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.lblFilterCount.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblFilterCount.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lblFilterCount.Location = new System.Drawing.Point(647, 5);
+            this.lblFilterCount.Location = new System.Drawing.Point(605, 5);
             this.lblFilterCount.Name = "lblFilterCount";
             this.lblFilterCount.Size = new System.Drawing.Size(71, 21);
             this.lblFilterCount.TabIndex = 15;
@@ -999,9 +984,9 @@ namespace LogExpert.Controls.LogWindow
             // filterTailCheckBox
             // 
             this.filterTailCheckBox.AutoSize = true;
-            this.filterTailCheckBox.Location = new System.Drawing.Point(263, 7);
+            this.filterTailCheckBox.Location = new System.Drawing.Point(235, 7);
             this.filterTailCheckBox.Name = "filterTailCheckBox";
-            this.filterTailCheckBox.Size = new System.Drawing.Size(83, 21);
+            this.filterTailCheckBox.Size = new System.Drawing.Size(64, 17);
             this.filterTailCheckBox.TabIndex = 14;
             this.filterTailCheckBox.Text = "Filter tail";
             this.helpToolTip.SetToolTip(this.filterTailCheckBox, "Filter tailed file content (keeps filter view up to date on file changes)");
@@ -1010,9 +995,9 @@ namespace LogExpert.Controls.LogWindow
             // filterRegexCheckBox
             // 
             this.filterRegexCheckBox.AutoSize = true;
-            this.filterRegexCheckBox.Location = new System.Drawing.Point(191, 7);
+            this.filterRegexCheckBox.Location = new System.Drawing.Point(172, 7);
             this.filterRegexCheckBox.Name = "filterRegexCheckBox";
-            this.filterRegexCheckBox.Size = new System.Drawing.Size(70, 21);
+            this.filterRegexCheckBox.Size = new System.Drawing.Size(57, 17);
             this.filterRegexCheckBox.TabIndex = 13;
             this.filterRegexCheckBox.Text = "Regex";
             this.helpToolTip.SetToolTip(this.filterRegexCheckBox, "Use regular expressions. (right-click for RegEx helper window)");
@@ -1025,7 +1010,7 @@ namespace LogExpert.Controls.LogWindow
             this.filterCaseSensitiveCheckBox.AutoSize = true;
             this.filterCaseSensitiveCheckBox.Location = new System.Drawing.Point(72, 7);
             this.filterCaseSensitiveCheckBox.Name = "filterCaseSensitiveCheckBox";
-            this.filterCaseSensitiveCheckBox.Size = new System.Drawing.Size(121, 21);
+            this.filterCaseSensitiveCheckBox.Size = new System.Drawing.Size(94, 17);
             this.filterCaseSensitiveCheckBox.TabIndex = 12;
             this.filterCaseSensitiveCheckBox.Text = "Case sensitive";
             this.helpToolTip.SetToolTip(this.filterCaseSensitiveCheckBox, "Makes the filter case sensitive");
@@ -1034,12 +1019,11 @@ namespace LogExpert.Controls.LogWindow
             // 
             // filterSearchButton
             // 
-            this.filterSearchButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.filterSearchButton.Image = global::LogExpert.Properties.Resources.AdvancedIcon2;
             this.filterSearchButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.filterSearchButton.Location = new System.Drawing.Point(3, 5);
+            this.filterSearchButton.Location = new System.Drawing.Point(18, 5);
             this.filterSearchButton.Name = "filterSearchButton";
-            this.filterSearchButton.Size = new System.Drawing.Size(63, 22);
+            this.filterSearchButton.Size = new System.Drawing.Size(50, 21);
             this.filterSearchButton.TabIndex = 11;
             this.filterSearchButton.Text = "Search";
             this.helpToolTip.SetToolTip(this.filterSearchButton, "Start the filter search");
@@ -1048,20 +1032,18 @@ namespace LogExpert.Controls.LogWindow
             // 
             // bookmarkContextMenuStrip
             // 
-            this.bookmarkContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.bookmarkContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deleteBookmarksToolStripMenuItem});
             this.bookmarkContextMenuStrip.Name = "bookmarkContextMenuStrip";
-            this.bookmarkContextMenuStrip.Size = new System.Drawing.Size(70, 26);
+            this.bookmarkContextMenuStrip.Size = new System.Drawing.Size(68, 26);
             // 
             // deleteBookmarksToolStripMenuItem
             // 
             this.deleteBookmarksToolStripMenuItem.Name = "deleteBookmarksToolStripMenuItem";
-            this.deleteBookmarksToolStripMenuItem.Size = new System.Drawing.Size(69, 22);
+            this.deleteBookmarksToolStripMenuItem.Size = new System.Drawing.Size(67, 22);
             // 
             // columnContextMenuStrip
             // 
-            this.columnContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.columnContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.freezeLeftColumnsUntilHereToolStripMenuItem,
             this.toolStripSeparator3,
@@ -1074,25 +1056,25 @@ namespace LogExpert.Controls.LogWindow
             this.toolStripSeparator6,
             this.allColumnsToolStripMenuItem});
             this.columnContextMenuStrip.Name = "columnContextMenuStrip";
-            this.columnContextMenuStrip.Size = new System.Drawing.Size(273, 190);
+            this.columnContextMenuStrip.Size = new System.Drawing.Size(230, 176);
             this.columnContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.OnColumnContextMenuStripOpening);
             // 
             // freezeLeftColumnsUntilHereToolStripMenuItem
             // 
             this.freezeLeftColumnsUntilHereToolStripMenuItem.Name = "freezeLeftColumnsUntilHereToolStripMenuItem";
-            this.freezeLeftColumnsUntilHereToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.freezeLeftColumnsUntilHereToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.freezeLeftColumnsUntilHereToolStripMenuItem.Text = "Freeze left columns until here";
             this.freezeLeftColumnsUntilHereToolStripMenuItem.Click += new System.EventHandler(this.OnFreezeLeftColumnsUntilHereToolStripMenuItemClick);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(269, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(226, 6);
             // 
             // moveToLastColumnToolStripMenuItem
             // 
             this.moveToLastColumnToolStripMenuItem.Name = "moveToLastColumnToolStripMenuItem";
-            this.moveToLastColumnToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.moveToLastColumnToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.moveToLastColumnToolStripMenuItem.Text = "Move to last column";
             this.moveToLastColumnToolStripMenuItem.ToolTipText = "Move this column to the last position";
             this.moveToLastColumnToolStripMenuItem.Click += new System.EventHandler(this.OnMoveToLastColumnToolStripMenuItemClick);
@@ -1100,26 +1082,26 @@ namespace LogExpert.Controls.LogWindow
             // moveLeftToolStripMenuItem
             // 
             this.moveLeftToolStripMenuItem.Name = "moveLeftToolStripMenuItem";
-            this.moveLeftToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.moveLeftToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.moveLeftToolStripMenuItem.Text = "Move left";
             this.moveLeftToolStripMenuItem.Click += new System.EventHandler(this.OnMoveLeftToolStripMenuItemClick);
             // 
             // moveRightToolStripMenuItem
             // 
             this.moveRightToolStripMenuItem.Name = "moveRightToolStripMenuItem";
-            this.moveRightToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.moveRightToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.moveRightToolStripMenuItem.Text = "Move right";
             this.moveRightToolStripMenuItem.Click += new System.EventHandler(this.OnMoveRightToolStripMenuItemClick);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(269, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(226, 6);
             // 
             // hideColumnToolStripMenuItem
             // 
             this.hideColumnToolStripMenuItem.Name = "hideColumnToolStripMenuItem";
-            this.hideColumnToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.hideColumnToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.hideColumnToolStripMenuItem.Text = "Hide column";
             this.hideColumnToolStripMenuItem.ToolTipText = "Hide this column";
             this.hideColumnToolStripMenuItem.Click += new System.EventHandler(this.OnHideColumnToolStripMenuItemClick);
@@ -1127,24 +1109,23 @@ namespace LogExpert.Controls.LogWindow
             // restoreColumnsToolStripMenuItem
             // 
             this.restoreColumnsToolStripMenuItem.Name = "restoreColumnsToolStripMenuItem";
-            this.restoreColumnsToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.restoreColumnsToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.restoreColumnsToolStripMenuItem.Text = "Restore columns";
             this.restoreColumnsToolStripMenuItem.Click += new System.EventHandler(this.OnRestoreColumnsToolStripMenuItemClick);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(269, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(266, 6);
             // 
             // allColumnsToolStripMenuItem
             // 
             this.allColumnsToolStripMenuItem.Name = "allColumnsToolStripMenuItem";
-            this.allColumnsToolStripMenuItem.Size = new System.Drawing.Size(272, 24);
+            this.allColumnsToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.allColumnsToolStripMenuItem.Text = "Scroll to column...";
             // 
             // editModeContextMenuStrip
             // 
-            this.editModeContextMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.editModeContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.editModecopyToolStripMenuItem,
             this.highlightSelectionInLogFileToolStripMenuItem,
@@ -1152,13 +1133,13 @@ namespace LogExpert.Controls.LogWindow
             this.filterForSelectionToolStripMenuItem,
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem});
             this.editModeContextMenuStrip.Name = "editModeContextMenuStrip";
-            this.editModeContextMenuStrip.Size = new System.Drawing.Size(418, 124);
+            this.editModeContextMenuStrip.Size = new System.Drawing.Size(344, 114);
             // 
             // editModecopyToolStripMenuItem
             // 
             this.editModecopyToolStripMenuItem.Name = "editModecopyToolStripMenuItem";
             this.editModecopyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.editModecopyToolStripMenuItem.Size = new System.Drawing.Size(417, 24);
+            this.editModecopyToolStripMenuItem.Size = new System.Drawing.Size(343, 22);
             this.editModecopyToolStripMenuItem.Text = "Copy";
             this.editModecopyToolStripMenuItem.Click += new System.EventHandler(this.OnEditModeCopyToolStripMenuItemClick);
             // 
@@ -1166,7 +1147,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.highlightSelectionInLogFileToolStripMenuItem.Name = "highlightSelectionInLogFileToolStripMenuItem";
             this.highlightSelectionInLogFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this.highlightSelectionInLogFileToolStripMenuItem.Size = new System.Drawing.Size(417, 24);
+            this.highlightSelectionInLogFileToolStripMenuItem.Size = new System.Drawing.Size(343, 22);
             this.highlightSelectionInLogFileToolStripMenuItem.Text = "Highlight selection in log file (full line)";
             this.highlightSelectionInLogFileToolStripMenuItem.Click += new System.EventHandler(this.OnHighlightSelectionInLogFileToolStripMenuItemClick);
             // 
@@ -1174,7 +1155,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.highlightSelectionInLogFilewordModeToolStripMenuItem.Name = "highlightSelectionInLogFilewordModeToolStripMenuItem";
             this.highlightSelectionInLogFilewordModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.highlightSelectionInLogFilewordModeToolStripMenuItem.Size = new System.Drawing.Size(417, 24);
+            this.highlightSelectionInLogFilewordModeToolStripMenuItem.Size = new System.Drawing.Size(343, 22);
             this.highlightSelectionInLogFilewordModeToolStripMenuItem.Text = "Highlight selection in log file (word mode)";
             this.highlightSelectionInLogFilewordModeToolStripMenuItem.Click += new System.EventHandler(this.OnHighlightSelectionInLogFilewordModeToolStripMenuItemClick);
             // 
@@ -1182,7 +1163,7 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.filterForSelectionToolStripMenuItem.Name = "filterForSelectionToolStripMenuItem";
             this.filterForSelectionToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.filterForSelectionToolStripMenuItem.Size = new System.Drawing.Size(417, 24);
+            this.filterForSelectionToolStripMenuItem.Size = new System.Drawing.Size(343, 22);
             this.filterForSelectionToolStripMenuItem.Text = "Filter for selection";
             this.filterForSelectionToolStripMenuItem.Click += new System.EventHandler(this.OnFilterForSelectionToolStripMenuItemClick);
             // 
@@ -1190,13 +1171,13 @@ namespace LogExpert.Controls.LogWindow
             // 
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Name = "setSelectedTextAsBookmarkCommentToolStripMenuItem";
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
-            this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Size = new System.Drawing.Size(417, 24);
+            this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Size = new System.Drawing.Size(343, 22);
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Text = "Set selected text as bookmark comment";
             this.setSelectedTextAsBookmarkCommentToolStripMenuItem.Click += new System.EventHandler(this.OnSetSelectedTextAsBookmarkCommentToolStripMenuItemClick);
             // 
             // LogWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1014, 656);
             this.ControlBox = false;
@@ -1339,13 +1320,12 @@ namespace LogExpert.Controls.LogWindow
         private System.Windows.Forms.CheckBox filterRegexCheckBox;
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
         private System.Windows.Forms.Button filterSearchButton;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator1;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator2;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator3;
-        private Extensions.MenuToolStripSeparatorExtension pluginSeparator;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator4;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator5;
-        private Extensions.MenuToolStripSeparatorExtension toolStripSeparator6;
-        private System.Windows.Forms.RichTextBox proFiltersRichTextBox;
+        private MenuToolStripSeparatorExtension toolStripSeparator1;
+        private MenuToolStripSeparatorExtension toolStripSeparator2;
+        private MenuToolStripSeparatorExtension toolStripSeparator3;
+        private MenuToolStripSeparatorExtension pluginSeparator;
+        private MenuToolStripSeparatorExtension toolStripSeparator4;
+        private MenuToolStripSeparatorExtension toolStripSeparator5;
+        private MenuToolStripSeparatorExtension toolStripSeparator6;
     }
 }
