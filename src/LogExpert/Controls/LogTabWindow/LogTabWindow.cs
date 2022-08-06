@@ -9,6 +9,7 @@ using LogExpert.Config;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 using NLog;
 //using System.Linq;
@@ -214,16 +215,16 @@ namespace LogExpert.Controls.LogTabWindow
             #endregion
 
             // Colors for selected menus
-            mainMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            mainMenuStrip.Renderer = new ExtendedMenuStripRenderer();
             
             // Dock special color
             dockPanel.DockBackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
 
             // Remove toolstrip bottom border
-            buttonToolStrip.Renderer = new LogExpert.Extensions.ToolStripRendererExtension();
+            buttonToolStrip.Renderer = new ToolStripRendererExtension();
 
             #region Tabs
-            tabContextMenuStrip.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            tabContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
 
             // Tabs menu
             for (var y = 0; y < tabContextMenuStrip.Items.Count; y++)

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Entities;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
@@ -70,7 +71,7 @@ namespace LogExpert.Dialogs
             bookmarkDataGridView.EnableHeadersVisualStyles = false;            
 
             // Colors for menu
-            contextMenuStrip1.Renderer = new LogExpert.Extensions.ExtendedMenuStripRenderer();
+            contextMenuStrip1.Renderer = new ExtendedMenuStripRenderer();
 
             for (var y = 0; y < contextMenuStrip1.Items.Count; y++)
             {
