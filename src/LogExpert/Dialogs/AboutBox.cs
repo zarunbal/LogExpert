@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -56,7 +57,20 @@ namespace LogExpert.Dialogs
             }
         }
 
-        public string AssemblyVersion => _assembly.GetName().Version.ToString(3);
+        public string AssemblyVersion
+        {
+            get
+            {
+                AssemblyName assembly = _assembly.GetName();
+                string version = $"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}.{assembly.Version.Revision}";
+                if (assembly.Version.Revision >= 9000)
+                {
+                    version += " Testrelease";
+                }
+
+                return version;
+            }
+        }
 
         public string AssemblyDescription
         {
