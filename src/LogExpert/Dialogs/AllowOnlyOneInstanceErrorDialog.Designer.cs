@@ -41,9 +41,9 @@ namespace LogExpert.Dialogs
             this.checkBoxIgnoreMessage.AutoSize = true;
             this.checkBoxIgnoreMessage.Location = new System.Drawing.Point(13, 88);
             this.checkBoxIgnoreMessage.Name = "checkBoxIgnoreMessage";
-            this.checkBoxIgnoreMessage.Size = new System.Drawing.Size(253, 24);
+            this.checkBoxIgnoreMessage.Size = new System.Drawing.Size(257, 24);
             this.checkBoxIgnoreMessage.TabIndex = 0;
-            this.checkBoxIgnoreMessage.Text = "Show this message only once?";
+            this.checkBoxIgnoreMessage.Text = "Show this message only once\\?";
             this.checkBoxIgnoreMessage.UseVisualStyleBackColor = true;
             // 
             // buttonOk
@@ -51,9 +51,9 @@ namespace LogExpert.Dialogs
             this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOk.Location = new System.Drawing.Point(272, 82);
+            this.buttonOk.Location = new System.Drawing.Point(313, 82);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(105, 36);
+            this.buttonOk.Size = new System.Drawing.Size(104, 36);
             this.buttonOk.TabIndex = 1;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -64,7 +64,7 @@ namespace LogExpert.Dialogs
             this.labelErrorText.AutoEllipsis = true;
             this.labelErrorText.Location = new System.Drawing.Point(13, 13);
             this.labelErrorText.Name = "labelErrorText";
-            this.labelErrorText.Size = new System.Drawing.Size(367, 66);
+            this.labelErrorText.Size = new System.Drawing.Size(404, 66);
             this.labelErrorText.TabIndex = 2;
             this.labelErrorText.Text = "Only one instance allowed, uncheck \\\"View Settings => Allow only 1 Instances\\\" to" +
     " start multiple instances!";
@@ -73,11 +73,11 @@ namespace LogExpert.Dialogs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 130);
+            this.ClientSize = new System.Drawing.Size(432, 130);
             this.Controls.Add(this.labelErrorText);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.checkBoxIgnoreMessage);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "AllowOnlyOneInstanceErrorDialog";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
