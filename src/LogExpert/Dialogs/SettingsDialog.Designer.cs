@@ -151,6 +151,7 @@
             this.buttonImport = new System.Windows.Forms.Button();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.checkBoxShowErrorMessageOnlyOneInstance = new System.Windows.Forms.CheckBox();
             this.tabControlSettings.SuspendLayout();
             this.tabPageViewSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.upDownMaximumFilterEntriesDisplayed)).BeginInit();
@@ -241,7 +242,7 @@
             0,
             0});
             this.upDownMaximumFilterEntriesDisplayed.Name = "upDownMaximumFilterEntriesDisplayed";
-            this.upDownMaximumFilterEntriesDisplayed.Size = new System.Drawing.Size(80, 26);
+            this.upDownMaximumFilterEntriesDisplayed.Size = new System.Drawing.Size(106, 26);
             this.upDownMaximumFilterEntriesDisplayed.TabIndex = 13;
             this.upDownMaximumFilterEntriesDisplayed.Value = new decimal(new int[] {
             20,
@@ -269,7 +270,7 @@
             0,
             0});
             this.upDownMaximumFilterEntries.Name = "upDownMaximumFilterEntries";
-            this.upDownMaximumFilterEntries.Size = new System.Drawing.Size(80, 26);
+            this.upDownMaximumFilterEntries.Size = new System.Drawing.Size(106, 26);
             this.upDownMaximumFilterEntries.TabIndex = 11;
             this.upDownMaximumFilterEntries.Value = new decimal(new int[] {
             30,
@@ -304,12 +305,13 @@
             this.comboBoxEncoding.Location = new System.Drawing.Point(688, 29);
             this.comboBoxEncoding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.comboBoxEncoding.Name = "comboBoxEncoding";
-            this.comboBoxEncoding.Size = new System.Drawing.Size(151, 28);
+            this.comboBoxEncoding.Size = new System.Drawing.Size(177, 28);
             this.comboBoxEncoding.TabIndex = 8;
             this.toolTip.SetToolTip(this.comboBoxEncoding, "Encoding to be used when no BOM header and no persistence data is available.");
             // 
             // groupBoxMisc
             // 
+            this.groupBoxMisc.Controls.Add(this.checkBoxShowErrorMessageOnlyOneInstance);
             this.groupBoxMisc.Controls.Add(this.cpDownColumnWidth);
             this.groupBoxMisc.Controls.Add(this.checkBoxColumnSize);
             this.groupBoxMisc.Controls.Add(this.buttonTailColor);
@@ -321,14 +323,14 @@
             this.groupBoxMisc.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxMisc.Name = "groupBoxMisc";
             this.groupBoxMisc.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxMisc.Size = new System.Drawing.Size(384, 226);
+            this.groupBoxMisc.Size = new System.Drawing.Size(410, 226);
             this.groupBoxMisc.TabIndex = 7;
             this.groupBoxMisc.TabStop = false;
             this.groupBoxMisc.Text = "Misc";
             // 
             // cpDownColumnWidth
             // 
-            this.cpDownColumnWidth.Location = new System.Drawing.Point(231, 174);
+            this.cpDownColumnWidth.Location = new System.Drawing.Point(304, 175);
             this.cpDownColumnWidth.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cpDownColumnWidth.Maximum = new decimal(new int[] {
             9000,
@@ -363,7 +365,7 @@
             // 
             // buttonTailColor
             // 
-            this.buttonTailColor.Location = new System.Drawing.Point(231, 134);
+            this.buttonTailColor.Location = new System.Drawing.Point(304, 135);
             this.buttonTailColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonTailColor.Name = "buttonTailColor";
             this.buttonTailColor.Size = new System.Drawing.Size(84, 32);
@@ -1666,6 +1668,17 @@
             this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             this.dataGridViewTextBoxColumn2.Width = 259;
             // 
+            // checkBoxShowErrorMessageOnlyOneInstance
+            // 
+            this.checkBoxShowErrorMessageOnlyOneInstance.AutoSize = true;
+            this.checkBoxShowErrorMessageOnlyOneInstance.Location = new System.Drawing.Point(210, 66);
+            this.checkBoxShowErrorMessageOnlyOneInstance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxShowErrorMessageOnlyOneInstance.Name = "checkBoxShowErrorMessageOnlyOneInstance";
+            this.checkBoxShowErrorMessageOnlyOneInstance.Size = new System.Drawing.Size(192, 24);
+            this.checkBoxShowErrorMessageOnlyOneInstance.TabIndex = 7;
+            this.checkBoxShowErrorMessageOnlyOneInstance.Text = "Show Error Message?";
+            this.checkBoxShowErrorMessageOnlyOneInstance.UseVisualStyleBackColor = true;
+            // 
             // SettingsDialog
             // 
             this.AcceptButton = this.buttonOk;
@@ -1867,5 +1880,6 @@
         private System.Windows.Forms.CheckBox checkBoxAutoPick;
         private System.Windows.Forms.CheckBox checkBoxPortableMode;
         private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
+        private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
     }
 }

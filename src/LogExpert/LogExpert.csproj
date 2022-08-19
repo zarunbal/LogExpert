@@ -103,6 +103,12 @@
     <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Dialogs\AllowOnlyOneInstanceErrorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\AllowOnlyOneInstanceErrorDialog.Designer.cs">
+      <DependentUpon>AllowOnlyOneInstanceErrorDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\LogCellEditingControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -356,6 +362,9 @@
     <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
     <Compile Include="Classes\Persister\ProjectPersister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Dialogs\AllowOnlyOneInstanceErrorDialog.resx">
+      <DependentUpon>AllowOnlyOneInstanceErrorDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DateTimeDragControl.resx">
       <DependentUpon>DateTimeDragControl.cs</DependentUpon>
       <SubType>Designer</SubType>

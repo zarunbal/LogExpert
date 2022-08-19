@@ -165,6 +165,7 @@ namespace LogExpert.Dialogs
             checkBoxAskCloseTabs.Checked = Preferences.askForClose;
             checkBoxColumnFinder.Checked = Preferences.showColumnFinder;
             checkBoxLegacyReader.Checked = Preferences.useLegacyReader;
+            checkBoxShowErrorMessageOnlyOneInstance.Checked = Preferences.ShowErrorMessageAllowOnlyOneInstances;
         }
 
         private void FillPortableMode()
@@ -659,6 +660,8 @@ namespace LogExpert.Dialogs
 
             Preferences.maximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
             Preferences.maximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
+            Preferences.ShowErrorMessageAllowOnlyOneInstances = checkBoxShowErrorMessageOnlyOneInstance.Checked;
+
 
             SavePluginSettings();
             SaveHighlightMaskList();
