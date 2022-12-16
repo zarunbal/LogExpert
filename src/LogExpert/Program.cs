@@ -157,12 +157,12 @@ namespace LogExpert
                         MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
 
-                    if (settings.preferences.allowOnlyOneInstance && settings.preferences.ShowErrorMessageAllowOnlyOneInstances == false)
+                    if (settings.preferences.allowOnlyOneInstance && settings.preferences.ShowErrorMessageAllowOnlyOneInstances)
                     {
                         AllowOnlyOneInstanceErrorDialog a = new AllowOnlyOneInstanceErrorDialog();
                         if (a.ShowDialog() == DialogResult.OK)
                         {
-                            settings.preferences.ShowErrorMessageAllowOnlyOneInstances = a.DoNotShowThisMessageAgain;
+                            settings.preferences.ShowErrorMessageAllowOnlyOneInstances = !a.DoNotShowThisMessageAgain;
                             ConfigManager.Save(SettingsFlags.All);
                         }
 
