@@ -98,6 +98,8 @@ namespace LogExpert.Config
 
         public bool useLegacyReader;
 
+        public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
+
         #endregion
     }
 }

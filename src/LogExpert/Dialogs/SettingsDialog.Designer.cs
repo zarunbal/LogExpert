@@ -151,6 +151,7 @@
             this.buttonImport = new System.Windows.Forms.Button();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.checkBoxShowErrorMessageOnlyOneInstance = new System.Windows.Forms.CheckBox();
             this.tabControlSettings.SuspendLayout();
             this.tabPageViewSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.upDownMaximumFilterEntriesDisplayed)).BeginInit();
@@ -241,7 +242,7 @@
             0,
             0});
             this.upDownMaximumFilterEntriesDisplayed.Name = "upDownMaximumFilterEntriesDisplayed";
-            this.upDownMaximumFilterEntriesDisplayed.Size = new System.Drawing.Size(80, 26);
+            this.upDownMaximumFilterEntriesDisplayed.Size = new System.Drawing.Size(106, 26);
             this.upDownMaximumFilterEntriesDisplayed.TabIndex = 13;
             this.upDownMaximumFilterEntriesDisplayed.Value = new decimal(new int[] {
             20,
@@ -269,7 +270,7 @@
             0,
             0});
             this.upDownMaximumFilterEntries.Name = "upDownMaximumFilterEntries";
-            this.upDownMaximumFilterEntries.Size = new System.Drawing.Size(80, 26);
+            this.upDownMaximumFilterEntries.Size = new System.Drawing.Size(106, 26);
             this.upDownMaximumFilterEntries.TabIndex = 11;
             this.upDownMaximumFilterEntries.Value = new decimal(new int[] {
             30,
@@ -304,12 +305,13 @@
             this.comboBoxEncoding.Location = new System.Drawing.Point(688, 29);
             this.comboBoxEncoding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.comboBoxEncoding.Name = "comboBoxEncoding";
-            this.comboBoxEncoding.Size = new System.Drawing.Size(151, 28);
+            this.comboBoxEncoding.Size = new System.Drawing.Size(177, 28);
             this.comboBoxEncoding.TabIndex = 8;
             this.toolTip.SetToolTip(this.comboBoxEncoding, "Encoding to be used when no BOM header and no persistence data is available.");
             // 
             // groupBoxMisc
             // 
+            this.groupBoxMisc.Controls.Add(this.checkBoxShowErrorMessageOnlyOneInstance);
             this.groupBoxMisc.Controls.Add(this.cpDownColumnWidth);
             this.groupBoxMisc.Controls.Add(this.checkBoxColumnSize);
             this.groupBoxMisc.Controls.Add(this.buttonTailColor);
@@ -321,14 +323,14 @@
             this.groupBoxMisc.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxMisc.Name = "groupBoxMisc";
             this.groupBoxMisc.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxMisc.Size = new System.Drawing.Size(384, 226);
+            this.groupBoxMisc.Size = new System.Drawing.Size(410, 226);
             this.groupBoxMisc.TabIndex = 7;
             this.groupBoxMisc.TabStop = false;
             this.groupBoxMisc.Text = "Misc";
             // 
             // cpDownColumnWidth
             // 
-            this.cpDownColumnWidth.Location = new System.Drawing.Point(231, 174);
+            this.cpDownColumnWidth.Location = new System.Drawing.Point(304, 175);
             this.cpDownColumnWidth.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cpDownColumnWidth.Maximum = new decimal(new int[] {
             9000,
@@ -359,18 +361,18 @@
             this.checkBoxColumnSize.TabIndex = 5;
             this.checkBoxColumnSize.Text = "Set last column width";
             this.checkBoxColumnSize.UseVisualStyleBackColor = true;
-            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.columnSizeCheckBox_CheckedChanged);
+            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.OnColumnSizeCheckBoxCheckedChanged);
             // 
             // buttonTailColor
             // 
-            this.buttonTailColor.Location = new System.Drawing.Point(231, 134);
+            this.buttonTailColor.Location = new System.Drawing.Point(304, 135);
             this.buttonTailColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonTailColor.Name = "buttonTailColor";
             this.buttonTailColor.Size = new System.Drawing.Size(84, 32);
             this.buttonTailColor.TabIndex = 4;
             this.buttonTailColor.Text = "Color...";
             this.buttonTailColor.UseVisualStyleBackColor = true;
-            this.buttonTailColor.Click += new System.EventHandler(this.tailColorButton_Click);
+            this.buttonTailColor.Click += new System.EventHandler(this.OnTailColorButtonClick);
             // 
             // checkBoxTailState
             // 
@@ -497,7 +499,7 @@
             this.buttonChangeFont.TabIndex = 1;
             this.buttonChangeFont.Text = "Change...";
             this.buttonChangeFont.UseVisualStyleBackColor = true;
-            this.buttonChangeFont.Click += new System.EventHandler(this.changeFontButton_Click);
+            this.buttonChangeFont.Click += new System.EventHandler(this.OnChangeFontButtonClick);
             // 
             // labelFont
             // 
@@ -594,7 +596,7 @@
             this.buttonTimespreadColor.TabIndex = 7;
             this.buttonTimespreadColor.Text = "Color...";
             this.buttonTimespreadColor.UseVisualStyleBackColor = true;
-            this.buttonTimespreadColor.Click += new System.EventHandler(this.timespreadColorButton_Click);
+            this.buttonTimespreadColor.Click += new System.EventHandler(this.OnTimespreadColorButtonClick);
             // 
             // checkBoxTimeSpread
             // 
@@ -718,7 +720,7 @@
             this.buttonToolDelete.TabIndex = 2;
             this.buttonToolDelete.Text = "Remove";
             this.buttonToolDelete.UseVisualStyleBackColor = true;
-            this.buttonToolDelete.Click += new System.EventHandler(this.toolDeleteButton_Click);
+            this.buttonToolDelete.Click += new System.EventHandler(this.OnToolDeleteButtonClick);
             // 
             // buttonToolAdd
             // 
@@ -729,7 +731,7 @@
             this.buttonToolAdd.TabIndex = 1;
             this.buttonToolAdd.Text = "Add new";
             this.buttonToolAdd.UseVisualStyleBackColor = true;
-            this.buttonToolAdd.Click += new System.EventHandler(this.toolAddButton_Click);
+            this.buttonToolAdd.Click += new System.EventHandler(this.OnToolAddButtonClick);
             // 
             // buttonToolDown
             // 
@@ -740,7 +742,7 @@
             this.buttonToolDown.TabIndex = 4;
             this.buttonToolDown.Text = "Down";
             this.buttonToolDown.UseVisualStyleBackColor = true;
-            this.buttonToolDown.Click += new System.EventHandler(this.toolDownButton_Click);
+            this.buttonToolDown.Click += new System.EventHandler(this.OnToolDownButtonClick);
             // 
             // buttonToolUp
             // 
@@ -751,7 +753,7 @@
             this.buttonToolUp.TabIndex = 3;
             this.buttonToolUp.Text = "Up";
             this.buttonToolUp.UseVisualStyleBackColor = true;
-            this.buttonToolUp.Click += new System.EventHandler(this.toolUpButton_Click);
+            this.buttonToolUp.Click += new System.EventHandler(this.OnToolUpButtonClick);
             // 
             // listBoxTools
             // 
@@ -761,7 +763,7 @@
             this.listBoxTools.Name = "listBoxTools";
             this.listBoxTools.Size = new System.Drawing.Size(406, 165);
             this.listBoxTools.TabIndex = 0;
-            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.toolListBox_SelectedIndexChanged);
+            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.OnToolListBoxSelectedIndexChanged);
             // 
             // groupBoxToolSettings
             // 
@@ -829,7 +831,7 @@
             this.buttonIcon.Text = "   Icon...";
             this.buttonIcon.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonIcon.UseVisualStyleBackColor = true;
-            this.buttonIcon.Click += new System.EventHandler(this.iconButton_Click);
+            this.buttonIcon.Click += new System.EventHandler(this.OnIconButtonClick);
             // 
             // labelToolName
             // 
@@ -878,7 +880,7 @@
             this.checkBoxSysout.TabIndex = 6;
             this.checkBoxSysout.Text = "Pipe sysout to tab";
             this.checkBoxSysout.UseVisualStyleBackColor = true;
-            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.sysoutCheckBoxA_CheckedChanged);
+            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.OnSysoutCheckBoxACheckedChanged);
             // 
             // buttonArguments
             // 
@@ -889,7 +891,7 @@
             this.buttonArguments.TabIndex = 5;
             this.buttonArguments.Text = "...";
             this.buttonArguments.UseVisualStyleBackColor = true;
-            this.buttonArguments.Click += new System.EventHandler(this.argButtonA_Click);
+            this.buttonArguments.Click += new System.EventHandler(this.OnArgButtonAClick);
             // 
             // labelTool
             // 
@@ -910,7 +912,7 @@
             this.buttonTool.TabIndex = 3;
             this.buttonTool.Text = "...";
             this.buttonTool.UseVisualStyleBackColor = true;
-            this.buttonTool.Click += new System.EventHandler(this.toolButtonA_Click);
+            this.buttonTool.Click += new System.EventHandler(this.OnToolButtonAClick);
             // 
             // textBoxTool
             // 
@@ -986,7 +988,7 @@
             this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.deleteButton_Click);
+            this.buttonDelete.Click += new System.EventHandler(this.OnDeleteButtonClick);
             // 
             // dataGridViewColumnizer
             // 
@@ -1005,7 +1007,7 @@
             this.dataGridViewColumnizer.RowHeadersWidth = 62;
             this.dataGridViewColumnizer.Size = new System.Drawing.Size(934, 365);
             this.dataGridViewColumnizer.TabIndex = 2;
-            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.columnizerDataGridView_RowsAdded);
+            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.OnColumnizerDataGridViewRowsAdded);
             // 
             // columnFileMask
             // 
@@ -1247,7 +1249,7 @@
             this.listBoxPlugin.Size = new System.Drawing.Size(322, 344);
             this.listBoxPlugin.TabIndex = 0;
             this.listBoxPlugin.ValueMember = "Text";
-            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.pluginListBox_SelectedIndexChanged);
+            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.OnPluginListBoxSelectedIndexChanged);
             // 
             // groupBoxSettings
             // 
@@ -1286,7 +1288,7 @@
             this.buttonConfigPlugin.TabIndex = 0;
             this.buttonConfigPlugin.Text = "Configure...";
             this.buttonConfigPlugin.UseVisualStyleBackColor = true;
-            this.buttonConfigPlugin.Click += new System.EventHandler(this.configPluginButton_Click);
+            this.buttonConfigPlugin.Click += new System.EventHandler(this.OnConfigPluginButtonClick);
             // 
             // tabPageSessions
             // 
@@ -1363,7 +1365,7 @@
             this.buttonSessionSaveDir.TabIndex = 3;
             this.buttonSessionSaveDir.Text = "...";
             this.buttonSessionSaveDir.UseVisualStyleBackColor = true;
-            this.buttonSessionSaveDir.Click += new System.EventHandler(this.sessionSaveDirButton_Click);
+            this.buttonSessionSaveDir.Click += new System.EventHandler(this.OnSessionSaveDirButtonClick);
             // 
             // radioButtonSessionSaveOwn
             // 
@@ -1567,7 +1569,7 @@
             0,
             0,
             0});
-            this.upDownLinesPerBlock.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.upDownLinesPerBlock.ValueChanged += new System.EventHandler(this.OnNumericUpDown1ValueChanged);
             // 
             // upDownBlockCount
             // 
@@ -1666,6 +1668,17 @@
             this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             this.dataGridViewTextBoxColumn2.Width = 259;
             // 
+            // checkBoxShowErrorMessageOnlyOneInstance
+            // 
+            this.checkBoxShowErrorMessageOnlyOneInstance.AutoSize = true;
+            this.checkBoxShowErrorMessageOnlyOneInstance.Location = new System.Drawing.Point(210, 66);
+            this.checkBoxShowErrorMessageOnlyOneInstance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxShowErrorMessageOnlyOneInstance.Name = "checkBoxShowErrorMessageOnlyOneInstance";
+            this.checkBoxShowErrorMessageOnlyOneInstance.Size = new System.Drawing.Size(192, 24);
+            this.checkBoxShowErrorMessageOnlyOneInstance.TabIndex = 7;
+            this.checkBoxShowErrorMessageOnlyOneInstance.Text = "Show Error Message?";
+            this.checkBoxShowErrorMessageOnlyOneInstance.UseVisualStyleBackColor = true;
+            // 
             // SettingsDialog
             // 
             this.AcceptButton = this.buttonOk;
@@ -1689,7 +1702,7 @@
             this.helpProvider.SetShowHelp(this, true);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
-            this.Load += new System.EventHandler(this.SettingsDialog_Load);
+            this.Load += new System.EventHandler(this.OnSettingsDialogLoad);
             this.tabControlSettings.ResumeLayout(false);
             this.tabPageViewSettings.ResumeLayout(false);
             this.tabPageViewSettings.PerformLayout();
@@ -1867,5 +1880,6 @@
         private System.Windows.Forms.CheckBox checkBoxAutoPick;
         private System.Windows.Forms.CheckBox checkBoxPortableMode;
         private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
+        private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
     }
 }
