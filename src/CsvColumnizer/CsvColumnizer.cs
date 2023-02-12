@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using CsvHelper;
 using Newtonsoft.Json;
+using System.CodeDom;
 
 namespace CsvColumnizer
 {
@@ -38,16 +39,13 @@ namespace CsvColumnizer
             if (realLineNum == 0)
             {
                 // store for later field names and field count retrieval
-                _firstLine = new CsvLogLine
-                {
-                    FullLine = logLine,
-                    LineNumber = 0
-                };
+                _firstLine = new CsvLogLine(logLine, 0);
+
                 if (_config.MinColumns > 0)
                 {
                     using (CsvReader csv = new CsvReader(new StringReader(logLine), _config.ReaderConfiguration))
                     {
-                        if (csv.ColumnCount < _config.MinColumns)
+                        if (csv.Parser.Count < _config.MinColumns)
                         {
                             // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
                             _isValidCsv = false;
@@ -113,10 +111,14 @@ namespace CsvColumnizer
                 return SplitCsvLine(line);
             }
 
+            return CreateColumnizedLogLine(line);
+        }
+
+        private static ColumnizedLogLine CreateColumnizedLogLine(ILogLine line)
+        {
             ColumnizedLogLine cLogLine = new ColumnizedLogLine();
             cLogLine.LogLine = line;
-            cLogLine.ColumnValues = new IColumn[] {new Column {FullValue = line.FullLine, Parent = cLogLine}};
-
+            cLogLine.ColumnValues = new IColumn[] { new Column { FullValue = line.FullLine, Parent = cLogLine } };
             return cLogLine;
         }
 
@@ -158,20 +160,21 @@ namespace CsvColumnizer
                     {
                         csv.Read();
                         csv.ReadHeader();
-                        var records = csv.GetRecord<dynamic>();
-                        int fieldCount = csv.ColumnCount;
+                        
+                        int fieldCount = csv.Parser.Count;
 
-                        var header = csv.HeaderRecord;
+                        string[] headerRecord = csv.HeaderRecord;
 
-                        //List<Column> columns = new List<Column>();
-
-                        for (int i = 0; i < fieldCount; ++i)
+                        if (_config.HasFieldNames && headerRecord != null)
                         {
-                            if (_config.HasFieldNames)
+                            foreach (string headerColumn in headerRecord)
                             {
-                                _columnList.Add(new CsvColumn(csv[i]));
+                                _columnList.Add(new CsvColumn(headerColumn));
                             }
-                            else
+                        }
+                        else
+                        {
+                            for (int i = 0; i < fieldCount; ++i)
                             {
                                 _columnList.Add(new CsvColumn("Column " + i + 1));
                             }
@@ -235,6 +238,7 @@ namespace CsvColumnizer
         public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
         {
             Priority result = Priority.NotSupport;
+
             if (fileName.EndsWith("csv", StringComparison.OrdinalIgnoreCase))
             {
                 result = Priority.CanSupport;
@@ -254,17 +258,23 @@ namespace CsvColumnizer
             
             using (CsvReader csv = new CsvReader(new StringReader(line.FullLine), _config.ReaderConfiguration))
             {
-                var records = csv.GetRecord<dynamic>();
-                int fieldCount = csv.ColumnCount;
+                csv.Read();
+                csv.ReadHeader();
 
-                List<Column> columns = new List<Column>();
+                //we only read line by line and not the whole file so it is always the header
+                string[] records = csv.HeaderRecord; 
 
-                for (int i = 0; i < fieldCount; ++i)
+                if (records != null)
                 {
-                    columns.Add(new Column {FullValue = csv[i], Parent = cLogLine});
-                }
+                    List<Column> columns = new List<Column>();
 
-                cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+                    foreach (string record in records)
+                    {
+                        columns.Add(new Column { FullValue = record, Parent = cLogLine });
+                    }
+
+                    cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+                }
 
                 return cLogLine;
             }

@@ -2,20 +2,23 @@
 
 namespace CsvColumnizer
 {
-
-    public partial class CsvColumnizer
+    public class CsvLogLine : ILogLine
     {
-        public class CsvLogLine : ILogLine
+        public CsvLogLine(string fullLine, int lineNumber)
         {
-            #region Properties
-
-            public string FullLine { get; set; }
-
-            public int LineNumber { get; set; }
-
-            string ITextValue.Text => FullLine;
-
-            #endregion
+            FullLine = fullLine;
+            LineNumber = lineNumber;
         }
+
+        #region Properties
+
+        public string FullLine { get; set; }
+
+        public int LineNumber { get; set; }
+
+        string ITextValue.Text => FullLine;
+
+        #endregion
     }
+
 }
