@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using CsvHelper;
 using Newtonsoft.Json;
-using System.CodeDom;
 
 namespace CsvColumnizer
 {
@@ -16,7 +15,7 @@ namespace CsvColumnizer
     /// The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
     /// the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
     /// </summary>
-    public partial class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer, IColumnizerPriority
+    public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer, IColumnizerPriority
     {
         #region Fields
 
@@ -204,6 +203,8 @@ namespace CsvColumnizer
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Serialize(sw, _config);
                 }
+
+                _config.ConfigureReaderConfiguration();
 
                 Selected(callback);
             }
