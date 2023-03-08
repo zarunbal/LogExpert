@@ -71,6 +71,16 @@ namespace RegexColumnizer
                         Parent = logLine,
                         FullValue = line.FullLine
                     };
+                    
+                    //Fill other columns with empty string to avoid null pointer exceptions in unexpected places
+                    for (int i = columns.Length - 2; i >= 0; i--)
+                    {
+                        logLine.ColumnValues[i] = new Column
+                        {
+                            Parent = logLine,
+                            FullValue = ""
+                        };
+                    }
                 }
             }
             else
