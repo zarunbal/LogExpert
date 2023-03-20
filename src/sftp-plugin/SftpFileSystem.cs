@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
 using Chilkat;
+using Renci.SshNet;
 using LogExpert;
 
 namespace SftpFileSystem
@@ -17,6 +17,7 @@ namespace SftpFileSystem
 
         private ConfigDialog _configDialog;
         private volatile SshKey _sshKey;
+        private volatile PrivateKeyFile _privateKeyFile;
 
         #endregion
 
@@ -34,20 +35,15 @@ namespace SftpFileSystem
 
         private CredentialCache CredentialsCache { get; }
 
-        public string Text
-        {
-            get { return "SFTP plugin"; }
-        }
+        public string Text => "SFTP plugin";
 
         public string Description => "Can read log files directly from SFTP server.";
 
         public ConfigData ConfigData { get; private set; } = new ConfigData();
 
-        public SshKey SshKey
-        {
-            get { return _sshKey; }
-            set { _sshKey = value; }
-        }
+        public PrivateKeyFile PrivateKeyFile { get =>  _privateKeyFile; set => _privateKeyFile = value; }
+
+        public SshKey SshKey { get => _sshKey; set => _sshKey = value; }
 
         #endregion
 

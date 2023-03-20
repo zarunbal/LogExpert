@@ -163,10 +163,7 @@ namespace SftpFileSystem
 
         #region Properties
 
-        public string FullName
-        {
-            get { return Uri.ToString(); }
-        }
+        public string FullName => Uri.ToString();
 
         public string FileName
         {
@@ -193,17 +190,11 @@ namespace SftpFileSystem
             }
         }
 
-        public char DirectorySeparatorChar
-        {
-            get { return '/'; }
-        }
+        public char DirectorySeparatorChar => '/';
 
         public Uri Uri { get; }
 
-        public long Length
-        {
-            get { return _sftp.GetFileSize64(_remoteFileName, true, false); }
-        }
+        public long Length => _sftp.GetFileSize64(_remoteFileName, true, false);
 
         public long OriginalLength { get; } = -1;
 

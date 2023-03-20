@@ -27,12 +27,12 @@ namespace SftpFileSystem
 
         #region Events handler
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             Password = passwordTextBox.Text;
         }
 
-        private void LoginDialog_Load(object sender, EventArgs e)
+        private void OnLoginDialogLoad(object sender, EventArgs e)
         {
             passwordTextBox.Focus();
         }

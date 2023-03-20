@@ -61,7 +61,7 @@
       this.okButton.TabIndex = 6;
       this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
+      this.okButton.Click += new System.EventHandler(this.OnOkButtonClick);
       // 
       // cancelButton
       // 
@@ -100,7 +100,7 @@
       this.ShowIcon = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "LogExpert SFTP Plugin";
-      this.Load += new System.EventHandler(this.LoginDialog_Load);
+      this.Load += new System.EventHandler(this.OnLoginDialogLoad);
       this.ResumeLayout(false);
       this.PerformLayout();
 

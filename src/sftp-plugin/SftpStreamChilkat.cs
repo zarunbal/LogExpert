@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Renci.SshNet;
+
+using System;
 using System.IO;
 
 namespace SftpFileSystem
@@ -12,6 +12,7 @@ namespace SftpFileSystem
         private readonly string _handle;
         private readonly string _remoteFileName;
         private readonly Chilkat.SFtp _sftp;
+        private readonly SftpClient _sftpClient;
 
         private long _currentPos;
 
@@ -29,6 +30,14 @@ namespace SftpFileSystem
             {
                 throw new IOException("Cannot open " + remoteFileName);
             }
+        }
+
+        internal SftpStreamChilkat(SftpClient sftpClient, string remoteFilename)
+        {
+            _sftpClient = sftpClient;
+            _currentPos = 0;
+            _remoteFileName = remoteFilename;
+            Renci.SshNet.Sftp.SftpFileStream handle = _sftpClient.OpenRead(_remoteFileName);
         }
 
         #endregion

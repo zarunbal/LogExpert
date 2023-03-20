@@ -81,6 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SftpFileSystem.cs" />
     <Compile Include="SftpLogFileInfoChilkat.cs" />
+    <Compile Include="SftpLogFileInfoSSHDotNET.cs" />
     <Compile Include="SftpStreamChilkat.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,9 @@
   <ItemGroup>
     <PackageReference Include="chilkat-x64">
       <Version>9.5.0.90</Version>
+    </PackageReference>
+    <PackageReference Include="SSH.NET">
+      <Version>2020.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
