@@ -181,7 +181,7 @@ namespace RegexColumnizer
 
         protected abstract string GetNameInternal();
 
-        private void Init(RegexColumnizerConfig config)
+        internal void Init(RegexColumnizerConfig config)
         {
             Config = config;
 
