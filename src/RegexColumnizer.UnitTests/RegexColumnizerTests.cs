@@ -47,10 +47,9 @@ namespace RegexColumnizer.UnitTests
             var columnizer = new Regex1Columnizer();
             columnizer.Init(columnizerConfig);
             
-            var notMatchingLogLine = new TestLogLine(5, "5 test message");
-            
-            
-            var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), notMatchingLogLine);
+            var matchingLogLine = new TestLogLine(5, "5 test message");
+
+            var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), matchingLogLine);
             
             // verify that the expected number of columns are created
             Assert.AreEqual(2, parsedLogLine.ColumnValues.Length);
