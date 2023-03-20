@@ -55,7 +55,7 @@
       this.okButton.TabIndex = 0;
       this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
+      this.okButton.Click += new System.EventHandler(this.OnOkButtonClick);
       // 
       // cancelButton
       // 
@@ -125,7 +125,7 @@
       this.escapeCheckBox.TabIndex = 8;
       this.escapeCheckBox.Text = "use escape chars";
       this.escapeCheckBox.UseVisualStyleBackColor = true;
-      this.escapeCheckBox.CheckedChanged += new System.EventHandler(this.escapeCheckBox_CheckedChanged);
+      this.escapeCheckBox.CheckedChanged += new System.EventHandler(this.OnEscapeCheckBoxCheckedChanged);
       // 
       // commentCharTextBox
       // 

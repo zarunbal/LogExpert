@@ -584,7 +584,7 @@
   <ItemGroup />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
+      <Version>13.0.2</Version>
     </PackageReference>
     <PackageReference Include="NLog.Config">
       <Version>4.7.15</Version>
