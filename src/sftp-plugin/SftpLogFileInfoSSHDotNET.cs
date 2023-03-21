@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,7 +22,7 @@ namespace SftpFileSystem
         private readonly ILogExpertLogger _logger;
         private readonly string _remoteFileName;
 
-        private readonly SftpFileSystem _sftFileSystem;
+        private readonly SftpFileSystemSSHDotNET _sftFileSystem;
         private readonly SftpClient _sftp;
         private readonly object _sshKeyMonitor = new object();
         private DateTime _lastChange = DateTime.Now;
@@ -29,7 +30,7 @@ namespace SftpFileSystem
 
         PrivateKeyFile _key;
 
-        internal SftpLogFileInfoSSHDotNET(SftpFileSystem sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
+        internal SftpLogFileInfoSSHDotNET(SftpFileSystemSSHDotNET sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
         {
             _logger = logger;
             _sftFileSystem = sftpFileSystem;
@@ -114,7 +115,7 @@ namespace SftpFileSystem
                         // first fail -> try again with disabled cache
                         credentials = _sftFileSystem.GetCredentials(Uri, false, false);
                         _sftp = new SftpClient(credentials.UserName, credentials.Password);
-                        
+
                         if (_sftp == null)
                         {
                             // 2nd fail -> abort
@@ -136,7 +137,7 @@ namespace SftpFileSystem
         }
 
         public string FullName => Uri.ToString();
-        
+
         public string FileName
         {
             get
@@ -166,19 +167,71 @@ namespace SftpFileSystem
 
         public Uri Uri { get; }
 
-        public long Length => _sftp.;
+        //File Length
+        public long Length 
+        {
+            get 
+            {
+                SftpFile file = _sftp.Get(_remoteFileName);
+                return file.Attributes.Size;
+            } 
+        }
+
         public long OriginalLength { get; }
-        public bool FileExists { get; }
-        public int PollInterval { get; }
+        
+        public bool FileExists
+        {
+            get
+            {
+                try
+                {
+                    SftpFile file = _sftp.Get(_remoteFileName);
+                    long len = file.Attributes.Size;
+                    return len != -1;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message);
+                    return false;
+                }
+            }
+        }
+
+        public int PollInterval
+        {
+            get
+            {
+                TimeSpan diff = DateTime.Now - _lastChange;
+                if (diff.TotalSeconds < 4)
+                {
+                    return 400;
+                }
+                else if (diff.TotalSeconds < 30)
+                {
+                    return (int)diff.TotalSeconds * 100;
+                }
+                else
+                {
+                    return 5000;
+                }
+            }
+        }
 
         public bool FileHasChanged()
         {
-            throw new NotImplementedException();
+            if (Length != _lastLength)
+            {
+                _lastLength = Length;
+                _lastChange = DateTime.Now;
+                return true;
+            }
+
+            return false;
         }
 
         public Stream OpenStream()
         {
-            throw new NotImplementedException();
+            return _sftp.OpenRead(_remoteFileName);
         }
     }
 }

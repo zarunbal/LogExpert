@@ -32,14 +32,6 @@ namespace SftpFileSystem
             }
         }
 
-        internal SftpStreamChilkat(SftpClient sftpClient, string remoteFilename)
-        {
-            _sftpClient = sftpClient;
-            _currentPos = 0;
-            _remoteFileName = remoteFilename;
-            Renci.SshNet.Sftp.SftpFileStream handle = _sftpClient.OpenRead(_remoteFileName);
-        }
-
         #endregion
 
         #region Properties
