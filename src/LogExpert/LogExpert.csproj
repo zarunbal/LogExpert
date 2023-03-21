@@ -576,6 +576,10 @@
       <Name>ColumnizerLib</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\FileLockFinder\FileLockFinder.csproj">
+      <Project>{6c463ea8-fe3f-4832-b22b-e1b199f2c308}</Project>
+      <Name>FileLockFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
       <Project>{c75532c4-765b-418e-b09b-46d36b2abdb1}</Project>
       <Name>WinFormsUI</Name>
