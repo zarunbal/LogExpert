@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
@@ -22,7 +23,7 @@ namespace LogExpert.Tests
 
         private void CompareReaderImplementationsInternal(string fileName, Encoding enc, int maxPosition)
         {
-            string path = "..\\..\\data\\";
+            string path = Environment.CurrentDirectory + "\\data\\";
             EncodingOptions encOpts = new EncodingOptions();
             encOpts.Encoding = enc;
 
