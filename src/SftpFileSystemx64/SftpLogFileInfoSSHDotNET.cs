@@ -4,12 +4,7 @@ using Renci.SshNet;
 using Renci.SshNet.Sftp;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
@@ -22,18 +17,15 @@ namespace SftpFileSystem
         private readonly ILogExpertLogger _logger;
         private readonly string _remoteFileName;
 
-        private readonly SftpFileSystemSSHDotNET _sftFileSystem;
         private readonly SftpClient _sftp;
         private readonly object _sshKeyMonitor = new object();
         private DateTime _lastChange = DateTime.Now;
         private long _lastLength;
 
-        PrivateKeyFile _key;
-
         internal SftpLogFileInfoSSHDotNET(SftpFileSystemSSHDotNET sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
         {
             _logger = logger;
-            _sftFileSystem = sftpFileSystem;
+            SftpFileSystemSSHDotNET sftFileSystem = sftpFileSystem;
             Uri = fileUri;
             _remoteFileName = Uri.PathAndQuery;
 
@@ -41,11 +33,11 @@ namespace SftpFileSystem
 
             bool success = false;
             bool cancelled = false;
-            if (_sftFileSystem.ConfigData.UseKeyfile)
+            if (sftFileSystem.ConfigData.UseKeyfile)
             {
                 lock (_sshKeyMonitor) // prevent multiple password dialogs when opening multiple files at once
                 {
-                    while (_sftFileSystem.PrivateKeyFile == null)
+                    while (sftFileSystem.PrivateKeyFile == null)
                     {
                         PrivateKeyPasswordDialog dlg = new PrivateKeyPasswordDialog();
                         DialogResult dialogResult = dlg.ShowDialog();
@@ -55,11 +47,11 @@ namespace SftpFileSystem
                             break;
                         }
 
-                        PrivateKeyFile privateKeyFile = new PrivateKeyFile(_sftFileSystem.ConfigData.KeyFile, dlg.Password);
+                        PrivateKeyFile privateKeyFile = new PrivateKeyFile(sftFileSystem.ConfigData.KeyFile, dlg.Password);
 
                         if (privateKeyFile != null)
                         {
-                            _sftFileSystem.PrivateKeyFile = privateKeyFile;
+                            sftFileSystem.PrivateKeyFile = privateKeyFile;
                         }
                         else
                         {
@@ -71,14 +63,15 @@ namespace SftpFileSystem
                 if (cancelled == false)
                 {
                     success = false;
-                    Credentials credentials = _sftFileSystem.GetCredentials(Uri, true, true);
+                    Credentials credentials = sftFileSystem.GetCredentials(Uri, true, true);
                     while (success == false)
                     {
                         //Add ConnectionInfo object
-                        _sftp = new SftpClient(Uri.Host, credentials.UserName, new[] { _sftFileSystem.PrivateKeyFile });
+                        _sftp = new SftpClient(Uri.Host, credentials.UserName, new[] { sftFileSystem.PrivateKeyFile });
 
                         if (_sftp != null)
                         {
+                            _sftp.Connect();
                             success = true;
                         }
 
@@ -98,42 +91,45 @@ namespace SftpFileSystem
                             }
 
                             // retries with disabled cache
-                            credentials = _sftFileSystem.GetCredentials(Uri, false, true);
+                            credentials = sftFileSystem.GetCredentials(Uri, false, true);
                         }
                     }
                 }
+            }
 
-                if (success == false)
+            if (success == false)
+            {
+                // username/password auth
+                Credentials credentials = sftFileSystem.GetCredentials(Uri, true, false);
+                _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
+
+                if (_sftp == null)
                 {
-                    // username/password auth
-
-                    Credentials credentials = _sftFileSystem.GetCredentials(Uri, true, false);
-                    _sftp = new SftpClient(credentials.UserName, credentials.Password);
+                    // first fail -> try again with disabled cache
+                    credentials = sftFileSystem.GetCredentials(Uri, false, false);
+                    _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
 
                     if (_sftp == null)
                     {
-                        // first fail -> try again with disabled cache
-                        credentials = _sftFileSystem.GetCredentials(Uri, false, false);
-                        _sftp = new SftpClient(credentials.UserName, credentials.Password);
-
-                        if (_sftp == null)
-                        {
-                            // 2nd fail -> abort
-                            MessageBox.Show("Authentication failed!");
-                            //MessageBox.Show(sftp.LastErrorText);
-                            return;
-                        }
+                        // 2nd fail -> abort
+                        MessageBox.Show("Authentication failed!");
+                        //MessageBox.Show(sftp.LastErrorText);
+                        return;
                     }
                 }
-
-                if (_sftp.IsConnected == false)
+                else
                 {
-                    MessageBox.Show("Sftp is not connected");
-                    return;
+                    _sftp.Connect();
                 }
-
-                OriginalLength = _lastLength = Length;
             }
+
+            if (_sftp.IsConnected == false)
+            {
+                MessageBox.Show("Sftp is not connected");
+                return;
+            }
+
+            OriginalLength = _lastLength = Length;
         }
 
         public string FullName => Uri.ToString();
@@ -167,7 +163,6 @@ namespace SftpFileSystem
 
         public Uri Uri { get; }
 
-        //File Length
         public long Length 
         {
             get 
@@ -206,14 +201,13 @@ namespace SftpFileSystem
                 {
                     return 400;
                 }
-                else if (diff.TotalSeconds < 30)
+
+                if (diff.TotalSeconds < 30)
                 {
                     return (int)diff.TotalSeconds * 100;
                 }
-                else
-                {
-                    return 5000;
-                }
+
+                return 5000;
             }
         }
 

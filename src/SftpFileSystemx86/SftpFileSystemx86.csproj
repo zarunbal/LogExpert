@@ -45,54 +45,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\sftp-plugin\ConfigData.cs">
+    <Compile Include="..\SftpFileSystemx64\ConfigData.cs">
       <Link>ConfigData.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\ConfigDialog.cs">
+    <Compile Include="..\SftpFileSystemx64\ConfigDialog.cs">
       <Link>ConfigDialog.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\sftp-plugin\ConfigDialog.Designer.cs">
+    <Compile Include="..\SftpFileSystemx64\ConfigDialog.Designer.cs">
       <Link>ConfigDialog.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\CredentialCache.cs">
+    <Compile Include="..\SftpFileSystemx64\CredentialCache.cs">
       <Link>CredentialCache.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\Credentials.cs">
+    <Compile Include="..\SftpFileSystemx64\Credentials.cs">
       <Link>Credentials.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\FailedKeyDialog.cs">
+    <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.cs">
       <Link>FailedKeyDialog.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\sftp-plugin\FailedKeyDialog.Designer.cs">
+    <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.Designer.cs">
       <Link>FailedKeyDialog.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\KeyType.cs">
+    <Compile Include="..\SftpFileSystemx64\KeyType.cs">
       <Link>KeyType.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\LoginDialog.cs">
+    <Compile Include="..\SftpFileSystemx64\LoginDialog.cs">
       <Link>LoginDialog.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\sftp-plugin\LoginDialog.Designer.cs">
+    <Compile Include="..\SftpFileSystemx64\LoginDialog.Designer.cs">
       <Link>LoginDialog.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\PrivateKeyPasswordDialog.cs">
+    <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.cs">
       <Link>PrivateKeyPasswordDialog.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\sftp-plugin\PrivateKeyPasswordDialog.Designer.cs">
+    <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.Designer.cs">
       <Link>PrivateKeyPasswordDialog.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\SftpFileSystem.cs">
-      <Link>SftpFileSystem.cs</Link>
+    <Compile Include="..\SftpFileSystemx64\SftpFileSystemSSHDotNET.cs">
+      <Link>SftpFileSystemSSHDotNET.cs</Link>
     </Compile>
-    <Compile Include="..\sftp-plugin\SftpLogFileInfoChilkat.cs">
-      <Link>SftpLogFileInfoChilkat.cs</Link>
-    </Compile>
-    <Compile Include="..\sftp-plugin\SftpStreamChilkat.cs">
-      <Link>SftpStreamChilkat.cs</Link>
+    <Compile Include="..\SftpFileSystemx64\SftpLogFileInfoSSHDotNET.cs">
+      <Link>SftpLogFileInfoSSHDotNET.cs</Link>
     </Compile>
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
@@ -110,21 +107,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="chilkat-win32">
-      <Version>9.5.0.90</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\sftp-plugin\ConfigDialog.resx">
+    <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx">
       <Link>ConfigDialog.resx</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\sftp-plugin\FailedKeyDialog.resx">
+    <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx">
       <Link>FailedKeyDialog.resx</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\sftp-plugin\LoginDialog.resx">
+    <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx">
       <Link>LoginDialog.resx</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\sftp-plugin\PrivateKeyPasswordDialog.resx">
+    <EmbeddedResource Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.resx">
       <Link>PrivateKeyPasswordDialog.resx</Link>
     </EmbeddedResource>
   </ItemGroup>
@@ -132,6 +124,11 @@
     <None Include="..\Solution Items\Key.snk">
       <Link>Key.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SSH.NET">
+      <Version>2020.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
