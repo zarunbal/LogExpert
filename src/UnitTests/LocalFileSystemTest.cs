@@ -25,7 +25,7 @@ namespace UnitTests
 
 
         [Test]
-        public void testUriHandle()
+        public void TestUriHandle()
         {
             LocalFileSystem fs = new LocalFileSystem();
             Assert.True(fs.CanHandleUri("file:///c:/logfile.txt"));
@@ -35,7 +35,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void testUriToFileStream()
+        public void TestUriToFileStream()
         {
             DirectoryInfo dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
             string fullName = CreateFile(dInfo, "test.log");
