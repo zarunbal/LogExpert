@@ -99,16 +99,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
-      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
-      <Name>ColumnizerLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj">
-      <Project>{2563526e-4566-40cb-aa27-587b904fd25b}</Project>
-      <Name>CsvColumnizer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\Solution Items\Key.snk">
       <Link>Key.snk</Link>
     </None>
@@ -117,6 +107,12 @@
     <PackageReference Include="SSH.NET">
       <Version>2020.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
+      <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
+      <Name>ColumnizerLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

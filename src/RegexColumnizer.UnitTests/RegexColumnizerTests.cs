@@ -13,10 +13,10 @@ namespace RegexColumnizer.UnitTests
         [TestCase("Error in com.example.core", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 2)]
         public void SplitLine_ColumnCountMatches(string lineToParse, string regex, int expectedNumberOfColumns)
         {
-            var columnizer = CreateInitializedColumnizer(regex);
+            Regex1Columnizer columnizer = CreateInitializedColumnizer(regex);
             
-            var testLogLine = new TestLogLine(4, lineToParse);
-            var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+            TestLogLine testLogLine = new TestLogLine(4, lineToParse);
+            IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
             
             Assert.AreEqual(expectedNumberOfColumns, parsedLogLine.ColumnValues.Length);
         }
@@ -29,22 +29,22 @@ namespace RegexColumnizer.UnitTests
         public void SplitLine_ColumnValues(string lineToParse, string regex, int columnIndexToTest,
             string expectedColumnValue)
         {
-            var columnizer = CreateInitializedColumnizer(regex);
+            Regex1Columnizer columnizer = CreateInitializedColumnizer(regex);
 
-            var testLogLine = new TestLogLine(3, lineToParse);
-            var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+            TestLogLine testLogLine = new TestLogLine(3, lineToParse);
+            IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
             
             Assert.AreEqual(expectedColumnValue, parsedLogLine.ColumnValues[columnIndexToTest].Text);
         }
         
         private Regex1Columnizer CreateInitializedColumnizer(string regex)
         {
-            var columnizerConfig = new RegexColumnizerConfig
+            RegexColumnizerConfig columnizerConfig = new RegexColumnizerConfig
             {
                 Expression =  regex,
                 Name = "Test regex"
             };
-            var columnizer = new Regex1Columnizer();
+            Regex1Columnizer columnizer = new Regex1Columnizer();
             columnizer.Init(columnizerConfig);
             return columnizer;
         }
