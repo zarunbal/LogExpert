@@ -81,9 +81,15 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\50 MB UTF16.txt" />
-    <Content Include="Data\50 MB UTF8.txt" />
-    <Content Include="Data\50 MB.txt" />
+    <Content Include="Data\50 MB UTF16.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\50 MB UTF8.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\50 MB.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\JsonColumnizerTest_01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
