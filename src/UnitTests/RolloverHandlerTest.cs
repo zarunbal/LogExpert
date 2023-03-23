@@ -1,46 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Collections;
+using LogExpert;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
+using NUnit.Framework;
 
-
-namespace LogExpert
+namespace UnitTests
 {
     [TestFixture]
     internal class RolloverHandlerTest : RolloverHandlerTestBase
     {
         [Test]
-        public void testFilenameListWithAppendedIndex()
+        [TestCase("*$J(.)", 66)]
+        [TestCase("*$D(YYYY-mm-DD)_$I.log", 3)]
+        public void TestFilenameListWithAppendedIndex(string format, int retries)
         {
             MultiFileOptions options = new MultiFileOptions();
-            options.FormatPattern = "*$J(.)";
-            options.MaxDayTry = 66;
-            LinkedList<string> files = CreateTestfilesWithoutDate();
-            string firstFile = files.Last.Value;
-            ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
-            RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
-            LinkedList<string> fileList = handler.GetNameList();
-            Assert.AreEqual(files, fileList);
-            Cleanup();
-        }
+            options.FormatPattern = format;
+            options.MaxDayTry = retries;
 
-        [Test]
-        public void testFilenameListWithDate()
-        {
-            MultiFileOptions options = new MultiFileOptions();
-            options.FormatPattern = "*$D(YYYY-mm-DD)_$I.log";
-            options.MaxDayTry = 3;
-            LinkedList<string> files = CreateTestfilesWithDate();
+            LinkedList<string> files = CreateTestfilesWithoutDate();
+            
             string firstFile = files.Last.Value;
+            
             ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
             RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
             LinkedList<string> fileList = handler.GetNameList();
+
             Assert.AreEqual(files, fileList);
+            
             Cleanup();
         }
     }

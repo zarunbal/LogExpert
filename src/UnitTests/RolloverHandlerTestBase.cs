@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
 using LogExpert.Classes.Log;
 
-namespace LogExpert
+namespace UnitTests
 {
     internal class RolloverHandlerTestBase
     {
@@ -17,29 +17,29 @@ namespace LogExpert
         protected LinkedList<string> CreateTestfilesWithDate()
         {
             LinkedList<string> createdFiles = new LinkedList<string>();
-            DirectoryInfo dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-08_1.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-08_0.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-10_0.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-11_1.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-11_0.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-12_2.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-12_1.log"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine_2010-06-12_0.log"));
+            DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_1.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_0.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-10_0.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-11_1.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-11_0.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-12_2.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-12_1.log"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-12_0.log"));
             return createdFiles;
         }
 
         protected LinkedList<string> CreateTestfilesWithoutDate()
         {
             LinkedList<string> createdFiles = new LinkedList<string>();
-            DirectoryInfo dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.6"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.5"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.4"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.3"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.2"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log.1"));
-            createdFiles.AddLast((string) CreateFile(dInfo, "engine.log"));
+            DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.6"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.5"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.4"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.3"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.2"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log.1"));
+            createdFiles.AddLast(CreateFile(dInfo, "engine.log"));
             return createdFiles;
         }
 
@@ -49,7 +49,7 @@ namespace LogExpert
             LinkedList<string> fileList = files;
             RolloverFilenameBuilder fnb = new RolloverFilenameBuilder(formatPattern);
             fnb.SetFileName(fileList.Last.Value);
-            fnb.Index = fnb.Index + fileList.Count;
+            fnb.Index += fileList.Count;
             string newFileName = fnb.BuildFileName();
             fileList.AddFirst(newFileName);
             LinkedList<string>.Enumerator enumerator = fileList.GetEnumerator();

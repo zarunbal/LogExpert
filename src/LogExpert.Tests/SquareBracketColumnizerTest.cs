@@ -1,13 +1,12 @@
-﻿
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
+using NUnit.Framework;
 
-namespace LogExpert
+namespace LogExpert.Tests
 {
     [TestFixture]
     public class SquareBracketColumnizerTest

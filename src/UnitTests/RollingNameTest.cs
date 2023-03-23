@@ -1,119 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LogExpert.Classes.Log;
 using NUnit.Framework;
-using System.Text.RegularExpressions;
-using LogExpert.Classes.Log;
 
-
-namespace LogExpert
+namespace UnitTests
 {
     [TestFixture]
     internal class RollingNameTest
     {
         [Test]
-        public void testFilename1()
+        [TestCase("engine_2010-06-12_0.log", "*$D(yyyy-MM-dd)_$I.log")]
+        [TestCase("engine_2010-06-12.log", "*$D(yyyy-MM-dd).log")]
+        [TestCase("engine_0.log", "*_$I.log")]
+        [TestCase("engine.log","*.log$J(.)")]
+        [TestCase("engine.log","engine$J.log")]
+        [TestCase("engine1.log","engine$J.log")]
+        [TestCase("engine.log", "*$J(.)")]
+        [TestCase("engine_2010-06-12.log", "*$D(yyyy-MM-dd).log$J(.)")]
+        public void TestFilename1(string expectedResult, string formatString)
         {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*$D(yyyy-MM-dd)_$I.log");
-            fnb.SetFileName("engine_2010-06-12_0.log");
+            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder(formatString);
+            fnb.SetFileName(expectedResult);
             string name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12_0.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12_1.log", name);
+            Assert.AreEqual(expectedResult, name);
         }
 
         [Test]
-        public void testFilename2()
+        [TestCase("engine_2010-06-12_0.log", "engine_2010-06-12_1.log", "*$D(yyyy-MM-dd)_$I.log")]
+        [TestCase("engine_2010-06-12.log", "engine_2010-06-12.log", "*$D(yyyy-MM-dd).log")]
+        [TestCase("engine_0.log", "engine_1.log","*_$I.log")]
+        [TestCase("engine.log", "engine.log.1","*.log$J(.)")]
+        [TestCase("engine.log.1", "engine.log.2","*.log$J(.)")]
+        [TestCase("engine.log", "engine1.log","engine$J.log")]
+        [TestCase("engine1.log", "engine2.log","engine$J.log")]
+        [TestCase("engine.log", "engine.log.1","*$J(.)")]
+        [TestCase("engine.log.1", "engine.log.2","*$J(.)")]
+        [TestCase("engine_2010-06-12.log", "engine_2010-06-12.log.1", "*$D(yyyy-MM-dd).log$J(.)")]
+        public void TestFilenameAnd1(string fileName, string expectedResult, string formatString)
         {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*$D(yyyy-MM-dd).log");
-            fnb.SetFileName("engine_2010-06-12.log");
+            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder(formatString);
+            fnb.SetFileName(fileName);
+            fnb.Index += 1;
             string name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12.log", name);
+            Assert.AreEqual(expectedResult, name);
         }
 
         [Test]
-        public void testFilename3()
+        [TestCase("engine1.log", "engine.log","engine$J.log")]
+        public void TestFilenameMinus1(string fileName, string expectedResult, string formatString)
         {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*_$I.log");
-            fnb.SetFileName("engine_0.log");
-            string name = fnb.BuildFileName();
-            Assert.AreEqual("engine_0.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine_1.log", name);
-        }
-
-        [Test]
-        public void testFilenameHiddenZero()
-        {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*.log$J(.)");
-            fnb.SetFileName("engine.log");
+            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder(formatString);
+            fnb.SetFileName(fileName);
+            fnb.Index -= 1;
             string name = fnb.BuildFileName();
             Assert.AreEqual("engine.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log.1", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log.2", name);
-        }
-
-        [Test]
-        public void testFilenameHiddenZero2()
-        {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("engine$J.log");
-            fnb.SetFileName("engine.log");
-            string name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine1.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine2.log", name);
-        }
-
-        [Test]
-        public void testFilenameHiddenZero3()
-        {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("engine$J.log");
-            fnb.SetFileName("engine1.log");
-            string name = fnb.BuildFileName();
-            Assert.AreEqual("engine1.log", name);
-            fnb.Index = fnb.Index - 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log", name);
-        }
-
-        [Test]
-        public void testFilenameHiddenZero4()
-        {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*$J(.)");
-            fnb.SetFileName("engine.log");
-            string name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log.1", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine.log.2", name);
-        }
-
-        [Test]
-        public void testFilenameWithDateAndHiddenZero()
-        {
-            RolloverFilenameBuilder fnb = new RolloverFilenameBuilder("*$D(yyyy-MM-dd).log$J(.)");
-            fnb.SetFileName("engine_2010-06-12.log");
-            string name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12.log", name);
-            fnb.Index = fnb.Index + 1;
-            name = fnb.BuildFileName();
-            Assert.AreEqual("engine_2010-06-12.log.1", name);
         }
     }
 }
