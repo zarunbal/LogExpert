@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.IO;
-using Renci.SshNet;
 using LogExpert;
+using Renci.SshNet;
 
 namespace SftpFileSystem
 {
     public class SftpFileSystem : IFileSystemPlugin, ILogExpertPluginConfigurator
     {
-        #region Fields
+        #region Private Fields
 
         private readonly ILogExpertLogger _logger;
 
@@ -19,7 +19,7 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public SftpFileSystem(IFileSystemCallback callback)
         {
@@ -29,21 +29,11 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
-
-        private CredentialCache CredentialsCache { get; }
-
-        public string Text => "SFTP plugin";
+        #region Interface IFileSystemPlugin
 
         public string Description => "Can read log files directly from SFTP server.";
 
-        public ConfigData ConfigData { get; private set; } = new ConfigData();
-
-        public PrivateKeyFile PrivateKeyFile { get =>  _privateKeyFile; set => _privateKeyFile = value; }
-
-        #endregion
-
-        #region Public methods
+        public string Text => "SFTP plugin";
 
         public bool CanHandleUri(string uriString)
         {
@@ -72,6 +62,10 @@ namespace SftpFileSystem
                 return null;
             }
         }
+
+        #endregion
+
+        #region Interface ILogExpertPluginConfigurator
 
         public bool HasEmbeddedForm()
         {
@@ -102,7 +96,7 @@ namespace SftpFileSystem
             {
                 fs = configFile.OpenRead();
 
-                ConfigData = (ConfigData) xml.Deserialize(fs);
+                ConfigData = (ConfigData)xml.Deserialize(fs);
             }
             catch (IOException e)
             {
@@ -159,7 +153,19 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Internals
+        #region Properties / Indexers
+
+        public ConfigData ConfigData { get; private set; } = new ConfigData();
+
+        public PrivateKeyFile PrivateKeyFile
+        {
+            get => _privateKeyFile;
+            set => _privateKeyFile = value;
+        }
+
+        private CredentialCache CredentialsCache { get; }
+
+        #endregion
 
         internal Credentials GetCredentials(Uri uri, bool cacheAllowed, bool hidePasswordField)
         {
@@ -171,7 +177,7 @@ namespace SftpFileSystem
                 string password = null;
                 if (uri.UserInfo != null && uri.UserInfo.Length > 0)
                 {
-                    string[] split = uri.UserInfo.Split(new char[] {':'});
+                    string[] split = uri.UserInfo.Split(':');
                     if (split.Length > 0)
                     {
                         userName = split[0];
@@ -204,11 +210,11 @@ namespace SftpFileSystem
                 if (userName == null || password == null)
                 {
                     LoginDialog dlg = new LoginDialog(uri.Host, usersForHost, hidePasswordField);
-                    dlg.UserName = userName;
+                    dlg.Username = userName;
                     if (DialogResult.OK == dlg.ShowDialog())
                     {
                         password = dlg.Password;
-                        userName = dlg.UserName;
+                        userName = dlg.Username;
                     }
 
                     dlg.Dispose();
@@ -219,7 +225,5 @@ namespace SftpFileSystem
                 return credentials;
             }
         }
-
-        #endregion
     }
 }

@@ -1,19 +1,24 @@
-﻿using LogExpert;
-
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Windows.Forms;
+using LogExpert;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
-
-using System;
-using System.IO;
-using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     internal class SftpLogFileInfo : ILogFileInfo
     {
+        #region Static/Constants
+        //TODO Add to Options
+        private const int RETRY_COUNT = 20;
+        private const int RETRY_SLEEP = 250;
 
-        private const int RetryCount = 20;
-        private const int RetrySleep = 250;
+        #endregion
+
+        #region Private Fields
+
         private readonly ILogExpertLogger _logger;
         private readonly string _remoteFileName;
 
@@ -22,10 +27,14 @@ namespace SftpFileSystem
         private DateTime _lastChange = DateTime.Now;
         private long _lastLength;
 
-        internal SftpLogFileInfo(SftpFileSystemSSHDotNET sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
+        #endregion
+
+        #region Ctor
+
+        internal SftpLogFileInfo(SftpFileSystem sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
         {
             _logger = logger;
-            SftpFileSystemSSHDotNET sftFileSystem = sftpFileSystem;
+            SftpFileSystem sftFileSystem = sftpFileSystem;
             Uri = fileUri;
             _remoteFileName = Uri.PathAndQuery;
 
@@ -67,7 +76,7 @@ namespace SftpFileSystem
                     while (success == false)
                     {
                         //Add ConnectionInfo object
-                        _sftp = new SftpClient(Uri.Host, credentials.UserName, new[] { sftFileSystem.PrivateKeyFile });
+                        _sftp = new SftpClient(Uri.Host, credentials.UserName, sftFileSystem.PrivateKeyFile);
 
                         if (_sftp != null)
                         {
@@ -132,17 +141,9 @@ namespace SftpFileSystem
             OriginalLength = _lastLength = Length;
         }
 
-        public string FullName => Uri.ToString();
+        #endregion
 
-        public string FileName
-        {
-            get
-            {
-                string full = FullName;
-                int i = full.LastIndexOf(DirectorySeparatorChar);
-                return full.Substring(i + 1);
-            }
-        }
+        #region Interface ILogFileInfo
 
         public string DirectoryName
         {
@@ -161,19 +162,6 @@ namespace SftpFileSystem
 
         public char DirectorySeparatorChar => '/';
 
-        public Uri Uri { get; }
-
-        public long Length 
-        {
-            get 
-            {
-                SftpFile file = _sftp.Get(_remoteFileName);
-                return file.Attributes.Size;
-            } 
-        }
-
-        public long OriginalLength { get; }
-        
         public bool FileExists
         {
             get
@@ -191,6 +179,29 @@ namespace SftpFileSystem
                 }
             }
         }
+
+        public string FileName
+        {
+            get
+            {
+                string full = FullName;
+                int i = full.LastIndexOf(DirectorySeparatorChar);
+                return full.Substring(i + 1);
+            }
+        }
+
+        public string FullName => Uri.ToString();
+
+        public long Length
+        {
+            get
+            {
+                SftpFile file = _sftp.Get(_remoteFileName);
+                return file.Attributes.Size;
+            }
+        }
+
+        public long OriginalLength { get; }
 
         public int PollInterval
         {
@@ -211,6 +222,8 @@ namespace SftpFileSystem
             }
         }
 
+        public Uri Uri { get; }
+
         public bool FileHasChanged()
         {
             if (Length != _lastLength)
@@ -225,7 +238,26 @@ namespace SftpFileSystem
 
         public Stream OpenStream()
         {
-            return _sftp.OpenRead(_remoteFileName);
+            int retry = RETRY_COUNT;
+            while (true)
+            {
+                try
+                {
+                    return _sftp.OpenRead(_remoteFileName);
+                }
+                catch (IOException)
+                {
+                    //First remove a try then check if its less or 0
+                    if (--retry <= 0)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(RETRY_SLEEP);
+                }
+            }
         }
+
+        #endregion
     }
 }

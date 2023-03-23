@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SftpFileSystem
+﻿namespace SftpFileSystem
 {
     internal class Credentials
     {
-        #region cTor
+        #region Ctor
 
         internal Credentials(string host, string userName, string password)
         {
@@ -17,13 +13,13 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string Host { get; }
 
-        public string UserName { get; }
-
         public string Password { get; }
+
+        public string UserName { get; }
 
         #endregion
     }

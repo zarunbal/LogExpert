@@ -79,8 +79,8 @@
       <DependentUpon>LoginDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SftpFileSystemSSHDotNET.cs" />
-    <Compile Include="SftpLogFileInfoSSHDotNET.cs" />
+    <Compile Include="SftpFileSystem.cs" />
+    <Compile Include="SftpLogFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ConfigDialog.resx">

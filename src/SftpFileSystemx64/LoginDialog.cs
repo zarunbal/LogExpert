@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     public partial class LoginDialog : Form
     {
-        #region Fields
+        #region Private Fields
 
-        private string _userName;
+        private string _username;
 
         #endregion
 
-        #region cTor
+        #region Ctor
 
         public LoginDialog(string host, IList<string> userNames, bool hidePasswordField)
         {
@@ -28,49 +24,49 @@ namespace SftpFileSystem
                 {
                     if (name != null)
                     {
-                        userNameComboBox.Items.Add(name);
+                        cmbUsername.Items.Add(name);
                     }
                 }
             }
 
             if (hidePasswordField)
             {
-                passwordTextBox.Enabled = false;
-                passwordLabel.Enabled = false;
+                txtBoxPassword.Enabled = false;
+                lblPassword.Enabled = false;
             }
         }
 
         #endregion
 
-        #region Properties
-
-        public string UserName
-        {
-            get { return _userName; }
-            set
-            {
-                _userName = value != null ? value : "";
-                userNameComboBox.Text = value;
-            }
-        }
+        #region Properties / Indexers
 
         public string Password { get; private set; }
 
-        #endregion
-
-        #region Events handler
-
-        private void okButton_Click(object sender, EventArgs e)
+        public string Username
         {
-            Password = passwordTextBox.Text;
-            _userName = userNameComboBox.Text;
+            get => _username;
+            set
+            {
+                _username = value ?? string.Empty;
+                cmbUsername.Text = value;
+            }
         }
 
-        private void LoginDialog_Load(object sender, EventArgs e)
+        #endregion
+
+        #region Event handling Methods
+
+        private void OnBtnOKClick(object sender, EventArgs e)
         {
-            if (userNameComboBox.Text.Length > 0)
+            Password = txtBoxPassword.Text;
+            _username = cmbUsername.Text;
+        }
+
+        private void OnLoginDialogLoad(object sender, EventArgs e)
+        {
+            if (cmbUsername.Text.Length > 0)
             {
-                passwordTextBox.Focus();
+                txtBoxPassword.Focus();
             }
         }
 

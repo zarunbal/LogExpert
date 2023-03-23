@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SftpFileSystem
 {
     public partial class PrivateKeyPasswordDialog : Form
     {
-        #region cTor
+        #region Ctor
 
         public PrivateKeyPasswordDialog()
         {
@@ -19,22 +14,22 @@ namespace SftpFileSystem
 
         #endregion
 
-        #region Properties
+        #region Properties / Indexers
 
         public string Password { get; private set; }
 
         #endregion
 
-        #region Events handler
-
-        private void OnOkButtonClick(object sender, EventArgs e)
-        {
-            Password = passwordTextBox.Text;
-        }
+        #region Event handling Methods
 
         private void OnLoginDialogLoad(object sender, EventArgs e)
         {
             passwordTextBox.Focus();
+        }
+
+        private void OnBtnOkClick(object sender, EventArgs e)
+        {
+            Password = passwordTextBox.Text;
         }
 
         #endregion

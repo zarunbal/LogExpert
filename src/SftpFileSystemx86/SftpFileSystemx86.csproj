@@ -53,6 +53,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\ConfigDialog.Designer.cs">
+	  <DependentUpon>ConfigDialog.cs</DependentUpon>
       <Link>ConfigDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\CredentialCache.cs">
@@ -66,6 +67,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.Designer.cs">
+	  <DependentUpon>FailedKeyDialog.cs</DependentUpon>
       <Link>FailedKeyDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\KeyType.cs">
@@ -76,6 +78,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\LoginDialog.Designer.cs">
+      <DependentUpon>LoginDialog.cs</DependentUpon>
       <Link>LoginDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.cs">
@@ -83,13 +86,14 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.Designer.cs">
+	  <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
       <Link>PrivateKeyPasswordDialog.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\SftpFileSystemx64\SftpFileSystemSSHDotNET.cs">
-      <Link>SftpFileSystemSSHDotNET.cs</Link>
+    <Compile Include="..\SftpFileSystemx64\SftpFileSystem.cs">
+      <Link>SftpFileSystem.cs</Link>
     </Compile>
-    <Compile Include="..\SftpFileSystemx64\SftpLogFileInfoSSHDotNET.cs">
-      <Link>SftpLogFileInfoSSHDotNET.cs</Link>
+    <Compile Include="..\SftpFileSystemx64\SftpLogFileInfo.cs">
+      <Link>SftpLogFileInfo.cs</Link>
     </Compile>
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
@@ -108,15 +112,19 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx">
+	  <DependentUpon>ConfigDialog.cs</DependentUpon>
       <Link>ConfigDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx">
+	  <DependentUpon>FailedKeyDialog.cs</DependentUpon>
       <Link>FailedKeyDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx">
+	  <DependentUpon>LoginDialog.cs</DependentUpon>
       <Link>LoginDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.resx">
+	  <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
       <Link>PrivateKeyPasswordDialog.resx</Link>
     </EmbeddedResource>
   </ItemGroup>
