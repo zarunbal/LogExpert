@@ -58,6 +58,7 @@ class Build : NukeBuild
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
     AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
+
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
@@ -92,7 +93,7 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb"};
 
     [PathExecutable("choco.exe")] readonly Tool Chocolatey;
 
@@ -284,7 +285,7 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll", "ChilkatDotNet47.dll" };
+            string[] files = new[] {"SftpFileSystem.dll", "Renci.SshNet.dll" };
 
             OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
             OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));
