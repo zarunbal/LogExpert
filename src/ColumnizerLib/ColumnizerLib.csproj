@@ -57,6 +57,7 @@
     </Compile>
     <Compile Include="Column.cs" />
     <Compile Include="ColumnizedLogLine.cs" />
+    <Compile Include="Extensions\LogLineExtensions.cs" />
     <Compile Include="IAutoLogLineColumnizerCallback.cs" />
     <Compile Include="IColumn.cs" />
     <Compile Include="IColumnizerConfigurator.cs" />
