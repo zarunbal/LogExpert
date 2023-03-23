@@ -51,6 +51,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferShiftTest.cs" />
     <Compile Include="CSVColumnizerTest.cs" />
     <Compile Include="DateFormatParserTest.cs" />
     <Compile Include="ColumnizerPickerTest.cs" />
@@ -58,7 +59,12 @@
     <Compile Include="JsonCompactColumnizerTest.cs" />
     <Compile Include="JsonColumnizerTest.cs" />
     <Compile Include="JSONSaveTest.cs" />
+    <Compile Include="LocalFileSystemTest.cs" />
     <Compile Include="LogWindowTest.cs" />
+    <Compile Include="ReaderTest.cs" />
+    <Compile Include="RollingNameTest.cs" />
+    <Compile Include="RolloverHandlerTest.cs" />
+    <Compile Include="RolloverHandlerTestBase.cs" />
     <Compile Include="SquareBracketColumnizerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LogStreamReaderTest.cs" />
@@ -75,6 +81,15 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\50 MB UTF16.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\50 MB UTF8.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\50 MB.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\JsonColumnizerTest_01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -140,6 +155,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Solution Items\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
     <None Include="TestData\organizations-1000.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -150,6 +168,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

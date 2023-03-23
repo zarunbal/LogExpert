@@ -61,16 +61,33 @@ Source: "..\..\bin\Release\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\..\bin\Release\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\AutoColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\ColumnizerLib.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+;DLLS for CSV Suppport
 Source: "..\..\bin\Release\plugins\CsvColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\CsvHelper.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+;Created by CSV Helper
+Source: "..\..\bin\Release\plugins\Microsoft.Bcl.AsyncInterfaces.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Microsoft.Bcl.HashCode.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\System.Buffers.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\System.Memory.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\System.Numerics.Vectors.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\System.Runtime.CompilerServices.Unsafe.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+
 Source: "..\..\bin\Release\plugins\DefaultPlugins.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\FlashIconHighlighter.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\GlassfishColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\JsonColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\JsonCompactColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\Log4jXmlColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\bin\Release\plugins\CsvHelper.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\bin\Release\plugins\RegexColumnizer.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+;DLLS for SFTP Support
+Source: "..\..\bin\Release\plugins\SftpFileSystem.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\bin\Release\plugins\Renci.SshNet.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+
 Source: "..\..\bin\Release\ColumnizerLib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Release\LogExpert.exe.config"; DestDir: "{app}"; Flags: ignoreversion
