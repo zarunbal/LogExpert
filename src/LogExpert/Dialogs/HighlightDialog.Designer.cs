@@ -63,6 +63,7 @@
             this.helpProvider = new System.Windows.Forms.HelpProvider();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.buttonImportGroup = new System.Windows.Forms.Button();
+            this.buttonExportGroup = new System.Windows.Forms.Button();
             this.buttonMoveGroupDown = new System.Windows.Forms.Button();
             this.buttonMoveGroupUp = new System.Windows.Forms.Button();
             this.labelAssignNamesToGroups = new System.Windows.Forms.Label();
@@ -71,7 +72,6 @@
             this.buttonNewGroup = new System.Windows.Forms.Button();
             this.comboBoxGroups = new System.Windows.Forms.ComboBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.buttonExportGroup = new System.Windows.Forms.Button();
             this.groupBoxLineMatchCriteria.SuspendLayout();
             this.groupBoxColoring.SuspendLayout();
             this.groupBoxActions.SuspendLayout();
@@ -90,7 +90,7 @@
             this.listBoxHighlight.Name = "listBoxHighlight";
             this.listBoxHighlight.Size = new System.Drawing.Size(634, 264);
             this.listBoxHighlight.TabIndex = 0;
-            this.listBoxHighlight.SelectedIndexChanged += new System.EventHandler(this.OnHighlightListBoxSelectedIndexChanged);
+            this.listBoxHighlight.SelectedIndexChanged += new System.EventHandler(this.OnListBoxHighlightSelectedIndexChanged);
             // 
             // buttonAdd
             // 
@@ -129,7 +129,7 @@
             this.buttonMoveUp.Text = "&Up";
             this.toolTip.SetToolTip(this.buttonMoveUp, "Move the current hilight one position up");
             this.buttonMoveUp.UseVisualStyleBackColor = true;
-            this.buttonMoveUp.Click += new System.EventHandler(this.OnMoveUpButtonClick);
+            this.buttonMoveUp.Click += new System.EventHandler(this.OnBtnMoveUpClick);
             // 
             // buttonMoveDown
             // 
@@ -142,7 +142,7 @@
             this.buttonMoveDown.Text = "&Down";
             this.toolTip.SetToolTip(this.buttonMoveDown, "Move the current hilight one position down");
             this.buttonMoveDown.UseVisualStyleBackColor = true;
-            this.buttonMoveDown.Click += new System.EventHandler(this.OnMoveDownButtonClick);
+            this.buttonMoveDown.Click += new System.EventHandler(this.OnBtnMoveDownClick);
             // 
             // labelForgroundColor
             // 
@@ -150,7 +150,7 @@
             this.labelForgroundColor.Location = new System.Drawing.Point(9, 38);
             this.labelForgroundColor.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelForgroundColor.Name = "labelForgroundColor";
-            this.labelForgroundColor.Size = new System.Drawing.Size(130, 20);
+            this.labelForgroundColor.Size = new System.Drawing.Size(87, 13);
             this.labelForgroundColor.TabIndex = 6;
             this.labelForgroundColor.Text = "Foreground color";
             // 
@@ -160,7 +160,7 @@
             this.labelBackgroundColor.Location = new System.Drawing.Point(9, 115);
             this.labelBackgroundColor.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelBackgroundColor.Name = "labelBackgroundColor";
-            this.labelBackgroundColor.Size = new System.Drawing.Size(133, 20);
+            this.labelBackgroundColor.Size = new System.Drawing.Size(91, 13);
             this.labelBackgroundColor.TabIndex = 8;
             this.labelBackgroundColor.Text = "Background color";
             // 
@@ -175,7 +175,7 @@
             this.buttonOk.TabIndex = 9;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
+            this.buttonOk.Click += new System.EventHandler(this.OnBtnOkClick);
             // 
             // buttonCancel
             // 
@@ -196,7 +196,7 @@
             this.textBoxSearchString.Location = new System.Drawing.Point(9, 55);
             this.textBoxSearchString.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxSearchString.Name = "textBoxSearchString";
-            this.textBoxSearchString.Size = new System.Drawing.Size(786, 26);
+            this.textBoxSearchString.Size = new System.Drawing.Size(786, 20);
             this.textBoxSearchString.TabIndex = 11;
             this.textBoxSearchString.TextChanged += new System.EventHandler(this.ChangeToDirty);
             // 
@@ -206,7 +206,7 @@
             this.labelSearchString.Location = new System.Drawing.Point(9, 31);
             this.labelSearchString.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSearchString.Name = "labelSearchString";
-            this.labelSearchString.Size = new System.Drawing.Size(107, 20);
+            this.labelSearchString.Size = new System.Drawing.Size(72, 13);
             this.labelSearchString.TabIndex = 12;
             this.labelSearchString.Text = "Search string:";
             // 
@@ -224,7 +224,7 @@
             this.buttonApply.Text = "A&pply";
             this.toolTip.SetToolTip(this.buttonApply, "Apply changes below to current hiligth");
             this.buttonApply.UseVisualStyleBackColor = true;
-            this.buttonApply.Click += new System.EventHandler(this.OnApplyButtonClick);
+            this.buttonApply.Click += new System.EventHandler(this.OnBtnApplyClick);
             // 
             // buttonCustomForeColor
             // 
@@ -237,7 +237,7 @@
             this.buttonCustomForeColor.Text = "Custom";
             this.toolTip.SetToolTip(this.buttonCustomForeColor, "Pick a custom foreground color");
             this.buttonCustomForeColor.UseVisualStyleBackColor = true;
-            this.buttonCustomForeColor.Click += new System.EventHandler(this.OnCustomForeColorButtonClick);
+            this.buttonCustomForeColor.Click += new System.EventHandler(this.OnBtnCustomForeColorClick);
             // 
             // buttonCustomBackColor
             // 
@@ -250,7 +250,7 @@
             this.buttonCustomBackColor.Text = "Custom";
             this.toolTip.SetToolTip(this.buttonCustomBackColor, "Pick a custom background color");
             this.buttonCustomBackColor.UseVisualStyleBackColor = true;
-            this.buttonCustomBackColor.Click += new System.EventHandler(this.OnCustomBackColorButtonClick);
+            this.buttonCustomBackColor.Click += new System.EventHandler(this.OnBtnCustomBackColorClick);
             // 
             // checkBoxRegex
             // 
@@ -258,13 +258,13 @@
             this.checkBoxRegex.Location = new System.Drawing.Point(180, 95);
             this.checkBoxRegex.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxRegex.Name = "checkBoxRegex";
-            this.checkBoxRegex.Size = new System.Drawing.Size(83, 24);
+            this.checkBoxRegex.Size = new System.Drawing.Size(58, 17);
             this.checkBoxRegex.TabIndex = 16;
             this.checkBoxRegex.Text = "RegEx";
             this.toolTip.SetToolTip(this.checkBoxRegex, "Whether the string is a regular expresion");
             this.checkBoxRegex.UseVisualStyleBackColor = true;
             this.checkBoxRegex.CheckedChanged += new System.EventHandler(this.ChangeToDirty);
-            this.checkBoxRegex.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnRegexCheckBoxMouseUp);
+            this.checkBoxRegex.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnChkBoxRegexMouseUp);
             // 
             // checkBoxCaseSensitive
             // 
@@ -272,7 +272,7 @@
             this.checkBoxCaseSensitive.Location = new System.Drawing.Point(14, 95);
             this.checkBoxCaseSensitive.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxCaseSensitive.Name = "checkBoxCaseSensitive";
-            this.checkBoxCaseSensitive.Size = new System.Drawing.Size(137, 24);
+            this.checkBoxCaseSensitive.Size = new System.Drawing.Size(94, 17);
             this.checkBoxCaseSensitive.TabIndex = 17;
             this.checkBoxCaseSensitive.Text = "Case sensitive";
             this.toolTip.SetToolTip(this.checkBoxCaseSensitive, "Whether the string will match uppercases and lowercases");
@@ -285,7 +285,7 @@
             this.checkBoxDontDirtyLed.Location = new System.Drawing.Point(15, 38);
             this.checkBoxDontDirtyLed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxDontDirtyLed.Name = "checkBoxDontDirtyLed";
-            this.checkBoxDontDirtyLed.Size = new System.Drawing.Size(157, 24);
+            this.checkBoxDontDirtyLed.Size = new System.Drawing.Size(107, 17);
             this.checkBoxDontDirtyLed.TabIndex = 18;
             this.checkBoxDontDirtyLed.Text = "Don\'t lit dirty LED";
             this.toolTip.SetToolTip(this.checkBoxDontDirtyLed, "When matching a line, don\'t mark the page as \"dirty\"");
@@ -338,12 +338,12 @@
             this.checkBoxNoBackground.Location = new System.Drawing.Point(141, 240);
             this.checkBoxNoBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxNoBackground.Name = "checkBoxNoBackground";
-            this.checkBoxNoBackground.Size = new System.Drawing.Size(145, 24);
+            this.checkBoxNoBackground.Size = new System.Drawing.Size(101, 17);
             this.checkBoxNoBackground.TabIndex = 18;
             this.checkBoxNoBackground.Text = "No Background";
             this.toolTip.SetToolTip(this.checkBoxNoBackground, "Don\'t set the background color");
             this.checkBoxNoBackground.UseVisualStyleBackColor = true;
-            this.checkBoxNoBackground.CheckedChanged += new System.EventHandler(this.OnNoBackgroundCheckBoxCheckedChanged);
+            this.checkBoxNoBackground.CheckedChanged += new System.EventHandler(this.OnChkBoxNoBackgroundCheckedChanged);
             // 
             // checkBoxBold
             // 
@@ -351,12 +351,12 @@
             this.checkBoxBold.Location = new System.Drawing.Point(9, 205);
             this.checkBoxBold.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxBold.Name = "checkBoxBold";
-            this.checkBoxBold.Size = new System.Drawing.Size(67, 24);
+            this.checkBoxBold.Size = new System.Drawing.Size(47, 17);
             this.checkBoxBold.TabIndex = 17;
             this.checkBoxBold.Text = "Bold";
             this.toolTip.SetToolTip(this.checkBoxBold, "Display the line in bold characters");
             this.checkBoxBold.UseVisualStyleBackColor = true;
-            this.checkBoxBold.CheckedChanged += new System.EventHandler(this.OnBoldCheckBoxCheckedChanged);
+            this.checkBoxBold.CheckedChanged += new System.EventHandler(this.OnChkBoxBoldCheckedChanged);
             // 
             // checkBoxWordMatch
             // 
@@ -364,12 +364,12 @@
             this.checkBoxWordMatch.Location = new System.Drawing.Point(9, 240);
             this.checkBoxWordMatch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxWordMatch.Name = "checkBoxWordMatch";
-            this.checkBoxWordMatch.Size = new System.Drawing.Size(117, 24);
+            this.checkBoxWordMatch.Size = new System.Drawing.Size(81, 17);
             this.checkBoxWordMatch.TabIndex = 16;
             this.checkBoxWordMatch.Text = "Word mode";
             this.toolTip.SetToolTip(this.checkBoxWordMatch, "Don\'t highlight the whole line but only the matching keywords");
             this.checkBoxWordMatch.UseVisualStyleBackColor = true;
-            this.checkBoxWordMatch.CheckedChanged += new System.EventHandler(this.OnWordMatchCheckBoxCheckedChanged);
+            this.checkBoxWordMatch.CheckedChanged += new System.EventHandler(this.OnChkBoxWordMatchCheckedChanged);
             // 
             // colorBoxForeground
             // 
@@ -415,11 +415,29 @@
             System.Drawing.Color.Purple,
             System.Drawing.Color.IndianRed,
             System.Drawing.Color.DarkCyan,
+            System.Drawing.Color.Yellow,
+            System.Drawing.Color.Black,
+            System.Drawing.Color.Black,
+            System.Drawing.Color.White,
+            System.Drawing.Color.Gray,
+            System.Drawing.Color.DarkGray,
+            System.Drawing.Color.Blue,
+            System.Drawing.Color.LightBlue,
+            System.Drawing.Color.DarkBlue,
+            System.Drawing.Color.Green,
+            System.Drawing.Color.LightGreen,
+            System.Drawing.Color.DarkGreen,
+            System.Drawing.Color.Olive,
+            System.Drawing.Color.Red,
+            System.Drawing.Color.Pink,
+            System.Drawing.Color.Purple,
+            System.Drawing.Color.IndianRed,
+            System.Drawing.Color.DarkCyan,
             System.Drawing.Color.Yellow});
             this.colorBoxForeground.Location = new System.Drawing.Point(8, 63);
             this.colorBoxForeground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.colorBoxForeground.Name = "colorBoxForeground";
-            this.colorBoxForeground.Size = new System.Drawing.Size(376, 27);
+            this.colorBoxForeground.Size = new System.Drawing.Size(376, 21);
             this.colorBoxForeground.TabIndex = 5;
             this.colorBoxForeground.SelectedIndexChanged += new System.EventHandler(this.ChangeToDirty);
             // 
@@ -467,11 +485,29 @@
             System.Drawing.Color.Purple,
             System.Drawing.Color.IndianRed,
             System.Drawing.Color.DarkCyan,
+            System.Drawing.Color.Yellow,
+            System.Drawing.Color.Black,
+            System.Drawing.Color.Black,
+            System.Drawing.Color.White,
+            System.Drawing.Color.Gray,
+            System.Drawing.Color.DarkGray,
+            System.Drawing.Color.Blue,
+            System.Drawing.Color.LightBlue,
+            System.Drawing.Color.DarkBlue,
+            System.Drawing.Color.Green,
+            System.Drawing.Color.LightGreen,
+            System.Drawing.Color.DarkGreen,
+            System.Drawing.Color.Olive,
+            System.Drawing.Color.Red,
+            System.Drawing.Color.Pink,
+            System.Drawing.Color.Purple,
+            System.Drawing.Color.IndianRed,
+            System.Drawing.Color.DarkCyan,
             System.Drawing.Color.Yellow});
             this.colorBoxBackground.Location = new System.Drawing.Point(9, 140);
             this.colorBoxBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.colorBoxBackground.Name = "colorBoxBackground";
-            this.colorBoxBackground.Size = new System.Drawing.Size(376, 27);
+            this.colorBoxBackground.Size = new System.Drawing.Size(376, 21);
             this.colorBoxBackground.TabIndex = 7;
             this.colorBoxBackground.SelectedIndexChanged += new System.EventHandler(this.ChangeToDirty);
             // 
@@ -503,7 +539,7 @@
             this.buttonBookmarkComment.TabIndex = 23;
             this.buttonBookmarkComment.Text = "Text...";
             this.buttonBookmarkComment.UseVisualStyleBackColor = true;
-            this.buttonBookmarkComment.Click += new System.EventHandler(this.OnBookmarkCommentButtonClick);
+            this.buttonBookmarkComment.Click += new System.EventHandler(this.OnBtnBookmarkCommentClick);
             // 
             // buttonPlugin
             // 
@@ -523,12 +559,12 @@
             this.checkBoxPlugin.Location = new System.Drawing.Point(15, 148);
             this.checkBoxPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxPlugin.Name = "checkBoxPlugin";
-            this.checkBoxPlugin.Size = new System.Drawing.Size(78, 24);
+            this.checkBoxPlugin.Size = new System.Drawing.Size(55, 17);
             this.checkBoxPlugin.TabIndex = 21;
             this.checkBoxPlugin.Text = "Plugin";
             this.toolTip.SetToolTip(this.checkBoxPlugin, "When matching a line, call a keyword action plugin");
             this.checkBoxPlugin.UseVisualStyleBackColor = true;
-            this.checkBoxPlugin.CheckedChanged += new System.EventHandler(this.OnPluginCheckBoxCheckedChanged);
+            this.checkBoxPlugin.CheckedChanged += new System.EventHandler(this.OnChkBoxPluginCheckedChanged);
             // 
             // checkBoxStopTail
             // 
@@ -536,7 +572,7 @@
             this.checkBoxStopTail.Location = new System.Drawing.Point(15, 111);
             this.checkBoxStopTail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxStopTail.Name = "checkBoxStopTail";
-            this.checkBoxStopTail.Size = new System.Drawing.Size(146, 24);
+            this.checkBoxStopTail.Size = new System.Drawing.Size(101, 17);
             this.checkBoxStopTail.TabIndex = 20;
             this.checkBoxStopTail.Text = "Stop Follow Tail";
             this.toolTip.SetToolTip(this.checkBoxStopTail, "When matching a line, stop automatic scrolling");
@@ -549,7 +585,7 @@
             this.checkBoxBookmark.Location = new System.Drawing.Point(15, 74);
             this.checkBoxBookmark.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxBookmark.Name = "checkBoxBookmark";
-            this.checkBoxBookmark.Size = new System.Drawing.Size(134, 24);
+            this.checkBoxBookmark.Size = new System.Drawing.Size(92, 17);
             this.checkBoxBookmark.TabIndex = 19;
             this.checkBoxBookmark.Text = "Set bookmark";
             this.toolTip.SetToolTip(this.checkBoxBookmark, "When matching a line, create a new bookmark for it");
@@ -594,7 +630,20 @@
             this.buttonImportGroup.Text = "Import";
             this.toolTip.SetToolTip(this.buttonImportGroup, "Import highlight groups");
             this.buttonImportGroup.UseVisualStyleBackColor = true;
-            this.buttonImportGroup.Click += new System.EventHandler(this.OnImportGroupButtonClick);
+            this.buttonImportGroup.Click += new System.EventHandler(this.OnBtnImportGroupClick);
+            // 
+            // buttonExportGroup
+            // 
+            this.buttonExportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonExportGroup.Location = new System.Drawing.Point(516, 75);
+            this.buttonExportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonExportGroup.Name = "buttonExportGroup";
+            this.buttonExportGroup.Size = new System.Drawing.Size(68, 35);
+            this.buttonExportGroup.TabIndex = 8;
+            this.buttonExportGroup.Text = "Export";
+            this.toolTip.SetToolTip(this.buttonExportGroup, "Export highlight groups");
+            this.buttonExportGroup.UseVisualStyleBackColor = true;
+            this.buttonExportGroup.Click += new System.EventHandler(this.OnBtnExportGroupClick);
             // 
             // buttonMoveGroupDown
             // 
@@ -607,7 +656,7 @@
             this.buttonMoveGroupDown.Text = "Down";
             this.toolTip.SetToolTip(this.buttonMoveGroupDown, "Move the current hilight group one position down");
             this.buttonMoveGroupDown.UseVisualStyleBackColor = true;
-            this.buttonMoveGroupDown.Click += new System.EventHandler(this.OnGroupDownButtonClick);
+            this.buttonMoveGroupDown.Click += new System.EventHandler(this.OnBtnGroupDownClick);
             // 
             // buttonMoveGroupUp
             // 
@@ -620,7 +669,7 @@
             this.buttonMoveGroupUp.Text = "Up";
             this.toolTip.SetToolTip(this.buttonMoveGroupUp, "Move the current hilight group one position up");
             this.buttonMoveGroupUp.UseVisualStyleBackColor = true;
-            this.buttonMoveGroupUp.Click += new System.EventHandler(this.OnGroupUpButtonClick);
+            this.buttonMoveGroupUp.Click += new System.EventHandler(this.OnBtnGroupUpClick);
             // 
             // labelAssignNamesToGroups
             // 
@@ -628,7 +677,7 @@
             this.labelAssignNamesToGroups.Location = new System.Drawing.Point(9, 88);
             this.labelAssignNamesToGroups.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelAssignNamesToGroups.Name = "labelAssignNamesToGroups";
-            this.labelAssignNamesToGroups.Size = new System.Drawing.Size(372, 20);
+            this.labelAssignNamesToGroups.Size = new System.Drawing.Size(248, 13);
             this.labelAssignNamesToGroups.TabIndex = 4;
             this.labelAssignNamesToGroups.Text = "You can assign groups to file names in the settings.";
             // 
@@ -643,7 +692,7 @@
             this.buttonCopyGroup.Text = "Copy";
             this.toolTip.SetToolTip(this.buttonCopyGroup, "Copy the current hilight group into a new one");
             this.buttonCopyGroup.UseVisualStyleBackColor = true;
-            this.buttonCopyGroup.Click += new System.EventHandler(this.OnCopyGroupButtonClick);
+            this.buttonCopyGroup.Click += new System.EventHandler(this.OnBtnCopyGroupClick);
             // 
             // buttonDeleteGroup
             // 
@@ -656,7 +705,7 @@
             this.buttonDeleteGroup.Text = "Del";
             this.toolTip.SetToolTip(this.buttonDeleteGroup, "Delete the current hilight group");
             this.buttonDeleteGroup.UseVisualStyleBackColor = true;
-            this.buttonDeleteGroup.Click += new System.EventHandler(this.OnDelGroupButtonClick);
+            this.buttonDeleteGroup.Click += new System.EventHandler(this.OnBtnDelGroupClick);
             // 
             // buttonNewGroup
             // 
@@ -669,7 +718,7 @@
             this.buttonNewGroup.Text = "New group";
             this.toolTip.SetToolTip(this.buttonNewGroup, "Create a new empty hilight group");
             this.buttonNewGroup.UseVisualStyleBackColor = true;
-            this.buttonNewGroup.Click += new System.EventHandler(this.OnNewGroupButtonClick);
+            this.buttonNewGroup.Click += new System.EventHandler(this.OnBtnNewGroupClick);
             // 
             // comboBoxGroups
             // 
@@ -680,30 +729,18 @@
             this.comboBoxGroups.Location = new System.Drawing.Point(14, 32);
             this.comboBoxGroups.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.comboBoxGroups.Name = "comboBoxGroups";
-            this.comboBoxGroups.Size = new System.Drawing.Size(481, 27);
+            this.comboBoxGroups.Size = new System.Drawing.Size(481, 21);
             this.comboBoxGroups.TabIndex = 0;
             this.toolTip.SetToolTip(this.comboBoxGroups, "Choose a group to create different highlight settings. Type in a name to change i" +
         "n the name of a group.");
-            this.comboBoxGroups.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnGroupComboBoxDrawItem);
-            this.comboBoxGroups.SelectionChangeCommitted += new System.EventHandler(this.OnGroupComboBoxSelectionChangeCommitted);
-            this.comboBoxGroups.TextUpdate += new System.EventHandler(this.OnGroupComboBoxTextUpdate);
-            // 
-            // buttonExportGroup
-            // 
-            this.buttonExportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExportGroup.Location = new System.Drawing.Point(516, 75);
-            this.buttonExportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonExportGroup.Name = "buttonExportGroup";
-            this.buttonExportGroup.Size = new System.Drawing.Size(68, 35);
-            this.buttonExportGroup.TabIndex = 8;
-            this.buttonExportGroup.Text = "Export";
-            this.toolTip.SetToolTip(this.buttonExportGroup, "Export highlight groups");
-            this.buttonExportGroup.UseVisualStyleBackColor = true;
-            this.buttonExportGroup.Click += new System.EventHandler(this.OnButtonExportGroupClick);
+            this.comboBoxGroups.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnCmbBoxGroupDrawItem);
+            this.comboBoxGroups.SelectionChangeCommitted += new System.EventHandler(this.OnCmbBoxGroupSelectionChangeCommitted);
+            this.comboBoxGroups.TextUpdate += new System.EventHandler(this.OnCmbBoxGroupTextUpdate);
             // 
             // HighlightDialog
             // 
             this.AcceptButton = this.buttonOk;
+            this.AutoScroll = true;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(855, 912);
             this.Controls.Add(this.groupBox4);

@@ -1652,7 +1652,7 @@
             this.buttonImport.TabIndex = 3;
             this.buttonImport.Text = "Import...";
             this.buttonImport.UseVisualStyleBackColor = true;
-            this.buttonImport.Click += new System.EventHandler(this.OnImportButtonClick);
+            this.buttonImport.Click += new System.EventHandler(this.OnBtnImportClick);
             // 
             // dataGridViewTextBoxColumn1
             // 
