@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -44,7 +45,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnOkButtonClick(object sender, EventArgs e)
+        private void OnBtnOkClick(object sender, EventArgs e)
         {
             UriHistory = new List<string>();
             foreach (object item in cmbUri.Items)
