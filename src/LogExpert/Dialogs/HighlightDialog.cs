@@ -38,8 +38,8 @@ namespace LogExpert.Dialogs
 
             Load += OnHighlightDialogLoad;
             listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
-            _applyButtonImage = buttonApply.Image;
-            buttonApply.Image = null;
+            _applyButtonImage = btnApply.Image;
+            btnApply.Image = null;
         }
 
         #endregion
@@ -56,7 +56,7 @@ namespace LogExpert.Dialogs
 
         public string PreSelectedGroupName { get; set; }
 
-        private bool IsDirty => buttonApply.Image == _applyButtonImage;
+        private bool IsDirty => btnApply.Image == _applyButtonImage;
 
         #endregion
 
@@ -279,7 +279,7 @@ namespace LogExpert.Dialogs
             if (IsDirty)
             {
                 // cannot call 'this.applyButton.PerformClick();' because it prohibits the OK button to terminate the dialog
-                OnBtnApplyClick(buttonApply, EventArgs.Empty);
+                OnBtnApplyClick(btnApply, EventArgs.Empty);
             }
         }
 
@@ -291,14 +291,14 @@ namespace LogExpert.Dialogs
         private void OnChkBoxNoBackgroundCheckedChanged(object sender, EventArgs e)
         {
             colorBoxBackground.Enabled = !checkBoxNoBackground.Checked;
-            buttonCustomBackColor.Enabled = !checkBoxNoBackground.Checked;
+            btnCustomBackColor.Enabled = !checkBoxNoBackground.Checked;
             Dirty();
         }
 
         private void OnChkBoxPluginCheckedChanged(object sender, EventArgs e)
         {
             Dirty();
-            buttonPlugin.Enabled = checkBoxPlugin.Checked;
+            btnSelectPlugin.Enabled = checkBoxPlugin.Checked;
         }
 
         private void OnChkBoxRegexMouseUp(object sender, MouseEventArgs e)
@@ -377,10 +377,10 @@ namespace LogExpert.Dialogs
         {
             colorBoxForeground.SelectedIndex = 1;
             colorBoxBackground.SelectedIndex = 2;
-            buttonApply.Enabled = false;
-            buttonApply.Image = null;
-            buttonBookmarkComment.Enabled = false;
-            buttonPlugin.Enabled = false;
+            btnApply.Enabled = false;
+            btnApply.Image = null;
+            btnBookmarkComment.Enabled = false;
+            btnSelectPlugin.Enabled = false;
 
             ReEvaluateHighlightButtonStates();
         }
@@ -504,11 +504,11 @@ namespace LogExpert.Dialogs
             int index = listBoxHighlight.SelectedIndex;
             if (index > -1)
             {
-                buttonApply.Enabled = true;
-                buttonApply.Image = _applyButtonImage;
+                btnApply.Enabled = true;
+                btnApply.Image = _applyButtonImage;
             }
 
-            buttonAdd.Enabled = textBoxSearchString.Text.Length > 0;
+            btnAdd.Enabled = textBoxSearchString.Text.Length > 0;
         }
 
         private void FillGroupComboBox()
@@ -589,10 +589,10 @@ namespace LogExpert.Dialogs
             bool firstSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == 0;
             bool lastSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == comboBoxGroups.Items.Count - 1;
 
-            buttonDeleteGroup.Enabled = atLeastOneSelected;
-            buttonCopyGroup.Enabled = atLeastOneSelected;
-            buttonMoveGroupUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
-            buttonMoveGroupDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+            btnDeleteGroup.Enabled = atLeastOneSelected;
+            btnCopyGroup.Enabled = atLeastOneSelected;
+            btnMoveGroupUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+            btnMoveGroupDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
         }
 
         private void ReEvaluateHighlightButtonStates()
@@ -603,9 +603,9 @@ namespace LogExpert.Dialogs
             bool firstSelected = atLeastOneSelected && listBoxHighlight.SelectedIndex == 0;
             bool lastSelected = atLeastOneSelected && listBoxHighlight.SelectedIndex == listBoxHighlight.Items.Count - 1;
 
-            buttonDelete.Enabled = atLeastOneSelected;
-            buttonMoveUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
-            buttonMoveDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
+            btnDelete.Enabled = atLeastOneSelected;
+            btnMoveUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
+            btnMoveDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
         }
 
         private void SaveEntry()
@@ -621,8 +621,8 @@ namespace LogExpert.Dialogs
                 entry.SearchText = textBoxSearchString.Text;
                 entry.IsRegEx = checkBoxRegex.Checked;
                 entry.IsCaseSensitive = checkBoxCaseSensitive.Checked;
-                buttonApply.Enabled = false;
-                buttonApply.Image = null;
+                btnApply.Enabled = false;
+                btnApply.Image = null;
                 entry.IsLedSwitch = checkBoxDontDirtyLed.Checked;
                 entry.IsSetBookmark = checkBoxBookmark.Checked;
                 entry.IsStopTail = checkBoxStopTail.Checked;
@@ -697,8 +697,8 @@ namespace LogExpert.Dialogs
                 checkBoxBookmark.Checked = entry.IsSetBookmark;
                 checkBoxStopTail.Checked = entry.IsStopTail;
                 checkBoxPlugin.Checked = entry.IsActionEntry;
-                buttonPlugin.Enabled = checkBoxPlugin.Checked;
-                buttonBookmarkComment.Enabled = checkBoxBookmark.Checked;
+                btnSelectPlugin.Enabled = checkBoxPlugin.Checked;
+                btnBookmarkComment.Enabled = checkBoxBookmark.Checked;
                 _currentActionEntry = entry.ActionEntry != null ? entry.ActionEntry.Copy() : new ActionEntry();
                 _bookmarkComment = entry.BookmarkComment;
                 checkBoxWordMatch.Checked = entry.IsWordMatch;
@@ -706,8 +706,8 @@ namespace LogExpert.Dialogs
                 checkBoxNoBackground.Checked = entry.NoBackground;
             }
 
-            buttonApply.Enabled = false;
-            buttonApply.Image = null;
+            btnApply.Enabled = false;
+            btnApply.Image = null;
 
             ReEvaluateHighlightButtonStates();
         }

@@ -31,19 +31,19 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HighlightDialog));
             this.listBoxHighlight = new System.Windows.Forms.ListBox();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonMoveUp = new System.Windows.Forms.Button();
-            this.buttonMoveDown = new System.Windows.Forms.Button();
+            this.btnAdd = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.btnMoveUp = new System.Windows.Forms.Button();
+            this.btnMoveDown = new System.Windows.Forms.Button();
             this.labelForgroundColor = new System.Windows.Forms.Label();
             this.labelBackgroundColor = new System.Windows.Forms.Label();
-            this.buttonOk = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.btnOk = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.textBoxSearchString = new System.Windows.Forms.TextBox();
             this.labelSearchString = new System.Windows.Forms.Label();
-            this.buttonApply = new System.Windows.Forms.Button();
-            this.buttonCustomForeColor = new System.Windows.Forms.Button();
-            this.buttonCustomBackColor = new System.Windows.Forms.Button();
+            this.btnApply = new System.Windows.Forms.Button();
+            this.btnCustomForeColor = new System.Windows.Forms.Button();
+            this.btnCustomBackColor = new System.Windows.Forms.Button();
             this.checkBoxRegex = new System.Windows.Forms.CheckBox();
             this.checkBoxCaseSensitive = new System.Windows.Forms.CheckBox();
             this.checkBoxDontDirtyLed = new System.Windows.Forms.CheckBox();
@@ -52,30 +52,32 @@
             this.checkBoxNoBackground = new System.Windows.Forms.CheckBox();
             this.checkBoxBold = new System.Windows.Forms.CheckBox();
             this.checkBoxWordMatch = new System.Windows.Forms.CheckBox();
-            this.colorBoxForeground = new LogExpert.Dialogs.ColorComboBox();
-            this.colorBoxBackground = new LogExpert.Dialogs.ColorComboBox();
             this.groupBoxActions = new System.Windows.Forms.GroupBox();
-            this.buttonBookmarkComment = new System.Windows.Forms.Button();
-            this.buttonPlugin = new System.Windows.Forms.Button();
+            this.btnBookmarkComment = new System.Windows.Forms.Button();
+            this.btnSelectPlugin = new System.Windows.Forms.Button();
             this.checkBoxPlugin = new System.Windows.Forms.CheckBox();
             this.checkBoxStopTail = new System.Windows.Forms.CheckBox();
             this.checkBoxBookmark = new System.Windows.Forms.CheckBox();
             this.helpProvider = new System.Windows.Forms.HelpProvider();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.buttonImportGroup = new System.Windows.Forms.Button();
-            this.buttonExportGroup = new System.Windows.Forms.Button();
-            this.buttonMoveGroupDown = new System.Windows.Forms.Button();
-            this.buttonMoveGroupUp = new System.Windows.Forms.Button();
+            this.btnImportGroup = new System.Windows.Forms.Button();
+            this.btnExportGroup = new System.Windows.Forms.Button();
+            this.btnMoveGroupDown = new System.Windows.Forms.Button();
+            this.btnMoveGroupUp = new System.Windows.Forms.Button();
             this.labelAssignNamesToGroups = new System.Windows.Forms.Label();
-            this.buttonCopyGroup = new System.Windows.Forms.Button();
-            this.buttonDeleteGroup = new System.Windows.Forms.Button();
-            this.buttonNewGroup = new System.Windows.Forms.Button();
+            this.btnCopyGroup = new System.Windows.Forms.Button();
+            this.btnDeleteGroup = new System.Windows.Forms.Button();
+            this.btnNewGroup = new System.Windows.Forms.Button();
             this.comboBoxGroups = new System.Windows.Forms.ComboBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.pnlBackground = new System.Windows.Forms.Panel();
+            this.colorBoxForeground = new LogExpert.Dialogs.ColorComboBox();
+            this.colorBoxBackground = new LogExpert.Dialogs.ColorComboBox();
             this.groupBoxLineMatchCriteria.SuspendLayout();
             this.groupBoxColoring.SuspendLayout();
             this.groupBoxActions.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.pnlBackground.SuspendLayout();
             this.SuspendLayout();
             // 
             // listBoxHighlight
@@ -88,61 +90,61 @@
             this.listBoxHighlight.Location = new System.Drawing.Point(32, 160);
             this.listBoxHighlight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listBoxHighlight.Name = "listBoxHighlight";
-            this.listBoxHighlight.Size = new System.Drawing.Size(634, 264);
+            this.listBoxHighlight.Size = new System.Drawing.Size(423, 238);
             this.listBoxHighlight.TabIndex = 0;
             this.listBoxHighlight.SelectedIndexChanged += new System.EventHandler(this.OnListBoxHighlightSelectedIndexChanged);
             // 
-            // buttonAdd
+            // btnAdd
             // 
-            this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAdd.Location = new System.Drawing.Point(676, 218);
-            this.buttonAdd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(138, 35);
-            this.buttonAdd.TabIndex = 1;
-            this.buttonAdd.Text = "&Add";
-            this.toolTip.SetToolTip(this.buttonAdd, "Create a new hilight item from information below");
-            this.buttonAdd.UseVisualStyleBackColor = true;
-            this.buttonAdd.Click += new System.EventHandler(this.OnAddButtonClick);
+            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAdd.Location = new System.Drawing.Point(465, 218);
+            this.btnAdd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(138, 35);
+            this.btnAdd.TabIndex = 1;
+            this.btnAdd.Text = "&Add";
+            this.toolTip.SetToolTip(this.btnAdd, "Create a new hilight item from information below");
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.OnAddButtonClick);
             // 
-            // buttonDelete
+            // btnDelete
             // 
-            this.buttonDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonDelete.Location = new System.Drawing.Point(676, 263);
-            this.buttonDelete.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonDelete.Name = "buttonDelete";
-            this.buttonDelete.Size = new System.Drawing.Size(138, 35);
-            this.buttonDelete.TabIndex = 2;
-            this.buttonDelete.Text = "D&elete";
-            this.toolTip.SetToolTip(this.buttonDelete, "Delete the current hilight");
-            this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.OnDeleteButtonClick);
+            this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDelete.Location = new System.Drawing.Point(465, 263);
+            this.btnDelete.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(138, 35);
+            this.btnDelete.TabIndex = 2;
+            this.btnDelete.Text = "D&elete";
+            this.toolTip.SetToolTip(this.btnDelete, "Delete the current hilight");
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.OnDeleteButtonClick);
             // 
-            // buttonMoveUp
+            // btnMoveUp
             // 
-            this.buttonMoveUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMoveUp.Location = new System.Drawing.Point(676, 160);
-            this.buttonMoveUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonMoveUp.Name = "buttonMoveUp";
-            this.buttonMoveUp.Size = new System.Drawing.Size(68, 35);
-            this.buttonMoveUp.TabIndex = 3;
-            this.buttonMoveUp.Text = "&Up";
-            this.toolTip.SetToolTip(this.buttonMoveUp, "Move the current hilight one position up");
-            this.buttonMoveUp.UseVisualStyleBackColor = true;
-            this.buttonMoveUp.Click += new System.EventHandler(this.OnBtnMoveUpClick);
+            this.btnMoveUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMoveUp.Location = new System.Drawing.Point(465, 160);
+            this.btnMoveUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnMoveUp.Name = "btnMoveUp";
+            this.btnMoveUp.Size = new System.Drawing.Size(68, 35);
+            this.btnMoveUp.TabIndex = 3;
+            this.btnMoveUp.Text = "&Up";
+            this.toolTip.SetToolTip(this.btnMoveUp, "Move the current hilight one position up");
+            this.btnMoveUp.UseVisualStyleBackColor = true;
+            this.btnMoveUp.Click += new System.EventHandler(this.OnBtnMoveUpClick);
             // 
-            // buttonMoveDown
+            // btnMoveDown
             // 
-            this.buttonMoveDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMoveDown.Location = new System.Drawing.Point(747, 160);
-            this.buttonMoveDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonMoveDown.Name = "buttonMoveDown";
-            this.buttonMoveDown.Size = new System.Drawing.Size(68, 35);
-            this.buttonMoveDown.TabIndex = 4;
-            this.buttonMoveDown.Text = "&Down";
-            this.toolTip.SetToolTip(this.buttonMoveDown, "Move the current hilight one position down");
-            this.buttonMoveDown.UseVisualStyleBackColor = true;
-            this.buttonMoveDown.Click += new System.EventHandler(this.OnBtnMoveDownClick);
+            this.btnMoveDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMoveDown.Location = new System.Drawing.Point(536, 160);
+            this.btnMoveDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnMoveDown.Name = "btnMoveDown";
+            this.btnMoveDown.Size = new System.Drawing.Size(68, 35);
+            this.btnMoveDown.TabIndex = 4;
+            this.btnMoveDown.Text = "&Down";
+            this.toolTip.SetToolTip(this.btnMoveDown, "Move the current hilight one position down");
+            this.btnMoveDown.UseVisualStyleBackColor = true;
+            this.btnMoveDown.Click += new System.EventHandler(this.OnBtnMoveDownClick);
             // 
             // labelForgroundColor
             // 
@@ -164,30 +166,30 @@
             this.labelBackgroundColor.TabIndex = 8;
             this.labelBackgroundColor.Text = "Background color";
             // 
-            // buttonOk
+            // btnOk
             // 
-            this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOk.Location = new System.Drawing.Point(596, 849);
-            this.buttonOk.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(112, 35);
-            this.buttonOk.TabIndex = 9;
-            this.buttonOk.Text = "OK";
-            this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.OnBtnOkClick);
+            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnOk.Location = new System.Drawing.Point(385, 832);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(112, 35);
+            this.btnOk.TabIndex = 9;
+            this.btnOk.Text = "OK";
+            this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.OnBtnOkClick);
             // 
-            // buttonCancel
+            // btnCancel
             // 
-            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(723, 849);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(112, 35);
-            this.buttonCancel.TabIndex = 10;
-            this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Location = new System.Drawing.Point(512, 832);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(112, 35);
+            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // textBoxSearchString
             // 
@@ -196,7 +198,7 @@
             this.textBoxSearchString.Location = new System.Drawing.Point(9, 55);
             this.textBoxSearchString.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxSearchString.Name = "textBoxSearchString";
-            this.textBoxSearchString.Size = new System.Drawing.Size(786, 20);
+            this.textBoxSearchString.Size = new System.Drawing.Size(575, 20);
             this.textBoxSearchString.TabIndex = 11;
             this.textBoxSearchString.TextChanged += new System.EventHandler(this.ChangeToDirty);
             // 
@@ -210,47 +212,47 @@
             this.labelSearchString.TabIndex = 12;
             this.labelSearchString.Text = "Search string:";
             // 
-            // buttonApply
+            // btnApply
             // 
-            this.buttonApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonApply.Enabled = false;
-            this.buttonApply.Image = global::LogExpert.Properties.Resources.AdvancedIcon2;
-            this.buttonApply.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.buttonApply.Location = new System.Drawing.Point(676, 308);
-            this.buttonApply.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonApply.Name = "buttonApply";
-            this.buttonApply.Size = new System.Drawing.Size(138, 35);
-            this.buttonApply.TabIndex = 13;
-            this.buttonApply.Text = "A&pply";
-            this.toolTip.SetToolTip(this.buttonApply, "Apply changes below to current hiligth");
-            this.buttonApply.UseVisualStyleBackColor = true;
-            this.buttonApply.Click += new System.EventHandler(this.OnBtnApplyClick);
+            this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnApply.Enabled = false;
+            this.btnApply.Image = global::LogExpert.Properties.Resources.AdvancedIcon2;
+            this.btnApply.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.btnApply.Location = new System.Drawing.Point(465, 308);
+            this.btnApply.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(138, 35);
+            this.btnApply.TabIndex = 13;
+            this.btnApply.Text = "A&pply";
+            this.toolTip.SetToolTip(this.btnApply, "Apply changes below to current hiligth");
+            this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.OnBtnApplyClick);
             // 
-            // buttonCustomForeColor
+            // btnCustomForeColor
             // 
-            this.buttonCustomForeColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCustomForeColor.Location = new System.Drawing.Point(394, 60);
-            this.buttonCustomForeColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonCustomForeColor.Name = "buttonCustomForeColor";
-            this.buttonCustomForeColor.Size = new System.Drawing.Size(78, 35);
-            this.buttonCustomForeColor.TabIndex = 14;
-            this.buttonCustomForeColor.Text = "Custom";
-            this.toolTip.SetToolTip(this.buttonCustomForeColor, "Pick a custom foreground color");
-            this.buttonCustomForeColor.UseVisualStyleBackColor = true;
-            this.buttonCustomForeColor.Click += new System.EventHandler(this.OnBtnCustomForeColorClick);
+            this.btnCustomForeColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCustomForeColor.Location = new System.Drawing.Point(183, 60);
+            this.btnCustomForeColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnCustomForeColor.Name = "btnCustomForeColor";
+            this.btnCustomForeColor.Size = new System.Drawing.Size(78, 35);
+            this.btnCustomForeColor.TabIndex = 14;
+            this.btnCustomForeColor.Text = "Custom";
+            this.toolTip.SetToolTip(this.btnCustomForeColor, "Pick a custom foreground color");
+            this.btnCustomForeColor.UseVisualStyleBackColor = true;
+            this.btnCustomForeColor.Click += new System.EventHandler(this.OnBtnCustomForeColorClick);
             // 
-            // buttonCustomBackColor
+            // btnCustomBackColor
             // 
-            this.buttonCustomBackColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCustomBackColor.Location = new System.Drawing.Point(394, 137);
-            this.buttonCustomBackColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonCustomBackColor.Name = "buttonCustomBackColor";
-            this.buttonCustomBackColor.Size = new System.Drawing.Size(78, 35);
-            this.buttonCustomBackColor.TabIndex = 15;
-            this.buttonCustomBackColor.Text = "Custom";
-            this.toolTip.SetToolTip(this.buttonCustomBackColor, "Pick a custom background color");
-            this.buttonCustomBackColor.UseVisualStyleBackColor = true;
-            this.buttonCustomBackColor.Click += new System.EventHandler(this.OnBtnCustomBackColorClick);
+            this.btnCustomBackColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCustomBackColor.Location = new System.Drawing.Point(183, 137);
+            this.btnCustomBackColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnCustomBackColor.Name = "btnCustomBackColor";
+            this.btnCustomBackColor.Size = new System.Drawing.Size(78, 35);
+            this.btnCustomBackColor.TabIndex = 15;
+            this.btnCustomBackColor.Text = "Custom";
+            this.toolTip.SetToolTip(this.btnCustomBackColor, "Pick a custom background color");
+            this.btnCustomBackColor.UseVisualStyleBackColor = true;
+            this.btnCustomBackColor.Click += new System.EventHandler(this.OnBtnCustomBackColorClick);
             // 
             // checkBoxRegex
             // 
@@ -300,11 +302,11 @@
             this.groupBoxLineMatchCriteria.Controls.Add(this.labelSearchString);
             this.groupBoxLineMatchCriteria.Controls.Add(this.checkBoxRegex);
             this.groupBoxLineMatchCriteria.Controls.Add(this.checkBoxCaseSensitive);
-            this.groupBoxLineMatchCriteria.Location = new System.Drawing.Point(18, 454);
+            this.groupBoxLineMatchCriteria.Location = new System.Drawing.Point(18, 437);
             this.groupBoxLineMatchCriteria.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxLineMatchCriteria.Name = "groupBoxLineMatchCriteria";
             this.groupBoxLineMatchCriteria.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxLineMatchCriteria.Size = new System.Drawing.Size(818, 135);
+            this.groupBoxLineMatchCriteria.Size = new System.Drawing.Size(607, 135);
             this.groupBoxLineMatchCriteria.TabIndex = 19;
             this.groupBoxLineMatchCriteria.TabStop = false;
             this.groupBoxLineMatchCriteria.Text = "Line match criteria";
@@ -318,15 +320,15 @@
             this.groupBoxColoring.Controls.Add(this.checkBoxWordMatch);
             this.groupBoxColoring.Controls.Add(this.labelForgroundColor);
             this.groupBoxColoring.Controls.Add(this.colorBoxForeground);
-            this.groupBoxColoring.Controls.Add(this.buttonCustomForeColor);
-            this.groupBoxColoring.Controls.Add(this.buttonCustomBackColor);
+            this.groupBoxColoring.Controls.Add(this.btnCustomForeColor);
+            this.groupBoxColoring.Controls.Add(this.btnCustomBackColor);
             this.groupBoxColoring.Controls.Add(this.labelBackgroundColor);
             this.groupBoxColoring.Controls.Add(this.colorBoxBackground);
-            this.groupBoxColoring.Location = new System.Drawing.Point(18, 598);
+            this.groupBoxColoring.Location = new System.Drawing.Point(18, 581);
             this.groupBoxColoring.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBoxColoring.Name = "groupBoxColoring";
             this.groupBoxColoring.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxColoring.Size = new System.Drawing.Size(496, 286);
+            this.groupBoxColoring.Size = new System.Drawing.Size(285, 286);
             this.groupBoxColoring.TabIndex = 20;
             this.groupBoxColoring.TabStop = false;
             this.groupBoxColoring.Text = "Coloring";
@@ -370,6 +372,253 @@
             this.toolTip.SetToolTip(this.checkBoxWordMatch, "Don\'t highlight the whole line but only the matching keywords");
             this.checkBoxWordMatch.UseVisualStyleBackColor = true;
             this.checkBoxWordMatch.CheckedChanged += new System.EventHandler(this.OnChkBoxWordMatchCheckedChanged);
+            // 
+            // groupBoxActions
+            // 
+            this.groupBoxActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxActions.Controls.Add(this.btnBookmarkComment);
+            this.groupBoxActions.Controls.Add(this.btnSelectPlugin);
+            this.groupBoxActions.Controls.Add(this.checkBoxPlugin);
+            this.groupBoxActions.Controls.Add(this.checkBoxStopTail);
+            this.groupBoxActions.Controls.Add(this.checkBoxBookmark);
+            this.groupBoxActions.Controls.Add(this.checkBoxDontDirtyLed);
+            this.groupBoxActions.Location = new System.Drawing.Point(313, 581);
+            this.groupBoxActions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxActions.Name = "groupBoxActions";
+            this.groupBoxActions.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxActions.Size = new System.Drawing.Size(312, 195);
+            this.groupBoxActions.TabIndex = 21;
+            this.groupBoxActions.TabStop = false;
+            this.groupBoxActions.Text = "Actions";
+            // 
+            // btnBookmarkComment
+            // 
+            this.btnBookmarkComment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBookmarkComment.Location = new System.Drawing.Point(210, 69);
+            this.btnBookmarkComment.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnBookmarkComment.Name = "btnBookmarkComment";
+            this.btnBookmarkComment.Size = new System.Drawing.Size(81, 31);
+            this.btnBookmarkComment.TabIndex = 23;
+            this.btnBookmarkComment.Text = "Text...";
+            this.btnBookmarkComment.UseVisualStyleBackColor = true;
+            this.btnBookmarkComment.Click += new System.EventHandler(this.OnBtnBookmarkCommentClick);
+            // 
+            // btnSelectPlugin
+            // 
+            this.btnSelectPlugin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectPlugin.Location = new System.Drawing.Point(210, 143);
+            this.btnSelectPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnSelectPlugin.Name = "btnSelectPlugin";
+            this.btnSelectPlugin.Size = new System.Drawing.Size(81, 31);
+            this.btnSelectPlugin.TabIndex = 22;
+            this.btnSelectPlugin.Text = "Select...";
+            this.btnSelectPlugin.UseVisualStyleBackColor = true;
+            this.btnSelectPlugin.Click += new System.EventHandler(this.OnPluginButtonClick);
+            // 
+            // checkBoxPlugin
+            // 
+            this.checkBoxPlugin.AutoSize = true;
+            this.checkBoxPlugin.Location = new System.Drawing.Point(15, 148);
+            this.checkBoxPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxPlugin.Name = "checkBoxPlugin";
+            this.checkBoxPlugin.Size = new System.Drawing.Size(55, 17);
+            this.checkBoxPlugin.TabIndex = 21;
+            this.checkBoxPlugin.Text = "Plugin";
+            this.toolTip.SetToolTip(this.checkBoxPlugin, "When matching a line, call a keyword action plugin");
+            this.checkBoxPlugin.UseVisualStyleBackColor = true;
+            this.checkBoxPlugin.CheckedChanged += new System.EventHandler(this.OnChkBoxPluginCheckedChanged);
+            // 
+            // checkBoxStopTail
+            // 
+            this.checkBoxStopTail.AutoSize = true;
+            this.checkBoxStopTail.Location = new System.Drawing.Point(15, 111);
+            this.checkBoxStopTail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxStopTail.Name = "checkBoxStopTail";
+            this.checkBoxStopTail.Size = new System.Drawing.Size(101, 17);
+            this.checkBoxStopTail.TabIndex = 20;
+            this.checkBoxStopTail.Text = "Stop Follow Tail";
+            this.toolTip.SetToolTip(this.checkBoxStopTail, "When matching a line, stop automatic scrolling");
+            this.checkBoxStopTail.UseVisualStyleBackColor = true;
+            this.checkBoxStopTail.CheckedChanged += new System.EventHandler(this.ChangeToDirty);
+            // 
+            // checkBoxBookmark
+            // 
+            this.checkBoxBookmark.AutoSize = true;
+            this.checkBoxBookmark.Location = new System.Drawing.Point(15, 74);
+            this.checkBoxBookmark.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxBookmark.Name = "checkBoxBookmark";
+            this.checkBoxBookmark.Size = new System.Drawing.Size(92, 17);
+            this.checkBoxBookmark.TabIndex = 19;
+            this.checkBoxBookmark.Text = "Set bookmark";
+            this.toolTip.SetToolTip(this.checkBoxBookmark, "When matching a line, create a new bookmark for it");
+            this.checkBoxBookmark.UseVisualStyleBackColor = true;
+            this.checkBoxBookmark.CheckedChanged += new System.EventHandler(this.ChangeToDirty);
+            // 
+            // helpProvider
+            // 
+            this.helpProvider.HelpNamespace = "LogExpert.chm";
+            this.helpProvider.Tag = "";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this.btnImportGroup);
+            this.groupBox4.Controls.Add(this.btnExportGroup);
+            this.groupBox4.Controls.Add(this.btnMoveGroupDown);
+            this.groupBox4.Controls.Add(this.btnMoveGroupUp);
+            this.groupBox4.Controls.Add(this.labelAssignNamesToGroups);
+            this.groupBox4.Controls.Add(this.btnCopyGroup);
+            this.groupBox4.Controls.Add(this.btnDeleteGroup);
+            this.groupBox4.Controls.Add(this.btnNewGroup);
+            this.groupBox4.Controls.Add(this.comboBoxGroups);
+            this.groupBox4.Location = new System.Drawing.Point(18, 5);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox4.Size = new System.Drawing.Size(607, 129);
+            this.groupBox4.TabIndex = 22;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Groups";
+            // 
+            // btnImportGroup
+            // 
+            this.btnImportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnImportGroup.Location = new System.Drawing.Point(305, 29);
+            this.btnImportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnImportGroup.Name = "btnImportGroup";
+            this.btnImportGroup.Size = new System.Drawing.Size(68, 35);
+            this.btnImportGroup.TabIndex = 7;
+            this.btnImportGroup.Text = "Import";
+            this.toolTip.SetToolTip(this.btnImportGroup, "Import highlight groups");
+            this.btnImportGroup.UseVisualStyleBackColor = true;
+            this.btnImportGroup.Click += new System.EventHandler(this.OnBtnImportGroupClick);
+            // 
+            // btnExportGroup
+            // 
+            this.btnExportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExportGroup.Location = new System.Drawing.Point(305, 75);
+            this.btnExportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnExportGroup.Name = "btnExportGroup";
+            this.btnExportGroup.Size = new System.Drawing.Size(68, 35);
+            this.btnExportGroup.TabIndex = 8;
+            this.btnExportGroup.Text = "Export";
+            this.toolTip.SetToolTip(this.btnExportGroup, "Export highlight groups");
+            this.btnExportGroup.UseVisualStyleBackColor = true;
+            this.btnExportGroup.Click += new System.EventHandler(this.OnBtnExportGroupClick);
+            // 
+            // btnMoveGroupDown
+            // 
+            this.btnMoveGroupDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMoveGroupDown.Location = new System.Drawing.Point(518, 75);
+            this.btnMoveGroupDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnMoveGroupDown.Name = "btnMoveGroupDown";
+            this.btnMoveGroupDown.Size = new System.Drawing.Size(68, 35);
+            this.btnMoveGroupDown.TabIndex = 6;
+            this.btnMoveGroupDown.Text = "Down";
+            this.toolTip.SetToolTip(this.btnMoveGroupDown, "Move the current hilight group one position down");
+            this.btnMoveGroupDown.UseVisualStyleBackColor = true;
+            this.btnMoveGroupDown.Click += new System.EventHandler(this.OnBtnGroupDownClick);
+            // 
+            // btnMoveGroupUp
+            // 
+            this.btnMoveGroupUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMoveGroupUp.Location = new System.Drawing.Point(447, 75);
+            this.btnMoveGroupUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnMoveGroupUp.Name = "btnMoveGroupUp";
+            this.btnMoveGroupUp.Size = new System.Drawing.Size(68, 35);
+            this.btnMoveGroupUp.TabIndex = 5;
+            this.btnMoveGroupUp.Text = "Up";
+            this.toolTip.SetToolTip(this.btnMoveGroupUp, "Move the current hilight group one position up");
+            this.btnMoveGroupUp.UseVisualStyleBackColor = true;
+            this.btnMoveGroupUp.Click += new System.EventHandler(this.OnBtnGroupUpClick);
+            // 
+            // labelAssignNamesToGroups
+            // 
+            this.labelAssignNamesToGroups.AutoSize = true;
+            this.labelAssignNamesToGroups.Location = new System.Drawing.Point(9, 88);
+            this.labelAssignNamesToGroups.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAssignNamesToGroups.Name = "labelAssignNamesToGroups";
+            this.labelAssignNamesToGroups.Size = new System.Drawing.Size(248, 13);
+            this.labelAssignNamesToGroups.TabIndex = 4;
+            this.labelAssignNamesToGroups.Text = "You can assign groups to file names in the settings.";
+            // 
+            // btnCopyGroup
+            // 
+            this.btnCopyGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCopyGroup.Location = new System.Drawing.Point(518, 29);
+            this.btnCopyGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnCopyGroup.Name = "btnCopyGroup";
+            this.btnCopyGroup.Size = new System.Drawing.Size(68, 35);
+            this.btnCopyGroup.TabIndex = 3;
+            this.btnCopyGroup.Text = "Copy";
+            this.toolTip.SetToolTip(this.btnCopyGroup, "Copy the current hilight group into a new one");
+            this.btnCopyGroup.UseVisualStyleBackColor = true;
+            this.btnCopyGroup.Click += new System.EventHandler(this.OnBtnCopyGroupClick);
+            // 
+            // btnDeleteGroup
+            // 
+            this.btnDeleteGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDeleteGroup.Location = new System.Drawing.Point(447, 29);
+            this.btnDeleteGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnDeleteGroup.Name = "btnDeleteGroup";
+            this.btnDeleteGroup.Size = new System.Drawing.Size(68, 35);
+            this.btnDeleteGroup.TabIndex = 2;
+            this.btnDeleteGroup.Text = "Del";
+            this.toolTip.SetToolTip(this.btnDeleteGroup, "Delete the current hilight group");
+            this.btnDeleteGroup.UseVisualStyleBackColor = true;
+            this.btnDeleteGroup.Click += new System.EventHandler(this.OnBtnDelGroupClick);
+            // 
+            // btnNewGroup
+            // 
+            this.btnNewGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnNewGroup.Location = new System.Drawing.Point(381, 29);
+            this.btnNewGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnNewGroup.Name = "btnNewGroup";
+            this.btnNewGroup.Size = new System.Drawing.Size(63, 35);
+            this.btnNewGroup.TabIndex = 1;
+            this.btnNewGroup.Text = "New group";
+            this.toolTip.SetToolTip(this.btnNewGroup, "Create a new empty hilight group");
+            this.btnNewGroup.UseVisualStyleBackColor = true;
+            this.btnNewGroup.Click += new System.EventHandler(this.OnBtnNewGroupClick);
+            // 
+            // comboBoxGroups
+            // 
+            this.comboBoxGroups.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxGroups.DisplayMember = "GroupName";
+            this.comboBoxGroups.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxGroups.Location = new System.Drawing.Point(14, 32);
+            this.comboBoxGroups.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.comboBoxGroups.Name = "comboBoxGroups";
+            this.comboBoxGroups.Size = new System.Drawing.Size(270, 21);
+            this.comboBoxGroups.TabIndex = 0;
+            this.toolTip.SetToolTip(this.comboBoxGroups, "Choose a group to create different highlight settings. Type in a name to change i" +
+        "n the name of a group.");
+            this.comboBoxGroups.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnCmbBoxGroupDrawItem);
+            this.comboBoxGroups.SelectionChangeCommitted += new System.EventHandler(this.OnCmbBoxGroupSelectionChangeCommitted);
+            this.comboBoxGroups.TextUpdate += new System.EventHandler(this.OnCmbBoxGroupTextUpdate);
+            // 
+            // pnlBackground
+            // 
+            this.pnlBackground.AutoScroll = true;
+            this.pnlBackground.Controls.Add(this.listBoxHighlight);
+            this.pnlBackground.Controls.Add(this.btnAdd);
+            this.pnlBackground.Controls.Add(this.btnDelete);
+            this.pnlBackground.Controls.Add(this.btnMoveUp);
+            this.pnlBackground.Controls.Add(this.btnMoveDown);
+            this.pnlBackground.Controls.Add(this.btnOk);
+            this.pnlBackground.Controls.Add(this.btnCancel);
+            this.pnlBackground.Controls.Add(this.btnApply);
+            this.pnlBackground.Controls.Add(this.groupBoxLineMatchCriteria);
+            this.pnlBackground.Controls.Add(this.groupBoxColoring);
+            this.pnlBackground.Controls.Add(this.groupBoxActions);
+            this.pnlBackground.Controls.Add(this.groupBox4);
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
+            this.pnlBackground.Name = "pnlBackground";
+            this.pnlBackground.Size = new System.Drawing.Size(644, 895);
+            this.pnlBackground.TabIndex = 23;
             // 
             // colorBoxForeground
             // 
@@ -437,7 +686,7 @@
             this.colorBoxForeground.Location = new System.Drawing.Point(8, 63);
             this.colorBoxForeground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.colorBoxForeground.Name = "colorBoxForeground";
-            this.colorBoxForeground.Size = new System.Drawing.Size(376, 21);
+            this.colorBoxForeground.Size = new System.Drawing.Size(165, 21);
             this.colorBoxForeground.TabIndex = 5;
             this.colorBoxForeground.SelectedIndexChanged += new System.EventHandler(this.ChangeToDirty);
             // 
@@ -507,254 +756,16 @@
             this.colorBoxBackground.Location = new System.Drawing.Point(9, 140);
             this.colorBoxBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.colorBoxBackground.Name = "colorBoxBackground";
-            this.colorBoxBackground.Size = new System.Drawing.Size(376, 21);
+            this.colorBoxBackground.Size = new System.Drawing.Size(165, 21);
             this.colorBoxBackground.TabIndex = 7;
             this.colorBoxBackground.SelectedIndexChanged += new System.EventHandler(this.ChangeToDirty);
             // 
-            // groupBoxActions
-            // 
-            this.groupBoxActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxActions.Controls.Add(this.buttonBookmarkComment);
-            this.groupBoxActions.Controls.Add(this.buttonPlugin);
-            this.groupBoxActions.Controls.Add(this.checkBoxPlugin);
-            this.groupBoxActions.Controls.Add(this.checkBoxStopTail);
-            this.groupBoxActions.Controls.Add(this.checkBoxBookmark);
-            this.groupBoxActions.Controls.Add(this.checkBoxDontDirtyLed);
-            this.groupBoxActions.Location = new System.Drawing.Point(524, 598);
-            this.groupBoxActions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxActions.Name = "groupBoxActions";
-            this.groupBoxActions.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBoxActions.Size = new System.Drawing.Size(312, 195);
-            this.groupBoxActions.TabIndex = 21;
-            this.groupBoxActions.TabStop = false;
-            this.groupBoxActions.Text = "Actions";
-            // 
-            // buttonBookmarkComment
-            // 
-            this.buttonBookmarkComment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBookmarkComment.Location = new System.Drawing.Point(210, 69);
-            this.buttonBookmarkComment.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonBookmarkComment.Name = "buttonBookmarkComment";
-            this.buttonBookmarkComment.Size = new System.Drawing.Size(81, 31);
-            this.buttonBookmarkComment.TabIndex = 23;
-            this.buttonBookmarkComment.Text = "Text...";
-            this.buttonBookmarkComment.UseVisualStyleBackColor = true;
-            this.buttonBookmarkComment.Click += new System.EventHandler(this.OnBtnBookmarkCommentClick);
-            // 
-            // buttonPlugin
-            // 
-            this.buttonPlugin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonPlugin.Location = new System.Drawing.Point(210, 143);
-            this.buttonPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonPlugin.Name = "buttonPlugin";
-            this.buttonPlugin.Size = new System.Drawing.Size(81, 31);
-            this.buttonPlugin.TabIndex = 22;
-            this.buttonPlugin.Text = "Select...";
-            this.buttonPlugin.UseVisualStyleBackColor = true;
-            this.buttonPlugin.Click += new System.EventHandler(this.OnPluginButtonClick);
-            // 
-            // checkBoxPlugin
-            // 
-            this.checkBoxPlugin.AutoSize = true;
-            this.checkBoxPlugin.Location = new System.Drawing.Point(15, 148);
-            this.checkBoxPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxPlugin.Name = "checkBoxPlugin";
-            this.checkBoxPlugin.Size = new System.Drawing.Size(55, 17);
-            this.checkBoxPlugin.TabIndex = 21;
-            this.checkBoxPlugin.Text = "Plugin";
-            this.toolTip.SetToolTip(this.checkBoxPlugin, "When matching a line, call a keyword action plugin");
-            this.checkBoxPlugin.UseVisualStyleBackColor = true;
-            this.checkBoxPlugin.CheckedChanged += new System.EventHandler(this.OnChkBoxPluginCheckedChanged);
-            // 
-            // checkBoxStopTail
-            // 
-            this.checkBoxStopTail.AutoSize = true;
-            this.checkBoxStopTail.Location = new System.Drawing.Point(15, 111);
-            this.checkBoxStopTail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxStopTail.Name = "checkBoxStopTail";
-            this.checkBoxStopTail.Size = new System.Drawing.Size(101, 17);
-            this.checkBoxStopTail.TabIndex = 20;
-            this.checkBoxStopTail.Text = "Stop Follow Tail";
-            this.toolTip.SetToolTip(this.checkBoxStopTail, "When matching a line, stop automatic scrolling");
-            this.checkBoxStopTail.UseVisualStyleBackColor = true;
-            this.checkBoxStopTail.CheckedChanged += new System.EventHandler(this.ChangeToDirty);
-            // 
-            // checkBoxBookmark
-            // 
-            this.checkBoxBookmark.AutoSize = true;
-            this.checkBoxBookmark.Location = new System.Drawing.Point(15, 74);
-            this.checkBoxBookmark.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxBookmark.Name = "checkBoxBookmark";
-            this.checkBoxBookmark.Size = new System.Drawing.Size(92, 17);
-            this.checkBoxBookmark.TabIndex = 19;
-            this.checkBoxBookmark.Text = "Set bookmark";
-            this.toolTip.SetToolTip(this.checkBoxBookmark, "When matching a line, create a new bookmark for it");
-            this.checkBoxBookmark.UseVisualStyleBackColor = true;
-            this.checkBoxBookmark.CheckedChanged += new System.EventHandler(this.ChangeToDirty);
-            // 
-            // helpProvider
-            // 
-            this.helpProvider.HelpNamespace = "LogExpert.chm";
-            this.helpProvider.Tag = "";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox4.Controls.Add(this.buttonImportGroup);
-            this.groupBox4.Controls.Add(this.buttonExportGroup);
-            this.groupBox4.Controls.Add(this.buttonMoveGroupDown);
-            this.groupBox4.Controls.Add(this.buttonMoveGroupUp);
-            this.groupBox4.Controls.Add(this.labelAssignNamesToGroups);
-            this.groupBox4.Controls.Add(this.buttonCopyGroup);
-            this.groupBox4.Controls.Add(this.buttonDeleteGroup);
-            this.groupBox4.Controls.Add(this.buttonNewGroup);
-            this.groupBox4.Controls.Add(this.comboBoxGroups);
-            this.groupBox4.Location = new System.Drawing.Point(18, 5);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox4.Size = new System.Drawing.Size(818, 129);
-            this.groupBox4.TabIndex = 22;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Groups";
-            // 
-            // buttonImportGroup
-            // 
-            this.buttonImportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonImportGroup.Location = new System.Drawing.Point(516, 29);
-            this.buttonImportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonImportGroup.Name = "buttonImportGroup";
-            this.buttonImportGroup.Size = new System.Drawing.Size(68, 35);
-            this.buttonImportGroup.TabIndex = 7;
-            this.buttonImportGroup.Text = "Import";
-            this.toolTip.SetToolTip(this.buttonImportGroup, "Import highlight groups");
-            this.buttonImportGroup.UseVisualStyleBackColor = true;
-            this.buttonImportGroup.Click += new System.EventHandler(this.OnBtnImportGroupClick);
-            // 
-            // buttonExportGroup
-            // 
-            this.buttonExportGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExportGroup.Location = new System.Drawing.Point(516, 75);
-            this.buttonExportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonExportGroup.Name = "buttonExportGroup";
-            this.buttonExportGroup.Size = new System.Drawing.Size(68, 35);
-            this.buttonExportGroup.TabIndex = 8;
-            this.buttonExportGroup.Text = "Export";
-            this.toolTip.SetToolTip(this.buttonExportGroup, "Export highlight groups");
-            this.buttonExportGroup.UseVisualStyleBackColor = true;
-            this.buttonExportGroup.Click += new System.EventHandler(this.OnBtnExportGroupClick);
-            // 
-            // buttonMoveGroupDown
-            // 
-            this.buttonMoveGroupDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMoveGroupDown.Location = new System.Drawing.Point(729, 75);
-            this.buttonMoveGroupDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonMoveGroupDown.Name = "buttonMoveGroupDown";
-            this.buttonMoveGroupDown.Size = new System.Drawing.Size(68, 35);
-            this.buttonMoveGroupDown.TabIndex = 6;
-            this.buttonMoveGroupDown.Text = "Down";
-            this.toolTip.SetToolTip(this.buttonMoveGroupDown, "Move the current hilight group one position down");
-            this.buttonMoveGroupDown.UseVisualStyleBackColor = true;
-            this.buttonMoveGroupDown.Click += new System.EventHandler(this.OnBtnGroupDownClick);
-            // 
-            // buttonMoveGroupUp
-            // 
-            this.buttonMoveGroupUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMoveGroupUp.Location = new System.Drawing.Point(658, 75);
-            this.buttonMoveGroupUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonMoveGroupUp.Name = "buttonMoveGroupUp";
-            this.buttonMoveGroupUp.Size = new System.Drawing.Size(68, 35);
-            this.buttonMoveGroupUp.TabIndex = 5;
-            this.buttonMoveGroupUp.Text = "Up";
-            this.toolTip.SetToolTip(this.buttonMoveGroupUp, "Move the current hilight group one position up");
-            this.buttonMoveGroupUp.UseVisualStyleBackColor = true;
-            this.buttonMoveGroupUp.Click += new System.EventHandler(this.OnBtnGroupUpClick);
-            // 
-            // labelAssignNamesToGroups
-            // 
-            this.labelAssignNamesToGroups.AutoSize = true;
-            this.labelAssignNamesToGroups.Location = new System.Drawing.Point(9, 88);
-            this.labelAssignNamesToGroups.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelAssignNamesToGroups.Name = "labelAssignNamesToGroups";
-            this.labelAssignNamesToGroups.Size = new System.Drawing.Size(248, 13);
-            this.labelAssignNamesToGroups.TabIndex = 4;
-            this.labelAssignNamesToGroups.Text = "You can assign groups to file names in the settings.";
-            // 
-            // buttonCopyGroup
-            // 
-            this.buttonCopyGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCopyGroup.Location = new System.Drawing.Point(729, 29);
-            this.buttonCopyGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonCopyGroup.Name = "buttonCopyGroup";
-            this.buttonCopyGroup.Size = new System.Drawing.Size(68, 35);
-            this.buttonCopyGroup.TabIndex = 3;
-            this.buttonCopyGroup.Text = "Copy";
-            this.toolTip.SetToolTip(this.buttonCopyGroup, "Copy the current hilight group into a new one");
-            this.buttonCopyGroup.UseVisualStyleBackColor = true;
-            this.buttonCopyGroup.Click += new System.EventHandler(this.OnBtnCopyGroupClick);
-            // 
-            // buttonDeleteGroup
-            // 
-            this.buttonDeleteGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonDeleteGroup.Location = new System.Drawing.Point(658, 29);
-            this.buttonDeleteGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonDeleteGroup.Name = "buttonDeleteGroup";
-            this.buttonDeleteGroup.Size = new System.Drawing.Size(68, 35);
-            this.buttonDeleteGroup.TabIndex = 2;
-            this.buttonDeleteGroup.Text = "Del";
-            this.toolTip.SetToolTip(this.buttonDeleteGroup, "Delete the current hilight group");
-            this.buttonDeleteGroup.UseVisualStyleBackColor = true;
-            this.buttonDeleteGroup.Click += new System.EventHandler(this.OnBtnDelGroupClick);
-            // 
-            // buttonNewGroup
-            // 
-            this.buttonNewGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonNewGroup.Location = new System.Drawing.Point(592, 29);
-            this.buttonNewGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonNewGroup.Name = "buttonNewGroup";
-            this.buttonNewGroup.Size = new System.Drawing.Size(63, 35);
-            this.buttonNewGroup.TabIndex = 1;
-            this.buttonNewGroup.Text = "New group";
-            this.toolTip.SetToolTip(this.buttonNewGroup, "Create a new empty hilight group");
-            this.buttonNewGroup.UseVisualStyleBackColor = true;
-            this.buttonNewGroup.Click += new System.EventHandler(this.OnBtnNewGroupClick);
-            // 
-            // comboBoxGroups
-            // 
-            this.comboBoxGroups.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxGroups.DisplayMember = "GroupName";
-            this.comboBoxGroups.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.comboBoxGroups.Location = new System.Drawing.Point(14, 32);
-            this.comboBoxGroups.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.comboBoxGroups.Name = "comboBoxGroups";
-            this.comboBoxGroups.Size = new System.Drawing.Size(481, 21);
-            this.comboBoxGroups.TabIndex = 0;
-            this.toolTip.SetToolTip(this.comboBoxGroups, "Choose a group to create different highlight settings. Type in a name to change i" +
-        "n the name of a group.");
-            this.comboBoxGroups.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.OnCmbBoxGroupDrawItem);
-            this.comboBoxGroups.SelectionChangeCommitted += new System.EventHandler(this.OnCmbBoxGroupSelectionChangeCommitted);
-            this.comboBoxGroups.TextUpdate += new System.EventHandler(this.OnCmbBoxGroupTextUpdate);
-            // 
             // HighlightDialog
             // 
-            this.AcceptButton = this.buttonOk;
-            this.AutoScroll = true;
-            this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(855, 912);
-            this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.groupBoxActions);
-            this.Controls.Add(this.groupBoxColoring);
-            this.Controls.Add(this.groupBoxLineMatchCriteria);
-            this.Controls.Add(this.buttonApply);
-            this.Controls.Add(this.buttonCancel);
-            this.Controls.Add(this.buttonOk);
-            this.Controls.Add(this.buttonMoveDown);
-            this.Controls.Add(this.buttonMoveUp);
-            this.Controls.Add(this.buttonDelete);
-            this.Controls.Add(this.buttonAdd);
-            this.Controls.Add(this.listBoxHighlight);
+            this.AcceptButton = this.btnOk;
+            this.CancelButton = this.btnCancel;
+            this.ClientSize = new System.Drawing.Size(644, 895);
+            this.Controls.Add(this.pnlBackground);
             this.DoubleBuffered = true;
             this.helpProvider.SetHelpKeyword(this, "Highlighting.htm");
             this.helpProvider.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
@@ -777,6 +788,7 @@
             this.groupBoxActions.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.pnlBackground.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -784,21 +796,21 @@
         #endregion
 
         private System.Windows.Forms.ListBox listBoxHighlight;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonMoveUp;
-        private System.Windows.Forms.Button buttonMoveDown;
+        private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.Button btnMoveUp;
+        private System.Windows.Forms.Button btnMoveDown;
         private ColorComboBox colorBoxForeground;
         private System.Windows.Forms.Label labelForgroundColor;
         private ColorComboBox colorBoxBackground;
         private System.Windows.Forms.Label labelBackgroundColor;
-        private System.Windows.Forms.Button buttonOk;
-        private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.TextBox textBoxSearchString;
         private System.Windows.Forms.Label labelSearchString;
-        private System.Windows.Forms.Button buttonApply;
-        private System.Windows.Forms.Button buttonCustomForeColor;
-        private System.Windows.Forms.Button buttonCustomBackColor;
+        private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button btnCustomForeColor;
+        private System.Windows.Forms.Button btnCustomBackColor;
         private System.Windows.Forms.CheckBox checkBoxRegex;
         private System.Windows.Forms.CheckBox checkBoxCaseSensitive;
         private System.Windows.Forms.CheckBox checkBoxDontDirtyLed;
@@ -809,21 +821,22 @@
         private System.Windows.Forms.CheckBox checkBoxStopTail;
         private System.Windows.Forms.HelpProvider helpProvider;
         private System.Windows.Forms.CheckBox checkBoxPlugin;
-        private System.Windows.Forms.Button buttonPlugin;
-        private System.Windows.Forms.Button buttonBookmarkComment;
+        private System.Windows.Forms.Button btnSelectPlugin;
+        private System.Windows.Forms.Button btnBookmarkComment;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.ComboBox comboBoxGroups;
-        private System.Windows.Forms.Button buttonDeleteGroup;
-        private System.Windows.Forms.Button buttonNewGroup;
-        private System.Windows.Forms.Button buttonCopyGroup;
+        private System.Windows.Forms.Button btnDeleteGroup;
+        private System.Windows.Forms.Button btnNewGroup;
+        private System.Windows.Forms.Button btnCopyGroup;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.Label labelAssignNamesToGroups;
-        private System.Windows.Forms.Button buttonMoveGroupUp;
-        private System.Windows.Forms.Button buttonMoveGroupDown;
+        private System.Windows.Forms.Button btnMoveGroupUp;
+        private System.Windows.Forms.Button btnMoveGroupDown;
         private System.Windows.Forms.CheckBox checkBoxWordMatch;
         private System.Windows.Forms.CheckBox checkBoxBold;
         private System.Windows.Forms.CheckBox checkBoxNoBackground;
-        private System.Windows.Forms.Button buttonImportGroup;
-        private System.Windows.Forms.Button buttonExportGroup;
+        private System.Windows.Forms.Button btnImportGroup;
+        private System.Windows.Forms.Button btnExportGroup;
+        private System.Windows.Forms.Panel pnlBackground;
     }
 }
