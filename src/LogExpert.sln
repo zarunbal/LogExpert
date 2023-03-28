@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30002.166
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -20,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultPlugins", "DefaultPl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlassfishColumnizer", "GlassfishColumnizer\GlassfishColumnizer.csproj", "{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
@@ -33,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonColumnizer", "JsonColumnizer\JsonColumnizer.csproj", "{4C899885-E361-410A-B6AC-C2F236C436FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx64", "sftp-plugin\SftpFileSystemx64.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx64", "SftpFileSystemx64\SftpFileSystemx64.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
 EndProject
@@ -57,6 +55,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2
 		setup\ExtraFunctions.iss = setup\ExtraFunctions.iss
 		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -161,20 +161,6 @@ Global
 		{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}.Release|Win32.ActiveCfg = Release|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{086398CC-2D7F-4F50-B6DD-5ACBC55B618B}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -358,6 +344,24 @@ Global
 		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Win32.ActiveCfg = Release|Any CPU
 		{3D01E923-5219-488B-B0A7-98521841E680}.Release|Win32.Build.0 = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Win32.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Any CPU.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Win32.ActiveCfg = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.DebugNoTimeout|Win32.Build.0 = Debug|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Win32.ActiveCfg = Release|Any CPU
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

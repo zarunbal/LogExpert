@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace CsvColumnizer
@@ -12,7 +7,7 @@ namespace CsvColumnizer
     {
         #region Fields
 
-        private readonly CsvColumnizerConfig config;
+        private readonly CsvColumnizerConfig _config;
 
         #endregion
 
@@ -20,49 +15,49 @@ namespace CsvColumnizer
 
         public CsvColumnizerConfigDlg(CsvColumnizerConfig config)
         {
-            this.config = config;
+            _config = config;
             InitializeComponent();
-            fillValues();
+            FillValues();
         }
 
         #endregion
 
         #region Private Methods
 
-        private void fillValues()
+        private void FillValues()
         {
-            this.delimiterTextBox.Text = "" + this.config.delimiterChar;
-            this.quoteCharTextBox.Text = "" + this.config.quoteChar;
-            this.escapeCharTextBox.Text = "" + this.config.escapeChar;
-            this.escapeCheckBox.Checked = this.config.escapeChar != '\0';
-            this.commentCharTextBox.Text = "" + this.config.commentChar;
-            this.fieldNamesCheckBox.Checked = this.config.hasFieldNames;
-            this.escapeCharTextBox.Enabled = this.escapeCheckBox.Checked;
-            this.minColumnsNumericUpDown.Value = this.config.minColumns;
+            delimiterTextBox.Text = _config.DelimiterChar;
+            quoteCharTextBox.Text = _config.QuoteChar.ToString();
+            escapeCharTextBox.Text = _config.EscapeChar.ToString();
+            escapeCheckBox.Checked = _config.EscapeChar != '\0';
+            commentCharTextBox.Text = _config.CommentChar.ToString();
+            fieldNamesCheckBox.Checked = _config.HasFieldNames;
+            escapeCharTextBox.Enabled = escapeCheckBox.Checked;
+            minColumnsNumericUpDown.Value = _config.MinColumns;
         }
 
-        private void retrieveValues()
+        private void RetrieveValues()
         {
-            this.config.delimiterChar = this.delimiterTextBox.Text[0];
-            this.config.quoteChar = this.quoteCharTextBox.Text[0];
-            this.config.escapeChar = this.escapeCheckBox.Checked ? this.escapeCharTextBox.Text[0] : '\0';
-            this.config.commentChar = this.commentCharTextBox.Text[0];
-            this.config.hasFieldNames = this.fieldNamesCheckBox.Checked;
-            this.config.minColumns = (int) this.minColumnsNumericUpDown.Value;
+            _config.DelimiterChar = delimiterTextBox.Text;
+            _config.QuoteChar = quoteCharTextBox.Text[0];
+            _config.EscapeChar = escapeCheckBox.Checked ? escapeCharTextBox.Text[0] : '\0';
+            _config.CommentChar = commentCharTextBox.Text[0];
+            _config.HasFieldNames = fieldNamesCheckBox.Checked;
+            _config.MinColumns = (int) minColumnsNumericUpDown.Value;
         }
 
         #endregion
 
         #region Events handler
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
-            retrieveValues();
+            RetrieveValues();
         }
 
-        private void escapeCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void OnEscapeCheckBoxCheckedChanged(object sender, EventArgs e)
         {
-            this.escapeCharTextBox.Enabled = this.escapeCheckBox.Checked;
+            escapeCharTextBox.Enabled = escapeCheckBox.Checked;
         }
 
         #endregion

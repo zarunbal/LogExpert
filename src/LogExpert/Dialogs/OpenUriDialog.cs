@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -28,7 +24,7 @@ namespace LogExpert.Dialogs
 
         #region Properties
 
-        public string Uri => comboBoxUri.Text;
+        public string Uri => cmbUri.Text;
 
         public IList<string> UriHistory { get; set; }
 
@@ -36,33 +32,30 @@ namespace LogExpert.Dialogs
 
         #region Events handler
 
-        private void OpenUriDialog_Load(object sender, EventArgs e)
+        private void OnOpenUriDialogLoad(object sender, EventArgs e)
         {
             if (UriHistory != null)
             {
-                comboBoxUri.Items.Clear();
+                cmbUri.Items.Clear();
                 foreach (string uri in UriHistory)
                 {
-                    comboBoxUri.Items.Add(uri);
+                    cmbUri.Items.Add(uri);
                 }
             }
         }
 
-        private void OnButtonOkClick(object sender, EventArgs e)
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             UriHistory = new List<string>();
-
-            foreach (object item in comboBoxUri.Items)
+            foreach (object item in cmbUri.Items)
             {
                 UriHistory.Add(item.ToString());
             }
-
-            if (UriHistory.Contains(comboBoxUri.Text))
+            if (UriHistory.Contains(cmbUri.Text))
             {
-                UriHistory.Remove(comboBoxUri.Text);
+                UriHistory.Remove(cmbUri.Text);
             }
-
-            UriHistory.Insert(0, comboBoxUri.Text);
+            UriHistory.Insert(0, cmbUri.Text);
 
             while (UriHistory.Count > 20)
             {
