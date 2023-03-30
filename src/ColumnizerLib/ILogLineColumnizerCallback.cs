@@ -24,7 +24,7 @@ namespace LogExpert
         /// This function returns the current line number. That is the line number of the log line
         /// a ILogLineColumnizer function is called for (e.g. the line that has to be painted).
         /// </summary>
-        /// <returns>The current line number</returns>
+        /// <returns>The current line number starting at 0</returns>
         int GetLineNum();
 
         /// <summary>

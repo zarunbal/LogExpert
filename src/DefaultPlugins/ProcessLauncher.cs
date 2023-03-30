@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace LogExpert
 {
@@ -6,14 +7,13 @@ namespace LogExpert
     {
         #region Properties
 
-        public string Text
-        {
-            get { return GetName(); }
-        }
+        public string Text => GetName();
 
         #endregion
 
         #region IKeywordAction Member
+
+        private readonly object _callbackLock = new object();
 
         public void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
         {
@@ -22,28 +22,36 @@ namespace LogExpert
             if (param.StartsWith("\""))
             {
                 start = 1;
-                end = param.IndexOf("\"", start);
+                end = param.IndexOf("\"", start, StringComparison.Ordinal);
             }
             else
             {
-                end = param.IndexOf(" ");
+                end = param.IndexOf(" ", StringComparison.Ordinal);
             }
             if (end == -1)
             {
                 end = param.Length;
             }
             string procName = param.Substring(start, end - start);
-            string parameters = param.Substring(end).Trim();
-            parameters = parameters.Replace("%F", callback.GetFileName());
-            parameters = parameters.Replace("%K", keyword);
-            parameters = parameters.Replace("%L", "" + callback.GetLineNum());
-            parameters = parameters.Replace("%T", callback.GetTabTitle());
-            parameters = parameters.Replace("%C", callback.GetLogLine(callback.GetLineNum()).FullLine);
-            Process explorer = new Process();
-            explorer.StartInfo.FileName = procName;
-            explorer.StartInfo.Arguments = parameters;
-            explorer.StartInfo.UseShellExecute = false;
-            explorer.Start();
+            
+            lock(_callbackLock)
+            {
+                string parameters = param.Substring(end).Trim();
+                parameters = parameters.Replace("%F", callback.GetFileName());
+                parameters = parameters.Replace("%K", keyword);
+                
+                int lineNumber = callback.GetLineNum(); //Line Numbers start at 0, but are displayed (+1)
+                string logline = callback.GetLogLine(lineNumber).FullLine;
+                parameters = parameters.Replace("%L", string.Empty + lineNumber);
+                parameters = parameters.Replace("%T", callback.GetTabTitle());
+                parameters = parameters.Replace("%C", logline);
+
+                Process explorer = new Process();
+                explorer.StartInfo.FileName = procName;
+                explorer.StartInfo.Arguments = parameters;
+                explorer.StartInfo.UseShellExecute = false;
+                explorer.Start();
+            }
         }
 
         public string GetName()

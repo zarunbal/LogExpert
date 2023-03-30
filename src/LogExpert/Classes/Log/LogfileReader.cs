@@ -461,7 +461,7 @@ namespace LogExpert.Classes.Log
         public string GetLogFileNameForLine(int lineNum)
         {
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             string fileName = logBuffer?.FileInfo.FullName;
             ReleaseBufferListReaderLock();
             return fileName;
@@ -475,7 +475,7 @@ namespace LogExpert.Classes.Log
         public ILogFileInfo GetLogFileInfoForLine(int lineNum)
         {
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             ILogFileInfo info = logBuffer?.FileInfo;
             ReleaseBufferListReaderLock();
             return info;
@@ -491,7 +491,7 @@ namespace LogExpert.Classes.Log
         {
             int result = -1;
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             if (logBuffer != null)
             {
                 int index = _bufferList.IndexOf(logBuffer);
@@ -516,7 +516,7 @@ namespace LogExpert.Classes.Log
         {
             int result = -1;
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             if (logBuffer != null)
             {
                 int index = _bufferList.IndexOf(logBuffer);
@@ -549,7 +549,7 @@ namespace LogExpert.Classes.Log
         public int GetRealLineNumForVirtualLineNum(int lineNum)
         {
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             int result = -1;
             if (logBuffer != null)
             {
@@ -693,7 +693,7 @@ namespace LogExpert.Classes.Log
         internal void LogBufferInfoForLine(int lineNum)
         {
             AcquireBufferListReaderLock();
-            LogBuffer buffer = getBufferForLine(lineNum);
+            LogBuffer buffer = GetBufferForLine(lineNum);
             if (buffer == null)
             {
                 ReleaseBufferListReaderLock();
@@ -774,7 +774,7 @@ namespace LogExpert.Classes.Log
             }
 
             AcquireBufferListReaderLock();
-            LogBuffer logBuffer = getBufferForLine(lineNum);
+            LogBuffer logBuffer = GetBufferForLine(lineNum);
             if (logBuffer == null)
             {
                 ReleaseBufferListReaderLock();
@@ -1394,7 +1394,7 @@ namespace LogExpert.Classes.Log
             }
         }
 
-        private LogBuffer getBufferForLine(int lineNum)
+        private LogBuffer GetBufferForLine(int lineNum)
         {
 #if DEBUG
             long startTime = Environment.TickCount;
