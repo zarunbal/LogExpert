@@ -38,7 +38,7 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 if (ConfigManager.Settings.appBounds.Right > 0)
                 {
-                    Bounds = ConfigManager.Settings.appBounds;
+                    SetBoundsWithinVirtualScreen(ConfigManager.Settings.appBounds);
                 }
             }
 
@@ -73,6 +73,7 @@ namespace LogExpert.Controls.LogTabWindow
 #endif
         }
 
+        
         private void OnLogTabWindowClosing(object sender, CancelEventArgs e)
         {
             try

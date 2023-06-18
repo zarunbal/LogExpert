@@ -216,7 +216,7 @@ namespace LogExpert.Controls.LogWindow
             Settings settings = ConfigManager.Settings;
             if (settings.appBounds != null && settings.appBounds.Right > 0)
             {
-                Bounds = settings.appBounds;
+                SetBoundsWithinVirtualScreen(settings.appBounds);
             }
 
             _waitingForClose = false;
@@ -246,6 +246,13 @@ namespace LogExpert.Controls.LogWindow
         }
 
         #endregion
+
+        /*
+        private int virtualScreenWidth
+        {
+
+        }
+        */
 
         #region Delegates
 
