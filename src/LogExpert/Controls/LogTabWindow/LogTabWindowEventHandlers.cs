@@ -38,7 +38,11 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 if (ConfigManager.Settings.appBounds.Right > 0)
                 {
-                    SetBoundsWithinVirtualScreen(ConfigManager.Settings.appBounds);
+                    Bounds = ConfigManager.Settings.appBounds;
+                }
+                else
+                {
+                    StartPosition = FormStartPosition.WindowsDefaultBounds;
                 }
             }
 

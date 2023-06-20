@@ -3712,18 +3712,6 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        private void SetBoundsWithinVirtualScreen(Rectangle appBounds)
-        {
-            var vs = SystemInformation.VirtualScreen;
-            if (vs.X + vs.Width < appBounds.X + appBounds.Width || vs.Y + vs.Height < appBounds.Y + appBounds.Height)
-            {
-                StartPosition = FormStartPosition.WindowsDefaultBounds;
-            }
-            else
-            {
-                Bounds = appBounds;
-            }
-        }
 
         #endregion
     }

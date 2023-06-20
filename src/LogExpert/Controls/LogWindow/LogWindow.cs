@@ -216,7 +216,11 @@ namespace LogExpert.Controls.LogWindow
             Settings settings = ConfigManager.Settings;
             if (settings.appBounds != null && settings.appBounds.Right > 0)
             {
-                SetBoundsWithinVirtualScreen(settings.appBounds);
+                Bounds = settings.appBounds;
+            }
+            else
+            {
+                StartPosition = FormStartPosition.WindowsDefaultBounds;
             }
 
             _waitingForClose = false;
