@@ -13,11 +13,11 @@ namespace LogExpert.Classes
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        [NonSerialized] private readonly List<LogTabWindow> windowList = new List<LogTabWindow>();
+        [NonSerialized] private readonly List<LogTabWindow> _windowList = [];
 
-        [NonSerialized] private LogTabWindow firstLogTabWindow;
+        [NonSerialized] private LogTabWindow _firstLogTabWindow;
 
-        [NonSerialized] private int logWindowIndex = 1;
+        [NonSerialized] private int _logWindowIndex = 1;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace LogExpert.Classes
         {
             AddWindow(logTabWindow);
             logTabWindow.LogExpertProxy = this;
-            firstLogTabWindow = logTabWindow;
+            _firstLogTabWindow = logTabWindow;
         }
 
         #endregion
@@ -61,43 +61,43 @@ namespace LogExpert.Classes
         public void LoadFiles(string[] fileNames)
         {
             _logger.Info("Loading files into existing LogTabWindow");
-            LogTabWindow logWin = this.windowList[this.windowList.Count - 1];
-            logWin.Invoke(new MethodInvoker(logWin.SetForeground));
+            LogTabWindow logWin = _windowList[^1];
+            _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
             logWin.LoadFiles(fileNames);
         }
 
         public void NewWindow(string[] fileNames)
         {
-            if (this.firstLogTabWindow.IsDisposed)
+            if (_firstLogTabWindow.IsDisposed)
             {
                 _logger.Warn("first GUI thread window is disposed. Setting a new one.");
                 // may occur if a window is closed because of unhandled exception.
                 // Determine a new 'firstWindow'. If no window is left, start a new one.
-                RemoveWindow(this.firstLogTabWindow);
-                if (this.windowList.Count == 0)
+                RemoveWindow(_firstLogTabWindow);
+                if (_windowList.Count == 0)
                 {
                     _logger.Info("No windows left. New created window will be the new 'first' GUI window");
                     LoadFiles(fileNames);
                 }
                 else
                 {
-                    this.firstLogTabWindow = this.windowList[this.windowList.Count - 1];
+                    _firstLogTabWindow = _windowList[^1];
                     NewWindow(fileNames);
                 }
             }
             else
             {
-                this.firstLogTabWindow.Invoke(new NewWindowFx(NewWindowWorker), new object[] {fileNames});
+                _ = _firstLogTabWindow.Invoke(new NewWindowFx(NewWindowWorker), new object[] { fileNames });
             }
         }
 
         public void NewWindowOrLockedWindow(string[] fileNames)
         {
-            foreach (LogTabWindow logWin in this.windowList)
+            foreach (LogTabWindow logWin in _windowList)
             {
                 if (LogTabWindow.StaticData.CurrentLockedMainWindow == logWin)
                 {
-                    logWin.Invoke(new MethodInvoker(logWin.SetForeground));
+                    _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
                     logWin.LoadFiles(fileNames);
                     return;
                 }
@@ -110,7 +110,7 @@ namespace LogExpert.Classes
         public void NewWindowWorker(string[] fileNames)
         {
             _logger.Info("Creating new LogTabWindow");
-            LogTabWindow logWin = new LogTabWindow(fileNames.Length > 0 ? fileNames : null, logWindowIndex++, true);
+            LogTabWindow logWin = new(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true);
             logWin.LogExpertProxy = this;
             AddWindow(logWin);
             logWin.Show();
@@ -121,7 +121,7 @@ namespace LogExpert.Classes
         public void WindowClosed(LogTabWindow logWin)
         {
             RemoveWindow(logWin);
-            if (this.windowList.Count == 0)
+            if (_windowList.Count == 0)
             {
                 _logger.Info("Last LogTabWindow was closed");
                 PluginRegistry.GetInstance().CleanupPlugins();
@@ -129,17 +129,17 @@ namespace LogExpert.Classes
             }
             else
             {
-                if (this.firstLogTabWindow == logWin)
+                if (_firstLogTabWindow == logWin)
                 {
                     // valid firstLogTabWindow is needed for the Invoke()-Calls in NewWindow()
-                    this.firstLogTabWindow = this.windowList[this.windowList.Count - 1];
+                    _firstLogTabWindow = _windowList[^1];
                 }
             }
         }
 
         public int GetLogWindowCount()
         {
-            return this.windowList.Count;
+            return _windowList.Count;
         }
 
         public override object InitializeLifetimeService()
@@ -154,13 +154,13 @@ namespace LogExpert.Classes
         private void AddWindow(LogTabWindow window)
         {
             _logger.Info("Adding window to list");
-            this.windowList.Add(window);
+            _windowList.Add(window);
         }
 
         private void RemoveWindow(LogTabWindow window)
         {
             _logger.Info("Removing window from list");
-            this.windowList.Remove(window);
+            _ = _windowList.Remove(window);
         }
 
         #endregion

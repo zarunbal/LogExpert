@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using LogExpert.Classes;
 using LogExpert.Classes.Bookmark;
@@ -606,11 +607,68 @@ namespace LogExpert.Controls.LogWindow
             SendProgressBarUpdate();
 
             SearchFx searchFx = Search;
-            searchFx.BeginInvoke(searchParams, SearchComplete, null);
+            Task.Run(() => searchFx).ContinueWith(SearchComplete, null);
+            //searchFx.BeginInvoke(searchParams, SearchComplete, null);
 
             RemoveAllSearchHighlightEntries();
             AddSearchHitHighlightEntry(searchParams);
         }
+
+        private void SearchComplete(Task<SearchFx> task, object arg2)
+        {
+            if (Disposing)
+            {
+                return;
+            }
+
+            try
+            {
+                Invoke(new MethodInvoker(ResetProgressBar));
+                SearchFx fx = task.Result;
+                int line = fx.EndInvoke(task);
+                _guiStateArgs.MenuEnabled = true;
+                GuiStateUpdate(this, _guiStateArgs);
+                if (line == -1)
+                {
+                    return;
+                }
+
+                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
+            }
+            catch (Exception ex) // in the case the windows is already destroyed
+            {
+                _logger.Warn(ex);
+            }
+            throw new NotImplementedException();
+        }
+
+        //private void SearchComplete(IAsyncResult result)
+        //{
+        //    if (Disposing)
+        //    {
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        Invoke(new MethodInvoker(ResetProgressBar));
+        //        AsyncLocal ar = (AsyncResult)result;
+        //        SearchFx fx = (SearchFx)ar.AsyncDelegate;
+        //        int line = fx.EndInvoke(result);
+        //        _guiStateArgs.MenuEnabled = true;
+        //        GuiStateUpdate(this, _guiStateArgs);
+        //        if (line == -1)
+        //        {
+        //            return;
+        //        }
+
+        //        dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
+        //    }
+        //    catch (Exception ex) // in the case the windows is already destroyed
+        //    {
+        //        _logger.Warn(ex);
+        //    }
+        //}
 
         public void SelectLogLine(int line)
         {

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
+//using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1675,34 +1675,6 @@ namespace LogExpert.Controls.LogWindow
                         _logger.Warn(ex);
                     }
                 }
-            }
-        }
-
-        private void SearchComplete(IAsyncResult result)
-        {
-            if (Disposing)
-            {
-                return;
-            }
-
-            try
-            {
-                Invoke(new MethodInvoker(ResetProgressBar));
-                AsyncResult ar = (AsyncResult)result;
-                SearchFx fx = (SearchFx)ar.AsyncDelegate;
-                int line = fx.EndInvoke(result);
-                _guiStateArgs.MenuEnabled = true;
-                GuiStateUpdate(this, _guiStateArgs);
-                if (line == -1)
-                {
-                    return;
-                }
-
-                dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
-            }
-            catch (Exception ex) // in the case the windows is already destroyed
-            {
-                _logger.Warn(ex);
             }
         }
 

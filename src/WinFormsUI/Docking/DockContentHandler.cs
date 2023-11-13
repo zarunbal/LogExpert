@@ -541,7 +541,7 @@ namespace WeifenLuo.WinFormsUI.Docking
             }
         }
 
-        public ContextMenu TabPageContextMenu { get; set; } = null;
+        public ContextMenuStrip TabPageContextMenu { get; set; } = null;
 
         public string ToolTipText { get; set; } = null;
 

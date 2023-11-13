@@ -179,7 +179,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         [LocalizedCategory("Category_Docking")]
         [LocalizedDescription("DockContent_TabPageContextMenu_Description")]
         [DefaultValue(null)]
-        public ContextMenu TabPageContextMenu
+        public ContextMenuStrip TabPageContextMenu
         {
             get => DockHandler.TabPageContextMenu;
             set => DockHandler.TabPageContextMenu = value;

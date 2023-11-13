@@ -1,74 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}</ProjectGuid>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LogExpert.Tests</RootNamespace>
-    <AssemblyName>LogExpert.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
-    <IsCodedUITest>False</IsCodedUITest>
-    <TestProjectType>UnitTest</TestProjectType>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyTitle>LogExpert.Tests</AssemblyTitle>
+    <Product>LogExpert.Tests</Product>
+    <Copyright>Copyright ©  2018</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BufferShiftTest.cs" />
-    <Compile Include="CSVColumnizerTest.cs" />
-    <Compile Include="DateFormatParserTest.cs" />
-    <Compile Include="ColumnizerPickerTest.cs" />
-    <Compile Include="Extensions\EnumerableTests.cs" />
-    <Compile Include="JsonCompactColumnizerTest.cs" />
-    <Compile Include="JsonColumnizerTest.cs" />
-    <Compile Include="JSONSaveTest.cs" />
-    <Compile Include="LocalFileSystemTest.cs" />
-    <Compile Include="LogWindowTest.cs" />
-    <Compile Include="ReaderTest.cs" />
-    <Compile Include="RollingNameTest.cs" />
-    <Compile Include="RolloverHandlerTest.cs" />
-    <Compile Include="RolloverHandlerTestBase.cs" />
-    <Compile Include="SquareBracketColumnizerTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LogStreamReaderTest.cs" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
       <Version>4.18.1</Version>
@@ -113,30 +62,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
-      <Project>{E72C2BB1-34DE-4D66-A830-9647C3837833}</Project>
-      <Name>ColumnizerLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj">
-      <Project>{2563526E-4566-40CB-AA27-587B904FD25B}</Project>
-      <Name>CsvColumnizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj">
-      <Project>{4c899885-e361-410a-b6ac-c2f236c436fa}</Project>
-      <Name>JsonColumnizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj">
-      <Project>{003535ec-4186-4958-9dd9-c641f089aeed}</Project>
-      <Name>JsonCompactColumnizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj">
-      <Project>{c41a517b-7502-4b17-9119-55d5716fad65}</Project>
-      <Name>Log4jXmlColumnizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LogExpert\LogExpert.csproj">
-      <Project>{f0c0d370-f416-44ed-939a-b4827d15ac14}</Project>
-      <Name>LogExpert</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
+    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
+    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
+    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
+    <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestData\JsonCompactColumnizerTest_01.json">
@@ -158,17 +89,14 @@
     <None Include="..\Solution Items\Key.snk">
       <Link>Key.snk</Link>
     </None>
-    <None Include="TestData\organizations-1000.csv">
+    <None Update="TestData\organizations-1000.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\organizations-10000.csv">
+    <None Update="TestData\organizations-10000.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\people-10000.csv">
+    <None Update="TestData\people-10000.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,54 +1,54 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4C899885-E361-410A-B6AC-C2F236C436FA} = {4C899885-E361-410A-B6AC-C2F236C436FA}
 		{B5A7DFA4-48A8-4616-8008-7441699EC946} = {B5A7DFA4-48A8-4616-8008-7441699EC946}
 		{003535EC-4186-4958-9DD9-C641F089AEED} = {003535EC-4186-4958-9DD9-C641F089AEED}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvColumnizer", "CsvColumnizer\CsvColumnizer.csproj", "{2563526E-4566-40CB-AA27-587B904FD25B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvColumnizer", "CsvColumnizer\CsvColumnizer.csproj", "{2563526E-4566-40CB-AA27-587B904FD25B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColumnizerLib", "ColumnizerLib\ColumnizerLib.csproj", "{E72C2BB1-34DE-4D66-A830-9647C3837833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColumnizerLib", "ColumnizerLib\ColumnizerLib.csproj", "{E72C2BB1-34DE-4D66-A830-9647C3837833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Log4jXmlColumnizer", "Log4jXmlColumnizer\Log4jXmlColumnizer.csproj", "{C41A517B-7502-4B17-9119-55D5716FAD65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log4jXmlColumnizer", "Log4jXmlColumnizer\Log4jXmlColumnizer.csproj", "{C41A517B-7502-4B17-9119-55D5716FAD65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultPlugins", "DefaultPlugins\DefaultPlugins.csproj", "{00ED9F5D-742B-441C-B48B-16940B070B77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultPlugins", "DefaultPlugins\DefaultPlugins.csproj", "{00ED9F5D-742B-441C-B48B-16940B070B77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlassfishColumnizer", "GlassfishColumnizer\GlassfishColumnizer.csproj", "{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlassfishColumnizer", "GlassfishColumnizer\GlassfishColumnizer.csproj", "{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashIconHighlighter", "FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashIconHighlighter", "FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}"
 	ProjectSection(SolutionItems) = preProject
 		Solution Items\AssemblyVersion.cs = Solution Items\AssemblyVersion.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonColumnizer", "JsonColumnizer\JsonColumnizer.csproj", "{4C899885-E361-410A-B6AC-C2F236C436FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonColumnizer", "JsonColumnizer\JsonColumnizer.csproj", "{4C899885-E361-410A-B6AC-C2F236C436FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx64", "SftpFileSystemx64\SftpFileSystemx64.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SftpFileSystemx64", "SftpFileSystemx64\SftpFileSystemx64.csproj", "{B9BF5AB6-4791-4CC1-B9B7-66151A212814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColumnizerLib.UnitTests", "ColumnizerLib.UnitTests\ColumnizerLib.UnitTests.csproj", "{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColumnizerLib.UnitTests", "ColumnizerLib.UnitTests\ColumnizerLib.UnitTests.csproj", "{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Tests", "LogExpert.Tests\LogExpert.Tests.csproj", "{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert.Tests", "LogExpert.Tests\LogExpert.Tests.csproj", "{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2563526E-4566-40CB-AA27-587B904FD25B} = {2563526E-4566-40CB-AA27-587B904FD25B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonCompactColumnizer", "JsonCompactColumnizer\JsonCompactColumnizer.csproj", "{003535EC-4186-4958-9DD9-C641F089AEED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonCompactColumnizer", "JsonCompactColumnizer\JsonCompactColumnizer.csproj", "{003535EC-4186-4958-9DD9-C641F089AEED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoColumnizer", "AutoColumnizer\AutoColumnizer.csproj", "{B57259A3-4ED7-4F8B-A252-29E799A56B9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoColumnizer", "AutoColumnizer\AutoColumnizer.csproj", "{B57259A3-4ED7-4F8B-A252-29E799A56B9E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.csproj", "{CFA0360E-BA8D-4D6F-AF76-63D8282109FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystemx86", "SftpFileSystemx86\SftpFileSystemx86.csproj", "{3D01E923-5219-488B-B0A7-98521841E680}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SftpFileSystemx86", "SftpFileSystemx86\SftpFileSystemx86.csproj", "{3D01E923-5219-488B-B0A7-98521841E680}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2-AF15-4C40-8C35-3E166D46F939}"
 	ProjectSection(SolutionItems) = preProject
@@ -56,7 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2
 		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
