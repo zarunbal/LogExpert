@@ -12,9 +12,6 @@
     <bugTrackerUrl>https://github.com/zarunbal/LogExpert/issues</bugTrackerUrl>
     <releaseNotes>https://github.com/zarunbal/LogExpert/releases/tag/v##version##</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <dependencies>
-      <dependency id="chocolatey" version="0.10.8" />
-    </dependencies>
     <description>LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
 Summary of (most) features:
