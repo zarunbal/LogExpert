@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>SftpFileSystem</RootNamespace>
     <AssemblyName>SftpFileSystem</AssemblyName>
@@ -19,15 +19,23 @@
     <Compile Include="..\SftpFileSystemx64\ConfigData.cs">
       <Link>ConfigData.cs</Link>
     </Compile>
+    <Compile Include="..\SftpFileSystemx64\ConfigDialog.cs" Link="ConfigDialog.cs" />
+    <Compile Include="..\SftpFileSystemx64\ConfigDialog.Designer.cs" Link="ConfigDialog.Designer.cs" />
     <Compile Include="..\SftpFileSystemx64\CredentialCache.cs">
       <Link>CredentialCache.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\Credentials.cs">
       <Link>Credentials.cs</Link>
     </Compile>
+    <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.cs" Link="FailedKeyDialog.cs" />
+    <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.Designer.cs" Link="FailedKeyDialog.Designer.cs" />
     <Compile Include="..\SftpFileSystemx64\KeyType.cs">
       <Link>KeyType.cs</Link>
     </Compile>
+    <Compile Include="..\SftpFileSystemx64\LoginDialog.cs" Link="LoginDialog.cs" />
+    <Compile Include="..\SftpFileSystemx64\LoginDialog.Designer.cs" Link="LoginDialog.Designer.cs" />
+    <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.cs" Link="PrivateKeyPasswordDialog.cs" />
+    <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.Designer.cs" Link="PrivateKeyPasswordDialog.Designer.cs" />
     <Compile Include="..\SftpFileSystemx64\SftpFileSystem.cs">
       <Link>SftpFileSystem.cs</Link>
     </Compile>
@@ -37,6 +45,12 @@
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx" Link="ConfigDialog.resx" />
+    <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx" Link="FailedKeyDialog.resx" />
+    <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx" Link="LoginDialog.resx" />
+    <EmbeddedResource Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.resx" Link="PrivateKeyPasswordDialog.resx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />

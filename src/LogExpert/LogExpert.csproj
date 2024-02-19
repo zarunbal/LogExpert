@@ -77,6 +77,11 @@
     <Content Include="Resources\Pro_Filter.bmp" />
   </ItemGroup>
   <ItemGroup>
+  <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
+  <PackageReference Include="Google.Protobuf" Version="3.25.3" />
+  <PackageReference Include="Grpc.Tools" Version="2.61.0" PrivateAssets="All" />
+</ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
   </ItemGroup>
@@ -87,6 +92,6 @@
   <PropertyGroup />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.2.5" />
+    <PackageReference Include="NLog" Version="5.2.8" />
   </ItemGroup>
 </Project>
