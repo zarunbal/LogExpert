@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
-
+using Newtonsoft.Json;
 
 namespace LogExpert
 {
@@ -15,10 +13,12 @@ namespace LogExpert
     {
         #region Fields
 
-        private const string CFG_FILE_NAME = "\\eminus.dat";
-        private EminusConfig config = new EminusConfig();
+        private const string CFG_FILE_NAME = "eminus.json";
+        private const string dot = ".";
+        private const string doubleDot = ":";
+        private EminusConfig _config = new();
         private EminusConfigDlg dlg;
-        private EminusConfig tmpConfig = new EminusConfig();
+        private EminusConfig tmpConfig = new();
 
         #endregion
 
@@ -37,42 +37,49 @@ namespace LogExpert
         {
             string temp = line.FullLine;
             // no Java stacktrace but some special logging of our applications at work:
-            if (temp.IndexOf("Exception of type") != -1 || temp.IndexOf("Nested:") != -1)
+            if (temp.Contains("Exception of type", StringComparison.CurrentCulture) || temp.Contains("Nested:", StringComparison.CurrentCulture))
             {
                 int pos = temp.IndexOf("created in ");
                 if (pos == -1)
                 {
                     return null;
                 }
+
                 pos += "created in ".Length;
-                int endPos = temp.IndexOf(".", pos);
+                int endPos = temp.IndexOf(dot, pos);
+                
                 if (endPos == -1)
                 {
                     return null;
                 }
-                string className = temp.Substring(pos, endPos - pos);
-                pos = temp.IndexOf(":", pos);
+
+                string className = temp[pos..endPos];
+                pos = temp.IndexOf(doubleDot, pos);
+                
                 if (pos == -1)
                 {
                     return null;
                 }
-                string lineNum = temp.Substring(pos + 1);
+
+                string lineNum = temp[(pos + 1)..];
                 XmlDocument doc = BuildXmlDocument(className, lineNum);
                 return doc;
             }
-            if (temp.IndexOf("at ") != -1)
+
+            if (temp.Contains("at ", StringComparison.CurrentCulture))
             {
                 string str = temp.Trim();
                 string className = null;
                 string lineNum = null;
                 int pos = str.IndexOf("at ") + 3;
-                str = str.Substring(pos); // remove 'at '
-                int idx = str.IndexOfAny(new char[] {'(', '$', '<'});
+                str = str[pos..]; // remove 'at '
+                int idx = str.IndexOfAny(['(', '$', '<']);
+                
                 if (idx != -1)
                 {
                     if (str[idx] == '$')
                     {
-                        className = str.Substring(0, idx);
+                        className = str[..idx];
                     }
                     else
                     {
@@ -81,18 +88,23 @@ namespace LogExpert
                         {
                             return null;
                         }
-                        className = str.Substring(0, pos);
+                        className = str[..pos];
                     }
+
                     idx = str.LastIndexOf(':');
+                    
                     if (idx == -1)
                     {
                         return null;
                     }
+
                     pos = str.IndexOf(')', idx);
+                    
                     if (pos == -1)
                     {
                         return null;
                     }
+                    
                     lineNum = str.Substring(idx + 1, pos - idx - 1);
                 }
                 /*
@@ -113,11 +125,11 @@ namespace LogExpert
 
         private XmlDocument BuildXmlDocument(string className, string lineNum)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            XmlDocument xmlDoc = new();
             xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
             XmlElement rootElement = xmlDoc.CreateElement("eminus");
             xmlDoc.AppendChild(rootElement);
-            rootElement.SetAttribute("authKey", this.config.password);
+            rootElement.SetAttribute("authKey", _config.password);
 
             XmlElement loadElement = xmlDoc.CreateElement("loadclass");
             loadElement.SetAttribute("mode", "dialog");
@@ -164,9 +176,9 @@ namespace LogExpert
             {
                 try
                 {
-                    TcpClient client = new TcpClient(this.config.host, this.config.port);
+                    TcpClient client = new(_config.host, _config.port);
                     NetworkStream stream = client.GetStream();
-                    StreamWriter writer = new StreamWriter(stream);
+                    StreamWriter writer = new(stream);
                     doc.Save(writer);
                     writer.Flush();
                     stream.Flush();
@@ -190,26 +202,22 @@ namespace LogExpert
         {
             string configPath = configDir + CFG_FILE_NAME;
 
+            FileInfo fileInfo = new(configDir + Path.DirectorySeparatorChar + CFG_FILE_NAME);
+
             if (!File.Exists(configPath))
             {
-                this.config = new EminusConfig();
+                _config = new EminusConfig();
             }
             else
             {
-                Stream fs = File.OpenRead(configPath);
-                BinaryFormatter formatter = new BinaryFormatter();
                 try
                 {
-                    this.config = (EminusConfig) formatter.Deserialize(fs);
+                    _config = JsonConvert.DeserializeObject<EminusConfig>(File.ReadAllText($"{fileInfo.FullName}"));
                 }
                 catch (SerializationException e)
                 {
                     MessageBox.Show(e.Message, "Deserialize");
-                    this.config = new EminusConfig();
-                }
-                finally
-                {
-                    fs.Close();
+                    _config = new EminusConfig();
                 }
             }
         }
@@ -217,16 +225,15 @@ namespace LogExpert
 
         public void SaveConfig(string configDir)
         {
-            string configPath = configDir + CFG_FILE_NAME;
-            if (this.dlg != null)
-            {
-                this.dlg.ApplyChanges();
-            }
-            this.config = this.tmpConfig.Clone();
-            BinaryFormatter formatter = new BinaryFormatter();
-            Stream fs = new FileStream(configPath, FileMode.Create, FileAccess.Write);
-            formatter.Serialize(fs, this.config);
-            fs.Close();
+            FileInfo fileInfo = new(configDir + Path.DirectorySeparatorChar + CFG_FILE_NAME);
+
+            dlg?.ApplyChanges();
+            
+            _config = tmpConfig.Clone();
+            
+            using StreamWriter sw = new(fileInfo.Create());
+            JsonSerializer serializer = new();
+            serializer.Serialize(sw, _config);
         }
 
         public bool HasEmbeddedForm()
@@ -236,9 +243,9 @@ namespace LogExpert
 
         public void ShowConfigForm(Panel panel)
         {
-            this.dlg = new EminusConfigDlg(this.tmpConfig);
-            this.dlg.Parent = panel;
-            this.dlg.Show();
+            dlg = new EminusConfigDlg(tmpConfig);
+            dlg.Parent = panel;
+            dlg.Show();
         }
 
         /// <summary>
@@ -248,28 +255,28 @@ namespace LogExpert
         /// <param name="owner"></param>
         public void ShowConfigDialog(Form owner)
         {
-            this.dlg = new EminusConfigDlg(this.tmpConfig);
-            this.dlg.TopLevel = true;
-            this.dlg.Owner = owner;
-            this.dlg.ShowDialog();
-            this.dlg.ApplyChanges();
+            dlg = new EminusConfigDlg(tmpConfig);
+            dlg.TopLevel = true;
+            dlg.Owner = owner;
+            dlg.ShowDialog();
+            dlg.ApplyChanges();
         }
 
 
         public void HideConfigForm()
         {
-            if (this.dlg != null)
+            if (dlg != null)
             {
-                this.dlg.ApplyChanges();
-                this.dlg.Hide();
-                this.dlg.Dispose();
-                this.dlg = null;
+                dlg.ApplyChanges();
+                dlg.Hide();
+                dlg.Dispose();
+                dlg = null;
             }
         }
 
         public void StartConfig()
         {
-            this.tmpConfig = this.config.Clone();
+            tmpConfig = _config.Clone();
         }
 
         #endregion

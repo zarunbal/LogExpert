@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert
 {
@@ -19,10 +17,10 @@ namespace LogExpert
 
         public EminusConfig Clone()
         {
-            EminusConfig config = new EminusConfig();
-            config.host = this.host;
-            config.port = this.port;
-            config.password = this.password;
+            EminusConfig config = new();
+            config.host = host;
+            config.port = port;
+            config.password = password;
             return config;
         }
 
