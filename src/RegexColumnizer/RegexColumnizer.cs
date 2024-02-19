@@ -1,6 +1,5 @@
 ﻿using LogExpert;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -181,7 +180,7 @@ namespace RegexColumnizer
 
         protected abstract string GetNameInternal();
 
-        internal void Init(RegexColumnizerConfig config)
+        public void Init(RegexColumnizerConfig config)
         {
             Config = config;
 

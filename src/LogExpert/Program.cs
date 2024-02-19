@@ -53,12 +53,12 @@ namespace LogExpert
 
             _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
 
-            CmdLine cmdLine = new CmdLine();
-            CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
+            CmdLine cmdLine = new();
+            CmdLineString configFile = new("config", false, "A configuration (settings) file");
             cmdLine.RegisterParameter(configFile);
             string[] remainingArgs = cmdLine.Parse(orgArgs);
 
-            List<string> argsList = new List<string>();
+            List<string> argsList = [];
 
             // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
             // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
@@ -67,7 +67,7 @@ namespace LogExpert
             {
                 try
                 {
-                    FileInfo info = new FileInfo(fileArg);
+                    FileInfo info = new(fileArg);
                     argsList.Add(info.Exists ? info.FullName : fileArg);
                 }
                 catch (Exception)
@@ -78,7 +78,7 @@ namespace LogExpert
             string[] args = argsList.ToArray();
             if (configFile.Exists)
             {
-                FileInfo cfgFileInfo = new FileInfo(configFile.Value);
+                FileInfo cfgFileInfo = new(configFile.Value);
 
                 if (cfgFileInfo.Exists)
                 {
@@ -96,14 +96,14 @@ namespace LogExpert
             {
                 Settings settings = ConfigManager.Settings;
 
-                Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
+                Mutex mutex = new(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
 
                 if (isCreated)
                 {
                     // first application instance
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
+                    LogTabWindow logWin = new(args.Length > 0 ? args : null, 1, false);
 
                     // first instance
                     //WindowsIdentity wi = WindowsIdentity.GetCurrent();
@@ -111,10 +111,10 @@ namespace LogExpert
                     IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
                     ChannelServices.RegisterChannel(ipcChannel, false);
                     RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
-                    LogExpertProxy proxy = new LogExpertProxy(logWin);
+                    LogExpertProxy proxy = new(logWin);
                     RemotingServices.Marshal(proxy, "LogExpertProxy");
 
-                    LogExpertApplicationContext context = new LogExpertApplicationContext(proxy, logWin);
+                    LogExpertApplicationContext context = new(proxy, logWin);
                     Application.Run(context);
 
                     ChannelServices.UnregisterChannel(ipcChannel);
@@ -161,7 +161,7 @@ namespace LogExpert
 
                     if (settings.preferences.allowOnlyOneInstance && settings.preferences.ShowErrorMessageAllowOnlyOneInstances)
                     {
-                        AllowOnlyOneInstanceErrorDialog a = new AllowOnlyOneInstanceErrorDialog();
+                        AllowOnlyOneInstanceErrorDialog a = new();
                         if (a.ShowDialog() == DialogResult.OK)
                         {
                             settings.preferences.ShowErrorMessageAllowOnlyOneInstances = !a.DoNotShowThisMessageAgain;
@@ -201,8 +201,8 @@ namespace LogExpert
                     errorText = lines[0];
                 }
             }
-            ExceptionWindow win = new ExceptionWindow(errorText, stackTrace);
-            win.ShowDialog();
+            ExceptionWindow win = new(errorText, stackTrace);
+            _ = win.ShowDialog();
         }
 
         #endregion
@@ -214,7 +214,7 @@ namespace LogExpert
             _logger.Fatal(e);
 
             //ShowUnhandledException(e.Exception);
-            Thread thread = new Thread(ShowUnhandledException);
+            Thread thread = new(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(e.Exception);
@@ -227,7 +227,7 @@ namespace LogExpert
 
             object exceptionObject = e.ExceptionObject;
             //ShowUnhandledException(exceptionObject);
-            Thread thread = new Thread(ShowUnhandledException);
+            Thread thread = new(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(exceptionObject);

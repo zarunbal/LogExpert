@@ -44,7 +44,9 @@ namespace RegexColumnizer.UnitTests
                 Expression =  regex,
                 Name = "Test regex"
             };
+
             Regex1Columnizer columnizer = new Regex1Columnizer();
+            //TODO this should be an internal function
             columnizer.Init(columnizerConfig);
             return columnizer;
         }

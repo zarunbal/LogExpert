@@ -23,7 +23,7 @@ namespace SftpFileSystem
         private readonly string _remoteFileName;
 
         private readonly SftpClient _sftp;
-        private readonly object _sshKeyMonitor = new object();
+        private readonly object _sshKeyMonitor = new();
         private DateTime _lastChange = DateTime.Now;
         private long _lastLength;
 
@@ -48,7 +48,7 @@ namespace SftpFileSystem
                 {
                     while (sftFileSystem.PrivateKeyFile == null)
                     {
-                        PrivateKeyPasswordDialog dlg = new PrivateKeyPasswordDialog();
+                        PrivateKeyPasswordDialog dlg = new();
                         DialogResult dialogResult = dlg.ShowDialog();
                         if (dialogResult == DialogResult.Cancel)
                         {
@@ -56,7 +56,7 @@ namespace SftpFileSystem
                             break;
                         }
 
-                        PrivateKeyFile privateKeyFile = new PrivateKeyFile(sftFileSystem.ConfigData.KeyFile, dlg.Password);
+                        PrivateKeyFile privateKeyFile = new(sftFileSystem.ConfigData.KeyFile, dlg.Password);
 
                         if (privateKeyFile != null)
                         {
@@ -86,7 +86,7 @@ namespace SftpFileSystem
 
                         if (success == false)
                         {
-                            FailedKeyDialog dlg = new FailedKeyDialog();
+                            FailedKeyDialog dlg = new();
                             DialogResult res = dlg.ShowDialog();
                             dlg.Dispose();
                             if (res == DialogResult.Cancel)
