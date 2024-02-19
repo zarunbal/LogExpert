@@ -48,7 +48,7 @@ namespace LogExpert.Classes.Log
         /// <returns></returns>
         public LinkedList<string> GetNameList()
         {
-            LinkedList<string> fileList = new LinkedList<string>();
+            LinkedList<string> fileList = new();
             string fileName = _filenameBuilder.BuildFileName();
             string filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;
             fileList.AddFirst(filePath);

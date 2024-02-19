@@ -21,7 +21,7 @@ namespace LogExpert.Classes.xml
         private readonly XmlParserContext _context;
         private readonly XmlReaderSettings _settings;
 
-        private readonly Queue<string> _lineList = new Queue<string>();
+        private readonly Queue<string> _lineList = new();
         
         private string _stylesheet;
         private XslCompiledTransform _xslt;
@@ -39,8 +39,8 @@ namespace LogExpert.Classes.xml
             Stylesheet = xmlLogConfig.Stylesheet;
 
             // Create the XmlNamespaceManager.
-            NameTable nt = new NameTable();
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(nt);
+            NameTable nt = new();
+            XmlNamespaceManager nsmgr = new(nt);
             if (xmlLogConfig.Namespace != null)
             {
                 nsmgr.AddNamespace(xmlLogConfig.Namespace[0], xmlLogConfig.Namespace[1]);
@@ -98,7 +98,7 @@ namespace LogExpert.Classes.xml
                 xmlReader.Read();
                 xmlReader.MoveToContent();
                 //xmlReader.MoveToContent();
-                StringWriter textWriter = new StringWriter();
+                StringWriter textWriter = new();
 
                 _xslt.Transform(xmlReader, null, textWriter);
                 string message = textWriter.ToString();

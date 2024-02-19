@@ -227,7 +227,7 @@ namespace LogExpert.Classes
         #region Fields
 
         // A private dictonary containing the parameters.
-        private readonly Dictionary<string, CmdLineParameter> parameters = new Dictionary<string, CmdLineParameter>();
+        private readonly Dictionary<string, CmdLineParameter> parameters = [];
 
         #endregion
 
@@ -300,7 +300,7 @@ namespace LogExpert.Classes
         {
             int i = 0;
 
-            List<string> new_args = new List<string>();
+            List<string> new_args = [];
 
             while (i < args.Length)
             {

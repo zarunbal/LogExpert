@@ -19,9 +19,9 @@ namespace LogExpert.Dialogs
         private readonly Brush _brush;
 
         private readonly Color _bubbleColor = Color.FromArgb(160, 250, 250, 00);
-        private readonly Font _font = new Font("Arial", 10);
+        private readonly Font _font = new("Arial", 10);
 
-        private readonly SortedList<int, BookmarkOverlay> _overlayList = new SortedList<int, BookmarkOverlay>();
+        private readonly SortedList<int, BookmarkOverlay> _overlayList = [];
 
         private readonly Pen _pen;
         private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90));
@@ -166,7 +166,7 @@ namespace LogExpert.Dialogs
             if (_isDrag)
             {
                 Cursor = Cursors.Hand;
-                Size offset = new Size(e.X - _dragStartPoint.X, e.Y - _dragStartPoint.Y);
+                Size offset = new(e.X - _dragStartPoint.X, e.Y - _dragStartPoint.Y);
                 _draggedOverlay.Bookmark.OverlayOffset = _oldOverlayOffset + offset;
                 Refresh();
             }
@@ -227,18 +227,18 @@ namespace LogExpert.Dialogs
                 myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
                 e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
 
-                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
+                PaintEventArgs args = new(myBuffer.Graphics, e.ClipRectangle);
 
                 base.OnPaint(args);
 
-                StringFormat format = new StringFormat();
+                StringFormat format = new();
                 format.LineAlignment = StringAlignment.Center;
                 format.Alignment = StringAlignment.Near;
 
                 myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
 
                 // Remove Columnheader from Clippingarea
-                Rectangle rectTableHeader = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, DisplayRectangle.Width, ColumnHeadersHeight);
+                Rectangle rectTableHeader = new(DisplayRectangle.X, DisplayRectangle.Y, DisplayRectangle.Width, ColumnHeadersHeight);
                 myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
 
                 //e.Graphics.SetClip(rect, CombineMode.Union);
@@ -248,7 +248,7 @@ namespace LogExpert.Dialogs
                     foreach (BookmarkOverlay overlay in _overlayList.Values)
                     {
                         SizeF textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
-                        Rectangle rectBubble = new Rectangle(overlay.Position,
+                        Rectangle rectBubble = new(overlay.Position,
                             new Size((int) textSize.Width, (int) textSize.Height));
                         rectBubble.Offset(60, -(rectBubble.Height + 40));
                         rectBubble.Inflate(3, 3);
@@ -257,7 +257,7 @@ namespace LogExpert.Dialogs
                         myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
                         myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
                         e.Graphics.SetClip(rectBubble, CombineMode.Union);
-                        RectangleF textRect = new RectangleF(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
+                        RectangleF textRect = new(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
                         myBuffer.Graphics.FillRectangle(_brush, rectBubble);
                         //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
                         myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));

@@ -66,7 +66,7 @@ namespace LogExpert.Dialogs
 
         private void OnButtonRegexHelpClick(object sender, EventArgs e)
         {
-            RegexHelperDialog regexDlg = new RegexHelperDialog();
+            RegexHelperDialog regexDlg = new();
             if (regexDlg.ShowDialog() == DialogResult.OK)
             {
                 textBoxArguments.SelectedText = regexDlg.Pattern;
@@ -82,7 +82,7 @@ namespace LogExpert.Dialogs
                 ILogFileInfo info = logTabWin.CurrentLogWindow.GetCurrentFileInfo();
                 if (line != null && info != null)
                 {
-                    ArgParser parser = new ArgParser(textBoxArguments.Text);
+                    ArgParser parser = new(textBoxArguments.Text);
                     string args = parser.BuildArgs(line, logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info,
                         this);
                     labelTestResult.Text = args;

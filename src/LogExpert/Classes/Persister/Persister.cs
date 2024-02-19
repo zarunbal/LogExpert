@@ -17,7 +17,7 @@ namespace LogExpert.Classes.Persister
     {
         #region Fields
 
-        public SortedList<int, Entities.Bookmark> bookmarkList = new SortedList<int, Entities.Bookmark>();
+        public SortedList<int, Entities.Bookmark> bookmarkList = [];
         public int bookmarkListPosition = 300;
         public bool bookmarkListVisible = false;
         public string columnizerName;
@@ -25,10 +25,10 @@ namespace LogExpert.Classes.Persister
         public Encoding encoding;
         public string fileName = null;
         public bool filterAdvanced = false;
-        public List<FilterParams> filterParamsList = new List<FilterParams>();
+        public List<FilterParams> filterParamsList = [];
         public int filterPosition = 222;
         public bool filterSaveListVisible = false;
-        public List<FilterTabData> filterTabDataList = new List<FilterTabData>();
+        public List<FilterTabData> filterTabDataList = [];
         public bool filterVisible = false;
         public int firstDisplayedLine = -1;
         public bool followTail = true;
@@ -37,9 +37,9 @@ namespace LogExpert.Classes.Persister
 
         public bool multiFile = false;
         public int multiFileMaxDays;
-        public List<string> multiFileNames = new List<string>();
+        public List<string> multiFileNames = [];
         public string multiFilePattern;
-        public SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
+        public SortedList<int, RowHeightEntry> rowHeightList = [];
         public string sessionFileName = null;
         public bool showBookmarkCommentColumn;
         public string tabName = null;
@@ -120,8 +120,8 @@ namespace LogExpert.Classes.Persister
         /// <returns></returns>
         public static PersistenceData LoadOptionsOnly(string fileName)
         {
-            PersistenceData persistenceData = new PersistenceData();
-            XmlDocument xmlDoc = new XmlDocument();
+            PersistenceData persistenceData = new();
+            XmlDocument xmlDoc = new();
             try
             {
                 xmlDoc.Load(fileName);
@@ -155,7 +155,7 @@ namespace LogExpert.Classes.Persister
                 case SessionSaveLocation.SameDir:
                 default:
                 {
-                    FileInfo fileInfo = new FileInfo(logFileName);
+                    FileInfo fileInfo = new(logFileName);
                     dir = fileInfo.DirectoryName;
                     file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
                     break;
@@ -208,7 +208,7 @@ namespace LogExpert.Classes.Persister
 
         private static void Save(string fileName, PersistenceData persistenceData)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            XmlDocument xmlDoc = new();
             XmlElement rootElement = xmlDoc.CreateElement("logexpert");
             xmlDoc.AppendChild(rootElement);
             XmlElement fileElement = xmlDoc.CreateElement("file");
@@ -255,8 +255,7 @@ namespace LogExpert.Classes.Persister
                     WriteFilterTabs(xmlDoc, filterTabElement, persistenceData.filterTabDataList);
                     XmlElement filterElement = xmlDoc.CreateElement("tabFilter");
                     filterTabElement.AppendChild(filterElement);
-                    List<FilterParams> filterList = new List<FilterParams>();
-                    filterList.Add(data.filterParams);
+                    List<FilterParams> filterList = [data.filterParams];
                     WriteFilter(xmlDoc, filterElement, filterList);
                 }
             }
@@ -264,7 +263,7 @@ namespace LogExpert.Classes.Persister
 
         private static List<FilterTabData> ReadFilterTabs(XmlElement startNode)
         {
-            List<FilterTabData> dataList = new List<FilterTabData>();
+            List<FilterTabData> dataList = [];
             XmlNode filterTabsNode = startNode.SelectSingleNode("filterTabs");
             if (filterTabsNode != null)
             {
@@ -276,7 +275,7 @@ namespace LogExpert.Classes.Persister
                     if (filterNode != null)
                     {
                         List<FilterParams> filterList = ReadFilter(filterNode as XmlElement);
-                        FilterTabData data = new FilterTabData();
+                        FilterTabData data = new();
                         data.persistenceData = persistenceData;
                         data.filterParams = filterList[0]; // there's only 1
                         dataList.Add(data);
@@ -296,8 +295,8 @@ namespace LogExpert.Classes.Persister
                 XmlElement filterElement = xmlDoc.CreateElement("filter");
                 XmlElement paramsElement = xmlDoc.CreateElement("params");
 
-                BinaryFormatter formatter = new BinaryFormatter();
-                MemoryStream stream = new MemoryStream(200);
+                BinaryFormatter formatter = new();
+                MemoryStream stream = new(200);
                 formatter.Serialize(stream, filterParams);
                 string base64Data = System.Convert.ToBase64String(stream.ToArray());
                 paramsElement.InnerText = base64Data;
@@ -309,7 +308,7 @@ namespace LogExpert.Classes.Persister
 
         private static List<FilterParams> ReadFilter(XmlElement startNode)
         {
-            List<FilterParams> filterList = new List<FilterParams>();
+            List<FilterParams> filterList = [];
             XmlNode filtersNode = startNode.SelectSingleNode("filters");
             if (filtersNode != null)
             {
@@ -322,8 +321,8 @@ namespace LogExpert.Classes.Persister
                         {
                             string base64Text = subNode.InnerText;
                             byte[] data = System.Convert.FromBase64String(base64Text);
-                            BinaryFormatter formatter = new BinaryFormatter();
-                            MemoryStream stream = new MemoryStream(data);
+                            BinaryFormatter formatter = new();
+                            MemoryStream stream = new(data);
                             FilterParams filterParams = (FilterParams) formatter.Deserialize(stream);
                             filterParams.Init();
                             filterList.Add(filterParams);
@@ -360,10 +359,10 @@ namespace LogExpert.Classes.Persister
 
         private static PersistenceData Load(string fileName)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            XmlDocument xmlDoc = new();
             xmlDoc.Load(fileName);
             XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
-            PersistenceData persistenceData = new PersistenceData();
+            PersistenceData persistenceData = new();
             if (fileNode != null)
             {
                 persistenceData = ReadPersistenceDataFromNode(fileNode);
@@ -373,7 +372,7 @@ namespace LogExpert.Classes.Persister
 
         private static PersistenceData ReadPersistenceDataFromNode(XmlNode node)
         {
-            PersistenceData persistenceData = new PersistenceData();
+            PersistenceData persistenceData = new();
             XmlElement fileElement = node as XmlElement;
             persistenceData.bookmarkList = ReadBookmarks(fileElement);
             persistenceData.rowHeightList = ReadRowHeightList(fileElement);
@@ -418,7 +417,7 @@ namespace LogExpert.Classes.Persister
 
         private static SortedList<int, Entities.Bookmark> ReadBookmarks(XmlElement startNode)
         {
-            SortedList<int, Entities.Bookmark> bookmarkList = new SortedList<int, Entities.Bookmark>();
+            SortedList<int, Entities.Bookmark> bookmarkList = [];
             XmlNode boomarksNode = startNode.SelectSingleNode("bookmarks");
             if (boomarksNode != null)
             {
@@ -457,7 +456,7 @@ namespace LogExpert.Classes.Persister
                         continue;
                     }
                     int lineNum = int.Parse(line);
-                    Entities.Bookmark bookmark = new Entities.Bookmark(lineNum);
+                    Entities.Bookmark bookmark = new(lineNum);
                     bookmark.OverlayOffset = new Size(int.Parse(posX), int.Parse(posY));
                     if (text != null)
                     {
@@ -485,7 +484,7 @@ namespace LogExpert.Classes.Persister
 
         private static SortedList<int, RowHeightEntry> ReadRowHeightList(XmlElement startNode)
         {
-            SortedList<int, RowHeightEntry> rowHeightList = new SortedList<int, RowHeightEntry>();
+            SortedList<int, RowHeightEntry> rowHeightList = [];
             XmlNode rowHeightsNode = startNode.SelectSingleNode("rowheights");
             if (rowHeightsNode != null)
             {

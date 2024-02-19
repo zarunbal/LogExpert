@@ -82,7 +82,7 @@ namespace LogExpert.Dialogs
 
         private void OnButtonRegexClick(object sender, EventArgs e)
         {
-            RegexHelperDialog dlg = new RegexHelperDialog();
+            RegexHelperDialog dlg = new();
             dlg.Owner = this;
             dlg.CaseSensitive = checkBoxCaseSensitive.Checked;
             dlg.Pattern = comboBoxSearchFor.Text;

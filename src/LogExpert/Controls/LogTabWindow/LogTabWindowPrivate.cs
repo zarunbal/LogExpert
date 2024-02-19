@@ -34,8 +34,8 @@ namespace LogExpert.Controls.LogTabWindow
                 string text = Clipboard.GetText();
                 string fileName = Path.GetTempFileName();
 
-                using (FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
-                using (StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode))
+                using (FileStream fStream = new(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (StreamWriter writer = new(fStream, Encoding.Unicode))
                 {
                     writer.Write(text);
                     writer.Close();
@@ -164,7 +164,7 @@ namespace LogExpert.Controls.LogTabWindow
                 logWindow.Show(dockPanel);
             }
 
-            LogWindowData data = new LogWindowData();
+            LogWindowData data = new();
             data.diffSum = 0;
             logWindow.Tag = data;
             lock (_logWindowList)
@@ -326,7 +326,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ShowHighlightSettingsDialog()
         {
-            HighlightDialog dlg = new HighlightDialog();
+            HighlightDialog dlg = new();
             dlg.KeywordActionList = PluginRegistry.GetInstance().RegisteredKeywordActions;
             dlg.Owner = this;
             dlg.TopMost = TopMost;
@@ -361,11 +361,11 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OpenFileDialog()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new();
 
             if (CurrentLogWindow != null)
             {
-                FileInfo info = new FileInfo(CurrentLogWindow.FileName);
+                FileInfo info = new(CurrentLogWindow.FileName);
                 openFileDialog.InitialDirectory = info.DirectoryName;
             }
             else
@@ -392,7 +392,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (DialogResult.OK == openFileDialog.ShowDialog(this))
             {
-                FileInfo info = new FileInfo(openFileDialog.FileName);
+                FileInfo info = new(openFileDialog.FileName);
                 if (info.Directory.Exists)
                 {
                     ConfigManager.Settings.lastDirectory = info.DirectoryName;
@@ -425,7 +425,7 @@ namespace LogExpert.Controls.LogTabWindow
             MultiFileOption option = ConfigManager.Settings.preferences.multiFileOption;
             if (option == MultiFileOption.Ask)
             {
-                MultiLoadRequestDialog dlg = new MultiLoadRequestDialog();
+                MultiLoadRequestDialog dlg = new();
                 DialogResult res = dlg.ShowDialog();
 
                 if (res == DialogResult.Yes)
@@ -587,7 +587,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ConnectBookmarkWindow(LogWindow.LogWindow logWindow)
         {
-            FileViewContext ctx = new FileViewContext(logWindow, logWindow);
+            FileViewContext ctx = new(logWindow, logWindow);
             _bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
             _bookmarkWindow.SetCurrentFile(ctx);
         }
@@ -717,7 +717,7 @@ namespace LogExpert.Controls.LogTabWindow
             Rectangle iconRect = _leds[0];
             iconRect.Height = 16; // (DockPanel's damn hardcoded height) // this.leds[this.leds.Length - 1].Bottom;
             iconRect.Width = iconRect.Right + 6;
-            Bitmap bmp = new Bitmap(iconRect.Width, iconRect.Height);
+            Bitmap bmp = new(iconRect.Width, iconRect.Height);
             Graphics gfx = Graphics.FromImage(bmp);
 
             int offsetFromTop = 4;
@@ -740,10 +740,10 @@ namespace LogExpert.Controls.LogTabWindow
             int ledSize = 3;
             int ledGap = 1;
             Rectangle lastLed = _leds[_leds.Length - 1];
-            Rectangle dirtyLed = new Rectangle(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
-            Rectangle tailLed = new Rectangle(dirtyLed.Location, dirtyLed.Size);
+            Rectangle dirtyLed = new(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
+            Rectangle tailLed = new(dirtyLed.Location, dirtyLed.Size);
             tailLed.Offset(0, -(ledSize + ledGap));
-            Rectangle syncLed = new Rectangle(tailLed.Location, dirtyLed.Size);
+            Rectangle syncLed = new(tailLed.Location, dirtyLed.Size);
             syncLed.Offset(0, -(ledSize + ledGap));
 
             syncLed.Offset(0, offsetFromTop);
@@ -944,7 +944,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OpenSettings(int tabToOpen)
         {
-            SettingsDialog dlg = new SettingsDialog(ConfigManager.Settings.preferences, this, tabToOpen);
+            SettingsDialog dlg = new(ConfigManager.Settings.preferences, this, tabToOpen);
             dlg.TopMost = TopMost;
 
             if (DialogResult.OK == dlg.ShowDialog())
@@ -1065,7 +1065,7 @@ namespace LogExpert.Controls.LogTabWindow
                 ILogFileInfo info = CurrentLogWindow.GetCurrentFileInfo();
                 if (line != null && info != null)
                 {
-                    ArgParser parser = new ArgParser(toolEntry.args);
+                    ArgParser parser = new(toolEntry.args);
                     string argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
                     if (argLine != null)
                     {
@@ -1083,8 +1083,8 @@ namespace LogExpert.Controls.LogTabWindow
                 return;
             }
 
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo(cmd, args);
+            Process process = new();
+            ProcessStartInfo startInfo = new(cmd, args);
             if (!Util.IsNull(workingDir))
             {
                 startInfo.WorkingDirectory = workingDir;
@@ -1113,7 +1113,7 @@ namespace LogExpert.Controls.LogTabWindow
                     return;
                 }
 
-                SysoutPipe pipe = new SysoutPipe(process.StandardOutput);
+                SysoutPipe pipe = new(process.StandardOutput);
 
                 LogWindow.LogWindow logWin = AddTempFileTab(pipe.FileName,
                     CurrentLogWindow.IsTempFile
@@ -1178,7 +1178,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
             {
-                ProjectLoadDlg dlg = new ProjectLoadDlg();
+                ProjectLoadDlg dlg = new();
                 if (DialogResult.Cancel != dlg.ShowDialog())
                 {
                     switch (dlg.ProjectLoadResult)
@@ -1243,14 +1243,14 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 if (tool.isFavourite)
                 {
-                    ToolStripButton button = new ToolStripButton("" + labels[num % 26]);
+                    ToolStripButton button = new("" + labels[num % 26]);
                     button.Tag = tool;
                     SetToolIcon(tool, button);
                     externalToolsToolStrip.Items.Add(button);
                 }
 
                 num++;
-                ToolStripMenuItem menuItem = new ToolStripMenuItem(tool.name);
+                ToolStripMenuItem menuItem = new(tool.name);
                 menuItem.Tag = tool;
                 SetToolIcon(tool, menuItem);
                 toolsToolStripMenuItem.DropDownItems.Add(menuItem);
@@ -1291,9 +1291,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         private string SaveLayout()
         {
-            using (MemoryStream memStream = new MemoryStream(2000))
+            using (MemoryStream memStream = new(2000))
             {
-                using (StreamReader r = new StreamReader(memStream))
+                using (StreamReader r = new(memStream))
                 {
                     dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
 
@@ -1309,9 +1309,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void RestoreLayout(string layoutXml)
         {
-            using (MemoryStream memStream = new MemoryStream(2000))
+            using (MemoryStream memStream = new(2000))
             {
-                using (StreamWriter w = new StreamWriter(memStream))
+                using (StreamWriter w = new(memStream))
                 {
                     w.Write(layoutXml);
                     w.Flush();

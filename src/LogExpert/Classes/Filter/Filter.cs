@@ -25,9 +25,9 @@ namespace LogExpert.Classes.Filter
         public Filter(ColumnizerCallback callback)
         {
             _callback = callback;
-            FilterResultLines = new List<int>();
-            LastFilterLinesList = new List<int>();
-            FilterHitList = new List<int>();
+            FilterResultLines = [];
+            LastFilterLinesList = [];
+            FilterHitList = [];
         }
 
         #endregion

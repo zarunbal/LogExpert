@@ -88,7 +88,7 @@ namespace LogExpert.Classes.Log
 
         private string GetLineAndResetCharBufferPos()
         {
-            string result = new string(_charBuffer, 0, _charBufferPos);
+            string result = new(_charBuffer, 0, _charBufferPos);
             ResetCharBufferPos();
             return result;
         }

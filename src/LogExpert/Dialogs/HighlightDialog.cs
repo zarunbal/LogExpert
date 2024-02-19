@@ -21,7 +21,7 @@ namespace LogExpert.Dialogs
 
         private readonly Image _applyButtonImage;
         private string _bookmarkComment;
-        private ActionEntry _currentActionEntry = new ActionEntry();
+        private ActionEntry _currentActionEntry = new();
         private HilightGroup _currentGroup;
         private List<HilightGroup> _highlightGroupList;
 
@@ -75,7 +75,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnBookmarkCommentClick(object sender, EventArgs e)
         {
-            BookmarkCommentDlg dlg = new BookmarkCommentDlg();
+            BookmarkCommentDlg dlg = new();
             dlg.Comment = _bookmarkComment;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -175,7 +175,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnImportGroupClick(object sender, EventArgs e)
         {
-            ImportSettingsDialog dlg = new ImportSettingsDialog();
+            ImportSettingsDialog dlg = new();
 
             foreach (Control ctl in dlg.groupBoxImportOptions.Controls)
             {
@@ -266,8 +266,7 @@ namespace LogExpert.Dialogs
                 }
             }
 
-            HilightGroup newGroup = new HilightGroup
-                { GroupName = name };
+            HilightGroup newGroup = new() { GroupName = name };
             HighlightGroupList.Add(newGroup);
             FillGroupComboBox();
             SelectGroup(HighlightGroupList.Count - 1);
@@ -305,7 +304,7 @@ namespace LogExpert.Dialogs
         {
             if (e.Button == MouseButtons.Right)
             {
-                RegexHelperDialog dlg = new RegexHelperDialog();
+                RegexHelperDialog dlg = new();
                 dlg.Owner = this;
                 dlg.CaseSensitive = checkBoxCaseSensitive.Checked;
                 dlg.Pattern = textBoxSearchString.Text;
@@ -330,7 +329,7 @@ namespace LogExpert.Dialogs
             if (e.Index >= 0)
             {
                 HilightGroup group = HighlightGroupList[e.Index];
-                Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
+                Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 Brush brush = new SolidBrush(SystemColors.ControlText);
                 e.Graphics.DrawString(group.GroupName, e.Font, brush, new PointF(rectangle.Left, rectangle.Top));
@@ -396,7 +395,7 @@ namespace LogExpert.Dialogs
             if (e.Index >= 0)
             {
                 HilightEntry entry = (HilightEntry)listBoxHighlight.Items[e.Index];
-                Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
+                Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 if ((e.State & DrawItemState.Selected) != DrawItemState.Selected)
                 {
@@ -417,7 +416,7 @@ namespace LogExpert.Dialogs
 
         private void OnPluginButtonClick(object sender, EventArgs e)
         {
-            KeywordActionDlg dlg = new KeywordActionDlg(_currentActionEntry, KeywordActionList);
+            KeywordActionDlg dlg = new(_currentActionEntry, KeywordActionList);
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -438,7 +437,7 @@ namespace LogExpert.Dialogs
                     CheckRegex();
 
                     // Create a new entry
-                    HilightEntry entry = new HilightEntry(
+                    HilightEntry entry = new(
                         textBoxSearchString.Text,
                         colorBoxForeground.SelectedColor,
                         colorBoxBackground.SelectedColor,
@@ -488,7 +487,7 @@ namespace LogExpert.Dialogs
 
         private void ChooseColor(ColorComboBox comboBox)
         {
-            ColorDialog colorDialog = new ColorDialog();
+            ColorDialog colorDialog = new();
             colorDialog.AllowFullOpen = true;
             colorDialog.ShowHelp = false;
             colorDialog.Color = comboBox.CustomColor;
@@ -542,15 +541,15 @@ namespace LogExpert.Dialogs
             const string def = "[Default]";
             if (HighlightGroupList == null)
             {
-                HighlightGroupList = new List<HilightGroup>();
+                HighlightGroupList = [];
             }
 
             if (HighlightGroupList.Count == 0)
             {
-                HilightGroup highlightGroup = new HilightGroup
+                HilightGroup highlightGroup = new()
                 {
                     GroupName = def,
-                    HilightEntryList = new List<HilightEntry>()
+                    HilightEntryList = []
                 };
 
                 HighlightGroupList.Add(highlightGroup);

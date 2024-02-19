@@ -63,7 +63,7 @@ namespace LogExpert.Classes.xml
             bool eof = false;
             int tryCounter = 5;
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             while (!eof && !blockComplete)
             {

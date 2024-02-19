@@ -24,7 +24,7 @@ namespace LogExpert.Classes
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly object _lockObject = new object();
+        private static readonly object _lockObject = new();
         private static PluginRegistry _instance;
 
         private readonly IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
@@ -120,7 +120,7 @@ namespace LogExpert.Classes
                                         ConstructorInfo cti = type.GetConstructor(Type.EmptyTypes);
                                         if (cti != null)
                                         {
-                                            object o = cti.Invoke(new object[] { });
+                                            object o = cti.Invoke([]);
                                             RegisteredColumnizers.Add((ILogLineColumnizer) o);
                                             
                                             if (o is IColumnizerConfigurator configurator)
@@ -242,9 +242,9 @@ namespace LogExpert.Classes
             if (me != null)
             {
                 RegisteredContextMenuPlugins.Add(me);
-                if (me is ILogExpertPluginConfigurator)
+                if (me is ILogExpertPluginConfigurator configurator)
                 {
-                    ((ILogExpertPluginConfigurator) me).LoadConfig(ConfigManager.ConfigDir);
+                    configurator.LoadConfig(ConfigManager.ConfigDir);
                 }
 
                 if (me is ILogExpertPlugin)
@@ -267,9 +267,9 @@ namespace LogExpert.Classes
             {
                 RegisteredKeywordActions.Add(ka);
                 _registeredKeywordsDict.Add(ka.GetName(), ka);
-                if (ka is ILogExpertPluginConfigurator)
+                if (ka is ILogExpertPluginConfigurator configurator)
                 {
-                    ((ILogExpertPluginConfigurator) ka).LoadConfig(ConfigManager.ConfigDir);
+                    configurator.LoadConfig(ConfigManager.ConfigDir);
                 }
 
                 if (ka is ILogExpertPlugin)
@@ -289,17 +289,14 @@ namespace LogExpert.Classes
         {
             // file system plugins can have optional constructor with IFileSystemCallback argument
             IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, _fileSystemCallback);
-            if (fs == null)
-            {
-                fs = TryInstantiate<IFileSystemPlugin>(type);
-            }
+            fs ??= TryInstantiate<IFileSystemPlugin>(type);
 
             if (fs != null)
             {
                 RegisteredFileSystemPlugins.Add(fs);
-                if (fs is ILogExpertPluginConfigurator)
+                if (fs is ILogExpertPluginConfigurator configurator)
                 {
-                    ((ILogExpertPluginConfigurator) fs).LoadConfig(ConfigManager.ConfigDir);
+                    configurator.LoadConfig(ConfigManager.ConfigDir);
                 }
 
                 if (fs is ILogExpertPlugin)
@@ -324,7 +321,7 @@ namespace LogExpert.Classes
                 ConstructorInfo cti = loadedType.GetConstructor(Type.EmptyTypes);
                 if (cti != null)
                 {
-                    object o = cti.Invoke(new object[] { });
+                    object o = cti.Invoke([]);
                     return o as T;
                 }
             }
@@ -338,15 +335,15 @@ namespace LogExpert.Classes
             Type inter = loadedType.GetInterface(t.Name);
             if (inter != null)
             {
-                ConstructorInfo cti = loadedType.GetConstructor(new Type[] {typeof(IFileSystemCallback)});
+                ConstructorInfo cti = loadedType.GetConstructor([typeof(IFileSystemCallback)]);
                 if (cti != null)
                 {
-                    object o = cti.Invoke(new object[] {fsCallback});
+                    object o = cti.Invoke([fsCallback]);
                     return o as T;
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         #endregion
@@ -360,9 +357,9 @@ namespace LogExpert.Classes
             string mainDir = Application.StartupPath + Path.DirectorySeparatorChar;
             string pluginDir = mainDir + "plugins\\";
 
-            FileInfo mainFile = new FileInfo(mainDir + file);
+            FileInfo mainFile = new(mainDir + file);
 
-            FileInfo pluginFile = new FileInfo(pluginDir + file);
+            FileInfo pluginFile = new(pluginDir + file);
             if (mainFile.Exists)
             {
                 return Assembly.LoadFrom(mainFile.FullName);

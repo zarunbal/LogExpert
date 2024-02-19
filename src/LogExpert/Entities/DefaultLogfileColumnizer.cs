@@ -29,7 +29,7 @@ namespace LogExpert.Entities
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            ColumnizedLogLine cLogLine = new ColumnizedLogLine();
+            ColumnizedLogLine cLogLine = new();
             cLogLine.LogLine = line;
             cLogLine.ColumnValues = new IColumn[]
             {

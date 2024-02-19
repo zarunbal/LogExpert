@@ -22,7 +22,7 @@ namespace LogExpert.Entities.EventArgs
 
         public StatusLineEventArgs Clone()
         {
-            StatusLineEventArgs e = new StatusLineEventArgs();
+            StatusLineEventArgs e = new();
             e.StatusText = StatusText;
             e.CurrentLineNum = CurrentLineNum;
             e.LineCount = LineCount;

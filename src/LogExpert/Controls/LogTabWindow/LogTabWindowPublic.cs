@@ -29,7 +29,7 @@ namespace LogExpert.Controls.LogTabWindow
             LogWindow.LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
             if (pipe.FilterParams.searchText.Length > 0)
             {
-                ToolTip tip = new ToolTip(components);
+                ToolTip tip = new(components);
                 tip.SetToolTip(logWin,
                     "Filter: \"" + pipe.FilterParams.searchText + "\"" +
                     (pipe.FilterParams.isInvert ? " (Invert match)" : "") +
@@ -64,9 +64,9 @@ namespace LogExpert.Controls.LogTabWindow
                 return win;
             }
 
-            EncodingOptions encodingOptions = new EncodingOptions();
+            EncodingOptions encodingOptions = new();
             FillDefaultEncodingFromSettings(encodingOptions);
-            LogWindow.LogWindow logWindow = new LogWindow.LogWindow(this, logFileName, isTempFile, forcePersistenceLoading);
+            LogWindow.LogWindow logWindow = new(this, logFileName, isTempFile, forcePersistenceLoading);
 
             logWindow.GivenFileName = givenFileName;
 
@@ -127,11 +127,11 @@ namespace LogExpert.Controls.LogTabWindow
                 return null;
             }
 
-            LogWindow.LogWindow logWindow = new LogWindow.LogWindow(this, fileNames[fileNames.Length - 1], false, false);
+            LogWindow.LogWindow logWindow = new(this, fileNames[fileNames.Length - 1], false, false);
             AddLogWindow(logWindow, fileNames[fileNames.Length - 1], false);
             multiFileToolStripMenuItem.Checked = true;
             multiFileEnabledStripMenuItem.Checked = true;
-            EncodingOptions encodingOptions = new EncodingOptions();
+            EncodingOptions encodingOptions = new();
             FillDefaultEncodingFromSettings(encodingOptions);
             BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
             AddToFileHistory(fileNames[0]);
@@ -150,7 +150,7 @@ namespace LogExpert.Controls.LogTabWindow
                 return;
             }
 
-            SearchDialog dlg = new SearchDialog();
+            SearchDialog dlg = new();
             AddOwnedForm(dlg);
             dlg.TopMost = TopMost;
             SearchParams.historyList = ConfigManager.Settings.searchHistoryList;

@@ -110,8 +110,10 @@ namespace LogExpert.Classes
         public void NewWindowWorker(string[] fileNames)
         {
             _logger.Info("Creating new LogTabWindow");
-            LogTabWindow logWin = new(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true);
-            logWin.LogExpertProxy = this;
+            LogTabWindow logWin = new(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true)
+            {
+                LogExpertProxy = this
+            };
             AddWindow(logWin);
             logWin.Show();
             logWin.Activate();
@@ -167,10 +169,7 @@ namespace LogExpert.Classes
 
         protected void OnLastWindowClosed()
         {
-            if (LastWindowClosed != null)
-            {
-                LastWindowClosed(this, new EventArgs());
-            }
+            LastWindowClosed?.Invoke(this, new EventArgs());
         }
 
         private delegate void NewWindowFx(string[] fileNames);

@@ -11,7 +11,7 @@ namespace LogExpert.Classes
         {
             try
             {
-                Uri uri = new Uri(uriString);
+                Uri uri = new(uriString);
                 return uri.IsFile;
             }
             catch (Exception)
@@ -22,7 +22,7 @@ namespace LogExpert.Classes
 
         public ILogFileInfo GetLogfileInfo(string uriString)
         {
-            Uri uri = new Uri(uriString);
+            Uri uri = new(uriString);
             if (uri.IsFile)
             {
                 ILogFileInfo logFileInfo = new LogFileInfo(uri);

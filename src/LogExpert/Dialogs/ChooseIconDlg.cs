@@ -47,7 +47,7 @@ namespace LogExpert.Dialogs
                 return;
             }
 
-            ImageList imageList = new ImageList();
+            ImageList imageList = new();
             
             if (icons.GetLength(0) > 0)
             {
@@ -56,7 +56,7 @@ namespace LogExpert.Dialogs
                 for (int i = 0; i < icons.GetLength(1); ++i)
                 {
                     imageList.Images.Add(icons[1, i]);
-                    ListViewItem item = new ListViewItem();
+                    ListViewItem item = new();
                     item.ImageIndex = i;
                     iconListView.Items.Add(item);
                 }
@@ -85,12 +85,12 @@ namespace LogExpert.Dialogs
 
         private void OnButtonChooseIconFileClick(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             
             if (string.IsNullOrEmpty(iconFileLabel.Text) == false)
             {
-                FileInfo info = new FileInfo(iconFileLabel.Text);
+                FileInfo info = new(iconFileLabel.Text);
                 if (info.Directory != null && info.Directory.Exists)
                 {
                     dlg.InitialDirectory = info.DirectoryName;

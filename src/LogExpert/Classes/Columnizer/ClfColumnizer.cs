@@ -9,9 +9,9 @@ namespace LogExpert.Classes.Columnizer
     {
         #region Fields
 
-        private readonly Regex lineRegex = new Regex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
+        private readonly Regex lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
 
-        protected CultureInfo cultureInfo = new CultureInfo("de-DE");
+        protected CultureInfo cultureInfo = new("de-DE");
         protected int timeOffset = 0;
 
         #endregion
@@ -110,21 +110,21 @@ namespace LogExpert.Classes.Columnizer
 
         public IColumnizedLogLine SplitLine(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
         {
-            ColumnizedLogLine cLogLine = new ColumnizedLogLine
+            ColumnizedLogLine cLogLine = new()
             {
                 LogLine = line
             };
 
             Column[] columns = new Column[8]
             {
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine},
-                new Column {FullValue = "", Parent = cLogLine}
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine},
+                new() {FullValue = "", Parent = cLogLine}
             };
 
             cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();

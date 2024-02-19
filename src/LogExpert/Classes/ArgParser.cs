@@ -27,7 +27,7 @@ namespace LogExpert.Classes
 
         public string BuildArgs(ILogLine logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
         {
-            StringBuilder builder = new StringBuilder(this.argLine);
+            StringBuilder builder = new(this.argLine);
             builder.Replace("%L", "" + lineNum);
             builder.Replace("%P", logFileInfo.DirectoryName);
             builder.Replace("%N", logFileInfo.FileName);
@@ -91,7 +91,7 @@ namespace LogExpert.Classes
                         end = end2;
                     }
 
-                    ParamRequesterDialog dlg = new ParamRequesterDialog();
+                    ParamRequesterDialog dlg = new();
                     dlg.ParamName = ask;
                     dlg.Values = values;
                     DialogResult res = dlg.ShowDialog(parent);

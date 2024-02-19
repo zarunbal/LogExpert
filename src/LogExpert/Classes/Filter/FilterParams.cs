@@ -18,7 +18,7 @@ namespace LogExpert.Classes.Filter
 
         //public List<string> historyList = new List<string>();
         //public List<string> rangeHistoryList = new List<string>();
-        public List<int> columnList = new List<int>(); // list of columns in which to search
+        public List<int> columnList = []; // list of columns in which to search
 
         public bool columnRestrict = false;
 
@@ -43,7 +43,7 @@ namespace LogExpert.Classes.Filter
 
         [NonSerialized] public string lastLine = "";
 
-        [NonSerialized] public Hashtable lastNonEmptyCols = new Hashtable();
+        [NonSerialized] public Hashtable lastNonEmptyCols = [];
 
         [NonSerialized] public bool lastResult;
 
@@ -102,7 +102,7 @@ namespace LogExpert.Classes.Filter
         // call after deserialization!
         public void Init()
         {
-            lastNonEmptyCols = new Hashtable();
+            lastNonEmptyCols = [];
             lowerRangeSearchText = _rangeSearchText.ToLower();
             lowerSearchText = _searchText.ToLower();
             lastLine = "";

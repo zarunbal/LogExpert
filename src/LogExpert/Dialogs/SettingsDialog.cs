@@ -205,12 +205,12 @@ namespace LogExpert.Dialogs
 
         private void OnBtnToolClickInternal(TextBox textBox)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             
             if (string.IsNullOrEmpty(textBox.Text) == false)
             {
-                FileInfo info = new FileInfo(textBox.Text);
+                FileInfo info = new(textBox.Text);
                 if (info.Directory != null && info.Directory.Exists)
                 {
                     dlg.InitialDirectory = info.DirectoryName;
@@ -225,7 +225,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnArgsClickInternal(TextBox textBox)
         {
-            ToolArgsDialog dlg = new ToolArgsDialog(_logTabWin, this);
+            ToolArgsDialog dlg = new(_logTabWin, this);
             dlg.Arg = textBox.Text;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -235,12 +235,12 @@ namespace LogExpert.Dialogs
 
         private void OnBtnWorkingDirClick(TextBox textBox)
         {
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            FolderBrowserDialog dlg = new();
             dlg.RootFolder = Environment.SpecialFolder.MyComputer;
             dlg.Description = @"Select a working directory";
             if (!string.IsNullOrEmpty(textBox.Text))
             {
-                DirectoryInfo info = new DirectoryInfo(textBox.Text);
+                DirectoryInfo info = new(textBox.Text);
                 if (info.Exists)
                 {
                     dlg.SelectedPath = info.FullName;
@@ -300,9 +300,9 @@ namespace LogExpert.Dialogs
 
             foreach (ColumnizerMaskEntry maskEntry in Preferences.columnizerMaskList)
             {
-                DataGridViewRow row = new DataGridViewRow();
+                DataGridViewRow row = new();
                 row.Cells.Add(new DataGridViewTextBoxCell());
-                DataGridViewComboBoxCell cell = new DataGridViewComboBoxCell();
+                DataGridViewComboBoxCell cell = new();
 
                 foreach (ILogLineColumnizer logColumnizer in columnizers)
                 {
@@ -343,9 +343,9 @@ namespace LogExpert.Dialogs
 
             foreach (HighlightMaskEntry maskEntry in Preferences.highlightMaskList)
             {
-                DataGridViewRow row = new DataGridViewRow();
+                DataGridViewRow row = new();
                 row.Cells.Add(new DataGridViewTextBoxCell());
-                DataGridViewComboBoxCell cell = new DataGridViewComboBoxCell();
+                DataGridViewComboBoxCell cell = new();
 
                 foreach (HilightGroup group in groups)
                 {
@@ -386,7 +386,7 @@ namespace LogExpert.Dialogs
             {
                 if (!row.IsNewRow)
                 {
-                    ColumnizerMaskEntry entry = new ColumnizerMaskEntry();
+                    ColumnizerMaskEntry entry = new();
                     entry.mask = (string)row.Cells[0].Value;
                     entry.columnizerName = (string)row.Cells[1].Value;
                     Preferences.columnizerMaskList.Add(entry);
@@ -402,7 +402,7 @@ namespace LogExpert.Dialogs
             {
                 if (!row.IsNewRow)
                 {
-                    HighlightMaskEntry entry = new HighlightMaskEntry();
+                    HighlightMaskEntry entry = new();
                     entry.mask = (string)row.Cells[0].Value;
                     entry.highlightGroupName = (string)row.Cells[1].Value;
                     Preferences.highlightMaskList.Add(entry);
@@ -584,7 +584,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnChangeFontClick(object sender, EventArgs e)
         {
-            FontDialog dlg = new FontDialog();
+            FontDialog dlg = new();
             dlg.ShowEffects = false;
             dlg.AllowVerticalFonts = false;
             dlg.AllowScriptChange = false;
@@ -715,7 +715,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnTailColorClick(object sender, EventArgs e)
         {
-            ColorDialog dlg = new ColorDialog();
+            ColorDialog dlg = new();
             dlg.Color = Preferences.showTailColor;
 
             if (dlg.ShowDialog() == DialogResult.OK)
@@ -731,7 +731,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnTimespreadColorClick(object sender, EventArgs e)
         {
-            ColorDialog dlg = new ColorDialog();
+            ColorDialog dlg = new();
             dlg.Color = Preferences.timeSpreadColor;
 
             if (dlg.ShowDialog() == DialogResult.OK)
@@ -774,7 +774,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnSessionSaveDirClick(object sender, EventArgs e)
         {
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            FolderBrowserDialog dlg = new();
 
             if (Preferences.sessionSaveDirectory != null)
             {
@@ -930,7 +930,7 @@ namespace LogExpert.Dialogs
                     iconFile = textBoxTool.Text;
                 }
 
-                ChooseIconDlg dlg = new ChooseIconDlg(iconFile);
+                ChooseIconDlg dlg = new(iconFile);
                 
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
@@ -959,7 +959,7 @@ namespace LogExpert.Dialogs
 
         private void OnBtnExportClick(object sender, EventArgs e)
         {
-            SaveFileDialog dlg = new SaveFileDialog();
+            SaveFileDialog dlg = new();
             dlg.Title = @"Export Settings to file";
             dlg.DefaultExt = "json";
             dlg.AddExtension = true;
@@ -969,7 +969,7 @@ namespace LogExpert.Dialogs
             
             if (result == DialogResult.OK)
             {
-                FileInfo fileInfo = new FileInfo(dlg.FileName);
+                FileInfo fileInfo = new(dlg.FileName);
                 ConfigManager.Export(fileInfo);
             }
         }
@@ -981,7 +981,7 @@ namespace LogExpert.Dialogs
         /// <param name="e"></param>
         private void OnBtnImportClick(object sender, EventArgs e)
         {
-            ImportSettingsDialog dlg = new ImportSettingsDialog();
+            ImportSettingsDialog dlg = new();
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {

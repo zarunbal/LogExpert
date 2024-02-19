@@ -12,11 +12,11 @@ namespace LogExpert.Dialogs
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
-        private Bitmap _bitmap = new Bitmap(1, 1);
+        private Bitmap _bitmap = new(1, 1);
         private int _displayHeight = 1;
         private readonly int _edgeOffset = (int) Win32.GetSystemMetricsForDpi(Win32.SM_CYVSCROLL);
         private int _lastMouseY = 0;
-        private readonly object _monitor = new object();
+        private readonly object _monitor = new();
         private int _rectHeight = 1;
 
         private TimeSpreadCalculator _timeSpreadCalc;
@@ -174,7 +174,7 @@ namespace LogExpert.Dialogs
                     step = 1;
                     _rectHeight = (int) Math.Round(_displayHeight / (double) list.Count);
                 }
-                Rectangle fillRect = new Rectangle(0, 0, rect.Width, _rectHeight);
+                Rectangle fillRect = new(0, 0, rect.Width, _rectHeight);
 
                 lock (list)
                 {
@@ -220,11 +220,11 @@ namespace LogExpert.Dialogs
                 Brush fgBrush = new SolidBrush(ForeColor);
                 //gfx.FillRectangle(bgBrush, rect);
                 
-                StringFormat format = new StringFormat(StringFormatFlags.DirectionVertical | StringFormatFlags.NoWrap);
+                StringFormat format = new(StringFormatFlags.DirectionVertical | StringFormatFlags.NoWrap);
                 format.LineAlignment = StringAlignment.Center;
                 format.Alignment = StringAlignment.Center;
                 
-                RectangleF rectf = new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height);
+                RectangleF rectf = new(rect.Left, rect.Top, rect.Width, rect.Height);
                 
                 gfx.DrawString("Calculating time spread view...", Font, fgBrush, rectf, format);
                 

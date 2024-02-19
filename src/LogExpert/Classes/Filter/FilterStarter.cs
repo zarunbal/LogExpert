@@ -33,14 +33,14 @@ namespace LogExpert.Classes.Filter
         public FilterStarter(ColumnizerCallback callback, int minThreads)
         {
             _callback = callback;
-            FilterResultLines = new List<int>();
-            LastFilterLinesList = new List<int>();
-            FilterHitList = new List<int>();
-            _filterReadyList = new List<Filter>();
-            _filterWorkerList = new List<Filter>();
-            _filterHitDict = new SortedDictionary<int, int>();
-            _filterResultDict = new SortedDictionary<int, int>();
-            _lastFilterLinesDict = new SortedDictionary<int, int>();
+            FilterResultLines = [];
+            LastFilterLinesList = [];
+            FilterHitList = [];
+            _filterReadyList = [];
+            _filterWorkerList = [];
+            _filterHitDict = [];
+            _filterResultDict = [];
+            _lastFilterLinesDict = [];
             ThreadCount = Environment.ProcessorCount * 4;
             ThreadCount = minThreads;
             ThreadPool.GetMinThreads(out var worker, out var completion);
@@ -83,7 +83,7 @@ namespace LogExpert.Classes.Filter
                 interval = 1;
             }
             int workStartLine = startLine;
-            List<WaitHandle> handleList = new List<WaitHandle>();
+            List<WaitHandle> handleList = [];
             _progressLineCount = 0;
             _progressCallback = progressCallback;
             while (workStartLine < startLine + maxCount)
@@ -150,7 +150,7 @@ namespace LogExpert.Classes.Filter
             FilterParams threadFilterParams = filterParams.CreateCopy2();
             ColumnizerCallback threadColumnizerCallback = _callback.CreateCopy();
 
-            Filter filter = new Filter(threadColumnizerCallback);
+            Filter filter = new(threadColumnizerCallback);
             lock (_filterWorkerList)
             {
                 _filterWorkerList.Add(filter);

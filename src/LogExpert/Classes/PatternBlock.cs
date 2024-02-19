@@ -20,12 +20,12 @@ namespace LogExpert.Classes
         public int endLine;
 
         // key: line num
-        public Dictionary<int, QualityInfo> qualityInfoList = new Dictionary<int, QualityInfo>();
+        public Dictionary<int, QualityInfo> qualityInfoList = [];
 
-        public SortedDictionary<int, int> srcLines = new SortedDictionary<int, int>();
+        public SortedDictionary<int, int> srcLines = [];
         public int startLine;
         public int targetEnd;
-        public SortedDictionary<int, int> targetLines = new SortedDictionary<int, int>();
+        public SortedDictionary<int, int> targetLines = [];
         public int targetStart;
         public int weigth;
 

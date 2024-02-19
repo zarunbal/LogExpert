@@ -27,7 +27,7 @@ namespace LogExpert.Dialogs
 
         private DateTime _dateTime;
         private readonly IList<Rectangle> _digitRects = new List<Rectangle>();
-        private readonly StringFormat _digitsFormat = new StringFormat();
+        private readonly StringFormat _digitsFormat = new();
         private int _draggedDigit;
 
         public DragOrientations dragOrientation = DragOrientations.Vertical;

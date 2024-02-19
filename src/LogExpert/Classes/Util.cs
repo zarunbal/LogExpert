@@ -407,18 +407,18 @@ namespace LogExpert.Classes
             string[] words = text.Split(new char[] {' ', '.', ':', ';'});
             int i = 0;
             int index = 0;
-            List<CharacterRange> crList = new List<CharacterRange>();
+            List<CharacterRange> crList = [];
             for (i = 0; i < words.Length; ++i)
             {
                 crList.Add(new CharacterRange(index, words[i].Length));
                 index += words[i].Length;
             }
             CharacterRange[] crArray = crList.ToArray();
-            StringFormat stringFormat = new StringFormat(StringFormat.GenericTypographic);
+            StringFormat stringFormat = new(StringFormat.GenericTypographic);
             stringFormat.Trimming = StringTrimming.None;
             stringFormat.FormatFlags = StringFormatFlags.NoClip;
             stringFormat.SetMeasurableCharacterRanges(crArray);
-            RectangleF rect = new RectangleF(0, 0, 3000, 20);
+            RectangleF rect = new(0, 0, 3000, 20);
             Region[] stringRegions = g.MeasureCharacterRanges(text,
                 font, rect, stringFormat);
             bool found = false;

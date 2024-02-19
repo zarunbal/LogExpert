@@ -29,7 +29,7 @@ namespace LogExpert.Config
 
         public ToolEntry Clone()
         {
-            ToolEntry clone = new ToolEntry();
+            ToolEntry clone = new();
             clone.cmd = this.cmd;
             clone.args = this.args;
             clone.name = this.name;

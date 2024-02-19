@@ -18,41 +18,41 @@ namespace LogExpert.Config
         
         public Rectangle appBoundsFullscreen;
         
-        public IList<ColumnizerHistoryEntry> columnizerHistoryList = new List<ColumnizerHistoryEntry>();
+        public IList<ColumnizerHistoryEntry> columnizerHistoryList = [];
         
-        public List<ColorEntry> fileColors = new List<ColorEntry>();
+        public List<ColorEntry> fileColors = [];
         
-        public List<string> fileHistoryList = new List<string>();
+        public List<string> fileHistoryList = [];
         
-        public List<string> filterHistoryList = new List<string>();
+        public List<string> filterHistoryList = [];
         
-        public List<FilterParams> filterList = new List<FilterParams>();
+        public List<FilterParams> filterList = [];
         
-        public FilterParams filterParams = new FilterParams();
+        public FilterParams filterParams = new();
         
-        public List<string> filterRangeHistoryList = new List<string>();
+        public List<string> filterRangeHistoryList = [];
         
         public bool hideLineColumn;
 
-        public List<HilightEntry> hilightEntryList = new List<HilightEntry>(); // legacy. is automatically converted to highlight groups on settings load
+        public List<HilightEntry> hilightEntryList = []; // legacy. is automatically converted to highlight groups on settings load
 
-        public List<HilightGroup> hilightGroupList = new List<HilightGroup>(); // should be in Preferences but is here for mistake. Maybe I migrate it some day.
+        public List<HilightGroup> hilightGroupList = []; // should be in Preferences but is here for mistake. Maybe I migrate it some day.
 
         public bool isMaximized;
         
         public string lastDirectory;
         
-        public List<string> lastOpenFilesList = new List<string>();
+        public List<string> lastOpenFilesList = [];
 
-        public Preferences preferences = new Preferences();
+        public Preferences preferences = new();
         
-        public RegexHistory regexHistory = new RegexHistory();
+        public RegexHistory regexHistory = new();
         
-        public List<string> searchHistoryList = new List<string>();
+        public List<string> searchHistoryList = [];
         
-        public SearchParams searchParams = new SearchParams();
+        public SearchParams searchParams = new();
         
-        public IList<string> uriHistoryList = new List<string>();
+        public IList<string> uriHistoryList = [];
         
         public int versionBuild;
 

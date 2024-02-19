@@ -12,7 +12,7 @@ namespace LogExpert.Classes.Columnizer
         #region ILogLineColumnizer implementation
 
         protected int timeOffset = 0;
-        private TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
+        private TimeFormatDeterminer _timeFormatDeterminer = new();
 
         public bool IsTimeshiftImplemented()
         {
@@ -110,14 +110,14 @@ namespace LogExpert.Classes.Columnizer
             // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
             // 03.01.2008 14:48:00.066 <rest of line>
 
-            ColumnizedLogLine clogLine = new ColumnizedLogLine();
+            ColumnizedLogLine clogLine = new();
             clogLine.LogLine = line;
 
             Column[] columns = new Column[3]
             {
-                new Column {FullValue = "", Parent = clogLine},
-                new Column {FullValue = "", Parent = clogLine},
-                new Column {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
             };
 
             clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();

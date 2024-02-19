@@ -20,7 +20,7 @@ namespace LogExpert.Classes
         private readonly Thread _calcThread;
         private readonly ColumnizerCallback _callback;
 
-        private readonly object _diffListLock = new object();
+        private readonly object _diffListLock = new();
         private readonly EventWaitHandle _lineCountEvent = new ManualResetEvent(false);
 
         private readonly LogWindow _logWindow;
@@ -132,7 +132,7 @@ namespace LogExpert.Classes
             get => _contrast;
         }
 
-        public List<SpreadEntry> DiffList { get; set; } = new List<SpreadEntry>();
+        public List<SpreadEntry> DiffList { get; set; } = [];
 
         #endregion
 
@@ -242,8 +242,8 @@ namespace LogExpert.Classes
 
                 _logger.Debug("TimeSpreadCalculator.DoCalc() collecting data for {0} lines with step size {1}", lastLineNum, step);
 
-                List<SpreadEntry> newDiffList = new List<SpreadEntry>();
-                List<TimeSpan> maxList = new List<TimeSpan>();
+                List<SpreadEntry> newDiffList = [];
+                List<TimeSpan> maxList = [];
                 lineNum++;
                 for (int i = lineNum; i < lastLineNum; i += step)
                 {
@@ -315,8 +315,8 @@ namespace LogExpert.Classes
                 int lineDiffSum = 0;
                 int minDiff = int.MaxValue;
                 _maxDiff = 0;
-                List<int> maxList = new List<int>();
-                List<SpreadEntry> newDiffList = new List<SpreadEntry>();
+                List<int> maxList = [];
+                List<SpreadEntry> newDiffList = [];
                 while (searchTimeStamp.CompareTo(_endTimestamp) <= 0)
                 {
                     lineNum = _logWindow.FindTimestampLine_Internal(lineNum, lineNum, lastLineNum, searchTimeStamp, false);

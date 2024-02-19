@@ -23,7 +23,7 @@ namespace LogExpert.Classes.Log
         private readonly int _MAX_BUFFERS = 10;
         private readonly int _MAX_LINES_PER_BUFFER = 100;
 
-        private readonly object _monitor = new object();
+        private readonly object _monitor = new();
         private readonly MultiFileOptions _multiFileOptions;
 
         private IList<LogBuffer> _bufferList;
@@ -71,7 +71,7 @@ namespace LogExpert.Classes.Log
             if (multiFile)
             {
                 ILogFileInfo info = GetLogFileInfo(fileName);
-                RolloverFilenameHandler rolloverHandler = new RolloverFilenameHandler(info, _multiFileOptions);
+                RolloverFilenameHandler rolloverHandler = new(info, _multiFileOptions);
                 LinkedList<string> nameList = rolloverHandler.GetNameList();
 
                 ILogFileInfo fileInfo = null;
@@ -242,7 +242,7 @@ namespace LogExpert.Classes.Log
                 LineCount = 0;
             }
 
-            LogEventArgs args = new LogEventArgs();
+            LogEventArgs args = new();
             args.PrevFileSize = 0;
             args.PrevLineCount = 0;
             args.LineCount = LineCount;
@@ -263,7 +263,7 @@ namespace LogExpert.Classes.Log
             lock (_monitor)
             {
                 RolloverFilenameHandler rolloverHandler =
-                    new RolloverFilenameHandler(_watchedILogFileInfo, _multiFileOptions);
+                    new(_watchedILogFileInfo, _multiFileOptions);
                 LinkedList<string> fileNameList = rolloverHandler.GetNameList();
 
                 ResetBufferCache();
@@ -613,7 +613,7 @@ namespace LogExpert.Classes.Log
         /// </summary>
         public void StopMonitoringAsync()
         {
-            Thread stopperThread = new Thread(new ThreadStart(stopMonitoring));
+            Thread stopperThread = new(new ThreadStart(stopMonitoring));
             stopperThread.IsBackground = true;
             stopperThread.Start();
         }
@@ -994,7 +994,7 @@ namespace LogExpert.Classes.Log
 
                             while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
                             {
-                                LogLine logLine = new LogLine();
+                                LogLine logLine = new();
                                 if (_shouldStop)
                                 {
                                     Monitor.Exit(logBuffer);
@@ -1131,7 +1131,7 @@ namespace LogExpert.Classes.Log
             {
                 _lruCacheDict.Remove(logBuffer.StartLine);
                 logBuffer.StartLine = newLineNum;
-                LogBufferCacheEntry cacheEntry = new LogBufferCacheEntry();
+                LogBufferCacheEntry cacheEntry = new();
                 cacheEntry.LogBuffer = logBuffer;
                 _lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
             }
@@ -1159,7 +1159,7 @@ namespace LogExpert.Classes.Log
                     _logger.Info("Removing {0} entries from LRU cache for {1}", diff, Util.GetNameFromPath(_fileName));
                 }
 #endif
-                SortedList<long, int> useSorterList = new SortedList<long, int>();
+                SortedList<long, int> useSorterList = [];
                 // sort by usage counter
                 foreach (LogBufferCacheEntry entry in _lruCacheDict.Values)
                 {
@@ -1356,7 +1356,7 @@ namespace LogExpert.Classes.Log
                             continue;
                         }
 
-                        LogLine logLine = new LogLine();
+                        LogLine logLine = new();
 
                         logLine.FullLine = line;
                         logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
@@ -1579,7 +1579,7 @@ namespace LogExpert.Classes.Log
 
         private void FireChangeEvent()
         {
-            LogEventArgs args = new LogEventArgs();
+            LogEventArgs args = new();
             args.PrevFileSize = FileSize;
             args.PrevLineCount = LineCount;
             long newSize = _fileLength;

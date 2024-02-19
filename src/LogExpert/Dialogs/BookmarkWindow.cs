@@ -16,7 +16,7 @@ namespace LogExpert.Dialogs
         #region Fields
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly object paintLock = new object();
+        private readonly object paintLock = new();
 
         private IBookmarkData bookmarkData;
         private ILogPaintContext logPaintContext;
@@ -68,7 +68,7 @@ namespace LogExpert.Dialogs
                 bookmarkDataGridView.Columns[0].Width = 20;
             }
 
-            DataGridViewTextBoxColumn commentColumn = new DataGridViewTextBoxColumn();
+            DataGridViewTextBoxColumn commentColumn = new();
             commentColumn.HeaderText = "Bookmark Comment";
             commentColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             commentColumn.Resizable = DataGridViewTriState.NotSet;
@@ -200,7 +200,7 @@ namespace LogExpert.Dialogs
                 Rectangle r = ClientRectangle;
                 e.Graphics.FillRectangle(SystemBrushes.ControlLight, r);
                 RectangleF rect = r;
-                StringFormat sf = new StringFormat();
+                StringFormat sf = new();
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;
                 e.Graphics.DrawString("No bookmarks in current file", SystemFonts.DialogFont, SystemBrushes.WindowText, r, sf);
@@ -217,7 +217,7 @@ namespace LogExpert.Dialogs
 
         private void SetFont(string fontName, float fontSize)
         {
-            Font font = new Font(new FontFamily(fontName), fontSize);
+            Font font = new(new FontFamily(fontName), fontSize);
             bookmarkDataGridView.DefaultCellStyle.Font = font;
             bookmarkDataGridView.RowTemplate.Height = font.Height + 4;
             bookmarkDataGridView.Refresh();
@@ -256,7 +256,7 @@ namespace LogExpert.Dialogs
 
         private void DeleteSelectedBookmarks()
         {
-            List<int> lineNumList = new List<int>();
+            List<int> lineNumList = [];
             foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
             {
                 if (row.Index != -1)
@@ -550,7 +550,7 @@ namespace LogExpert.Dialogs
                     MessageBoxButtons.YesNo) ==
                 DialogResult.Yes)
             {
-                List<int> lineNumList = new List<int>();
+                List<int> lineNumList = [];
                 foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
                 {
                     if (row.Index != -1)

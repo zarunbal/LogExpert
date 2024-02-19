@@ -40,7 +40,7 @@ namespace LogExpert.Dialogs
 
         private void OnFileButtonClick(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new();
             dlg.Title = "Load Settings from file";
             dlg.DefaultExt = "json";
             dlg.AddExtension = false;

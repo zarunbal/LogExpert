@@ -11,12 +11,12 @@ namespace LogExpert.Controls
     {
         #region Fields
 
-        private readonly List<List<PatternBlock>> blockList = new List<List<PatternBlock>>();
+        private readonly List<List<PatternBlock>> blockList = [];
         private PatternBlock currentBlock;
         private List<PatternBlock> currentList;
 
         private readonly LogWindow.LogWindow logWindow;
-        private PatternArgs patternArgs = new PatternArgs();
+        private PatternArgs patternArgs = new();
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace LogExpert.Controls
         {
             this.patternArgs = patternArgs;
             blockList.Clear();
-            List<PatternBlock> singeList = new List<PatternBlock>();
+            List<PatternBlock> singeList = [];
             //int blockId = -1;
             for (int i = 0; i < flatBlockList.Count; ++i)
             {
@@ -105,7 +105,7 @@ namespace LogExpert.Controls
             this.patternHitsDataGridView.Columns[0].Width = 20;
             this.contentDataGridView.Columns[0].Width = 20;
 
-            DataGridViewTextBoxColumn blockInfoColumn = new DataGridViewTextBoxColumn();
+            DataGridViewTextBoxColumn blockInfoColumn = new();
             blockInfoColumn.HeaderText = "Weight";
             blockInfoColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
             blockInfoColumn.Resizable = DataGridViewTriState.False;
@@ -113,7 +113,7 @@ namespace LogExpert.Controls
             blockInfoColumn.ReadOnly = true;
             blockInfoColumn.Width = 50;
 
-            DataGridViewTextBoxColumn contentInfoColumn = new DataGridViewTextBoxColumn();
+            DataGridViewTextBoxColumn contentInfoColumn = new();
             contentInfoColumn.HeaderText = "Diff";
             contentInfoColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
             contentInfoColumn.Resizable = DataGridViewTriState.False;
@@ -127,7 +127,7 @@ namespace LogExpert.Controls
 
         public void SetFont(string fontName, float fontSize)
         {
-            Font font = new Font(new FontFamily(fontName), fontSize);
+            Font font = new(new FontFamily(fontName), fontSize);
             int lineSpacing = font.FontFamily.GetLineSpacing(FontStyle.Regular);
             float lineSpacingPixel = font.Size * lineSpacing / font.FontFamily.GetEmHeight(FontStyle.Regular);
 
@@ -219,7 +219,7 @@ namespace LogExpert.Controls
                 if (maxWeight > 0)
                 {
                     int width = (int) ((double) (int) e.Value / (double) maxWeight * (double) e.CellBounds.Width);
-                    Rectangle rect = new Rectangle(e.CellBounds.X, e.CellBounds.Y, width, e.CellBounds.Height);
+                    Rectangle rect = new(e.CellBounds.X, e.CellBounds.Y, width, e.CellBounds.Height);
                     int alpha = 90 + (int) ((double) (int) e.Value / (double) maxWeight * (double) 165);
                     Color color = Color.FromArgb(alpha, 170, 180, 150);
                     Brush brush = new SolidBrush(color);

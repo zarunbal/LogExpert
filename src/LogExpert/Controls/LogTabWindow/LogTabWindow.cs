@@ -43,9 +43,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         private readonly EventWaitHandle _statusLineEventHandle = new AutoResetEvent(false);
         private readonly EventWaitHandle _statusLineEventWakeupHandle = new ManualResetEvent(false);
-        private readonly object _statusLineLock = new object();
+        private readonly object _statusLineLock = new();
         private readonly Brush _syncLedBrush;
-        private readonly StringFormat _tabStringFormat = new StringFormat();
+        private readonly StringFormat _tabStringFormat = new();
         private readonly Brush[] _tailLedBrush = new Brush[3];
 
         private BookmarkWindow _bookmarkWindow;
@@ -86,7 +86,7 @@ namespace LogExpert.Controls.LogTabWindow
             ConfigManager.Instance.ConfigChanged += OnConfigChanged;
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
-            Rectangle led = new Rectangle(0, 0, 8, 2);
+            Rectangle led = new(0, 0, 8, 2);
             
             for (int i = 0; i < _leds.Length; ++i)
             {
@@ -117,7 +117,7 @@ namespace LogExpert.Controls.LogTabWindow
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
-            ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
+            ToolStripControlHost host = new(checkBoxFollowTail);
             
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
@@ -201,7 +201,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         public Preferences Preferences => ConfigManager.Settings.preferences;
 
-        public List<HilightGroup> HilightGroupList { get; private set; } = new List<HilightGroup>();
+        public List<HilightGroup> HilightGroupList { get; private set; } = [];
 
         //public Settings Settings
         //{

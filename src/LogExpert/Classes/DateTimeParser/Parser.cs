@@ -29,7 +29,7 @@ namespace LogExpert.Classes.DateTimeParser
         {
             bool hasDateParts = false;
             string token;
-            List<string> tokens = new List<string>();
+            List<string> tokens = [];
 
             while ((token = ReadToken(reader, out syntaxError)) != null)
             {
@@ -75,7 +75,7 @@ namespace LogExpert.Classes.DateTimeParser
         private static void ParseMilliseconds(List<string> tokens, out List<string> result)
         {
             // if tokens form .0 through .000.., combine to single subsecond token
-            result = new List<string>();
+            result = [];
             for (var i = 0; i < tokens.Count; i++)
             {
                 var token = tokens[i];

@@ -56,7 +56,7 @@ namespace LogExpert.Dialogs
             textBoxMatches.Text = "";
             try
             {
-                Regex rex = new Regex(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                Regex rex = new(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
                 MatchCollection matches = rex.Matches(comboBoxTestText.Text);
 
                 foreach (Match match in matches)
@@ -94,7 +94,7 @@ namespace LogExpert.Dialogs
 
         private void SaveHistory()
         {
-            RegexHistory history = new RegexHistory();
+            RegexHistory history = new();
             
             foreach (string item in comboBoxRegex.Items)
             {

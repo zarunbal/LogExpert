@@ -9,7 +9,7 @@ namespace LogExpert.Entities
         #region Fields
 
         public int currentLine;
-        public List<string> historyList = new List<string>();
+        public List<string> historyList = [];
         public bool isCaseSensitive = false;
         public bool isFindNext;
 

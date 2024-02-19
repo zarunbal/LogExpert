@@ -50,7 +50,7 @@ namespace LogExpert.Classes
             int lineCount = _callback.GetLineCount();
             int lineNum = startLine;
             bool foundStartLine = false;
-            Range range = new Range();
+            Range range = new();
             FilterParams tmpParam = _filterParams.CreateCopy2();
             tmpParam.searchText = _filterParams.rangeSearchText;
 

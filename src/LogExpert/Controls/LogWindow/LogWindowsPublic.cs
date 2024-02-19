@@ -206,7 +206,7 @@ namespace LogExpert.Controls.LogWindow
 
         public PersistenceData GetPersistenceData()
         {
-            PersistenceData persistenceData = new PersistenceData();
+            PersistenceData persistenceData = new();
             persistenceData.bookmarkList = _bookmarkProvider.BookmarkList;
             persistenceData.rowHeightList = _rowHeightList;
             persistenceData.multiFile = IsMultiFile;
@@ -227,13 +227,12 @@ namespace LogExpert.Controls.LogWindow
             
             if (Preferences.saveFilters)
             {
-                List<FilterParams> filterList = new List<FilterParams>();
-                filterList.Add(_filterParams);
+                List<FilterParams> filterList = [_filterParams];
                 persistenceData.filterParamsList = filterList;
 
                 foreach (FilterPipe filterPipe in _filterPipeList)
                 {
-                    FilterTabData data = new FilterTabData();
+                    FilterTabData data = new();
                     data.persistenceData = filterPipe.OwnLogWindow.GetPersistenceData();
                     data.filterParams = filterPipe.FilterParams;
                     persistenceData.filterTabDataList.Add(data);
@@ -464,11 +463,11 @@ namespace LogExpert.Controls.LogWindow
                     
                         if (bookmark.Text.Length > 0)
                         {
-                            StringFormat format = new StringFormat();
+                            StringFormat format = new();
                             format.LineAlignment = StringAlignment.Center;
                             format.Alignment = StringAlignment.Center;
                             Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
-                            Font font = new Font("Courier New", Preferences.fontSize, FontStyle.Bold);
+                            Font font = new("Courier New", Preferences.fontSize, FontStyle.Bold);
                             e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height),
                                 format);
                             font.Dispose();
@@ -945,7 +944,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     return;
                 }
-                ParamParser paramParser = new ParamParser(comment);
+                ParamParser paramParser = new(comment);
                 try
                 {
                     comment = paramParser.ReplaceParams(line, lineNum, FileName);
@@ -1189,7 +1188,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
             {
-                List<int> lineNumList = new List<int>();
+                List<int> lineNumList = [];
                 foreach (DataGridViewRow row in dataGridView.SelectedRows)
                 {
                     if (row.Index != -1)
@@ -1200,15 +1199,15 @@ namespace LogExpert.Controls.LogWindow
                 lineNumList.Sort();
                 // create dummy FilterPipe for connecting line numbers to original window
                 // setting IsStopped to true prevents further filter processing
-                FilterPipe pipe = new FilterPipe(new FilterParams(), this);
+                FilterPipe pipe = new(new FilterParams(), this);
                 pipe.IsStopped = true;
                 WritePipeToTab(pipe, lineNumList, Text + "->C", null);
             }
             else
             {
                 string fileName = Path.GetTempFileName();
-                FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-                StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode);
+                FileStream fStream = new(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+                StreamWriter writer = new(fStream, Encoding.Unicode);
 
                 DataObject data = dataGridView.GetClipboardContent();
                 string text = data.GetText(TextDataFormat.Text);
@@ -1616,7 +1615,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
             {
-                List<int> lineNumList = new List<int>();
+                List<int> lineNumList = [];
                 foreach (DataGridViewRow row in dataGridView.SelectedRows)
                 {
                     if (row.Index != -1)
@@ -1644,13 +1643,13 @@ namespace LogExpert.Controls.LogWindow
 
         public void PatternStatistic(PatternArgs patternArgs)
         {
-            PatternStatisticFx fx = new PatternStatisticFx(TestStatistic);
+            PatternStatisticFx fx = new(TestStatistic);
             fx.BeginInvoke(patternArgs, null, null);
         }
 
         public void ExportBookmarkList()
         {
-            SaveFileDialog dlg = new SaveFileDialog();
+            SaveFileDialog dlg = new();
             dlg.Title = "Choose a file to save bookmarks into";
             dlg.AddExtension = true;
             dlg.DefaultExt = "csv";
@@ -1674,7 +1673,7 @@ namespace LogExpert.Controls.LogWindow
 
         public void ImportBookmarkList()
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new();
             dlg.Title = "Choose a file to load bookmarks from";
             dlg.AddExtension = true;
             dlg.DefaultExt = "csv";
@@ -1687,7 +1686,7 @@ namespace LogExpert.Controls.LogWindow
                 try
                 {
                     // add to the existing bookmarks
-                    SortedList<int, Bookmark> newBookmarks = new SortedList<int, Bookmark>();
+                    SortedList<int, Bookmark> newBookmarks = [];
                     BookmarkExporter.ImportBookmarkList(FileName, dlg.FileName, newBookmarks);
 
                     // Add (or replace) to existing bookmark list

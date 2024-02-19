@@ -31,42 +31,42 @@ namespace LogExpert.Controls.LogWindow
 
         private readonly Image _advancedButtonImage;
 
-        private readonly object _bookmarkLock = new object();
-        private readonly BookmarkDataProvider _bookmarkProvider = new BookmarkDataProvider();
+        private readonly object _bookmarkLock = new();
+        private readonly BookmarkDataProvider _bookmarkProvider = new();
 
         private readonly IList<BackgroundProcessCancelHandler> _cancelHandlerList = new List<BackgroundProcessCancelHandler>();
 
-        private readonly object _currentColumnizerLock = new object();
+        private readonly object _currentColumnizerLock = new();
 
-        private readonly object _currentHighlightGroupLock = new object();
+        private readonly object _currentHighlightGroupLock = new();
 
         private readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false);
 
         private readonly IList<FilterPipe> _filterPipeList = new List<FilterPipe>();
-        private readonly Dictionary<Control, bool> _freezeStateMap = new Dictionary<Control, bool>();
-        private readonly GuiStateArgs _guiStateArgs = new GuiStateArgs();
+        private readonly Dictionary<Control, bool> _freezeStateMap = [];
+        private readonly GuiStateArgs _guiStateArgs = new();
 
-        private readonly List<int> _lineHashList = new List<int>();
+        private readonly List<int> _lineHashList = [];
 
         private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 
         private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
 
-        private readonly List<LogEventArgs> _logEventArgsList = new List<LogEventArgs>();
+        private readonly List<LogEventArgs> _logEventArgsList = [];
         private readonly Thread _logEventHandlerThread;
         private readonly Image _panelCloseButtonImage;
 
         private readonly Image _panelOpenButtonImage;
         private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
 
-        private readonly ProgressEventArgs _progressEventArgs = new ProgressEventArgs();
-        private readonly object _reloadLock = new object();
+        private readonly ProgressEventArgs _progressEventArgs = new();
+        private readonly object _reloadLock = new();
         private readonly Image _searchButtonImage;
-        private readonly DelayedTrigger _selectionChangedTrigger = new DelayedTrigger(200);
-        private readonly StatusLineEventArgs _statusEventArgs = new StatusLineEventArgs();
+        private readonly DelayedTrigger _selectionChangedTrigger = new(200);
+        private readonly StatusLineEventArgs _statusEventArgs = new();
 
-        private readonly DelayedTrigger _statusLineTrigger = new DelayedTrigger(200);
-        private readonly object _tempHighlightEntryListLock = new object();
+        private readonly DelayedTrigger _statusLineTrigger = new(200);
+        private readonly object _tempHighlightEntryListLock = new();
 
         private readonly Thread _timeShiftSyncThread;
         private readonly EventWaitHandle _timeShiftSyncTimerEvent = new ManualResetEvent(false);
@@ -74,22 +74,22 @@ namespace LogExpert.Controls.LogWindow
 
         private readonly TimeSpreadCalculator _timeSpreadCalc;
 
-        private readonly object _timeSyncListLock = new object();
+        private readonly object _timeSyncListLock = new();
 
-        private ColumnCache _columnCache = new ColumnCache();
+        private ColumnCache _columnCache = new();
 
         private ILogLineColumnizer _currentColumnizer;
 
         //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
-        private HilightGroup _currentHighlightGroup = new HilightGroup();
+        private HilightGroup _currentHighlightGroup = new();
 
         private SearchParams _currentSearchParams;
 
         private string[] _fileNames;
-        private List<int> _filterHitList = new List<int>();
-        private FilterParams _filterParams = new FilterParams();
+        private List<int> _filterHitList = [];
+        private FilterParams _filterParams = new();
         private int _filterPipeNameCounter = 0;
-        private List<int> _filterResultList = new List<int>();
+        private List<int> _filterResultList = [];
 
         private EventWaitHandle _filterUpdateEvent = new ManualResetEvent(false);
 
@@ -102,25 +102,25 @@ namespace LogExpert.Controls.LogWindow
         private bool _isMultiFile;
         private bool _isSearching;
         private bool _isTimestampDisplaySyncing;
-        private List<int> _lastFilterLinesList = new List<int>();
+        private List<int> _lastFilterLinesList = [];
 
         private int _lineHeight = 0;
 
         internal LogfileReader _logFileReader;
-        private MultiFileOptions _multiFileOptions = new MultiFileOptions();
+        private MultiFileOptions _multiFileOptions = new();
         private bool _noSelectionUpdates;
-        private PatternArgs _patternArgs = new PatternArgs();
+        private PatternArgs _patternArgs = new();
         private PatternWindow _patternWindow;
 
         private ReloadMemento _reloadMemento;
         private int _reloadOverloadCounter = 0;
-        private SortedList<int, RowHeightEntry> _rowHeightList = new SortedList<int, RowHeightEntry>();
+        private SortedList<int, RowHeightEntry> _rowHeightList = [];
         private int _selectedCol = 0; // set by context menu event for column headers only
         private bool _shouldCallTimeSync;
         private bool _shouldCancel;
         private bool _shouldTimestampDisplaySyncingCancel;
         private bool _showAdvanced;
-        private List<HilightEntry> _tempHighlightEntryList = new List<HilightEntry>();
+        private List<HilightEntry> _tempHighlightEntryList = [];
         private int _timeShiftSyncLine = 0;
 
         private bool _waitingForClose;
@@ -449,7 +449,7 @@ namespace LogExpert.Controls.LogWindow
 
         internal void ChangeMultifileMask()
         {
-            MultiFileMaskDialog dlg = new MultiFileMaskDialog(this, FileName);
+            MultiFileMaskDialog dlg = new(this, FileName);
             dlg.Owner = this;
             dlg.MaxDays = _multiFileOptions.MaxDayTry;
             dlg.FileNamePattern = _multiFileOptions.FormatPattern;
@@ -471,8 +471,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 columnComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
                 columnComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                columnComboBox.AutoCompleteCustomSource = new AutoCompleteStringCollection();
-                columnComboBox.AutoCompleteCustomSource.AddRange(CurrentColumnizer.GetColumnNames());
+                columnComboBox.AutoCompleteCustomSource = [.. CurrentColumnizer.GetColumnNames()];
                 if (setFocus)
                 {
                     columnComboBox.Focus();

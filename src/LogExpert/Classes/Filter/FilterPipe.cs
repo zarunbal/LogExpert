@@ -64,7 +64,7 @@ namespace LogExpert.Classes.Filter
 
         public void OpenFile()
         {
-            FileStream fStream = new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+            FileStream fStream = new(FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
             _writer = new StreamWriter(fStream, new UnicodeEncoding(false, false));
         }
 
@@ -122,7 +122,7 @@ namespace LogExpert.Classes.Filter
         public void ShiftLineNums(int offset)
         {
             _logger.Debug("FilterPipe.ShiftLineNums() offset={0}", offset);
-            List<int> newList = new List<int>();
+            List<int> newList = [];
             lock (_lineMappingList)
             {
                 foreach (int lineNum in _lineMappingList)
@@ -171,7 +171,7 @@ namespace LogExpert.Classes.Filter
             {
                 CloseFile();
                 // trunc file
-                FileStream fStream = new FileStream(FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read);
+                FileStream fStream = new(FileName, FileMode.Truncate, FileAccess.Write, FileShare.Read);
                 fStream.SetLength(0);
                 fStream.Close();
             }

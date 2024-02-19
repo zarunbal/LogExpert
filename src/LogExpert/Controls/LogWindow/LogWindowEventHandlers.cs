@@ -272,7 +272,7 @@ namespace LogExpert.Controls.LogWindow
             //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
             CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
             dataGridView.Refresh();
-            TimeSpan timeSpan = new TimeSpan(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
+            TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
             string span = timeSpan.ToString();
             int index = span.LastIndexOf('.');
             if (index > 0) span = span.Substring(0, index + 4);
@@ -405,7 +405,7 @@ namespace LogExpert.Controls.LogWindow
                 if (e.ColumnIndex == 0)
                     if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
                     {
-                        Rectangle r = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
+                        Rectangle r = new(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
                         r = e.CellBounds;
                         r.Inflate(-2, -2);
                         Brush brush = new SolidBrush(BookmarkColor);
@@ -414,11 +414,11 @@ namespace LogExpert.Controls.LogWindow
                         Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
                         if (bookmark.Text.Length > 0)
                         {
-                            StringFormat format = new StringFormat();
+                            StringFormat format = new();
                             format.LineAlignment = StringAlignment.Center;
                             format.Alignment = StringAlignment.Center;
                             Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
-                            Font font = new Font("Verdana", Preferences.fontSize, FontStyle.Bold);
+                            Font font = new("Verdana", Preferences.fontSize, FontStyle.Bold);
                             e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height),
                                 format);
                             font.Dispose();
@@ -738,8 +738,8 @@ namespace LogExpert.Controls.LogWindow
                 IList<int> lines = GetSelectedContent();
                 foreach (IContextMenuEntry entry in PluginRegistry.GetInstance().RegisteredContextMenuPlugins)
                 {
-                    LogExpertCallback callback = new LogExpertCallback(this);
-                    ContextMenuPluginEventArgs evArgs = new ContextMenuPluginEventArgs(entry, lines, CurrentColumnizer, callback);
+                    LogExpertCallback callback = new(this);
+                    ContextMenuPluginEventArgs evArgs = new(entry, lines, CurrentColumnizer, callback);
                     EventHandler ev = OnHandlePluginContextMenu;
                     //MenuItem item = this.dataGridView.ContextMenu.MenuItems.Add(entry.GetMenuText(line, this.CurrentColumnizer, callback), ev);
                     string menuText = entry.GetMenuText(lines, CurrentColumnizer, callback);
@@ -769,7 +769,7 @@ namespace LogExpert.Controls.LogWindow
                 syncTimestampsToToolStripMenuItem.Enabled = true;
                 syncTimestampsToToolStripMenuItem.DropDownItems.Clear();
                 EventHandler ev = OnHandleSyncContextMenu;
-                Font italicFont = new Font(syncTimestampsToToolStripMenuItem.Font.FontFamily, syncTimestampsToToolStripMenuItem.Font.Size, FontStyle.Italic);
+                Font italicFont = new(syncTimestampsToToolStripMenuItem.Font.FontFamily, syncTimestampsToToolStripMenuItem.Font.Size, FontStyle.Italic);
 
                 foreach (WindowFileEntry fileEntry in list)
                 {
@@ -904,7 +904,7 @@ namespace LogExpert.Controls.LogWindow
         private void OnColumnButtonClick(object sender, EventArgs e)
         {
             _filterParams.currentColumnizer = _currentColumnizer;
-            FilterColumnChooser chooser = new FilterColumnChooser(_filterParams);
+            FilterColumnChooser chooser = new(_filterParams);
             if (chooser.ShowDialog() == DialogResult.OK)
             {
                 columnNamesLabel.Text = CalculateColumnNames(_filterParams);
@@ -1095,7 +1095,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
             {
-                HilightEntry he = new HilightEntry(ctl.SelectedText, Color.Red, Color.Yellow, false, true, false, false, false, false, null, false);
+                HilightEntry he = new(ctl.SelectedText, Color.Red, Color.Yellow, false, true, false, false, false, false, null, false);
                 lock (_tempHighlightEntryListLock)
                 {
                     _tempHighlightEntryList.Add(he);
@@ -1111,7 +1111,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
             {
-                HilightEntry he = new HilightEntry(ctl.SelectedText, Color.Red, Color.Yellow, false, true, false, false, false, false, null, true);
+                HilightEntry he = new(ctl.SelectedText, Color.Red, Color.Yellow, false, true, false, false, false, false, null, true);
                 lock (_tempHighlightEntryListLock)
                 {
                     _tempHighlightEntryList.Add(he);
@@ -1194,7 +1194,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (e.Button == MouseButtons.Right)
             {
-                RegexHelperDialog dlg = new RegexHelperDialog();
+                RegexHelperDialog dlg = new();
                 dlg.Owner = this;
                 dlg.CaseSensitive = filterCaseSensitiveCheckBox.Checked;
                 dlg.Pattern = filterComboBox.Text;
@@ -1291,7 +1291,7 @@ namespace LogExpert.Controls.LogWindow
             if (e.Index >= 0)
             {
                 FilterParams filterParams = (FilterParams)filterListBox.Items[e.Index];
-                Rectangle rectangle = new Rectangle(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
+                Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
                 Brush brush;
 
@@ -1318,7 +1318,7 @@ namespace LogExpert.Controls.LogWindow
             if (i < filterListBox.Items.Count && i >= 0)
             {
                 FilterParams filterParams = (FilterParams)filterListBox.Items[i];
-                ColorDialog dlg = new ColorDialog();
+                ColorDialog dlg = new();
                 dlg.CustomColors = new[] { filterParams.color.ToArgb() };
                 dlg.Color = filterParams.color;
                 if (dlg.ShowDialog() == DialogResult.OK)
@@ -1418,7 +1418,7 @@ namespace LogExpert.Controls.LogWindow
 
         private void OnMarkFilterHitsInLogViewToolStripMenuItemClick(object sender, EventArgs e)
         {
-            SearchParams p = new SearchParams();
+            SearchParams p = new();
             p.searchText = _filterParams.searchText;
             p.isRegex = _filterParams.isRegex;
             p.isCaseSensitive = _filterParams.isCaseSensitive;

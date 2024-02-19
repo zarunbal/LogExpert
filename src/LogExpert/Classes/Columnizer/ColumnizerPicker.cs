@@ -100,12 +100,12 @@ namespace LogExpert.Classes.Columnizer
                 return new DefaultLogfileColumnizer();
             }
 
-            List<ILogLine> loglines = new List<ILogLine>();
+            List<ILogLine> loglines = [];
 
             if (logFileReader != null)
             {
-                loglines = new List<ILogLine>()
-                {
+                loglines =
+                [
                     // Sampling a few lines to select the correct columnizer
                     logFileReader.GetLogLine(0),
                     logFileReader.GetLogLine(1),
@@ -117,12 +117,12 @@ namespace LogExpert.Classes.Columnizer
                     logFileReader.GetLogLine(100),
                     logFileReader.GetLogLine(200),
                     logFileReader.GetLogLine(400)
-                };
+                ];
             }
 
             var registeredColumnizer = PluginRegistry.GetInstance().RegisteredColumnizers;
 
-            List<Tuple<Priority, ILogLineColumnizer>> priorityListOfColumnizers = new List<Tuple<Priority, ILogLineColumnizer>>();
+            List<Tuple<Priority, ILogLineColumnizer>> priorityListOfColumnizers = [];
 
             foreach (ILogLineColumnizer logLineColumnizer in registeredColumnizer)
             {

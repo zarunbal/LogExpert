@@ -68,7 +68,7 @@ namespace LogExpert.Dialogs
             e.DrawBackground();
             if (e.Index >= 0)
             {
-                Rectangle rectangle = new Rectangle(4, e.Bounds.Top + 2, 30, e.Bounds.Height - 4);
+                Rectangle rectangle = new(4, e.Bounds.Top + 2, 30, e.Bounds.Height - 4);
                 Color rectColor = (Color) Items[e.Index];
                 e.Graphics.FillRectangle(new SolidBrush(rectColor), rectangle);
                 e.Graphics.DrawRectangle(Pens.Black, rectangle);
@@ -86,7 +86,7 @@ namespace LogExpert.Dialogs
 
                 if (!Enabled)
                 {
-                    HatchBrush brush = new HatchBrush(HatchStyle.Percent50, Color.LightGray, Color.FromArgb(10, Color.LightGray));
+                    HatchBrush brush = new(HatchStyle.Percent50, Color.LightGray, Color.FromArgb(10, Color.LightGray));
                     rectangle.Inflate(1, 1);
                     e.Graphics.FillRectangle(brush, rectangle);
                     brush.Dispose();

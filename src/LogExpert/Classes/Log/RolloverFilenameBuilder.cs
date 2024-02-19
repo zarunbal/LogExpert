@@ -184,9 +184,9 @@ namespace LogExpert.Classes.Log
         private string EscapeNonvarRegions(string formatString)
         {
             string fmt = formatString.Replace('*', '\xFFFD');
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
             int state = 0;
-            StringBuilder segment = new StringBuilder();
+            StringBuilder segment = new();
             for (int i = 0; i < fmt.Length; ++i)
             {
                 switch (state)
