@@ -168,7 +168,7 @@ namespace SftpFileSystem
             {
                 try
                 {
-                    SftpFile file = _sftp.Get(_remoteFileName);
+                    SftpFile file = (SftpFile) _sftp.Get(_remoteFileName);
                     long len = file.Attributes.Size;
                     return len != -1;
                 }
@@ -196,7 +196,7 @@ namespace SftpFileSystem
         {
             get
             {
-                SftpFile file = _sftp.Get(_remoteFileName);
+                SftpFile file = (SftpFile)_sftp.Get(_remoteFileName);
                 return file.Attributes.Size;
             }
         }

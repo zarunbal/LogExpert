@@ -3512,7 +3512,7 @@ namespace LogExpert.Controls.LogWindow
             _filterParams.rangeSearchText = filterRangeComboBox.Text;
             ColumnizerCallback callback = new(this);
             RangeFinder rangeFinder = new(_filterParams, callback);
-            Range range = rangeFinder.FindRange(dataGridView.CurrentCellAddress.Y);
+            Entities.Range range = rangeFinder.FindRange(dataGridView.CurrentCellAddress.Y);
             if (range != null)
             {
                 SetCellSelectionMode(false);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -36,7 +37,7 @@ namespace LogExpert.Tests
             };
 
             var result = jsonCompactColumnizer.GetPriority(path, loglines);
-            Assert.AreEqual(result, priority);
+            ClassicAssert.AreEqual(result, priority);
         }
     }
 }

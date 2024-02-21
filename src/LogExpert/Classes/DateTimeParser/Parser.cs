@@ -2,7 +2,7 @@
 
 namespace LogExpert.Classes.DateTimeParser
 {
-    internal static class Parser
+    public static class Parser
     {
         public static List<Section> ParseSections(string formatString, out bool syntaxError)
         {
@@ -14,10 +14,14 @@ namespace LogExpert.Classes.DateTimeParser
                 var section = ParseSection(tokenizer, sections.Count, out var sectionSyntaxError);
 
                 if (sectionSyntaxError)
+                {
                     syntaxError = true;
+                }
 
                 if (section == null)
+                {
                     break;
+                }
 
                 sections.Add(section);
             }
@@ -34,7 +38,9 @@ namespace LogExpert.Classes.DateTimeParser
             while ((token = ReadToken(reader, out syntaxError)) != null)
             {
                 if (token == ";")
+                {
                     break;
+                }
 
                 if (Token.IsDatePart(token))
                 {
@@ -89,9 +95,13 @@ namespace LogExpert.Classes.DateTimeParser
                     }
 
                     if (zeros > 0)
+                    {
                         result.Add("." + new string('0', zeros));
+                    }
                     else
+                    {
                         result.Add(".");
+                    }
                 }
                 else
                 {

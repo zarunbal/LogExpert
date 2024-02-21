@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -87,7 +88,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     _logger.Error(lfe);
                     MessageBox.Show("Cannot load file\n" + lfe.Message, "LogExpert");
-                    BeginInvoke(new FunctionWith1BoolParam(Close), true);
+                    _ = BeginInvoke(new FunctionWith1BoolParam(Close), true);
                     _isLoadError = true;
                     return;
                 }
@@ -114,7 +115,7 @@ namespace LogExpert.Controls.LogWindow
                 
                 RegisterLogFileReaderEvents();
                 _logger.Info($"Loading logfile: {fileName}");
-                _logFileReader.startMonitoring();
+                _logFileReader.StartMonitoring();
                 
                 if (isUsingDefaultColumnizer)
                 {
@@ -146,7 +147,7 @@ namespace LogExpert.Controls.LogWindow
 
             if (_logFileReader != null)
             {
-                _logFileReader.stopMonitoring();
+                _logFileReader.StopMonitoring();
                 UnRegisterLogFileReaderEvents();
             }
 
@@ -156,7 +157,7 @@ namespace LogExpert.Controls.LogWindow
             _logFileReader = new LogfileReader(fileNames, EncodingOptions, Preferences.bufferCount, Preferences.linesPerBuffer, _multiFileOptions);
             _logFileReader.UseNewReader = !Preferences.useLegacyReader;
             RegisterLogFileReaderEvents();
-            _logFileReader.startMonitoring();
+            _logFileReader.StartMonitoring();
             FileName = fileNames[fileNames.Length - 1];
             _fileNames = fileNames;
             IsMultiFile = true;
@@ -481,7 +482,7 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        public void dataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        public void OnDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             DataGridView gridView = (DataGridView) sender;
             CellPainting(gridView, e.RowIndex, e);
@@ -1671,6 +1672,7 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
+        [SupportedOSPlatformGuard("windows")]
         public void ImportBookmarkList()
         {
             OpenFileDialog dlg = new();
@@ -1693,14 +1695,14 @@ namespace LogExpert.Controls.LogWindow
                     bool bookmarkAdded = false;
                     foreach (Bookmark b in newBookmarks.Values)
                     {
-                        if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
+                        if (!_bookmarkProvider.BookmarkList.TryGetValue(b.LineNum, out Bookmark value))
                         {
                             _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
                             bookmarkAdded = true; // refresh the list only once at the end
                         }
                         else
                         {
-                            Bookmark existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
+                            Bookmark existingBookmark = value;
                             existingBookmark.Text =
                                 b.Text; // replace existing bookmark for that line, preserving the overlay
                             OnBookmarkTextChanged(b);
@@ -1755,6 +1757,7 @@ namespace LogExpert.Controls.LogWindow
             hideFilterListOnLoadCheckBox.Checked = Preferences.isAutoHideFilterList;
         }
 
+        [SupportedOSPlatformGuard("windows")]
         public void SetCurrentHighlightGroup(string groupName)
         {
             _guiStateArgs.HighlightGroupName = groupName;

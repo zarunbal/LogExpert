@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using LogExpert.Classes.DateTimeParser;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -26,15 +27,15 @@ namespace LogExpert.Tests
                 var message = $"Culture: {culture.Name} ({culture.EnglishName} {datePattern})";
                 var sections = Parser.ParseSections(datePattern, out bool syntaxError);
 
-                Assert.IsFalse(syntaxError, message);
+                ClassicAssert.IsFalse(syntaxError, message);
 
                 var dateSection = sections.FirstOrDefault();
-                Assert.IsNotNull(dateSection, message);
+                ClassicAssert.IsNotNull(dateSection, message);
 
                 var now = DateTime.Now;
                 var expectedFormattedDate = now.ToString(datePattern);
                 var actualFormattedDate = now.ToString(string.Join("", dateSection.GeneralTextDateDurationParts));
-                Assert.AreEqual(expectedFormattedDate, actualFormattedDate, message);
+                ClassicAssert.AreEqual(expectedFormattedDate, actualFormattedDate, message);
             }
         }
 
@@ -55,10 +56,10 @@ namespace LogExpert.Tests
 
             var message = $"Culture: {culture.EnglishName}, Actual date pattern: {datePattern}";
 
-            Assert.IsFalse(syntaxError, message);
+            ClassicAssert.IsFalse(syntaxError, message);
 
             var dateSection = sections.FirstOrDefault();
-            Assert.IsNotNull(dateSection);
+            ClassicAssert.IsNotNull(dateSection);
 
             var dateParts = dateSection
                 .GeneralTextDateDurationParts
@@ -66,13 +67,13 @@ namespace LogExpert.Tests
                 .Select(p => DateFormatPartAdjuster.AdjustDateTimeFormatPart(p))
                 .ToArray();
 
-            Assert.AreEqual(expectedDateParts.Length, dateParts.Length, message);
+            ClassicAssert.AreEqual(expectedDateParts.Length, dateParts.Length, message);
 
             for (var i = 0; i < expectedDateParts.Length; i++)
             {
                 var expected = expectedDateParts[i];
                 var actual = dateParts[i];
-                Assert.AreEqual(expected, actual, message);
+                ClassicAssert.AreEqual(expected, actual, message);
             }
         }
 

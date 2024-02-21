@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading;
-using System.Runtime.Remoting.Channels.Ipc;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting;
+//using System.Runtime.Remoting.Channels.Ipc;
+//using System.Runtime.Remoting.Channels;
+//using System.Runtime.Remoting;
+//using Grpc.Net.Client;
 using System.IO;
 using System.Diagnostics;
 using System.Security;
@@ -14,6 +15,9 @@ using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
 using NLog;
+using LogexpertgRPCService.Services;
+using LogExpert.Grpc;
+using Microsoft.AspNetCore.Builder;
 
 namespace LogExpert
 {
@@ -75,7 +79,7 @@ namespace LogExpert
                     argsList.Add(fileArg);
                 }
             }
-            string[] args = argsList.ToArray();
+            string[] args = [.. argsList];
             if (configFile.Exists)
             {
                 FileInfo cfgFileInfo = new(configFile.Value);
@@ -107,51 +111,57 @@ namespace LogExpert
 
                     // first instance
                     //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-
-                    IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
-                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
+                    //IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
+                    //ChannelServices.RegisterChannel(ipcChannel, false);
+                    //RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
                     LogExpertProxy proxy = new(logWin);
-                    RemotingServices.Marshal(proxy, "LogExpertProxy");
+                    //RemotingServices.Marshal(proxy, "LogExpertProxy");
 
                     LogExpertApplicationContext context = new(proxy, logWin);
                     Application.Run(context);
 
-                    ChannelServices.UnregisterChannel(ipcChannel);
+                    //ChannelServices.UnregisterChannel(ipcChannel);
                 }
                 else
                 {
                     int counter = 3;
                     Exception errMsg = null;
-                    IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
+                    //IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
+                    //ChannelServices.RegisterChannel(ipcChannel, false);
 
-                    while (counter > 0)
-                    {
-                        try
-                        {
-                            // another instance already exists
-                            //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                            LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
-                            if (settings.preferences.allowOnlyOneInstance)
-                            {
-                                proxy.LoadFiles(args);
-                            }
-                            else
-                            {
-                                proxy.NewWindowOrLockedWindow(args);
-                            }
+                    //while (counter > 0)
+                    //{
+                    //    try
+                    //    {
 
-                            break;
-                        }
-                        catch (RemotingException e)
-                        {
-                            _logger.Warn(e, "IpcClientChannel error: ");
-                            errMsg = e;
-                            counter--;
-                            Thread.Sleep(500);
-                        }
-                    }
+                    //        using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+                    //        var client = new LogExpertService.LogExpertServiceClient(channel);
+
+                    //        var reply = await client.SendLogAsync(new LogRequest { Message = "Hello, gRPC!" });
+
+                    //        Console.WriteLine("Greeting: " + reply.Result);
+                    //        // another instance already exists
+                    //        //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                    //        LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
+                    //        if (settings.preferences.allowOnlyOneInstance)
+                    //        {
+                    //            proxy.LoadFiles(args);
+                    //        }
+                    //        else
+                    //        {
+                    //            proxy.NewWindowOrLockedWindow(args);
+                    //        }
+
+                    //        break;
+                    //    }
+                    //    catch (RemotingException e)
+                    //    {
+                    //        _logger.Warn(e, "IpcClientChannel error: ");
+                    //        errMsg = e;
+                    //        counter--;
+                    //        Thread.Sleep(500);
+                    //    }
+                    //}
 
                     if (counter == 0)
                     {

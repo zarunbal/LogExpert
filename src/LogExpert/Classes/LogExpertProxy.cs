@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using LogExpert.Controls.LogTabWindow;
+using LogExpert.Grpc;
 using LogExpert.Interface;
 using NLog;
 
 namespace LogExpert.Classes
 {
-    internal class LogExpertProxy : MarshalByRefObject, ILogExpertProxy
+    internal class LogExpertProxy : LogExpertService.LogExpertServiceBase, ILogExpertProxy
     {
         #region Fields
 
@@ -144,10 +145,10 @@ namespace LogExpert.Classes
             return _windowList.Count;
         }
 
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
+        //public override object InitializeLifetimeService()
+        //{
+        //    return null;
+        //}
 
         #endregion
 

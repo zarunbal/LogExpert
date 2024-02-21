@@ -1,6 +1,7 @@
 ﻿using LogExpert;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace RegexColumnizer.UnitTests
 {
@@ -17,8 +18,8 @@ namespace RegexColumnizer.UnitTests
             
             TestLogLine testLogLine = new TestLogLine(4, lineToParse);
             IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
-            
-            Assert.AreEqual(expectedNumberOfColumns, parsedLogLine.ColumnValues.Length);
+
+            ClassicAssert.AreEqual(expectedNumberOfColumns, parsedLogLine.ColumnValues.Length);
         }
 
         //Using "" for empty string since string.Empty can't be passed to the TestCase attribute.
@@ -33,8 +34,8 @@ namespace RegexColumnizer.UnitTests
 
             TestLogLine testLogLine = new TestLogLine(3, lineToParse);
             IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
-            
-            Assert.AreEqual(expectedColumnValue, parsedLogLine.ColumnValues[columnIndexToTest].Text);
+
+            ClassicAssert.AreEqual(expectedColumnValue, parsedLogLine.ColumnValues[columnIndexToTest].Text);
         }
         
         private Regex1Columnizer CreateInitializedColumnizer(string regex)

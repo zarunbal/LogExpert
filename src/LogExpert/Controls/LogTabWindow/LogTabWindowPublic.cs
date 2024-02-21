@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
@@ -116,7 +117,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
             LoadFileDelegate loadFileFx = logWindow.LoadFile;
-            loadFileFx.BeginInvoke(logFileName, encodingOptions, null, null);
+            Task task = Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
             return logWindow;
         }
 

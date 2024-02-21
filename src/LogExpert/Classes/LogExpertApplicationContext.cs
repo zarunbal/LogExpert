@@ -8,7 +8,7 @@ namespace LogExpert.Classes
     {
         #region Fields
 
-        private readonly LogExpertProxy proxy;
+        private readonly LogExpertProxy _proxy;
 
         #endregion
 
@@ -16,8 +16,8 @@ namespace LogExpert.Classes
 
         public LogExpertApplicationContext(LogExpertProxy proxy, LogTabWindow firstLogWin)
         {
-            this.proxy = proxy;
-            this.proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(proxy_LastWindowClosed);
+            _proxy = proxy;
+            _proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(OnProxyLastWindowClosed);
             firstLogWin.Show();
         }
 
@@ -25,7 +25,7 @@ namespace LogExpert.Classes
 
         #region Events handler
 
-        private void proxy_LastWindowClosed(object sender, EventArgs e)
+        private void OnProxyLastWindowClosed(object sender, EventArgs e)
         {
             ExitThread();
             Application.Exit();

@@ -151,7 +151,7 @@ namespace LogExpert.Controls.LogWindow
             ForcePersistenceLoading = forcePersistenceLoading;
 
             dataGridView.CellValueNeeded += OnDataGridViewCellValueNeeded;
-            dataGridView.CellPainting += dataGridView_CellPainting;
+            dataGridView.CellPainting += OnDataGridView_CellPainting;
 
             filterGridView.CellValueNeeded += OnFilterGridViewCellValueNeeded;
             filterGridView.CellPainting += OnFilterGridViewCellPainting;

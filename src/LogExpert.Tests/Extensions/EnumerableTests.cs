@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LogExpert.Extensions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests.Extensions
 {
@@ -13,7 +14,7 @@ namespace LogExpert.Tests.Extensions
         {
             object[] arrayObject = null;
 
-            Assert.IsTrue(arrayObject.IsEmpty());
+            ClassicAssert.IsTrue(arrayObject.IsEmpty());
         }
 
         [Test]
@@ -21,7 +22,7 @@ namespace LogExpert.Tests.Extensions
         {
             object[] arrayObject = Array.Empty<object>();
 
-            Assert.IsTrue(arrayObject.IsEmpty());
+            ClassicAssert.IsTrue(arrayObject.IsEmpty());
         }
 
         [Test]
@@ -29,7 +30,7 @@ namespace LogExpert.Tests.Extensions
         {
             object[] arrayObject = {new object()};
 
-            Assert.IsFalse(arrayObject.IsEmpty());
+            ClassicAssert.IsFalse(arrayObject.IsEmpty());
         }
 
         [Test]
@@ -37,7 +38,7 @@ namespace LogExpert.Tests.Extensions
         {
             IEnumerable<object> arrayObject = null;
 
-            Assert.IsTrue(arrayObject.IsEmpty());
+            ClassicAssert.IsTrue(arrayObject.IsEmpty());
         }
 
         [Test]
@@ -45,7 +46,7 @@ namespace LogExpert.Tests.Extensions
         {
             IEnumerable<object> arrayObject = new List<object>();
 
-            Assert.IsTrue(arrayObject.IsEmpty());
+            ClassicAssert.IsTrue(arrayObject.IsEmpty());
         }
 
         [Test]
@@ -53,7 +54,7 @@ namespace LogExpert.Tests.Extensions
         {
             IEnumerable<object> arrayObject = new List<object>(new []{new object()});
 
-            Assert.IsFalse(arrayObject.IsEmpty());
+            ClassicAssert.IsFalse(arrayObject.IsEmpty());
         }
     }
 }

@@ -35,6 +35,7 @@ namespace LogExpert.Dialogs
             
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         public SettingsDialog(Preferences prefs, LogTabWindow logTabWin, int tabToOpen) : this(prefs, logTabWin)
@@ -161,6 +162,8 @@ namespace LogExpert.Dialogs
             FillToolListbox();
             FillMultifileSettings();
             FillEncodingList();
+
+            var temp = Encoding.GetEncoding(Preferences.defaultEncoding);
 
             comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.defaultEncoding);
             checkBoxMaskPrio.Checked = Preferences.maskPrio;
@@ -569,6 +572,7 @@ namespace LogExpert.Dialogs
             comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
             comboBoxEncoding.Items.Add(Encoding.UTF8);
             comboBoxEncoding.Items.Add(Encoding.Unicode);
+            comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
             comboBoxEncoding.ValueMember = "HeaderName";
         }
@@ -803,9 +807,11 @@ namespace LogExpert.Dialogs
                             Directory.CreateDirectory(ConfigManager.PortableModeDir);
                         }
 
-                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName)) 
-                            break;
-                    }
+                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
+                            {
+                                break;
+                            }
+                        }
                     case CheckState.Unchecked when File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
                         File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);

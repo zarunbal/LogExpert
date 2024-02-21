@@ -267,9 +267,9 @@ namespace LogExpert.Classes.Log
                 LinkedList<string> fileNameList = rolloverHandler.GetNameList();
 
                 ResetBufferCache();
-                IList<ILogFileInfo> lostILogFileInfoList = new List<ILogFileInfo>();
-                IList<ILogFileInfo> readNewILogFileInfoList = new List<ILogFileInfo>();
-                IList<ILogFileInfo> newFileInfoList = new List<ILogFileInfo>();
+                IList<ILogFileInfo> lostILogFileInfoList = [];
+                IList<ILogFileInfo> readNewILogFileInfoList = [];
+                IList<ILogFileInfo> newFileInfoList = [];
                 IEnumerator<ILogFileInfo> enumerator = _logFileInfoList.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
@@ -564,7 +564,7 @@ namespace LogExpert.Classes.Log
             return result;
         }
 
-        public void startMonitoring()
+        public void StartMonitoring()
         {
             _logger.Info("startMonitoring()");
             _monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
@@ -573,7 +573,7 @@ namespace LogExpert.Classes.Log
             _monitorThread.Start();
         }
 
-        public void stopMonitoring()
+        public void StopMonitoring()
         {
             _logger.Info("stopMonitoring()");
             _shouldStop = true;
@@ -613,7 +613,7 @@ namespace LogExpert.Classes.Log
         /// </summary>
         public void StopMonitoringAsync()
         {
-            Thread stopperThread = new(new ThreadStart(stopMonitoring));
+            Thread stopperThread = new(new ThreadStart(StopMonitoring));
             stopperThread.IsBackground = true;
             stopperThread.Start();
         }

@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -31,7 +32,7 @@ namespace LogExpert.Tests
 
             var columnHeaders = jsonColumnizer.GetColumnNames();
             var result = string.Join(" ", columnHeaders);
-            Assert.AreEqual(result, expectedHeaders);
+            ClassicAssert.AreEqual(result, expectedHeaders);
         }
     }
 }

@@ -6,6 +6,7 @@ using LogExpert.Classes;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Controls.LogWindow;
 using LogExpert.Entities;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -20,7 +21,7 @@ namespace LogExpert.Tests
             LogWindow logWindow =
                 new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.AreEqual(columnizerType, logWindow.CurrentColumnizer.GetType());
+            ClassicAssert.AreEqual(columnizerType, logWindow.CurrentColumnizer.GetType());
         }
 
         [TestCase(@".\TestData\XmlTest_01.xml")]
@@ -33,7 +34,7 @@ namespace LogExpert.Tests
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
             LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.True(true);
+            ClassicAssert.True(true);
         }
     }
 }

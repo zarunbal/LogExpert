@@ -3,6 +3,7 @@ using System.Text;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -36,13 +37,13 @@ namespace LogExpert.Tests
             reader.ReadFiles();
 
             IList<ILogFileInfo> lil = reader.GetLogFileInfoList();
-            Assert.AreEqual(files.Count, lil.Count);
+            ClassicAssert.AreEqual(files.Count, lil.Count);
             LinkedList<string>.Enumerator enumerator = files.GetEnumerator();
             enumerator.MoveNext();
             foreach (LogFileInfo li in lil)
             {
                 string fileName = enumerator.Current;
-                Assert.AreEqual(fileName, li.FullName);
+                ClassicAssert.AreEqual(fileName, li.FullName);
                 enumerator.MoveNext();
             }
             int oldCount = lil.Count;
@@ -56,19 +57,19 @@ namespace LogExpert.Tests
             reader.ShiftBuffers();
 
             lil = reader.GetLogFileInfoList();
-            Assert.AreEqual(oldCount + 1, lil.Count);
+            ClassicAssert.AreEqual(oldCount + 1, lil.Count);
 
-            Assert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
+            ClassicAssert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
 
             // Check if rollover'd file names have been handled by LogfileReader
             //
-            Assert.AreEqual(files.Count, lil.Count);
+            ClassicAssert.AreEqual(files.Count, lil.Count);
             enumerator = files.GetEnumerator();
             enumerator.MoveNext();
             foreach (LogFileInfo li in lil)
             {
                 string fileName = enumerator.Current;
-                Assert.AreEqual(fileName, li.FullName);
+                ClassicAssert.AreEqual(fileName, li.FullName);
                 enumerator.MoveNext();
             }
 
@@ -81,8 +82,8 @@ namespace LogExpert.Tests
             int startLine = 0;
             foreach (LogBuffer logBuffer in logBuffers)
             {
-                Assert.AreEqual(logBuffer.FileInfo.FullName, enumerator.Current);
-                Assert.AreEqual(startLine, logBuffer.StartLine);
+                ClassicAssert.AreEqual(logBuffer.FileInfo.FullName, enumerator.Current);
+                ClassicAssert.AreEqual(startLine, logBuffer.StartLine);
                 startLine += 10;
                 enumerator.MoveNext();
             }
@@ -98,7 +99,7 @@ namespace LogExpert.Tests
             {
                 LogBuffer logBuffer = logBuffers[i];
                 ILogLine line = logBuffer.GetLineOfBlock(0);
-                Assert.IsTrue(line.FullLine.Contains(enumerator.Current));
+                ClassicAssert.IsTrue(line.FullLine.Contains(enumerator.Current));
                 enumerator.MoveNext();
             }
             enumerator.MoveNext();
@@ -107,7 +108,7 @@ namespace LogExpert.Tests
             {
                 LogBuffer logBuffer = logBuffers[i];
                 ILogLine line = logBuffer.GetLineOfBlock(0);
-                Assert.IsTrue(line.FullLine.Contains(enumerator.Current));
+                ClassicAssert.IsTrue(line.FullLine.Contains(enumerator.Current));
             }
 
             oldCount = lil.Count;
@@ -121,16 +122,16 @@ namespace LogExpert.Tests
             reader.ShiftBuffers();
             lil = reader.GetLogFileInfoList();
 
-            Assert.AreEqual(oldCount, lil.Count); // same count because oldest file is deleted
-            Assert.AreEqual(files.Count, lil.Count);
-            Assert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
+            ClassicAssert.AreEqual(oldCount, lil.Count); // same count because oldest file is deleted
+            ClassicAssert.AreEqual(files.Count, lil.Count);
+            ClassicAssert.AreEqual(linesPerFile * lil.Count, reader.LineCount);
 
             // Check first line to see if buffers are correct
             //
             ILogLine firstLine = reader.GetLogLine(0);
             string[] names = new string[files.Count];
             files.CopyTo(names, 0);
-            Assert.IsTrue(firstLine.FullLine.Contains(names[2]));
+            ClassicAssert.IsTrue(firstLine.FullLine.Contains(names[2]));
         }
     }
 }

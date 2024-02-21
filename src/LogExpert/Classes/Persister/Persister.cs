@@ -9,6 +9,7 @@ using System.Xml;
 using LogExpert.Classes.Filter;
 using LogExpert.Config;
 using LogExpert.Entities;
+using System.Text.Json;
 using NLog;
 
 namespace LogExpert.Classes.Persister
@@ -295,10 +296,9 @@ namespace LogExpert.Classes.Persister
                 XmlElement filterElement = xmlDoc.CreateElement("filter");
                 XmlElement paramsElement = xmlDoc.CreateElement("params");
 
-                BinaryFormatter formatter = new();
-                MemoryStream stream = new(200);
-                formatter.Serialize(stream, filterParams);
-                string base64Data = System.Convert.ToBase64String(stream.ToArray());
+                MemoryStream stream = new(capacity: 200);
+                JsonSerializer.Serialize(stream, filterParams);
+                string base64Data = Convert.ToBase64String(stream.ToArray());
                 paramsElement.InnerText = base64Data;
                 filterElement.AppendChild(paramsElement);
                 filtersElement.AppendChild(filterElement);
@@ -320,10 +320,9 @@ namespace LogExpert.Classes.Persister
                         if (subNode.Name.Equals("params"))
                         {
                             string base64Text = subNode.InnerText;
-                            byte[] data = System.Convert.FromBase64String(base64Text);
-                            BinaryFormatter formatter = new();
+                            byte[] data = Convert.FromBase64String(base64Text);
                             MemoryStream stream = new(data);
-                            FilterParams filterParams = (FilterParams) formatter.Deserialize(stream);
+                            FilterParams filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
                             filterParams.Init();
                             filterList.Add(filterParams);
                         }

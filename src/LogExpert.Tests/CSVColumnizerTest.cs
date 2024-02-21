@@ -4,6 +4,7 @@ using LogExpert.Classes.Log;
 using LogExpert.Entities;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -28,7 +29,7 @@ namespace LogExpert.Tests
             }
             
             string expectedResult = string.Join(",", expectedHeaders);
-            Assert.AreEqual(expectedResult, logline.LogLine.FullLine);
+            ClassicAssert.AreEqual(expectedResult, logline.LogLine.FullLine);
         }
     }
 }

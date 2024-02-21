@@ -2,6 +2,7 @@
 using LogExpert.Config;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -19,16 +20,16 @@ namespace LogExpert.Tests
             Settings settings = null;
             
             Assert.DoesNotThrow(CastSettings);
-            Assert.NotNull(settings);
-            Assert.True(settings.alwaysOnTop);
+            ClassicAssert.NotNull(settings);
+            ClassicAssert.True(settings.alwaysOnTop);
 
             ConfigManager.Settings.alwaysOnTop = false;
             ConfigManager.Save(SettingsFlags.All);
             
             settings = null;
             Assert.DoesNotThrow(CastSettings);
-            Assert.NotNull(settings);
-            Assert.False(settings.alwaysOnTop);
+            ClassicAssert.NotNull(settings);
+            ClassicAssert.False(settings.alwaysOnTop);
 
 
             void CastSettings()

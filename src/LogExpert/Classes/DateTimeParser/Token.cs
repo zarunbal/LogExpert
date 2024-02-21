@@ -2,7 +2,7 @@
 
 namespace LogExpert.Classes.DateTimeParser
 {
-    internal static class Token
+    public static class Token
     {
         public static bool IsDatePart(string token)
         {

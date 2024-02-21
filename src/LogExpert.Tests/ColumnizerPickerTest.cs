@@ -7,6 +7,7 @@ using System.IO;
 using LogExpert.Classes;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
+using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -57,7 +58,7 @@ namespace LogExpert.Tests
 
             var result = ColumnizerPicker.FindColumnizer(path, autoLogLineColumnizerCallbackMock.Object);
 
-            Assert.AreEqual(expectedColumnizerName, result.GetName());
+            ClassicAssert.AreEqual(expectedColumnizerName, result.GetName());
         }
 
 
@@ -77,7 +78,7 @@ namespace LogExpert.Tests
             PluginRegistry.GetInstance().RegisteredColumnizers.Add(new JsonCompactColumnizer());
             var result = ColumnizerPicker.FindReplacementForAutoColumnizer(fileName, reader, autoColumnizer.Object);
 
-            Assert.AreEqual(result.GetType(), columnizerType);
+            ClassicAssert.AreEqual(result.GetType(), columnizerType);
         }
 
         [TestCase(@".\TestData\FileNotExists.txt", typeof(DefaultLogfileColumnizer))]
@@ -91,7 +92,7 @@ namespace LogExpert.Tests
             var result = ColumnizerPicker.DecideColumnizerByName(fileName,
                 PluginRegistry.GetInstance().RegisteredColumnizers);
 
-            Assert.AreEqual(result.GetType(), columnizerType);
+            ClassicAssert.AreEqual(result.GetType(), columnizerType);
         }
 
         [TestCase(@"Invalid Name", typeof(DefaultLogfileColumnizer))]
@@ -107,7 +108,7 @@ namespace LogExpert.Tests
             var result = ColumnizerPicker.DecideColumnizerByName(columnizerName,
                 PluginRegistry.GetInstance().RegisteredColumnizers);
 
-            Assert.AreEqual(result.GetType(), columnizerType);
+            ClassicAssert.AreEqual(result.GetType(), columnizerType);
         }
 
         private class TestLogLine : ILogLine

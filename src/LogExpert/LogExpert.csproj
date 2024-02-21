@@ -80,9 +80,11 @@
   <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
   <PackageReference Include="Google.Protobuf" Version="3.25.3" />
   <PackageReference Include="Grpc.Tools" Version="2.61.0" PrivateAssets="All" />
+  <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
 </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\LogexpertgRPCService\LogexpertgRPCService.csproj" />
     <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
   </ItemGroup>
   <ItemGroup>
