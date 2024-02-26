@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SftpFileSystem</RootNamespace>
     <AssemblyName>SftpFileSystem</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="chilkat-x64">
-      <Version>9.5.0.90</Version>
+      <Version>9.5.0.97</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

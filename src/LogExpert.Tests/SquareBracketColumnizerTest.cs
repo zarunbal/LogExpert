@@ -39,7 +39,7 @@ namespace LogExpert
             };
 
             squareBracketColumnizer.GetPriority(path, loglines);
-            Assert.AreEqual(squareBracketColumnizer.GetColumnCount(), count);
+            Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
         }
 
     }

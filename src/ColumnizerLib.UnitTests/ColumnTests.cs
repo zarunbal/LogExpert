@@ -27,8 +27,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = builder.ToString();
 
-            Assert.AreEqual(expected, column.DisplayValue);
-            Assert.AreEqual(builder.ToString(), column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo(expected));
+            Assert.That(column.FullValue, Is.EqualTo(builder.ToString()));
         }
 
         [Test]
@@ -47,8 +47,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = expected;
 
-            Assert.AreEqual(expected, column.DisplayValue);
-            Assert.AreEqual(expected, column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo(expected));
+            Assert.That(column.DisplayValue, Is.EqualTo(expected));
         }
 
         [Test]
@@ -63,14 +63,14 @@ namespace ColumnizerLib.UnitTests
             //only one implementation depending on the windows version is executed
             if (Environment.Version >= Version.Parse("6.2"))
             {
-                Assert.AreEqual("asdf␀", column.DisplayValue);
+                Assert.That(column.DisplayValue, Is.EqualTo("asdf␀"));
             }
             else
             {
-                Assert.AreEqual("asdf ", column.DisplayValue);
+                Assert.That(column.DisplayValue, Is.EqualTo("asdf "));
             }
 
-            Assert.AreEqual("asdf\0", column.FullValue);
+            Assert.That(column.FullValue, Is.EqualTo("asdf\0"));
         }
 
         [Test]
@@ -80,8 +80,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = "asdf\t";
 
-            Assert.AreEqual("asdf  ", column.DisplayValue);
-            Assert.AreEqual("asdf\t", column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo("asdf  "));
+            Assert.That(column.FullValue, Is.EqualTo("asdf\t"));
         }
     }
 }

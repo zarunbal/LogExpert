@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogExpert</RootNamespace>
     <AssemblyName>LogExpert</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <ApplicationIcon>Resources\logexpert.ico</ApplicationIcon>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -575,10 +575,10 @@
   <ItemGroup />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
-    <PackageReference Include="NLog.Config">
-      <Version>4.7.15</Version>
+    <PackageReference Include="NLog">
+      <Version>5.2.8</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
