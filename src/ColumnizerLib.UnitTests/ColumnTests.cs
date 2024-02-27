@@ -48,7 +48,7 @@ namespace ColumnizerLib.UnitTests
             column.FullValue = expected;
 
             Assert.That(column.DisplayValue, Is.EqualTo(expected));
-            Assert.That(column.DisplayValue, Is.EqualTo(expected));
+            Assert.That(column.FullValue, Is.EqualTo(expected));
         }
 
         [Test]
