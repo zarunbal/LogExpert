@@ -31,7 +31,7 @@ namespace LogExpert.Tests
 
             var columnHeaders = jsonColumnizer.GetColumnNames();
             var result = string.Join(" ", columnHeaders);
-            Assert.AreEqual(result, expectedHeaders);
+            Assert.That(result, Is.EqualTo( expectedHeaders));
         }
     }
 }

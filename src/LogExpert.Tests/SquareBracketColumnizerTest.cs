@@ -1,12 +1,13 @@
-﻿using System;
+﻿
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
-using NUnit.Framework;
 
-namespace LogExpert.Tests
+namespace LogExpert
 {
     [TestFixture]
     public class SquareBracketColumnizerTest
@@ -38,7 +39,7 @@ namespace LogExpert.Tests
             };
 
             squareBracketColumnizer.GetPriority(path, loglines);
-            Assert.AreEqual(squareBracketColumnizer.GetColumnCount(), count);
+            Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
         }
 
     }

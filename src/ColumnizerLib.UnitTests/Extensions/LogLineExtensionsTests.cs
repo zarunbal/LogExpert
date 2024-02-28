@@ -25,7 +25,7 @@ namespace ColumnizerLib.UnitTests.Extensions
                 LineNumber = 89,
                 Text = "a text"
             };
-            Assert.AreEqual("\t90\ta fullLine", underTest.ToClipBoardText());
+            Assert.That(underTest.ToClipBoardText(), Is.EqualTo("\t90\ta fullLine"));
         }
     }
 }

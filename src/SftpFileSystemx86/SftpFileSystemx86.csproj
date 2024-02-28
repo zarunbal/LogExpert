@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SftpFileSystem</RootNamespace>
     <AssemblyName>SftpFileSystem</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -53,7 +53,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\ConfigDialog.Designer.cs">
-	  <DependentUpon>ConfigDialog.cs</DependentUpon>
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
       <Link>ConfigDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\CredentialCache.cs">
@@ -67,7 +67,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\FailedKeyDialog.Designer.cs">
-	  <DependentUpon>FailedKeyDialog.cs</DependentUpon>
+      <DependentUpon>FailedKeyDialog.cs</DependentUpon>
       <Link>FailedKeyDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\KeyType.cs">
@@ -86,7 +86,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.Designer.cs">
-	  <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
+      <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
       <Link>PrivateKeyPasswordDialog.Designer.cs</Link>
     </Compile>
     <Compile Include="..\SftpFileSystemx64\SftpFileSystem.cs">
@@ -112,19 +112,19 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx">
-	  <DependentUpon>ConfigDialog.cs</DependentUpon>
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
       <Link>ConfigDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx">
-	  <DependentUpon>FailedKeyDialog.cs</DependentUpon>
+      <DependentUpon>FailedKeyDialog.cs</DependentUpon>
       <Link>FailedKeyDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx">
-	  <DependentUpon>LoginDialog.cs</DependentUpon>
+      <DependentUpon>LoginDialog.cs</DependentUpon>
       <Link>LoginDialog.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.resx">
-	  <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
+      <DependentUpon>PrivateKeyPasswordDialog.cs</DependentUpon>
       <Link>PrivateKeyPasswordDialog.resx</Link>
     </EmbeddedResource>
   </ItemGroup>
@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SSH.NET">
-      <Version>2020.0.2</Version>
+      <Version>2024.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
