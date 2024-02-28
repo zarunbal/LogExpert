@@ -17,16 +17,16 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
+using Serilog;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.IO.TextTasks;
 using static Nuke.Common.IO.CompressionTasks;
 using static Nuke.GitHub.GitHubTasks;
-using static Nuke.Common.ControlFlow;
+using static Nuke.Common.Assert;
 
-[CheckBuildProjectConfigurations]
+//[CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
@@ -58,7 +58,6 @@ class Build : NukeBuild
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
     AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
-
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
@@ -93,9 +92,9 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb"};
+    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
 
-    [PathExecutable("choco.exe")] readonly Tool Chocolatey;
+    [PathVariable("choco.exe")] readonly Tool Chocolatey;
 
     [Parameter("Exlcude directory glob")]
     string[] ExcludeDirectoryGlob => new[] {"**/pluginsx86"};
@@ -130,38 +129,41 @@ class Build : NukeBuild
         .Before(Compile, Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(x => x.DeleteDirectory());
 
-            if (DirectoryExists(BinDirectory))
+            var path = AbsolutePath.Create(BinDirectory);
+            if (path.DirectoryExists())
             {
-                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(DeleteFile);
-                BinDirectory.GlobDirectories("*").ForEach(DeleteDirectory);
+                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(x => x.DeleteFile());
+                BinDirectory.GlobDirectories("*").ForEach(x => x.DeleteDirectory());
 
-                DeleteDirectory(BinDirectory);
+                path.DeleteDirectory();
 
-                EnsureCleanDirectory(BinDirectory);
+                path.CreateOrCleanDirectory();
             }
         });
 
     Target CleanPackage => _ => _
         .Before(Compile, Restore)
-        .OnlyWhenDynamic(() => DirectoryExists(BinDirectory))
+        .OnlyWhenDynamic(() => AbsolutePath.Create(BinDirectory).DirectoryExists())
         .Executes(() =>
         {
-            BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(DeleteFile);
+            BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(x => x.DeleteFile());
 
-            if (DirectoryExists(PackageDirectory))
+            var path = AbsolutePath.Create(PackageDirectory);
+            if (path.DirectoryExists())
             {
-                DeleteDirectory(PackageDirectory);
+                path.DeleteDirectory();
 
-                EnsureCleanDirectory(PackageDirectory);
+                path.CreateOrCleanDirectory();
             }
 
-            if (DirectoryExists(ChocolateyDirectory))
+            path = AbsolutePath.Create(ChocolateyDirectory);
+            if (path.DirectoryExists())
             {
-                DeleteDirectory(ChocolateyDirectory);
+                path.DeleteDirectory();
 
-                EnsureCleanDirectory(ChocolateyDirectory);
+                path.CreateOrCleanDirectory();
             }
         });
 
@@ -177,7 +179,7 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            Logger.Info($"Version: '{VersionString}'");
+            Serilog.Log.Information($"Version: '{VersionString}'");
 
             MSBuild(s => s
                 .SetTargetPath(Solution)
@@ -214,8 +216,8 @@ class Build : NukeBuild
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory / "tools", DirectoryExistsPolicy.Merge);
-            ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
-            ChocolateyDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+            ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
+            ChocolateyDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
         });
 
     Target BuildChocolateyPackage => _ => _
@@ -230,22 +232,22 @@ class Build : NukeBuild
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, PackageDirectory, DirectoryExistsPolicy.Merge);
-            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
 
-            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
 
-            Compress(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
+            PackageDirectory.CompressTo(BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
     Target ChangeVersionNumber => _ => _
         .Before(Compile)
         .Executes(() =>
         {
-            Logger.Info($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
+            Log.Information($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
 
             AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
 
-            string text = ReadAllText(assemblyVersion);
+            string text = AbsolutePath.Create(assemblyVersion).ReadAllText();
             Regex configurationRegex = new Regex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])");
             Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])");
             Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])");
@@ -256,11 +258,11 @@ class Build : NukeBuild
             text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
             text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
 
-            Logger.Trace("Content of AssemblyVersion file");
-            Logger.Trace(text);
-            Logger.Trace("End of Content");
+            Log.Verbose("Content of AssemblyVersion file");
+            Log.Verbose(text);
+            Log.Verbose("End of Content");
 
-            WriteAllText(assemblyVersion, text);
+            assemblyVersion.WriteAllText(text);
 
             SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
             {
@@ -269,14 +271,14 @@ class Build : NukeBuild
                     return;
                 }
 
-                string fileText = ReadAllText(file);
+                string fileText = file.ReadAllText();
 
                 Regex reg = new Regex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
 
                 if (reg.IsMatch(fileText))
                 {
                     fileText = reg.Replace(fileText, MyVariable);
-                    WriteAllText(file, fileText);
+                    file.WriteAllText(fileText);
                 }
             });
         });
@@ -285,13 +287,13 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            string[] files = new[] {"SftpFileSystem.dll", "Renci.SshNet.dll" };
+            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll", "ChilkatDotNet47.dll" };
 
             OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
             OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));
 
-            Compress(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
-            Compress(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
+            SftpFileSystemPackagex64.CompressTo(BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
+            SftpFileSystemPackagex86.CompressTo(BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
         });
 
     Target ColumnizerLibCreateNuget => _ => _
@@ -321,9 +323,9 @@ class Build : NukeBuild
         .Executes(() =>
         {
             CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
-            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(DeleteFile);
+            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
 
-            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(DeleteDirectory);
+            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
         });
 
     Target CreateSetup => _ => _
@@ -339,7 +341,7 @@ class Build : NukeBuild
             bool executed = false;
             foreach (var setupCombinations in publishCombinations)
             {
-                if (!FileExists(setupCombinations))
+                if (!setupCombinations.FileExists())
                 {
                     //Search for next combination
                     continue;
@@ -364,7 +366,7 @@ class Build : NukeBuild
         {
             BinDirectory.GlobFiles("**/LogExpert.ColumnizerLib.*.nupkg").ForEach(file =>
             {
-                Logger.Normal($"Publish nuget {file}");
+                Log.Debug($"Publish nuget {file}");
 
                 NuGetTasks.NuGetPush(s =>
                 {
@@ -385,7 +387,7 @@ class Build : NukeBuild
         {
             ChocolateyDirectory.GlobFiles("**/*.nupkg").ForEach(file =>
             {
-                Logger.Normal($"Publish chocolatey package {file}");
+                Log.Debug($"Publish chocolatey package {file}");
 
                 Chocolatey($"push {file} --key {ChocolateyApiKey} --source https://push.chocolatey.org/", WorkingDirectory = ChocolateyDirectory);
             });
@@ -425,7 +427,7 @@ class Build : NukeBuild
         .OnlyWhenDynamic(() => AppVeyor.Instance != null)
         .Executes(() =>
         {
-            CompressZip(BinDirectory / Configuration, BinDirectory / $"LogExpert-CI-{VersionString}.zip");
+            AbsolutePath.Create(BinDirectory / Configuration).CompressTo(BinDirectory / $"LogExpert-CI-{VersionString}.zip");
 
             AppveyorArtifacts.ForEach((artifact) =>
             {
@@ -452,7 +454,7 @@ class Build : NukeBuild
 
             DirectoryInfo info = new DirectoryInfo(logExpertApplicationData);
             info.GetDirectories().ForEach(a => a.Delete(true));
-            DeleteDirectory(logExpertApplicationData);
+            logExpertApplicationData.DeleteDirectory();
         });
 
     Target CleanupDocumentsLogExpert => _ => _
@@ -462,14 +464,14 @@ class Build : NukeBuild
 
             DirectoryInfo info = new DirectoryInfo(logExpertDocuments);
             info.GetDirectories().ForEach(a => a.Delete(true));
-            DeleteDirectory(logExpertDocuments);
+            logExpertDocuments.DeleteDirectory();
         });
 
     private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
         Process proc = new Process();
 
-        Logger.Info($"Start '{innoPath}' {SetupCommandLineParameter} \"{InnoSetupScript}\"");
+        Log.Information($"Start '{innoPath}' {SetupCommandLineParameter} \"{InnoSetupScript}\"");
 
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
@@ -479,7 +481,7 @@ class Build : NukeBuild
 
         proc.WaitForExit();
 
-        Logger.Info($"Executed '{innoPath}' with exit code {proc.ExitCode}");
+        Log.Information($"Executed '{innoPath}' with exit code {proc.ExitCode}");
 
         if (proc.ExitCode != 0)
         {
@@ -494,13 +496,13 @@ class Build : NukeBuild
 
     private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
     {
-        string text = ReadAllText(path);
+        string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
 
-        WriteAllText($"{Regex.Replace(path, "\\.template$", "")}", text);
+        AbsolutePath.Create($"{Regex.Replace(path, "\\.template$", "")}").WriteAllText(text);
         if (deleteTemplate)
         {
-            DeleteFile(path);
+            path.DeleteFile();
         }
     }
 }
