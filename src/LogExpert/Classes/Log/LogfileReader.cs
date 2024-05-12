@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+
 using LogExpert.Classes.xml;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
@@ -423,20 +425,15 @@ namespace LogExpert.Classes.Log
 
             if (!_isFastFailOnGetLogLine)
             {
-                //TODO Replace wit Async Await / awaitable task
-
-                IAsyncResult asyncResult = _logLineFx.BeginInvoke(lineNum, null, null);
-
-                if (asyncResult.AsyncWaitHandle.WaitOne(WAIT_TIME, false))
+                Task.Run(async () =>
                 {
-                    result = _logLineFx.EndInvoke(asyncResult);
+                    result = await Task.Run(() => _logLineFx(lineNum));
                     _isFastFailOnGetLogLine = false;
-                }
-                else
-                {
-                    _logLineFx.EndInvoke(asyncResult); // must be called according to MSDN docs... :(
-                    _isFastFailOnGetLogLine = true;
+                }).Wait(WAIT_TIME);
 
+                if (result == null)
+                {
+                    _isFastFailOnGetLogLine = true;
                     _logger.Debug("No result after {0}ms. Returning <null>.", WAIT_TIME);
                 }
             }

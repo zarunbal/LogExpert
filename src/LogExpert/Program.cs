@@ -18,6 +18,8 @@ using NLog;
 using LogexpertgRPCService.Services;
 using LogExpert.Grpc;
 using Microsoft.AspNetCore.Builder;
+using System.Security.Principal;
+using Grpc.Net.Client;
 
 namespace LogExpert
 {
@@ -110,7 +112,7 @@ namespace LogExpert
                     LogTabWindow logWin = new(args.Length > 0 ? args : null, 1, false);
 
                     // first instance
-                    //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                    WindowsIdentity wi = WindowsIdentity.GetCurrent();
                     //IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
                     //ChannelServices.RegisterChannel(ipcChannel, false);
                     //RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
@@ -129,39 +131,39 @@ namespace LogExpert
                     //IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
                     //ChannelServices.RegisterChannel(ipcChannel, false);
 
-                    //while (counter > 0)
-                    //{
-                    //    try
-                    //    {
+                    while (counter > 0)
+                    {
+                        try
+                        {
 
-                    //        using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-                    //        var client = new LogExpertService.LogExpertServiceClient(channel);
+                            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+                            //var client = new LogExpertService.LogExpertServiceClient(channel);
 
-                    //        var reply = await client.SendLogAsync(new LogRequest { Message = "Hello, gRPC!" });
+                            //var reply = await client.SendLogAsync(new LogRequest { Message = "Hello, gRPC!" });
 
-                    //        Console.WriteLine("Greeting: " + reply.Result);
-                    //        // another instance already exists
-                    //        //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                    //        LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
-                    //        if (settings.preferences.allowOnlyOneInstance)
-                    //        {
-                    //            proxy.LoadFiles(args);
-                    //        }
-                    //        else
-                    //        {
-                    //            proxy.NewWindowOrLockedWindow(args);
-                    //        }
+                            //Console.WriteLine("Greeting: " + reply.Result);
+                            // another instance already exists
+                            WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                            //LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
+                            //if (settings.preferences.allowOnlyOneInstance)
+                            //{
+                            //    proxy.LoadFiles(args);
+                            //}
+                            //else
+                            //{
+                            //    proxy.NewWindowOrLockedWindow(args);
+                            //}
 
-                    //        break;
-                    //    }
-                    //    catch (RemotingException e)
-                    //    {
-                    //        _logger.Warn(e, "IpcClientChannel error: ");
-                    //        errMsg = e;
-                    //        counter--;
-                    //        Thread.Sleep(500);
-                    //    }
-                    //}
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Warn(e, "IpcClientChannel error: ");
+                            errMsg = e;
+                            counter--;
+                            Thread.Sleep(500);
+                        }
+                    }
 
                     if (counter == 0)
                     {
