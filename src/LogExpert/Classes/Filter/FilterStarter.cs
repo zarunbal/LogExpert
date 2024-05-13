@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+
 using LogExpert.Classes.ILogLineColumnizerCallback;
 using NLog;
 
@@ -43,9 +45,9 @@ namespace LogExpert.Classes.Filter
             _lastFilterLinesDict = [];
             ThreadCount = Environment.ProcessorCount * 4;
             ThreadCount = minThreads;
-            ThreadPool.GetMinThreads(out var worker, out var completion);
+            ThreadPool.GetMinThreads(out _, out var completion);
             ThreadPool.SetMinThreads(minThreads, completion);
-            ThreadPool.GetMaxThreads(out worker, out completion);
+            ThreadPool.GetMaxThreads(out _, out _);
         }
 
         #endregion
@@ -97,14 +99,20 @@ namespace LogExpert.Classes.Filter
                     }
                 }
                 _logger.Info("FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
-                WorkerFx workerFx = DoWork;
-                IAsyncResult ar = workerFx.BeginInvoke(filterParams, workStartLine, interval, ThreadProgressCallback,
-                    FilterDoneCallback, workerFx);
+
+                Task.Run(() =>
+                {
+                    Filter filter = DoWork(filterParams, workStartLine, interval, ThreadProgressCallback);
+                });
+
+                //WorkerFx workerFx = DoWork;
+                //IAsyncResult ar = workerFx.BeginInvoke(filterParams, workStartLine, interval, ThreadProgressCallback,
+                //    FilterDoneCallback, workerFx);
                 workStartLine += interval;
-                handleList.Add(ar.AsyncWaitHandle);
+                //handleList.Add(ar.AsyncWaitHandle);
             }
 
-            WaitHandle[] handles = handleList.ToArray();
+            WaitHandle[] handles = [.. handleList];
             // wait for worker threads completion
             if (handles.Length > 0)
             {
@@ -144,7 +152,7 @@ namespace LogExpert.Classes.Filter
 
         private Filter DoWork(FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
         {
-            _logger.Info("Started Filter worker [{0}] for line {1}", Thread.CurrentThread.ManagedThreadId, startLine);
+            _logger.Info("Started Filter worker [{0}] for line {1}", Environment.CurrentManagedThreadId, startLine);
 
             // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
             FilterParams threadFilterParams = filterParams.CreateCopy2();
@@ -159,7 +167,8 @@ namespace LogExpert.Classes.Filter
             {
                 return filter;
             }
-            int realCount = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
+
+            _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
             _logger.Info("Filter worker [{0}] for line {1} has completed.", Thread.CurrentThread.ManagedThreadId, startLine);
             lock (_filterReadyList)
             {
@@ -178,7 +187,7 @@ namespace LogExpert.Classes.Filter
             //    this.filterReadyList.Add(filter);
             //  }
             //}
-            Filter filter = ((WorkerFx) ar.AsyncState).EndInvoke(ar); // EndInvoke() has to be called mandatory.
+            _ = ((WorkerFx)ar.AsyncState).EndInvoke(ar); // EndInvoke() has to be called mandatory.
         }
 
         private void MergeResults()

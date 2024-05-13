@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
@@ -2028,9 +2029,9 @@ namespace LogExpert.Controls.LogWindow
             SendProgressBarUpdate();
 
             Settings settings = ConfigManager.Settings;
-            FilterFx fx;
-            fx = settings.preferences.multiThreadFilter ? MultiThreadedFilter : new FilterFx(Filter);
-            fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
+            FilterFx fx = settings.preferences.multiThreadFilter ? MultiThreadedFilter : new FilterFx(Filter);
+            Task.Run(() => fx.Invoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList));
+            //fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
             CheckForFilterDirty();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -43,6 +44,7 @@ namespace LogExpert.Classes.Log
         private bool _isLineCountDirty = true;
         private IList<ILogFileInfo> _logFileInfoList = new List<ILogFileInfo>();
         private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
+        private CancellationTokenSource _cancellationTokenSource;
 
         private ReaderWriterLock _lruCacheDictLock;
 
@@ -193,9 +195,11 @@ namespace LogExpert.Classes.Log
             set
             {
                 {
-                    _encodingOptions = new EncodingOptions();
-                    _encodingOptions.DefaultEncoding = value.DefaultEncoding;
-                    _encodingOptions.Encoding = value.Encoding;
+                    _encodingOptions = new EncodingOptions
+                    {
+                        DefaultEncoding = value.DefaultEncoding,
+                        Encoding = value.Encoding
+                    };
                 }
             }
         }
@@ -244,11 +248,13 @@ namespace LogExpert.Classes.Log
                 LineCount = 0;
             }
 
-            LogEventArgs args = new();
-            args.PrevFileSize = 0;
-            args.PrevLineCount = 0;
-            args.LineCount = LineCount;
-            args.FileSize = FileSize;
+            LogEventArgs args = new()
+            {
+                PrevFileSize = 0,
+                PrevLineCount = 0,
+                LineCount = LineCount,
+                FileSize = FileSize
+            };
             OnFileSizeChanged(args);
         }
 
@@ -570,13 +576,19 @@ namespace LogExpert.Classes.Log
             _monitorThread.Start();
         }
 
+        //public void StopMonitoring(CancellationToken cancellationToken)
+        //{
+        //    _logger.Info("stopMonitoring()");
+        //    _shouldStop = true;
+        //    _cancellationTokenSource = cancellationToken;
+        //}
+
         public void StopMonitoring()
         {
             _logger.Info("stopMonitoring()");
             _shouldStop = true;
 
-            Thread.Sleep(_watchedILogFileInfo
-                .PollInterval); // leave time for the threads to stop by themselves
+            Thread.Sleep(_watchedILogFileInfo.PollInterval); // leave time for the threads to stop by themselves
 
             if (_monitorThread != null)
             {
@@ -610,9 +622,13 @@ namespace LogExpert.Classes.Log
         /// </summary>
         public void StopMonitoringAsync()
         {
-            Thread stopperThread = new(new ThreadStart(StopMonitoring));
-            stopperThread.IsBackground = true;
-            stopperThread.Start();
+            Task task = Task.Run(StopMonitoring);
+
+            //Thread stopperThread = new(new ThreadStart(StopMonitoring))
+            //{
+            //    IsBackground = true
+            //};
+            //stopperThread.Start();
         }
 
         /// <summary>
