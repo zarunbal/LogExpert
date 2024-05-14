@@ -1,4 +1,16 @@
-﻿using System;
+﻿using LogExpert.Classes;
+using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Filter;
+using LogExpert.Classes.Highlight;
+using LogExpert.Classes.ILogLineColumnizerCallback;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -10,17 +22,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using LogExpert.Classes;
-using LogExpert.Classes.Columnizer;
-using LogExpert.Classes.Filter;
-using LogExpert.Classes.Highlight;
-using LogExpert.Classes.ILogLineColumnizerCallback;
-using LogExpert.Classes.Persister;
-using LogExpert.Config;
-using LogExpert.Dialogs;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
-using LogExpert.Interface;
 
 namespace LogExpert.Controls.LogWindow
 {
@@ -74,7 +75,7 @@ namespace LogExpert.Controls.LogWindow
             dataGridViewCellStyleFilterGrid.WrapMode = DataGridViewTriState.False;
             filterGridView.DefaultCellStyle = dataGridViewCellStyleFilterGrid;
         }
-        
+
         private bool LoadPersistenceOptions()
         {
             if (InvokeRequired)
@@ -110,7 +111,7 @@ namespace LogExpert.Controls.LogWindow
                 _multiFileOptions = new MultiFileOptions();
                 _multiFileOptions.FormatPattern = persistenceData.multiFilePattern;
                 _multiFileOptions.MaxDayTry = persistenceData.multiFileMaxDays;
-                
+
                 if (string.IsNullOrEmpty(_multiFileOptions.FormatPattern))
                 {
                     _multiFileOptions = ObjectClone.Clone(Preferences.multiFileOptions);
@@ -642,7 +643,7 @@ namespace LogExpert.Controls.LogWindow
                     }
 
                     UpdateGridCallback callback = UpdateGrid;
-                    Invoke(callback, new object[] { e });
+                    Invoke(callback, [e]);
                     CheckFilterAndHighlight(e);
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }
@@ -652,8 +653,9 @@ namespace LogExpert.Controls.LogWindow
         private void StopLogEventWorkerThread()
         {
             _logEventArgsEvent.Set();
-            _logEventHandlerThread.Abort();
-            _logEventHandlerThread.Join();
+            cts.Cancel();
+            //_logEventHandlerThread.Abort();
+            //_logEventHandlerThread.Join();
         }
 
         private void OnFileSizeChanged(LogEventArgs e)
@@ -723,7 +725,7 @@ namespace LogExpert.Controls.LogWindow
                 }
 
                 _statusEventArgs.LineCount = e.LineCount;
-                statusLineFileSize(e.FileSize);
+                StatusLineFileSize(e.FileSize);
 
                 if (!_isLoading)
                 {
@@ -815,7 +817,7 @@ namespace LogExpert.Controls.LogWindow
                         FollowTailChanged(false, true);
                         if (firstStopTail && wasFollow)
                         {
-                            Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] { i, false });
+                            Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
                             firstStopTail = false;
                         }
                     }
@@ -864,7 +866,7 @@ namespace LogExpert.Controls.LogWindow
                             FollowTailChanged(false, true);
                             if (firstStopTail && wasFollow)
                             {
-                                Invoke(new SelectLineFx(SelectAndEnsureVisible), new object[] { i, false });
+                                Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
                                 firstStopTail = false;
                             }
                         }
@@ -974,7 +976,7 @@ namespace LogExpert.Controls.LogWindow
 
             Type oldColType = _filterParams.currentColumnizer?.GetType();
             Type newColType = columnizer?.GetType();
-            
+
             if (oldColType != newColType && _filterParams.columnRestrict && _filterParams.isFilterTail)
             {
                 _filterParams.columnList.Clear();
@@ -1410,7 +1412,7 @@ namespace LogExpert.Controls.LogWindow
                 }
             }
 
-            bookmarkComment.TrimEnd(new char[] { '\r', '\n' });
+            bookmarkComment = bookmarkComment.TrimEnd(['\r', '\n']);
         }
 
         private void StopTimespreadThread()
@@ -1421,9 +1423,10 @@ namespace LogExpert.Controls.LogWindow
         private void StopTimestampSyncThread()
         {
             _shouldTimestampDisplaySyncingCancel = true;
-            _timeShiftSyncWakeupEvent.Set();
-            _timeShiftSyncThread.Abort();
-            _timeShiftSyncThread.Join();
+            //_timeShiftSyncWakeupEvent.Set();
+            //_timeShiftSyncThread.Abort();
+            //_timeShiftSyncThread.Join();
+            cts.Cancel();
         }
 
         private void SyncTimestampDisplay()
@@ -1498,9 +1501,7 @@ namespace LogExpert.Controls.LogWindow
                     int row2 = dataGridView.SelectedRows[1].Index;
                     if (row1 > row2)
                     {
-                        int tmp = row1;
-                        row1 = row2;
-                        row2 = tmp;
+                        (row2, row1) = (row1, row2);
                     }
 
                     int refLine = row1;
@@ -1562,7 +1563,7 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        private void statusLineFileSize(long size)
+        private void StatusLineFileSize(long size)
         {
             _statusEventArgs.FileSize = size;
             SendStatusLineUpdate();
@@ -1634,7 +1635,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     if (!searchParams.isCaseSensitive)
                     {
-                        if (line.FullLine.ToLower().Contains(lowerSearchText))
+                        if (line.FullLine.Contains(lowerSearchText, StringComparison.CurrentCultureIgnoreCase))
                         {
                             return lineNum;
                         }
@@ -1668,7 +1669,7 @@ namespace LogExpert.Controls.LogWindow
                     {
                         if (!Disposing)
                         {
-                            Invoke(progressFx, new object[] { count });
+                            Invoke(progressFx, [count]);
                         }
                     }
                     catch (ObjectDisposedException ex) // can occur when closing the app while searching
@@ -2760,7 +2761,7 @@ namespace LogExpert.Controls.LogWindow
             }
 
             pipe.CloseFile();
-            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), new object[] { pipe, title, null });
+            Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), [pipe, title, null]);
         }
 
         private void FilterRestore(LogWindow newWin, PersistenceData persistenceData)
@@ -2771,14 +2772,14 @@ namespace LogExpert.Controls.LogWindow
             if (columnizer != null)
             {
                 SetColumnizerFx fx = newWin.ForceColumnizer;
-                newWin.Invoke(fx, new object[] { columnizer });
+                newWin.Invoke(fx, [columnizer]);
             }
             else
             {
                 _logger.Warn("FilterRestore(): Columnizer {0} not found", persistenceData.columnizerName);
             }
 
-            newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), new object[] { persistenceData });
+            newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), [persistenceData]);
         }
 
         private void ProcessFilterPipes(int lineNum)
@@ -2933,9 +2934,9 @@ namespace LogExpert.Controls.LogWindow
             return new List<int>();
         }
 
-       /* ========================================================================
-        * Timestamp stuff
-        * =======================================================================*/
+        /* ========================================================================
+         * Timestamp stuff
+         * =======================================================================*/
 
         private void SetTimestampLimits()
         {

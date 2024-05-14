@@ -1,16 +1,16 @@
-﻿using System;
+﻿using LogExpert.Classes.xml;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-using LogExpert.Classes.xml;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
-using LogExpert.Interface;
-using NLog;
 
 namespace LogExpert.Classes.Log
 {
@@ -37,18 +37,21 @@ namespace LogExpert.Classes.Log
         private ReaderWriterLock _disposeLock;
         private EncodingOptions _encodingOptions;
         private long _fileLength;
-        private Thread _garbageCollectorThread;
+
+        private Task _garbageCollectorTask;
+        private Task _monitorTask;
+        private readonly CancellationTokenSource cts = new();
+
         private bool _isDeleted;
         private bool _isFailModeCheckCallPending;
         private bool _isFastFailOnGetLogLine;
         private bool _isLineCountDirty = true;
         private IList<ILogFileInfo> _logFileInfoList = new List<ILogFileInfo>();
         private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
-        private CancellationTokenSource _cancellationTokenSource;
 
         private ReaderWriterLock _lruCacheDictLock;
 
-        private Thread _monitorThread;
+
         private bool _shouldStop;
         private ILogFileInfo _watchedILogFileInfo;
 
@@ -335,8 +338,8 @@ namespace LogExpert.Classes.Log
                         _logger.Info("{0} does not exist", fileName);
                         lostILogFileInfoList.Add(logFileInfo);
 #if DEBUG // for better overview in logfile:
-//ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
-//ReplaceBufferInfos(ILogFileInfo, newILogFileInfo);
+                        //ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
+                        //ReplaceBufferInfos(ILogFileInfo, newILogFileInfo);
 #endif
                     }
                 }
@@ -412,7 +415,7 @@ namespace LogExpert.Classes.Log
         /// Get the text content of the given line number.
         /// The actual work is done in an async thread. This method waits for thread completion for only 1 second. If the async
         /// thread has not returned, the method will return <code>null</code>. This is because this method is also called from GUI thread
-        /// (e.g. LogWindow draw events). Under some circumstances, repeated calls to this method would lead the GUI to freeze. E.g. when 
+        /// (e.g. LogWindow draw events). Under some circumstances, repeated calls to this method would lead the GUI to freeze. E.g. when
         /// trying to re-load content from disk but the file was deleted. Especially on network shares.
         /// </summary>
         /// <remarks>
@@ -570,10 +573,10 @@ namespace LogExpert.Classes.Log
         public void StartMonitoring()
         {
             _logger.Info("startMonitoring()");
-            _monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
-            _monitorThread.IsBackground = true;
+            _monitorTask = Task.Run(MonitorThreadProc, cts.Token);
+            //_monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
+            //_monitorThread.IsBackground = true;
             _shouldStop = false;
-            _monitorThread.Start();
         }
 
         //public void StopMonitoring(CancellationToken cancellationToken)
@@ -590,34 +593,30 @@ namespace LogExpert.Classes.Log
 
             Thread.Sleep(_watchedILogFileInfo.PollInterval); // leave time for the threads to stop by themselves
 
-            if (_monitorThread != null)
+            if (_monitorTask != null)
             {
-                if (_monitorThread.IsAlive) // if thread has not finished, abort it
+                if (_monitorTask.Status == TaskStatus.Running) // if thread has not finished, abort it
                 {
-                    _monitorThread.Interrupt();
-                    _monitorThread.Abort();
-                    _monitorThread.Join();
+                    cts.Cancel();
                 }
             }
 
-            if (_garbageCollectorThread != null)
+            if (_garbageCollectorTask.IsCanceled == false)
             {
-                if (_garbageCollectorThread.IsAlive) // if thread has not finished, abort it
+                if (_garbageCollectorTask.Status == TaskStatus.Running) // if thread has not finished, abort it
                 {
-                    _garbageCollectorThread.Interrupt();
-                    _garbageCollectorThread.Abort();
-                    _garbageCollectorThread.Join();
+                    cts.Cancel();
                 }
             }
 
             //this.loadThread = null;
-            _monitorThread = null;
-            _garbageCollectorThread = null; // preventive call
+            //_monitorThread = null;
+            //_garbageCollectorThread = null; // preventive call
             CloseFiles();
         }
 
         /// <summary>
-        /// calls stopMonitoring() in a background thread and returns to the caller immediately. 
+        /// calls stopMonitoring() in a background thread and returns to the caller immediately.
         /// This is useful for a fast responding GUI (e.g. when closing a file tab)
         /// </summary>
         public void StopMonitoringAsync()
@@ -689,7 +688,7 @@ namespace LogExpert.Classes.Log
         }
 
         /// <summary>
-        /// For unit tests only 
+        /// For unit tests only
         /// </summary>
         /// <returns></returns>
         public IList<LogBuffer> GetBufferList()
@@ -828,9 +827,10 @@ namespace LogExpert.Classes.Log
 
         private void StartGCThread()
         {
-            _garbageCollectorThread = new Thread(new ThreadStart(GarbageCollectorThreadProc));
-            _garbageCollectorThread.IsBackground = true;
-            _garbageCollectorThread.Start();
+            _garbageCollectorTask = Task.Run(GarbageCollectorThreadProc, cts.Token);
+            //_garbageCollectorThread = new Thread(new ThreadStart(GarbageCollectorThreadProc));
+            //_garbageCollectorThread.IsBackground = true;
+            //_garbageCollectorThread.Start();
         }
 
         private void ResetBufferCache()
@@ -1284,7 +1284,7 @@ namespace LogExpert.Classes.Log
         //  {
         //    this.bufferLru.RemoveAt(index);
         //    this.lruDict.Remove(buffer.StartLine);
-        //    // adjust indizes, they have changed because of the remove 
+        //    // adjust indizes, they have changed because of the remove
         //    for (int i = index; i < this.bufferLru.Count; ++i)
         //    {
         //      this.lruDict[this.bufferLru[i].StartLine] = this.lruDict[this.bufferLru[i].StartLine] - 1;
@@ -1448,7 +1448,7 @@ namespace LogExpert.Classes.Log
         private void GetLineFinishedCallback(IAsyncResult res)
         {
             _isFailModeCheckCallPending = false;
-            GetLogLineFx logLineFx = (GetLogLineFx) res.AsyncState;
+            GetLogLineFx logLineFx = (GetLogLineFx)res.AsyncState;
             ILogLine line = logLineFx.EndInvoke(res);
             if (line != null)
             {

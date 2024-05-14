@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
-using LogExpert.Classes;
+﻿using LogExpert.Classes;
 using LogExpert.Classes.Bookmark;
 using LogExpert.Classes.Filter;
 using LogExpert.Classes.Highlight;
@@ -15,7 +10,16 @@ using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
 using LogExpert.Interface;
+
 using NLog;
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Controls.LogWindow
@@ -53,7 +57,8 @@ namespace LogExpert.Controls.LogWindow
         private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
 
         private readonly List<LogEventArgs> _logEventArgsList = [];
-        private readonly Thread _logEventHandlerThread;
+        private readonly Task _logEventHandlerTask;
+        //private readonly Thread _logEventHandlerThread;
         private readonly Image _panelCloseButtonImage;
 
         private readonly Image _panelOpenButtonImage;
@@ -68,7 +73,10 @@ namespace LogExpert.Controls.LogWindow
         private readonly DelayedTrigger _statusLineTrigger = new(200);
         private readonly object _tempHighlightEntryListLock = new();
 
-        private readonly Thread _timeShiftSyncThread;
+        private readonly Task _timeShiftSyncTask;
+        private readonly CancellationTokenSource cts = new();
+
+        //private readonly Thread _timeShiftSyncThread;
         private readonly EventWaitHandle _timeShiftSyncTimerEvent = new ManualResetEvent(false);
         private readonly EventWaitHandle _timeShiftSyncWakeupEvent = new ManualResetEvent(false);
 
@@ -189,9 +197,9 @@ namespace LogExpert.Controls.LogWindow
                 filterComboBox.Items.Add(item);
             }
 
-            filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;            
+            filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.preferences.maximumFilterEntriesDisplayed;
             AutoResizeFilterBox();
-            
+
             filterRegexCheckBox.Checked = _filterParams.isRegex;
             filterCaseSensitiveCheckBox.Checked = _filterParams.isCaseSensitive;
             filterTailCheckBox.Checked = _filterParams.isFilterTail;
@@ -199,13 +207,17 @@ namespace LogExpert.Controls.LogWindow
             splitContainerLogWindow.Panel2Collapsed = true;
             advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
-            _timeShiftSyncThread = new Thread(SyncTimestampDisplayWorker);
-            _timeShiftSyncThread.IsBackground = true;
-            _timeShiftSyncThread.Start();
+            _timeShiftSyncTask = new Task(SyncTimestampDisplayWorker, cts.Token);
+            _timeShiftSyncTask.Start();
+            //_timeShiftSyncThread = new Thread(SyncTimestampDisplayWorker);
+            //_timeShiftSyncThread.IsBackground = true;
+            //_timeShiftSyncThread.Start();
 
-            _logEventHandlerThread = new Thread(LogEventWorker);
-            _logEventHandlerThread.IsBackground = true;
-            _logEventHandlerThread.Start();
+            _logEventHandlerTask = new Task(LogEventWorker, cts.Token);
+            _logEventHandlerTask.Start();
+            //_logEventHandlerThread = new Thread(LogEventWorker);
+            //_logEventHandlerThread.IsBackground = true;
+            //_logEventHandlerThread.Start();
 
             //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
             //this.filterUpdateThread.Start();
@@ -221,7 +233,8 @@ namespace LogExpert.Controls.LogWindow
             _panelCloseButtonImage = Properties.Resources.PanelClose;
 
             Settings settings = ConfigManager.Settings;
-            if (settings.appBounds != null && settings.appBounds.Right > 0)
+
+            if (settings.appBounds.Right > 0)
             {
                 Bounds = settings.appBounds;
             }

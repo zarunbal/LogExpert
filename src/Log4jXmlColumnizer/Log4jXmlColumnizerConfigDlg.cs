@@ -27,9 +27,9 @@ namespace LogExpert
 
         private void FillListBox()
         {
-            DataGridViewCheckBoxColumn checkColumn = (DataGridViewCheckBoxColumn) columnGridView.Columns[0];
-            DataGridViewTextBoxColumn nameColumn = (DataGridViewTextBoxColumn) columnGridView.Columns[1];
-            DataGridViewTextBoxColumn lenColumn = (DataGridViewTextBoxColumn) columnGridView.Columns[2];
+            DataGridViewCheckBoxColumn checkColumn = (DataGridViewCheckBoxColumn)columnGridView.Columns[0];
+            DataGridViewTextBoxColumn nameColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[1];
+            DataGridViewTextBoxColumn lenColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[2];
 
             foreach (Log4jColumnEntry entry in _config.columnList)
             {
@@ -48,7 +48,7 @@ namespace LogExpert
 
         #region Events handler
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OkButton_Click(object sender, EventArgs e)
         {
             //  for (int i = 0; i < this.config.columnList.Count; ++i)
             //  {
@@ -56,8 +56,8 @@ namespace LogExpert
             //  }
             for (int i = 0; i < columnGridView.Rows.Count; ++i)
             {
-                _config.columnList[i].visible = (bool) columnGridView.Rows[i].Cells[0].Value;
-                string sLen = (string) columnGridView.Rows[i].Cells[2].Value;
+                _config.columnList[i].visible = (bool)columnGridView.Rows[i].Cells[0].Value;
+                string sLen = (string)columnGridView.Rows[i].Cells[2].Value;
                 int len;
                 if (int.TryParse(sLen, out len))
                 {
