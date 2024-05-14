@@ -1,8 +1,10 @@
-﻿using System;
+﻿using LogExpert.Classes.ILogLineColumnizerCallback;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using LogExpert.Classes.ILogLineColumnizerCallback;
-using NLog;
 
 namespace LogExpert.Classes.Filter
 {
@@ -112,7 +114,7 @@ namespace LogExpert.Classes.Filter
             IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
 
             filterResultLines.AddRange(filterResult);
-            
+
             lastFilterLinesList.AddRange(filterResult);
 
             if (lastFilterLinesList.Count > SPREAD_MAX * 2)
@@ -123,9 +125,9 @@ namespace LogExpert.Classes.Filter
 
 
         /// <summary>
-        ///  Returns a list with 'additional filter results'. This is the given line number 
+        ///  Returns a list with 'additional filter results'. This is the given line number
         ///  and (if back spread and/or fore spread is enabled) some additional lines.
-        ///  This function doesn't check the filter condition! 
+        ///  This function doesn't check the filter condition!
         /// </summary>
         /// <param name="filterParams"></param>
         /// <param name="lineNum"></param>

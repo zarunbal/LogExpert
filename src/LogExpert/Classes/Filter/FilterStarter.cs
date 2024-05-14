@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LogExpert.Classes.ILogLineColumnizerCallback;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
-using LogExpert.Classes.ILogLineColumnizerCallback;
-using NLog;
 
 namespace LogExpert.Classes.Filter
 {
@@ -22,8 +23,7 @@ namespace LogExpert.Classes.Filter
         private readonly SortedDictionary<int, int> _filterResultDict;
 
         private readonly List<Filter> _filterWorkerList;
-        private readonly List<Task<Filter>> _filterWorkerTaskList;
-        
+
         private readonly SortedDictionary<int, int> _lastFilterLinesDict;
 
         private ProgressCallback _progressCallback;
@@ -103,12 +103,8 @@ namespace LogExpert.Classes.Filter
                 }
                 _logger.Info("FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
 
-                WorkerFxFunc = DoWork;
-                _filterTask = Task.Run(() => WorkerFxFunc(filterParams, workStartLine, interval, ThreadProgressCallback));
-
-                Filter result = await _filterTask;
+                await Task.Run(() => DoWork(filterParams, workStartLine, interval, ThreadProgressCallback)).ContinueWith(FilterDoneCallback);
                 workStartLine += interval;
-                FilterDoneCallback();
             }
 
             WaitHandle[] handles = [.. handleList];
@@ -169,7 +165,7 @@ namespace LogExpert.Classes.Filter
 
             _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
             _logger.Info("Filter worker [{0}] for line {1} has completed.", Thread.CurrentThread.ManagedThreadId, startLine);
-            
+
             lock (_filterReadyList)
             {
                 _filterReadyList.Add(filter);
@@ -178,12 +174,12 @@ namespace LogExpert.Classes.Filter
             return filter;
         }
 
-        private void FilterDoneCallback()
+        private void FilterDoneCallback(Task<Filter> filterTask)
         {
-            if (_filterTask.IsCompleted)
+            if (filterTask.IsCompleted)
             {
-                Filter filter = _filterTask.Result;
-               
+                Filter filter = filterTask.Result;
+
                 lock (_filterReadyList)
                 {
                     _filterReadyList.Add(filter);
@@ -225,7 +221,5 @@ namespace LogExpert.Classes.Filter
         }
 
         #endregion
-
-        private Func<FilterParams, int, int, ProgressCallback, Filter> WorkerFxFunc;
     }
 }

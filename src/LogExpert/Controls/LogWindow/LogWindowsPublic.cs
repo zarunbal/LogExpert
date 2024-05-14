@@ -159,7 +159,7 @@ namespace LogExpert.Controls.LogWindow
             _logFileReader.UseNewReader = !Preferences.useLegacyReader;
             RegisterLogFileReaderEvents();
             _logFileReader.StartMonitoring();
-            FileName = fileNames[fileNames.Length - 1];
+            FileName = fileNames[^1];
             _fileNames = fileNames;
             IsMultiFile = true;
             //if (this.isTempFile)
@@ -373,7 +373,7 @@ namespace LogExpert.Controls.LogWindow
 
                     if (columnIndex == 2)
                     {
-                        return cols.ColumnValues[cols.ColumnValues.Length - 1];
+                        return cols.ColumnValues[^1];
                     }
 
                     return Column.EmptyColumn;
@@ -607,15 +607,13 @@ namespace LogExpert.Controls.LogWindow
             _progressEventArgs.Visible = true;
             SendProgressBarUpdate();
 
-            SearchFx searchFx = Search;
-            Task.Run(() => searchFx).ContinueWith(SearchComplete, null);
-            //searchFx.BeginInvoke(searchParams, SearchComplete, null);
+            Task.Run(() => Search(searchParams)).ContinueWith(SearchComplete);
 
             RemoveAllSearchHighlightEntries();
             AddSearchHitHighlightEntry(searchParams);
         }
 
-        private void SearchComplete(Task<SearchFx> task, object arg2)
+        private void SearchComplete(Task<int> task)
         {
             if (Disposing)
             {
@@ -625,8 +623,7 @@ namespace LogExpert.Controls.LogWindow
             try
             {
                 Invoke(new MethodInvoker(ResetProgressBar));
-                SearchFx fx = task.Result;
-                int line = fx.EndInvoke(task);
+                int line = task.Result;
                 _guiStateArgs.MenuEnabled = true;
                 GuiStateUpdate(this, _guiStateArgs);
                 if (line == -1)
@@ -640,36 +637,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 _logger.Warn(ex);
             }
-            throw new NotImplementedException();
         }
-
-        //private void SearchComplete(IAsyncResult result)
-        //{
-        //    if (Disposing)
-        //    {
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        Invoke(new MethodInvoker(ResetProgressBar));
-        //        AsyncLocal ar = (AsyncResult)result;
-        //        SearchFx fx = (SearchFx)ar.AsyncDelegate;
-        //        int line = fx.EndInvoke(result);
-        //        _guiStateArgs.MenuEnabled = true;
-        //        GuiStateUpdate(this, _guiStateArgs);
-        //        if (line == -1)
-        //        {
-        //            return;
-        //        }
-
-        //        dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
-        //    }
-        //    catch (Exception ex) // in the case the windows is already destroyed
-        //    {
-        //        _logger.Warn(ex);
-        //    }
-        //}
 
         public void SelectLogLine(int line)
         {
@@ -1627,7 +1595,7 @@ namespace LogExpert.Controls.LogWindow
                 }
                 lineNumList.Sort();
                 patternArgs.startLine = lineNumList[0];
-                patternArgs.endLine = lineNumList[lineNumList.Count - 1];
+                patternArgs.endLine = lineNumList[^1];
             }
             else
             {

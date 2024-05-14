@@ -517,8 +517,6 @@ namespace LogExpert.Controls.LogWindow
 
         private delegate void LoadingStartedFx(LoadFileEventArgs e);
 
-        private delegate int SearchFx(SearchParams searchParams);
-
         private delegate void SelectLineFx(int line, bool triggerSyncCall);
 
         private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;

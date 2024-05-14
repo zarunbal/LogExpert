@@ -333,7 +333,7 @@ namespace LogExpert.Classes
                     {
                         lineDiffSum += lineDiff;
                         newDiffList.Add(new SpreadEntry(lineNum, lineDiff, searchTimeStamp));
-                        
+
                         if (lineDiff < minDiff)
                         {
                             minDiff = lineDiff;
@@ -359,7 +359,7 @@ namespace LogExpert.Classes
                 _average = lineDiffSum / (double)loopCount;
                 //double average = maxList[maxList.Count / 2];
                 _logger.Debug("Average diff={0} minDiff={1} maxDiff={2}", _average, minDiff, _maxDiff);
-                
+
                 lock (_diffListLock)
                 {
                     if (newDiffList.Count > 0)
@@ -390,7 +390,7 @@ namespace LogExpert.Classes
                 {
                     TimeSpan span = entry.Timestamp - oldTime;
                     double diffFromAverage = (int)(span.Ticks / TimeSpan.TicksPerMillisecond) - timePerLine;
-                    
+
                     if (diffFromAverage < 0)
                     {
                         diffFromAverage = 0;
@@ -436,7 +436,7 @@ namespace LogExpert.Classes
         {
             #region Fields
 
-            public int Diff { get ; set; }
+            public int Diff { get; set; }
 
             public DateTime Timestamp { get; set; }
 
