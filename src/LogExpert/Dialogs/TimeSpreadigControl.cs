@@ -181,7 +181,7 @@ namespace LogExpert.Dialogs
                     for (int i = 0; i < list.Count; i += step)
                     {
                         TimeSpreadCalculator.SpreadEntry entry = list[i];
-                        int color = ReverseAlpha ? entry.value : 255 - entry.value;
+                        int color = ReverseAlpha ? entry.Value : 255 - entry.Value;
                         if (color > 255)
                         {
                             color = 255;
@@ -257,7 +257,7 @@ namespace LogExpert.Dialogs
                 {
                     return;
                 }
-                OnLineSelected(new SelectLineEventArgs(entry.lineNum));
+                OnLineSelected(new SelectLineEventArgs(entry.LineNum));
             }
         }
 
@@ -290,8 +290,8 @@ namespace LogExpert.Dialogs
                 return;
             }
             _lastMouseY = e.Y;
-            string dts = entry.timestamp.ToString("dd.MM.yyyy HH:mm:ss");
-            _toolTip.SetToolTip(this, "Line " + (entry.lineNum + 1) + "\n" + dts);
+            string dts = entry.Timestamp.ToString("dd.MM.yyyy HH:mm:ss");
+            _toolTip.SetToolTip(this, "Line " + (entry.LineNum + 1) + "\n" + dts);
         }
 
         #endregion

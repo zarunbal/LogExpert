@@ -71,19 +71,23 @@ namespace LogExpert.Classes.Filter
                     {
                         return count;
                     }
+
                     ILogLine line = _callback.GetLogLine(lineNum);
                     if (line == null)
                     {
                         return count;
                     }
+
                     _callback.LineNum = lineNum;
                     if (Util.TestFilterCondition(filterParams, line, _callback))
                     {
                         AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList,
                             filterHitList);
                     }
+
                     lineNum++;
                     callbackCounter++;
+
                     if (lineNum % PROGRESS_BAR_MODULO == 0)
                     {
                         progressCallback(callbackCounter);
@@ -98,17 +102,19 @@ namespace LogExpert.Classes.Filter
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");
             }
+
             return count;
         }
 
         private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
         {
-            int count;
             filterHitList.Add(lineNum);
             IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+
             filterResultLines.AddRange(filterResult);
-            count = filterResultLines.Count;
+            
             lastFilterLinesList.AddRange(filterResult);
+
             if (lastFilterLinesList.Count > SPREAD_MAX * 2)
             {
                 lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
@@ -127,7 +133,7 @@ namespace LogExpert.Classes.Filter
         /// <returns></returns>
         private IList<int> GetAdditionalFilterResults(FilterParams filterParams, int lineNum, IList<int> checkList)
         {
-            IList<int> resultList = new List<int>();
+            IList<int> resultList = [];
 
             if (filterParams.spreadBefore == 0 && filterParams.spreadBehind == 0)
             {

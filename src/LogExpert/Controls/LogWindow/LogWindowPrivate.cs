@@ -1949,7 +1949,7 @@ namespace LogExpert.Controls.LogWindow
             FilterSearch(filterComboBox.Text);
         }
 
-        private void FilterSearch(string text)
+        private async void FilterSearch(string text)
         {
             FireCancelHandlers(); // make sure that there's no other filter running (maybe from filter restore)
 
@@ -2030,8 +2030,16 @@ namespace LogExpert.Controls.LogWindow
             SendProgressBarUpdate();
 
             Settings settings = ConfigManager.Settings;
-            FilterFx fx = settings.preferences.multiThreadFilter ? MultiThreadedFilter : new FilterFx(Filter);
-            Task.Run(() => fx.Invoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList));
+
+            //FilterFx fx = settings.preferences.multiThreadFilter ? MultiThreadedFilter : new FilterFx(Filter);
+            FilterFxAction = settings.preferences.multiThreadFilter ? MultiThreadedFilter : Filter;
+
+            //Task.Run(() => fx.Invoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList));
+            Task filterFxActionTask = Task.Run(() => Filter(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList));
+
+            await filterFxActionTask;
+            FilterComplete();
+
             //fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
             CheckForFilterDirty();
         }
@@ -2302,6 +2310,14 @@ namespace LogExpert.Controls.LogWindow
             }
 
             SendProgressBarUpdate();
+        }
+
+        private void FilterComplete()
+        {
+            if (!IsDisposed && !_waitingForClose && !Disposing)
+            {
+                Invoke(new MethodInvoker(ResetStatusAfterFilter));
+            }
         }
 
         private void FilterComplete(IAsyncResult result)

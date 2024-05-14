@@ -139,6 +139,7 @@ namespace LogExpert.Classes.Log
 
         public delegate void FinishedLoadingEventHandler(object sender, EventArgs e);
 
+        private Func<int, ILogLine> GetLogLineFxFunc;
         private delegate ILogLine GetLogLineFx(int lineNum);
 
         public delegate void LoadingStartedEventHandler(object sender, LoadFileEventArgs e);

@@ -521,7 +521,8 @@ namespace LogExpert.Controls.LogWindow
 
         private delegate void SelectLineFx(int line, bool triggerSyncCall);
 
-        private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
+        private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;
+        //private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
         private delegate void UpdateProgressBarFx(int lineNum);
 

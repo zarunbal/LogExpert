@@ -262,7 +262,7 @@ namespace LogExpert.Classes
                 if (maxList.Count > 3)
                 {
                     maxList.Sort();
-                    _maxSpan = maxList[maxList.Count - 3];
+                    _maxSpan = maxList[^3];
                 }
                 lock (_diffListLock)
                 {
@@ -275,6 +275,7 @@ namespace LogExpert.Classes
             }
         }
 
+        //TODO Refactor this method
         private async Task DoCalc_via_Time()
         {
             OnStartCalc(EventArgs.Empty);
@@ -332,10 +333,12 @@ namespace LogExpert.Classes
                     {
                         lineDiffSum += lineDiff;
                         newDiffList.Add(new SpreadEntry(lineNum, lineDiff, searchTimeStamp));
+                        
                         if (lineDiff < minDiff)
                         {
                             minDiff = lineDiff;
                         }
+
                         if (lineDiff > _maxDiff)
                         {
                             _maxDiff = lineDiff;
@@ -343,6 +346,7 @@ namespace LogExpert.Classes
                         maxList.Add(lineDiff);
                         loopCount++;
                     }
+
                     searchTimeStamp = searchTimeStamp.AddMilliseconds(step);
                     oldLineNum = lineNum;
                     //lineNum++;
@@ -350,21 +354,24 @@ namespace LogExpert.Classes
                 if (maxList.Count > 3)
                 {
                     maxList.Sort();
-                    _maxDiff = maxList[maxList.Count - 3];
+                    _maxDiff = maxList[^3];
                 }
                 _average = lineDiffSum / (double)loopCount;
                 //double average = maxList[maxList.Count / 2];
                 _logger.Debug("Average diff={0} minDiff={1} maxDiff={2}", _average, minDiff, _maxDiff);
+                
                 lock (_diffListLock)
                 {
                     if (newDiffList.Count > 0)
                     {
                         newDiffList.RemoveAt(0);
                     }
+
                     if (newDiffList.Count > 0)
                     {
                         newDiffList.RemoveAt(0);
                     }
+
                     DiffList = newDiffList;
                     CalcValuesViaTime(_maxDiff, _average);
                     OnCalcDone(EventArgs.Empty);
@@ -378,19 +385,20 @@ namespace LogExpert.Classes
             DateTime oldTime = DateTime.MinValue;
             if (DiffList.Count > 0)
             {
-                oldTime = DiffList[0].timestamp;
+                oldTime = DiffList[0].Timestamp;
                 foreach (SpreadEntry entry in DiffList)
                 {
-                    TimeSpan span = entry.timestamp - oldTime;
+                    TimeSpan span = entry.Timestamp - oldTime;
                     double diffFromAverage = (int)(span.Ticks / TimeSpan.TicksPerMillisecond) - timePerLine;
+                    
                     if (diffFromAverage < 0)
                     {
                         diffFromAverage = 0;
                     }
-                    int value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond)
-                                       * _contrast);
-                    entry.value = 255 - value;
-                    oldTime = entry.timestamp;
+
+                    int value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond) * _contrast);
+                    entry.Value = 255 - value;
+                    oldTime = entry.Timestamp;
                 }
             }
             return oldTime;
@@ -400,15 +408,15 @@ namespace LogExpert.Classes
         {
             foreach (SpreadEntry entry in DiffList)
             {
-                int lineDiff = entry.diff;
-                double diffFromAverage = entry.diff - average;
+                int lineDiff = entry.Diff;
+                double diffFromAverage = entry.Diff - average;
                 if (diffFromAverage < 0)
                 {
                     diffFromAverage = 0;
                 }
                 int value = (int)(diffFromAverage / maxDiff * _contrast);
-                entry.value = 255 - value;
-                _logger.Debug("TimeSpreadCalculator.DoCalc() test time {0:HH:mm:ss.fff} line diff={1} value={2}", entry.timestamp, lineDiff, value);
+                entry.Value = 255 - value;
+                _logger.Debug("TimeSpreadCalculator.DoCalc() test time {0:HH:mm:ss.fff} line diff={1} value={2}", entry.Timestamp, lineDiff, value);
             }
         }
 
@@ -428,10 +436,13 @@ namespace LogExpert.Classes
         {
             #region Fields
 
-            public int diff;
-            public int lineNum;
-            public DateTime timestamp;
-            public int value;
+            public int Diff { get ; set; }
+
+            public DateTime Timestamp { get; set; }
+
+            public int LineNum { get; set; }
+
+            public int Value { get; set; }
 
             #endregion
 
@@ -439,9 +450,9 @@ namespace LogExpert.Classes
 
             public SpreadEntry(int lineNum, int diff, DateTime timestamp)
             {
-                this.lineNum = lineNum;
-                this.diff = diff;
-                this.timestamp = timestamp;
+                LineNum = lineNum;
+                Diff = diff;
+                Timestamp = timestamp;
             }
 
             #endregion
