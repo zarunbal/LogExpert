@@ -46,7 +46,7 @@ namespace LogExpert.Classes.Log
         private bool _isFailModeCheckCallPending;
         private bool _isFastFailOnGetLogLine;
         private bool _isLineCountDirty = true;
-        private IList<ILogFileInfo> _logFileInfoList = new List<ILogFileInfo>();
+        private IList<ILogFileInfo> _logFileInfoList = [];
         private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
 
         private ReaderWriterLock _lruCacheDictLock;
@@ -259,6 +259,7 @@ namespace LogExpert.Classes.Log
                 LineCount = LineCount,
                 FileSize = FileSize
             };
+
             OnFileSizeChanged(args);
         }
 
@@ -274,8 +275,7 @@ namespace LogExpert.Classes.Log
             _isLineCountDirty = true;
             lock (_monitor)
             {
-                RolloverFilenameHandler rolloverHandler =
-                    new(_watchedILogFileInfo, _multiFileOptions);
+                RolloverFilenameHandler rolloverHandler = new(_watchedILogFileInfo, _multiFileOptions);
                 LinkedList<string> fileNameList = rolloverHandler.GetNameList();
 
                 ResetBufferCache();
@@ -435,13 +435,13 @@ namespace LogExpert.Classes.Log
 
             if (!_isFastFailOnGetLogLine)
             {
-                Task.Run(async () =>
+                var task = Task.Run(() => _logLineFx(lineNum));
+                if (task.Wait(WAIT_TIME))
                 {
-                    result = await Task.Run(() => _logLineFx(lineNum));
+                    result = task.Result;
                     _isFastFailOnGetLogLine = false;
-                }).Wait(WAIT_TIME);
-
-                if (result == null)
+                }
+                else
                 {
                     _isFastFailOnGetLogLine = true;
                     _logger.Debug("No result after {0}ms. Returning <null>.", WAIT_TIME);
@@ -453,7 +453,7 @@ namespace LogExpert.Classes.Log
                 if (!_isFailModeCheckCallPending)
                 {
                     _isFailModeCheckCallPending = true;
-                    IAsyncResult asyncResult = _logLineFx.BeginInvoke(lineNum, GetLineFinishedCallback, _logLineFx);
+                    _logLineFx.BeginInvoke(lineNum, GetLineFinishedCallback, _logLineFx);
                 }
             }
 
@@ -575,17 +575,8 @@ namespace LogExpert.Classes.Log
         {
             _logger.Info("startMonitoring()");
             _monitorTask = Task.Run(MonitorThreadProc, cts.Token);
-            //_monitorThread = new Thread(new ThreadStart(MonitorThreadProc));
-            //_monitorThread.IsBackground = true;
             _shouldStop = false;
         }
-
-        //public void StopMonitoring(CancellationToken cancellationToken)
-        //{
-        //    _logger.Info("stopMonitoring()");
-        //    _shouldStop = true;
-        //    _cancellationTokenSource = cancellationToken;
-        //}
 
         public void StopMonitoring()
         {
@@ -817,7 +808,7 @@ namespace LogExpert.Classes.Log
 
         private void InitLruBuffers()
         {
-            _bufferList = new List<LogBuffer>();
+            _bufferList = [];
             _bufferLru = new List<LogBuffer>(_MAX_BUFFERS + 1);
             //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
             _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(_MAX_BUFFERS + 1);
@@ -858,19 +849,9 @@ namespace LogExpert.Classes.Log
 
         private ILogFileInfo GetLogFileInfo(string fileNameOrUri)
         {
-            IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(fileNameOrUri);
-            if (fs == null)
-            {
-                throw new LogFileException("No file system plugin found for " + fileNameOrUri);
-            }
-
+            IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(fileNameOrUri) ?? throw new LogFileException("No file system plugin found for " + fileNameOrUri);
             ILogFileInfo logFileInfo = fs.GetLogfileInfo(fileNameOrUri);
-            if (logFileInfo == null)
-            {
-                throw new LogFileException("Cannot find " + fileNameOrUri);
-            }
-
-            return logFileInfo;
+            return logFileInfo ?? throw new LogFileException("Cannot find " + fileNameOrUri);
         }
 
         private void ReplaceBufferInfos(ILogFileInfo oldLogFileInfo, ILogFileInfo newLogFileInfo)
@@ -893,7 +874,7 @@ namespace LogExpert.Classes.Log
         {
             _logger.Info("Deleting buffers for file {0}", ILogFileInfo.FullName);
             LogBuffer lastRemovedBuffer = null;
-            IList<LogBuffer> deleteList = new List<LogBuffer>();
+            IList<LogBuffer> deleteList = [];
             AcquireBufferListWriterLock();
             _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
             if (matchNamesOnly)
@@ -954,115 +935,111 @@ namespace LogExpert.Classes.Log
         {
             try
             {
-                using (Stream fileStream = logFileInfo.OpenStream())
+                using Stream fileStream = logFileInfo.OpenStream();
+                try
                 {
-                    try
+                    using ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                    reader.Position = filePos;
+                    _fileLength = logFileInfo.Length;
+
+                    int lineNum = startLine;
+                    LogBuffer logBuffer;
+                    AcquireBufferListReaderLock();
+                    if (_bufferList.Count == 0)
                     {
-                        using (ILogStreamReader reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader))
+                        logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
+                        logBuffer.StartLine = startLine;
+                        logBuffer.StartPos = filePos;
+                        LockCookie cookie = UpgradeBufferListLockToWriter();
+                        AddBufferToList(logBuffer);
+                        DowngradeBufferListLockFromWriter(ref cookie);
+                    }
+                    else
+                    {
+                        logBuffer = _bufferList[_bufferList.Count - 1];
+
+                        if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName))
                         {
-                            reader.Position = filePos;
-                            _fileLength = logFileInfo.Length;
-
-                            int lineNum = startLine;
-                            LogBuffer logBuffer;
-                            AcquireBufferListReaderLock();
-                            if (_bufferList.Count == 0)
-                            {
-                                logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
-                                logBuffer.StartLine = startLine;
-                                logBuffer.StartPos = filePos;
-                                LockCookie cookie = UpgradeBufferListLockToWriter();
-                                AddBufferToList(logBuffer);
-                                DowngradeBufferListLockFromWriter(ref cookie);
-                            }
-                            else
-                            {
-                                logBuffer = _bufferList[_bufferList.Count - 1];
-
-                                if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName))
-                                {
-                                    logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
-                                    logBuffer.StartLine = startLine;
-                                    logBuffer.StartPos = filePos;
-                                    LockCookie cookie = UpgradeBufferListLockToWriter();
-                                    AddBufferToList(logBuffer);
-                                    DowngradeBufferListLockFromWriter(ref cookie);
-                                }
-
-                                _disposeLock.AcquireReaderLock(Timeout.Infinite);
-                                if (logBuffer.IsDisposed)
-                                {
-                                    LockCookie cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
-                                    ReReadBuffer(logBuffer);
-                                    _disposeLock.DowngradeFromWriterLock(ref cookie);
-                                }
-
-                                _disposeLock.ReleaseReaderLock();
-                            }
-
-                            Monitor.Enter(logBuffer); // Lock the buffer
-                            ReleaseBufferListReaderLock();
-                            int lineCount = logBuffer.LineCount;
-                            int droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
-                            filePos = reader.Position;
-
-                            while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
-                            {
-                                LogLine logLine = new();
-                                if (_shouldStop)
-                                {
-                                    Monitor.Exit(logBuffer);
-                                    return;
-                                }
-
-                                if (line == null)
-                                {
-                                    logBuffer.DroppedLinesCount += 1;
-                                    droppedLines++;
-                                    continue;
-                                }
-
-                                lineCount++;
-                                if (lineCount > _MAX_LINES_PER_BUFFER && reader.IsBufferComplete)
-                                {
-                                    OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
-
-                                    Monitor.Exit(logBuffer);
-                                    logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
-                                    Monitor.Enter(logBuffer);
-                                    logBuffer.StartLine = lineNum;
-                                    logBuffer.StartPos = filePos;
-                                    logBuffer.PrevBuffersDroppedLinesSum = droppedLines;
-                                    AcquireBufferListWriterLock();
-                                    AddBufferToList(logBuffer);
-                                    ReleaseBufferListWriterLock();
-                                    lineCount = 1;
-                                }
-
-                                logLine.FullLine = line;
-                                logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
-
-                                logBuffer.AddLine(logLine, filePos);
-                                filePos = reader.Position;
-                                lineNum++;
-                            }
-
-                            logBuffer.Size = filePos - logBuffer.StartPos;
-                            Monitor.Exit(logBuffer);
-                            _isLineCountDirty = true;
-                            FileSize = reader.Position;
-                            CurrentEncoding = reader.Encoding; // Reader may have detected another encoding
-                            if (!_shouldStop)
-                            {
-                                OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, true, _fileLength, false));
-                                // Fire "Ready" Event
-                            }
+                            logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
+                            logBuffer.StartLine = startLine;
+                            logBuffer.StartPos = filePos;
+                            LockCookie cookie = UpgradeBufferListLockToWriter();
+                            AddBufferToList(logBuffer);
+                            DowngradeBufferListLockFromWriter(ref cookie);
                         }
+
+                        _disposeLock.AcquireReaderLock(Timeout.Infinite);
+                        if (logBuffer.IsDisposed)
+                        {
+                            LockCookie cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                            ReReadBuffer(logBuffer);
+                            _disposeLock.DowngradeFromWriterLock(ref cookie);
+                        }
+
+                        _disposeLock.ReleaseReaderLock();
                     }
-                    catch (IOException ioex)
+
+                    Monitor.Enter(logBuffer); // Lock the buffer
+                    ReleaseBufferListReaderLock();
+                    int lineCount = logBuffer.LineCount;
+                    int droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
+                    filePos = reader.Position;
+
+                    while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
                     {
-                        _logger.Warn(ioex);
+                        LogLine logLine = new();
+                        if (_shouldStop)
+                        {
+                            Monitor.Exit(logBuffer);
+                            return;
+                        }
+
+                        if (line == null)
+                        {
+                            logBuffer.DroppedLinesCount += 1;
+                            droppedLines++;
+                            continue;
+                        }
+
+                        lineCount++;
+                        if (lineCount > _MAX_LINES_PER_BUFFER && reader.IsBufferComplete)
+                        {
+                            OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
+
+                            Monitor.Exit(logBuffer);
+                            logBuffer = new LogBuffer(logFileInfo, _MAX_LINES_PER_BUFFER);
+                            Monitor.Enter(logBuffer);
+                            logBuffer.StartLine = lineNum;
+                            logBuffer.StartPos = filePos;
+                            logBuffer.PrevBuffersDroppedLinesSum = droppedLines;
+                            AcquireBufferListWriterLock();
+                            AddBufferToList(logBuffer);
+                            ReleaseBufferListWriterLock();
+                            lineCount = 1;
+                        }
+
+                        logLine.FullLine = line;
+                        logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
+
+                        logBuffer.AddLine(logLine, filePos);
+                        filePos = reader.Position;
+                        lineNum++;
                     }
+
+                    logBuffer.Size = filePos - logBuffer.StartPos;
+                    Monitor.Exit(logBuffer);
+                    _isLineCountDirty = true;
+                    FileSize = reader.Position;
+                    CurrentEncoding = reader.Encoding; // Reader may have detected another encoding
+                    if (!_shouldStop)
+                    {
+                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, true, _fileLength, false));
+                        // Fire "Ready" Event
+                    }
+                }
+                catch (IOException ioex)
+                {
+                    _logger.Warn(ioex);
                 }
             }
             catch (IOException fe)
@@ -1357,6 +1334,7 @@ namespace LogExpert.Classes.Log
                     int lineCount = 0;
                     int dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                     logBuffer.ClearLines();
+
                     while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out string line))
                     {
                         if (lineCount >= maxLinesCount)
@@ -1370,10 +1348,11 @@ namespace LogExpert.Classes.Log
                             continue;
                         }
 
-                        LogLine logLine = new();
-
-                        logLine.FullLine = line;
-                        logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
+                        LogLine logLine = new()
+                        {
+                            FullLine = line,
+                            LineNumber = logBuffer.StartLine + logBuffer.LineCount
+                        };
 
                         logBuffer.AddLine(logLine, filePos);
                         filePos = reader.Position;
