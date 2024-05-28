@@ -77,9 +77,10 @@
     <Content Include="Resources\Pro_Filter.bmp" />
   </ItemGroup>
   <ItemGroup>
-  <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
-  <PackageReference Include="Google.Protobuf" Version="3.25.3" />
-  <PackageReference Include="Grpc.Tools" Version="2.61.0" PrivateAssets="All" />
+  <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
+  <PackageReference Include="Google.Protobuf" Version="3.27.0" />
+  <PackageReference Include="Grpc.Core" Version="2.46.6" />
+  <PackageReference Include="Grpc.Tools" Version="2.64.0" PrivateAssets="All" />
   <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
 </ItemGroup>
   <ItemGroup>
@@ -94,6 +95,6 @@
   <PropertyGroup />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.2.8" />
+    <PackageReference Include="NLog" Version="5.3.2" />
   </ItemGroup>
 </Project>

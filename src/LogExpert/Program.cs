@@ -1,25 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Threading;
-//using System.Runtime.Remoting.Channels.Ipc;
-//using System.Runtime.Remoting.Channels;
-//using System.Runtime.Remoting;
-//using Grpc.Net.Client;
-using System.IO;
-using System.Diagnostics;
-using System.Security;
-using System.Reflection;
+using Grpc.Core;
+using Grpc.Net.Client;
+
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
+
+using LogexpertGRPCService.Services;
+
 using NLog;
-using LogexpertgRPCService.Services;
-using LogExpert.Grpc;
-using Microsoft.AspNetCore.Builder;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+//using System.Runtime.Remoting.Channels.Ipc;
+//using System.Runtime.Remoting.Channels;
+//using System.Runtime.Remoting;
+using System.IO;
+using System.Reflection;
+using System.Security;
 using System.Security.Principal;
-using Grpc.Net.Client;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace LogExpert
 {
@@ -28,6 +30,8 @@ namespace LogExpert
         #region Fields
 
         private static readonly ILogger _logger = LogManager.GetLogger("Program");
+        private static LogExpertServiceImpl _logExpertService;
+        private static Grpc.LogExpertService.LogExpertServiceClient _logExpertServiceClient;
 
         #endregion
 
@@ -41,7 +45,13 @@ namespace LogExpert
         {
             try
             {
-                Sub_Main(orgArgs);
+                var server = new Server()
+                {
+                    Services = { Grpc.LogExpertService.BindService(new LogExpertServiceImpl()) },
+                    Ports = { new ServerPort("localhost", 5001, ServerCredentials.Insecure) }
+                };
+
+                Sub_Main(server, orgArgs);
             }
             catch (SecurityException se)
             {
@@ -49,7 +59,7 @@ namespace LogExpert
             }
         }
 
-        private static void Sub_Main(string[] orgArgs)
+        private static void Sub_Main(Server server, string[] orgArgs)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.ThreadException += Application_ThreadException;
@@ -113,6 +123,9 @@ namespace LogExpert
 
                     // first instance
                     WindowsIdentity wi = WindowsIdentity.GetCurrent();
+
+                    server.Start();
+
                     //IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
                     //ChannelServices.RegisterChannel(ipcChannel, false);
                     //RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
@@ -123,6 +136,7 @@ namespace LogExpert
                     Application.Run(context);
 
                     //ChannelServices.UnregisterChannel(ipcChannel);
+                    server.ShutdownAsync().Wait();
                 }
                 else
                 {
@@ -137,22 +151,22 @@ namespace LogExpert
                         {
 
                             using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-                            //var client = new LogExpertService.LogExpertServiceClient(channel);
+                            var client = new Grpc.LogExpertService.LogExpertServiceClient(channel);
 
-                            //var reply = await client.SendLogAsync(new LogRequest { Message = "Hello, gRPC!" });
+
 
                             //Console.WriteLine("Greeting: " + reply.Result);
                             // another instance already exists
                             WindowsIdentity wi = WindowsIdentity.GetCurrent();
                             //LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
-                            //if (settings.preferences.allowOnlyOneInstance)
-                            //{
-                            //    proxy.LoadFiles(args);
-                            //}
-                            //else
-                            //{
-                            //    proxy.NewWindowOrLockedWindow(args);
-                            //}
+                            if (settings.preferences.allowOnlyOneInstance)
+                            {
+                                client.LoadFiles(new Grpc.FileNames { FileNames_ = { args } });
+                            }
+                            else
+                            {
+                                client.NewWindowOrLockedWindow(new Grpc.FileNames { FileNames_ = { args } });
+                            }
 
                             break;
                         }

@@ -1,4 +1,4 @@
-using LogexpertgRPCService.Services;
+using LogexpertGRPCService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

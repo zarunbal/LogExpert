@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 package logexpert;
 
 // The log service definition.
-service LogExpertService 
+service LogExpertService
 {
   // Sends a log message
   rpc SendLog (LogRequest) returns (LogReply) ;
@@ -19,9 +19,9 @@ service LogExpertService
   rpc GetLogWindowCount(google.protobuf.Empty) returns (Count);
 }
 
-message FileNames 
+message FileNames
 {
-	repeated string FileNames = 1;
+	repeated string fileNames = 1;
 }
 
 message Count
@@ -35,13 +35,13 @@ message FilesReply
 }
 
 // The request message containing the log message.
-message LogRequest 
+message LogRequest
 {
   string message = 1;
 }
 
 // The response message containing the response.
-message LogReply 
+message LogReply
 {
   string result = 1;
 }
