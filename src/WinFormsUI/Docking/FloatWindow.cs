@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
@@ -223,7 +220,6 @@ namespace WeifenLuo.WinFormsUI.Docking
             base.SetBoundsCore(x, y, width, height, specified);
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == (int) Win32.Msgs.WM_NCLBUTTONDOWN)

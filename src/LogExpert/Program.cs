@@ -1,21 +1,14 @@
 using Grpc.Core;
 using Grpc.Net.Client;
-
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
-
 using LogexpertGRPCService.Services;
-
 using NLog;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-//using System.Runtime.Remoting.Channels.Ipc;
-//using System.Runtime.Remoting.Channels;
-//using System.Runtime.Remoting;
 using System.IO;
 using System.Reflection;
 using System.Security;
@@ -28,11 +21,7 @@ namespace LogExpert
     internal static class Program
     {
         #region Fields
-
         private static readonly ILogger _logger = LogManager.GetLogger("Program");
-        private static LogExpertServiceImpl _logExpertService;
-        private static Grpc.LogExpertService.LogExpertServiceClient _logExpertServiceClient;
-
         #endregion
 
         #region Private Methods

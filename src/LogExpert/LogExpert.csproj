@@ -7,21 +7,21 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\..\bin\Debug\</OutputPath>
     <DocumentationFile>
     </DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>False</Optimize>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)'=='Release|AnyCPU' ">
     <OutputPath>..\..\bin\Release\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>True</Optimize>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -77,10 +77,10 @@
     <Content Include="Resources\Pro_Filter.bmp" />
   </ItemGroup>
   <ItemGroup>
-  <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
-  <PackageReference Include="Google.Protobuf" Version="3.27.0" />
+  <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
+  <PackageReference Include="Google.Protobuf" Version="3.29.2" />
   <PackageReference Include="Grpc.Core" Version="2.46.6" />
-  <PackageReference Include="Grpc.Tools" Version="2.64.0" PrivateAssets="All" />
+  <PackageReference Include="Grpc.Tools" Version="2.68.1" PrivateAssets="All" />
   <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
 </ItemGroup>
   <ItemGroup>
@@ -92,9 +92,8 @@
     <Compile Remove="DebugWindow.Designer.cs" />
     <Compile Remove="HighlightThread.cs" />
   </ItemGroup>
-  <PropertyGroup />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NLog" Version="5.3.4" />
   </ItemGroup>
 </Project>
