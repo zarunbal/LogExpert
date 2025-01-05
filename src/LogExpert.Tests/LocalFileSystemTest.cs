@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using LogExpert.Classes;
+﻿using LogExpert.Classes;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using System;
+using System.IO;
 
 namespace LogExpert.Tests
 {
@@ -26,10 +25,10 @@ namespace LogExpert.Tests
         public void TestUriHandle()
         {
             LocalFileSystem fs = new LocalFileSystem();
-            ClassicAssert.True(fs.CanHandleUri("file:///c:/logfile.txt"));
-            ClassicAssert.True(fs.CanHandleUri("file:///c:\\logfile.txt"));
-            ClassicAssert.True(fs.CanHandleUri("c:/logfile.txt"));
-            ClassicAssert.True(fs.CanHandleUri("c:\\logfile.txt"));
+            Assert.That(fs.CanHandleUri("file:///c:/logfile.txt"), Is.True);
+            Assert.That(fs.CanHandleUri("file:///c:\\logfile.txt"), Is.True);
+            Assert.That(fs.CanHandleUri("c:/logfile.txt"), Is.True);
+            Assert.That(fs.CanHandleUri("c:\\logfile.txt"), Is.True);
         }
 
         [Test]
@@ -40,13 +39,13 @@ namespace LogExpert.Tests
 
             LocalFileSystem fs = new LocalFileSystem();
             ILogFileInfo info = fs.GetLogfileInfo(fullName);
-            ClassicAssert.True(info.Length > 0);
-            ClassicAssert.True(info.OriginalLength == info.Length);
+            Assert.That(info.Length > 0, Is.True);
+            Assert.That(info.OriginalLength == info.Length, Is.True);
             Stream stream = info.OpenStream();
-            ClassicAssert.True(stream.CanSeek);
+            Assert.That(stream.CanSeek, Is.True);
             StreamReader reader = new StreamReader(stream);
             string line = reader.ReadLine();
-            ClassicAssert.True(line.StartsWith("line number", StringComparison.InvariantCultureIgnoreCase));
+            Assert.That(line.StartsWith("line number", StringComparison.InvariantCultureIgnoreCase), Is.True);
             reader.Close();
         }
     }

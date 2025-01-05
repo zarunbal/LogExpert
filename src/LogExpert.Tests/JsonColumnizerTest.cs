@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
+﻿using LogExpert.Classes.Log;
+using LogExpert.Entities;
+using NUnit.Framework;
 using System;
 using System.IO;
-using LogExpert.Classes.Log;
-using LogExpert.Entities;
-using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -18,13 +17,13 @@ namespace LogExpert.Tests
             LogfileReader reader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions());
             reader.ReadFiles();
 
-            ILogLine line = reader.GetLogLineWithWait(0);
+            ILogLine line = reader.GetLogLine(0);
             if (line != null)
             {
                 jsonColumnizer.SplitLine(null, line);
             }
 
-            line = reader.GetLogLineWithWait(1);
+            line = reader.GetLogLine(1);
             if (line != null)
             {
                 jsonColumnizer.SplitLine(null, line);
@@ -32,7 +31,7 @@ namespace LogExpert.Tests
 
             var columnHeaders = jsonColumnizer.GetColumnNames();
             var result = string.Join(" ", columnHeaders);
-            ClassicAssert.AreEqual(result, expectedHeaders);
+            Assert.That(expectedHeaders, Is.EqualTo(result));
         }
     }
 }

@@ -176,7 +176,7 @@ namespace LogExpert.Classes
 
         /// <summary>
         /// Cetin Sert, David Necas
-        /// http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&view=markup
+        /// <a href="http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&amp;view=markup">Source Code</a>
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="l1"></param>
@@ -375,7 +375,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Returns true, if the given string is null or empty
         /// </summary>
-        /// <param name="?"></param>
+        /// <param name="toTest"></param>
         /// <returns></returns>
         public static bool IsNull(string toTest)
         {
@@ -385,7 +385,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Returns true, if the given string is null or empty or contains only spaces
         /// </summary>
-        /// <param name="?"></param>
+        /// <param name="toTest"></param>
         /// <returns></returns>
         public static bool IsNullOrSpaces(string toTest)
         {

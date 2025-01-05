@@ -1,6 +1,5 @@
 ﻿using LogExpert;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace ColumnizerLib.UnitTests.Extensions
 {
@@ -26,7 +25,7 @@ namespace ColumnizerLib.UnitTests.Extensions
                 LineNumber = 89,
                 Text = "a text"
             };
-            ClassicAssert.AreEqual("\t90\ta fullLine", underTest.ToClipBoardText());
+            Assert.That(underTest.ToClipBoardText(), Is.EqualTo("\t90\ta fullLine"));
         }
     }
 }

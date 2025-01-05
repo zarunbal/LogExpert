@@ -1,6 +1,5 @@
 ﻿using LogExpert.Classes.Log;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using System.IO;
 using System.Text;
 using LogExpert.Entities;
@@ -32,11 +31,12 @@ namespace LogExpert.Tests
 
                 lineCount += 1;
 
-                StringAssert.StartsWith($"Line {lineCount}", line, $"Invalid line: {line}");
+                Assert.That(line.StartsWith($"Line {lineCount}"), $"Invalid line: {line}");
             }
 
-            ClassicAssert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+            Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
         }
+
         [Test]
         [TestCase("\n\n\n", 3)]
         [TestCase("\r\n\r\n\r\n", 3)]
@@ -51,7 +51,7 @@ namespace LogExpert.Tests
                 lineCount += 1;
             }
 
-            ClassicAssert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+            Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
         }
 
         [Test]
@@ -77,10 +77,10 @@ namespace LogExpert.Tests
 
                     lineCount += 1;
 
-                    StringAssert.StartsWith($"Line {lineCount}", line, $"Invalid line: {line}");
+                    Assert.That(line.StartsWith($"Line {lineCount}"), $"Invalid line: {line}");
                 }
 
-                ClassicAssert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+                Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
             }
         }
         [Test]
@@ -98,7 +98,8 @@ namespace LogExpert.Tests
                     lineCount += 1;
                 }
 
-                ClassicAssert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+
+                Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -57,7 +58,7 @@ namespace LogExpert.Dialogs
                         return titleAttribute.Title;
                     }
                 }
-                return System.IO.Path.GetFileNameWithoutExtension(_assembly.CodeBase);
+                return Path.GetFileNameWithoutExtension(_assembly.Location);
             }
         }
 

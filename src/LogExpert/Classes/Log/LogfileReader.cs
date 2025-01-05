@@ -139,8 +139,7 @@ namespace LogExpert.Classes.Log
 
         public delegate void FinishedLoadingEventHandler(object sender, EventArgs e);
 
-        private Func<int, ILogLine> GetLogLineFxFunc;
-        private delegate ILogLine GetLogLineFx(int lineNum);
+        private delegate Task<ILogLine> GetLogLineFx(int lineNum);
 
         public delegate void LoadingStartedEventHandler(object sender, LoadFileEventArgs e);
 
@@ -409,7 +408,7 @@ namespace LogExpert.Classes.Log
 
         public ILogLine GetLogLine(int lineNum)
         {
-            return GetLogLineInternal(lineNum);
+            return GetLogLineInternal(lineNum).Result;
         }
 
         /// <summary>
@@ -427,7 +426,7 @@ namespace LogExpert.Classes.Log
         /// </remarks>
         /// <param name="lineNum">line to retrieve</param>
         /// <returns></returns>
-        public ILogLine GetLogLineWithWait(int lineNum)
+        public async Task<ILogLine> GetLogLineWithWait(int lineNum)
         {
             const int WAIT_TIME = 1000;
 
@@ -453,7 +452,8 @@ namespace LogExpert.Classes.Log
                 if (!_isFailModeCheckCallPending)
                 {
                     _isFailModeCheckCallPending = true;
-                    _logLineFx.BeginInvoke(lineNum, GetLineFinishedCallback, _logLineFx);
+                    var logLine = await _logLineFx(lineNum);
+                    GetLineFinishedCallback(logLine);
                 }
             }
 
@@ -767,7 +767,7 @@ namespace LogExpert.Classes.Log
             return info;
         }
 
-        private ILogLine GetLogLineInternal(int lineNum)
+        private Task<ILogLine> GetLogLineInternal(int lineNum)
         {
             if (_isDeleted)
             {
@@ -803,7 +803,7 @@ namespace LogExpert.Classes.Log
             _disposeLock.ReleaseReaderLock();
             ReleaseBufferListReaderLock();
 
-            return line;
+            return Task.FromResult(line);
         }
 
         private void InitLruBuffers()
@@ -1425,11 +1425,9 @@ namespace LogExpert.Classes.Log
         /// <summary>
         /// Async callback used to check if the GetLogLine() call is succeeding again after a detected timeout.
         /// </summary>
-        private void GetLineFinishedCallback(IAsyncResult res)
+        private void GetLineFinishedCallback(ILogLine line)
         {
             _isFailModeCheckCallPending = false;
-            GetLogLineFx logLineFx = (GetLogLineFx)res.AsyncState;
-            ILogLine line = logLineFx.EndInvoke(res);
             if (line != null)
             {
                 _logger.Debug("'isFastFailOnGetLogLine' flag was reset");

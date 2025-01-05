@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Windows.Forms;
-using LogExpert.Classes.Columnizer;
+﻿using LogExpert.Classes.Columnizer;
 using LogExpert.Config;
 using LogExpert.Entities;
 using LogExpert.Extensions;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace LogExpert.Classes
 {
@@ -78,110 +79,87 @@ namespace LogExpert.Classes
         {
             _logger.Info("Loading plugins...");
 
-            RegisteredColumnizers = new List<ILogLineColumnizer>();
-            RegisteredColumnizers.Add(new DefaultLogfileColumnizer());
-            RegisteredColumnizers.Add(new TimestampColumnizer());
-            RegisteredColumnizers.Add(new SquareBracketColumnizer());
-            RegisteredColumnizers.Add(new ClfColumnizer());
+            RegisteredColumnizers =
+            [
+                //TODO: Remove this plugins and load them as any other plugin
+                new DefaultLogfileColumnizer(),
+                new TimestampColumnizer(),
+                new SquareBracketColumnizer(),
+                new ClfColumnizer(),
+            ];
             RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 
-            string pluginDir = Application.StartupPath + Path.DirectorySeparatorChar + "plugins";
-            
+            string pluginDir = Path.Combine(Application.StartupPath, "plugins");
+            //TODO: FIXME: This is a hack for the tests to pass. Need to find a better approach
+            if (!Directory.Exists(pluginDir)) {
+                pluginDir = ".";
+            }
+
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
 
-            if (Directory.Exists(pluginDir))
+
+            string interfaceName = typeof(ILogLineColumnizer).FullName;
+            foreach (string dllName in Directory.GetFiles(pluginDir, "*.dll"))
             {
-                string[] dllNames = Directory.GetFiles(pluginDir, "*.dll");
-                foreach (string dllName in dllNames)
+                try
                 {
-                    try
+                    Assembly assembly = Assembly.LoadFrom(dllName);
+                    var types = assembly.GetTypes().Where(t => t.GetInterfaces().Any(i => i.FullName == interfaceName));
+                    foreach (var type in types)
                     {
-                        Assembly assemblyTmp = Assembly.ReflectionOnlyLoadFrom(dllName);
-                        Assembly assembly = Assembly.Load(assemblyTmp.FullName);
+                        _logger.Info($"Type {type.FullName} in assembly {assembly.FullName} implements {interfaceName}");
 
-                        Module[] modules = assembly.GetModules(false);
-                        foreach (Module module in modules)
+                        ConstructorInfo cti = type.GetConstructor(Type.EmptyTypes);
+                        if (cti != null)
                         {
-                            Type[] types = module.FindTypes(Module.FilterTypeName, "*");
-                            foreach (Type type in types)
+                            object o = cti.Invoke([]);
+                            RegisteredColumnizers.Add((ILogLineColumnizer)o);
+
+                            if (o is IColumnizerConfigurator configurator)
                             {
-                                if (type.IsInterface)
-                                {
-                                    continue;
-                                }
-
-                                if (type.Name.EndsWith("Columnizer"))
-                                {
-                                    Type t = typeof(ILogLineColumnizer);
-                                    Type inter = type.GetInterface(t.Name);
-                                    if (inter != null)
-                                    {
-                                        ConstructorInfo cti = type.GetConstructor(Type.EmptyTypes);
-                                        if (cti != null)
-                                        {
-                                            object o = cti.Invoke([]);
-                                            RegisteredColumnizers.Add((ILogLineColumnizer) o);
-                                            
-                                            if (o is IColumnizerConfigurator configurator)
-                                            {
-                                                configurator.LoadConfig(ConfigManager.Settings.preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
-                                            }
-
-                                            if (o is ILogExpertPlugin plugin)
-                                            {
-                                                _pluginList.Add(plugin);
-                                                plugin.PluginLoaded();
-                                            }
-
-                                            _logger.Info("Added columnizer {0}", type.Name);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (TryAsContextMenu(type))
-                                    {
-                                        continue;
-                                    }
-
-                                    if (TryAsKeywordAction(type))
-                                    {
-                                        continue;
-                                    }
-
-                                    if (TryAsFileSystem(type))
-                                    {
-                                        continue;
-                                    }
-                                }
+                                configurator.LoadConfig(ConfigManager.Settings.preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                             }
+
+                            if (o is ILogExpertPlugin plugin)
+                            {
+                                _pluginList.Add(plugin);
+                                plugin.PluginLoaded();
+                            }
+
+                            _logger.Info("Added columnizer {0}", type.Name);
                         }
                     }
-                    catch (BadImageFormatException e)
+                }
+                catch (BadImageFormatException e)
+                {
+                    _logger.Error(e, dllName);
+                    // nothing... could be a DLL which is needed by any plugin
+                }
+                catch (FileLoadException e)
+                {
+                    // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
+                    _logger.Error(e, dllName);
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    // can happen when a dll dependency is missing
+                    if (!ex.LoaderExceptions.IsEmpty())
                     {
-                        _logger.Error(e, dllName);
-                        // nothing... could be a DLL which is needed by any plugin
-                    }
-                    catch (FileLoadException e)
-                    {
-                        // can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
-                        _logger.Error(e, dllName);
-                    }
-                    catch (ReflectionTypeLoadException ex)
-                    {
-                        if (!ex.LoaderExceptions.IsEmpty())
+                        foreach (Exception loaderException in ex.LoaderExceptions)
                         {
-                            foreach (Exception loaderException in ex.LoaderExceptions)
-                            {
-                                _logger.Error(loaderException, "Plugin load failed with '{0}'", dllName);
-                            }
+                            _logger.Error(loaderException, "Plugin load failed with '{0}'", dllName);
                         }
-
-                        _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
-
-                        throw;
                     }
+
+                    _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
+
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"General Exception for the file {dllName}, of type: {ex.GetType()}, with the message: {ex.Message}");
+                    throw;
                 }
             }
 

@@ -395,7 +395,7 @@ namespace LogExpert.Controls.LogWindow
                 return;
             }
 
-            ILogLine line = _logFileReader.GetLogLineWithWait(rowIndex);
+            ILogLine line = _logFileReader.GetLogLineWithWait(rowIndex).Result;
 
             if (line != null)
             {

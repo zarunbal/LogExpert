@@ -1,10 +1,9 @@
-﻿using NUnit.Framework;
+﻿using LogExpert.Classes.Log;
+using LogExpert.Entities;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LogExpert.Classes.Log;
-using LogExpert.Entities;
-using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -37,7 +36,7 @@ namespace LogExpert.Tests
             };
 
             var result = jsonCompactColumnizer.GetPriority(path, loglines);
-            ClassicAssert.AreEqual(result, priority);
+            Assert.That(result, Is.EqualTo(priority));
         }
     }
 }
