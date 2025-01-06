@@ -171,7 +171,7 @@ namespace LogExpert.Classes
 
         #region Private Methods
 
-        private async Task WorkerFx()
+        private void WorkerFx()
         {
             //Thread.CurrentThread.Name = "TimeSpreadCalculator Worker";
             //Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
@@ -191,11 +191,11 @@ namespace LogExpert.Classes
                         _logger.Debug("TimeSpreadCalculator: unbusy. starting calc.");
                         if (TimeMode)
                         {
-                            await DoCalc_via_Time();
+                            DoCalc_via_Time();
                         }
                         else
                         {
-                            await DoCalc();
+                            DoCalc();
                         }
                         break;
                     }
@@ -207,7 +207,7 @@ namespace LogExpert.Classes
             }
         }
 
-        private async Task DoCalc()
+        private void DoCalc()
         {
             OnStartCalc(EventArgs.Empty);
             _logger.Debug("TimeSpreadCalculator.DoCalc() begin");
@@ -276,7 +276,7 @@ namespace LogExpert.Classes
         }
 
         //TODO Refactor this method
-        private async Task DoCalc_via_Time()
+        private void DoCalc_via_Time()
         {
             OnStartCalc(EventArgs.Empty);
             _logger.Debug("TimeSpreadCalculator.DoCalc_via_Time() begin");

@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using LogExpert.Classes.Log;
+﻿using LogExpert.Classes.Log;
 using LogExpert.Entities;
 using LogExpert.Interface;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using System;
+using System.IO;
+using System.Text;
 
 namespace LogExpert.Tests
 {
@@ -41,16 +40,16 @@ namespace LogExpert.Tests
                     break;
                 }
 
-                ClassicAssert.AreEqual(line1, line2, "File " + fileName);
+                Assert.That(line1, Is.EqualTo(line2), "File " + fileName);
 
                 if (r1.Position != maxPosition)
                 {
-                    ClassicAssert.AreEqual(r1.Position, r2.Position, "Line " + lineNum + ", File: " + fileName);
+                    Assert.That(r2.Position, Is.EqualTo(r1.Position), "Line " + lineNum + ", File: " + fileName);
                 }
                 else
                 {
                     //Its desired that the position of the new implementation is 2 bytes ahead to fix the problem of empty lines every time a new line is appended.
-                    ClassicAssert.AreEqual(r1.Position, r2.Position - 2, "Line " + lineNum + ", File: " + fileName);
+                    Assert.That(r2.Position - 2, Is.EqualTo(r1.Position), "Line " + lineNum + ", File: " + fileName);
                 }
             }
         }

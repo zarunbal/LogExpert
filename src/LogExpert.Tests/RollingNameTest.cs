@@ -1,6 +1,5 @@
 ﻿using LogExpert.Classes.Log;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -21,7 +20,7 @@ namespace LogExpert.Tests
             RolloverFilenameBuilder fnb = new RolloverFilenameBuilder(formatString);
             fnb.SetFileName(expectedResult);
             string name = fnb.BuildFileName();
-            ClassicAssert.AreEqual(expectedResult, name);
+            Assert.That(name, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -39,7 +38,7 @@ namespace LogExpert.Tests
             fnb.SetFileName(fileName);
             fnb.Index += 1;
             string name = fnb.BuildFileName();
-            ClassicAssert.AreEqual(expectedResult, name);
+            Assert.That(name, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -51,7 +50,7 @@ namespace LogExpert.Tests
             fnb.SetFileName(fileName);
             fnb.Index += 2;
             string name = fnb.BuildFileName();
-            ClassicAssert.AreEqual(expectedResult, name);
+            Assert.That(name, Is.EqualTo(expectedResult));
         }
 
 
@@ -63,7 +62,7 @@ namespace LogExpert.Tests
             fnb.SetFileName(fileName);
             fnb.Index -= 1;
             string name = fnb.BuildFileName();
-            ClassicAssert.AreEqual("engine.log", name);
+            Assert.That(name, Is.EqualTo("engine.log"));
         }
     }
 }

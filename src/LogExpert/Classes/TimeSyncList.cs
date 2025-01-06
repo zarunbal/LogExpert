@@ -66,6 +66,7 @@ namespace LogExpert.Classes
         /// Scrolls all LogWindows to the given timestamp
         /// </summary>
         /// <param name="timestamp"></param>
+        /// <param name="sender"></param>
         public void NavigateToTimestamp(DateTime timestamp, LogWindow sender)
         {
             this.CurrentTimestamp = timestamp;

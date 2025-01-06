@@ -1,10 +1,8 @@
-﻿using System;
-using System.IO;
-using LogExpert.Classes.Log;
+﻿using LogExpert.Classes.Log;
 using LogExpert.Entities;
-
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using System;
+using System.IO;
 
 namespace LogExpert.Tests
 {
@@ -20,16 +18,14 @@ namespace LogExpert.Tests
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
             LogfileReader reader = new LogfileReader(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions());
             reader.ReadFiles();
-
-            ILogLine line = reader.GetLogLineWithWait(0);
+            ILogLine line = reader.GetLogLine(0);
             IColumnizedLogLine logline = new ColumnizedLogLine();
             if (line != null)
             {
                 logline = csvColumnizer.SplitLine(null, line);
             }
-            
             string expectedResult = string.Join(",", expectedHeaders);
-            ClassicAssert.AreEqual(expectedResult, logline.LogLine.FullLine);
+            Assert.That(logline.LogLine.FullLine, Is.EqualTo(expectedResult));
         }
     }
 }

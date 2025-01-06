@@ -1,7 +1,5 @@
 ﻿using LogExpert.Classes.ILogLineColumnizerCallback;
-
 using NLog;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -27,7 +25,6 @@ namespace LogExpert.Classes.Filter
         private readonly SortedDictionary<int, int> _lastFilterLinesDict;
 
         private ProgressCallback _progressCallback;
-        private Task<Filter> _filterTask;
         private int _progressLineCount;
         private bool _shouldStop;
 

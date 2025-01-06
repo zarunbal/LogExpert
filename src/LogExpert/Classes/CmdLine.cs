@@ -268,7 +268,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Registers a parameter to be used and adds it to the help screen.
         /// </summary>
-        /// <param name="p">The parameter to add.</param>
+        /// <param name="parameter">The parameter to add.</param>
         public void RegisterParameter(CmdLineParameter parameter)
         {
             if (parameters.ContainsKey(parameter.Name))
@@ -281,7 +281,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Registers parameters to be used and adds hem to the help screen.
         /// </summary>
-        /// <param name="p">The parameter to add.</param>
+        /// <param name="parameters">The parameter to add.</param>
         public void RegisterParameter(CmdLineParameter[] parameters)
         {
             foreach (CmdLineParameter p in parameters)

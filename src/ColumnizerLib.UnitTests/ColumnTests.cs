@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text;
-using LogExpert;
+﻿using LogExpert;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using System;
+using System.Text;
 
 namespace ColumnizerLib.UnitTests
 {
@@ -26,8 +25,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = builder.ToString();
 
-            ClassicAssert.AreEqual(expected, column.DisplayValue);
-            ClassicAssert.AreEqual(builder.ToString(), column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo(expected));
+            Assert.That(column.FullValue, Is.EqualTo(builder.ToString()));
         }
 
         [Test]
@@ -46,8 +45,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = expected;
 
-            ClassicAssert.AreEqual(expected, column.DisplayValue);
-            ClassicAssert.AreEqual(expected, column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo(expected));
+            Assert.That(column.FullValue, Is.EqualTo(expected));
         }
 
         [Test]
@@ -62,14 +61,14 @@ namespace ColumnizerLib.UnitTests
             //only one implementation depending on the windows version is executed
             if (Environment.Version >= Version.Parse("6.2"))
             {
-                ClassicAssert.AreEqual("asdf␀", column.DisplayValue);
+                Assert.That(column.DisplayValue, Is.EqualTo("asdf␀"));
             }
             else
             {
-                ClassicAssert.AreEqual("asdf ", column.DisplayValue);
+                Assert.That(column.DisplayValue, Is.EqualTo("asdf "));
             }
 
-            ClassicAssert.AreEqual("asdf\0", column.FullValue);
+            Assert.That(column.FullValue, Is.EqualTo("asdf\0"));
         }
 
         [Test]
@@ -79,8 +78,8 @@ namespace ColumnizerLib.UnitTests
 
             column.FullValue = "asdf\t";
 
-            ClassicAssert.AreEqual("asdf  ", column.DisplayValue);
-            ClassicAssert.AreEqual("asdf\t", column.FullValue);
+            Assert.That(column.DisplayValue, Is.EqualTo("asdf  "));
+            Assert.That(column.FullValue, Is.EqualTo("asdf\t"));
         }
     }
 }

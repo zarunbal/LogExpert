@@ -2765,6 +2765,7 @@ namespace LogExpert.Controls.LogWindow
         /// Used to create a new tab and pipe the given content into it.
         /// </summary>
         /// <param name="lineEntryList"></param>
+        /// <param name="title"></param>
         internal void WritePipeTab(IList<LineEntry> lineEntryList, string title)
         {
             FilterPipe pipe = new(new FilterParams(), this);

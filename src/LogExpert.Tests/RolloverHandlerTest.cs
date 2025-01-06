@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using LogExpert.Classes.Log;
 using LogExpert.Entities;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace LogExpert.Tests
 {
@@ -26,7 +25,7 @@ namespace LogExpert.Tests
             RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
             LinkedList<string> fileList = handler.GetNameList();
 
-            ClassicAssert.AreEqual(files, fileList);
+            Assert.That(fileList, Is.EqualTo(files));
             
             Cleanup();
         }
@@ -47,7 +46,7 @@ namespace LogExpert.Tests
             RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
             LinkedList<string> fileList = handler.GetNameList();
 
-            ClassicAssert.AreEqual(files, fileList);
+            Assert.That(fileList, Is.EqualTo(files));
             
             Cleanup();
         }

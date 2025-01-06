@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Version>8.2.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <InformationalVersion>2.0.0.0-rc1</InformationalVersion>
+    <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
+    <Company>Log Expert</Company>
+    </PropertyGroup>
+</Project>
