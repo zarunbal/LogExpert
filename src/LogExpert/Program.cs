@@ -52,6 +52,7 @@ namespace LogExpert
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.ThreadException += Application_ThreadException;
+            ApplicationConfiguration.Initialize();
 
             Application.EnableVisualStyles();
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
