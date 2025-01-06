@@ -1,6 +1,6 @@
 ﻿namespace LogExpert.Dialogs
 {
-	partial class AboutBox
+    partial class AboutBox
 	{
 		/// <summary>
 		/// Required designer variable.

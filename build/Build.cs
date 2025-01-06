@@ -78,7 +78,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 9, 0, patch);
+            return new Version(1, 10, 0, patch);
         }
     }
 
@@ -341,7 +341,7 @@ class Build : NukeBuild
         });
 
     Target CreateSetup => _ => _
-        .DependsOn(CopyFilesForSetup)
+        .DependsOn(CopyFilesForSetup, ChangeVersionNumber)
         .Before(Publish)
         .OnlyWhenStatic(() => Configuration == "Release")
         .Executes(() =>

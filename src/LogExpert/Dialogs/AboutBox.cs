@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -18,9 +17,6 @@ namespace LogExpert.Dialogs
         public AboutBox()
         {
             InitializeComponent();
-
-            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
 
             _assembly = Assembly.GetExecutingAssembly();
 
@@ -52,7 +48,7 @@ namespace LogExpert.Dialogs
                 object[] attributes = _assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
                 if (attributes.Length > 0)
                 {
-                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) attributes[0];
+                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
                     if (titleAttribute.Title != "")
                     {
                         return titleAttribute.Title;
@@ -86,7 +82,7 @@ namespace LogExpert.Dialogs
                 {
                     return string.Empty;
                 }
-                return ((AssemblyDescriptionAttribute) attributes[0]).Description;
+                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
             }
         }
 
@@ -99,7 +95,7 @@ namespace LogExpert.Dialogs
                 {
                     return string.Empty;
                 }
-                return ((AssemblyProductAttribute) attributes[0]).Product;
+                return ((AssemblyProductAttribute)attributes[0]).Product;
             }
         }
 
@@ -112,7 +108,7 @@ namespace LogExpert.Dialogs
                 {
                     return string.Empty;
                 }
-                return ((AssemblyCopyrightAttribute) attributes[0]).Copyright;
+                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
             }
         }
 
