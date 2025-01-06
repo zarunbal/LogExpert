@@ -983,7 +983,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonOpen.Image = global::LogExpert.Properties.Resources.folder_blue;
-            this.toolStripButtonOpen.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonOpen.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonOpen.Name = "toolStripButtonOpen";
             this.toolStripButtonOpen.Size = new System.Drawing.Size(34, 18);
@@ -1000,7 +1000,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonSearch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonSearch.Image = global::LogExpert.Properties.Resources.search_icon_blue;
-            this.toolStripButtonSearch.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonSearch.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSearch.Name = "toolStripButtonSearch";
             this.toolStripButtonSearch.Size = new System.Drawing.Size(34, 18);
@@ -1012,7 +1012,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonFilter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonFilter.Image = global::LogExpert.Properties.Resources.search_folder_blue;
-            this.toolStripButtonFilter.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonFilter.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonFilter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonFilter.Name = "toolStripButtonFilter";
             this.toolStripButtonFilter.Size = new System.Drawing.Size(34, 18);
@@ -1029,7 +1029,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonBookmark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonBookmark.Image = global::LogExpert.Properties.Resources.check_blue;
-            this.toolStripButtonBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonBookmark.Name = "toolStripButtonBookmark";
             this.toolStripButtonBookmark.Size = new System.Drawing.Size(34, 18);
@@ -1041,7 +1041,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonUp.Image = global::LogExpert.Properties.Resources.up_blue;
-            this.toolStripButtonUp.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonUp.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonUp.Name = "toolStripButtonUp";
             this.toolStripButtonUp.Size = new System.Drawing.Size(34, 18);
@@ -1053,7 +1053,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButtonDown.Image = global::LogExpert.Properties.Resources.down_blue;
-            this.toolStripButtonDown.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripButtonDown.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonDown.Name = "toolStripButtonDown";
             this.toolStripButtonDown.Size = new System.Drawing.Size(34, 18);
