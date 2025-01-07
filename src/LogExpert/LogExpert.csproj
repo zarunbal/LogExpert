@@ -65,15 +65,6 @@
     <Content Include="Licenses\WinformsUI.Docking.license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\bubble.ico" />
-    <Content Include="Resources\check-blue.gif" />
-    <EmbeddedResource Include="Resources\delete-page-red.gif" />
-    <Content Include="Resources\LogExpert-Logo.png" />
-    <Content Include="Resources\Log_Icon.png" />
-    <Content Include="Resources\Log_Icon_small.png" />
-    <EmbeddedResource Include="Resources\PanelOpen.gif" />
-    <EmbeddedResource Include="Resources\PanelClose.gif" />
-    <Content Include="Resources\Pro_Filter.bmp" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" />

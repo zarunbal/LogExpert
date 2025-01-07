@@ -509,6 +509,15 @@ namespace LogExpert.Controls.LogWindow
 
         #endregion
 
+        private void OnButtonSizeChanged(object sender, EventArgs e)
+        {
+            if (sender is Button button && button.Image != null)
+            {
+                button.ImageAlign = ContentAlignment.MiddleCenter;
+                button.Image = new Bitmap(button.Image, new Size(button.Size.Height, button.Size.Height));
+            }
+        }
+
         // used for external wait fx WaitForLoadFinished()
 
         private delegate void UpdateGridCallback(LogEventArgs e);
