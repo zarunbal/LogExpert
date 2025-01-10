@@ -3559,7 +3559,9 @@ namespace LogExpert.Controls.LogWindow
         private void ToggleHighlightPanel(bool open)
         {
             highlightSplitContainer.Panel2Collapsed = !open;
-            btnToggleHighlightPanel.Image = open ? _panelCloseButtonImage : _panelOpenButtonImage;
+            btnToggleHighlightPanel.Image = open
+                ? new Bitmap(_panelCloseButtonImage, new Size(btnToggleHighlightPanel.Size.Height, btnToggleHighlightPanel.Size.Height))
+                : new Bitmap(_panelOpenButtonImage, new Size(btnToggleHighlightPanel.Size.Height, btnToggleHighlightPanel.Size.Height));
         }
 
         private void SetBookmarksForSelectedFilterLines()

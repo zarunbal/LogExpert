@@ -1,4 +1,7 @@
-﻿namespace LogExpert.Dialogs
+﻿using LogExpert.Properties;
+using System.Drawing;
+
+namespace LogExpert.Dialogs
 {
     partial class HighlightDialog
     {
@@ -216,12 +219,12 @@
             // 
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnApply.Enabled = false;
-            this.btnApply.Image = global::LogExpert.Properties.Resources.AdvancedIcon2;
-            this.btnApply.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.btnApply.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnApply.Location = new System.Drawing.Point(465, 308);
             this.btnApply.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(138, 35);
+            this.btnApply.Image = new Bitmap(Resources.Check_circle, new Size(btnApply.Height, btnApply.Height));
             this.btnApply.TabIndex = 13;
             this.btnApply.Text = "A&pply";
             this.toolTip.SetToolTip(this.btnApply, "Apply changes below to current hiligth");

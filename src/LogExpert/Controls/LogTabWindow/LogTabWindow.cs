@@ -1,16 +1,18 @@
-﻿using System;
+﻿using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Interface;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using LogExpert.Config;
-using LogExpert.Dialogs;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
-using LogExpert.Interface;
-using NLog;
 //using System.Linq;
 
 namespace LogExpert.Controls.LogTabWindow
@@ -87,7 +89,7 @@ namespace LogExpert.Controls.LogTabWindow
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
             Rectangle led = new(0, 0, 8, 2);
-            
+
             for (int i = 0; i < _leds.Length; ++i)
             {
                 _leds[i] = led;
@@ -101,27 +103,27 @@ namespace LogExpert.Controls.LogTabWindow
             _ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            
+
             _offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
-            
+
             _dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-            
+
             _tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
             _tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
             _tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
-            
+
             _syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
-            
+
             CreateIcons();
-            
+
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
             ToolStripControlHost host = new(checkBoxFollowTail);
-            
+
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
-            
+
             int index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
             toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
@@ -145,7 +147,7 @@ namespace LogExpert.Controls.LogTabWindow
             // get a list of resource names from the manifest
             string[] resNames = a.GetManifestResourceNames();
 
-            Bitmap bmp = Properties.Resources.delete_page_red;
+            Bitmap bmp = Properties.Resources.Deceased;
             _deadIcon = Icon.FromHandle(bmp.GetHicon());
             bmp.Dispose();
             Closing += OnLogTabWindowClosing;

@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using LogExpert.Dialogs;
+using LogExpert.Properties;
 
 namespace LogExpert.Controls.LogTabWindow
 {
@@ -271,7 +272,8 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // openToolStripMenuItem
             // 
-            this.openToolStripMenuItem.Image = global::LogExpert.Properties.Resources.folder_blue;
+            this.openToolStripMenuItem.Image = global::LogExpert.Properties.Resources.File_open;
+            this.openToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openToolStripMenuItem.Size = new System.Drawing.Size(368, 34);
@@ -289,7 +291,10 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // closeFileToolStripMenuItem
             // 
+            //TODO Add Image HERE
             this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
+            this.closeFileToolStripMenuItem.Image = Resources.Close;
+            this.openToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.closeFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
             this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(368, 34);
             this.closeFileToolStripMenuItem.Text = "Close File";
@@ -298,6 +303,8 @@ namespace LogExpert.Controls.LogTabWindow
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
+            this.reloadToolStripMenuItem.Image = global::LogExpert.Properties.Resources.Restart_alt;
+            this.openToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.reloadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.reloadToolStripMenuItem.Size = new System.Drawing.Size(368, 34);
             this.reloadToolStripMenuItem.Text = "Reload";
@@ -388,6 +395,8 @@ namespace LogExpert.Controls.LogTabWindow
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Image = Resources.Exit;
+            this.exitToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(368, 34);
             this.exitToolStripMenuItem.Text = "Exit";
@@ -430,7 +439,8 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // filterToolStripMenuItem
             // 
-            this.filterToolStripMenuItem.Image = global::LogExpert.Properties.Resources.search_blue;
+            this.filterToolStripMenuItem.Image = global::LogExpert.Properties.Resources.Filter;
+            this.filterToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.filterToolStripMenuItem.Name = "filterToolStripMenuItem";
             this.filterToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
             this.filterToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
@@ -450,7 +460,8 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // toggleBookmarkToolStripMenuItem
             // 
-            this.toggleBookmarkToolStripMenuItem.Image = global::LogExpert.Properties.Resources.check_blue;
+            this.toggleBookmarkToolStripMenuItem.Image = global::LogExpert.Properties.Resources.Bookmark_add;
+            this.toggleBookmarkToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toggleBookmarkToolStripMenuItem.Name = "toggleBookmarkToolStripMenuItem";
             this.toggleBookmarkToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F2)));
             this.toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size(323, 34);
@@ -459,7 +470,8 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // jumpToNextToolStripMenuItem
             // 
-            this.jumpToNextToolStripMenuItem.Image = global::LogExpert.Properties.Resources.down_blue;
+            this.jumpToNextToolStripMenuItem.Image = global::LogExpert.Properties.Resources.ArrowDown;
+            this.jumpToNextToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.jumpToNextToolStripMenuItem.Name = "jumpToNextToolStripMenuItem";
             this.jumpToNextToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.jumpToNextToolStripMenuItem.Size = new System.Drawing.Size(323, 34);
@@ -468,7 +480,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // jumpToPrevToolStripMenuItem
             // 
-            this.jumpToPrevToolStripMenuItem.Image = global::LogExpert.Properties.Resources.up_blue;
+            this.jumpToPrevToolStripMenuItem.Image = global::LogExpert.Properties.Resources.ArrowUp;
             this.jumpToPrevToolStripMenuItem.Name = "jumpToPrevToolStripMenuItem";
             this.jumpToPrevToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F2)));
             this.jumpToPrevToolStripMenuItem.Size = new System.Drawing.Size(323, 34);
@@ -620,6 +632,8 @@ namespace LogExpert.Controls.LogTabWindow
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Image = Resources.Settings;
+            this.settingsToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(325, 34);
             this.settingsToolStripMenuItem.Text = "Settings...";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.OnSettingsToolStripMenuItemClick);
@@ -982,12 +996,12 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripButtonOpen
             // 
             this.toolStripButtonOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonOpen.Image = global::LogExpert.Properties.Resources.folder_blue;
+            this.toolStripButtonOpen.Image = global::LogExpert.Properties.Resources.File_open;
             this.toolStripButtonOpen.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonOpen.Name = "toolStripButtonOpen";
             this.toolStripButtonOpen.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonOpen.Text = "toolStripButton1";
+            this.toolStripButtonOpen.Text = "Open File";
             this.toolStripButtonOpen.ToolTipText = "Open file";
             this.toolStripButtonOpen.Click += new System.EventHandler(this.OnToolStripButtonOpenClick);
             // 
@@ -999,24 +1013,24 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripButtonSearch
             // 
             this.toolStripButtonSearch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonSearch.Image = global::LogExpert.Properties.Resources.search_icon_blue;
+            this.toolStripButtonSearch.Image = global::LogExpert.Properties.Resources.Search;
             this.toolStripButtonSearch.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSearch.Name = "toolStripButtonSearch";
             this.toolStripButtonSearch.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonSearch.Text = "toolStripButtonSearch";
+            this.toolStripButtonSearch.Text = "Search";
             this.toolStripButtonSearch.ToolTipText = "Search";
             this.toolStripButtonSearch.Click += new System.EventHandler(this.OnToolStripButtonSearchClick);
             // 
             // toolStripButtonFilter
             // 
             this.toolStripButtonFilter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonFilter.Image = global::LogExpert.Properties.Resources.search_folder_blue;
+            this.toolStripButtonFilter.Image = global::LogExpert.Properties.Resources.Filter;
             this.toolStripButtonFilter.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonFilter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonFilter.Name = "toolStripButtonFilter";
             this.toolStripButtonFilter.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonFilter.Text = "toolStripButton1";
+            this.toolStripButtonFilter.Text = "Filter";
             this.toolStripButtonFilter.ToolTipText = "Filter window";
             this.toolStripButtonFilter.Click += new System.EventHandler(this.OnToolStripButtonFilterClick);
             // 
@@ -1028,36 +1042,36 @@ namespace LogExpert.Controls.LogTabWindow
             // toolStripButtonBookmark
             // 
             this.toolStripButtonBookmark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonBookmark.Image = global::LogExpert.Properties.Resources.check_blue;
+            this.toolStripButtonBookmark.Image = global::LogExpert.Properties.Resources.Bookmark_add;
             this.toolStripButtonBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonBookmark.Name = "toolStripButtonBookmark";
             this.toolStripButtonBookmark.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonBookmark.Text = "toolStripButton1";
+            this.toolStripButtonBookmark.Text = "Toggle Bookmark";
             this.toolStripButtonBookmark.ToolTipText = "Toggle bookmark";
             this.toolStripButtonBookmark.Click += new System.EventHandler(this.OnToolStripButtonBookmarkClick);
             // 
             // toolStripButtonUp
             // 
             this.toolStripButtonUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonUp.Image = global::LogExpert.Properties.Resources.up_blue;
+            this.toolStripButtonUp.Image = global::LogExpert.Properties.Resources.ArrowUp;
             this.toolStripButtonUp.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonUp.Name = "toolStripButtonUp";
             this.toolStripButtonUp.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonUp.Text = "toolStripButton1";
+            this.toolStripButtonUp.Text = "Previous Bookmark";
             this.toolStripButtonUp.ToolTipText = "Go to previous bookmark";
             this.toolStripButtonUp.Click += new System.EventHandler(this.OnToolStripButtonUpClick);
             // 
             // toolStripButtonDown
             // 
             this.toolStripButtonDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonDown.Image = global::LogExpert.Properties.Resources.down_blue;
+            this.toolStripButtonDown.Image = global::LogExpert.Properties.Resources.ArrowDown;
             this.toolStripButtonDown.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.SizeToFit;
             this.toolStripButtonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonDown.Name = "toolStripButtonDown";
             this.toolStripButtonDown.Size = new System.Drawing.Size(34, 18);
-            this.toolStripButtonDown.Text = "toolStripButton1";
+            this.toolStripButtonDown.Text = "Next Bookmark";
             this.toolStripButtonDown.ToolTipText = "Go to next bookmark";
             this.toolStripButtonDown.Click += new System.EventHandler(this.OnToolStripButtonDownClick);
             // 
@@ -1070,7 +1084,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             this.toolStripButtonBubbles.CheckOnClick = true;
             this.toolStripButtonBubbles.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonBubbles.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonBubbles.Image")));
+            this.toolStripButtonBubbles.Image = Resources.bookmark_bubbles;
             this.toolStripButtonBubbles.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.toolStripButtonBubbles.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonBubbles.Name = "toolStripButtonBubbles";
