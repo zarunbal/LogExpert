@@ -75,6 +75,7 @@ namespace LogExpert.Dialogs
             checkBoxSyncFilter.Checked = Preferences.filterSync;
             checkBoxFilterTail.Checked = Preferences.filterTail;
             checkBoxFollowTail.Checked = Preferences.followTail;
+            checkBoxDarkMode.Checked = Preferences.darkMode;
 
             radioButtonHorizMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizontal;
             radioButtonVerticalMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Vertical;
@@ -595,12 +596,14 @@ namespace LogExpert.Dialogs
             DisplayFontName();
         }
 
+
         private void OnOkButtonClick(object sender, EventArgs e)
         {
             Preferences.timestampControl = checkBoxTimestamp.Checked;
             Preferences.filterSync = checkBoxSyncFilter.Checked;
             Preferences.filterTail = checkBoxFilterTail.Checked;
             Preferences.followTail = checkBoxFollowTail.Checked;
+            Preferences.darkMode = checkBoxDarkMode.Checked;
 
             if (radioButtonVerticalMouseDrag.Checked)
             {
@@ -1003,6 +1006,7 @@ namespace LogExpert.Dialogs
                 MessageBox.Show(this, @"Settings imported", @"LogExpert");
             }
         }
+
 
         #endregion
     }

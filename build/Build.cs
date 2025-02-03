@@ -22,6 +22,7 @@ using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.IO.TextTasks;
 using static Nuke.Common.IO.CompressionTasks;
 using static Nuke.GitHub.GitHubTasks;
 using static Nuke.Common.Assert;
@@ -77,7 +78,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 9, 0, patch);
+            return new Version(1, 9, 1, patch);
         }
     }
 

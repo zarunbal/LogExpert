@@ -87,7 +87,7 @@ namespace LogExpert.Controls.LogTabWindow
                 AddToFileHistory(givenFileName);
             }
 
-            LogWindowData data = logWindow.Tag as LogWindowData;
+            LogWindowData data = logWindow.Tag as LogWindowData;            
             data.color = _defaultTabColor;
             SetTabColor(logWindow, _defaultTabColor);
             //data.tabPage.BorderColor = this.defaultTabBorderColor;

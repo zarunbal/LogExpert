@@ -361,7 +361,7 @@ namespace LogExpert.Controls.LogWindow
                 e.Graphics.SetClip(e.CellBounds);
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
-                    Color backColor = e.CellStyle.SelectionBackColor;
+                    Color backColor = LogExpert.Config.ColorMode.DockBackgroundColor;
                     Brush brush;
                     if (gridView.Focused)
                     {
@@ -369,7 +369,7 @@ namespace LogExpert.Controls.LogWindow
                     }
                     else
                     {
-                        Color color = Color.FromArgb(255, 170, 170, 170);
+                        Color color = backColor;
                         brush = new SolidBrush(color);
                     }
 
@@ -378,7 +378,8 @@ namespace LogExpert.Controls.LogWindow
                 }
                 else
                 {
-                    Color bgColor = Color.White;
+                    Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+                    Color foreColor = LogExpert.Config.ColorMode.ForeColor;
                     // paint direct filter hits with different bg color
                     //if (this.filterParams.SpreadEnabled && this.filterHitList.Contains(lineNum))
                     //{
@@ -394,6 +395,8 @@ namespace LogExpert.Controls.LogWindow
                     }
 
                     e.CellStyle.BackColor = bgColor;
+                    e.CellStyle.ForeColor = foreColor; // Not working?
+
                     e.PaintBackground(e.ClipBounds, false);
                 }
 
@@ -1497,5 +1500,6 @@ namespace LogExpert.Controls.LogWindow
         #endregion
 
         #endregion
+        
     }
 }

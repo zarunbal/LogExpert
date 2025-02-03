@@ -42,7 +42,7 @@ namespace LogExpert.Dialogs
 
             InitializeComponent();
             DoubleBuffered = true;
-            VirtualMode = true;
+            VirtualMode = true;          
         }
 
         #endregion
@@ -94,7 +94,7 @@ namespace LogExpert.Dialogs
             {
                 if (PaintWithOverlays)
                 {
-                    PaintOverlays(e);
+                    PaintOverlays(e);                    
                 }
                 else
                 {
@@ -104,7 +104,7 @@ namespace LogExpert.Dialogs
             catch (Exception ex)
             {
                 _logger.Error(ex);
-            }
+            }            
         }
 
         protected override void OnEditingControlShowing(DataGridViewEditingControlShowingEventArgs e)
@@ -227,7 +227,7 @@ namespace LogExpert.Dialogs
                 myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
                 e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
 
-                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
+                PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);                
 
                 base.OnPaint(args);
 

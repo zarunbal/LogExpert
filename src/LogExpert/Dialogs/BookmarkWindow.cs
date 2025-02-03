@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Entities;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
@@ -31,6 +32,55 @@ namespace LogExpert.Dialogs
             InitializeComponent();
             bookmarkDataGridView.CellValueNeeded += boomarkDataGridView_CellValueNeeded;
             bookmarkDataGridView.CellPainting += boomarkDataGridView_CellPainting;
+
+            ChangeTheme(Controls);
+        }
+
+        #endregion
+
+        #region ColorTheme
+
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+            #region ApplyColorToAllControls
+            foreach (Control component in container)
+            {
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+                else
+                {
+                    component.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    component.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                }
+
+            }
+            #endregion            
+
+            #region DataGridView
+
+            BackColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
+            // Main DataGridView
+            bookmarkDataGridView.BackgroundColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+            bookmarkDataGridView.ColumnHeadersDefaultCellStyle.BackColor = LogExpert.Config.ColorMode.BackgroundColor;
+            bookmarkDataGridView.ColumnHeadersDefaultCellStyle.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+            bookmarkDataGridView.EnableHeadersVisualStyles = false;            
+
+            // Colors for menu
+            contextMenuStrip1.Renderer = new ExtendedMenuStripRenderer();
+
+            for (var y = 0; y < contextMenuStrip1.Items.Count; y++)
+            {
+                var item = contextMenuStrip1.Items[y];
+                item.ForeColor = LogExpert.Config.ColorMode.ForeColor;
+                item.BackColor = LogExpert.Config.ColorMode.MenuBackgroundColor;
+            }            
+
+            #endregion DataGridView
         }
 
         #endregion
@@ -195,7 +245,7 @@ namespace LogExpert.Dialogs
             if (!splitContainer1.Visible)
             {
                 Rectangle r = ClientRectangle;
-                e.Graphics.FillRectangle(SystemBrushes.ControlLight, r);
+                e.Graphics.FillRectangle(SystemBrushes.FromSystemColor(LogExpert.Config.ColorMode.BookmarksDefaultBackgroundColor), r);
                 RectangleF rect = r;
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
@@ -223,14 +273,15 @@ namespace LogExpert.Dialogs
 
         private void CommentPainting(DataGridView gridView, int rowIndex, DataGridViewCellPaintingEventArgs e)
         {
+            Color backColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+
             if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
-            {
-                Color backColor = e.CellStyle.SelectionBackColor;
+            {                
                 Brush brush;
                 if (gridView.Focused)
                 {
                     // _logger.logDebug("CellPaint Focus");
-                    brush = new SolidBrush(e.CellStyle.SelectionBackColor);
+                    brush = new SolidBrush(backColor);
                 }
                 else
                 {
@@ -244,7 +295,7 @@ namespace LogExpert.Dialogs
             }
             else
             {
-                e.CellStyle.BackColor = Color.White;
+                e.CellStyle.BackColor = backColor;
                 e.PaintBackground(e.CellBounds, false);
             }
 

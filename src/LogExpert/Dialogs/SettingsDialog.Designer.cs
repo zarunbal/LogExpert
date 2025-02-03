@@ -47,6 +47,7 @@
             this.checkBoxSingleInstance = new System.Windows.Forms.CheckBox();
             this.checkBoxAskCloseTabs = new System.Windows.Forms.CheckBox();
             this.groupBoxDefaults = new System.Windows.Forms.GroupBox();
+            this.checkBoxDarkMode = new System.Windows.Forms.CheckBox();
             this.checkBoxFollowTail = new System.Windows.Forms.CheckBox();
             this.checkBoxColumnFinder = new System.Windows.Forms.CheckBox();
             this.checkBoxSyncFilter = new System.Windows.Forms.CheckBox();
@@ -420,6 +421,7 @@
             // 
             // groupBoxDefaults
             // 
+            this.groupBoxDefaults.Controls.Add(this.checkBoxDarkMode);
             this.groupBoxDefaults.Controls.Add(this.checkBoxFollowTail);
             this.groupBoxDefaults.Controls.Add(this.checkBoxColumnFinder);
             this.groupBoxDefaults.Controls.Add(this.checkBoxSyncFilter);
@@ -432,6 +434,17 @@
             this.groupBoxDefaults.TabIndex = 6;
             this.groupBoxDefaults.TabStop = false;
             this.groupBoxDefaults.Text = "Defaults";
+            // 
+            // checkBoxDarkMode
+            // 
+            this.checkBoxDarkMode.AutoSize = true;
+            this.checkBoxDarkMode.Location = new System.Drawing.Point(7, 141);
+            this.checkBoxDarkMode.Margin = new System.Windows.Forms.Padding(4);
+            this.checkBoxDarkMode.Name = "checkBoxDarkMode";
+            this.checkBoxDarkMode.Size = new System.Drawing.Size(374, 26);
+            this.checkBoxDarkMode.TabIndex = 6;
+            this.checkBoxDarkMode.Text = "Dark Mode (restart required)";
+            this.checkBoxDarkMode.UseVisualStyleBackColor = true;
             // 
             // checkBoxFollowTail
             // 
@@ -1881,5 +1894,6 @@
         private System.Windows.Forms.CheckBox checkBoxPortableMode;
         private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
         private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
+        private System.Windows.Forms.CheckBox checkBoxDarkMode;
     }
 }

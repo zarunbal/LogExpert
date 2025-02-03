@@ -1,13 +1,12 @@
-﻿using System;
+﻿using LogExpert.Classes.DateTimeParser;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using LogExpert.Classes.DateTimeParser;
 
 namespace LogExpert.Dialogs
 {
@@ -27,7 +26,7 @@ namespace LogExpert.Dialogs
         private DateTime dateTime = new DateTime();
         private readonly IList<Rectangle> digitRects = new List<Rectangle>();
         private readonly StringFormat digitsFormat = new StringFormat();
-        private int draggedDigit = NO_DIGIT_DRAGGED;
+        private int _draggedDigit = NO_DIGIT_DRAGGED;
 
         public DragOrientations dragOrientation = DragOrientations.Vertical;
 
@@ -37,7 +36,7 @@ namespace LogExpert.Dialogs
 
         private int oldValue = 0;
 
-        private string[] dateParts;
+        private string[] _dateParts;
 
         private int startMouseX = 0;
         private int startMouseY = 0;
@@ -53,13 +52,12 @@ namespace LogExpert.Dialogs
         {
             InitializeComponent();
 
-            this.digitsFormat.LineAlignment = StringAlignment.Center;
-            this.digitsFormat.Alignment = StringAlignment.Near;
-            this.digitsFormat.Trimming = StringTrimming.None;
-            this.digitsFormat.FormatFlags =
-                StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip | StringFormatFlags.NoWrap;
+            digitsFormat.LineAlignment = StringAlignment.Center;
+            digitsFormat.Alignment = StringAlignment.Near;
+            digitsFormat.Trimming = StringTrimming.None;
+            digitsFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip | StringFormatFlags.NoWrap;
 
-            this.draggedDigit = NO_DIGIT_DRAGGED;
+            _draggedDigit = NO_DIGIT_DRAGGED;
         }
 
         #endregion
@@ -99,17 +97,17 @@ namespace LogExpert.Dialogs
 
         public DateTime DateTime
         {
-            get { return this.dateTime.Subtract(TimeSpan.FromMilliseconds(this.dateTime.Millisecond)); }
+            get { return dateTime.Subtract(TimeSpan.FromMilliseconds(dateTime.Millisecond)); }
             set
             {
-                this.dateTime = value;
-                if (this.dateTime < this.MinDateTime)
+                dateTime = value;
+                if (dateTime < MinDateTime)
                 {
-                    this.dateTime = MinDateTime;
+                    dateTime = MinDateTime;
                 }
-                if (this.dateTime > this.MaxDateTime)
+                if (dateTime > MaxDateTime)
                 {
-                    this.dateTime = MaxDateTime;
+                    dateTime = MaxDateTime;
                 }
             }
         }
@@ -121,9 +119,9 @@ namespace LogExpert.Dialogs
         // Returns the index of the rectangle (digitRects) under the mouse cursor
         private int DetermineDraggedDigit(MouseEventArgs e)
         {
-            for (int i = 0; i < this.digitRects.Count; ++i)
+            for (int i = 0; i < digitRects.Count; ++i)
             {
-                if (this.digitRects[i].Contains(e.Location) && Token.IsDatePart(this.dateParts[i]))
+                if (digitRects[i].Contains(e.Location) && Token.IsDatePart(_dateParts[i]))
                 {
                     return i;
                 }
@@ -135,83 +133,111 @@ namespace LogExpert.Dialogs
         // Return the value corresponding to current dragged digit
         private int GetDraggedValue()
         {
-            var datePart = this.dateParts[this.draggedDigit];
+            var datePart = _dateParts[_draggedDigit];
 
             if (datePart.StartsWith("y", StringComparison.OrdinalIgnoreCase))
-                return this.dateTime.Year;
+            {
+                return dateTime.Year;
+            }
             else if (datePart.StartsWith("M"))
-                return this.dateTime.Month;
+            {
+                return dateTime.Month;
+            }
             else if (datePart.StartsWith("d", StringComparison.OrdinalIgnoreCase))
-                return this.dateTime.Day;
+            {
+                return dateTime.Day;
+            }
             else if (datePart.StartsWith("h", StringComparison.OrdinalIgnoreCase))
-                return this.dateTime.Hour;
+            {
+                return dateTime.Hour;
+            }
             else if (datePart.StartsWith("m"))
-                return this.dateTime.Minute;
+            {
+                return dateTime.Minute;
+            }
             else if (datePart.StartsWith("s", StringComparison.OrdinalIgnoreCase))
-                return this.dateTime.Second;
+            {
+                return dateTime.Second;
+            }
             else
+            {
                 return NO_DIGIT_DRAGGED;
+            }
         }
 
         private bool SetDraggedValue(int delta)
         {
-            if (this.draggedDigit == NO_DIGIT_DRAGGED)
+            if (_draggedDigit == NO_DIGIT_DRAGGED)
+            {
                 return false;
+            }
 
             bool changed = true;
             try
             {
-                var datePart = this.dateParts[this.draggedDigit];
+                var datePart = _dateParts[_draggedDigit];
 
                 if (datePart.StartsWith("y", StringComparison.OrdinalIgnoreCase))
-                    this.dateTime = this.dateTime.AddYears(delta);
+                {
+                    dateTime = dateTime.AddYears(delta);
+                }
                 else if (datePart.StartsWith("M"))
-                    this.dateTime = this.dateTime.AddMonths(delta);
+                {
+                    dateTime = dateTime.AddMonths(delta);
+                }
                 else if (datePart.StartsWith("d", StringComparison.OrdinalIgnoreCase))
-                    this.dateTime = this.dateTime.AddDays(delta);
+                {
+                    dateTime = dateTime.AddDays(delta);
+                }
                 else if (datePart.StartsWith("h", StringComparison.OrdinalIgnoreCase))
-                    this.dateTime = this.dateTime.AddHours(delta);
+                {
+                    dateTime = dateTime.AddHours(delta);
+                }
                 else if (datePart.StartsWith("m"))
-                    this.dateTime = this.dateTime.AddMinutes(delta);
+                {
+                    dateTime = dateTime.AddMinutes(delta);
+                }
                 else if (datePart.StartsWith("s", StringComparison.OrdinalIgnoreCase))
-                    this.dateTime = this.dateTime.AddSeconds(delta);
+                {
+                    dateTime = dateTime.AddSeconds(delta);
+                }
             }
             catch (Exception)
             {
                 // invalid value dragged
             }
 
-            if (this.dateTime > this.MaxDateTime)
+            if (dateTime > MaxDateTime)
             {
-                this.dateTime = this.MaxDateTime;
+                dateTime = MaxDateTime;
                 changed = false;
             }
-            if (this.dateTime < this.MinDateTime)
+            if (dateTime < MinDateTime)
             {
-                this.dateTime = this.MinDateTime;
+                dateTime = MinDateTime;
                 changed = false;
             }
 
             return changed;
-        }        
+        }
 
         private void InitCustomRects(Section dateSection)
         {
-            this.dateParts = dateSection
+            _dateParts = dateSection
                 .GeneralTextDateDurationParts
                 .Select(p => DateFormatPartAdjuster.AdjustDateTimeFormatPart(p))
                 .ToArray();
 
-            Rectangle rect = this.ClientRectangle;
-            int oneCharWidth = rect.Width / dateParts.Sum(s => s.Length);
+            Rectangle rect = ClientRectangle;
+            int oneCharWidth = rect.Width / _dateParts.Sum(s => s.Length);
             int left = rect.Left;
 
-            this.digitRects.Clear();
-            for (var i = 0; i < dateParts.Length; i++)
+            digitRects.Clear();
+            for (var i = 0; i < _dateParts.Length; i++)
             {
-                var datePart = dateParts[i];
+                var datePart = _dateParts[i];
                 var s = datePart.Length * oneCharWidth;
-                this.digitRects.Add(new Rectangle(left, rect.Top, s, rect.Height));
+                digitRects.Add(new Rectangle(left, rect.Top, s, rect.Height));
                 left += s;
             }
 
@@ -254,18 +280,12 @@ namespace LogExpert.Dialogs
 
         protected void OnValueChanged(EventArgs e)
         {
-            if (ValueChanged != null)
-            {
-                ValueChanged(this, e);
-            }
+            ValueChanged?.Invoke(this, e);
         }
 
         protected void OnValueDragged(EventArgs e)
         {
-            if (ValueDragged != null)
-            {
-                ValueDragged(this, e);
-            }
+            ValueDragged?.Invoke(this, e);
         }
 
         public enum DragOrientations
@@ -279,11 +299,11 @@ namespace LogExpert.Dialogs
 
         private void BuildContextualMenu()
         {
-            this.ContextMenuStrip = new ContextMenuStrip();
-            this.ContextMenuStrip.Name = "Timestamp selector";
-            this.ContextMenuStrip.Items.Add(item1);
-            this.ContextMenuStrip.Items.Add(item2);
-            this.ContextMenuStrip.Items.Add(item3);
+            ContextMenuStrip = new ContextMenuStrip();
+            ContextMenuStrip.Name = "Timestamp selector";
+            ContextMenuStrip.Items.Add(item1);
+            ContextMenuStrip.Items.Add(item2);
+            ContextMenuStrip.Items.Add(item3);
             item1.Click += new EventHandler(item1_Click);
             item1.Text = "Drag horizontal";
             item2.Click += new EventHandler(item2_Click);
@@ -298,14 +318,14 @@ namespace LogExpert.Dialogs
 
         private void UpdateContextMenu()
         {
-            item1.Enabled = this.DragOrientation != DragOrientations.Horizontal;
-            item2.Enabled = this.DragOrientation != DragOrientations.Vertical;
-            item3.Enabled = this.DragOrientation != DragOrientations.InvertedVertical;
+            item1.Enabled = DragOrientation != DragOrientations.Horizontal;
+            item2.Enabled = DragOrientation != DragOrientations.Vertical;
+            item3.Enabled = DragOrientation != DragOrientations.InvertedVertical;
         }
 
         private void ContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            if (this.Capture)
+            if (Capture)
             {
                 e.Cancel = true;
             }
@@ -313,7 +333,7 @@ namespace LogExpert.Dialogs
 
         private void item1_Click(object sender, EventArgs e)
         {
-            this.DragOrientation = DragOrientations.Horizontal;
+            DragOrientation = DragOrientations.Horizontal;
             item1.Enabled = false;
             item2.Enabled = true;
             item3.Enabled = true;
@@ -321,7 +341,7 @@ namespace LogExpert.Dialogs
 
         private void item2_Click(object sender, EventArgs e)
         {
-            this.DragOrientation = DragOrientations.Vertical;
+            DragOrientation = DragOrientations.Vertical;
             item1.Enabled = true;
             item2.Enabled = false;
             item3.Enabled = true;
@@ -329,7 +349,7 @@ namespace LogExpert.Dialogs
 
         private void item3_Click(object sender, EventArgs e)
         {
-            this.DragOrientation = DragOrientations.InvertedVertical;
+            DragOrientation = DragOrientations.InvertedVertical;
             item1.Enabled = true;
             item2.Enabled = true;
             item3.Enabled = false;
@@ -344,20 +364,20 @@ namespace LogExpert.Dialogs
             base.OnPaint(e);
 
             // Show what digit is dragged
-            using (Brush hoverBrush = new SolidBrush(this.HoverColor))
+            using (Brush hoverBrush = new SolidBrush(HoverColor))
             {
-                if (this.draggedDigit != NO_DIGIT_DRAGGED)
+                if (_draggedDigit != NO_DIGIT_DRAGGED)
                 {
-                    e.Graphics.FillRectangle(hoverBrush, this.digitRects[this.draggedDigit]);
+                    e.Graphics.FillRectangle(hoverBrush, digitRects[_draggedDigit]);
                 }
             }
 
             // Display current value with user-defined date format and fixed time format ("HH:mm:ss")
             using (Brush brush = new SolidBrush(Color.Black))
             {
-                for (var i = 0; i < dateParts.Length; i++)
+                for (var i = 0; i < _dateParts.Length; i++)
                 {
-                    var datePart = dateParts[i];
+                    var datePart = _dateParts[i];
                     var rect = digitRects[i];
                     string value;
 
@@ -365,7 +385,7 @@ namespace LogExpert.Dialogs
                     {
                         try
                         {
-                            value = this.dateTime.ToString("-" + datePart + "-");
+                            value = dateTime.ToString("-" + datePart + "-");
                             value = value.Substring(1, value.Length - 2);
                         }
                         catch
@@ -374,9 +394,11 @@ namespace LogExpert.Dialogs
                         }
                     }
                     else
+                    {
                         value = datePart;
+                    }
 
-                    e.Graphics.DrawString(value, this.Font, brush, rect, this.digitsFormat);
+                    e.Graphics.DrawString(value, Font, brush, rect, digitsFormat);
                 }
             }
         }
@@ -396,23 +418,23 @@ namespace LogExpert.Dialogs
 
             if (e.Button == MouseButtons.Left)
             {
-                this.draggedDigit = DetermineDraggedDigit(e);
-                if (this.draggedDigit == NO_DIGIT_DRAGGED)
+                _draggedDigit = DetermineDraggedDigit(e);
+                if (_draggedDigit == NO_DIGIT_DRAGGED)
                 {
                     return;
                 }
                 Capture = true;
-                this.startMouseY = e.Y;
-                this.startMouseX = e.X;
-                this.oldValue = GetDraggedValue();
-                this.addedValue = 0;
+                startMouseY = e.Y;
+                startMouseX = e.X;
+                oldValue = GetDraggedValue();
+                addedValue = 0;
             }
-            else if (e.Button == MouseButtons.Right && this.Capture)
+            else if (e.Button == MouseButtons.Right && Capture)
             {
                 Capture = false;
                 SetDraggedValue(0); //undo
             }
-            this.Invalidate(); // repaint with the selected item (or none)
+            Invalidate(); // repaint with the selected item (or none)
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -425,8 +447,8 @@ namespace LogExpert.Dialogs
             base.OnMouseUp(e);
 
             Capture = false;
-            this.draggedDigit = NO_DIGIT_DRAGGED;
-            this.Invalidate(); // repaint without the selected item
+            _draggedDigit = NO_DIGIT_DRAGGED;
+            Invalidate(); // repaint without the selected item
 
             OnValueChanged(new EventArgs());
         }
@@ -441,28 +463,28 @@ namespace LogExpert.Dialogs
             }
 
             int diff;
-            if (this.DragOrientation == DragOrientations.Vertical)
+            if (DragOrientation == DragOrientations.Vertical)
             {
-                diff = this.startMouseY - e.Y;
+                diff = startMouseY - e.Y;
             }
-            else if (this.DragOrientation == DragOrientations.InvertedVertical)
+            else if (DragOrientation == DragOrientations.InvertedVertical)
             {
-                diff = this.startMouseY + e.Y;
+                diff = startMouseY + e.Y;
             }
             else
             {
-                diff = e.X - this.startMouseX;
+                diff = e.X - startMouseX;
             }
 
-            int delta = diff / 5 - this.addedValue; // one unit per 5 pixels move
+            int delta = diff / 5 - addedValue; // one unit per 5 pixels move
 
             if (delta != 0)
             {
                 if (SetDraggedValue(delta))
                 {
-                    this.addedValue += delta;
+                    addedValue += delta;
                 }
-                this.Invalidate();
+                Invalidate();
 
                 OnValueDragged(new EventArgs());
             }
@@ -470,9 +492,9 @@ namespace LogExpert.Dialogs
 
         private void DateTimeDragControl_MouseLeave(object sender, EventArgs e)
         {
-            if (!this.Capture)
+            if (!Capture)
             {
-                this.draggedDigit = NO_DIGIT_DRAGGED;
+                _draggedDigit = NO_DIGIT_DRAGGED;
                 Refresh();
             }
         }
