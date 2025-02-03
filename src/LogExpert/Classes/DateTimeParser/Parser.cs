@@ -14,10 +14,14 @@ namespace LogExpert.Classes.DateTimeParser
                 var section = ParseSection(tokenizer, sections.Count, out var sectionSyntaxError);
 
                 if (sectionSyntaxError)
+                {
                     syntaxError = true;
+                }
 
                 if (section == null)
+                {
                     break;
+                }
 
                 sections.Add(section);
             }
@@ -34,7 +38,9 @@ namespace LogExpert.Classes.DateTimeParser
             while ((token = ReadToken(reader, out syntaxError)) != null)
             {
                 if (token == ";")
+                {
                     break;
+                }
 
                 if (Token.IsDatePart(token))
                 {
@@ -89,9 +95,13 @@ namespace LogExpert.Classes.DateTimeParser
                     }
 
                     if (zeros > 0)
+                    {
                         result.Add("." + new string('0', zeros));
+                    }
                     else
+                    {
                         result.Add(".");
+                    }
                 }
                 else
                 {
@@ -115,18 +125,18 @@ namespace LogExpert.Classes.DateTimeParser
                 reader.ReadOneOf("#?,!&%+-$€£0123456789{}():;/.@ ") ||
 
                 // Date
-                reader.ReadString("tt", true) || 
-                reader.ReadOneOrMore('y') || 
-                reader.ReadOneOrMore('Y') || 
-                reader.ReadOneOrMore('m') || 
-                reader.ReadOneOrMore('M') || 
-                reader.ReadOneOrMore('d') || 
-                reader.ReadOneOrMore('D') || 
-                reader.ReadOneOrMore('h') || 
-                reader.ReadOneOrMore('H') || 
-                reader.ReadOneOrMore('s') || 
+                reader.ReadString("tt", true) || //AM / PM
+                reader.ReadOneOrMore('y') ||
+                reader.ReadOneOrMore('Y') ||
+                reader.ReadOneOrMore('m') ||
+                reader.ReadOneOrMore('M') ||
+                reader.ReadOneOrMore('d') ||
+                reader.ReadOneOrMore('D') ||
+                reader.ReadOneOrMore('h') ||
+                reader.ReadOneOrMore('H') ||
+                reader.ReadOneOrMore('s') ||
                 reader.ReadOneOrMore('S') ||
-                //Latin Date String: (a.C.n.  ante Christum natum) 
+                //Latin Date String: (a.C.n.  ante Christum natum)
                 reader.ReadString("gg"))
             {
                 syntaxError = false;

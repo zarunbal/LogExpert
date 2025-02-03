@@ -1,8 +1,10 @@
-﻿using NUnit.Framework;
+﻿using LogExpert.Classes.DateTimeParser;
+
+using NUnit.Framework;
+
 using System;
 using System.Globalization;
 using System.Linq;
-using LogExpert.Classes.DateTimeParser;
 
 namespace LogExpert.Tests
 {
@@ -14,15 +16,28 @@ namespace LogExpert.Tests
         {
             var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
 
+            //TODO Add Support for languages with TT (AM / PM)
             foreach (var culture in cultures)
             {
-                if (culture.Name == "dz" || culture.Name.StartsWith("dz-"))
+                var datePattern = GetDateAndTimeFormat(culture);
+
+                //aa (Afar dd/MM/yyyy h:mm:ss tt)
+                //af-NA (Afrikaans (Namibia) yyyy-MM-dd h:mm:ss tt)
+                //ak (Akan yyyy/MM/dd h:mm:ss tt)
+                //bem (Bemba dd/MM/yyyy h:mm:ss tt)
+                //ceb (Cebuano M/d/yyyy h:mm:ss tt)
+                //el-CY (Greek (Cyprus) d/M/yyyy h:mm:ss tt)
+                //dz (Dzongkha yyyy-MM-dd ཆུ་ཚོད་h:mm:ss tt)
+                //es-CO(Spanish(Colombia) d/MM/yyyy h:mm:ss tt)
+                //es-DO (Spanish (Dominican Republic) d/M/yyyy h:mm:ss tt)
+                //es-PA (Spanish (Panama) MM/dd/yyyy h:mm:ss tt)
+                //es-PH (Spanish (Philippines) d/M/yyyy h:mm:ss tt)
+                if (datePattern.Contains("tt"))
                 {
-                    Console.WriteLine("The dz (Dzongkha) time format is not supported yet.");
+                    Console.WriteLine($"The {culture.Name} time format is not supported yet.");
                     continue;
                 }
 
-                var datePattern = GetDateAndTimeFormat(culture);
                 var message = $"Culture: {culture.Name} ({culture.EnglishName} {datePattern})";
                 var sections = Parser.ParseSections(datePattern, out bool syntaxError);
 
