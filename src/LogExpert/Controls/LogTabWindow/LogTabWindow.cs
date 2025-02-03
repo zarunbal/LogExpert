@@ -2,6 +2,7 @@
 using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 
 using NLog;
@@ -189,14 +190,15 @@ namespace LogExpert.Controls.LogTabWindow
 
                         try
                         {
-                            for(var x = 0; x< item.DropDownItems.Count; x++)
+                            for (var x = 0; x < item.DropDownItems.Count; x++)
                             {
                                 var children = item.DropDownItems[x];
                                 children.ForeColor = ColorMode.ForeColor;
                                 children.BackColor = ColorMode.MenuBackgroundColor;
 
 
-                                if(children is ToolStripDropDownItem) { 
+                                if (children is ToolStripDropDownItem)
+                                {
 
                                     for (var y = 0; y < ((ToolStripDropDownItem)children).DropDownItems.Count; y++)
                                     {
@@ -218,7 +220,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             // Colors for selected menus
             mainMenuStrip.Renderer = new ExtendedMenuStripRenderer();
-            
+
             // Dock special color
             dockPanel.DockBackColor = ColorMode.DockBackgroundColor;
 
@@ -254,7 +256,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = ColorMode.InactiveTabColor;
             dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = ColorMode.InactiveTabColor;
-            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = ColorMode.ForeColor;            
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = ColorMode.ForeColor;
             #endregion Tabs
         }
         #endregion

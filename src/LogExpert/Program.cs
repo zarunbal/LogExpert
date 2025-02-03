@@ -1,11 +1,15 @@
 using Grpc.Core;
 using Grpc.Net.Client;
+
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
+
 using LogexpertGRPCService.Services;
+
 using NLog;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -139,11 +143,8 @@ namespace LogExpert
                     {
                         try
                         {
-
                             using var channel = GrpcChannel.ForAddress("https://localhost:5001");
                             var client = new Grpc.LogExpertService.LogExpertServiceClient(channel);
-
-
 
                             //Console.WriteLine("Greeting: " + reply.Result);
                             // another instance already exists
