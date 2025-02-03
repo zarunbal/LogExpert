@@ -36,7 +36,7 @@ namespace LogExpert.Tests
             };
 
             var result = jsonCompactColumnizer.GetPriority(path, loglines);
-            Assert.AreEqual(result, priority);
+            Assert.That(result, Is.EqualTo(priority));
         }
     }
 }

@@ -31,7 +31,7 @@ Or Install via chocolatey
 ```choco install logexpert```
 
 Requirements
-- .NET 4.7.2
+- [.NET 4.8.1](https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net481-web-installer)
 
 ## CI
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
@@ -57,6 +57,9 @@ Nuke.build Requirements
 Please checkout the wiki for FAQ / HELP / Informations / Examples
 
 https://github.com/zarunbal/LogExpert/wiki
+
+# Discord Server
+https://discord.gg/SjxkuckRe9
 
 ## Credits
 ### Contributors

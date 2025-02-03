@@ -22,7 +22,7 @@ namespace LogExpert.Tests
             LogWindow logWindow =
                 new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.AreEqual(columnizerType, logWindow.CurrentColumnizer.GetType());
+            Assert.That(logWindow.CurrentColumnizer.GetType(),Is.EqualTo(columnizerType));
         }
 
         [TestCase(@".\TestData\XmlTest_01.xml")]
@@ -35,7 +35,7 @@ namespace LogExpert.Tests
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
             LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.True(true);
+            Assert.That(true,Is.True);
         }
     }
 }

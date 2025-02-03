@@ -2870,7 +2870,7 @@ namespace LogExpert.Controls.LogWindow
                         line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                     }
 
-                    clipText.AppendLine(line.FullLine);
+                    clipText.AppendLine(line.ToClipBoardText());
                 }
 
                 Clipboard.SetText(clipText.ToString());

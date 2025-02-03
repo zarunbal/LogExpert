@@ -112,10 +112,11 @@ namespace LogExpert.Classes.Log
                 fileName = fileName.Remove(_dateGroup.Index, _dateGroup.Length);
                 fileName = fileName.Insert(_dateGroup.Index, newDate);
             }
+
             if (_indexGroup != null && _indexGroup.Success)
             {
                 fileName = fileName.Remove(_indexGroup.Index, _indexGroup.Length);
-                string fileNameBak = fileName;
+
                 if (!_hideZeroIndex || Index > 0)
                 {
                     string format = "D" + _indexGroup.Length;
@@ -126,8 +127,9 @@ namespace LogExpert.Classes.Log
                     }
                 }
             }
-//      this.currentFileName = fileName;
-//      SetFileName(fileName);
+
+            //      this.currentFileName = fileName;
+            //      SetFileName(fileName);
             return fileName;
         }
 
