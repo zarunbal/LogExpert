@@ -1476,79 +1476,22 @@ namespace LogExpert.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripMenuItem toolStripEncodingANSIItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripEncodingUTF8Item;
         private System.Windows.Forms.ToolStripMenuItem toolStripEncodingUTF16Item;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem columnizerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private DateTimeDragControl dragControlDateTime;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        
         private System.Windows.Forms.ToolStripMenuItem showBookmarkListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        
         private System.Windows.Forms.ToolStrip buttonToolStrip;
         private System.Windows.Forms.ToolStripButton toolStripButtonOpen;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
         private System.Windows.Forms.ToolStripButton toolStripButtonSearch;
         private System.Windows.Forms.ToolStripButton toolStripButtonFilter;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private System.Windows.Forms.ToolStripButton toolStripButtonBookmark;
         private System.Windows.Forms.ToolStripButton toolStripButtonUp;
         private System.Windows.Forms.ToolStripButton toolStripButtonDown;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private CheckBox host;
-        private CheckBox checkBoxFollowTail;
-        private ToolStripButton toolStripButtonTail;
-        private ToolStripMenuItem showHelpToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator5;
-        private ToolStripMenuItem hideLineColumnToolStripMenuItem;
-        private ToolStripMenuItem lastUsedToolStripMenuItem;
-        private ContextMenuStrip tabContextMenuStrip;
-        private ToolStripMenuItem closeThisTabToolStripMenuItem;
-        private ToolStripMenuItem closeOtherTabsToolStripMenuItem;
-        private ToolStripMenuItem closeAllTabsToolStripMenuItem;
-        private ToolStripMenuItem tabColorToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator13;
-        private ToolStripMenuItem loadProjectToolStripMenuItem;
-        private ToolStripMenuItem saveProjectToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator14;
-        private ToolStripButton toolStripButtonBubbles;
-        private ToolStripSeparator toolStripSeparator15;
-        private ToolStripSeparator toolStripSeparator16;
-        private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
-        private ToolStripMenuItem findInExplorerToolStripMenuItem;
-        private ToolStripMenuItem exportBookmarksToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator17;
-        private ToolStripComboBox groupsComboBoxHighlightGroups;
-        private ToolStripMenuItem debugToolStripMenuItem;
-        private ToolStripMenuItem dumpLogBufferInfoToolStripMenuItem;
-        private ToolStripMenuItem dumpBufferDiagnosticToolStripMenuItem;
-        private ToolStripMenuItem runGCToolStripMenuItem;
-        private ToolStripMenuItem gCInfoToolStripMenuItem;
-        private ToolStrip externalToolsToolStrip;
-        private ToolStripMenuItem toolsToolStripMenuItem;
-        private ToolStripMenuItem configureToolStripMenuItem;
-        private ToolStripSeparator configureToolStripSeparator;
-        private ToolStripMenuItem throwExceptionGUIThreadToolStripMenuItem;
-        private ToolStripMenuItem throwExceptionbackgroundThToolStripMenuItem;
-        private ToolStripMenuItem throwExceptionBackgroundThreadToolStripMenuItem;
-        private ToolStripMenuItem loglevelToolStripMenuItem;
-        private ToolStripMenuItem warnToolStripMenuItem;
-        private ToolStripMenuItem infoToolStripMenuItem;
-        private ToolStripMenuItem debugToolStripMenuItem1;
-        private ToolStripSeparator toolStripSeparator12;
-        private ToolStripSeparator toolStripSeparator18;
-        private ToolStripMenuItem disableWordHighlightModeToolStripMenuItem;
-        private ToolStripMenuItem multifileMaskToolStripMenuItem;
-        private ToolStripMenuItem multiFileEnabledStripMenuItem;
-        private ToolStripMenuItem toolStripEncodingISO88591Item;
-        private ToolStripSeparator toolStripSeparator19;
-        private ToolStripMenuItem lockInstanceToolStripMenuItem;
-        private ToolStripMenuItem newFromClipboardToolStripMenuItem;
-        private ToolStripMenuItem openURIToolStripMenuItem;
-        private ToolStripMenuItem columnFinderToolStripMenuItem;
-        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
-        private ToolStripMenuItem tabRenameToolStripMenuItem;
+        
         private LineToolStripSeparatorExtension toolStripSeparator1;
         private MenuToolStripSeparatorExtension toolStripSeparator2;
         private MenuToolStripSeparatorExtension toolStripSeparator3;
@@ -1569,6 +1512,54 @@ namespace LogExpert.Controls.LogTabWindow
         private MenuToolStripSeparatorExtension toolStripSeparator12;
         private MenuToolStripSeparatorExtension toolStripSeparator18;
         private MenuToolStripSeparatorExtension toolStripSeparator19;
+
+        private CheckBox host;
+        private CheckBox checkBoxFollowTail;
+        private ToolStripButton toolStripButtonTail;
+        private ToolStripMenuItem showHelpToolStripMenuItem;
+        
+        private ToolStripMenuItem hideLineColumnToolStripMenuItem;
+        private ToolStripMenuItem lastUsedToolStripMenuItem;
+        private ContextMenuStrip tabContextMenuStrip;
+        private ToolStripMenuItem closeThisTabToolStripMenuItem;
+        private ToolStripMenuItem closeOtherTabsToolStripMenuItem;
+        private ToolStripMenuItem closeAllTabsToolStripMenuItem;
+        private ToolStripMenuItem tabColorToolStripMenuItem;
+        private ToolStripMenuItem loadProjectToolStripMenuItem;
+        private ToolStripMenuItem saveProjectToolStripMenuItem;
+        private ToolStripButton toolStripButtonBubbles;
+        private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
+        private ToolStripMenuItem findInExplorerToolStripMenuItem;
+        private ToolStripMenuItem exportBookmarksToolStripMenuItem;
+        private ToolStripComboBox groupsComboBoxHighlightGroups;
+        private ToolStripMenuItem debugToolStripMenuItem;
+        private ToolStripMenuItem dumpLogBufferInfoToolStripMenuItem;
+        private ToolStripMenuItem dumpBufferDiagnosticToolStripMenuItem;
+        private ToolStripMenuItem runGCToolStripMenuItem;
+        private ToolStripMenuItem gCInfoToolStripMenuItem;
+        private ToolStrip externalToolsToolStrip;
+        private ToolStripMenuItem toolsToolStripMenuItem;
+        private ToolStripMenuItem configureToolStripMenuItem;
+        
+        private ToolStripMenuItem throwExceptionGUIThreadToolStripMenuItem;
+        private ToolStripMenuItem throwExceptionbackgroundThToolStripMenuItem;
+        private ToolStripMenuItem throwExceptionBackgroundThreadToolStripMenuItem;
+        private ToolStripMenuItem loglevelToolStripMenuItem;
+        private ToolStripMenuItem warnToolStripMenuItem;
+        private ToolStripMenuItem infoToolStripMenuItem;
+        private ToolStripMenuItem debugToolStripMenuItem1;
+
+        private ToolStripMenuItem disableWordHighlightModeToolStripMenuItem;
+        private ToolStripMenuItem multifileMaskToolStripMenuItem;
+        private ToolStripMenuItem multiFileEnabledStripMenuItem;
+        private ToolStripMenuItem toolStripEncodingISO88591Item;
+        
+        private ToolStripMenuItem lockInstanceToolStripMenuItem;
+        private ToolStripMenuItem newFromClipboardToolStripMenuItem;
+        private ToolStripMenuItem openURIToolStripMenuItem;
+        private ToolStripMenuItem columnFinderToolStripMenuItem;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
+        private ToolStripMenuItem tabRenameToolStripMenuItem;
     }
 }
 

@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
-using System.Runtime.InteropServices;
 using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Entities;
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
 {
@@ -32,7 +33,7 @@ namespace LogExpert.Dialogs
             Preferences = prefs;
             _logTabWin = logTabWin;
             InitializeComponent();
-            
+
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
         }
@@ -94,12 +95,12 @@ namespace LogExpert.Dialogs
             {
                 if (Preferences.lastColumnWidth < cpDownColumnWidth.Minimum)
                 {
-                    Preferences.lastColumnWidth = (int) cpDownColumnWidth.Minimum;
+                    Preferences.lastColumnWidth = (int)cpDownColumnWidth.Minimum;
                 }
 
                 if (Preferences.lastColumnWidth > cpDownColumnWidth.Maximum)
                 {
-                    Preferences.lastColumnWidth = (int) cpDownColumnWidth.Maximum;
+                    Preferences.lastColumnWidth = (int)cpDownColumnWidth.Maximum;
                 }
 
                 cpDownColumnWidth.Value = Preferences.lastColumnWidth;
@@ -116,27 +117,27 @@ namespace LogExpert.Dialogs
             switch (Preferences.saveLocation)
             {
                 case SessionSaveLocation.OwnDir:
-                {
-                    radioButtonSessionSaveOwn.Checked = true;
-                }
-                break;
+                    {
+                        radioButtonSessionSaveOwn.Checked = true;
+                    }
+                    break;
                 case SessionSaveLocation.SameDir:
-                {
-                    radioButtonSessionSameDir.Checked = true;
-                }
-                break;
+                    {
+                        radioButtonSessionSameDir.Checked = true;
+                    }
+                    break;
                 case SessionSaveLocation.DocumentsDir:
-                {
-                    radioButtonsessionSaveDocuments.Checked = true;
-                    break;
-                }
+                    {
+                        radioButtonsessionSaveDocuments.Checked = true;
+                        break;
+                    }
                 case SessionSaveLocation.ApplicationStartupDir:
-                {
-                    radioButtonSessionApplicationStartupDir.Checked = true;
-                    break;
-                }
+                    {
+                        radioButtonSessionApplicationStartupDir.Checked = true;
+                        break;
+                    }
             }
-            
+
             //overwrite preferences save location in portable mode to always be application startup directory
             if (checkBoxPortableMode.Checked)
             {
@@ -153,7 +154,7 @@ namespace LogExpert.Dialogs
             upDownPollingInterval.Value = Preferences.pollingInterval;
             checkBoxMultiThread.Checked = Preferences.multiThreadFilter;
 
-            dataGridViewColumnizer.DataError += OnDataGridViewColumnizerDataError;
+            dataGridViewColumnizer.DataError += OnDataGridColumnizerViewError;
 
             FillColumnizerList();
             FillPluginList();
@@ -179,7 +180,7 @@ namespace LogExpert.Dialogs
 
         private void DisplayFontName()
         {
-            labelFont.Text = Preferences.fontName + @" " + (int) Preferences.fontSize;
+            labelFont.Text = Preferences.fontName + @" " + (int)Preferences.fontSize;
             labelFont.Font = new Font(new FontFamily(Preferences.fontName), Preferences.fontSize);
         }
 
@@ -208,7 +209,7 @@ namespace LogExpert.Dialogs
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            
+
             if (string.IsNullOrEmpty(textBox.Text) == false)
             {
                 FileInfo info = new FileInfo(textBox.Text);
@@ -286,10 +287,10 @@ namespace LogExpert.Dialogs
         {
             dataGridViewColumnizer.Rows.Clear();
 
-            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) dataGridViewColumnizer.Columns[1];
+            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) dataGridViewColumnizer.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
 
             IList<ILogLineColumnizer> columnizers = PluginRegistry.GetInstance().RegisteredColumnizers;
             foreach (ILogLineColumnizer columnizer in columnizers)
@@ -322,7 +323,7 @@ namespace LogExpert.Dialogs
             int count = dataGridViewColumnizer.RowCount;
             if (count > 0 && !dataGridViewColumnizer.Rows[count - 1].IsNewRow)
             {
-                DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) dataGridViewColumnizer.Rows[count - 1].Cells[1];
+                DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
@@ -331,10 +332,10 @@ namespace LogExpert.Dialogs
         {
             dataGridViewHighlightMask.Rows.Clear();
 
-            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn) dataGridViewHighlightMask.Columns[1];
+            DataGridViewComboBoxColumn comboColumn = (DataGridViewComboBoxColumn)dataGridViewHighlightMask.Columns[1];
             comboColumn.Items.Clear();
 
-            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn) dataGridViewHighlightMask.Columns[0];
+            DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
 
             IList<HilightGroup> groups = _logTabWin.HilightGroupList;
             foreach (HilightGroup group in groups)
@@ -374,7 +375,7 @@ namespace LogExpert.Dialogs
             if (count > 0 && !dataGridViewHighlightMask.Rows[count - 1].IsNewRow)
             {
                 DataGridViewComboBoxCell comboCell =
-                    (DataGridViewComboBoxCell) dataGridViewHighlightMask.Rows[count - 1].Cells[1];
+                    (DataGridViewComboBoxCell)dataGridViewHighlightMask.Rows[count - 1].Cells[1];
                 comboCell.Value = comboCell.Items[0];
             }
         }
@@ -484,20 +485,20 @@ namespace LogExpert.Dialogs
             switch (Preferences.multiFileOption)
             {
                 case MultiFileOption.SingleFiles:
-                {
-                    radioButtonLoadEveryFileIntoSeperatedTab.Checked = true;
-                    break;
-                }
+                    {
+                        radioButtonLoadEveryFileIntoSeperatedTab.Checked = true;
+                        break;
+                    }
                 case MultiFileOption.MultiFile:
-                {
-                    radioButtonTreatAllFilesAsOneMultifile.Checked = true;
-                    break;
-                }
+                    {
+                        radioButtonTreatAllFilesAsOneMultifile.Checked = true;
+                        break;
+                    }
                 case MultiFileOption.Ask:
-                {
-                    radioButtonAskWhatToDo.Checked = true;
-                    break;
-                }
+                    {
+                        radioButtonAskWhatToDo.Checked = true;
+                        break;
+                    }
             }
 
             textBoxMultifilePattern.Text = Preferences.multiFileOptions.FormatPattern;
@@ -623,7 +624,7 @@ namespace LogExpert.Dialogs
             }
 
             SaveColumnizerList();
-            
+
             Preferences.maskPrio = checkBoxMaskPrio.Checked;
             Preferences.autoPick = checkBoxAutoPick.Checked;
             Preferences.askForClose = checkBoxAskCloseTabs.Checked;
@@ -631,7 +632,7 @@ namespace LogExpert.Dialogs
             Preferences.openLastFiles = checkBoxOpenLastFiles.Checked;
             Preferences.showTailState = checkBoxTailState.Checked;
             Preferences.setLastColumnWidth = checkBoxColumnSize.Checked;
-            Preferences.lastColumnWidth = (int) cpDownColumnWidth.Value;
+            Preferences.lastColumnWidth = (int)cpDownColumnWidth.Value;
             Preferences.showTimeSpread = checkBoxTimeSpread.Checked;
             Preferences.reverseAlpha = checkBoxReverseAlpha.Checked;
             Preferences.timeSpreadTimeMode = radioButtonTimeView.Checked;
@@ -657,9 +658,9 @@ namespace LogExpert.Dialogs
             }
 
             Preferences.saveFilters = checkBoxSaveFilter.Checked;
-            Preferences.bufferCount = (int) upDownBlockCount.Value;
-            Preferences.linesPerBuffer = (int) upDownLinesPerBlock.Value;
-            Preferences.pollingInterval = (int) upDownPollingInterval.Value;
+            Preferences.bufferCount = (int)upDownBlockCount.Value;
+            Preferences.linesPerBuffer = (int)upDownLinesPerBlock.Value;
+            Preferences.pollingInterval = (int)upDownPollingInterval.Value;
             Preferences.multiThreadFilter = checkBoxMultiThread.Checked;
             Preferences.defaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
             Preferences.showColumnFinder = checkBoxColumnFinder.Checked;
@@ -678,21 +679,21 @@ namespace LogExpert.Dialogs
 
         private void OnToolButtonAClick(object sender, EventArgs e)
         {
-            OnToolButtonClick(textBoxTool);
+            OnBtnToolClickInternal(textBoxTool);
         }
 
         private void OnArgButtonAClick(object sender, EventArgs e)
         {
-            OnArgsButtonClick(textBoxArguments);
+            OnBtnArgsClickInternal(textBoxArguments);
         }
 
         //TODO Remove or refactor this function
         private void OnColumnizerDataGridViewRowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
+            DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
             if (comboCell.Items.Count > 0)
             {
-//        comboCell.Value = comboCell.Items[0];
+                //        comboCell.Value = comboCell.Items[0];
             }
         }
 
@@ -706,7 +707,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnColumnizerDataGridViewDataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void OnDataGridColumnizerViewError(object sender, DataGridViewDataErrorEventArgs e)
         {
             e.Cancel = true;
         }
@@ -716,7 +717,7 @@ namespace LogExpert.Dialogs
             comboBoxColumnizer.Enabled = checkBoxSysout.Checked;
         }
 
-        private void OnTailColorButtonClick(object sender, EventArgs e)
+        private void OnButtonTailColorClick(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.showTailColor;
@@ -727,12 +728,12 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnColumnSizeCheckBoxCheckedChanged(object sender, EventArgs e)
+        private void OnCheckBoxColumnSizeCheckedChanged(object sender, EventArgs e)
         {
             cpDownColumnWidth.Enabled = checkBoxColumnSize.Checked;
         }
 
-        private void OnTimespreadColorButtonClick(object sender, EventArgs e)
+        private void OnButtonTimespreadColorClick(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.timeSpreadColor;
@@ -748,11 +749,11 @@ namespace LogExpert.Dialogs
             _selectedPlugin?.HideConfigForm();
 
             object o = listBoxPlugin.SelectedItem;
-            
+
             if (o != null)
             {
                 _selectedPlugin = o as ILogExpertPluginConfigurator;
-                
+
                 if (o is ILogExpertPluginConfigurator)
                 {
                     if (_selectedPlugin.HasEmbeddedForm())
@@ -786,7 +787,7 @@ namespace LogExpert.Dialogs
 
             dlg.ShowNewFolderButton = true;
             dlg.Description = @"Choose folder for LogExpert's session files";
-            
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 labelSessionSaveOwnDir.Text = dlg.SelectedPath;
@@ -800,44 +801,46 @@ namespace LogExpert.Dialogs
                 switch (checkBoxPortableMode.CheckState)
                 {
                     case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
-                    {
-                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
                         {
-                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
-                        }
+                            if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                            {
+                                Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            }
 
-                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName)) 
-                            break;
-                    }
+                            using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
+                            {
+                                break;
+                            }
+                        }
                     case CheckState.Unchecked when File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
-                    {
-                        File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
-                        break;
-                    }
+                        {
+                            File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
+                            break;
+                        }
                 }
 
                 switch (checkBoxPortableMode.CheckState)
                 {
                     case CheckState.Unchecked:
-                    {
-                        checkBoxPortableMode.Text = @"Activate Portable Mode";
-                        Preferences.PortableMode = false;
-                        break;
-                    }
+                        {
+                            checkBoxPortableMode.Text = @"Activate Portable Mode";
+                            Preferences.PortableMode = false;
+                            break;
+                        }
 
                     case CheckState.Checked:
-                    {
-                        Preferences.PortableMode = true;
-                        checkBoxPortableMode.Text = @"Deactivate Portable Mode";
-                        break;
-                    }
+                        {
+                            Preferences.PortableMode = true;
+                            checkBoxPortableMode.Text = @"Deactivate Portable Mode";
+                            break;
+                        }
                 }
             }
             catch (Exception exception)
             {
                 MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
             }
-          
+
         }
 
         private void OnConfigPluginButtonClick(object sender, EventArgs e)
@@ -851,9 +854,9 @@ namespace LogExpert.Dialogs
         private void OnNumericUpDown1ValueChanged(object sender, EventArgs e)
         {
             //TODO implement
-        }   
+        }
 
-        private void OnToolListBoxSelectedIndexChanged(object sender, EventArgs e)
+        private void OnListBoxToolsSelectedIndexChanged(object sender, EventArgs e)
         {
             GetCurrentToolValues();
             _selectedTool = listBoxTools.SelectedItem as ToolEntry;
@@ -863,10 +866,10 @@ namespace LogExpert.Dialogs
             DisplayCurrentIcon();
         }
 
-        private void OnToolUpButtonClick(object sender, EventArgs e)
+        private void OnButtonToolUpClick(object sender, EventArgs e)
         {
             int i = listBoxTools.SelectedIndex;
-        
+
             if (i > 0)
             {
                 bool isChecked = listBoxTools.GetItemChecked(i);
@@ -879,10 +882,10 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnToolDownButtonClick(object sender, EventArgs e)
+        private void OnButtonToolDownClick(object sender, EventArgs e)
         {
             int i = listBoxTools.SelectedIndex;
-            
+
             if (i < listBoxTools.Items.Count - 1)
             {
                 bool isChecked = listBoxTools.GetItemChecked(i);
@@ -895,7 +898,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnToolAddButtonClick(object sender, EventArgs e)
+        private void OnButtonToolAddClick(object sender, EventArgs e)
         {
             listBoxTools.Items.Add(new ToolEntry());
             listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
@@ -904,7 +907,7 @@ namespace LogExpert.Dialogs
         private void OnToolDeleteButtonClick(object sender, EventArgs e)
         {
             int i = listBoxTools.SelectedIndex;
-            
+
             if (i < listBoxTools.Items.Count && i >= 0)
             {
                 listBoxTools.Items.RemoveAt(i);
@@ -922,19 +925,19 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnIconButtonClick(object sender, EventArgs e)
+        private void OnButtonIconClick(object sender, EventArgs e)
         {
             if (_selectedTool != null)
             {
                 string iconFile = _selectedTool.iconFile;
-            
+
                 if (Util.IsNullOrSpaces(iconFile))
                 {
                     iconFile = textBoxTool.Text;
                 }
 
                 ChooseIconDlg dlg = new ChooseIconDlg(iconFile);
-                
+
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     _selectedTool.iconFile = dlg.FileName;
@@ -949,9 +952,9 @@ namespace LogExpert.Dialogs
             _selectedPlugin?.HideConfigForm();
         }
 
-        private void OnWorkingDirButtonClick(object sender, EventArgs e)
+        private void OnButtonWorkingDirClick(object sender, EventArgs e)
         {
-            OnWorkingDirButtonClick(textBoxWorkingDir);
+            OnBtnWorkingDirClick(textBoxWorkingDir);
         }
 
         private void OnMultiFilePatternTextChanged(object sender, EventArgs e)
@@ -960,16 +963,16 @@ namespace LogExpert.Dialogs
             upDownMultifileDays.Enabled = pattern.Contains("$D");
         }
 
-        private void OnExportButtonClick(object sender, EventArgs e)
+        private void OnButtonExportClick(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Title = @"Export Settings to file";
             dlg.DefaultExt = "json";
             dlg.AddExtension = true;
             dlg.Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*";
-            
+
             DialogResult result = dlg.ShowDialog();
-            
+
             if (result == DialogResult.OK)
             {
                 FileInfo fileInfo = new FileInfo(dlg.FileName);
@@ -978,11 +981,11 @@ namespace LogExpert.Dialogs
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnImportButtonClick(object sender, EventArgs e)
+        private void OnButtonImportClick(object sender, EventArgs e)
         {
             ImportSettingsDialog dlg = new ImportSettingsDialog();
 

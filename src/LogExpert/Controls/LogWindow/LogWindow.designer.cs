@@ -516,7 +516,7 @@ namespace LogExpert.Controls.LogWindow
             this.columnButton.Text = "Columns...";
             this.helpToolTip.SetToolTip(this.columnButton, "Choose columns for \'Column restrict\'");
             this.columnButton.UseVisualStyleBackColor = true;
-            this.columnButton.Click += new System.EventHandler(this.OncolumnButtonClick);
+            this.columnButton.Click += new System.EventHandler(this.OnColumnButtonClick);
             // 
             // columnRestrictCheckBox
             // 
@@ -1309,8 +1309,6 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ToolStripMenuItem toggleBoomarkToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem markEditModeToolStripMenuItem;
 		//private BufferedDataGridView boomarkDataGridView;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ContextMenuStrip bookmarkContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem deleteBookmarksToolStripMenuItem;
 		private System.Windows.Forms.CheckBox columnRestrictCheckBox;
@@ -1318,14 +1316,11 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ContextMenuStrip columnContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem freezeLeftColumnsUntilHereToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveToLastColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripMenuItem moveLeftToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveRightToolStripMenuItem;
 		private TimeSpreadingControl timeSpreadingControl;
     private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.ToolStripSeparator pluginSeparator;
 		private System.Windows.Forms.ToolStripMenuItem bookmarkCommentToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ContextMenuStrip editModeContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem editModecopyToolStripMenuItem;
@@ -1357,8 +1352,6 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ToolStripMenuItem markFilterHitsInLogViewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFilewordModeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem hideColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ToolStripMenuItem restoreColumnsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem allColumnsToolStripMenuItem;
 		private System.Windows.Forms.Label columnNamesLabel;
