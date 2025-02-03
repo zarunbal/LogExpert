@@ -12,3 +12,4 @@ temp.txt
 *.scgdat
 /Data
 /.tmp
+/.nuke/temp/*.log
