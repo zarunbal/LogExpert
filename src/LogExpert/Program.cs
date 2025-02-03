@@ -39,7 +39,9 @@ namespace LogExpert
             }
             catch (SecurityException se)
             {
-                MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
+                MessageBox.Show(
+                    "Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" +
+                    se.Message + ")", "LogExpert Error");
             }
         }
 

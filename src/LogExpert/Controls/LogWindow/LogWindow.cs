@@ -14,6 +14,7 @@ using LogExpert.Config;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 using NLog;
 using WeifenLuo.WinFormsUI.Docking;
@@ -250,6 +251,105 @@ namespace LogExpert.Controls.LogWindow
 
             _statusLineTrigger.Signal += OnStatusLineTriggerSignal;
             _selectionChangedTrigger.Signal += OnSelectionChangedTriggerSignal;
+
+            ChangeTheme(Controls);
+        }
+
+        #endregion
+
+        #region ColorTheme
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+            #region ApplyColorToAllControls
+            foreach (Control component in container)
+            {
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = ColorMode.BackgroundColor;
+                    component.ForeColor = ColorMode.ForeColor;
+                }
+                else
+                {
+                    component.BackColor = ColorMode.BackgroundColor;
+                    component.ForeColor = ColorMode.ForeColor;
+                }
+
+            }
+            #endregion            
+
+            #region DataGridView
+
+            // Main DataGridView
+            dataGridView.BackgroundColor = ColorMode.DockBackgroundColor;
+            dataGridView.ColumnHeadersDefaultCellStyle.BackColor = ColorMode.BackgroundColor;
+            dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = ColorMode.ForeColor;
+            dataGridView.EnableHeadersVisualStyles = false;
+
+            // Colors for menu
+            dataGridContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            bookmarkContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            columnContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            editModeContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            filterContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            filterListContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+
+            foreach (ToolStripItem item in dataGridContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            foreach (ToolStripItem item in bookmarkContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            foreach (ToolStripItem item in columnContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            foreach (ToolStripItem item in editModeContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            foreach (ToolStripItem item in filterContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            foreach (ToolStripItem item in filterListContextMenuStrip.Items)
+            {
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            // Filter dataGridView
+            filterGridView.BackgroundColor = ColorMode.DockBackgroundColor;
+            filterGridView.ColumnHeadersDefaultCellStyle.BackColor = ColorMode.BackgroundColor;
+            filterGridView.ColumnHeadersDefaultCellStyle.ForeColor = ColorMode.ForeColor;
+            filterGridView.EnableHeadersVisualStyles = false;
+
+            // Colors for menu
+            filterContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+
+            for (var y = 0; y < filterContextMenuStrip.Items.Count; y++)
+            {
+                var item = filterContextMenuStrip.Items[y];
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            #endregion DataGridView
+
+            filterComboBox.BackColor = ColorMode.DockBackgroundColor;
+
         }
 
         #endregion

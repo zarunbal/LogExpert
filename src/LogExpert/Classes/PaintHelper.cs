@@ -60,7 +60,7 @@ namespace LogExpert.Classes
                 }
                 else
                 {
-                    Color bgColor = Color.White;
+                    Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
                     if (!DebugOptions.disableWordHighlight)
                     {
                         if (entry != null)
@@ -311,7 +311,7 @@ namespace LogExpert.Classes
                     HilightMatchEntry hme = new HilightMatchEntry();
                     hme.StartPos = 0;
                     hme.Length = column.FullValue.Length;
-                    hme.HilightEntry = new HilightEntry(column.FullValue, groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black), groundEntry?.BackgroundColor ?? Color.Empty, false);
+                    hme.HilightEntry = new HilightEntry(column.FullValue, groundEntry?.ForegroundColor ?? LogExpert.Config.ColorMode.ForeColor, groundEntry?.BackgroundColor ?? Color.Empty, false);
                     matchList = MergeHighlightMatchEntries(matchList, hme);
                 }
             }

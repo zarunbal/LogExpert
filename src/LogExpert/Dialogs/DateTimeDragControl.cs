@@ -397,7 +397,9 @@ namespace LogExpert.Dialogs
                         }
                     }
                     else
+                    {
                         value = datePart;
+                    }
 
                     e.Graphics.DrawString(value, Font, brush, rect, _digitsFormat);
                 }

@@ -28,11 +28,10 @@ namespace LogExpert.Tests
                     if (line == null) break;
 
                     lineCount += 1;
-
-                    StringAssert.StartsWith($"Line {lineCount}", line, $"Invalid line: {line}");
+                    Assert.That(line, Does.StartWith($"Line {lineCount}"), $"Invalid line: {line}");
                 }
 
-                Assert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
             }
         }
         [Test]
@@ -50,7 +49,7 @@ namespace LogExpert.Tests
                     lineCount += 1;
                 }
 
-                Assert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
             }
         }
 
@@ -74,10 +73,10 @@ namespace LogExpert.Tests
 
                     lineCount += 1;
 
-                    StringAssert.StartsWith($"Line {lineCount}", line, $"Invalid line: {line}");
+                    Assert.That(line, Does.StartWith($"Line {lineCount}"), $"Invalid line: {line}");
                 }
 
-                Assert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
             }
         }
         [Test]
@@ -95,7 +94,7 @@ namespace LogExpert.Tests
                     lineCount += 1;
                 }
 
-                Assert.AreEqual(expectedLines, lineCount, $"Unexpected lines:\n{text}");
+                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
             }
         }
     }

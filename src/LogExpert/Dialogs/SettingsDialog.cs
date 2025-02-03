@@ -78,6 +78,7 @@ namespace LogExpert.Dialogs
             checkBoxSyncFilter.Checked = Preferences.filterSync;
             checkBoxFilterTail.Checked = Preferences.filterTail;
             checkBoxFollowTail.Checked = Preferences.followTail;
+            checkBoxDarkMode.Checked = Preferences.darkMode;
 
             radioButtonHorizMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Horizontal;
             radioButtonVerticalMouseDrag.Checked = Preferences.timestampControlDragOrientation == DateTimeDragControl.DragOrientations.Vertical;
@@ -599,12 +600,14 @@ namespace LogExpert.Dialogs
             DisplayFontName();
         }
 
-        private void OnBtnOkClick(object sender, EventArgs e)
+
+        private void OnOkButtonClick(object sender, EventArgs e)
         {
             Preferences.timestampControl = checkBoxTimestamp.Checked;
             Preferences.filterSync = checkBoxSyncFilter.Checked;
             Preferences.filterTail = checkBoxFilterTail.Checked;
             Preferences.followTail = checkBoxFollowTail.Checked;
+            Preferences.darkMode = checkBoxDarkMode.Checked;
 
             if (radioButtonVerticalMouseDrag.Checked)
             {
@@ -673,18 +676,18 @@ namespace LogExpert.Dialogs
             SaveMultifileData();
         }
 
-        private void OnBtnToolClick(object sender, EventArgs e)
+        private void OnToolButtonAClick(object sender, EventArgs e)
         {
-            OnBtnToolClickInternal(textBoxTool);
+            OnToolButtonClick(textBoxTool);
         }
 
-        private void OnBtnArgClick(object sender, EventArgs e)
+        private void OnArgButtonAClick(object sender, EventArgs e)
         {
-            OnBtnArgsClickInternal(textBoxArguments);
+            OnArgsButtonClick(textBoxArguments);
         }
 
         //TODO Remove or refactor this function
-        private void OnDataGridViewColumnizerRowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        private void OnColumnizerDataGridViewRowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
             DataGridViewComboBoxCell comboCell = (DataGridViewComboBoxCell) dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
             if (comboCell.Items.Count > 0)
@@ -693,7 +696,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnDeleteClick(object sender, EventArgs e)
+        private void OnDeleteButtonClick(object sender, EventArgs e)
         {
             if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
             {
@@ -703,17 +706,17 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnDataGridViewColumnizerDataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void OnColumnizerDataGridViewDataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             e.Cancel = true;
         }
 
-        private void OnChkBoxSysoutCheckedChanged(object sender, EventArgs e)
+        private void OnSysoutCheckBoxACheckedChanged(object sender, EventArgs e)
         {
             comboBoxColumnizer.Enabled = checkBoxSysout.Checked;
         }
 
-        private void OnBtnTailColorClick(object sender, EventArgs e)
+        private void OnTailColorButtonClick(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.showTailColor;
@@ -724,12 +727,12 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnChkBoxColumnSizeCheckedChanged(object sender, EventArgs e)
+        private void OnColumnSizeCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             cpDownColumnWidth.Enabled = checkBoxColumnSize.Checked;
         }
 
-        private void OnBtnTimespreadColorClick(object sender, EventArgs e)
+        private void OnTimespreadColorButtonClick(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
             dlg.Color = Preferences.timeSpreadColor;
@@ -740,7 +743,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnListBoxPluginSelectedIndexChanged(object sender, EventArgs e)
+        private void OnPluginListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             _selectedPlugin?.HideConfigForm();
 
@@ -772,7 +775,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnSessionSaveDirClick(object sender, EventArgs e)
+        private void OnSessionSaveDirButtonClick(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
 
@@ -837,7 +840,7 @@ namespace LogExpert.Dialogs
           
         }
 
-        private void OnBtnConfigPluginClick(object sender, EventArgs e)
+        private void OnConfigPluginButtonClick(object sender, EventArgs e)
         {
             if (!_selectedPlugin.HasEmbeddedForm())
             {
@@ -850,7 +853,7 @@ namespace LogExpert.Dialogs
             //TODO implement
         }   
 
-        private void OnListBoxToolSelectedIndexChanged(object sender, EventArgs e)
+        private void OnToolListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             GetCurrentToolValues();
             _selectedTool = listBoxTools.SelectedItem as ToolEntry;
@@ -860,7 +863,7 @@ namespace LogExpert.Dialogs
             DisplayCurrentIcon();
         }
 
-        private void OnBtnToolUpClick(object sender, EventArgs e)
+        private void OnToolUpButtonClick(object sender, EventArgs e)
         {
             int i = listBoxTools.SelectedIndex;
         
@@ -876,7 +879,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnToolDownClick(object sender, EventArgs e)
+        private void OnToolDownButtonClick(object sender, EventArgs e)
         {
             int i = listBoxTools.SelectedIndex;
             
@@ -892,7 +895,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnToolAddClick(object sender, EventArgs e)
+        private void OnToolAddButtonClick(object sender, EventArgs e)
         {
             listBoxTools.Items.Add(new ToolEntry());
             listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
@@ -919,7 +922,7 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnIconClick(object sender, EventArgs e)
+        private void OnIconButtonClick(object sender, EventArgs e)
         {
             if (_selectedTool != null)
             {
@@ -941,14 +944,14 @@ namespace LogExpert.Dialogs
             }
         }
 
-        private void OnBtnCancelClick(object sender, EventArgs e)
+        private void OnCancelButtonClick(object sender, EventArgs e)
         {
             _selectedPlugin?.HideConfigForm();
         }
 
-        private void OnBtnWorkingDirClick(object sender, EventArgs e)
+        private void OnWorkingDirButtonClick(object sender, EventArgs e)
         {
-            OnBtnWorkingDirClick(textBoxWorkingDir);
+            OnWorkingDirButtonClick(textBoxWorkingDir);
         }
 
         private void OnMultiFilePatternTextChanged(object sender, EventArgs e)
@@ -957,7 +960,7 @@ namespace LogExpert.Dialogs
             upDownMultifileDays.Enabled = pattern.Contains("$D");
         }
 
-        private void OnBtnExportClick(object sender, EventArgs e)
+        private void OnExportButtonClick(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Title = @"Export Settings to file";
@@ -979,7 +982,7 @@ namespace LogExpert.Dialogs
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnBtnImportClick(object sender, EventArgs e)
+        private void OnImportButtonClick(object sender, EventArgs e)
         {
             ImportSettingsDialog dlg = new ImportSettingsDialog();
 

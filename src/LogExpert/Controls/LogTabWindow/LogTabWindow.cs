@@ -9,6 +9,7 @@ using LogExpert.Config;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions.Forms;
 using LogExpert.Interface;
 using NLog;
 //using System.Linq;
@@ -76,6 +77,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
+            ChangeTheme(Controls);
 
             _startupFileNames = fileNames;
             _instanceNumber = instanceNumber;
@@ -87,7 +89,7 @@ namespace LogExpert.Controls.LogTabWindow
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
             Rectangle led = new Rectangle(0, 0, 8, 2);
-            
+
             for (int i = 0; i < _leds.Length; ++i)
             {
                 _leds[i] = led;
@@ -101,27 +103,27 @@ namespace LogExpert.Controls.LogTabWindow
             _ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
             _ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-            
+
             _offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
-            
+
             _dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-            
+
             _tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
             _tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
             _tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
-            
+
             _syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
-            
+
             CreateIcons();
-            
+
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
             ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
-            
+
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
-            
+
             int index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
             toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
@@ -153,6 +155,108 @@ namespace LogExpert.Controls.LogTabWindow
             InitToolWindows();
         }
 
+        #endregion
+
+        #region ColorTheme
+        public void ChangeTheme(Control.ControlCollection container)
+        {
+            ColorMode.LoadColorMode();
+            ColorMode.UseImmersiveDarkMode(Handle, ColorMode.DarkModeEnabled);
+
+            #region ApplyColorToAllControls
+            foreach (Control component in container)
+            {
+                if (component.Controls != null && component.Controls.Count > 0)
+                {
+                    ChangeTheme(component.Controls);
+                    component.BackColor = ColorMode.BackgroundColor;
+                    component.ForeColor = ColorMode.ForeColor;
+                }
+                else
+                {
+                    component.BackColor = ColorMode.BackgroundColor;
+                    component.ForeColor = ColorMode.ForeColor;
+                }
+
+                if (component is MenuStrip)
+                {
+                    var menu = (MenuStrip)component;
+
+                    foreach (ToolStripMenuItem item in menu.Items)
+                    {
+                        item.ForeColor = ColorMode.ForeColor;
+                        item.BackColor = ColorMode.BackgroundColor;
+
+                        try
+                        {
+                            for(var x = 0; x< item.DropDownItems.Count; x++)
+                            {
+                                var children = item.DropDownItems[x];
+                                children.ForeColor = ColorMode.ForeColor;
+                                children.BackColor = ColorMode.MenuBackgroundColor;
+
+
+                                if(children is ToolStripDropDownItem) { 
+
+                                    for (var y = 0; y < ((ToolStripDropDownItem)children).DropDownItems.Count; y++)
+                                    {
+                                        var subChildren = ((ToolStripDropDownItem)children).DropDownItems[y];
+                                        subChildren.ForeColor = ColorMode.ForeColor;
+                                        subChildren.BackColor = ColorMode.MenuBackgroundColor;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "An error occured while applying style dynamically to all Controls under LogTabWindow:");
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            // Colors for selected menus
+            mainMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+            
+            // Dock special color
+            dockPanel.DockBackColor = ColorMode.DockBackgroundColor;
+
+            // Remove toolstrip bottom border
+            buttonToolStrip.Renderer = new ToolStripRendererExtension();
+
+            #region Tabs
+            tabContextMenuStrip.Renderer = new ExtendedMenuStripRenderer();
+
+            // Tabs menu
+            for (var y = 0; y < tabContextMenuStrip.Items.Count; y++)
+            {
+                var item = tabContextMenuStrip.Items[y];
+                item.ForeColor = ColorMode.ForeColor;
+                item.BackColor = ColorMode.MenuBackgroundColor;
+            }
+
+            // Tabs line
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.StartColor = ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.DockStripGradient.EndColor = ColorMode.TabsBackgroundStripColor;
+
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.StartColor = ColorMode.TabsBackgroundStripColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.DockStripGradient.EndColor = ColorMode.TabsBackgroundStripColor;
+
+            // Tabs
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.StartColor = ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.EndColor = ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.ToolWindowGradient.ActiveTabGradient.TextColor = ColorMode.ForeColor;
+
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.StartColor = ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.EndColor = ColorMode.ActiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.ActiveTabGradient.TextColor = ColorMode.ForeColor;
+
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = ColorMode.InactiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = ColorMode.InactiveTabColor;
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = ColorMode.ForeColor;            
+            #endregion Tabs
+        }
         #endregion
 
         #region Delegates
