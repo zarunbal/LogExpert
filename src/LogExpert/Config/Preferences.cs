@@ -15,6 +15,8 @@ namespace LogExpert.Config
 
         public bool askForClose = false;
         
+        public bool darkMode = false;
+        
         public int bufferCount = 100;
         
         public List<ColumnizerMaskEntry> columnizerMaskList = [];

@@ -603,8 +603,14 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,visualstudio,csharp,powershell
 
 packages/
+*.user
+*.csproj.user
 AssemblyVersion.cs
+temp.txt
+*.lock.*.docx#
 *.userprefs
+.vs/
 *.scgdat
 /Data
-/.nuke/temp/
+/.tmp
+/.nuke/temp/*.log

@@ -1,5 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/build",
+  "title": "Build Schema",
   "definitions": {
     "Host": {
       "type": "string",
@@ -61,21 +63,76 @@
     },
     "NukeBuild": {
       "properties": {
+        "ChocolateyApiKey": {
+          "type": "string",
+          "description": "Chocolatey api key"
+        },
+        "Configuration": {
+          "type": "string",
+          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
+          "enum": [
+            "Debug",
+            "Release"
+          ]
+        },
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
+        },
+        "ExcludeDirectoryGlob": {
+          "type": "array",
+          "description": "Exlcude directory glob",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExcludeFileGlob": {
+          "type": "array",
+          "description": "Exclude file globs",
+          "items": {
+            "type": "string"
+          }
+        },
+        "GitHubApiKey": {
+          "type": "string",
+          "description": "GitHub Api key"
         },
         "Help": {
           "type": "boolean",
           "description": "Shows the help text for this build assembly"
         },
         "Host": {
+          "type": "string",
           "description": "Host for execution. Default is 'automatic'",
-          "$ref": "#/definitions/Host"
+          "enum": [
+            "AppVeyor",
+            "AzurePipelines",
+            "Bamboo",
+            "Bitbucket",
+            "Bitrise",
+            "GitHubActions",
+            "GitLab",
+            "Jenkins",
+            "Rider",
+            "SpaceAutomation",
+            "TeamCity",
+            "Terminal",
+            "TravisCI",
+            "VisualStudio",
+            "VSCode"
+          ]
+        },
+        "my_variable": {
+          "type": "string",
+          "description": "My variable"
         },
         "NoLogo": {
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
+        },
+        "NugetApiKey": {
+          "type": "string",
+          "description": "Nuget api key"
         },
         "Partition": {
           "type": "string",
@@ -100,17 +157,70 @@
           "type": "array",
           "description": "List of targets to be skipped. Empty list skips all dependencies",
           "items": {
-            "$ref": "#/definitions/ExecutableTarget"
+            "type": "string",
+            "enum": [
+              "BuildChocolateyPackage",
+              "ChangeVersionNumber",
+              "Clean",
+              "CleanPackage",
+              "CleanupAppDataLogExpert",
+              "CleanupDocumentsLogExpert",
+              "ColumnizerLibCreateNuget",
+              "Compile",
+              "CopyFilesForSetup",
+              "CopyOutputForChocolatey",
+              "CreatePackage",
+              "CreateSetup",
+              "Pack",
+              "PackageSftpFileSystem",
+              "PrepareChocolateyTemplates",
+              "Publish",
+              "PublishChocolatey",
+              "PublishColumnizerNuget",
+              "PublishGithub",
+              "PublishToAppveyor",
+              "Restore",
+              "Test"
+            ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
           "description": "List of targets to be invoked. Default is '{default_target}'",
           "items": {
-            "$ref": "#/definitions/ExecutableTarget"
+            "type": "string",
+            "enum": [
+              "BuildChocolateyPackage",
+              "ChangeVersionNumber",
+              "Clean",
+              "CleanPackage",
+              "CleanupAppDataLogExpert",
+              "CleanupDocumentsLogExpert",
+              "ColumnizerLibCreateNuget",
+              "Compile",
+              "CopyFilesForSetup",
+              "CopyOutputForChocolatey",
+              "CreatePackage",
+              "CreateSetup",
+              "Pack",
+              "PackageSftpFileSystem",
+              "PrepareChocolateyTemplates",
+              "Publish",
+              "PublishChocolatey",
+              "PublishColumnizerNuget",
+              "PublishGithub",
+              "PublishToAppveyor",
+              "Restore",
+              "Test"
+            ]
           }
         },
         "Verbosity": {
+          "type": "string",
           "description": "Logging verbosity during build execution. Default is 'Normal'",
           "$ref": "#/definitions/Verbosity"
         }
@@ -128,8 +238,10 @@
           "type": "string",
           "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
           "enum": [
-            "Debug",
-            "Release"
+            "Minimal",
+            "Normal",
+            "Quiet",
+            "Verbose"
           ]
         },
         "ExcludeDirectoryGlob": {
@@ -179,5 +291,5 @@
     {
       "$ref": "#/definitions/NukeBuild"
     }
-  ]
+  }
 }

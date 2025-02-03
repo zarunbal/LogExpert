@@ -126,18 +126,18 @@ namespace LogExpert.Classes.DateTimeParser
                 reader.ReadOneOf("#?,!&%+-$€£0123456789{}():;/.@ ") ||
 
                 // Date
-                reader.ReadString("tt", true) || 
-                reader.ReadOneOrMore('y') || 
-                reader.ReadOneOrMore('Y') || 
-                reader.ReadOneOrMore('m') || 
-                reader.ReadOneOrMore('M') || 
-                reader.ReadOneOrMore('d') || 
-                reader.ReadOneOrMore('D') || 
-                reader.ReadOneOrMore('h') || 
-                reader.ReadOneOrMore('H') || 
-                reader.ReadOneOrMore('s') || 
+                reader.ReadString("tt", true) || //AM / PM
+                reader.ReadOneOrMore('y') ||
+                reader.ReadOneOrMore('Y') ||
+                reader.ReadOneOrMore('m') ||
+                reader.ReadOneOrMore('M') ||
+                reader.ReadOneOrMore('d') ||
+                reader.ReadOneOrMore('D') ||
+                reader.ReadOneOrMore('h') ||
+                reader.ReadOneOrMore('H') ||
+                reader.ReadOneOrMore('s') ||
                 reader.ReadOneOrMore('S') ||
-                //Latin Date String: (a.C.n.  ante Christum natum) 
+                //Latin Date String: (a.C.n.  ante Christum natum)
                 reader.ReadString("gg"))
             {
                 syntaxError = false;

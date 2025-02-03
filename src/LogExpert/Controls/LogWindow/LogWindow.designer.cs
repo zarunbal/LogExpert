@@ -1153,7 +1153,9 @@ namespace LogExpert.Controls.LogWindow
             setSelectedTextAsBookmarkCommentToolStripMenuItem.Click += OnSetSelectedTextAsBookmarkCommentToolStripMenuItemClick;
             // 
             // LogWindow
-            // 
+            //
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font; 
             BackColor = SystemColors.Control;
             ClientSize = new Size(1145, 920);
             ControlBox = false;
@@ -1209,11 +1211,11 @@ namespace LogExpert.Controls.LogWindow
             columnContextMenuStrip.ResumeLayout(false);
             editModeContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
-        }
+		}
 
-        #endregion
+		#endregion
 
-        private System.Windows.Forms.SplitContainer splitContainerLogWindow;
+		private System.Windows.Forms.SplitContainer splitContainerLogWindow;
 		private System.Windows.Forms.Panel pnlFilterInput;
 		private BufferedDataGridView dataGridView;
 		private BufferedDataGridView filterGridView;
@@ -1237,9 +1239,6 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ToolStripMenuItem locateLineInOriginalFileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toggleBoomarkToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem markEditModeToolStripMenuItem;
-		//private BufferedDataGridView boomarkDataGridView;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ContextMenuStrip bookmarkContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem deleteBookmarksToolStripMenuItem;
 		private System.Windows.Forms.CheckBox columnRestrictCheckBox;
@@ -1247,14 +1246,11 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ContextMenuStrip columnContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem freezeLeftColumnsUntilHereToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveToLastColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripMenuItem moveLeftToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveRightToolStripMenuItem;
 		private TimeSpreadingControl timeSpreadingControl;
     private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.ToolStripSeparator pluginSeparator;
 		private System.Windows.Forms.ToolStripMenuItem bookmarkCommentToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ContextMenuStrip editModeContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem editModecopyToolStripMenuItem;
@@ -1286,8 +1282,6 @@ namespace LogExpert.Controls.LogWindow
 		private System.Windows.Forms.ToolStripMenuItem markFilterHitsInLogViewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFilewordModeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem hideColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ToolStripMenuItem restoreColumnsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem allColumnsToolStripMenuItem;
 		private System.Windows.Forms.Label columnNamesLabel;
@@ -1305,5 +1299,12 @@ namespace LogExpert.Controls.LogWindow
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
         private System.Windows.Forms.Button filterSearchButton;
         private System.Windows.Forms.Panel panelBackgroundAdvancedFilterSplitContainer;
+        private MenuToolStripSeparatorExtension toolStripSeparator1;
+        private MenuToolStripSeparatorExtension toolStripSeparator2;
+        private MenuToolStripSeparatorExtension toolStripSeparator3;
+        private MenuToolStripSeparatorExtension pluginSeparator;
+        private MenuToolStripSeparatorExtension toolStripSeparator4;
+        private MenuToolStripSeparatorExtension toolStripSeparator5;
+        private MenuToolStripSeparatorExtension toolStripSeparator6;
     }
 }

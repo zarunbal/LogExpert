@@ -404,7 +404,8 @@ namespace LogExpert.Controls.LogWindow
 
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
-                    Color backColor = e.CellStyle.SelectionBackColor;
+                    Color backColor = LogExpert.Config.ColorMode.BackgroundColor;
+
                     Brush brush;
 
                     if (gridView.Focused)
@@ -413,7 +414,7 @@ namespace LogExpert.Controls.LogWindow
                     }
                     else
                     {
-                        Color color = Color.FromArgb(255, 170, 170, 170);
+                        Color color = backColor;
                         brush = new SolidBrush(color);
                     }
 
@@ -422,7 +423,7 @@ namespace LogExpert.Controls.LogWindow
                 }
                 else
                 {
-                    Color bgColor = Color.White;
+                    Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
 
                     if (!DebugOptions.disableWordHighlight)
                     {
@@ -438,7 +439,9 @@ namespace LogExpert.Controls.LogWindow
                             bgColor = entry.BackgroundColor;
                         }
                     }
-                    e.CellStyle.BackColor = bgColor;
+
+                    e.CellStyle.BackColor = bgColor;             
+                    
                     e.PaintBackground(e.ClipBounds, false);
                 }
 
@@ -861,7 +864,7 @@ namespace LogExpert.Controls.LogWindow
             if (filterGridView.Focused)
             {
                 gridView = filterGridView;
-                if (gridView.CurrentCellAddress.Y == -1)
+                if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
                 {
                     return;
                 }
@@ -871,7 +874,7 @@ namespace LogExpert.Controls.LogWindow
             else
             {
                 gridView = dataGridView;
-                if (gridView.CurrentCellAddress.Y == -1)
+                if (gridView.CurrentCellAddress == null || gridView.CurrentCellAddress.Y == -1)
                 {
                     return;
                 }
@@ -914,7 +917,7 @@ namespace LogExpert.Controls.LogWindow
                 {
                     return;
                 }
-                ParamParser paramParser = new(comment);
+                ParamParser paramParser = new ParamParser(comment);
                 try
                 {
                     comment = paramParser.ReplaceParams(line, lineNum, FileName);
@@ -1074,7 +1077,7 @@ namespace LogExpert.Controls.LogWindow
                                 text = text.Substring(1);
                             }
                             TimeSpan timeSpan = TimeSpan.Parse(text);
-                            int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
+                            int diff = (int) (timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
                             CurrentColumnizer.SetTimeOffset(diff);
                         }
                         catch (Exception)
@@ -1158,7 +1161,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
             {
-                List<int> lineNumList = [];
+                List<int> lineNumList = new List<int>();
                 foreach (DataGridViewRow row in dataGridView.SelectedRows)
                 {
                     if (row.Index != -1)
@@ -1169,15 +1172,15 @@ namespace LogExpert.Controls.LogWindow
                 lineNumList.Sort();
                 // create dummy FilterPipe for connecting line numbers to original window
                 // setting IsStopped to true prevents further filter processing
-                FilterPipe pipe = new(new FilterParams(), this);
+                FilterPipe pipe = new FilterPipe(new FilterParams(), this);
                 pipe.IsStopped = true;
                 WritePipeToTab(pipe, lineNumList, Text + "->C", null);
             }
             else
             {
                 string fileName = Path.GetTempFileName();
-                FileStream fStream = new(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-                StreamWriter writer = new(fStream, Encoding.Unicode);
+                FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+                StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode);
 
                 DataObject data = dataGridView.GetClipboardContent();
                 string text = data.GetText(TextDataFormat.Text);
@@ -1292,7 +1295,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 UpdateFilterHistoryFromSettings();
 
-                if (isLoadTime)
+                if(isLoadTime)
                 {
                     AutoResizeFilterBox();
                 }
@@ -1585,7 +1588,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.SelectionMode == DataGridViewSelectionMode.FullRowSelect)
             {
-                List<int> lineNumList = [];
+                List<int> lineNumList = new List<int>();
                 foreach (DataGridViewRow row in dataGridView.SelectedRows)
                 {
                     if (row.Index != -1)
@@ -1595,7 +1598,7 @@ namespace LogExpert.Controls.LogWindow
                 }
                 lineNumList.Sort();
                 patternArgs.startLine = lineNumList[0];
-                patternArgs.endLine = lineNumList[^1];
+                patternArgs.endLine = lineNumList[lineNumList.Count - 1];
             }
             else
             {
@@ -1613,13 +1616,13 @@ namespace LogExpert.Controls.LogWindow
 
         public void PatternStatistic(PatternArgs patternArgs)
         {
-            PatternStatisticFx fx = new(TestStatistic);
+            PatternStatisticFx fx = new PatternStatisticFx(TestStatistic);
             fx.BeginInvoke(patternArgs, null, null);
         }
 
         public void ExportBookmarkList()
         {
-            SaveFileDialog dlg = new();
+            SaveFileDialog dlg = new SaveFileDialog();
             dlg.Title = "Choose a file to save bookmarks into";
             dlg.AddExtension = true;
             dlg.DefaultExt = "csv";
@@ -1641,10 +1644,9 @@ namespace LogExpert.Controls.LogWindow
             }
         }
 
-        [SupportedOSPlatformGuard("windows")]
         public void ImportBookmarkList()
         {
-            OpenFileDialog dlg = new();
+            OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "Choose a file to load bookmarks from";
             dlg.AddExtension = true;
             dlg.DefaultExt = "csv";
@@ -1657,21 +1659,21 @@ namespace LogExpert.Controls.LogWindow
                 try
                 {
                     // add to the existing bookmarks
-                    SortedList<int, Bookmark> newBookmarks = [];
+                    SortedList<int, Bookmark> newBookmarks = new SortedList<int, Bookmark>();
                     BookmarkExporter.ImportBookmarkList(FileName, dlg.FileName, newBookmarks);
 
                     // Add (or replace) to existing bookmark list
                     bool bookmarkAdded = false;
                     foreach (Bookmark b in newBookmarks.Values)
                     {
-                        if (!_bookmarkProvider.BookmarkList.TryGetValue(b.LineNum, out Bookmark value))
+                        if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
                         {
                             _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
                             bookmarkAdded = true; // refresh the list only once at the end
                         }
                         else
                         {
-                            Bookmark existingBookmark = value;
+                            Bookmark existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
                             existingBookmark.Text =
                                 b.Text; // replace existing bookmark for that line, preserving the overlay
                             OnBookmarkTextChanged(b);
@@ -1726,7 +1728,6 @@ namespace LogExpert.Controls.LogWindow
             hideFilterListOnLoadCheckBox.Checked = Preferences.isAutoHideFilterList;
         }
 
-        [SupportedOSPlatformGuard("windows")]
         public void SetCurrentHighlightGroup(string groupName)
         {
             _guiStateArgs.HighlightGroupName = groupName;
@@ -1782,7 +1783,7 @@ namespace LogExpert.Controls.LogWindow
             lock (_timeSyncListLock)
             {
                 if (IsTimeSynced && master.TimeSyncList != TimeSyncList)
-                // already synced but master has different sync list
+                    // already synced but master has different sync list
                 {
                     FreeFromTimeSync();
                 }

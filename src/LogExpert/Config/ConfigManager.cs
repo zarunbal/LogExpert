@@ -239,6 +239,8 @@ namespace LogExpert.Config
                     settings.preferences.maximumFilterEntries = 30;
                 }
 
+                SetBoundsWithinVirtualScreen(settings);
+
                 ConvertSettings(settings);
 
                 return settings;
@@ -400,6 +402,17 @@ namespace LogExpert.Config
             return newList;
         }
 
+        // Checking if the appBounds values are outside the current virtual screen.
+        // If so, the appBounds values are set to 0.
+        private void SetBoundsWithinVirtualScreen(Settings settings)
+        {
+            var vs = SystemInformation.VirtualScreen;
+            if (vs.X + vs.Width < settings.appBounds.X + settings.appBounds.Width || 
+                vs.Y + vs.Height < settings.appBounds.Y + settings.appBounds.Height)
+            {
+                settings.appBounds = new Rectangle(); 
+            }
+        }
         #endregion
 
         protected void OnConfigChanged(SettingsFlags flags)
