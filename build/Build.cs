@@ -1,9 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.CI.AppVeyor;
 using Nuke.Common.Execution;
@@ -11,7 +5,6 @@ using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
@@ -31,13 +24,8 @@ using System.Threading.Tasks;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.IO.TextTasks;
-using static Nuke.Common.IO.CompressionTasks;
 using static Nuke.GitHub.GitHubTasks;
-using static Nuke.Common.ControlFlow;
 
-[CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
@@ -445,7 +433,7 @@ class Build : NukeBuild
         });
 
     Target Publish => _ => _
-        .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub);
+        .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub, PublishToAppveyor, CleanupAppDataLogExpert, CleanupDocumentsLogExpert);
 
     Target PublishToAppveyor => _ => _
         .After(Publish, CreateSetup)
