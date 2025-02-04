@@ -327,7 +327,6 @@ class Build : NukeBuild
 
     Target Pack => _ => _
         .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate);
-    //.DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
@@ -433,7 +432,7 @@ class Build : NukeBuild
         });
 
     Target Publish => _ => _
-        .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub, PublishToAppveyor, CleanupAppDataLogExpert, CleanupDocumentsLogExpert);
+        .DependsOn(PublishChocolatey, PublishColumnizerNuget, PublishGithub);
 
     Target PublishToAppveyor => _ => _
         .After(Publish, CreateSetup)
