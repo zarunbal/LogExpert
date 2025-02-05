@@ -15,7 +15,7 @@ namespace LogExpert.Classes.Log
 
         ~LogStreamReaderBase()
         {
-            Dispose(true);
+            Dispose(false);
         }
 
         #endregion
