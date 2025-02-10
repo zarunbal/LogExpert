@@ -132,20 +132,22 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="advancedButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vwAADr8BOAVTJAAAAM1JREFUOE/dlDsKQkEMRYO1jZU7EAS3YG1h51ZsdSdWIoLrcBla2dhZ2PvhPiYQ
-        rplMsLDwwBS5n8C8gSfyT0xF5EVnwqEsF1q0FZE9aRsuRWgpopfMdaSDhWb+3ApUQGfBovLNQjCudfWV
-        syB7o/mD5rcxeFnMV9I6cceig7ewqkM40MwhT1NczxOt5vkWeEcWR5WSLvM8S9WH0WcxKhSWUWYdmQHo
-        DFi0ZK5qQfbBoocunrFhWJXMk42IOT2Sd4ZcyoJf3N0sOnHgJ7wBih1ZgqnoK8MAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADNSURBVDhP3ZQ7CkJBDEWDtY2VOxAEt2BtYedWbHUnViKC
+        63AZWtnYWdj74T4mEK6ZTLCw8MAUuZ/AvIEn8k9MReRFZ8KhLBdatBWRPWkbLkVoKaKXzHWkg4Vm/twK
+        VEBnwaLyzUIwrnX1lbMge6P5g+a3MXhZzFfSOnHHooO3sKpDONDMIU9TXM8Treb5FnhHFkeVki7zPEvV
+        h9FnMSoUllFmHZkB6AxYtGSuakH2waKHLp6xYViVzJONiDk9kneGXMqCX9zdLDpx4Ce8AYodWYKp6CvD
+        AAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="filterSearchButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vwAADr8BOAVTJAAAAM1JREFUOE/dlDsKQkEMRYO1jZU7EAS3YG1h51ZsdSdWIoLrcBla2dhZ2PvhPiYQ
-        rplMsLDwwBS5n8C8gSfyT0xF5EVnwqEsF1q0FZE9aRsuRWgpopfMdaSDhWb+3ApUQGfBovLNQjCudfWV
-        syB7o/mD5rcxeFnMV9I6cceig7ewqkM40MwhT1NczxOt5vkWeEcWR5WSLvM8S9WH0WcxKhSWUWYdmQHo
-        DFi0ZK5qQfbBoocunrFhWJXMk42IOT2Sd4ZcyoJf3N0sOnHgJ7wBih1ZgqnoK8MAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADNSURBVDhP3ZQ7CkJBDEWDtY2VOxAEt2BtYedWbHUnViKC
+        63AZWtnYWdj74T4mEK6ZTLCw8MAUuZ/AvIEn8k9MReRFZ8KhLBdatBWRPWkbLkVoKaKXzHWkg4Vm/twK
+        VEBnwaLyzUIwrnX1lbMge6P5g+a3MXhZzFfSOnHHooO3sKpDONDMIU9TXM8Treb5FnhHFkeVki7zPEvV
+        h9FnMSoUllFmHZkB6AxYtGSuakH2waKHLp6xYViVzJONiDk9kneGXMqCX9zdLDpx4Ce8AYodWYKp6CvD
+        AAAAAElFTkSuQmCC
 </value>
   </data>
   <metadata name="bookmarkContextMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

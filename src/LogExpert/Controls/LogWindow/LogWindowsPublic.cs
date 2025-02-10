@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -404,7 +403,7 @@ namespace LogExpert.Controls.LogWindow
 
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
-                    Color backColor = LogExpert.Config.ColorMode.BackgroundColor;
+                    Color backColor = ColorMode.BackgroundColor;
 
                     Brush brush;
 
@@ -423,7 +422,7 @@ namespace LogExpert.Controls.LogWindow
                 }
                 else
                 {
-                    Color bgColor = LogExpert.Config.ColorMode.DockBackgroundColor;
+                    Color bgColor = ColorMode.DockBackgroundColor;
 
                     if (!DebugOptions.disableWordHighlight)
                     {
@@ -440,8 +439,8 @@ namespace LogExpert.Controls.LogWindow
                         }
                     }
 
-                    e.CellStyle.BackColor = bgColor;             
-                    
+                    e.CellStyle.BackColor = bgColor;
+
                     e.PaintBackground(e.ClipBounds, false);
                 }
 
@@ -1077,7 +1076,7 @@ namespace LogExpert.Controls.LogWindow
                                 text = text.Substring(1);
                             }
                             TimeSpan timeSpan = TimeSpan.Parse(text);
-                            int diff = (int) (timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
+                            int diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
                             CurrentColumnizer.SetTimeOffset(diff);
                         }
                         catch (Exception)
@@ -1295,7 +1294,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 UpdateFilterHistoryFromSettings();
 
-                if(isLoadTime)
+                if (isLoadTime)
                 {
                     AutoResizeFilterBox();
                 }
@@ -1783,7 +1782,7 @@ namespace LogExpert.Controls.LogWindow
             lock (_timeSyncListLock)
             {
                 if (IsTimeSynced && master.TimeSyncList != TimeSyncList)
-                    // already synced but master has different sync list
+                // already synced but master has different sync list
                 {
                     FreeFromTimeSync();
                 }

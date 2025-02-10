@@ -1202,7 +1202,8 @@ namespace LogExpert.Controls.LogWindow
                     }
                 }
 
-                if (foreColor == System.Drawing.Color.Black) { 
+                if (foreColor == System.Drawing.Color.Black)
+                {
                     foreColor = LogExpert.Config.ColorMode.ForeColor;
                 }
 
@@ -3727,6 +3728,6 @@ namespace LogExpert.Controls.LogWindow
         }
 
         #endregion
-        
+
     }
 }
