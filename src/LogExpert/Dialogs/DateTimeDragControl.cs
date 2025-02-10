@@ -1,13 +1,13 @@
-﻿using System;
+﻿using LogExpert.Classes.DateTimeParser;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using LogExpert.Classes.DateTimeParser;
 
 namespace LogExpert.Dialogs
 {
@@ -223,7 +223,7 @@ namespace LogExpert.Dialogs
             }
 
             return changed;
-        }        
+        }
 
         private void InitCustomRects(Section dateSection)
         {
@@ -304,13 +304,13 @@ namespace LogExpert.Dialogs
             ContextMenuStrip.Items.Add(toolStripItemHorizontalDrag);
             ContextMenuStrip.Items.Add(toolStripItemVerticalDrag);
             ContextMenuStrip.Items.Add(toolStripItemVerticalInvertedDrag);
-            
+
             toolStripItemHorizontalDrag.Click += OnToolStripItemHorizontalDragClick;
             toolStripItemHorizontalDrag.Text = "Drag horizontal";
-            
+
             toolStripItemVerticalDrag.Click += OnToolStripItemVerticalDragClick;
             toolStripItemVerticalDrag.Text = "Drag vertical";
-            
+
             toolStripItemVerticalInvertedDrag.Click += OnToolStripItemVerticalInvertedDragClick;
             toolStripItemVerticalInvertedDrag.Text = "Drag vertical inverted";
 
@@ -397,7 +397,9 @@ namespace LogExpert.Dialogs
                         }
                     }
                     else
+                    {
                         value = datePart;
+                    }
 
                     e.Graphics.DrawString(value, Font, brush, rect, _digitsFormat);
                 }
@@ -467,20 +469,20 @@ namespace LogExpert.Dialogs
             switch (DragOrientation)
             {
                 case DragOrientations.Vertical:
-                {
-                    diff = _startMouseY - e.Y;
-                    break;
-                }
+                    {
+                        diff = _startMouseY - e.Y;
+                        break;
+                    }
                 case DragOrientations.InvertedVertical:
-                {
-                    diff = _startMouseY + e.Y;
-                    break;
-                }
+                    {
+                        diff = _startMouseY + e.Y;
+                        break;
+                    }
                 default:
-                {
-                    diff = e.X - _startMouseX;
-                    break;
-                }
+                    {
+                        diff = e.X - _startMouseX;
+                        break;
+                    }
             }
 
             int delta = diff / 5 - _addedValue; // one unit per 5 pixels move

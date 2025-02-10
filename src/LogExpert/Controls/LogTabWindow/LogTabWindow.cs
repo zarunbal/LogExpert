@@ -179,10 +179,8 @@ namespace LogExpert.Controls.LogTabWindow
                     component.ForeColor = ColorMode.ForeColor;
                 }
 
-                if (component is MenuStrip)
+                if (component is MenuStrip menu)
                 {
-                    var menu = (MenuStrip)component;
-
                     foreach (ToolStripMenuItem item in menu.Items)
                     {
                         item.ForeColor = ColorMode.ForeColor;
@@ -196,13 +194,11 @@ namespace LogExpert.Controls.LogTabWindow
                                 children.ForeColor = ColorMode.ForeColor;
                                 children.BackColor = ColorMode.MenuBackgroundColor;
 
-
-                                if (children is ToolStripDropDownItem)
+                                if (children is ToolStripDropDownItem toolstripDropDownItem)
                                 {
-
-                                    for (var y = 0; y < ((ToolStripDropDownItem)children).DropDownItems.Count; y++)
+                                    for (var y = 0; y < toolstripDropDownItem.DropDownItems.Count; y++)
                                     {
-                                        var subChildren = ((ToolStripDropDownItem)children).DropDownItems[y];
+                                        var subChildren = toolstripDropDownItem.DropDownItems[y];
                                         subChildren.ForeColor = ColorMode.ForeColor;
                                         subChildren.BackColor = ColorMode.MenuBackgroundColor;
                                     }

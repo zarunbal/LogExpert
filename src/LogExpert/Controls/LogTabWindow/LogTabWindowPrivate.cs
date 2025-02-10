@@ -1,4 +1,12 @@
-﻿using System;
+﻿using LogExpert.Classes;
+using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,13 +17,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using LogExpert.Classes;
-using LogExpert.Classes.Columnizer;
-using LogExpert.Classes.Persister;
-using LogExpert.Config;
-using LogExpert.Dialogs;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Controls.LogTabWindow
@@ -332,9 +334,9 @@ namespace LogExpert.Controls.LogTabWindow
             dlg.TopMost = TopMost;
             dlg.HighlightGroupList = HilightGroupList;
             dlg.PreSelectedGroupName = groupsComboBoxHighlightGroups.Text;
-            
+
             DialogResult res = dlg.ShowDialog();
-            
+
             if (res == DialogResult.OK)
             {
                 HilightGroupList = dlg.HighlightGroupList;
@@ -726,7 +728,7 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 Rectangle ledRect = _leds[i];
                 ledRect.Offset(0, offsetFromTop);
-                
+
                 if (level >= _leds.Length - i)
                 {
                     gfx.FillRectangle(_ledBrushes[i], ledRect);
@@ -1120,7 +1122,7 @@ namespace LogExpert.Controls.LogTabWindow
                         ? CurrentLogWindow.TempTitleName
                         : Util.GetNameFromPath(CurrentLogWindow.FileName) + "->E");
                 logWin.ForceColumnizer(columnizer);
-                
+
                 process.Exited += pipe.ProcessExitedEventHandler;
                 //process.BeginOutputReadLine();
             }
@@ -1190,7 +1192,7 @@ namespace LogExpert.Controls.LogTabWindow
                             CloseAllTabs();
                             break;
                         case ProjectLoadDlgResult.NewWindow:
-                            LogExpertProxy.NewWindow(new[] {projectFileName});
+                            LogExpertProxy.NewWindow(new[] { projectFileName });
                             return;
                     }
                 }
@@ -1228,7 +1230,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void FillToolLauncherBar()
         {
-            char[] labels = 
+            char[] labels =
             {
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                 'U', 'V', 'W', 'X', 'Y', 'Z'
@@ -1243,8 +1245,11 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 if (tool.isFavourite)
                 {
-                    ToolStripButton button = new("" + labels[num % 26]);
-                    button.Tag = tool;
+                    ToolStripButton button = new("" + labels[num % 26])
+                    {
+                        Tag = tool
+                    };
+
                     SetToolIcon(tool, button);
                     externalToolsToolStrip.Items.Add(button);
                 }

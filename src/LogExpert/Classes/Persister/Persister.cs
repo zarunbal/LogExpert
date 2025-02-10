@@ -1,16 +1,17 @@
-﻿using System;
+﻿using LogExpert.Classes.Filter;
+using LogExpert.Config;
+using LogExpert.Entities;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
 using System.Xml;
-using LogExpert.Classes.Filter;
-using LogExpert.Config;
-using LogExpert.Entities;
-using System.Text.Json;
-using NLog;
 
 namespace LogExpert.Classes.Persister
 {
@@ -155,32 +156,32 @@ namespace LogExpert.Classes.Persister
             {
                 case SessionSaveLocation.SameDir:
                 default:
-                {
-                    FileInfo fileInfo = new(logFileName);
-                    dir = fileInfo.DirectoryName;
-                    file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
-                    break;
-                }
+                    {
+                        FileInfo fileInfo = new(logFileName);
+                        dir = fileInfo.DirectoryName;
+                        file = fileInfo.DirectoryName + Path.DirectorySeparatorChar + fileInfo.Name + ".lxp";
+                        break;
+                    }
                 case SessionSaveLocation.DocumentsDir:
-                {
-                    dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                          Path.DirectorySeparatorChar +
-                          "LogExpert";
-                    file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
-                    break;
-                }
+                    {
+                        dir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                              Path.DirectorySeparatorChar +
+                              "LogExpert";
+                        file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
+                        break;
+                    }
                 case SessionSaveLocation.OwnDir:
-                {
-                    dir = preferences.sessionSaveDirectory;
-                    file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
-                    break;
-                }
+                    {
+                        dir = preferences.sessionSaveDirectory;
+                        file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
+                        break;
+                    }
                 case SessionSaveLocation.ApplicationStartupDir:
-                {
-                    dir = Application.StartupPath + Path.DirectorySeparatorChar + "sessionfiles";
-                    file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
-                    break;
-                }
+                    {
+                        dir = Application.StartupPath + Path.DirectorySeparatorChar + "sessionfiles";
+                        file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
+                        break;
+                    }
             }
 
             if (string.IsNullOrWhiteSpace(dir) == false && Directory.Exists(dir) == false)
