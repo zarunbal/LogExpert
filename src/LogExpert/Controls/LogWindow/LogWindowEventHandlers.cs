@@ -1344,6 +1344,11 @@ namespace LogExpert.Controls.LogWindow
         private void OnFilterDownButtonClick(object sender, EventArgs e)
         {
             int i = filterListBox.SelectedIndex;
+            if (i < 0)
+            {
+                return;
+            }
+
             if (i < filterListBox.Items.Count - 1)
             {
                 FilterParams filterParams = (FilterParams)filterListBox.Items[i];

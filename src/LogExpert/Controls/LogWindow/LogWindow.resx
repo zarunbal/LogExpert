@@ -132,22 +132,22 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="advancedButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADNSURBVDhP3ZQ7CkJBDEWDtY2VOxAEt2BtYedWbHUnViKC
-        63AZWtnYWdj74T4mEK6ZTLCw8MAUuZ/AvIEn8k9MReRFZ8KhLBdatBWRPWkbLkVoKaKXzHWkg4Vm/twK
-        VEBnwaLyzUIwrnX1lbMge6P5g+a3MXhZzFfSOnHHooO3sKpDONDMIU9TXM8Treb5FnhHFkeVki7zPEvV
-        h9FnMSoUllFmHZkB6AxYtGSuakH2waKHLp6xYViVzJONiDk9kneGXMqCX9zdLDpx4Ce8AYodWYKp6CvD
-        AAAAAElFTkSuQmCC
+        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAANtJREFUOE/dlC0OwlAQhBs0BsUNSEi4AhqB4ypYuAmKEBLOwTFAYXAIPD8zb7tp
+        KdPX1woEXzLJvN3ZMU2a/RVT6FXRBOrEBSoXbaF9ZbaBkvGjGD0oJRdIDuY05s9Qm0KHNwuz33QpJGNI
+        3vpXToXZm9mAvOUwtVRl+b6aLeBwZzaKKiRyzsHBbECF5GGO3Klheab2Zbg7mi0YQerIy2KFpHbPRd/s
+        B02FS6g2s4aaChS8GZjVMNCmmNmH2ThePAsvzQpi5hleicwhL6/TEOoEf3F3yItO0K/JsjeKHVmCovKH
+        bgAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="filterSearchButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADNSURBVDhP3ZQ7CkJBDEWDtY2VOxAEt2BtYedWbHUnViKC
-        63AZWtnYWdj74T4mEK6ZTLCw8MAUuZ/AvIEn8k9MReRFZ8KhLBdatBWRPWkbLkVoKaKXzHWkg4Vm/twK
-        VEBnwaLyzUIwrnX1lbMge6P5g+a3MXhZzFfSOnHHooO3sKpDONDMIU9TXM8Treb5FnhHFkeVki7zPEvV
-        h9FnMSoUllFmHZkB6AxYtGSuakH2waKHLp6xYViVzJONiDk9kneGXMqCX9zdLDpx4Ce8AYodWYKp6CvD
-        AAAAAElFTkSuQmCC
+        iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAANtJREFUOE/dlC0OwlAQhBs0BsUNSEi4AhqB4ypYuAmKEBLOwTFAYXAIPD8zb7tp
+        KdPX1woEXzLJvN3ZMU2a/RVT6FXRBOrEBSoXbaF9ZbaBkvGjGD0oJRdIDuY05s9Qm0KHNwuz33QpJGNI
+        3vpXToXZm9mAvOUwtVRl+b6aLeBwZzaKKiRyzsHBbECF5GGO3Klheab2Zbg7mi0YQerIy2KFpHbPRd/s
+        B02FS6g2s4aaChS8GZjVMNCmmNmH2ThePAsvzQpi5hleicwhL6/TEOoEf3F3yItO0K/JsjeKHVmCovKH
+        bgAAAABJRU5ErkJggg==
 </value>
   </data>
   <metadata name="bookmarkContextMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

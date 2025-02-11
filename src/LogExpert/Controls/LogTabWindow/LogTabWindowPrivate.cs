@@ -1247,6 +1247,7 @@ namespace LogExpert.Controls.LogTabWindow
                 {
                     ToolStripButton button = new("" + labels[num % 26])
                     {
+                        Alignment = ToolStripItemAlignment.Left,
                         Tag = tool
                     };
 
