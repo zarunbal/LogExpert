@@ -1148,8 +1148,6 @@ namespace LogExpert.Controls.LogTabWindow
             // LogTabWindow
             // 
             AllowDrop = true;
-            AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            AutoScaleMode = AutoScaleMode.Font;
             BackColor = System.Drawing.SystemColors.Control;
             ClientSize = new System.Drawing.Size(1603, 1017);
             Controls.Add(checkBoxFollowTail);

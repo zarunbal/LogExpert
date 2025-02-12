@@ -75,10 +75,10 @@ namespace LogExpert.Controls.LogTabWindow
 
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
-            InitializeComponent();
-
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
+
+            InitializeComponent();
 
             _startupFileNames = fileNames;
             _instanceNumber = instanceNumber;

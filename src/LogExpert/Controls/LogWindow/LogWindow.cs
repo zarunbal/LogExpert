@@ -142,12 +142,12 @@ namespace LogExpert.Controls.LogWindow
         {
             SuspendLayout();
 
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
             InitializeComponent();
 
             CreateDefaultViewStyle();
-
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
 
             columnNamesLabel.Text = ""; // no filtering on columns by default
 

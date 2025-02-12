@@ -9,9 +9,10 @@ namespace LogExpert.Dialogs
 
         public BookmarkCommentDlg()
         {
-            InitializeComponent();
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
+
+            InitializeComponent();
         }
 
         #endregion

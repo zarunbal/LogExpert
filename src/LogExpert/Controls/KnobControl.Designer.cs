@@ -32,8 +32,6 @@ namespace LogExpert.Controls
       // 
       // KnobControl
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Name = "KnobControl";
       this.Size = new System.Drawing.Size(21, 21);
       this.ResumeLayout(false);

@@ -32,6 +32,7 @@ namespace LogExpert.Dialogs
         {
             InitializeComponent();
             _toolTip = new ToolTip();
+            Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             _toolTip.InitialDelay = 0;
             _toolTip.ReshowDelay = 0;
             _toolTip.ShowAlways = true;

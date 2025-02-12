@@ -1114,8 +1114,6 @@ namespace LogExpert.Controls.LogWindow
             // 
             // LogWindow
             // 
-            AutoScaleDimensions = new SizeF(10F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(1862, 1104);
             ControlBox = false;
