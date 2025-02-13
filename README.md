@@ -56,6 +56,10 @@ Nuke.build Requirements
 # FAQ / HELP / Informations / Examples
 Please checkout the wiki for FAQ / HELP / Informations / Examples
 
+# High DPI
+- dont use AutoScaleMode for single GUI controls like Buttons etc.
+- dont use AutoScaleDimensions for single GUI controls like Buttons etc.
+
 https://github.com/zarunbal/LogExpert/wiki
 
 # Discord Server
