@@ -24,10 +24,12 @@ namespace LogExpert.Extensions.Forms
             Color backColor = Config.ColorMode.BackgroundColor;
 
             // Fill the background.
-            e.Graphics.FillRectangle(new SolidBrush(backColor), 0, 0, width, height);
+            using SolidBrush backbrush = new(backColor);
+            e.Graphics.FillRectangle(backbrush, 0, 0, width, height);
 
             // Draw the line.
-            e.Graphics.DrawLine(new Pen(foreColor), 4, height / 2, width - 4, height / 2);
+            using Pen pen = new(foreColor);
+            e.Graphics.DrawLine(pen, width / 2, 4, width / 2, height - 4);
         }
-    }  
+    }
 }

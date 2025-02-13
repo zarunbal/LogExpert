@@ -101,7 +101,7 @@ namespace LogExpert.Classes
                         brush.Dispose();
                         if (bookmark.Text.Length > 0)
                         {
-                            StringFormat format = new StringFormat();
+                            StringFormat format = new();
                             format.LineAlignment = StringAlignment.Center;
                             format.Alignment = StringAlignment.Center;
                             Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
@@ -121,7 +121,7 @@ namespace LogExpert.Classes
 
         public static DataGridViewTextBoxColumn CreateMarkerColumn()
         {
-            DataGridViewTextBoxColumn markerColumn = new DataGridViewTextBoxColumn();
+            DataGridViewTextBoxColumn markerColumn = new();
             markerColumn.HeaderText = "";
             markerColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
             markerColumn.Resizable = DataGridViewTriState.False;
@@ -134,7 +134,7 @@ namespace LogExpert.Classes
 
         public static DataGridViewTextBoxColumn CreateLineNumberColumn()
         {
-            DataGridViewTextBoxColumn lineNumberColumn = new DataGridViewTextBoxColumn();
+            DataGridViewTextBoxColumn lineNumberColumn = new();
             lineNumberColumn.HeaderText = "Line";
             lineNumberColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
             lineNumberColumn.Resizable = DataGridViewTriState.NotSet;
@@ -247,7 +247,7 @@ namespace LogExpert.Classes
 
         public static Rectangle BorderWidths(DataGridViewAdvancedBorderStyle advancedBorderStyle)
         {
-            Rectangle rect = new Rectangle();
+            Rectangle rect = new();
 
             rect.X = advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None ? 0 : 1;
             if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
@@ -308,7 +308,7 @@ namespace LogExpert.Classes
             {
                 if (string.IsNullOrEmpty(column.FullValue) == false)
                 {
-                    HilightMatchEntry hme = new HilightMatchEntry();
+                    HilightMatchEntry hme = new();
                     hme.StartPos = 0;
                     hme.Length = column.FullValue.Length;
                     hme.HilightEntry = new HilightEntry(column.FullValue, groundEntry?.ForegroundColor ?? LogExpert.Config.ColorMode.ForeColor, groundEntry?.BackgroundColor ?? Color.Empty, false);
@@ -317,7 +317,7 @@ namespace LogExpert.Classes
             }
 
             int leftPad = e.CellStyle.Padding.Left;
-            RectangleF rect = new RectangleF(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
+            RectangleF rect = new(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
             Rectangle borderWidths = BorderWidths(e.AdvancedBorderStyle);
             Rectangle valBounds = e.CellBounds;
             valBounds.Offset(borderWidths.X, borderWidths.Y);
@@ -346,7 +346,7 @@ namespace LogExpert.Classes
             //TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
 
             Point wordPos = valBounds.Location;
-            Size proposedSize = new Size(valBounds.Width, valBounds.Height);
+            Size proposedSize = new(valBounds.Width, valBounds.Height);
 
             Rectangle r = gridView.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
             e.Graphics.SetClip(e.CellBounds);
@@ -372,7 +372,7 @@ namespace LogExpert.Classes
 
                 Size wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
                 wordSize.Height = e.CellBounds.Height;
-                Rectangle wordRect = new Rectangle(wordPos, wordSize);
+                Rectangle wordRect = new(wordPos, wordSize);
 
                 Color foreColor = matchEntry.HilightEntry.ForegroundColor;
                 if ((e.State & DataGridViewElementStates.Selected) != DataGridViewElementStates.Selected)
@@ -444,7 +444,7 @@ namespace LogExpert.Classes
                 {
                     if (entryArray[pos] != currentEntry)
                     {
-                        HilightMatchEntry me = new HilightMatchEntry();
+                        HilightMatchEntry me = new();
                         me.StartPos = lastStartPos;
                         me.Length = pos - lastStartPos;
                         me.HilightEntry = currentEntry;
@@ -453,7 +453,7 @@ namespace LogExpert.Classes
                         lastStartPos = pos;
                     }
                 }
-                HilightMatchEntry me2 = new HilightMatchEntry();
+                HilightMatchEntry me2 = new();
                 me2.StartPos = lastStartPos;
                 me2.Length = pos - lastStartPos;
                 me2.HilightEntry = currentEntry;

@@ -9,8 +9,8 @@ namespace LogExpert.Classes.Persister
 
         public static ProjectData LoadProjectData(string projectFileName)
         {
-            ProjectData projectData = new ProjectData();
-            XmlDocument xmlDoc = new XmlDocument();
+            ProjectData projectData = new();
+            XmlDocument xmlDoc = new();
             xmlDoc.Load(projectFileName);
             XmlNodeList fileList = xmlDoc.GetElementsByTagName("member");
             foreach (XmlNode fileNode in fileList)
@@ -30,7 +30,7 @@ namespace LogExpert.Classes.Persister
 
         public static void SaveProjectData(string projectFileName, ProjectData projectData)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            XmlDocument xmlDoc = new();
             XmlElement rootElement = xmlDoc.CreateElement("logexpert");
             xmlDoc.AppendChild(rootElement);
             XmlElement projectElement = xmlDoc.CreateElement("project");

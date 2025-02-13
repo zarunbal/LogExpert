@@ -4,7 +4,7 @@ namespace LogExpert.Extensions
 {
     public static class ComboBoxExtensions
     {
-        /// <see cref="https://stackoverflow.com/a/4842576/1987788"/>
+        /// <seealso href="https://stackoverflow.com/a/4842576/1987788"/>
         public static int GetMaxTextWidth(this ComboBox comboBox)
         {
             var maxTextWidth = comboBox.Width;

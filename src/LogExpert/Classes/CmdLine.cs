@@ -227,7 +227,7 @@ namespace LogExpert.Classes
         #region Fields
 
         // A private dictonary containing the parameters.
-        private readonly Dictionary<string, CmdLineParameter> parameters = new Dictionary<string, CmdLineParameter>();
+        private readonly Dictionary<string, CmdLineParameter> parameters = [];
 
         #endregion
 
@@ -268,7 +268,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Registers a parameter to be used and adds it to the help screen.
         /// </summary>
-        /// <param name="p">The parameter to add.</param>
+        /// <param name="parameter">The parameter to add.</param>
         public void RegisterParameter(CmdLineParameter parameter)
         {
             if (parameters.ContainsKey(parameter.Name))
@@ -281,7 +281,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Registers parameters to be used and adds hem to the help screen.
         /// </summary>
-        /// <param name="p">The parameter to add.</param>
+        /// <param name="parameters">The parameter to add.</param>
         public void RegisterParameter(CmdLineParameter[] parameters)
         {
             foreach (CmdLineParameter p in parameters)
@@ -300,7 +300,7 @@ namespace LogExpert.Classes
         {
             int i = 0;
 
-            List<string> new_args = new List<string>();
+            List<string> new_args = [];
 
             while (i < args.Length)
             {

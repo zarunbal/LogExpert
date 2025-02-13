@@ -24,7 +24,10 @@ namespace LogExpert.Classes.DateTimeParser
         public int Peek(int offset = 0)
         {
             if (formatStringPosition + offset >= formatString.Length)
+            {
                 return -1;
+            }
+
             return formatString[formatStringPosition + offset];
         }
 
@@ -35,9 +38,14 @@ namespace LogExpert.Classes.DateTimeParser
             {
                 var c = Peek(offset++);
                 if (c == -1)
+                {
                     break;
+                }
+
                 if (c == until)
+                {
                     return offset - startOffset;
+                }
             }
             return 0;
         }
@@ -62,10 +70,14 @@ namespace LogExpert.Classes.DateTimeParser
         public bool ReadOneOrMore(int c)
         {
             if (Peek() != c)
+            {
                 return false;
+            }
 
             while (Peek() == c)
+            {
                 Advance();
+            }
 
             return true;
         }
@@ -83,7 +95,9 @@ namespace LogExpert.Classes.DateTimeParser
         public bool ReadString(string s, bool ignoreCase = false)
         {
             if (formatStringPosition + s.Length > formatString.Length)
+            {
                 return false;
+            }
 
             for (var i = 0; i < s.Length; i++)
             {
@@ -91,11 +105,17 @@ namespace LogExpert.Classes.DateTimeParser
                 var c2 = (char)Peek(i);
                 if (ignoreCase)
                 {
-                    if (char.ToLower(c1) != char.ToLower(c2)) return false;
+                    if (char.ToLower(c1) != char.ToLower(c2))
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    if (c1 != c2) return false;
+                    if (c1 != c2)
+                    {
+                        return false;
+                    }
                 }
             }
 

@@ -21,7 +21,7 @@ namespace LogExpert.Classes
             {
                 _lastColumnizer = columnizer;
                 _lastLineNumber = lineNumber;
-                ILogLine line = logFileReader.GetLogLineWithWait(lineNumber);
+                ILogLine line = logFileReader.GetLogLineWithWait(lineNumber).Result;
                 if (line != null)
                 {
                     columnizerCallback.LineNum = lineNumber;

@@ -28,226 +28,227 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.okButton = new System.Windows.Forms.Button();
-      this.cancelButton = new System.Windows.Forms.Button();
-      this.label1 = new System.Windows.Forms.Label();
-      this.caseSensitiveCheckBox = new System.Windows.Forms.CheckBox();
-      this.regexCheckBox = new System.Windows.Forms.CheckBox();
-      this.regexHelperButton = new System.Windows.Forms.Button();
-      this.fromTopRadioButton = new System.Windows.Forms.RadioButton();
-      this.fromSelectedRadioButton = new System.Windows.Forms.RadioButton();
-      this.groupBox1 = new System.Windows.Forms.GroupBox();
-      this.groupBox2 = new System.Windows.Forms.GroupBox();
-      this.groupBox3 = new System.Windows.Forms.GroupBox();
-      this.backwardRadioButton = new System.Windows.Forms.RadioButton();
-      this.forwardRadioButton = new System.Windows.Forms.RadioButton();
-      this.searchComboBox = new System.Windows.Forms.ComboBox();
-      this.helpProvider1 = new System.Windows.Forms.HelpProvider();
-      this.groupBox1.SuspendLayout();
-      this.groupBox2.SuspendLayout();
-      this.groupBox3.SuspendLayout();
-      this.SuspendLayout();
-      // 
-      // okButton
-      // 
-      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(221, 204);
-      this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 5;
-      this.okButton.Text = "OK";
-      this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
-      // 
-      // cancelButton
-      // 
-      this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(298, 204);
-      this.cancelButton.Name = "cancelButton";
-      this.cancelButton.Size = new System.Drawing.Size(75, 23);
-      this.cancelButton.TabIndex = 6;
-      this.cancelButton.Text = "Cancel";
-      this.cancelButton.UseVisualStyleBackColor = true;
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(10, 9);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(59, 13);
-      this.label1.TabIndex = 0;
-      this.label1.Text = "&Search for:";
-      // 
-      // caseSensitiveCheckBox
-      // 
-      this.caseSensitiveCheckBox.AutoSize = true;
-      this.caseSensitiveCheckBox.Location = new System.Drawing.Point(6, 19);
-      this.caseSensitiveCheckBox.Name = "caseSensitiveCheckBox";
-      this.caseSensitiveCheckBox.Size = new System.Drawing.Size(94, 17);
-      this.caseSensitiveCheckBox.TabIndex = 4;
-      this.caseSensitiveCheckBox.Text = "&Case sensitive";
-      this.caseSensitiveCheckBox.UseVisualStyleBackColor = true;
-      // 
-      // regexCheckBox
-      // 
-      this.regexCheckBox.AutoSize = true;
-      this.regexCheckBox.Location = new System.Drawing.Point(6, 43);
-      this.regexCheckBox.Name = "regexCheckBox";
-      this.regexCheckBox.Size = new System.Drawing.Size(116, 17);
-      this.regexCheckBox.TabIndex = 5;
-      this.regexCheckBox.Text = "&Regular expression";
-      this.regexCheckBox.UseVisualStyleBackColor = true;
-      // 
-      // regexHelperButton
-      // 
-      this.regexHelperButton.Location = new System.Drawing.Point(124, 34);
-      this.regexHelperButton.Name = "regexHelperButton";
-      this.regexHelperButton.Size = new System.Drawing.Size(84, 26);
-      this.regexHelperButton.TabIndex = 3;
-      this.regexHelperButton.Text = "Regex-&Helper";
-      this.regexHelperButton.UseVisualStyleBackColor = true;
-      this.regexHelperButton.Click += new System.EventHandler(this.regexHelperButton_Click);
-      // 
-      // fromTopRadioButton
-      // 
-      this.fromTopRadioButton.AutoSize = true;
-      this.fromTopRadioButton.Location = new System.Drawing.Point(6, 19);
-      this.fromTopRadioButton.Name = "fromTopRadioButton";
-      this.fromTopRadioButton.Size = new System.Drawing.Size(66, 17);
-      this.fromTopRadioButton.TabIndex = 7;
-      this.fromTopRadioButton.TabStop = true;
-      this.fromTopRadioButton.Text = "From top";
-      this.fromTopRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // fromSelectedRadioButton
-      // 
-      this.fromSelectedRadioButton.AutoSize = true;
-      this.fromSelectedRadioButton.Location = new System.Drawing.Point(6, 42);
-      this.fromSelectedRadioButton.Name = "fromSelectedRadioButton";
-      this.fromSelectedRadioButton.Size = new System.Drawing.Size(110, 17);
-      this.fromSelectedRadioButton.TabIndex = 8;
-      this.fromSelectedRadioButton.TabStop = true;
-      this.fromSelectedRadioButton.Text = "From selected line";
-      this.fromSelectedRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // groupBox1
-      // 
-      this.groupBox1.Controls.Add(this.fromTopRadioButton);
-      this.groupBox1.Controls.Add(this.fromSelectedRadioButton);
-      this.groupBox1.Location = new System.Drawing.Point(13, 62);
-      this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(122, 79);
-      this.groupBox1.TabIndex = 1;
-      this.groupBox1.TabStop = false;
-      this.groupBox1.Text = "Search start";
-      // 
-      // groupBox2
-      // 
-      this.groupBox2.Controls.Add(this.caseSensitiveCheckBox);
-      this.groupBox2.Controls.Add(this.regexCheckBox);
-      this.groupBox2.Controls.Add(this.regexHelperButton);
-      this.groupBox2.Location = new System.Drawing.Point(158, 62);
-      this.groupBox2.Name = "groupBox2";
-      this.groupBox2.Size = new System.Drawing.Size(219, 79);
-      this.groupBox2.TabIndex = 2;
-      this.groupBox2.TabStop = false;
-      this.groupBox2.Text = "Options";
-      // 
-      // groupBox3
-      // 
-      this.groupBox3.Controls.Add(this.backwardRadioButton);
-      this.groupBox3.Controls.Add(this.forwardRadioButton);
-      this.groupBox3.Location = new System.Drawing.Point(13, 148);
-      this.groupBox3.Name = "groupBox3";
-      this.groupBox3.Size = new System.Drawing.Size(122, 79);
-      this.groupBox3.TabIndex = 4;
-      this.groupBox3.TabStop = false;
-      this.groupBox3.Text = "Direction";
-      // 
-      // backwardRadioButton
-      // 
-      this.backwardRadioButton.AutoSize = true;
-      this.backwardRadioButton.Location = new System.Drawing.Point(7, 44);
-      this.backwardRadioButton.Name = "backwardRadioButton";
-      this.backwardRadioButton.Size = new System.Drawing.Size(73, 17);
-      this.backwardRadioButton.TabIndex = 1;
-      this.backwardRadioButton.TabStop = true;
-      this.backwardRadioButton.Text = "Backward";
-      this.backwardRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // forwardRadioButton
-      // 
-      this.forwardRadioButton.AutoSize = true;
-      this.forwardRadioButton.Location = new System.Drawing.Point(7, 20);
-      this.forwardRadioButton.Name = "forwardRadioButton";
-      this.forwardRadioButton.Size = new System.Drawing.Size(63, 17);
-      this.forwardRadioButton.TabIndex = 0;
-      this.forwardRadioButton.TabStop = true;
-      this.forwardRadioButton.Text = "Forward";
-      this.forwardRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // searchComboBox
-      // 
-      this.searchComboBox.FormattingEnabled = true;
-      this.searchComboBox.Location = new System.Drawing.Point(13, 25);
-      this.searchComboBox.Name = "searchComboBox";
-      this.searchComboBox.Size = new System.Drawing.Size(364, 21);
-      this.searchComboBox.TabIndex = 0;
-      // 
-      // helpProvider1
-      // 
-      this.helpProvider1.HelpNamespace = "LogExpert.chm";
-      // 
-      // SearchDialog
-      // 
-      this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.CancelButton = this.cancelButton;
-      this.ClientSize = new System.Drawing.Size(385, 239);
-      this.Controls.Add(this.searchComboBox);
-      this.Controls.Add(this.groupBox3);
-      this.Controls.Add(this.groupBox2);
-      this.Controls.Add(this.groupBox1);
-      this.Controls.Add(this.label1);
-      this.Controls.Add(this.cancelButton);
-      this.Controls.Add(this.okButton);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.helpProvider1.SetHelpKeyword(this, "Search and Navigation.htm");
-      this.helpProvider1.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
-      this.Name = "SearchDialog";
-      this.helpProvider1.SetShowHelp(this, true);
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-      this.Text = "Search";
-      this.groupBox1.ResumeLayout(false);
-      this.groupBox1.PerformLayout();
-      this.groupBox2.ResumeLayout(false);
-      this.groupBox2.PerformLayout();
-      this.groupBox3.ResumeLayout(false);
-      this.groupBox3.PerformLayout();
-      this.ResumeLayout(false);
-      this.PerformLayout();
+            this.buttonOk = new System.Windows.Forms.Button();
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.labelSearchFor = new System.Windows.Forms.Label();
+            this.checkBoxCaseSensitive = new System.Windows.Forms.CheckBox();
+            this.checkBoxRegex = new System.Windows.Forms.CheckBox();
+            this.buttonRegexHelper = new System.Windows.Forms.Button();
+            this.radioButtonFromTop = new System.Windows.Forms.RadioButton();
+            this.radioButtonFromSelected = new System.Windows.Forms.RadioButton();
+            this.groupBoxSearchStart = new System.Windows.Forms.GroupBox();
+            this.groupBoxOptions = new System.Windows.Forms.GroupBox();
+            this.groupBoxDirection = new System.Windows.Forms.GroupBox();
+            this.radioButtonBackward = new System.Windows.Forms.RadioButton();
+            this.radioButtonForward = new System.Windows.Forms.RadioButton();
+            this.comboBoxSearchFor = new System.Windows.Forms.ComboBox();
+            this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+            this.groupBoxSearchStart.SuspendLayout();
+            this.groupBoxOptions.SuspendLayout();
+            this.groupBoxDirection.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // buttonOk
+            // 
+            this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonOk.Location = new System.Drawing.Point(317, 215);
+            this.buttonOk.Name = "buttonOk";
+            this.buttonOk.Size = new System.Drawing.Size(75, 23);
+            this.buttonOk.TabIndex = 5;
+            this.buttonOk.Text = "OK";
+            this.buttonOk.UseVisualStyleBackColor = true;
+            this.buttonOk.Click += new System.EventHandler(this.OnButtonOkClick);
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttonCancel.Location = new System.Drawing.Point(398, 215);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonCancel.TabIndex = 6;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.OnButtonCancelClick);
+            // 
+            // labelSearchFor
+            // 
+            this.labelSearchFor.AutoSize = true;
+            this.labelSearchFor.Location = new System.Drawing.Point(10, 9);
+            this.labelSearchFor.Name = "labelSearchFor";
+            this.labelSearchFor.Size = new System.Drawing.Size(87, 20);
+            this.labelSearchFor.TabIndex = 0;
+            this.labelSearchFor.Text = "&Search for:";
+            // 
+            // checkBoxCaseSensitive
+            // 
+            this.checkBoxCaseSensitive.AutoSize = true;
+            this.checkBoxCaseSensitive.Location = new System.Drawing.Point(6, 19);
+            this.checkBoxCaseSensitive.Name = "checkBoxCaseSensitive";
+            this.checkBoxCaseSensitive.Size = new System.Drawing.Size(137, 24);
+            this.checkBoxCaseSensitive.TabIndex = 4;
+            this.checkBoxCaseSensitive.Text = "&Case sensitive";
+            this.checkBoxCaseSensitive.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxRegex
+            // 
+            this.checkBoxRegex.AutoSize = true;
+            this.checkBoxRegex.Location = new System.Drawing.Point(6, 43);
+            this.checkBoxRegex.Name = "checkBoxRegex";
+            this.checkBoxRegex.Size = new System.Drawing.Size(171, 24);
+            this.checkBoxRegex.TabIndex = 5;
+            this.checkBoxRegex.Text = "&Regular expression";
+            this.checkBoxRegex.UseVisualStyleBackColor = true;
+            // 
+            // buttonRegexHelper
+            // 
+            this.buttonRegexHelper.Location = new System.Drawing.Point(6, 72);
+            this.buttonRegexHelper.Name = "buttonRegexHelper";
+            this.buttonRegexHelper.Size = new System.Drawing.Size(84, 26);
+            this.buttonRegexHelper.TabIndex = 3;
+            this.buttonRegexHelper.Text = "Regex-&Helper";
+            this.buttonRegexHelper.UseVisualStyleBackColor = true;
+            this.buttonRegexHelper.Click += new System.EventHandler(this.OnButtonRegexClick);
+            // 
+            // radioButtonFromTop
+            // 
+            this.radioButtonFromTop.AutoSize = true;
+            this.radioButtonFromTop.Location = new System.Drawing.Point(6, 19);
+            this.radioButtonFromTop.Name = "radioButtonFromTop";
+            this.radioButtonFromTop.Size = new System.Drawing.Size(98, 24);
+            this.radioButtonFromTop.TabIndex = 7;
+            this.radioButtonFromTop.TabStop = true;
+            this.radioButtonFromTop.Text = "From top";
+            this.radioButtonFromTop.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonFromSelected
+            // 
+            this.radioButtonFromSelected.AutoSize = true;
+            this.radioButtonFromSelected.Location = new System.Drawing.Point(6, 42);
+            this.radioButtonFromSelected.Name = "radioButtonFromSelected";
+            this.radioButtonFromSelected.Size = new System.Drawing.Size(163, 24);
+            this.radioButtonFromSelected.TabIndex = 8;
+            this.radioButtonFromSelected.TabStop = true;
+            this.radioButtonFromSelected.Text = "From selected line";
+            this.radioButtonFromSelected.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxSearchStart
+            // 
+            this.groupBoxSearchStart.Controls.Add(this.radioButtonFromTop);
+            this.groupBoxSearchStart.Controls.Add(this.radioButtonFromSelected);
+            this.groupBoxSearchStart.Location = new System.Drawing.Point(12, 74);
+            this.groupBoxSearchStart.Name = "groupBoxSearchStart";
+            this.groupBoxSearchStart.Size = new System.Drawing.Size(179, 79);
+            this.groupBoxSearchStart.TabIndex = 1;
+            this.groupBoxSearchStart.TabStop = false;
+            this.groupBoxSearchStart.Text = "Search start";
+            // 
+            // groupBoxOptions
+            // 
+            this.groupBoxOptions.Controls.Add(this.checkBoxCaseSensitive);
+            this.groupBoxOptions.Controls.Add(this.checkBoxRegex);
+            this.groupBoxOptions.Controls.Add(this.buttonRegexHelper);
+            this.groupBoxOptions.Location = new System.Drawing.Point(198, 74);
+            this.groupBoxOptions.Name = "groupBoxOptions";
+            this.groupBoxOptions.Size = new System.Drawing.Size(275, 104);
+            this.groupBoxOptions.TabIndex = 2;
+            this.groupBoxOptions.TabStop = false;
+            this.groupBoxOptions.Text = "Options";
+            // 
+            // groupBoxDirection
+            // 
+            this.groupBoxDirection.Controls.Add(this.radioButtonBackward);
+            this.groupBoxDirection.Controls.Add(this.radioButtonForward);
+            this.groupBoxDirection.Location = new System.Drawing.Point(13, 159);
+            this.groupBoxDirection.Name = "groupBoxDirection";
+            this.groupBoxDirection.Size = new System.Drawing.Size(122, 79);
+            this.groupBoxDirection.TabIndex = 4;
+            this.groupBoxDirection.TabStop = false;
+            this.groupBoxDirection.Text = "Direction";
+            // 
+            // radioButtonBackward
+            // 
+            this.radioButtonBackward.AutoSize = true;
+            this.radioButtonBackward.Location = new System.Drawing.Point(7, 44);
+            this.radioButtonBackward.Name = "radioButtonBackward";
+            this.radioButtonBackward.Size = new System.Drawing.Size(104, 24);
+            this.radioButtonBackward.TabIndex = 1;
+            this.radioButtonBackward.TabStop = true;
+            this.radioButtonBackward.Text = "Backward";
+            this.radioButtonBackward.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonForward
+            // 
+            this.radioButtonForward.AutoSize = true;
+            this.radioButtonForward.Location = new System.Drawing.Point(7, 20);
+            this.radioButtonForward.Name = "radioButtonForward";
+            this.radioButtonForward.Size = new System.Drawing.Size(92, 24);
+            this.radioButtonForward.TabIndex = 0;
+            this.radioButtonForward.TabStop = true;
+            this.radioButtonForward.Text = "Forward";
+            this.radioButtonForward.UseVisualStyleBackColor = true;
+            // 
+            // comboBoxSearchFor
+            // 
+            this.comboBoxSearchFor.FormattingEnabled = true;
+            this.comboBoxSearchFor.Location = new System.Drawing.Point(13, 34);
+            this.comboBoxSearchFor.Name = "comboBoxSearchFor";
+            this.comboBoxSearchFor.Size = new System.Drawing.Size(460, 28);
+            this.comboBoxSearchFor.TabIndex = 0;
+            // 
+            // helpProvider1
+            // 
+            this.helpProvider1.HelpNamespace = "LogExpert.chm";
+            // 
+            // SearchDialog
+            // 
+            this.AcceptButton = this.buttonOk;
+            this.CancelButton = this.buttonCancel;
+            this.ClientSize = new System.Drawing.Size(488, 250);
+            this.Controls.Add(this.comboBoxSearchFor);
+            this.Controls.Add(this.groupBoxDirection);
+            this.Controls.Add(this.groupBoxOptions);
+            this.Controls.Add(this.groupBoxSearchStart);
+            this.Controls.Add(this.labelSearchFor);
+            this.Controls.Add(this.buttonCancel);
+            this.Controls.Add(this.buttonOk);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.helpProvider1.SetHelpKeyword(this, "Search and Navigation.htm");
+            this.helpProvider1.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "SearchDialog";
+            this.helpProvider1.SetShowHelp(this, true);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Search";
+            this.groupBoxSearchStart.ResumeLayout(false);
+            this.groupBoxSearchStart.PerformLayout();
+            this.groupBoxOptions.ResumeLayout(false);
+            this.groupBoxOptions.PerformLayout();
+            this.groupBoxDirection.ResumeLayout(false);
+            this.groupBoxDirection.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Button cancelButton;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.CheckBox caseSensitiveCheckBox;
-    private System.Windows.Forms.CheckBox regexCheckBox;
-    private System.Windows.Forms.Button regexHelperButton;
-    private System.Windows.Forms.RadioButton fromTopRadioButton;
-    private System.Windows.Forms.RadioButton fromSelectedRadioButton;
-    private System.Windows.Forms.GroupBox groupBox1;
-    private System.Windows.Forms.GroupBox groupBox2;
-    private System.Windows.Forms.GroupBox groupBox3;
-    private System.Windows.Forms.RadioButton backwardRadioButton;
-    private System.Windows.Forms.RadioButton forwardRadioButton;
-    private System.Windows.Forms.ComboBox searchComboBox;
+    private System.Windows.Forms.Button buttonOk;
+    private System.Windows.Forms.Button buttonCancel;
+    private System.Windows.Forms.Label labelSearchFor;
+    private System.Windows.Forms.CheckBox checkBoxCaseSensitive;
+    private System.Windows.Forms.CheckBox checkBoxRegex;
+    private System.Windows.Forms.Button buttonRegexHelper;
+    private System.Windows.Forms.RadioButton radioButtonFromTop;
+    private System.Windows.Forms.RadioButton radioButtonFromSelected;
+    private System.Windows.Forms.GroupBox groupBoxSearchStart;
+    private System.Windows.Forms.GroupBox groupBoxOptions;
+    private System.Windows.Forms.GroupBox groupBoxDirection;
+    private System.Windows.Forms.RadioButton radioButtonBackward;
+    private System.Windows.Forms.RadioButton radioButtonForward;
+    private System.Windows.Forms.ComboBox comboBoxSearchFor;
     private System.Windows.Forms.HelpProvider helpProvider1;
   }
 }

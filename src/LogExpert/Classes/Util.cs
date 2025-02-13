@@ -176,7 +176,7 @@ namespace LogExpert.Classes
 
         /// <summary>
         /// Cetin Sert, David Necas
-        /// http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&view=markup
+        /// <a href="http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&amp;view=markup">Source Code</a>
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="l1"></param>
@@ -375,7 +375,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Returns true, if the given string is null or empty
         /// </summary>
-        /// <param name="?"></param>
+        /// <param name="toTest"></param>
         /// <returns></returns>
         public static bool IsNull(string toTest)
         {
@@ -385,7 +385,7 @@ namespace LogExpert.Classes
         /// <summary>
         /// Returns true, if the given string is null or empty or contains only spaces
         /// </summary>
-        /// <param name="?"></param>
+        /// <param name="toTest"></param>
         /// <returns></returns>
         public static bool IsNullOrSpaces(string toTest)
         {
@@ -407,18 +407,18 @@ namespace LogExpert.Classes
             string[] words = text.Split(new char[] {' ', '.', ':', ';'});
             int i = 0;
             int index = 0;
-            List<CharacterRange> crList = new List<CharacterRange>();
+            List<CharacterRange> crList = [];
             for (i = 0; i < words.Length; ++i)
             {
                 crList.Add(new CharacterRange(index, words[i].Length));
                 index += words[i].Length;
             }
             CharacterRange[] crArray = crList.ToArray();
-            StringFormat stringFormat = new StringFormat(StringFormat.GenericTypographic);
+            StringFormat stringFormat = new(StringFormat.GenericTypographic);
             stringFormat.Trimming = StringTrimming.None;
             stringFormat.FormatFlags = StringFormatFlags.NoClip;
             stringFormat.SetMeasurableCharacterRanges(crArray);
-            RectangleF rect = new RectangleF(0, 0, 3000, 20);
+            RectangleF rect = new(0, 0, 3000, 20);
             Region[] stringRegions = g.MeasureCharacterRanges(text,
                 font, rect, stringFormat);
             bool found = false;

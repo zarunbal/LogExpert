@@ -21,9 +21,9 @@ namespace LogExpert.Config
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly object _monitor = new object();
+        private static readonly object _monitor = new();
         private static ConfigManager _instance;
-        private readonly object _loadSaveLock = new object();
+        private readonly object _loadSaveLock = new();
         private Settings _settings;
 
         #endregion
@@ -51,10 +51,7 @@ namespace LogExpert.Config
             {
                 lock (_monitor)
                 {
-                    if (_instance == null)
-                    {
-                        _instance = new ConfigManager();
-                    }
+                    _instance ??= new ConfigManager();
                 }
                 return _instance;
             }
@@ -127,7 +124,7 @@ namespace LogExpert.Config
 
             try
             {
-                FileInfo fileInfo = new FileInfo(dir + Path.DirectorySeparatorChar + "settings.json");
+                FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + "settings.json");
                 return LoadOrCreateNew(fileInfo);
             }
             catch (Exception e)
@@ -166,35 +163,17 @@ namespace LogExpert.Config
                     }
                 }
 
-                if (settings.preferences == null)
-                {
-                    settings.preferences = new Preferences();
-                }
+                settings.preferences ??= new Preferences();
 
-                if (settings.preferences.toolEntries == null)
-                {
-                    settings.preferences.toolEntries = new List<ToolEntry>();
-                }
+                settings.preferences.toolEntries ??= [];
 
-                if (settings.preferences.columnizerMaskList == null)
-                {
-                    settings.preferences.columnizerMaskList = new List<ColumnizerMaskEntry>();
-                }
+                settings.preferences.columnizerMaskList ??= [];
 
-                if (settings.fileHistoryList == null)
-                {
-                    settings.fileHistoryList = new List<string>();
-                }
+                settings.fileHistoryList ??= [];
 
-                if (settings.lastOpenFilesList == null)
-                {
-                    settings.lastOpenFilesList = new List<string>();
-                }
+                settings.lastOpenFilesList ??= [];
 
-                if (settings.fileColors == null)
-                {
-                    settings.fileColors = new List<ColorEntry>();
-                }
+                settings.fileColors ??= [];
 
                 if (settings.preferences.showTailColor == Color.Empty)
                 {
@@ -216,25 +195,13 @@ namespace LogExpert.Config
                     settings.preferences.linesPerBuffer = 500;
                 }
 
-                if (settings.filterList == null)
-                {
-                    settings.filterList = new List<FilterParams>();
-                }
+                settings.filterList ??= [];
 
-                if (settings.searchHistoryList == null)
-                {
-                    settings.searchHistoryList = new List<string>();
-                }
+                settings.searchHistoryList ??= [];
 
-                if (settings.filterHistoryList == null)
-                {
-                    settings.filterHistoryList = new List<string>();
-                }
+                settings.filterHistoryList ??= [];
 
-                if (settings.filterRangeHistoryList == null)
-                {
-                    settings.filterRangeHistoryList = new List<string>();
-                }
+                settings.filterRangeHistoryList ??= [];
 
                 foreach (FilterParams filterParams in settings.filterList)
                 {
@@ -243,33 +210,24 @@ namespace LogExpert.Config
 
                 if (settings.hilightGroupList == null)
                 {
-                    settings.hilightGroupList = new List<HilightGroup>();
+                    settings.hilightGroupList = [];
                     // migrate old non-grouped entries
-                    HilightGroup defaultGroup = new HilightGroup();
+                    HilightGroup defaultGroup = new();
                     defaultGroup.GroupName = "[Default]";
                     defaultGroup.HilightEntryList = settings.hilightEntryList;
                     settings.hilightGroupList.Add(defaultGroup);
                 }
 
-                if (settings.preferences.highlightMaskList == null)
-                {
-                    settings.preferences.highlightMaskList = new List<HighlightMaskEntry>();
-                }
+                settings.preferences.highlightMaskList ??= [];
 
                 if (settings.preferences.pollingInterval < 20)
                 {
                     settings.preferences.pollingInterval = 250;
                 }
 
-                if (settings.preferences.multiFileOptions == null)
-                {
-                    settings.preferences.multiFileOptions = new MultiFileOptions();
-                }
+                settings.preferences.multiFileOptions ??= new MultiFileOptions();
 
-                if (settings.preferences.defaultEncoding == null)
-                {
-                    settings.preferences.defaultEncoding = Encoding.Default.HeaderName;
-                }
+                settings.preferences.defaultEncoding ??= Encoding.Default.HeaderName;
 
                 if (settings.preferences.maximumFilterEntriesDisplayed == 0)
                 {
@@ -308,7 +266,7 @@ namespace LogExpert.Config
                         Directory.CreateDirectory(dir);
                     }
 
-                    FileInfo fileInfo = new FileInfo(dir + Path.DirectorySeparatorChar + "settings.json");
+                    FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + "settings.json");
                     Save(fileInfo, settings);
                 }
 
@@ -331,11 +289,9 @@ namespace LogExpert.Config
         {
             settings.versionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;
 
-            using (StreamWriter sw = new StreamWriter(fileInfo.Create()))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(sw, settings);
-            }
+            using StreamWriter sw = new(fileInfo.Create());
+            JsonSerializer serializer = new();
+            serializer.Serialize(sw, settings);
         }
 
         /// <summary>
@@ -350,7 +306,7 @@ namespace LogExpert.Config
             if (oldBuildNumber < 3584)
             {
                 // External tools
-                List<ToolEntry> newList = new List<ToolEntry>();
+                List<ToolEntry> newList = [];
                 foreach (ToolEntry tool in settings.preferences.toolEntries)
                 {
                     // set favourite to true only when name is empty, because there are always version released without this conversion fx

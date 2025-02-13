@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using LogExpert.Classes.Log;
+﻿using LogExpert.Classes.Log;
 using LogExpert.Entities;
 using LogExpert.Interface;
 using NUnit.Framework;
+using System;
+using System.IO;
+using System.Text;
 
 namespace LogExpert.Tests
 {
@@ -24,37 +24,34 @@ namespace LogExpert.Tests
         private void CompareReaderImplementationsInternal(string fileName, Encoding enc, int maxPosition)
         {
             string path = Environment.CurrentDirectory + "\\data\\";
-            EncodingOptions encOpts = new EncodingOptions();
+            EncodingOptions encOpts = new();
             encOpts.Encoding = enc;
 
-            using (Stream s1 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read))
-                using (Stream s2 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read))
+            using Stream s1 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read);
+            using Stream s2 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read);
+            using ILogStreamReader r1 = new PositionAwareStreamReaderLegacy(s1, encOpts);
+            using ILogStreamReader r2 = new PositionAwareStreamReaderSystem(s2, encOpts);
+            for (int lineNum = 0; ; lineNum++)
+            {
+                string line1 = r1.ReadLine();
+                string line2 = r2.ReadLine();
+                if (line1 == null && line2 == null)
                 {
-                    using (ILogStreamReader r1 = new PositionAwareStreamReaderLegacy(s1, encOpts))
-                        using (ILogStreamReader r2 = new PositionAwareStreamReaderSystem(s2, encOpts))
-                        {
-                            for (int lineNum = 0;; lineNum++)
-                            {
-                                string line1 = r1.ReadLine();
-                                string line2 = r2.ReadLine();
-                                if (line1 == null && line2 == null)
-                                {
-                                    break;
-                                }
-
-                                Assert.AreEqual(line1, line2, "File " + fileName);
-                                if (r1.Position != maxPosition)
-                                {
-                                    Assert.AreEqual(r1.Position, r2.Position, "Line " + lineNum + ", File: " + fileName);
-                                }
-                                else
-                                {
-                                    //Its desired that the position of the new implementation is 2 bytes ahead to fix the problem of empty lines every time a new line is appended.
-                                    Assert.AreEqual(r1.Position, r2.Position - 2, "Line " + lineNum + ", File: " + fileName);
-                                }
-                            }
-                        }
+                    break;
                 }
+
+                Assert.That(line1, Is.EqualTo(line2), "File " + fileName);
+
+                if (r1.Position != maxPosition)
+                {
+                    Assert.That(r2.Position, Is.EqualTo(r1.Position), "Line " + lineNum + ", File: " + fileName);
+                }
+                else
+                {
+                    //Its desired that the position of the new implementation is 2 bytes ahead to fix the problem of empty lines every time a new line is appended.
+                    Assert.That(r2.Position - 2, Is.EqualTo(r1.Position), "Line " + lineNum + ", File: " + fileName);
+                }
+            }
         }
 
         //TODO find out why it does not work with appveyor, but works fine with normal environment!

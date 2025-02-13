@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using LogExpert;
+﻿using LogExpert;
 using NUnit.Framework;
+using System;
+using System.Text;
 
 namespace ColumnizerLib.UnitTests
 {
@@ -13,9 +11,9 @@ namespace ColumnizerLib.UnitTests
         [Test]
         public void Column_LineCutOf()
         {
-            Column column = new Column();
+            Column column = new();
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             for (int i = 0; i < 4675; i++)
             {
@@ -34,9 +32,9 @@ namespace ColumnizerLib.UnitTests
         [Test]
         public void Column_NoLineCutOf()
         {
-            Column column = new Column();
+            Column column = new();
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             for (int i = 0; i < 4675; i++)
             {
@@ -54,7 +52,7 @@ namespace ColumnizerLib.UnitTests
         [Test]
         public void Column_NullCharReplacement()
         {
-            Column column = new Column();
+            Column column = new();
 
             column.FullValue = "asdf\0";
 
@@ -76,7 +74,7 @@ namespace ColumnizerLib.UnitTests
         [Test]
         public void Column_TabReplacement()
         {
-            Column column = new Column();
+            Column column = new();
 
             column.FullValue = "asdf\t";
 

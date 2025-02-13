@@ -24,8 +24,8 @@ namespace LogExpert.Classes
         {
             //IntPtr[] smallIcons = new IntPtr[1];
             //IntPtr[] largeIcons = new IntPtr[1];
-            IntPtr smallIcons = new IntPtr();
-            IntPtr largeIcons = new IntPtr();
+            IntPtr smallIcons = new();
+            IntPtr largeIcons = new();
             int num = (int)ExtractIconEx(fileName, index, ref largeIcons, ref smallIcons, 1);
             if (num > 0 && smallIcons.ToInt32() != 0)
             {
@@ -53,8 +53,8 @@ namespace LogExpert.Classes
                 return null;
             }
 
-            IntPtr smallIcons = new IntPtr();
-            IntPtr largeIcons = new IntPtr();
+            IntPtr smallIcons = new();
+            IntPtr largeIcons = new();
             Icon[,] result = new Icon[2, iconCount];
 
             for (int i = 0; i < iconCount; ++i)
@@ -81,6 +81,9 @@ namespace LogExpert.Classes
             }
             return result;
         }
+        
+        [DllImport("user32.dll")]
+        public static extern long GetSystemMetricsForDpi(long index);
 
 
         [DllImport("user32.dll")]

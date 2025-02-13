@@ -1,8 +1,10 @@
-﻿using System;
+﻿using LogExpert.Classes.ILogLineColumnizerCallback;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using LogExpert.Classes.ILogLineColumnizerCallback;
-using NLog;
 
 namespace LogExpert.Classes.Filter
 {
@@ -25,9 +27,9 @@ namespace LogExpert.Classes.Filter
         public Filter(ColumnizerCallback callback)
         {
             _callback = callback;
-            FilterResultLines = new List<int>();
-            LastFilterLinesList = new List<int>();
-            FilterHitList = new List<int>();
+            FilterResultLines = [];
+            LastFilterLinesList = [];
+            FilterHitList = [];
         }
 
         #endregion
@@ -71,19 +73,23 @@ namespace LogExpert.Classes.Filter
                     {
                         return count;
                     }
+
                     ILogLine line = _callback.GetLogLine(lineNum);
                     if (line == null)
                     {
                         return count;
                     }
+
                     _callback.LineNum = lineNum;
                     if (Util.TestFilterCondition(filterParams, line, _callback))
                     {
                         AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList,
                             filterHitList);
                     }
+
                     lineNum++;
                     callbackCounter++;
+
                     if (lineNum % PROGRESS_BAR_MODULO == 0)
                     {
                         progressCallback(callbackCounter);
@@ -98,17 +104,19 @@ namespace LogExpert.Classes.Filter
                     "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
                     "LogExpert");
             }
+
             return count;
         }
 
         private void AddFilterLine(int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
         {
-            int count;
             filterHitList.Add(lineNum);
             IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+
             filterResultLines.AddRange(filterResult);
-            count = filterResultLines.Count;
+
             lastFilterLinesList.AddRange(filterResult);
+
             if (lastFilterLinesList.Count > SPREAD_MAX * 2)
             {
                 lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
@@ -117,9 +125,9 @@ namespace LogExpert.Classes.Filter
 
 
         /// <summary>
-        ///  Returns a list with 'additional filter results'. This is the given line number 
+        ///  Returns a list with 'additional filter results'. This is the given line number
         ///  and (if back spread and/or fore spread is enabled) some additional lines.
-        ///  This function doesn't check the filter condition! 
+        ///  This function doesn't check the filter condition!
         /// </summary>
         /// <param name="filterParams"></param>
         /// <param name="lineNum"></param>
@@ -127,7 +135,7 @@ namespace LogExpert.Classes.Filter
         /// <returns></returns>
         private IList<int> GetAdditionalFilterResults(FilterParams filterParams, int lineNum, IList<int> checkList)
         {
-            IList<int> resultList = new List<int>();
+            IList<int> resultList = [];
 
             if (filterParams.spreadBefore == 0 && filterParams.spreadBehind == 0)
             {

@@ -1,12 +1,12 @@
 ﻿using JsonColumnizer;
+using LogExpert.Classes;
 using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Log;
+using LogExpert.Entities;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
-using LogExpert.Classes;
-using LogExpert.Classes.Log;
-using LogExpert.Entities;
 
 namespace LogExpert.Tests
 {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace LogExpert.Classes.DateTimeParser
 {
     // Ensures we have constant width (number of characters) date formats
-    internal static class DateFormatPartAdjuster
+    public static class DateFormatPartAdjuster
     {
         private static readonly IDictionary<string, string> _dateTimePartReplacements = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {

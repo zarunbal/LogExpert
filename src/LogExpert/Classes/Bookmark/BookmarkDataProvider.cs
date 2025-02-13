@@ -18,7 +18,7 @@ namespace LogExpert.Classes.Bookmark
 
         internal BookmarkDataProvider()
         {
-            BookmarkList = new SortedList<int, Entities.Bookmark>();
+            BookmarkList = [];
         }
 
         internal BookmarkDataProvider(SortedList<int, Entities.Bookmark> bookmarkList)
@@ -48,7 +48,7 @@ namespace LogExpert.Classes.Bookmark
 
         #region Properties
         
-        public BookmarkCollection Bookmarks => new BookmarkCollection(BookmarkList);
+        public BookmarkCollection Bookmarks => new(BookmarkList);
 
         internal SortedList<int, Entities.Bookmark> BookmarkList { get; set; }
 
@@ -89,7 +89,7 @@ namespace LogExpert.Classes.Bookmark
 
         internal void ShiftBookmarks(int offset)
         {
-            SortedList<int, Entities.Bookmark> newBookmarkList = new SortedList<int, Entities.Bookmark>();
+            SortedList<int, Entities.Bookmark> newBookmarkList = [];
             foreach (Entities.Bookmark bookmark in BookmarkList.Values)
             {
                 int line = bookmark.LineNum - offset;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using LogExpert.Config;
 
@@ -15,6 +16,10 @@ namespace LogExpert.Dialogs
         public ImportSettingsDialog()
         {
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
         }
 
         #endregion
@@ -35,7 +40,7 @@ namespace LogExpert.Dialogs
 
         private void OnFileButtonClick(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new();
             dlg.Title = "Load Settings from file";
             dlg.DefaultExt = "json";
             dlg.AddExtension = false;

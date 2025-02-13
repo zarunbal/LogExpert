@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogExpert.Dialogs
 {
@@ -14,7 +12,7 @@ namespace LogExpert.Dialogs
 
         public SelectLineEventArgs(int line)
         {
-            this.Line = line;
+            Line = line;
         }
 
         #endregion

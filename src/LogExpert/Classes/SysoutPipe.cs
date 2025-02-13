@@ -24,9 +24,9 @@ namespace LogExpert.Classes
             this.sysout = sysout;
             this.FileName = Path.GetTempFileName();
             _logger.Info("sysoutPipe created temp file: {0}", this.FileName);
-            FileStream fStream = new FileStream(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+            FileStream fStream = new(this.FileName, FileMode.Append, FileAccess.Write, FileShare.Read);
             this.writer = new StreamWriter(fStream, Encoding.Unicode);
-            Thread thread = new Thread(new ThreadStart(this.ReaderThread));
+            Thread thread = new(new ThreadStart(this.ReaderThread));
             thread.IsBackground = true;
             thread.Start();
         }

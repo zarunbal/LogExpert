@@ -18,39 +18,40 @@ namespace LogExpert.Tests
         [TestCase("Line 1\rLine 2\rLine 3\r", 3)]
         public void ReadLinesWithSystemNewLine(string text, int expectedLines)
         {
-            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(text)))
-            using (var reader = new PositionAwareStreamReaderSystem(stream, new EncodingOptions()))
+            using var stream = new MemoryStream(Encoding.ASCII.GetBytes(text));
+            using var reader = new PositionAwareStreamReaderSystem(stream, new EncodingOptions());
+            int lineCount = 0;
+            while (true)
             {
-                int lineCount = 0;
-                while (true)
+                string line = reader.ReadLine();
+                if (line == null)
                 {
-                    string line = reader.ReadLine();
-                    if (line == null) break;
-
-                    lineCount += 1;
-                    Assert.That(line, Does.StartWith($"Line {lineCount}"), $"Invalid line: {line}");
+                    break;
                 }
 
-                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
+                lineCount += 1;
+
+                Assert.That(line.StartsWith($"Line {lineCount}"), $"Invalid line: {line}");
             }
+
+            Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
         }
+
         [Test]
         [TestCase("\n\n\n", 3)]
         [TestCase("\r\n\r\n\r\n", 3)]
         [TestCase("\r\r\r", 3)]
         public void CountLinesWithSystemNewLine(string text, int expectedLines)
         {
-            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(text)))
-            using (var reader = new PositionAwareStreamReaderSystem(stream, new EncodingOptions()))
+            using var stream = new MemoryStream(Encoding.ASCII.GetBytes(text));
+            using var reader = new PositionAwareStreamReaderSystem(stream, new EncodingOptions());
+            int lineCount = 0;
+            while (reader.ReadLine() != null)
             {
-                int lineCount = 0;
-                while (reader.ReadLine() != null)
-                {
-                    lineCount += 1;
-                }
-
-                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
+                lineCount += 1;
             }
+
+            Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
         }
 
         [Test]
@@ -69,14 +70,17 @@ namespace LogExpert.Tests
                 while (true)
                 {
                     string line = reader.ReadLine();
-                    if (line == null) break;
+                    if (line == null)
+                    {
+                        break;
+                    }
 
                     lineCount += 1;
 
-                    Assert.That(line, Does.StartWith($"Line {lineCount}"), $"Invalid line: {line}");
+                    Assert.That(line.StartsWith($"Line {lineCount}"), $"Invalid line: {line}");
                 }
 
-                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
+                Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
             }
         }
         [Test]
@@ -94,7 +98,8 @@ namespace LogExpert.Tests
                     lineCount += 1;
                 }
 
-                Assert.That(lineCount, Is.EqualTo(expectedLines), $"Unexpected lines:\n{text}");
+
+                Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
             }
         }
     }

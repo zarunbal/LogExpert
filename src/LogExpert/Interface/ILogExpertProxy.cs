@@ -1,4 +1,5 @@
 using LogExpert.Controls.LogTabWindow;
+using LogExpert.Grpc;
 
 namespace LogExpert.Interface
 {

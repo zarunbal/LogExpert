@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace LogExpert.Config
 {
@@ -28,7 +24,7 @@ namespace LogExpert.Config
         private static readonly Color DarkForeColor = Color.FromArgb(255, 255, 255);
 
         // Default
-        public static Color BackgroundColor = LessBrightBackgroundColor;
+        public static Color BackgroundColor = BrightBackgroundColor;
         public static Color DockBackgroundColor = BrighterBackgroundColor;
         public static Color BookmarksDefaultBackgroundColor = BrightBookmarkDefaultSystemColor;
         public static Color ForeColor = BrightForeColor;
@@ -39,7 +35,7 @@ namespace LogExpert.Config
         public static Color TabsBackgroundStripColor = LessBrightBackgroundColor;
 
 
-        public static bool DarkModeEnabled = false;
+        public static bool DarkModeEnabled;
 
         public static void LoadColorMode()
         {

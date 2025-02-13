@@ -362,7 +362,7 @@
             this.checkBoxColumnSize.TabIndex = 5;
             this.checkBoxColumnSize.Text = "Set last column width";
             this.checkBoxColumnSize.UseVisualStyleBackColor = true;
-            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.OnColumnSizeCheckBoxCheckedChanged);
+            this.checkBoxColumnSize.CheckedChanged += new System.EventHandler(this.OnChkBoxColumnSizeCheckedChanged);
             // 
             // buttonTailColor
             // 
@@ -373,7 +373,7 @@
             this.buttonTailColor.TabIndex = 4;
             this.buttonTailColor.Text = "Color...";
             this.buttonTailColor.UseVisualStyleBackColor = true;
-            this.buttonTailColor.Click += new System.EventHandler(this.OnTailColorButtonClick);
+            this.buttonTailColor.Click += new System.EventHandler(this.OnBtnTailColorClick);
             // 
             // checkBoxTailState
             // 
@@ -512,7 +512,7 @@
             this.buttonChangeFont.TabIndex = 1;
             this.buttonChangeFont.Text = "Change...";
             this.buttonChangeFont.UseVisualStyleBackColor = true;
-            this.buttonChangeFont.Click += new System.EventHandler(this.OnChangeFontButtonClick);
+            this.buttonChangeFont.Click += new System.EventHandler(this.OnBtnChangeFontClick);
             // 
             // labelFont
             // 
@@ -609,7 +609,7 @@
             this.buttonTimespreadColor.TabIndex = 7;
             this.buttonTimespreadColor.Text = "Color...";
             this.buttonTimespreadColor.UseVisualStyleBackColor = true;
-            this.buttonTimespreadColor.Click += new System.EventHandler(this.OnTimespreadColorButtonClick);
+            this.buttonTimespreadColor.Click += new System.EventHandler(this.OnBtnTimespreadColorClick);
             // 
             // checkBoxTimeSpread
             // 
@@ -744,7 +744,7 @@
             this.buttonToolAdd.TabIndex = 1;
             this.buttonToolAdd.Text = "Add new";
             this.buttonToolAdd.UseVisualStyleBackColor = true;
-            this.buttonToolAdd.Click += new System.EventHandler(this.OnToolAddButtonClick);
+            this.buttonToolAdd.Click += new System.EventHandler(this.OnBtnToolAddClick);
             // 
             // buttonToolDown
             // 
@@ -755,7 +755,7 @@
             this.buttonToolDown.TabIndex = 4;
             this.buttonToolDown.Text = "Down";
             this.buttonToolDown.UseVisualStyleBackColor = true;
-            this.buttonToolDown.Click += new System.EventHandler(this.OnToolDownButtonClick);
+            this.buttonToolDown.Click += new System.EventHandler(this.OnBtnToolDownClick);
             // 
             // buttonToolUp
             // 
@@ -766,7 +766,7 @@
             this.buttonToolUp.TabIndex = 3;
             this.buttonToolUp.Text = "Up";
             this.buttonToolUp.UseVisualStyleBackColor = true;
-            this.buttonToolUp.Click += new System.EventHandler(this.OnToolUpButtonClick);
+            this.buttonToolUp.Click += new System.EventHandler(this.OnBtnToolUpClick);
             // 
             // listBoxTools
             // 
@@ -776,7 +776,7 @@
             this.listBoxTools.Name = "listBoxTools";
             this.listBoxTools.Size = new System.Drawing.Size(406, 165);
             this.listBoxTools.TabIndex = 0;
-            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.OnToolListBoxSelectedIndexChanged);
+            this.listBoxTools.SelectedIndexChanged += new System.EventHandler(this.OnListBoxToolSelectedIndexChanged);
             // 
             // groupBoxToolSettings
             // 
@@ -823,7 +823,7 @@
             this.buttonWorkingDir.TabIndex = 10;
             this.buttonWorkingDir.Text = "...";
             this.buttonWorkingDir.UseVisualStyleBackColor = true;
-            this.buttonWorkingDir.Click += new System.EventHandler(this.OnWorkingDirButtonClick);
+            this.buttonWorkingDir.Click += new System.EventHandler(this.OnBtnWorkingDirClick);
             // 
             // textBoxWorkingDir
             // 
@@ -844,7 +844,7 @@
             this.buttonIcon.Text = "   Icon...";
             this.buttonIcon.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonIcon.UseVisualStyleBackColor = true;
-            this.buttonIcon.Click += new System.EventHandler(this.OnIconButtonClick);
+            this.buttonIcon.Click += new System.EventHandler(this.OnBtnIconClick);
             // 
             // labelToolName
             // 
@@ -893,7 +893,7 @@
             this.checkBoxSysout.TabIndex = 6;
             this.checkBoxSysout.Text = "Pipe sysout to tab";
             this.checkBoxSysout.UseVisualStyleBackColor = true;
-            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.OnSysoutCheckBoxACheckedChanged);
+            this.checkBoxSysout.CheckedChanged += new System.EventHandler(this.OnChkBoxSysoutCheckedChanged);
             // 
             // buttonArguments
             // 
@@ -904,7 +904,7 @@
             this.buttonArguments.TabIndex = 5;
             this.buttonArguments.Text = "...";
             this.buttonArguments.UseVisualStyleBackColor = true;
-            this.buttonArguments.Click += new System.EventHandler(this.OnArgButtonAClick);
+            this.buttonArguments.Click += new System.EventHandler(this.OnBtnArgClick);
             // 
             // labelTool
             // 
@@ -925,7 +925,7 @@
             this.buttonTool.TabIndex = 3;
             this.buttonTool.Text = "...";
             this.buttonTool.UseVisualStyleBackColor = true;
-            this.buttonTool.Click += new System.EventHandler(this.OnToolButtonAClick);
+            this.buttonTool.Click += new System.EventHandler(this.OnBtnToolClick);
             // 
             // textBoxTool
             // 
@@ -1001,7 +1001,7 @@
             this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.OnDeleteButtonClick);
+            this.buttonDelete.Click += new System.EventHandler(this.OnBtnDeleteClick);
             // 
             // dataGridViewColumnizer
             // 
@@ -1020,7 +1020,7 @@
             this.dataGridViewColumnizer.RowHeadersWidth = 62;
             this.dataGridViewColumnizer.Size = new System.Drawing.Size(934, 365);
             this.dataGridViewColumnizer.TabIndex = 2;
-            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.OnColumnizerDataGridViewRowsAdded);
+            this.dataGridViewColumnizer.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.OnDataGridViewColumnizerRowsAdded);
             // 
             // columnFileMask
             // 
@@ -1262,7 +1262,7 @@
             this.listBoxPlugin.Size = new System.Drawing.Size(322, 344);
             this.listBoxPlugin.TabIndex = 0;
             this.listBoxPlugin.ValueMember = "Text";
-            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.OnPluginListBoxSelectedIndexChanged);
+            this.listBoxPlugin.SelectedIndexChanged += new System.EventHandler(this.OnListBoxPluginSelectedIndexChanged);
             // 
             // groupBoxSettings
             // 
@@ -1301,7 +1301,7 @@
             this.buttonConfigPlugin.TabIndex = 0;
             this.buttonConfigPlugin.Text = "Configure...";
             this.buttonConfigPlugin.UseVisualStyleBackColor = true;
-            this.buttonConfigPlugin.Click += new System.EventHandler(this.OnConfigPluginButtonClick);
+            this.buttonConfigPlugin.Click += new System.EventHandler(this.OnBtnConfigPluginClick);
             // 
             // tabPageSessions
             // 
@@ -1378,7 +1378,7 @@
             this.buttonSessionSaveDir.TabIndex = 3;
             this.buttonSessionSaveDir.Text = "...";
             this.buttonSessionSaveDir.UseVisualStyleBackColor = true;
-            this.buttonSessionSaveDir.Click += new System.EventHandler(this.OnSessionSaveDirButtonClick);
+            this.buttonSessionSaveDir.Click += new System.EventHandler(this.OnBtnSessionSaveDirClick);
             // 
             // radioButtonSessionSaveOwn
             // 
@@ -1627,7 +1627,7 @@
             this.buttonCancel.TabIndex = 1;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.OnCancelButtonClick);
+            this.buttonCancel.Click += new System.EventHandler(this.OnBtnCancelClick);
             // 
             // buttonOk
             // 
@@ -1639,7 +1639,7 @@
             this.buttonOk.TabIndex = 0;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
+            this.buttonOk.Click += new System.EventHandler(this.OnBtnOkClick);
             // 
             // helpProvider
             // 
@@ -1654,7 +1654,7 @@
             this.buttonExport.TabIndex = 2;
             this.buttonExport.Text = "Export...";
             this.buttonExport.UseVisualStyleBackColor = true;
-            this.buttonExport.Click += new System.EventHandler(this.OnExportButtonClick);
+            this.buttonExport.Click += new System.EventHandler(this.OnBtnExportClick);
             // 
             // buttonImport
             // 
@@ -1665,7 +1665,7 @@
             this.buttonImport.TabIndex = 3;
             this.buttonImport.Text = "Import...";
             this.buttonImport.UseVisualStyleBackColor = true;
-            this.buttonImport.Click += new System.EventHandler(this.OnImportButtonClick);
+            this.buttonImport.Click += new System.EventHandler(this.OnBtnImportClick);
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -1695,8 +1695,6 @@
             // SettingsDialog
             // 
             this.AcceptButton = this.buttonOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(956, 563);
             this.Controls.Add(this.buttonImport);

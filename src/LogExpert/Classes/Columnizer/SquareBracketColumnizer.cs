@@ -11,7 +11,7 @@ namespace LogExpert.Classes.Columnizer
         #region ILogLineColumnizer implementation
 
         protected int timeOffset = 0;
-        private TimeFormatDeterminer _timeFormatDeterminer = new TimeFormatDeterminer();
+        private TimeFormatDeterminer _timeFormatDeterminer = new();
 
         // TODO: need preparing this columnizer with sample log lines before use it.
         private int _columnCount = 5;
@@ -156,16 +156,16 @@ namespace LogExpert.Classes.Columnizer
             // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
             // 03.01.2008 14:48:00.066 <rest of line>
 
-            ColumnizedLogLine clogLine = new ColumnizedLogLine
+            ColumnizedLogLine clogLine = new()
             {
                 LogLine = line
             };
 
             Column[] columns = new Column[]
             {
-                new Column {FullValue = "", Parent = clogLine},
-                new Column {FullValue = "", Parent = clogLine},
-                new Column {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
+                new() {FullValue = "", Parent = clogLine},
             };
 
             string temp = line.FullLine;
@@ -218,7 +218,7 @@ namespace LogExpert.Classes.Columnizer
 
         void SquareSplit(ref Column[] columns, string line, int dateLen, int timeLen, int dateTimeEndPos, ColumnizedLogLine clogLine)
         {
-            List<Column> columnList = new List<Column>();
+            List<Column> columnList = [];
             int restColumn = _columnCount;
             if (_isTimeExists)
             {
@@ -258,7 +258,7 @@ namespace LogExpert.Classes.Columnizer
         public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
         {
             Priority result = Priority.NotSupport;
-            TimeFormatDeterminer timeDeterminer = new TimeFormatDeterminer();
+            TimeFormatDeterminer timeDeterminer = new();
             int timeStampExistsCount = 0;
             int bracketsExistsCount = 0;
             int maxBracketNumbers = 1;

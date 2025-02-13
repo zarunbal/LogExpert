@@ -39,27 +39,27 @@ namespace LogExpert.Classes.Columnizer
 
         #endregion
 
-        protected FormatInfo formatInfo1 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo2 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo3 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo4 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo5 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo6 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo7 = new FormatInfo("dd.MM.yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo8 = new FormatInfo("yyyy/MM/dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo9 = new FormatInfo("yyyy.MM.dd", "HH:mm:ss,fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo10 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo11 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo12 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo13 = new FormatInfo("dd MMM yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo14 = new FormatInfo("dd MMM yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo15 = new FormatInfo("dd MMM yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo16 = new FormatInfo("dd.MM.yy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
-        protected FormatInfo formatInfo17 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo18 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss.fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo19 = new FormatInfo("dd/MM/yyyy", "HH:mm:ss:fff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo20 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss.ffff", new CultureInfo("en-US"));
-        protected FormatInfo formatInfo21 = new FormatInfo("yyyy-MM-dd", "HH:mm:ss,ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo1 = new("dd.MM.yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo2 = new("dd.MM.yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo3 = new("yyyy/MM/dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo4 = new("yyyy/MM/dd", "HH:mm:ss", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo5 = new("yyyy.MM.dd", "HH:mm:ss.fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo6 = new("yyyy.MM.dd", "HH:mm:ss", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo7 = new("dd.MM.yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo8 = new("yyyy/MM/dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo9 = new("yyyy.MM.dd", "HH:mm:ss,fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo10 = new("yyyy-MM-dd", "HH:mm:ss.fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo11 = new("yyyy-MM-dd", "HH:mm:ss,fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo12 = new("yyyy-MM-dd", "HH:mm:ss", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo13 = new("dd MMM yyyy", "HH:mm:ss,fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo14 = new("dd MMM yyyy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo15 = new("dd MMM yyyy", "HH:mm:ss", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo16 = new("dd.MM.yy", "HH:mm:ss.fff", new CultureInfo("de-DE"));
+        protected FormatInfo formatInfo17 = new("yyyy-MM-dd", "HH:mm:ss:ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo18 = new("dd/MM/yyyy", "HH:mm:ss.fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo19 = new("dd/MM/yyyy", "HH:mm:ss:fff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo20 = new("yyyy-MM-dd", "HH:mm:ss.ffff", new CultureInfo("en-US"));
+        protected FormatInfo formatInfo21 = new("yyyy-MM-dd", "HH:mm:ss,ffff", new CultureInfo("en-US"));
 
 
         public FormatInfo DetermineDateTimeFormatInfo(string line)

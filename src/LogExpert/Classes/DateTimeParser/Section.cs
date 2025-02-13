@@ -2,7 +2,7 @@
 
 namespace LogExpert.Classes.DateTimeParser
 {
-    internal class Section
+    public class Section
     {
         public int SectionIndex { get; set; }
 

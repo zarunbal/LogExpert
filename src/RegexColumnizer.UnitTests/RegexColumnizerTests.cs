@@ -17,8 +17,8 @@ namespace RegexColumnizer.UnitTests
             
             TestLogLine testLogLine = new TestLogLine(4, lineToParse);
             IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
-            
-            Assert.That(parsedLogLine.ColumnValues.Length, Is.EqualTo(expectedNumberOfColumns));
+
+            Assert.That(expectedNumberOfColumns, Is.EqualTo(parsedLogLine.ColumnValues.Length));
         }
 
         //Using "" for empty string since string.Empty can't be passed to the TestCase attribute.
@@ -33,8 +33,8 @@ namespace RegexColumnizer.UnitTests
 
             TestLogLine testLogLine = new TestLogLine(3, lineToParse);
             IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
-            
-            Assert.That(parsedLogLine.ColumnValues[columnIndexToTest].Text, Is.EqualTo(expectedColumnValue));
+
+            Assert.That(expectedColumnValue, Is.EqualTo(parsedLogLine.ColumnValues[columnIndexToTest].Text));
         }
         
         private Regex1Columnizer CreateInitializedColumnizer(string regex)
@@ -44,7 +44,9 @@ namespace RegexColumnizer.UnitTests
                 Expression =  regex,
                 Name = "Test regex"
             };
+
             Regex1Columnizer columnizer = new Regex1Columnizer();
+            //TODO this should be an internal function
             columnizer.Init(columnizerConfig);
             return columnizer;
         }

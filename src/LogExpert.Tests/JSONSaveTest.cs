@@ -1,7 +1,7 @@
-﻿using System.IO;
-using LogExpert.Config;
+﻿using LogExpert.Config;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.IO;
 
 namespace LogExpert.Tests
 {
@@ -27,7 +27,8 @@ namespace LogExpert.Tests
             
             settings = null;
             Assert.DoesNotThrow(CastSettings);
-            Assert.That(settings, Is.Not.Null);
+
+            Assert.That(settings, !Is.Null);
             Assert.That(settings.alwaysOnTop, Is.False);
 
 

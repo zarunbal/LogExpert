@@ -8,8 +8,8 @@ namespace LogExpert.Config
     {
         #region Fields
 
-        public List<string> expressionHistoryList = new List<string>();
-        public List<string> testtextHistoryList = new List<string>();
+        public List<string> expressionHistoryList = [];
+        public List<string> testtextHistoryList = [];
 
         #endregion
     }

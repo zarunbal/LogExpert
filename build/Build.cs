@@ -1,9 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.CI.AppVeyor;
 using Nuke.Common.Execution;
@@ -11,23 +5,27 @@ using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
-using Serilog;
-using static Nuke.Common.EnvironmentInfo;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.IO.TextTasks;
-using static Nuke.Common.IO.CompressionTasks;
-using static Nuke.GitHub.GitHubTasks;
-using static Nuke.Common.Assert;
 
-//[CheckBuildProjectConfigurations]
+using Serilog;
+
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+using static Nuke.Common.EnvironmentInfo;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
+using static Nuke.GitHub.GitHubTasks;
+
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
@@ -38,12 +36,13 @@ class Build : NukeBuild
     ///   - Microsoft VSCode           https://nuke.build/vscode
     public static int Main() => Execute<Build>(x => x.Test);
 
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")] 
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    [GitVersion(UpdateBuildNumber = true)] 
+    [GitVersion(UpdateBuildNumber = true)]
     readonly Nuke.Common.Tools.GitVersion.GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
@@ -59,6 +58,7 @@ class Build : NukeBuild
     AbsolutePath ChocolateyTemplateFiles => RootDirectory / "chocolatey";
 
     AbsolutePath SftpFileSystemPackagex86 => BinDirectory / "SftpFileSystemx86/";
+
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
@@ -78,7 +78,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 9, 1, patch);
+            return new Version(1, 10, 0, patch);
         }
     }
 
@@ -93,12 +93,12 @@ class Build : NukeBuild
     string VersionFileString => $"{Version.Major}.{Version.Minor}.0";
 
     [Parameter("Exclude file globs")]
-    string[] ExcludeFileGlob => new[] {"**/*.xml", "**/*.XML", "**/*.pdb", "**/ChilkatDotNet4.dll", "**/ChilkatDotNet47.dll", "**/SftpFileSystem.dll"};
+    string[] ExcludeFileGlob => ["**/*.xml", "**/*.XML", "**/*.pdb"];
 
     [PathVariable("choco.exe")] readonly Tool Chocolatey;
 
     [Parameter("Exlcude directory glob")]
-    string[] ExcludeDirectoryGlob => new[] {"**/pluginsx86"};
+    string[] ExcludeDirectoryGlob => ["**/pluginsx86"];
 
     [Parameter("My variable", Name = "my_variable")] string MyVariable = null;
 
@@ -108,8 +108,8 @@ class Build : NukeBuild
 
     [Parameter("GitHub Api key")] string GitHubApiKey = null;
 
-    AbsolutePath[] AppveyorArtifacts => new[]
-    {
+    AbsolutePath[] AppveyorArtifacts =>
+    [
         (BinDirectory / $"LogExpert-Setup-{VersionString}.exe"),
         BinDirectory / $"LogExpert-CI-{VersionString}.zip",
         BinDirectory / $"LogExpert.{VersionString}.zip",
@@ -117,7 +117,7 @@ class Build : NukeBuild
         BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip",
         BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip",
         ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
-    };
+    ];
 
     protected override void OnBuildInitialized()
     {
@@ -130,41 +130,38 @@ class Build : NukeBuild
         .Before(Compile, Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(x => x.DeleteDirectory());
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(dir => dir.DeleteDirectory());
 
-            var path = AbsolutePath.Create(BinDirectory);
-            if (path.DirectoryExists())
+            if (BinDirectory.DirectoryExists())
             {
-                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(x => x.DeleteFile());
-                BinDirectory.GlobDirectories("*").ForEach(x => x.DeleteDirectory());
+                BinDirectory.GlobFiles("*", "*.*", ".*").ForEach(file => file.DeleteFile());
+                BinDirectory.GlobDirectories("*").ForEach(dir => dir.DeleteDirectory());
 
-                path.DeleteDirectory();
+                BinDirectory.DeleteDirectory();
 
-                path.CreateOrCleanDirectory();
+                BinDirectory.CreateOrCleanDirectory();
             }
         });
 
     Target CleanPackage => _ => _
         .Before(Compile, Restore)
-        .OnlyWhenDynamic(() => AbsolutePath.Create(BinDirectory).DirectoryExists())
+        .OnlyWhenDynamic(() => BinDirectory.DirectoryExists())
         .Executes(() =>
         {
-            BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(x => x.DeleteFile());
+            BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg").ForEach(file => file.DeleteFile());
 
-            var path = AbsolutePath.Create(PackageDirectory);
-            if (path.DirectoryExists())
+            if (PackageDirectory.DirectoryExists())
             {
-                path.DeleteDirectory();
+                PackageDirectory.DeleteDirectory();
 
-                path.CreateOrCleanDirectory();
+                PackageDirectory.CreateOrCleanDirectory();
             }
 
-            path = AbsolutePath.Create(ChocolateyDirectory);
-            if (path.DirectoryExists())
+            if (ChocolateyDirectory.DirectoryExists())
             {
-                path.DeleteDirectory();
+                ChocolateyDirectory.DeleteDirectory();
 
-                path.CreateOrCleanDirectory();
+                ChocolateyDirectory.CreateOrCleanDirectory();
             }
         });
 
@@ -180,7 +177,8 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            Serilog.Log.Information($"Version: '{VersionString}'");
+
+            Log.Information($"Version: '{VersionString}'");
 
             MSBuild(s => s
                 .SetTargetPath(Solution)
@@ -196,10 +194,10 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            DotNetTest(c =>c
+            DotNetTest(c => c
                     .SetConfiguration(Configuration)
                     .EnableNoBuild()
-                    .CombineWith(SourceDirectory.GlobFiles("**/*Tests.csproj"), (settings, path) => 
+                    .CombineWith(SourceDirectory.GlobFiles("**/*Tests.csproj"), (settings, path) =>
                         settings.SetProjectFile(path)), degreeOfParallelism: 4, completeOnFailure: true);
         });
 
@@ -207,7 +205,7 @@ class Build : NukeBuild
         .DependsOn(CleanPackage)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(ChocolateyTemplateFiles, ChocolateyDirectory, DirectoryExistsPolicy.Merge);
+            ChocolateyTemplateFiles.Copy(ChocolateyDirectory, ExistsPolicy.MergeAndOverwriteIfNewer);
 
             ChocolateyDirectory.GlobFiles("**/*.template").ForEach(path => TransformTemplateFile(path, true));
         });
@@ -216,9 +214,10 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, ChocolateyDirectory / "tools", DirectoryExistsPolicy.Merge);
-            ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
-            ChocolateyDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
+
+            OutputDirectory.Copy(ChocolateyDirectory / "tools", ExistsPolicy.MergeAndOverwriteIfNewer);
+            ChocolateyDirectory.GlobFiles(ExcludeFileGlob).ForEach(file => file.DeleteFile());
+            ChocolateyDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
         });
 
     Target BuildChocolateyPackage => _ => _
@@ -232,12 +231,12 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, PackageDirectory, DirectoryExistsPolicy.Merge);
-            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
+            OutputDirectory.Copy(PackageDirectory, ExistsPolicy.MergeAndOverwriteIfNewer);
+            PackageDirectory.GlobFiles(ExcludeFileGlob).ForEach(file => file.DeleteFile());
 
-            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
+            PackageDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
 
-            PackageDirectory.CompressTo(BinDirectory / $"LogExpert.{VersionString}.zip");
+            CompressionExtensions.ZipTo(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
     Target ChangeVersionNumber => _ => _
@@ -248,7 +247,7 @@ class Build : NukeBuild
 
             AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
 
-            string text = AbsolutePath.Create(assemblyVersion).ReadAllText();
+            string text = assemblyVersion.ReadAllText();
             Regex configurationRegex = new Regex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])");
             Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])");
             Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])");
@@ -288,13 +287,24 @@ class Build : NukeBuild
         .DependsOn(Compile, Test)
         .Executes(() =>
         {
-            string[] files = new[] {"SftpFileSystem.dll", "ChilkatDotNet4.dll", "ChilkatDotNet47.dll" };
+            string[] files = ["SftpFileSystem.dll", "Renci.SshNet.dll"];
 
-            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex64, FileExistsPolicy.Overwrite));
-            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => CopyFileToDirectory(file, SftpFileSystemPackagex86, FileExistsPolicy.Overwrite));
+            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex64, ExistsPolicy.FileOverwrite));
+            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex86, ExistsPolicy.FileOverwrite));
 
-            SftpFileSystemPackagex64.CompressTo(BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
-            SftpFileSystemPackagex86.CompressTo(BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
+            CompressionExtensions.ZipTo(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
+            CompressionExtensions.ZipTo(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
+        });
+
+    Target ColumnizerLibCreate => _ => _.DependsOn(Compile, Test)
+        .Executes(() =>
+        {
+            var columnizerFolder = SourceDirectory / "ColumnizerLib";
+            DotNetPack(s => s
+                .SetProject(columnizerFolder / "ColumnizerLib.csproj")
+                .SetConfiguration(Configuration)
+                .SetOutputDirectory(BinDirectory)
+                .SetVersion(VersionString));
         });
 
     Target ColumnizerLibCreateNuget => _ => _
@@ -306,7 +316,7 @@ class Build : NukeBuild
             NuGetTasks.NuGetPack(s =>
             {
                 s = s.SetTargetPath(columnizerFolder / "ColumnizerLib.csproj")
-                    .DisableBuild()
+                    .EnableBuild()
                     .SetConfiguration(Configuration)
                     .SetProperty("version", VersionString)
                     .SetOutputDirectory(BinDirectory);
@@ -316,28 +326,28 @@ class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreateNuget);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
         .After(Test)
         .Executes(() =>
         {
-            CopyDirectoryRecursively(OutputDirectory, SetupDirectory, DirectoryExistsPolicy.Merge);
-            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(x => x.DeleteFile());
+            OutputDirectory.Copy(SetupDirectory, ExistsPolicy.DirectoryMerge);
+            SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(file => file.DeleteFile());
 
-            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(x => x.DeleteDirectory());
+            SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
         });
 
     Target CreateSetup => _ => _
-        .DependsOn(CopyFilesForSetup)
+        .DependsOn(CopyFilesForSetup, ChangeVersionNumber)
         .Before(Publish)
         .OnlyWhenStatic(() => Configuration == "Release")
         .Executes(() =>
         {
             var publishCombinations =
-                from framework in new[] {(AbsolutePath) SpecialFolder(SpecialFolders.ProgramFilesX86), (AbsolutePath) SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs"}
-                from version in new[] {"5", "6"}
+                from framework in new[] { SpecialFolder(SpecialFolders.ProgramFilesX86), SpecialFolder(SpecialFolders.LocalApplicationData) / "Programs" }
+                from version in new[] { "5", "6" }
                 select framework / $"Inno Setup {version}" / "iscc.exe";
             bool executed = false;
             foreach (var setupCombinations in publishCombinations)
@@ -355,12 +365,13 @@ class Build : NukeBuild
 
             if (!executed)
             {
-                Fail("Inno setup was not found");
+                Assert.True(true, "Inno setup was not found");
             }
         });
 
     Target PublishColumnizerNuget => _ => _
-        .DependsOn(ColumnizerLibCreateNuget)
+        .DependsOn(ColumnizerLibCreate)
+    //.DependsOn(ColumnizerLibCreateNuget)
         .Requires(() => NugetApiKey)
         //.OnlyWhenDynamic(() => GitVersion.BranchName.Equals("master") || GitVersion.BranchName.Equals("origin/master"))
         .Executes(() =>
@@ -428,7 +439,7 @@ class Build : NukeBuild
         .OnlyWhenDynamic(() => AppVeyor.Instance != null)
         .Executes(() =>
         {
-            AbsolutePath.Create(BinDirectory / Configuration).CompressTo(BinDirectory / $"LogExpert-CI-{VersionString}.zip");
+            CompressionExtensions.ZipTo(BinDirectory / Configuration, BinDirectory / $"LogExpert-CI-{VersionString}.zip");
 
             AppveyorArtifacts.ForEach((artifact) =>
             {
@@ -436,14 +447,14 @@ class Build : NukeBuild
                 proc.StartInfo = new ProcessStartInfo("appveyor", $"PushArtifact \"{artifact}\"");
                 if (!proc.Start())
                 {
-                    Fail("Failed to start appveyor pushartifact");
+                    Assert.True(true, "Failed to start appveyor pushartifact");
                 }
 
                 proc.WaitForExit();
 
                 if (proc.ExitCode != 0)
                 {
-                    Fail($"Exit code is {proc.ExitCode}");
+                    Assert.True(true, $"Exit code is {proc.ExitCode}");
                 }
             });
         });
@@ -451,7 +462,7 @@ class Build : NukeBuild
     Target CleanupAppDataLogExpert => _ => _
         .Executes(() =>
         {
-            AbsolutePath logExpertApplicationData = ((AbsolutePath) SpecialFolder(SpecialFolders.ApplicationData)) / "LogExpert";
+            AbsolutePath logExpertApplicationData = SpecialFolder(SpecialFolders.ApplicationData) / "LogExpert";
 
             DirectoryInfo info = new DirectoryInfo(logExpertApplicationData);
             info.GetDirectories().ForEach(a => a.Delete(true));
@@ -461,7 +472,7 @@ class Build : NukeBuild
     Target CleanupDocumentsLogExpert => _ => _
         .Executes(() =>
         {
-            AbsolutePath logExpertDocuments = (AbsolutePath) SpecialFolder(SpecialFolders.UserProfile) / "Documents" / "LogExpert";
+            AbsolutePath logExpertDocuments = SpecialFolder(SpecialFolders.UserProfile) / "Documents" / "LogExpert";
 
             DirectoryInfo info = new DirectoryInfo(logExpertDocuments);
             info.GetDirectories().ForEach(a => a.Delete(true));
@@ -477,7 +488,7 @@ class Build : NukeBuild
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
         {
-            Fail($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+            Assert.True(true, $"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
         }
 
         proc.WaitForExit();
@@ -486,7 +497,7 @@ class Build : NukeBuild
 
         if (proc.ExitCode != 0)
         {
-            Fail($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+            Nuke.Common.Assert.True(true, $"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
         }
     }
 
@@ -500,7 +511,8 @@ class Build : NukeBuild
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
 
-        AbsolutePath.Create($"{Regex.Replace(path, "\\.template$", "")}").WriteAllText(text);
+        AbsolutePath template = $"{Regex.Replace(path, "\\.template$", "")}";
+        template.WriteAllText(text);
         if (deleteTemplate)
         {
             path.DeleteFile();

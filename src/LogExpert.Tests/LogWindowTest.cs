@@ -1,17 +1,15 @@
 ﻿
-using CsvColumnizerType=CsvColumnizer.CsvColumnizer;
-using NUnit.Framework;
-using System;
-using System.Threading;
 using LogExpert.Classes;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Controls.LogWindow;
 using LogExpert.Entities;
+using NUnit.Framework;
+using System;
+using CsvColumnizerType = CsvColumnizer.CsvColumnizer;
 
 namespace LogExpert.Tests
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     public class LogWindowTest
     {
         // TODO: Add more tests when DI container is ready.
@@ -19,10 +17,9 @@ namespace LogExpert.Tests
         public void Instantiate_JsonFile_BuildCorrectColumnizer(string fileName, Type columnizerType)
         {
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
-            LogWindow logWindow =
-                new LogWindow(logTabWindow, fileName, false, false);
+            LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.That(logWindow.CurrentColumnizer.GetType(),Is.EqualTo(columnizerType));
+            Assert.That(columnizerType, Is.EqualTo(logWindow.CurrentColumnizer.GetType()));
         }
 
         [TestCase(@".\TestData\XmlTest_01.xml")]
@@ -35,7 +32,7 @@ namespace LogExpert.Tests
             LogTabWindow logTabWindow = new LogTabWindow(null, 0, false);
             LogWindow logWindow = new LogWindow(logTabWindow, fileName, false, false);
 
-            Assert.That(true,Is.True);
+            Assert.That(true, Is.True);
         }
     }
 }

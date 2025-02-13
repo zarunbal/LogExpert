@@ -19,7 +19,7 @@ namespace LogExpert.Config
         
         public int bufferCount = 100;
         
-        public List<ColumnizerMaskEntry> columnizerMaskList = new List<ColumnizerMaskEntry>();
+        public List<ColumnizerMaskEntry> columnizerMaskList = [];
         
         public string defaultEncoding;
         
@@ -33,7 +33,7 @@ namespace LogExpert.Config
         
         public float fontSize = 9;
         
-        public List<HighlightMaskEntry> highlightMaskList = new List<HighlightMaskEntry>();
+        public List<HighlightMaskEntry> highlightMaskList = [];
         
         public bool isAutoHideFilterList = false;
         
@@ -96,7 +96,7 @@ namespace LogExpert.Config
 
         public DateTimeDragControl.DragOrientations timestampControlDragOrientation = DateTimeDragControl.DragOrientations.Horizontal;
 
-        public List<ToolEntry> toolEntries = new List<ToolEntry>();
+        public List<ToolEntry> toolEntries = [];
 
         public bool useLegacyReader;
 

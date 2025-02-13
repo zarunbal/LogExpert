@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-//using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LogExpert.Dialogs
@@ -20,7 +15,11 @@ namespace LogExpert.Dialogs
         public GotoLineDialog(Form parent)
         {
             InitializeComponent();
-            this.Owner = parent;
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            Owner = parent;
         }
 
         #endregion
@@ -41,11 +40,11 @@ namespace LogExpert.Dialogs
         {
             try
             {
-                this.Line = int.Parse(this.lineNumberTextBox.Text);
+                Line = int.Parse(lineNumberTextBox.Text);
             }
             catch (Exception)
             {
-                this.Line = -1;
+                Line = -1;
             }
         }
 

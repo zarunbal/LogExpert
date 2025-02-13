@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using LogExpert.Entities;
@@ -25,97 +21,102 @@ namespace LogExpert.Dialogs
         public SearchDialog()
         {
             InitializeComponent();
-            Load += new EventHandler(SearchDialog_Load);
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+
+            Load += OnSearchDialogLoad;
         }
 
         #endregion
 
         #region Properties
 
-        public SearchParams SearchParams { get; set; } = null;
+        public SearchParams SearchParams { get; set; }
 
         #endregion
 
         #region Events handler
 
-        private void SearchDialog_Load(object sender, EventArgs e)
+        private void OnSearchDialogLoad(object sender, EventArgs e)
         {
             if (SearchParams != null)
             {
                 if (SearchParams.isFromTop)
                 {
-                    fromTopRadioButton.Checked = true;
+                    radioButtonFromTop.Checked = true;
                 }
                 else
                 {
-                    fromSelectedRadioButton.Checked = true;
+                    radioButtonFromSelected.Checked = true;
                 }
 
                 if (SearchParams.isForward)
                 {
-                    forwardRadioButton.Checked = true;
+                    radioButtonForward.Checked = true;
                 }
                 else
                 {
-                    backwardRadioButton.Checked = true;
+                    radioButtonBackward.Checked = true;
                 }
 
-                regexCheckBox.Checked = SearchParams.isRegex;
-                caseSensitiveCheckBox.Checked = SearchParams.isCaseSensitive;
+                checkBoxRegex.Checked = SearchParams.isRegex;
+                checkBoxCaseSensitive.Checked = SearchParams.isCaseSensitive;
                 foreach (string item in SearchParams.historyList)
                 {
-                    searchComboBox.Items.Add(item);
+                    comboBoxSearchFor.Items.Add(item);
                 }
 
-                if (searchComboBox.Items.Count > 0)
+                if (comboBoxSearchFor.Items.Count > 0)
                 {
-                    searchComboBox.SelectedIndex = 0;
+                    comboBoxSearchFor.SelectedIndex = 0;
                 }
             }
             else
             {
-                fromSelectedRadioButton.Checked = true;
-                forwardRadioButton.Checked = true;
+                radioButtonFromSelected.Checked = true;
+                radioButtonForward.Checked = true;
                 SearchParams = new SearchParams();
             }
         }
 
-        private void regexHelperButton_Click(object sender, EventArgs e)
+        private void OnButtonRegexClick(object sender, EventArgs e)
         {
-            RegexHelperDialog dlg = new RegexHelperDialog();
+            RegexHelperDialog dlg = new();
             dlg.Owner = this;
-            dlg.CaseSensitive = caseSensitiveCheckBox.Checked;
-            dlg.Pattern = searchComboBox.Text;
+            dlg.CaseSensitive = checkBoxCaseSensitive.Checked;
+            dlg.Pattern = comboBoxSearchFor.Text;
+
             DialogResult res = dlg.ShowDialog();
             if (res == DialogResult.OK)
             {
-                caseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-                searchComboBox.Text = dlg.Pattern;
+                checkBoxCaseSensitive.Checked = dlg.CaseSensitive;
+                comboBoxSearchFor.Text = dlg.Pattern;
             }
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OnButtonOkClick(object sender, EventArgs e)
         {
             try
             {
-                if (regexCheckBox.Checked)
+                if (checkBoxRegex.Checked)
                 {
-                    if (string.IsNullOrWhiteSpace(searchComboBox.Text))
+                    if (string.IsNullOrWhiteSpace(comboBoxSearchFor.Text))
                     {
                         throw new ArgumentException("Search text is empty");
                     }
 
                     // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                    Regex.IsMatch("", searchComboBox.Text);
+                    Regex.IsMatch("", comboBoxSearchFor.Text);
                 }
 
-                SearchParams.searchText = searchComboBox.Text;
-                SearchParams.isCaseSensitive = caseSensitiveCheckBox.Checked;
-                SearchParams.isForward = forwardRadioButton.Checked;
-                SearchParams.isFromTop = fromTopRadioButton.Checked;
-                SearchParams.isRegex = regexCheckBox.Checked;
-                SearchParams.historyList.Remove(searchComboBox.Text);
-                SearchParams.historyList.Insert(0, searchComboBox.Text);
+                SearchParams.searchText = comboBoxSearchFor.Text;
+                SearchParams.isCaseSensitive = checkBoxCaseSensitive.Checked;
+                SearchParams.isForward = radioButtonForward.Checked;
+                SearchParams.isFromTop = radioButtonFromTop.Checked;
+                SearchParams.isRegex = checkBoxRegex.Checked;
+                SearchParams.historyList.Remove(comboBoxSearchFor.Text);
+                SearchParams.historyList.Insert(0, comboBoxSearchFor.Text);
                 if (SearchParams.historyList.Count > MAX_HISTORY)
                 {
                     SearchParams.historyList.RemoveAt(SearchParams.historyList.Count - 1);
@@ -129,5 +130,10 @@ namespace LogExpert.Dialogs
         }
 
         #endregion
+
+        private void OnButtonCancelClick(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

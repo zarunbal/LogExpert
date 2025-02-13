@@ -12,7 +12,7 @@ namespace LogExpert.Controls
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
 
-        private readonly StringFormat stringFormat = new StringFormat();
+        private readonly StringFormat stringFormat = new();
 
         private bool isShiftPressed = false;
 
@@ -79,8 +79,8 @@ namespace LogExpert.Controls
 
             Color foregroundColor = this.Enabled ? Color.Black : Color.Gray;
 
-            Pen blackPen = new Pen(foregroundColor, 1);
-            Pen greyPen = new Pen(Color.Gray, 1);
+            Pen blackPen = new(foregroundColor, 1);
+            Pen greyPen = new(Color.Gray, 1);
 
             Rectangle rect = this.ClientRectangle;
             int height = this.Font.Height + 3;
@@ -100,7 +100,7 @@ namespace LogExpert.Controls
             e.Graphics.DrawPie(blackPen, rect, startAngle, sweepAngle);
 
             Brush brush = new SolidBrush(foregroundColor);
-            RectangleF rectF = new RectangleF(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
+            RectangleF rectF = new(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
             e.Graphics.DrawString("" + this.value, this.Font, brush, rectF, this.stringFormat);
 
             blackPen.Dispose();

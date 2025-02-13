@@ -1,28 +1,31 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Threading;
-using System.Runtime.Remoting.Channels.Ipc;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting;
-using System.IO;
-using System.Diagnostics;
-using System.Security;
-using System.Reflection;
+using Grpc.Core;
+using Grpc.Net.Client;
+
 using LogExpert.Classes;
 using LogExpert.Config;
 using LogExpert.Controls.LogTabWindow;
 using LogExpert.Dialogs;
+
+using LogexpertGRPCService.Services;
+
 using NLog;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Security;
+using System.Security.Principal;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace LogExpert
 {
     internal static class Program
     {
         #region Fields
-
         private static readonly ILogger _logger = LogManager.GetLogger("Program");
-
         #endregion
 
         #region Private Methods
@@ -35,31 +38,37 @@ namespace LogExpert
         {
             try
             {
-                Sub_Main(orgArgs);
+                var server = new Server()
+                {
+                    Services = { Grpc.LogExpertService.BindService(new LogExpertServiceImpl()) },
+                    Ports = { new ServerPort("localhost", 5001, ServerCredentials.Insecure) }
+                };
+
+                Sub_Main(server, orgArgs);
             }
             catch (SecurityException se)
             {
-                MessageBox.Show(
-                    "Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" +
-                    se.Message + ")", "LogExpert Error");
+                MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
             }
         }
 
-        private static void Sub_Main(string[] orgArgs)
+        private static void Sub_Main(Server server, string[] orgArgs)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.ThreadException += Application_ThreadException;
+            ApplicationConfiguration.Initialize();
 
+            Application.EnableVisualStyles();
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
             _logger.Info("\r\n============================================================================\r\nLogExpert {0} started.\r\n============================================================================", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
 
-            CmdLine cmdLine = new CmdLine();
-            CmdLineString configFile = new CmdLineString("config", false, "A configuration (settings) file");
+            CmdLine cmdLine = new();
+            CmdLineString configFile = new("config", false, "A configuration (settings) file");
             cmdLine.RegisterParameter(configFile);
             string[] remainingArgs = cmdLine.Parse(orgArgs);
 
-            List<string> argsList = new List<string>();
+            List<string> argsList = [];
 
             // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
             // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
@@ -68,7 +77,7 @@ namespace LogExpert
             {
                 try
                 {
-                    FileInfo info = new FileInfo(fileArg);
+                    FileInfo info = new(fileArg);
                     argsList.Add(info.Exists ? info.FullName : fileArg);
                 }
                 catch (Exception)
@@ -76,10 +85,10 @@ namespace LogExpert
                     argsList.Add(fileArg);
                 }
             }
-            string[] args = argsList.ToArray();
+            string[] args = [.. argsList];
             if (configFile.Exists)
             {
-                FileInfo cfgFileInfo = new FileInfo(configFile.Value);
+                FileInfo cfgFileInfo = new(configFile.Value);
 
                 if (cfgFileInfo.Exists)
                 {
@@ -96,54 +105,63 @@ namespace LogExpert
             try
             {
                 Settings settings = ConfigManager.Settings;
-                Mutex mutex = new Mutex(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);           
+
+                Mutex mutex = new(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
 
                 if (isCreated)
                 {
                     // first application instance
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    LogTabWindow logWin = new LogTabWindow(args.Length > 0 ? args : null, 1, false);
+                    LogTabWindow logWin = new(args.Length > 0 ? args : null, 1, false);
 
                     // first instance
-                    //WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                    WindowsIdentity wi = WindowsIdentity.GetCurrent();
 
-                    IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
-                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
-                    LogExpertProxy proxy = new LogExpertProxy(logWin);
-                    RemotingServices.Marshal(proxy, "LogExpertProxy");
+                    server.Start();
 
-                    LogExpertApplicationContext context = new LogExpertApplicationContext(proxy, logWin);
+                    //IpcServerChannel ipcChannel = new IpcServerChannel("LogExpert" + pId);
+                    //ChannelServices.RegisterChannel(ipcChannel, false);
+                    //RemotingConfiguration.RegisterWellKnownServiceType(typeof(LogExpertProxy), "LogExpertProxy", WellKnownObjectMode.Singleton);
+                    LogExpertProxy proxy = new(logWin);
+                    //RemotingServices.Marshal(proxy, "LogExpertProxy");
+
+                    LogExpertApplicationContext context = new(proxy, logWin);
                     Application.Run(context);
 
-                    ChannelServices.UnregisterChannel(ipcChannel);
+                    //ChannelServices.UnregisterChannel(ipcChannel);
+                    server.ShutdownAsync().Wait();
                 }
                 else
                 {
                     int counter = 3;
                     Exception errMsg = null;
-                    IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
-                    ChannelServices.RegisterChannel(ipcChannel, false);
+                    //IpcClientChannel ipcChannel = new IpcClientChannel("LogExpertClient#" + pId, null);
+                    //ChannelServices.RegisterChannel(ipcChannel, false);
 
                     while (counter > 0)
                     {
                         try
                         {
+                            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+                            var client = new Grpc.LogExpertService.LogExpertServiceClient(channel);
+
+                            //Console.WriteLine("Greeting: " + reply.Result);
                             // another instance already exists
-                            //WindowsIdentity wi = WindowsIdentity.GetCurrent();
-                            LogExpertProxy proxy = (LogExpertProxy) Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
+                            WindowsIdentity wi = WindowsIdentity.GetCurrent();
+                            //LogExpertProxy proxy = (LogExpertProxy)Activator.GetObject(typeof(LogExpertProxy), "ipc://LogExpert" + pId + "/LogExpertProxy");
                             if (settings.preferences.allowOnlyOneInstance)
                             {
-                                proxy.LoadFiles(args);
+                                client.LoadFiles(new Grpc.FileNames { FileNames_ = { args } });
                             }
                             else
                             {
-                                proxy.NewWindowOrLockedWindow(args);
+                                client.NewWindowOrLockedWindow(new Grpc.FileNames { FileNames_ = { args } });
                             }
+
                             break;
                         }
-                        catch (RemotingException e)
+                        catch (Exception e)
                         {
                             _logger.Warn(e, "IpcClientChannel error: ");
                             errMsg = e;
@@ -160,7 +178,7 @@ namespace LogExpert
 
                     if (settings.preferences.allowOnlyOneInstance && settings.preferences.ShowErrorMessageAllowOnlyOneInstances)
                     {
-                        AllowOnlyOneInstanceErrorDialog a = new AllowOnlyOneInstanceErrorDialog();
+                        AllowOnlyOneInstanceErrorDialog a = new();
                         if (a.ShowDialog() == DialogResult.OK)
                         {
                             settings.preferences.ShowErrorMessageAllowOnlyOneInstances = !a.DoNotShowThisMessageAgain;
@@ -200,8 +218,8 @@ namespace LogExpert
                     errorText = lines[0];
                 }
             }
-            ExceptionWindow win = new ExceptionWindow(errorText, stackTrace);
-            win.ShowDialog();
+            ExceptionWindow win = new(errorText, stackTrace);
+            _ = win.ShowDialog();
         }
 
         #endregion
@@ -213,7 +231,7 @@ namespace LogExpert
             _logger.Fatal(e);
 
             //ShowUnhandledException(e.Exception);
-            Thread thread = new Thread(ShowUnhandledException);
+            Thread thread = new(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(e.Exception);
@@ -226,7 +244,7 @@ namespace LogExpert
 
             object exceptionObject = e.ExceptionObject;
             //ShowUnhandledException(exceptionObject);
-            Thread thread = new Thread(ShowUnhandledException);
+            Thread thread = new(ShowUnhandledException);
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(exceptionObject);

@@ -25,23 +25,26 @@ namespace LogExpert.Dialogs
         {
             this.logTabWin = logTabWin;
             parent.AddOwnedForm(this);
-            this.TopMost = parent.TopMost;
+            TopMost = parent.TopMost;
             InitializeComponent();
+
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
         }
 
         #endregion
 
         #region Properties
 
-        public string Arg { get; set; } = null;
+        public string Arg { get; set; }
 
         #endregion
 
         #region Events handler
 
-        private void ToolArgsDialog_Load(object sender, EventArgs e)
+        private void OnToolArgsDialogLoad(object sender, EventArgs e)
         {
-            this.helpLabel.Text = "" +
+            labelHelp.Text = "" +
                                   "%L = Current line number\n" +
                                   "%N = Current log file name without path\n" +
                                   "%P = Path (directory) of current log file\n" +
@@ -58,38 +61,38 @@ namespace LogExpert.Dialogs
                                   "{<regex>}{<replace>}:\n" +
                                   "Regex search/replace on current selected line.";
 
-            this.argsTextBox.Text = this.Arg;
+            textBoxArguments.Text = Arg;
         }
 
-        private void regexHelpButton_Click(object sender, EventArgs e)
+        private void OnButtonRegexHelpClick(object sender, EventArgs e)
         {
-            RegexHelperDialog regexDlg = new RegexHelperDialog();
+            RegexHelperDialog regexDlg = new();
             if (regexDlg.ShowDialog() == DialogResult.OK)
             {
-                this.argsTextBox.SelectedText = regexDlg.Pattern;
+                textBoxArguments.SelectedText = regexDlg.Pattern;
             }
         }
 
 
-        private void testButton_Click(object sender, EventArgs e)
+        private void OnButtonTestClick(object sender, EventArgs e)
         {
-            if (this.logTabWin.CurrentLogWindow != null)
+            if (logTabWin.CurrentLogWindow != null)
             {
-                ILogLine line = this.logTabWin.CurrentLogWindow.GetCurrentLine();
-                ILogFileInfo info = this.logTabWin.CurrentLogWindow.GetCurrentFileInfo();
+                ILogLine line = logTabWin.CurrentLogWindow.GetCurrentLine();
+                ILogFileInfo info = logTabWin.CurrentLogWindow.GetCurrentFileInfo();
                 if (line != null && info != null)
                 {
-                    ArgParser parser = new ArgParser(this.argsTextBox.Text);
-                    string args = parser.BuildArgs(line, this.logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info,
+                    ArgParser parser = new(textBoxArguments.Text);
+                    string args = parser.BuildArgs(line, logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info,
                         this);
-                    this.testResultLabel.Text = args;
+                    labelTestResult.Text = args;
                 }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void OnButtonOkClick(object sender, EventArgs e)
         {
-            this.Arg = this.argsTextBox.Text;
+            Arg = textBoxArguments.Text;
         }
 
         #endregion

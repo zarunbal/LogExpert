@@ -1,4 +1,12 @@
-﻿using System;
+﻿using LogExpert.Classes;
+using LogExpert.Classes.Columnizer;
+using LogExpert.Classes.Persister;
+using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,13 +17,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using LogExpert.Classes;
-using LogExpert.Classes.Columnizer;
-using LogExpert.Classes.Persister;
-using LogExpert.Config;
-using LogExpert.Dialogs;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Controls.LogTabWindow
@@ -34,8 +36,8 @@ namespace LogExpert.Controls.LogTabWindow
                 string text = Clipboard.GetText();
                 string fileName = Path.GetTempFileName();
 
-                using (FileStream fStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
-                using (StreamWriter writer = new StreamWriter(fStream, Encoding.Unicode))
+                using (FileStream fStream = new(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (StreamWriter writer = new(fStream, Encoding.Unicode))
                 {
                     writer.Write(text);
                     writer.Close();
@@ -164,7 +166,7 @@ namespace LogExpert.Controls.LogTabWindow
                 logWindow.Show(dockPanel);
             }
 
-            LogWindowData data = new LogWindowData();
+            LogWindowData data = new();
             data.diffSum = 0;
             logWindow.Tag = data;
             lock (_logWindowList)
@@ -326,15 +328,15 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ShowHighlightSettingsDialog()
         {
-            HighlightDialog dlg = new HighlightDialog();
+            HighlightDialog dlg = new();
             dlg.KeywordActionList = PluginRegistry.GetInstance().RegisteredKeywordActions;
             dlg.Owner = this;
             dlg.TopMost = TopMost;
             dlg.HighlightGroupList = HilightGroupList;
             dlg.PreSelectedGroupName = groupsComboBoxHighlightGroups.Text;
-            
+
             DialogResult res = dlg.ShowDialog();
-            
+
             if (res == DialogResult.OK)
             {
                 HilightGroupList = dlg.HighlightGroupList;
@@ -361,11 +363,11 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OpenFileDialog()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new();
 
             if (CurrentLogWindow != null)
             {
-                FileInfo info = new FileInfo(CurrentLogWindow.FileName);
+                FileInfo info = new(CurrentLogWindow.FileName);
                 openFileDialog.InitialDirectory = info.DirectoryName;
             }
             else
@@ -392,7 +394,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (DialogResult.OK == openFileDialog.ShowDialog(this))
             {
-                FileInfo info = new FileInfo(openFileDialog.FileName);
+                FileInfo info = new(openFileDialog.FileName);
                 if (info.Directory.Exists)
                 {
                     ConfigManager.Settings.lastDirectory = info.DirectoryName;
@@ -425,7 +427,7 @@ namespace LogExpert.Controls.LogTabWindow
             MultiFileOption option = ConfigManager.Settings.preferences.multiFileOption;
             if (option == MultiFileOption.Ask)
             {
-                MultiLoadRequestDialog dlg = new MultiLoadRequestDialog();
+                MultiLoadRequestDialog dlg = new();
                 DialogResult res = dlg.ShowDialog();
 
                 if (res == DialogResult.Yes)
@@ -587,7 +589,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void ConnectBookmarkWindow(LogWindow.LogWindow logWindow)
         {
-            FileViewContext ctx = new FileViewContext(logWindow, logWindow);
+            FileViewContext ctx = new(logWindow, logWindow);
             _bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
             _bookmarkWindow.SetCurrentFile(ctx);
         }
@@ -704,9 +706,9 @@ namespace LogExpert.Controls.LogTabWindow
         {
             //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
             labelStatus.Text = e.StatusText;
-            labelLines.Text = "" + e.LineCount + " lines";
+            labelLines.Text = $@"{string.Empty} {e.LineCount} lines";
             labelSize.Text = Util.GetFileSizeAsText(e.FileSize);
-            labelCurrentLine.Text = "" + e.CurrentLineNum;
+            labelCurrentLine.Text = $@"Line: {e.CurrentLineNum}";
             statusStrip.Refresh();
         }
 
@@ -717,7 +719,7 @@ namespace LogExpert.Controls.LogTabWindow
             Rectangle iconRect = _leds[0];
             iconRect.Height = 16; // (DockPanel's damn hardcoded height) // this.leds[this.leds.Length - 1].Bottom;
             iconRect.Width = iconRect.Right + 6;
-            Bitmap bmp = new Bitmap(iconRect.Width, iconRect.Height);
+            Bitmap bmp = new(iconRect.Width, iconRect.Height);
             Graphics gfx = Graphics.FromImage(bmp);
 
             int offsetFromTop = 4;
@@ -726,7 +728,7 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 Rectangle ledRect = _leds[i];
                 ledRect.Offset(0, offsetFromTop);
-                
+
                 if (level >= _leds.Length - i)
                 {
                     gfx.FillRectangle(_ledBrushes[i], ledRect);
@@ -740,10 +742,10 @@ namespace LogExpert.Controls.LogTabWindow
             int ledSize = 3;
             int ledGap = 1;
             Rectangle lastLed = _leds[_leds.Length - 1];
-            Rectangle dirtyLed = new Rectangle(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
-            Rectangle tailLed = new Rectangle(dirtyLed.Location, dirtyLed.Size);
+            Rectangle dirtyLed = new(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
+            Rectangle tailLed = new(dirtyLed.Location, dirtyLed.Size);
             tailLed.Offset(0, -(ledSize + ledGap));
-            Rectangle syncLed = new Rectangle(tailLed.Location, dirtyLed.Size);
+            Rectangle syncLed = new(tailLed.Location, dirtyLed.Size);
             syncLed.Offset(0, -(ledSize + ledGap));
 
             syncLed.Offset(0, offsetFromTop);
@@ -944,7 +946,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OpenSettings(int tabToOpen)
         {
-            SettingsDialog dlg = new SettingsDialog(ConfigManager.Settings.preferences, this, tabToOpen);
+            SettingsDialog dlg = new(ConfigManager.Settings.preferences, this, tabToOpen);
             dlg.TopMost = TopMost;
 
             if (DialogResult.OK == dlg.ShowDialog())
@@ -1065,7 +1067,7 @@ namespace LogExpert.Controls.LogTabWindow
                 ILogFileInfo info = CurrentLogWindow.GetCurrentFileInfo();
                 if (line != null && info != null)
                 {
-                    ArgParser parser = new ArgParser(toolEntry.args);
+                    ArgParser parser = new(toolEntry.args);
                     string argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
                     if (argLine != null)
                     {
@@ -1083,8 +1085,8 @@ namespace LogExpert.Controls.LogTabWindow
                 return;
             }
 
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo(cmd, args);
+            Process process = new();
+            ProcessStartInfo startInfo = new(cmd, args);
             if (!Util.IsNull(workingDir))
             {
                 startInfo.WorkingDirectory = workingDir;
@@ -1113,18 +1115,21 @@ namespace LogExpert.Controls.LogTabWindow
                     return;
                 }
 
-                SysoutPipe pipe = new SysoutPipe(process.StandardOutput);
+                SysoutPipe pipe = new(process.StandardOutput);
+
                 LogWindow.LogWindow logWin = AddTempFileTab(pipe.FileName,
                     CurrentLogWindow.IsTempFile
                         ? CurrentLogWindow.TempTitleName
                         : Util.GetNameFromPath(CurrentLogWindow.FileName) + "->E");
                 logWin.ForceColumnizer(columnizer);
+
                 process.Exited += pipe.ProcessExitedEventHandler;
                 //process.BeginOutputReadLine();
             }
             else
             {
                 _logger.Info("Starting external tool: {0} {1}", cmd, args);
+
                 try
                 {
                     startInfo.UseShellExecute = false;
@@ -1175,7 +1180,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
             {
-                ProjectLoadDlg dlg = new ProjectLoadDlg();
+                ProjectLoadDlg dlg = new();
                 if (DialogResult.Cancel != dlg.ShowDialog())
                 {
                     switch (dlg.ProjectLoadResult)
@@ -1187,7 +1192,7 @@ namespace LogExpert.Controls.LogTabWindow
                             CloseAllTabs();
                             break;
                         case ProjectLoadDlgResult.NewWindow:
-                            LogExpertProxy.NewWindow(new string[] {projectFileName});
+                            LogExpertProxy.NewWindow(new[] { projectFileName });
                             return;
                     }
                 }
@@ -1225,7 +1230,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void FillToolLauncherBar()
         {
-            char[] labels = 
+            char[] labels =
             {
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                 'U', 'V', 'W', 'X', 'Y', 'Z'
@@ -1240,14 +1245,18 @@ namespace LogExpert.Controls.LogTabWindow
             {
                 if (tool.isFavourite)
                 {
-                    ToolStripButton button = new ToolStripButton("" + labels[num % 26]);
-                    button.Tag = tool;
+                    ToolStripButton button = new("" + labels[num % 26])
+                    {
+                        Alignment = ToolStripItemAlignment.Left,
+                        Tag = tool
+                    };
+
                     SetToolIcon(tool, button);
                     externalToolsToolStrip.Items.Add(button);
                 }
 
                 num++;
-                ToolStripMenuItem menuItem = new ToolStripMenuItem(tool.name);
+                ToolStripMenuItem menuItem = new(tool.name);
                 menuItem.Tag = tool;
                 SetToolIcon(tool, menuItem);
                 toolsToolStripMenuItem.DropDownItems.Add(menuItem);
@@ -1288,32 +1297,35 @@ namespace LogExpert.Controls.LogTabWindow
 
         private string SaveLayout()
         {
-            ;
-            using (MemoryStream memStream = new MemoryStream(2000))
-            using (StreamReader r = new StreamReader(memStream))
+            using (MemoryStream memStream = new(2000))
             {
-                dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
+                using (StreamReader r = new(memStream))
+                {
+                    dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
 
-                memStream.Seek(0, SeekOrigin.Begin);
-                string resultXml = r.ReadToEnd();
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    string resultXml = r.ReadToEnd();
 
-                r.Close();
+                    r.Close();
 
-                return resultXml;
+                    return resultXml;
+                }
             }
         }
 
         private void RestoreLayout(string layoutXml)
         {
-            using (MemoryStream memStream = new MemoryStream(2000))
-            using (StreamWriter w = new StreamWriter(memStream))
+            using (MemoryStream memStream = new(2000))
             {
-                w.Write(layoutXml);
-                w.Flush();
+                using (StreamWriter w = new(memStream))
+                {
+                    w.Write(layoutXml);
+                    w.Flush();
 
-                memStream.Seek(0, SeekOrigin.Begin);
+                    memStream.Seek(0, SeekOrigin.Begin);
 
-                dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+                    dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+                }
             }
         }
 

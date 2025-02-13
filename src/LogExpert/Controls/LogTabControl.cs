@@ -31,7 +31,7 @@ namespace LogExpert.Controls
             currentContext = BufferedGraphicsManager.Current;
             myBuffer = currentContext.Allocate(this.CreateGraphics(), this.DisplayRectangle);
 
-            PaintEventArgs args = new PaintEventArgs(myBuffer.Graphics, e.ClipRectangle);
+            PaintEventArgs args = new(myBuffer.Graphics, e.ClipRectangle);
 
             base.OnPaint(args);
 

@@ -63,7 +63,7 @@
       this.okButton.TabIndex = 1;
       this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
+      this.okButton.Click += new System.EventHandler(this.OkButton_Click);
       // 
       // label1
       // 
@@ -153,8 +153,6 @@
       // 
       // Log4jXmlColumnizerConfigDlg
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(300, 266);
       this.Controls.Add(this.columnGridView);
       this.Controls.Add(this.localTimeCheckBox);

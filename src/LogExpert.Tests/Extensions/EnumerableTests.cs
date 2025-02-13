@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using LogExpert.Extensions;
+﻿using LogExpert.Extensions;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace LogExpert.Tests.Extensions
 {
@@ -29,7 +29,7 @@ namespace LogExpert.Tests.Extensions
         {
             object[] arrayObject = {new object()};
 
-            Assert.That(arrayObject.IsEmpty(),Is.False);
+            Assert.That(!arrayObject.IsEmpty(), Is.True);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace LogExpert.Tests.Extensions
         {
             IEnumerable<object> arrayObject = new List<object>(new []{new object()});
 
-            Assert.That(arrayObject.IsEmpty(), Is.False);
+            Assert.That(!arrayObject.IsEmpty(), Is.True);
         }
     }
 }

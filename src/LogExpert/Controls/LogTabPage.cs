@@ -12,7 +12,7 @@ namespace LogExpert.Controls
 
         private const int DIFF_MAX = 100;
         private int diffSum = 0;
-        private readonly object diffSumLock = new object();
+        private readonly object diffSumLock = new();
         private readonly Thread ledThread;
         private bool shouldStop = false;
 

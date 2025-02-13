@@ -16,14 +16,13 @@ namespace LogExpert.Classes.Bookmark
         public static void ExportBookmarkList(SortedList<int, Entities.Bookmark> bookmarkList, string logfileName,
             string fileName)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
-            StreamWriter writer = new StreamWriter(fs);
+            FileStream fs = new(fileName, FileMode.Create, FileAccess.Write);
+            StreamWriter writer = new(fs);
             writer.WriteLine("Log file name;Line number;Comment");
             foreach (Entities.Bookmark bookmark in bookmarkList.Values)
             {
                 string line = logfileName + ";" + bookmark.LineNum + ";" +
-                              bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",
-                                  replacementForNewLine);
+                              bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine).Replace("\r\n",                                  replacementForNewLine);
                 writer.WriteLine(line);
             }
             writer.Close();
@@ -33,9 +32,9 @@ namespace LogExpert.Classes.Bookmark
         public static void ImportBookmarkList(string logfileName, string fileName,
             SortedList<int, Entities.Bookmark> bookmarkList)
         {
-            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new(fileName, FileMode.Open, FileAccess.Read))
             {
-                using (StreamReader reader = new StreamReader(fs))
+                using (StreamReader reader = new(fs))
                 {
                     if (!reader.EndOfStream)
                     {
@@ -60,7 +59,7 @@ namespace LogExpert.Classes.Bookmark
                             int lineNum;
                             if (int.TryParse(lineStr, out lineNum))
                             {
-                                Entities.Bookmark bookmark = new Entities.Bookmark(lineNum, comment);
+                                Entities.Bookmark bookmark = new(lineNum, comment);
                                 bookmarkList.Add(lineNum, bookmark);
                             }
                             else

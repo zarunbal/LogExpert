@@ -12,18 +12,19 @@ namespace LogExpert.Classes.xml
     {
         #region Fields
 
-        private static readonly string[] splitStrings = new string[] { "\r\n", "\n", "\r" };
-        private static readonly char[] newLineChar = new char[] { '\n' };
+        private static readonly string[] _splitStrings = { "\r\n", "\n", "\r" };
 
-        private readonly XmlLogReader reader;
+        private static readonly char[] _newLineChar = { '\n' };
 
-        private readonly XmlParserContext context;
-        private readonly XmlReaderSettings settings;
+        private readonly XmlLogReader _reader;
 
-        private readonly Queue<string> lineList = new Queue<string>();
+        private readonly XmlParserContext _context;
+        private readonly XmlReaderSettings _settings;
+
+        private readonly Queue<string> _lineList = new();
         
-        private string stylesheet;
-        private XslCompiledTransform xslt;
+        private string _stylesheet;
+        private XslCompiledTransform _xslt;
 
         #endregion
 
@@ -31,23 +32,23 @@ namespace LogExpert.Classes.xml
 
         public XmlBlockSplitter(XmlLogReader reader, IXmlLogConfiguration xmlLogConfig)
         {
-            this.reader = reader;
-            this.reader.StartTag = xmlLogConfig.XmlStartTag;
-            this.reader.EndTag = xmlLogConfig.XmlEndTag;
+            _reader = reader;
+            _reader.StartTag = xmlLogConfig.XmlStartTag;
+            _reader.EndTag = xmlLogConfig.XmlEndTag;
 
             Stylesheet = xmlLogConfig.Stylesheet;
 
             // Create the XmlNamespaceManager.
-            NameTable nt = new NameTable();
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(nt);
+            NameTable nt = new();
+            XmlNamespaceManager nsmgr = new(nt);
             if (xmlLogConfig.Namespace != null)
             {
                 nsmgr.AddNamespace(xmlLogConfig.Namespace[0], xmlLogConfig.Namespace[1]);
             }
             // Create the XmlParserContext.
-            context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
-            settings = new XmlReaderSettings();
-            settings.ConformanceLevel = ConformanceLevel.Fragment;
+            _context = new XmlParserContext(nt, nsmgr, null, XmlSpace.None);
+            _settings = new XmlReaderSettings();
+            _settings.ConformanceLevel = ConformanceLevel.Fragment;
         }
 
         #endregion
@@ -56,30 +57,30 @@ namespace LogExpert.Classes.xml
 
         public override long Position
         {
-            get => reader.Position;
-            set => reader.Position = value;
+            get => _reader.Position;
+            set => _reader.Position = value;
         }
 
-        public override Encoding Encoding => reader.Encoding;
+        public override Encoding Encoding => _reader.Encoding;
 
-        public override bool IsBufferComplete => lineList.Count == 0;
+        public override bool IsBufferComplete => _lineList.Count == 0;
 
         public string Stylesheet
         {
-            get => stylesheet;
+            get => _stylesheet;
             set
             {
-                stylesheet = value;
-                if (stylesheet != null)
+                _stylesheet = value;
+                if (_stylesheet != null)
                 {
-                    XmlReader stylesheetReader = XmlReader.Create(new StringReader(stylesheet));
+                    XmlReader stylesheetReader = XmlReader.Create(new StringReader(_stylesheet));
 
-                    xslt = new XslCompiledTransform();
-                    xslt.Load(stylesheetReader);
+                    _xslt = new XslCompiledTransform();
+                    _xslt.Load(stylesheetReader);
                 }
                 else
                 {
-                    xslt = null;
+                    _xslt = null;
                 }
             }
         }
@@ -90,16 +91,16 @@ namespace LogExpert.Classes.xml
 
         private void ParseXmlBlock(string block)
         {
-            if (stylesheet != null)
+            if (_stylesheet != null)
             {
-                XmlReader xmlReader = XmlReader.Create(new StringReader(block), settings, context);
+                XmlReader xmlReader = XmlReader.Create(new StringReader(block), _settings, _context);
 
                 xmlReader.Read();
                 xmlReader.MoveToContent();
                 //xmlReader.MoveToContent();
-                StringWriter textWriter = new StringWriter();
+                StringWriter textWriter = new();
 
-                xslt.Transform(xmlReader, null, textWriter);
+                _xslt.Transform(xmlReader, null, textWriter);
                 string message = textWriter.ToString();
                 SplitToLinesList(message);
             }
@@ -113,17 +114,17 @@ namespace LogExpert.Classes.xml
         private void SplitToLinesList(string message)
         {
             const int MAX_LEN = 3000;
-            string[] lines = message.Split(splitStrings, StringSplitOptions.None);
+            string[] lines = message.Split(_splitStrings, StringSplitOptions.None);
             foreach (string theLine in lines)
             {
-                string line = theLine.Trim(newLineChar);
+                string line = theLine.Trim(_newLineChar);
                 while (line.Length > MAX_LEN)
                 {
                     string part = line.Substring(0, MAX_LEN);
                     line = line.Substring(MAX_LEN);
-                    lineList.Enqueue(part);
+                    _lineList.Enqueue(part);
                 }
-                lineList.Enqueue(line);
+                _lineList.Enqueue(line);
             }
         }
 
@@ -135,20 +136,20 @@ namespace LogExpert.Classes.xml
         {
             if (disposing)
             {
-                reader.Dispose();
+                _reader.Dispose();
             }
         }
 
         public override int ReadChar()
         {
-            return reader.ReadChar();
+            return _reader.ReadChar();
         }
 
         public override string ReadLine()
         {
-            if (lineList.Count == 0)
+            if (_lineList.Count == 0)
             {
-                string block = reader.ReadLine();
+                string block = _reader.ReadLine();
                 if (block == null)
                 {
                     return null;
@@ -160,10 +161,10 @@ namespace LogExpert.Classes.xml
                 }
                 catch (XmlException)
                 {
-                    lineList.Enqueue("[XML Parser error] " + block);
+                    _lineList.Enqueue("[XML Parser error] " + block);
                 }
             }
-            return lineList.Dequeue();
+            return _lineList.Dequeue();
         }
 
         #endregion

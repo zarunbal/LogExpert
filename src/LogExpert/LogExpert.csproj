@@ -1,615 +1,101 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F0C0D370-F416-44ED-939A-B4827D15AC14}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LogExpert</RootNamespace>
-    <AssemblyName>LogExpert</AssemblyName>
-    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <ApplicationIcon>Resources\logexpert.ico</ApplicationIcon>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <DocumentationFile>$(SolutionDir)..\bin\Docs\LogExpert.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+	<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <NoWarn>CS1591;CA1416;</NoWarn>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)'=='Release|AnyCPU' ">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Solution Items\AssemblyVersion.cs">
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
-    <Compile Include="Classes\ILogLineColumnizerCallback\ColumnizerCallback.cs" />
-    <Compile Include="Classes\Columnizer\ColumnizerPicker.cs" />
-    <Compile Include="Classes\Columnizer\SquareBracketColumnizer.cs" />
-    <Compile Include="Classes\Columnizer\TimeFormatDeterminer.cs" />
-    <Compile Include="Classes\DateTimeParser\DateFormatPartAdjuster.cs" />
-    <Compile Include="Classes\DateTimeParser\Parser.cs" />
-    <Compile Include="Classes\DateTimeParser\Section.cs" />
-    <Compile Include="Classes\DateTimeParser\Token.cs" />
-    <Compile Include="Classes\DateTimeParser\Tokenizer.cs" />
-    <Compile Include="Classes\Highlight\ActionEntry.cs" />
-    <Compile Include="Classes\ArgParser.cs" />
-    <Compile Include="Classes\Highlight\HilightMatchEntry.cs" />
-    <Compile Include="Classes\ILogLineColumnizerCallback\LogExpertCallback.cs" />
-    <Compile Include="Classes\Log\LogStreamReaderBase.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReaderBase.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReaderLegacy.cs" />
-    <Compile Include="Classes\Persister\FilterTabData.cs" />
-    <Compile Include="Classes\Persister\ProjectData.cs" />
-    <Compile Include="Config\ColorEntry.cs" />
-    <Compile Include="Config\ColumnizerHistoryEntry.cs" />
-    <Compile Include="Config\ColumnizerMaskEntry.cs" />
-    <Compile Include="Config\ExportImportFlags.cs" />
-    <Compile Include="Config\HighlightMaskEntry.cs" />
-    <Compile Include="Config\MultiFileOption.cs" />
-    <Compile Include="Config\Preferences.cs" />
-    <Compile Include="Config\RegexHistory.cs" />
-    <Compile Include="Config\SessionSaveLocation.cs" />
-    <Compile Include="Config\Settings.cs" />
-    <Compile Include="Config\SettingsFlags.cs" />
-    <Compile Include="Config\ToolEntry.cs" />
-    <Compile Include="Controls\LogTabWindow\LogTabWindowEventHandlers.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogTabWindow\LogTabWindowPrivate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogTabWindow\LogTabWindowPublic.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogWindow\LogWindowEventHandlers.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogWindow\LogWindowPrivate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogWindow\LogWindowsPublic.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\AllowOnlyOneInstanceErrorDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\AllowOnlyOneInstanceErrorDialog.Designer.cs">
-      <DependentUpon>AllowOnlyOneInstanceErrorDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\LogCellEditingControl.cs">
+    <Compile Update="Dialogs\LogCellEditingControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialogs\LogGridCell.cs" />
-    <Compile Include="Dialogs\LogTextColumn.cs" />
-    <Compile Include="Extensions\ComboBoxExtensions.cs" />
-    <Compile Include="Extensions\Forms\MenuSelectedColors.cs" />
-    <Compile Include="Extensions\Forms\MenuStripExtension.cs" />
-    <Compile Include="Extensions\Forms\LineToolStripSeparatorExtension.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Extensions\Forms\MenuToolStripSeparatorExtension.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Extensions\IEnumerable.cs" />
-    <Compile Include="Extensions\Forms\ToolStripRendererExtension.cs" />
-    <Compile Include="Interface\BackgroundProcessCancelHandler.cs" />
-    <Compile Include="Entities\Bookmark.cs" />
-    <Compile Include="Entities\BookmarkCollection.cs" />
-    <Compile Include="Classes\Bookmark\BookmarkDataProvider.cs" />
-    <Compile Include="Entities\EventArgs\BookmarkEventArgs.cs" />
-    <Compile Include="Classes\Bookmark\BookmarkExporter.cs" />
-    <Compile Include="Entities\BookmarkOverlay.cs" />
-    <Compile Include="Classes\Bookmark\BookmarkView.cs" />
-    <Compile Include="Classes\CmdLine.cs" />
-    <Compile Include="Classes\ColumnCache.cs" />
-    <Compile Include="Entities\EventArgs\ColumnizerEventArgs.cs" />
-    <Compile Include="Entities\EventArgs\ConfigChangedEventArgs.cs" />
-    <Compile Include="Entities\EventArgs\ContextMenuPluginEventArgs.cs" />
-    <Compile Include="Entities\EventArgs\CurrentHighlightGroupChangedEventArgs.cs" />
-    <Compile Include="Entities\DebugOptions.cs" />
-    <Compile Include="Classes\DelayedTrigger.cs" />
-    <Compile Include="Dialogs\BookmarkCommentDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\BookmarkCommentDlg.Designer.cs">
-      <DependentUpon>BookmarkCommentDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ChooseIconDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ChooseIconDlg.Designer.cs">
-      <DependentUpon>ChooseIconDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ExceptionWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ExceptionWindow.Designer.cs">
-      <DependentUpon>ExceptionWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ImportSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ImportSettingsDialog.Designer.cs">
-      <DependentUpon>ImportSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\KeywordActionDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\KeywordActionDlg.Designer.cs">
-      <DependentUpon>KeywordActionDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\MultiFileMaskDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\MultiFileMaskDialog.Designer.cs">
-      <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\OpenUriDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\OpenUriDialog.Designer.cs">
-      <DependentUpon>OpenUriDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\OverlayEventArgs.cs" />
-    <Compile Include="Dialogs\ProjectLoadDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ProjectLoadDlg.Designer.cs">
-      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\TabRenameDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\TabRenameDlg.Designer.cs">
-      <DependentUpon>TabRenameDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\EncodingOptions.cs" />
-    <Compile Include="Classes\FileSystemCallback.cs" />
-    <Compile Include="Entities\FileViewContext.cs" />
-    <Compile Include="Classes\Filter\Filter.cs" />
-    <Compile Include="Classes\Filter\FilterCancelHandler.cs" />
-    <Compile Include="Classes\Filter\FilterStarter.cs" />
-    <Compile Include="Entities\EventArgs\FilterListChangedEventArgs.cs" />
-    <Compile Include="Entities\HilightGroup.cs" />
-    <Compile Include="Config\ColorMode.cs" />
-    <Compile Include="Interface\IBookmarkData.cs" />
-    <Compile Include="Interface\IBookmarkView.cs" />
-    <Compile Include="Interface\ILogExpertProxy.cs" />
-    <Compile Include="Interface\ILogStreamReader.cs" />
-    <Compile Include="Interface\ILogPaintContext.cs" />
-    <Compile Include="Interface\ILogView.cs" />
-    <Compile Include="Interface\ISharedToolWindow.cs" />
-    <Compile Include="Classes\LocalFileSystem.cs" />
-    <Compile Include="Classes\Log\LogBufferCacheEntry.cs" />
-    <Compile Include="Classes\LogExpertApplicationContext.cs" />
-    <Compile Include="Entities\LogFileException.cs" />
-    <Compile Include="Entities\MultiFileOptions.cs" />
-    <Compile Include="Classes\ObjectClone.cs" />
-    <Compile Include="Classes\PaintHelper.cs" />
-    <Compile Include="Classes\ParamParser.cs" />
-    <Compile Include="Classes\Persister\Persister.cs" />
-    <Compile Include="Classes\Columnizer\ClfColumnizer.cs" />
-    <Compile Include="Config\ConfigManager.cs" />
-    <Compile Include="Dialogs\BookmarkWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\BookmarkWindow.Designer.cs">
-      <DependentUpon>BookmarkWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\DateTimeDragControl.cs">
+    <Compile Update="Dialogs\DateTimeDragControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\DateTimeDragControl.Designer.cs">
-      <DependentUpon>DateTimeDragControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\FilterColumnChooser.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\FilterColumnChooser.Designer.cs">
-      <DependentUpon>FilterColumnChooser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\SelectLineEventArgs.cs" />
-    <Compile Include="Dialogs\TimeSpreadigControl.cs">
+    <Compile Update="Dialogs\TimeSpreadigControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\TimeSpreadigControl.Designer.cs">
-      <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\MultiLoadRequestDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\MultiLoadRequestDialog.Designer.cs">
-      <DependentUpon>MultiLoadRequestDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ParamRequesterDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ParamRequesterDialog.Designer.cs">
-      <DependentUpon>ParamRequesterDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\SettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\SettingsDialog.Designer.cs">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ToolArgsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ToolArgsDialog.Designer.cs">
-      <DependentUpon>ToolArgsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\Filter\FilterPipe.cs" />
-    <Compile Include="Entities\EventArgs\GuiStateArgs.cs" />
-    <Compile Include="Controls\KnobControl.cs">
+    <Compile Update="Controls\KnobControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\KnobControl.Designer.cs">
-      <DependentUpon>KnobControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\LogExpertProxy.cs" />
-    <Compile Include="Controls\LogTabControl.cs">
+    <Compile Update="Controls\LogTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\LogTabPage.cs">
+    <Compile Update="Controls\LogTabPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\LogTabWindow\LogTabWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogTabWindow\LogTabWindow.designer.cs">
-      <DependentUpon>LogTabWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\DefaultLogfileColumnizer.cs" />
-    <Compile Include="Dialogs\AboutBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\AboutBox.Designer.cs">
-      <DependentUpon>AboutBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\BufferedDataGridView.cs">
+    <Compile Update="Dialogs\BufferedDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialogs\BufferedDataGridView.Designer.cs">
-      <DependentUpon>BufferedDataGridView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ColorComboBox.cs">
+    <Compile Update="Dialogs\ColorComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialogs\FilterSelectorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\FilterSelectorForm.Designer.cs">
-      <DependentUpon>FilterSelectorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\GotoLineDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\GotoLineDialog.Designer.cs">
-      <DependentUpon>GotoLineDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\HighlightDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\HighlightDialog.Designer.cs">
-      <DependentUpon>HighlightDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\RegexHelperDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\RegexHelperDialog.Designer.cs">
-      <DependentUpon>RegexHelperDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\SearchDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\SearchDialog.Designer.cs">
-      <DependentUpon>SearchDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\SearchProgressDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\SearchProgressDialog.Designer.cs">
-      <DependentUpon>SearchProgressDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\Filter\FilterParams.cs" />
-    <Compile Include="Classes\Highlight\HilightEntry.cs" />
-    <Compile Include="Entities\EventArgs\LoadFileEventArgs.cs" />
-    <Compile Include="Classes\Log\LogBuffer.cs" />
-    <Compile Include="Entities\LogEventData.cs" />
-    <Compile Include="Classes\Log\LogFileInfo.cs" />
-    <Compile Include="Classes\Log\LogfileReader.cs" />
-    <Compile Include="Controls\LogWindow\LogWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\LogWindow\LogWindow.designer.cs">
-      <DependentUpon>LogWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\EventArgs\PatternArgs.cs" />
-    <Compile Include="Classes\PatternBlock.cs" />
-    <Compile Include="Controls\PatternWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\PatternWindow.Designer.cs">
-      <DependentUpon>PatternWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\PluginRegistry.cs" />
-    <Compile Include="Classes\Log\PositionAwareStreamReaderSystem.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Entities\EventArgs\ProgressEventArgs.cs" />
-    <Compile Include="Classes\Persister\ProjectPersister.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Dialogs\AllowOnlyOneInstanceErrorDialog.resx">
-      <DependentUpon>AllowOnlyOneInstanceErrorDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DateTimeDragControl.resx">
-      <DependentUpon>DateTimeDragControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\MultiLoadRequestDialog.resx">
-      <DependentUpon>MultiLoadRequestDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ParamRequesterDialog.resx">
-      <DependentUpon>ParamRequesterDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SettingsDialog.resx">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ToolArgsDialog.resx">
-      <DependentUpon>ToolArgsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\KnobControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>KnobControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\LogTabWindow\LogTabWindow.resx">
-      <DependentUpon>LogTabWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\AboutBox.resx">
-      <DependentUpon>AboutBox.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\FilterSelectorForm.resx">
-      <DependentUpon>FilterSelectorForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\GotoLineDialog.resx">
-      <DependentUpon>GotoLineDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\HighlightDialog.resx">
-      <DependentUpon>HighlightDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\RegexHelperDialog.resx">
-      <DependentUpon>RegexHelperDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SearchDialog.resx">
-      <DependentUpon>SearchDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SearchProgressDialog.resx">
-      <DependentUpon>SearchProgressDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\LogWindow\LogWindow.resx">
-      <DependentUpon>LogWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="..\Solution Items\Key.snk">
       <Link>Key.snk</Link>
     </None>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Entities\Range.cs" />
-    <Compile Include="Classes\RangeFinder.cs" />
-    <Compile Include="Entities\ReloadMemento.cs" />
-    <Compile Include="Classes\Log\RolloverFilenameBuilder.cs" />
-    <Compile Include="Classes\Log\RolloverFilenameHandler.cs" />
-    <Compile Include="Entities\RowHeightEntry.cs" />
-    <Compile Include="Entities\SearchParams.cs" />
-    <Compile Include="Entities\EventArgs\StatusEventArgs.cs" />
-    <Compile Include="Entities\EventArgs\SyncModeEventArgs.cs" />
-    <Compile Include="Classes\SysoutPipe.cs" />
-    <Compile Include="Classes\TimeSpreadCalculator.cs" />
-    <Compile Include="Classes\Columnizer\TimestampColumnizer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\TimeSyncList.cs" />
-    <Compile Include="Classes\Util.cs" />
-    <Compile Include="Classes\Win32.cs" />
-    <Compile Include="Entities\WindowFileEntry.cs" />
-    <Compile Include="Entities\WindowTypes.cs" />
-    <Compile Include="Classes\xml\XmlBlockSplitter.cs" />
-    <Compile Include="Classes\xml\XmlLogReader.cs" />
-    <None Include="Start.cmd">
+    <None Update="Start.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\up-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\down-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\folder-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\search-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\search-folder-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\search-icon-blue.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\app.manifest" />
-    <None Include="Resources\LogExpert.bmp" />
-    <None Include="Resources\Icon1.ico" />
-    <None Include="Resources\AdvancedIcon.bmp" />
-    <None Include="Resources\AdvancedIcon2.gif" />
-    <None Include="Resources\ArrowDown.gif" />
-    <None Include="Resources\ArrowUp.gif" />
-    <None Include="Licenses\Nlog.license.txt">
+    <None Update="Licenses\Nlog.license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Licenses\WinformsUI.Docking.license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\bubble.ico" />
-    <Content Include="Resources\check-blue.gif" />
-    <None Include="Resources\LogExpert-Icon.gif" />
-    <None Include="Resources\Icon2.ico" />
-    <EmbeddedResource Include="Dialogs\BookmarkCommentDlg.resx">
-      <DependentUpon>BookmarkCommentDlg.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\BookmarkWindow.resx">
-      <DependentUpon>BookmarkWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ChooseIconDlg.resx">
-      <DependentUpon>ChooseIconDlg.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ExceptionWindow.resx">
-      <DependentUpon>ExceptionWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\FilterColumnChooser.resx">
-      <DependentUpon>FilterColumnChooser.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ImportSettingsDialog.resx">
-      <DependentUpon>ImportSettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\KeywordActionDlg.resx">
-      <DependentUpon>KeywordActionDlg.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\MultiFileMaskDialog.resx">
-      <DependentUpon>MultiFileMaskDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\OpenUriDialog.resx">
-      <DependentUpon>OpenUriDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ProjectLoadDlg.resx">
-      <DependentUpon>ProjectLoadDlg.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\TabRenameDlg.resx">
-      <DependentUpon>TabRenameDlg.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\TimeSpreadigControl.resx">
-      <DependentUpon>TimeSpreadigControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\PatternWindow.resx">
-      <DependentUpon>PatternWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\delete-page-red.gif" />
-    <Content Include="Resources\LogExpert-Logo.png" />
-    <None Include="Resources\LogLover.gif" />
-    <None Include="Resources\logexpert.ico" />
-    <Content Include="Resources\Log_Icon.png" />
-    <Content Include="Resources\Log_Icon_small.png" />
-    <EmbeddedResource Include="Resources\PanelOpen.gif" />
-    <EmbeddedResource Include="Resources\PanelClose.gif" />
-    <Content Include="Resources\Pro_Filter.bmp" />
-    <None Include="Resources\SearchIcon.gif" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj">
-      <Project>{e72c2bb1-34de-4d66-a830-9647c3837833}</Project>
-      <Name>ColumnizerLib</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
-      <Project>{c75532c4-765b-418e-b09b-46d36b2abdb1}</Project>
-      <Name>WinFormsUI</Name>
-    </ProjectReference>
+    <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.Core" />
+    <PackageReference Include="Grpc.Tools" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Encoding" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="NLog" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="NLog">
-      <Version>5.2.8</Version>
-    </PackageReference>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\LogexpertgRPCService\LogexpertgRPCService.csproj" />
+    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="DebugWindow.Designer.cs" />
+    <Compile Remove="HighlightThread.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

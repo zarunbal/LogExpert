@@ -10,7 +10,7 @@ namespace LogExpert.Entities
         #region Fields
 
         private string groupName = "";
-        private List<HilightEntry> hilightEntryList = new List<HilightEntry>();
+        private List<HilightEntry> hilightEntryList = [];
 
         #endregion
 

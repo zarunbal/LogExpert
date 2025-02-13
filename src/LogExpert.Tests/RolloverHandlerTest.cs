@@ -25,7 +25,7 @@ namespace LogExpert.Tests
             RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
             LinkedList<string> fileList = handler.GetNameList();
 
-            Assert.AreEqual(files, fileList);
+            Assert.That(fileList, Is.EqualTo(files));
             
             Cleanup();
         }
@@ -46,7 +46,7 @@ namespace LogExpert.Tests
             RolloverFilenameHandler handler = new RolloverFilenameHandler(info, options);
             LinkedList<string> fileList = handler.GetNameList();
 
-            Assert.AreEqual(files, fileList);
+            Assert.That(fileList, Is.EqualTo(files));
             
             Cleanup();
         }

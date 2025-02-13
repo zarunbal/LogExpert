@@ -25,8 +25,8 @@ namespace LogExpert.Classes
 
         public string ReplaceParams(ILogLine logLine, int lineNum, string fileName)
         {
-            FileInfo fileInfo = new FileInfo(fileName);
-            StringBuilder builder = new StringBuilder(this.argLine);
+            FileInfo fileInfo = new(fileName);
+            StringBuilder builder = new(this.argLine);
             builder.Replace("%L", "" + lineNum);
             builder.Replace("%P",
                 fileInfo.DirectoryName.Contains(" ") ? "\"" + fileInfo.DirectoryName + "\"" : fileInfo.DirectoryName);

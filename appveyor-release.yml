@@ -1,9 +1,18 @@
-version: 1.8.{build}
+version: 1.10.{build}
 branches:
   only:
   - master
-image: Visual Studio 2017
+
+install:
+- ps: dotnet tool restore
+- ps: dotnet restore --use-current-runtime
+- ps: dotnet build --no-restore
+
+build:
+    project: LogExpert.sln
+
 environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
   my_variable:
     secure: Qpq/4cyuTUzmt/r4HsQxioG6WXrZSK3mzVq5iUJC2RI=
   NugetApiKey:
@@ -12,6 +21,5 @@ environment:
     secure: mXmzLqgFyDEjGRcE4UpqwqOXmdiCm9HwJ2V3LzSAz06GL1OaBDoTzidw7Rly+UHk
   GitHubApiKey:
     secure: N83nQZ/QQVqpRnl0D6F/xSbKjn062y07JdskpUpbWryMY2JDo4Be9lUXmob+xcOO
-build_script:
-- cmd: PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\build.ps1' --target Clean Pack Publish CreateSetup PublishToAppveyor ChangeVersionNumber --Configuration Release"
+
 test: off

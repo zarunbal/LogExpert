@@ -1,17 +1,19 @@
-﻿using System;
+﻿using LogExpert.Config;
+using LogExpert.Dialogs;
+using LogExpert.Entities;
+using LogExpert.Entities.EventArgs;
+using LogExpert.Extensions.Forms;
+using LogExpert.Interface;
+
+using NLog;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using LogExpert.Config;
-using LogExpert.Dialogs;
-using LogExpert.Entities;
-using LogExpert.Entities.EventArgs;
-using LogExpert.Extensions.Forms;
-using LogExpert.Interface;
-using NLog;
 //using System.Linq;
 
 namespace LogExpert.Controls.LogTabWindow
@@ -44,9 +46,9 @@ namespace LogExpert.Controls.LogTabWindow
 
         private readonly EventWaitHandle _statusLineEventHandle = new AutoResetEvent(false);
         private readonly EventWaitHandle _statusLineEventWakeupHandle = new ManualResetEvent(false);
-        private readonly object _statusLineLock = new object();
+        private readonly object _statusLineLock = new();
         private readonly Brush _syncLedBrush;
-        private readonly StringFormat _tabStringFormat = new StringFormat();
+        private readonly StringFormat _tabStringFormat = new();
         private readonly Brush[] _tailLedBrush = new Brush[3];
 
         private BookmarkWindow _bookmarkWindow;
@@ -73,9 +75,14 @@ namespace LogExpert.Controls.LogTabWindow
 
         public LogTabWindow(string[] fileNames, int instanceNumber, bool showInstanceNumbers)
         {
-            InitializeComponent();            
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
 
-            ChangeTheme(Controls);
+            InitializeComponent();
+
+            //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+            mainMenuStrip.Location = new Point(0, 0);
+            externalToolsToolStrip.Location = new Point(0, 54);
 
             _startupFileNames = fileNames;
             _instanceNumber = instanceNumber;
@@ -83,10 +90,10 @@ namespace LogExpert.Controls.LogTabWindow
 
             Load += OnLogTabWindowLoad;
 
-            ConfigManager.Instance.ConfigChanged += ConfigChanged;
+            ConfigManager.Instance.ConfigChanged += OnConfigChanged;
             HilightGroupList = ConfigManager.Settings.hilightGroupList;
 
-            Rectangle led = new Rectangle(0, 0, 8, 2);
+            Rectangle led = new(0, 0, 8, 2);
 
             for (int i = 0; i < _leds.Length; ++i)
             {
@@ -117,7 +124,7 @@ namespace LogExpert.Controls.LogTabWindow
             _tabStringFormat.LineAlignment = StringAlignment.Center;
             _tabStringFormat.Alignment = StringAlignment.Near;
 
-            ToolStripControlHost host = new ToolStripControlHost(checkBoxFollowTail);
+            ToolStripControlHost host = new(checkBoxFollowTail);
 
             host.Padding = new Padding(20, 0, 0, 0);
             host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
@@ -145,7 +152,7 @@ namespace LogExpert.Controls.LogTabWindow
             // get a list of resource names from the manifest
             string[] resNames = a.GetManifestResourceNames();
 
-            Bitmap bmp = Properties.Resources.delete_page_red;
+            Bitmap bmp = Properties.Resources.Deceased;
             _deadIcon = Icon.FromHandle(bmp.GetHicon());
             bmp.Dispose();
             Closing += OnLogTabWindowClosing;
@@ -176,10 +183,8 @@ namespace LogExpert.Controls.LogTabWindow
                     component.ForeColor = ColorMode.ForeColor;
                 }
 
-                if (component is MenuStrip)
+                if (component is MenuStrip menu)
                 {
-                    var menu = (MenuStrip)component;
-
                     foreach (ToolStripMenuItem item in menu.Items)
                     {
                         item.ForeColor = ColorMode.ForeColor;
@@ -187,18 +192,17 @@ namespace LogExpert.Controls.LogTabWindow
 
                         try
                         {
-                            for(var x = 0; x< item.DropDownItems.Count; x++)
+                            for (var x = 0; x < item.DropDownItems.Count; x++)
                             {
                                 var children = item.DropDownItems[x];
                                 children.ForeColor = ColorMode.ForeColor;
                                 children.BackColor = ColorMode.MenuBackgroundColor;
 
-
-                                if(children is ToolStripDropDownItem) { 
-
-                                    for (var y = 0; y < ((ToolStripDropDownItem)children).DropDownItems.Count; y++)
+                                if (children is ToolStripDropDownItem toolstripDropDownItem)
+                                {
+                                    for (var y = 0; y < toolstripDropDownItem.DropDownItems.Count; y++)
                                     {
-                                        var subChildren = ((ToolStripDropDownItem)children).DropDownItems[y];
+                                        var subChildren = toolstripDropDownItem.DropDownItems[y];
                                         subChildren.ForeColor = ColorMode.ForeColor;
                                         subChildren.BackColor = ColorMode.MenuBackgroundColor;
                                     }
@@ -216,7 +220,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             // Colors for selected menus
             mainMenuStrip.Renderer = new ExtendedMenuStripRenderer();
-            
+
             // Dock special color
             dockPanel.DockBackColor = ColorMode.DockBackgroundColor;
 
@@ -252,7 +256,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.StartColor = ColorMode.InactiveTabColor;
             dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.EndColor = ColorMode.InactiveTabColor;
-            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = ColorMode.ForeColor;            
+            dockPanel.Skin.DockPaneStripSkin.DocumentGradient.InactiveTabGradient.TextColor = ColorMode.ForeColor;
             #endregion Tabs
         }
         #endregion
@@ -303,7 +307,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         public Preferences Preferences => ConfigManager.Settings.preferences;
 
-        public List<HilightGroup> HilightGroupList { get; private set; } = new List<HilightGroup>();
+        public List<HilightGroup> HilightGroupList { get; private set; } = [];
 
         //public Settings Settings
         //{

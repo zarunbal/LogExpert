@@ -3,8 +3,65 @@
   "$ref": "#/definitions/build",
   "title": "Build Schema",
   "definitions": {
-    "build": {
-      "type": "object",
+    "Host": {
+      "type": "string",
+      "enum": [
+        "AppVeyor",
+        "AzurePipelines",
+        "Bamboo",
+        "Bitbucket",
+        "Bitrise",
+        "GitHubActions",
+        "GitLab",
+        "Jenkins",
+        "Rider",
+        "SpaceAutomation",
+        "TeamCity",
+        "Terminal",
+        "TravisCI",
+        "VisualStudio",
+        "VSCode"
+      ]
+    },
+    "ExecutableTarget": {
+      "type": "string",
+      "enum": [
+        "BuildChocolateyPackage",
+        "ChangeVersionNumber",
+        "Clean",
+        "CleanPackage",
+        "CleanupAppDataLogExpert",
+        "CleanupDocumentsLogExpert",
+        "ColumnizerLibCreate",
+        "ColumnizerLibCreateNuget",
+        "Compile",
+        "CopyFilesForSetup",
+        "CopyOutputForChocolatey",
+        "CreatePackage",
+        "CreateSetup",
+        "Pack",
+        "PackageSftpFileSystem",
+        "PrepareChocolateyTemplates",
+        "Publish",
+        "PublishChocolatey",
+        "PublishColumnizerNuget",
+        "PublishGithub",
+        "PublishToAppveyor",
+        "Restore",
+        "Test"
+      ]
+    },
+    "Verbosity": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "Verbose",
+        "Normal",
+        "Minimal",
+        "Quiet"
+      ]
+    },
+    "NukeBuild": {
       "properties": {
         "ChocolateyApiKey": {
           "type": "string",
@@ -165,12 +222,57 @@
         "Verbosity": {
           "type": "string",
           "description": "Logging verbosity during build execution. Default is 'Normal'",
+          "$ref": "#/definitions/Verbosity"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "ChocolateyApiKey": {
+          "type": "string",
+          "description": "Chocolatey api key"
+        },
+        "Configuration": {
+          "type": "string",
+          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
           "enum": [
             "Minimal",
             "Normal",
             "Quiet",
             "Verbose"
           ]
+        },
+        "ExcludeDirectoryGlob": {
+          "type": "array",
+          "description": "Exlcude directory glob",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExcludeFileGlob": {
+          "type": "array",
+          "description": "Exclude file globs",
+          "items": {
+            "type": "string"
+          }
+        },
+        "GitHubApiKey": {
+          "type": "string",
+          "description": "GitHub Api key"
+        },
+        "my_variable": {
+          "type": "string",
+          "description": "My variable"
+        },
+        "NugetApiKey": {
+          "type": "string",
+          "description": "Nuget api key"
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "VersionFileString": {
           "type": "string",
@@ -185,6 +287,9 @@
           "description": "Version string"
         }
       }
+    },
+    {
+      "$ref": "#/definitions/NukeBuild"
     }
   }
 }

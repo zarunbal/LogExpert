@@ -16,7 +16,7 @@ namespace LogExpert.Classes.Highlight
 
         public ActionEntry Copy()
         {
-            ActionEntry e = new ActionEntry();
+            ActionEntry e = new();
             e.pluginName = this.pluginName;
             e.actionParam = this.actionParam;
             return e;

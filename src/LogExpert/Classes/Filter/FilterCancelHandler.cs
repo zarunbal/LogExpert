@@ -8,7 +8,7 @@ namespace LogExpert.Classes.Filter
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         #region Fields
 
-        private readonly FilterStarter filterStarter;
+        private readonly FilterStarter _filterStarter;
 
         #endregion
 
@@ -16,7 +16,7 @@ namespace LogExpert.Classes.Filter
 
         public FilterCancelHandler(FilterStarter filterStarter)
         {
-            this.filterStarter = filterStarter;
+            _filterStarter = filterStarter;
         }
 
         #endregion
@@ -26,7 +26,7 @@ namespace LogExpert.Classes.Filter
         public void EscapePressed()
         {
             _logger.Info("FilterCancelHandler called.");
-            this.filterStarter.CancelFilter();
+            _filterStarter.CancelFilter();
         }
 
         #endregion

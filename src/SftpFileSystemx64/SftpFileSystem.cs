@@ -39,7 +39,7 @@ namespace SftpFileSystem
         {
             try
             {
-                Uri uri = new Uri(uriString);
+                Uri uri = new(uriString);
                 return uri.Scheme.Equals("sftp", StringComparison.InvariantCultureIgnoreCase);
             }
             catch (Exception e)
@@ -53,7 +53,7 @@ namespace SftpFileSystem
         {
             try
             {
-                Uri uri = new Uri(uriString.Replace('\\', '/'));
+                Uri uri = new(uriString.Replace('\\', '/'));
                 return new SftpLogFileInfo(this, uri, _logger);
             }
             catch (Exception e)
@@ -81,9 +81,9 @@ namespace SftpFileSystem
 
         public void LoadConfig(string configDir)
         {
-            XmlSerializer xml = new XmlSerializer(ConfigData.GetType());
+            XmlSerializer xml = new(ConfigData.GetType());
 
-            FileInfo configFile = new FileInfo(configDir + "\\" + "sftpfilesystem.cfg");
+            FileInfo configFile = new(configDir + "\\" + "sftpfilesystem.cfg");
 
             if (!configFile.Exists)
             {
@@ -113,7 +113,7 @@ namespace SftpFileSystem
         public void SaveConfig(string configDir)
         {
             _logger.Info("Saving SFTP config");
-            XmlSerializer xml = new XmlSerializer(ConfigData.GetType());
+            XmlSerializer xml = new(ConfigData.GetType());
 
             FileStream fs = null;
 
@@ -209,7 +209,7 @@ namespace SftpFileSystem
 
                 if (userName == null || password == null)
                 {
-                    LoginDialog dlg = new LoginDialog(uri.Host, usersForHost, hidePasswordField);
+                    LoginDialog dlg = new(uri.Host, usersForHost, hidePasswordField);
                     dlg.Username = userName;
                     if (DialogResult.OK == dlg.ShowDialog())
                     {
@@ -220,7 +220,7 @@ namespace SftpFileSystem
                     dlg.Dispose();
                 }
 
-                Credentials credentials = new Credentials(uri.Host, userName, password);
+                Credentials credentials = new(uri.Host, userName, password);
                 CredentialsCache.Add(credentials);
                 return credentials;
             }

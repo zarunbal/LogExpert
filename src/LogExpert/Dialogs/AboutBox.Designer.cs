@@ -1,6 +1,6 @@
 ﻿namespace LogExpert.Dialogs
 {
-	partial class AboutBox
+    partial class AboutBox
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -142,7 +142,7 @@
             this.linkLabelURL.TabStop = true;
             this.linkLabelURL.Text = "https://github.com/zarunbal/LogExpert/";
             this.linkLabelURL.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.linkLabelURL.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.linkLabelURL.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelURLClicked);
             // 
             // panel1
             // 
@@ -169,7 +169,6 @@
             // AboutBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(942, 677);
             this.Controls.Add(this.tableLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
