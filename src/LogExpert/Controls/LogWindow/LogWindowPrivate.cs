@@ -2634,7 +2634,7 @@ namespace LogExpert.Controls.LogWindow
             }
 
             advancedFilterSplitContainer.Panel1Collapsed = !show;
-            advancedFilterSplitContainer.SplitterDistance = 54;
+            advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
             _showAdvanced = show;
         }
 

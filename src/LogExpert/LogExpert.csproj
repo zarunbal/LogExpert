@@ -16,6 +16,7 @@
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+	<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
     <NoWarn>CS1591;CA1416;</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

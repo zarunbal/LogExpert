@@ -31,7 +31,7 @@ namespace LogExpert.Controls.LogWindow
 
         private const int SPREAD_MAX = 99;
         private const int PROGRESS_BAR_MODULO = 1000;
-        private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 54;
+        private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 100;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly Image _advancedButtonImage;

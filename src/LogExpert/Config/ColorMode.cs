@@ -24,7 +24,7 @@ namespace LogExpert.Config
         private static readonly Color DarkForeColor = Color.FromArgb(255, 255, 255);
 
         // Default
-        public static Color BackgroundColor = LessBrightBackgroundColor;
+        public static Color BackgroundColor = BrightBackgroundColor;
         public static Color DockBackgroundColor = BrighterBackgroundColor;
         public static Color BookmarksDefaultBackgroundColor = BrightBookmarkDefaultSystemColor;
         public static Color ForeColor = BrightForeColor;

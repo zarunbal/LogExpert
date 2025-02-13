@@ -122,7 +122,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         /// Determines the color with which the client rectangle will be drawn.
         /// If this property is used instead of the BackColor it will not have any influence on the borders to the surrounding controls (DockPane).
         /// The BackColor property changes the borders of surrounding controls (DockPane).
-        /// Alternatively both properties may be used (BackColor to draw and define the color of the borders and DockBackColor to define the color of the client rectangle). 
+        /// Alternatively both properties may be used (BackColor to draw and define the color of the borders and DockBackColor to define the color of the client rectangle).
         /// For Backgroundimages: Set your prefered Image, then set the DockBackColor and the BackColor to the same Color (Control)
         /// </summary>
         [Description("Determines the color with which the client rectangle will be drawn.\r\n" +
@@ -138,7 +138,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 if (m_BackColor != value)
                 {
                     m_BackColor = value;
-                    this.Refresh();
+                    Refresh();
                 }
             }
         }
@@ -434,21 +434,21 @@ namespace WeifenLuo.WinFormsUI.Docking
                 Rectangle rect = DockArea;
                 if (DockWindows[DockState.DockLeft].VisibleNestedPanes.Count != 0)
                 {
-                    rect.X += (int) (DockArea.Width * DockLeftPortion);
-                    rect.Width -= (int) (DockArea.Width * DockLeftPortion);
+                    rect.X += (int)(DockArea.Width * DockLeftPortion);
+                    rect.Width -= (int)(DockArea.Width * DockLeftPortion);
                 }
                 if (DockWindows[DockState.DockRight].VisibleNestedPanes.Count != 0)
                 {
-                    rect.Width -= (int) (DockArea.Width * DockRightPortion);
+                    rect.Width -= (int)(DockArea.Width * DockRightPortion);
                 }
                 if (DockWindows[DockState.DockTop].VisibleNestedPanes.Count != 0)
                 {
-                    rect.Y += (int) (DockArea.Height * DockTopPortion);
-                    rect.Height -= (int) (DockArea.Height * DockTopPortion);
+                    rect.Y += (int)(DockArea.Height * DockTopPortion);
+                    rect.Height -= (int)(DockArea.Height * DockTopPortion);
                 }
                 if (DockWindows[DockState.DockBottom].VisibleNestedPanes.Count != 0)
                 {
-                    rect.Height -= (int) (DockArea.Height * DockBottomPortion);
+                    rect.Height -= (int)(DockArea.Height * DockBottomPortion);
                 }
 
                 return rect;
@@ -896,10 +896,10 @@ namespace WeifenLuo.WinFormsUI.Docking
             if (dockState == DockState.DockLeft || dockState == DockState.DockRight)
             {
                 int width = ClientRectangle.Width - DockPadding.Left - DockPadding.Right;
-                int dockLeftSize = m_dockLeftPortion >= 1 ? (int) m_dockLeftPortion : (int) (width * m_dockLeftPortion);
+                int dockLeftSize = m_dockLeftPortion >= 1 ? (int)m_dockLeftPortion : (int)(width * m_dockLeftPortion);
                 int dockRightSize = m_dockRightPortion >= 1
-                    ? (int) m_dockRightPortion
-                    : (int) (width * m_dockRightPortion);
+                    ? (int)m_dockRightPortion
+                    : (int)(width * m_dockRightPortion);
 
                 if (dockLeftSize < MeasurePane.MinSize)
                 {
@@ -922,10 +922,10 @@ namespace WeifenLuo.WinFormsUI.Docking
             else if (dockState == DockState.DockTop || dockState == DockState.DockBottom)
             {
                 int height = ClientRectangle.Height - DockPadding.Top - DockPadding.Bottom;
-                int dockTopSize = m_dockTopPortion >= 1 ? (int) m_dockTopPortion : (int) (height * m_dockTopPortion);
+                int dockTopSize = m_dockTopPortion >= 1 ? (int)m_dockTopPortion : (int)(height * m_dockTopPortion);
                 int dockBottomSize = m_dockBottomPortion >= 1
-                    ? (int) m_dockBottomPortion
-                    : (int) (height * m_dockBottomPortion);
+                    ? (int)m_dockBottomPortion
+                    : (int)(height * m_dockBottomPortion);
 
                 if (dockTopSize < MeasurePane.MinSize)
                 {
@@ -1050,7 +1050,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         private void UpdateWindowRegion_EmptyDocumentArea()
         {
             Rectangle rect = DocumentWindowBounds;
-            SetRegion(new Rectangle[] {rect});
+            SetRegion(new Rectangle[] { rect });
         }
 
         private void UpdateWindowRegion_ClipContent()
@@ -1197,21 +1197,12 @@ namespace WeifenLuo.WinFormsUI.Docking
 
         protected virtual void OnContentAdded(DockContentEventArgs e)
         {
-            EventHandler<DockContentEventArgs> handler = (EventHandler<DockContentEventArgs>) Events[ContentAddedEvent];
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            ((EventHandler<DockContentEventArgs>)Events[ContentAddedEvent])?.Invoke(this, e);
         }
 
         protected virtual void OnContentRemoved(DockContentEventArgs e)
         {
-            EventHandler<DockContentEventArgs> handler =
-                (EventHandler<DockContentEventArgs>) Events[ContentRemovedEvent];
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            ((EventHandler<DockContentEventArgs>)Events[ContentRemovedEvent])?.Invoke(this, e);
         }
     }
 }
