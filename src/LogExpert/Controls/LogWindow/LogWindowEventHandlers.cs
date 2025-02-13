@@ -788,6 +788,7 @@ namespace LogExpert.Controls.LogWindow
 
             // Remove all "old" plugin entries
             int index = dataGridContextMenuStrip.Items.IndexOf(pluginSeparator);
+
             if (index > 0)
             {
                 for (int i = index + 1; i < dataGridContextMenuStrip.Items.Count;)
@@ -811,10 +812,10 @@ namespace LogExpert.Controls.LogWindow
                     string menuText = entry.GetMenuText(lines, CurrentColumnizer, callback);
                     if (menuText != null)
                     {
-                        bool disabled = menuText.StartsWith("_");
+                        bool disabled = menuText.StartsWith('_');
                         if (disabled)
                         {
-                            menuText = menuText.Substring(1);
+                            menuText = menuText[1..];
                         }
 
                         ToolStripItem item = dataGridContextMenuStrip.Items.Add(menuText, null, ev);

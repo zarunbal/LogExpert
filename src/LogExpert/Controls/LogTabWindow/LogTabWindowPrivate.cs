@@ -706,9 +706,13 @@ namespace LogExpert.Controls.LogTabWindow
         {
             //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
             labelStatus.Text = e.StatusText;
-            labelLines.Text = $@"{string.Empty} {e.LineCount} lines";
+            labelStatus.Size = TextRenderer.MeasureText(labelStatus.Text, labelStatus.Font);
+            labelLines.Text = $" {e.LineCount} lines";
+            labelLines.Size = TextRenderer.MeasureText(labelLines.Text, labelLines.Font);
             labelSize.Text = Util.GetFileSizeAsText(e.FileSize);
-            labelCurrentLine.Text = $@"Line: {e.CurrentLineNum}";
+            labelSize.Size = TextRenderer.MeasureText(labelSize.Text, labelSize.Font);
+            labelCurrentLine.Text = $"Line: {e.CurrentLineNum}";
+            labelCurrentLine.Size = TextRenderer.MeasureText(labelCurrentLine.Text, labelCurrentLine.Font);
             statusStrip.Refresh();
         }
 
