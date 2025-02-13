@@ -27,7 +27,7 @@ using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.GitHub.GitHubTasks;
 
 [UnsetVisualStudioEnvironmentVariables]
-class Build : NukeBuild
+partial class Build : NukeBuild
 {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
@@ -78,7 +78,7 @@ class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 10, 0, patch);
+            return new Version(1, 11, 0, patch);
         }
     }
 
@@ -248,10 +248,10 @@ class Build : NukeBuild
             AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
 
             string text = assemblyVersion.ReadAllText();
-            Regex configurationRegex = new Regex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])");
-            Regex assemblyVersionRegex = new Regex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])");
-            Regex assemblyFileVersionRegex = new Regex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])");
-            Regex assemblyInformationalVersionRegex = new Regex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])");
+            Regex configurationRegex = AssemblyConfiguration();
+            Regex assemblyVersionRegex = AssemblyVersion();
+            Regex assemblyFileVersionRegex = AssemblyFileVersion();
+            Regex assemblyInformationalVersionRegex = AssemblyInformationalVersion();
 
             text = configurationRegex.Replace(text, (match) => ReplaceVersionMatch(match, $"\"{Configuration}\""));
             text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
@@ -273,7 +273,7 @@ class Build : NukeBuild
 
                 string fileText = file.ReadAllText();
 
-                Regex reg = new Regex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase);
+                Regex reg = SFTPPlugin();
 
                 if (reg.IsMatch(fileText))
                 {
@@ -481,7 +481,7 @@ class Build : NukeBuild
 
     private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
-        Process proc = new Process();
+        Process proc = new();
 
         Log.Information($"Start '{innoPath}' {SetupCommandLineParameter} \"{InnoSetupScript}\"");
 
@@ -518,4 +518,19 @@ class Build : NukeBuild
             path.DeleteFile();
         }
     }
+
+    [GeneratedRegex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])")]
+    private static partial Regex AssemblyInformationalVersion();
+
+    [GeneratedRegex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])")]
+    private static partial Regex AssemblyVersion();
+
+    [GeneratedRegex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])")]
+    private static partial Regex AssemblyConfiguration();
+
+    [GeneratedRegex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])")]
+    private static partial Regex AssemblyFileVersion();
+
+    [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
+    private static partial Regex SFTPPlugin();
 }
