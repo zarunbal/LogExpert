@@ -80,6 +80,10 @@ namespace LogExpert.Controls.LogTabWindow
 
             InitializeComponent();
 
+            //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+            mainMenuStrip.Location = new Point(0, 0);
+            externalToolsToolStrip.Location = new Point(0, 54);
+
             _startupFileNames = fileNames;
             _instanceNumber = instanceNumber;
             _showInstanceNumbers = showInstanceNumbers;

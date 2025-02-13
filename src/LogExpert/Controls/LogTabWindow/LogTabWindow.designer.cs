@@ -132,6 +132,7 @@ namespace LogExpert.Controls.LogTabWindow
             host = new CheckBox();
             toolStripContainer = new ToolStripContainer();
             dockPanel = new DockPanel();
+            externalToolsToolStrip = new ToolStrip();
             buttonToolStrip = new ToolStrip();
             toolStripButtonOpen = new ToolStripButton();
             lineToolStripSeparatorExtension1 = new LineToolStripSeparatorExtension();
@@ -147,7 +148,6 @@ namespace LogExpert.Controls.LogTabWindow
             toolStripButtonTail = new ToolStripButton();
             lineToolStripSeparatorExtension5 = new LineToolStripSeparatorExtension();
             groupsComboBoxHighlightGroups = new ToolStripComboBox();
-            externalToolsToolStrip = new ToolStrip();
             checkBoxFollowTail = new CheckBox();
             tabContextMenuStrip = new ContextMenuStrip(components);
             closeThisTabToolStripMenuItem = new ToolStripMenuItem();
@@ -225,7 +225,7 @@ namespace LogExpert.Controls.LogTabWindow
             mainMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             mainMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, viewNavigateToolStripMenuItem, optionToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem, debugToolStripMenuItem });
             mainMenuStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
-            mainMenuStrip.Location = new System.Drawing.Point(0, 0);
+            mainMenuStrip.Location = new System.Drawing.Point(0, 19);
             mainMenuStrip.Name = "mainMenuStrip";
             mainMenuStrip.Size = new System.Drawing.Size(1603, 23);
             mainMenuStrip.TabIndex = 6;
@@ -803,7 +803,7 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             toolStripContainer.ContentPanel.Controls.Add(dockPanel);
             toolStripContainer.ContentPanel.Margin = new Padding(0);
-            toolStripContainer.ContentPanel.Size = new System.Drawing.Size(1603, 856);
+            toolStripContainer.ContentPanel.Size = new System.Drawing.Size(1603, 881);
             toolStripContainer.Dock = DockStyle.Fill;
             // 
             // toolStripContainer.LeftToolStripPanel
@@ -824,9 +824,9 @@ namespace LogExpert.Controls.LogTabWindow
             // 
             // toolStripContainer.TopToolStripPanel
             // 
+            toolStripContainer.TopToolStripPanel.Controls.Add(externalToolsToolStrip);
             toolStripContainer.TopToolStripPanel.Controls.Add(mainMenuStrip);
             toolStripContainer.TopToolStripPanel.Controls.Add(buttonToolStrip);
-            toolStripContainer.TopToolStripPanel.Controls.Add(externalToolsToolStrip);
             // 
             // dockPanel
             // 
@@ -840,7 +840,7 @@ namespace LogExpert.Controls.LogTabWindow
             dockPanel.Margin = new Padding(0);
             dockPanel.Name = "dockPanel";
             dockPanel.ShowDocumentIcon = true;
-            dockPanel.Size = new System.Drawing.Size(1603, 856);
+            dockPanel.Size = new System.Drawing.Size(1603, 881);
             dockPanelGradient1.EndColor = System.Drawing.SystemColors.Control;
             dockPanelGradient1.StartColor = System.Drawing.SystemColors.Control;
             autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
@@ -890,6 +890,18 @@ namespace LogExpert.Controls.LogTabWindow
             dockPanel.TabIndex = 14;
             dockPanel.ActiveContentChanged += OnDockPanelActiveContentChanged;
             // 
+            // externalToolsToolStrip
+            // 
+            externalToolsToolStrip.AllowMerge = false;
+            externalToolsToolStrip.Dock = DockStyle.None;
+            externalToolsToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
+            externalToolsToolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
+            externalToolsToolStrip.Location = new System.Drawing.Point(8, 0);
+            externalToolsToolStrip.Name = "externalToolsToolStrip";
+            externalToolsToolStrip.Size = new System.Drawing.Size(32, 19);
+            externalToolsToolStrip.TabIndex = 8;
+            externalToolsToolStrip.ItemClicked += OnExternalToolsToolStripItemClicked;
+            // 
             // buttonToolStrip
             // 
             buttonToolStrip.AllowMerge = false;
@@ -897,7 +909,7 @@ namespace LogExpert.Controls.LogTabWindow
             buttonToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             buttonToolStrip.Items.AddRange(new ToolStripItem[] { toolStripButtonOpen, lineToolStripSeparatorExtension1, toolStripButtonSearch, toolStripButtonFilter, lineToolStripSeparatorExtension2, toolStripButtonBookmark, toolStripButtonUp, toolStripButtonDown, lineToolStripSeparatorExtension3, toolStripButtonBubbles, lineToolStripSeparatorExtension4, toolStripButtonTail, lineToolStripSeparatorExtension5, groupsComboBoxHighlightGroups });
             buttonToolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
-            buttonToolStrip.Location = new System.Drawing.Point(8, 23);
+            buttonToolStrip.Location = new System.Drawing.Point(3, 42);
             buttonToolStrip.Name = "buttonToolStrip";
             buttonToolStrip.Size = new System.Drawing.Size(406, 31);
             buttonToolStrip.TabIndex = 7;
@@ -1026,18 +1038,6 @@ namespace LogExpert.Controls.LogTabWindow
             groupsComboBoxHighlightGroups.DropDownClosed += OnHighlightGroupsComboBoxDropDownClosed;
             groupsComboBoxHighlightGroups.SelectedIndexChanged += OnHighlightGroupsComboBoxSelectedIndexChanged;
             groupsComboBoxHighlightGroups.MouseUp += OnHighlightGroupsComboBoxMouseUp;
-            // 
-            // externalToolsToolStrip
-            // 
-            externalToolsToolStrip.AllowMerge = false;
-            externalToolsToolStrip.Dock = DockStyle.None;
-            externalToolsToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
-            externalToolsToolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
-            externalToolsToolStrip.Location = new System.Drawing.Point(8, 54);
-            externalToolsToolStrip.Name = "externalToolsToolStrip";
-            externalToolsToolStrip.Size = new System.Drawing.Size(32, 19);
-            externalToolsToolStrip.TabIndex = 8;
-            externalToolsToolStrip.ItemClicked += OnExternalToolsToolStripItemClicked;
             // 
             // checkBoxFollowTail
             // 
