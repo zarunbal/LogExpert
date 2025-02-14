@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using LogExpert;
-using System.Windows.Forms;
+﻿using LogExpert;
+
+using System;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace FlashIconHighlighter
 {
@@ -30,7 +29,7 @@ namespace FlashIconHighlighter
                 if (form.TopLevel && form.Name.Equals("LogTabWindow") && form.Text.Contains(callback.GetFileName()))
                 {
                     FlashWindowFx fx = FlashWindow;
-                    form.BeginInvoke(fx, new object[] {form});
+                    form.BeginInvoke(fx, [form]);
                 }
             }
         }

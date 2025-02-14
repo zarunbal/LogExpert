@@ -2653,8 +2653,7 @@ namespace LogExpert.Controls.LogWindow
         private void FilterToTab()
         {
             filterSearchButton.Enabled = false;
-            MethodInvoker invoker = WriteFilterToTab;
-            invoker.BeginInvoke(null, null);
+            Task.Run(() => WriteFilterToTab());
         }
 
         private void WriteFilterToTab()
@@ -2734,19 +2733,17 @@ namespace LogExpert.Controls.LogWindow
             {
                 string title = name;
                 ILogLineColumnizer preProcessColumnizer = null;
-                if (!(CurrentColumnizer is ILogLineXmlColumnizer))
+                if (CurrentColumnizer is not ILogLineXmlColumnizer)
                 {
                     preProcessColumnizer = CurrentColumnizer;
                 }
 
-                LogWindow newWin = _parentLogTabWin.AddFilterTab(pipe, title,
-                    preProcessColumnizer);
+                LogWindow newWin = _parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
                 newWin.FilterPipe = pipe;
                 pipe.OwnLogWindow = newWin;
                 if (persistenceData != null)
                 {
-                    FilterRestoreFx fx = FilterRestore;
-                    fx.BeginInvoke(newWin, persistenceData, null, null);
+                    Task.Run(() => FilterRestore(newWin, persistenceData));
                 }
             }
 
