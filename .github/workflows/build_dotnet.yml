@@ -1,18 +1,21 @@
 name: .NET Core Desktop
 
 on:
-  # push:
+  push:
     # branches: [ "Development" ]
 
   pull_request:
     branches: [ "Development" ]
+    types: [opened, synchronize]
 
 env:
   Solution: src/LogExpert.sln
   Test_Project: src/LogExpert.Tests/LogExpert.Tests.csproj
 
 jobs:
-  build:    
+  build:
+    permissions: 
+      contents: read
     
     strategy:
       fail-fast: false
