@@ -32,7 +32,8 @@
 				"streetsidesoftware.code-spell-checker",
 				"github.vscode-github-actions",
 				"davidanson.vscode-markdownlint",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"ms-dotnettools.csdevkit"
 			]
 		}
 	}
