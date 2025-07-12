@@ -51,14 +51,14 @@ env:
 
 jobs:
   build:
-
+    
     strategy:
       matrix:
         configuration: [Debug, Release]
-
-      fail-fast: false
-
+        fail-fast: false
+        
     runs-on: ubuntu-latest
+    name: Build Application - ${{ matrix.configuration }}
     
     steps:
       - name: Checkout code
