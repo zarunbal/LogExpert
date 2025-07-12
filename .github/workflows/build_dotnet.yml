@@ -1,7 +1,7 @@
 name: .NET Core Desktop
 
 on:
-  push:
+  # push:
     # branches: [ "Development" ]
 
   pull_request:
@@ -12,7 +12,7 @@ env:
   Test_Project: src/LogExpert.Tests/LogExpert.Tests.csproj
 
 jobs:
-  build:
+  build:    
     
     strategy:
       fail-fast: false
