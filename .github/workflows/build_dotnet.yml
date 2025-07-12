@@ -53,9 +53,9 @@ jobs:
   build:
     
     strategy:
+      fail-fast: false
       matrix:
         configuration: [Debug, Release]
-        fail-fast: false
         
     runs-on: ubuntu-latest
     name: Build Application - ${{ matrix.configuration }}
