@@ -73,7 +73,7 @@ jobs:
 
       - name: Build application
         run: |
-          dotnet build ${{ env.Solution }} --no-logo -v quiet -c ${{ matrix.configuration }}
+          dotnet build ${{ env.Solution }} --nologo -v quiet -c ${{ matrix.configuration }}
 
       - name: List files
         run: |
