@@ -8,7 +8,7 @@ public static class ColumnizerPicker
 {
     public static ILogLineColumnizer FindColumnizerByName (string name, IList<ILogLineColumnizer> list)
     {
-        foreach (ILogLineColumnizer columnizer in list)
+        foreach (var columnizer in list)
         {
             if (columnizer.GetName().Equals(name, StringComparison.Ordinal))
             {
