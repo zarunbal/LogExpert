@@ -58,6 +58,7 @@ internal partial class SettingsDialog : Form
     #region Properties
 
     public Preferences Preferences { get; private set; }
+
     private IConfigManager ConfigManager { get; }
 
     #endregion

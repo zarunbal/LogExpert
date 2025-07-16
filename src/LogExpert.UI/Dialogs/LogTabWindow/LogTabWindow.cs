@@ -18,6 +18,7 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interface;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
+using LogExpert.Extensions;
 using LogExpert.PluginRegistry.FileSystem;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
@@ -288,6 +289,129 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public LogWindow.LogWindow AddTempFileTab (string fileName, string title)
     {
         return AddFileTab(fileName, true, title, false, null);
+    }
+
+    private void ApplyTextResources ()
+    {
+        var map = ResourceHelper.GenerateTextMapFromNaming(this, nameof(LogTabWindow), "UI");
+
+        openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
+        newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
+        newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
+        multiFileToolStripMenuItem.Text = "MultiFile";
+        multiFileToolStripMenuItem.ToolTipText = "Treat multiple files as one large file (e.g. data.log, data.log.1, data.log.2,...)";
+        multiFileEnabledStripMenuItem.Text = "Enable MultiFile";
+        multifileMaskToolStripMenuItem.Text = "File name mask...";
+        loadProjectToolStripMenuItem.Text = "Load session...";
+        loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
+        saveProjectToolStripMenuItem.Text = "Save session...";
+        saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
+        lastUsedToolStripMenuItem.Text = "Last used";
+        exitToolStripMenuItem.Text = "Exit";
+        viewNavigateToolStripMenuItem.Text = "View/Navigate";
+        goToLineToolStripMenuItem.Text = "Go to line...";
+        searchToolStripMenuItem.Text = "Search...";
+        filterToolStripMenuItem.Text = "Filter";
+        bookmarksToolStripMenuItem.Text = "Bookmarks";
+        toggleBookmarkToolStripMenuItem.Text = "Toggle Bookmark";
+        jumpToNextToolStripMenuItem.Text = "Jump to next";
+        jumpToPrevToolStripMenuItem.Text = "Jump to prev";
+        showBookmarkListToolStripMenuItem.Text = "Bookmark list";
+        columnFinderToolStripMenuItem.Text = "Column finder";
+        toolStripEncodingMenuItem.Text = "Encoding";
+        toolStripEncodingASCIIItem.Tag = "";
+        toolStripEncodingASCIIItem.Text = "ASCII";
+        toolStripEncodingANSIItem.Tag = "";
+        toolStripEncodingANSIItem.Text = "ANSI";
+        toolStripEncodingISO88591Item.Text = "ISO-8859-1";
+        toolStripEncodingUTF8Item.Text = "UTF8";
+        toolStripEncodingUTF16Item.Text = "Unicode";
+        timeshiftToolStripMenuItem.Text = "Timeshift";
+        timeshiftToolStripMenuItem.ToolTipText = "If supported by the columnizer, you can set an offset to the displayed log time";
+        timeshiftMenuTextBox.Text = "+00:00:00.000";
+        timeshiftMenuTextBox.ToolTipText = "Time offset (hh:mm:ss.fff)";
+        copyMarkedLinesIntoNewTabToolStripMenuItem.Text = "Copy to Tab";
+        copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = "Copies all selected lines into a new tab page";
+        optionToolStripMenuItem.Text = "Options";
+        columnizerToolStripMenuItem.Text = "Columnizer...";
+        columnizerToolStripMenuItem.ToolTipText = "Splits various kinds of logfiles into fixed columns";
+        hilightingToolStripMenuItem1.Text = "Highlighting and triggers...";
+        settingsToolStripMenuItem.Text = "Settings...";
+        cellSelectModeToolStripMenuItem.Text = "Cell select mode";
+        cellSelectModeToolStripMenuItem.ToolTipText = "Switches between foll row selection and single cell selection mode";
+        alwaysOnTopToolStripMenuItem.Text = "Always on top";
+        hideLineColumnToolStripMenuItem.Text = "Hide line column";
+        lockInstanceToolStripMenuItem.Text = "Lock instance";
+        lockInstanceToolStripMenuItem.ToolTipText = "When enabled all new launched LogExpert instances will redirect to this window";
+        toolsToolStripMenuItem.Text = "Tools";
+        toolsToolStripMenuItem.ToolTipText = "Launch external tools (configure in the settings)";
+        configureToolStripMenuItem.Text = "Configure...";
+        helpToolStripMenuItem.Text = "Help";
+        showHelpToolStripMenuItem.Text = "Show help";
+        aboutToolStripMenuItem.Text = "About";
+        debugToolStripMenuItem.Text = "Debug";
+        dumpLogBufferInfoToolStripMenuItem.Text = "Dump LogBuffer info";
+        dumpBufferDiagnosticToolStripMenuItem.Text = "Dump buffer diagnostic";
+        runGCToolStripMenuItem.Text = "Run GC";
+        gCInfoToolStripMenuItem.Text = "Dump GC info";
+        throwExceptionGUIThreadToolStripMenuItem.Text = "Throw exception (GUI Thread)";
+        throwExceptionbackgroundThToolStripMenuItem.Text = "Throw exception (Async delegate)";
+        throwExceptionBackgroundThreadToolStripMenuItem.Text = "Throw exception (background thread)";
+        loglevelToolStripMenuItem.Text = "Loglevel";
+        warnToolStripMenuItem.Text = "Warn";
+        infoToolStripMenuItem.Text = "Info";
+        debugToolStripMenuItem1.Text = "Debug";
+        disableWordHighlightModeToolStripMenuItem.Text = "Disable word highlight mode";
+        host.Text = "Follow tail";
+        host.AccessibleName = "host";
+        toolStripButtonOpen.Text = "Open File";
+        toolStripButtonOpen.ToolTipText = "Open file";
+        toolStripButtonSearch.Text = "Search";
+        toolStripButtonSearch.ToolTipText = "Search";
+        toolStripButtonFilter.Text = "Filter";
+        toolStripButtonFilter.ToolTipText = "Filter window";
+        toolStripButtonBookmark.Text = "Toggle Bookmark";
+        toolStripButtonBookmark.ToolTipText = "Toggle bookmark";
+        toolStripButtonUp.Text = "Previous Bookmark";
+        toolStripButtonUp.ToolTipText = "Go to previous bookmark";
+        toolStripButtonDown.Text = "Next Bookmark";
+        toolStripButtonDown.ToolTipText = "Go to next bookmark";
+        toolStripButtonBubbles.Text = "Show bookmark bubbles";
+        toolStripButtonTail.Text = "tail";
+        groupsComboBoxHighlightGroups.ToolTipText = "Select the current highlight settings for the log file (right-click to open highlight settings)";
+        checkBoxFollowTail.Text = "Follow tail";
+        closeThisTabToolStripMenuItem.Text = "Close this tab";
+        closeOtherTabsToolStripMenuItem.Text = "Close other tabs";
+        closeOtherTabsToolStripMenuItem.ToolTipText = "Close all tabs except of this one";
+        closeAllTabsToolStripMenuItem.Text = "Close all tabs";
+        closeAllTabsToolStripMenuItem.ToolTipText = "Close all tabs";
+        tabColorToolStripMenuItem.Text = "Tab color...";
+        tabColorToolStripMenuItem.ToolTipText = "Sets the tab color";
+        tabRenameToolStripMenuItem.Text = "Tab rename...";
+        tabRenameToolStripMenuItem.ToolTipText = "Set the text which is shown on the tab";
+        copyPathToClipboardToolStripMenuItem.Text = "Copy path to clipboard";
+        copyPathToClipboardToolStripMenuItem.ToolTipText = "The complete file name (incl. path) is copied to clipboard";
+        findInExplorerToolStripMenuItem.Text = "Find in Explorer";
+        findInExplorerToolStripMenuItem.ToolTipText = "Opens an Explorer window and selects the log file";
+        truncateFileToolStripMenuItem.Text = "Truncate File";
+        truncateFileToolStripMenuItem.ToolTipText = "Try to truncate the file opened in tab";
+
+
+        // Add exceptions or unrelated entries manually:
+        map[buttonCancel] = Resources.LogExpert_Common_UI_Button_Cancel;
+        map[buttonOk] = Resources.LogExpert_Common_UI_Button_OK;
+        map[buttonExport] = Resources.LogExpert_Common_UI_Button_Export;
+        map[buttonImport] = Resources.LogExpert_Common_UI_Button_Import;
+
+        foreach (var entry in map)
+        {
+            entry.Key.Text = entry.Value;
+        }
+
+        dataGridViewTextBoxColumnFileMask.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask;
+        dataGridViewComboBoxColumnColumnizer.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer;
+        dataGridViewTextBoxColumnFileName.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileName;
+        dataGridViewComboBoxColumnHighlightGroup.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup;
     }
 
     [SupportedOSPlatform("windows")]

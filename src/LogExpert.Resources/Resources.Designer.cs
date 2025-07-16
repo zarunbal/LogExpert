@@ -963,6 +963,42 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to L:.
+        /// </summary>
+        public static string LogTabWindow_UI_Label_labelCurrentLine {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Label_labelCurrentLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.
+        /// </summary>
+        public static string LogTabWindow_UI_Label_labelLines {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Label_labelLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.
+        /// </summary>
+        public static string LogTabWindow_UI_Label_labelSize {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Label_labelSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string LogTabWindow_UI_Label_labelStatus {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Label_labelStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to -&gt;E.
         /// </summary>
         public static string LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix {
@@ -1018,11 +1054,74 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to menuStrip1.
+        /// </summary>
+        public static string LogTabWindow_UI_MenuStrip_mainMenuStrip {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_MenuStrip_mainMenuStrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LogExpert session {0}.
         /// </summary>
         public static string LogTabWindow_UI_Project_Session_Default_Filter {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_Project_Session_Default_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to statusStrip1.
+        /// </summary>
+        public static string LogTabWindow_UI_StatusStrip_StatusStrip {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_StatusStrip_StatusStrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close File.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open....
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open URL....
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem", resourceCulture);
             }
         }
         

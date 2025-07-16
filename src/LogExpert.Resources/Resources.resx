@@ -1393,4 +1393,37 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="ColorComboBox_UI_ColorComboBox_Text_Custom" xml:space="preserve">
     <value>Custom</value>
   </data>
+  <data name="LogTabWindow_UI_StatusStrip_StatusStrip" xml:space="preserve">
+    <value>statusStrip1</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelSize" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelLines" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelCurrentLine" xml:space="preserve">
+    <value>L:</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelStatus" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="LogTabWindow_UI_MenuStrip_mainMenuStrip" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem" xml:space="preserve">
+    <value>Open...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem" xml:space="preserve">
+    <value>Open URL...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem" xml:space="preserve">
+    <value>Close File</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem" xml:space="preserve">
+    <value>Reload</value>
+  </data>
 </root>
