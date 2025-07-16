@@ -1,4 +1,4 @@
-# LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml)
+# LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml)
 
 This is a clone from (no longer exists) https://logexpert.codeplex.com/
 
@@ -33,7 +33,6 @@ Or Install via chocolatey
 Requirements
 - https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 - .NET 8 (https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer or https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x86-installer) 
-- ASP.NET Core Runtime (https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-x64-installer, https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-x86-installer or https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-hosting-bundle-installer)
 
 ## CI
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.

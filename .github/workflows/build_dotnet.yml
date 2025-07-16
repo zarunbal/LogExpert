@@ -1,0 +1,48 @@
+name: .NET Core Desktop
+
+on:
+  # push:
+    # branches: [ "Development" ]
+
+  pull_request:
+    branches: [ "Development" ]
+    types: [opened, synchronize]
+
+env:
+  Solution: src/LogExpert.sln
+  Test_Project: src/LogExpert.Tests/LogExpert.Tests.csproj
+
+jobs:
+  build:
+    permissions: 
+      contents: read
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        
+    runs-on: windows-latest
+    name: Build Application - ${{ matrix.configuration }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build application
+        run: |
+          dotnet build ${{ env.Solution }} --nologo -v quiet -c ${{ matrix.configuration }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Snapshot-${{ matrix.configuration }}
+          path: bin/${{ matrix.configuration }}
+          retention-days: 7
