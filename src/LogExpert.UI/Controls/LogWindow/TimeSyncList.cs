@@ -13,15 +13,9 @@ internal class TimeSyncList
 
     #endregion
 
-    #region Delegates
-
-    public delegate void WindowRemovedEventHandler (object sender, EventArgs e);
-
-    #endregion
-
     #region Events
 
-    public event WindowRemovedEventHandler WindowRemoved;
+    public event EventHandler<EventArgs> WindowRemoved;
 
     #endregion
 
@@ -53,7 +47,7 @@ internal class TimeSyncList
     {
         lock (logWindowList)
         {
-            logWindowList.Remove(logWindow);
+            _ = logWindowList.Remove(logWindow);
         }
 
         OnWindowRemoved();
@@ -71,11 +65,11 @@ internal class TimeSyncList
         CurrentTimestamp = timestamp;
         lock (logWindowList)
         {
-            foreach (LogWindow logWindow in logWindowList)
+            foreach (var logWindow in logWindowList)
             {
                 if (sender != logWindow)
                 {
-                    logWindow.ScrollToTimestamp(timestamp, false, false);
+                    _ = logWindow.ScrollToTimestamp(timestamp, false, false);
                 }
             }
         }

@@ -227,6 +227,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ClipRgn: {0},{1},{2},{3}.
+        /// </summary>
+        public static string BufferedDataGridView_Logger_Debug_PaintOverlays {
+            get {
+                return ResourceManager.GetString("BufferedDataGridView_Logger_Debug_PaintOverlays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit control was null, to be checked.
+        /// </summary>
+        public static string BufferedDataGridView_Logger_Warn_OnControlKeyDown_EditControlWasNullToBeChecked {
+            get {
+                return ResourceManager.GetString("BufferedDataGridView_Logger_Warn_OnControlKeyDown_EditControlWasNullToBeChecked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Check_circle {
@@ -243,6 +261,15 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Close", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string ColorComboBox_UI_ColorComboBox_Text_Custom {
+            get {
+                return ResourceManager.GetString("ColorComboBox_UI_ColorComboBox_Text_Custom", resourceCulture);
             }
         }
         
@@ -2643,6 +2670,51 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Starting range search for {0} ... {1}.
+        /// </summary>
+        public static string RangeFinder_Logger_Info_FindRange {
+            get {
+                return ResourceManager.GetString("RangeFinder_Logger_Info_FindRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range search finished. Found {0} lines.
+        /// </summary>
+        public static string RangeFinder_Logger_Info_FindRange_Finished {
+            get {
+                return ResourceManager.GetString("RangeFinder_Logger_Info_FindRange_Finished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range search text not set. Cancelling range search..
+        /// </summary>
+        public static string RangeFinder_Logger_Info_FindRange_RangeSearchTextNotSetCancellingRangeSearch {
+            get {
+                return ResourceManager.GetString("RangeFinder_Logger_Info_FindRange_RangeSearchTextNotSetCancellingRangeSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range start not found.
+        /// </summary>
+        public static string RangeFinder_Logger_Info_FindRange_RangeStartNotFound {
+            get {
+                return ResourceManager.GetString("RangeFinder_Logger_Info_FindRange_RangeStartNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search text not set. Cancelling range search..
+        /// </summary>
+        public static string RangeFinder_Logger_Info_FindRange_SearchTextNotSetCancellingRangeSearch {
+            get {
+                return ResourceManager.GetString("RangeFinder_Logger_Info_FindRange_SearchTextNotSetCancellingRangeSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Restart_alt {
@@ -3706,6 +3778,78 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Star", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test time {0:} line diff={1} value={2}.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collecting data for {0} lines with step size {1}.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_DoCalc_CollectingDataForLinesWithStepSize {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_DoCalc_CollectingDataForLinesWithStepSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Average diff={0} minDiff={1} maxDiff={2}.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_AverageDiffMinDiffMaxDiff {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_AverageDiffMinDiffMaxDiff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End because of line count &lt; 1.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_EndBecauseOfLineCount {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_EndBecauseOfLineCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test time {0} line diff={1}.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TestTimeLineDiff {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TestTimeLineDiff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time range is {0} ms.
+        /// </summary>
+        public static string TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TimeRangeIsMs {
+            get {
+                return ResourceManager.GetString("TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TimeRangeIsMs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calculating time spread view....
+        /// </summary>
+        public static string TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView {
+            get {
+                return ResourceManager.GetString("TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line {0}\n{0}.
+        /// </summary>
+        public static string TimeSpreadingControl_UI_ToolTip {
+            get {
+                return ResourceManager.GetString("TimeSpreadingControl_UI_ToolTip", resourceCulture);
             }
         }
         

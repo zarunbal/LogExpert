@@ -3,7 +3,6 @@ using System.Globalization;
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Filter;
-using LogExpert.Core.Entities;
 
 using NLog;
 
@@ -12,9 +11,16 @@ using Range = LogExpert.Core.Entities.Range;
 namespace LogExpert.UI.Controls.LogWindow;
 
 /// <summary>
+/// Provides functionality to find a range of lines in a log based on specified search criteria.
 /// Delivers the range (from..to) that matches the current range filter settings starting from a given line.
 /// </summary>
-internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callback)
+/// <remarks>The <see cref="RangeFinder"/> class is used to locate a contiguous block of log lines that match
+/// specified search criteria. It utilizes a callback mechanism to interact with the log data and determine the start
+/// and end of the range. The search is performed by evaluating filter conditions on each line, starting from a
+/// specified line number and searching both forwards and backwards as necessary.</remarks>
+/// <param name="filterParams"></param>
+/// <param name="callback"></param>
+internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callback)
 {
     #region Fields
 
@@ -25,18 +31,19 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
 
     #region Public methods
 
-    public Range FindRange(int startLine)
+    public Range FindRange (int startLine)
     {
-        _logger.Info($"Starting range search for {_filterParams.SearchText} ... {_filterParams.RangeSearchText}");
+        _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.RangeFinder_Logger_Info_FindRange, _filterParams.SearchText, _filterParams.RangeSearchText));
 
         if (_filterParams.RangeSearchText == null || _filterParams.RangeSearchText.Trim().Length == 0)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Range search text not set. Cancelling range search.");
+            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_RangeSearchTextNotSetCancellingRangeSearch);
             return null;
         }
+
         if (_filterParams.SearchText == null || _filterParams.SearchText.Trim().Length == 0)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Search text not set. Cancelling range search.");
+            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_SearchTextNotSetCancellingRangeSearch);
             return null;
         }
 
@@ -48,7 +55,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
         var foundStartLine = false;
 
         Range range = new();
-        FilterParams tmpParam = _filterParams.CloneWithCurrentColumnizer();
+        var tmpParam = _filterParams.CloneWithCurrentColumnizer();
 
         tmpParam.SearchText = _filterParams.RangeSearchText;
 
@@ -64,6 +71,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
                 foundStartLine = true;
                 break;
             }
+
             lineNum--;
             line = callback.GetLogLine(lineNum);
 
@@ -76,7 +84,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
 
         if (!foundStartLine)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Range start not found");
+            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_RangeStartNotFound);
             return null;
         }
 
@@ -89,16 +97,19 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
         {
             line = callback.GetLogLine(lineNum);
             callback.LineNum = lineNum;
+
             if (!Util.TestFilterCondition(_filterParams, line, callback))
             {
                 break;
             }
+
             lineNum++;
         }
+
         lineNum--;
         range.EndLine = lineNum;
 
-        _logger.Info($"Range search finished. Found {range.EndLine - range.StartLine} lines");
+        _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.RangeFinder_Logger_Info_FindRange_Finished, range.EndLine - range.StartLine));
 
         return range;
     }

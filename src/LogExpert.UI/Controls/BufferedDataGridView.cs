@@ -260,7 +260,7 @@ internal partial class BufferedDataGridView : DataGridView
 
                 if (_logger.IsDebugEnabled)
                 {
-                    _logger.Debug(CultureInfo.InvariantCulture, $"ClipRgn: {myBuffer.Graphics.ClipBounds.Left},{myBuffer.Graphics.ClipBounds.Top},{myBuffer.Graphics.ClipBounds.Width},{myBuffer.Graphics.ClipBounds.Height}");
+                    _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.BufferedDataGridView_Logger_Debug_PaintOverlays, myBuffer.Graphics.ClipBounds.Left, myBuffer.Graphics.ClipBounds.Top, myBuffer.Graphics.ClipBounds.Width, myBuffer.Graphics.ClipBounds.Height));
                 }
             }
         }
@@ -321,7 +321,7 @@ internal partial class BufferedDataGridView : DataGridView
                 }
                 else
                 {
-                    _logger.Warn(CultureInfo.InvariantCulture, "Edit control was null, to be checked");
+                    _logger.Warn(Resources.BufferedDataGridView_Logger_Warn_OnControlKeyDown_EditControlWasNullToBeChecked);
                 }
             }
         }
