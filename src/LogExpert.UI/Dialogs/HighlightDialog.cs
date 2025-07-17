@@ -684,7 +684,9 @@ internal partial class HighlightDialog : Form
                                         or SystemException)
         {
             _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry, ex));
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message, Resources.Title_LogExpert_Error));
+            _ = MessageBox.Show(
+                string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message),
+                Resources.Title_LogExpert_Error);
         }
     }
 
