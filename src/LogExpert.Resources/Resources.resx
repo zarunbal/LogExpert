@@ -1376,13 +1376,14 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     <value>Average diff={0} minDiff={1} maxDiff={2}</value>
   </data>
   <data name="TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue" xml:space="preserve">
-    <value>Test time {0:} line diff={1} value={2}</value>
+    <value>Test time {0} line diff={1} value={2}</value>
   </data>
   <data name="TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView" xml:space="preserve">
     <value>Calculating time spread view...</value>
   </data>
   <data name="TimeSpreadingControl_UI_ToolTip" xml:space="preserve">
-    <value>Line {0}\n{0}</value>
+    <value>Line {0}
+{1}</value>
   </data>
   <data name="BufferedDataGridView_Logger_Warn_OnControlKeyDown_EditControlWasNullToBeChecked" xml:space="preserve">
     <value>Edit control was null, to be checked</value>

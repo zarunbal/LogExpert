@@ -4765,7 +4765,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test time {0:} line diff={1} value={2}.
+        ///   Looks up a localized string similar to Test time {0} line diff={1} value={2}.
         /// </summary>
         public static string TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue {
             get {
@@ -4828,7 +4828,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Line {0}\n{0}.
+        ///   Looks up a localized string similar to Line {0}
+        ///{1}.
         /// </summary>
         public static string TimeSpreadingControl_UI_ToolTip {
             get {
