@@ -503,7 +503,11 @@ internal partial class HighlightDialog : Form
                                             or SystemException)
             {
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry, ex));
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message, Resources.Title_LogExpert_Error));
+                _ = MessageBox.Show(
+                    string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message),
+                    Resources.Title_LogExpert_Error,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
     }
