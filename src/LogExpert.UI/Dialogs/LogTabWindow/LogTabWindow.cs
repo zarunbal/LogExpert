@@ -150,11 +150,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
-        toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
-        toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
-        toolStripEncodingISO88591Item.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
-        toolStripEncodingUTF8Item.Text = Encoding.UTF8.HeaderName;
-        toolStripEncodingUTF16Item.Text = Encoding.Unicode.HeaderName;
+        encodingASCIIToolStripMenuItem.Text = Encoding.ASCII.HeaderName;
+        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
+        encodingISO88591toolStripMenuItem.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
+        encodingUTF8toolStripMenuItem.Text = Encoding.UTF8.HeaderName;
+        encodingUTF16toolStripMenuItem.Text = Encoding.Unicode.HeaderName;
 
         if (index != -1)
         {
@@ -295,124 +295,68 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         var map = ResourceHelper.GenerateTextMapFromNaming(this, nameof(LogTabWindow), "UI");
 
-        openURIToolStripMenuItem.ToolTipText = "Opens a file by entering a URL which is supported by a file system plugin";
-        newFromClipboardToolStripMenuItem.Text = "New tab from clipboard";
-        newFromClipboardToolStripMenuItem.ToolTipText = "Creates a new tab with content from clipboard";
-        multiFileToolStripMenuItem.Text = "MultiFile";
-        multiFileToolStripMenuItem.ToolTipText = "Treat multiple files as one large file (e.g. data.log, data.log.1, data.log.2,...)";
-        multiFileEnabledStripMenuItem.Text = "Enable MultiFile";
-        multifileMaskToolStripMenuItem.Text = "File name mask...";
-        loadProjectToolStripMenuItem.Text = "Load session...";
-        loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
-        saveProjectToolStripMenuItem.Text = "Save session...";
-        saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
-        lastUsedToolStripMenuItem.Text = "Last used";
-        exitToolStripMenuItem.Text = "Exit";
-        viewNavigateToolStripMenuItem.Text = "View/Navigate";
-        goToLineToolStripMenuItem.Text = "Go to line...";
-        searchToolStripMenuItem.Text = "Search...";
-        filterToolStripMenuItem.Text = "Filter";
-        bookmarksToolStripMenuItem.Text = "Bookmarks";
-        toggleBookmarkToolStripMenuItem.Text = "Toggle Bookmark";
-        jumpToNextToolStripMenuItem.Text = "Jump to next";
-        jumpToPrevToolStripMenuItem.Text = "Jump to prev";
-        showBookmarkListToolStripMenuItem.Text = "Bookmark list";
-        columnFinderToolStripMenuItem.Text = "Column finder";
-        toolStripEncodingMenuItem.Text = "Encoding";
-        toolStripEncodingASCIIItem.Tag = "";
-        toolStripEncodingASCIIItem.Text = "ASCII";
-        toolStripEncodingANSIItem.Tag = "";
-        toolStripEncodingANSIItem.Text = "ANSI";
-        toolStripEncodingISO88591Item.Text = "ISO-8859-1";
-        toolStripEncodingUTF8Item.Text = "UTF8";
-        toolStripEncodingUTF16Item.Text = "Unicode";
-        timeshiftToolStripMenuItem.Text = "Timeshift";
-        timeshiftToolStripMenuItem.ToolTipText = "If supported by the columnizer, you can set an offset to the displayed log time";
-        timeshiftMenuTextBox.Text = "+00:00:00.000";
-        timeshiftMenuTextBox.ToolTipText = "Time offset (hh:mm:ss.fff)";
-        copyMarkedLinesIntoNewTabToolStripMenuItem.Text = "Copy to Tab";
-        copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = "Copies all selected lines into a new tab page";
-        optionToolStripMenuItem.Text = "Options";
-        columnizerToolStripMenuItem.Text = "Columnizer...";
-        columnizerToolStripMenuItem.ToolTipText = "Splits various kinds of logfiles into fixed columns";
-        hilightingToolStripMenuItem1.Text = "Highlighting and triggers...";
-        settingsToolStripMenuItem.Text = "Settings...";
-        cellSelectModeToolStripMenuItem.Text = "Cell select mode";
-        cellSelectModeToolStripMenuItem.ToolTipText = "Switches between foll row selection and single cell selection mode";
-        alwaysOnTopToolStripMenuItem.Text = "Always on top";
-        hideLineColumnToolStripMenuItem.Text = "Hide line column";
-        lockInstanceToolStripMenuItem.Text = "Lock instance";
-        lockInstanceToolStripMenuItem.ToolTipText = "When enabled all new launched LogExpert instances will redirect to this window";
-        toolsToolStripMenuItem.Text = "Tools";
-        toolsToolStripMenuItem.ToolTipText = "Launch external tools (configure in the settings)";
-        configureToolStripMenuItem.Text = "Configure...";
-        helpToolStripMenuItem.Text = "Help";
-        showHelpToolStripMenuItem.Text = "Show help";
-        aboutToolStripMenuItem.Text = "About";
-        debugToolStripMenuItem.Text = "Debug";
-        dumpLogBufferInfoToolStripMenuItem.Text = "Dump LogBuffer info";
-        dumpBufferDiagnosticToolStripMenuItem.Text = "Dump buffer diagnostic";
-        runGCToolStripMenuItem.Text = "Run GC";
-        gCInfoToolStripMenuItem.Text = "Dump GC info";
-        throwExceptionGUIThreadToolStripMenuItem.Text = "Throw exception (GUI Thread)";
-        throwExceptionbackgroundThToolStripMenuItem.Text = "Throw exception (Async delegate)";
-        throwExceptionBackgroundThreadToolStripMenuItem.Text = "Throw exception (background thread)";
-        loglevelToolStripMenuItem.Text = "Loglevel";
-        warnToolStripMenuItem.Text = "Warn";
-        infoToolStripMenuItem.Text = "Info";
-        debugToolStripMenuItem1.Text = "Debug";
-        disableWordHighlightModeToolStripMenuItem.Text = "Disable word highlight mode";
-        host.Text = "Follow tail";
-        host.AccessibleName = "host";
-        toolStripButtonOpen.Text = "Open File";
-        toolStripButtonOpen.ToolTipText = "Open file";
-        toolStripButtonSearch.Text = "Search";
-        toolStripButtonSearch.ToolTipText = "Search";
-        toolStripButtonFilter.Text = "Filter";
-        toolStripButtonFilter.ToolTipText = "Filter window";
-        toolStripButtonBookmark.Text = "Toggle Bookmark";
-        toolStripButtonBookmark.ToolTipText = "Toggle bookmark";
-        toolStripButtonUp.Text = "Previous Bookmark";
-        toolStripButtonUp.ToolTipText = "Go to previous bookmark";
-        toolStripButtonDown.Text = "Next Bookmark";
-        toolStripButtonDown.ToolTipText = "Go to next bookmark";
-        toolStripButtonBubbles.Text = "Show bookmark bubbles";
-        toolStripButtonTail.Text = "tail";
-        groupsComboBoxHighlightGroups.ToolTipText = "Select the current highlight settings for the log file (right-click to open highlight settings)";
-        checkBoxFollowTail.Text = "Follow tail";
-        closeThisTabToolStripMenuItem.Text = "Close this tab";
-        closeOtherTabsToolStripMenuItem.Text = "Close other tabs";
-        closeOtherTabsToolStripMenuItem.ToolTipText = "Close all tabs except of this one";
-        closeAllTabsToolStripMenuItem.Text = "Close all tabs";
-        closeAllTabsToolStripMenuItem.ToolTipText = "Close all tabs";
-        tabColorToolStripMenuItem.Text = "Tab color...";
-        tabColorToolStripMenuItem.ToolTipText = "Sets the tab color";
-        tabRenameToolStripMenuItem.Text = "Tab rename...";
-        tabRenameToolStripMenuItem.ToolTipText = "Set the text which is shown on the tab";
-        copyPathToClipboardToolStripMenuItem.Text = "Copy path to clipboard";
-        copyPathToClipboardToolStripMenuItem.ToolTipText = "The complete file name (incl. path) is copied to clipboard";
-        findInExplorerToolStripMenuItem.Text = "Find in Explorer";
-        findInExplorerToolStripMenuItem.ToolTipText = "Opens an Explorer window and selects the log file";
-        truncateFileToolStripMenuItem.Text = "Truncate File";
-        truncateFileToolStripMenuItem.ToolTipText = "Try to truncate the file opened in tab";
-
-
-        // Add exceptions or unrelated entries manually:
-        map[buttonCancel] = Resources.LogExpert_Common_UI_Button_Cancel;
-        map[buttonOk] = Resources.LogExpert_Common_UI_Button_OK;
-        map[buttonExport] = Resources.LogExpert_Common_UI_Button_Export;
-        map[buttonImport] = Resources.LogExpert_Common_UI_Button_Import;
-
         foreach (var entry in map)
         {
             entry.Key.Text = entry.Value;
         }
 
-        dataGridViewTextBoxColumnFileMask.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask;
-        dataGridViewComboBoxColumnColumnizer.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer;
-        dataGridViewTextBoxColumnFileName.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileName;
-        dataGridViewComboBoxColumnHighlightGroup.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup;
+        checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
     }
+
+    #region Resources Map
+
+    private void ApplyToolTips ()
+    {
+        //TODO use ToolTip class instead of ToolTipText
+        timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
+        openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
+        newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
+        multiFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem;
+        loadProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
+        saveProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
+        timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
+        copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
+        cellSelectModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem;
+        lockInstanceToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem;
+        toolsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_toolsToolStripMenuItem;
+        toolStripButtonSearch.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonSearch;
+        toolStripButtonOpen.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonOpen;
+        toolStripButtonDown.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonDown;
+        toolStripButtonUp.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonUp;
+        toolStripButtonBookmark.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonBookmark;
+        toolStripButtonFilter.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonFilter;
+        highlightGroupsToolStripComboBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripComboBox_ToolTip_highlightGroupsToolStripComboBox;
+        tabRenameToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabRenameToolStripMenuItem;
+        closeAllTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeAllTabsToolStripMenuItem;
+        closeOtherTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeOtherTabsToolStripMenuItem;
+        tabColorToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabColorToolStripMenuItem;
+        findInExplorerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_findInExplorerToolStripMenuItem;
+        copyPathToClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem;
+        truncateFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem;
+    }
+
+    /// <summary>
+    /// Creates a mapping of UI controls to their corresponding tooltip text.
+    /// </summary>
+    /// <remarks>This method initializes a dictionary with predefined tooltips for specific UI controls.
+    /// Additional tooltips can be added to the dictionary as needed.</remarks>
+    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
+    /// strings representing the tooltip text for each control.</returns>
+    //private Dictionary<Control, string> GetToolTipMap ()
+    //{
+
+    //    return new Dictionary<Control, string>
+    //    {
+    //        { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage },
+    //        { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
+    //        { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
+    //        { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
+    //        { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
+    //    };
+    //}
+
+    #endregion
 
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
@@ -1074,7 +1018,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             Owner = this,
             TopMost = TopMost,
             HighlightGroupList = HighlightGroupList,
-            PreSelectedGroupName = groupsComboBoxHighlightGroups.Text
+            PreSelectedGroupName = highlightGroupsToolStripComboBox.Text
         };
 
         var res = dlg.ShowDialog();
@@ -1092,14 +1036,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void FillHighlightComboBox ()
     {
-        var currentGroupName = groupsComboBoxHighlightGroups.Text;
-        groupsComboBoxHighlightGroups.Items.Clear();
+        var currentGroupName = highlightGroupsToolStripComboBox.Text;
+        highlightGroupsToolStripComboBox.Items.Clear();
         foreach (var group in HighlightGroupList)
         {
-            _ = groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
+            _ = highlightGroupsToolStripComboBox.Items.Add(group.GroupName);
             if (group.GroupName.Equals(currentGroupName, StringComparison.Ordinal))
             {
-                groupsComboBoxHighlightGroups.Text = group.GroupName;
+                highlightGroupsToolStripComboBox.Text = group.GroupName;
             }
         }
     }
@@ -1165,7 +1109,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 return;
             }
 
-            AddFileTab(names[0], false, null, false, null);
+            _ = AddFileTab(names[0], false, null, false, null);
             return;
         }
 
@@ -1307,8 +1251,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             mainMenuStrip.Enabled = true;
             timeshiftToolStripMenuItem.Enabled = false;
             timeshiftToolStripMenuItem.Checked = false;
-            timeshiftMenuTextBox.Text = string.Empty;
-            timeshiftMenuTextBox.Enabled = false;
+            timeshiftToolStripTextBox.Text = string.Empty;
+            timeshiftToolStripTextBox.Enabled = false;
             multiFileToolStripMenuItem.Enabled = false;
             cellSelectModeToolStripMenuItem.Checked = false;
             cellSelectModeToolStripMenuItem.Enabled = false;
@@ -1352,8 +1296,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         mainMenuStrip.Enabled = e.MenuEnabled;
         timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
         timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;
-        timeshiftMenuTextBox.Text = e.TimeshiftText;
-        timeshiftMenuTextBox.Enabled = e.TimeshiftEnabled;
+        timeshiftToolStripTextBox.Text = e.TimeshiftText;
+        timeshiftToolStripTextBox.Enabled = e.TimeshiftEnabled;
         multiFileToolStripMenuItem.Enabled = e.MultiFileEnabled; // disabled for temp files
         multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
         multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
@@ -1376,7 +1320,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
-        groupsComboBoxHighlightGroups.Text = e.HighlightGroupName;
+        highlightGroupsToolStripComboBox.Text = e.HighlightGroupName;
         columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
 
         _skipEvents = false;
@@ -1634,11 +1578,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void RefreshEncodingMenuBar (Encoding encoding)
     {
-        toolStripEncodingASCIIItem.Checked = false;
-        toolStripEncodingANSIItem.Checked = false;
-        toolStripEncodingUTF8Item.Checked = false;
-        toolStripEncodingUTF16Item.Checked = false;
-        toolStripEncodingISO88591Item.Checked = false;
+        encodingASCIIToolStripMenuItem.Checked = false;
+        encodingANSIToolStripMenuItem.Checked = false;
+        encodingUTF8toolStripMenuItem.Checked = false;
+        encodingUTF16toolStripMenuItem.Checked = false;
+        encodingISO88591toolStripMenuItem.Checked = false;
 
         if (encoding == null)
         {
@@ -1647,26 +1591,26 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (encoding is ASCIIEncoding)
         {
-            toolStripEncodingASCIIItem.Checked = true;
+            encodingASCIIToolStripMenuItem.Checked = true;
         }
         else if (encoding.Equals(Encoding.Default))
         {
-            toolStripEncodingANSIItem.Checked = true;
+            encodingANSIToolStripMenuItem.Checked = true;
         }
         else if (encoding is UTF8Encoding)
         {
-            toolStripEncodingUTF8Item.Checked = true;
+            encodingUTF8toolStripMenuItem.Checked = true;
         }
         else if (encoding is UnicodeEncoding)
         {
-            toolStripEncodingUTF16Item.Checked = true;
+            encodingUTF16toolStripMenuItem.Checked = true;
         }
         else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
         {
-            toolStripEncodingISO88591Item.Checked = true;
+            encodingISO88591toolStripMenuItem.Checked = true;
         }
 
-        toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
+        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1954,7 +1898,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void ApplySelectedHighlightGroup ()
     {
-        var groupName = groupsComboBoxHighlightGroups.Text;
+        var groupName = highlightGroupsToolStripComboBox.Text;
         CurrentLogWindow?.SetCurrentHighlightGroup(groupName);
     }
 
@@ -2372,10 +2316,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (!_skipEvents && CurrentLogWindow != null)
         {
-            CurrentLogWindow.SetTimeshiftValue(timeshiftMenuTextBox.Text);
-            timeshiftMenuTextBox.Enabled = timeshiftToolStripMenuItem.Checked;
+            CurrentLogWindow.SetTimeshiftValue(timeshiftToolStripTextBox.Text);
+            timeshiftToolStripTextBox.Enabled = timeshiftToolStripMenuItem.Checked;
             CurrentLogWindow.TimeshiftEnabled(timeshiftToolStripMenuItem.Checked,
-                timeshiftMenuTextBox.Text);
+                timeshiftToolStripTextBox.Text);
         }
     }
 
@@ -2485,7 +2429,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (e.KeyCode == Keys.Enter)
         {
             e.Handled = true;
-            CurrentLogWindow.SetTimeshiftValue(timeshiftMenuTextBox.Text);
+            CurrentLogWindow.SetTimeshiftValue(timeshiftToolStripTextBox.Text);
         }
     }
 
