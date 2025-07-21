@@ -23,6 +23,11 @@ internal partial class AboutBox : Form
     {
         InitializeComponent();
 
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         LoadResources();
         usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
@@ -33,7 +38,10 @@ internal partial class AboutBox : Form
         labelCopyright.Text = AssemblyCopyright;
         var link = "https://github.com/LogExperts/LogExpert";
         _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
+
         LoadUsedComponents();
+
+        ResumeLayout();
     }
 
     //Name, Version, License, Download, Source

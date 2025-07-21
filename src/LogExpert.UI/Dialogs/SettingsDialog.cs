@@ -119,22 +119,28 @@ internal partial class SettingsDialog : Form
                 {
                     radioButtonSessionSaveOwn.Checked = true;
                 }
+
                 break;
             case SessionSaveLocation.SameDir:
                 {
                     radioButtonSessionSameDir.Checked = true;
                 }
+
                 break;
             case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
-                    break;
+
                 }
+
+                break;
             case SessionSaveLocation.ApplicationStartupDir:
                 {
                     radioButtonSessionApplicationStartupDir.Checked = true;
-                    break;
+
                 }
+
+                break;
         }
 
         //overwrite preferences save location in portable mode to always be application startup directory
@@ -210,10 +216,12 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnToolClickInternal (TextBox textBox)
     {
-        OpenFileDialog dlg = new();
-        dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        OpenFileDialog dlg = new()
+        {
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
 
-        if (string.IsNullOrEmpty(textBox.Text) == false)
+        if (!string.IsNullOrEmpty(textBox.Text))
         {
             FileInfo info = new(textBox.Text);
             if (info.Directory != null && info.Directory.Exists)
@@ -277,9 +285,9 @@ internal partial class SettingsDialog : Form
     {
         var selIndex = 0;
         comboBox.Items.Clear();
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
             var index = comboBox.Items.Add(columnizer.GetName());
             if (columnizer.GetName().Equals(columnizerName, StringComparison.Ordinal))
@@ -301,35 +309,33 @@ internal partial class SettingsDialog : Form
         var comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[1];
         comboColumn.Items.Clear();
 
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
-
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
-            comboColumn.Items.Add(columnizer.GetName());
+            _ = comboColumn.Items.Add(columnizer.GetName());
         }
         //comboColumn.DisplayMember = "Name";
         //comboColumn.ValueMember = "Columnizer";
 
-        foreach (ColumnizerMaskEntry maskEntry in Preferences.ColumnizerMaskList)
+        foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (ILogLineColumnizer logColumnizer in columnizers)
+            foreach (var logColumnizer in columnizers)
             {
-                cell.Items.Add(logColumnizer.GetName());
+                _ = cell.Items.Add(logColumnizer.GetName());
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
-            dataGridViewColumnizer.Rows.Add(row);
+            _ = dataGridViewColumnizer.Rows.Add(row);
         }
 
         var count = dataGridViewColumnizer.RowCount;
@@ -348,34 +354,31 @@ internal partial class SettingsDialog : Form
         var comboColumn = (DataGridViewComboBoxColumn)dataGridViewHighlightMask.Columns[1];
         comboColumn.Items.Clear();
 
-        //TODO Remove if not necessary
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
-
-        foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+        foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
         {
-            comboColumn.Items.Add(group.GroupName);
+            _ = comboColumn.Items.Add(group.GroupName);
         }
 
-        foreach (HighlightMaskEntry maskEntry in Preferences.HighlightMaskList)
+        foreach (var maskEntry in Preferences.HighlightMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+            foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
-                cell.Items.Add(group.GroupName);
+                _ = cell.Items.Add(group.GroupName);
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
-            HighlightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
+            var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
             currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
-            dataGridViewHighlightMask.Rows.Add(row);
+            _ = dataGridViewHighlightMask.Rows.Add(row);
         }
 
         var count = dataGridViewHighlightMask.RowCount;
@@ -424,27 +427,27 @@ internal partial class SettingsDialog : Form
     {
         listBoxPlugin.Items.Clear();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IFileSystemPlugin entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -458,7 +461,7 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -466,7 +469,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -479,9 +482,9 @@ internal partial class SettingsDialog : Form
     {
         listBoxTools.Items.Clear();
 
-        foreach (ToolEntry tool in Preferences.ToolEntries)
+        foreach (var tool in Preferences.ToolEntries)
         {
-            listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
+            _ = listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
         }
 
         if (listBoxTools.Items.Count > 0)
@@ -558,12 +561,12 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            Icon icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
+            var icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
             if (icon != null)
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                NativeMethods.DestroyIcon(icon.Handle);
+                _ = NativeMethods.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -577,12 +580,12 @@ internal partial class SettingsDialog : Form
     {
         comboBoxEncoding.Items.Clear();
 
-        comboBoxEncoding.Items.Add(Encoding.ASCII);
-        comboBoxEncoding.Items.Add(Encoding.Default);
-        comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        comboBoxEncoding.Items.Add(Encoding.UTF8);
-        comboBoxEncoding.Items.Add(Encoding.Unicode);
-        comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
+        _ = comboBoxEncoding.Items.Add(Encoding.Default);
+        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
+        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
+        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
         comboBoxEncoding.ValueMember = "HeaderName";
     }
@@ -622,18 +625,11 @@ internal partial class SettingsDialog : Form
         Preferences.FilterTail = checkBoxFilterTail.Checked;
         Preferences.FollowTail = checkBoxFollowTail.Checked;
 
-        if (radioButtonVerticalMouseDrag.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Vertical;
-        }
-        else if (radioButtonVerticalMouseDragInverted.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.InvertedVertical;
-        }
-        else
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Horizontal;
-        }
+        Preferences.TimestampControlDragOrientation = radioButtonVerticalMouseDrag.Checked
+            ? DragOrientationsEnum.Vertical
+            : radioButtonVerticalMouseDragInverted.Checked
+                ? DragOrientationsEnum.InvertedVertical
+                : DragOrientationsEnum.Horizontal;
 
         SaveColumnizerList();
 
@@ -652,22 +648,13 @@ internal partial class SettingsDialog : Form
         Preferences.SaveSessions = checkBoxSaveSessions.Checked;
         Preferences.SessionSaveDirectory = labelSessionSaveOwnDir.Text;
 
-        if (radioButtonsessionSaveDocuments.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.DocumentsDir;
-        }
-        else if (radioButtonSessionSaveOwn.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.OwnDir;
-        }
-        else if (radioButtonSessionApplicationStartupDir.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.ApplicationStartupDir;
-        }
-        else
-        {
-            Preferences.SaveLocation = SessionSaveLocation.SameDir;
-        }
+        Preferences.SaveLocation = radioButtonsessionSaveDocuments.Checked
+            ? SessionSaveLocation.DocumentsDir
+            : radioButtonSessionSaveOwn.Checked
+                ? SessionSaveLocation.OwnDir
+                : radioButtonSessionApplicationStartupDir.Checked
+                    ? SessionSaveLocation.ApplicationStartupDir
+                    : SessionSaveLocation.SameDir;
 
         Preferences.SaveFilters = checkBoxSaveFilter.Checked;
         Preferences.BufferCount = (int)upDownBlockCount.Value;
@@ -715,7 +702,7 @@ internal partial class SettingsDialog : Form
         if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
         {
             var index = dataGridViewColumnizer.CurrentRow.Index;
-            dataGridViewColumnizer.EndEdit();
+            _ = dataGridViewColumnizer.EndEdit();
             dataGridViewColumnizer.Rows.RemoveAt(index);
         }
     }
@@ -819,9 +806,9 @@ internal partial class SettingsDialog : Form
             {
                 case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                        if (!Directory.Exists(ConfigManager.PortableModeDir))
                         {
-                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            _ = Directory.CreateDirectory(ConfigManager.PortableModeDir);
                         }
 
                         using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
@@ -855,7 +842,7 @@ internal partial class SettingsDialog : Form
         }
         catch (Exception exception)
         {
-            MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
+            _ = MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
         }
 
     }
@@ -918,7 +905,7 @@ internal partial class SettingsDialog : Form
     [SupportedOSPlatform("windows")]
     private void OnBtnToolAddClick (object sender, EventArgs e)
     {
-        listBoxTools.Items.Add(new ToolEntry());
+        _ = listBoxTools.Items.Add(new ToolEntry());
         listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
     }
 
@@ -981,7 +968,7 @@ internal partial class SettingsDialog : Form
     private void OnMultiFilePatternTextChanged (object sender, EventArgs e)
     {
         var pattern = textBoxMultifilePattern.Text;
-        upDownMultifileDays.Enabled = pattern.Contains("$D", System.StringComparison.Ordinal);
+        upDownMultifileDays.Enabled = pattern.Contains("$D", StringComparison.Ordinal);
     }
 
     [SupportedOSPlatform("windows")]
@@ -995,7 +982,7 @@ internal partial class SettingsDialog : Form
             Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*"
         };
 
-        DialogResult result = dlg.ShowDialog();
+        var result = dlg.ShowDialog();
 
         if (result == DialogResult.OK)
         {
@@ -1027,14 +1014,14 @@ internal partial class SettingsDialog : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                _ = MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
                 return;
             }
 
             ConfigManager.Import(fileInfo, dlg.ImportFlags);
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
-            MessageBox.Show(this, @"Settings imported", @"LogExpert");
+            _ = MessageBox.Show(this, @"Settings imported", @"LogExpert");
         }
     }
 
