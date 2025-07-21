@@ -834,7 +834,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (Preferences.AskForClose)
         {
-            if (MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            if (MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
             {
                 e.Cancel = true;
                 return;
@@ -3953,7 +3953,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (lineNum == -1)
             {
                 // Hmm... is that experimental code from early days?
-                _ = MessageBox.Show(this, Resources.LogWindow_UI_SelectLine_SearchResultNotFound, Resources.Title_LogExpert);
+                _ = MessageBox.Show(this, Resources.LogWindow_UI_SelectLine_SearchResultNotFound, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
@@ -4371,7 +4371,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(null, string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_Filter_ExceptionWhileFiltering, ex, ex.StackTrace), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(null, string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_Filter_ExceptionWhileFiltering, ex, ex.StackTrace), Resources.LogExpert_Common_UI_Title_Error);
         }
 
         long endTime = Environment.TickCount;
@@ -4633,7 +4633,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Logger_Error_In_Function, nameof(ClearFilterList), e));
 
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList, e), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList, e), Resources.LogExpert_Common_UI_Title_Error);
         }
     }
 
@@ -6087,7 +6087,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             catch (LogFileException lfe)
             {
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Logger_Error_In_Function, nameof(LoadFile), lfe));
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_LoadFile_CannotLoadFile, lfe.Message), Resources.Title_LogExpert);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_LoadFile_CannotLoadFile, lfe.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
                 _ = BeginInvoke(new FunctionWith1BoolParam(Close), true);
                 _isLoadError = true;
                 return;
@@ -6188,7 +6188,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
         catch (Exception e)
         {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_SavePersistenceData_ErrorWhileSaving, e), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_SavePersistenceData_ErrorWhileSaving, e), Resources.LogExpert_Common_UI_Title_Error);
         }
 
         return null;
@@ -6900,7 +6900,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (!string.IsNullOrEmpty(bookmark.Text))
             {
-                if (MessageBox.Show(Resources.LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt, Resources.Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.No)
+                if (MessageBox.Show(Resources.LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.No)
                 {
                     return;
                 }
@@ -7076,7 +7076,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (
                 MessageBox.Show(
                     Resources.LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks,
-                    Resources.Title_LogExpert,
+                    Resources.LogExpert_Common_UI_Title_LogExpert,
                     MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;
@@ -7673,7 +7673,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             catch (IOException e)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileExportingBookmarkList, e.Message), Resources.Title_LogExpert);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileExportingBookmarkList, e.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
     }
@@ -7727,7 +7727,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             catch (IOException e)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileImportingBookmarkList, e.Message), Resources.Title_LogExpert);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileImportingBookmarkList, e.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
     }

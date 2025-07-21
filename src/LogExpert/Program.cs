@@ -69,7 +69,7 @@ internal static class Program
                 }
                 else
                 {
-                    _ = MessageBox.Show(Resources.Program_UI_Error_ConfigFileNotFound, Resources.Title_LogExpert);
+                    _ = MessageBox.Show(Resources.Program_UI_Error_ConfigFileNotFound, Resources.LogExpert_Common_UI_Title_LogExpert);
                 }
             }
 
@@ -131,7 +131,7 @@ internal static class Program
                     if (counter == 0)
                     {
                         _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_IPCChannel_ClientError, errMsg));
-                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.Title_LogExpert);
+                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.LogExpert_Common_UI_Title_LogExpert);
                     }
 
                     //Dont create a new separated instance of LogExpert if the settings allows only one instance
@@ -161,12 +161,12 @@ internal static class Program
             {
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_MutexError, ex));
                 cts.Cancel();
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.Title_LogExpert);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
         catch (SecurityException se)
         {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficientRights, se.Message), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficientRights, se.Message), Resources.LogExpert_Common_UI_Title_Error);
             cts.Cancel();
         }
     }

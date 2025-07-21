@@ -107,6 +107,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show this message only once?.
+        /// </summary>
+        public static string AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage {
+            get {
+                return ResourceManager.GetString("AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one instance allowed, uncheck &quot;View Settings =&gt; Allow only 1 Instances&quot; to start multiple instances!.
+        /// </summary>
+        public static string AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText {
+            get {
+                return ResourceManager.GetString("AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Arrow_menu_close {
@@ -217,12 +235,84 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bookmark comment.
+        /// </summary>
+        public static string BookmarkCommentDlg_UI_Text {
+            get {
+                return ResourceManager.GetString("BookmarkCommentDlg_UI_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Bookmarks {
             get {
                 object obj = ResourceManager.GetObject("Bookmarks", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show comment column.
+        /// </summary>
+        public static string BookmarkWindow_UI_CheckBox_checkBoxCommentColumn {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_CheckBox_checkBoxCommentColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmark Comment.
+        /// </summary>
+        public static string BookmarkWindow_UI_DataGridColumn_HeaderText {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_DataGridColumn_HeaderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmark comment:.
+        /// </summary>
+        public static string BookmarkWindow_UI_Label_labelComment {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_Label_labelComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No bookmarks in current file.
+        /// </summary>
+        public static string BookmarkWindow_UI_NoBookmarksInCurrentFile {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_NoBookmarksInCurrentFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Really remove bookmark comments for selected lines?.
+        /// </summary>
+        public static string BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmarks.
+        /// </summary>
+        public static string BookmarkWindow_UI_Text {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove comment(s).
+        /// </summary>
+        public static string BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem", resourceCulture);
             }
         }
         
@@ -746,6 +836,33 @@ namespace LogExpert {
         public static string LogExpert_Common_UI_Button_OK {
             get {
                 return ResourceManager.GetString("LogExpert_Common_UI_Button_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialize.
+        /// </summary>
+        public static string LogExpert_Common_UI_Title_Deserialize {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Title_Deserialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert Error.
+        /// </summary>
+        public static string LogExpert_Common_UI_Title_Error {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Title_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert.
+        /// </summary>
+        public static string LogExpert_Common_UI_Title_LogExpert {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Title_LogExpert", resourceCulture);
             }
         }
         
@@ -4834,33 +4951,6 @@ namespace LogExpert {
         public static string TimeSpreadingControl_UI_ToolTip {
             get {
                 return ResourceManager.GetString("TimeSpreadingControl_UI_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to LogExpert.
-        /// </summary>
-        public static string Title_LogExpert {
-            get {
-                return ResourceManager.GetString("Title_LogExpert", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Deserialize.
-        /// </summary>
-        public static string Title_LogExpert_Deserialize {
-            get {
-                return ResourceManager.GetString("Title_LogExpert_Deserialize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to LogExpert Error.
-        /// </summary>
-        public static string Title_LogExpert_Error {
-            get {
-                return ResourceManager.GetString("Title_LogExpert_Error", resourceCulture);
             }
         }
     }

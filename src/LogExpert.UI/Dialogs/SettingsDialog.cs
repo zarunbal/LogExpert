@@ -950,7 +950,7 @@ internal partial class SettingsDialog : Form
                                                     or DirectoryNotFoundException
                                                     or NotSupportedException)
         {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.Title_LogExpert_Error, MessageBoxButtons.OK);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.LogExpert_Common_UI_Title_Error, MessageBoxButtons.OK);
         }
 
     }
@@ -1127,14 +1127,14 @@ internal partial class SettingsDialog : Form
                                           or NotSupportedException
                                           or UnauthorizedAccessException)
             {
-                _ = MessageBox.Show(this, string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Error_SettingsCouldNotBeImported, ex), Resources.Title_LogExpert_Error);
+                _ = MessageBox.Show(this, string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Error_SettingsCouldNotBeImported, ex), Resources.LogExpert_Common_UI_Title_Error);
                 return;
             }
 
             ConfigManager.Import(fileInfo, dlg.ImportFlags);
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
-            _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.Title_LogExpert);
+            _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.LogExpert_Common_UI_Title_LogExpert);
         }
     }
 

@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

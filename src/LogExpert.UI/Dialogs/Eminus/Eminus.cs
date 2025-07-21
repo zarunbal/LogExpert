@@ -191,7 +191,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
 
         if (doc == null)
         {
-            _ = MessageBox.Show(Resources.Eminus_UI_CannotParseJavaStackTraceLine, Resources.Title_LogExpert);
+            _ = MessageBox.Show(Resources.Eminus_UI_CannotParseJavaStackTraceLine, Resources.LogExpert_Common_UI_Title_LogExpert);
         }
         else
         {
@@ -209,7 +209,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
                                         or ObjectDisposedException
                                         or XmlException)
             {
-                _ = MessageBox.Show(e.Message, Resources.Title_LogExpert);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
     }
@@ -237,7 +237,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
             }
             catch (SerializationException e)
             {
-                _ = MessageBox.Show(e.Message, Resources.Title_LogExpert_Deserialize);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_Deserialize);
                 _config = new EminusConfig();
             }
         }

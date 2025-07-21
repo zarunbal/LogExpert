@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Dialogs;
+namespace LogExpert.Dialogs;
 
 partial class BookmarkCommentDlg
 {
@@ -29,48 +29,48 @@ protected override void Dispose(bool disposing)
 private void InitializeComponent()
 {
   System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BookmarkCommentDlg));
-  this.okButton = new System.Windows.Forms.Button();
-  this.cancelButton = new System.Windows.Forms.Button();
-  this.commentTextBox = new System.Windows.Forms.TextBox();
+  this.buttonOk = new System.Windows.Forms.Button();
+  this.buttonCancel = new System.Windows.Forms.Button();
+  this.textBoxComment = new System.Windows.Forms.TextBox();
   this.SuspendLayout();
   // 
   // okButton
   // 
-  this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-  this.okButton.Location = new System.Drawing.Point(150, 86);
-  this.okButton.Name = "okButton";
-  this.okButton.Size = new System.Drawing.Size(75, 23);
-  this.okButton.TabIndex = 1;
-  this.okButton.Text = "OK";
-  this.okButton.UseVisualStyleBackColor = true;
+  this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+  this.buttonOk.Location = new System.Drawing.Point(150, 86);
+  this.buttonOk.Name = "buttonOk";
+  this.buttonOk.Size = new System.Drawing.Size(75, 23);
+  this.buttonOk.TabIndex = 1;
+  this.buttonOk.Text = "OK";
+  this.buttonOk.UseVisualStyleBackColor = true;
   // 
   // cancelButton
   // 
-  this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-  this.cancelButton.Location = new System.Drawing.Point(241, 86);
-  this.cancelButton.Name = "cancelButton";
-  this.cancelButton.Size = new System.Drawing.Size(75, 23);
-  this.cancelButton.TabIndex = 2;
-  this.cancelButton.Text = "&Cancel";
-  this.cancelButton.UseVisualStyleBackColor = true;
+  this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+  this.buttonCancel.Location = new System.Drawing.Point(241, 86);
+  this.buttonCancel.Name = "buttonCancel";
+  this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+  this.buttonCancel.TabIndex = 2;
+  this.buttonCancel.Text = "&Cancel";
+  this.buttonCancel.UseVisualStyleBackColor = true;
   // 
   // commentTextBox
   // 
-  this.commentTextBox.Dock = System.Windows.Forms.DockStyle.Top;
-  this.commentTextBox.Location = new System.Drawing.Point(0, 0);
-  this.commentTextBox.Multiline = true;
-  this.commentTextBox.Name = "commentTextBox";
-  this.commentTextBox.Size = new System.Drawing.Size(324, 80);
-  this.commentTextBox.TabIndex = 0;
+  this.textBoxComment.Dock = System.Windows.Forms.DockStyle.Top;
+  this.textBoxComment.Location = new System.Drawing.Point(0, 0);
+  this.textBoxComment.Multiline = true;
+  this.textBoxComment.Name = "textBoxComment";
+  this.textBoxComment.Size = new System.Drawing.Size(324, 80);
+  this.textBoxComment.TabIndex = 0;
   // 
   // BookmarkCommentDlg
   // 
-  this.AcceptButton = this.okButton;
-  this.CancelButton = this.cancelButton;
+  this.AcceptButton = this.buttonOk;
+  this.CancelButton = this.buttonCancel;
   this.ClientSize = new System.Drawing.Size(324, 115);
-  this.Controls.Add(this.commentTextBox);
-  this.Controls.Add(this.cancelButton);
-  this.Controls.Add(this.okButton);
+  this.Controls.Add(this.textBoxComment);
+  this.Controls.Add(this.buttonCancel);
+  this.Controls.Add(this.buttonOk);
   this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
   this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
   this.Name = "BookmarkCommentDlg";
@@ -83,7 +83,7 @@ private void InitializeComponent()
 
 #endregion
 
-private System.Windows.Forms.Button okButton;
-private System.Windows.Forms.Button cancelButton;
-private System.Windows.Forms.TextBox commentTextBox;
+private System.Windows.Forms.Button buttonOk;
+private System.Windows.Forms.Button buttonCancel;
+private System.Windows.Forms.TextBox textBoxComment;
 }

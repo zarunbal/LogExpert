@@ -230,7 +230,7 @@ internal partial class HighlightDialog : Form
                                     or PathTooLongException
                                     or NotSupportedException)
         {
-            _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsCouldNotBeImported, Resources.Title_LogExpert);
+            _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsCouldNotBeImported, Resources.LogExpert_Common_UI_Title_LogExpert);
             _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_FileAccessError, dlg.FileName, ex));
             return;
         }
@@ -242,7 +242,7 @@ internal partial class HighlightDialog : Form
 
         FillGroupComboBox();
 
-        _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsImported, Resources.Title_LogExpert);
+        _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsImported, Resources.LogExpert_Common_UI_Title_LogExpert);
 
     }
 
@@ -503,7 +503,7 @@ internal partial class HighlightDialog : Form
                                             or SystemException)
             {
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry, ex));
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message, Resources.Title_LogExpert_Error));
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message, Resources.LogExpert_Common_UI_Title_Error));
             }
         }
     }
@@ -680,7 +680,7 @@ internal partial class HighlightDialog : Form
                                         or SystemException)
         {
             _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry, ex));
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message, Resources.Title_LogExpert_Error));
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message, Resources.LogExpert_Common_UI_Title_Error));
         }
     }
 

@@ -188,7 +188,7 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Title_LogExpert" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
     <value>LogExpert</value>
     <comment>LogExpert</comment>
   </data>
@@ -218,7 +218,7 @@
   <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Title_LogExpert_Error" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_Error" xml:space="preserve">
     <value>LogExpert Error</value>
     <comment>LogExpert Error Title</comment>
   </data>
@@ -1303,7 +1303,7 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
     <value>{0}Load class in Eclipse</value>
   </data>
-  <data name="Title_LogExpert_Deserialize" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_Deserialize" xml:space="preserve">
     <value>Deserialize</value>
   </data>
   <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
@@ -1720,5 +1720,35 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem" xml:space="preserve">
     <value>Try to truncate the file opened in tab</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText" xml:space="preserve">
+    <value>Only one instance allowed, uncheck "View Settings =&gt; Allow only 1 Instances" to start multiple instances!</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage" xml:space="preserve">
+    <value>Show this message only once?</value>
+  </data>
+  <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
+    <value>Bookmark comment</value>
+  </data>
+  <data name="BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem" xml:space="preserve">
+    <value>Remove comment(s)</value>
+  </data>
+  <data name="BookmarkWindow_UI_CheckBox_checkBoxCommentColumn" xml:space="preserve">
+    <value>Show comment column</value>
+  </data>
+  <data name="BookmarkWindow_UI_Text" xml:space="preserve">
+    <value>Bookmarks</value>
+  </data>
+  <data name="BookmarkWindow_UI_Label_labelComment" xml:space="preserve">
+    <value>Bookmark comment:</value>
+  </data>
+  <data name="BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines" xml:space="preserve">
+    <value>Really remove bookmark comments for selected lines?</value>
+  </data>
+  <data name="BookmarkWindow_UI_NoBookmarksInCurrentFile" xml:space="preserve">
+    <value>No bookmarks in current file</value>
+  </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderText" xml:space="preserve">
+    <value>Bookmark Comment</value>
   </data>
 </root>

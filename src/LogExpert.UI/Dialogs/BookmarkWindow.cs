@@ -13,7 +13,6 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Dialogs;
 
-//TODO can be moved to Logexpert.UI if the PaintHelper has been refactored
 [SupportedOSPlatform("windows")]
 internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmarkView
 {
@@ -38,6 +37,16 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
         bookmarkDataGridView.CellValueNeeded += OnBoomarkDataGridViewCellValueNeeded;
         bookmarkDataGridView.CellPainting += OnBoomarkDataGridViewCellPainting;
+
+        ApplyResources();
+    }
+
+    private void ApplyResources ()
+    {
+        removeCommentsToolStripMenuItem.Text = Resources.BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem;
+        checkBoxCommentColumn.Text = Resources.BookmarkWindow_UI_CheckBox_checkBoxCommentColumn;
+        Text = Resources.BookmarkWindow_UI_Text;
+        labelComment.Text = Resources.BookmarkWindow_UI_Label_labelComment;
     }
 
     #endregion
@@ -51,10 +60,10 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     public bool ShowBookmarkCommentColumn
     {
-        get => commentColumnCheckBox.Checked;
+        get => checkBoxCommentColumn.Checked;
         set
         {
-            commentColumnCheckBox.Checked = value;
+            checkBoxCommentColumn.Checked = value;
             ShowCommentColumn(value);
         }
     }
@@ -74,7 +83,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
         DataGridViewTextBoxColumn commentColumn = new()
         {
-            HeaderText = "Bookmark Comment",
+            HeaderText = Resources.BookmarkWindow_UI_DataGridColumn_HeaderText,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
             Resizable = DataGridViewTriState.NotSet,
             DividerWidth = 1,
@@ -84,7 +93,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         };
 
         bookmarkDataGridView.Columns.Insert(1, commentColumn);
-        ShowCommentColumn(commentColumnCheckBox.Checked);
+        ShowCommentColumn(checkBoxCommentColumn.Checked);
         ResizeColumns();
     }
 
@@ -212,7 +221,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
                 LineAlignment = StringAlignment.Center
             };
 
-            e.Graphics.DrawString("No bookmarks in current file", SystemFonts.DialogFont, SystemBrushes.WindowText, ClientRectangle, sf);
+            e.Graphics.DrawString(Resources.BookmarkWindow_UI_NoBookmarksInCurrentFile, SystemFonts.DialogFont, SystemBrushes.WindowText, ClientRectangle, sf);
         }
         else
         {
@@ -402,7 +411,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         {
             if (bookmarkDataGridView.Focused)
             {
-                bookmarkTextBox.Focus();
+                _ = bookmarkTextBox.Focus();
                 e.Handled = true;
             }
         }
@@ -537,7 +546,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     private void OnRemoveCommentsToolStripMenuItemClick (object sender, EventArgs e)
     {
-        if (MessageBox.Show("Really remove bookmark comments for selected lines?", "LogExpert", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        if (MessageBox.Show(Resources.BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.Yes)
         {
             foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
             {
@@ -555,7 +564,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     private void OnCommentColumnCheckBoxCheckedChanged (object sender, EventArgs e)
     {
-        ShowCommentColumn(commentColumnCheckBox.Checked);
+        ShowCommentColumn(checkBoxCommentColumn.Checked);
     }
 
     private void BookmarkWindow_ClientSizeChanged (object sender, EventArgs e)

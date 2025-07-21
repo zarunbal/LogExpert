@@ -7,12 +7,20 @@ internal partial class BookmarkCommentDlg : Form
 {
     #region cTor
 
-    public BookmarkCommentDlg()
+    public BookmarkCommentDlg ()
     {
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        ApplyResources();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.BookmarkCommentDlg_UI_Text;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
     }
 
     #endregion
@@ -21,8 +29,8 @@ internal partial class BookmarkCommentDlg : Form
 
     public string Comment
     {
-        set => commentTextBox.Text = value;
-        get => commentTextBox.Text;
+        set => textBoxComment.Text = value;
+        get => textBoxComment.Text;
     }
 
     #endregion

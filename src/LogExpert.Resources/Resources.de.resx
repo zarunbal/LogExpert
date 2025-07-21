@@ -188,7 +188,7 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Title_LogExpert" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
     <value>LogExpert</value>
   </data>
   <data name="LogLover" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -214,7 +214,7 @@
   <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Title_LogExpert_Error" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_Error" xml:space="preserve">
     <value>LogExpert Fehler</value>
   </data>
   <data name="Program_Logger_Error_Pipe_TimeoutException" xml:space="preserve">
@@ -1297,7 +1297,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
     <value>{0}Klasse in Eclipse laden</value>
   </data>
-  <data name="Title_LogExpert_Deserialize" xml:space="preserve">
+  <data name="LogExpert_Common_UI_Title_Deserialize" xml:space="preserve">
     <value>Deserialisieren</value>
   </data>
   <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
@@ -1717,5 +1717,35 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem" xml:space="preserve">
     <value>Versucht die Datei im offenen Tab ab zu schneiden</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText" xml:space="preserve">
+    <value>Nur eine Instanz ist erlaubt. Deaktivieren von "Anzeigen Setteings =&gt; Nur eine Instanz erlauben" um mutliple Instanzen zu starten!</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage" xml:space="preserve">
+    <value>Diese Meldung nur einmal zeigen?</value>
+  </data>
+  <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
+    <value>Lesezeichenkommentar</value>
+  </data>
+  <data name="BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem" xml:space="preserve">
+    <value>Entferne Kommentar(e)</value>
+  </data>
+  <data name="BookmarkWindow_UI_CheckBox_checkBoxCommentColumn" xml:space="preserve">
+    <value>Anzeigen Kommentar Spalte</value>
+  </data>
+  <data name="BookmarkWindow_UI_Text" xml:space="preserve">
+    <value>Lesezeichen</value>
+  </data>
+  <data name="BookmarkWindow_UI_Label_labelComment" xml:space="preserve">
+    <value>Lesezeichenkommentar:</value>
+  </data>
+  <data name="BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines" xml:space="preserve">
+    <value>Wirklich das Lesezeichenkommentar für die selektierten Spalten entfernen?</value>
+  </data>
+  <data name="BookmarkWindow_UI_NoBookmarksInCurrentFile" xml:space="preserve">
+    <value>Keine Lesezeichen für die aktuelle Zeile</value>
+  </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderText" xml:space="preserve">
+    <value>Lesezeichenkommentar</value>
   </data>
 </root>
