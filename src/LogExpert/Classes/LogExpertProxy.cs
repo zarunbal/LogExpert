@@ -1,14 +1,11 @@
+using System.Globalization;
+using System.Windows.Forms;
+
 using LogExpert.Config;
 using LogExpert.Core.Interface;
-using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Extensions.LogWindow;
 
 using NLog;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Windows.Forms;
 
 namespace LogExpert.Classes;
 
@@ -28,7 +25,7 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region cTor
 
-    public LogExpertProxy(ILogTabWindow logTabWindow)
+    public LogExpertProxy (ILogTabWindow logTabWindow)
     {
         AddWindow(logTabWindow);
         logTabWindow.LogExpertProxy = this;
@@ -60,15 +57,15 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region Public methods
 
-    public void LoadFiles(string[] fileNames)
+    public void LoadFiles (string[] fileNames)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Loading files into existing LogTabWindow");
-        ILogTabWindow logWin = _windowList[^1];
+        var logWin = _windowList[^1];
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
         logWin.LoadFiles(fileNames);
     }
 
-    public void NewWindow(string[] fileNames)
+    public void NewWindow (string[] fileNames)
     {
         if (_firstLogTabWindow.IsDisposed)
         {
@@ -93,7 +90,7 @@ internal class LogExpertProxy : ILogExpertProxy
         }
     }
 
-    public void NewWindowOrLockedWindow(string[] fileNames)
+    public void NewWindowOrLockedWindow (string[] fileNames)
     {
         foreach (var logWin in _windowList)
         {
@@ -101,6 +98,7 @@ internal class LogExpertProxy : ILogExpertProxy
             {
                 _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
                 logWin.LoadFiles(fileNames);
+                logWin.ShowOnlyOneInstanceError();
                 return;
             }
         }
@@ -109,11 +107,11 @@ internal class LogExpertProxy : ILogExpertProxy
     }
 
 
-    public void NewWindowWorker(string[] fileNames)
+    public void NewWindowWorker (string[] fileNames)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Creating new LogTabWindow");
         IConfigManager configManager = ConfigManager.Instance;
-        ILogTabWindow logWin = AbstractLogTabWindow.Create(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true, configManager);
+        var logWin = AbstractLogTabWindow.Create(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true, configManager);
         logWin.LogExpertProxy = this;
         AddWindow(logWin);
         logWin.Show();
@@ -121,7 +119,7 @@ internal class LogExpertProxy : ILogExpertProxy
     }
 
 
-    public void WindowClosed(ILogTabWindow logWin)
+    public void WindowClosed (ILogTabWindow logWin)
     {
         RemoveWindow(logWin);
         if (_windowList.Count == 0)
@@ -140,7 +138,7 @@ internal class LogExpertProxy : ILogExpertProxy
         }
     }
 
-    public int GetLogWindowCount()
+    public int GetLogWindowCount ()
     {
         return _windowList.Count;
     }
@@ -154,13 +152,13 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region Private Methods
 
-    private void AddWindow(ILogTabWindow window)
+    private void AddWindow (ILogTabWindow window)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Adding window to list");
         _windowList.Add(window);
     }
 
-    private void RemoveWindow(ILogTabWindow window)
+    private void RemoveWindow (ILogTabWindow window)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Removing window from list");
         _ = _windowList.Remove(window);
@@ -168,10 +166,10 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #endregion
 
-    protected void OnLastWindowClosed()
+    protected void OnLastWindowClosed ()
     {
         LastWindowClosed?.Invoke(this, new EventArgs());
     }
 
-    private delegate void NewWindowFx(string[] fileNames);
+    private delegate void NewWindowFx (string[] fileNames);
 }

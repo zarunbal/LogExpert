@@ -141,10 +141,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _tabStringFormat.LineAlignment = StringAlignment.Center;
         _tabStringFormat.Alignment = StringAlignment.Near;
 
-        ToolStripControlHost host = new(checkBoxFollowTail);
-
-        host.Padding = new Padding(20, 0, 0, 0);
-        host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
+        ToolStripControlHost host = new(checkBoxFollowTail)
+        {
+            Padding = new Padding(20, 0, 0, 0),
+            BackColor = Color.FromKnownColor(KnownColor.Transparent)
+        };
 
         var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
@@ -169,7 +170,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // get a list of resource names from the manifest
         var resNames = a.GetManifestResourceNames();
 
-        Bitmap bmp = Resources.Deceased;
+        var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
         bmp.Dispose();
         Closing += OnLogTabWindowClosing;
@@ -189,8 +190,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private delegate void FileRespawnedDelegate (LogWindow.LogWindow logWin);
 
-    public delegate void HighlightSettingsChangedEventHandler (object sender, EventArgs e);
-
     private delegate void LoadMultiFilesDelegate (string[] fileName, EncodingOptions encodingOptions);
 
     private delegate void SetColumnizerFx (ILogLineColumnizer columnizer);
@@ -201,7 +200,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     #region Events
 
-    public event HighlightSettingsChangedEventHandler HighlightSettingsChanged;
+    public event EventHandler<EventArgs> HighlightSettingsChanged;
 
     #endregion
 
@@ -226,6 +225,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     //}
 
     public ILogExpertProxy LogExpertProxy { get; set; }
+
     public IConfigManager ConfigManager { get; }
 
     #endregion
@@ -236,7 +236,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         lock (HighlightGroupList)
         {
-            foreach (HighlightGroup group in HighlightGroupList)
+            foreach (var group in HighlightGroupList)
             {
                 if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
                 {
@@ -386,7 +386,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
-        Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
+        _ = Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
         return logWindow;
     }
 
@@ -404,7 +404,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileEnabledStripMenuItem.Checked = true;
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
-        BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
+        _ = BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
         AddToFileHistory(fileNames[0]);
         return logWindow;
     }
@@ -412,7 +412,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public void LoadFiles (string[] fileNames)
     {
-        Invoke(new AddFileTabsDelegate(AddFileTabs), [fileNames]);
+        _ = Invoke(new AddFileTabsDelegate(AddFileTabs), [fileNames]);
+    }
+
+    public void ShowOnlyOneInstanceError ()
+    {
+        if (lockInstanceToolStripMenuItem.Checked && ConfigManager.Instance.Settings.Preferences.ShowErrorMessageAllowOnlyOneInstances)
+        {
+            using AllowOnlyOneInstanceErrorDialog a = new();
+            if (a.ShowDialog() == DialogResult.OK)
+            {
+                ConfigManager.Instance.Settings.Preferences.ShowErrorMessageAllowOnlyOneInstances = !a.DoNotShowThisMessageAgain;
+                ConfigManager.Instance.Save(SettingsFlags.All);
+            }
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -450,7 +463,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
             }
 
-            ConfigManager.Settings.ColumnizerHistoryList.Remove(entry); // no valid name -> remove entry
+            _ = ConfigManager.Settings.ColumnizerHistoryList.Remove(entry); // no valid name -> remove entry
         }
 
         return null;
@@ -562,7 +575,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public void SetForeground ()
     {
-        NativeMethods.SetForegroundWindow(Handle);
+        _ = NativeMethods.SetForegroundWindow(Handle);
         if (WindowState == FormWindowState.Minimized)
         {
             if (_wasMaximized)
@@ -597,7 +610,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (Preferences.ShowTailState)
         {
             var icon = GetIcon(data.DiffSum, data);
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
         }
     }
 
@@ -762,7 +775,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 else
                 {
-                    AddFileTab(fileName, false, null, false, null);
+                    _ = AddFileTab(fileName, false, null, false, null);
                 }
             }
         }
@@ -915,7 +928,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         foreach (var file in ConfigManager.Settings.FileHistoryList)
         {
             ToolStripItem item = new ToolStripMenuItem(file);
-            strip.Items.Add(item);
+            _ = strip.Items.Add(item);
         }
 
         strip.ItemClicked += OnHistoryItemClicked;
@@ -928,7 +941,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         lock (_logWindowList)
         {
-            _logWindowList.Remove(logWindow);
+            _ = _logWindowList.Remove(logWindow);
         }
 
         DisconnectEventHandlers(logWindow);
@@ -944,7 +957,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         lock (_logWindowList)
         {
-            _logWindowList.Remove(logWindow);
+            _ = _logWindowList.Remove(logWindow);
         }
 
         logWindow.Close(dontAsk);
@@ -981,7 +994,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         groupsComboBoxHighlightGroups.Items.Clear();
         foreach (var group in HighlightGroupList)
         {
-            groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
+            _ = groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
             if (group.GroupName.Equals(currentGroupName, StringComparison.Ordinal))
             {
                 groupsComboBoxHighlightGroups.Text = group.GroupName;
@@ -1050,7 +1063,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 return;
             }
 
-            AddFileTab(names[0], false, null, false, null);
+            _ = AddFileTab(names[0], false, null, false, null);
             return;
         }
 
@@ -1089,7 +1102,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         else
         {
-            AddMultiFileTab(names);
+            _ = AddMultiFileTab(names);
         }
     }
 
@@ -1283,7 +1296,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 _logger.Error(ex, "Error during ProgressBarUpdateWorker value {0}, min {1}, max {2}, visible {3}", e.Value, e.MinValue, e.MaxValue, e.Visible);
             }
 
-            Invoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
+            _ = Invoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
         }
     }
 
@@ -1304,7 +1317,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             labelCurrentLine.Size = TextRenderer.MeasureText(labelCurrentLine.Text, labelCurrentLine.Font);
             if (statusStrip.InvokeRequired)
             {
-                statusStrip.BeginInvoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
+                _ = statusStrip.BeginInvoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
             }
             else
             {
@@ -1383,7 +1396,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // a managed copy of icon. then the unmanaged win32 handle is destroyed
         var iconHandle = bmp.GetHicon();
         var icon = Icon.FromHandle(iconHandle).Clone() as Icon;
-        NativeMethods.DestroyIcon(iconHandle);
+        _ = NativeMethods.DestroyIcon(iconHandle);
 
         gfx.Dispose();
         bmp.Dispose();
@@ -1414,7 +1427,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void FileNotFound (LogWindow.LogWindow logWin)
     {
         var data = logWin.Tag as LogWindowData;
-        BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, _deadIcon);
+        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, _deadIcon);
         dragControlDateTime.Visible = false;
     }
 
@@ -1423,7 +1436,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         var data = logWin.Tag as LogWindowData;
         var icon = GetIcon(0, data);
-        BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
+        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1436,7 +1449,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         var icon = GetIcon(data.DiffSum, data);
-        BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
+        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
     }
 
     private int GetLevelFromDiff (int diff)
@@ -1488,7 +1501,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         }
 
                         var icon = GetIcon(data.DiffSum, data);
-                        BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+                        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
                     }
                 }
             }
@@ -1507,11 +1520,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private Icon GetIcon (int diff, LogWindowData data)
     {
-        var icon =
-            _ledIcons[
-                GetLevelFromDiff(diff), data.Dirty ? 1 : 0, Preferences.ShowTailState ? data.TailState : 3,
-                data.SyncMode
-            ];
+        var icon = _ledIcons[GetLevelFromDiff(diff),
+                             data.Dirty
+                                 ? 1
+                                 : 0,
+                             Preferences.ShowTailState
+                                 ? data.TailState
+                                 : 3,
+                             data.SyncMode
+                            ];
         return icon;
     }
 
@@ -1639,7 +1656,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 var data = logWindow.Tag as LogWindowData;
                 var icon = GetIcon(data.DiffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
             }
         }
     }
@@ -1657,7 +1674,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 ? ToolStripItemDisplayStyle.ImageAndText
                 : ToolStripItemDisplayStyle.Image;
 
-            NativeMethods.DestroyIcon(icon.Handle);
+            _ = NativeMethods.DestroyIcon(icon.Handle);
             icon.Dispose();
         }
 
@@ -1726,7 +1743,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             catch (Win32Exception e)
             {
                 _logger.Error(e);
-                MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message);
                 return;
             }
 
@@ -1753,7 +1770,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             catch (Exception e)
             {
                 _logger.Error(e);
-                MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message);
             }
         }
     }
@@ -1822,11 +1839,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 if (hasLayoutData)
                 {
-                    AddFileTabDeferred(fileName, false, null, true, null);
+                    _ = AddFileTabDeferred(fileName, false, null, true, null);
                 }
                 else
                 {
-                    AddFileTab(fileName, false, null, true, null);
+                    _ = AddFileTab(fileName, false, null, true, null);
                 }
             }
 
@@ -1856,8 +1873,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             'U', 'V', 'W', 'X', 'Y', 'Z'
         ];
         toolsToolStripMenuItem.DropDownItems.Clear();
-        toolsToolStripMenuItem.DropDownItems.Add(configureToolStripMenuItem);
-        toolsToolStripMenuItem.DropDownItems.Add(configureToolStripSeparator);
+        _ = toolsToolStripMenuItem.DropDownItems.Add(configureToolStripMenuItem);
+        _ = toolsToolStripMenuItem.DropDownItems.Add(configureToolStripSeparator);
         externalToolsToolStrip.Items.Clear();
         var num = 0;
         externalToolsToolStrip.SuspendLayout();
@@ -1872,7 +1889,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 };
 
                 SetToolIcon(tool, button);
-                externalToolsToolStrip.Items.Add(button);
+                _ = externalToolsToolStrip.Items.Add(button);
             }
 
             num++;
@@ -1882,7 +1899,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             };
 
             SetToolIcon(tool, menuItem);
-            toolsToolStripMenuItem.DropDownItems.Add(menuItem);
+            _ = toolsToolStripMenuItem.DropDownItems.Add(menuItem);
         }
 
         externalToolsToolStrip.ResumeLayout();
@@ -1924,7 +1941,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         using StreamReader r = new(memStream);
         dockPanel.SaveAsXml(memStream, Encoding.UTF8, true);
 
-        memStream.Seek(0, SeekOrigin.Begin);
+        _ = memStream.Seek(0, SeekOrigin.Begin);
         var resultXml = r.ReadToEnd();
 
         r.Close();
@@ -1940,7 +1957,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         w.Write(layoutXml);
         w.Flush();
 
-        memStream.Seek(0, SeekOrigin.Begin);
+        _ = memStream.Seek(0, SeekOrigin.Begin);
 
         dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
     }
@@ -2070,7 +2087,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (sender is ToolStripDropDown dropDown)
         {
-            AddFileTab(dropDown.Text, false, null, false, null);
+            _ = AddFileTab(dropDown.Text, false, null, false, null);
         }
     }
 
@@ -2078,7 +2095,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (string.IsNullOrEmpty(e.ClickedItem.Text) == false)
         {
-            AddFileTab(e.ClickedItem.Text, false, null, false, null);
+            _ = AddFileTab(e.ClickedItem.Text, false, null, false, null);
         }
     }
 
@@ -2128,7 +2145,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         {
                             //logWindow.SetColumnizer(form.SelectedColumnizer);
                             SetColumnizerFx fx = logWindow.ForceColumnizer;
-                            logWindow.Invoke(fx, form.SelectedColumnizer);
+                            _ = logWindow.Invoke(fx, form.SelectedColumnizer);
                             SetColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
                         }
                         else
@@ -2146,7 +2163,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 if (CurrentLogWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
                 {
                     SetColumnizerFx fx = CurrentLogWindow.ForceColumnizer;
-                    CurrentLogWindow.Invoke(fx, form.SelectedColumnizer);
+                    _ = CurrentLogWindow.Invoke(fx, form.SelectedColumnizer);
                     SetColumnizerHistoryEntry(CurrentLogWindow.FileName, form.SelectedColumnizer);
                 }
 
@@ -2276,7 +2293,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             TopMost = TopMost
         };
 
-        aboutBox.ShowDialog();
+        _ = aboutBox.ShowDialog();
     }
 
     private void OnFilterToolStripMenuItemClick (object sender, EventArgs e)
@@ -2294,7 +2311,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnGuiStateUpdate (object sender, GuiStateArgs e)
     {
-        BeginInvoke(GuiStateUpdateWorker, e);
+        _ = BeginInvoke(GuiStateUpdateWorker, e);
     }
 
     private void OnColumnizerChanged (object sender, ColumnizerEventArgs e)
@@ -2319,7 +2336,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnProgressBarUpdate (object sender, ProgressEventArgs e)
     {
-        Invoke(ProgressBarUpdateWorker, e);
+        _ = Invoke(ProgressBarUpdateWorker, e);
     }
 
     private void OnStatusLineEvent (object sender, StatusLineEventArgs e)
@@ -2413,19 +2430,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     data.Dirty = true;
                 }
                 var icon = GetIcon(diff, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
+                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
         }
     }
 
     private void OnLogWindowFileNotFound (object sender, EventArgs e)
     {
-        Invoke(new FileNotFoundDelegate(FileNotFound), sender);
+        _ = Invoke(new FileNotFoundDelegate(FileNotFound), sender);
     }
 
     private void OnLogWindowFileRespawned (object sender, EventArgs e)
     {
-        Invoke(new FileRespawnedDelegate(FileRespawned), sender);
+        _ = Invoke(new FileRespawnedDelegate(FileRespawned), sender);
     }
 
     private void OnLogWindowFilterListChanged (object sender, FilterListChangedEventArgs e)
@@ -2463,7 +2480,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
                 data.Dirty = false;
                 var icon = GetIcon(data.DiffSum, data);
-                BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
+                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
         }
     }
@@ -2476,7 +2493,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
             data.SyncMode = e.IsTimeSynced ? 1 : 0;
             var icon = GetIcon(data.DiffSum, data);
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
+            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
         }
         else
         {
@@ -2539,7 +2556,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var data = CurrentLogWindow.Tag as LogWindowData;
             var icon = GetIcon(0, data);
-            BeginInvoke(new SetTabIconDelegate(SetTabIcon), CurrentLogWindow, icon);
+            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), CurrentLogWindow, icon);
             CurrentLogWindow.Reload();
         }
     }
@@ -2562,7 +2579,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnDateTimeDragControlValueChanged (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ScrollToTimestamp(dragControlDateTime.DateTime, true, true);
+        _ = (CurrentLogWindow?.ScrollToTimestamp(dragControlDateTime.DateTime, true, true));
     }
 
     [SupportedOSPlatform("windows")]
@@ -2810,7 +2827,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         explorer.StartInfo.FileName = "explorer.exe";
         explorer.StartInfo.Arguments = "/e,/select," + logWindow.Title;
         explorer.StartInfo.UseShellExecute = false;
-        explorer.Start();
+        _ = explorer.Start();
     }
 
     private void TruncateFileToolStripMenuItem_Click (object sender, EventArgs e)
@@ -2908,7 +2925,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnThrowExceptionBackgroundThToolStripMenuItemClick (object sender, EventArgs e)
     {
         ExceptionFx fx = ThrowExceptionFx;
-        fx.BeginInvoke(null, null);
+        _ = fx.BeginInvoke(null, null);
     }
 
     private void OnThrowExceptionBackgroundThreadToolStripMenuItemClick (object sender, EventArgs e)
@@ -2975,7 +2992,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnOptionToolStripMenuItemDropDownOpening (object sender, EventArgs e)
     {
-        lockInstanceToolStripMenuItem.Enabled = !ConfigManager.Settings.Preferences.AllowOnlyOneInstance;
         lockInstanceToolStripMenuItem.Checked = AbstractLogTabWindow.StaticData.CurrentLockedMainWindow == this;
     }
 
