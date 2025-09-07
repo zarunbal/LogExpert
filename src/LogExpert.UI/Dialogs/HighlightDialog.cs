@@ -231,7 +231,6 @@ internal partial class HighlightDialog : Form
                                     or NotSupportedException)
         {
             _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsCouldNotBeImported, Resources.LogExpert_Common_UI_Title_LogExpert);
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_FileAccessError, dlg.FileName, ex));
             return;
         }
 
@@ -502,7 +501,6 @@ internal partial class HighlightDialog : Form
                                             or InvalidOperationException
                                             or SystemException)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry, ex));
                 _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message),
                     Resources.LogExpert_Common_UI_Title_Error,
                     MessageBoxButtons.OK,
@@ -682,7 +680,6 @@ internal partial class HighlightDialog : Form
                                         or InvalidOperationException
                                         or SystemException)
         {
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry, ex));
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message), Resources.LogExpert_Common_UI_Title_Error);
         }
     }

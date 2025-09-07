@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Interface;
@@ -224,7 +222,7 @@ internal class TimeSpreadCalculator
                 ? (int)Math.Round(_lineCount / (double)_displayHeight)
                 : 1;
 
-            _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadCalculator_Logger_Debug_DoCalc_CollectingDataForLinesWithStepSize, lastLineNum, step));
+            //_logger.Debug($"Collecting data for {lastLineNum} lines with step size {step}"));
 
             List<SpreadEntry> newDiffList = [];
             List<TimeSpan> maxList = [];
@@ -267,7 +265,7 @@ internal class TimeSpreadCalculator
         if (_callback.GetLineCount() < 1)
         {
             OnCalcDone(EventArgs.Empty);
-            _logger.Debug(Resources.TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_EndBecauseOfLineCount);
+            //_logger.Debug($"End because of line count < 1");
             return;
         }
 
@@ -284,7 +282,7 @@ internal class TimeSpreadCalculator
 
             var step = overallSpanMillis > _displayHeight ? (long)Math.Round(overallSpanMillis / (double)_displayHeight) : 1;
 
-            _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TimeRangeIsMs, overallSpanMillis));
+            //_logger.Debug($"Time range is {overallSpanMillis} ms");
 
             lineNum = 0;
             var searchTimeStamp = _startTimestamp;
@@ -307,7 +305,7 @@ internal class TimeSpreadCalculator
                 var lineDiff = lineNum - oldLineNum;
 
                 var timestamp = $"{searchTimeStamp:HH:mm:ss.fff}";
-                _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TestTimeLineDiff, timestamp, lineDiff));
+                //_logger.Debug($"Test time {timestamp} line diff={lineDiff}"));
 
                 if (lineDiff >= 0)
                 {
@@ -341,7 +339,7 @@ internal class TimeSpreadCalculator
 
             _average = lineDiffSum / (double)loopCount;
             //double average = maxList[maxList.Count / 2];
-            _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_AverageDiffMinDiffMaxDiff, _average, minDiff, _maxDiff));
+            //_logger.Debug($"Average diff={_average} minDiff={minDiff} maxDiff={_maxDiff}");
 
             lock (_diffListLock)
             {
@@ -393,7 +391,7 @@ internal class TimeSpreadCalculator
     {
         foreach (var entry in DiffList)
         {
-            var lineDiff = entry.Diff;
+            //var lineDiff = entry.Diff;
             var diffFromAverage = entry.Diff - average;
 
             if (diffFromAverage < 0)
@@ -404,8 +402,8 @@ internal class TimeSpreadCalculator
             var value = (int)(diffFromAverage / maxDiff * _contrast);
             entry.Value = 255 - value;
 
-            var timestamp = $"{entry.Timestamp:HH:mm:ss.fff}";
-            _logger.Debug(string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue, timestamp, lineDiff, value));
+            //var timestamp = $"{entry.Timestamp:HH:mm:ss.fff}";
+            //_logger.Debug($"Test time {timestamp} line diff={lineDiff} value={value}"));
         }
     }
 

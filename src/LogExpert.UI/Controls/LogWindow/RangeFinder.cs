@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Filter;
@@ -33,17 +31,17 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
 
     public Range FindRange (int startLine)
     {
-        _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.RangeFinder_Logger_Info_FindRange, _filterParams.SearchText, _filterParams.RangeSearchText));
+        //_logger.Info($"Starting range search for {_filterParams.SearchText} ... {_filterParams.RangeSearchText}");
 
         if (_filterParams.RangeSearchText == null || _filterParams.RangeSearchText.Trim().Length == 0)
         {
-            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_RangeSearchTextNotSetCancellingRangeSearch);
+            //_logger.Info("Search text not set. Cancelling range search.");
             return null;
         }
 
         if (_filterParams.SearchText == null || _filterParams.SearchText.Trim().Length == 0)
         {
-            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_SearchTextNotSetCancellingRangeSearch);
+            //_logger.Info("Range search text not set. Cancelling range search.");
             return null;
         }
 
@@ -84,7 +82,7 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
 
         if (!foundStartLine)
         {
-            _logger.Info(Resources.RangeFinder_Logger_Info_FindRange_RangeStartNotFound);
+            //_logger.Info("Range start not found");
             return null;
         }
 
@@ -109,7 +107,7 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
         lineNum--;
         range.EndLine = lineNum;
 
-        _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.RangeFinder_Logger_Info_FindRange_Finished, range.EndLine - range.StartLine));
+        //_logger.Info($"Range search finished. Found {range.EndLine - range.StartLine} lines");
 
         return range;
     }

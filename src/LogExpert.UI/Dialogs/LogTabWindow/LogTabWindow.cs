@@ -587,7 +587,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 catch (ArgumentException e)
                 {
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer, e));
+                    _logger.Error($"RegEx-error while finding columnizer: {e}");
                 }
             }
         }
@@ -611,7 +611,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 catch (ArgumentException e)
                 {
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer, e));
+                    _logger.Error($"RegEx-error while finding columnizer: {e}");
                 }
             }
         }
@@ -801,7 +801,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             catch (ArgumentException)
             {
                 //ConfigManager.Settings.Preferences.DefaultEncoding
-                _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Warn_EncodingIsNotValid, ConfigManager.Settings.Preferences.DefaultEncoding));
+                _logger.Warn($"### FillDefaultEncodingFromSettings: Encoding {ConfigManager.Settings.Preferences.DefaultEncoding} is not a valid encoding");
                 encodingOptions.DefaultEncoding = null;
             }
         }
@@ -1632,7 +1632,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void NotifyWindowsForChangedPrefs (SettingsFlags flags)
     {
-        _logger.Info(Resources.LogTabWindow_Logger_Warn_ThePreferencesHaveChanged);
         ApplySettings(ConfigManager.Settings, flags);
 
         var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
@@ -1775,7 +1774,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var columnizer = ColumnizerPicker.DecideColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
-            _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection, cmd, args));
+            //_logger.Info($"Starting external tool with sysout redirection: {cmd} {args}"));
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             //process.OutputDataReceived += pipe.DataReceivedEventHandler;
@@ -1803,8 +1802,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         else
         {
-            _logger.Info(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Info_StartingExternalTool, cmd, args));
-
             try
             {
                 startInfo.UseShellExecute = false;
@@ -2017,7 +2014,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 return win;
             }
 
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogWindowForFileName, fileName));
+            //_logger.Warn("Layout data contains non-existing LogWindow for {fileName}"));
         }
 
         return null;
@@ -2260,7 +2257,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
 #if DEBUG
         var formats = e.Data.GetFormats();
-        var s = Resources.LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFormats;
+        var s = "Dragging something over LogExpert. Formats: ";
         foreach (var format in formats)
         {
             s += format;
@@ -2288,7 +2285,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
 #if DEBUG
         var formats = e.Data.GetFormats();
-        var s = Resources.LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats;
+        var s = "Dropped formats: ";
         foreach (var format in formats)
         {
             s += format;
@@ -2535,10 +2532,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var icon = GetIcon(data.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
         }
-        else
-        {
-            _logger.Warn(Resources.LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventWhileDisposingEventIgnored);
-        }
+        //else
+        //{
+        //    _logger.Warn("Received SyncModeChanged event while disposing. Event ignored.");
+        //}
     }
 
     [SupportedOSPlatform("windows")]

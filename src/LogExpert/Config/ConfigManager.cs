@@ -138,20 +138,9 @@ public class ConfigManager : IConfigManager
     [SupportedOSPlatform("windows")]
     private Settings Load ()
     {
-        _logger.Info(Resources.ConfigManager_Logger_Info_LoadingSettings);
-
-        string dir;
-
-        if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
-        {
-            _logger.Info(Resources.ConfigManager_Logger_Info_LoadSettingsStandardMode);
-            dir = ConfigDir;
-        }
-        else
-        {
-            _logger.Info(Resources.ConfigManager_Logger_Info_LoadSettingsPortableMode);
-            dir = Application.StartupPath;
-        }
+        var dir = !File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName))
+            ? ConfigDir
+            : Application.StartupPath;
 
         if (!Directory.Exists(dir))
         {
@@ -170,15 +159,15 @@ public class ConfigManager : IConfigManager
         }
         catch (IOException ex)
         {
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_FileSystemErrorExMessage, ex.Message));
+            _logger.Error($"File system error: {ex.Message}");
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_AccessDeniedExMessage, ex));
+            _logger.Error($"Access denied: {ex}");
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_UnexpectedErrorExMessage, ex));
+            _logger.Error($"Access denied: {ex}");
         }
 
         return LoadOrCreateNew(null);
@@ -214,7 +203,7 @@ public class ConfigManager : IConfigManager
                                             or ArgumentNullException
                                             or ArgumentException)
                 {
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData, e));
+                    _logger.Error($"### LoadOrCreateNew: Error while deserializing config data: {e}");
                     settings = new Settings();
                 }
             }
@@ -308,7 +297,6 @@ public class ConfigManager : IConfigManager
     {
         lock (_loadSaveLock)
         {
-            _logger.Info(Resources.ConfigManager_Logger_Info_SavingSettings);
             var dir = Settings.Preferences.PortableMode ? Application.StartupPath : ConfigDir;
 
             if (!Directory.Exists(dir))
@@ -409,7 +397,7 @@ public class ConfigManager : IConfigManager
                             or ArgumentNullException
                             or ArgumentException)
         {
-            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData, e));
+            _logger.Error($"### Import: Error while deserializing config data: {e}");
             newGroups = [];
         }
 

@@ -121,7 +121,7 @@ internal static class Program
                                                        or ArgumentException
                                                        or SecurityException)
                         {
-                            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_IPCChannel_ClientError_Default, ex));
+                            _logger.Error($"IpcClientChannel error: {ex}");
                             errMsg = ex;
                             counter--;
                             Thread.Sleep(500);
@@ -130,7 +130,7 @@ internal static class Program
 
                     if (counter == 0)
                     {
-                        _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_IPCChannel_ClientError, errMsg));
+                        _logger.Error($"IpcClientChannel error, giving up: {errMsg}");
                         _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.LogExpert_Common_UI_Title_LogExpert);
                     }
 
@@ -159,7 +159,7 @@ internal static class Program
                                        or ArgumentNullException
                                        or ArgumentException)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_MutexError, ex));
+                _logger.Error($"Mutex error, giving up: {ex}");
                 cts.Cancel();
                 _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
@@ -238,7 +238,7 @@ internal static class Program
                     proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
                     break;
                 default:
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_Pipe_UnknownIPCMessage, message.Type, payLoad));
+                    _logger.Error($"Unknown IPC Message Type: {message.Type} with payload: {payLoad}");
                     break;
             }
         }
@@ -248,7 +248,7 @@ internal static class Program
     {
         if (payLoad == null)
         {
-            _logger.Error(Resources.Program_Logger_Error_Payload_InvalidCommand);
+            _logger.Error("Invalid payload command: null");
             return false;
         }
 
@@ -265,22 +265,22 @@ internal static class Program
         }
         catch (TimeoutException)
         {
-            _logger.Error(Resources.Program_Logger_Error_Pipe_TimeoutException);
+            _logger.Error("Timeout connecting to pipe server");
             return;
         }
         catch (IOException ex)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Error_Pipe_IOException, ex));
+            _logger.Warn($"An I/O error occurred while connecting to the pipe server: {ex}");
             return;
         }
         catch (InvalidOperationException ioe)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_InvalidOperationException, ioe));
+            _logger.Warn($"Invalid Operation while connecting to the pipe server: {ioe}");
             return;
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_UnauthorizedAccessException, ex));
+            _logger.Warn($"Unauthorized access while connecting to the pipe server: {ex}");
             return;
         }
 
@@ -326,7 +326,7 @@ internal static class Program
                                                or ArgumentOutOfRangeException
                                                or ArgumentException)
             {
-                _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_CommonError, ex));
+                _logger.Warn($"Pipe server error: {ex}");
             }
         }
     }

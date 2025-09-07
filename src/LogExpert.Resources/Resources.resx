@@ -222,66 +222,11 @@
     <value>LogExpert Error</value>
     <comment>LogExpert Error Title</comment>
   </data>
-  <data name="Program_Logger_Error_Pipe_TimeoutException" xml:space="preserve">
-    <value>Timeout connecting to pipe server</value>
-    <comment>Timeout Exception thrown from the Named Pipe</comment>
-  </data>
-  <data name="Program_Logger_Warn_Error_Pipe_IOException" xml:space="preserve">
-    <value>An I/O error occurred while connecting to the pipe server: {0}</value>
-  </data>
-  <data name="Program_Logger_Warn_Pipe_UnauthorizedAccessException" xml:space="preserve">
-    <value>Unauthorized access while connecting to the pipe server: {0}</value>
-  </data>
-  <data name="Program_Logger_Warn_Pipe_CommonError" xml:space="preserve">
-    <value>Pipe server error: {0}</value>
-  </data>
-  <data name="Program_Logger_Error_Payload_InvalidCommand" xml:space="preserve">
-    <value>Invalid payload command: null</value>
-  </data>
-  <data name="Program_Logger_Error_Pipe_UnknownIPCMessage" xml:space="preserve">
-    <value>Unknown IPC Message Type: {0}; with payload: {1}</value>
-  </data>
   <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
     <value>Cannot open connection to first instance ({0})</value>
   </data>
-  <data name="Program_Logger_Error_MutexError" xml:space="preserve">
-    <value>Mutex error, giving up: {0}</value>
-  </data>
-  <data name="Program_Logger_Error_IPCChannel_ClientError" xml:space="preserve">
-    <value>IpcClientChannel error, giving up: {0}</value>
-  </data>
-  <data name="Program_Logger_Error_IPCChannel_ClientError_Default" xml:space="preserve">
-    <value>IpcClientChannel error: {0}</value>
-  </data>
-  <data name="Program_Logger_Warn_Pipe_InvalidOperationException" xml:space="preserve">
-    <value>Invalid Operation while connecting to the pipe server: {0}</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab" xml:space="preserve">
-    <value>Loading files into existing LogTabWindow</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne" xml:space="preserve">
-    <value>first GUI thread window is disposed. Setting a new one.</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne" xml:space="preserve">
-    <value>No windows left. New created window will be the new 'first' GUI window</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_CreatingNewWindow" xml:space="preserve">
-    <value>Creating new LogTabWindow</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_LastTabWindowClosed" xml:space="preserve">
-    <value>Last LogTabWindow was closed</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_AddWindow" xml:space="preserve">
-    <value>Adding window to list</value>
-  </data>
-  <data name="LogExpertProxy_Logger_Info_RemoveWindow" xml:space="preserve">
-    <value>Removing window from list</value>
-  </data>
   <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
     <value>Settings imported</value>
-  </data>
-  <data name="HighlightDialog_Logger_Error_FileAccessError" xml:space="preserve">
-    <value>Error while trying to access file: {0}, exception: {1}</value>
   </data>
   <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
     <value>Settings could not be imported: {0}</value>
@@ -298,9 +243,6 @@
   <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
     <value>New group</value>
   </data>
-  <data name="HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
-    <value>Error during add of highlight entry: {0}</value>
-  </data>
   <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
     <value>Error during add of entry.
 {0}</value>
@@ -311,35 +253,8 @@
   <data name="HighlightDialog_UI_DefaultGroupName" xml:space="preserve">
     <value>[Default]</value>
   </data>
-  <data name="HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
-    <value>Error during save of save highlight entry: {0}</value>
-  </data>
   <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
     <value>Error during save of entry.\r\n{0}</value>
-  </data>
-  <data name="ConfigManager_Logger_Info_LoadingSettings" xml:space="preserve">
-    <value>Loading settings</value>
-  </data>
-  <data name="ConfigManager_Logger_Info_LoadSettingsStandardMode" xml:space="preserve">
-    <value>Load settings standard mode</value>
-  </data>
-  <data name="ConfigManager_Logger_Info_LoadSettingsPortableMode" xml:space="preserve">
-    <value>Load settings portable mode</value>
-  </data>
-  <data name="ConfigManager_Logger_Error_FileSystemErrorExMessage" xml:space="preserve">
-    <value>File system error: {0}</value>
-  </data>
-  <data name="ConfigManager_Logger_Error_AccessDeniedExMessage" xml:space="preserve">
-    <value>Access denied: {0}</value>
-  </data>
-  <data name="ConfigManager_Logger_Error_UnexpectedErrorExMessage" xml:space="preserve">
-    <value>Unexpected error: {0}</value>
-  </data>
-  <data name="ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData" xml:space="preserve">
-    <value>Error while deserializing config data: {0}</value>
-  </data>
-  <data name="ConfigManager_Logger_Info_SavingSettings" xml:space="preserve">
-    <value>Saving settings</value>
   </data>
   <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
     <value>No processes are locking the path specified</value>
@@ -362,62 +277,17 @@
   <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
     <value>Line</value>
   </data>
-  <data name="LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName" xml:space="preserve">
-    <value>Setting columnizer {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_FinishedLoading" xml:space="preserve">
-    <value>Finished loading.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload" xml:space="preserve">
-    <value>Refreshing filter view because of reload.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_HandlingFileNotFoundEvent" xml:space="preserve">
-    <value>Handling file not found event.</value>
-  </data>
   <data name="LogWindow_UI_SureToClose" xml:space="preserve">
     <value>Sure to close?</value>
   </data>
-  <data name="LogWindow_Logger_Info_NewFileCreated" xml:space="preserve">
-    <value>new File created.</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_ReloadingInvoked" xml:space="preserve">
-    <value>Reloading invoked.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1" xml:space="preserve">
-    <value>Got FileSizeChanged event. prevLines:{0}, curr lines: {1}</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_SelectionChangedTrigger" xml:space="preserve">
-    <value>Selection changed trigger</value>
-  </data>
   <data name="LogWindow_UI_StatusLineText_SelCountSelectedLines" xml:space="preserve">
     <value>{0} selected lines</value>
-  </data>
-  <data name="LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount" xml:space="preserve">
-    <value>Error in selectionChangedTrigger_Signal selcount {0}, Exception: {1}</value>
   </data>
   <data name="LogWindow_UI_Text_Frozen" xml:space="preserve">
     <value>Frozen</value>
   </data>
   <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
     <value>Freeze left columns until here ({0})</value>
-  </data>
-  <data name="LogWindow_Logger_Info_NoPersistenceDataForFileNameFound" xml:space="preserve">
-    <value>No persistence data for {0} found.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions" xml:space="preserve">
-    <value>Detected MultiFile name list in persistence options</value>
-  </data>
-  <data name="LogWindow_Logger_Error_LoadingPersistenceData" xml:space="preserve">
-    <value>Error loading persistence data: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Error_LoadingBookmarks" xml:space="preserve">
-    <value>Error loading bookmarks: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded" xml:space="preserve">
-    <value>Persistence data for {0} is outdated. It was discarded.</value>
-  </data>
-  <data name="LogWindow_Logger_Error_SettingSplitterDistance" xml:space="preserve">
-    <value>Error setting splitter distance: {0}</value>
   </data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
     <value>Invalid regular expression</value>
@@ -428,56 +298,11 @@
   <data name="LogWindow_UI_StatusLineText_FileNotFound" xml:space="preserve">
     <value>File not found</value>
   </data>
-  <data name="LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned" xml:space="preserve">
-    <value>Reloading file because it has been respawned.</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls" xml:space="preserve">
-    <value>Preventing reload because of recursive calls.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter" xml:space="preserve">
-    <value>ReloadNewFile(): counter = {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_WaitingForLoadingToBeComplete" xml:space="preserve">
-    <value>Waiting for loading to be complete.</value>
-  </data>
-  <data name="LogWindow_Logger_Error_InUpdateProgressCallback" xml:space="preserve">
-    <value>Error in UpdateProgress Callback: {0}</value>
-  </data>
   <data name="LogWindow_UI_StatusText_LoadingWithParameter" xml:space="preserve">
     <value>Loading {0}</value>
   </data>
-  <data name="LogWindow_Logger_Error_LoadingStartedCallback" xml:space="preserve">
-    <value>Error LoadingStarted Callback: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_FileLoadingComplete" xml:space="preserve">
-    <value>File loading complete.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_WaitingForSignal" xml:space="preserve">
-    <value>Waiting for signal</value>
-  </data>
-  <data name="LogWindow_Logger_Info_WakeupSignalReceived" xml:space="preserve">
-    <value>Wakeup signal received.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_EventsInQueue" xml:space="preserve">
-    <value>{0} events in queue</value>
-  </data>
-  <data name="LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount" xml:space="preserve">
-    <value>Line count of event is: {0}, should be greater than last line count: {1}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_UpdateGridNewRowCount" xml:space="preserve">
-    <value>UpdateGrid(): new RowCount={0}</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover" xml:space="preserve">
-    <value>UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}</value>
-  </data>
   <data name="Logger_Error_In_Function" xml:space="preserve">
     <value>Error in {0}: {1}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_SetColumnizerInternal" xml:space="preserve">
-    <value>SetColumnizerInternal(): {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Error_WhileResizingColumns" xml:space="preserve">
-    <value>Error while resizing columns: {0}</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
     <value>Time diff is {0}</value>
@@ -512,12 +337,6 @@
   <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
     <value>Choose a file to save bookmarks into</value>
   </data>
-  <data name="LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter" xml:space="preserve">
-    <value>GetTimestampForLine({0}) enter</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum" xml:space="preserve">
-    <value>GetTimestampForLine() leave with lineNum={0}</value>
-  </data>
   <data name="LogWindow_UI_CopyMarkedLinesToTab_Clip" xml:space="preserve">
     <value>{0}-&gt;Clip</value>
   </data>
@@ -527,57 +346,18 @@
   <data name="LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt" xml:space="preserve">
     <value>There's a comment attached to the bookmark. Really remove the bookmark?</value>
   </data>
-  <data name="LogWindow_Logger_Debug_AddBookmarkOverlays" xml:space="preserve">
-    <value>AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}</value>
-  </data>
   <data name="LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile" xml:space="preserve">
     <value>Unexpected issue truncating file</value>
-  </data>
-  <data name="LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage" xml:space="preserve">
-    <value>Unexpected issue truncating file: {0}</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
     <value>Truncate failed: file is locked by {0}</value>
   </data>
-  <data name="LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile" xml:space="preserve">
-    <value>Error while deleting temp file {0}: {1}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile" xml:space="preserve">
-    <value>Deleting temp file {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Error_ErrorSavingPersistence" xml:space="preserve">
-    <value>Error saving persistence: {0}</value>
-  </data>
   <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
     <value>Unexpected error while saving persistence: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_LoadFilesAsMulti_FileName" xml:space="preserve">
-    <value>LoadFilesAsMulti: File: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_LoadFile_PickedNewColumnizer" xml:space="preserve">
-    <value>Picked new columnizer {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_LoadFile_LoadingLogfile" xml:space="preserve">
-    <value>Loading logfile: {0}</value>
   </data>
   <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
     <value>Cannot load file
 {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine" xml:space="preserve">
-    <value>TestStatistics() called with start line {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo" xml:space="preserve">
-    <value>TestStatistic(): i={0} searchLine={1}</value>
-  </data>
-  <data name="LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock" xml:space="preserve">
-    <value>Found block: {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_TestStatistic_Ended" xml:space="preserve">
-    <value>TestStatistics() ended</value>
-  </data>
-  <data name="LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound" xml:space="preserve">
-    <value>FilterRestore(): Columnizer {0} not found</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile" xml:space="preserve">
     <value>Writing to temp file... Press ESC to cancel.</value>
@@ -591,7 +371,7 @@
   <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced" xml:space="preserve">
     <value>Show advanced...</value>
   </data>
-  <data name="LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
+  <data name="LogWindow_UI_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
     <value>Error occured while clearing filter list: {0}</value>
   </data>
   <data name="LogWindow_UI_FilterCount_ZeroValue" xml:space="preserve">
@@ -600,40 +380,19 @@
   <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
     <value>Search result not found</value>
   </data>
-  <data name="LogWindow_Logger_Error_SelectLine_WhileSelectingLine" xml:space="preserve">
-    <value>Error while selecting line: {0}</value>
-  </data>
   <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
     <value>Exception while filtering. Please report to developer: 
 {0}
 {1}</value>
   </data>
-  <data name="LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration" xml:space="preserve">
-    <value>Single threaded filter duration: {0} ms.</value>
-  </data>
   <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
     <value>Filter duration: {0} ms.</value>
-  </data>
-  <data name="LogWindow_Logger_Info_MultiThreadedFilter_Duration" xml:space="preserve">
-    <value>Multi threaded filter duration: {0} ms.</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
     <value>Filtering... Press ESC to cancel.</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
     <value>   {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_UpdateEditColumnDisplay" xml:space="preserve">
-    <value>SelStart: {0}, SelLen: {1}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull" xml:space="preserve">
-    <value>Edit control in logWindow was null</value>
-  </data>
-  <data name="LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow" xml:space="preserve">
-    <value>De-Syncing window for {0}</value>
-  </data>
-  <data name="LogWindow_Logger_Info_AddToTimeSync_SyncingWindow" xml:space="preserve">
-    <value>Syncing window for {0} to {1}</value>
   </data>
   <data name="LogWindow_UI_ColumnComboBox_ToolTip" xml:space="preserve">
     <value>Select column to scroll to</value>
@@ -869,9 +628,6 @@
   <data name="LogWindow_UI_ComboBox_ToolTip_Filter" xml:space="preserve">
     <value>Search string for the filter</value>
   </data>
-  <data name="LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer" xml:space="preserve">
-    <value>RegEx-error while finding columnizer: {0}</value>
-  </data>
   <data name="LogTabWindow_UI_LogWindow_ToolTip_InvertMatch" xml:space="preserve">
     <value>(Invert match)</value>
   </data>
@@ -888,9 +644,6 @@ Column restrict</value>
   <data name="LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn" xml:space="preserve">
     <value>Pasted on {0}</value>
   </data>
-  <data name="LogTabWindow_Logger_Warn_EncodingIsNotValid" xml:space="preserve">
-    <value>Encoding {0} is not a valid encoding</value>
-  </data>
   <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
     <value>Insufficient rights {0}: {1} </value>
   </data>
@@ -903,15 +656,6 @@ Column restrict</value>
   <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
     <value>Line</value>
   </data>
-  <data name="LogTabWindow_Logger_Warn_ThePreferencesHaveChanged" xml:space="preserve">
-    <value>The preferences have changed</value>
-  </data>
-  <data name="LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection" xml:space="preserve">
-    <value>Starting external tool with sysout redirection: {0} {1}</value>
-  </data>
-  <data name="LogTabWindow_Logger_Info_StartingExternalTool" xml:space="preserve">
-    <value>Starting external tool: {0} {1}</value>
-  </data>
   <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
     <value>-&gt;E</value>
   </data>
@@ -920,18 +664,6 @@ Column restrict</value>
   </data>
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
     <value>This is a test exception thrown by a background thread</value>
-  </data>
-  <data name="LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogWindowForFileName" xml:space="preserve">
-    <value>Layout data contains non-existing LogWindow for {0}</value>
-  </data>
-  <data name="LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFormats" xml:space="preserve">
-    <value>Dragging something over LogExpert. Formats: </value>
-  </data>
-  <data name="LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats" xml:space="preserve">
-    <value>Dropped formats: </value>
-  </data>
-  <data name="LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventWhileDisposingEventIgnored" xml:space="preserve">
-    <value>Received SyncModeChanged event while disposing. Event ignored.</value>
   </data>
   <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
     <value>LogExpert session {0}</value>
@@ -1345,51 +1077,12 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector" xml:space="preserve">
     <value>Timestamp selector</value>
   </data>
-  <data name="RangeFinder_Logger_Info_FindRange" xml:space="preserve">
-    <value>Starting range search for {0} ... {1}</value>
-  </data>
-  <data name="RangeFinder_Logger_Info_FindRange_RangeSearchTextNotSetCancellingRangeSearch" xml:space="preserve">
-    <value>Range search text not set. Cancelling range search.</value>
-  </data>
-  <data name="RangeFinder_Logger_Info_FindRange_SearchTextNotSetCancellingRangeSearch" xml:space="preserve">
-    <value>Search text not set. Cancelling range search.</value>
-  </data>
-  <data name="RangeFinder_Logger_Info_FindRange_RangeStartNotFound" xml:space="preserve">
-    <value>Range start not found</value>
-  </data>
-  <data name="RangeFinder_Logger_Info_FindRange_Finished" xml:space="preserve">
-    <value>Range search finished. Found {0} lines</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_EndBecauseOfLineCount" xml:space="preserve">
-    <value>End because of line count &lt; 1</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_DoCalc_CollectingDataForLinesWithStepSize" xml:space="preserve">
-    <value>Collecting data for {0} lines with step size {1}</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TimeRangeIsMs" xml:space="preserve">
-    <value>Time range is {0} ms</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_TestTimeLineDiff" xml:space="preserve">
-    <value>Test time {0} line diff={1}</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_DoCalcViaTime_AverageDiffMinDiffMaxDiff" xml:space="preserve">
-    <value>Average diff={0} minDiff={1} maxDiff={2}</value>
-  </data>
-  <data name="TimeSpreadCalculator_Logger_Debug_CalcValuesViaTime_TestTimeLineDiffValue" xml:space="preserve">
-    <value>Test time {0} line diff={1} value={2}</value>
-  </data>
   <data name="TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView" xml:space="preserve">
     <value>Calculating time spread view...</value>
   </data>
   <data name="TimeSpreadingControl_UI_ToolTip" xml:space="preserve">
     <value>Line {0}
 {1}</value>
-  </data>
-  <data name="BufferedDataGridView_Logger_Warn_OnControlKeyDown_EditControlWasNullToBeChecked" xml:space="preserve">
-    <value>Edit control was null, to be checked</value>
-  </data>
-  <data name="BufferedDataGridView_Logger_Debug_PaintOverlays" xml:space="preserve">
-    <value>ClipRgn: {0},{1},{2},{3}</value>
   </data>
   <data name="ColorComboBox_UI_ColorComboBox_Text_Custom" xml:space="preserve">
     <value>Custom</value>

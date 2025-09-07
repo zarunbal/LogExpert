@@ -59,7 +59,6 @@ internal class LogExpertProxy : ILogExpertProxy
 
     public void LoadFiles (string[] fileNames)
     {
-        _logger.Info(Resources.LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab);
         var logWin = _windowList[^1];
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
         logWin.LoadFiles(fileNames);
@@ -70,13 +69,13 @@ internal class LogExpertProxy : ILogExpertProxy
     {
         if (_firstLogTabWindow.IsDisposed)
         {
-            _logger.Warn(Resources.LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne);
+            _logger.Warn("### NewWindow: first GUI thread window is disposed. Setting a new one.");
             // may occur if a window is closed because of unhandled exception.
             // Determine a new 'firstWindow'. If no window is left, start a new one.
             RemoveWindow(_firstLogTabWindow);
             if (_windowList.Count == 0)
             {
-                _logger.Info(Resources.LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne);
+                _logger.Info("### NewWindow: No windows left. New created window will be the new 'first' GUI window");
                 LoadFiles(fileNames);
             }
             else
@@ -110,7 +109,6 @@ internal class LogExpertProxy : ILogExpertProxy
     [SupportedOSPlatform("windows")]
     public void NewWindowWorker (string[] fileNames)
     {
-        _logger.Info(Resources.LogExpertProxy_Logger_Info_CreatingNewWindow);
         IConfigManager configManager = ConfigManager.Instance;
         var logWin = AbstractLogTabWindow.Create(fileNames.Length > 0
                                                     ? fileNames
@@ -129,7 +127,6 @@ internal class LogExpertProxy : ILogExpertProxy
         RemoveWindow(logWin);
         if (_windowList.Count == 0)
         {
-            _logger.Info(Resources.LogExpertProxy_Logger_Info_LastTabWindowClosed);
             PluginRegistry.PluginRegistry.Instance.CleanupPlugins();
             OnLastWindowClosed();
         }
@@ -159,13 +156,11 @@ internal class LogExpertProxy : ILogExpertProxy
 
     private void AddWindow (ILogTabWindow window)
     {
-        _logger.Info(Resources.LogExpertProxy_Logger_Info_AddWindow);
         _windowList.Add(window);
     }
 
     private void RemoveWindow (ILogTabWindow window)
     {
-        _logger.Info(Resources.LogExpertProxy_Logger_Info_RemoveWindow);
         _ = _windowList.Remove(window);
     }
 
