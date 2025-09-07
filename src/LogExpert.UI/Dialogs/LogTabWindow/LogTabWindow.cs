@@ -95,6 +95,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        ApplyTextResources();
+        ApplyToolTips();
 
         ConfigManager = configManager;
 
