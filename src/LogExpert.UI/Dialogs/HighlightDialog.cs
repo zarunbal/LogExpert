@@ -10,15 +10,11 @@ using LogExpert.UI.Controls;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 
-using NLog;
-
 namespace LogExpert.Dialogs;
 
 [SupportedOSPlatform("windows")]
 internal partial class HighlightDialog : Form
 {
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
     #region Private Fields
 
     private readonly Image _applyButtonImage;

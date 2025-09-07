@@ -2,8 +2,6 @@ using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Filter;
 
-using NLog;
-
 using Range = LogExpert.Core.Entities.Range;
 
 namespace LogExpert.UI.Controls.LogWindow;
@@ -22,7 +20,6 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
     private readonly FilterParams _filterParams = filterParams.CloneWithCurrentColumnizer();
 
     #endregion
