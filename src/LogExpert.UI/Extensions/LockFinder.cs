@@ -6,7 +6,6 @@ using System.Runtime.Versioning;
 // Uses Windows Restart Manager.
 // A more involved and cross platform solution to this problem is here: https://github.com/cklutz/LockCheck
 
-
 namespace LogExpert.UI.Extensions;
 
 internal class LockFinder
@@ -47,7 +46,7 @@ internal class LockFinder
 
     /// <summary>
     /// Used to find processes holding a lock on the file. This would cause
-    /// other usage, such as file truncation or write opretions to throw
+    /// other usage, such as file truncation or write operations to throw
     /// IOException if an exclusive lock is attempted.
     /// </summary>
     /// <param name="path">Path being checked</param>

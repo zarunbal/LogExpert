@@ -327,6 +327,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Icon file....
+        /// </summary>
+        public static string ChooseIconDialog_UI_Button_ChooseIconFile {
+            get {
+                return ResourceManager.GetString("ChooseIconDialog_UI_Button_ChooseIconFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose Icon.
+        /// </summary>
+        public static string ChooseIconDialog_UI_Text {
+            get {
+                return ResourceManager.GetString("ChooseIconDialog_UI_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Close {

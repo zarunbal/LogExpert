@@ -1444,4 +1444,10 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="BookmarkWindow_UI_DataGridColumn_HeaderText" xml:space="preserve">
     <value>Bookmark Comment</value>
   </data>
+  <data name="ChooseIconDialog_UI_Button_ChooseIconFile" xml:space="preserve">
+    <value>Icon file...</value>
+  </data>
+  <data name="ChooseIconDialog_UI_Text" xml:space="preserve">
+    <value>Choose Icon</value>
+  </data>
 </root>
