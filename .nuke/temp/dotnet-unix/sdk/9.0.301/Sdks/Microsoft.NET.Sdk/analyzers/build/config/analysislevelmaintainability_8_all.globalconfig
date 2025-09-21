@@ -1,0 +1,30 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Maintainability' Rules from '8.0' release with 'All' analysis mode
+# Description: 'Maintainability' Rules with enabled-by-default state from '8.0' release with 'All' analysis mode. Rules that are first released in a version later than '8.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# CA1507: Use nameof to express symbol names
+dotnet_diagnostic.CA1507.severity = warning
+
+# CA1508: Avoid dead conditional code
+dotnet_diagnostic.CA1508.severity = warning
+
+# CA1510: Use ArgumentNullException throw helper
+dotnet_diagnostic.CA1510.severity = warning
+
+# CA1511: Use ArgumentException throw helper
+dotnet_diagnostic.CA1511.severity = warning
+
+# CA1512: Use ArgumentOutOfRangeException throw helper
+dotnet_diagnostic.CA1512.severity = warning
+
+# CA1513: Use ObjectDisposedException throw helper
+dotnet_diagnostic.CA1513.severity = warning
+
+# CA1514: Avoid redundant length argument
+dotnet_diagnostic.CA1514.severity = none

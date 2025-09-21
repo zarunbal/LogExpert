@@ -1,0 +1,30 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Reliability' Rules from '8.0' release with 'Default' analysis mode escalated to 'error' severity
+# Description: 'Reliability' Rules with enabled-by-default state from '8.0' release with 'Default' analysis mode. Rules that are first released in a version later than '8.0' are disabled. Enabled rules with 'warning' severity are escalated to 'error' severity to respect 'CodeAnalysisTreatWarningsAsErrors' MSBuild property.
+
+is_global = true
+
+global_level = -99
+
+
+# CA2013: Do not use ReferenceEquals with value types
+dotnet_diagnostic.CA2013.severity = error
+
+# CA2014: Do not use stackalloc in loops
+dotnet_diagnostic.CA2014.severity = error
+
+# CA2015: Do not define finalizers for types derived from MemoryManager<T>
+dotnet_diagnostic.CA2015.severity = error
+
+# CA2017: Parameter count mismatch
+dotnet_diagnostic.CA2017.severity = error
+
+# CA2018: 'Buffer.BlockCopy' expects the number of bytes to be copied for the 'count' argument
+dotnet_diagnostic.CA2018.severity = error
+
+# CA2021: Do not call Enumerable.Cast<T> or Enumerable.OfType<T> with incompatible types
+dotnet_diagnostic.CA2021.severity = error
+
+# CA2022: Avoid inexact read with 'Stream.Read'
+dotnet_diagnostic.CA2022.severity = none

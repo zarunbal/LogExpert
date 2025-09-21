@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.StaticAssets</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.Infrastructure.StaticAssetsEndpointDataSourceHelper">
+            <summary>
+            For internal framework use only.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.Infrastructure.StaticAssetsEndpointDataSourceHelper.HasStaticAssetsDataSource(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String)">
+            <summary>
+            For internal framework use only.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.Infrastructure.StaticAssetsEndpointDataSourceHelper.ResolveStaticAssetDescriptors(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String)">
+            <summary>
+            For internal framework use only.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor">
+            <summary>
+            The description of a static asset that was generated during the build process.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor.Route">
+            <summary>
+            The route that the asset is served from.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor.AssetPath">
+            <summary>
+            The path to the asset file from the wwwroot folder.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor.Selectors">
+            <summary>
+            A list of selectors that are used to discriminate between two or more assets with the same route.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor.Properties">
+            <summary>
+            A list of properties that are associated with the endpoint.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetDescriptor.ResponseHeaders">
+            <summary>
+            A list of headers to apply to the response when this resource is served.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointDataSource">
+            <summary>
+            An <see cref="T:Microsoft.AspNetCore.Routing.EndpointDataSource"/> for static assets.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointDataSource.ManifestPath">
+            <summary>
+            Gets the manifest name associated with this static asset endpoint data source.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointDataSource.DefaultBuilder">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointDataSource.Endpoints">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointDataSource.GetChangeToken">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetProperty">
+            <summary>
+            A property associated with a static asset.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetProperty.#ctor(System.String,System.String)">
+            <summary>
+            A property associated with a static asset.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetProperty.Name">
+            <summary>
+            The name of the property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetProperty.Value">
+            <summary>
+            The value of the property.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetResponseHeader">
+            <summary>
+            A response header to apply to the response when a static asset is served.
+            </summary>
+            <param name="name">The name of the header.</param>
+            <param name="value">The value of the header.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetResponseHeader.#ctor(System.String,System.String)">
+            <summary>
+            A response header to apply to the response when a static asset is served.
+            </summary>
+            <param name="name">The name of the header.</param>
+            <param name="value">The value of the header.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetResponseHeader.Name">
+            <summary>
+            The name of the header.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetResponseHeader.Value">
+            <summary>
+            The value of the header.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetSelector">
+            <summary>
+            A static asset selector. Selectors are used to discriminate between two or more assets with the same route.
+            </summary>
+            <param name="name">The name associated to the selector.</param>
+            <param name="value">The value associated to the selector and used to match against incoming requests.</param>
+            <param name="quality">The static server quality associated to this selector.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetSelector.#ctor(System.String,System.String,System.String)">
+            <summary>
+            A static asset selector. Selectors are used to discriminate between two or more assets with the same route.
+            </summary>
+            <param name="name">The name associated to the selector.</param>
+            <param name="value">The value associated to the selector and used to match against incoming requests.</param>
+            <param name="quality">The static server quality associated to this selector.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetSelector.Name">
+            <summary>
+            The name associated to the selector.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetSelector.Value">
+            <summary>
+            The value associated to the selector and used to match against incoming requests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetSelector.Quality">
+            <summary>
+            The static asset server quality associated to this selector. Used to break ties when a request matches multiple values
+            with the same degree of specificity.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointConventionBuilder">
+            <summary>
+            A builder for configuring conventions for static assets.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointConventionBuilder.Add(System.Action{Microsoft.AspNetCore.Builder.EndpointBuilder})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsEndpointConventionBuilder.Finally(System.Action{Microsoft.AspNetCore.Builder.EndpointBuilder})">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.StaticAssetDescriptor">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.StaticAssetProperty">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.StaticAssetResponseHeader">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.StaticAssetSelector">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.StaticAssetsManifest">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.IReadOnlyListStaticAssetProperty">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.IReadOnlyListStaticAssetResponseHeader">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.IReadOnlyListStaticAssetSelector">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.ListStaticAssetDescriptor">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.Int32">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.String">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.Default">
+            <summary>
+            The default <see cref="T:System.Text.Json.Serialization.JsonSerializerContext"/> associated with a default <see cref="T:System.Text.Json.JsonSerializerOptions"/> instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.GeneratedSerializerOptions">
+            <summary>
+            The source-generated options associated with this context.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.#ctor">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.#ctor(System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.StaticAssets.StaticAssetsManifestJsonContext.GetTypeInfo(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Builder.StaticAssetsEndpointRouteBuilderExtensions">
+            <summary>
+            Contains methods to integrate static assets with endpoints.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Builder.StaticAssetsEndpointRouteBuilderExtensions.MapStaticAssets(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String)">
+            <summary>
+            Maps static files produced during the build as endpoints.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/>.</param>
+            <param name="staticAssetsManifestPath">The path to the static assets manifest file.</param>
+            <remarks>
+            The <paramref name="staticAssetsManifestPath"/> can be null to use the <see cref="P:Microsoft.Extensions.Hosting.IHostEnvironment.ApplicationName"/> to locate the manifes.
+            As an alternative, a full path can be specified to the manifest file. If a relative path is used, we'll search for the file in the <see cref="P:System.AppContext.BaseDirectory"/>." />
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Internal.RangeHelper">
+            <summary>
+            Provides a parser for the Range Header in an <see cref="P:Microsoft.AspNetCore.Http.HttpContext.Request"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Internal.RangeHelper.ParseRange(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.Http.Headers.RequestHeaders,System.Int64,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Returns the normalized form of the requested range if the Range Header in the <see cref="P:Microsoft.AspNetCore.Http.HttpContext.Request"/> is valid.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> associated with the request.</param>
+            <param name="requestHeaders">The <see cref="T:Microsoft.AspNetCore.Http.Headers.RequestHeaders"/> associated with the given <paramref name="context"/>.</param>
+            <param name="length">The total length of the file representation requested.</param>
+            <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILogger"/>.</param>
+            <returns>A boolean value which represents if the <paramref name="requestHeaders"/> contain a single valid
+            range request. A <see cref="T:Microsoft.Net.Http.Headers.RangeItemHeaderValue"/> which represents the normalized form of the
+            range parsed from the <paramref name="requestHeaders"/> or <c>null</c> if it cannot be normalized.</returns>
+            <remark>If the Range header exists but cannot be parsed correctly, or if the provided length is 0, then the range request cannot be satisfied (status 416).
+            This results in (<c>true</c>,<c>null</c>) return values.</remark>
+        </member>
+    </members>
+</doc>

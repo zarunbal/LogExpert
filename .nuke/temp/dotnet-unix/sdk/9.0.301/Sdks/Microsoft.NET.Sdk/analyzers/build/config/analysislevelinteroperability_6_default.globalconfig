@@ -1,0 +1,18 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Interoperability' Rules from '6.0' release with 'Default' analysis mode
+# Description: 'Interoperability' Rules with enabled-by-default state from '6.0' release with 'Default' analysis mode. Rules that are first released in a version later than '6.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# CA1420: Property, type, or attribute requires runtime marshalling
+dotnet_diagnostic.CA1420.severity = none
+
+# CA1421: This method uses runtime marshalling even when the 'DisableRuntimeMarshallingAttribute' is applied
+dotnet_diagnostic.CA1421.severity = none
+
+# CA1422: Validate platform compatibility
+dotnet_diagnostic.CA1422.severity = none

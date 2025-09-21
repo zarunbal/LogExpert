@@ -1,0 +1,1708 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Server.IIS</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.BadHttpRequestException">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.BadHttpRequestException.StatusCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISHttpContext.ReadAsync(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Reads data from the Input pipe to the user.
+            </summary>
+            <param name="memory"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISHttpContext.WriteAsync(System.ReadOnlyMemory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Writes data to the output pipe.
+            </summary>
+            <param name="memory"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISHttpContext.FlushAsync(System.Threading.CancellationToken)">
+            <summary>
+            Flushes the data in the output pipe
+            </summary>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.Core.IISServerAuthenticationHandlerInternal">
+            <summary>
+            The default authentication handler with IIS In-Process
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISServerAuthenticationHandlerInternal.AuthenticateAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISServerAuthenticationHandlerInternal.ChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISServerAuthenticationHandlerInternal.ForbidAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.IISServerAuthenticationHandlerInternal.InitializeAsync(Microsoft.AspNetCore.Authentication.AuthenticationScheme,Microsoft.AspNetCore.Http.HttpContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal">
+            <summary>
+            A <see cref="T:System.IO.Stream"/> which throws on calls to write after the stream was upgraded
+            </summary>
+            <remarks>
+            Users should not need to instantiate this class.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal.Write(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal.Flush">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal.Seek(System.Int64,System.IO.SeekOrigin)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.ThrowingWasUpgradedWriteOnlyStreamInternal.SetLength(System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal">
+            <summary>
+            A <see cref="T:System.IO.Stream"/> which only allows for writes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.CanRead">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.CanWrite">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.ReadTimeout">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.CanSeek">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.Length">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.Position">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.Read(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.Seek(System.Int64,System.IO.SeekOrigin)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.Core.WriteOnlyStreamInternal.SetLength(System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.HttpContextExtensions">
+            <summary>
+            Extensions to <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> that enable access to IIS features.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.HttpContextExtensions.GetIISServerVariable(Microsoft.AspNetCore.Http.HttpContext,System.String)">
+            <summary>
+            Gets the value of a server variable for the current request.
+            </summary>
+            <param name="context">The http context for the request.</param>
+            <param name="variableName">The name of the variable.</param>
+            <returns>
+            <c>null</c> if the server does not support the <see cref="T:Microsoft.AspNetCore.Http.Features.IServerVariablesFeature"/> feature.
+            May return null or empty if the variable does not exist or is not set.
+            </returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature">
+            <summary>
+            This feature provides access to IIS application information
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.IISVersion">
+            <summary>
+            Gets the version of IIS that is being used.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.AppPoolId">
+            <summary>
+            Gets the AppPool name that is currently running
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.AppPoolConfigFile">
+            <summary>
+            Gets the path to the AppPool config
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.AppConfigPath">
+            <summary>
+            Gets path to the application configuration that is currently running
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.ApplicationPhysicalPath">
+            <summary>
+            Gets the physical path of the application.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.ApplicationVirtualPath">
+            <summary>
+            Gets the virtual path of the application.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.ApplicationId">
+            <summary>
+            Gets ID of the current application.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.SiteName">
+            <summary>
+            Gets the name of the current site.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.IIISEnvironmentFeature.SiteId">
+            <summary>
+            Gets the id of the current site.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.IIS.IISServerDefaults">
+            <summary>
+            String constants used to configure IIS In-Process.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Server.IIS.IISServerDefaults.AuthenticationScheme">
+            <summary>
+            Default authentication scheme, which is "Windows".
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.ResponseStreamWasUpgraded">
+            <summary>Cannot write to response body after connection has been upgraded.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.UnhandledApplicationException">
+            <summary>The response has been aborted due to an unhandled application exception.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.CannotUpgradeNonUpgradableRequest">
+            <summary>Cannot upgrade a non-upgradable request. Check IHttpUpgradeFeature.IsUpgradableRequest to determine if a request can be upgraded.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.UpgradeCannotBeCalledMultipleTimes">
+            <summary>IHttpUpgradeFeature.UpgradeAsync was already called and can only be called once per connection.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.SynchronousReadsDisallowed">
+            <summary>Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.SynchronousWritesDisallowed">
+            <summary>Synchronous operations are disallowed. Call WriteAsync or set AllowSynchronousIO to true instead.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.WritingToResponseBodyAfterResponseCompleted">
+            <summary>Cannot write to the response body, the response has completed.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.ConnectionAbortedByApplication">
+            <summary>The connection was aborted by the application.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.ConnectionOrStreamAbortedByCancellationToken">
+            <summary>The connection or stream was aborted because a write operation was aborted with a CancellationToken.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.ParameterReadOnlyAfterResponseStarted">
+            <summary>{name} cannot be set because the response has already started.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.IIS.CoreStrings.FormatParameterReadOnlyAfterResponseStarted(System.Object)">
+            <summary>{name} cannot be set because the response has already started.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.BadRequest_RequestBodyTooLarge">
+            <summary>Request body too large.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.MaxRequestBodySizeCannotBeModifiedAfterRead">
+            <summary>The maximum request body size cannot be modified after the app has already started reading from the request body.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.MaxRequestBodySizeCannotBeModifiedForUpgradedRequests">
+            <summary>The maximum request body size cannot be modified after the request has been upgraded.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.NonNegativeNumberOrNullRequired">
+            <summary>Value must be null or a non-negative number.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.BadRequest">
+            <summary>Bad request.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.MaxRequestLimitWarning">
+            <summary>Increasing the MaxRequestBodySize conflicts with the max value for IIS limit maxAllowedContentLength. HTTP requests that have a content length greater than maxAllowedContentLength will still be rejected by IIS. You can disable the limit by either removing  ...</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.IIS.CoreStrings.UpgradeWithWrongProtocolVersion">
+            <summary>Upgrade requires HTTP/1.1.</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.Kestrel.Core.Internal.DuplexPipeStreamAdapter`1">
+            <summary>
+            A helper for wrapping a Stream decorator from an <see cref="T:System.IO.Pipelines.IDuplexPipe"/>.
+            </summary>
+            <typeparam name="TStream"></typeparam>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.Kestrel.Core.Internal.MemoryPoolExtensions.GetMinimumSegmentSize(System.Buffers.MemoryPool{System.Byte})">
+            <summary>
+            Computes a minimum segment size
+            </summary>
+            <param name="pool"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.StringUtilities.ConcatAsHexSuffix(System.String,System.Char,System.UInt32)">
+            <summary>
+            A faster version of String.Concat(<paramref name="str"/>, <paramref name="separator"/>, <paramref name="number"/>.ToString("X8"))
+            </summary>
+            <param name="str"></param>
+            <param name="separator"></param>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Builder.IISServerOptions">
+            <summary>
+            Provides configuration for IIS In-Process.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.AllowSynchronousIO">
+            <summary>
+            Gets or sets a value that controls whether synchronous IO is allowed for the <see cref="P:Microsoft.AspNetCore.Http.HttpContext.Request"/> and <see cref="P:Microsoft.AspNetCore.Http.HttpContext.Response"/>
+            </summary>
+            <remarks>
+            Defaults to false.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.AutomaticAuthentication">
+            <summary>
+            If true the server should set HttpContext.User. If false the server will only provide an
+            identity when explicitly requested by the AuthenticationScheme.
+            Note Windows Authentication must also be enabled in IIS for this to work.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.AuthenticationDisplayName">
+            <summary>
+            Sets the display name shown to users on login pages. The default is null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.MaxRequestBodyBufferSize">
+            <summary>
+            Gets or sets the maximum unconsumed incoming bytes the server will buffer for incoming request body.
+            </summary>
+            <value>
+            Defaults to 1 MB.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.ForwardWindowsAuthentication">
+            <summary>
+            Used to indicate if the authentication handler should be registered. This is only done if ANCM indicates
+            IIS has a non-anonymous authentication enabled, or for back compat with ANCMs that did not provide this information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Builder.IISServerOptions.MaxRequestBodySize">
+            <summary>
+            Gets or sets the maximum allowed size of any request body in bytes.
+            When set to null, the maximum request length will not be restricted in ASP.NET Core.
+            However, the IIS maxAllowedContentLength will still restrict content length requests (30,000,000 by default).
+            This limit has no effect on upgraded connections which are always unlimited.
+            This can be overridden per-request via <see cref="T:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature"/>.
+            </summary>
+            <remarks>
+            Defaults to 30,000,000 bytes (~28.6 MB).
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Hosting.WebHostBuilderIISExtensions">
+            <summary>
+            Extension methods for the IIS In-Process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Hosting.WebHostBuilderIISExtensions.UseIIS(Microsoft.AspNetCore.Hosting.IWebHostBuilder)">
+            <summary>
+            Configures the port and base path the server should listen on when running behind AspNetCoreModule.
+            The app will also be configured to capture startup errors.
+            </summary>
+            <param name="hostBuilder">The <see cref="T:Microsoft.AspNetCore.Hosting.IWebHostBuilder"/> to configure.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Hosting.IWebHostBuilder"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Hosting.Views.ErrorPageModel">
+            <summary>
+            Holds data to be displayed on the error page.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Hosting.Views.ErrorPageModel.ErrorDetails">
+            <summary>
+            Detailed information about each exception in the stack.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RawUrlHelper.GetPath(System.Span{System.Byte})">
+            <summary>
+            Find the segment of the URI byte array which represents the path.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RawUrlHelper.FindHttpOrHttps(System.Span{System.Byte})">
+            <summary>
+            Compare the beginning portion of the raw URL byte array to https:// and http://
+            </summary>
+            <param name="raw">The byte array represents the raw URI</param>
+            <returns>Length of the matched bytes, 0 if it is not matched.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RequestUriBuilder.Unescape(System.Span{System.Byte})">
+            <summary>
+            Unescape a given path string in place. The given path string  may contain escaped char.
+            </summary>
+            <param name="rawPath">The raw path string to be unescaped</param>
+            <returns>The unescaped path string</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RequestUriBuilder.DecodeCore(System.Int32@,System.Int32@,System.Int32,System.Span{System.Byte})">
+            <summary>
+            Unescape the percent-encodings
+            </summary>
+            <param name="reader">The iterator point to the first % char</param>
+            <param name="writer">The place to write to</param>
+            <param name="end">The end of the buffer</param>
+            <param name="buffer">The byte array</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RequestUriBuilder.UnescapePercentEncoding(System.Int32@,System.Int32,System.ReadOnlySpan{System.Byte})">
+             <summary>
+             Read the percent-encoding and try unescape it.
+            
+             The operation first peek at the character the <paramref name="scan"/>
+             iterator points at. If it is % the <paramref name="scan"/> is then
+             moved on to scan the following to characters. If the two following
+             characters are hexadecimal literals they will be unescaped and the
+             value will be returned.
+            
+             If the first character is not % the <paramref name="scan"/> iterator
+             will be removed beyond the location of % and -1 will be returned.
+            
+             If the following two characters can't be successfully unescaped the
+             <paramref name="scan"/> iterator will be move behind the % and -1
+             will be returned.
+             </summary>
+             <param name="scan">The value to read</param>
+             <param name="end">The end of the buffer</param>
+             <param name="buffer">The byte array</param>
+             <returns>The unescaped byte if success. Otherwise return -1.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.HttpSys.Internal.RequestUriBuilder.ReadHex(System.Int32@,System.Int32,System.ReadOnlySpan{System.Byte})">
+             <summary>
+             Read the next char and convert it into hexadecimal value.
+            
+             The <paramref name="scan"/> iterator will be moved to the next
+             byte no matter no matter whether the operation successes.
+             </summary>
+             <param name="scan">The value to read</param>
+             <param name="end">The end of the buffer</param>
+             <param name="buffer">The byte array</param>
+             <returns>The hexadecimal value if successes, otherwise -1.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Shared.DictionaryItemDebugView`2">
+            <summary>
+            Defines a key/value pair for displaying an item of a dictionary by a debugger.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Internal.TypeNameHelper.GetTypeDisplayName(System.Type,System.Boolean,System.Boolean,System.Boolean,System.Char)">
+            <summary>
+            Pretty print a type name.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/>.</param>
+            <param name="fullName"><c>true</c> to print a fully qualified name.</param>
+            <param name="includeGenericParameterNames"><c>true</c> to include generic parameter names.</param>
+            <param name="includeGenericParameters"><c>true</c> to include generic parameters.</param>
+            <param name="nestedTypeDelimiter">Character to use as a delimiter in nested type names</param>
+            <returns>The pretty printed type name.</returns>
+        </member>
+        <member name="T:Microsoft.Extensions.StackTrace.Sources.ExceptionDetails">
+            <summary>
+            Contains details for individual exception messages.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.ExceptionDetails.Error">
+            <summary>
+            An individual exception
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.ExceptionDetails.StackFrames">
+            <summary>
+            The generated stack frames
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.ExceptionDetails.ErrorMessage">
+            <summary>
+            Gets or sets the summary message.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo">
+            <summary>
+            Contains the source code where the exception occurred.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.Function">
+            <summary>
+            Function containing instruction
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.File">
+            <summary>
+            File containing the instruction
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.Line">
+            <summary>
+            The line number of the instruction
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.PreContextLine">
+            <summary>
+            The line preceding the frame line
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.PreContextCode">
+            <summary>
+            Lines of code before the actual error line(s).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.ContextCode">
+            <summary>
+            Line(s) of code responsible for the error.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.PostContextCode">
+            <summary>
+            Lines of code after the actual error line(s).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.StackTrace.Sources.StackFrameSourceCodeInfo.ErrorDetails">
+            <summary>
+            Specific error details for this stack frame.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.RazorViews.BaseView">
+            <summary>
+            Infrastructure
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.Context">
+            <summary>
+            The request context
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.Request">
+            <summary>
+            The request
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.Response">
+            <summary>
+            The response
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.Output">
+            <summary>
+            The output stream
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.HtmlEncoder">
+            <summary>
+            Html encoder used to encode content.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.UrlEncoder">
+            <summary>
+            Url encoder used to encode content.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Extensions.RazorViews.BaseView.JavaScriptEncoder">
+            <summary>
+            JavaScript encoder used to encode content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.ExecuteAsync(System.IO.Stream)">
+            <summary>
+            Execute an individual request
+            </summary>
+            <param name="stream">The stream to write to</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Execute an individual request
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.ExecuteAsync">
+            <summary>
+            Execute an individual request
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.WriteLiteral(System.Object)">
+            <summary>
+            Write the given value without HTML encoding directly to <see cref="P:Microsoft.Extensions.RazorViews.BaseView.Output"/>.
+            </summary>
+            <param name="value">The <see cref="T:System.Object"/> to write.</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.WriteLiteral(System.String)">
+            <summary>
+            Write the given value without HTML encoding directly to <see cref="P:Microsoft.Extensions.RazorViews.BaseView.Output"/>.
+            </summary>
+            <param name="value">The <see cref="T:System.String"/> to write.</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.WriteAttribute(System.String,System.String,System.String,Microsoft.Extensions.RazorViews.AttributeValue[])">
+            <summary>
+            Writes the given attribute to the given writer
+            </summary>
+            <param name="name">The name of the attribute to write</param>
+            <param name="leader">The value of the prefix</param>
+            <param name="trailer">The value of the suffix</param>
+            <param name="values">The <see cref="T:Microsoft.Extensions.RazorViews.AttributeValue"/>s to write.</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.Write(Microsoft.Extensions.RazorViews.HelperResult)">
+            <summary>
+            <see cref="M:Microsoft.Extensions.RazorViews.HelperResult.WriteTo(System.IO.TextWriter)"/> is invoked
+            </summary>
+            <param name="result">The <see cref="T:Microsoft.Extensions.RazorViews.HelperResult"/> to invoke</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.Write(System.Object)">
+            <summary>
+            Writes the specified <paramref name="value"/> to <see cref="P:Microsoft.Extensions.RazorViews.BaseView.Output"/>.
+            </summary>
+            <param name="value">The <see cref="T:System.Object"/> to write.</param>
+            <remarks>
+            <see cref="M:Microsoft.Extensions.RazorViews.HelperResult.WriteTo(System.IO.TextWriter)"/> is invoked for <see cref="T:Microsoft.Extensions.RazorViews.HelperResult"/> types.
+            For all other types, the encoded result of <see cref="M:System.Object.ToString"/> is written to
+            <see cref="P:Microsoft.Extensions.RazorViews.BaseView.Output"/>.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.BaseView.Write(System.String)">
+            <summary>
+            Writes the specified <paramref name="value"/> with HTML encoding to <see cref="P:Microsoft.Extensions.RazorViews.BaseView.Output"/>.
+            </summary>
+            <param name="value">The <see cref="T:System.String"/> to write.</param>
+        </member>
+        <member name="T:Microsoft.Extensions.RazorViews.HelperResult">
+            <summary>
+            Represents a deferred write operation in a <see cref="T:Microsoft.Extensions.RazorViews.BaseView"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.HelperResult.#ctor(System.Action{System.IO.TextWriter})">
+            <summary>
+            Creates a new instance of <see cref="T:Microsoft.Extensions.RazorViews.HelperResult"/>.
+            </summary>
+            <param name="action">The delegate to invoke when <see cref="M:Microsoft.Extensions.RazorViews.HelperResult.WriteTo(System.IO.TextWriter)"/> is called.</param>
+        </member>
+        <member name="M:Microsoft.Extensions.RazorViews.HelperResult.WriteTo(System.IO.TextWriter)">
+            <summary>
+            Method invoked to produce content from the <see cref="T:Microsoft.Extensions.RazorViews.HelperResult"/>.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.TextWriter"/> instance to write to.</param>
+        </member>
+        <member name="T:StartupHook">
+            <summary>
+            Startup hooks are pieces of code that will run before a users program main executes
+            See: <see href="https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/host-startup-hook.md"/>
+            The type must be named StartupHook without any namespace, and should be internal.
+            </summary>
+        </member>
+        <member name="M:StartupHook.Initialize">
+            <summary>
+            Startup hooks are pieces of code that will run before a users program main executes
+            See: <see href="https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/host-startup-hook.md"/>
+            </summary>
+        </member>
+        <member name="T:System.Buffers.DiagnosticMemoryPool">
+            <summary>
+            Used to allocate and distribute re-usable blocks of memory.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.DiagnosticMemoryPool.AnySize">
+            <summary>
+            This default value passed in to Rent to use the default value for the pool.
+            </summary>
+        </member>
+        <member name="T:System.Buffers.DiagnosticPoolBlock">
+            <summary>
+            Block tracking object used by the byte buffer memory pool. A slab is a large allocation which is divided into smaller blocks. The
+            individual blocks are then treated as independent array segments.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.DiagnosticPoolBlock._pool">
+            <summary>
+            Back-reference to the memory pool which this block was allocated from. It may only be returned to this pool.
+            </summary>
+        </member>
+        <member name="M:System.Buffers.DiagnosticPoolBlock.#ctor(System.Buffers.DiagnosticMemoryPool,System.Buffers.IMemoryOwner{System.Byte})">
+            <summary>
+            This object cannot be instantiated outside of the static Create method
+            </summary>
+        </member>
+        <member name="T:System.Buffers.MemoryPoolBlock">
+            <summary>
+            Wraps an array allocated in the pinned object heap in a reusable block of managed memory
+            </summary>
+        </member>
+        <member name="P:System.Buffers.MemoryPoolBlock.Pool">
+            <summary>
+            Back-reference to the memory pool which this block was allocated from. It may only be returned to this pool.
+            </summary>
+        </member>
+        <member name="T:System.Buffers.PinnedBlockMemoryPool">
+            <summary>
+            Used to allocate and distribute re-usable blocks of memory.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.PinnedBlockMemoryPool._blockSize">
+            <summary>
+            The size of a block. 4096 is chosen because most operating systems use 4k pages.
+            </summary>
+        </member>
+        <member name="P:System.Buffers.PinnedBlockMemoryPool.MaxBufferSize">
+            <summary>
+            Max allocation block size for pooled blocks,
+            larger values can be leased but they will be disposed after use rather than returned to the pool.
+            </summary>
+        </member>
+        <member name="P:System.Buffers.PinnedBlockMemoryPool.BlockSize">
+            <summary>
+            The size of a block. 4096 is chosen because most operating systems use 4k pages.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.PinnedBlockMemoryPool._blocks">
+            <summary>
+            Thread-safe collection of blocks which are currently in the pool. A slab will pre-allocate all of the block tracking objects
+            and add them to this collection. When memory is requested it is taken from here first, and when it is returned it is re-added.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.PinnedBlockMemoryPool._isDisposed">
+            <summary>
+            This is part of implementing the IDisposable pattern.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.PinnedBlockMemoryPool.AnySize">
+            <summary>
+            This default value passed in to Rent to use the default value for the pool.
+            </summary>
+        </member>
+        <member name="M:System.Buffers.PinnedBlockMemoryPool.Return(System.Buffers.MemoryPoolBlock)">
+            <summary>
+            Called to return a block to the pool. Once Return has been called the memory no longer belongs to the caller, and
+            Very Bad Things will happen if the memory is read of modified subsequently. If a caller fails to call Return and the
+            block tracking object is garbage collected, the block tracking object's finalizer will automatically re-create and return
+            a new tracking object into the pool. This will only happen if there is a bug in the server, however it is necessary to avoid
+            leaving "dead zones" in the slab due to lost block tracking objects.
+            </summary>
+            <param name="block">The block to return. It must have been acquired by calling Lease on the same memory pool instance.</param>
+        </member>
+        <member name="M:System.Buffers.BufferExtensions.PositionOfAny``1(System.Buffers.ReadOnlySequence{``0}@,``0,``0)">
+            <summary>
+            Returns position of first occurrence of item in the <see cref="T:System.Buffers.ReadOnlySequence`1"/>
+            </summary>
+        </member>
+        <member name="T:System.Buffers.BufferWriter`1">
+            <summary>
+            A fast access struct that wraps <see cref="T:System.Buffers.IBufferWriter`1"/>.
+            </summary>
+            <typeparam name="T">The type of element to be written.</typeparam>
+        </member>
+        <member name="F:System.Buffers.BufferWriter`1._output">
+            <summary>
+            The underlying <see cref="T:System.Buffers.IBufferWriter`1"/>.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.BufferWriter`1._span">
+            <summary>
+            The result of the last call to <see cref="M:System.Buffers.IBufferWriter`1.GetSpan(System.Int32)"/>, less any bytes already "consumed" with <see cref="M:System.Buffers.BufferWriter`1.Advance(System.Int32)"/>.
+            Backing field for the <see cref="P:System.Buffers.BufferWriter`1.Span"/> property.
+            </summary>
+        </member>
+        <member name="F:System.Buffers.BufferWriter`1._buffered">
+            <summary>
+            The number of uncommitted bytes (all the calls to <see cref="M:System.Buffers.BufferWriter`1.Advance(System.Int32)"/> since the last call to <see cref="M:System.Buffers.BufferWriter`1.Commit"/>).
+            </summary>
+        </member>
+        <member name="F:System.Buffers.BufferWriter`1._bytesCommitted">
+            <summary>
+            The total number of bytes written with this writer.
+            Backing field for the <see cref="P:System.Buffers.BufferWriter`1.BytesCommitted"/> property.
+            </summary>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Buffers.BufferWriter`1"/> struct.
+            </summary>
+            <param name="output">The <see cref="T:System.Buffers.IBufferWriter`1"/> to be wrapped.</param>
+        </member>
+        <member name="P:System.Buffers.BufferWriter`1.Span">
+            <summary>
+            Gets the result of the last call to <see cref="M:System.Buffers.IBufferWriter`1.GetSpan(System.Int32)"/>.
+            </summary>
+        </member>
+        <member name="P:System.Buffers.BufferWriter`1.BytesCommitted">
+            <summary>
+            Gets the total number of bytes written with this writer.
+            </summary>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.Commit">
+            <summary>
+            Calls <see cref="M:System.Buffers.IBufferWriter`1.Advance(System.Int32)"/> on the underlying writer
+            with the number of uncommitted bytes.
+            </summary>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.Advance(System.Int32)">
+            <summary>
+            Used to indicate that part of the buffer has been written to.
+            </summary>
+            <param name="count">The number of bytes written to.</param>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.Write(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Copies the caller's buffer into this writer and calls <see cref="M:System.Buffers.BufferWriter`1.Advance(System.Int32)"/> with the length of the source buffer.
+            </summary>
+            <param name="source">The buffer to copy in.</param>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.Ensure(System.Int32)">
+            <summary>
+            Acquires a new buffer if necessary to ensure that some given number of bytes can be written to a single buffer.
+            </summary>
+            <param name="count">The number of bytes that must be allocated in a single buffer.</param>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.EnsureMore(System.Int32)">
+            <summary>
+            Gets a fresh span to write to, with an optional minimum size.
+            </summary>
+            <param name="count">The minimum size for the next requested buffer.</param>
+        </member>
+        <member name="M:System.Buffers.BufferWriter`1.WriteMultiBuffer(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Copies the caller's buffer into this writer, potentially across multiple buffers from the underlying writer.
+            </summary>
+            <param name="source">The buffer to copy into this writer.</param>
+        </member>
+        <member name="T:System.Threading.Tasks.TaskToApm">
+            <summary>
+            Provides support for efficiently using Tasks to implement the APM (Begin/End) pattern.
+            </summary>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.Begin(System.Threading.Tasks.Task,System.AsyncCallback,System.Object)">
+            <summary>
+            Marshals the Task as an IAsyncResult, using the supplied callback and state
+            to implement the APM pattern.
+            </summary>
+            <param name="task">The Task to be marshaled.</param>
+            <param name="callback">The callback to be invoked upon completion.</param>
+            <param name="state">The state to be stored in the IAsyncResult.</param>
+            <returns>An IAsyncResult to represent the task's asynchronous operation.</returns>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.End(System.IAsyncResult)">
+            <summary>Processes an IAsyncResult returned by Begin.</summary>
+            <param name="asyncResult">The IAsyncResult to unwrap.</param>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.End``1(System.IAsyncResult)">
+            <summary>Processes an IAsyncResult returned by Begin.</summary>
+            <param name="asyncResult">The IAsyncResult to unwrap.</param>
+        </member>
+        <member name="T:System.Threading.Tasks.TaskToApm.TaskAsyncResult">
+            <summary>Provides a simple IAsyncResult that wraps a Task.</summary>
+            <remarks>
+            We could use the Task as the IAsyncResult if the Task's AsyncState is the same as the object state,
+            but that's very rare, in particular in a situation where someone cares about allocation, and always
+            using TaskAsyncResult simplifies things and enables additional optimizations.
+            </remarks>
+        </member>
+        <member name="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._task">
+            <summary>The wrapped Task.</summary>
+        </member>
+        <member name="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._callback">
+            <summary>Callback to invoke when the wrapped task completes.</summary>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.TaskAsyncResult.#ctor(System.Threading.Tasks.Task,System.Object,System.AsyncCallback)">
+            <summary>Initializes the IAsyncResult with the Task to wrap and the associated object state.</summary>
+            <param name="task">The Task to wrap.</param>
+            <param name="state">The new AsyncState value.</param>
+            <param name="callback">Callback to invoke when the wrapped task completes.</param>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.TaskAsyncResult.InvokeCallback">
+            <summary>Invokes the callback.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.AsyncState">
+            <summary>Gets a user-defined object that qualifies or contains information about an asynchronous operation.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.CompletedSynchronously">
+            <summary>Gets a value that indicates whether the asynchronous operation completed synchronously.</summary>
+            <remarks>This is set lazily based on whether the <see cref="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._task"/> has completed by the time this object is created.</remarks>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.IsCompleted">
+            <summary>Gets a value that indicates whether the asynchronous operation has completed.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.AsyncWaitHandle">
+            <summary>Gets a <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an asynchronous operation to complete.</summary>
+        </member>
+        <member name="T:System.IO.Pipelines.DuplexPipe">
+             <remarks>
+             A <see cref="T:System.IO.Pipelines.Pipe"/> is a reader-writer pair, where content written to the writer can be read from the reader.
+            
+             An <see cref="T:System.IO.Pipelines.IDuplexPipe"/> is *not* a pipe.  It is also a reader-writer pair, but the reader and writer are not
+             connected.  Rather, it can be regarded as *one end* of a two-way (i.e. duplex) communication channel, where content
+             written to the writer is sent to the counterparty and content received from the counterparty is readable from the
+             reader.
+            
+             A <see cref="T:System.IO.Pipelines.DuplexPipe.DuplexPipePair"/> is a pair of <see cref="T:System.IO.Pipelines.IDuplexPipe"/> instances, each of which represents one end of
+             a two-way communication channel.  (In a sense, this makes it a "duplex pipe".)  It can also be viewed as a pair of
+             <see cref="T:System.IO.Pipelines.Pipe"/>s, as these underlie the <see cref="T:System.IO.Pipelines.IDuplexPipe"/> instances.  In either view, it is composed of
+             two <see cref="T:System.IO.Pipelines.PipeReader"/>s and two <see cref="T:System.IO.Pipelines.PipeWriter"/>s - it is only how they are grouped that differs.
+             </remarks>
+        </member>
+        <member name="T:UnmanagedBufferAllocator">
+            <summary>
+            Allocator that manages blocks of unmanaged memory.
+            </summary>
+        </member>
+        <member name="P:UnmanagedBufferAllocator.DefaultBlockSize">
+            <summary>
+            The default block size for the allocator.
+            </summary>
+            <remarks>
+            This size assumes a common page size and provides an accommodation
+            for the pointer chain used to track allocated blocks.
+            </remarks>
+        </member>
+        <member name="M:UnmanagedBufferAllocator.#ctor(System.Int32)">
+            <summary>
+            Instantiate an <see cref="T:UnmanagedBufferAllocator"/> instance.
+            </summary>
+            <param name="blockSize">The unmanaged memory block size in bytes.</param>
+        </member>
+        <member name="M:UnmanagedBufferAllocator.AllocAsPointer``1(System.Int32)">
+            <summary>
+            Allocate the requested amount of space from the allocator.
+            </summary>
+            <typeparam name="T">The type requested</typeparam>
+            <param name="count">The count in <typeparamref name="T"/> units</param>
+            <returns>A pointer to the reserved memory.</returns>
+            <remarks>
+            The allocated memory is uninitialized.
+            </remarks>
+        </member>
+        <member name="M:UnmanagedBufferAllocator.AllocAsSpan``1(System.Int32)">
+            <summary>
+            Allocate the requested amount of space from the allocator.
+            </summary>
+            <typeparam name="T">The type requested</typeparam>
+            <param name="count">The count in <typeparamref name="T"/> units</param>
+            <returns>A Span to the reserved memory.</returns>
+            <remarks>
+            The allocated memory is uninitialized.
+            </remarks>
+        </member>
+        <member name="M:UnmanagedBufferAllocator.GetHeaderEncodedBytes(System.String,System.Int32@)">
+            <summary>
+            Get pointer to bytes for the supplied string in UTF-8.
+            </summary>
+            <param name="myString">The string</param>
+            <param name="length">The length of the returned byte buffer.</param>
+            <returns>A pointer to the buffer of bytes</returns>
+        </member>
+        <member name="M:UnmanagedBufferAllocator.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:Windows.Win32.Networking.WinSock.SOCKADDR">
+            <summary>The sockaddr structure varies depending on the protocol selected. (sockaddr)</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/winsock/ns-winsock-sockaddr">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.WinSock.SOCKADDR.sa_family">
+            <summary></summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.WinSock.SOCKADDR.sa_data">
+            <summary></summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_AUTH_STATUS">
+            <summary>Defines the authentication state of a request.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_auth_status">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_AUTH_STATUS.HttpAuthStatusSuccess">
+            <summary>The request was successfully authenticated for the authentication type indicated in the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_auth_info">HTTP_REQUEST_AUTH_INFO</a> structure.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_AUTH_STATUS.HttpAuthStatusNotAuthenticated">
+            <summary>
+            <para>Authentication was configured on the URL group for this request, however, the HTTP Server API did not handle the authentication. This could be because of one of the following reasons: </para>
+            <para>This doc was truncated.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_auth_status#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_AUTH_STATUS.HttpAuthStatusFailure">
+            <summary>
+            <para></para>
+            <para>This doc was truncated.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_auth_status#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_BYTE_RANGE">
+            <summary>The HTTP_BYTE_RANGE structure is used to specify a byte range within a cached response fragment, file, or other data block.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_byte_range">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_BYTE_RANGE.StartingOffset">
+            <summary>Starting offset of the byte range.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_BYTE_RANGE.Length">
+            <summary>Size, in bytes, of the range. If this member is HTTP_BYTE_RANGE_TO_EOF, the range extends from the starting offset to the end of the file or data block.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL">
+            <summary>Contains a validated, canonical, UTF-16 Unicode-encoded URL request string together with pointers into it and element lengths.</summary>
+            <remarks>For example, if <b>pFullUrl</b> is "http://www.fabrikam.com/path1/path2/file.ext?n1=v1&amp;n2=v2", then <b>pHost</b> points to "www.fabrikam", <b>pAbsPath</b> points to "/path1/…" and <b>pQueryString</b> points to "?n1=v1…".</remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.FullUrlLength">
+            <summary>Size, in bytes, of the data pointed to by the <b>pFullUrl</b> member, not including a terminating null character.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.HostLength">
+            <summary>Size, in bytes, of the data pointed to by the <b>pHost</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.AbsPathLength">
+            <summary>Size, in bytes, of the data pointed to by the <b>pAbsPath</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.QueryStringLength">
+            <summary>Size, in bytes, of the data pointed to by the <b>pQueryString</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.pFullUrl">
+            <summary>Pointer to the scheme element at the beginning of the URL (must be either "http://..." or "https://...").</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.pHost">
+            <summary>Pointer to the first character in the host element, immediately following the double slashes at the end of the scheme element.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.pAbsPath">
+            <summary>Pointer to the third forward slash ("/") in the string. In a UrlPrefix string, this is the slash immediately preceding the relativeUri element.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_COOKED_URL.pQueryString">
+            <summary>Pointer to the first question mark (?) in the string, or <b>NULL</b> if there is none.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK">
+            <summary>Represents an individual block of data either in memory, in a file, or in the HTTP Server API response-fragment cache.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_data_chunk">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK.DataChunkType">
+            <summary>Type of data store. This member can be one of the values from the <b>HTTP_DATA_CHUNK_TYPE</b> enumeration.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE">
+            <summary>Defines the data source for a data chunk.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_data_chunk_type">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory">
+            <summary>The data source is a memory data block. The union should be interpreted as a <b>FromMemory</b> structure.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFileHandle">
+            <summary>The data source is a file handle data block. The union should be interpreted as a <b>FromFileHandle</b> structure.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFragmentCache">
+            <summary>The data source is a fragment cache data block. The union should be interpreted as a <b>FromFragmentCache</b> structure.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFragmentCacheEx">
+            <summary>
+            <para>The data source is a fragment cache data block. The union should be interpreted as a <b>FromFragmentCacheEx</b> structure. <b>Windows Server 2003 with SP1 and Windows XP with SP2:  </b>This flag is not supported.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_data_chunk_type#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkTrailers">
+            <summary>
+            <para>The data source is a trailers data block. The union should be interpreted as a <b>Trailers</b> structure. <b>Windows 10, version 2004 and prior:  </b>This flag is not supported.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_data_chunk_type#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_DATA_CHUNK_TYPE.HttpDataChunkMaximum">
+            <summary></summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_KNOWN_HEADER">
+            <summary>Contains the header values for a known header from an HTTP request or HTTP response.</summary>
+            <remarks>
+            <para>In the HTTP Server API, known headers are defined as those that are enumerated in the <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_header_id">HTTP_HEADER_ID</a> enumeration type. Be aware that there are different lists of different sizes for request and response headers. For more information about the structure and usage of HTTP headers, see the <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_known_header#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_KNOWN_HEADER.RawValueLength">
+            <summary>Size, in bytes,  of the 8-bit string pointed to by the <b>pRawValue</b> member, not counting a terminating null character, if present. If <b>RawValueLength</b> is zero, then the value of the <b>pRawValue</b> element is meaningless.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_KNOWN_HEADER.pRawValue">
+            <summary>
+            <para>Pointer to the text of this HTTP header. Use <b>RawValueLength</b> to determine where this text ends rather than relying on the string to have a terminating null. The format of the header text is specified in <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_known_header#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="P:Windows.Win32.Networking.HttpServer.__HTTP_KNOWN_HEADER_41.Length">
+            <summary>The length of the inline array.</summary>
+        </member>
+        <member name="M:Windows.Win32.Networking.HttpServer.__HTTP_KNOWN_HEADER_41.AsSpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="M:Windows.Win32.Networking.HttpServer.__HTTP_KNOWN_HEADER_41.AsReadOnlySpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO">
+            <summary>Contains the authentication status of the request with a handle to the client token that the receiving process can use to impersonate the authenticated client.</summary>
+            <remarks>
+            <para>Starting with HTTP version 2.0, the <a href="https://docs.microsoft.com/previous-versions/windows/desktop/legacy/aa364545(v=vs.85)">HTTP_REQUEST</a> structure  contains an <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_info">HTTP_REQUEST_INFO</a> structure. The <b>pVoid</b> member of the <b>HTTP_REQUEST_INFO</b> structure points to the <b>HTTP_REQUEST_AUTH_INFO</b> when the request information type is <b>HttpRequestInfoTypeAuth</b>. When the application receives a request with this structure and the request has not been authenticated, it can send the initial 401 challenge with the desired set of WWW-Authenticate headers in the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_multiple_known_headers">HTTP_MULTIPLE_KNOWN_HEADERS</a> structure. When the HTTP Server API completes  the authentication handshake, it fills  the <b>HTTP_REQUEST_AUTH_INFO</b> structure and passes it to the application with the request again. The handle to the access token that represents the client identity is provided in this structure by the HTTP Server API. Context Attributes The <b>ContextAttributes</b> member is provided for SSPI based schemes. For example, SSPI applications can determine whether <b>ASC_RET_MUTUAL_AUTH</b> is set for a mutually authenticated session. The HTTP Server API does not provide the expiration time for the context in the <b>PackedContext</b> member. Applications may require the expiration time  in specific  circumstances, for example, when NTLM credential caching is enabled and the application queries for the expiration time for a cached context. If the server application requires the expiration time for the underlying client context associated with the access token, it can receive the packed context and call <a href="https://docs.microsoft.com/windows/desktop/api/sspi/nf-sspi-querycontextattributesa">QueryContextAttributes</a> with the  <b>SECPKG_ATTR_LIFESPAN</b>. Mutual Authentication Data By default, the HTTP Server API ensures that the mutual authentication data is added to the final 200 response; in general, server applications are not responsible for sending the mutual authentication data. However, applications can receive the mutual authentication data and send it with the final response. When the <b>ReceiveMutualAuth</b> member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_server_authentication_info">HTTP_SERVER_AUTHENTICATION_INFO</a> structure is set to true, applications receive the server credentials for mutual authentication along with the authenticated request. The mutual authentication data provided in the <b>pMutualAuthData</b> member contains the exact value of WWW-Authenticate header without the header name. For example, <b>pMutualAuthData</b> points to "Negotiate ade02938481eca". The application builds the WWW-Authenticate header by appending the provided <b>pMutualAuthData</b> as a response header value.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_auth_info#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.AuthStatus">
+            <summary>
+            <para>A member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_auth_status">HTTP_AUTH_STATUS</a> enumeration that indicates the final authentication status of the request. If the authentication status is not <b>HttpAuthStatusSuccess</b>, applications should disregard members of this structure except <b>AuthStatus</b>, <b>SecStatus</b>, and <b>AuthType</b>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_auth_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.SecStatus">
+            <summary>A <a href="https://docs.microsoft.com/windows/desktop/api/sspi/nf-sspi-acceptsecuritycontext">SECURITY_STATUS</a> value that indicates the security failure status when the <b>AuthStatus</b> member   is <b>HttpAuthStatusFailure</b>.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.Flags">
+            <summary>
+            <para>The authentication flags that indicate the following authentication attributes: </para>
+            <para>This doc was truncated.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_auth_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.AuthType">
+            <summary>A member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_request_auth_type">HTTP_REQUEST_AUTH_TYPE</a> enumeration that indicates the authentication scheme attempted or established  for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.AccessToken">
+            <summary>
+            <para>A  handle to the client token that the receiving process can use to impersonate the authenticated client. The handle to the token should be closed by calling <a href="https://docs.microsoft.com/windows/desktop/api/handleapi/nf-handleapi-closehandle">CloseHandle</a> when it is no longer required. This token is valid only for the lifetime of the request. Applications can regenerate the initial 401 challenge to reauthenticate when the token expires.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_auth_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.ContextAttributes">
+            <summary>The client context attributes for the access token.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.PackedContextLength">
+            <summary>The length, in bytes, of the <b>PackedContext</b>.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.PackedContextType">
+            <summary>The type of context in the <b>PackedContext</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.PackedContext">
+            <summary>
+            <para>The security context for the authentication type. Applications can query the attributes of the packed context by calling the SSPI <a href="https://docs.microsoft.com/windows/desktop/api/sspi/nf-sspi-querycontextattributesa">QueryContextAttributes</a> API. However, applications must acquire a  credential handle for the security package for the indicated AuthType. Application should call the SSPI <a href="https://docs.microsoft.com/windows/desktop/api/sspi/nf-sspi-freecontextbuffer">FreeContextBuffer</a> API to free the serialized context when it is no longer required.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_auth_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.MutualAuthDataLength">
+            <summary>The length, in bytes, of the <b>pMutualAuthData</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.pMutualAuthData">
+            <summary>The Base64 encoded mutual authentication data used in  the WWW-Authenticate header.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.PackageNameLength">
+            <summary></summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_INFO.pPackageName">
+            <summary></summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE">
+            <summary>The HTTP_REQUEST_AUTH_TYPE enumeration defines the authentication types supported by the HTTP Server API.This enumeration is used in the HTTP_REQUEST_AUTH_INFO structure.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_request_auth_type">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNone">
+            <summary>No authentication is attempted for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic">
+            <summary>Basic authentication is attempted for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest">
+            <summary>Digest authentication is attempted for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM">
+            <summary>NTLM authentication is attempted for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate">
+            <summary>Negotiate authentication is attempted for the request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos">
+            <summary>Kerberos authentication is attempted for the request.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS">
+            <summary>Contains headers sent with an HTTP request.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_headers">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS.UnknownHeaderCount">
+            <summary>A number of unknown headers sent with the HTTP request. This number is the size of the array pointed to by the <b>pUnknownHeaders</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS.pUnknownHeaders">
+            <summary>
+            <para>A pointer to an array of <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_unknown_header">HTTP_UNKNOWN_HEADER</a> structures. This array contains one structure for each of the unknown headers sent in the HTTP request.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_headers#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS.TrailerCount">
+            <summary>This member is reserved and must be zero.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS.pTrailers">
+            <summary>This member is reserved and must be <b>NULL</b>.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_HEADERS.KnownHeaders">
+            <summary>
+            <para>Fixed-size array of <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_known_header">HTTP_KNOWN_HEADER</a> structures. The <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_header_id">HTTP_HEADER_ID</a> enumeration provides a mapping from header types to array indexes. If a known header of a given type is included in the HTTP request, the array element at the index that corresponds to that type specifies the header value. Those elements of the array for which no corresponding headers are present contain a zero-valued <b>RawValueLength</b> member. Use <b>RawValueLength</b> to determine the end of the header string pointed to by <b>pRawValue</b>, rather than relying on the string to have a terminating null.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_headers#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO">
+            <summary>Extends the HTTP_REQUEST structure with additional information about the request.</summary>
+            <remarks>Starting with the HTTP Server API version 2.0, the HTTP_REQUEST structure is extended to include an array of <b>HTTP_REQUEST_INFO</b> structures in the <b>pRequestInfo</b> member. These structures contain additional information for the  request.</remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO.InfoType">
+            <summary>A member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_request_info_type">HTTP_REQUEST_INFO_TYPE</a> enumeration specifying the type of information contained in this structure.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO.InfoLength">
+            <summary>The length, in bytes,  of the <b>pInfo</b> member.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO.pInfo">
+            <summary>A pointer to the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_auth_info">HTTP_REQUEST_AUTH_INFO</a> structure when the <b>InfoType</b> member is <b>HttpRequestInfoTypeAuth</b>; otherwise <b>NULL</b>.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE">
+            <summary>The HTTP_REQUEST_INFO_TYPE enumeration defines the type of information contained in the HTTP_REQUEST_INFO structure. This enumeration is used in the HTTP_REQUEST_INFO structure.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_request_info_type">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeAuth">
+            <summary>
+            <para>The request information type is authentication. The <b>pInfo</b> member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_info">HTTP_REQUEST_INFO</a> structure points to a <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_auth_info">HTTP_REQUEST_AUTH_INFO</a> structure.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_request_info_type#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeChannelBind">
+            <summary></summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeSslProtocol">
+            <summary></summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeSslTokenBindingDraft">
+            <summary></summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeSslTokenBinding">
+            <summary></summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_PROPERTY">
+            <summary>Defines the properties that are configured by the HTTP Server API on a request.</summary>
+            <remarks>The **HTTP\_REQUEST\_PROPERTY** enumeration types are used to set or query the configurations on a request. A member of this enumeration together with the associated configuration structure is used by [HttpSetRequestProperty](/windows/desktop/api/http/nf-http-httpsetrequestproperty) to define the configuration parameters.</remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_PROPERTY.HttpRequestPropertyStreamError">
+            <summary>
+            <para>The HTTP/2 or HTTP/3 stream error on the request. The [HTTP\_REQUEST\_PROPERTY\_STREAM\_ERROR](/windows/win32/api/http/ns-http-http_request_property_stream_error) structure contains the configuration data for this property.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_request_property#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1">
+            <summary>Uses the HTTP_REQUEST structure to return data associated with a specific request.</summary>
+            <remarks>The unprocessed URL contained in the <b>pRawUrl</b> member is for tracking and statistical purposes only. For other purposes, use the processed, canonical URL contained in the <b>CookedUrl</b> member.</remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.Flags">
+            <summary>
+            <para>A combination of zero or more of the following flag values may be combined, with OR, as appropriate. </para>
+            <para>This doc was truncated.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.ConnectionId">
+            <summary>
+            <para>An identifier for the connection on which the request was received. Use this value when calling <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpwaitfordisconnect">HttpWaitForDisconnect</a> or <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpreceiveclientcertificate">HttpReceiveClientCertificate</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.RequestId">
+            <summary>
+            <para>A value used to identify the request when calling <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpreceiverequestentitybody">HttpReceiveRequestEntityBody</a>, <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpsendhttpresponse">HttpSendHttpResponse</a>, and/or <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpsendresponseentitybody">HttpSendResponseEntityBody</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.UrlContext">
+            <summary>
+            <para>The context that is associated with the URL in the <i>pRawUrl</i> parameter. <b>Windows Server 2003 with SP1 and Windows XP with SP2:  </b></para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.Version">
+            <summary>
+            <para>An <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_version">HTTP_VERSION</a> structure that contains the version of HTTP specified by this request.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.Verb">
+            <summary>
+            <para>An HTTP verb associated with this request. This member can be one of the values from the <a href="https://docs.microsoft.com/windows/desktop/api/http/ne-http-http_verb">HTTP_VERB</a> enumeration.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.UnknownVerbLength">
+            <summary>If the <b>Verb</b> member contains a value equal to <b>HttpVerbUnknown</b>, the <b>UnknownVerbLength</b> member contains the size, in bytes, of the string pointed to by the <b>pUnknownVerb</b> member, not including the terminating null character. If <b>Verb</b> is not equal to <b>HttpVerbUnknown</b>, <b>UnknownVerbLength</b> is equal to zero.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.RawUrlLength">
+            <summary>The size, in bytes, of the unprocessed URL string pointed to by the <b>pRawUrl</b> member, not including the terminating null character.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.pUnknownVerb">
+            <summary>If the <b>Verb</b> member is equal to <b>HttpVerbUnknown</b>, <b>pUnknownVerb</b>, points to a null-terminated string of octets that contains the HTTP verb for this request; otherwise, the application ignores this parameter.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.pRawUrl">
+            <summary>A pointer to a string of octets that contains the original, unprocessed URL targeted by this request.  Use this unprocessed URL only for tracking or statistical purposes; the  <b>CookedUrl</b> member contains the canonical form of the URL for general use.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.CookedUrl">
+            <summary>
+            <para>An <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_cooked_url">HTTP_COOKED_URL</a> structure that contains a parsed canonical wide-character version of the URL targeted by this request. This is the version of the URL HTTP Listeners should act upon, rather than the raw URL.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.Address">
+            <summary>
+            <para>An <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_transport_address">HTTP_TRANSPORT_ADDRESS</a> structure that contains the transport addresses for the connection for this request.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.Headers">
+            <summary>
+            <para>An <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_headers">HTTP_REQUEST_HEADERS</a> structure that contains the headers specified in this request.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.BytesReceived">
+            <summary>The total number of bytes received from the network comprising this request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.EntityChunkCount">
+            <summary>The number of elements in the <b>pEntityChunks</b> array. If no entity body was copied, this value is zero.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.pEntityChunks">
+            <summary>
+            <para>A pointer to an array of <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_data_chunk">HTTP_DATA_CHUNK</a> structures that contains the data blocks making up the entity body. <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpreceivehttprequest">HttpReceiveHttpRequest</a> does not copy the entity body unless called with the HTTP_RECEIVE_REQUEST_FLAG_COPY_BODY flag set.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.RawConnectionId">
+            <summary>Raw connection ID for an Secure Sockets Layer (SSL) request.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V1.pSslInfo">
+            <summary>
+            <para>A pointer to an <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_ssl_info">HTTP_SSL_INFO</a> structure that contains Secure Sockets Layer (SSL) information about the connection on which the request was received.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v1#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V2">
+            <summary>Extends the HTTP_REQUEST_V1 request structure with more information about the request.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_request_v2">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V2.RequestInfoCount">
+            <summary>The number of <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_info">HTTP_REQUEST_INFO</a> structures in the array pointed to by <b>pRequestInfo</b>.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_REQUEST_V2.pRequestInfo">
+            <summary>A pointer to an array of <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_request_info">HTTP_REQUEST_INFO</a> structures that contains additional information about the request.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO">
+            <summary>Contains data about a Secure Sockets Layer (SSL) client certificate that can be used to determine whether the certificate is valid.</summary>
+            <remarks>
+            <para>An <b>HTTP_SSL_CLIENT_CERT_INFO</b> structure is pointed to by the <b>pClientCertInfo</b> member of the <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_ssl_info">HTTP_SSL_INFO</a> structure, and is used by the <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpreceiveclientcertificate">HttpReceiveClientCertificate</a> function to return data about the client certificate through the <i>pSslClientCertInfo</i> parameter.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_ssl_client_cert_info#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO.CertFlags">
+            <summary>
+            <para>Flags that indicate whether the certificate is valid. The possible values for this member are a <a href="https://docs.microsoft.com/windows/desktop/SecAuthN/sspi-status-codes">SSPI Status Code</a> returned from SSPI or one of the following flags from the <b>dwError</b> member of the <a href="https://docs.microsoft.com/windows/desktop/api/wincrypt/ns-wincrypt-cert_chain_policy_status">CERT_CHAIN_POLICY_STATUS</a> structure: <a id="CERT_E_EXPIRED"></a> <a id="cert_e_expired"></a></para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_ssl_client_cert_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO.CertEncodedSize">
+            <summary>The size, in bytes, of the certificate.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO.pCertEncoded">
+            <summary>A pointer to the actual certificate.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO.Token">
+            <summary>
+            <para>A handle to an access token. If the HTTP_SERVICE_CONFIG_SSL_FLAG_USE_DS_MAPPER flag is set using the <a href="https://docs.microsoft.com/windows/desktop/api/http/nf-http-httpsetserviceconfiguration">HttpSetServiceConfiguration</a> function, and the client certificate was successfully mapped to an operating-system user account, then this member contains the handle to a valid <a href="https://docs.microsoft.com/windows/desktop/SecAuthZ/access-tokens">access token</a>. When the <b>HTTP_SSL_CLIENT_CERT_INFO</b> structure is no longer required, release this token explicitly by closing the handle.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_ssl_client_cert_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_CLIENT_CERT_INFO.CertDeniedByMapper">
+            <summary>Reserved.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO">
+            <summary>Contains data for a connection that uses Secure Sockets Layer (SSL), obtained through the SSL handshake.</summary>
+            <remarks>
+            <para>An <b>HTTP_SSL_INFO</b> structure can be pointed to by the <b>pSslInfo</b> member of an <a href="https://docs.microsoft.com/previous-versions/windows/desktop/legacy/aa364545(v=vs.85)">HTTP_REQUEST</a> structure.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_ssl_info#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.ServerCertKeySize">
+            <summary>The size, in bytes, of the public key used to sign the server certificate.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.ConnectionKeySize">
+            <summary>The size, in bytes, of the cipher key used to encrypt the current session.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.ServerCertIssuerSize">
+            <summary>The size, in bytes, of the string pointed to by the <b>pServerCertIssuer</b> member not including the terminating null character.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.ServerCertSubjectSize">
+            <summary>The size, in bytes, of the string pointed to by the <b>pServerCertSubject</b> member not including the terminating null character.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.pServerCertIssuer">
+            <summary>A pointer to a null-terminated string of octets that specifies the name of the entity that issued the certificate.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.pServerCertSubject">
+            <summary>A pointer to a null-terminated string of octets that specifies the name of the entity to which the certificate belongs.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.pClientCertInfo">
+            <summary>
+            <para>A pointer to an <a href="https://docs.microsoft.com/windows/desktop/api/http/ns-http-http_ssl_client_cert_info">HTTP_SSL_CLIENT_CERT_INFO</a> structure that specifies the client certificate.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_ssl_info#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_SSL_INFO.SslClientCertNegotiated">
+            <summary>If non-zero, indicates that the client certificate is already present locally.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_TRANSPORT_ADDRESS">
+            <summary>Specifies the addresses (local and remote) used for a particular HTTP connection.</summary>
+            <remarks>Although the <b>pRemoteAddress</b> and <b>pLocalAddress</b> members are formally declared as <b>PSOCKADDR</b>, they are in fact <b>PSOCKADDR_IN</b> or <b>PSOCKADDR_IN6</b> types. Inspect the <b>sa_family</b> member, which is the same in all three structures, to determine how to access the address. If <b>sa_family</b> is equal to AF_INET, then the address is in IPv4 form and can be accessed by casting the members to <b>PSOCKADDR_IN</b>, but if <b>sa_family</b> equals AF_INET6, the address is in IPv6 form and you must cast them to <b>PSOCKADDR_IN6</b> before accessing the address. Both <b>pLocalAddress</b> and <b>pRemoteAddress</b> are always of the same type; that is they are either both of type <b>PSOCKADDR_IN</b> or both of type <b>PSOCKADDR_IN6</b>.</remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_TRANSPORT_ADDRESS.pRemoteAddress">
+            <summary>A pointer to the remote IP address associated with this connection. For more information about how to access this address, see the Remarks section.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_TRANSPORT_ADDRESS.pLocalAddress">
+            <summary>A pointer to the local IP address associated with this connection. For more information about how to access this address, see the Remarks section.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_UNKNOWN_HEADER">
+            <summary>Contains the name and value for a header in an HTTP request or response whose name does not appear in the enumeration.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_unknown_header">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_UNKNOWN_HEADER.NameLength">
+            <summary>The size, in bytes, of the data pointed to by the <b>pName</b> member not counting a terminating null.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_UNKNOWN_HEADER.RawValueLength">
+            <summary>The size, in bytes, of the data pointed to by the <b>pRawValue</b> member, in bytes.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_UNKNOWN_HEADER.pName">
+            <summary>A pointer to a string of octets that specifies the header name. Use <b>NameLength</b> to determine the end of the string, rather than relying on a terminating <b>null</b>.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_UNKNOWN_HEADER.pRawValue">
+            <summary>A pointer to a string of octets that specifies the values for this header. Use <b>RawValueLength</b> to determine the end of the string, rather than relying on a terminating <b>null</b>.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_VERB">
+            <summary>The HTTP_VERB enumeration type defines values that are used to specify known, standard HTTP verbs in the HTTP_REQUEST structure. The majority of these known verbs are documented in RFC 2616 and RFC 2518, as indicated below.</summary>
+            <remarks>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb">Learn more about this API from docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbUnparsed">
+            <summary>Not relevant for applications; used only in kernel mode.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbUnknown">
+            <summary>Indicates that the application can examine the <b>UnknownVerbLength</b> and <b>pUnknownVerb</b> members of the <a href="https://docs.microsoft.com/previous-versions/windows/desktop/legacy/aa364545(v=vs.85)">HTTP_REQUEST</a> structure to retrieve the HTTP verb for the request.  This is the case in an HTTP/1.1 request when a browser client specifies a custom verb.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbInvalid">
+            <summary>Not relevant for applications; used only in kernel mode.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbOPTIONS">
+            <summary>
+            <para>The OPTIONS method requests information about the communication options  and requirements associated with a URI.</para>
+            <para>See page 52 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbGET">
+            <summary>
+            <para>The GET method  retrieves the information or entity that is identified by the URI of the Request. If that URI refers to a script or other data-producing process, it is the data produced, not the text of the script, that is returned in the response. A GET method can be made conditional or partial by including a conditional  or Range header field in the request. A conditional GET requests that the entity be sent only if all conditions specified in the header are met, and a partial GET requests only part of the entity, as specified in the Range header. Both of these forms of GET can help avoid unnecessary network traffic.</para>
+            <para>See page 53 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbHEAD">
+            <summary>
+            <para>The HEAD method is identical to GET except that the server only returns message-headers in the response, without a message-body. The headers are the same as would be returned in response to a GET.</para>
+            <para>See page 54 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbPOST">
+            <summary>
+            <para>The POST method is used to post a new entity as an addition to  a URI. The URI identifies an entity that  consumes the posted data in some fashion.</para>
+            <para>See page 54 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbPUT">
+            <summary>
+            <para>The PUT method is used to replace an entity identified by a URI.</para>
+            <para>See page 55 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbDELETE">
+            <summary>
+            <para>The DELETE method requests that a specified URI be deleted.</para>
+            <para>See page 56 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbTRACE">
+            <summary>
+            <para>The TRACE method invokes a remote, application-layer loop-back of the request message. It allows the client to see what is being received at the other end of the request chain for diagnostic purposes. See page 56 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbCONNECT">
+            <summary>
+            <para>The CONNECT method can be used with a proxy that can dynamically switch to tunneling, as in the case of SSL tunneling. See page 57 of <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbTRACK">
+            <summary>The TRACK method is used by Microsoft Cluster Server to implement a non-logged trace.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbMOVE">
+            <summary>
+            <para>The MOVE method requests a WebDAV operation equivalent to a copy (COPY), followed by consistency maintenance processing, followed by a delete of the source, where all three actions are performed atomically. When applied to a collection, "Depth" is assumed to be or must be specified as "infinity". See page 42 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbCOPY">
+            <summary>
+            <para>The COPY method requests a WebDAV operation that creates a duplicate of the source resource, identified by the Request URI, in the destination resource, identified by a URI specified in the Destination header. See page 37 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbPROPFIND">
+            <summary>
+            <para>The PROPFIND method requests a WebDAV operation that retrieves properties defined on the resource identified by the Request-URI. See page 24 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbPROPPATCH">
+            <summary>
+            <para>The PROPPATCH method requests a WebDAV operation that sets and/or removes properties defined on the resource identified by the Request-URI. See page 31 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbMKCOL">
+            <summary>
+            <para>The MKCOL method requests a WebDAV operation that creates a new collection resource at the location specified by the Request-URI. See page 33 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbLOCK">
+            <summary>
+            <para>The LOCK method requests a  WebDAV operation that creates a lock as specified by the lockinfo XML element on the Request-URI. See page 45 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbUNLOCK">
+            <summary>
+            <para>The UNLOCK method requests a WebDAV operation that removes a lock, identified by a lock token in the Lock-Token request header, from the resource identified by the Request-URI, and from all other resources included in the lock. See page 51 of <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbSEARCH">
+            <summary>
+            <para>The SEARCH method requests a WebDAV operation used by Microsoft Exchange to search folders. See the Internet Engineering Task Force (IETF) Internet Draft WebDAV SEARCH for more information, and the <a href="http://www.webdav.org/">WebDAV Web site</a> for possible updates.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ne-http-http_verb#members">Read more on docs.microsoft.com</see>.</para>
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERB.HttpVerbMaximum">
+            <summary>Terminates the enumeration; is not used to define a verb.</summary>
+        </member>
+        <member name="T:Windows.Win32.Networking.HttpServer.HTTP_VERSION">
+            <summary>Defines a version of the HTTP protocol that a request requires or a response provides.</summary>
+            <remarks>
+            <para>For more information about the HTTP protocol, see <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>. The following macros define various versions of the HTTP protocol:"#define HTTP_VERSION_UNKNOWN    { 0, 0 }""#define HTTP_VERSION_0_9        { 0, 9 }""#define HTTP_VERSION_1_0        { 1, 0 }""#define HTTP_VERSION_1_1        { 1, 1 }" The HTTP Server API provides a number of macros that can be used to evaluate the value of an HTTP_VERSION structure; For more information, see <a href="https://docs.microsoft.com/windows/desktop/Http/http-server-api-version-1-0-macros">HTTP Server API Version 1.0 Macros</a>. <div class="alert"><b>Note</b>  The HTTP Server API rejects a version of HTTP larger than 65,535 in either the major or minor portion. If a request includes such a version number, the HTTP Server API discards it and returns a response with status 400 ("Bad Request").</div> <div> </div></para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/http/ns-http-http_version#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERSION.MajorVersion">
+            <summary>Major version of the HTTP protocol.</summary>
+        </member>
+        <member name="F:Windows.Win32.Networking.HttpServer.HTTP_VERSION.MinorVersion">
+            <summary>Minor version of the HTTP protocol.</summary>
+        </member>
+        <member name="P:Windows.Win32.Foundation.__CHAR_14.Length">
+            <summary>The length of the inline array.</summary>
+        </member>
+        <member name="M:Windows.Win32.Foundation.__CHAR_14.AsSpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="M:Windows.Win32.Foundation.__CHAR_14.AsReadOnlySpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="T:Windows.Win32.Foundation.HRESULT">
+            <remarks>
+            <para>The **HRESULT** data type is the same as the [SCODE](scode.md) data type. An **HRESULT** value consists of the following fields: - A 1-bit code indicating severity, where zero represents success and 1 represents failure. - A 4-bit reserved value. - An 11-bit code indicating responsibility for the error or warning, also known as a facility code. - A 16-bit code describing the error or warning. Most MAPI interface methods and functions return **HRESULT** values to provide detailed cause formation. **HRESULT** values are also used widely in OLE interface methods. OLE provides several macros for converting between **HRESULT** values and **SCODE** values, another common data type for error handling. > [!NOTE] > In 64-bit MAPI, **HRESULT** is still a 32-bit value. For information about the OLE use of **HRESULT** values, see the  *OLE Programmer's Reference*. For more information about the use of these values in MAPI, see [Error Handling](error-handling-in-mapi.md) and any of the following interface methods: [IABLogon::GetLastError](iablogon-getlasterror.md) [IMAPISupport::GetLastError](imapisupport-getlasterror.md) [IMAPIControl::GetLastError](imapicontrol-getlasterror.md) [IMAPITable::GetLastError](imapitable-getlasterror.md) [IMAPIProp::GetLastError](imapiprop-getlasterror.md) [IMAPIViewAdviseSink::OnPrint](imapiviewadvisesink-onprint.md)</para>
+            <para><see href="https://learn.microsoft.com/office/client-developer/outlook/mapi/hresult#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+        <member name="M:Windows.Win32.Foundation.HRESULT.ThrowOnFailure(System.IntPtr)">
+            <inheritdoc cref="M:System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Int32,System.IntPtr)" />
+            <param name="errorInfo">
+            A pointer to the IErrorInfo interface that provides more information about the
+            error. You can specify <see cref="F:System.IntPtr.Zero"/> to use the current IErrorInfo interface, or
+            <c>new IntPtr(-1)</c> to ignore the current IErrorInfo interface and construct the exception
+            just from the error code.
+            </param>
+            <returns><see langword="this"/> <see cref="T:Windows.Win32.Foundation.HRESULT"/>, if it does not reflect an error.</returns>
+            <seealso cref="M:System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="T:Windows.Win32.Foundation.PCSTR">
+            <summary>
+            A pointer to a null-terminated, constant, ANSI character string.
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Foundation.PCSTR.Value">
+            <summary>
+            A pointer to the first character in the string. The content should be considered readonly, as it was typed as constant in the SDK.
+            </summary>
+        </member>
+        <member name="P:Windows.Win32.Foundation.PCSTR.Length">
+            <summary>
+            Gets the number of characters up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PCSTR.ToString">
+            <summary>
+            Returns a <see langword="string"/> with a copy of this character array, decoding as UTF-8.
+            </summary>
+            <returns>A <see langword="string"/>, or <see langword="null"/> if <see cref="F:Windows.Win32.Foundation.PCSTR.Value"/> is <see langword="null"/>.</returns>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PCSTR.AsSpan">
+            <summary>
+            Returns a span of the characters in this string, up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.Foundation.PCWSTR">
+            <summary>
+            A pointer to a null-terminated, constant character string.
+            </summary>
+        </member>
+        <member name="F:Windows.Win32.Foundation.PCWSTR.Value">
+            <summary>
+            A pointer to the first character in the string. The content should be considered readonly, as it was typed as constant in the SDK.
+            </summary>
+        </member>
+        <member name="P:Windows.Win32.Foundation.PCWSTR.Length">
+            <summary>
+            Gets the number of characters up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PCWSTR.ToString">
+            <summary>
+            Returns a <see langword="string"/> with a copy of this character array, up to the first null character (exclusive).
+            </summary>
+            <returns>A <see langword="string"/>, or <see langword="null"/> if <see cref="F:Windows.Win32.Foundation.PCWSTR.Value"/> is <see langword="null"/>.</returns>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PCWSTR.AsSpan">
+            <summary>
+            Returns a span of the characters in this string, up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PSTR.ToString">
+            <inheritdoc cref="M:Windows.Win32.Foundation.PCSTR.ToString"/>
+        </member>
+        <member name="P:Windows.Win32.Foundation.PSTR.Length">
+            <inheritdoc cref="P:Windows.Win32.Foundation.PCSTR.Length"/>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PSTR.AsSpan">
+            <summary>
+            Returns a span of the characters in this string, up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PWSTR.ToString">
+            <inheritdoc cref="M:Windows.Win32.Foundation.PCWSTR.ToString"/>
+        </member>
+        <member name="P:Windows.Win32.Foundation.PWSTR.Length">
+            <inheritdoc cref="P:Windows.Win32.Foundation.PCWSTR.Length"/>
+        </member>
+        <member name="M:Windows.Win32.Foundation.PWSTR.AsSpan">
+            <summary>
+            Returns a span of the characters in this string, up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="P:Windows.Win32.__char_256.Length">
+            <summary>The length of the inline array.</summary>
+        </member>
+        <member name="P:Windows.Win32.__char_256.Item(System.Int32)">
+            <summary>
+            Gets a ref to an individual element of the inline array.
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned reference outlive the stack frame that defines it.
+            </summary>
+        </member>
+        <member name="M:Windows.Win32.__char_256.AsSpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="M:Windows.Win32.__char_256.AsReadOnlySpan">
+            <summary>
+            Gets this inline array as a span.
+            </summary>
+            <remarks>
+            ⚠ Important ⚠: When this struct is on the stack, do not let the returned span outlive the stack frame that defines it.
+            </remarks>
+        </member>
+        <member name="M:Windows.Win32.__char_256.ToString(System.Int32)">
+            <summary>
+            Copies the fixed array to a new string up to the specified length regardless of whether there are null terminating characters.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="length"/> is less than <c>0</c> or greater than <see cref="P:Windows.Win32.__char_256.Length"/>.
+            </exception>
+        </member>
+        <member name="M:Windows.Win32.__char_256.ToString">
+            <summary>
+            Copies the fixed array to a new string, stopping before the first null terminator character or at the end of the fixed array (whichever is shorter).
+            </summary>
+        </member>
+        <member name="T:Windows.Win32.PInvoke">
+            <content>
+            Contains extern methods from "KERNEL32.dll".
+            </content>
+        </member>
+        <member name="M:Windows.Win32.PInvoke.CloseHandle(Windows.Win32.Foundation.HANDLE)">
+            <summary>Closes an open object handle.</summary>
+            <param name="hObject">A valid handle to an open object.</param>
+            <returns>
+            <para>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero. To get extended error information, call <a href="https://docs.microsoft.com/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>. If the application is running under a debugger,  the function will throw an exception if it receives either a  handle value that is not valid  or a pseudo-handle value. This can happen if you close a handle twice, or if you  call <b>CloseHandle</b> on a handle returned by the <a href="https://docs.microsoft.com/windows/desktop/api/fileapi/nf-fileapi-findfirstfilea">FindFirstFile</a> function instead of calling the <a href="https://docs.microsoft.com/windows/desktop/api/fileapi/nf-fileapi-findclose">FindClose</a> function.</para>
+            </returns>
+            <remarks>
+            <para>The <b>CloseHandle</b> function closes handles to the following objects: </para>
+            <para>This doc was truncated.</para>
+            <para><see href="https://learn.microsoft.com/windows/win32/api/handleapi/nf-handleapi-closehandle#">Read more on docs.microsoft.com</see>.</para>
+            </remarks>
+        </member>
+    </members>
+</doc>

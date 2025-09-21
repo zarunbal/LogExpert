@@ -1,0 +1,70 @@
+{
+  "version": "9.0.6",
+  "workloads": {
+    "microsoft-net-sdk-emscripten": {
+      "abstract": true,
+      "description": "Emscripten SDK compiler tooling for net9.0",
+      "packs": [
+        "Microsoft.NET.Runtime.Emscripten.Node.net9",
+        "Microsoft.NET.Runtime.Emscripten.Python.net9",
+        "Microsoft.NET.Runtime.Emscripten.Cache.net9",
+        "Microsoft.NET.Runtime.Emscripten.Sdk.net9"
+      ],
+      "platforms": [ "win-x64", "win-arm64", "linux-x64", "linux-arm64", "linux-musl-x64", "linux-musl-arm64", "osx-x64", "osx-arm64" ]
+    }
+  },
+  "packs": {
+    "Microsoft.NET.Runtime.Emscripten.Node.net9" : {
+      "kind": "Sdk",
+      "version": "9.0.6",
+      "alias-to": {
+        "win-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.win-x64",
+        "win-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.win-arm64",
+        "linux-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.linux-x64",
+        "linux-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.linux-arm64",
+        "linux-musl-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.linux-musl-x64",
+        "linux-musl-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.linux-musl-arm64",
+        "osx-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.osx-x64",
+        "osx-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Node.osx-arm64"
+      }
+    },
+    "Microsoft.NET.Runtime.Emscripten.Python.net9" : {
+      "kind": "Sdk",
+      "version": "9.0.6",
+      "alias-to": {
+        "win-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Python.win-x64",
+        "win-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Python.win-arm64",
+        "osx-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Python.osx-x64",
+        "osx-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Python.osx-arm64"
+      }
+    },
+    "Microsoft.NET.Runtime.Emscripten.Cache.net9" : {
+      "kind": "Sdk",
+      "version": "9.0.6",
+      "alias-to": {
+        "win-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.win-x64",
+        "win-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.win-arm64",
+        "linux-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.linux-x64",
+        "linux-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.linux-arm64",
+        "linux-musl-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.linux-musl-x64",
+        "linux-musl-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.linux-musl-arm64",
+        "osx-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.osx-x64",
+        "osx-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Cache.osx-arm64"
+      }
+    },
+    "Microsoft.NET.Runtime.Emscripten.Sdk.net9" : {
+      "kind": "Sdk",
+      "version": "9.0.6",
+      "alias-to": {
+        "win-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.win-x64",
+        "win-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.win-arm64",
+        "linux-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.linux-x64",
+        "linux-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.linux-arm64",
+        "linux-musl-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.linux-musl-x64",
+        "linux-musl-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.linux-musl-arm64",
+        "osx-x64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.osx-x64",
+        "osx-arm64": "Microsoft.NET.Runtime.Emscripten.3.1.56.Sdk.osx-arm64"
+      }
+    }
+  }
+}

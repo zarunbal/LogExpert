@@ -1,0 +1,48 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Usage' Rules from '7.0' release with 'Default' analysis mode escalated to 'error' severity
+# Description: 'Usage' Rules with enabled-by-default state from '7.0' release with 'Default' analysis mode. Rules that are first released in a version later than '7.0' are disabled. Enabled rules with 'warning' severity are escalated to 'error' severity to respect 'CodeAnalysisTreatWarningsAsErrors' MSBuild property.
+
+is_global = true
+
+global_level = -99
+
+
+# CA2200: Rethrow to preserve stack details
+dotnet_diagnostic.CA2200.severity = error
+
+# CA2247: Argument passed to TaskCompletionSource constructor should be TaskCreationOptions enum instead of TaskContinuationOptions enum
+dotnet_diagnostic.CA2247.severity = error
+
+# CA2255: The 'ModuleInitializer' attribute should not be used in libraries
+dotnet_diagnostic.CA2255.severity = error
+
+# CA2256: All members declared in parent interfaces must have an implementation in a DynamicInterfaceCastableImplementation-attributed interface
+dotnet_diagnostic.CA2256.severity = error
+
+# CA2257: Members defined on an interface with the 'DynamicInterfaceCastableImplementationAttribute' should be 'static'
+dotnet_diagnostic.CA2257.severity = error
+
+# CA2258: Providing a 'DynamicInterfaceCastableImplementation' interface in Visual Basic is unsupported
+dotnet_diagnostic.CA2258.severity = error
+
+# CA2259: 'ThreadStatic' only affects static fields
+dotnet_diagnostic.CA2259.severity = error
+
+# CA2260: Use correct type parameter
+dotnet_diagnostic.CA2260.severity = error
+
+# CA2261: Do not use ConfigureAwaitOptions.SuppressThrowing with Task<TResult>
+dotnet_diagnostic.CA2261.severity = none
+
+# CA2262: Set 'MaxResponseHeadersLength' properly
+dotnet_diagnostic.CA2262.severity = none
+
+# CA2263: Prefer generic overload when type is known
+dotnet_diagnostic.CA2263.severity = none
+
+# CA2264: Do not pass a non-nullable value to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA2264.severity = none
+
+# CA2265: Do not compare Span<T> to 'null' or 'default'
+dotnet_diagnostic.CA2265.severity = none

@@ -1,0 +1,318 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Microsoft.Build.Tasks.CodeAnalysis/4.14.0-3.25262.10": {
+        "dependencies": {
+          "Microsoft.Build.Framework": "17.7.2",
+          "Microsoft.Build.Tasks.Core": "17.7.2",
+          "Microsoft.CodeAnalysis.NetAnalyzers": "8.0.0-preview.23468.1",
+          "Microsoft.CodeAnalysis.PerformanceSensitiveAnalyzers": "3.3.4-beta1.22504.1",
+          "Microsoft.DotNet.XliffTasks": "9.0.0-beta.25255.5",
+          "Microsoft.VisualStudio.Threading.Analyzers": "17.13.2",
+          "Roslyn.Diagnostics.Analyzers": "3.11.0-beta1.24081.1"
+        },
+        "runtime": {
+          "Microsoft.Build.Tasks.CodeAnalysis.dll": {}
+        },
+        "resources": {
+          "cs/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "cs"
+          },
+          "de/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "de"
+          },
+          "es/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "es"
+          },
+          "fr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "fr"
+          },
+          "it/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "it"
+          },
+          "ja/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "ja"
+          },
+          "ko/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "ko"
+          },
+          "pl/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "pl"
+          },
+          "pt-BR/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "ru/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "ru"
+          },
+          "tr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "tr"
+          },
+          "zh-Hans/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "zh-Hant/Microsoft.Build.Tasks.CodeAnalysis.resources.dll": {
+            "locale": "zh-Hant"
+          }
+        }
+      },
+      "Microsoft.Build.Framework/17.7.2": {
+        "dependencies": {
+          "System.Security.Permissions": "9.0.0"
+        }
+      },
+      "Microsoft.Build.Tasks.Core/17.7.2": {
+        "dependencies": {
+          "Microsoft.Build.Framework": "17.7.2",
+          "Microsoft.Build.Utilities.Core": "17.7.2",
+          "Microsoft.NET.StringTools": "17.7.2",
+          "Microsoft.VisualStudio.Setup.Configuration.Interop": "3.2.2146",
+          "System.CodeDom": "7.0.0",
+          "System.Collections.Immutable": "9.0.0",
+          "System.Configuration.ConfigurationManager": "9.0.0",
+          "System.Resources.Extensions": "9.0.0",
+          "System.Security.Cryptography.Pkcs": "7.0.2",
+          "System.Security.Cryptography.Xml": "7.0.1",
+          "System.Security.Permissions": "9.0.0"
+        }
+      },
+      "Microsoft.Build.Utilities.Core/17.7.2": {
+        "dependencies": {
+          "Microsoft.Build.Framework": "17.7.2",
+          "Microsoft.NET.StringTools": "17.7.2",
+          "Microsoft.VisualStudio.Setup.Configuration.Interop": "3.2.2146",
+          "System.Collections.Immutable": "9.0.0",
+          "System.Configuration.ConfigurationManager": "9.0.0",
+          "System.Security.Permissions": "9.0.0"
+        }
+      },
+      "Microsoft.CodeAnalysis.BannedApiAnalyzers/3.11.0-beta1.24081.1": {},
+      "Microsoft.CodeAnalysis.NetAnalyzers/8.0.0-preview.23468.1": {},
+      "Microsoft.CodeAnalysis.PerformanceSensitiveAnalyzers/3.3.4-beta1.22504.1": {},
+      "Microsoft.CodeAnalysis.PublicApiAnalyzers/3.11.0-beta1.24081.1": {},
+      "Microsoft.DotNet.XliffTasks/9.0.0-beta.25255.5": {},
+      "Microsoft.NET.StringTools/17.7.2": {},
+      "Microsoft.VisualStudio.Setup.Configuration.Interop/3.2.2146": {},
+      "Microsoft.VisualStudio.Threading.Analyzers/17.13.2": {},
+      "Roslyn.Diagnostics.Analyzers/3.11.0-beta1.24081.1": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.BannedApiAnalyzers": "3.11.0-beta1.24081.1",
+          "Microsoft.CodeAnalysis.PublicApiAnalyzers": "3.11.0-beta1.24081.1"
+        }
+      },
+      "System.CodeDom/7.0.0": {},
+      "System.Collections.Immutable/9.0.0": {},
+      "System.Configuration.ConfigurationManager/9.0.0": {
+        "dependencies": {
+          "System.Diagnostics.EventLog": "9.0.0",
+          "System.Security.Cryptography.ProtectedData": "9.0.0"
+        }
+      },
+      "System.Diagnostics.EventLog/9.0.0": {},
+      "System.Formats.Asn1/7.0.0": {},
+      "System.Formats.Nrbf/9.0.0": {},
+      "System.Resources.Extensions/9.0.0": {
+        "dependencies": {
+          "System.Formats.Nrbf": "9.0.0"
+        }
+      },
+      "System.Security.Cryptography.Pkcs/7.0.2": {
+        "dependencies": {
+          "System.Formats.Asn1": "7.0.0"
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/9.0.0": {},
+      "System.Security.Cryptography.Xml/7.0.1": {
+        "dependencies": {
+          "System.Security.Cryptography.Pkcs": "7.0.2"
+        }
+      },
+      "System.Security.Permissions/9.0.0": {
+        "dependencies": {
+          "System.Windows.Extensions": "9.0.0"
+        }
+      },
+      "System.Windows.Extensions/9.0.0": {}
+    }
+  },
+  "libraries": {
+    "Microsoft.Build.Tasks.CodeAnalysis/4.14.0-3.25262.10": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Build.Framework/17.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-F+SglYQv6ij5RK4Bmd1X4q01E2ry4M8/huTIZ/1Vk7ZoxdT2J3vmV23cnJZsA/ZLunOTv3B905TU5J1eFmWNPw==",
+      "path": "microsoft.build.framework/17.7.2",
+      "hashPath": "microsoft.build.framework.17.7.2.nupkg.sha512"
+    },
+    "Microsoft.Build.Tasks.Core/17.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CmI+mDQ44GWVv0mxFcGYlvek838kK3PgNvXPo/1/Q5/Tc97tajO611uZAj2wNfwJ1kjsCef2Mza4d+SVSyd3Mg==",
+      "path": "microsoft.build.tasks.core/17.7.2",
+      "hashPath": "microsoft.build.tasks.core.17.7.2.nupkg.sha512"
+    },
+    "Microsoft.Build.Utilities.Core/17.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-soXfaIBW904uEP6WTDv7EbiT0vRfBdNIcqOOEOfyy27WEa8DaXVPQJYSlsDGycS7uTnYU8vlROJbbmlCTBL7hg==",
+      "path": "microsoft.build.utilities.core/17.7.2",
+      "hashPath": "microsoft.build.utilities.core.17.7.2.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.BannedApiAnalyzers/3.11.0-beta1.24081.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DH6L3rsbjppLrHM2l2/NKbnMaYd0NFHx2pjZaFdrVcRkONrV3i9FHv6Id8Dp6/TmjhXQsJVJJFbhhjkpuP1xxg==",
+      "path": "microsoft.codeanalysis.bannedapianalyzers/3.11.0-beta1.24081.1",
+      "hashPath": "microsoft.codeanalysis.bannedapianalyzers.3.11.0-beta1.24081.1.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.NetAnalyzers/8.0.0-preview.23468.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZhIvyxmUCqb8OiU/VQfxfuAmIB4lQsjqhMVYKeoyxzSI+d7uR5Pzx3ZKoaIhPizQ15wa4lnyD6wg3TnSJ6P4LA==",
+      "path": "microsoft.codeanalysis.netanalyzers/8.0.0-preview.23468.1",
+      "hashPath": "microsoft.codeanalysis.netanalyzers.8.0.0-preview.23468.1.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.PerformanceSensitiveAnalyzers/3.3.4-beta1.22504.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2XRlqPAzVke7Sb80+UqaC7o57OwfK+tIr+aIOxrx41RWDMeR2SBUW7kL4sd6hfLFfBNsLo3W5PT+UwfvwPaOzA==",
+      "path": "microsoft.codeanalysis.performancesensitiveanalyzers/3.3.4-beta1.22504.1",
+      "hashPath": "microsoft.codeanalysis.performancesensitiveanalyzers.3.3.4-beta1.22504.1.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.PublicApiAnalyzers/3.11.0-beta1.24081.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3bYGBihvoNO0rhCOG1U9O50/4Q8suZ+glHqQLIAcKvnodSnSW+dYWYzTNb1UbS8pUS8nAUfxSFMwuMup/G5DtQ==",
+      "path": "microsoft.codeanalysis.publicapianalyzers/3.11.0-beta1.24081.1",
+      "hashPath": "microsoft.codeanalysis.publicapianalyzers.3.11.0-beta1.24081.1.nupkg.sha512"
+    },
+    "Microsoft.DotNet.XliffTasks/9.0.0-beta.25255.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bb0fZB5ViPscdfYeWlmtyXJMzNkgcpkV5RWmXktfV9lwIUZgNZmFotUXrdcTyZzrN7v1tQK/Y6BGnbkP9gEsXg==",
+      "path": "microsoft.dotnet.xlifftasks/9.0.0-beta.25255.5",
+      "hashPath": "microsoft.dotnet.xlifftasks.9.0.0-beta.25255.5.nupkg.sha512"
+    },
+    "Microsoft.NET.StringTools/17.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GDm2qPXJeWR4FSwY90zYZ+Wd0CN4FE+Nu2F57Vu8avatMzNQxV9WaVEBZFKbT4JLhNcXKc0CKBO50oVoRJR5BQ==",
+      "path": "microsoft.net.stringtools/17.7.2",
+      "hashPath": "microsoft.net.stringtools.17.7.2.nupkg.sha512"
+    },
+    "Microsoft.VisualStudio.Setup.Configuration.Interop/3.2.2146": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-gMq8uGy8zTIp0kQGTI45buZC3JOStGJyjGD8gksskk83aQISW65IESErLE/WDT7Bdy+QWbdUi7QyO1LEzUSOFA==",
+      "path": "microsoft.visualstudio.setup.configuration.interop/3.2.2146",
+      "hashPath": "microsoft.visualstudio.setup.configuration.interop.3.2.2146.nupkg.sha512"
+    },
+    "Microsoft.VisualStudio.Threading.Analyzers/17.13.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Qcd8IlaTXZVq3wolBnzby1P7kWihdWaExtD8riumiKuG1sHa8EgjV/o70TMjTaeUMhomBbhfdC9OPwAHoZfnjQ==",
+      "path": "microsoft.visualstudio.threading.analyzers/17.13.2",
+      "hashPath": "microsoft.visualstudio.threading.analyzers.17.13.2.nupkg.sha512"
+    },
+    "Roslyn.Diagnostics.Analyzers/3.11.0-beta1.24081.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-reHqZCDKifA+DURcL8jUfYkMGL4FpgNt5LI0uWTS6IpM8kKVbu/kO8byZsqfhBu4wUzT3MBDcoMfzhZPdENIpg==",
+      "path": "roslyn.diagnostics.analyzers/3.11.0-beta1.24081.1",
+      "hashPath": "roslyn.diagnostics.analyzers.3.11.0-beta1.24081.1.nupkg.sha512"
+    },
+    "System.CodeDom/7.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GLltyqEsE5/3IE+zYRP5sNa1l44qKl9v+bfdMcwg+M9qnQf47wK3H0SUR/T+3N4JEQXF3vV4CSuuo0rsg+nq2A==",
+      "path": "system.codedom/7.0.0",
+      "hashPath": "system.codedom.7.0.0.nupkg.sha512"
+    },
+    "System.Collections.Immutable/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+      "path": "system.collections.immutable/9.0.0",
+      "hashPath": "system.collections.immutable.9.0.0.nupkg.sha512"
+    },
+    "System.Configuration.ConfigurationManager/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-PdkuMrwDhXoKFo/JxISIi9E8L+QGn9Iquj2OKDWHB6Y/HnUOuBouF7uS3R4Hw3FoNmwwMo6hWgazQdyHIIs27A==",
+      "path": "system.configuration.configurationmanager/9.0.0",
+      "hashPath": "system.configuration.configurationmanager.9.0.0.nupkg.sha512"
+    },
+    "System.Diagnostics.EventLog/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qd01+AqPhbAG14KtdtIqFk+cxHQFZ/oqRSCoxU1F+Q6Kv0cl726sl7RzU9yLFGd4BUOKdN4XojXF0pQf/R6YeA==",
+      "path": "system.diagnostics.eventlog/9.0.0",
+      "hashPath": "system.diagnostics.eventlog.9.0.0.nupkg.sha512"
+    },
+    "System.Formats.Asn1/7.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+nfpV0afLmvJW8+pLlHxRjz3oZJw4fkyU9MMEaMhCsHi/SN9bGF9q79ROubDiwTiCHezmK0uCWkPP7tGFP/4yg==",
+      "path": "system.formats.asn1/7.0.0",
+      "hashPath": "system.formats.asn1.7.0.0.nupkg.sha512"
+    },
+    "System.Formats.Nrbf/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-F/6tNE+ckmdFeSQAyQo26bQOqfPFKEfZcuqnp4kBE6/7jP26diP+QTHCJJ6vpEfaY6bLy+hBLiIQUSxSmNwLkA==",
+      "path": "system.formats.nrbf/9.0.0",
+      "hashPath": "system.formats.nrbf.9.0.0.nupkg.sha512"
+    },
+    "System.Resources.Extensions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tvhuT1D2OwPROdL1kRWtaTJliQo0WdyhvwDpd8RM997G7m3Hya5nhbYhNTS75x6Vu+ypSOgL5qxDCn8IROtCxw==",
+      "path": "system.resources.extensions/9.0.0",
+      "hashPath": "system.resources.extensions.9.0.0.nupkg.sha512"
+    },
+    "System.Security.Cryptography.Pkcs/7.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xhFNJOcQSWhpiVGLLBQYoxAltQSQVycMkwaX1z7I7oEdT9Wr0HzSM1yeAbfoHaERIYd5s6EpLSOLs2qMchSKlA==",
+      "path": "system.security.cryptography.pkcs/7.0.2",
+      "hashPath": "system.security.cryptography.pkcs.7.0.2.nupkg.sha512"
+    },
+    "System.Security.Cryptography.ProtectedData/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CJW+x/F6fmRQ7N6K8paasTw9PDZp4t7G76UjGNlSDgoHPF0h08vTzLYbLZpOLEJSg35d5wy2jCXGo84EN05DpQ==",
+      "path": "system.security.cryptography.protecteddata/9.0.0",
+      "hashPath": "system.security.cryptography.protecteddata.9.0.0.nupkg.sha512"
+    },
+    "System.Security.Cryptography.Xml/7.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-MCxBCtH0GrDuvU63ZODwQHQZPchb24pUAX3MfZ6b13qg246ZD10PRdOvay8C9HBPfCXkymUNwFPEegud7ax2zg==",
+      "path": "system.security.cryptography.xml/7.0.1",
+      "hashPath": "system.security.cryptography.xml.7.0.1.nupkg.sha512"
+    },
+    "System.Security.Permissions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-H2VFD4SFVxieywNxn9/epb63/IOcPPfA0WOtfkljzNfu7GCcHIBQNuwP6zGCEIi7Ci/oj8aLPUNK9sYImMFf4Q==",
+      "path": "system.security.permissions/9.0.0",
+      "hashPath": "system.security.permissions.9.0.0.nupkg.sha512"
+    },
+    "System.Windows.Extensions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U9msthvnH2Fsw7xwAvIhNHOdnIjOQTwOc8Vd0oGOsiRcGMGoBFlUD6qtYawRUoQdKH9ysxesZ9juFElt1Jw/7A==",
+      "path": "system.windows.extensions/9.0.0",
+      "hashPath": "system.windows.extensions.9.0.0.nupkg.sha512"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Globalization' Rules from '6.0' release with 'Minimum' analysis mode
+# Description: 'Globalization' Rules with enabled-by-default state from '6.0' release with 'Minimum' analysis mode. Rules that are first released in a version later than '6.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# CA1311: Specify a culture or use an invariant version
+dotnet_diagnostic.CA1311.severity = none
+
+# CA2101: Specify marshaling for P/Invoke string arguments
+dotnet_diagnostic.CA2101.severity = warning

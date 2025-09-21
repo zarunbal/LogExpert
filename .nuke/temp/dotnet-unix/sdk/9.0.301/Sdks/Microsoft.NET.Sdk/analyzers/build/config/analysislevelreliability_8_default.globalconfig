@@ -1,0 +1,12 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Reliability' Rules from '8.0' release with 'Default' analysis mode
+# Description: 'Reliability' Rules with enabled-by-default state from '8.0' release with 'Default' analysis mode. Rules that are first released in a version later than '8.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# CA2022: Avoid inexact read with 'Stream.Read'
+dotnet_diagnostic.CA2022.severity = none

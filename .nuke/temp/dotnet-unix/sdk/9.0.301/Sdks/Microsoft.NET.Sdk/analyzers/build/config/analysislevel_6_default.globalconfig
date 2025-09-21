@@ -1,0 +1,132 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# Rules from '6.0' release with 'Default' analysis mode
+# Description: Rules with enabled-by-default state from '6.0' release with 'Default' analysis mode. Rules that are first released in a version later than '6.0' are disabled.
+
+is_global = true
+
+global_level = -100
+
+
+# CA1311: Specify a culture or use an invariant version
+dotnet_diagnostic.CA1311.severity = none
+
+# CA1420: Property, type, or attribute requires runtime marshalling
+dotnet_diagnostic.CA1420.severity = none
+
+# CA1421: This method uses runtime marshalling even when the 'DisableRuntimeMarshallingAttribute' is applied
+dotnet_diagnostic.CA1421.severity = none
+
+# CA1422: Validate platform compatibility
+dotnet_diagnostic.CA1422.severity = none
+
+# CA1510: Use ArgumentNullException throw helper
+dotnet_diagnostic.CA1510.severity = none
+
+# CA1511: Use ArgumentException throw helper
+dotnet_diagnostic.CA1511.severity = none
+
+# CA1512: Use ArgumentOutOfRangeException throw helper
+dotnet_diagnostic.CA1512.severity = none
+
+# CA1513: Use ObjectDisposedException throw helper
+dotnet_diagnostic.CA1513.severity = none
+
+# CA1514: Avoid redundant length argument
+dotnet_diagnostic.CA1514.severity = none
+
+# CA1850: Prefer static 'HashData' method over 'ComputeHash'
+dotnet_diagnostic.CA1850.severity = none
+
+# CA1852: Seal internal types
+dotnet_diagnostic.CA1852.severity = none
+
+# CA1853: Unnecessary call to 'Dictionary.ContainsKey(key)'
+dotnet_diagnostic.CA1853.severity = none
+
+# CA1854: Prefer the 'IDictionary.TryGetValue(TKey, out TValue)' method
+dotnet_diagnostic.CA1854.severity = none
+
+# CA1855: Prefer 'Clear' over 'Fill'
+dotnet_diagnostic.CA1855.severity = none
+
+# CA1856: Incorrect usage of ConstantExpected attribute
+dotnet_diagnostic.CA1856.severity = none
+
+# CA1857: A constant is expected for the parameter
+dotnet_diagnostic.CA1857.severity = none
+
+# CA1858: Use 'StartsWith' instead of 'IndexOf'
+dotnet_diagnostic.CA1858.severity = none
+
+# CA1859: Use concrete types when possible for improved performance
+dotnet_diagnostic.CA1859.severity = none
+
+# CA1860: Avoid using 'Enumerable.Any()' extension method
+dotnet_diagnostic.CA1860.severity = none
+
+# CA1861: Avoid constant arrays as arguments
+dotnet_diagnostic.CA1861.severity = none
+
+# CA1862: Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
+dotnet_diagnostic.CA1862.severity = none
+
+# CA1863: Use 'CompositeFormat'
+dotnet_diagnostic.CA1863.severity = none
+
+# CA1864: Prefer the 'IDictionary.TryAdd(TKey, TValue)' method
+dotnet_diagnostic.CA1864.severity = none
+
+# CA1865: Use char overload
+dotnet_diagnostic.CA1865.severity = none
+
+# CA1866: Use char overload
+dotnet_diagnostic.CA1866.severity = none
+
+# CA1868: Unnecessary call to 'Contains(item)'
+dotnet_diagnostic.CA1868.severity = none
+
+# CA1869: Cache and reuse 'JsonSerializerOptions' instances
+dotnet_diagnostic.CA1869.severity = none
+
+# CA1870: Use a cached 'SearchValues' instance
+dotnet_diagnostic.CA1870.severity = none
+
+# CA1871: Do not pass a nullable struct to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA1871.severity = none
+
+# CA1872: Prefer 'Convert.ToHexString' and 'Convert.ToHexStringLower' over call chains based on 'BitConverter.ToString'
+dotnet_diagnostic.CA1872.severity = none
+
+# CA2019: Improper 'ThreadStatic' field initialization
+dotnet_diagnostic.CA2019.severity = none
+
+# CA2020: Prevent behavioral change
+dotnet_diagnostic.CA2020.severity = none
+
+# CA2021: Do not call Enumerable.Cast<T> or Enumerable.OfType<T> with incompatible types
+dotnet_diagnostic.CA2021.severity = none
+
+# CA2022: Avoid inexact read with 'Stream.Read'
+dotnet_diagnostic.CA2022.severity = none
+
+# CA2259: 'ThreadStatic' only affects static fields
+dotnet_diagnostic.CA2259.severity = none
+
+# CA2260: Use correct type parameter
+dotnet_diagnostic.CA2260.severity = none
+
+# CA2261: Do not use ConfigureAwaitOptions.SuppressThrowing with Task<TResult>
+dotnet_diagnostic.CA2261.severity = none
+
+# CA2262: Set 'MaxResponseHeadersLength' properly
+dotnet_diagnostic.CA2262.severity = none
+
+# CA2263: Prefer generic overload when type is known
+dotnet_diagnostic.CA2263.severity = none
+
+# CA2264: Do not pass a non-nullable value to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA2264.severity = none
+
+# CA2265: Do not compare Span<T> to 'null' or 'default'
+dotnet_diagnostic.CA2265.severity = none

@@ -1,0 +1,51 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Naming' Rules from '7.0' release with 'All' analysis mode escalated to 'error' severity
+# Description: 'Naming' Rules with enabled-by-default state from '7.0' release with 'All' analysis mode. Rules that are first released in a version later than '7.0' are disabled. Enabled rules with 'warning' severity are escalated to 'error' severity to respect 'CodeAnalysisTreatWarningsAsErrors' MSBuild property.
+
+is_global = true
+
+global_level = -99
+
+
+# CA1700: Do not name enum values 'Reserved'
+dotnet_diagnostic.CA1700.severity = error
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = error
+
+# CA1708: Identifiers should differ by more than case
+dotnet_diagnostic.CA1708.severity = error
+
+# CA1710: Identifiers should have correct suffix
+dotnet_diagnostic.CA1710.severity = error
+
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = error
+
+# CA1712: Do not prefix enum values with type name
+dotnet_diagnostic.CA1712.severity = error
+
+# CA1713: Events should not have 'Before' or 'After' prefix
+dotnet_diagnostic.CA1713.severity = error
+
+# CA1715: Identifiers should have correct prefix
+dotnet_diagnostic.CA1715.severity = error
+
+# CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = error
+
+# CA1720: Identifier contains type name
+dotnet_diagnostic.CA1720.severity = error
+
+# CA1721: Property names should not match get methods
+dotnet_diagnostic.CA1721.severity = error
+
+# CA1724: Type names should not match namespaces
+dotnet_diagnostic.CA1724.severity = error
+
+# CA1725: Parameter names should match base declaration
+dotnet_diagnostic.CA1725.severity = error
+
+# CA1727: Use PascalCase for named placeholders
+dotnet_diagnostic.CA1727.severity = error

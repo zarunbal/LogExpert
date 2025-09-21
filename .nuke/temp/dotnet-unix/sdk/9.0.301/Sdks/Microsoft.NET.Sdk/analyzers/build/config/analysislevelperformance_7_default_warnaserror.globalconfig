@@ -1,0 +1,60 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Performance' Rules from '7.0' release with 'Default' analysis mode escalated to 'error' severity
+# Description: 'Performance' Rules with enabled-by-default state from '7.0' release with 'Default' analysis mode. Rules that are first released in a version later than '7.0' are disabled. Enabled rules with 'warning' severity are escalated to 'error' severity to respect 'CodeAnalysisTreatWarningsAsErrors' MSBuild property.
+
+is_global = true
+
+global_level = -99
+
+
+# CA1831: Use AsSpan or AsMemory instead of Range-based indexers when appropriate
+dotnet_diagnostic.CA1831.severity = error
+
+# CA1856: Incorrect usage of ConstantExpected attribute
+dotnet_diagnostic.CA1856.severity = none
+
+# CA1857: A constant is expected for the parameter
+dotnet_diagnostic.CA1857.severity = none
+
+# CA1858: Use 'StartsWith' instead of 'IndexOf'
+dotnet_diagnostic.CA1858.severity = none
+
+# CA1859: Use concrete types when possible for improved performance
+dotnet_diagnostic.CA1859.severity = none
+
+# CA1860: Avoid using 'Enumerable.Any()' extension method
+dotnet_diagnostic.CA1860.severity = none
+
+# CA1861: Avoid constant arrays as arguments
+dotnet_diagnostic.CA1861.severity = none
+
+# CA1862: Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
+dotnet_diagnostic.CA1862.severity = none
+
+# CA1863: Use 'CompositeFormat'
+dotnet_diagnostic.CA1863.severity = none
+
+# CA1864: Prefer the 'IDictionary.TryAdd(TKey, TValue)' method
+dotnet_diagnostic.CA1864.severity = none
+
+# CA1865: Use char overload
+dotnet_diagnostic.CA1865.severity = none
+
+# CA1866: Use char overload
+dotnet_diagnostic.CA1866.severity = none
+
+# CA1868: Unnecessary call to 'Contains(item)'
+dotnet_diagnostic.CA1868.severity = none
+
+# CA1869: Cache and reuse 'JsonSerializerOptions' instances
+dotnet_diagnostic.CA1869.severity = none
+
+# CA1870: Use a cached 'SearchValues' instance
+dotnet_diagnostic.CA1870.severity = none
+
+# CA1871: Do not pass a nullable struct to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA1871.severity = none
+
+# CA1872: Prefer 'Convert.ToHexString' and 'Convert.ToHexStringLower' over call chains based on 'BitConverter.ToString'
+dotnet_diagnostic.CA1872.severity = none

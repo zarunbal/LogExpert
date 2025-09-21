@@ -1,0 +1,21 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'Usage' Rules from '8.0' release with 'Default' analysis mode
+# Description: 'Usage' Rules with enabled-by-default state from '8.0' release with 'Default' analysis mode. Rules that are first released in a version later than '8.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# CA2262: Set 'MaxResponseHeadersLength' properly
+dotnet_diagnostic.CA2262.severity = none
+
+# CA2263: Prefer generic overload when type is known
+dotnet_diagnostic.CA2263.severity = none
+
+# CA2264: Do not pass a non-nullable value to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA2264.severity = none
+
+# CA2265: Do not compare Span<T> to 'null' or 'default'
+dotnet_diagnostic.CA2265.severity = none
