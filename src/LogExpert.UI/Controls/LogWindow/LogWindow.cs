@@ -7179,7 +7179,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
-            NormalFont = new Font(new FontFamily(fontName), fontSize);
+            Font NormalFont;
+
+            try
+            {
+                NormalFont = new Font(new FontFamily(fontName), fontSize);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.Warn($"Specified font '{fontName}' not found. Falling back to default. {ex.Message}");
+                // NOTE: Checking for invalid font name and falling back to default font might belong in LogExpert.Config.ConfigManager
+                NormalFont = new Font(FontFamily.GenericMonospace, fontSize);
+                Preferences.FontName = NormalFont.Name;
+            }
+            
             BoldFont = new Font(NormalFont, FontStyle.Bold);
             MonospacedFont = new Font("Courier New", Preferences.FontSize, FontStyle.Bold);
 
