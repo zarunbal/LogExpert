@@ -204,6 +204,18 @@ public class ConfigManager : IConfigManager
 
             settings.FileColors ??= [];
 
+            try
+            {
+                using var fontFamily = new FontFamily(settings.Preferences.FontName);
+                settings.Preferences.FontName = fontFamily.Name;
+            }
+            catch (ArgumentException)
+            {
+                var genericMonospaceFont = FontFamily.GenericMonospace.Name;
+                _logger.Warn($"Specified font '{settings.Preferences.FontName}' not found. Falling back to default: '{genericMonospaceFont}'.");
+                settings.Preferences.FontName = genericMonospaceFont;
+            }
+
             if (settings.Preferences.ShowTailColor == Color.Empty)
             {
                 settings.Preferences.ShowTailColor = Color.FromKnownColor(KnownColor.Blue);
