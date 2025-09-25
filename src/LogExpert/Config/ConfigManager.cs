@@ -209,7 +209,7 @@ public class ConfigManager : IConfigManager
                 using var fontFamily = new FontFamily(settings.Preferences.FontName);
                 settings.Preferences.FontName = fontFamily.Name;
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 var genericMonospaceFont = FontFamily.GenericMonospace.Name;
                 _logger.Warn($"Specified font '{settings.Preferences.FontName}' not found. Falling back to default: '{genericMonospaceFont}'.");
