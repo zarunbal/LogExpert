@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Classes.Highlight;
+using LogExpert.Core.Classes.Highlight;
 
 namespace LogExpert.Core.Entities;
 
@@ -11,14 +11,14 @@ public class HighlightGroup : ICloneable
 
     public List<HighlightEntry> HighlightEntryList { get; set; } = [];
 
-    public object Clone()
+    public object Clone ()
     {
         HighlightGroup clone = new()
         {
             GroupName = GroupName
         };
 
-        foreach (HighlightEntry entry in HighlightEntryList)
+        foreach (var entry in HighlightEntryList)
         {
             clone.HighlightEntryList.Add((HighlightEntry)entry.Clone());
         }

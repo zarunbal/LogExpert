@@ -38,7 +38,7 @@ public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
 
     public override Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
-        Priority result = Priority.NotSupport;
+        var result = Priority.NotSupport;
         if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
         {
             result = Priority.WellSupport;
@@ -49,7 +49,7 @@ public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
             try
             {
                 var line = samples.First();
-                JObject json = ParseJson(line);
+                var json = ParseJson(line);
                 if (json != null)
                 {
                     var columns = SplitJsonLine(samples.First(), json);
@@ -98,7 +98,7 @@ public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
         {
             if (column.StartsWith('@'))
             {
-                ColumnWithName existingColumn = columns.Find(x => x.ColumnName == column);
+                var existingColumn = columns.Find(x => x.ColumnName == column);
 
                 if (existingColumn != null)
                 {

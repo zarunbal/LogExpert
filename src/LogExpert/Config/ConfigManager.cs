@@ -5,7 +5,6 @@ using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
@@ -56,6 +55,7 @@ public class ConfigManager : IConfigManager
             {
                 _instance ??= new ConfigManager();
             }
+
             return _instance;
         }
     }
@@ -94,20 +94,20 @@ public class ConfigManager : IConfigManager
         Instance.Save(fileInfo, Settings);
     }
 
-    public void Export (FileInfo fileInfo, SettingsFlags flags)
+    public void Export (FileInfo fileInfo, SettingsFlags highlightSettings)
     {
-        Instance.Save(fileInfo, Settings, flags);
+        Instance.Save(fileInfo, Settings, highlightSettings);
     }
 
-    public void Import (FileInfo fileInfo, ExportImportFlags flags)
+    public void Import (FileInfo fileInfo, ExportImportFlags importFlags)
     {
-        Instance._settings = Instance.Import(Instance._settings, fileInfo, flags);
+        Instance._settings = Instance.Import(Instance._settings, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
-    public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags flags)
+    public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags)
     {
-        Instance._settings.Preferences.HighlightGroupList = Instance.Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, flags);
+        Instance._settings.Preferences.HighlightGroupList = Instance.Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
@@ -120,7 +120,7 @@ public class ConfigManager : IConfigManager
         _logger.Info(CultureInfo.InvariantCulture, "Loading settings");
 
         string dir;
-        
+
         if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
         {
             _logger.Info(CultureInfo.InvariantCulture, "Load settings standard mode");
@@ -244,7 +244,7 @@ public class ConfigManager : IConfigManager
 
             settings.FilterRangeHistoryList ??= [];
 
-            foreach (FilterParams filterParams in settings.FilterList)
+            foreach (var filterParams in settings.FilterList)
             {
                 filterParams.Init();
             }
@@ -403,14 +403,17 @@ public class ConfigManager : IConfigManager
         {
             newSettings.Preferences.ColumnizerMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ColumnizerMaskList, importSettings.Preferences.ColumnizerMaskList);
         }
+
         if ((flags & ExportImportFlags.HighlightMasks) == ExportImportFlags.HighlightMasks)
         {
             newSettings.Preferences.HighlightMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightMaskList, importSettings.Preferences.HighlightMaskList);
         }
+
         if ((flags & ExportImportFlags.HighlightSettings) == ExportImportFlags.HighlightSettings)
         {
             newSettings.Preferences.HighlightGroupList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightGroupList, importSettings.Preferences.HighlightGroupList);
         }
+
         if ((flags & ExportImportFlags.ToolEntries) == ExportImportFlags.ToolEntries)
         {
             newSettings.Preferences.ToolEntries = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ToolEntries, importSettings.Preferences.ToolEntries);

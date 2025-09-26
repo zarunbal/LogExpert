@@ -94,6 +94,7 @@ internal class ColorComboBox : ComboBox
                 e.Graphics.FillRectangle(brush, rectangle);
                 brush.Dispose();
             }
+
             e.DrawFocusRectangle();
         }
     }

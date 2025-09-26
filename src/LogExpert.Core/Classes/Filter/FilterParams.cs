@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Filter;
 
@@ -96,7 +97,7 @@ public class FilterParams : ICloneable
     /// <returns></returns>
     public FilterParams CloneWithCurrentColumnizer ()
     {
-        FilterParams newParams = Clone();
+        var newParams = Clone();
         newParams.Init();
         // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
         // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
@@ -124,6 +125,7 @@ public class FilterParams : ICloneable
         {
             Rex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         }
+
         if (RangeSearchText != null && IsRangeSearch)
         {
             RangeRex = new Regex(RangeSearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);

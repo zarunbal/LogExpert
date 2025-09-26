@@ -344,7 +344,7 @@ internal partial class HighlightDialog : Form
         e.DrawBackground();
         if (e.Index >= 0)
         {
-            HighlightGroup group = HighlightGroupList[e.Index];
+            var group = HighlightGroupList[e.Index];
             Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
             Brush brush = new SolidBrush(SystemColors.ControlText);
@@ -467,7 +467,7 @@ internal partial class HighlightDialog : Form
                     SearchText = textBoxSearchString.Text,
                     ForegroundColor = colorBoxForeground.SelectedColor,
                     BackgroundColor = colorBoxBackground.SelectedColor,
-                    IsRegEx = checkBoxRegex.Checked,
+                    IsRegex = checkBoxRegex.Checked,
                     IsCaseSensitive = checkBoxCaseSensitive.Checked,
                     IsLedSwitch = checkBoxDontDirtyLed.Checked,
                     IsStopTail = checkBoxStopTail.Checked,
@@ -543,7 +543,7 @@ internal partial class HighlightDialog : Form
 
         comboBoxGroups.Items.Clear();
 
-        foreach (HighlightGroup group in HighlightGroupList)
+        foreach (var group in HighlightGroupList)
         {
             comboBoxGroups.Items.Add(group);
         }
@@ -556,7 +556,7 @@ internal partial class HighlightDialog : Form
         listBoxHighlight.Items.Clear();
         if (_currentGroup != null)
         {
-            foreach (HighlightEntry entry in _currentGroup.HighlightEntryList)
+            foreach (var entry in _currentGroup.HighlightEntryList)
             {
                 listBoxHighlight.Items.Add(entry);
             }
@@ -588,7 +588,7 @@ internal partial class HighlightDialog : Form
             groupToSelect = def;
         }
 
-        foreach (HighlightGroup group in HighlightGroupList)
+        foreach (var group in HighlightGroupList)
         {
             if (group.GroupName.Equals(groupToSelect, StringComparison.Ordinal))
             {
@@ -642,7 +642,7 @@ internal partial class HighlightDialog : Form
             entry.ForegroundColor = (Color)colorBoxForeground.SelectedItem;
             entry.BackgroundColor = (Color)colorBoxBackground.SelectedItem;
             entry.SearchText = textBoxSearchString.Text;
-            entry.IsRegEx = checkBoxRegex.Checked;
+            entry.IsRegex = checkBoxRegex.Checked;
             entry.IsCaseSensitive = checkBoxCaseSensitive.Checked;
             btnApply.Enabled = false;
             btnApply.Image = null;
@@ -714,7 +714,7 @@ internal partial class HighlightDialog : Form
                 colorBoxBackground.SelectedItem = entry.BackgroundColor;
             }
 
-            checkBoxRegex.Checked = entry.IsRegEx;
+            checkBoxRegex.Checked = entry.IsRegex;
             checkBoxCaseSensitive.Checked = entry.IsCaseSensitive;
             checkBoxDontDirtyLed.Checked = entry.IsLedSwitch;
             checkBoxBookmark.Checked = entry.IsSetBookmark;

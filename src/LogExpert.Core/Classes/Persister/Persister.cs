@@ -37,13 +37,11 @@ public static class Persister
         return fileName;
     }
 
-    public static string SavePersistenceDataWithFixedName (string persistenceFileName,
-        PersistenceData persistenceData)
+    public static string SavePersistenceDataWithFixedName (string persistenceFileName, PersistenceData persistenceData)
     {
         Save(persistenceFileName, persistenceData);
         return persistenceFileName;
     }
-
 
     public static PersistenceData LoadPersistenceData (string logFileName, Preferences preferences)
     {
@@ -86,7 +84,7 @@ public static class Persister
             return null;
         }
 
-        XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
+        var fileNode = xmlDoc.SelectSingleNode("logexpert/file");
         if (fileNode != null)
         {
             var fileElement = fileNode as XmlElement;
@@ -94,6 +92,7 @@ public static class Persister
             persistenceData.FileName = fileElement.GetAttribute("fileName");
             persistenceData.Encoding = ReadEncoding(fileElement);
         }
+
         return persistenceData;
     }
 
@@ -168,9 +167,9 @@ public static class Persister
     private static void Save (string fileName, PersistenceData persistenceData)
     {
         XmlDocument xmlDoc = new();
-        XmlElement rootElement = xmlDoc.CreateElement("logexpert");
+        var rootElement = xmlDoc.CreateElement("logexpert");
         xmlDoc.AppendChild(rootElement);
-        XmlElement fileElement = xmlDoc.CreateElement("file");
+        var fileElement = xmlDoc.CreateElement("file");
         rootElement.AppendChild(fileElement);
         fileElement.SetAttribute("fileName", persistenceData.FileName);
         fileElement.SetAttribute("lineCount", "" + persistenceData.LineCount);
@@ -190,7 +189,7 @@ public static class Persister
     {
         if (encoding != null)
         {
-            XmlElement encodingElement = xmlDoc.CreateElement("encoding");
+            var encodingElement = xmlDoc.CreateElement("encoding");
             rootElement.AppendChild(encodingElement);
             encodingElement.SetAttribute("name", encoding.WebName);
         }
@@ -200,19 +199,19 @@ public static class Persister
     {
         if (dataList.Count > 0)
         {
-            XmlElement filterTabsElement = xmlDoc.CreateElement("filterTabs");
+            var filterTabsElement = xmlDoc.CreateElement("filterTabs");
             rootElement.AppendChild(filterTabsElement);
-            foreach (FilterTabData data in dataList)
+            foreach (var data in dataList)
             {
-                PersistenceData persistenceData = data.PersistenceData;
-                XmlElement filterTabElement = xmlDoc.CreateElement("filterTab");
+                var persistenceData = data.PersistenceData;
+                var filterTabElement = xmlDoc.CreateElement("filterTab");
                 filterTabsElement.AppendChild(filterTabElement);
                 WriteBookmarks(xmlDoc, filterTabElement, persistenceData.BookmarkList);
                 WriteRowHeightList(xmlDoc, filterTabElement, persistenceData.RowHeightList);
                 WriteOptions(xmlDoc, filterTabElement, persistenceData);
                 WriteFilter(xmlDoc, filterTabElement, persistenceData.FilterParamsList);
                 WriteFilterTabs(xmlDoc, filterTabElement, persistenceData.FilterTabDataList);
-                XmlElement filterElement = xmlDoc.CreateElement("tabFilter");
+                var filterElement = xmlDoc.CreateElement("tabFilter");
                 filterTabElement.AppendChild(filterElement);
                 List<FilterParams> filterList = [data.FilterParams];
                 WriteFilter(xmlDoc, filterElement, filterList);
@@ -223,19 +222,19 @@ public static class Persister
     private static List<FilterTabData> ReadFilterTabs (XmlElement startNode)
     {
         List<FilterTabData> dataList = [];
-        XmlNode filterTabsNode = startNode.SelectSingleNode("filterTabs");
+        var filterTabsNode = startNode.SelectSingleNode("filterTabs");
         if (filterTabsNode != null)
         {
-            XmlNodeList filterTabNodeList = filterTabsNode.ChildNodes; // all "filterTab" nodes
+            var filterTabNodeList = filterTabsNode.ChildNodes; // all "filterTab" nodes
 
             foreach (XmlNode node in filterTabNodeList)
             {
-                PersistenceData persistenceData = ReadPersistenceDataFromNode(node);
-                XmlNode filterNode = node.SelectSingleNode("tabFilter");
+                var persistenceData = ReadPersistenceDataFromNode(node);
+                var filterNode = node.SelectSingleNode("tabFilter");
 
                 if (filterNode != null)
                 {
-                    List<FilterParams> filterList = ReadFilter(filterNode as XmlElement);
+                    var filterList = ReadFilter(filterNode as XmlElement);
                     FilterTabData data = new()
                     {
                         PersistenceData = persistenceData,
@@ -246,18 +245,19 @@ public static class Persister
                 }
             }
         }
+
         return dataList;
     }
 
 
     private static void WriteFilter (XmlDocument xmlDoc, XmlElement rootElement, List<FilterParams> filterList)
     {
-        XmlElement filtersElement = xmlDoc.CreateElement("filters");
+        var filtersElement = xmlDoc.CreateElement("filters");
         rootElement.AppendChild(filtersElement);
-        foreach (FilterParams filterParams in filterList)
+        foreach (var filterParams in filterList)
         {
-            XmlElement filterElement = xmlDoc.CreateElement("filter");
-            XmlElement paramsElement = xmlDoc.CreateElement("params");
+            var filterElement = xmlDoc.CreateElement("filter");
+            var paramsElement = xmlDoc.CreateElement("params");
 
             MemoryStream stream = new(capacity: 200);
             JsonSerializer.Serialize(stream, filterParams);
@@ -272,10 +272,10 @@ public static class Persister
     private static List<FilterParams> ReadFilter (XmlElement startNode)
     {
         List<FilterParams> filterList = [];
-        XmlNode filtersNode = startNode.SelectSingleNode("filters");
+        var filtersNode = startNode.SelectSingleNode("filters");
         if (filtersNode != null)
         {
-            XmlNodeList filterNodeList = filtersNode.ChildNodes; // all "filter" nodes
+            var filterNodeList = filtersNode.ChildNodes; // all "filter" nodes
             foreach (XmlNode node in filterNodeList)
             {
                 foreach (XmlNode subNode in node.ChildNodes)
@@ -288,7 +288,7 @@ public static class Persister
 
                         try
                         {
-                            FilterParams filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
+                            var filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
                             filterParams.Init();
                             filterList.Add(filterParams);
                         }
@@ -300,6 +300,7 @@ public static class Persister
                 }
             }
         }
+
         return filterList;
     }
 
@@ -307,16 +308,16 @@ public static class Persister
     private static void WriteBookmarks (XmlDocument xmlDoc, XmlElement rootElement,
         SortedList<int, Entities.Bookmark> bookmarkList)
     {
-        XmlElement bookmarksElement = xmlDoc.CreateElement("bookmarks");
+        var bookmarksElement = xmlDoc.CreateElement("bookmarks");
         rootElement.AppendChild(bookmarksElement);
-        foreach (Entities.Bookmark bookmark in bookmarkList.Values)
+        foreach (var bookmark in bookmarkList.Values)
         {
-            XmlElement bookmarkElement = xmlDoc.CreateElement("bookmark");
+            var bookmarkElement = xmlDoc.CreateElement("bookmark");
             bookmarkElement.SetAttribute("line", "" + bookmark.LineNum);
-            XmlElement textElement = xmlDoc.CreateElement("text");
+            var textElement = xmlDoc.CreateElement("text");
             textElement.InnerText = bookmark.Text;
-            XmlElement posXElement = xmlDoc.CreateElement("posX");
-            XmlElement posYElement = xmlDoc.CreateElement("posY");
+            var posXElement = xmlDoc.CreateElement("posX");
+            var posYElement = xmlDoc.CreateElement("posY");
             posXElement.InnerText = "" + bookmark.OverlayOffset.Width;
             posYElement.InnerText = "" + bookmark.OverlayOffset.Height;
             bookmarkElement.AppendChild(textElement);
@@ -331,12 +332,13 @@ public static class Persister
     {
         XmlDocument xmlDoc = new();
         xmlDoc.Load(fileName);
-        XmlNode fileNode = xmlDoc.SelectSingleNode("logexpert/file");
+        var fileNode = xmlDoc.SelectSingleNode("logexpert/file");
         PersistenceData persistenceData = new();
         if (fileNode != null)
         {
             persistenceData = ReadPersistenceDataFromNode(fileNode);
         }
+
         return persistenceData;
     }
 
@@ -353,6 +355,7 @@ public static class Persister
         {
             persistenceData.LineCount = int.Parse(sLineCount);
         }
+
         persistenceData.FilterParamsList = ReadFilter(fileElement);
         persistenceData.FilterTabDataList = ReadFilterTabs(fileElement);
         persistenceData.Encoding = ReadEncoding(fileElement);
@@ -362,10 +365,10 @@ public static class Persister
 
     private static Encoding ReadEncoding (XmlElement fileElement)
     {
-        XmlNode encodingNode = fileElement.SelectSingleNode("encoding");
+        var encodingNode = fileElement.SelectSingleNode("encoding");
         if (encodingNode != null)
         {
-            XmlAttribute encAttr = encodingNode.Attributes["name"];
+            var encAttr = encodingNode.Attributes["name"];
             try
             {
                 return encAttr == null ? null : Encoding.GetEncoding(encAttr.Value);
@@ -381,6 +384,7 @@ public static class Persister
                 return Encoding.Default;
             }
         }
+
         return null;
     }
 
@@ -388,10 +392,10 @@ public static class Persister
     private static SortedList<int, Entities.Bookmark> ReadBookmarks (XmlElement startNode)
     {
         SortedList<int, Entities.Bookmark> bookmarkList = [];
-        XmlNode boomarksNode = startNode.SelectSingleNode("bookmarks");
+        var boomarksNode = startNode.SelectSingleNode("bookmarks");
         if (boomarksNode != null)
         {
-            XmlNodeList bookmarkNodeList = boomarksNode.ChildNodes; // all "bookmark" nodes
+            var bookmarkNodeList = boomarksNode.ChildNodes; // all "bookmark" nodes
             foreach (XmlNode node in bookmarkNodeList)
             {
                 string text = null;
@@ -406,6 +410,7 @@ public static class Persister
                         line = attr.InnerText;
                     }
                 }
+
                 foreach (XmlNode subNode in node.ChildNodes)
                 {
                     if (subNode.Name.Equals("text", StringComparison.OrdinalIgnoreCase))
@@ -421,11 +426,13 @@ public static class Persister
                         posY = subNode.InnerText;
                     }
                 }
+
                 if (line == null || posX == null || posY == null)
                 {
                     _logger.Error($"Invalid XML format for bookmark: {node.InnerText}");
                     continue;
                 }
+
                 var lineNum = int.Parse(line);
 
                 Entities.Bookmark bookmark = new(lineNum)
@@ -437,19 +444,21 @@ public static class Persister
                 {
                     bookmark.Text = text;
                 }
+
                 bookmarkList.Add(lineNum, bookmark);
             }
         }
+
         return bookmarkList;
     }
 
     private static void WriteRowHeightList (XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, RowHeightEntry> rowHeightList)
     {
-        XmlElement rowheightElement = xmlDoc.CreateElement("rowheights");
+        var rowheightElement = xmlDoc.CreateElement("rowheights");
         rootElement.AppendChild(rowheightElement);
-        foreach (RowHeightEntry entry in rowHeightList.Values)
+        foreach (var entry in rowHeightList.Values)
         {
-            XmlElement entryElement = xmlDoc.CreateElement("rowheight");
+            var entryElement = xmlDoc.CreateElement("rowheight");
             entryElement.SetAttribute("line", "" + entry.LineNum);
             entryElement.SetAttribute("height", "" + entry.Height);
             rowheightElement.AppendChild(entryElement);
@@ -459,10 +468,10 @@ public static class Persister
     private static SortedList<int, RowHeightEntry> ReadRowHeightList (XmlElement startNode)
     {
         SortedList<int, RowHeightEntry> rowHeightList = [];
-        XmlNode rowHeightsNode = startNode.SelectSingleNode("rowheights");
+        var rowHeightsNode = startNode.SelectSingleNode("rowheights");
         if (rowHeightsNode != null)
         {
-            XmlNodeList rowHeightNodeList = rowHeightsNode.ChildNodes; // all "rowheight" nodes
+            var rowHeightNodeList = rowHeightsNode.ChildNodes; // all "rowheight" nodes
             foreach (XmlNode node in rowHeightNodeList)
             {
                 string height = null;
@@ -478,30 +487,32 @@ public static class Persister
                         height = attr.InnerText;
                     }
                 }
+
                 var lineNum = int.Parse(line);
                 var heightValue = int.Parse(height);
                 rowHeightList.Add(lineNum, new RowHeightEntry(lineNum, heightValue));
             }
         }
+
         return rowHeightList;
     }
 
-
     private static void WriteOptions (XmlDocument xmlDoc, XmlElement rootElement, PersistenceData persistenceData)
     {
-        XmlElement optionsElement = xmlDoc.CreateElement("options");
+        var optionsElement = xmlDoc.CreateElement("options");
         rootElement.AppendChild(optionsElement);
 
-        XmlElement element = xmlDoc.CreateElement("multifile");
+        var element = xmlDoc.CreateElement("multifile");
         element.SetAttribute("enabled", persistenceData.MultiFile ? "1" : "0");
         element.SetAttribute("pattern", persistenceData.MultiFilePattern);
         element.SetAttribute("maxDays", "" + persistenceData.MultiFileMaxDays);
         foreach (var fileName in persistenceData.MultiFileNames)
         {
-            XmlElement entryElement = xmlDoc.CreateElement("fileEntry");
+            var entryElement = xmlDoc.CreateElement("fileEntry");
             entryElement.SetAttribute("fileName", "" + fileName);
             element.AppendChild(entryElement);
         }
+
         optionsElement.AppendChild(element);
 
         element = xmlDoc.CreateElement("currentline");
@@ -548,10 +559,9 @@ public static class Persister
         optionsElement.AppendChild(element);
     }
 
-
     private static void ReadOptions (XmlElement startNode, PersistenceData persistenceData)
     {
-        XmlNode optionsNode = startNode.SelectSingleNode("options");
+        var optionsNode = startNode.SelectSingleNode("options");
         var value = GetOptionsAttribute(optionsNode, "multifile", "enabled");
         persistenceData.MultiFile = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
         persistenceData.MultiFilePattern = GetOptionsAttribute(optionsNode, "multifile", "pattern");
@@ -565,10 +575,10 @@ public static class Persister
             persistenceData.MultiFileMaxDays = 0;
         }
 
-        XmlNode multiFileNode = optionsNode.SelectSingleNode("multifile");
+        var multiFileNode = optionsNode.SelectSingleNode("multifile");
         if (multiFileNode != null)
         {
-            XmlNodeList multiFileNodeList = multiFileNode.ChildNodes; // all "fileEntry" nodes
+            var multiFileNodeList = multiFileNode.ChildNodes; // all "fileEntry" nodes
             foreach (XmlNode node in multiFileNodeList)
             {
                 string fileName = null;
@@ -579,6 +589,7 @@ public static class Persister
                         fileName = attr.InnerText;
                     }
                 }
+
                 persistenceData.MultiFileNames.Add(fileName);
             }
         }
@@ -588,6 +599,7 @@ public static class Persister
         {
             persistenceData.CurrentLine = int.Parse(value);
         }
+
         value = GetOptionsAttribute(optionsNode, "firstDisplayedLine", "line");
         if (value != null)
         {
@@ -621,17 +633,19 @@ public static class Persister
         value = GetOptionsAttribute(optionsNode, "filterSaveList", "visible");
         persistenceData.FilterSaveListVisible = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
 
-        XmlNode tabNode = startNode.SelectSingleNode("tab");
+        var tabNode = startNode.SelectSingleNode("tab");
         if (tabNode != null)
         {
             persistenceData.TabName = (tabNode as XmlElement).GetAttribute("name");
         }
-        XmlNode columnizerNode = startNode.SelectSingleNode("columnizer");
+
+        var columnizerNode = startNode.SelectSingleNode("columnizer");
         if (columnizerNode != null)
         {
             persistenceData.ColumnizerName = (columnizerNode as XmlElement).GetAttribute("name");
         }
-        XmlNode highlightGroupNode = startNode.SelectSingleNode("highlightGroup");
+
+        var highlightGroupNode = startNode.SelectSingleNode("highlightGroup");
         if (highlightGroupNode != null)
         {
             persistenceData.HighlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
@@ -641,11 +655,12 @@ public static class Persister
 
     private static string GetOptionsAttribute (XmlNode optionsNode, string elementName, string attrName)
     {
-        XmlNode node = optionsNode.SelectSingleNode(elementName);
+        var node = optionsNode.SelectSingleNode(elementName);
         if (node == null)
         {
             return null;
         }
+
         if (node is XmlElement)
         {
             var value = (node as XmlElement).GetAttribute(attrName);

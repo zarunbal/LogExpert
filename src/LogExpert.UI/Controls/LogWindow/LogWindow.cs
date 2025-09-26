@@ -1712,7 +1712,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsSetBookmark = false,
@@ -1742,7 +1742,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsStopTail = false,
@@ -3461,7 +3461,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
     {
-        if (entry.IsRegEx)
+        if (entry.IsRegex)
         {
             //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             if (entry.Regex.IsMatch(column.Text))
@@ -5317,6 +5317,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         blockList.Add(block);
                         AddBlockTargetLinesToDict(processedLinesDict, block);
                     }
+
                     block.BlockId = blockId;
                     //if (firstBlock)
                     //{
@@ -5869,7 +5870,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SearchText = para.SearchText,
             ForegroundColor = Color.Red,
             BackgroundColor = Color.Yellow,
-            IsRegEx = para.IsRegex,
+            IsRegex = para.IsRegex,
             IsCaseSensitive = para.IsCaseSensitive,
             IsLedSwitch = false,
             IsStopTail = false,
@@ -6804,6 +6805,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 return;
             }
+
             lineNum = dataGridView.CurrentCellAddress.Y;
         }
 
@@ -6823,12 +6825,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     return;
                 }
             }
+
             _bookmarkProvider.RemoveBookmarkForLine(lineNum);
         }
         else
         {
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum));
         }
+
         dataGridView.Refresh();
         filterGridView.Refresh();
         OnBookmarkAdded();
@@ -6843,6 +6847,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 return;
             }
+
             var paramParser = new ParamParser(comment);
             try
             {
@@ -6852,10 +6857,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 // occurs on invalid regex
             }
+
             if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
             {
                 _bookmarkProvider.RemoveBookmarkForLine(lineNum);
             }
+
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
             OnBookmarkAdded();
         }
@@ -6880,12 +6887,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         filterGridView.CurrentCell = filterGridView.Rows[filterLine].Cells[0];
                         break;
                     }
+
                     index++;
                     if (index > _bookmarkProvider.Bookmarks.Count - 1)
                     {
                         index = 0;
                         wrapped = true;
                     }
+
                     if (index >= startIndex && wrapped)
                     {
                         break;
@@ -6921,6 +6930,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     index = _bookmarkProvider.Bookmarks.Count - 1;
                 }
+
                 var startIndex = index;
                 var wrapped = false;
                 while (true)
@@ -6933,12 +6943,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         filterGridView.CurrentCell = filterGridView.Rows[filterLine].Cells[0];
                         break;
                     }
+
                     index--;
                     if (index < 0)
                     {
                         index = _bookmarkProvider.Bookmarks.Count - 1;
                         wrapped = true;
                     }
+
                     if (index <= startIndex && wrapped)
                     {
                         break;
@@ -6973,6 +6985,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
         }
+
         if (bookmarksPresent)
         {
             if (
@@ -6982,6 +6995,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
         }
+
         _bookmarkProvider.RemoveBookmarksForLines(lineNumList);
         OnBookmarkRemoved();
     }
@@ -7002,6 +7016,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         {
                             text = text.Substring(1);
                         }
+
                         var timeSpan = TimeSpan.Parse(text);
                         var diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
                         CurrentColumnizer.SetTimeOffset(diff);
@@ -7015,6 +7030,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     CurrentColumnizer.SetTimeOffset(0);
                 }
+
                 dataGridView.Refresh();
                 filterGridView.Refresh();
                 if (CurrentColumnizer.IsTimeshiftImplemented())
@@ -7141,6 +7157,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             dataGridView.Refresh();
             SendGuiStateUpdate();
         }
+
         _guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
     }
 
@@ -7263,6 +7280,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             currentLine = 0;
         }
+
         var foundLine = FindTimestampLine(currentLine, timestamp, roundToSeconds);
         if (foundLine >= 0)
         {
@@ -7285,6 +7303,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 foundLine--;
                 foundTimestamp = GetTimestampForLine(ref foundLine, roundToSeconds);
             }
+
             if (foundLine < 0)
             {
                 return 0;
@@ -7525,6 +7544,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     lineNumList.Add(row.Index);
                 }
             }
+
             lineNumList.Sort();
             patternArgs.StartLine = lineNumList[0];
             patternArgs.EndLine = lineNumList[^1];
@@ -7614,6 +7634,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     OnBookmarkAdded();
                 }
+
                 dataGridView.Refresh();
                 filterGridView.Refresh();
             }
@@ -7648,11 +7669,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             filterListBox.Items.Add(filterParam);
         }
+
         filterListBox.Refresh();
         if (index >= 0 && index < filterListBox.Items.Count)
         {
             filterListBox.SelectedIndex = index;
         }
+
         filterOnLoadCheckBox.Checked = Preferences.IsFilterOnLoad;
         hideFilterListOnLoadCheckBox.Checked = Preferences.IsAutoHideFilterList;
     }

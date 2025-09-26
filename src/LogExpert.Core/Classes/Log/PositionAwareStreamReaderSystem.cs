@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Entities;
+using LogExpert.Core.Entities;
 
 namespace LogExpert.Core.Classes.Log;
 
@@ -34,7 +34,7 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
 
     public override string ReadLine()
     {
-        StreamReader reader = GetStreamReader();
+        var reader = GetStreamReader();
 
         if (_newLineSequenceLength == 0)
         {
@@ -81,6 +81,7 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
                         return Encoding.GetByteCount("\r\n");
                     }
                 }
+
                 return Encoding.GetByteCount(((char)firstChar).ToString());
             }
 

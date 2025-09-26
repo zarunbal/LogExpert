@@ -38,7 +38,7 @@ internal partial class ChooseIconDlg : Form
     {
         iconListView.Items.Clear();
 
-        Icon[,] icons = NativeMethods.ExtractIcons(FileName);
+        var icons = NativeMethods.ExtractIcons(FileName);
 
         if (icons == null)
         {
@@ -66,7 +66,7 @@ internal partial class ChooseIconDlg : Form
 
     private void DisposeIcons()
     {
-        ImageList imageList = iconListView.LargeImageList;
+        var imageList = iconListView.LargeImageList;
         iconListView.LargeImageList = null;
         foreach (Image image in imageList.Images)
         {

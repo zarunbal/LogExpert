@@ -311,6 +311,7 @@ internal class TimeSpreadCalculator
                 {
                     lineNum = -lineNum;
                 }
+
                 var lineDiff = lineNum - oldLineNum;
 
                 _logger.Debug(CultureInfo.InvariantCulture, "TimeSpreadCalculator.DoCalc_via_Time() test time {0:HH:mm:ss.fff} line diff={1}", searchTimeStamp, lineDiff);
@@ -329,6 +330,7 @@ internal class TimeSpreadCalculator
                     {
                         _maxDiff = lineDiff;
                     }
+
                     maxList.Add(lineDiff);
                     loopCount++;
                 }

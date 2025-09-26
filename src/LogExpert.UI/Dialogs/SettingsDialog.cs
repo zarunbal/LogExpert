@@ -119,11 +119,13 @@ internal partial class SettingsDialog : Form
                 {
                     radioButtonSessionSaveOwn.Checked = true;
                 }
+
                 break;
             case SessionSaveLocation.SameDir:
                 {
                     radioButtonSessionSameDir.Checked = true;
                 }
+
                 break;
             case SessionSaveLocation.DocumentsDir:
                 {
@@ -277,9 +279,9 @@ internal partial class SettingsDialog : Form
     {
         var selIndex = 0;
         comboBox.Items.Clear();
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
             var index = comboBox.Items.Add(columnizer.GetName());
             if (columnizer.GetName().Equals(columnizerName, StringComparison.Ordinal))
@@ -303,29 +305,29 @@ internal partial class SettingsDialog : Form
 
         var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
 
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
             comboColumn.Items.Add(columnizer.GetName());
         }
         //comboColumn.DisplayMember = "Name";
         //comboColumn.ValueMember = "Columnizer";
 
-        foreach (ColumnizerMaskEntry maskEntry in Preferences.ColumnizerMaskList)
+        foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
             DataGridViewRow row = new();
             row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (ILogLineColumnizer logColumnizer in columnizers)
+            foreach (var logColumnizer in columnizers)
             {
                 cell.Items.Add(logColumnizer.GetName());
             }
 
             row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
@@ -351,18 +353,18 @@ internal partial class SettingsDialog : Form
         //TODO Remove if not necessary
         var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
 
-        foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+        foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
         {
             comboColumn.Items.Add(group.GroupName);
         }
 
-        foreach (HighlightMaskEntry maskEntry in Preferences.HighlightMaskList)
+        foreach (var maskEntry in Preferences.HighlightMaskList)
         {
             DataGridViewRow row = new();
             row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+            foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
                 cell.Items.Add(group.GroupName);
             }
@@ -370,7 +372,7 @@ internal partial class SettingsDialog : Form
             row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
-            HighlightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
+            var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
             currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
@@ -424,7 +426,7 @@ internal partial class SettingsDialog : Form
     {
         listBoxPlugin.Items.Clear();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
             listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
@@ -433,7 +435,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
             listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
@@ -442,7 +444,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IFileSystemPlugin entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
         {
             listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
@@ -458,7 +460,7 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -466,7 +468,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -479,7 +481,7 @@ internal partial class SettingsDialog : Form
     {
         listBoxTools.Items.Clear();
 
-        foreach (ToolEntry tool in Preferences.ToolEntries)
+        foreach (var tool in Preferences.ToolEntries)
         {
             listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
         }
@@ -558,7 +560,7 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            Icon icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
+            var icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
             if (icon != null)
             {
                 Image image = icon.ToBitmap();
@@ -995,7 +997,7 @@ internal partial class SettingsDialog : Form
             Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*"
         };
 
-        DialogResult result = dlg.ShowDialog();
+        var result = dlg.ShowDialog();
 
         if (result == DialogResult.OK)
         {

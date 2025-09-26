@@ -110,6 +110,7 @@ internal partial class DateTimeDragControl : UserControl
             {
                 _dateTime = MinDateTime;
             }
+
             if (_dateTime > MaxDateTime)
             {
                 _dateTime = MaxDateTime;
@@ -250,12 +251,12 @@ internal partial class DateTimeDragControl : UserControl
 
     private void InitDigitRects ()
     {
-        CultureInfo culture = CultureInfo.CurrentCulture;
+        var culture = CultureInfo.CurrentCulture;
 
         var datePattern = string.Concat(culture.DateTimeFormat.ShortDatePattern, " ", culture.DateTimeFormat.LongTimePattern);
 
-        List<Section> sections = Parser.ParseSections(datePattern, out _);
-        Section dateSection = sections.FirstOrDefault();
+        var sections = Parser.ParseSections(datePattern, out _);
+        var dateSection = sections.FirstOrDefault();
 
         if (dateSection == null)
         {
@@ -377,7 +378,7 @@ internal partial class DateTimeDragControl : UserControl
         for (var i = 0; i < _dateParts.Length; i++)
         {
             var datePart = _dateParts[i];
-            Rectangle rect = _digitRects[i];
+            var rect = _digitRects[i];
             string value;
 
             if (Token.IsDatePart(datePart))

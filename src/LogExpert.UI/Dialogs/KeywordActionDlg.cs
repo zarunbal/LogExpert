@@ -29,7 +29,7 @@ internal partial class KeywordActionDlg : Form
 
         actionComboBox.Items.Clear();
 
-        foreach (IKeywordAction action in actionList)
+        foreach (var action in actionList)
         {
             actionComboBox.Items.Add(action.GetName());
             _actionDict[action.GetName()] = action;

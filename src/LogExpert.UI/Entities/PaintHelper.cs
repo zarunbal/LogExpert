@@ -349,7 +349,7 @@ internal static class PaintHelper
                     //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
                     ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
-                    IsRegEx = false,
+                    IsRegex = false,
                     IsCaseSensitive = false,
                     IsLedSwitch = false,
                     IsStopTail = false,

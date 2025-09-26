@@ -169,7 +169,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // get a list of resource names from the manifest
         var resNames = a.GetManifestResourceNames();
 
-        Bitmap bmp = Resources.Deceased;
+        var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
         bmp.Dispose();
         Closing += OnLogTabWindowClosing;
@@ -236,7 +236,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         lock (HighlightGroupList)
         {
-            foreach (HighlightGroup group in HighlightGroupList)
+            foreach (var group in HighlightGroupList)
             {
                 if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
                 {
@@ -2412,6 +2412,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 {
                     data.Dirty = true;
                 }
+
                 var icon = GetIcon(diff, data);
                 BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
@@ -2440,6 +2441,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
             }
         }
+
         ConfigManager.Save(SettingsFlags.FilterList);
     }
 
@@ -2456,6 +2458,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             return;
         }
+
         if (sender.GetType().IsAssignableFrom(typeof(LogWindow.LogWindow)))
         {
             if (dockPanel.ActiveContent == sender)
@@ -2649,6 +2652,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 logWin.ShowLineColumn(!ConfigManager.Settings.HideLineColumn);
             }
         }
+
         _bookmarkWindow.LineColumnVisible = ConfigManager.Settings.HideLineColumn;
     }
 
