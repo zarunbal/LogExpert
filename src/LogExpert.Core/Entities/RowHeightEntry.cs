@@ -1,16 +1,17 @@
-﻿namespace LogExpert.Core.Entities;
+namespace LogExpert.Core.Entities;
 
+[Serializable]
 public class RowHeightEntry
 {
     #region cTor
 
-    public RowHeightEntry()
+    public RowHeightEntry ()
     {
         LineNum = 0;
         Height = 0;
     }
 
-    public RowHeightEntry(int lineNum, int height)
+    public RowHeightEntry (int lineNum, int height)
     {
         LineNum = lineNum;
         Height = height;

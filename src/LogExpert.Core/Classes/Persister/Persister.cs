@@ -1,11 +1,12 @@
 using System.Drawing;
 using System.Text;
-using System.Text.Json;
 using System.Xml;
 
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
+
+using Newtonsoft.Json;
 
 using NLog;
 
@@ -34,12 +35,14 @@ public static class Persister
         }
 
         Save(fileName, persistenceData);
+        SaveJson(fileName + ".json", persistenceData);
         return fileName;
     }
 
     public static string SavePersistenceDataWithFixedName (string persistenceFileName, PersistenceData persistenceData)
     {
         Save(persistenceFileName, persistenceData);
+        SaveJson(persistenceFileName + ".json", persistenceData);
         return persistenceFileName;
     }
 
@@ -138,7 +141,7 @@ public static class Persister
                 }
         }
 
-        if (string.IsNullOrWhiteSpace(dir) == false && Directory.Exists(dir) == false)
+        if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
         {
             try
             {
@@ -184,6 +187,63 @@ public static class Persister
             xmlDoc.Save(fileName);
         }
     }
+
+    private static void SaveJson (string fileName, PersistenceData persistenceData)
+    {
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+        };
+
+        try
+        {
+            var json = JsonConvert.SerializeObject(persistenceData, settings);
+            File.WriteAllText(fileName, json, Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, $"Error saving persistence data to {fileName}");
+            throw;
+        }
+    }
+
+    private static PersistenceData LoadJson (string fileName)
+    {
+        if (!File.Exists(fileName))
+        {
+            return null;
+        }
+
+        try
+        {
+            var json = File.ReadAllText(fileName, Encoding.UTF8);
+            var data = JsonConvert.DeserializeObject<PersistenceData>(json);
+            // Call Init on all FilterParams if needed
+            if (data?.FilterParamsList != null)
+            {
+                foreach (var filter in data.FilterParamsList)
+                {
+                    filter?.Init();
+                }
+            }
+
+            if (data?.FilterTabDataList != null)
+            {
+                foreach (var tab in data.FilterTabDataList)
+                {
+                    tab?.FilterParams?.Init();
+                }
+            }
+
+            return data;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, $"Error loading persistence data from {fileName}");
+            return null;
+        }
+    }
+
 
     private static void WriteEncoding (XmlDocument xmlDoc, XmlElement rootElement, Encoding encoding)
     {
@@ -249,7 +309,6 @@ public static class Persister
         return dataList;
     }
 
-
     private static void WriteFilter (XmlDocument xmlDoc, XmlElement rootElement, List<FilterParams> filterList)
     {
         var filtersElement = xmlDoc.CreateElement("filters");
@@ -260,14 +319,15 @@ public static class Persister
             var paramsElement = xmlDoc.CreateElement("params");
 
             MemoryStream stream = new(capacity: 200);
-            JsonSerializer.Serialize(stream, filterParams);
+            using TextWriter writer = new StreamWriter(stream);
+            JsonSerializer serializer = new();
+            serializer.Serialize(writer, filterParams);
             var base64Data = Convert.ToBase64String(stream.ToArray());
             paramsElement.InnerText = base64Data;
             filterElement.AppendChild(paramsElement);
             filtersElement.AppendChild(filterElement);
         }
     }
-
 
     private static List<FilterParams> ReadFilter (XmlElement startNode)
     {
@@ -288,7 +348,9 @@ public static class Persister
 
                         try
                         {
-                            var filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
+                            using JsonReader reader = new JsonTextReader(new StreamReader(stream));
+                            JsonSerializer serializer = new();
+                            var filterParams = serializer.Deserialize<FilterParams>(reader);
                             filterParams.Init();
                             filterList.Add(filterParams);
                         }
@@ -304,9 +366,7 @@ public static class Persister
         return filterList;
     }
 
-
-    private static void WriteBookmarks (XmlDocument xmlDoc, XmlElement rootElement,
-        SortedList<int, Entities.Bookmark> bookmarkList)
+    private static void WriteBookmarks (XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, Entities.Bookmark> bookmarkList)
     {
         var bookmarksElement = xmlDoc.CreateElement("bookmarks");
         rootElement.AppendChild(bookmarksElement);
@@ -326,7 +386,6 @@ public static class Persister
             bookmarksElement.AppendChild(bookmarkElement);
         }
     }
-
 
     private static PersistenceData Load (string fileName)
     {
@@ -362,7 +421,6 @@ public static class Persister
         return persistenceData;
     }
 
-
     private static Encoding ReadEncoding (XmlElement fileElement)
     {
         var encodingNode = fileElement.SelectSingleNode("encoding");
@@ -388,14 +446,13 @@ public static class Persister
         return null;
     }
 
-
     private static SortedList<int, Entities.Bookmark> ReadBookmarks (XmlElement startNode)
     {
         SortedList<int, Entities.Bookmark> bookmarkList = [];
-        var boomarksNode = startNode.SelectSingleNode("bookmarks");
-        if (boomarksNode != null)
+        var bookmarksNode = startNode.SelectSingleNode("bookmarks");
+        if (bookmarksNode != null)
         {
-            var bookmarkNodeList = boomarksNode.ChildNodes; // all "bookmark" nodes
+            var bookmarkNodeList = bookmarksNode.ChildNodes; // all "bookmark" nodes
             foreach (XmlNode node in bookmarkNodeList)
             {
                 string text = null;
@@ -651,7 +708,6 @@ public static class Persister
             persistenceData.HighlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
         }
     }
-
 
     private static string GetOptionsAttribute (XmlNode optionsNode, string elementName, string attrName)
     {
