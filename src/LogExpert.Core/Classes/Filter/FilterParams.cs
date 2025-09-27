@@ -61,15 +61,19 @@ public class FilterParams : ICloneable
     /// false=looking for start
     /// true=looking for end
     /// </summary>
+    [JsonIgnore]
     [field: NonSerialized]
     public bool IsInRange { get; set; }
 
+    [JsonIgnore]
     [field: NonSerialized]
     public string LastLine { get; set; } = string.Empty;
 
+    [JsonIgnore]
     [field: NonSerialized]
     public Hashtable LastNonEmptyCols { get; set; } = [];
 
+    [JsonIgnore]
     [field: NonSerialized]
     public bool LastResult { get; set; }
 
@@ -81,11 +85,13 @@ public class FilterParams : ICloneable
     [JsonIgnore]
     internal string NormalizedSearchText => SearchText.ToUpperInvariant();
 
+    [JsonIgnore]
     [field: NonSerialized]
     public Regex RangeRex { get; set; }
 
+    [JsonIgnore]
     [field: NonSerialized]
-    public Regex Rex { get; set; }
+    public Regex Regex { get; set; }
 
     #endregion
 
@@ -123,7 +129,7 @@ public class FilterParams : ICloneable
     {
         if (SearchText != null)
         {
-            Rex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            Regex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         }
 
         if (RangeSearchText != null && IsRangeSearch)

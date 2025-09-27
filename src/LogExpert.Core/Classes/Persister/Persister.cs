@@ -12,7 +12,6 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Persister;
 
-//TODO Rewrite as json Persister, xml is outdated and difficult to parse and write
 public static class Persister
 {
     #region Fields
@@ -34,14 +33,14 @@ public static class Persister
             persistenceData.FileName = filePart;
         }
 
-        Save(fileName, persistenceData);
+        SaveXML(fileName, persistenceData);
         SaveJson(fileName + ".json", persistenceData);
         return fileName;
     }
 
     public static string SavePersistenceDataWithFixedName (string persistenceFileName, PersistenceData persistenceData)
     {
-        Save(persistenceFileName, persistenceData);
+        SaveXML(persistenceFileName, persistenceData);
         SaveJson(persistenceFileName + ".json", persistenceData);
         return persistenceFileName;
     }
@@ -167,7 +166,7 @@ public static class Persister
         return result;
     }
 
-    private static void Save (string fileName, PersistenceData persistenceData)
+    private static void SaveXML (string fileName, PersistenceData persistenceData)
     {
         XmlDocument xmlDoc = new();
         var rootElement = xmlDoc.CreateElement("logexpert");
@@ -243,7 +242,6 @@ public static class Persister
             return null;
         }
     }
-
 
     private static void WriteEncoding (XmlDocument xmlDoc, XmlElement rootElement, Encoding encoding)
     {

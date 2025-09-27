@@ -483,7 +483,7 @@ public class Util
         {
             normalizedSearchText = filterParams.NormalizedSearchText;
             searchText = filterParams.SearchText;
-            rex = filterParams.Rex;
+            rex = filterParams.Regex;
         }
 
         if (string.IsNullOrEmpty(searchText))
