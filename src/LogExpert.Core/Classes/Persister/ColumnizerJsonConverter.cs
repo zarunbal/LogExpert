@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -94,7 +93,7 @@ public class ColumnizerJsonConverter : JsonConverter
             {
                 try
                 {
-                    if (Activator.CreateInstance(type) is ILogLineColumnizer inst && inst.GetName() == name)
+                    if (Activator.CreateInstance(type) is ILogLineColumnizer instance && instance.GetName() == name)
                     {
                         return type;
                     }
@@ -105,9 +104,7 @@ public class ColumnizerJsonConverter : JsonConverter
                                            TargetInvocationException or
                                            MethodAccessException or
                                            MemberAccessException or
-                                           InvalidComObjectException or
                                            MissingMethodException or
-                                           COMException or
                                            TypeLoadException)
                 {
                     // intentionally ignored
