@@ -877,7 +877,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (fileName.EndsWith(".lxp"))
         {
-            var persistenceData = Persister.LoadOptionsOnly(fileName);
+            var persistenceData = Persister.Load(fileName);
             if (persistenceData == null)
             {
                 return fileName;

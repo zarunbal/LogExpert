@@ -1,10 +1,8 @@
-using System.Drawing;
+using System.Runtime.Serialization;
+using System.Security;
 using System.Text;
-using System.Xml;
 
-using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
-using LogExpert.Core.Entities;
 
 using Newtonsoft.Json;
 
@@ -22,8 +20,25 @@ public static class Persister
 
     #region Public methods
 
+    /// <summary>
+    /// Saves the specified persistence data to a file and returns the file name used.
+    /// </summary>
+    /// <remarks>If the <see cref="PersistenceData.SessionFileName"/> property of <paramref
+    /// name="persistenceData"/> is not set, a file name is generated based on <paramref name="logFileName"/> and the
+    /// provided <paramref name="preferences"/>. If the save location specified in <paramref name="preferences"/> is
+    /// <see cref="SessionSaveLocation.SameDir"/>, the file name is adjusted to be relative to the log file's
+    /// directory.</remarks>
+    /// <param name="logFileName">The name of the log file associated with the session. This is used to generate the file name if one is not
+    /// provided in <paramref name="persistenceData"/>.</param>
+    /// <param name="persistenceData">The persistence data to save. This parameter cannot be <see langword="null"/>.</param>
+    /// <param name="preferences">The user preferences that determine the save location and other settings. This parameter cannot be <see
+    /// langword="null"/>.</param>
+    /// <returns>The full path of the file where the persistence data was saved.</returns>
     public static string SavePersistenceData (string logFileName, PersistenceData persistenceData, Preferences preferences)
     {
+        ArgumentNullException.ThrowIfNull(preferences);
+        ArgumentNullException.ThrowIfNull(persistenceData);
+
         var fileName = persistenceData.SessionFileName ?? BuildPersisterFileName(logFileName, preferences);
 
         if (preferences.SaveLocation == SessionSaveLocation.SameDir)
@@ -33,75 +48,95 @@ public static class Persister
             persistenceData.FileName = filePart;
         }
 
-        SaveXML(fileName, persistenceData);
-        SaveJson(fileName + ".json", persistenceData);
+        Save(fileName, persistenceData);
         return fileName;
     }
 
+    /// <summary>
+    /// Saves the specified persistence data to a file with the given name.
+    /// </summary>
+    /// <param name="persistenceFileName">The name of the file to save the persistence data to. Must not be null or empty.</param>
+    /// <param name="persistenceData">The persistence data to be saved. Must not be null.</param>
+    /// <returns>The name of the file where the persistence data was saved.</returns>
     public static string SavePersistenceDataWithFixedName (string persistenceFileName, PersistenceData persistenceData)
     {
-        SaveXML(persistenceFileName, persistenceData);
-        SaveJson(persistenceFileName + ".json", persistenceData);
+        Save(persistenceFileName, persistenceData);
         return persistenceFileName;
     }
 
+    /// <summary>
+    /// Loads persistence data from the specified log file using the provided preferences.
+    /// </summary>
+    /// <param name="logFileName">The name of the log file to load persistence data from. This value cannot be null.</param>
+    /// <param name="preferences">The preferences used to determine the file path and loading behaviour. This value cannot be null.</param>
+    /// <returns>The loaded <see cref="PersistenceData"/> object containing the persistence information.</returns>
     public static PersistenceData LoadPersistenceData (string logFileName, Preferences preferences)
     {
+        ArgumentNullException.ThrowIfNull(preferences);
         var fileName = BuildPersisterFileName(logFileName, preferences);
-        return Load(fileName);
+        return LoadInternal(fileName);
     }
-
-    public static PersistenceData LoadPersistenceDataOptionsOnly (string logFileName, Preferences preferences)
-    {
-        var fileName = BuildPersisterFileName(logFileName, preferences);
-        return LoadOptionsOnly(fileName);
-    }
-
-    public static PersistenceData LoadPersistenceDataOptionsOnlyFromFixedFile (string persistenceFile)
-    {
-        return LoadOptionsOnly(persistenceFile);
-    }
-
-    public static PersistenceData LoadPersistenceDataFromFixedFile (string persistenceFile)
-    {
-        return Load(persistenceFile);
-    }
-
 
     /// <summary>
-    /// Loads the persistence options out of the given persistence file name.
+    /// Loads persistence data based on the specified log file name and preferences.
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
-    public static PersistenceData LoadOptionsOnly (string fileName)
+    /// <param name="logFileName">The name of the log file used to determine the persistence data file.</param>
+    /// <param name="preferences">The preferences that influence the file name generation. Cannot be <see langword="null"/>.</param>
+    /// <returns>A <see cref="PersistenceData"/> object containing the loaded data.</returns>
+    public static PersistenceData LoadPersistenceDataOptionsOnly (string logFileName, Preferences preferences)
     {
-        PersistenceData persistenceData = new();
-        XmlDocument xmlDoc = new();
-        try
-        {
-            xmlDoc.Load(fileName);
-        }
-        catch (IOException)
-        {
-            return null;
-        }
+        ArgumentNullException.ThrowIfNull(preferences);
+        var fileName = BuildPersisterFileName(logFileName, preferences);
+        return LoadInternal(fileName);
+    }
 
-        var fileNode = xmlDoc.SelectSingleNode("logexpert/file");
-        if (fileNode != null)
-        {
-            var fileElement = fileNode as XmlElement;
-            ReadOptions(fileElement, persistenceData);
-            persistenceData.FileName = fileElement.GetAttribute("fileName");
-            persistenceData.Encoding = ReadEncoding(fileElement);
-        }
+    /// <summary>
+    /// Loads persistence data options from a specified file.
+    /// </summary>
+    /// <remarks>This method only loads the options portion of the persistence data from the specified file.
+    /// Ensure the file format is valid and compatible with the expected structure of <see
+    /// cref="PersistenceData"/>.</remarks>
+    /// <param name="persistenceFile">The path to the file containing the persistence data options. The file must exist and be accessible.</param>
+    /// <returns>A <see cref="PersistenceData"/> object containing the loaded options.</returns>
+    public static PersistenceData LoadPersistenceDataOptionsOnlyFromFixedFile (string persistenceFile)
+    {
+        return LoadInternal(persistenceFile);
+    }
 
-        return persistenceData;
+    /// <summary>
+    /// Loads persistence data from the specified file.
+    /// </summary>
+    /// <param name="persistenceFile">The path to the file containing the persistence data. The file must exist and be accessible.</param>
+    /// <returns>A <see cref="PersistenceData"/> object containing the data loaded from the file.</returns>
+    public static PersistenceData LoadPersistenceDataFromFixedFile (string persistenceFile)
+    {
+        return LoadInternal(persistenceFile);
+    }
+
+    /// <summary>
+    /// Loads persistence data from the specified file.
+    /// </summary>
+    /// <param name="fileName">The path to the file containing the persistence data. The file must exist and be accessible.</param>
+    /// <returns>A <see cref="PersistenceData"/> object representing the data loaded from the file.</returns>
+    public static PersistenceData Load (string fileName)
+    {
+        return LoadInternal(fileName);
     }
 
     #endregion
 
     #region Private Methods
 
+    /// <summary>
+    /// Constructs the file path for the persister file based on the specified log file name and preferences.
+    /// </summary>
+    /// <remarks>The method determines the save location for the persister file based on the <see
+    /// cref="Preferences.SaveLocation"/> property. If the specified directory does not exist, the method attempts to
+    /// create it. If directory creation fails, an error is logged.</remarks>
+    /// <param name="logFileName">The name of the log file for which the persister file path is being generated.</param>
+    /// <param name="preferences">The preferences that determine the save location and directory structure for the persister file.</param>
+    /// <returns>The full file path of the persister file, including the directory and file name, based on the specified log file
+    /// name and preferences.</returns>
     private static string BuildPersisterFileName (string logFileName, Preferences preferences)
     {
         string dir;
@@ -144,18 +179,30 @@ public static class Persister
         {
             try
             {
-                Directory.CreateDirectory(dir);
+                _ = Directory.CreateDirectory(dir);
             }
-            catch (Exception e)
+            catch (Exception ex) when (ex is ArgumentNullException or
+                                             ArgumentException or
+                                             IOException or
+                                             UnauthorizedAccessException or
+                                             NotSupportedException or
+                                             PathTooLongException or
+                                             SecurityException or
+                                             DirectoryNotFoundException)
             {
-                //TODO this needs to be handled differently
-                //MessageBox.Show(e.Message, "LogExpert");
+                _logger.Error(ex, $"Error creating directory {dir}");
             }
         }
 
         return file;
     }
 
+    /// <summary>
+    /// Generates a session file name based on the specified log file path.
+    /// </summary>
+    /// <param name="logFileName">The full path of the log file to be converted into a session file name.</param>
+    /// <returns>A string representing the session file name, where directory, volume, and path separators are replaced with
+    /// underscores, and the file name is appended with the ".lxp" extension.</returns>
     private static string BuildSessionFileNameFromPath (string logFileName)
     {
         var result = logFileName;
@@ -166,28 +213,15 @@ public static class Persister
         return result;
     }
 
-    private static void SaveXML (string fileName, PersistenceData persistenceData)
-    {
-        XmlDocument xmlDoc = new();
-        var rootElement = xmlDoc.CreateElement("logexpert");
-        xmlDoc.AppendChild(rootElement);
-        var fileElement = xmlDoc.CreateElement("file");
-        rootElement.AppendChild(fileElement);
-        fileElement.SetAttribute("fileName", persistenceData.FileName);
-        fileElement.SetAttribute("lineCount", "" + persistenceData.LineCount);
-        WriteBookmarks(xmlDoc, fileElement, persistenceData.BookmarkList);
-        WriteRowHeightList(xmlDoc, fileElement, persistenceData.RowHeightList);
-        WriteOptions(xmlDoc, fileElement, persistenceData);
-        WriteFilter(xmlDoc, fileElement, persistenceData.FilterParamsList);
-        WriteFilterTabs(xmlDoc, fileElement, persistenceData.FilterTabDataList);
-        WriteEncoding(xmlDoc, fileElement, persistenceData.Encoding);
-        if (xmlDoc.HasChildNodes)
-        {
-            xmlDoc.Save(fileName);
-        }
-    }
-
-    private static void SaveJson (string fileName, PersistenceData persistenceData)
+    /// <summary>
+    /// Saves the specified persistence data to a file in JSON format.
+    /// </summary>
+    /// <remarks>The method serializes the <paramref name="persistenceData"/> object to JSON using specific
+    /// settings,  including a custom JSON converter. The resulting JSON is written to the specified file with UTF-8
+    /// encoding.</remarks>
+    /// <param name="fileName">The full path of the file where the data will be saved. This cannot be null or empty.</param>
+    /// <param name="persistenceData">The data to be persisted. This cannot be null.</param>
+    private static void Save (string fileName, PersistenceData persistenceData)
     {
         var settings = new JsonSerializerSettings
         {
@@ -195,7 +229,7 @@ public static class Persister
             {
                 new ColumnizerJsonConverter()
             },
-            Formatting = Newtonsoft.Json.Formatting.Indented,
+            Formatting = Formatting.Indented,
         };
 
         try
@@ -210,7 +244,17 @@ public static class Persister
         }
     }
 
-    private static PersistenceData LoadJson (string fileName)
+    /// <summary>
+    /// Loads persistence data from the specified file.
+    /// </summary>
+    /// <remarks>This method attempts to deserialize the file's contents into a <see cref="PersistenceData"/>
+    /// object using JSON. If the deserialization is successful, it initializes any filter parameters within the loaded
+    /// data. If an error occurs during file access or deserialization, the method logs the error and returns <see
+    /// langword="null"/>.</remarks>
+    /// <param name="fileName">The full path to the file containing the persistence data. The file must exist and be accessible.</param>
+    /// <returns>An instance of <see cref="PersistenceData"/> containing the deserialized data from the file, or <see
+    /// langword="null"/> if the file does not exist, an error occurs during loading, or the data is invalid.</returns>
+    private static PersistenceData LoadInternal (string fileName)
     {
         if (!File.Exists(fileName))
         {
@@ -225,7 +269,7 @@ public static class Persister
                 {
                     new ColumnizerJsonConverter()
                 },
-                Formatting = Newtonsoft.Json.Formatting.Indented,
+                Formatting = Formatting.Indented,
             };
 
             var json = File.ReadAllText(fileName, Encoding.UTF8);
@@ -249,502 +293,19 @@ public static class Persister
 
             return data;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentNullException or
+                                         ArgumentException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         JsonException or
+                                         UnauthorizedAccessException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException or
+                                         SerializationException or
+                                         IOException)
         {
             _logger.Error(ex, $"Error loading persistence data from {fileName}");
-            return null;
-        }
-    }
-
-    private static void WriteEncoding (XmlDocument xmlDoc, XmlElement rootElement, Encoding encoding)
-    {
-        if (encoding != null)
-        {
-            var encodingElement = xmlDoc.CreateElement("encoding");
-            rootElement.AppendChild(encodingElement);
-            encodingElement.SetAttribute("name", encoding.WebName);
-        }
-    }
-
-    private static void WriteFilterTabs (XmlDocument xmlDoc, XmlElement rootElement, List<FilterTabData> dataList)
-    {
-        if (dataList.Count > 0)
-        {
-            var filterTabsElement = xmlDoc.CreateElement("filterTabs");
-            rootElement.AppendChild(filterTabsElement);
-            foreach (var data in dataList)
-            {
-                var persistenceData = data.PersistenceData;
-                var filterTabElement = xmlDoc.CreateElement("filterTab");
-                filterTabsElement.AppendChild(filterTabElement);
-                WriteBookmarks(xmlDoc, filterTabElement, persistenceData.BookmarkList);
-                WriteRowHeightList(xmlDoc, filterTabElement, persistenceData.RowHeightList);
-                WriteOptions(xmlDoc, filterTabElement, persistenceData);
-                WriteFilter(xmlDoc, filterTabElement, persistenceData.FilterParamsList);
-                WriteFilterTabs(xmlDoc, filterTabElement, persistenceData.FilterTabDataList);
-                var filterElement = xmlDoc.CreateElement("tabFilter");
-                filterTabElement.AppendChild(filterElement);
-                List<FilterParams> filterList = [data.FilterParams];
-                WriteFilter(xmlDoc, filterElement, filterList);
-            }
-        }
-    }
-
-    private static List<FilterTabData> ReadFilterTabs (XmlElement startNode)
-    {
-        List<FilterTabData> dataList = [];
-        var filterTabsNode = startNode.SelectSingleNode("filterTabs");
-        if (filterTabsNode != null)
-        {
-            var filterTabNodeList = filterTabsNode.ChildNodes; // all "filterTab" nodes
-
-            foreach (XmlNode node in filterTabNodeList)
-            {
-                var persistenceData = ReadPersistenceDataFromNode(node);
-                var filterNode = node.SelectSingleNode("tabFilter");
-
-                if (filterNode != null)
-                {
-                    var filterList = ReadFilter(filterNode as XmlElement);
-                    FilterTabData data = new()
-                    {
-                        PersistenceData = persistenceData,
-                        FilterParams = filterList[0] // there's only 1
-                    };
-
-                    dataList.Add(data);
-                }
-            }
-        }
-
-        return dataList;
-    }
-
-    private static void WriteFilter (XmlDocument xmlDoc, XmlElement rootElement, List<FilterParams> filterList)
-    {
-        var filtersElement = xmlDoc.CreateElement("filters");
-        rootElement.AppendChild(filtersElement);
-        foreach (var filterParams in filterList)
-        {
-            var filterElement = xmlDoc.CreateElement("filter");
-            var paramsElement = xmlDoc.CreateElement("params");
-
-            MemoryStream stream = new(capacity: 200);
-            using TextWriter writer = new StreamWriter(stream);
-            JsonSerializer serializer = new();
-            serializer.Serialize(writer, filterParams);
-            var base64Data = Convert.ToBase64String(stream.ToArray());
-            paramsElement.InnerText = base64Data;
-            filterElement.AppendChild(paramsElement);
-            filtersElement.AppendChild(filterElement);
-        }
-    }
-
-    private static List<FilterParams> ReadFilter (XmlElement startNode)
-    {
-        List<FilterParams> filterList = [];
-        var filtersNode = startNode.SelectSingleNode("filters");
-        if (filtersNode != null)
-        {
-            var filterNodeList = filtersNode.ChildNodes; // all "filter" nodes
-            foreach (XmlNode node in filterNodeList)
-            {
-                foreach (XmlNode subNode in node.ChildNodes)
-                {
-                    if (subNode.Name.Equals("params", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var base64Text = subNode.InnerText;
-                        var data = Convert.FromBase64String(base64Text);
-                        MemoryStream stream = new(data);
-
-                        try
-                        {
-                            using JsonReader reader = new JsonTextReader(new StreamReader(stream));
-                            JsonSerializer serializer = new();
-                            var filterParams = serializer.Deserialize<FilterParams>(reader);
-
-                            if (filterParams == null)
-                            {
-                                filterParams = new FilterParams();
-                                filterParams.Init();
-                            }
-                            else
-                            {
-                                filterParams.Init();
-                            }
-
-                            filterList.Add(filterParams);
-                        }
-                        catch (JsonException ex)
-                        {
-                            _logger.Error($"Error while deserializing filter params. Exception Message: {ex.Message}");
-                        }
-                    }
-                }
-            }
-        }
-
-        return filterList;
-    }
-
-    private static void WriteBookmarks (XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, Entities.Bookmark> bookmarkList)
-    {
-        var bookmarksElement = xmlDoc.CreateElement("bookmarks");
-        rootElement.AppendChild(bookmarksElement);
-        foreach (var bookmark in bookmarkList.Values)
-        {
-            var bookmarkElement = xmlDoc.CreateElement("bookmark");
-            bookmarkElement.SetAttribute("line", "" + bookmark.LineNum);
-            var textElement = xmlDoc.CreateElement("text");
-            textElement.InnerText = bookmark.Text;
-            var posXElement = xmlDoc.CreateElement("posX");
-            var posYElement = xmlDoc.CreateElement("posY");
-            posXElement.InnerText = "" + bookmark.OverlayOffset.Width;
-            posYElement.InnerText = "" + bookmark.OverlayOffset.Height;
-            bookmarkElement.AppendChild(textElement);
-            bookmarkElement.AppendChild(posXElement);
-            bookmarkElement.AppendChild(posYElement);
-            bookmarksElement.AppendChild(bookmarkElement);
-        }
-    }
-
-    private static PersistenceData Load (string fileName)
-    {
-        XmlDocument xmlDoc = new();
-        xmlDoc.Load(fileName);
-        var fileNode = xmlDoc.SelectSingleNode("logexpert/file");
-        PersistenceData persistenceData = new();
-        if (fileNode != null)
-        {
-            persistenceData = ReadPersistenceDataFromNode(fileNode);
-        }
-
-        return persistenceData;
-    }
-
-    private static PersistenceData ReadPersistenceDataFromNode (XmlNode node)
-    {
-        PersistenceData persistenceData = new();
-        var fileElement = node as XmlElement;
-        persistenceData.BookmarkList = ReadBookmarks(fileElement);
-        persistenceData.RowHeightList = ReadRowHeightList(fileElement);
-        ReadOptions(fileElement, persistenceData);
-        persistenceData.FileName = fileElement.GetAttribute("fileName");
-        var sLineCount = fileElement.GetAttribute("lineCount");
-        if (sLineCount != null && sLineCount.Length > 0)
-        {
-            persistenceData.LineCount = int.Parse(sLineCount);
-        }
-
-        persistenceData.FilterParamsList = ReadFilter(fileElement);
-        persistenceData.FilterTabDataList = ReadFilterTabs(fileElement);
-        persistenceData.Encoding = ReadEncoding(fileElement);
-        return persistenceData;
-    }
-
-    private static Encoding ReadEncoding (XmlElement fileElement)
-    {
-        var encodingNode = fileElement.SelectSingleNode("encoding");
-        if (encodingNode != null)
-        {
-            var encAttr = encodingNode.Attributes["name"];
-            try
-            {
-                return encAttr == null ? null : Encoding.GetEncoding(encAttr.Value);
-            }
-            catch (ArgumentException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
-            catch (NotSupportedException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
-        }
-
-        return null;
-    }
-
-    private static SortedList<int, Entities.Bookmark> ReadBookmarks (XmlElement startNode)
-    {
-        SortedList<int, Entities.Bookmark> bookmarkList = [];
-        var bookmarksNode = startNode.SelectSingleNode("bookmarks");
-        if (bookmarksNode != null)
-        {
-            var bookmarkNodeList = bookmarksNode.ChildNodes; // all "bookmark" nodes
-            foreach (XmlNode node in bookmarkNodeList)
-            {
-                string text = null;
-                string posX = null;
-                string posY = null;
-                string line = null;
-
-                foreach (XmlAttribute attr in node.Attributes)
-                {
-                    if (attr.Name.Equals("line", StringComparison.OrdinalIgnoreCase))
-                    {
-                        line = attr.InnerText;
-                    }
-                }
-
-                foreach (XmlNode subNode in node.ChildNodes)
-                {
-                    if (subNode.Name.Equals("text", StringComparison.OrdinalIgnoreCase))
-                    {
-                        text = subNode.InnerText;
-                    }
-                    else if (subNode.Name.Equals("posX", StringComparison.OrdinalIgnoreCase))
-                    {
-                        posX = subNode.InnerText;
-                    }
-                    else if (subNode.Name.Equals("posY", StringComparison.OrdinalIgnoreCase))
-                    {
-                        posY = subNode.InnerText;
-                    }
-                }
-
-                if (line == null || posX == null || posY == null)
-                {
-                    _logger.Error($"Invalid XML format for bookmark: {node.InnerText}");
-                    continue;
-                }
-
-                var lineNum = int.Parse(line);
-
-                Entities.Bookmark bookmark = new(lineNum)
-                {
-                    OverlayOffset = new Size(int.Parse(posX), int.Parse(posY))
-                };
-
-                if (text != null)
-                {
-                    bookmark.Text = text;
-                }
-
-                bookmarkList.Add(lineNum, bookmark);
-            }
-        }
-
-        return bookmarkList;
-    }
-
-    private static void WriteRowHeightList (XmlDocument xmlDoc, XmlElement rootElement, SortedList<int, RowHeightEntry> rowHeightList)
-    {
-        var rowheightElement = xmlDoc.CreateElement("rowheights");
-        rootElement.AppendChild(rowheightElement);
-        foreach (var entry in rowHeightList.Values)
-        {
-            var entryElement = xmlDoc.CreateElement("rowheight");
-            entryElement.SetAttribute("line", "" + entry.LineNum);
-            entryElement.SetAttribute("height", "" + entry.Height);
-            rowheightElement.AppendChild(entryElement);
-        }
-    }
-
-    private static SortedList<int, RowHeightEntry> ReadRowHeightList (XmlElement startNode)
-    {
-        SortedList<int, RowHeightEntry> rowHeightList = [];
-        var rowHeightsNode = startNode.SelectSingleNode("rowheights");
-        if (rowHeightsNode != null)
-        {
-            var rowHeightNodeList = rowHeightsNode.ChildNodes; // all "rowheight" nodes
-            foreach (XmlNode node in rowHeightNodeList)
-            {
-                string height = null;
-                string line = null;
-                foreach (XmlAttribute attr in node.Attributes)
-                {
-                    if (attr.Name.Equals("line", StringComparison.OrdinalIgnoreCase))
-                    {
-                        line = attr.InnerText;
-                    }
-                    else if (attr.Name.Equals("height", StringComparison.OrdinalIgnoreCase))
-                    {
-                        height = attr.InnerText;
-                    }
-                }
-
-                var lineNum = int.Parse(line);
-                var heightValue = int.Parse(height);
-                rowHeightList.Add(lineNum, new RowHeightEntry(lineNum, heightValue));
-            }
-        }
-
-        return rowHeightList;
-    }
-
-    private static void WriteOptions (XmlDocument xmlDoc, XmlElement rootElement, PersistenceData persistenceData)
-    {
-        var optionsElement = xmlDoc.CreateElement("options");
-        rootElement.AppendChild(optionsElement);
-
-        var element = xmlDoc.CreateElement("multifile");
-        element.SetAttribute("enabled", persistenceData.MultiFile ? "1" : "0");
-        element.SetAttribute("pattern", persistenceData.MultiFilePattern);
-        element.SetAttribute("maxDays", "" + persistenceData.MultiFileMaxDays);
-        foreach (var fileName in persistenceData.MultiFileNames)
-        {
-            var entryElement = xmlDoc.CreateElement("fileEntry");
-            entryElement.SetAttribute("fileName", "" + fileName);
-            element.AppendChild(entryElement);
-        }
-
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("currentline");
-        element.SetAttribute("line", "" + persistenceData.CurrentLine);
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("firstDisplayedLine");
-        element.SetAttribute("line", "" + persistenceData.FirstDisplayedLine);
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("filter");
-        element.SetAttribute("visible", persistenceData.FilterVisible ? "1" : "0");
-        element.SetAttribute("advanced", persistenceData.FilterAdvanced ? "1" : "0");
-        element.SetAttribute("position", "" + persistenceData.FilterPosition);
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("bookmarklist");
-        element.SetAttribute("visible", persistenceData.BookmarkListVisible ? "1" : "0");
-        element.SetAttribute("position", "" + persistenceData.BookmarkListPosition);
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("followTail");
-        element.SetAttribute("enabled", persistenceData.FollowTail ? "1" : "0");
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("tab");
-        element.SetAttribute("name", persistenceData.TabName);
-        rootElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("columnizer");
-        element.SetAttribute("name", persistenceData.ColumnizerName);
-        rootElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("highlightGroup");
-        element.SetAttribute("name", persistenceData.HighlightGroupName);
-        rootElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("bookmarkCommentColumn");
-        element.SetAttribute("visible", persistenceData.ShowBookmarkCommentColumn ? "1" : "0");
-        optionsElement.AppendChild(element);
-
-        element = xmlDoc.CreateElement("filterSaveList");
-        element.SetAttribute("visible", persistenceData.FilterSaveListVisible ? "1" : "0");
-        optionsElement.AppendChild(element);
-    }
-
-    private static void ReadOptions (XmlElement startNode, PersistenceData persistenceData)
-    {
-        var optionsNode = startNode.SelectSingleNode("options");
-        var value = GetOptionsAttribute(optionsNode, "multifile", "enabled");
-        persistenceData.MultiFile = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-        persistenceData.MultiFilePattern = GetOptionsAttribute(optionsNode, "multifile", "pattern");
-        value = GetOptionsAttribute(optionsNode, "multifile", "maxDays");
-        try
-        {
-            persistenceData.MultiFileMaxDays = value != null ? short.Parse(value) : 0;
-        }
-        catch (Exception)
-        {
-            persistenceData.MultiFileMaxDays = 0;
-        }
-
-        var multiFileNode = optionsNode.SelectSingleNode("multifile");
-        if (multiFileNode != null)
-        {
-            var multiFileNodeList = multiFileNode.ChildNodes; // all "fileEntry" nodes
-            foreach (XmlNode node in multiFileNodeList)
-            {
-                string fileName = null;
-                foreach (XmlAttribute attr in node.Attributes)
-                {
-                    if (attr.Name.Equals("fileName", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fileName = attr.InnerText;
-                    }
-                }
-
-                persistenceData.MultiFileNames.Add(fileName);
-            }
-        }
-
-        value = GetOptionsAttribute(optionsNode, "currentline", "line");
-        if (value != null)
-        {
-            persistenceData.CurrentLine = int.Parse(value);
-        }
-
-        value = GetOptionsAttribute(optionsNode, "firstDisplayedLine", "line");
-        if (value != null)
-        {
-            persistenceData.FirstDisplayedLine = int.Parse(value);
-        }
-
-        value = GetOptionsAttribute(optionsNode, "filter", "visible");
-        persistenceData.FilterVisible = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-        value = GetOptionsAttribute(optionsNode, "filter", "advanced");
-        persistenceData.FilterAdvanced = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-        value = GetOptionsAttribute(optionsNode, "filter", "position");
-        if (value != null)
-        {
-            persistenceData.FilterPosition = int.Parse(value);
-        }
-
-        value = GetOptionsAttribute(optionsNode, "bookmarklist", "visible");
-        persistenceData.BookmarkListVisible = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-        value = GetOptionsAttribute(optionsNode, "bookmarklist", "position");
-        if (value != null)
-        {
-            persistenceData.BookmarkListPosition = int.Parse(value);
-        }
-
-        value = GetOptionsAttribute(optionsNode, "followTail", "enabled");
-        persistenceData.FollowTail = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-
-        value = GetOptionsAttribute(optionsNode, "bookmarkCommentColumn", "visible");
-        persistenceData.ShowBookmarkCommentColumn = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-
-        value = GetOptionsAttribute(optionsNode, "filterSaveList", "visible");
-        persistenceData.FilterSaveListVisible = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-
-        var tabNode = startNode.SelectSingleNode("tab");
-        if (tabNode != null)
-        {
-            persistenceData.TabName = (tabNode as XmlElement).GetAttribute("name");
-        }
-
-        var columnizerNode = startNode.SelectSingleNode("columnizer");
-        if (columnizerNode != null)
-        {
-            persistenceData.ColumnizerName = (columnizerNode as XmlElement).GetAttribute("name");
-        }
-
-        var highlightGroupNode = startNode.SelectSingleNode("highlightGroup");
-        if (highlightGroupNode != null)
-        {
-            persistenceData.HighlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
-        }
-    }
-
-    private static string GetOptionsAttribute (XmlNode optionsNode, string elementName, string attrName)
-    {
-        var node = optionsNode.SelectSingleNode(elementName);
-        if (node == null)
-        {
-            return null;
-        }
-
-        if (node is XmlElement)
-        {
-            var value = (node as XmlElement).GetAttribute(attrName);
-            return value;
-        }
-        else
-        {
             return null;
         }
     }
