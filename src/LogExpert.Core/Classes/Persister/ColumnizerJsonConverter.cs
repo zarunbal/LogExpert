@@ -18,8 +18,11 @@ public class ColumnizerJsonConverter : JsonConverter
         return typeof(ILogLineColumnizer).IsAssignableFrom(objectType);
     }
 
-    public override void WriteJson (JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson (JsonWriter writer, object? value, JsonSerializer serializer)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(value);
+
         if (value is not ILogLineColumnizer columnizer)
         {
             writer.WriteNull();
@@ -45,8 +48,15 @@ public class ColumnizerJsonConverter : JsonConverter
         writer.WriteEndObject();
     }
 
-    public override object ReadJson (JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson (JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
+        if (reader.TokenType == JsonToken.Null)
+        {
+            return null;
+        }
+
         var jObject = JObject.Load(reader);
         var typeName = jObject["Type"]?.ToString();
         if (typeName == null || jObject["State"] is not JObject state)
