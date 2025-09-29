@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-using System.Security;
 using System.Text;
 
 using LogExpert.Core.Config;
@@ -181,13 +179,9 @@ public static class Persister
             {
                 _ = Directory.CreateDirectory(dir);
             }
-            catch (Exception ex) when (ex is ArgumentNullException or
-                                             ArgumentException or
-                                             IOException or
+            catch (Exception ex) when (ex is IOException or
                                              UnauthorizedAccessException or
-                                             NotSupportedException or
                                              PathTooLongException or
-                                             SecurityException or
                                              DirectoryNotFoundException)
             {
                 _logger.Error(ex, $"Error creating directory {dir}");
@@ -293,16 +287,7 @@ public static class Persister
 
             return data;
         }
-        catch (Exception ex) when (ex is ArgumentNullException or
-                                         ArgumentException or
-                                         PathTooLongException or
-                                         DirectoryNotFoundException or
-                                         JsonException or
-                                         UnauthorizedAccessException or
-                                         FileNotFoundException or
-                                         NotSupportedException or
-                                         SecurityException or
-                                         SerializationException or
+        catch (Exception ex) when (ex is UnauthorizedAccessException or
                                          IOException)
         {
             _logger.Error(ex, $"Error loading persistence data from {fileName}");
