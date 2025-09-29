@@ -6144,8 +6144,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-            List<FilterParams> filterList = [_filterParams];
-            persistenceData.FilterParamsList = filterList;
+            persistenceData.FilterParamsList = [.. ConfigManager.Settings.FilterList];
 
             foreach (var filterPipe in _filterPipeList)
             {
