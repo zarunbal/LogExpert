@@ -875,7 +875,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// <returns></returns>
     private string FindFilenameForSettings (string fileName)
     {
-        if (fileName.EndsWith(".lxp"))
+        if (fileName.EndsWith(".lxp", StringComparison.InvariantCulture))
         {
             var persistenceData = Persister.Load(fileName);
             if (persistenceData == null)
