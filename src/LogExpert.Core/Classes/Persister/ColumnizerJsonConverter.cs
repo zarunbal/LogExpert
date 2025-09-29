@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -46,9 +47,9 @@ public class ColumnizerJsonConverter : JsonConverter
 
     public override object ReadJson (JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        var jo = JObject.Load(reader);
-        var typeName = jo["Type"]?.ToString();
-        if (typeName == null || jo["State"] is not JObject state)
+        var jObject = JObject.Load(reader);
+        var typeName = jObject["Type"]?.ToString();
+        if (typeName == null || jObject["State"] is not JObject state)
         {
             return null;
         }
@@ -57,6 +58,7 @@ public class ColumnizerJsonConverter : JsonConverter
         var columnizerType = FindColumnizerTypeByName(typeName) ?? throw new JsonSerializationException($"Columnizer type '{typeName}' not found.");
 
         var instance = Activator.CreateInstance(columnizerType);
+
         foreach (var prop in columnizerType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             if (prop.GetCustomAttribute<JsonColumnizerPropertyAttribute>() != null && prop.CanWrite)
@@ -69,15 +71,16 @@ public class ColumnizerJsonConverter : JsonConverter
                 }
             }
         }
+
         return instance;
     }
 
-    private Type FindColumnizerTypeByName (string name)
+    private static Type FindColumnizerTypeByName (string name)
     {
         // Search all loaded assemblies for a type implementing ILogLineColumnizer with matching GetName()
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        foreach (var currentAssembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            foreach (var type in asm.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
+            foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
             {
                 try
                 {
@@ -86,9 +89,22 @@ public class ColumnizerJsonConverter : JsonConverter
                         return type;
                     }
                 }
-                catch { }
+                catch (Exception ex) when (ex is ArgumentNullException or
+                                           ArgumentException or
+                                           NotSupportedException or
+                                           TargetInvocationException or
+                                           MethodAccessException or
+                                           MemberAccessException or
+                                           InvalidComObjectException or
+                                           MissingMethodException or
+                                           COMException or
+                                           TypeLoadException)
+                {
+                    // intentionally ignored
+                }
             }
         }
+
         return null;
     }
 }

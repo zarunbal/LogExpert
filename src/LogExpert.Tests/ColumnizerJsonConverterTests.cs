@@ -1,6 +1,3 @@
-
-using ColumnizerLib;
-
 using LogExpert.Core.Classes.Persister;
 
 using Newtonsoft.Json;
@@ -18,21 +15,35 @@ public class MockColumnizer : ILogLineColumnizer
     public string StringProperty { get; set; }
 
     public string GetName () => "MockColumnizer";
+
     public string GetDescription () => "Test columnizer";
+
     public int GetColumnCount () => 1;
+
     public string GetColumnName (int column) => "Col";
-    public string GetColumnValue (LogLine line, int column) => "";
+
+    public string GetColumnValue (LogExpert.ILogLine line, int column) => "";
+
     public bool IsTimeshiftImplemented () => false;
-    public void PushValue (LogLine line, int column, string value) { }
+
+    public void PushValue (LogExpert.ILogLine line, int column, string value) { }
+
     public void SetColumnNames (string[] names) { }
+
     public void SetParameters (string param) { }
+
     public void SetConfig (object config) { }
 
     public string[] GetColumnNames () => throw new NotImplementedException();
+
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+
     public void SetTimeOffset (int msecOffset) => throw new NotImplementedException();
+
     public int GetTimeOffset () => throw new NotImplementedException();
+
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 }
 
@@ -57,9 +68,9 @@ public class ColumnizerJsonConverterTests
         var json = JsonConvert.SerializeObject(original, settings);
         var deserialized = JsonConvert.DeserializeObject<ILogLineColumnizer>(json, settings);
 
-        Assert.IsNotNull(deserialized);
-        Assert.AreEqual(original.GetName(), deserialized.GetName());
-        Assert.AreEqual(42, ((MockColumnizer)deserialized).IntProperty);
-        Assert.AreEqual("TestValue", ((MockColumnizer)deserialized).StringProperty);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(original.GetName(), Is.EqualTo(deserialized.GetName()));
+        Assert.That(42, Is.EqualTo(((MockColumnizer)deserialized).IntProperty));
+        Assert.That("TestValue", Is.EqualTo(((MockColumnizer)deserialized).StringProperty));
     }
 }
