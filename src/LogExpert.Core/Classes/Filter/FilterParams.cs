@@ -55,8 +55,6 @@ public class FilterParams : ICloneable
     // list of columns in which to search
     public Collection<int> ColumnList { get; } = [];
 
-    //[JsonIgnore]
-    //[field: NonSerialized]
     [JsonConverter(typeof(ColumnizerJsonConverter))]
     public ILogLineColumnizer CurrentColumnizer { get; set; }
 
