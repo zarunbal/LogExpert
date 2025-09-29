@@ -219,8 +219,17 @@ public static class Persister
 
         try
         {
+            var settings = new JsonSerializerSettings
+            {
+                Converters =
+                {
+                    new ColumnizerJsonConverter()
+                },
+                Formatting = Newtonsoft.Json.Formatting.Indented,
+            };
+
             var json = File.ReadAllText(fileName, Encoding.UTF8);
-            var data = JsonConvert.DeserializeObject<PersistenceData>(json);
+            var data = JsonConvert.DeserializeObject<PersistenceData>(json, settings);
             // Call Init on all FilterParams if needed
             if (data?.FilterParamsList != null)
             {
