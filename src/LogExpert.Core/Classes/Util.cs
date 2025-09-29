@@ -143,6 +143,7 @@ public class Util
                 }
             }
         }
+
         return d[str1.Length, str2.Length];
     }
 
@@ -440,13 +441,13 @@ public class Util
         stringFormat.SetMeasurableCharacterRanges(crArray);
 
         RectangleF rect = new(0, 0, 3000, 20);
-        Region[] stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
+        var stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
 
         var found = false;
 
         var y = 0;
 
-        foreach (Region regio in stringRegions)
+        foreach (var regio in stringRegions)
         {
             if (regio.IsVisible(xPos, 3, g))
             {
@@ -482,7 +483,7 @@ public class Util
         {
             normalizedSearchText = filterParams.NormalizedSearchText;
             searchText = filterParams.SearchText;
-            rex = filterParams.Rex;
+            rex = filterParams.Regex;
         }
 
         if (string.IsNullOrEmpty(searchText))
@@ -492,7 +493,7 @@ public class Util
 
         if (filterParams.ColumnRestrict)
         {
-            IColumnizedLogLine columns = filterParams.CurrentColumnizer.SplitLine(columnizerCallback, line);
+            var columns = filterParams.CurrentColumnizer.SplitLine(columnizerCallback, line);
             var found = false;
             foreach (var colIndex in filterParams.ColumnList)
             {

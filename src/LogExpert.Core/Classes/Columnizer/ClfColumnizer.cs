@@ -44,7 +44,7 @@ public class ClfColumnizer : ILogLineColumnizer
 
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        IColumnizedLogLine cols = SplitLine(callback, line);
+        var cols = SplitLine(callback, line);
         if (cols == null || cols.ColumnValues.Length < 8)
         {
             return DateTime.MinValue;
@@ -140,8 +140,8 @@ public class ClfColumnizer : ILogLineColumnizer
 
         if (_lineRegex.IsMatch(temp))
         {
-            Match match = _lineRegex.Match(temp);
-            GroupCollection groups = match.Groups;
+            var match = _lineRegex.Match(temp);
+            var groups = match.Groups;
             if (groups.Count == 10)
             {
                 columns[0].FullValue = groups[1].Value;

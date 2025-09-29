@@ -63,7 +63,7 @@ internal class LogExpertProxy : ILogExpertProxy
     public void LoadFiles(string[] fileNames)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Loading files into existing LogTabWindow");
-        ILogTabWindow logWin = _windowList[^1];
+        var logWin = _windowList[^1];
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
         logWin.LoadFiles(fileNames);
     }
@@ -113,7 +113,7 @@ internal class LogExpertProxy : ILogExpertProxy
     {
         _logger.Info(CultureInfo.InvariantCulture, "Creating new LogTabWindow");
         IConfigManager configManager = ConfigManager.Instance;
-        ILogTabWindow logWin = AbstractLogTabWindow.Create(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true, configManager);
+        var logWin = AbstractLogTabWindow.Create(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true, configManager);
         logWin.LogExpertProxy = this;
         AddWindow(logWin);
         logWin.Show();

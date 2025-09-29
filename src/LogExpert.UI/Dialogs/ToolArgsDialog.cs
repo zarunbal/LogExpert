@@ -74,8 +74,8 @@ internal partial class ToolArgsDialog : Form
     {
         if (logTabWin.CurrentLogWindow != null)
         {
-            ILogLine line = logTabWin.CurrentLogWindow.GetCurrentLine();
-            ILogFileInfo info = logTabWin.CurrentLogWindow.GetCurrentFileInfo();
+            var line = logTabWin.CurrentLogWindow.GetCurrentLine();
+            var info = logTabWin.CurrentLogWindow.GetCurrentFileInfo();
             if (line != null && info != null)
             {
                 ArgParser parser = new(textBoxArguments.Text);

@@ -5,6 +5,7 @@ using LogExpert.Core.Entities;
 
 namespace LogExpert.Core.Classes.Persister;
 
+[Serializable]
 public class PersistenceData
 {
     public SortedList<int, Entities.Bookmark> BookmarkList { get; set; } = [];

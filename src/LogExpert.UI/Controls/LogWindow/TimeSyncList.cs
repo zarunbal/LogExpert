@@ -71,7 +71,7 @@ internal class TimeSyncList
         CurrentTimestamp = timestamp;
         lock (logWindowList)
         {
-            foreach (LogWindow logWindow in logWindowList)
+            foreach (var logWindow in logWindowList)
             {
                 if (sender != logWindow)
                 {

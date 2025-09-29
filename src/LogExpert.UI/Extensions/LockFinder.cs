@@ -31,6 +31,7 @@ internal class LockFinder
             throw new Exception(
             "No processes are locking the path specified");
         }
+
         return list[0].ProcessName;
     }
 
@@ -46,6 +47,7 @@ internal class LockFinder
         var list = FindLockProcesses(path);
         if (list.Count > 0)
         { return true; }
+
         return false;
     }
 
@@ -81,6 +83,7 @@ internal class LockFinder
             {
                 throw new Exception("Could not register resource.");
             }
+
             res = NativeMethods.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null,
                             ref lpdwRebootReasons);
             const int ERROR_MORE_DATA = 234;

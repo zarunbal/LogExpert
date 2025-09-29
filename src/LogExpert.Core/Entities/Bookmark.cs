@@ -1,19 +1,20 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 namespace LogExpert.Core.Entities;
 
+[Serializable]
 public class Bookmark
 {
     #region cTor
 
-    public Bookmark(int lineNum)
+    public Bookmark (int lineNum)
     {
         LineNum = lineNum;
         Text = string.Empty;
         Overlay = new BookmarkOverlay();
     }
 
-    public Bookmark(int lineNum, string comment)
+    public Bookmark (int lineNum, string comment)
     {
         LineNum = lineNum;
         Text = comment;

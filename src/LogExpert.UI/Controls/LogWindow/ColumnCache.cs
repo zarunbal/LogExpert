@@ -21,7 +21,7 @@ internal class ColumnCache
         {
             _lastColumnizer = columnizer;
             _lastLineNumber = lineNumber;
-            ILogLine line = logFileReader.GetLogLineWithWait(lineNumber).Result;
+            var line = logFileReader.GetLogLineWithWait(lineNumber).Result;
 
             if (line != null)
             {

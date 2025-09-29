@@ -485,12 +485,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (setFocus)
             {
-                columnComboBox.Focus();
+                _ = columnComboBox.Focus();
             }
         }
         else
         {
-            dataGridView.Focus();
+            _ = dataGridView.Focus();
         }
 
         tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
@@ -660,7 +660,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         lock (_cancelHandlerList)
         {
-            _cancelHandlerList.Remove(handler);
+            _ = _cancelHandlerList.Remove(handler);
         }
     }
 
@@ -688,7 +688,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogFileReaderLoadingStarted (object sender, LoadFileEventArgs e)
     {
-        Invoke(LoadingStarted, e);
+        _ = Invoke(LoadingStarted, e);
     }
 
     [SupportedOSPlatform("windows")]
@@ -700,22 +700,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _isDeadFile = false;
         if (!_waitingForClose)
         {
-            Invoke(new MethodInvoker(LoadingFinished));
-            Invoke(new MethodInvoker(LoadPersistenceData));
-            Invoke(new MethodInvoker(SetGuiAfterLoading));
-            _loadingFinishedEvent.Set();
-            _externaLoadingFinishedEvent.Set();
+            _ = Invoke(new MethodInvoker(LoadingFinished));
+            _ = Invoke(new MethodInvoker(LoadPersistenceData));
+            _ = Invoke(new MethodInvoker(SetGuiAfterLoading));
+            _ = _loadingFinishedEvent.Set();
+            _ = _externaLoadingFinishedEvent.Set();
             _timeSpreadCalc.SetLineCount(_logFileReader.LineCount);
 
             if (_reloadMemento != null)
             {
-                Invoke(new PositionAfterReloadFx(PositionAfterReload), _reloadMemento);
+                _ = Invoke(new PositionAfterReloadFx(PositionAfterReload), _reloadMemento);
             }
 
             if (filterTailCheckBox.Checked)
             {
                 _logger.Info(CultureInfo.InvariantCulture, "Refreshing filter view because of reload.");
-                Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
+                _ = Invoke(new MethodInvoker(FilterSearch)); // call on proper thread
             }
 
             HandleChangedFilterList();
@@ -731,14 +731,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _logger.Info(CultureInfo.InvariantCulture, "Handling file not found event.");
             _isDeadFile = true;
-            BeginInvoke(new MethodInvoker(LogfileDead));
+            _ = BeginInvoke(new MethodInvoker(LogfileDead));
         }
     }
 
     [SupportedOSPlatform("windows")]
     private void OnLogFileReaderRespawned (object sender, EventArgs e)
     {
-        BeginInvoke(new MethodInvoker(LogfileRespawned));
+        _ = BeginInvoke(new MethodInvoker(LogfileRespawned));
     }
 
     [SupportedOSPlatform("windows")]
@@ -753,7 +753,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        SavePersistenceData(false);
+        _ = SavePersistenceData(false);
         CloseLogWindow();
     }
 
@@ -779,14 +779,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             UnRegisterLogFileReaderEvents();
             dataGridView.CurrentCellChanged -= OnDataGridViewCurrentCellChanged;
             MethodInvoker invoker = ReloadNewFile;
-            BeginInvoke(invoker);
+            _ = BeginInvoke(invoker);
             //Thread loadThread = new Thread(new ThreadStart(ReloadNewFile));
             //loadThread.Start();
             _logger.Debug(CultureInfo.InvariantCulture, "Reloading invoked.");
         }
         else if (_isLoading)
         {
-            BeginInvoke(UpdateProgress, e);
+            _ = BeginInvoke(UpdateProgress, e);
         }
     }
 
@@ -984,7 +984,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         e.Handled = true;
         AutoResizeColumnsFx fx = AutoResizeColumns;
-        BeginInvoke(fx, filterGridView);
+        _ = BeginInvoke(fx, filterGridView);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1166,7 +1166,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (IsMultiFile)
                 {
                     MethodInvoker invoker = DisplayCurrentFileOnStatusline;
-                    invoker.BeginInvoke(null, null);
+                    _ = invoker.BeginInvoke(null, null);
                 }
                 else
                 {
@@ -1198,7 +1198,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             lock (_filterPipeList)
             {
-                _filterPipeList.Remove((FilterPipe)sender);
+                _ = _filterPipeList.Remove((FilterPipe)sender);
                 if (_filterPipeList.Count == 0)
                 // reset naming counter to 0 if no more open filter tabs for this source window
                 {
@@ -1712,7 +1712,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsSetBookmark = false,
@@ -1726,8 +1726,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _tempHighlightEntryList.Add(he);
             }
 
-            dataGridView.CancelEdit();
-            dataGridView.EndEdit();
+            _ = dataGridView.CancelEdit();
+            _ = dataGridView.EndEdit();
             RefreshAllGrids();
         }
     }
@@ -1742,7 +1742,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsStopTail = false,
@@ -1757,8 +1757,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _tempHighlightEntryList.Add(he);
             }
 
-            dataGridView.CancelEdit();
-            dataGridView.EndEdit();
+            _ = dataGridView.CancelEdit();
+            _ = dataGridView.EndEdit();
             RefreshAllGrids();
         }
     }
@@ -1893,7 +1893,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (index >= 0)
         {
             var filterParams = (FilterParams)filterListBox.Items[index];
-            ConfigManager.Settings.FilterList.Remove(filterParams);
+            _ = ConfigManager.Settings.FilterList.Remove(filterParams);
             OnFilterListChanged(this);
             if (filterListBox.Items.Count > 0)
             {
@@ -2334,7 +2334,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (InvokeRequired)
         {
-            Invoke(new MethodInvoker(LoadPersistenceData));
+            _ = Invoke(new MethodInvoker(LoadPersistenceData));
             return;
         }
 
@@ -2422,7 +2422,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         ApplyFilterParams(); // re-loaded filter settingss
-        BeginInvoke(new MethodInvoker(FilterSearch));
+        _ = BeginInvoke(new MethodInvoker(FilterSearch));
         try
         {
             splitContainerLogWindow.SplitterDistance = persistenceData.FilterPosition;
@@ -2479,7 +2479,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (InvokeRequired)
         {
-            Invoke(new MethodInvoker(EnterLoadFileStatus));
+            _ = Invoke(new MethodInvoker(EnterLoadFileStatus));
             return;
         }
 
@@ -2597,7 +2597,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            Invoke(new SetColumnizerFx(SetColumnizer), columnizer);
+            _ = Invoke(new SetColumnizerFx(SetColumnizer), columnizer);
         }
 
         dataGridView.Enabled = true;
@@ -2649,9 +2649,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _logger.Info($"ReloadNewFile(): counter = {_reloadOverloadCounter}");
             if (_reloadOverloadCounter <= 1)
             {
-                SavePersistenceData(false);
-                _loadingFinishedEvent.Reset();
-                _externaLoadingFinishedEvent.Reset();
+                _ = SavePersistenceData(false);
+                _ = _loadingFinishedEvent.Reset();
+                _ = _externaLoadingFinishedEvent.Reset();
                 Thread reloadFinishedThread = new(ReloadFinishedThreadFx)
                 {
                     IsBackground = true
@@ -2660,7 +2660,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 LoadFile(FileName, EncodingOptions);
 
                 ClearBookmarkList();
-                SavePersistenceData(false);
+                _ = SavePersistenceData(false);
 
                 //if (this.filterTailCheckBox.Checked)
                 //{
@@ -2684,9 +2684,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void ReloadFinishedThreadFx ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "Waiting for loading to be complete.");
-        _loadingFinishedEvent.WaitOne();
+        _ = _loadingFinishedEvent.WaitOne();
         _logger.Info(CultureInfo.InvariantCulture, "Refreshing filter view because of reload.");
-        Invoke(new MethodInvoker(FilterSearch));
+        _ = Invoke(new MethodInvoker(FilterSearch));
         LoadFilterPipes();
     }
 
@@ -2774,7 +2774,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         while (true)
         {
             _logger.Debug(CultureInfo.InvariantCulture, "Waiting for signal");
-            _logEventArgsEvent.WaitOne();
+            _ = _logEventArgsEvent.WaitOne();
             _logger.Debug(CultureInfo.InvariantCulture, "Wakeup signal received.");
             while (true)
             {
@@ -2785,7 +2785,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     _logger.Info(CultureInfo.InvariantCulture, "{0} events in queue", _logEventArgsList.Count);
                     if (_logEventArgsList.Count == 0)
                     {
-                        _logEventArgsEvent.Reset();
+                        _ = _logEventArgsEvent.Reset();
                         break;
                     }
 
@@ -2808,7 +2808,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     }
                 }
 
-                Invoke(UpdateGrid, [e]);
+                _ = Invoke(UpdateGrid, [e]);
                 CheckFilterAndHighlight(e);
                 _timeSpreadCalc.SetLineCount(e.LineCount);
             }
@@ -2817,7 +2817,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void StopLogEventWorkerThread ()
     {
-        _logEventArgsEvent.Set();
+        _ = _logEventArgsEvent.Set();
         cts.Cancel();
         //_logEventHandlerThread.Abort();
         //_logEventHandlerThread.Join();
@@ -2958,8 +2958,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         //AddFilterLineFx addFx = new AddFilterLineFx(AddFilterLine);
                         //this.Invoke(addFx, new object[] { i, true });
                         filterLineAdded = true;
-                        AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList,
-                            _filterHitList);
+                        AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList, _filterHitList);
                     }
                 }
 
@@ -2973,7 +2972,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (setBookmark)
                 {
                     SetBookmarkFx fx = SetBookmarkFromTrigger;
-                    fx.BeginInvoke(i, bookmarkComment, null, null);
+                    _ = fx.BeginInvoke(i, bookmarkComment, null, null);
                 }
 
                 if (stopTail && _guiStateArgs.FollowTail)
@@ -2982,7 +2981,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     FollowTailChanged(false, true);
                     if (firstStopTail && wasFollow)
                     {
-                        Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                        _ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
                         firstStopTail = false;
                     }
                 }
@@ -3022,7 +3021,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     if (setBookmark)
                     {
                         SetBookmarkFx fx = SetBookmarkFromTrigger;
-                        fx.BeginInvoke(i, bookmarkComment, null, null);
+                        _ = fx.BeginInvoke(i, bookmarkComment, null, null);
                     }
 
                     if (stopTail && _guiStateArgs.FollowTail)
@@ -3031,7 +3030,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         FollowTailChanged(false, true);
                         if (firstStopTail && wasFollow)
                         {
-                            Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                            _ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
                             firstStopTail = false;
                         }
                     }
@@ -3065,7 +3064,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (plugin != null)
                 {
                     ActionPluginExecuteFx fx = plugin.Execute;
-                    fx.BeginInvoke(entry.SearchText, entry.ActionEntry.ActionParam, callback, CurrentColumnizer, null, null);
+                    _ = fx.BeginInvoke(entry.SearchText, entry.ActionEntry.ActionParam, callback, CurrentColumnizer, null, null);
                 }
             }
         }
@@ -3108,7 +3107,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         // Check if the filtered columns disappeared, if so must refresh the UI
         if (_filterParams.ColumnRestrict)
         {
-            var newColumns = columnizer != null ? columnizer.GetColumnNames() : Array.Empty<string>();
+            var newColumns = columnizer != null ? columnizer.GetColumnNames() : [];
             var colChanged = false;
 
             if (dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
@@ -3230,7 +3229,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         foreach (var columnName in columnizer.GetColumnNames())
         {
-            columnComboBox.Items.Add(columnName);
+            _ = columnComboBox.Items.Add(columnName);
         }
 
         columnComboBox.SelectedIndex = 0;
@@ -3461,7 +3460,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
     {
-        if (entry.IsRegEx)
+        if (entry.IsRegex)
         {
             //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             if (entry.Regex.IsMatch(column.Text))
@@ -3829,7 +3828,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (!Disposing)
                     {
-                        Invoke(UpdateProgressBar, [count]);
+                        _ = Invoke(UpdateProgressBar, [count]);
                     }
                 }
                 catch (ObjectDisposedException ex) // can occur when closing the app while searching
@@ -3867,7 +3866,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (lineNum == -1)
             {
                 // Hmm... is that experimental code from early days?
-                MessageBox.Show(this, "Not found:", "Search result");
+                _ = MessageBox.Show(this, "Not found:", "Search result");
                 return;
             }
 
@@ -4285,7 +4284,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         catch (Exception ex)
         {
             _logger.Error(ex, "Exception while filtering. Please report to developer: ");
-            MessageBox.Show(null, $"Exception while filtering. Please report to developer: \n\n{ex}\n\n{ex.StackTrace}", "LogExpert");
+            _ = MessageBox.Show(null, $"Exception while filtering. Please report to developer: \n\n{ex}\n\n{ex.StackTrace}", "LogExpert");
         }
 
         long endTime = Environment.TickCount;
@@ -4386,7 +4385,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //  this.filterEventCount++;
         //  this.filterUpdateEvent.Set();
         //}
-        Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
+        _ = Invoke(new MethodInvoker(AddFilterLineGuiUpdate));
     }
 
     //private void FilterUpdateWorker()
@@ -4491,7 +4490,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (!IsDisposed && !_waitingForClose && !Disposing)
         {
-            Invoke(new MethodInvoker(ResetStatusAfterFilter));
+            _ = Invoke(new MethodInvoker(ResetStatusAfterFilter));
         }
     }
 
@@ -4500,7 +4499,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (!IsDisposed && !_waitingForClose && !Disposing)
         {
-            Invoke(new MethodInvoker(ResetStatusAfterFilter));
+            _ = Invoke(new MethodInvoker(ResetStatusAfterFilter));
         }
     }
 
@@ -4520,7 +4519,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             lblFilterCount.Text = "" + _filterResultList.Count;
             if (filterGridView.RowCount > 0)
             {
-                filterGridView.Focus();
+                _ = filterGridView.Focus();
             }
 
             filterSearchButton.Enabled = true;
@@ -4556,7 +4555,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _logger.Error(ex, "Wieder dieser sporadische Fehler: ");
 
-            MessageBox.Show(null, ex.StackTrace, "Wieder dieser sporadische Fehler:");
+            _ = MessageBox.Show(null, ex.StackTrace, "Wieder dieser sporadische Fehler:");
         }
     }
 
@@ -4755,13 +4754,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterComboBox.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
-            filterComboBox.Items.Add(item);
+            _ = filterComboBox.Items.Add(item);
         }
 
         filterRangeComboBox.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterRangeHistoryList)
         {
-            filterRangeComboBox.Items.Add(item);
+            _ = filterRangeComboBox.Items.Add(item);
         }
     }
 
@@ -4829,7 +4828,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void FilterToTab ()
     {
         filterSearchButton.Enabled = false;
-        Task.Run(() => WriteFilterToTab());
+        _ = Task.Run(() => WriteFilterToTab());
     }
 
     [SupportedOSPlatform("windows")]
@@ -4858,7 +4857,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.MaxValue = lineNumberList.Count;
         _progressEventArgs.Value = 0;
         _progressEventArgs.Visible = true;
-        Invoke(new MethodInvoker(SendProgressBarUpdate));
+        _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
         _isSearching = true;
         _shouldCancel = false;
 
@@ -4885,17 +4884,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
             }
 
-            pipe.WriteToPipe(line, i);
+            _ = pipe.WriteToPipe(line, i);
             if (++count % PROGRESS_BAR_MODULO == 0)
             {
                 _progressEventArgs.Value = count;
-                Invoke(new MethodInvoker(SendProgressBarUpdate));
+                _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
             }
         }
 
         pipe.CloseFile();
         _logger.Info(CultureInfo.InvariantCulture, "WritePipeToTab(): finished");
-        Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), pipe, name, persistenceData);
+        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), pipe, name, persistenceData);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4916,7 +4915,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             pipe.OwnLogWindow = newWin;
             if (persistenceData != null)
             {
-                Task.Run(() => FilterRestore(newWin, persistenceData));
+                _ = Task.Run(() => FilterRestore(newWin, persistenceData));
             }
         }
 
@@ -4946,11 +4945,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         pipe.OpenFile();
         foreach (var entry in lineEntryList)
         {
-            pipe.WriteToPipe(entry.LogLine, entry.LineNum);
+            _ = pipe.WriteToPipe(entry.LogLine, entry.LineNum);
         }
 
         pipe.CloseFile();
-        Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), [pipe, title, null]);
+        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), [pipe, title, null]);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4962,14 +4961,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (columnizer != null)
         {
             SetColumnizerFx fx = newWin.ForceColumnizer;
-            newWin.Invoke(fx, [columnizer]);
+            _ = newWin.Invoke(fx, [columnizer]);
         }
         else
         {
             _logger.Warn($"FilterRestore(): Columnizer {persistenceData.ColumnizerName} not found");
         }
 
-        newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), [persistenceData]);
+        _ = newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), [persistenceData]);
     }
 
     [SupportedOSPlatform("windows")]
@@ -5027,7 +5026,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         foreach (var pipe in deleteList)
         {
-            _filterPipeList.Remove(pipe);
+            _ = _filterPipeList.Remove(pipe);
         }
     }
 
@@ -5065,7 +5064,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                 }
 
-                clipText.AppendLine(line.ToClipBoardText());
+                _ = clipText.AppendLine(line.ToClipBoardText());
             }
 
             Clipboard.SetText(clipText.ToString());
@@ -5317,6 +5316,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         blockList.Add(block);
                         AddBlockTargetLinesToDict(processedLinesDict, block);
                     }
+
                     block.BlockId = blockId;
                     //if (firstBlock)
                     //{
@@ -5639,7 +5639,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 entry.Height -= _lineHeight;
                 if (entry.Height <= _lineHeight)
                 {
-                    _rowHeightList.Remove(rowNum);
+                    _ = _rowHeightList.Remove(rowNum);
                 }
             }
         }
@@ -5869,7 +5869,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SearchText = para.SearchText,
             ForegroundColor = Color.Red,
             BackgroundColor = Color.Yellow,
-            IsRegEx = para.IsRegex,
+            IsRegex = para.IsRegex,
             IsCaseSensitive = para.IsCaseSensitive,
             IsLedSwitch = false,
             IsStopTail = false,
@@ -6009,7 +6009,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             catch (LogFileException lfe)
             {
                 _logger.Error(lfe);
-                MessageBox.Show($"Cannot load file\n{lfe.Message}", "LogExpert");
+                _ = MessageBox.Show($"Cannot load file\n{lfe.Message}", "LogExpert");
                 _ = BeginInvoke(new FunctionWith1BoolParam(Close), true);
                 _isLoadError = true;
                 return;
@@ -6111,7 +6111,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
         catch (Exception e)
         {
-            MessageBox.Show($"Unexpected error while saving persistence: {e.Message}");
+            _ = MessageBox.Show($"Unexpected error while saving persistence: {e.Message}");
         }
 
         return null;
@@ -6143,8 +6143,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-            List<FilterParams> filterList = [_filterParams];
-            persistenceData.FilterParamsList = filterList;
+            //when a filter is added, its added to the Configmanager.Settings.FilterList and not to the _filterParams, this is probably an oversight and maybe a bug
+            //but for the consistency the FilterList should be saved as whole for every file
+            persistenceData.FilterParamsList = [.. ConfigManager.Settings.FilterList];
 
             foreach (var filterPipe in _filterPipeList)
             {
@@ -6219,7 +6220,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void WaitForLoadingFinished ()
     {
-        _externaLoadingFinishedEvent.WaitOne();
+        _ = _externaLoadingFinishedEvent.WaitOne();
     }
 
     public void ForceColumnizer (ILogLineColumnizer columnizer)
@@ -6463,7 +6464,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        BeginInvoke(new MethodInvoker(dataGridView.Refresh));
+        _ = BeginInvoke(new MethodInvoker(dataGridView.Refresh));
         //this.dataGridView.Refresh();
         _parentLogTabWin.FollowTailChanged(this, isChecked, byTrigger);
         SendGuiStateUpdate();
@@ -6530,7 +6531,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        Task.Run(() => Search(searchParams)).ContinueWith(SearchComplete);
+        _ = Task.Run(() => Search(searchParams)).ContinueWith(SearchComplete);
 
         RemoveAllSearchHighlightEntries();
         AddSearchHitHighlightEntry(searchParams);
@@ -6545,7 +6546,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            Invoke(new MethodInvoker(ResetProgressBar));
+            _ = Invoke(new MethodInvoker(ResetProgressBar));
             var line = task.Result;
             _guiStateArgs.MenuEnabled = true;
             GuiStateUpdate(this, _guiStateArgs);
@@ -6554,7 +6555,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
 
-            dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
+            _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
         }
         catch (Exception ex) // in the case the windows is already destroyed
         {
@@ -6564,7 +6565,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void SelectLogLine (int line)
     {
-        Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
+        _ = Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
     }
 
     public void SelectAndEnsureVisible (int line, bool triggerSyncCall)
@@ -6804,6 +6805,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 return;
             }
+
             lineNum = dataGridView.CurrentCellAddress.Y;
         }
 
@@ -6823,12 +6825,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     return;
                 }
             }
+
             _bookmarkProvider.RemoveBookmarkForLine(lineNum);
         }
         else
         {
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum));
         }
+
         dataGridView.Refresh();
         filterGridView.Refresh();
         OnBookmarkAdded();
@@ -6843,6 +6847,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 return;
             }
+
             var paramParser = new ParamParser(comment);
             try
             {
@@ -6852,10 +6857,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 // occurs on invalid regex
             }
+
             if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
             {
                 _bookmarkProvider.RemoveBookmarkForLine(lineNum);
             }
+
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
             OnBookmarkAdded();
         }
@@ -6880,12 +6887,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         filterGridView.CurrentCell = filterGridView.Rows[filterLine].Cells[0];
                         break;
                     }
+
                     index++;
                     if (index > _bookmarkProvider.Bookmarks.Count - 1)
                     {
                         index = 0;
                         wrapped = true;
                     }
+
                     if (index >= startIndex && wrapped)
                     {
                         break;
@@ -6921,6 +6930,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     index = _bookmarkProvider.Bookmarks.Count - 1;
                 }
+
                 var startIndex = index;
                 var wrapped = false;
                 while (true)
@@ -6933,12 +6943,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         filterGridView.CurrentCell = filterGridView.Rows[filterLine].Cells[0];
                         break;
                     }
+
                     index--;
                     if (index < 0)
                     {
                         index = _bookmarkProvider.Bookmarks.Count - 1;
                         wrapped = true;
                     }
+
                     if (index <= startIndex && wrapped)
                     {
                         break;
@@ -6973,6 +6985,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
         }
+
         if (bookmarksPresent)
         {
             if (
@@ -6982,6 +6995,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
         }
+
         _bookmarkProvider.RemoveBookmarksForLines(lineNumList);
         OnBookmarkRemoved();
     }
@@ -7002,6 +7016,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         {
                             text = text.Substring(1);
                         }
+
                         var timeSpan = TimeSpan.Parse(text);
                         var diff = (int)(timeSpan.Ticks / TimeSpan.TicksPerMillisecond);
                         CurrentColumnizer.SetTimeOffset(diff);
@@ -7015,6 +7030,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     CurrentColumnizer.SetTimeOffset(0);
                 }
+
                 dataGridView.Refresh();
                 filterGridView.Refresh();
                 if (CurrentColumnizer.IsTimeshiftImplemented())
@@ -7035,11 +7051,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         splitContainerLogWindow.Panel2Collapsed = !splitContainerLogWindow.Panel2Collapsed;
         if (!splitContainerLogWindow.Panel2Collapsed)
         {
-            filterComboBox.Focus();
+            _ = filterComboBox.Focus();
         }
         else
         {
-            dataGridView.Focus();
+            _ = dataGridView.Focus();
         }
     }
 
@@ -7056,7 +7072,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SyncTimestampDisplay();
         }
 
-        dataGridView.Focus();
+        _ = dataGridView.Focus();
 
         SendGuiStateUpdate();
         SendStatusLineUpdate();
@@ -7119,7 +7135,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             writer.Close();
             var title = Util.GetNameFromPath(FileName) + "->Clip";
-            _parentLogTabWin.AddTempFileTab(fileName, title);
+            _ = _parentLogTabWin.AddTempFileTab(fileName, title);
         }
     }
 
@@ -7141,12 +7157,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             dataGridView.Refresh();
             SendGuiStateUpdate();
         }
+
         _guiStateArgs.CurrentEncoding = _logFileReader.CurrentEncoding;
     }
 
     public void Reload ()
     {
-        SavePersistenceData(false);
+        _ = SavePersistenceData(false);
 
         _reloadMemento = new ReloadMemento
         {
@@ -7215,7 +7232,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (CurrentColumnizer.IsTimeshiftImplemented())
             {
-                timeSpreadingControl.Invoke(new MethodInvoker(timeSpreadingControl.Refresh));
+                _ = timeSpreadingControl.Invoke(new MethodInvoker(timeSpreadingControl.Refresh));
                 ShowTimeSpread(Preferences.ShowTimeSpread);
             }
 
@@ -7242,7 +7259,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (InvokeRequired)
         {
-            BeginInvoke(new ScrollToTimestampFx(ScrollToTimestampWorker), timestamp, roundToSeconds, triggerSyncCall);
+            _ = BeginInvoke(new ScrollToTimestampFx(ScrollToTimestampWorker), timestamp, roundToSeconds, triggerSyncCall);
             return true;
         }
 
@@ -7263,6 +7280,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             currentLine = 0;
         }
+
         var foundLine = FindTimestampLine(currentLine, timestamp, roundToSeconds);
         if (foundLine >= 0)
         {
@@ -7285,13 +7303,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 foundLine--;
                 foundTimestamp = GetTimestampForLine(ref foundLine, roundToSeconds);
             }
+
             if (foundLine < 0)
             {
                 return 0;
             }
 
             foundLine++;
-            GetTimestampForLineForward(ref foundLine, roundToSeconds); // fwd to next valid timestamp
+            _ = GetTimestampForLineForward(ref foundLine, roundToSeconds); // fwd to next valid timestamp
             return foundLine;
         }
 
@@ -7525,6 +7544,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     lineNumList.Add(row.Index);
                 }
             }
+
             lineNumList.Sort();
             patternArgs.StartLine = lineNumList[0];
             patternArgs.EndLine = lineNumList[^1];
@@ -7541,7 +7561,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public void PatternStatistic (PatternArgs patternArgs)
     {
         var fx = new PatternStatisticFx(TestStatistic);
-        fx.BeginInvoke(patternArgs, null, null);
+        _ = fx.BeginInvoke(patternArgs, null, null);
     }
 
     public void ExportBookmarkList ()
@@ -7566,7 +7586,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             catch (IOException e)
             {
                 _logger.Error(e);
-                MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
+                _ = MessageBox.Show("Error while exporting bookmark list: " + e.Message, "LogExpert");
             }
         }
     }
@@ -7614,13 +7634,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     OnBookmarkAdded();
                 }
+
                 dataGridView.Refresh();
                 filterGridView.Refresh();
             }
             catch (IOException e)
             {
                 _logger.Error(e);
-                MessageBox.Show($"Error while importing bookmark list: {e.Message}", "LogExpert");
+                _ = MessageBox.Show($"Error while importing bookmark list: {e.Message}", "LogExpert");
             }
         }
     }
@@ -7637,7 +7658,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void HandleChangedFilterList ()
     {
-        Invoke(new MethodInvoker(HandleChangedFilterListWorker));
+        _ = Invoke(new MethodInvoker(HandleChangedFilterListWorker));
     }
 
     public void HandleChangedFilterListWorker ()
@@ -7646,13 +7667,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterListBox.Items.Clear();
         foreach (var filterParam in ConfigManager.Settings.FilterList)
         {
-            filterListBox.Items.Add(filterParam);
+            _ = filterListBox.Items.Add(filterParam);
         }
+
         filterListBox.Refresh();
         if (index >= 0 && index < filterListBox.Items.Count)
         {
             filterListBox.SelectedIndex = index;
         }
+
         filterOnLoadCheckBox.Checked = Preferences.IsFilterOnLoad;
         hideFilterListOnLoadCheckBox.Checked = Preferences.IsAutoHideFilterList;
     }
@@ -7672,7 +7695,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         SendGuiStateUpdate();
-        BeginInvoke(new MethodInvoker(RefreshAllGrids));
+        _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
     }
 
     public void SwitchMultiFile (bool enabled)
@@ -7714,7 +7737,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             TimeSyncList = master.TimeSyncList;
             TimeSyncList.AddWindow(this);
-            ScrollToTimestamp(TimeSyncList.CurrentTimestamp, false, false);
+            _ = ScrollToTimestamp(TimeSyncList.CurrentTimestamp, false, false);
         }
 
         OnSyncModeChanged();

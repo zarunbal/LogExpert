@@ -59,6 +59,7 @@ internal partial class OpenUriDialog : Form
         {
             UriHistory.Remove(cmbUri.Text);
         }
+
         UriHistory.Insert(0, cmbUri.Text);
 
         while (UriHistory.Count > 20)

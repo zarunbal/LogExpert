@@ -34,6 +34,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
             _logger.Info(CultureInfo.InvariantCulture, "Range search text not set. Cancelling range search.");
             return null;
         }
+
         if (_filterParams.SearchText == null || _filterParams.SearchText.Trim().Length == 0)
         {
             _logger.Info(CultureInfo.InvariantCulture, "Search text not set. Cancelling range search.");
@@ -48,7 +49,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
         var foundStartLine = false;
 
         Range range = new();
-        FilterParams tmpParam = _filterParams.CloneWithCurrentColumnizer();
+        var tmpParam = _filterParams.CloneWithCurrentColumnizer();
 
         tmpParam.SearchText = _filterParams.RangeSearchText;
 
@@ -64,6 +65,7 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
                 foundStartLine = true;
                 break;
             }
+
             lineNum--;
             line = callback.GetLogLine(lineNum);
 
@@ -93,8 +95,10 @@ internal class RangeFinder(FilterParams filterParams, ColumnizerCallback callbac
             {
                 break;
             }
+
             lineNum++;
         }
+
         lineNum--;
         range.EndLine = lineNum;
 

@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Interface;
 
 using System.Text;
@@ -131,6 +131,7 @@ public class XmlLogReader : LogStreamReaderBase
                         state = 0;
                         builder.Clear();
                     }
+
                     break;
                 case 2:
                     builder.Append(readChar);
@@ -141,6 +142,7 @@ public class XmlLogReader : LogStreamReaderBase
                         state = 3;
                         tagIndex = 1;
                     }
+
                     break;
                 case 3:
                     builder.Append(readChar);
@@ -159,6 +161,7 @@ public class XmlLogReader : LogStreamReaderBase
                         //_logger.logInfo("state = 2");
                         state = 2;
                     }
+
                     break;
             }
         }

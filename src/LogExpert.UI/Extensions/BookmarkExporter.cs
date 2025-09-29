@@ -24,6 +24,7 @@ internal static class BookmarkExporter
             var line = $"{logfileName};{bookmark.LineNum};{bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine, StringComparison.OrdinalIgnoreCase).Replace("\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase)}";
             writer.WriteLine(line);
         }
+
         writer.Close();
         fs.Close();
     }

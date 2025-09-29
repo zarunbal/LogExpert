@@ -1,19 +1,3 @@
-using LogExpert.Classes;
-using LogExpert.Classes.CommandLine;
-using LogExpert.Config;
-using LogExpert.Core.Classes.IPC;
-using LogExpert.Core.Config;
-using LogExpert.Core.Interface;
-using LogExpert.Dialogs;
-using LogExpert.UI.Controls.LogWindow;
-using LogExpert.UI.Dialogs;
-using LogExpert.UI.Extensions.LogWindow;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using NLog;
-
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Pipes;
@@ -22,6 +6,20 @@ using System.Security;
 using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
+
+using LogExpert.Classes;
+using LogExpert.Classes.CommandLine;
+using LogExpert.Config;
+using LogExpert.Core.Classes.IPC;
+using LogExpert.Core.Config;
+using LogExpert.Dialogs;
+using LogExpert.UI.Dialogs;
+using LogExpert.UI.Extensions.LogWindow;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using NLog;
 
 namespace LogExpert;
 
@@ -41,7 +39,7 @@ internal static class Program
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
-    private static void Main(string[] args)
+    private static void Main (string[] args)
     {
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         Application.ThreadException += Application_ThreadException;
@@ -104,7 +102,7 @@ internal static class Program
                     var counter = 3;
                     Exception errMsg = null;
 
-                    Settings settings = ConfigManager.Instance.Settings;
+                    var settings = ConfigManager.Instance.Settings;
                     while (counter > 0)
                     {
                         try
@@ -158,7 +156,7 @@ internal static class Program
         }
     }
 
-    private static string SerializeCommandIntoNonFormattedJSON(string[] fileNames, bool allowOnlyOneInstance)
+    private static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance)
     {
         var message = new IpcMessage()
         {
@@ -172,7 +170,7 @@ internal static class Program
     // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
     // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
     // TODO: possibly should be moved to LocalFileSystem plugin
-    private static string[] GenerateAbsoluteFilePaths(string[] remainingArgs)
+    private static string[] GenerateAbsoluteFilePaths (string[] remainingArgs)
     {
         List<string> argsList = [];
 
@@ -192,7 +190,7 @@ internal static class Program
         return [.. argsList];
     }
 
-    private static void SendMessageToProxy(IpcMessage message, LogExpertProxy proxy)
+    private static void SendMessageToProxy (IpcMessage message, LogExpertProxy proxy)
     {
         var payLoad = message.Payload.ToObject<LoadPayload>();
 
@@ -227,7 +225,7 @@ internal static class Program
         return true;
     }
 
-    private static void SendCommandToServer(string command)
+    private static void SendCommandToServer (string command)
     {
         using var client = new NamedPipeClientStream(".", PIPE_SERVER_NAME, PipeDirection.Out);
 
@@ -255,7 +253,7 @@ internal static class Program
         writer.WriteLine(command);
     }
 
-    private static async Task RunServerLoopAsync(Action<IpcMessage, LogExpertProxy> onCommand, LogExpertProxy proxy, CancellationToken cancellationToken)
+    private static async Task RunServerLoopAsync (Action<IpcMessage, LogExpertProxy> onCommand, LogExpertProxy proxy, CancellationToken cancellationToken)
     {
         while (cancellationToken.IsCancellationRequested == false)
         {
@@ -290,7 +288,7 @@ internal static class Program
     }
 
     [STAThread]
-    private static void ShowUnhandledException(object exceptionObject)
+    private static void ShowUnhandledException (object exceptionObject)
     {
         var errorText = string.Empty;
         string stackTrace;
@@ -319,7 +317,7 @@ internal static class Program
 
     #region Events handler
 
-    private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+    private static void Application_ThreadException (object sender, ThreadExceptionEventArgs e)
     {
         _logger.Fatal(e);
 
@@ -333,7 +331,7 @@ internal static class Program
         thread.Join();
     }
 
-    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private static void CurrentDomain_UnhandledException (object sender, UnhandledExceptionEventArgs e)
     {
         _logger.Fatal(e);
 

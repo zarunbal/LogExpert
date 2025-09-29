@@ -87,7 +87,7 @@ public class BookmarkDataProvider : IBookmarkData
     {
         SortedList<int, Entities.Bookmark> newBookmarkList = [];
 
-        foreach (Entities.Bookmark bookmark in BookmarkList.Values)
+        foreach (var bookmark in BookmarkList.Values)
         {
             var line = bookmark.LineNum - offset;
             if (line >= 0)
@@ -102,7 +102,7 @@ public class BookmarkDataProvider : IBookmarkData
 
     public int FindPrevBookmarkIndex (int lineNum)
     {
-        IList<Entities.Bookmark> values = BookmarkList.Values;
+        var values = BookmarkList.Values;
         for (var i = BookmarkList.Count - 1; i >= 0; --i)
         {
             if (values[i].LineNum <= lineNum)
@@ -116,7 +116,7 @@ public class BookmarkDataProvider : IBookmarkData
 
     public int FindNextBookmarkIndex (int lineNum)
     {
-        IList<Entities.Bookmark> values = BookmarkList.Values;
+        var values = BookmarkList.Values;
         for (var i = 0; i < BookmarkList.Count; ++i)
         {
             if (values[i].LineNum >= lineNum)
@@ -124,6 +124,7 @@ public class BookmarkDataProvider : IBookmarkData
                 return i;
             }
         }
+
         return 0;
     }
 
