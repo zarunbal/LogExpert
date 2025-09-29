@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using LogExpert;
 
 using Newtonsoft.Json;
@@ -159,7 +155,8 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
     {
         return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings()
         {
-            Error = (sender, args) => { args.ErrorContext.Handled = true; } //We ignore the error and handle the null value
+            //We ignore the error and handle the null value
+            Error = (sender, args) => args.ErrorContext.Handled = true
         });
     }
 
@@ -195,7 +192,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         }
 
         //
-        // Always rearrage the order of all json fields within a line to follow the sequence of columnNameList.
+        // Always rearrange the order of all json fields within a line to follow the sequence of columnNameList.
         // This will make sure the log line displayed correct even the order of json fields changed.
         //
         List<IColumn> returnColumns = [];

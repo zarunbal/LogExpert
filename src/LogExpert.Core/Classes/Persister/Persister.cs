@@ -191,6 +191,10 @@ public static class Persister
     {
         var settings = new JsonSerializerSettings
         {
+            Converters =
+            {
+                new ColumnizerJsonConverter()
+            },
             Formatting = Newtonsoft.Json.Formatting.Indented,
         };
 
@@ -349,7 +353,17 @@ public static class Persister
                             using JsonReader reader = new JsonTextReader(new StreamReader(stream));
                             JsonSerializer serializer = new();
                             var filterParams = serializer.Deserialize<FilterParams>(reader);
-                            filterParams.Init();
+
+                            if (filterParams == null)
+                            {
+                                filterParams = new FilterParams();
+                                filterParams.Init();
+                            }
+                            else
+                            {
+                                filterParams.Init();
+                            }
+
                             filterList.Add(filterParams);
                         }
                         catch (JsonException ex)
