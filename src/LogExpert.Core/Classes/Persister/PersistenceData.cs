@@ -3,6 +3,8 @@ using System.Text;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
 
+using Newtonsoft.Json;
+
 namespace LogExpert.Core.Classes.Persister;
 
 [Serializable]
@@ -18,6 +20,7 @@ public class PersistenceData
 
     public int CurrentLine { get; set; } = -1;
 
+    [JsonConverter(typeof(EncodingJsonConverter))]
     public Encoding Encoding { get; set; }
 
     public string FileName { get; set; }

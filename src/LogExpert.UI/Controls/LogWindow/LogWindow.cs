@@ -4630,6 +4630,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private bool IsFilterSearchDirty (FilterParams filterParams)
     {
+        if (filterParams == null || filterParams.SearchText == null)
+        {
+            return true;
+        }
+
         if (!filterParams.SearchText.Equals(filterComboBox.Text, StringComparison.Ordinal))
         {
             return true;

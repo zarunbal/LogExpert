@@ -1,67 +1,54 @@
-using System.Collections.Generic;
-using System.Xml;
+using System.Text;
+
+using Newtonsoft.Json;
+
+using NLog;
 
 namespace LogExpert.Core.Classes.Persister;
 
 public static class ProjectPersister
 {
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
     #region Public methods
 
-    public static ProjectData LoadProjectData(string projectFileName)
+    public static ProjectData LoadProjectData (string projectFileName)
     {
-        ProjectData projectData = new();
-        XmlDocument xmlDoc = new();
-        xmlDoc.Load(projectFileName);
-        var fileList = xmlDoc.GetElementsByTagName("member");
-        foreach (XmlNode fileNode in fileList)
+        try
         {
-            var fileElement = fileNode as XmlElement;
-            var fileName = fileElement.GetAttribute("fileName");
-            projectData.MemberList.Add(fileName);
-        }
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+            };
 
-        var layoutElements = xmlDoc.GetElementsByTagName("layout");
-        if (layoutElements.Count > 0)
+            var json = File.ReadAllText(projectFileName, Encoding.UTF8);
+            return JsonConvert.DeserializeObject<ProjectData>(json, settings);
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or
+                                 IOException)
         {
-            projectData.TabLayoutXml = layoutElements[0].InnerXml;
+            _logger.Error(ex, $"Error loading persistence data from {projectFileName}");
+            return null;
         }
-
-        return projectData;
     }
 
-
-    public static void SaveProjectData(string projectFileName, ProjectData projectData)
+    public static void SaveProjectData (string projectFileName, ProjectData projectData)
     {
-        XmlDocument xmlDoc = new();
-        var rootElement = xmlDoc.CreateElement("logexpert");
-        xmlDoc.AppendChild(rootElement);
-        var projectElement = xmlDoc.CreateElement("project");
-        rootElement.AppendChild(projectElement);
-        var membersElement = xmlDoc.CreateElement("members");
-        projectElement.AppendChild(membersElement);
-        SaveProjectMembers(xmlDoc, membersElement, projectData.MemberList);
-
-        if (projectData.TabLayoutXml != null)
+        var settings = new JsonSerializerSettings
         {
-            var layoutElement = xmlDoc.CreateElement("layout");
-            layoutElement.InnerXml = projectData.TabLayoutXml;
-            rootElement.AppendChild(layoutElement);
+            Formatting = Formatting.Indented,
+        };
+
+        try
+        {
+            var json = JsonConvert.SerializeObject(projectData, settings);
+            File.WriteAllText(projectFileName, json, Encoding.UTF8);
         }
-
-        xmlDoc.Save(projectFileName);
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private static void SaveProjectMembers(XmlDocument xmlDoc, XmlNode membersNode, List<string> memberList)
-    {
-        foreach (var fileName in memberList)
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
+                                         IOException)
         {
-            var memberElement = xmlDoc.CreateElement("member");
-            membersNode.AppendChild(memberElement);
-            memberElement.SetAttribute("fileName", fileName);
+            _logger.Error(ex, $"Error saving persistence data to {projectFileName}");
         }
     }
 

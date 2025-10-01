@@ -1818,7 +1818,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (projectData != null)
         {
-            foreach (var fileName in projectData.MemberList)
+            foreach (var fileName in projectData.FileNames)
             {
                 if (hasLayoutData)
                 {
@@ -2767,7 +2767,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             ProjectData projectData = new()
             {
-                MemberList = fileNames,
+                FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
             ProjectPersister.SaveProjectData(fileName, projectData);
