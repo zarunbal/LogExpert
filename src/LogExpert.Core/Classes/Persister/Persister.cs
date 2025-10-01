@@ -14,6 +14,19 @@ public static class Persister
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    private static readonly JsonSerializerSettings _jsonSettings = new()
+    {
+        Converters =
+            {
+                new ColumnizerJsonConverter(),
+                new EncodingJsonConverter()
+            },
+        Formatting = Formatting.Indented,
+        //This is needed for the BookmarkList and the Bookmark Overlay
+        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+    };
+
     #endregion
 
     #region Public methods
@@ -217,24 +230,16 @@ public static class Persister
     /// <param name="persistenceData">The data to be persisted. This cannot be null.</param>
     private static void Save (string fileName, PersistenceData persistenceData)
     {
-        var settings = new JsonSerializerSettings
-        {
-            Converters =
-            {
-                new ColumnizerJsonConverter()
-            },
-            Formatting = Formatting.Indented,
-        };
-
         try
         {
-            var json = JsonConvert.SerializeObject(persistenceData, settings);
+            var json = JsonConvert.SerializeObject(persistenceData, _jsonSettings);
             File.WriteAllText(fileName, json, Encoding.UTF8);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
+                                         IOException)
         {
             _logger.Error(ex, $"Error saving persistence data to {fileName}");
-            throw;
         }
     }
 
@@ -257,17 +262,8 @@ public static class Persister
 
         try
         {
-            var settings = new JsonSerializerSettings
-            {
-                Converters =
-                {
-                    new ColumnizerJsonConverter()
-                },
-                Formatting = Formatting.Indented,
-            };
-
             var json = File.ReadAllText(fileName, Encoding.UTF8);
-            var data = JsonConvert.DeserializeObject<PersistenceData>(json, settings);
+            var data = JsonConvert.DeserializeObject<PersistenceData>(json, _jsonSettings);
             // Call Init on all FilterParams if needed
             if (data?.FilterParamsList != null)
             {
@@ -287,7 +283,8 @@ public static class Persister
 
             return data;
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
                                          IOException)
         {
             _logger.Error(ex, $"Error loading persistence data from {fileName}");
