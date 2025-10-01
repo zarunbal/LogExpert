@@ -28,7 +28,7 @@ public static class ProjectPersister
                                  IOException)
         {
             _logger.Error(ex, $"Error loading persistence data from {projectFileName}");
-            return null;
+            return new ProjectData();
         }
     }
 

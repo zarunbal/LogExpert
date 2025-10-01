@@ -283,7 +283,8 @@ public static class Persister
 
             return data;
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
                                          IOException)
         {
             _logger.Error(ex, $"Error loading persistence data from {fileName}");

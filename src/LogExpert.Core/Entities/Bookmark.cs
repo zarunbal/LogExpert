@@ -10,10 +10,7 @@ public class Bookmark
     #region cTor
 
     [JsonConstructor]
-    public Bookmark ()
-    {
-
-    }
+    public Bookmark () { }
 
     public Bookmark (int lineNum)
     {
