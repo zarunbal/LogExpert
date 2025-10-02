@@ -319,7 +319,7 @@ internal static class Program
 
     private static void Application_ThreadException (object sender, ThreadExceptionEventArgs e)
     {
-        _logger.Fatal(e.Exception, "Application.ThreadException: ");
+        _logger.Fatal(e);
 
         Thread thread = new(ShowUnhandledException)
         {
@@ -333,7 +333,7 @@ internal static class Program
 
     private static void CurrentDomain_UnhandledException (object sender, UnhandledExceptionEventArgs e)
     {
-        _logger.Fatal(e.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException: ");
+        _logger.Fatal(e);
 
         var exceptionObject = e.ExceptionObject;
 
