@@ -109,12 +109,12 @@ internal partial class RegexHelperDialog : Form
     private void OnButtonOkClick (object sender, EventArgs e)
     {
         var text = comboBoxRegex.Text;
-        comboBoxRegex.Items.Remove(text);
-        comboBoxRegex.Items.Insert(0, text);
+        _ = _expressionHistoryList.Remove(text);
+        _expressionHistoryList.Insert(0, text);
 
         text = comboBoxTestText.Text;
-        comboBoxTestText.Items.Remove(text);
-        comboBoxTestText.Items.Insert(0, text);
+        _ = _testtextHistoryList.Remove(text);
+        _testtextHistoryList.Insert(0, text);
 
         if (comboBoxRegex.Items.Count > MAX_HISTORY)
         {
