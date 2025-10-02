@@ -33,7 +33,7 @@ protected override void Dispose(bool disposing)
         labelSearchFor = new Label();
         checkBoxCaseSensitive = new CheckBox();
         checkBoxRegex = new CheckBox();
-        buttonRegexHelper = new Button();
+        linkLabelRegexHelper = new LinkLabel();
         radioButtonFromTop = new RadioButton();
         radioButtonFromSelected = new RadioButton();
         groupBoxSearchStart = new GroupBox();
@@ -55,7 +55,7 @@ protected override void Dispose(bool disposing)
         buttonOk.Location = new Point(317, 215);
         buttonOk.Name = "buttonOk";
         buttonOk.Size = new Size(75, 23);
-        buttonOk.TabIndex = 5;
+        buttonOk.TabIndex = 7;
         buttonOk.Text = "OK";
         buttonOk.UseVisualStyleBackColor = true;
         buttonOk.Click += OnButtonOkClick;
@@ -67,7 +67,7 @@ protected override void Dispose(bool disposing)
         buttonCancel.Location = new Point(398, 215);
         buttonCancel.Name = "buttonCancel";
         buttonCancel.Size = new Size(75, 23);
-        buttonCancel.TabIndex = 6;
+        buttonCancel.TabIndex = 8;
         buttonCancel.Text = "Cancel";
         buttonCancel.UseVisualStyleBackColor = true;
         buttonCancel.Click += OnButtonCancelClick;
@@ -101,16 +101,17 @@ protected override void Dispose(bool disposing)
         checkBoxRegex.Text = "&Regular expression";
         checkBoxRegex.UseVisualStyleBackColor = true;
         // 
-        // buttonRegexHelper
+        // linkLabelRegexHelper
         // 
-        buttonRegexHelper.AutoSize = true;
-        buttonRegexHelper.Location = new Point(6, 72);
-        buttonRegexHelper.Name = "buttonRegexHelper";
-        buttonRegexHelper.Size = new Size(89, 26);
-        buttonRegexHelper.TabIndex = 3;
-        buttonRegexHelper.Text = "Regex-&Helper";
-        buttonRegexHelper.UseVisualStyleBackColor = true;
-        buttonRegexHelper.Click += OnButtonRegexClick;
+        linkLabelRegexHelper.AccessibleDescription = "Open regular expressions helper dialog";
+        linkLabelRegexHelper.AutoSize = true;
+        linkLabelRegexHelper.Location = new Point(158, 46);
+        linkLabelRegexHelper.Name = "linkLabelRegexHelper";
+        linkLabelRegexHelper.Size = new Size(79, 15);
+        linkLabelRegexHelper.TabIndex = 6;
+        linkLabelRegexHelper.TabStop = true;
+        linkLabelRegexHelper.Text = "Regex-&Helper";
+        linkLabelRegexHelper.Click += OnButtonRegexClick;
         // 
         // radioButtonFromTop
         // 
@@ -118,7 +119,7 @@ protected override void Dispose(bool disposing)
         radioButtonFromTop.Location = new Point(6, 19);
         radioButtonFromTop.Name = "radioButtonFromTop";
         radioButtonFromTop.Size = new Size(74, 19);
-        radioButtonFromTop.TabIndex = 7;
+        radioButtonFromTop.TabIndex = 0;
         radioButtonFromTop.TabStop = true;
         radioButtonFromTop.Text = "From top";
         radioButtonFromTop.UseVisualStyleBackColor = true;
@@ -129,7 +130,7 @@ protected override void Dispose(bool disposing)
         radioButtonFromSelected.Location = new Point(6, 42);
         radioButtonFromSelected.Name = "radioButtonFromSelected";
         radioButtonFromSelected.Size = new Size(121, 19);
-        radioButtonFromSelected.TabIndex = 8;
+        radioButtonFromSelected.TabIndex = 0;
         radioButtonFromSelected.TabStop = true;
         radioButtonFromSelected.Text = "From selected line";
         radioButtonFromSelected.UseVisualStyleBackColor = true;
@@ -149,11 +150,11 @@ protected override void Dispose(bool disposing)
         // 
         groupBoxOptions.Controls.Add(checkBoxCaseSensitive);
         groupBoxOptions.Controls.Add(checkBoxRegex);
-        groupBoxOptions.Controls.Add(buttonRegexHelper);
+        groupBoxOptions.Controls.Add(linkLabelRegexHelper);
         groupBoxOptions.Location = new Point(198, 74);
         groupBoxOptions.Name = "groupBoxOptions";
-        groupBoxOptions.Size = new Size(275, 104);
-        groupBoxOptions.TabIndex = 2;
+        groupBoxOptions.Size = new Size(275, 79);
+        groupBoxOptions.TabIndex = 3;
         groupBoxOptions.TabStop = false;
         groupBoxOptions.Text = "Options";
         // 
@@ -163,8 +164,8 @@ protected override void Dispose(bool disposing)
         groupBoxDirection.Controls.Add(radioButtonForward);
         groupBoxDirection.Location = new Point(13, 159);
         groupBoxDirection.Name = "groupBoxDirection";
-        groupBoxDirection.Size = new Size(122, 79);
-        groupBoxDirection.TabIndex = 4;
+        groupBoxDirection.Size = new Size(178, 79);
+        groupBoxDirection.TabIndex = 2;
         groupBoxDirection.TabStop = false;
         groupBoxDirection.Text = "Direction";
         // 
@@ -174,7 +175,7 @@ protected override void Dispose(bool disposing)
         radioButtonBackward.Location = new Point(7, 44);
         radioButtonBackward.Name = "radioButtonBackward";
         radioButtonBackward.Size = new Size(76, 19);
-        radioButtonBackward.TabIndex = 1;
+        radioButtonBackward.TabIndex = 0;
         radioButtonBackward.TabStop = true;
         radioButtonBackward.Text = "Backward";
         radioButtonBackward.UseVisualStyleBackColor = true;
@@ -241,7 +242,7 @@ private System.Windows.Forms.Button buttonCancel;
 private System.Windows.Forms.Label labelSearchFor;
 private System.Windows.Forms.CheckBox checkBoxCaseSensitive;
 private System.Windows.Forms.CheckBox checkBoxRegex;
-private System.Windows.Forms.Button buttonRegexHelper;
+private System.Windows.Forms.LinkLabel linkLabelRegexHelper;
 private System.Windows.Forms.RadioButton radioButtonFromTop;
 private System.Windows.Forms.RadioButton radioButtonFromSelected;
 private System.Windows.Forms.GroupBox groupBoxSearchStart;
