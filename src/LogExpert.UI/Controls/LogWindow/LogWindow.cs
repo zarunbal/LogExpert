@@ -2358,6 +2358,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 ? Persister.LoadPersistenceData(FileName, Preferences)
                 : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 
+            if (persistenceData == null)
+            {
+                _logger.Info($"No persistence data for {FileName} found.");
+                return;
+            }
+
             if (persistenceData.LineCount > _logFileReader.LineCount)
             {
                 // outdated persistence data (logfile rollover)
