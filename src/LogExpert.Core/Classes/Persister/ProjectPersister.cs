@@ -12,6 +12,11 @@ public static class ProjectPersister
 
     #region Public methods
 
+    /// <summary>
+    /// Loads the project session data from a specified file.
+    /// </summary>
+    /// <param name="projectFileName"></param>
+    /// <returns></returns>
     public static ProjectData LoadProjectData (string projectFileName)
     {
         try
@@ -25,13 +30,26 @@ public static class ProjectPersister
             return JsonConvert.DeserializeObject<ProjectData>(json, settings);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or
-                                 IOException)
+                                         IOException or
+                                         JsonSerializationException)
         {
+            //Backup try to load xml instead of json
+            var xmlData = ProjectPersisterXML.LoadProjectData(projectFileName);
+            if (xmlData != null)
+            {
+                return xmlData;
+            }
+
             _logger.Error(ex, $"Error loading persistence data from {projectFileName}");
             return new ProjectData();
         }
     }
 
+    /// <summary>
+    /// Saves the project session data to a specified file.
+    /// </summary>
+    /// <param name="projectFileName"></param>
+    /// <param name="projectData"></param>
     public static void SaveProjectData (string projectFileName, ProjectData projectData)
     {
         var settings = new JsonSerializerSettings

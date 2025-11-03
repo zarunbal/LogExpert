@@ -80,9 +80,9 @@ internal partial class SettingsDialog : Form
         checkBoxFilterTail.Checked = Preferences.FilterTail;
         checkBoxFollowTail.Checked = Preferences.FollowTail;
 
-        radioButtonHorizMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.Horizontal;
-        radioButtonVerticalMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.Vertical;
-        radioButtonVerticalMouseDragInverted.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.InvertedVertical;
+        radioButtonHorizMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.Horizontal;
+        radioButtonVerticalMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.Vertical;
+        radioButtonVerticalMouseDragInverted.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.InvertedVertical;
 
         checkBoxSingleInstance.Checked = Preferences.AllowOnlyOneInstance;
         checkBoxOpenLastFiles.Checked = Preferences.OpenLastFiles;
@@ -212,10 +212,12 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnToolClickInternal (TextBox textBox)
     {
-        OpenFileDialog dlg = new();
-        dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        OpenFileDialog dlg = new()
+        {
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
 
-        if (string.IsNullOrEmpty(textBox.Text) == false)
+        if (!string.IsNullOrEmpty(textBox.Text))
         {
             FileInfo info = new(textBox.Text);
             if (info.Directory != null && info.Directory.Exists)
@@ -309,7 +311,7 @@ internal partial class SettingsDialog : Form
 
         foreach (var columnizer in columnizers)
         {
-            comboColumn.Items.Add(columnizer.GetName());
+            _ = comboColumn.Items.Add(columnizer.GetName());
         }
         //comboColumn.DisplayMember = "Name";
         //comboColumn.ValueMember = "Columnizer";
@@ -317,21 +319,21 @@ internal partial class SettingsDialog : Form
         foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
             foreach (var logColumnizer in columnizers)
             {
-                cell.Items.Add(logColumnizer.GetName());
+                _ = cell.Items.Add(logColumnizer.GetName());
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
             var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
-            dataGridViewColumnizer.Rows.Add(row);
+            _ = dataGridViewColumnizer.Rows.Add(row);
         }
 
         var count = dataGridViewColumnizer.RowCount;
@@ -355,21 +357,21 @@ internal partial class SettingsDialog : Form
 
         foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
         {
-            comboColumn.Items.Add(group.GroupName);
+            _ = comboColumn.Items.Add(group.GroupName);
         }
 
         foreach (var maskEntry in Preferences.HighlightMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
             foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
-                cell.Items.Add(group.GroupName);
+                _ = cell.Items.Add(group.GroupName);
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
             var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
@@ -377,7 +379,7 @@ internal partial class SettingsDialog : Form
             currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
-            dataGridViewHighlightMask.Rows.Add(row);
+            _ = dataGridViewHighlightMask.Rows.Add(row);
         }
 
         var count = dataGridViewHighlightMask.RowCount;
@@ -428,7 +430,7 @@ internal partial class SettingsDialog : Form
 
         foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -437,7 +439,7 @@ internal partial class SettingsDialog : Form
 
         foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -446,7 +448,7 @@ internal partial class SettingsDialog : Form
 
         foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -483,7 +485,7 @@ internal partial class SettingsDialog : Form
 
         foreach (var tool in Preferences.ToolEntries)
         {
-            listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
+            _ = listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
         }
 
         if (listBoxTools.Items.Count > 0)
@@ -565,7 +567,7 @@ internal partial class SettingsDialog : Form
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                NativeMethods.DestroyIcon(icon.Handle);
+                _ = NativeMethods.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -579,12 +581,12 @@ internal partial class SettingsDialog : Form
     {
         comboBoxEncoding.Items.Clear();
 
-        comboBoxEncoding.Items.Add(Encoding.ASCII);
-        comboBoxEncoding.Items.Add(Encoding.Default);
-        comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        comboBoxEncoding.Items.Add(Encoding.UTF8);
-        comboBoxEncoding.Items.Add(Encoding.Unicode);
-        comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
+        _ = comboBoxEncoding.Items.Add(Encoding.Default);
+        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
+        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
+        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
         comboBoxEncoding.ValueMember = "HeaderName";
     }
@@ -624,18 +626,11 @@ internal partial class SettingsDialog : Form
         Preferences.FilterTail = checkBoxFilterTail.Checked;
         Preferences.FollowTail = checkBoxFollowTail.Checked;
 
-        if (radioButtonVerticalMouseDrag.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Vertical;
-        }
-        else if (radioButtonVerticalMouseDragInverted.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.InvertedVertical;
-        }
-        else
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Horizontal;
-        }
+        Preferences.TimestampControlDragOrientation = radioButtonVerticalMouseDrag.Checked
+            ? DragOrientations.Vertical
+            : radioButtonVerticalMouseDragInverted.Checked
+                ? DragOrientations.InvertedVertical
+                : DragOrientations.Horizontal;
 
         SaveColumnizerList();
 
@@ -708,7 +703,7 @@ internal partial class SettingsDialog : Form
         var comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
         if (comboCell.Items.Count > 0)
         {
-            //        comboCell.Value = comboCell.Items[0];
+            //comboCell.Value = comboCell.Items[0];
         }
     }
 
@@ -717,7 +712,7 @@ internal partial class SettingsDialog : Form
         if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
         {
             var index = dataGridViewColumnizer.CurrentRow.Index;
-            dataGridViewColumnizer.EndEdit();
+            _ = dataGridViewColumnizer.EndEdit();
             dataGridViewColumnizer.Rows.RemoveAt(index);
         }
     }
@@ -767,14 +762,14 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        var o = listBoxPlugin.SelectedItem;
+        var selectedPlugin = listBoxPlugin.SelectedItem;
 
-        if (o != null)
+        if (selectedPlugin != null)
         {
-            _selectedPlugin = o as ILogExpertPluginConfigurator;
-
-            if (o is ILogExpertPluginConfigurator)
+            if (selectedPlugin is ILogExpertPluginConfigurator)
             {
+                _selectedPlugin = selectedPlugin as ILogExpertPluginConfigurator;
+
                 if (_selectedPlugin.HasEmbeddedForm())
                 {
                     buttonConfigPlugin.Enabled = false;
@@ -823,7 +818,7 @@ internal partial class SettingsDialog : Form
                     {
                         if (Directory.Exists(ConfigManager.PortableModeDir) == false)
                         {
-                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            _ = Directory.CreateDirectory(ConfigManager.PortableModeDir);
                         }
 
                         using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
@@ -857,9 +852,8 @@ internal partial class SettingsDialog : Form
         }
         catch (Exception exception)
         {
-            MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
+            _ = MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
         }
-
     }
 
     private void OnBtnConfigPluginClick (object sender, EventArgs e)
@@ -894,7 +888,9 @@ internal partial class SettingsDialog : Form
             var isChecked = listBoxTools.GetItemChecked(i);
             var item = listBoxTools.Items[i];
             listBoxTools.Items.RemoveAt(i);
+
             i--;
+
             listBoxTools.Items.Insert(i, item);
             listBoxTools.SelectedIndex = i;
             listBoxTools.SetItemChecked(i, isChecked);
@@ -910,7 +906,9 @@ internal partial class SettingsDialog : Form
             var isChecked = listBoxTools.GetItemChecked(i);
             var item = listBoxTools.Items[i];
             listBoxTools.Items.RemoveAt(i);
+
             i++;
+
             listBoxTools.Items.Insert(i, item);
             listBoxTools.SelectedIndex = i;
             listBoxTools.SetItemChecked(i, isChecked);
@@ -920,7 +918,7 @@ internal partial class SettingsDialog : Form
     [SupportedOSPlatform("windows")]
     private void OnBtnToolAddClick (object sender, EventArgs e)
     {
-        listBoxTools.Items.Add(new ToolEntry());
+        _ = listBoxTools.Items.Add(new ToolEntry());
         listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
     }
 
@@ -1029,14 +1027,51 @@ internal partial class SettingsDialog : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                _ = MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
                 return;
             }
 
-            ConfigManager.Import(fileInfo, dlg.ImportFlags);
+            ImportResult importResult = ConfigManager.Import(fileInfo, dlg.ImportFlags);
+
+            if (!importResult.Success)
+            {
+                if (importResult.RequiresUserConfirmation)
+                {
+                    var confirmResult = MessageBox.Show(
+                        this,
+                        importResult.ConfirmationMessage,
+                        importResult.ConfirmationTitle,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2);
+
+                    if (confirmResult == DialogResult.Yes)
+                    {
+                        // User confirmed, retry import without validation
+                        _ = ConfigManager.Import(fileInfo, dlg.ImportFlags);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    _ = MessageBox.Show(
+                        this,
+                        importResult.ErrorMessage,
+                        importResult.ErrorTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+
+                    return;
+                }
+            }
+
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
-            MessageBox.Show(this, @"Settings imported", @"LogExpert");
+
+            _ = MessageBox.Show(this, @"Settings imported", @"LogExpert");
         }
     }
 

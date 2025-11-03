@@ -63,7 +63,20 @@ internal static class Program
                 //TODO: The config file import and the try catch for the primary instance and secondary instance should be separated functions
                 if (cfgFileInfo.Exists)
                 {
-                    ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+                    ImportResult importResult = ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+                    
+                    // Handle import result
+                    if (!importResult.Success)
+                    {
+                        string message = importResult.RequiresUserConfirmation 
+                            ? importResult.ConfirmationMessage 
+                            : importResult.ErrorMessage;
+                        string title = importResult.RequiresUserConfirmation 
+                            ? importResult.ConfirmationTitle 
+                            : importResult.ErrorTitle;
+                        
+                        MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                 }
                 else
                 {

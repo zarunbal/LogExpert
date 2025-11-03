@@ -1126,7 +1126,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             dragControlDateTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             dragControlDateTime.BackColor = System.Drawing.SystemColors.Control;
             dragControlDateTime.DateTime = new System.DateTime(0L);
-            dragControlDateTime.DragOrientation = DragOrientationsEnum.Vertical;
+            dragControlDateTime.DragOrientation = DragOrientations.Vertical;
             dragControlDateTime.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             dragControlDateTime.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             dragControlDateTime.HoverColor = System.Drawing.Color.LightGray;
