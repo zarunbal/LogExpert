@@ -1,5 +1,6 @@
 using System.Text;
 
+using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Config;
 
 using Newtonsoft.Json;
@@ -285,8 +286,16 @@ public static class Persister
         }
         catch (Exception ex) when (ex is JsonSerializationException or
                                          UnauthorizedAccessException or
-                                         IOException)
+                                         IOException or
+                                         JsonReaderException)
         {
+            //Backup try to load xml instead of json
+            var xmlData = PersisterXML.Load(fileName);
+            if (xmlData != null)
+            {
+                return xmlData;
+            }
+
             _logger.Error(ex, $"Error loading persistence data from {fileName}");
             return null;
         }

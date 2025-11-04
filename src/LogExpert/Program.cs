@@ -63,15 +63,33 @@ internal static class Program
                 //TODO: The config file import and the try catch for the primary instance and secondary instance should be separated functions
                 if (cfgFileInfo.Exists)
                 {
-                    ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+                    ImportResult importResult = ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+
+                    // Handle import result
+                    if (!importResult.Success)
+                    {
+                        string message = importResult.RequiresUserConfirmation
+                            ? importResult.ConfirmationMessage
+                            : importResult.ErrorMessage;
+                        string title = importResult.RequiresUserConfirmation
+                            ? importResult.ConfirmationTitle
+                            : importResult.ErrorTitle;
+
+                        if (MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                        {
+                            _logger.Warn(CultureInfo.InvariantCulture, "### Program: Import of config file cancelled by user.");
+                            Application.Exit();
+                            return;
+                        }
+                    }
                 }
                 else
                 {
-                    MessageBox.Show(@"Config file not found", @"LogExpert");
+                    _ = MessageBox.Show(@"Config file not found", @"LogExpert");
                 }
             }
 
-            PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+            _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             var pId = Process.GetCurrentProcess().SessionId;
 
@@ -93,7 +111,7 @@ internal static class Program
                     LogExpertProxy proxy = new(logWin);
                     LogExpertApplicationContext context = new(proxy, logWin);
 
-                    Task.Run(() => RunServerLoopAsync(SendMessageToProxy, proxy, cts.Token));
+                    _ = Task.Run(() => RunServerLoopAsync(SendMessageToProxy, proxy, cts.Token));
 
                     Application.Run(context);
                 }
@@ -124,7 +142,7 @@ internal static class Program
                     if (counter == 0)
                     {
                         _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
-                        MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
+                        _ = MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
                     }
 
                     //TODO: Remove this from here? Why is it called from the Main project and not from the main window?
@@ -146,12 +164,12 @@ internal static class Program
             {
                 _logger.Error(ex, "Mutex error, giving up: ");
                 cts.Cancel();
-                MessageBox.Show($"Cannot open connection to first instance ({ex.Message})", "LogExpert");
+                _ = MessageBox.Show($"Cannot open connection to first instance ({ex.Message})", "LogExpert");
             }
         }
         catch (SecurityException se)
         {
-            MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
+            _ = MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
             cts.Cancel();
         }
     }
