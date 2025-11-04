@@ -299,7 +299,7 @@ public class ConfigManager : IConfigManager
     /// <exception cref="JsonSerializationException"></exception>
     private LoadResult LoadOrCreateNew (FileInfo fileInfo)
     {
-        //TODO this needs to be refactor, its quite big
+        //TODO this needs to be refactord, its quite big
         lock (_loadSaveLock)
         {
             Settings settings = null;

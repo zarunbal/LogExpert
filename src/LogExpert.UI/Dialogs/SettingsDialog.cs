@@ -766,9 +766,9 @@ internal partial class SettingsDialog : Form
 
         if (selectedPlugin != null)
         {
-            if (selectedPlugin is ILogExpertPluginConfigurator)
+            if (selectedPlugin is ILogExpertPluginConfigurator pluginConfigurator)
             {
-                _selectedPlugin = selectedPlugin as ILogExpertPluginConfigurator;
+                _selectedPlugin = pluginConfigurator;
 
                 if (_selectedPlugin.HasEmbeddedForm())
                 {
