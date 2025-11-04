@@ -2765,6 +2765,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
+
+
             ProjectPersister.SaveProjectData(fileName, projectData);
         }
     }

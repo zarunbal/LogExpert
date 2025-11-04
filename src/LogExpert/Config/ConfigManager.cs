@@ -2,11 +2,11 @@ using System.Drawing;
 using System.Globalization;
 using System.Reflection;
 using System.Security;
-using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
@@ -187,7 +187,6 @@ public class ConfigManager : IConfigManager
             return ImportResult.RequiresConfirmation("Confirm Import", confirmationMessage);
         }
 
-        // Log what we're importing
         _logger.Info($"Importing: Filters={importedSettings.FilterList?.Count ?? 0}, " +
             $"History={importedSettings.FileHistoryList?.Count ?? 0}, " +
             $"Highlights={importedSettings.Preferences?.HighlightGroupList?.Count ?? 0}");
@@ -223,18 +222,18 @@ public class ConfigManager : IConfigManager
     /// <returns></returns>
     private Settings Load ()
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Loading settings");
+        _logger.Info($"### {nameof(Load)}: Loading settings");
 
         string dir;
 
         if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Load settings standard mode");
+            _logger.Info($"### {nameof(Load)}: Load settings standard mode");
             dir = ConfigDir;
         }
         else
         {
-            _logger.Info("Load settings portable mode");
+            _logger.Info($"### {nameof(Load)}: Load settings portable mode");
             dir = Application.StartupPath;
         }
 
@@ -276,43 +275,17 @@ public class ConfigManager : IConfigManager
         // Handle recovery notifications (if loaded from backup)
         if (result.LoadedFromBackup)
         {
-            _logger.Info("Settings recovered from backup, notification pending");
-            // Store recovery information for UI layer to display
-            // Note: MessageBox should be shown by UI layer after initialization
-            OnSettingsRecoveredFromBackup(result.RecoveryTitle, result.RecoveryMessage);
+            _logger.Info($"### {nameof(Load)}: Settings recovered from backup");
         }
 
         // Handle critical failures
         if (result.CriticalFailure)
         {
-            _logger.Error("Critical settings load failure, user decision required");
-            // Store critical error for UI layer to display
-            // Note: MessageBox should be shown by UI layer after initialization
-            OnCriticalSettingsFailure(result.CriticalTitle, result.CriticalMessage);
+            _logger.Error($"### {nameof(Load)}: settings load failure. Set to default settings");
+            result = LoadOrCreateNew(null);
         }
 
         return result.Settings;
-    }
-
-    /// <summary>
-    /// Event raised when settings are recovered from backup (UI layer should show notification)
-    /// </summary>
-    private void OnSettingsRecoveredFromBackup (string title, string message)
-    {
-        // UI layer should subscribe to this or check status after ConfigManager initialization
-        // For now, just log - proper event mechanism can be added later
-        _logger.Warn($"Recovery notification: {title} - {message}");
-    }
-
-    /// <summary>
-    /// Event raised when critical settings failure occurs (UI layer should show error and get user choice)
-    /// </summary>
-    private void OnCriticalSettingsFailure (string title, string message)
-    {
-        // UI layer should subscribe to this or check status after ConfigManager initialization
-        // For now, default to creating new settings - proper event mechanism can be added later
-        _logger.Error($"Critical failure: {title} - {message}");
-        _logger.Warn("Defaulting to create new settings (UI layer should prompt user)");
     }
 
     /// <summary>
@@ -529,7 +502,7 @@ public class ConfigManager : IConfigManager
 
         settings.FilterRangeHistoryList ??= [];
 
-        foreach (Core.Classes.Filter.FilterParams filterParams in settings.FilterList)
+        foreach (FilterParams filterParams in settings.FilterList)
         {
             filterParams.Init();
         }
@@ -548,7 +521,7 @@ public class ConfigManager : IConfigManager
 
         settings.Preferences.MultiFileOptions ??= new MultiFileOptions();
 
-        settings.Preferences.DefaultEncoding ??= Encoding.Default.HeaderName;
+        settings.Preferences.DefaultEncoding ??= System.Text.Encoding.Default.HeaderName;
 
         if (settings.Preferences.MaximumFilterEntriesDisplayed == 0)
         {
@@ -639,8 +612,8 @@ public class ConfigManager : IConfigManager
 
         try
         {
-            _logger.Debug($"Writing to {fileInfo.FullName}");
-            File.WriteAllText(tempFile, json, Encoding.UTF8);
+            _logger.Info($"Writing to {fileInfo.FullName}");
+            File.WriteAllText(tempFile, json, System.Text.Encoding.UTF8);
 
             if (File.Exists(fileInfo.FullName))
             {
@@ -648,7 +621,7 @@ public class ConfigManager : IConfigManager
                 if (existingSize > 0)
                 {
                     File.Copy(fileInfo.FullName, backupFile, overwrite: true);
-                    _logger.Debug($"Created backup: {backupFile} ({existingSize} bytes)");
+                    _logger.Info($"Created backup: {backupFile} ({existingSize} bytes)");
                 }
                 else
                 {
@@ -657,7 +630,6 @@ public class ConfigManager : IConfigManager
             }
 
             File.Move(tempFile, fileInfo.FullName, overwrite: true);
-            _logger.Info("Settings saved successfully");
         }
         catch (Exception ex)
         {
@@ -699,7 +671,6 @@ public class ConfigManager : IConfigManager
                 try
                 {
                     File.Delete(tempFile);
-                    _logger.Debug($"Cleaned up temp file: {tempFile}");
                 }
                 catch (Exception cleanupException) when (cleanupException is ArgumentException or
                                                                              DirectoryNotFoundException or

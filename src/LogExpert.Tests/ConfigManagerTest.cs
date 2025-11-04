@@ -40,9 +40,13 @@ public class ConfigManagerTest
             {
                 Directory.Delete(_testDir, recursive: true);
             }
-            catch
+            catch (IOException)
             {
-                // Ignore cleanup errors
+                // Ignore IO errors during cleanup
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Ignore access errors during cleanup
             }
         }
     }
@@ -56,12 +60,9 @@ public class ConfigManagerTest
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
 
-        if (method == null)
-        {
-            throw new Exception($"Static method {methodName} not found");
-        }
-
-        return (T)method.Invoke(null, parameters);
+        return method == null
+            ? throw new Exception($"Static method {methodName} not found")
+            : (T)method.Invoke(null, parameters);
     }
 
     /// <summary>
@@ -71,12 +72,9 @@ public class ConfigManagerTest
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
-        if (method == null)
-        {
-            throw new Exception($"Instance method {methodName} not found");
-        }
-
-        return (T)method.Invoke(ConfigManager.Instance, parameters);
+        return method == null
+            ? throw new Exception($"Instance method {methodName} not found")
+            : (T)method.Invoke(ConfigManager.Instance, parameters);
     }
 
     /// <summary>
@@ -84,12 +82,8 @@ public class ConfigManagerTest
     /// </summary>
     private void InvokePrivateInstanceMethod (string methodName, params object[] parameters)
     {
-        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-
-        if (method == null)
-        {
-            throw new Exception($"Instance method {methodName} not found");
-        }
+        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new Exception($"Instance method {methodName} not found");
 
         method.Invoke(ConfigManager.Instance, parameters);
     }
@@ -99,8 +93,11 @@ public class ConfigManagerTest
     /// </summary>
     private Settings CreateTestSettings ()
     {
-        var settings = new Settings();
-        settings.Preferences = new Preferences();
+        var settings = new Settings
+        {
+            Preferences = new Preferences()
+        };
+
         return settings;
     }
 
@@ -293,11 +290,11 @@ public class ConfigManagerTest
         Assert.That(File.Exists(backupFile), Is.True, "Backup file should exist");
 
         string backupContent = File.ReadAllText(backupFile);
-        Settings? backupSettings = JsonConvert.DeserializeObject<Settings>(backupContent);
+        Settings backupSettings = JsonConvert.DeserializeObject<Settings>(backupContent);
         Assert.That(backupSettings.AlwaysOnTop, Is.True, "Backup should contain previous settings");
 
         string mainContent = File.ReadAllText(_testSettingsFile.FullName);
-        Settings? mainSettings = JsonConvert.DeserializeObject<Settings>(mainContent);
+        Settings mainSettings = JsonConvert.DeserializeObject<Settings>(mainContent);
         Assert.That(mainSettings.AlwaysOnTop, Is.False, "Main file should contain new settings");
     }
 

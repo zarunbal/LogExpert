@@ -1,4 +1,5 @@
-using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Classes.Attributes;
+using LogExpert.Core.Classes.JsonConverters;
 
 using Newtonsoft.Json;
 

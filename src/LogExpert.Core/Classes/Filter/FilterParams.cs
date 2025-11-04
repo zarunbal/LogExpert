@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
-using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Classes.JsonConverters;
 
 using Newtonsoft.Json;
 

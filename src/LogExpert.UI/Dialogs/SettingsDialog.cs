@@ -13,7 +13,7 @@ using LogExpert.UI.Extensions;
 
 namespace LogExpert.Dialogs;
 
-//TODO: This class should not knoow ConfigManager?
+//TODO: This class should not know ConfigManager?
 [SupportedOSPlatform("windows")]
 internal partial class SettingsDialog : Form
 {
@@ -1005,7 +1005,7 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    ///
+    /// Import settings from file
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

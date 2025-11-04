@@ -1,5 +1,6 @@
 using System.Text;
 
+using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Config;
 
 using Newtonsoft.Json;

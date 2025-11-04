@@ -1,9 +1,11 @@
 using System.Reflection;
 
+using LogExpert.Core.Classes.Attributes;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace LogExpert.Core.Classes.Persister;
+namespace LogExpert.Core.Classes.JsonConverters;
 
 /// <summary>
 /// Custom JsonConverter for ILogLineColumnizer implementations.
