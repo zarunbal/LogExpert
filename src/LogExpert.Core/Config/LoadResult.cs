@@ -52,11 +52,8 @@ public class LoadResult
     /// <param name="settings"></param>
     /// <returns></returns>
     public static LoadResult Success (Settings settings) => new()
-
     {
-
         Settings = settings
-
     };
 
     /// <summary>
