@@ -6,42 +6,43 @@ namespace LogExpert.Core.Config;
 public class LoadResult
 {
     /// <summary>
-    /// Gets or sets the loaded settings.
+    /// The loaded settings object. Always populated on success or recovery.
     /// </summary>
+
     public Settings Settings { get; set; }
 
     /// <summary>
-    /// Indicates whether the settings were loaded from a backup.
+    /// Indicates whether the settings were loaded from a backup file due to a failure loading the primary file.
     /// </summary>
     public bool LoadedFromBackup { get; set; }
 
     /// <summary>
-    /// Message to show to the user if settings were recovered from backup
+    /// A message describing the recovery process. Only meaningful when <see cref="LoadedFromBackup"/> is true.
     /// </summary>
     public string RecoveryMessage { get; set; }
 
     /// <summary>
-    /// Gets or sets the title used for recovery operations.
+    /// A title for the recovery message dialog. Only meaningful when <see cref="LoadedFromBackup"/> is true.
     /// </summary>
     public string RecoveryTitle { get; set; }
 
     /// <summary>
-    /// Indicates whether a critical failure occurred during loading.
+    /// Indicates a critical failure occurred during loading. When true, loading could not complete normally.
     /// </summary>
     public bool CriticalFailure { get; set; }
 
     /// <summary>
-    /// Message to show to the user in case of a critical failure
+    /// A message describing the critical failure. Only meaningful when <see cref="CriticalFailure"/> is true.
     /// </summary>
     public string CriticalMessage { get; set; }
 
     /// <summary>
-    /// Gets or sets the title used to indicate critical messages.
+    /// A title for the critical failure dialog. Only meaningful when <see cref="CriticalFailure"/> is true.
     /// </summary>
     public string CriticalTitle { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether a user choice is required.
+    /// Indicates whether user input is required to proceed after a critical failure.
     /// </summary>
     public bool RequiresUserChoice { get; set; }
 
@@ -51,8 +52,11 @@ public class LoadResult
     /// <param name="settings"></param>
     /// <returns></returns>
     public static LoadResult Success (Settings settings) => new()
+
     {
+
         Settings = settings
+
     };
 
     /// <summary>
