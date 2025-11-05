@@ -76,7 +76,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
         var temp = line.FullLine;
 
-        Column[] columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
+        var columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
         cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
 
         // delete '[#|' and '|#]'
@@ -100,7 +100,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         {
             try
             {
-                DateTime dateTime = GetTimestamp(callback, line);
+                var dateTime = GetTimestamp(callback, line);
                 if (dateTime == DateTime.MinValue)
                 {
                     columns[1].FullValue = temp;
@@ -114,7 +114,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
                 columns[0].FullValue = "n/a";
             }
 
-            Column timestmp = columns[0];
+            var timestmp = columns[0];
 
             string[] cols;
             cols = temp.Split(trimChars, COLUMN_COUNT, StringSplitOptions.None);
@@ -180,7 +180,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         try
         {
             // convert glassfish timestamp into a readable format:
-            if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out DateTime timestamp))
+            if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out var timestamp))
             {
                 return timestamp.AddMilliseconds(timeOffset);
             }

@@ -34,17 +34,17 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
         // will apply to the current instance
         _columnizerList = new List<ILogLineColumnizer>();
 
-        foreach (ILogLineColumnizer col in existingColumnizerList)
+        foreach (var col in existingColumnizerList)
         {
             _columnizerList.Add(col.GetType() == SelectedColumnizer.GetType() ? SelectedColumnizer : col);
         }
 
-        foreach (ILogLineColumnizer col in _columnizerList)
+        foreach (var col in _columnizerList)
         {
             filterComboBox.Items.Add(col);
         }
 
-        foreach (ILogLineColumnizer columnizer in _columnizerList)
+        foreach (var columnizer in _columnizerList)
         {
             if (columnizer.GetType() == SelectedColumnizer.GetType())
             {
@@ -71,7 +71,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     private void OnFilterComboBoxSelectedIndexChanged (object sender, EventArgs e)
     {
-        ILogLineColumnizer col = _columnizerList[filterComboBox.SelectedIndex];
+        var col = _columnizerList[filterComboBox.SelectedIndex];
         SelectedColumnizer = col;
         var description = col.GetDescription();
         description += "\r\nSupports timeshift: " + (SelectedColumnizer.IsTimeshiftImplemented() ? "Yes" : "No");

@@ -28,9 +28,9 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
     {
         _stream = new BufferedStream(stream);
 
-        _preambleLength = DetectPreambleLengthAndEncoding(out Encoding detectedEncoding);
+        _preambleLength = DetectPreambleLengthAndEncoding(out var detectedEncoding);
 
-        Encoding usedEncoding = GetUsedEncoding(encodingOptions, detectedEncoding);
+        var usedEncoding = GetUsedEncoding(encodingOptions, detectedEncoding);
         _posIncPrecomputed = GetPosIncPrecomputed(usedEncoding);
 
         _reader = new StreamReader(_stream, usedEncoding, true);
@@ -112,6 +112,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
                     _position += _reader.CurrentEncoding.GetByteCount(&readChar, 1);
                 }
             }
+
             return readInt;
         }
         catch (IOException)
@@ -160,7 +161,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
         if (readLen >= 2)
         {
-            foreach (Encoding encoding in _preambleEncodings)
+            foreach (var encoding in _preambleEncodings)
             {
                 var preamble = encoding.GetPreamble();
                 var fail = false;

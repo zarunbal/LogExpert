@@ -34,7 +34,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             FormatPattern = "*$J(.)"
         };
 
-        LinkedList<string> files = CreateTestFilesWithoutDate();
+        var files = CreateTestFilesWithoutDate();
 
         EncodingOptions encodingOptions = new()
         {
@@ -45,13 +45,13 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
 
-        IList<ILogFileInfo> lil = reader.GetLogFileInfoList();
+        var lil = reader.GetLogFileInfoList();
         Assert.That(lil.Count, Is.EqualTo(files.Count));
 
-        LinkedList<string>.Enumerator enumerator = files.GetEnumerator();
+        var enumerator = files.GetEnumerator();
         enumerator.MoveNext();
 
-        foreach (LogFileInfo li in lil.Cast<LogFileInfo>())
+        foreach (var li in lil.Cast<LogFileInfo>())
         {
             var fileName = enumerator.Current;
             Assert.That(li.FullName, Is.EqualTo(fileName));
@@ -93,10 +93,10 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         enumerator = files.GetEnumerator();
         enumerator.MoveNext();
 
-        IList<LogBuffer> logBuffers = reader.GetBufferList();
+        var logBuffers = reader.GetBufferList();
         var startLine = 0;
 
-        foreach (LogBuffer logBuffer in logBuffers)
+        foreach (var logBuffer in logBuffers)
         {
             Assert.That(enumerator.Current, Is.EqualTo(logBuffer.FileInfo.FullName));
             Assert.That(logBuffer.StartLine, Is.EqualTo(startLine));
@@ -114,8 +114,8 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
         for (i = 0; i < logBuffers.Count - 2; ++i)
         {
-            LogBuffer logBuffer = logBuffers[i];
-            ILogLine line = logBuffer.GetLineOfBlock(0);
+            var logBuffer = logBuffers[i];
+            var line = logBuffer.GetLineOfBlock(0);
             Assert.That(line.FullLine.Contains(enumerator.Current, StringComparison.Ordinal));
             enumerator.MoveNext();
         }
@@ -124,8 +124,8 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         // the last 2 files now contain the content of the previously watched file
         for (; i < logBuffers.Count; ++i)
         {
-            LogBuffer logBuffer = logBuffers[i];
-            ILogLine line = logBuffer.GetLineOfBlock(0);
+            var logBuffer = logBuffers[i];
+            var line = logBuffer.GetLineOfBlock(0);
             Assert.That(line.FullLine.Contains(enumerator.Current, StringComparison.Ordinal));
         }
 
@@ -146,7 +146,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
         // Check first line to see if buffers are correct
         //
-        ILogLine firstLine = reader.GetLogLine(0);
+        var firstLine = reader.GetLogLine(0);
         var names = new string[files.Count];
         files.CopyTo(names, 0);
         Assert.That(firstLine.FullLine.Contains(names[2], StringComparison.Ordinal));

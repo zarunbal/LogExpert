@@ -49,7 +49,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
 
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        IColumnizedLogLine cols = SplitLine(callback, line);
+        var cols = SplitLine(callback, line);
         if (cols == null || cols.ColumnValues == null || cols.ColumnValues.Length < 2)
         {
             return DateTime.MinValue;
@@ -60,7 +60,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             return DateTime.MinValue;
         }
 
-        FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
+        var formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
         if (formatInfo == null)
         {
             return DateTime.MinValue;
@@ -85,7 +85,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
         {
             try
             {
-                FormatInfo formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue);
+                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue);
                 if (formatInfo == null)
                 {
                     return;
@@ -175,7 +175,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             return clogLine;
         }
 
-        FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
+        var formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
         if (formatInfo == null)
         {
             columns[2].FullValue = temp;
@@ -256,13 +256,13 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
-        Priority result = Priority.NotSupport;
+        var result = Priority.NotSupport;
         TimeFormatDeterminer timeDeterminer = new();
         var timeStampExistsCount = 0;
         var bracketsExistsCount = 0;
         var maxBracketNumbers = 1;
 
-        foreach (ILogLine logline in samples)
+        foreach (var logline in samples)
         {
             var line = logline?.FullLine;
             if (string.IsNullOrEmpty(line))

@@ -29,7 +29,7 @@ internal partial class DateTimeDragControl : UserControl
     private readonly StringFormat _digitsFormat = new();
     private int _draggedDigit;
 
-    private DragOrientationsEnum _dragOrientation = DragOrientationsEnum.Vertical;
+    private DragOrientations _dragOrientation = DragOrientations.Vertical;
 
     private readonly ToolStripItem toolStripItemHorizontalDrag = new ToolStripMenuItem();
     private readonly ToolStripItem toolStripItemVerticalDrag = new ToolStripMenuItem();
@@ -87,7 +87,7 @@ internal partial class DateTimeDragControl : UserControl
 
     public DateTime MaxDateTime { get; set; } = DateTime.MaxValue;
 
-    public DragOrientationsEnum DragOrientation
+    public DragOrientations DragOrientation
     {
         get => _dragOrientation;
         set
@@ -110,6 +110,7 @@ internal partial class DateTimeDragControl : UserControl
             {
                 _dateTime = MinDateTime;
             }
+
             if (_dateTime > MaxDateTime)
             {
                 _dateTime = MaxDateTime;
@@ -250,12 +251,12 @@ internal partial class DateTimeDragControl : UserControl
 
     private void InitDigitRects ()
     {
-        CultureInfo culture = CultureInfo.CurrentCulture;
+        var culture = CultureInfo.CurrentCulture;
 
         var datePattern = string.Concat(culture.DateTimeFormat.ShortDatePattern, " ", culture.DateTimeFormat.LongTimePattern);
 
-        List<Section> sections = Parser.ParseSections(datePattern, out _);
-        Section dateSection = sections.FirstOrDefault();
+        var sections = Parser.ParseSections(datePattern, out _);
+        var dateSection = sections.FirstOrDefault();
 
         if (dateSection == null)
         {
@@ -318,9 +319,9 @@ internal partial class DateTimeDragControl : UserControl
 
     private void UpdateContextMenu ()
     {
-        toolStripItemHorizontalDrag.Enabled = DragOrientation != DragOrientationsEnum.Horizontal;
-        toolStripItemVerticalDrag.Enabled = DragOrientation != DragOrientationsEnum.Vertical;
-        toolStripItemVerticalInvertedDrag.Enabled = DragOrientation != DragOrientationsEnum.InvertedVertical;
+        toolStripItemHorizontalDrag.Enabled = DragOrientation != DragOrientations.Horizontal;
+        toolStripItemVerticalDrag.Enabled = DragOrientation != DragOrientations.Vertical;
+        toolStripItemVerticalInvertedDrag.Enabled = DragOrientation != DragOrientations.InvertedVertical;
     }
 
     private void OnContextMenuStripOpening (object sender, CancelEventArgs e)
@@ -333,7 +334,7 @@ internal partial class DateTimeDragControl : UserControl
 
     private void OnToolStripItemHorizontalDragClick (object sender, EventArgs e)
     {
-        DragOrientation = DragOrientationsEnum.Horizontal;
+        DragOrientation = DragOrientations.Horizontal;
         toolStripItemHorizontalDrag.Enabled = false;
         toolStripItemVerticalDrag.Enabled = true;
         toolStripItemVerticalInvertedDrag.Enabled = true;
@@ -341,7 +342,7 @@ internal partial class DateTimeDragControl : UserControl
 
     private void OnToolStripItemVerticalDragClick (object sender, EventArgs e)
     {
-        DragOrientation = DragOrientationsEnum.Vertical;
+        DragOrientation = DragOrientations.Vertical;
         toolStripItemHorizontalDrag.Enabled = true;
         toolStripItemVerticalDrag.Enabled = false;
         toolStripItemVerticalInvertedDrag.Enabled = true;
@@ -349,7 +350,7 @@ internal partial class DateTimeDragControl : UserControl
 
     private void OnToolStripItemVerticalInvertedDragClick (object sender, EventArgs e)
     {
-        DragOrientation = DragOrientationsEnum.InvertedVertical;
+        DragOrientation = DragOrientations.InvertedVertical;
         toolStripItemHorizontalDrag.Enabled = true;
         toolStripItemVerticalDrag.Enabled = true;
         toolStripItemVerticalInvertedDrag.Enabled = false;
@@ -377,7 +378,7 @@ internal partial class DateTimeDragControl : UserControl
         for (var i = 0; i < _dateParts.Length; i++)
         {
             var datePart = _dateParts[i];
-            Rectangle rect = _digitRects[i];
+            var rect = _digitRects[i];
             string value;
 
             if (Token.IsDatePart(datePart))
@@ -465,12 +466,12 @@ internal partial class DateTimeDragControl : UserControl
         int diff;
         switch (DragOrientation)
         {
-            case DragOrientationsEnum.Vertical:
+            case DragOrientations.Vertical:
                 {
                     diff = _startMouseY - e.Y;
                     break;
                 }
-            case DragOrientationsEnum.InvertedVertical:
+            case DragOrientations.InvertedVertical:
                 {
                     diff = _startMouseY + e.Y;
                     break;

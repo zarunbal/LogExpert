@@ -66,7 +66,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
             }
 
             var lineNum = fullLogLine[(pos + 1)..];
-            XmlDocument doc = BuildXmlDocument(className, lineNum);
+            var doc = BuildXmlDocument(className, lineNum);
             return doc;
         }
 
@@ -92,6 +92,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
                     {
                         return null;
                     }
+
                     className = str[..pos];
                 }
 
@@ -121,9 +122,10 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
                 </loadclass>
              */
 
-            XmlDocument doc = BuildXmlDocument(className, lineNum);
+            var doc = BuildXmlDocument(className, lineNum);
             return doc;
         }
+
         return null;
     }
 
@@ -132,16 +134,16 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     {
         XmlDocument xmlDoc = new();
         xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
-        XmlElement rootElement = xmlDoc.CreateElement("eminus");
+        var rootElement = xmlDoc.CreateElement("eminus");
         xmlDoc.AppendChild(rootElement);
         rootElement.SetAttribute("authKey", _config.Password);
 
-        XmlElement loadElement = xmlDoc.CreateElement("loadclass");
+        var loadElement = xmlDoc.CreateElement("loadclass");
         loadElement.SetAttribute("mode", "dialog");
         rootElement.AppendChild(loadElement);
 
-        XmlElement elemClassName = xmlDoc.CreateElement("classname");
-        XmlElement elemLineNum = xmlDoc.CreateElement("linenumber");
+        var elemClassName = xmlDoc.CreateElement("classname");
+        var elemLineNum = xmlDoc.CreateElement("linenumber");
         elemClassName.InnerText = className;
         elemLineNum.InnerText = lineNum;
         loadElement.AppendChild(elemClassName);
@@ -180,7 +182,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
             return;
         }
 
-        XmlDocument doc = BuildParam(logline);
+        var doc = BuildParam(logline);
 
         if (doc == null)
         {
@@ -191,7 +193,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
             try
             {
                 TcpClient client = new(_config.Host, _config.Port);
-                NetworkStream stream = client.GetStream();
+                var stream = client.GetStream();
                 StreamWriter writer = new(stream);
                 doc.Save(writer);
                 writer.Flush();

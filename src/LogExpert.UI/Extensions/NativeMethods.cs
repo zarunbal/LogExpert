@@ -153,19 +153,21 @@ internal static partial class NativeMethods
     {
         nint smallIcons = new();
         nint largeIcons = new();
-        int num = (int)ExtractIconEx(fileName, index, out largeIcons, out smallIcons, 1);
+        var num = (int)ExtractIconEx(fileName, index, out largeIcons, out smallIcons, 1);
         if (num > 0 && smallIcons != nint.Zero)
         {
             var icon = (Icon)Icon.FromHandle(smallIcons).Clone();
             DestroyIcon(smallIcons);
             return icon;
         }
+
         if (num > 0 && largeIcons != nint.Zero)
         {
             var icon = (Icon)Icon.FromHandle(largeIcons).Clone();
             DestroyIcon(largeIcons);
             return icon;
         }
+
         return null;
     }
 

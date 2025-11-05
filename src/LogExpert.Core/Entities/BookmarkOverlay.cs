@@ -1,7 +1,8 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 namespace LogExpert.Core.Entities;
 
+[Serializable]
 public class BookmarkOverlay
 {
     #region Properties

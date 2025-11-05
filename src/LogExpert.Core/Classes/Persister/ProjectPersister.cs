@@ -1,65 +1,68 @@
-﻿using System.Collections.Generic;
-using System.Xml;
+using System.Text;
+
+using Newtonsoft.Json;
+
+using NLog;
 
 namespace LogExpert.Core.Classes.Persister;
 
 public static class ProjectPersister
 {
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
     #region Public methods
 
-    public static ProjectData LoadProjectData(string projectFileName)
+    /// <summary>
+    /// Loads the project session data from a specified file.
+    /// </summary>
+    /// <param name="projectFileName"></param>
+    /// <returns></returns>
+    public static ProjectData LoadProjectData (string projectFileName)
     {
-        ProjectData projectData = new();
-        XmlDocument xmlDoc = new();
-        xmlDoc.Load(projectFileName);
-        XmlNodeList fileList = xmlDoc.GetElementsByTagName("member");
-        foreach (XmlNode fileNode in fileList)
+        try
         {
-            var fileElement = fileNode as XmlElement;
-            var fileName = fileElement.GetAttribute("fileName");
-            projectData.MemberList.Add(fileName);
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+            };
+
+            var json = File.ReadAllText(projectFileName, Encoding.UTF8);
+            return JsonConvert.DeserializeObject<ProjectData>(json, settings);
         }
-        XmlNodeList layoutElements = xmlDoc.GetElementsByTagName("layout");
-        if (layoutElements.Count > 0)
+        catch (Exception ex) when (ex is UnauthorizedAccessException or
+                                         IOException or
+                                         JsonSerializationException)
         {
-            projectData.TabLayoutXml = layoutElements[0].InnerXml;
+
+            _logger.Warn($"Error loading persistence data from {projectFileName}, trying old xml version");
+            return ProjectPersisterXML.LoadProjectData(projectFileName);
         }
-        return projectData;
     }
 
-
-    public static void SaveProjectData(string projectFileName, ProjectData projectData)
+    /// <summary>
+    /// Saves the specified project data to a file in JSON format.
+    /// </summary>
+    /// <remarks>The method serializes the <paramref name="projectData"/> into a JSON string with indented
+    /// formatting and writes it to the specified <paramref name="projectFileName"/> using UTF-8 encoding.</remarks>
+    /// <param name="projectFileName">The path to the file where the project data will be saved. Cannot be null or empty.</param>
+    /// <param name="projectData">The project data to be serialized and saved. Cannot be null.</param>
+    public static void SaveProjectData (string projectFileName, ProjectData projectData)
     {
-        XmlDocument xmlDoc = new();
-        XmlElement rootElement = xmlDoc.CreateElement("logexpert");
-        xmlDoc.AppendChild(rootElement);
-        XmlElement projectElement = xmlDoc.CreateElement("project");
-        rootElement.AppendChild(projectElement);
-        XmlElement membersElement = xmlDoc.CreateElement("members");
-        projectElement.AppendChild(membersElement);
-        SaveProjectMembers(xmlDoc, membersElement, projectData.MemberList);
-
-        if (projectData.TabLayoutXml != null)
+        var settings = new JsonSerializerSettings
         {
-            XmlElement layoutElement = xmlDoc.CreateElement("layout");
-            layoutElement.InnerXml = projectData.TabLayoutXml;
-            rootElement.AppendChild(layoutElement);
+            Formatting = Formatting.Indented,
+        };
+
+        try
+        {
+            var json = JsonConvert.SerializeObject(projectData, settings);
+            File.WriteAllText(projectFileName, json, Encoding.UTF8);
         }
-
-        xmlDoc.Save(projectFileName);
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private static void SaveProjectMembers(XmlDocument xmlDoc, XmlNode membersNode, List<string> memberList)
-    {
-        foreach (var fileName in memberList)
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
+                                         IOException)
         {
-            XmlElement memberElement = xmlDoc.CreateElement("member");
-            membersNode.AppendChild(memberElement);
-            memberElement.SetAttribute("fileName", fileName);
+            _logger.Error(ex, $"Error saving persistence data to {projectFileName}");
         }
     }
 

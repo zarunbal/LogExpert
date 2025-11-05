@@ -78,6 +78,7 @@ internal partial class AboutBox : Form
                     return titleAttribute.Title;
                 }
             }
+
             return Path.GetFileNameWithoutExtension(_assembly.Location);
         }
     }

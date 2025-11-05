@@ -75,17 +75,18 @@ internal partial class KnobControl : UserControl
     {
         base.OnPaint(e);
 
-        Color foregroundColor = Enabled ? Color.Black : Color.Gray;
+        var foregroundColor = Enabled ? Color.Black : Color.Gray;
 
         Pen blackPen = new(foregroundColor, 1);
         Pen greyPen = new(Color.Gray, 1);
 
-        Rectangle rect = ClientRectangle;
+        var rect = ClientRectangle;
         var height = Font.Height + 3;
         if (height > rect.Height)
         {
             height = rect.Height + 3;
         }
+
         rect.Inflate(-1, -height / 2);
         rect.Offset(0, -height / 2);
         e.Graphics.DrawEllipse(greyPen, rect);
@@ -116,6 +117,7 @@ internal partial class KnobControl : UserControl
             _startMouseY = e.Y;
             _oldValue = Value;
         }
+
         if (e.Button == MouseButtons.Right)
         {
             Capture = false;
@@ -161,6 +163,7 @@ internal partial class KnobControl : UserControl
         {
             _value = MaxValue;
         }
+
         Invalidate();
     }
 

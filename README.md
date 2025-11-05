@@ -1,8 +1,9 @@
 # LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml)
 
-This is a clone from (no longer exists) https://logexpert.codeplex.com/
+This is a clone from (no longer exists) <https://logexpert.codeplex.com/>
 
-# Overview
+## Overview
+
 LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
 Summary of (most) features:
@@ -23,7 +24,8 @@ Summary of (most) features:
 * Serilog.Formatting.Compact format support (Experimental)
 * Portable (all options / settings saved in application startup directory)
 
-# Download
+## Download
+
 Follow the [Link](https://github.com/LogExperts/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
 
 Or Install via chocolatey
@@ -31,43 +33,52 @@ Or Install via chocolatey
 ```choco install logexpert```
 
 Requirements
-- https://dotnet.microsoft.com/en-us/download/dotnet/8.0
-- .NET 8 (https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer or https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x86-installer) 
+
+* <https://dotnet.microsoft.com/en-us/download/dotnet/8.0>
+* .NET 8 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer> or <https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x86-installer>)
 
 ## CI
+
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
 
 [CI Download](https://ci.appveyor.com/project/Zarunbal/logexpert)
 
-# How to Build
+## How to Build
 
-- Clone / Fork / Download the source code
-- Open the Solution (src/LogExpert.sln) with Visual Studio 2017 (e.g. Community Edition)
-- Restore Nuget Packages on Solution
-- Build
-- The output is under bin/(Debug/Release)/
+* Clone / Fork / Download the source code
+* Open the Solution (src/LogExpert.sln) with Visual Studio 2017 (e.g. Community Edition)
+* Restore Nuget Packages on Solution
+* Build
+* The output is under bin/(Debug/Release)/
 
 Nuke.build Requirements
-- Chocolatey must be installed
-- Optional for Setup Inno Script 5 or 6
 
-# Pull Request
-- Use Development branch as target
+* Chocolatey must be installed
+* Optional for Setup Inno Script 5 or 6
 
-# FAQ / HELP / Informations / Examples
+## Pull Request
+
+* Use Development branch as target
+
+## FAQ / HELP / Informations / Examples
+
 Please checkout the wiki for FAQ / HELP / Informations / Examples
 
-# High DPI
-- dont use AutoScaleMode for single GUI controls like Buttons etc.
-- dont use AutoScaleDimensions for single GUI controls like Buttons etc.
+## High DPI
 
-https://github.com/LogExperts/LogExpert/wiki
+* dont use AutoScaleMode for single GUI controls like Buttons etc.
 
-# Discord Server
-https://discord.gg/SjxkuckRe9
+* dont use AutoScaleDimensions for single GUI controls like Buttons etc.
 
-## Credits
-### Contributors
+<https://github.com/LogExperts/LogExpert/wiki>
+
+## Discord Server
+
+<https://discord.gg/SjxkuckRe9>
+
+### Credits
+
+#### Contributors
 
 This project exists thanks to all the people who contribute.
 <a href="https://github.com/LogExperts/LogExpert/graphs/contributors">

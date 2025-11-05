@@ -1,10 +1,12 @@
-using System.Text;
-
 using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Entities;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Persister;
 
+[Serializable]
 public class PersistenceData
 {
     public SortedList<int, Entities.Bookmark> BookmarkList { get; set; } = [];
@@ -17,7 +19,8 @@ public class PersistenceData
 
     public int CurrentLine { get; set; } = -1;
 
-    public Encoding Encoding { get; set; }
+    [JsonConverter(typeof(EncodingJsonConverter))]
+    public System.Text.Encoding Encoding { get; set; }
 
     public string FileName { get; set; }
 

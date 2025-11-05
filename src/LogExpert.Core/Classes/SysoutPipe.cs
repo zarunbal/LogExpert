@@ -84,6 +84,7 @@ public class SysoutPipe : IDisposable
                 {
                     break;
                 }
+
                 _writer.Write(buff, 0, read);
             }
             catch (IOException e)
