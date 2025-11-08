@@ -586,7 +586,7 @@ internal partial class DateTimeDragControl : UserControl
                     diff = _startMouseY + e.Y;
                     break;
                 }
-            case DragOrientationsEnum.Horizontal:
+            case DragOrientations.Horizontal:
             default:
                 {
                     diff = e.X - _startMouseX;

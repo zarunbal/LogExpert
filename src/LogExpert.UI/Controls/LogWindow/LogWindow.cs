@@ -207,10 +207,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _filterParams = new FilterParams();
         foreach (var item in configManager.Settings.FilterHistoryList)
         {
-            _ = comboBoxFilter.Items.Add(item);
+            _ = filterComboBox.Items.Add(item);
         }
 
-        comboBoxFilter.DropDownHeight = comboBoxFilter.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
+        filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
@@ -230,8 +230,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //this.filterUpdateThread.Start();
 
         _advancedButtonImage = btnAdvanced.Image;
-        _searchButtonImage = btnFilterSearch.Image;
-        btnFilterSearch.Image = null;
+        _searchButtonImage = filterSearchButton.Image;
+        filterSearchButton.Image = null;
 
         dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
         markEditModeToolStripMenuItem.Enabled = true;
@@ -501,7 +501,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         btnDeleteFilter.Text = Resources.LogWindow_UI_Button_Delete;
         helpToolTip.SetToolTip(listBoxFilter, Resources.LogWindow_UI_ListBox_ToolTip_Filter);
         colorToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_Color;
-        helpToolTip.SetToolTip(comboBoxFilter, Resources.LogWindow_UI_ComboBox_ToolTip_Filter);
+        helpToolTip.SetToolTip(filterComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_Filter);
         lblTextFilter.Text = Resources.LogWindow_UI_Label_TextFilter;
         btnAdvanced.Text = Resources.LogWindow_UI_Button_ShowAdvanced;
         helpToolTip.SetToolTip(btnAdvanced, Resources.LogWindow_UI_Button_ToolTip_ShowAdvanced);
@@ -514,8 +514,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         helpToolTip.SetToolTip(filterRegexCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterRegex);
         filterCaseSensitiveCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterCaseSensitive;
         helpToolTip.SetToolTip(filterCaseSensitiveCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive);
-        btnFilterSearch.Text = Resources.LogWindow_UI_Button_Search;
-        helpToolTip.SetToolTip(btnFilterSearch, Resources.LogWindow_UI_Button_ToolTip_Search);
+        filterSearchButton.Text = Resources.LogWindow_UI_Button_Search;
+        helpToolTip.SetToolTip(filterSearchButton, Resources.LogWindow_UI_Button_ToolTip_Search);
         freezeLeftColumnsUntilHereToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere;
         moveToLastColumnToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MoveToLastColumn;
         moveToLastColumnToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn;
@@ -671,7 +671,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AutoResizeFilterBox ()
     {
-        filterSplitContainer.SplitterDistance = comboBoxFilter.Left + comboBoxFilter.GetMaxTextWidth();
+        filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
     }
 
     #region Events handler
@@ -841,7 +841,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        _ = SavePersistenceData(false);
+        SavePersistenceData(false);
         CloseLogWindow();
     }
 
@@ -1583,7 +1583,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 
             //CheckForFilterDirty(); //!!!GBro: Indicate to redo the search if search columns were changed
-            btnFilterSearch.Image = _searchButtonImage;
+            filterSearchButton.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
         }
     }
@@ -1940,7 +1940,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 TesttextHistoryList = ConfigManager.Settings.RegexHistory.TesttextHistoryList,
                 Owner = this,
                 CaseSensitive = filterCaseSensitiveCheckBox.Checked,
-                Pattern = comboBoxFilter.Text
+                Pattern = filterComboBox.Text
             };
 
             if (dlg.ShowDialog() == DialogResult.OK)
@@ -1949,7 +1949,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 ConfigManager.Settings.RegexHistory.TesttextHistoryList = dlg.TesttextHistoryList;
 
                 filterCaseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-                comboBoxFilter.Text = dlg.Pattern;
+                filterComboBox.Text = dlg.Pattern;
 
                 ConfigManager.Save(SettingsFlags.RegexHistory);
             }
@@ -2038,7 +2038,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             ApplyFilterParams();
             CheckForAdvancedButtonDirty();
             CheckForFilterDirty();
-            btnFilterSearch.Image = _searchButtonImage;
+            filterSearchButton.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
             if (hideFilterListOnLoadCheckBox.Checked)
             {
@@ -2736,7 +2736,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             //_logger.Info($"ReloadNewFile(): counter = {_reloadOverloadCounter}");
             if (_reloadOverloadCounter <= 1)
             {
-                _ = SavePersistenceData(false);
+                SavePersistenceData(false);
                 _ = _loadingFinishedEvent.Reset();
                 _ = _externaLoadingFinishedEvent.Reset();
                 Thread reloadFinishedThread = new(ReloadFinishedThreadFx)
@@ -2747,7 +2747,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 LoadFile(FileName, EncodingOptions);
 
                 ClearBookmarkList();
-                _ = SavePersistenceData(false);
+                SavePersistenceData(false);
 
                 //if (this.filterTailCheckBox.Checked)
                 //{
@@ -3528,19 +3528,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Returns the first HilightEntry that matches the given line
+    /// Returns the first HighlightEntry that matches the given line
     /// </summary>
-    private HighlightEntry FindHilightEntry (ITextValue line)
+    private HighlightEntry FindHighlightEntry (ITextValue line)
     {
         return FindHighlightEntry(line, false);
     }
 
-    private HighlightEntry FindFirstNoWordMatchHilightEntry (ITextValue line)
+    private HighlightEntry FindFirstNoWordMatchHighlightEntry (ITextValue line)
     {
         return FindHighlightEntry(line, true);
     }
 
-    private bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
+    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
     {
         if (entry.IsRegex)
         {
@@ -4029,7 +4029,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var line = _logFileReader.GetLogLine(lineNum);
             if (line != null)
             {
-                var entry = FindHilightEntry(line);
+                var entry = FindHighlightEntry(line);
                 if (entry != null)
                 {
                     SelectLine(lineNum, false, true);
@@ -4049,7 +4049,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var line = _logFileReader.GetLogLine(lineNum);
             if (line != null)
             {
-                var entry = FindHilightEntry(line);
+                var entry = FindHighlightEntry(line);
                 if (entry != null)
                 {
                     SelectLine(lineNum, false, true);
@@ -4160,7 +4160,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ApplyFilterParams ()
     {
-        comboBoxFilter.Text = _filterParams.SearchText;
+        filterComboBox.Text = _filterParams.SearchText;
         filterCaseSensitiveCheckBox.Checked = _filterParams.IsCaseSensitive;
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
         filterTailCheckBox.Checked = _filterParams.IsFilterTail;
@@ -4176,7 +4176,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ResetFilterControls ()
     {
-        comboBoxFilter.Text = "";
+        filterComboBox.Text = "";
         filterCaseSensitiveCheckBox.Checked = false;
         filterRegexCheckBox.Checked = false;
         //this.filterTailCheckBox.Checked = this.Preferences.filterTail;
@@ -4192,18 +4192,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void FilterSearch ()
     {
-        if (comboBoxFilter.Text.Length == 0)
+        if (filterComboBox.Text.Length == 0)
         {
             _filterParams.SearchText = string.Empty;
             _filterParams.IsRangeSearch = false;
             ClearFilterList();
-            btnFilterSearch.Image = null;
+            filterSearchButton.Image = null;
             ResetFilterControls();
             bntSaveFilter.Enabled = false;
             return;
         }
 
-        FilterSearch(comboBoxFilter.Text);
+        FilterSearch(filterComboBox.Text);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4218,16 +4218,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (ConfigManager.Settings.FilterHistoryList.Count > maxHistory)
         {
-            ConfigManager.Settings.FilterHistoryList.RemoveAt(comboBoxFilter.Items.Count - 1);
+            ConfigManager.Settings.FilterHistoryList.RemoveAt(filterComboBox.Items.Count - 1);
         }
 
-        comboBoxFilter.Items.Clear();
+        filterComboBox.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
-            _ = comboBoxFilter.Items.Add(item);
+            _ = filterComboBox.Items.Add(item);
         }
 
-        comboBoxFilter.Text = text;
+        filterComboBox.Text = text;
 
         _filterParams.IsRangeSearch = rangeCheckBox.Checked;
         _filterParams.RangeSearchText = filterRangeComboBox.Text;
@@ -4277,7 +4277,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _shouldCancel = false;
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_FilterSearch_Filtering);
-        btnFilterSearch.Enabled = false;
+        filterSearchButton.Enabled = false;
         ClearFilterList();
 
         _progressEventArgs.MinValue = 0;
@@ -4600,7 +4600,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = filterGridView.Focus();
             }
 
-            btnFilterSearch.Enabled = true;
+            filterSearchButton.Enabled = true;
         }
         catch (NullReferenceException e)
         {
@@ -4695,12 +4695,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (IsFilterSearchDirty(_filterParams))
         {
-            btnFilterSearch.Image = _searchButtonImage;
+            filterSearchButton.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
         }
         else
         {
-            btnFilterSearch.Image = null;
+            filterSearchButton.Image = null;
             bntSaveFilter.Enabled = true;
         }
     }
@@ -4834,7 +4834,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void UpdateFilterHistoryFromSettings ()
     {
         ConfigManager.Settings.FilterHistoryList = ConfigManager.Settings.FilterHistoryList;
-        comboBoxFilter.Items.Clear();
+        filterComboBox.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
             _ = filterComboBox.Items.Add(item);
@@ -4911,7 +4911,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void FilterToTab ()
     {
         filterSearchButton.Enabled = false;
-        _ = Task.Run(() => WriteFilterToTab());
+        _ = Task.Run(WriteFilterToTab);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4952,6 +4952,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var count = 0;
         pipe.OpenFile();
         LogExpertCallback callback = new(this);
+
         foreach (var i in lineNumberList)
         {
             if (_shouldCancel)
@@ -5006,7 +5007,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _guiStateArgs.MenuEnabled = true;
         SendGuiStateUpdate();
         StatusLineText("");
-        btnFilterSearch.Enabled = true;
+        filterSearchButton.Enabled = true;
     }
 
     /// <summary>
@@ -6413,7 +6414,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (line != null)
         {
-            var entry = FindFirstNoWordMatchHilightEntry(line);
+            var entry = FindFirstNoWordMatchHighlightEntry(line);
             e.Graphics.SetClip(e.CellBounds);
 
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
@@ -7148,7 +7149,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         splitContainerLogWindow.Panel2Collapsed = !splitContainerLogWindow.Panel2Collapsed;
         _ = !splitContainerLogWindow.Panel2Collapsed
-            ? comboBoxFilter.Focus()
+            ? filterComboBox.Focus()
             : dataGridView.Focus();
     }
 
@@ -7258,7 +7259,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void Reload ()
     {
-        _ = SavePersistenceData(false);
+        SavePersistenceData(false);
 
         _reloadMemento = new ReloadMemento
         {
@@ -7276,6 +7277,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             LoadFilesAsMulti(_fileNames, EncodingOptions);
         }
+
         //if (currentLine < this.dataGridView.RowCount && currentLine >= 0)
         //  this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLine].Cells[0];
         //if (firstDisplayedLine < this.dataGridView.RowCount && firstDisplayedLine >= 0)

@@ -98,7 +98,7 @@ namespace LogExpert.UI.Controls.LogWindow
             colorToolStripMenuItem = new ToolStripMenuItem();
             pnlFilterInput = new Panel();
             filterSplitContainer = new SplitContainer();
-            comboBoxFilter = new ComboBox();
+            filterComboBox = new ComboBox();
             lblTextFilter = new Label();
             btnAdvanced = new Button();
             syncFilterCheckBox = new CheckBox();
@@ -106,7 +106,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterTailCheckBox = new CheckBox();
             filterRegexCheckBox = new CheckBox();
             filterCaseSensitiveCheckBox = new CheckBox();
-            btnFilterSearch = new Button();
+            filterSearchButton = new Button();
             bookmarkContextMenuStrip = new ContextMenuStrip(components);
             deleteBookmarksToolStripMenuItem = new ToolStripMenuItem();
             columnContextMenuStrip = new ContextMenuStrip(components);
@@ -886,7 +886,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSplitContainer.Panel1
             // 
-            filterSplitContainer.Panel1.Controls.Add(comboBoxFilter);
+            filterSplitContainer.Panel1.Controls.Add(filterComboBox);
             filterSplitContainer.Panel1.Controls.Add(lblTextFilter);
             filterSplitContainer.Panel1MinSize = 200;
             // 
@@ -898,7 +898,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterSplitContainer.Panel2.Controls.Add(filterTailCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterRegexCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
-            filterSplitContainer.Panel2.Controls.Add(btnFilterSearch);
+            filterSplitContainer.Panel2.Controls.Add(filterSearchButton);
             filterSplitContainer.Panel2MinSize = 550;
             filterSplitContainer.Size = new Size(1855, 46);
             filterSplitContainer.SplitterDistance = 518;
@@ -910,16 +910,16 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterComboBox
             // 
-            comboBoxFilter.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            comboBoxFilter.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            comboBoxFilter.FormattingEnabled = true;
-            comboBoxFilter.Location = new Point(89, 5);
-            comboBoxFilter.Name = "filterComboBox";
-            comboBoxFilter.Size = new Size(426, 26);
-            comboBoxFilter.TabIndex = 4;
-            helpToolTip.SetToolTip(comboBoxFilter, "Search string for the filter");
-            comboBoxFilter.TextChanged += OnFilterComboBoxTextChanged;
-            comboBoxFilter.KeyDown += OnFilterComboBoxKeyDown;
+            filterComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            filterComboBox.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            filterComboBox.FormattingEnabled = true;
+            filterComboBox.Location = new Point(89, 5);
+            filterComboBox.Name = "filterComboBox";
+            filterComboBox.Size = new Size(426, 26);
+            filterComboBox.TabIndex = 4;
+            helpToolTip.SetToolTip(filterComboBox, "Search string for the filter");
+            filterComboBox.TextChanged += OnFilterComboBoxTextChanged;
+            filterComboBox.KeyDown += OnFilterComboBoxKeyDown;
             // 
             // lblTextFilter
             // 
@@ -1005,16 +1005,16 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSearchButton
             // 
-            btnFilterSearch.Image = (Image)resources.GetObject("filterSearchButton.Image");
-            btnFilterSearch.ImageAlign = ContentAlignment.MiddleRight;
-            btnFilterSearch.Location = new Point(3, 5);
-            btnFilterSearch.Name = "filterSearchButton";
-            btnFilterSearch.Size = new Size(128, 35);
-            btnFilterSearch.TabIndex = 11;
-            btnFilterSearch.Text = "Search";
-            helpToolTip.SetToolTip(btnFilterSearch, "Start the filter search");
-            btnFilterSearch.UseVisualStyleBackColor = true;
-            btnFilterSearch.Click += OnFilterSearchButtonClick;
+            filterSearchButton.Image = (Image)resources.GetObject("filterSearchButton.Image");
+            filterSearchButton.ImageAlign = ContentAlignment.MiddleRight;
+            filterSearchButton.Location = new Point(3, 5);
+            filterSearchButton.Name = "filterSearchButton";
+            filterSearchButton.Size = new Size(128, 35);
+            filterSearchButton.TabIndex = 11;
+            filterSearchButton.Text = "Search";
+            helpToolTip.SetToolTip(filterSearchButton, "Start the filter search");
+            filterSearchButton.UseVisualStyleBackColor = true;
+            filterSearchButton.Click += OnFilterSearchButtonClick;
             // 
             // bookmarkContextMenuStrip
             // 
@@ -1283,14 +1283,14 @@ namespace LogExpert.UI.Controls.LogWindow
 		private System.Windows.Forms.Label lblColumnName;
         private System.Windows.Forms.SplitContainer filterSplitContainer;
         private System.Windows.Forms.Label lblTextFilter;
-        private System.Windows.Forms.ComboBox comboBoxFilter;
+        private System.Windows.Forms.ComboBox filterComboBox;
         private System.Windows.Forms.Button btnAdvanced;
         private System.Windows.Forms.CheckBox syncFilterCheckBox;
         private System.Windows.Forms.Label lblFilterCount;
         private System.Windows.Forms.CheckBox filterTailCheckBox;
         private System.Windows.Forms.CheckBox filterRegexCheckBox;
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
-        private System.Windows.Forms.Button btnFilterSearch;
+        private System.Windows.Forms.Button filterSearchButton;
         private System.Windows.Forms.Panel panelBackgroundAdvancedFilterSplitContainer;
         private ToolStripSeparator pluginSeparator;
         private ToolStripSeparator menuToolStripSeparator1;

@@ -710,10 +710,10 @@ internal partial class SettingsDialog : Form
         Preferences.FollowTail = checkBoxFollowTail.Checked;
 
         Preferences.TimestampControlDragOrientation = radioButtonVerticalMouseDrag.Checked
-            ? DragOrientationsEnum.Vertical
+            ? DragOrientations.Vertical
             : radioButtonVerticalMouseDragInverted.Checked
-                ? DragOrientationsEnum.InvertedVertical
-                : DragOrientationsEnum.Horizontal;
+                ? DragOrientations.InvertedVertical
+                : DragOrientations.Horizontal;
 
         SaveColumnizerList();
 
