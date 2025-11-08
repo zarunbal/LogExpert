@@ -8,6 +8,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
+
 using LogExpert.Classes;
 using LogExpert.Classes.CommandLine;
 using LogExpert.Config;
@@ -65,7 +66,25 @@ internal static class Program
                 //TODO: The config file import and the try catch for the primary instance and secondary instance should be separated functions
                 if (cfgFileInfo.Exists)
                 {
-                    ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+                    ImportResult importResult = ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+
+                    // Handle import result
+                    if (!importResult.Success)
+                    {
+                        string message = importResult.RequiresUserConfirmation
+                            ? importResult.ConfirmationMessage
+                            : importResult.ErrorMessage;
+                        string title = importResult.RequiresUserConfirmation
+                            ? importResult.ConfirmationTitle
+                            : importResult.ErrorTitle;
+
+                        if (MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                        {
+                            _logger.Warn(CultureInfo.InvariantCulture, "### Program: Import of config file cancelled by user.");
+                            Application.Exit();
+                            return;
+                        }
+                    }
                 }
                 else
                 {

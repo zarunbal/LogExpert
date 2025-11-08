@@ -935,9 +935,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// <returns></returns>
     private string FindFilenameForSettings (string fileName)
     {
-        if (fileName.EndsWith(".lxp", StringComparison.OrdinalIgnoreCase))
+        if (fileName.EndsWith(".lxp"))
         {
-            var persistenceData = Persister.LoadOptionsOnly(fileName);
+            var persistenceData = Persister.Load(fileName);
             if (persistenceData == null)
             {
                 return fileName;
@@ -1877,7 +1877,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (projectData != null)
         {
-            foreach (var fileName in projectData.MemberList)
+            foreach (var fileName in projectData.FileNames)
             {
                 _ = hasLayoutData
                     ? AddFileTabDeferred(fileName, false, null, true, null)
@@ -2466,6 +2466,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 {
                     data.Dirty = true;
                 }
+
                 var icon = GetIcon(diff, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
@@ -2821,9 +2822,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             ProjectData projectData = new()
             {
-                MemberList = fileNames,
+                FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
+
             ProjectPersister.SaveProjectData(fileName, projectData);
         }
     }

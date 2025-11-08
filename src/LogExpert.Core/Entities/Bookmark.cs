@@ -1,19 +1,25 @@
-﻿using System.Drawing;
+using System.Drawing;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Entities;
 
+[Serializable]
 public class Bookmark
 {
     #region cTor
 
-    public Bookmark(int lineNum)
+    [JsonConstructor]
+    public Bookmark () { }
+
+    public Bookmark (int lineNum)
     {
         LineNum = lineNum;
         Text = string.Empty;
         Overlay = new BookmarkOverlay();
     }
 
-    public Bookmark(int lineNum, string comment)
+    public Bookmark (int lineNum, string comment)
     {
         LineNum = lineNum;
         Text = comment;

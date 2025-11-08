@@ -26,7 +26,7 @@ public class Preferences
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 
-    public DragOrientationsEnum TimestampControlDragOrientation { get; set; } = DragOrientationsEnum.Horizontal;
+    public DragOrientations TimestampControlDragOrientation { get; set; } = DragOrientations.Horizontal;
 
     public bool TimestampControl { get; set; }
 

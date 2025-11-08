@@ -69,7 +69,7 @@ internal partial class RegexHelperDialog : Form
         try
         {
             Regex rex = new(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            MatchCollection matches = rex.Matches(comboBoxTestText.Text);
+            var matches = rex.Matches(comboBoxTestText.Text);
 
             foreach (Match match in matches)
             {

@@ -1,4 +1,4 @@
-﻿using LogExpert;
+using LogExpert;
 using Moq;
 using NUnit.Framework;
 using System.Runtime.Versioning;
@@ -14,10 +14,10 @@ public class RegexColumnizerTests
     [TestCase("Error in com.example.core", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 2)]
     public void SplitLine_ColumnCountMatches(string lineToParse, string regex, int expectedNumberOfColumns)
     {
-        Regex1Columnizer columnizer = CreateInitializedColumnizer(regex);
+        var columnizer = CreateInitializedColumnizer(regex);
 
         TestLogLine testLogLine = new(4, lineToParse);
-        IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
 
         Assert.That(expectedNumberOfColumns, Is.EqualTo(parsedLogLine.ColumnValues.Length));
     }
@@ -30,10 +30,10 @@ public class RegexColumnizerTests
     public void SplitLine_ColumnValues(string lineToParse, string regex, int columnIndexToTest,
         string expectedColumnValue)
     {
-        Regex1Columnizer columnizer = CreateInitializedColumnizer(regex);
+        var columnizer = CreateInitializedColumnizer(regex);
 
         TestLogLine testLogLine = new(3, lineToParse);
-        IColumnizedLogLine parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
 
         Assert.That(expectedColumnValue, Is.EqualTo(parsedLogLine.ColumnValues[columnIndexToTest].Text));
     }

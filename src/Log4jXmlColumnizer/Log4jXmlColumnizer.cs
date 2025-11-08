@@ -82,7 +82,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         ColumnizedLogLine clogLine = new();
         clogLine.LogLine = line;
 
-        Column[] columns = Column.CreateColumns(COLUMN_COUNT, clogLine);
+        var columns = Column.CreateColumns(COLUMN_COUNT, clogLine);
 
         // If the line is too short (i.e. does not follow the format for this columnizer) return the whole line content
         // in colum 8 (the log message column). Date and time column will be left blank.
@@ -94,7 +94,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         {
             try
             {
-                DateTime dateTime = GetTimestamp(callback, line);
+                var dateTime = GetTimestamp(callback, line);
 
                 if (dateTime == DateTime.MinValue)
                 {
@@ -109,7 +109,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 columns[0].FullValue = "n/a";
             }
 
-            Column timestmp = columns[0];
+            var timestmp = columns[0];
 
             string[] cols;
             cols = line.FullLine.Split(trimChars, COLUMN_COUNT, StringSplitOptions.None);
@@ -137,7 +137,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
             }
         }
 
-        Column[] filteredColumns = MapColumns(columns);
+        var filteredColumns = MapColumns(columns);
 
         clogLine.ColumnValues = filteredColumns.Select(a => a as IColumn).ToArray();
 
@@ -174,6 +174,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         {
             return DateTime.MinValue;
         }
+
         var value = line.FullLine.Substring(0, endIndex);
 
         try
@@ -189,6 +190,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 {
                     dateTime = dateTime.ToLocalTime();
                 }
+
                 return dateTime.AddMilliseconds(_timeOffset);
             }
             else
@@ -264,11 +266,12 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
-        Priority result = Priority.NotSupport;
+        var result = Priority.NotSupport;
         if (fileName.EndsWith("xml", StringComparison.OrdinalIgnoreCase))
         {
             result = Priority.CanSupport;
         }
+
         return result;
     }
 
@@ -287,11 +290,11 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
     {
         List<Column> output = [];
         var index = 0;
-        foreach (Log4jColumnEntry entry in _config.ColumnList)
+        foreach (var entry in _config.ColumnList)
         {
             if (entry.Visible)
             {
-                Column column = cols[index];
+                var column = cols[index];
                 output.Add(column);
 
                 if (entry.MaxLen > 0 && column.FullValue.Length > entry.MaxLen)
@@ -299,6 +302,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                     column.FullValue = column.FullValue[^entry.MaxLen..];
                 }
             }
+
             index++;
         }
 

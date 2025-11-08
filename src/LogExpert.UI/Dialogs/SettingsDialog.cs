@@ -16,7 +16,7 @@ using LogExpert.UI.Extensions;
 
 namespace LogExpert.Dialogs;
 
-//TODO: This class should not knoow ConfigManager?
+//TODO: This class should not know ConfigManager?
 [SupportedOSPlatform("windows")]
 internal partial class SettingsDialog : Form
 {
@@ -131,9 +131,9 @@ internal partial class SettingsDialog : Form
         checkBoxFilterTail.Checked = Preferences.FilterTail;
         checkBoxFollowTail.Checked = Preferences.FollowTail;
 
-        radioButtonHorizMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.Horizontal;
-        radioButtonVerticalMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.Vertical;
-        radioButtonVerticalMouseDragInverted.Checked = Preferences.TimestampControlDragOrientation == DragOrientationsEnum.InvertedVertical;
+        radioButtonHorizMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.Horizontal;
+        radioButtonVerticalMouseDrag.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.Vertical;
+        radioButtonVerticalMouseDragInverted.Checked = Preferences.TimestampControlDragOrientation == DragOrientations.InvertedVertical;
 
         checkBoxSingleInstance.Checked = Preferences.AllowOnlyOneInstance;
         checkBoxOpenLastFiles.Checked = Preferences.OpenLastFiles;
@@ -176,6 +176,7 @@ internal partial class SettingsDialog : Form
                     radioButtonSessionSameDir.Checked = true;
                     break;
                 }
+
             case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
@@ -777,7 +778,7 @@ internal partial class SettingsDialog : Form
         var comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
         if (comboCell.Items.Count > 0)
         {
-            //        comboCell.Value = comboCell.Items[0];
+            //comboCell.Value = comboCell.Items[0];
         }
     }
 
@@ -836,14 +837,14 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        var o = listBoxPlugin.SelectedItem;
+        var selectedPlugin = listBoxPlugin.SelectedItem;
 
-        if (o != null)
+        if (selectedPlugin != null)
         {
-            _selectedPlugin = o as ILogExpertPluginConfigurator;
-
-            if (o is ILogExpertPluginConfigurator)
+            if (selectedPlugin is ILogExpertPluginConfigurator pluginConfigurator)
             {
+                _selectedPlugin = pluginConfigurator;
+
                 if (_selectedPlugin.HasEmbeddedForm())
                 {
                     buttonConfigPlugin.Enabled = false;
@@ -987,7 +988,9 @@ internal partial class SettingsDialog : Form
             var isChecked = listBoxTools.GetItemChecked(i);
             var item = listBoxTools.Items[i];
             listBoxTools.Items.RemoveAt(i);
+
             i--;
+
             listBoxTools.Items.Insert(i, item);
             listBoxTools.SelectedIndex = i;
             listBoxTools.SetItemChecked(i, isChecked);
@@ -1003,7 +1006,9 @@ internal partial class SettingsDialog : Form
             var isChecked = listBoxTools.GetItemChecked(i);
             var item = listBoxTools.Items[i];
             listBoxTools.Items.RemoveAt(i);
+
             i++;
+
             listBoxTools.Items.Insert(i, item);
             listBoxTools.SelectedIndex = i;
             listBoxTools.SetItemChecked(i, isChecked);
@@ -1100,7 +1105,7 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    ///
+    /// Import settings from file
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -1131,7 +1136,43 @@ internal partial class SettingsDialog : Form
                 return;
             }
 
-            ConfigManager.Import(fileInfo, dlg.ImportFlags);
+            ImportResult importResult = ConfigManager.Import(fileInfo, dlg.ImportFlags);
+
+            if (!importResult.Success)
+            {
+                if (importResult.RequiresUserConfirmation)
+                {
+                    var confirmResult = MessageBox.Show(
+                        this,
+                        importResult.ConfirmationMessage,
+                        importResult.ConfirmationTitle,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2);
+
+                    if (confirmResult == DialogResult.Yes)
+                    {
+                        // User confirmed, retry import without validation
+                        _ = ConfigManager.Import(fileInfo, dlg.ImportFlags);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    _ = MessageBox.Show(
+                        this,
+                        importResult.ErrorMessage,
+                        importResult.ErrorTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+
+                    return;
+                }
+            }
+
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
             _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.LogExpert_Common_UI_Title_LogExpert);

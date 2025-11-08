@@ -20,7 +20,7 @@ internal class FlashIconPlugin : IKeywordAction
 
     public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
     {
-        FormCollection openForms = Application.OpenForms;
+        var openForms = Application.OpenForms;
         foreach (Form form in openForms)
         {
             if (form.TopLevel && form.Name.Equals("LogTabWindow", StringComparison.OrdinalIgnoreCase) && form.Text.Contains(callback.GetFileName(), StringComparison.Ordinal))

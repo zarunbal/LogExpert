@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -59,7 +59,7 @@ public partial class RegexColumnizerConfigDialog : Form
 
             if (!string.IsNullOrEmpty(tbTestLine.Text))
             {
-                Match match = regex.Match(tbTestLine.Text);
+                var match = regex.Match(tbTestLine.Text);
                 var row = table.NewRow();
                 var values = match.Groups.OfType<Group>().Skip(offset).Select(group => group.Value).Cast<object>().ToArray();
                 row.ItemArray = values;

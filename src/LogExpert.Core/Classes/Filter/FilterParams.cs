@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+
+using LogExpert.Core.Classes.JsonConverters;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Filter;
 
@@ -52,23 +55,26 @@ public class FilterParams : ICloneable
     // list of columns in which to search
     public Collection<int> ColumnList { get; } = [];
 
-    [JsonIgnore]
-    [field: NonSerialized]
+    [JsonConverter(typeof(ColumnizerJsonConverter))]
     public ILogLineColumnizer CurrentColumnizer { get; set; }
 
     /// <summary>
     /// false=looking for start
     /// true=looking for end
     /// </summary>
+    [JsonIgnore]
     [field: NonSerialized]
     public bool IsInRange { get; set; }
 
+    [JsonIgnore]
     [field: NonSerialized]
     public string LastLine { get; set; } = string.Empty;
 
+    [JsonIgnore]
     [field: NonSerialized]
     public Hashtable LastNonEmptyCols { get; set; } = [];
 
+    [JsonIgnore]
     [field: NonSerialized]
     public bool LastResult { get; set; }
 
@@ -80,11 +86,13 @@ public class FilterParams : ICloneable
     [JsonIgnore]
     internal string NormalizedSearchText => SearchText.ToUpperInvariant();
 
+    [JsonIgnore]
     [field: NonSerialized]
     public Regex RangeRex { get; set; }
 
+    [JsonIgnore]
     [field: NonSerialized]
-    public Regex Rex { get; set; }
+    public Regex Regex { get; set; }
 
     #endregion
 
@@ -96,7 +104,7 @@ public class FilterParams : ICloneable
     /// <returns></returns>
     public FilterParams CloneWithCurrentColumnizer ()
     {
-        FilterParams newParams = Clone();
+        var newParams = Clone();
         newParams.Init();
         // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
         // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
@@ -122,8 +130,9 @@ public class FilterParams : ICloneable
     {
         if (SearchText != null)
         {
-            Rex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            Regex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         }
+
         if (RangeSearchText != null && IsRangeSearch)
         {
             RangeRex = new Regex(RangeSearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);

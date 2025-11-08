@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Entities;
+using LogExpert.Core.Entities;
 
 namespace LogExpert.Core.Classes.Log;
 
@@ -72,6 +72,7 @@ public class PositionAwareStreamReaderLegacy : PositionAwareStreamReaderBase
         {
             return null; // EOF
         }
+
         _crDetect = false;
         return result;
     }

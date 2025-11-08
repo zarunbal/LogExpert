@@ -473,7 +473,7 @@ internal partial class HighlightDialog : Form
                     SearchText = textBoxSearchString.Text,
                     ForegroundColor = colorBoxForeground.SelectedColor,
                     BackgroundColor = colorBoxBackground.SelectedColor,
-                    IsRegEx = checkBoxRegex.Checked,
+                    IsRegex = checkBoxRegex.Checked,
                     IsCaseSensitive = checkBoxCaseSensitive.Checked,
                     IsLedSwitch = checkBoxDontDirtyLed.Checked,
                     IsStopTail = checkBoxStopTail.Checked,
@@ -655,7 +655,7 @@ internal partial class HighlightDialog : Form
             entry.ForegroundColor = (Color)colorBoxForeground.SelectedItem;
             entry.BackgroundColor = (Color)colorBoxBackground.SelectedItem;
             entry.SearchText = textBoxSearchString.Text;
-            entry.IsRegEx = checkBoxRegex.Checked;
+            entry.IsRegex = checkBoxRegex.Checked;
             entry.IsCaseSensitive = checkBoxCaseSensitive.Checked;
             btnApply.Enabled = false;
             btnApply.Image = null;
@@ -730,7 +730,7 @@ internal partial class HighlightDialog : Form
                 colorBoxBackground.SelectedItem = entry.BackgroundColor;
             }
 
-            checkBoxRegex.Checked = entry.IsRegEx;
+            checkBoxRegex.Checked = entry.IsRegex;
             checkBoxCaseSensitive.Checked = entry.IsCaseSensitive;
             checkBoxDontDirtyLed.Checked = entry.IsLedSwitch;
             checkBoxBookmark.Checked = entry.IsSetBookmark;

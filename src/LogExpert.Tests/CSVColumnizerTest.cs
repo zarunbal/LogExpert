@@ -17,12 +17,13 @@ public class CSVColumnizerTest
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
-        ILogLine line = reader.GetLogLine(0);
+        var line = reader.GetLogLine(0);
         IColumnizedLogLine logline = new ColumnizedLogLine();
         if (line != null)
         {
             logline = csvColumnizer.SplitLine(null, line);
         }
+
         var expectedResult = string.Join(",", expectedHeaders);
         Assert.That(logline.LogLine.FullLine, Is.EqualTo(expectedResult));
     }

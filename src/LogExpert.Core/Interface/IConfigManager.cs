@@ -20,7 +20,7 @@ public interface IConfigManager
 
     void Export (FileInfo fileInfo);
 
-    void Import (FileInfo fileInfo, ExportImportFlags importFlags);
+    ImportResult Import (FileInfo fileInfo, ExportImportFlags importFlags);
 
     void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags);
 

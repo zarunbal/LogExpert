@@ -841,7 +841,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        SavePersistenceData(false);
+        _ = SavePersistenceData(false);
         CloseLogWindow();
     }
 
@@ -1800,7 +1800,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsSetBookmark = false,
@@ -1830,7 +1830,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 SearchText = ctl.SelectedText,
                 ForegroundColor = Color.Red,
                 BackgroundColor = Color.Yellow,
-                IsRegEx = false,
+                IsRegex = false,
                 IsCaseSensitive = true,
                 IsLedSwitch = false,
                 IsStopTail = false,
@@ -2736,7 +2736,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             //_logger.Info($"ReloadNewFile(): counter = {_reloadOverloadCounter}");
             if (_reloadOverloadCounter <= 1)
             {
-                SavePersistenceData(false);
+                _ = SavePersistenceData(false);
                 _ = _loadingFinishedEvent.Reset();
                 _ = _externaLoadingFinishedEvent.Reset();
                 Thread reloadFinishedThread = new(ReloadFinishedThreadFx)
@@ -2747,7 +2747,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 LoadFile(FileName, EncodingOptions);
 
                 ClearBookmarkList();
-                SavePersistenceData(false);
+                _ = SavePersistenceData(false);
 
                 //if (this.filterTailCheckBox.Checked)
                 //{
@@ -3189,7 +3189,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         // Check if the filtered columns disappeared, if so must refresh the UI
         if (_filterParams.ColumnRestrict)
         {
-            var newColumns = columnizer != null ? columnizer.GetColumnNames() : Array.Empty<string>();
+            var newColumns = columnizer != null ? columnizer.GetColumnNames() : [];
             var colChanged = false;
 
             if (dataGridView.ColumnCount - 2 == newColumns.Length) // two first columns are 'marker' and 'line number'
@@ -3540,9 +3540,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return FindHighlightEntry(line, true);
     }
 
-    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
+    private bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
     {
-        if (entry.IsRegEx)
+        if (entry.IsRegex)
         {
             //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             if (entry.Regex.IsMatch(column.Text))
@@ -4708,7 +4708,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private bool IsFilterSearchDirty (FilterParams filterParams)
     {
-        if (!filterParams.SearchText.Equals(comboBoxFilter.Text, StringComparison.Ordinal))
+        if (filterParams == null || filterParams.SearchText == null)
+        {
+            return true;
+        }
+
+        if (!filterParams.SearchText.Equals(filterComboBox.Text, StringComparison.Ordinal))
         {
             return true;
         }
@@ -4832,7 +4837,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         comboBoxFilter.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
-            _ = comboBoxFilter.Items.Add(item);
+            _ = filterComboBox.Items.Add(item);
         }
 
         filterRangeComboBox.Items.Clear();
@@ -4905,8 +4910,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void FilterToTab ()
     {
-        btnFilterSearch.Enabled = false;
-        _ = Task.Run(WriteFilterToTab);
+        filterSearchButton.Enabled = false;
+        _ = Task.Run(() => WriteFilterToTab());
     }
 
     [SupportedOSPlatform("windows")]
@@ -5396,6 +5401,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         blockList.Add(block);
                         AddBlockTargetLinesToDict(processedLinesDict, block);
                     }
+
                     block.BlockId = blockId;
                     //if (firstBlock)
                     //{
@@ -5950,7 +5956,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SearchText = para.SearchText,
             ForegroundColor = Color.Red,
             BackgroundColor = Color.Yellow,
-            IsRegEx = para.IsRegex,
+            IsRegex = para.IsRegex,
             IsCaseSensitive = para.IsCaseSensitive,
             IsLedSwitch = false,
             IsStopTail = false,
@@ -6228,8 +6234,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-            List<FilterParams> filterList = [_filterParams];
-            persistenceData.FilterParamsList = filterList;
+            //when a filter is added, its added to the Configmanager.Settings.FilterList and not to the _filterParams, this is probably an oversight and maybe a bug
+            //but for the consistency the FilterList should be saved as whole for every file
+            persistenceData.FilterParamsList = [.. ConfigManager.Settings.FilterList];
 
             foreach (var filterPipe in _filterPipeList)
             {
@@ -7084,6 +7091,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
         }
+
         _bookmarkProvider.RemoveBookmarksForLines(lineNumList);
         OnBookmarkRemoved();
     }
@@ -7250,7 +7258,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void Reload ()
     {
-        SavePersistenceData(false);
+        _ = SavePersistenceData(false);
 
         _reloadMemento = new ReloadMemento
         {
