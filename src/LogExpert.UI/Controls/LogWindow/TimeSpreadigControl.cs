@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 
@@ -55,8 +56,10 @@ internal partial class TimeSpreadingControl : UserControl
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ReverseAlpha { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     internal TimeSpreadCalculator TimeSpreadCalc
     {
         get => _timeSpreadCalc;

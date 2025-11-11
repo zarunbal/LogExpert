@@ -1,4 +1,5 @@
-﻿using LogExpert;
+using LogExpert;
+using LogExpert.Core.Helpers;
 using System;
 using System.IO;
 using System.Linq;
@@ -188,7 +189,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
         try
         {
-            Regex = new Regex(Config.Expression, RegexOptions.Compiled);
+            Regex = RegexHelper.GetOrCreateCached(Config.Expression, RegexOptions.Compiled);
             var skip = Regex.GetGroupNames().Length == 1 ? 0 : 1;
             columns = Regex.GetGroupNames().Skip(skip).ToArray();
         }

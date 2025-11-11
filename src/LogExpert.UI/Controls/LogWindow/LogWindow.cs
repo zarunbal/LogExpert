@@ -318,6 +318,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
 
     public ILogLineColumnizer CurrentColumnizer
@@ -334,6 +335,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ShowBookmarkBubbles
     {
         get => _guiStateArgs.ShowBookmarkBubbles;
@@ -350,6 +352,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public string FileName { get; private set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string SessionFileName { get; set; }
 
     public bool IsMultiFile
@@ -362,8 +365,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly IConfigManager ConfigManager;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string TempTitleName { get; set; } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     internal FilterPipe FilterPipe { get; set; }
 
     public string Title => IsTempFile
@@ -372,12 +377,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public ColumnizerCallback ColumnizerCallbackObject { get; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ForcePersistenceLoading { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ForcedPersistenceFileName { get; set; }
 
     public Preferences Preferences => _parentLogTabWin.Preferences;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string GivenFileName { get; set; }
 
     public TimeSyncList TimeSyncList { get; private set; }

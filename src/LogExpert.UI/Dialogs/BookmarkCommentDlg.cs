@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 namespace LogExpert.Dialogs;
@@ -27,6 +28,7 @@ internal partial class BookmarkCommentDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Comment
     {
         set => textBoxComment.Text = value;

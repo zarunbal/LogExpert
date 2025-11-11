@@ -1,9 +1,12 @@
 using System;
+using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+
+using LogExpert.Core.Helpers;
 
 namespace RegexColumnizer;
 
@@ -19,6 +22,7 @@ public partial class RegexColumnizerConfigDialog : Form
         ResumeLayout();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public RegexColumnizerConfig Config { get; set; }
 
     private void OnBtnOkClick(object sender, EventArgs e)
@@ -48,7 +52,8 @@ public partial class RegexColumnizerConfigDialog : Form
 
         try
         {
-            Regex regex = new(tbExpression.Text);
+            // Use RegexHelper for safe regex creation with timeout protection
+            Regex regex = RegexHelper.CreateSafeRegex(tbExpression.Text);
             var groupNames = regex.GetGroupNames();
             var offset = groupNames.Length > 1 ? 1 : 0;
 

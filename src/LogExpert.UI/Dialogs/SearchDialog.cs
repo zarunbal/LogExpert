@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
+using LogExpert.Core.Helpers;
 using LogExpert.Entities;
 using LogExpert.UI.Dialogs;
 
@@ -31,6 +33,7 @@ internal partial class SearchDialog : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public SearchParams SearchParams { get; set; } = new();
 
     #endregion
@@ -106,7 +109,11 @@ internal partial class SearchDialog : Form
                     throw new ArgumentException("Search text is empty");
                 }
 
-                Regex.IsMatch("", comboBoxSearchFor.Text);
+                // Use RegexHelper for safer validation with timeout protection
+                if (!RegexHelper.IsValidPattern(comboBoxSearchFor.Text, out var error))
+                {
+                    throw new ArgumentException($"Invalid regex pattern: {error}");
+                }
             }
 
             SearchParams.SearchText = comboBoxSearchFor.Text;

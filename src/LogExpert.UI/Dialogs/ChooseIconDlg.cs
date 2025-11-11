@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 using LogExpert.UI.Extensions;
@@ -37,8 +38,10 @@ internal partial class ChooseIconDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string FileName { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int IconIndex { get; set; }
 
     #endregion

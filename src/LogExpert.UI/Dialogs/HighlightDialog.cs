@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
@@ -5,6 +6,7 @@ using System.Text.RegularExpressions;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interface;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Dialogs;
@@ -44,6 +46,7 @@ internal partial class HighlightDialog : Form
 
     #region Properties / Indexers
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public List<HighlightGroup> HighlightGroupList
     {
         get => _highlightGroupList;
@@ -58,8 +61,10 @@ internal partial class HighlightDialog : Form
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public IList<IKeywordAction> KeywordActionList { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string PreSelectedGroupName { get; set; }
 
     private bool IsDirty => btnApply.Image == _applyButtonImage;
@@ -519,7 +524,11 @@ internal partial class HighlightDialog : Form
                 throw new ArgumentException(Resources.HighlightDialog_RegexError);
             }
 
-            _ = Regex.IsMatch(string.Empty, textBoxSearchString.Text);
+            // Use RegexHelper for safer validation with timeout protection
+            if (!RegexHelper.IsValidPattern(textBoxSearchString.Text, out var error))
+            {
+                throw new ArgumentException(error ?? Resources.HighlightDialog_RegexError);
+            }
         }
     }
 

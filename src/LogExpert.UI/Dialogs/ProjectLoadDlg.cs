@@ -1,6 +1,7 @@
-using LogExpert.Core.Enums;
-
+using System.ComponentModel;
 using System.Runtime.Versioning;
+
+using LogExpert.Core.Enums;
 
 namespace LogExpert.Dialogs;
 
@@ -25,6 +26,7 @@ internal partial class ProjectLoadDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ProjectLoadDlgResult ProjectLoadResult { get; set; } = ProjectLoadDlgResult.Cancel;
 
     #endregion
