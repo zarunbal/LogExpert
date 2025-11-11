@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security;
@@ -530,6 +531,8 @@ public class ConfigManager : IConfigManager
         settings.Preferences.MultiFileOptions ??= new MultiFileOptions();
 
         settings.Preferences.DefaultEncoding ??= System.Text.Encoding.Default.HeaderName;
+
+        settings.Preferences.DefaultLanguage ??= CultureInfo.GetCultureInfo("en-US").Name;
 
         if (settings.Preferences.MaximumFilterEntriesDisplayed == 0)
         {

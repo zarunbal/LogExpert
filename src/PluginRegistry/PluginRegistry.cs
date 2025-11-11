@@ -88,7 +88,10 @@ public class PluginRegistry : IPluginRegistry
 
     internal void LoadPlugins ()
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Loading plugins...");
+        _logger.Info(CultureInfo.InvariantCulture, "Loading plugins with security validation and manifest support...");
+
+        // **NEW**: Load plugin permissions from configuration
+        PluginPermissionManager.LoadPermissions(_applicationConfigurationFolder);
 
         RegisteredColumnizers =
         [
@@ -104,6 +107,7 @@ public class PluginRegistry : IPluginRegistry
         //TODO: FIXME: This is a hack for the tests to pass. Need to find a better approach
         if (!Directory.Exists(pluginDir))
         {
+            _logger.Warn("Plugin directory not found: {PluginDir}. Skipping plugin loading.", pluginDir);
             pluginDir = ".";
         }
 
@@ -112,17 +116,49 @@ public class PluginRegistry : IPluginRegistry
         var interfaceName = typeof(ILogLineColumnizer).FullName
             ?? throw new NotImplementedException("The interface name is null. How did this happen? Let's fix this.");
 
+        var loadedCount = 0;
+        var skippedCount = 0;
+        var failedCount = 0;
+
         foreach (var dllName in Directory.EnumerateFiles(pluginDir, "*.dll"))
         {
             try
             {
-                LoadPluginAssembly(dllName, interfaceName);
+                // **SECURITY**: Validate plugin before loading (with manifest support)
+                if (!PluginValidator.ValidatePlugin(dllName, out var manifest))
+                {
+                    skippedCount++;
+                    _logger.Info("Skipped plugin (failed validation): {FileName}", Path.GetFileName(dllName));
+                    continue;
+                }
+
+                // **NEW**: Log manifest information if available
+                if (manifest != null)
+                {
+                    _logger.Info("Plugin {PluginName} v{Version} by {Author}", 
+                        manifest.Name, manifest.Version, manifest.Author ?? "Unknown");
+                    if (manifest.Permissions != null && manifest.Permissions.Count > 0)
+                    {
+                        _logger.Debug("  Permissions: {Permissions}", string.Join(", ", manifest.Permissions));
+                    }
+                }
+
+                // **SECURITY**: Load plugin with timeout and exception handling
+                if (LoadPluginAssemblySafe(dllName, interfaceName))
+                {
+                    loadedCount++;
+                }
+                else
+                {
+                    failedCount++;
+                }
             }
             catch (Exception ex) when (ex is BadImageFormatException or FileLoadException)
             {
                 // Can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
                 // or could be a not columnizer DLL (e.g. A DLL that is needed by a plugin).
-                _logger.Error(ex, dllName);
+                _logger.Warn(ex, "Plugin load failed (bad format): {FileName}", Path.GetFileName(dllName));
+                failedCount++;
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -136,66 +172,174 @@ public class PluginRegistry : IPluginRegistry
                 }
 
                 _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
-                throw;
+                failedCount++;
+                // Don't throw - continue loading other plugins
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"General Exception for the file {dllName}, of type: {ex.GetType()}, with the message: {ex.Message}");
-                throw;
+                _logger.Error(ex, "General exception loading plugin: {FileName}", Path.GetFileName(dllName));
+                failedCount++;
+                // Don't throw - continue loading other plugins
             }
         }
 
-        _logger.Info(CultureInfo.InvariantCulture, "Plugin loading complete.");
+        _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}", 
+            loadedCount, skippedCount, failedCount);
+        
+        // **NEW**: Save any permission changes
+        PluginPermissionManager.SavePermissions(_applicationConfigurationFolder);
+    }
+
+    /// <summary>
+    /// Loads a plugin assembly with security measures: timeout protection and exception handling.
+    /// </summary>
+    /// <returns>True if plugin loaded successfully, false otherwise</returns>
+    private bool LoadPluginAssemblySafe(string dllName, string interfaceName)
+    {
+        try
+        {
+            // **SECURITY**: Use timeout to prevent plugin hangs during loading
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var loadTask = Task.Run(() => LoadPluginAssembly(dllName, interfaceName), cts.Token);
+            
+            // Wait for plugin to load with timeout
+            if (!loadTask.Wait(TimeSpan.FromSeconds(10)))
+            {
+                _logger.Error("Plugin loading timed out: {FileName}", Path.GetFileName(dllName));
+                return false;
+            }
+
+            return true;
+        }
+        catch (AggregateException ex)
+        {
+            // Unwrap AggregateException from Task
+            var innerEx = ex.InnerException ?? ex;
+            _logger.Error(innerEx, "Exception during plugin load: {FileName}", Path.GetFileName(dllName));
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Unexpected exception during plugin load: {FileName}", Path.GetFileName(dllName));
+            return false;
+        }
     }
 
     private void LoadPluginAssembly (string dllName, string interfaceName)
     {
+        // **SECURITY**: Log plugin loading for audit trail
+        _logger.Info("Loading plugin assembly: {FileName}", Path.GetFileName(dllName));
+
         var assembly = Assembly.LoadFrom(dllName);
         var types = assembly.GetTypes();
+        var pluginLoadedCount = 0;
 
         foreach (var type in types)
         {
-            _logger.Info($"Type {type.FullName} in assembly {assembly.FullName} implements {interfaceName}");
+            _logger.Debug("Checking type {TypeName} in assembly {AssemblyName}", type.FullName, assembly.FullName);
 
             if (type.GetInterfaces().Any(i => i.FullName == interfaceName))
             {
-                var cti = type.GetConstructor(Type.EmptyTypes);
-                if (cti != null)
+                // **SECURITY**: Instantiate plugin safely with timeout
+                if (TryInstantiatePluginSafe(type, out var instance))
                 {
-                    var instance = cti.Invoke([]);
                     RegisteredColumnizers.Add((ILogLineColumnizer)instance);
 
                     if (instance is IColumnizerConfigurator configurator)
                     {
-                        configurator.LoadConfig(_applicationConfigurationFolder);
+                        // **SECURITY**: Wrap config loading in try-catch
+                        try
+                        {
+                            configurator.LoadConfig(_applicationConfigurationFolder);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Plugin config loading failed: {TypeName}", type.Name);
+                            // Continue - don't fail entire plugin for config error
+                        }
                     }
 
                     if (instance is ILogExpertPlugin plugin)
                     {
                         _pluginList.Add(plugin);
-                        plugin.PluginLoaded();
+                        
+                        // **SECURITY**: Wrap plugin initialization in try-catch
+                        try
+                        {
+                            plugin.PluginLoaded();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Plugin initialization failed: {TypeName}", type.Name);
+                            // Continue - plugin is loaded but initialization failed
+                        }
                     }
 
-                    _logger.Info($"Added columnizer {type.Name}");
+                    _logger.Info("Added columnizer: {TypeName}", type.Name);
+                    pluginLoadedCount++;
                 }
             }
             else
             {
                 if (TryAsContextMenu(type))
                 {
+                    pluginLoadedCount++;
                     continue;
                 }
 
                 if (TryAsKeywordAction(type))
                 {
+                    pluginLoadedCount++;
                     continue;
                 }
 
                 if (TryAsFileSystem(type))
                 {
+                    pluginLoadedCount++;
                     continue;
                 }
             }
+        }
+
+        if (pluginLoadedCount == 0)
+        {
+            _logger.Warn("No plugins found in assembly: {FileName}", Path.GetFileName(dllName));
+        }
+    }
+
+    /// <summary>
+    /// Safely instantiates a plugin with timeout protection.
+    /// </summary>
+    private bool TryInstantiatePluginSafe(Type type, out object instance)
+    {
+        instance = null;
+
+        try
+        {
+            var cti = type.GetConstructor(Type.EmptyTypes);
+            if (cti == null)
+            {
+                _logger.Warn("Plugin type has no parameterless constructor: {TypeName}", type.Name);
+                return false;
+            }
+
+            // **SECURITY**: Use timeout for plugin instantiation
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var instantiateTask = Task.Run(() => cti.Invoke([]), cts.Token);
+            
+            if (!instantiateTask.Wait(TimeSpan.FromSeconds(5)))
+            {
+                _logger.Error("Plugin instantiation timed out: {TypeName}", type.Name);
+                return false;
+            }
+
+            instance = instantiateTask.Result;
+            return instance != null;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to instantiate plugin: {TypeName}", type.Name);
+            return false;
         }
     }
 

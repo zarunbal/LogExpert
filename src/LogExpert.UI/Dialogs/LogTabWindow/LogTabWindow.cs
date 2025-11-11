@@ -2991,7 +2991,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         //_logger.Get_logger().LogLevel = _logger.Level.INFO;
     }
 
-    private void OnDebugToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnDebugLogLevelToolStripMenuItemClick (object sender, EventArgs e)
     {
         //_logger.Get_logger().LogLevel = _logger.Level.DEBUG;
     }

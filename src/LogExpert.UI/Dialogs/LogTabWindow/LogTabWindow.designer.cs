@@ -122,9 +122,9 @@ namespace LogExpert.UI.Controls.LogTabWindow
             throwExceptionbackgroundThToolStripMenuItem = new ToolStripMenuItem();
             throwExceptionBackgroundThreadToolStripMenuItem = new ToolStripMenuItem();
             loglevelToolStripMenuItem = new ToolStripMenuItem();
-            warnToolStripMenuItem = new ToolStripMenuItem();
-            infoToolStripMenuItem = new ToolStripMenuItem();
-            debugToolStripMenuItem = new ToolStripMenuItem();
+            warnLogLevelToolStripMenuItem = new ToolStripMenuItem();
+            infoLogLevelToolStripMenuItem = new ToolStripMenuItem();
+            debugLogLevelToolStripMenuItem1 = new ToolStripMenuItem();
             disableWordHighlightModeToolStripMenuItem = new ToolStripMenuItem();
             checkBoxHost = new CheckBox();
             toolStripContainer = new ToolStripContainer();
@@ -740,7 +740,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // loglevelToolStripMenuItem
             // 
-            loglevelToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { warnToolStripMenuItem, infoToolStripMenuItem, debugToolStripMenuItem });
+            loglevelToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { warnLogLevelToolStripMenuItem, infoLogLevelToolStripMenuItem, debugLogLevelToolStripMenuItem1 });
             loglevelToolStripMenuItem.Name = "loglevelToolStripMenuItem";
             loglevelToolStripMenuItem.Size = new System.Drawing.Size(274, 22);
             loglevelToolStripMenuItem.Text = "Loglevel";
@@ -749,24 +749,24 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // warnToolStripMenuItem
             // 
-            warnToolStripMenuItem.Name = "warnToolStripMenuItem";
-            warnToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
-            warnToolStripMenuItem.Text = "Warn";
-            warnToolStripMenuItem.Click += OnWarnToolStripMenuItemClick;
+            warnLogLevelToolStripMenuItem.Name = "warnToolStripMenuItem";
+            warnLogLevelToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            warnLogLevelToolStripMenuItem.Text = "Warn";
+            warnLogLevelToolStripMenuItem.Click += OnWarnToolStripMenuItemClick;
             // 
             // infoToolStripMenuItem
             // 
-            infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            infoToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
-            infoToolStripMenuItem.Text = "Info";
-            infoToolStripMenuItem.Click += OnInfoToolStripMenuItemClick;
+            infoLogLevelToolStripMenuItem.Name = "infoToolStripMenuItem";
+            infoLogLevelToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            infoLogLevelToolStripMenuItem.Text = "Info";
+            infoLogLevelToolStripMenuItem.Click += OnInfoToolStripMenuItemClick;
             // 
-            // debugToolStripMenuItem1
+            // debugLogLevelToolStripMenuItem1
             // 
-            debugToolStripMenuItem1.Name = "debugToolStripMenuItem1";
-            debugToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
-            debugToolStripMenuItem1.Text = "Debug";
-            debugToolStripMenuItem1.Click += OnDebugToolStripMenuItemClick;
+            debugLogLevelToolStripMenuItem1.Name = "debugLogLevelToolStripMenuItem1";
+            debugLogLevelToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            debugLogLevelToolStripMenuItem1.Text = "Debug";
+            debugLogLevelToolStripMenuItem1.Click += OnDebugLogLevelToolStripMenuItemClick;
             // 
             // disableWordHighlightModeToolStripMenuItem
             // 
@@ -1257,9 +1257,9 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private ToolStripMenuItem throwExceptionbackgroundThToolStripMenuItem;
         private ToolStripMenuItem throwExceptionBackgroundThreadToolStripMenuItem;
         private ToolStripMenuItem loglevelToolStripMenuItem;
-        private ToolStripMenuItem warnToolStripMenuItem;
-        private ToolStripMenuItem infoToolStripMenuItem;
-        private ToolStripMenuItem debugToolStripMenuItem1;
+        private ToolStripMenuItem warnLogLevelToolStripMenuItem;
+        private ToolStripMenuItem infoLogLevelToolStripMenuItem;
+        private ToolStripMenuItem debugLogLevelToolStripMenuItem1;
         private ToolStripMenuItem disableWordHighlightModeToolStripMenuItem;
         private ToolStripMenuItem multifileMaskToolStripMenuItem;
         private ToolStripMenuItem multiFileEnabledStripMenuItem;
