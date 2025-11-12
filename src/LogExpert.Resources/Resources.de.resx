@@ -1417,7 +1417,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage" xml:space="preserve">
     <value>Diese Meldung nur einmal zeigen?</value>
   </data>
-  <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
+  <data name="BookmarkCommentDlg_UI_Title" xml:space="preserve">
     <value>Lesezeichenkommentar</value>
   </data>
   <data name="BookmarkWindow_UI_ToolStripMenuItem_RemoveComments" xml:space="preserve">
@@ -1638,5 +1638,14 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="TabRenameDialog_UI_Title" xml:space="preserve">
     <value>Umbenennungstab</value>
+  </data>
+  <data name="ExceptionWindow_UI_Title" xml:space="preserve">
+    <value>LogExpert Error</value>
+  </data>
+  <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
+    <value>In die Zwischenablage kopieren</value>
+  </data>
+  <data name="ExceptionWindow_UI_Label_ErrorMessage" xml:space="preserve">
+    <value>Ein unbehandelter Fehler ist aufgetreten. Bitte melden Sie dies dem Entwickler.</value>
   </data>
 </root>

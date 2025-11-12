@@ -1419,7 +1419,7 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage" xml:space="preserve">
     <value>Show this message only once?</value>
   </data>
-  <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
+  <data name="BookmarkCommentDlg_UI_Title" xml:space="preserve">
     <value>Bookmark comment</value>
   </data>
   <data name="BookmarkWindow_UI_ToolStripMenuItem_RemoveComments" xml:space="preserve">
@@ -1640,5 +1640,14 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   </data>
   <data name="TabRenameDialog_UI_Label_Name" xml:space="preserve">
     <value>Name:</value>
+  </data>
+  <data name="ExceptionWindow_UI_Title" xml:space="preserve">
+    <value>LogExpert Error</value>
+  </data>
+  <data name="ExceptionWindow_UI_Label_ErrorMessage" xml:space="preserve">
+    <value>An unhandled error has occurred. Please report to the developer.</value>
+  </data>
+  <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
   </data>
 </root>

@@ -246,9 +246,9 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Bookmark comment.
         /// </summary>
-        public static string BookmarkCommentDlg_UI_Text {
+        public static string BookmarkCommentDlg_UI_Title {
             get {
-                return ResourceManager.GetString("BookmarkCommentDlg_UI_Text", resourceCulture);
+                return ResourceManager.GetString("BookmarkCommentDlg_UI_Title", resourceCulture);
             }
         }
         
@@ -506,6 +506,33 @@ namespace LogExpert {
         public static string EminusConfigDlg_UI_Text {
             get {
                 return ResourceManager.GetString("EminusConfigDlg_UI_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to clipboard.
+        /// </summary>
+        public static string ExceptionWindow_UI_Button_CopyToClipboard {
+            get {
+                return ResourceManager.GetString("ExceptionWindow_UI_Button_CopyToClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unhandled error has occurred. Please report to the developer..
+        /// </summary>
+        public static string ExceptionWindow_UI_Label_ErrorMessage {
+            get {
+                return ResourceManager.GetString("ExceptionWindow_UI_Label_ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert Error.
+        /// </summary>
+        public static string ExceptionWindow_UI_Title {
+            get {
+                return ResourceManager.GetString("ExceptionWindow_UI_Title", resourceCulture);
             }
         }
         

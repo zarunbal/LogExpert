@@ -22,7 +22,7 @@ internal partial class BookmarkCommentDlg : Form
 
     private void ApplyResources ()
     {
-        Text = Resources.BookmarkCommentDlg_UI_Text;
+        Text = Resources.BookmarkCommentDlg_UI_Title;
         buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
         buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
     }
