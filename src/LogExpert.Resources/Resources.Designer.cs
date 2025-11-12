@@ -1110,6 +1110,114 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose file....
+        /// </summary>
+        public static string ImportSettingsDialog_UI_Button_ChooseFile {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_Button_ChooseFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer file masks.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_ColumnizerFileMasks {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_ColumnizerFileMasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External tools.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_ExternalTools {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_ExternalTools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight file masks.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_HighlightFileMasks {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_HighlightFileMasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight settings.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_HighlightSettings {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_HighlightSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep existing settings.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_KeepExistingSettings {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_KeepExistingSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_CheckBox_Other {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_CheckBox_Other", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import options.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_GroupBox_ImportOptions {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_GroupBox_ImportOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings file to import:.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_Label_SettingsFileToImport {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_Label_SettingsFileToImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings (*.json)|*.json|All files (*.*)|*.*.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_OpenFileDialog_Filter {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_OpenFileDialog_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load Settings from file.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_OpenFileDialog_Title {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_OpenFileDialog_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Settings.
+        /// </summary>
+        public static string ImportSettingsDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not begin restart session. Unable to determine file locker..
         /// </summary>
         public static string Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker {

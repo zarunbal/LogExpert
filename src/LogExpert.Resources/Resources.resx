@@ -1788,4 +1788,41 @@ all other chars will be used as given</value>
   <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_No" xml:space="preserve">
     <value>No</value>
   </data>
+  <data name="ImportSettingsDialog_UI_Title" xml:space="preserve">
+  <value>Import Settings</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_Label_SettingsFileToImport" xml:space="preserve">
+    <value>Settings file to import:</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_Button_ChooseFile" xml:space="preserve">
+    <value>Choose file...</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_GroupBox_ImportOptions" xml:space="preserve">
+    <value>Import options</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_HighlightSettings" xml:space="preserve">
+    <value>Highlight settings</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_HighlightFileMasks" xml:space="preserve">
+    <value>Highlight file masks</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_ColumnizerFileMasks" xml:space="preserve">
+    <value>Columnizer file masks</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_ExternalTools" xml:space="preserve">
+    <value>External tools</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_KeepExistingSettings" xml:space="preserve">
+    <value>Keep existing settings</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_OpenFileDialog_Title" xml:space="preserve">
+    <value>Load Settings from file</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_OpenFileDialog_Filter" xml:space="preserve">
+    <value>Settings (*.json)|*.json|All files (*.*)|*.*</value>
+    <comment>File filter format: Description|Pattern|Description|Pattern</comment>
+  </data>
 </root>
