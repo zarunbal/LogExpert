@@ -632,8 +632,7 @@
     <value>(Invert match)</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
-    <value>
-Column restrict</value>
+    <value>Column restrict</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
     <value>Filter: {0} {1}{2}</value>
@@ -1423,16 +1422,16 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
     <value>Bookmark comment</value>
   </data>
-  <data name="BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem" xml:space="preserve">
+  <data name="BookmarkWindow_UI_ToolStripMenuItem_RemoveComments" xml:space="preserve">
     <value>Remove comment(s)</value>
   </data>
-  <data name="BookmarkWindow_UI_CheckBox_checkBoxCommentColumn" xml:space="preserve">
+  <data name="BookmarkWindow_UI_CheckBox_ShowCommentColumn" xml:space="preserve">
     <value>Show comment column</value>
   </data>
-  <data name="BookmarkWindow_UI_Text" xml:space="preserve">
+  <data name="BookmarkWindow_UI_Title" xml:space="preserve">
     <value>Bookmarks</value>
   </data>
-  <data name="BookmarkWindow_UI_Label_labelComment" xml:space="preserve">
+  <data name="BookmarkWindow_UI_Label_Comment" xml:space="preserve">
     <value>Bookmark comment:</value>
   </data>
   <data name="BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines" xml:space="preserve">
@@ -1626,5 +1625,20 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   </data>
   <data name="HighlightDialog_UI_GroupBox_Groups" xml:space="preserve">
     <value>Groups</value>
+  </data>
+  <data name="BookmarkWindow_UI_MenuItem_DeleteBookmarks" xml:space="preserve">
+    <value>Delete bookmarks(s)</value>
+  </data>
+  <data name="GotoLineDialog_UI_Title" xml:space="preserve">
+    <value>Go to line</value>
+  </data>
+  <data name="GotoLineDialog_UI_Label_LineNumber" xml:space="preserve">
+    <value>Line number:</value>
+  </data>
+  <data name="TabRenameDialog_UI_Title" xml:space="preserve">
+    <value>Rename Tab</value>
+  </data>
+  <data name="TabRenameDialog_UI_Label_Name" xml:space="preserve">
+    <value>Name:</value>
   </data>
 </root>

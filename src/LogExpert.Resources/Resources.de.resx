@@ -603,7 +603,7 @@
     <value>Autostart</value>
   </data>
   <data name="LogWindow_UI_CheckBox_FilterCaseSensitive" xml:space="preserve">
-    <value>Schreibabhängig</value>
+    <value>Groß-/Kleinschreibung</value>
   </data>
   <data name="LogWindow_UI_CheckBox_ColumnRestrict" xml:space="preserve">
     <value>Spaltenrestriktion</value>
@@ -627,8 +627,7 @@
     <value>(Invertiere Match)</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
-    <value>
-Spalten restriktion</value>
+    <value>Spalten restriktion</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
     <value>Filter: {0} {1}{2}</value>
@@ -1421,16 +1420,16 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="BookmarkCommentDlg_UI_Text" xml:space="preserve">
     <value>Lesezeichenkommentar</value>
   </data>
-  <data name="BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem" xml:space="preserve">
+  <data name="BookmarkWindow_UI_ToolStripMenuItem_RemoveComments" xml:space="preserve">
     <value>Entferne Kommentar(e)</value>
   </data>
-  <data name="BookmarkWindow_UI_CheckBox_checkBoxCommentColumn" xml:space="preserve">
+  <data name="BookmarkWindow_UI_CheckBox_ShowCommentColumn" xml:space="preserve">
     <value>Anzeigen Kommentar Spalte</value>
   </data>
-  <data name="BookmarkWindow_UI_Text" xml:space="preserve">
+  <data name="BookmarkWindow_UI_Title" xml:space="preserve">
     <value>Lesezeichen</value>
   </data>
-  <data name="BookmarkWindow_UI_Label_labelComment" xml:space="preserve">
+  <data name="BookmarkWindow_UI_Label_Comment" xml:space="preserve">
     <value>Lesezeichenkommentar:</value>
   </data>
   <data name="BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines" xml:space="preserve">
@@ -1600,5 +1599,44 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="HighlightDialog_UI_GroupBox_LineMatchCriteria" xml:space="preserve">
     <value>Kriterien für die Zeilenübereinstimmung</value>
+  </data>
+  <data name="BookmarkWindow_UI_MenuItem_DeleteBookmarks" xml:space="preserve">
+    <value>Lesezeichen löschen</value>
+  </data>
+  <data name="AboutBox_UI_LinkLabel_URL" xml:space="preserve">
+    <value>https://github.com/LogExperts/LogExpert</value>
+  </data>
+  <data name="RegexHelperDialog_Help_Chapter" xml:space="preserve">
+    <value>RegEx.htm</value>
+  </data>
+  <data name="RegexHelperDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>Groß-/Kleinschreibung</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_Regex" xml:space="preserve">
+    <value>Regular Expression:</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_TestText" xml:space="preserve">
+    <value>Testtext:</value>
+  </data>
+  <data name="RegexHelperDialog_UI_TextBox_Matches_NoValidRegexPattern" xml:space="preserve">
+    <value>Regex ist nicht valide</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Title" xml:space="preserve">
+    <value>Regex-Helfer</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_Matches" xml:space="preserve">
+    <value>Matches:</value>
+  </data>
+  <data name="GotoLineDialog_UI_Label_LineNumber" xml:space="preserve">
+    <value>Zeilennummer:</value>
+  </data>
+  <data name="GotoLineDialog_UI_Title" xml:space="preserve">
+    <value>Gehe zu Zeile</value>
+  </data>
+  <data name="TabRenameDialog_UI_Label_Name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="TabRenameDialog_UI_Title" xml:space="preserve">
+    <value>Umbenennungstab</value>
   </data>
 </root>

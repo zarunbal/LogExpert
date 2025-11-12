@@ -265,9 +265,9 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Show comment column.
         /// </summary>
-        public static string BookmarkWindow_UI_CheckBox_checkBoxCommentColumn {
+        public static string BookmarkWindow_UI_CheckBox_ShowCommentColumn {
             get {
-                return ResourceManager.GetString("BookmarkWindow_UI_CheckBox_checkBoxCommentColumn", resourceCulture);
+                return ResourceManager.GetString("BookmarkWindow_UI_CheckBox_ShowCommentColumn", resourceCulture);
             }
         }
         
@@ -283,9 +283,18 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Bookmark comment:.
         /// </summary>
-        public static string BookmarkWindow_UI_Label_labelComment {
+        public static string BookmarkWindow_UI_Label_Comment {
             get {
-                return ResourceManager.GetString("BookmarkWindow_UI_Label_labelComment", resourceCulture);
+                return ResourceManager.GetString("BookmarkWindow_UI_Label_Comment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete bookmarks(s).
+        /// </summary>
+        public static string BookmarkWindow_UI_MenuItem_DeleteBookmarks {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_MenuItem_DeleteBookmarks", resourceCulture);
             }
         }
         
@@ -310,18 +319,18 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Bookmarks.
         /// </summary>
-        public static string BookmarkWindow_UI_Text {
+        public static string BookmarkWindow_UI_Title {
             get {
-                return ResourceManager.GetString("BookmarkWindow_UI_Text", resourceCulture);
+                return ResourceManager.GetString("BookmarkWindow_UI_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Remove comment(s).
         /// </summary>
-        public static string BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem {
+        public static string BookmarkWindow_UI_ToolStripMenuItem_RemoveComments {
             get {
-                return ResourceManager.GetString("BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem", resourceCulture);
+                return ResourceManager.GetString("BookmarkWindow_UI_ToolStripMenuItem_RemoveComments", resourceCulture);
             }
         }
         
@@ -547,6 +556,24 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Folder_open", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line number:.
+        /// </summary>
+        public static string GotoLineDialog_UI_Label_LineNumber {
+            get {
+                return ResourceManager.GetString("GotoLineDialog_UI_Label_LineNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to line.
+        /// </summary>
+        public static string GotoLineDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("GotoLineDialog_UI_Title", resourceCulture);
             }
         }
         
@@ -1239,8 +1266,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///Column restrict.
+        ///   Looks up a localized string similar to Column restrict.
         /// </summary>
         public static string LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict {
             get {
@@ -4560,6 +4586,24 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Star", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name:.
+        /// </summary>
+        public static string TabRenameDialog_UI_Label_Name {
+            get {
+                return ResourceManager.GetString("TabRenameDialog_UI_Label_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename Tab.
+        /// </summary>
+        public static string TabRenameDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("TabRenameDialog_UI_Title", resourceCulture);
             }
         }
         

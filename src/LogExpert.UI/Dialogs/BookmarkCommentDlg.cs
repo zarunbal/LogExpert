@@ -9,11 +9,15 @@ internal partial class BookmarkCommentDlg : Form
 
     public BookmarkCommentDlg ()
     {
+        SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
         ApplyResources();
+
+        ResumeLayout();
     }
 
     private void ApplyResources ()

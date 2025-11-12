@@ -41,7 +41,7 @@ private void InitializeComponent()
   this.buttonOk.Name = "buttonOk";
   this.buttonOk.Size = new System.Drawing.Size(75, 23);
   this.buttonOk.TabIndex = 1;
-  this.buttonOk.Text = "OK";
+  this.buttonOk.Text = "&OK";
   this.buttonOk.UseVisualStyleBackColor = true;
   // 
   // cancelButton

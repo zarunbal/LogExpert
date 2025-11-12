@@ -5,15 +5,11 @@ using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
 using LogExpert.UI.Extensions;
 
-using NLog;
-
 namespace LogExpert.UI.Controls.LogWindow;
 
 [SupportedOSPlatform("windows")]
 internal partial class TimeSpreadingControl : UserControl
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
     #region Fields
 
     private Bitmap _bitmap = new(1, 1);
