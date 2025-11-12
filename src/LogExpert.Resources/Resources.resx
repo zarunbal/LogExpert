@@ -1686,4 +1686,106 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
     <value>Start: {0}\nEnd: {1}</value>
   </data>
+  <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
+    <value>Loading Session</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
+    <value>Restoring layout requires an empty workbench.\n\n</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
+    <value>Please choose how to proceed:</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_CloseTabs" xml:space="preserve">
+    <value>Close existing tabs</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_NewWindow" xml:space="preserve">
+    <value>Open new window</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_Ignore" xml:space="preserve">
+    <value>Ignore layout data</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">
+    <value>MultiFile settings</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SettingsFor" xml:space="preserve">
+    <value>MultiFile settings for:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_FileNamePattern" xml:space="preserve">
+    <value>File name pattern:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
+    <value>Max days:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
+    <value>Pattern syntax:
+
+* = any characters (wildcard)
+$D(&amp;lt;date&amp;gt;) = Date pattern
+$I = File index number
+$J = File index number, hidden when zero
+$J(&amp;lt;prefix&amp;gt;) = Like $J, but adding &amp;lt;prefix&amp;gt; when non-zero
+
+&amp;lt;date&amp;gt;:
+DD = day
+MM = month
+YY[YY] = year
+all other chars will be used as given</value>
+  </data>
+  <data name="FilterColumnChooser_UI_Title" xml:space="preserve">
+    <value>Columns</value>
+  </data>
+  <data name="FilterColumnChooser_UI_GroupBox_OnEmptyColumns" xml:space="preserve">
+    <value>On empty columns</value>
+  </data>
+  <data name="FilterColumnChooser_UI_CheckBox_ExactMatch" xml:space="preserve">
+    <value>Exact match</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_NoHit" xml:space="preserve">
+    <value>No hit</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_SearchHit" xml:space="preserve">
+    <value>Search hit</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_UsePrevContent" xml:space="preserve">
+    <value>Use prev content</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_Title_Columns" xml:space="preserve">
+    <value>Columns</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ColumnListBox" xml:space="preserve">
+    <value>Choose one ore more columns to restrict the search operations to the selected columns.</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_NoHit" xml:space="preserve">
+    <value>No search hit on empty columns</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_SearchHit" xml:space="preserve">
+    <value>An empty column will always be a search hit</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_UsePrevContent" xml:space="preserve">
+    <value>An empty column will be a search hit if the previous non-empty column was a search hit</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ExactMatch" xml:space="preserve">
+    <value>If selected, the search string must match exactly (no substring search)</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Title" xml:space="preserve">
+    <value>Columnizer</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Label_ChooseColumnizer" xml:space="preserve">
+    <value>Choose a columnizer:</value>
+  </data>
+  <data name="FilterSelectorForm_UI_CheckBox_ApplyToAll" xml:space="preserve">
+    <value>Apply to all open files</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Button_Config" xml:space="preserve">
+    <value>Config...</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Format" xml:space="preserve">
+    <value>\r\nSupports timeshift: {0}</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_No" xml:space="preserve">
+    <value>No</value>
+  </data>
 </root>

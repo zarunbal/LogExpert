@@ -479,7 +479,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         lblBackSpread.Text = Resources.LogWindow_UI_Label_BackSpread;
         lblForeSpread.Text = Resources.LogWindow_UI_Label_ForeSpread;
         lblTextFilter.Text = Resources.LogWindow_UI_Label_TextFilter;
-        lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
+        lblFilterCount.Text = Resources.LogWindow_UI_Common_ZeroValue;
     }
 
     private void ApplyButtonResources ()
@@ -4646,7 +4646,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 filterGridView.SuspendLayout();
                 filterGridView.RowCount = 0;
-                lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
+                lblFilterCount.Text = Resources.LogWindow_UI_Common_ZeroValue;
                 _filterResultList = [];
                 _lastFilterLinesList = [];
                 _filterHitList = [];

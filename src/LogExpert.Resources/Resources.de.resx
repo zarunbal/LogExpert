@@ -1684,4 +1684,106 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
     <value>Start: {0}\nEnde: {1}</value>
   </data>
+  <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
+    <value>Sitzung laden</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
+    <value>Das Wiederherstellen des Layouts erfordert eine leere Arbeitsfläche.\n\n</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
+    <value>Bitte wählen Sie, wie Sie fortfahren möchten:</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_CloseTabs" xml:space="preserve">
+    <value>Vorhandene Tabs schließen</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_NewWindow" xml:space="preserve">
+    <value>Neues Fenster öffnen</value>
+  </data>
+  <data name="ProjectLoadDlg_UI_Button_Ignore" xml:space="preserve">
+    <value>Layoutdaten ignorieren</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">
+    <value>Multidatei Einstellungen</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SettingsFor" xml:space="preserve">
+    <value>Multidatei Einstellungen für:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_FileNamePattern" xml:space="preserve">
+    <value>Dateinamemuster:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
+    <value>Max Tage:</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
+    <value>Muster syntax:
+
+* = alle Zeichen (wildcard)
+$D(&amp;lt;date&amp;gt;) = Datumsmuster
+$I = Dateiindexnummer
+$J = Dateiindexnummer, versteckt wenn 09
+$J(&amp;lt;prefix&amp;gt;) = Wie $J, jedoch wird ein &amp;lt;prefix&amp;gt; hinzugefügt when es nicht 0 ist
+
+&amp;lt;date&amp;gt;:
+DD = Tag
+MM = Monat
+YY[YY] = Jahr
+Alle anderen Zeichen werden benutzt wie sie angegeben sind</value>
+  </data>
+  <data name="FilterColumnChooser_UI_Title" xml:space="preserve">
+    <value>Spalten</value>
+  </data>
+  <data name="FilterColumnChooser_UI_GroupBox_OnEmptyColumns" xml:space="preserve">
+    <value>Bei leeren Spalten</value>
+  </data>
+  <data name="FilterColumnChooser_UI_CheckBox_ExactMatch" xml:space="preserve">
+    <value>Exakte Übereinstimmung</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_NoHit" xml:space="preserve">
+    <value>Kein Treffer</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_SearchHit" xml:space="preserve">
+    <value>Such treffer</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_UsePrevContent" xml:space="preserve">
+    <value>Benutzer vorherigen Inhalt</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_Title_Columns" xml:space="preserve">
+    <value>Spalten</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ColumnListBox" xml:space="preserve">
+    <value>Wählen Sie eine oder mehrere Spalten aus, um die Suchvorgänge auf die ausgewählten Spalten zu beschränken.</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_SearchHit" xml:space="preserve">
+    <value>Eine leere Spalte ist immer ein Suchtreffer</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_UsePrevContent" xml:space="preserve">
+    <value>Eine leere Spalte ist ein Suchtreffer, wenn die vorherige nicht leere Spalte ein Suchtreffer war</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ExactMatch" xml:space="preserve">
+    <value>Wenn ausgewählt, muss die Suchzeichenfolge genau übereinstimmen (keine Teilzeichenfolgensuche)</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_NoHit" xml:space="preserve">
+    <value>Keine Treffer bei leeren Spalten</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Title" xml:space="preserve">
+    <value>Columnizer</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Label_ChooseColumnizer" xml:space="preserve">
+    <value>Wählen Sie einen Columnizer:</value>
+  </data>
+  <data name="FilterSelectorForm_UI_CheckBox_ApplyToAll" xml:space="preserve">
+    <value>Auf alle geöffneten Dateien anwenden</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Button_Config" xml:space="preserve">
+    <value>Konfigurieren...</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Format" xml:space="preserve">
+    <value>\r\nUnterstützt Zeitverschiebung: {0}</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_No" xml:space="preserve">
+    <value>Nein</value>
+  </data>
 </root>
