@@ -9,8 +9,16 @@ public partial class AllowOnlyOneInstanceErrorDialog : Form
 
     public AllowOnlyOneInstanceErrorDialog ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
+
         ApplyResources();
+
+        ResumeLayout();
     }
 
     private void ApplyResources ()

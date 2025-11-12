@@ -29,15 +29,67 @@ internal partial class HighlightDialog : Form
 
     public HighlightDialog (IConfigManager configManager)
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
+        ApplyResources();
+
         ConfigManager = configManager;
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
         _applyButtonImage = btnApply.Image;
         btnApply.Image = null;
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        // Dialog
+        Text = Resources.HighlightDialog_UI_Title;
+
+        btnOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        btnCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        btnAdd.Text = Resources.LogExpert_Common_UI_Button_Add;
+        btnDelete.Text = Resources.LogExpert_Common_UI_Button_Delete;
+        btnMoveUp.Text = Resources.LogExpert_Common_UI_Button_MoveUp;
+        btnMoveDown.Text = Resources.LogExpert_Common_UI_Button_MoveDown;
+        btnApply.Text = Resources.LogExpert_Common_UI_Button_Apply;
+        btnCustomForeColor.Text = Resources.HighlightDialog_UI_Button_CustomForeColor;
+        btnCustomBackColor.Text = Resources.HighlightDialog_UI_Button_CustomBackColor;
+        btnBookmarkComment.Text = Resources.HighlightDialog_UI_Button_BookmarkComment;
+        btnSelectPlugin.Text = Resources.HighlightDialog_UI_Button_SelectPlugin;
+        btnImportGroup.Text = Resources.LogExpert_Common_UI_Button_Import;
+        btnExportGroup.Text = Resources.LogExpert_Common_UI_Button_Export;
+        btnMoveGroupDown.Text = Resources.HighlightDialog_UI_Button_GroupDown;
+        btnMoveGroupUp.Text = Resources.HighlightDialog_UI_Button_GroupUp;
+        btnCopyGroup.Text = Resources.HighlightDialog_UI_Button_Copy;
+        btnDeleteGroup.Text = Resources.HighlightDialog_UI_Button_DeleteGroup;
+        btnNewGroup.Text = Resources.HighlightDialog_UI_Button_NewGroup;
+
+        labelForgroundColor.Text = Resources.HighlightDialog_UI_Label_ForegroundColor;
+        labelBackgroundColor.Text = Resources.HighlightDialog_UI_Label_BackgroundColor;
+        labelSearchString.Text = Resources.HighlightDialog_UI_Label_SearchString;
+        labelAssignNamesToGroups.Text = Resources.HighlightDialog_UI_Label_AssignNamesToGroups;
+
+        checkBoxRegex.Text = Resources.HighlightDialog_UI_CheckBox_RegEx;
+        checkBoxCaseSensitive.Text = Resources.HighlightDialog_UI_CheckBox_CaseSensitive;
+        checkBoxDontDirtyLed.Text = Resources.HighlightDialog_UI_CheckBox_DontDirtyLed;
+        checkBoxBookmark.Text = Resources.HighlightDialog_UI_CheckBox_Bookmark;
+        checkBoxStopTail.Text = Resources.HighlightDialog_UI_CheckBox_StopTail;
+        checkBoxPlugin.Text = Resources.HighlightDialog_UI_CheckBox_Plugin;
+        checkBoxWordMatch.Text = Resources.HighlightDialog_UI_CheckBox_WordMatch;
+        checkBoxBold.Text = Resources.HighlightDialog_UI_CheckBox_Bold;
+        checkBoxNoBackground.Text = Resources.HighlightDialog_UI_CheckBox_NoBackground;
+
+        groupBoxLineMatchCriteria.Text = Resources.HighlightDialog_UI_GroupBox_LineMatchCriteria;
+        groupBoxColoring.Text = Resources.HighlightDialog_UI_GroupBox_Coloring;
+        groupBoxActions.Text = Resources.HighlightDialog_UI_GroupBox_Actions;
+        groupBoxGroups.Text = Resources.HighlightDialog_UI_GroupBox_Groups;
     }
 
     #endregion

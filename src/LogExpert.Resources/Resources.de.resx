@@ -739,13 +739,13 @@ Spalten restriktion</value>
     <value>...</value>
   </data>
   <data name="LogExpert_Common_UI_Button_OK" xml:space="preserve">
-    <value>Ok</value>
+    <value>&amp;Ok</value>
   </data>
   <data name="LogExpert_Common_UI_Button_Cancel" xml:space="preserve">
-    <value>Abbrechen</value>
+    <value>&amp;Abbrechen</value>
   </data>
   <data name="LogExpert_Common_UI_Button_Import" xml:space="preserve">
-    <value>Importieren...</value>
+    <value>&amp;Importieren...</value>
   </data>
   <data name="SettingsDialog_UI_GroupBox_groupBoxDefaultFileNamePattern" xml:space="preserve">
     <value>Standard Dateinamen Pattern</value>
@@ -1450,5 +1450,155 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="LogTabWindow_HelpFile" xml:space="preserve">
     <value>LogExpert.chm</value>
+  </data>
+  <data name="OpenUriDialog_UI_Dialog_Text" xml:space="preserve">
+    <value>URL Öffnen</value>
+  </data>
+  <data name="OpenUriDialog_UI_Label_URL" xml:space="preserve">
+    <value>URL:</value>
+  </data>
+  <data name="OpenUriDialog_UI_Label_Explaination" xml:space="preserve">
+    <value>Geben Sie eine URL ein, die von einem installierten Dateisystem-Plugin unterstützt wird (z. B. file:// oder sftp://)</value>
+  </data>
+  <data name="SearchDialog_UI_Label_SearchFor" xml:space="preserve">
+    <value>&amp;Suchen nach:</value>
+  </data>
+  <data name="SearchDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>&amp;Groß-/Kleinschreibung</value>
+  </data>
+  <data name="SearchDialog_UI_CheckBox_RegularExpression" xml:space="preserve">
+    <value>&amp;Regularexpression</value>
+  </data>
+  <data name="SearchDialog_UI_Button_RegexHelper" xml:space="preserve">
+    <value>Regex-&amp;Hilfe</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_FromTop" xml:space="preserve">
+    <value>Von oben</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_FromSelectedLine" xml:space="preserve">
+    <value>Von der ausgewählten Zeile</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_SearchStart" xml:space="preserve">
+    <value>Start der Suche</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_Options" xml:space="preserve">
+    <value>Optionen</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_Direction" xml:space="preserve">
+    <value>Richtung</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_Backward" xml:space="preserve">
+    <value>Rückwärts</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_Forward" xml:space="preserve">
+    <value>Vorwärts</value>
+  </data>
+  <data name="SearchDialog_UI_Title" xml:space="preserve">
+    <value>Suche</value>
+  </data>
+  <data name="SearchDialog_UI_Error_SearchTextEmpty" xml:space="preserve">
+    <value>Suchtext ist leer</value>
+  </data>
+  <data name="SearchDialog_UI_Error_CreatingSearchParameter" xml:space="preserve">
+    <value>Fehler beim Erstellen des Suchparameters\r\n{0}</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Apply" xml:space="preserve">
+    <value>Ü&amp;bernehmen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Add" xml:space="preserve">
+    <value>&amp;Hinzufügen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Help" xml:space="preserve">
+    <value>&amp;Hilfe</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Delete" xml:space="preserve">
+    <value>&amp;Löschen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_MoveUp" xml:space="preserve">
+    <value>Nach oben</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_MoveDown" xml:space="preserve">
+    <value>Nach unten</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_CustomBackColor" xml:space="preserve">
+    <value>Hintergrundfarbe</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_CustomForeColor" xml:space="preserve">
+    <value>Vordergrundfarbe</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BookmarkComment" xml:space="preserve">
+    <value>Lesezeichen Kommentar</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
+    <value>Gruppe löschen</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_GroupDown" xml:space="preserve">
+    <value>Nach unten</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_GroupUp" xml:space="preserve">
+    <value>Nach oben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_NewGroup" xml:space="preserve">
+    <value>Neue Gruppe</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_SelectPlugin" xml:space="preserve">
+    <value>Wählen...</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_AssignNamesToGroups" xml:space="preserve">
+    <value>Sie können in den Einstellungen Gruppen zu Dateinamen zuweisen.</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_BackgroundColor" xml:space="preserve">
+    <value>Hintergrundfarbe</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_ForegroundColor" xml:space="preserve">
+    <value>Vordergrundfarbe</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SearchString" xml:space="preserve">
+    <value>Suchbegriff:</value>
+  </data>
+  <data name="HighlightDialog_UI_Title" xml:space="preserve">
+    <value>Hervorhebungen und Aktionsauslöser</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_RegEx" xml:space="preserve">
+    <value>RegEx</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_DontDirtyLed" xml:space="preserve">
+    <value>Nicht das "dirty LED" aktivieren</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_NoBackground" xml:space="preserve">
+    <value>Kein Hintergrund</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Plugin" xml:space="preserve">
+    <value>Plugin</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Bold" xml:space="preserve">
+    <value>Fett</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Bookmark" xml:space="preserve">
+    <value>Lesezeichen setzen</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_WordMatch" xml:space="preserve">
+    <value>Wort modus</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_StopTail" xml:space="preserve">
+    <value>"Follow tail' Funktion deaktivieren</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>Groß-/Kleinschreibung</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Coloring" xml:space="preserve">
+    <value>Farben</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Groups" xml:space="preserve">
+    <value>Gruppen</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_LineMatchCriteria" xml:space="preserve">
+    <value>Kriterien für die Zeilenübereinstimmung</value>
   </data>
 </root>
