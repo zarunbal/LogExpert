@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33502.453
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11206.111
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert", "LogExpert\LogExpert.csproj", "{F0C0D370-F416-44ED-939A-B4827D15AC14}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -25,10 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Solution Items\AssemblyInfo.cs = Solution Items\AssemblyInfo.cs
+		..\CHANGELOG.md = ..\CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		..\GitVersion.yml = ..\GitVersion.yml
-		..\global.json = ..\global.json
 		..\README.md = ..\README.md
 		Solution Items\usedComponents.json = Solution Items\usedComponents.json
 	EndProjectSection
@@ -73,6 +73,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Columnizers", "Columnizers", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SftpFileSystem.Resources", "SftpFileSystem.Resources\SftpFileSystem.Resources.csproj", "{201CE6E2-776D-40B2-91B1-6AC578374385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +164,10 @@ Global
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{201CE6E2-776D-40B2-91B1-6AC578374385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{201CE6E2-776D-40B2-91B1-6AC578374385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{201CE6E2-776D-40B2-91B1-6AC578374385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{201CE6E2-776D-40B2-91B1-6AC578374385}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
