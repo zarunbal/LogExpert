@@ -1358,11 +1358,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
             labelStatus.Text = e.StatusText;
             labelStatus.Size = TextRenderer.MeasureText(labelStatus.Text, labelStatus.Font);
-            labelLines.Text = $" {e.LineCount} {Resources.LogTabWindow_StatusLineText_lowerCase_Lines}";
+            labelLines.Text = $"{e.LineCount} {Resources.LogTabWindow_StatusLineText_lowerCase_Lines}";
             labelLines.Size = TextRenderer.MeasureText(labelLines.Text, labelLines.Font);
             labelSize.Text = Util.GetFileSizeAsText(e.FileSize);
             labelSize.Size = TextRenderer.MeasureText(labelSize.Text, labelSize.Font);
-            labelCurrentLine.Text = $"{Resources.LogTabWindow_StatusLineText_UpperCase_Lines}: {e.CurrentLineNum}";
+            labelCurrentLine.Text = $"{Resources.LogTabWindow_StatusLineText_UpperCase_Lines} {e.CurrentLineNum}";
             labelCurrentLine.Size = TextRenderer.MeasureText(labelCurrentLine.Text, labelCurrentLine.Font);
             if (statusStrip.InvokeRequired)
             {
@@ -1784,10 +1784,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 _ = process.Start();
             }
-            catch (Win32Exception e)
+            catch (Exception e) when (e is Win32Exception or
+                                            InvalidOperationException or
+                                            ObjectDisposedException or
+                                            PlatformNotSupportedException)
             {
                 _logger.Error(e);
-                _ = MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
@@ -1809,10 +1812,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 startInfo.UseShellExecute = false;
                 _ = process.Start();
             }
-            catch (Exception e)
+            catch (Exception e) when (e is Win32Exception or
+                                            InvalidOperationException or
+                                            ObjectDisposedException or
+                                            PlatformNotSupportedException)
             {
                 _logger.Error(e);
-                _ = MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
     }
@@ -2693,7 +2699,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnShowHelpToolStripMenuItemClick (object sender, EventArgs e)
     {
-        Help.ShowHelp(this, "LogExpert.chm");
+        Help.ShowHelp(this, Resources.LogTabWindow_HelpFile);
     }
 
     private void OnHideLineColumnToolStripMenuItemClick (object sender, EventArgs e)

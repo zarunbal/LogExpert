@@ -654,7 +654,7 @@ Column restrict</value>
     <value>lines</value>
   </data>
   <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
-    <value>Line</value>
+    <value>Line:</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
     <value>-&gt;E</value>
@@ -1449,5 +1449,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   </data>
   <data name="ChooseIconDialog_UI_Text" xml:space="preserve">
     <value>Choose Icon</value>
+  </data>
+  <data name="LogTabWindow_HelpFile" xml:space="preserve">
+    <value>LogExpert.chm</value>
   </data>
 </root>

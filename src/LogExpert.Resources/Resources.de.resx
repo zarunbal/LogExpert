@@ -649,7 +649,7 @@ Spalten restriktion</value>
     <value>linien</value>
   </data>
   <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
-    <value>Linien</value>
+    <value>Linien:</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
     <value>-&gt;E</value>
@@ -1447,5 +1447,8 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="ChooseIconDialog_UI_Text" xml:space="preserve">
     <value>Icon Auswählen</value>
+  </data>
+  <data name="LogTabWindow_HelpFile" xml:space="preserve">
+    <value>LogExpert.chm</value>
   </data>
 </root>
