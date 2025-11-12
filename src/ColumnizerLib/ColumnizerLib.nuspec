@@ -18,6 +18,6 @@
     <tags>LogExpert Columnizer</tags>
   </metadata>
   <files>
-    <file src="\..\..\README.md" target="docs\"></file>
+    <file src="..\..\README.md" target="docs\"></file>
   </files>
 </package>
