@@ -1834,4 +1834,16 @@ all other chars will be used as given</value>
   <data name="KeywordActionDlg_UI_Label_Parameter" xml:space="preserve">
     <value>Parameter</value>
   </data>
+  <data name="MultiLoadRequestDialog_UI_Title" xml:space="preserve">
+  <value>Loading multiple files</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Label_ChooseLoadingMode" xml:space="preserve">
+    <value>Choose loading mode:</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Button_SingleFiles" xml:space="preserve">
+    <value>Single files</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Button_MultiFile" xml:space="preserve">
+    <value>Multi file</value>
+  </data>
 </root>

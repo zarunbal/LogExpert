@@ -3651,6 +3651,42 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multi file.
+        /// </summary>
+        public static string MultiLoadRequestDialog_UI_Button_MultiFile {
+            get {
+                return ResourceManager.GetString("MultiLoadRequestDialog_UI_Button_MultiFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single files.
+        /// </summary>
+        public static string MultiLoadRequestDialog_UI_Button_SingleFiles {
+            get {
+                return ResourceManager.GetString("MultiLoadRequestDialog_UI_Button_SingleFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose loading mode:.
+        /// </summary>
+        public static string MultiLoadRequestDialog_UI_Label_ChooseLoadingMode {
+            get {
+                return ResourceManager.GetString("MultiLoadRequestDialog_UI_Label_ChooseLoadingMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading multiple files.
+        /// </summary>
+        public static string MultiLoadRequestDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("MultiLoadRequestDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open URL.
         /// </summary>
         public static string OpenUriDialog_UI_Dialog_Text {
