@@ -28,6 +28,11 @@ internal partial class TimeSpreadingControl : UserControl
 
     public TimeSpreadingControl ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
         _toolTip = new ToolTip();
         Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -35,6 +40,8 @@ internal partial class TimeSpreadingControl : UserControl
         _toolTip.ReshowDelay = 0;
         _toolTip.ShowAlways = true;
         DoubleBuffered = false;
+
+        ResumeLayout();
     }
 
     #endregion

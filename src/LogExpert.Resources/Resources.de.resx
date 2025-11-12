@@ -275,7 +275,7 @@
   <data name="LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter" xml:space="preserve">
     <value>-&gt;F</value>
   </data>
-  <data name="LogWindow_UI_FilterCount_ZeroValue" xml:space="preserve">
+  <data name="LogWindow_UI_Common_ZeroValue" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="LogWindow_UI_CopyMarkedLinesToTab_Copy" xml:space="preserve">
@@ -1647,5 +1647,41 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   </data>
   <data name="ExceptionWindow_UI_Label_ErrorMessage" xml:space="preserve">
     <value>Ein unbehandelter Fehler ist aufgetreten. Bitte melden Sie dies dem Entwickler.</value>
+  </data>
+  <data name="PatternWindow_UI_Title" xml:space="preserve">
+    <value>Muster</value>
+  </data>
+  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
+    <value>Anzahl der Blöcke (Mustervarianten):</value>
+  </data>
+  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
+    <value>Block Zeilen:</value>
+  </data>
+  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
+    <value>Diese Funktion befindet sich in der Pre-Beta-Phase und funktioniert nicht :)\r\nVerwendung: Wählen Sie einen Bereich im Protokollfenster aus und klicken Sie auf „Recalc“. \r\nDadurch wird nach Textbereichen gesucht, die dem ausgewählten Bereich ähneln.</value>
+  </data>
+  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
+    <value>Fuzzy</value>
+  </data>
+  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
+    <value>Max diff</value>
+  </data>
+  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
+    <value>Max misses</value>
+  </data>
+  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
+    <value>Gewichtung</value>
+  </data>
+  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
+    <value>(keine Reichweite gesetzt)</value>
+  </data>
+  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
+    <value>Neuberechnen</value>
+  </data>
+  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
+    <value>Bereich setzen</value>
+  </data>
+  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
+    <value>Start: {0}\nEnde: {1}</value>
   </data>
 </root>

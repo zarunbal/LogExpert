@@ -46,10 +46,12 @@ internal partial class DateTimeDragControl : UserControl
 
     public DateTimeDragControl ()
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
 
         _digitsFormat.LineAlignment = StringAlignment.Center;
         _digitsFormat.Alignment = StringAlignment.Near;
@@ -57,6 +59,8 @@ internal partial class DateTimeDragControl : UserControl
         _digitsFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip | StringFormatFlags.NoWrap;
 
         _draggedDigit = NO_DIGIT_DRAGGED;
+
+        ResumeLayout();
     }
 
     #endregion
