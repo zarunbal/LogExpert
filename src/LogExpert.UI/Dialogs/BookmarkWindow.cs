@@ -31,22 +31,33 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     public BookmarkWindow ()
     {
-        InitializeComponent();
+        SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
 
         bookmarkDataGridView.CellValueNeeded += OnBoomarkDataGridViewCellValueNeeded;
         bookmarkDataGridView.CellPainting += OnBoomarkDataGridViewCellPainting;
 
         ApplyResources();
+
+        ResumeLayout();
     }
 
     private void ApplyResources ()
     {
-        removeCommentsToolStripMenuItem.Text = Resources.BookmarkWindow_UI_ToolStripMenuItem_removeCommentsToolStripMenuItem;
-        checkBoxCommentColumn.Text = Resources.BookmarkWindow_UI_CheckBox_checkBoxCommentColumn;
-        Text = Resources.BookmarkWindow_UI_Text;
-        labelComment.Text = Resources.BookmarkWindow_UI_Label_labelComment;
+        // Dialog title
+        Text = Resources.BookmarkWindow_UI_Title;
+
+        labelComment.Text = Resources.BookmarkWindow_UI_Label_Comment;
+
+        checkBoxCommentColumn.Text = Resources.BookmarkWindow_UI_CheckBox_ShowCommentColumn;
+
+        deleteBookmarkssToolStripMenuItem.Text = Resources.BookmarkWindow_UI_MenuItem_DeleteBookmarks;
+        removeCommentsToolStripMenuItem.Text = Resources.BookmarkWindow_UI_ToolStripMenuItem_RemoveComments;
     }
 
     #endregion
