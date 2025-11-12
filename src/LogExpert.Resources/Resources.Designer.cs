@@ -3723,6 +3723,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value for parameter:.
+        /// </summary>
+        public static string ParamRequesterDialog_UI_Label_ValueForParameter {
+            get {
+                return ResourceManager.GetString("ParamRequesterDialog_UI_Label_ValueForParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tool parameter.
+        /// </summary>
+        public static string ParamRequesterDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("ParamRequesterDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recalc.
         /// </summary>
         public static string PatternWindow_UI_Button_Recalc {
