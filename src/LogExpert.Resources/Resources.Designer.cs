@@ -5240,5 +5240,63 @@ namespace LogExpert {
                 return ResourceManager.GetString("TimeSpreadingControl_UI_ToolTip", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RegEx Help.
+        /// </summary>
+        public static string ToolArgsDialog_UI_Button_RegexHelp {
+            get {
+                return ResourceManager.GetString("ToolArgsDialog_UI_Button_RegexHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test.
+        /// </summary>
+        public static string ToolArgsDialog_UI_Button_Test {
+            get {
+                return ResourceManager.GetString("ToolArgsDialog_UI_Button_Test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %L = Current line number
+        ///%N = Current log file name without path
+        ///%P = Path (directory) of current log file
+        ///%F = Full name (incl. path) of log file
+        ///%E = Extension of log file name (e.g. &apos;txt&apos;)
+        ///%M = Name of log file without extension
+        ///%S = User (from URI)
+        ///%R = Path (from URI)
+        ///%H = Host (from URI)
+        ///%T = Port (from URI)
+        ///?\&quot;&lt;name&gt;\&quot; = variable parameter &apos;name&apos;
+        ///?\&quot;&lt;name&gt;\&quot;(def1,def2,...) = variable parameter with predefined values
+        ///{&lt;regex&gt;}{&lt;replace&gt;}:
+        ///Regex search/replace on current selected line.
+        /// </summary>
+        public static string ToolArgsDialog_UI_HelpText {
+            get {
+                return ResourceManager.GetString("ToolArgsDialog_UI_HelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter command line:.
+        /// </summary>
+        public static string ToolArgsDialog_UI_Label_EnterCommandLine {
+            get {
+                return ResourceManager.GetString("ToolArgsDialog_UI_Label_EnterCommandLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tool Arguments Help.
+        /// </summary>
+        public static string ToolArgsDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("ToolArgsDialog_UI_Title", resourceCulture);
+            }
+        }
     }
 }

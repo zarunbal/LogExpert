@@ -1852,4 +1852,32 @@ Alle anderen Zeichen werden benutzt wie sie angegeben sind</value>
   <data name="SearchProgressDialog_UI_Button_CancelSearch" xml:space="preserve">
     <value>Suche abbrechen</value>
   </data>
+  <data name="ToolArgsDialog_UI_Title" xml:space="preserve">
+    <value>Tool Arguments Hilfe</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_RegexHelp" xml:space="preserve">
+    <value>Regex Hilfe</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Label_EnterCommandLine" xml:space="preserve">
+    <value>Befehlszeile eingeben:</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_Test" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="ToolArgsDialog_UI_HelpText" xml:space="preserve">
+    <value>%L = Aktuelle Zeilennummer
+%N = Aktueller Name der Protokolldatei ohne Pfad
+%P = Pfad (Verzeichnis) der aktuellen Protokolldatei
+%F = Vollständiger Name (inkl. Pfad) der Protokolldatei
+%E = Erweiterung des Namens der Protokolldatei (z. B. „txt”)
+%M = Name der Protokolldatei ohne Erweiterung
+%S = Benutzer (aus URI)
+%R = Pfad (aus URI)
+%H = Host (aus URI)
+%T = Port (aus URI)
+?\„&lt;name&gt;\“ = variabler Parameter „name”
+?\„&lt;name&gt;\“(def1,def2,...) = variabler Parameter mit vordefinierten Werten
+{&lt;regex&gt;}{&lt;replace&gt;}:
+Regex-Suche/Ersetzen in der aktuell ausgewählten Zeile</value>
+  </data>
 </root>

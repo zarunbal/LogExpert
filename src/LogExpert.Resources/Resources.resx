@@ -1855,4 +1855,32 @@ all other chars will be used as given</value>
   <data name="SearchProgressDialog_UI_Button_CancelSearch" xml:space="preserve">
     <value>Cancel search</value>
   </data>
+  <data name="ToolArgsDialog_UI_Title" xml:space="preserve">
+    <value>Tool Arguments Help</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Label_EnterCommandLine" xml:space="preserve">
+    <value>Enter command line:</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_Test" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_RegexHelp" xml:space="preserve">
+    <value>RegEx Help</value>
+  </data>
+  <data name="ToolArgsDialog_UI_HelpText" xml:space="preserve">
+    <value>%L = Current line number
+%N = Current log file name without path
+%P = Path (directory) of current log file
+%F = Full name (incl. path) of log file
+%E = Extension of log file name (e.g. 'txt')
+%M = Name of log file without extension
+%S = User (from URI)
+%R = Path (from URI)
+%H = Host (from URI)
+%T = Port (from URI)
+?\"&lt;name&gt;\" = variable parameter 'name'
+?\"&lt;name&gt;\"(def1,def2,...) = variable parameter with predefined values
+{&lt;regex&gt;}{&lt;replace&gt;}:
+Regex search/replace on current selected line</value>
+  </data>
 </root>
