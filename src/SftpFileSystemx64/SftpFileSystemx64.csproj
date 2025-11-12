@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\SftpFileSystem.Resources\SftpFileSystem.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
