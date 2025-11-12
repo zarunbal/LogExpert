@@ -1822,4 +1822,13 @@ Alle anderen Zeichen werden benutzt wie sie angegeben sind</value>
   <data name="ImportSettingsDialog_UI_OpenFileDialog_Filter" xml:space="preserve">
     <value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
   </data>
+  <data name="KeywordActionDlg_UI_Title" xml:space="preserve">
+  <value>Schlüsselwort-Aktion</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_KeywordActionPlugin" xml:space="preserve">
+    <value>Schlüsselwort-Aktion-Plugin:</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_Parameter" xml:space="preserve">
+    <value>Parameter</value>
+  </data>
 </root>

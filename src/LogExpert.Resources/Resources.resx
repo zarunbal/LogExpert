@@ -1825,4 +1825,13 @@ all other chars will be used as given</value>
     <value>Settings (*.json)|*.json|All files (*.*)|*.*</value>
     <comment>File filter format: Description|Pattern|Description|Pattern</comment>
   </data>
+  <data name="KeywordActionDlg_UI_Title" xml:space="preserve">
+  <value>Keyword Action</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_KeywordActionPlugin" xml:space="preserve">
+    <value>Keyword action plugin:</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_Parameter" xml:space="preserve">
+    <value>Parameter</value>
+  </data>
 </root>

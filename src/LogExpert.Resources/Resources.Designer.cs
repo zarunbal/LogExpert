@@ -1218,6 +1218,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Keyword action plugin:.
+        /// </summary>
+        public static string KeywordActionDlg_UI_Label_KeywordActionPlugin {
+            get {
+                return ResourceManager.GetString("KeywordActionDlg_UI_Label_KeywordActionPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter.
+        /// </summary>
+        public static string KeywordActionDlg_UI_Label_Parameter {
+            get {
+                return ResourceManager.GetString("KeywordActionDlg_UI_Label_Parameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyword Action.
+        /// </summary>
+        public static string KeywordActionDlg_UI_Title {
+            get {
+                return ResourceManager.GetString("KeywordActionDlg_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not begin restart session. Unable to determine file locker..
         /// </summary>
         public static string Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker {
