@@ -1846,4 +1846,13 @@ all other chars will be used as given</value>
   <data name="MultiLoadRequestDialog_UI_Button_MultiFile" xml:space="preserve">
     <value>Multi file</value>
   </data>
+  <data name="SearchProgressDialog_UI_Title" xml:space="preserve">
+  <value>Searching...</value>
+  </data>
+  <data name="SearchProgressDialog_UI_Label_SearchingInProgress" xml:space="preserve">
+    <value>Searching in progress...</value>
+  </data>
+  <data name="SearchProgressDialog_UI_Button_CancelSearch" xml:space="preserve">
+    <value>Cancel search</value>
+  </data>
 </root>

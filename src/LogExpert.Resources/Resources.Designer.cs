@@ -4131,6 +4131,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel search.
+        /// </summary>
+        public static string SearchProgressDialog_UI_Button_CancelSearch {
+            get {
+                return ResourceManager.GetString("SearchProgressDialog_UI_Button_CancelSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching in progress....
+        /// </summary>
+        public static string SearchProgressDialog_UI_Label_SearchingInProgress {
+            get {
+                return ResourceManager.GetString("SearchProgressDialog_UI_Label_SearchingInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching....
+        /// </summary>
+        public static string SearchProgressDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("SearchProgressDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Settings {
