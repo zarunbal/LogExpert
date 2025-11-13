@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Dialogs; 
+namespace LogExpert.Dialogs; 
 partial class BookmarkWindow {
 /// <summary>
 /// Required designer variable.
@@ -31,8 +31,8 @@ private void InitializeComponent() {
   this.bookmarkTextBox = new System.Windows.Forms.TextBox();
   this.splitContainer1 = new System.Windows.Forms.SplitContainer();
   this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
-  this.commentColumnCheckBox = new System.Windows.Forms.CheckBox();
-  this.label1 = new System.Windows.Forms.Label();
+  this.checkBoxCommentColumn = new System.Windows.Forms.CheckBox();
+  this.labelComment = new System.Windows.Forms.Label();
   this.contextMenuStrip1.SuspendLayout();
   this.splitContainer1.Panel1.SuspendLayout();
   this.splitContainer1.Panel2.SuspendLayout();
@@ -88,8 +88,8 @@ private void InitializeComponent() {
   // 
   // splitContainer1.Panel2
   // 
-  this.splitContainer1.Panel2.Controls.Add(this.commentColumnCheckBox);
-  this.splitContainer1.Panel2.Controls.Add(this.label1);
+  this.splitContainer1.Panel2.Controls.Add(this.checkBoxCommentColumn);
+  this.splitContainer1.Panel2.Controls.Add(this.labelComment);
   this.splitContainer1.Panel2.Controls.Add(this.bookmarkTextBox);
   this.splitContainer1.Size = new System.Drawing.Size(717, 158);
   this.splitContainer1.SplitterDistance = 517;
@@ -133,24 +133,24 @@ private void InitializeComponent() {
   // 
   // commentColumnCheckBox
   // 
-  this.commentColumnCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-  this.commentColumnCheckBox.AutoSize = true;
-  this.commentColumnCheckBox.Location = new System.Drawing.Point(7, 138);
-  this.commentColumnCheckBox.Name = "commentColumnCheckBox";
-  this.commentColumnCheckBox.Size = new System.Drawing.Size(136, 17);
-  this.commentColumnCheckBox.TabIndex = 8;
-  this.commentColumnCheckBox.Text = "Show comment column";
-  this.commentColumnCheckBox.UseVisualStyleBackColor = true;
-  this.commentColumnCheckBox.CheckedChanged += new System.EventHandler(this.OnCommentColumnCheckBoxCheckedChanged);
+  this.checkBoxCommentColumn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+  this.checkBoxCommentColumn.AutoSize = true;
+  this.checkBoxCommentColumn.Location = new System.Drawing.Point(7, 138);
+  this.checkBoxCommentColumn.Name = "checkBoxCommentColumn";
+  this.checkBoxCommentColumn.Size = new System.Drawing.Size(136, 17);
+  this.checkBoxCommentColumn.TabIndex = 8;
+  this.checkBoxCommentColumn.Text = "Show comment column";
+  this.checkBoxCommentColumn.UseVisualStyleBackColor = true;
+  this.checkBoxCommentColumn.CheckedChanged += new System.EventHandler(this.OnCommentColumnCheckBoxCheckedChanged);
   // 
   // label1
   // 
-  this.label1.AutoSize = true;
-  this.label1.Location = new System.Drawing.Point(4, 4);
-  this.label1.Name = "label1";
-  this.label1.Size = new System.Drawing.Size(104, 13);
-  this.label1.TabIndex = 7;
-  this.label1.Text = "Bookmark comment:";
+  this.labelComment.AutoSize = true;
+  this.labelComment.Location = new System.Drawing.Point(4, 4);
+  this.labelComment.Name = "labelComment";
+  this.labelComment.Size = new System.Drawing.Size(104, 13);
+  this.labelComment.TabIndex = 7;
+  this.labelComment.Text = "Bookmark comment:";
   // 
   // BookmarkWindow
   // 
@@ -189,7 +189,7 @@ private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
 private System.Windows.Forms.ToolStripMenuItem deleteBookmarkssToolStripMenuItem;
 private System.Windows.Forms.TextBox bookmarkTextBox;
 private System.Windows.Forms.SplitContainer splitContainer1;
-private System.Windows.Forms.Label label1;
+private System.Windows.Forms.Label labelComment;
 private System.Windows.Forms.ToolStripMenuItem removeCommentsToolStripMenuItem;
-private System.Windows.Forms.CheckBox commentColumnCheckBox;
+private System.Windows.Forms.CheckBox checkBoxCommentColumn;
 }

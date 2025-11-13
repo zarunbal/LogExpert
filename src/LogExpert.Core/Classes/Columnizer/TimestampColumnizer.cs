@@ -1,4 +1,4 @@
-﻿using static LogExpert.Core.Classes.Columnizer.TimeFormatDeterminer;
+using static LogExpert.Core.Classes.Columnizer.TimeFormatDeterminer;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
@@ -27,16 +27,18 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
 
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        IColumnizedLogLine cols = SplitLine(callback, line);
+        var cols = SplitLine(callback, line);
         if (cols == null || cols.ColumnValues == null || cols.ColumnValues.Length < 2)
         {
             return DateTime.MinValue;
         }
+
         if (cols.ColumnValues[0].FullValue.Length == 0 || cols.ColumnValues[1].FullValue.Length == 0)
         {
             return DateTime.MinValue;
         }
-        FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
+
+        var formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(line.FullLine);
         if (formatInfo == null)
         {
             return DateTime.MinValue;
@@ -62,11 +64,12 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         {
             try
             {
-                FormatInfo formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue);
+                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue);
                 if (formatInfo == null)
                 {
                     return;
                 }
+
                 var newDateTime = DateTime.ParseExact(value, formatInfo.TimeFormat, formatInfo.CultureInfo);
                 var oldDateTime = DateTime.ParseExact(oldValue, formatInfo.TimeFormat, formatInfo.CultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
@@ -119,12 +122,13 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
 
         var temp = line.FullLine;
 
-        FormatInfo formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(temp);
+        var formatInfo = _timeFormatDeterminer.DetermineDateTimeFormatInfo(temp);
         if (formatInfo == null)
         {
             columns[2].FullValue = temp;
             return clogLine;
         }
+
         var endPos = formatInfo.DateTimeFormat.Length;
         var timeLen = formatInfo.TimeFormat.Length;
         var dateLen = formatInfo.DateFormat.Length;
@@ -177,20 +181,22 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
             columns[1].FullValue = "n/a";
             columns[2].FullValue = temp;
         }
+
         return clogLine;
     }
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
-        Priority result = Priority.NotSupport;
+        var result = Priority.NotSupport;
 
         var timeStampCount = 0;
-        foreach (ILogLine line in samples)
+        foreach (var line in samples)
         {
             if (line == null || string.IsNullOrEmpty(line.FullLine))
             {
                 continue;
             }
+
             var timeDeterminer = new TimeFormatDeterminer();
             if (null != timeDeterminer.DetermineDateTimeFormatInfo(line.FullLine))
             {

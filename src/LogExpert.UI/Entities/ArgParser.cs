@@ -78,18 +78,14 @@ internal class ArgParser (string argTemplate)
                     {
                         end2 = builder.Length - 1;
                     }
+
                     var valueStr = builder.ToString().Substring(end + 2, end2 - end - 2);
                     values = valueStr.Split([','], StringSplitOptions.None);
                     end = end2;
                 }
 
-                ParamRequesterDialog dlg = new()
-                {
-                    ParamName = ask,
-                    Values = values
-                };
-
-                DialogResult res = dlg.ShowDialog(parent);
+                ParamRequesterDialog dlg = new(ask, values);
+                var res = dlg.ShowDialog(parent);
 
                 if (res is DialogResult.OK)
                 {

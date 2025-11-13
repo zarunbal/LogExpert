@@ -47,6 +47,7 @@ internal class Tokenizer
                 return offset - startOffset;
             }
         }
+
         return 0;
     }
 
@@ -59,6 +60,7 @@ internal class Tokenizer
                 return true;
             }
         }
+
         return false;
     }
 
@@ -89,6 +91,7 @@ internal class Tokenizer
             Advance();
             return true;
         }
+
         return false;
     }
 

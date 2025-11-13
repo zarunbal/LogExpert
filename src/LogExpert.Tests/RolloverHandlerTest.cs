@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
 using LogExpert.PluginRegistry.FileSystem;
 
@@ -20,13 +20,13 @@ internal class RolloverHandlerTest : RolloverHandlerTestBase
         options.FormatPattern = format;
         options.MaxDayTry = retries;
 
-        LinkedList<string> files = CreateTestFilesWithoutDate();
+        var files = CreateTestFilesWithoutDate();
 
         var firstFile = files.Last.Value;
 
         ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
         RolloverFilenameHandler handler = new(info, options);
-        LinkedList<string> fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
 
         Assert.That(fileList, Is.EqualTo(files));
 
@@ -41,13 +41,13 @@ internal class RolloverHandlerTest : RolloverHandlerTestBase
         options.FormatPattern = format;
         options.MaxDayTry = retries;
 
-        LinkedList<string> files = CreateTestFilesWithDate();
+        var files = CreateTestFilesWithDate();
 
         var firstFile = files.Last.Value;
 
         ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
         RolloverFilenameHandler handler = new(info, options);
-        LinkedList<string> fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
 
         Assert.That(fileList, Is.EqualTo(files));
 

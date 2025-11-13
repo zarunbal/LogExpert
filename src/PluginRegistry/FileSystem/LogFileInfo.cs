@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 
 namespace LogExpert.PluginRegistry.FileSystem;
 
@@ -67,6 +67,7 @@ public class LogFileInfo : ILogFileInfo
                         _logger.Warn(e, "LogFileInfo.Length");
                         return -1;
                     }
+
                     Thread.Sleep(RETRY_SLEEP);
                 }
             }
@@ -97,6 +98,7 @@ public class LogFileInfo : ILogFileInfo
             {
                 return -1;
             }
+
             try
             {
                 fInfo.Refresh();
@@ -137,6 +139,7 @@ public class LogFileInfo : ILogFileInfo
                 {
                     throw;
                 }
+
                 Thread.Sleep(RETRY_SLEEP);
             }
             catch (UnauthorizedAccessException uae)
@@ -146,6 +149,7 @@ public class LogFileInfo : ILogFileInfo
                 {
                     throw new IOException("Error opening file", uae);
                 }
+
                 Thread.Sleep(RETRY_SLEEP);
             }
         }
@@ -159,6 +163,7 @@ public class LogFileInfo : ILogFileInfo
             lastLength = LengthWithoutRetry;
             return true;
         }
+
         return false;
     }
 

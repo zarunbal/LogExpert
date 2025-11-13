@@ -8,19 +8,20 @@ public static class ColumnizerPicker
 {
     public static ILogLineColumnizer FindColumnizerByName (string name, IList<ILogLineColumnizer> list)
     {
-        foreach (ILogLineColumnizer columnizer in list)
+        foreach (var columnizer in list)
         {
             if (columnizer.GetName().Equals(name, StringComparison.Ordinal))
             {
                 return columnizer;
             }
         }
+
         return null;
     }
 
     public static ILogLineColumnizer DecideColumnizerByName (string name, IList<ILogLineColumnizer> list)
     {
-        foreach (ILogLineColumnizer columnizer in list)
+        foreach (var columnizer in list)
         {
             if (columnizer.GetName().Equals(name, StringComparison.Ordinal))
             {
@@ -37,7 +38,8 @@ public static class ColumnizerPicker
         {
             return null;
         }
-        ConstructorInfo cti = columnizer.GetType().GetConstructor(Type.EmptyTypes);
+
+        var cti = columnizer.GetType().GetConstructor(Type.EmptyTypes);
 
         if (cti != null)
         {
@@ -47,8 +49,10 @@ public static class ColumnizerPicker
             {
                 configurator.LoadConfig(directory);
             }
+
             return (ILogLineColumnizer)o;
         }
+
         return null;
     }
 
@@ -69,6 +73,7 @@ public static class ColumnizerPicker
         {
             return FindColumnizer(fileName, logFileReader, list);
         }
+
         return logLineColumnizer;
     }
 
@@ -83,6 +88,7 @@ public static class ColumnizerPicker
         {
             return null;
         }
+
         return newColumnizer;
     }
 
@@ -125,7 +131,7 @@ public static class ColumnizerPicker
 
         List<(Priority priority, ILogLineColumnizer columnizer)> priorityListOfColumnizers = [];
 
-        foreach (ILogLineColumnizer logLineColumnizer in registeredColumnizer)
+        foreach (var logLineColumnizer in registeredColumnizer)
         {
             Priority priority = default;
             if (logLineColumnizer is IColumnizerPriority columnizerPriority)
@@ -136,7 +142,7 @@ public static class ColumnizerPicker
             priorityListOfColumnizers.Add((priority, logLineColumnizer));
         }
 
-        ILogLineColumnizer lineColumnizer = priorityListOfColumnizers.OrderByDescending(item => item.priority).Select(item => item.columnizer).First();
+        var lineColumnizer = priorityListOfColumnizers.OrderByDescending(item => item.priority).Select(item => item.columnizer).First();
 
         return lineColumnizer;
     }

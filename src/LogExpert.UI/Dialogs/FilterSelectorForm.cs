@@ -18,33 +18,37 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     public FilterSelectorForm (IList<ILogLineColumnizer> existingColumnizerList, ILogLineColumnizer currentColumnizer, ILogLineColumnizerCallback callback, IConfigManager configManager)
     {
+        SuspendLayout();
+
         SelectedColumnizer = currentColumnizer;
         _callback = callback;
         InitializeComponent();
 
-        ConfigManager = configManager;
-
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        ApplyResources();
+
+        ConfigManager = configManager;
 
         filterComboBox.SelectedIndexChanged += OnFilterComboBoxSelectedIndexChanged;
 
         // for the currently selected columnizer use the current instance and not the template instance from
         // columnizer registry. This ensures that changes made in columnizer config dialogs
         // will apply to the current instance
-        _columnizerList = new List<ILogLineColumnizer>();
+        _columnizerList = [];
 
-        foreach (ILogLineColumnizer col in existingColumnizerList)
+        foreach (var col in existingColumnizerList)
         {
             _columnizerList.Add(col.GetType() == SelectedColumnizer.GetType() ? SelectedColumnizer : col);
         }
 
-        foreach (ILogLineColumnizer col in _columnizerList)
+        foreach (var col in _columnizerList)
         {
-            filterComboBox.Items.Add(col);
+            _ = filterComboBox.Items.Add(col);
         }
 
-        foreach (ILogLineColumnizer columnizer in _columnizerList)
+        foreach (var columnizer in _columnizerList)
         {
             if (columnizer.GetType() == SelectedColumnizer.GetType())
             {
@@ -52,6 +56,18 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
                 break;
             }
         }
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.FilterSelectorForm_UI_Title;
+        label1.Text = Resources.FilterSelectorForm_UI_Label_ChooseColumnizer;
+        applyToAllCheckBox.Text = Resources.FilterSelectorForm_UI_CheckBox_ApplyToAll;
+        configButton.Text = Resources.FilterSelectorForm_UI_Button_Config;
+        okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
+        cancelButton.Text = Resources.LogExpert_Common_UI_Button_Cancel;
     }
 
     #endregion
@@ -71,10 +87,15 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     private void OnFilterComboBoxSelectedIndexChanged (object sender, EventArgs e)
     {
-        ILogLineColumnizer col = _columnizerList[filterComboBox.SelectedIndex];
+        var col = _columnizerList[filterComboBox.SelectedIndex];
         SelectedColumnizer = col;
         var description = col.GetDescription();
-        description += "\r\nSupports timeshift: " + (SelectedColumnizer.IsTimeshiftImplemented() ? "Yes" : "No");
+        var timeshiftSupported = SelectedColumnizer.IsTimeshiftImplemented()
+            ? Resources.FilterSelectorForm_UI_Text_SupportsTimeshift_Yes
+            : Resources.FilterSelectorForm_UI_Text_SupportsTimeshift_No;
+        description += string.Format(System.Globalization.CultureInfo.CurrentCulture,
+            Resources.FilterSelectorForm_UI_Text_SupportsTimeshift_Format,
+            timeshiftSupported);
         commentTextBox.Text = description;
         configButton.Enabled = SelectedColumnizer is IColumnizerConfigurator;
     }

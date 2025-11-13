@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Runtime.Versioning;
 
@@ -49,6 +50,7 @@ internal class ColorComboBox : ComboBox
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color CustomColor
     {
         get => _customColor;
@@ -78,13 +80,11 @@ internal class ColorComboBox : ComboBox
 
             if (e.Index == 0)
             {
-                e.Graphics.DrawString("Custom", e.Font, Brushes.Black,
-                    new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(Resources.ColorComboBox_UI_ColorComboBox_Text_Custom, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
             }
             else
             {
-                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, Brushes.Black,
-                    new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
             }
 
             if (!Enabled)
@@ -94,6 +94,7 @@ internal class ColorComboBox : ComboBox
                 e.Graphics.FillRectangle(brush, rectangle);
                 brush.Dispose();
             }
+
             e.DrawFocusRectangle();
         }
     }

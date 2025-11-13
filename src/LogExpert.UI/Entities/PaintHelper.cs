@@ -122,7 +122,7 @@ internal static class PaintHelper
     {
         DataGridViewTextBoxColumn lineNumberColumn = new()
         {
-            HeaderText = "Line",
+            HeaderText = Resources.PaintHelper_HeaderText_LineNumberColumn,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet,
             Resizable = DataGridViewTriState.NotSet,
             DividerWidth = 1,
@@ -306,7 +306,12 @@ internal static class PaintHelper
         {
             DataGridViewAdvancedCellBorderStyle.None => 0,
             DataGridViewAdvancedCellBorderStyle.InsetDouble or DataGridViewAdvancedCellBorderStyle.OutsetDouble => 2,
-            _ => 1
+            DataGridViewAdvancedCellBorderStyle.NotSet => 0, // Default border size for NotSet
+            DataGridViewAdvancedCellBorderStyle.Single => 0, // Default border size for Single
+            DataGridViewAdvancedCellBorderStyle.Inset => 0, // Default border size for Inset
+            DataGridViewAdvancedCellBorderStyle.Outset => 0, // Default border size for Outset
+            DataGridViewAdvancedCellBorderStyle.OutsetPartial => 0, // Default border size for OutsetPartial
+            _ => 0
         };
     }
 
@@ -349,7 +354,7 @@ internal static class PaintHelper
                     //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
                     ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
-                    IsRegEx = false,
+                    IsRegex = false,
                     IsCaseSensitive = false,
                     IsLedSwitch = false,
                     IsStopTail = false,
@@ -376,7 +381,6 @@ internal static class PaintHelper
             valBounds.Width -= e.CellStyle.Padding.Horizontal;
             valBounds.Height -= e.CellStyle.Padding.Vertical;
         }
-
 
         var flags =
                 TextFormatFlags.Left
@@ -434,7 +438,6 @@ internal static class PaintHelper
                 {
                     e.Graphics.FillRectangle(bgBrush, wordRect);
                 }
-
             }
 
             TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect, foreColor, flags);

@@ -97,6 +97,7 @@ public class FilterStarter
                     break;
                 }
             }
+
             _logger.Info(CultureInfo.InvariantCulture, "FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
 
             var filter = await Task.Run(() => DoWork(filterParams, workStartLine, interval, ThreadProgressCallback)).ConfigureAwait(false);

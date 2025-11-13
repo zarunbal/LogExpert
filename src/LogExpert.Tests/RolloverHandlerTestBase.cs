@@ -15,7 +15,7 @@ internal class RolloverHandlerTestBase
     protected LinkedList<string> CreateTestFilesWithDate ()
     {
         LinkedList<string> createdFiles = new();
-        DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         TestDirectory = dInfo;
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_1.log"));
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_0.log"));
@@ -31,7 +31,7 @@ internal class RolloverHandlerTestBase
     protected LinkedList<string> CreateTestFilesWithoutDate ()
     {
         LinkedList<string> createdFiles = new();
-        DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         TestDirectory = dInfo;
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine.log.6"));
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine.log.5"));
@@ -46,14 +46,14 @@ internal class RolloverHandlerTestBase
     protected LinkedList<string> RolloverSimulation (LinkedList<string> files, string formatPattern,
         bool deleteLatestFile)
     {
-        LinkedList<string> fileList = files;
+        var fileList = files;
         RolloverFilenameBuilder fnb = new(formatPattern);
         fnb.SetFileName(fileList.Last.Value);
         fnb.Index += fileList.Count;
         var newFileName = fnb.BuildFileName();
         fileList.AddFirst(newFileName);
-        LinkedList<string>.Enumerator enumerator = fileList.GetEnumerator();
-        LinkedList<string>.Enumerator nextEnumerator = fileList.GetEnumerator();
+        var enumerator = fileList.GetEnumerator();
+        var nextEnumerator = fileList.GetEnumerator();
         nextEnumerator.MoveNext(); // move on 2nd entry
         enumerator.MoveNext();
 

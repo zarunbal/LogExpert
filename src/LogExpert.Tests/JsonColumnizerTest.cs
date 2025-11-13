@@ -16,7 +16,7 @@ public class JsonColumnizerTest
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
 
-        ILogLine line = reader.GetLogLine(0);
+        var line = reader.GetLogLine(0);
         if (line != null)
         {
             jsonColumnizer.SplitLine(null, line);

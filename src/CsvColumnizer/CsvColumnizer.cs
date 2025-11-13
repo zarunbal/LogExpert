@@ -93,7 +93,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         if (_isValidCsv)
         {
             var i = 0;
-            foreach (CsvColumn column in _columnList)
+            foreach (var column in _columnList)
             {
                 names[i++] = column.Name;
             }
@@ -156,7 +156,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         if (_isValidCsv) // see PreProcessLine()
         {
             _columnList.Clear();
-            ILogLine line = _config.HasFieldNames ? _firstLine : callback.GetLogLine(0);
+            var line = _config.HasFieldNames ? _firstLine : callback.GetLogLine(0);
 
             if (line != null)
             {
@@ -241,7 +241,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
-        Priority result = Priority.NotSupport;
+        var result = Priority.NotSupport;
 
         if (fileName.EndsWith("csv", StringComparison.OrdinalIgnoreCase))
         {

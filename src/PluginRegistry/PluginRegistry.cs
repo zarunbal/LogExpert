@@ -129,11 +129,12 @@ public class PluginRegistry : IPluginRegistry
                 // can happen when a dll dependency is missing
                 if (ex.LoaderExceptions != null && ex.LoaderExceptions.Length != 0)
                 {
-                    foreach (Exception loaderException in ex.LoaderExceptions)
+                    foreach (var loaderException in ex.LoaderExceptions)
                     {
                         _logger.Error(loaderException, "Plugin load failed with '{0}'", dllName);
                     }
                 }
+
                 _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
                 throw;
             }
@@ -150,15 +151,15 @@ public class PluginRegistry : IPluginRegistry
     private void LoadPluginAssembly (string dllName, string interfaceName)
     {
         var assembly = Assembly.LoadFrom(dllName);
-        Type[] types = assembly.GetTypes();
+        var types = assembly.GetTypes();
 
-        foreach (Type type in types)
+        foreach (var type in types)
         {
             _logger.Info($"Type {type.FullName} in assembly {assembly.FullName} implements {interfaceName}");
 
             if (type.GetInterfaces().Any(i => i.FullName == interfaceName))
             {
-                ConstructorInfo cti = type.GetConstructor(Type.EmptyTypes);
+                var cti = type.GetConstructor(Type.EmptyTypes);
                 if (cti != null)
                 {
                     var instance = cti.Invoke([]);
@@ -200,13 +201,13 @@ public class PluginRegistry : IPluginRegistry
 
     public IKeywordAction FindKeywordActionPluginByName (string name)
     {
-        _registeredKeywordsDict.TryGetValue(name, out IKeywordAction action);
+        _registeredKeywordsDict.TryGetValue(name, out var action);
         return action;
     }
 
     public void CleanupPlugins ()
     {
-        foreach (ILogExpertPlugin plugin in _pluginList)
+        foreach (var plugin in _pluginList)
         {
             plugin.AppExiting();
         }
@@ -219,7 +220,7 @@ public class PluginRegistry : IPluginRegistry
             _logger.Debug(CultureInfo.InvariantCulture, "Trying to find file system plugin for uri {0}", uriString);
         }
 
-        foreach (IFileSystemPlugin fs in RegisteredFileSystemPlugins)
+        foreach (var fs in RegisteredFileSystemPlugins)
         {
             if (_logger.IsDebugEnabled)
             {
@@ -247,7 +248,7 @@ public class PluginRegistry : IPluginRegistry
     //TODO: Can this be deleted?
     private bool TryAsContextMenu (Type type)
     {
-        IContextMenuEntry me = TryInstantiate<IContextMenuEntry>(type);
+        var me = TryInstantiate<IContextMenuEntry>(type);
 
         if (me != null)
         {
@@ -273,7 +274,7 @@ public class PluginRegistry : IPluginRegistry
     //TODO: Can this be delted?
     private bool TryAsKeywordAction (Type type)
     {
-        IKeywordAction ka = TryInstantiate<IKeywordAction>(type);
+        var ka = TryInstantiate<IKeywordAction>(type);
         if (ka != null)
         {
             RegisteredKeywordActions.Add(ka);
@@ -300,7 +301,7 @@ public class PluginRegistry : IPluginRegistry
     private bool TryAsFileSystem (Type type)
     {
         // file system plugins can have optional constructor with IFileSystemCallback argument
-        IFileSystemPlugin fs = TryInstantiate<IFileSystemPlugin>(type, _fileSystemCallback);
+        var fs = TryInstantiate<IFileSystemPlugin>(type, _fileSystemCallback);
         fs ??= TryInstantiate<IFileSystemPlugin>(type);
 
         if (fs != null)
@@ -327,11 +328,11 @@ public class PluginRegistry : IPluginRegistry
 
     private static T TryInstantiate<T> (Type loadedType) where T : class
     {
-        Type t = typeof(T);
-        Type inter = loadedType.GetInterface(t.Name);
+        var t = typeof(T);
+        var inter = loadedType.GetInterface(t.Name);
         if (inter != null)
         {
-            ConstructorInfo cti = loadedType.GetConstructor(Type.EmptyTypes);
+            var cti = loadedType.GetConstructor(Type.EmptyTypes);
             if (cti != null)
             {
                 var o = cti.Invoke([]);
@@ -344,11 +345,11 @@ public class PluginRegistry : IPluginRegistry
 
     private static T TryInstantiate<T> (Type loadedType, IFileSystemCallback fsCallback) where T : class
     {
-        Type t = typeof(T);
-        Type inter = loadedType.GetInterface(t.Name);
+        var t = typeof(T);
+        var inter = loadedType.GetInterface(t.Name);
         if (inter != null)
         {
-            ConstructorInfo cti = loadedType.GetConstructor([typeof(IFileSystemCallback)]);
+            var cti = loadedType.GetConstructor([typeof(IFileSystemCallback)]);
             if (cti != null)
             {
                 var o = cti.Invoke([fsCallback]);

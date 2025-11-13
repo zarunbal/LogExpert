@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 using LogExpert.UI.Controls.LogTabWindow;
@@ -11,7 +12,7 @@ internal partial class ToolArgsDialog : Form
 {
     #region Fields
 
-    private readonly LogTabWindow logTabWin;
+    private readonly LogTabWindow _logTabWin;
 
     #endregion
 
@@ -19,19 +20,37 @@ internal partial class ToolArgsDialog : Form
 
     public ToolArgsDialog (LogTabWindow logTabWin, Form parent)
     {
-        this.logTabWin = logTabWin;
+        SuspendLayout();
+
+        _logTabWin = logTabWin;
         parent.AddOwnedForm(this);
         TopMost = parent.TopMost;
-        InitializeComponent();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
+        ApplyResources();
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.ToolArgsDialog_UI_Title;
+        labelEnterArguments.Text = Resources.ToolArgsDialog_UI_Label_EnterCommandLine;
+        buttonTest.Text = Resources.ToolArgsDialog_UI_Button_Test;
+        buttonRegexHelp.Text = Resources.ToolArgsDialog_UI_Button_RegexHelp;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
     }
 
     #endregion
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Arg { get; set; }
 
     #endregion
@@ -40,23 +59,7 @@ internal partial class ToolArgsDialog : Form
 
     private void OnToolArgsDialogLoad (object sender, EventArgs e)
     {
-        labelHelp.Text = "" +
-                              "%L = Current line number\n" +
-                              "%N = Current log file name without path\n" +
-                              "%P = Path (directory) of current log file\n" +
-                              "%F = Full name (incl. path) of log file\n" +
-                              "%E = Extension of log file name (e.g. 'txt')\n" +
-                              "%M = Name of log file without extension\n" +
-                              "%S = User (from URI)\n" +
-                              "%R = Path (from URI)\n" +
-                              "%H = Host (from URI)\n" +
-                              "%T = Port (from URI)\n" +
-                              "?\"<name>\" = variable parameter 'name'\n" +
-                              "?\"<name>\"(def1,def2,...) = variable parameter with predefined values\n" +
-                              "\n" +
-                              "{<regex>}{<replace>}:\n" +
-                              "Regex search/replace on current selected line.";
-
+        labelHelp.Text = Resources.ToolArgsDialog_UI_HelpText;
         textBoxArguments.Text = Arg;
     }
 
@@ -72,14 +75,14 @@ internal partial class ToolArgsDialog : Form
     //TODO: what is the purpose of this in the settings? Can we just send the line and info instead of the object?
     private void OnButtonTestClick (object sender, EventArgs e)
     {
-        if (logTabWin.CurrentLogWindow != null)
+        if (_logTabWin.CurrentLogWindow != null)
         {
-            ILogLine line = logTabWin.CurrentLogWindow.GetCurrentLine();
-            ILogFileInfo info = logTabWin.CurrentLogWindow.GetCurrentFileInfo();
+            var line = _logTabWin.CurrentLogWindow.GetCurrentLine();
+            var info = _logTabWin.CurrentLogWindow.GetCurrentFileInfo();
             if (line != null && info != null)
             {
                 ArgParser parser = new(textBoxArguments.Text);
-                var args = parser.BuildArgs(line, logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info, this);
+                var args = parser.BuildArgs(line, _logTabWin.CurrentLogWindow.GetRealLineNum() + 1, info, this);
                 labelTestResult.Text = args;
             }
         }
