@@ -8,7 +8,6 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
-
 using LogExpert.Classes;
 using LogExpert.Classes.CommandLine;
 using LogExpert.Config;
@@ -96,6 +95,7 @@ internal static class Program
             }
 
             SetCulture();
+            SetDarkMode();
 
             _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
@@ -152,7 +152,7 @@ internal static class Program
                             _logger.Error($"IpcClientChannel error: {ex}");
                             errMsg = ex;
                             counter--;
-                            
+
                             // Use Task.Delay instead of Thread.Sleep for non-blocking wait
                             if (counter > 0)
                             {
@@ -201,6 +201,20 @@ internal static class Program
         {
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficientRights, se.Message), Resources.LogExpert_Common_UI_Title_Error);
             cts.Cancel();
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void SetDarkMode ()
+    {
+        var darkModeEnabled = ConfigManager.Instance.Settings.Preferences.DarkMode;
+        if (darkModeEnabled)
+        {
+            Application.SetColorMode(SystemColorMode.Dark);
+        }
+        else
+        {
+            Application.SetColorMode(SystemColorMode.System);
         }
     }
 
