@@ -1797,6 +1797,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to toolStripContainer1.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripContainer_toolStripContainer {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripContainer_toolStripContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to About.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem {
@@ -2018,6 +2027,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export bookmarks....
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem", resourceCulture);
             }
         }
         
@@ -2915,7 +2933,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception while filtering. Please report to developer: 
+        ///   Looks up a localized string similar to Exception while filtering. Please report to developer:
         ///{0}
         ///{1}.
         /// </summary>

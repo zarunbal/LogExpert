@@ -6,25 +6,25 @@ using System.Windows.Forms;
 
 namespace LogExpert.UI.Controls.LogWindow
 {
-	partial class LogWindow
-	{
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+    partial class LogWindow
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
         #region Windows Form Designer generated code
 
@@ -1209,78 +1209,78 @@ namespace LogExpert.UI.Controls.LogWindow
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainerLogWindow;
-		private System.Windows.Forms.Panel pnlFilterInput;
-		private BufferedDataGridView dataGridView;
-		private BufferedDataGridView filterGridView;
-		private System.Windows.Forms.SplitContainer advancedFilterSplitContainer;
-		private System.Windows.Forms.Panel pnlProFilter;
-		private System.Windows.Forms.Button btnFilterToTab;
-		private KnobControl knobControlFilterForeSpread;
-		private System.Windows.Forms.Label lblForeSpread;
-		private KnobControl knobControlFilterBackSpread;
-		private System.Windows.Forms.Label lblBackSpread;
-		private System.Windows.Forms.Panel pnlProFilterLabel;
-		private System.Windows.Forms.CheckBox invertFilterCheckBox;
-		private System.Windows.Forms.Label lblfuzzy;
-		private KnobControl knobControlFuzzy;
-		private System.Windows.Forms.CheckBox rangeCheckBox;
-		private System.Windows.Forms.ComboBox filterRangeComboBox;
-		private System.Windows.Forms.ContextMenuStrip dataGridContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem copyToTabToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem scrollAllTabsToTimestampToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem locateLineInOriginalFileToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem toggleBoomarkToolStripMenuItem;
+        private System.Windows.Forms.Panel pnlFilterInput;
+        private BufferedDataGridView dataGridView;
+        private BufferedDataGridView filterGridView;
+        private System.Windows.Forms.SplitContainer advancedFilterSplitContainer;
+        private System.Windows.Forms.Panel pnlProFilter;
+        private System.Windows.Forms.Button btnFilterToTab;
+        private KnobControl knobControlFilterForeSpread;
+        private System.Windows.Forms.Label lblForeSpread;
+        private KnobControl knobControlFilterBackSpread;
+        private System.Windows.Forms.Label lblBackSpread;
+        private System.Windows.Forms.Panel pnlProFilterLabel;
+        private System.Windows.Forms.CheckBox invertFilterCheckBox;
+        private System.Windows.Forms.Label lblfuzzy;
+        private KnobControl knobControlFuzzy;
+        private System.Windows.Forms.CheckBox rangeCheckBox;
+        private System.Windows.Forms.ComboBox filterRangeComboBox;
+        private System.Windows.Forms.ContextMenuStrip dataGridContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem copyToTabToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scrollAllTabsToTimestampToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem locateLineInOriginalFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toggleBoomarkToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem markEditModeToolStripMenuItem;
-		private System.Windows.Forms.ContextMenuStrip bookmarkContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem deleteBookmarksToolStripMenuItem;
-		private System.Windows.Forms.CheckBox columnRestrictCheckBox;
-		private System.Windows.Forms.Button btnColumn;
-		private System.Windows.Forms.ContextMenuStrip columnContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem freezeLeftColumnsUntilHereToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem moveToLastColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem moveLeftToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem moveRightToolStripMenuItem;
-		private TimeSpreadingControl timeSpreadingControl;
+        private System.Windows.Forms.ContextMenuStrip bookmarkContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem deleteBookmarksToolStripMenuItem;
+        private System.Windows.Forms.CheckBox columnRestrictCheckBox;
+        private System.Windows.Forms.Button btnColumn;
+        private System.Windows.Forms.ContextMenuStrip columnContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem freezeLeftColumnsUntilHereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveToLastColumnToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveLeftToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveRightToolStripMenuItem;
+        private TimeSpreadingControl timeSpreadingControl;
     private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.ToolStripMenuItem bookmarkCommentToolStripMenuItem;
-		private System.Windows.Forms.ContextMenuStrip editModeContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFileToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem editModecopyToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem tempHighlightsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem removeAllToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem makePermanentToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem filterForSelectionToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem setSelectedTextAsBookmarkCommentToolStripMenuItem;
-		private System.Windows.Forms.ToolTip helpToolTip;
-		private System.Windows.Forms.SplitContainer highlightSplitContainer;
-		private System.Windows.Forms.Button btnToggleHighlightPanel;
-		private System.Windows.Forms.Panel highlightSplitContainerBackPanel;
-		private System.Windows.Forms.Button bntSaveFilter;
-		private System.Windows.Forms.Button btnDeleteFilter;
-		private System.Windows.Forms.ListBox listBoxFilter;
-		private System.Windows.Forms.ContextMenuStrip filterContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem setBookmarksOnSelectedLinesToolStripMenuItem;
-		private System.Windows.Forms.CheckBox filterOnLoadCheckBox;
-		private System.Windows.Forms.ToolStripMenuItem markCurrentFilterRangeToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem syncTimestampsToToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem freeThisWindowFromTimeSyncToolStripMenuItem;
-		private System.Windows.Forms.Button btnFilterDown;
-		private System.Windows.Forms.Button btnFilterUp;
-		private System.Windows.Forms.ContextMenuStrip filterListContextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem colorToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem filterToTabToolStripMenuItem;
-		private System.Windows.Forms.CheckBox hideFilterListOnLoadCheckBox;
-		private System.Windows.Forms.Panel advancedBackPanel;
-		private System.Windows.Forms.ToolStripMenuItem markFilterHitsInLogViewToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFilewordModeToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem hideColumnToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem restoreColumnsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem allColumnsToolStripMenuItem;
-		private System.Windows.Forms.Label columnNamesLabel;
-		private System.Windows.Forms.Panel columnFinderPanel;
-		private System.Windows.Forms.ComboBox columnComboBox;
-		private System.Windows.Forms.Label lblColumnName;
+        private System.Windows.Forms.ToolStripMenuItem bookmarkCommentToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip editModeContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editModecopyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tempHighlightsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem makePermanentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem filterForSelectionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setSelectedTextAsBookmarkCommentToolStripMenuItem;
+        private System.Windows.Forms.ToolTip helpToolTip;
+        private System.Windows.Forms.SplitContainer highlightSplitContainer;
+        private System.Windows.Forms.Button btnToggleHighlightPanel;
+        private System.Windows.Forms.Panel highlightSplitContainerBackPanel;
+        private System.Windows.Forms.Button bntSaveFilter;
+        private System.Windows.Forms.Button btnDeleteFilter;
+        private System.Windows.Forms.ListBox listBoxFilter;
+        private System.Windows.Forms.ContextMenuStrip filterContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem setBookmarksOnSelectedLinesToolStripMenuItem;
+        private System.Windows.Forms.CheckBox filterOnLoadCheckBox;
+        private System.Windows.Forms.ToolStripMenuItem markCurrentFilterRangeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem syncTimestampsToToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem freeThisWindowFromTimeSyncToolStripMenuItem;
+        private System.Windows.Forms.Button btnFilterDown;
+        private System.Windows.Forms.Button btnFilterUp;
+        private System.Windows.Forms.ContextMenuStrip filterListContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem colorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem filterToTabToolStripMenuItem;
+        private System.Windows.Forms.CheckBox hideFilterListOnLoadCheckBox;
+        private System.Windows.Forms.Panel advancedBackPanel;
+        private System.Windows.Forms.ToolStripMenuItem markFilterHitsInLogViewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem highlightSelectionInLogFilewordModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hideColumnToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem restoreColumnsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem allColumnsToolStripMenuItem;
+        private System.Windows.Forms.Label columnNamesLabel;
+        private System.Windows.Forms.Panel columnFinderPanel;
+        private System.Windows.Forms.ComboBox columnComboBox;
+        private System.Windows.Forms.Label lblColumnName;
         private System.Windows.Forms.SplitContainer filterSplitContainer;
         private System.Windows.Forms.Label lblTextFilter;
         private System.Windows.Forms.ComboBox filterComboBox;

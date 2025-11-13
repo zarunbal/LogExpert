@@ -110,11 +110,11 @@ internal static class Program
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     var logWin = AbstractLogTabWindow.Create(
-                        absoluteFilePaths.Length > 0 
-                            ? absoluteFilePaths 
-                            : null, 
-                        1, 
-                        false, 
+                        absoluteFilePaths.Length > 0
+                            ? absoluteFilePaths
+                            : null,
+                        1,
+                        false,
                         ConfigManager.Instance);
 
                     // first instance

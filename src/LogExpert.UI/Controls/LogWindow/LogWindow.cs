@@ -156,6 +156,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
         SetResources();
 
         CreateDefaultViewStyle();
@@ -449,6 +450,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //}
     }
 
+    #region Apply Resources
+
     private void SetResources ()
     {
         ApplyButtonResources();
@@ -556,6 +559,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         helpToolTip.SetToolTip(filterSearchButton, Resources.LogWindow_UI_Button_ToolTip_Search);
         helpToolTip.SetToolTip(columnComboBox, Resources.LogWindow_UI_ColumnComboBox_ToolTip);
     }
+
+    #endregion
 
     [SupportedOSPlatform("windows")]
     internal void RefreshAllGrids ()
