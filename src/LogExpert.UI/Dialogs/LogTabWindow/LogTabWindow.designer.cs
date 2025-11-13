@@ -124,7 +124,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             loglevelToolStripMenuItem = new ToolStripMenuItem();
             warnToolStripMenuItem = new ToolStripMenuItem();
             infoToolStripMenuItem = new ToolStripMenuItem();
-            debugToolStripMenuItem = new ToolStripMenuItem();
+            debugToolStripMenuItem1 = new ToolStripMenuItem();
             disableWordHighlightModeToolStripMenuItem = new ToolStripMenuItem();
             checkBoxHost = new CheckBox();
             toolStripContainer = new ToolStripContainer();
@@ -740,7 +740,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // loglevelToolStripMenuItem
             // 
-            loglevelToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { warnToolStripMenuItem, infoToolStripMenuItem, debugToolStripMenuItem });
+            loglevelToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { warnToolStripMenuItem, infoToolStripMenuItem, debugToolStripMenuItem1 });
             loglevelToolStripMenuItem.Name = "loglevelToolStripMenuItem";
             loglevelToolStripMenuItem.Size = new System.Drawing.Size(274, 22);
             loglevelToolStripMenuItem.Text = "Loglevel";

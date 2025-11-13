@@ -2085,6 +2085,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         FillHighlightComboBox();
         FillToolLauncherBar();
+
+        //TODO Change to Debug and true
 #if !DEBUG
         debugToolStripMenuItem.Visible = false;
 #endif
