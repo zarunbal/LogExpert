@@ -1,6 +1,8 @@
 using System.Drawing;
 using System.Text.RegularExpressions;
 
+using LogExpert.Core.Helpers;
+
 using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Highlight;
@@ -54,10 +56,10 @@ public class HighlightEntry () : ICloneable
         get
         {
             _regex ??= IsRegex
-                    ? new Regex(SearchText, IsCaseSensitive
+                    ? RegexHelper.GetOrCreateCached(SearchText, IsCaseSensitive
                         ? RegexOptions.None
                         : RegexOptions.IgnoreCase)
-                    : new Regex(Regex.Escape(SearchText),
+                    : RegexHelper.GetOrCreateCached(System.Text.RegularExpressions.Regex.Escape(SearchText),
                                 IsCaseSensitive
                                 ? RegexOptions.None
                                 : RegexOptions.IgnoreCase);

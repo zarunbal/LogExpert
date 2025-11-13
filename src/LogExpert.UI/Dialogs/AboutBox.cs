@@ -21,17 +21,24 @@ internal partial class AboutBox : Form
 
     public AboutBox ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
 
         usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
 
         //resources need the assembly to be set
-        LoadResources();
+        ApplyResources();
 
         var link = "https://github.com/LogExperts/LogExpert";
         _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
         LoadUsedComponents();
+
+        ResumeLayout();
     }
 
     //TODO Jsons should be serialized on a central place and not in every UI component
@@ -42,16 +49,15 @@ internal partial class AboutBox : Form
         var usedComponents = JsonConvert.DeserializeObject<UsedComponents[]>(json);
         usedComponents = usedComponents?.OrderBy(x => x.PackageId).ToArray();
         usedComponentsDataGrid.DataSource = usedComponents;
-
     }
 
-
-    private void LoadResources ()
+    private void ApplyResources ()
     {
         logoPictureBox.Image = Resources.LogLover;
         labelProductName.Text = AssemblyProduct;
         labelVersion.Text = AssemblyVersion;
         labelCopyright.Text = AssemblyCopyright;
+        linkLabelURL.Text = Resources.AboutBox_UI_LinkLabel_URL;
         okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
         Text = $"{Resources.AboutBox_UI_Text} {AssemblyTitle}";
     }
@@ -88,7 +94,6 @@ internal partial class AboutBox : Form
                 ? $"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}.{assembly.Version.Revision}"
                 : "0.0.0.0";
         }
-
     }
 
     public string AssemblyDescription

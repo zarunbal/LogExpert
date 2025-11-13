@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 
@@ -8,10 +9,6 @@ namespace LogExpert;
 [SupportedOSPlatform("windows")]
 internal partial class EminusConfigDlg : Form
 {
-    #region Fields
-
-    #endregion
-
     #region cTor
 
     public EminusConfigDlg (EminusConfig config)
@@ -47,6 +44,7 @@ internal partial class EminusConfigDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public EminusConfig Config { get; set; }
 
     #endregion

@@ -4,7 +4,8 @@ using System.Runtime.Versioning;
 using LogExpert.UI.Extensions;
 
 namespace LogExpert.Extensions;
-internal class ResourceHelper
+
+internal static class ResourceHelper
 {
     /// <summary>
     /// Generates a mapping of controls to their corresponding text values based on resource naming conventions.

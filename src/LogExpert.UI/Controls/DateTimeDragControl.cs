@@ -46,10 +46,12 @@ internal partial class DateTimeDragControl : UserControl
 
     public DateTimeDragControl ()
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
 
         _digitsFormat.LineAlignment = StringAlignment.Center;
         _digitsFormat.Alignment = StringAlignment.Near;
@@ -57,6 +59,8 @@ internal partial class DateTimeDragControl : UserControl
         _digitsFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip | StringFormatFlags.NoWrap;
 
         _draggedDigit = NO_DIGIT_DRAGGED;
+
+        ResumeLayout();
     }
 
     #endregion
@@ -73,16 +77,19 @@ internal partial class DateTimeDragControl : UserControl
     /// <summary>
     /// Gets or sets the minimum allowable date and time value.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public DateTime MinDateTime { get; set; } = DateTime.MinValue;
 
     /// <summary>
     /// Gets or sets the maximum allowable date and time value.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public DateTime MaxDateTime { get; set; } = DateTime.MaxValue;
 
     /// <summary>
     /// Gets or sets the orientation for drag operations.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public DragOrientations DragOrientation
     {
         get => _dragOrientation;
@@ -96,11 +103,13 @@ internal partial class DateTimeDragControl : UserControl
     /// <summary>
     /// Gets or sets the color used to highlight an element when the mouse hovers over it.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color HoverColor { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time value, adjusted to exclude milliseconds.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public DateTime DateTime
     {
         get => _dateTime.Subtract(TimeSpan.FromMilliseconds(_dateTime.Millisecond));

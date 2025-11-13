@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
@@ -10,8 +11,6 @@ internal partial class RegexHelperDialog : Form
 
     private const int MAX_HISTORY = 30;
     private bool _caseSensitive;
-    private List<string> _expressionHistoryList = [];
-    private List<string> _testtextHistoryList = [];
 
     #endregion
 
@@ -19,18 +18,37 @@ internal partial class RegexHelperDialog : Form
 
     public RegexHelperDialog ()
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
+        InitializeComponent();
+
+        ApplyResources();
+
         Load += OnRegexHelperDialogLoad;
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        labelRegex.Text = Resources.RegexHelperDialog_UI_Label_Regex;
+        labelTestText.Text = Resources.RegexHelperDialog_UI_Label_TestText;
+        labelMatches.Text = Resources.RegexHelperDialog_UI_Label_Matches;
+        checkBoxCaseSensitive.Text = Resources.RegexHelperDialog_UI_CheckBox_CaseSensitive;
+        buttonHelp.Text = Resources.LogExpert_Common_UI_Button_Help;
+        Text = Resources.RegexHelperDialog_UI_Title;
     }
 
     #endregion
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool CaseSensitive
     {
         get => _caseSensitive;
@@ -41,23 +59,18 @@ internal partial class RegexHelperDialog : Form
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Pattern
     {
         get => comboBoxRegex.Text;
         set => comboBoxRegex.Text = value;
     }
 
-    public List<string> ExpressionHistoryList
-    {
-        get => _expressionHistoryList;
-        set => _expressionHistoryList = value;
-    }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+    public List<string> ExpressionHistoryList { get; set; } = [];
 
-    public List<string> TesttextHistoryList
-    {
-        get => _testtextHistoryList;
-        set => _testtextHistoryList = value;
-    }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+    public List<string> TesttextHistoryList { get; set; } = [];
 
     #endregion
 
@@ -65,7 +78,7 @@ internal partial class RegexHelperDialog : Form
 
     private void UpdateMatches ()
     {
-        textBoxMatches.Text = "";
+        textBoxMatches.Text = string.Empty;
         try
         {
             Regex rex = new(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
@@ -78,17 +91,17 @@ internal partial class RegexHelperDialog : Form
         }
         catch (ArgumentException)
         {
-            textBoxMatches.Text = "No valid regex pattern";
+            textBoxMatches.Text = Resources.RegexHelperDialog_UI_TextBox_Matches_NoValidRegexPattern;
         }
     }
 
     private void LoadHistory ()
     {
         comboBoxRegex.Items.Clear();
-        comboBoxRegex.DataSource = _expressionHistoryList;
+        comboBoxRegex.DataSource = ExpressionHistoryList;
 
         comboBoxTestText.Items.Clear();
-        comboBoxTestText.DataSource = _testtextHistoryList;
+        comboBoxTestText.DataSource = TesttextHistoryList;
     }
 
     #endregion
@@ -139,7 +152,7 @@ internal partial class RegexHelperDialog : Form
 
     private void OnButtonHelpClick (object sender, EventArgs e)
     {
-        Help.ShowHelp(this, "LogExpert.chm", HelpNavigator.Topic, "RegEx.htm");
+        Help.ShowHelp(this, Resources.LogTabWindow_HelpFile, HelpNavigator.Topic, Resources.RegexHelperDialog_Help_Chapter);
     }
 
     #endregion

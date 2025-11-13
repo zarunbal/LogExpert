@@ -18,17 +18,31 @@ public partial class ExceptionWindow : Form
     public ExceptionWindow (string errorText, string stackTrace)
     {
         SuspendLayout();
-        InitializeComponent();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+        ApplyResources();
 
         _errorText = errorText;
         _stackTrace = stackTrace;
 
         stackTraceTextBox.Text = _errorText + @"\n\n" + _stackTrace;
         stackTraceTextBox.Select(0, 0);
+
         ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        // Dialog title
+        Text = Resources.ExceptionWindow_UI_Title;
+
+        labelErrorMessage.Text = Resources.ExceptionWindow_UI_Label_ErrorMessage;
+
+        okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
+        copyButton.Text = Resources.ExceptionWindow_UI_Button_CopyToClipboard;
     }
 
     #endregion
@@ -44,7 +58,7 @@ public partial class ExceptionWindow : Form
 
     #region Events handler
 
-    private void copyButton_Click (object sender, EventArgs e)
+    private void OnCopyButtonClick (object sender, EventArgs e)
     {
         CopyToClipboard();
     }

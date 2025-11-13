@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
@@ -5,6 +6,7 @@ using System.Text.RegularExpressions;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interface;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Dialogs;
@@ -29,21 +31,74 @@ internal partial class HighlightDialog : Form
 
     public HighlightDialog (IConfigManager configManager)
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
+        ApplyResources();
+
         ConfigManager = configManager;
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
         _applyButtonImage = btnApply.Image;
         btnApply.Image = null;
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        // Dialog
+        Text = Resources.HighlightDialog_UI_Title;
+
+        btnOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        btnCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        btnAdd.Text = Resources.LogExpert_Common_UI_Button_Add;
+        btnDelete.Text = Resources.LogExpert_Common_UI_Button_Delete;
+        btnMoveUp.Text = Resources.LogExpert_Common_UI_Button_MoveUp;
+        btnMoveDown.Text = Resources.LogExpert_Common_UI_Button_MoveDown;
+        btnApply.Text = Resources.LogExpert_Common_UI_Button_Apply;
+        btnCustomForeColor.Text = Resources.HighlightDialog_UI_Button_CustomForeColor;
+        btnCustomBackColor.Text = Resources.HighlightDialog_UI_Button_CustomBackColor;
+        btnBookmarkComment.Text = Resources.HighlightDialog_UI_Button_BookmarkComment;
+        btnSelectPlugin.Text = Resources.HighlightDialog_UI_Button_SelectPlugin;
+        btnImportGroup.Text = Resources.LogExpert_Common_UI_Button_Import;
+        btnExportGroup.Text = Resources.LogExpert_Common_UI_Button_Export;
+        btnMoveGroupDown.Text = Resources.HighlightDialog_UI_Button_GroupDown;
+        btnMoveGroupUp.Text = Resources.HighlightDialog_UI_Button_GroupUp;
+        btnCopyGroup.Text = Resources.HighlightDialog_UI_Button_Copy;
+        btnDeleteGroup.Text = Resources.HighlightDialog_UI_Button_DeleteGroup;
+        btnNewGroup.Text = Resources.HighlightDialog_UI_Button_NewGroup;
+
+        labelForgroundColor.Text = Resources.HighlightDialog_UI_Label_ForegroundColor;
+        labelBackgroundColor.Text = Resources.HighlightDialog_UI_Label_BackgroundColor;
+        labelSearchString.Text = Resources.HighlightDialog_UI_Label_SearchString;
+        labelAssignNamesToGroups.Text = Resources.HighlightDialog_UI_Label_AssignNamesToGroups;
+
+        checkBoxRegex.Text = Resources.HighlightDialog_UI_CheckBox_RegEx;
+        checkBoxCaseSensitive.Text = Resources.HighlightDialog_UI_CheckBox_CaseSensitive;
+        checkBoxDontDirtyLed.Text = Resources.HighlightDialog_UI_CheckBox_DontDirtyLed;
+        checkBoxBookmark.Text = Resources.HighlightDialog_UI_CheckBox_Bookmark;
+        checkBoxStopTail.Text = Resources.HighlightDialog_UI_CheckBox_StopTail;
+        checkBoxPlugin.Text = Resources.HighlightDialog_UI_CheckBox_Plugin;
+        checkBoxWordMatch.Text = Resources.HighlightDialog_UI_CheckBox_WordMatch;
+        checkBoxBold.Text = Resources.HighlightDialog_UI_CheckBox_Bold;
+        checkBoxNoBackground.Text = Resources.HighlightDialog_UI_CheckBox_NoBackground;
+
+        groupBoxLineMatchCriteria.Text = Resources.HighlightDialog_UI_GroupBox_LineMatchCriteria;
+        groupBoxColoring.Text = Resources.HighlightDialog_UI_GroupBox_Coloring;
+        groupBoxActions.Text = Resources.HighlightDialog_UI_GroupBox_Actions;
+        groupBoxGroups.Text = Resources.HighlightDialog_UI_GroupBox_Groups;
     }
 
     #endregion
 
     #region Properties / Indexers
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public List<HighlightGroup> HighlightGroupList
     {
         get => _highlightGroupList;
@@ -58,8 +113,10 @@ internal partial class HighlightDialog : Form
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public IList<IKeywordAction> KeywordActionList { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string PreSelectedGroupName { get; set; }
 
     private bool IsDirty => btnApply.Image == _applyButtonImage;
@@ -519,7 +576,11 @@ internal partial class HighlightDialog : Form
                 throw new ArgumentException(Resources.HighlightDialog_RegexError);
             }
 
-            _ = Regex.IsMatch(string.Empty, textBoxSearchString.Text);
+            // Use RegexHelper for safer validation with timeout protection
+            if (!RegexHelper.IsValidPattern(textBoxSearchString.Text, out var error))
+            {
+                throw new ArgumentException(error ?? Resources.HighlightDialog_RegexError);
+            }
         }
     }
 

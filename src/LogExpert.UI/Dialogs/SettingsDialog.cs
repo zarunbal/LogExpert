@@ -35,22 +35,27 @@ internal partial class SettingsDialog : Form
 
     private SettingsDialog (Preferences prefs, LogTabWindow logTabWin)
     {
+        SuspendLayout();
+
         Preferences = prefs;
         _logTabWin = logTabWin; //TODO: uses only HighlightGroupList. Can we pass IList instead?
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
 
         LoadResources();
 
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        ResumeLayout();
     }
 
     public SettingsDialog (Preferences prefs, LogTabWindow logTabWin, int tabToOpen, IConfigManager configManager) : this(prefs, logTabWin)
     {
         tabControlSettings.SelectedIndex = tabToOpen;
         ConfigManager = configManager;
-
     }
 
     #endregion
@@ -953,7 +958,6 @@ internal partial class SettingsDialog : Form
         {
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.LogExpert_Common_UI_Title_Error, MessageBoxButtons.OK);
         }
-
     }
 
     private void OnBtnConfigPluginClick (object sender, EventArgs e)

@@ -59,16 +59,36 @@ public class XmlLogReader : LogStreamReaderBase
 
     public override string ReadLine()
     {
+        // Call async version synchronously for backward compatibility
+        // This maintains the interface but uses the improved async implementation internally
+        return ReadLineAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Reads a complete XML block asynchronously.
+    /// Replaces Thread.Sleep with Task.Delay for non-blocking waits.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token for graceful cancellation</param>
+    /// <returns>Complete XML block or null if not available</returns>
+    public async Task<string?> ReadLineAsync(CancellationToken cancellationToken = default)
+    {
         short state = 0;
         var tagIndex = 0;
         var blockComplete = false;
         var eof = false;
         var tryCounter = 5;
+        const int delayMs = 100;
 
         StringBuilder builder = new();
 
         while (!eof && !blockComplete)
         {
+            // Check for cancellation
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
+
             var readInt = ReadChar();
             if (readInt == -1)
             {
@@ -77,11 +97,21 @@ public class XmlLogReader : LogStreamReaderBase
                 {
                     if (--tryCounter > 0)
                     {
-                        Thread.Sleep(100);
+                        // Use Task.Delay instead of Thread.Sleep for non-blocking wait
+                        try
+                        {
+                            await Task.Delay(delayMs, cancellationToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Gracefully handle cancellation
+                            return null;
+                        }
                         continue;
                     }
                     else
                     {
+                        // Timeout - return partial block if available
                         break;
                     }
                 }

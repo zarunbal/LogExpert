@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 namespace LogExpert.Dialogs;
@@ -9,16 +10,20 @@ internal partial class BookmarkCommentDlg : Form
 
     public BookmarkCommentDlg ()
     {
+        SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
         ApplyResources();
+
+        ResumeLayout();
     }
 
     private void ApplyResources ()
     {
-        Text = Resources.BookmarkCommentDlg_UI_Text;
+        Text = Resources.BookmarkCommentDlg_UI_Title;
         buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
         buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
     }
@@ -27,6 +32,7 @@ internal partial class BookmarkCommentDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Comment
     {
         set => textBoxComment.Text = value;

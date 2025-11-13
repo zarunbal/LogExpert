@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
+using LogExpert.Core.Helpers;
+
 namespace LogExpert.Core.Classes;
 
 public class ParamParser (string argTemplate)
@@ -38,8 +40,18 @@ public class ParamParser (string argTemplate)
             replace = GetNextGroup(builder, ref sPos);
             if (reg != null && replace != null)
             {
-                var result = Regex.Replace(logLine.FullLine, reg, replace);
-                builder.Insert(sPos, result);
+                // Use RegexHelper for safe regex operations with timeout protection
+                try
+                {
+                    var regex = RegexHelper.GetOrCreateCached(reg);
+                    var result = regex.Replace(logLine.FullLine, replace);
+                    builder.Insert(sPos, result);
+                }
+                catch (RegexMatchTimeoutException)
+                {
+                    // If regex times out, insert the original pattern as fallback
+                    builder.Insert(sPos, $"{{timeout: {reg}}}");
+                }
             }
         } while (replace != null);
         return builder.ToString();

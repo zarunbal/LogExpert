@@ -1,6 +1,6 @@
-using LogExpert.Core.Classes.Highlight;
-
 using System.Runtime.Versioning;
+
+using LogExpert.Core.Classes.Highlight;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -11,14 +11,16 @@ internal partial class KeywordActionDlg : Form
 
     private readonly IDictionary<string, IKeywordAction> _actionDict = new Dictionary<string, IKeywordAction>();
 
-    private IList<IKeywordAction> _keywordActionList;
+    private readonly IList<IKeywordAction> _keywordActionList;
 
     #endregion
 
     #region cTor
 
-    public KeywordActionDlg(ActionEntry entry, IList<IKeywordAction> actionList)
+    public KeywordActionDlg (ActionEntry entry, IList<IKeywordAction> actionList)
     {
+        SuspendLayout();
+
         _keywordActionList = actionList;
         ActionEntry = entry;
 
@@ -27,11 +29,13 @@ internal partial class KeywordActionDlg : Form
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
+        ApplyResources();
+
         actionComboBox.Items.Clear();
 
-        foreach (var action in actionList)
+        foreach (var action in _keywordActionList)
         {
-            actionComboBox.Items.Add(action.GetName());
+            _ = actionComboBox.Items.Add(action.GetName());
             _actionDict[action.GetName()] = action;
         }
 
@@ -48,6 +52,17 @@ internal partial class KeywordActionDlg : Form
         }
 
         parameterTextBox.Text = ActionEntry.ActionParam;
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.KeywordActionDlg_UI_Title;
+        label1.Text = Resources.KeywordActionDlg_UI_Label_KeywordActionPlugin;
+        label2.Text = Resources.KeywordActionDlg_UI_Label_Parameter;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
     }
 
     #endregion
@@ -60,7 +75,7 @@ internal partial class KeywordActionDlg : Form
 
     #region Events handler
 
-    private void OnOkButtonClick(object sender, EventArgs e)
+    private void OnOkButtonClick (object sender, EventArgs e)
     {
         ActionEntry = new ActionEntry
         {
@@ -73,7 +88,7 @@ internal partial class KeywordActionDlg : Form
         }
     }
 
-    private void OnActionComboBoxSelectedIndexChanged(object sender, EventArgs e)
+    private void OnActionComboBoxSelectedIndexChanged (object sender, EventArgs e)
     {
         commentTextBox.Text = _actionDict[(string)actionComboBox.SelectedItem].GetDescription();
     }

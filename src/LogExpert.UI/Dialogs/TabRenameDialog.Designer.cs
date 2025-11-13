@@ -1,4 +1,4 @@
-﻿namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs;
 
 partial class TabRenameDialog
 {
@@ -57,7 +57,7 @@ private void InitializeComponent()
         this.buttonOk.Name = "buttonOk";
         this.buttonOk.Size = new System.Drawing.Size(75, 23);
         this.buttonOk.TabIndex = 2;
-        this.buttonOk.Text = "OK";
+        this.buttonOk.Text = "&OK";
         this.buttonOk.UseVisualStyleBackColor = true;
         // 
         // buttonCancel
@@ -67,7 +67,7 @@ private void InitializeComponent()
         this.buttonCancel.Name = "buttonCancel";
         this.buttonCancel.Size = new System.Drawing.Size(75, 23);
         this.buttonCancel.TabIndex = 3;
-        this.buttonCancel.Text = "Cancel";
+        this.buttonCancel.Text = "&Cancel";
         this.buttonCancel.UseVisualStyleBackColor = true;
         // 
         // TabRenameDlg

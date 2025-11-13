@@ -44,6 +44,9 @@ internal static class Program
     [SupportedOSPlatform("windows")]
     private static void Main (string[] args)
     {
+        // Set global regex timeout to prevent DoS attacks from catastrophic backtracking
+        AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromSeconds(2));
+
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         Application.ThreadException += Application_ThreadException;
 
@@ -109,7 +112,13 @@ internal static class Program
                     // first application instance
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    var logWin = AbstractLogTabWindow.Create(absoluteFilePaths.Length > 0 ? absoluteFilePaths : null, 1, false, ConfigManager.Instance);
+                    var logWin = AbstractLogTabWindow.Create(
+                        absoluteFilePaths.Length > 0
+                            ? absoluteFilePaths
+                            : null,
+                        1,
+                        false,
+                        ConfigManager.Instance);
 
                     // first instance
                     var wi = WindowsIdentity.GetCurrent();
@@ -143,7 +152,12 @@ internal static class Program
                             _logger.Error($"IpcClientChannel error: {ex}");
                             errMsg = ex;
                             counter--;
-                            Thread.Sleep(500);
+                            
+                            // Use Task.Delay instead of Thread.Sleep for non-blocking wait
+                            if (counter > 0)
+                            {
+                                Task.Delay(500).Wait();
+                            }
                         }
                     }
 

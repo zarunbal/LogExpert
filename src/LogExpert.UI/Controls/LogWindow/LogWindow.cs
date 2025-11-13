@@ -156,6 +156,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
         SetResources();
 
         CreateDefaultViewStyle();
@@ -318,6 +319,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
 
     public ILogLineColumnizer CurrentColumnizer
@@ -334,6 +336,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ShowBookmarkBubbles
     {
         get => _guiStateArgs.ShowBookmarkBubbles;
@@ -350,6 +353,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public string FileName { get; private set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string SessionFileName { get; set; }
 
     public bool IsMultiFile
@@ -362,8 +366,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly IConfigManager ConfigManager;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string TempTitleName { get; set; } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     internal FilterPipe FilterPipe { get; set; }
 
     public string Title => IsTempFile
@@ -372,12 +378,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public ColumnizerCallback ColumnizerCallbackObject { get; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ForcePersistenceLoading { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ForcedPersistenceFileName { get; set; }
 
     public Preferences Preferences => _parentLogTabWin.Preferences;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string GivenFileName { get; set; }
 
     public TimeSyncList TimeSyncList { get; private set; }
@@ -449,10 +458,53 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //}
     }
 
+    #region Apply Resources
+
     private void SetResources ()
     {
-        helpToolTip.SetToolTip(columnComboBox, Resources.LogWindow_UI_ColumnComboBox_ToolTip);
+        ApplyButtonResources();
+        ApplyLabelResources();
+        ApplyCheckBoxResources();
+        ApplyToolStripMenuItemResources();
+        ApplyToolTipsResources();
+    }
+
+    private void ApplyCheckBoxResources ()
+    {
+        columnRestrictCheckBox.Text = Resources.LogWindow_UI_CheckBox_ColumnRestrict;
+        invertFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_InvertMatch;
+        rangeCheckBox.Text = Resources.LogWindow_UI_CheckBox_RangeSearch;
+        hideFilterListOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_AutoHide;
+        filterOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterOnLoad;
+        syncFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterSync;
+        filterTailCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterTail;
+        filterRegexCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterRegex;
+        filterCaseSensitiveCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterCaseSensitive;
+    }
+
+    private void ApplyLabelResources ()
+    {
         lblColumnName.Text = Resources.LogWindow_UI_Label_ColumnName;
+        columnNamesLabel.Text = Resources.LogWindow_UI_Label_ColumnNames;
+        lblfuzzy.Text = Resources.LogWindow_UI_Label_Fuzzyness;
+        lblBackSpread.Text = Resources.LogWindow_UI_Label_BackSpread;
+        lblForeSpread.Text = Resources.LogWindow_UI_Label_ForeSpread;
+        lblTextFilter.Text = Resources.LogWindow_UI_Label_TextFilter;
+        lblFilterCount.Text = Resources.LogWindow_UI_Common_ZeroValue;
+    }
+
+    private void ApplyButtonResources ()
+    {
+        btnColumn.Text = Resources.LogWindow_UI_Button_Column;
+        btnFilterToTab.Text = Resources.LogWindow_UI_Button_FilterToTab;
+        bntSaveFilter.Text = Resources.LogWindow_UI_Button_SaveFilter;
+        btnDeleteFilter.Text = Resources.LogWindow_UI_Button_Delete;
+        btnAdvanced.Text = Resources.LogWindow_UI_Button_ShowAdvanced;
+        filterSearchButton.Text = Resources.LogWindow_UI_Button_Search;
+    }
+
+    private void ApplyToolStripMenuItemResources ()
+    {
         copyToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_CopyToClipboard;
         copyToTabToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_CopyToNewTab;
         copyToTabToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab;
@@ -469,53 +521,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         removeAllToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_RemoveAll;
         makePermanentToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MakeAllPermanent;
         markCurrentFilterRangeToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange;
-        btnColumn.Text = Resources.LogWindow_UI_Button_Column;
-        helpToolTip.SetToolTip(btnColumn, Resources.LogWindow_UI_Button_ToolTip_Column);
-        columnRestrictCheckBox.Text = Resources.LogWindow_UI_CheckBox_ColumnRestrict;
-        helpToolTip.SetToolTip(columnRestrictCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_ColumnRestrict);
-        rangeCheckBox.Text = Resources.LogWindow_UI_CheckBox_RangeSearch;
-        helpToolTip.SetToolTip(rangeCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_RangeSearch);
-        helpToolTip.SetToolTip(filterRangeComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_FilterRange);
-        columnNamesLabel.Text = Resources.LogWindow_UI_Label_ColumnNames;
-        lblfuzzy.Text = Resources.LogWindow_UI_Label_Fuzzyness;
-        helpToolTip.SetToolTip(knobControlFuzzy, Resources.LogWindow_UI_KnobControl_Fuzzy);
-        invertFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_InvertMatch;
-        helpToolTip.SetToolTip(invertFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_InvertMatch);
-        lblBackSpread.Text = Resources.LogWindow_UI_Label_BackSpread;
-        helpToolTip.SetToolTip(knobControlFilterBackSpread, Resources.LogWindow_UI_KnobControl_FilterBackSpread);
-        lblForeSpread.Text = Resources.LogWindow_UI_Label_ForeSpread;
-        helpToolTip.SetToolTip(knobControlFilterForeSpread, Resources.LogWindow_UI_KnobControl_FilterForeSpread);
-        btnFilterToTab.Text = Resources.LogWindow_UI_Button_FilterToTab;
-        helpToolTip.SetToolTip(btnFilterToTab, Resources.LogWindow_UI_Button_ToolTip_FilterToTab);
-        helpToolTip.SetToolTip(btnToggleHighlightPanel, Resources.LogWindow_UI_Button_ToolTip_ToggleHighlightPanel);
         setBookmarksOnSelectedLinesToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines;
         filterToTabToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FilterToNewTab;
         markFilterHitsInLogViewToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView;
-        hideFilterListOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_AutoHide;
-        helpToolTip.SetToolTip(hideFilterListOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_AutoHide);
-        helpToolTip.SetToolTip(btnFilterDown, Resources.LogWindow_UI_Button_ToolTip_FilterDown);
-        helpToolTip.SetToolTip(btnFilterUp, Resources.LogWindow_UI_Button_ToolTip_FilterUp);
-        filterOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterOnLoad;
-        helpToolTip.SetToolTip(filterOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterOnLoad);
-        bntSaveFilter.Text = Resources.LogWindow_UI_Button_SaveFilter;
-        btnDeleteFilter.Text = Resources.LogWindow_UI_Button_Delete;
-        helpToolTip.SetToolTip(listBoxFilter, Resources.LogWindow_UI_ListBox_ToolTip_Filter);
         colorToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_Color;
-        helpToolTip.SetToolTip(filterComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_Filter);
-        lblTextFilter.Text = Resources.LogWindow_UI_Label_TextFilter;
-        btnAdvanced.Text = Resources.LogWindow_UI_Button_ShowAdvanced;
-        helpToolTip.SetToolTip(btnAdvanced, Resources.LogWindow_UI_Button_ToolTip_ShowAdvanced);
-        syncFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterSync;
-        helpToolTip.SetToolTip(syncFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterSync);
-        lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
-        filterTailCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterTail;
-        helpToolTip.SetToolTip(filterTailCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterTail);
-        filterRegexCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterRegex;
-        helpToolTip.SetToolTip(filterRegexCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterRegex);
-        filterCaseSensitiveCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterCaseSensitive;
-        helpToolTip.SetToolTip(filterCaseSensitiveCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive);
-        filterSearchButton.Text = Resources.LogWindow_UI_Button_Search;
-        helpToolTip.SetToolTip(filterSearchButton, Resources.LogWindow_UI_Button_ToolTip_Search);
         freezeLeftColumnsUntilHereToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere;
         moveToLastColumnToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MoveToLastColumn;
         moveToLastColumnToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn;
@@ -531,6 +540,35 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterForSelectionToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FilterForSelection;
         setSelectedTextAsBookmarkCommentToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment;
     }
+
+    private void ApplyToolTipsResources ()
+    {
+        helpToolTip.SetToolTip(btnColumn, Resources.LogWindow_UI_Button_ToolTip_Column);
+        helpToolTip.SetToolTip(columnRestrictCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_ColumnRestrict);
+        helpToolTip.SetToolTip(knobControlFuzzy, Resources.LogWindow_UI_KnobControl_Fuzzy);
+        helpToolTip.SetToolTip(invertFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_InvertMatch);
+        helpToolTip.SetToolTip(knobControlFilterBackSpread, Resources.LogWindow_UI_KnobControl_FilterBackSpread);
+        helpToolTip.SetToolTip(knobControlFilterForeSpread, Resources.LogWindow_UI_KnobControl_FilterForeSpread);
+        helpToolTip.SetToolTip(rangeCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_RangeSearch);
+        helpToolTip.SetToolTip(filterRangeComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_FilterRange);
+        helpToolTip.SetToolTip(btnFilterToTab, Resources.LogWindow_UI_Button_ToolTip_FilterToTab);
+        helpToolTip.SetToolTip(btnToggleHighlightPanel, Resources.LogWindow_UI_Button_ToolTip_ToggleHighlightPanel);
+        helpToolTip.SetToolTip(filterOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterOnLoad);
+        helpToolTip.SetToolTip(hideFilterListOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_AutoHide);
+        helpToolTip.SetToolTip(btnFilterDown, Resources.LogWindow_UI_Button_ToolTip_FilterDown);
+        helpToolTip.SetToolTip(btnFilterUp, Resources.LogWindow_UI_Button_ToolTip_FilterUp);
+        helpToolTip.SetToolTip(listBoxFilter, Resources.LogWindow_UI_ListBox_ToolTip_Filter);
+        helpToolTip.SetToolTip(filterComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_Filter);
+        helpToolTip.SetToolTip(btnAdvanced, Resources.LogWindow_UI_Button_ToolTip_ShowAdvanced);
+        helpToolTip.SetToolTip(syncFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterSync);
+        helpToolTip.SetToolTip(filterTailCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterTail);
+        helpToolTip.SetToolTip(filterRegexCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterRegex);
+        helpToolTip.SetToolTip(filterCaseSensitiveCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive);
+        helpToolTip.SetToolTip(filterSearchButton, Resources.LogWindow_UI_Button_ToolTip_Search);
+        helpToolTip.SetToolTip(columnComboBox, Resources.LogWindow_UI_ColumnComboBox_ToolTip);
+    }
+
+    #endregion
 
     [SupportedOSPlatform("windows")]
     internal void RefreshAllGrids ()
@@ -4621,7 +4659,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 filterGridView.SuspendLayout();
                 filterGridView.RowCount = 0;
-                lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
+                lblFilterCount.Text = Resources.LogWindow_UI_Common_ZeroValue;
                 _filterResultList = [];
                 _lastFilterLinesList = [];
                 _filterHitList = [];
