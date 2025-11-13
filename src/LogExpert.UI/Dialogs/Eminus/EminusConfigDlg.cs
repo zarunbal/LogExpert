@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 
@@ -43,6 +44,7 @@ internal partial class EminusConfigDlg : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public EminusConfig Config { get; set; }
 
     #endregion

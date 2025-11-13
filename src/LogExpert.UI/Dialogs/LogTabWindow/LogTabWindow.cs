@@ -211,6 +211,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region Properties
 
     [SupportedOSPlatform("windows")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public LogWindow.LogWindow CurrentLogWindow
     {
         get => _currentLogWindow;
@@ -228,7 +229,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     //  get { return ConfigManager.Settings; }
     //}
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ILogExpertProxy LogExpertProxy { get; set; }
+
     public IConfigManager ConfigManager { get; }
 
     #endregion

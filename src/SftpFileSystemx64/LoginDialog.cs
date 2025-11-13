@@ -1,3 +1,9 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
+using System.ComponentModel;
+
 namespace SftpFileSystem;
 
 public partial class LoginDialog : Form
@@ -59,6 +65,7 @@ public partial class LoginDialog : Form
 
     public string Password { get; private set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Username
     {
         get => _username;

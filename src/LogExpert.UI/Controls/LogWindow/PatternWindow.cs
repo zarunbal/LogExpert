@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Classes;
@@ -57,24 +58,28 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int Fuzzy
     {
         set => fuzzyKnobControl.Value = value;
         get => fuzzyKnobControl.Value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int MaxDiff
     {
         set => maxDiffKnobControl.Value = value;
         get => maxDiffKnobControl.Value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int MaxMisses
     {
         set => maxMissesKnobControl.Value = value;
         get => maxMissesKnobControl.Value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int Weight
     {
         set => weigthKnobControl.Value = value;

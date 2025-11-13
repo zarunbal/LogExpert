@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 using LogExpert.UI.Controls.LogTabWindow;
@@ -49,6 +50,7 @@ internal partial class ToolArgsDialog : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Arg { get; set; }
 
     #endregion

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
@@ -47,6 +48,7 @@ internal partial class RegexHelperDialog : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool CaseSensitive
     {
         get => _caseSensitive;
@@ -57,14 +59,17 @@ internal partial class RegexHelperDialog : Form
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Pattern
     {
         get => comboBoxRegex.Text;
         set => comboBoxRegex.Text = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public List<string> ExpressionHistoryList { get; set; } = [];
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public List<string> TesttextHistoryList { get; set; } = [];
 
     #endregion

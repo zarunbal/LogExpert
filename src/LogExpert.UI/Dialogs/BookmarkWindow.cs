@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Config;
@@ -64,11 +65,13 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool LineColumnVisible
     {
         set => bookmarkDataGridView.Columns[2].Visible = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ShowBookmarkCommentColumn
     {
         get => checkBoxCommentColumn.Checked;

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 namespace LogExpert.Dialogs;
@@ -47,6 +48,7 @@ internal partial class ParamRequesterDialog : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ParamValue { get; set; }
 
     #endregion

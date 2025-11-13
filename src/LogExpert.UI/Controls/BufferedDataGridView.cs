@@ -6,6 +6,7 @@ using LogExpert.Core.EventArguments;
 using LogExpert.UI.Controls;
 
 using NLog;
+using System.ComponentModel;
 
 namespace LogExpert.Dialogs;
 
@@ -61,8 +62,10 @@ internal partial class BufferedDataGridView : DataGridView
   }
    */
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ContextMenuStrip EditModeMenuStrip { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool PaintWithOverlays { get; set; }
 
     #endregion

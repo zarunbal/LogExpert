@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Dialogs;
@@ -44,8 +45,10 @@ internal partial class MultiFileMaskDialog : Form
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string FileNamePattern { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int MaxDays { get; set; }
 
     #endregion
