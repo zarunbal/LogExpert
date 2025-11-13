@@ -1,7 +1,3 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
 namespace CsvColumnizer;
 
 public partial class CsvColumnizerConfigDlg : Form
@@ -14,7 +10,7 @@ public partial class CsvColumnizerConfigDlg : Form
 
     #region cTor
 
-    public CsvColumnizerConfigDlg(CsvColumnizerConfig config)
+    public CsvColumnizerConfigDlg (CsvColumnizerConfig config)
     {
         SuspendLayout();
         AutoScaleDimensions = new SizeF(96F, 96F);
@@ -22,15 +18,33 @@ public partial class CsvColumnizerConfigDlg : Form
 
         _config = config;
         InitializeComponent();
+
+        ApplyResources();
+
         FillValues();
         ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.CsvColumnizerConfigDlg_UI_Title;
+        label1.Text = Resources.CsvColumnizerConfigDlg_UI_Label_DelimiterChar;
+        labelQuoteChar.Text = Resources.CsvColumnizerConfigDlg_UI_Label_QuoteChar;
+        labelEscapeChar.Text = Resources.CsvColumnizerConfigDlg_UI_Label_EscapeChar;
+        checkBoxEscape.Text = Resources.CsvColumnizerConfigDlg_UI_CheckBox_UseEscapeChars;
+        labelCommentChar.Text = Resources.CsvColumnizerConfigDlg_UI_Label_CommentChar;
+        labelMinColumns.Text = Resources.CsvColumnizerConfigDlg_UI_Label_MinColumns;
+        labelMinColumnsNoCheck.Text = Resources.CsvColumnizerConfigDlg_UI_Label_MinColumnsInfo;
+        checkBoxFieldNames.Text = Resources.CsvColumnizerConfigDlg_UI_CheckBox_FirstLineFieldNames;
+        okButton.Text = Resources.CsvColumnizerConfigDlg_UI_Button_OK;
+        cancelButton.Text = Resources.CsvColumnizerConfigDlg_UI_Button_Cancel;
     }
 
     #endregion
 
     #region Private Methods
 
-    private void FillValues()
+    private void FillValues ()
     {
         delimiterTextBox.Text = _config.DelimiterChar;
         textBoxQuoteChar.Text = _config.QuoteChar.ToString();
@@ -42,7 +56,7 @@ public partial class CsvColumnizerConfigDlg : Form
         numericUpDownMinColumns.Value = _config.MinColumns;
     }
 
-    private void RetrieveValues()
+    private void RetrieveValues ()
     {
         _config.DelimiterChar = delimiterTextBox.Text;
         _config.QuoteChar = textBoxQuoteChar.Text[0];
@@ -56,12 +70,12 @@ public partial class CsvColumnizerConfigDlg : Form
 
     #region Events handler
 
-    private void OnOkButtonClick(object sender, EventArgs e)
+    private void OnOkButtonClick (object sender, EventArgs e)
     {
         RetrieveValues();
     }
 
-    private void OnEscapeCheckBoxCheckedChanged(object sender, EventArgs e)
+    private void OnEscapeCheckBoxCheckedChanged (object sender, EventArgs e)
     {
         textboxEscapeChar.Enabled = checkBoxEscape.Checked;
     }

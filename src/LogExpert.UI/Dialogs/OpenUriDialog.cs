@@ -11,13 +11,16 @@ internal partial class OpenUriDialog : Form
 
     #region cTor
 
-    public OpenUriDialog()
+    public OpenUriDialog ()
     {
         SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
+
+        ApplyResources();
 
         ResumeLayout();
     }
@@ -26,6 +29,7 @@ internal partial class OpenUriDialog : Form
 
     #region Properties
 
+    //TODO Convert to System.Uri
     public string Uri => cmbUri.Text;
 
     public IList<string> UriHistory { get; set; }
@@ -34,19 +38,29 @@ internal partial class OpenUriDialog : Form
 
     #region Events handler
 
-    private void OnOpenUriDialogLoad(object sender, EventArgs e)
+    private void ApplyResources ()
+    {
+        Text = Resources.OpenUriDialog_UI_Dialog_Text;
+        labelUrl.Text = Resources.OpenUriDialog_UI_Label_URL;
+        okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
+        cancelButton.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        labelExplaination.Text = Resources.OpenUriDialog_UI_Label_Explaination;
+
+    }
+
+    private void OnOpenUriDialogLoad (object sender, EventArgs e)
     {
         if (UriHistory != null)
         {
             cmbUri.Items.Clear();
             foreach (var uri in UriHistory)
             {
-                cmbUri.Items.Add(uri);
+                _ = cmbUri.Items.Add(uri);
             }
         }
     }
 
-    private void OnBtnOkClick(object sender, EventArgs e)
+    private void OnBtnOkClick (object sender, EventArgs e)
     {
         UriHistory = [];
 
@@ -57,7 +71,8 @@ internal partial class OpenUriDialog : Form
 
         if (UriHistory.Contains(cmbUri.Text))
         {
-            UriHistory.Remove(cmbUri.Text);
+            _ = UriHistory.Remove(cmbUri.Text);
+
         }
 
         UriHistory.Insert(0, cmbUri.Text);

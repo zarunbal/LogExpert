@@ -5,15 +5,11 @@ using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
 using LogExpert.UI.Extensions;
 
-using NLog;
-
 namespace LogExpert.UI.Controls.LogWindow;
 
 [SupportedOSPlatform("windows")]
 internal partial class TimeSpreadingControl : UserControl
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
     #region Fields
 
     private Bitmap _bitmap = new(1, 1);
@@ -32,6 +28,11 @@ internal partial class TimeSpreadingControl : UserControl
 
     public TimeSpreadingControl ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
         _toolTip = new ToolTip();
         Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -39,6 +40,8 @@ internal partial class TimeSpreadingControl : UserControl
         _toolTip.ReshowDelay = 0;
         _toolTip.ShowAlways = true;
         DoubleBuffered = false;
+
+        ResumeLayout();
     }
 
     #endregion
@@ -144,8 +147,6 @@ internal partial class TimeSpreadingControl : UserControl
 
     private void OnTimeSpreadCalcCalcDone (object sender, EventArgs e)
     {
-        _logger.Debug(CultureInfo.InvariantCulture, "timeSpreadCalc_CalcDone()");
-
         lock (_monitor)
         {
             Invalidate();
@@ -202,7 +203,7 @@ internal partial class TimeSpreadingControl : UserControl
             }
         }
 
-        BeginInvoke(new MethodInvoker(Refresh));
+        _ = BeginInvoke(new MethodInvoker(Refresh));
     }
 
     private void OnTimeSpreadCalcStartCalc (object sender, EventArgs e)
@@ -233,10 +234,10 @@ internal partial class TimeSpreadingControl : UserControl
 
             RectangleF rectf = new(rect.Left, rect.Top, rect.Width, rect.Height);
 
-            gfx.DrawString("Calculating time spread view...", Font, fgBrush, rectf, format);
+            gfx.DrawString(Resources.TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView, Font, fgBrush, rectf, format);
         }
 
-        BeginInvoke(new MethodInvoker(Refresh));
+        _ = BeginInvoke(new MethodInvoker(Refresh));
     }
 
     private void OnTimeSpreadingControlSizeChanged (object sender, EventArgs e)
@@ -298,7 +299,7 @@ internal partial class TimeSpreadingControl : UserControl
 
         _lastMouseY = e.Y;
         var dts = $"{entry.Timestamp:dd.MM.yyyy HH:mm:ss}";
-        _toolTip.SetToolTip(this, "Line " + (entry.LineNum + 1) + "\n" + dts);
+        _toolTip.SetToolTip(this, string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadingControl_UI_ToolTip, entry.LineNum, dts));
     }
 
     #endregion

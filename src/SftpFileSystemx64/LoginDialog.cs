@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-
 namespace SftpFileSystem;
 
 public partial class LoginDialog : Form
@@ -15,21 +10,26 @@ public partial class LoginDialog : Form
 
     #region Ctor
 
-    public LoginDialog(string host, IList<string> userNames, bool hidePasswordField)
+    public LoginDialog (string host, IList<string> userNames, bool hidePasswordField)
     {
         SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
+        ApplyResources();
+
         serverNameLabel.Text = host;
+
         if (userNames != null)
         {
             foreach (var name in userNames)
             {
                 if (name != null)
                 {
-                    cmbUsername.Items.Add(name);
+                    _ = cmbUsername.Items.Add(name);
                 }
             }
         }
@@ -41,6 +41,16 @@ public partial class LoginDialog : Form
         }
 
         ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.LoginDialog_UI_Title;
+        label3.Text = Resources.LoginDialog_UI_Label_Server;
+        label1.Text = Resources.LoginDialog_UI_Label_Username;
+        lblPassword.Text = Resources.LoginDialog_UI_Label_Password;
+        btnOk.Text = Resources.LoginDialog_UI_Button_OK;
+        btnCancel.Text = Resources.LoginDialog_UI_Button_Cancel;
     }
 
     #endregion
@@ -63,17 +73,17 @@ public partial class LoginDialog : Form
 
     #region Event handling Methods
 
-    private void OnBtnOKClick(object sender, EventArgs e)
+    private void OnBtnOKClick (object sender, EventArgs e)
     {
         Password = txtBoxPassword.Text;
         _username = cmbUsername.Text;
     }
 
-    private void OnLoginDialogLoad(object sender, EventArgs e)
+    private void OnLoginDialogLoad (object sender, EventArgs e)
     {
         if (cmbUsername.Text.Length > 0)
         {
-            txtBoxPassword.Focus();
+            _ = txtBoxPassword.Focus();
         }
     }
 

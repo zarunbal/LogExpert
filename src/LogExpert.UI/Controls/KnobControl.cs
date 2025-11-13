@@ -1,6 +1,3 @@
-using NLog;
-
-using System.Globalization;
 using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Controls;
@@ -9,9 +6,6 @@ namespace LogExpert.UI.Controls;
 internal partial class KnobControl : UserControl
 {
     #region Fields
-
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
 
     private readonly StringFormat _stringFormat = new();
 
@@ -25,7 +19,7 @@ internal partial class KnobControl : UserControl
 
     #region cTor
 
-    public KnobControl()
+    public KnobControl ()
     {
         InitializeComponent();
         _stringFormat.LineAlignment = StringAlignment.Far;
@@ -34,15 +28,9 @@ internal partial class KnobControl : UserControl
 
     #endregion
 
-    #region Delegates
-
-    public delegate void ValueChangedEventHandler(object sender, EventArgs e);
-
-    #endregion
-
     #region Events
 
-    public event ValueChangedEventHandler ValueChanged;
+    public event EventHandler<EventArgs> ValueChanged;
 
     #endregion
 
@@ -71,7 +59,7 @@ internal partial class KnobControl : UserControl
 
     #region Overrides
 
-    protected override void OnPaint(PaintEventArgs e)
+    protected override void OnPaint (PaintEventArgs e)
     {
         base.OnPaint(e);
 
@@ -94,20 +82,20 @@ internal partial class KnobControl : UserControl
         //rect = this.ClientRectangle;
         rect.Inflate(-2, -2);
 
-        var startAngle = 135.0F + 270F * ((float)_value / (float)Range);
+        var startAngle = 135.0F + (270F * (_value / (float)Range));
         var sweepAngle = 0.1F;
         e.Graphics.DrawPie(blackPen, rect, startAngle, sweepAngle);
 
         Brush brush = new SolidBrush(foregroundColor);
         RectangleF rectF = new(0, 0, ClientRectangle.Width, ClientRectangle.Height);
-        e.Graphics.DrawString("" + _value, Font, brush, rectF, _stringFormat);
+        e.Graphics.DrawString(string.Empty + _value, Font, brush, rectF, _stringFormat);
 
         blackPen.Dispose();
         greyPen.Dispose();
         brush.Dispose();
     }
 
-    protected override void OnMouseDown(MouseEventArgs e)
+    protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseDown(e);
 
@@ -126,7 +114,7 @@ internal partial class KnobControl : UserControl
         }
     }
 
-    protected override void OnMouseUp(MouseEventArgs e)
+    protected override void OnMouseUp (MouseEventArgs e)
     {
         base.OnMouseUp(e);
         Capture = false;
@@ -134,12 +122,12 @@ internal partial class KnobControl : UserControl
         OnValueChanged(new EventArgs());
     }
 
-    protected void OnValueChanged(EventArgs e)
+    protected void OnValueChanged (EventArgs e)
     {
         ValueChanged?.Invoke(this, e);
     }
 
-    protected override void OnMouseMove(MouseEventArgs e)
+    protected override void OnMouseMove (MouseEventArgs e)
     {
         base.OnMouseMove(e);
         if (!Capture)
@@ -150,9 +138,7 @@ internal partial class KnobControl : UserControl
         var sense = _isShiftPressed ? DragSensitivity * 2 : DragSensitivity;
 
         var diff = _startMouseY - e.Y;
-        _logger.Debug(CultureInfo.InvariantCulture, "KnobDiff: {0}", diff);
-        var range = MaxValue - MinValue;
-        _value = _oldValue + diff / sense;
+        _value = _oldValue + (diff / sense);
 
         if (_value < MinValue)
         {
@@ -167,13 +153,13 @@ internal partial class KnobControl : UserControl
         Invalidate();
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
+    protected override void OnKeyDown (KeyEventArgs e)
     {
         _isShiftPressed = e.Shift;
         base.OnKeyDown(e);
     }
 
-    protected override void OnKeyUp(KeyEventArgs e)
+    protected override void OnKeyUp (KeyEventArgs e)
     {
         _isShiftPressed = e.Shift;
         base.OnKeyUp(e);
