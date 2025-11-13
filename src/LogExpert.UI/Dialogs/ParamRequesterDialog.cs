@@ -8,16 +8,40 @@ internal partial class ParamRequesterDialog : Form
 {
     #region Fields
 
+    private readonly string[] _values;
+    private readonly string _paramName;
+
     #endregion
 
     #region cTor
 
-    public ParamRequesterDialog ()
+    public ParamRequesterDialog (string parameterName, string[] values)
     {
-        InitializeComponent();
+        SuspendLayout();
+
+        _values = values;
+        _paramName = parameterName;
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+        ApplyResources();
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.ParamRequesterDialog_UI_Title;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+
+        //Fallback
+        if (string.IsNullOrEmpty(_paramName))
+        {
+            labelValueForParameter.Text = Resources.ParamRequesterDialog_UI_Label_ValueForParameter;
+        }
     }
 
     #endregion
@@ -25,27 +49,19 @@ internal partial class ParamRequesterDialog : Form
     #region Properties
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public string ParamName { get; set; }
-
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ParamValue { get; set; }
-
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public string[] Values { get; set; }
 
     #endregion
 
     #region Events handler
 
-    private void ParamRequesterDialog_Shown (object sender, EventArgs e)
+    private void OnParamRequesterDialogShown (object sender, EventArgs e)
     {
-        labelValueForParameter.Text = ParamName;
-
-        if (Values != null)
+        if (_values != null)
         {
-            foreach (var value in Values)
+            foreach (var value in _values)
             {
-                comboBoxValue.Items.Add(value);
+                _ = comboBoxValue.Items.Add(value);
             }
 
             comboBoxValue.SelectedIndex = 0;

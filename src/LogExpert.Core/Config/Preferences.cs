@@ -93,7 +93,7 @@ public class Preferences
 
     public string DefaultEncoding { get; set; }
 
-    public string DefaultLanguage { get; set; }
+    public string DefaultLanguage { get; set; } = "en-US";
 
     public bool FilterSync { get; set; } = true;
 

@@ -112,7 +112,13 @@ internal static class Program
                     // first application instance
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    var logWin = AbstractLogTabWindow.Create(absoluteFilePaths.Length > 0 ? absoluteFilePaths : null, 1, false, ConfigManager.Instance);
+                    var logWin = AbstractLogTabWindow.Create(
+                        absoluteFilePaths.Length > 0
+                            ? absoluteFilePaths
+                            : null,
+                        1,
+                        false,
+                        ConfigManager.Instance);
 
                     // first instance
                     var wi = WindowsIdentity.GetCurrent();

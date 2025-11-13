@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.ComponentModel;
 using System.Runtime.Versioning;
 
@@ -25,14 +26,32 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
 
     public PatternWindow ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
+        ApplyResources();
+
+        ResumeLayout();
     }
 
     public PatternWindow (LogWindow logWindow)
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         _logWindow = logWindow;
+
         InitializeComponent();
-        recalcButton.Enabled = false;
+        ApplyResources();
+
+        buttonRecalculate.Enabled = false;
+
+        ResumeLayout();
     }
 
     #endregion
@@ -65,6 +84,30 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
     {
         set => weigthKnobControl.Value = value;
         get => weigthKnobControl.Value;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void ApplyResources ()
+    {
+        // Form title
+        Text = Resources.PatternWindow_UI_Title;
+
+        // Labels
+        labelNumberOfBlocks.Text = Resources.PatternWindow_UI_Label_NumberOfBlocks;
+        labelBlockLines.Text = Resources.PatternWindow_UI_Label_BlockLines;
+        labelFeatureDescription.Text = Resources.PatternWindow_UI_Label_FeatureDescription;
+        labelFuzzy.Text = Resources.PatternWindow_UI_Label_Fuzzy;
+        labelMaxDiff.Text = Resources.PatternWindow_UI_Label_MaxDiff;
+        labelMaxMisses.Text = Resources.PatternWindow_UI_Label_MaxMisses;
+        labelWeight.Text = Resources.PatternWindow_UI_Label_Weight;
+        labelNoRangeSet.Text = Resources.PatternWindow_UI_Label_NoRangeSet;
+
+        // Buttons
+        buttonRecalculate.Text = Resources.PatternWindow_UI_Button_Recalc;
+        buttonSetRange.Text = Resources.PatternWindow_UI_Button_SetRange;
     }
 
     #endregion
@@ -156,11 +199,11 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
     private void SetBlockListGuiStuff ()
     {
         patternHitsDataGridView.RowCount = 0;
-        blockCountLabel.Text = "0";
+        blockCountLabel.Text = Resources.LogWindow_UI_Common_ZeroValue;
         contentDataGridView.RowCount = 0;
-        blockLinesLabel.Text = "0";
-        recalcButton.Enabled = true;
-        setRangeButton.Enabled = true;
+        blockLinesLabel.Text = Resources.LogWindow_UI_Common_ZeroValue;
+        buttonRecalculate.Enabled = true;
+        buttonSetRange.Enabled = true;
         if (_blockList.Count > 0)
         {
             SetCurrentList(_blockList[0]);
@@ -341,8 +384,8 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
         _patternArgs.MaxMisses = maxMissesKnobControl.Value;
         _patternArgs.MinWeight = weigthKnobControl.Value;
         _logWindow.PatternStatistic(_patternArgs);
-        recalcButton.Enabled = false;
-        setRangeButton.Enabled = false;
+        buttonRecalculate.Enabled = false;
+        buttonSetRange.Enabled = false;
     }
 
     private void OnCloseButtonClick (object sender, EventArgs e)
@@ -365,8 +408,11 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
     private void OnSetRangeButtonClick (object sender, EventArgs e)
     {
         _logWindow.PatternStatisticSelectRange(_patternArgs);
-        recalcButton.Enabled = true;
-        rangeLabel.Text = $"Start: {_patternArgs.StartLine}\nEnd: {_patternArgs.EndLine}";
+        buttonRecalculate.Enabled = true;
+        labelNoRangeSet.Text = string.Format(CultureInfo.InvariantCulture,
+            Resources.PatternWindow_UI_Label_RangeFormat,
+            _patternArgs.StartLine,
+            _patternArgs.EndLine);
     }
 
     #endregion

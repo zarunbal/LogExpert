@@ -531,6 +531,8 @@ public class ConfigManager : IConfigManager
 
         settings.Preferences.DefaultEncoding ??= System.Text.Encoding.Default.HeaderName;
 
+        settings.Preferences.DefaultLanguage ??= "en-US";
+
         if (settings.Preferences.MaximumFilterEntriesDisplayed == 0)
         {
             settings.Preferences.MaximumFilterEntriesDisplayed = 20;

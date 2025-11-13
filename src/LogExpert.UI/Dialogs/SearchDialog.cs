@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
@@ -21,12 +22,36 @@ internal partial class SearchDialog : Form
 
     public SearchDialog ()
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
+        InitializeComponent();
+
+        ApplyResources();
+
         Load += OnSearchDialogLoad;
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        labelSearchFor.Text = Resources.SearchDialog_UI_Label_SearchFor;
+        checkBoxCaseSensitive.Text = Resources.SearchDialog_UI_CheckBox_CaseSensitive;
+        checkBoxRegex.Text = Resources.SearchDialog_UI_CheckBox_RegularExpression;
+        buttonRegexHelper.Text = Resources.SearchDialog_UI_Button_RegexHelper;
+        radioButtonFromTop.Text = Resources.SearchDialog_UI_RadioButton_FromTop;
+        radioButtonFromSelected.Text = Resources.SearchDialog_UI_RadioButton_FromSelectedLine;
+        groupBoxSearchStart.Text = Resources.SearchDialog_UI_GroupBox_SearchStart;
+        groupBoxOptions.Text = Resources.SearchDialog_UI_GroupBox_Options;
+        groupBoxDirection.Text = Resources.SearchDialog_UI_GroupBox_Direction;
+        radioButtonBackward.Text = Resources.SearchDialog_UI_RadioButton_Backward;
+        radioButtonForward.Text = Resources.SearchDialog_UI_RadioButton_Forward;
+        Text = Resources.SearchDialog_UI_Title;
     }
 
     #endregion
@@ -66,7 +91,7 @@ internal partial class SearchDialog : Form
             checkBoxCaseSensitive.Checked = SearchParams.IsCaseSensitive;
             foreach (var item in SearchParams.HistoryList)
             {
-                comboBoxSearchFor.Items.Add(item);
+                _ = comboBoxSearchFor.Items.Add(item);
             }
 
             if (comboBoxSearchFor.Items.Count > 0)
@@ -106,7 +131,7 @@ internal partial class SearchDialog : Form
             {
                 if (string.IsNullOrWhiteSpace(comboBoxSearchFor.Text))
                 {
-                    throw new ArgumentException("Search text is empty");
+                    throw new ArgumentException(Resources.SearchDialog_UI_Error_SearchTextEmpty);
                 }
 
                 // Use RegexHelper for safer validation with timeout protection
@@ -121,7 +146,7 @@ internal partial class SearchDialog : Form
             SearchParams.IsForward = radioButtonForward.Checked;
             SearchParams.IsFromTop = radioButtonFromTop.Checked;
             SearchParams.IsRegex = checkBoxRegex.Checked;
-            SearchParams.HistoryList.Remove(comboBoxSearchFor.Text);
+            _ = SearchParams.HistoryList.Remove(comboBoxSearchFor.Text);
             SearchParams.HistoryList.Insert(0, comboBoxSearchFor.Text);
 
             if (SearchParams.HistoryList.Count > MAX_HISTORY)
@@ -131,14 +156,14 @@ internal partial class SearchDialog : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error during creation of search parameter\r\n{ex.Message}");
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SearchDialog_UI_Error_CreatingSearchParameter, ex.Message));
         }
     }
-
-    #endregion
 
     private void OnButtonCancelClick (object sender, EventArgs e)
     {
         Close();
     }
+
+    #endregion
 }

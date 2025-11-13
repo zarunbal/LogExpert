@@ -1,6 +1,6 @@
-using LogExpert.Core.Classes.Filter;
-
 using System.Runtime.Versioning;
+
+using LogExpert.Core.Classes.Filter;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -16,39 +16,66 @@ internal partial class FilterColumnChooser : Form
 
     #region cTor
 
-    //TODO: add Suspend and ResumeLayout()
-    public FilterColumnChooser(FilterParams filterParams)
+    public FilterColumnChooser (FilterParams filterParams)
     {
+        SuspendLayout();
+
         InitializeComponent();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        ApplyResources();
 
         columnListBox.ItemHeight = columnListBox.Font.Height;
 
         _columnizer = filterParams.CurrentColumnizer;
         _filterParams = filterParams;
 
+        ResumeLayout();
+
         Init();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.FilterColumnChooser_UI_Title;
+
+        groupBox1.Text = Resources.FilterColumnChooser_UI_GroupBox_OnEmptyColumns;
+
+        checkBoxExactMatch.Text = Resources.FilterColumnChooser_UI_CheckBox_ExactMatch;
+
+        emptyColumnNoHitRadioButton.Text = Resources.FilterColumnChooser_UI_RadioButton_NoHit;
+        emptyColumnHitRadioButton.Text = Resources.FilterColumnChooser_UI_RadioButton_SearchHit;
+        emptyColumnUsePrevRadioButton.Text = Resources.FilterColumnChooser_UI_RadioButton_UsePrevContent;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+
+        toolTipListBox.ToolTipTitle = Resources.FilterColumnChooser_UI_ToolTip_Title_Columns;
+        toolTipListBox.SetToolTip(columnListBox, Resources.FilterColumnChooser_UI_ToolTip_ColumnListBox);
+        toolTipEmptyColumnNoHit.SetToolTip(emptyColumnNoHitRadioButton, Resources.FilterColumnChooser_UI_ToolTip_NoHit);
+        toolTipSearchHit.SetToolTip(emptyColumnHitRadioButton, Resources.FilterColumnChooser_UI_ToolTip_SearchHit);
+        toolTipPrevContent.SetToolTip(emptyColumnUsePrevRadioButton, Resources.FilterColumnChooser_UI_ToolTip_UsePrevContent);
+        toolTipExactMatch.SetToolTip(checkBoxExactMatch, Resources.FilterColumnChooser_UI_ToolTip_ExactMatch);
     }
 
     #endregion
 
     #region Private Methods
 
-    private void Init()
+    private void Init ()
     {
         var count = _columnizer.GetColumnCount();
         var names = _columnizer.GetColumnNames();
 
         for (var i = 0; i < count; ++i)
         {
-            columnListBox.Items.Add(names[i], _filterParams.ColumnList.Contains(i));
+            _ = columnListBox.Items.Add(names[i], _filterParams.ColumnList.Contains(i));
         }
 
         emptyColumnUsePrevRadioButton.Checked = _filterParams.EmptyColumnUsePrev;
         emptyColumnHitRadioButton.Checked = _filterParams.EmptyColumnHit;
-        emptyColumnNoHitRadioButton.Checked = _filterParams.EmptyColumnHit == false && _filterParams.EmptyColumnUsePrev == false;
+        emptyColumnNoHitRadioButton.Checked = !_filterParams.EmptyColumnHit && !_filterParams.EmptyColumnUsePrev;
         checkBoxExactMatch.Checked = _filterParams.ExactColumnMatch;
     }
 
@@ -56,7 +83,7 @@ internal partial class FilterColumnChooser : Form
 
     #region Events handler
 
-    private void OnOkButtonClick(object sender, EventArgs e)
+    private void OnOkButtonClick (object sender, EventArgs e)
     {
         _filterParams.ColumnList.Clear();
 

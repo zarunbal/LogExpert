@@ -9,10 +9,6 @@ namespace LogExpert;
 [SupportedOSPlatform("windows")]
 internal partial class EminusConfigDlg : Form
 {
-    #region Fields
-
-    #endregion
-
     #region cTor
 
     public EminusConfigDlg (EminusConfig config)
