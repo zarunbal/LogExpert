@@ -298,7 +298,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyTextResources ()
     {
 
-        mainMenuStrip.Text = "menuStrip1";
         Text = "LogExpert";
         checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
 
@@ -405,9 +404,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         throwExceptionbackgroundThToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem;
         throwExceptionBackgroundThreadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem;
         loglevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem;
-        warnToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
-        infoToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
-        debugToolStripMenuItem1.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1;
+        warnLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
+        infoLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
+        debugLogLevelToolStripMenuItem1.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1;
         disableWordHighlightModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem;
     }
 
