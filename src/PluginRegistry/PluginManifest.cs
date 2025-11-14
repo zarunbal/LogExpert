@@ -132,7 +132,7 @@ public class PluginManifest
     /// and logs the operation result. If the file doesn't exist or deserialization fails, null is returned.
     /// </remarks>
     /// <exception cref="Exception">Logs any exceptions that occur during file reading or deserialization but returns null instead of throwing.</exception>
-    public static PluginManifest Load(string manifestPath)
+    public static PluginManifest Load (string manifestPath)
     {
         try
         {
@@ -175,7 +175,7 @@ public class PluginManifest
     /// <item><description>Validating permission strings against known permission types</description></item>
     /// </list>
     /// </remarks>
-    public bool Validate(out List<string> errors)
+    public bool Validate (out List<string> errors)
     {
         errors = [];
 
@@ -252,7 +252,7 @@ public class PluginManifest
     /// If no requirement is specified in the manifest, the plugin is assumed to be compatible.
     /// </remarks>
     /// <exception cref="Exception">Logs any exceptions that occur during version parsing but returns false instead of throwing.</exception>
-    public bool IsCompatibleWith(Version logExpertVersion)
+    public bool IsCompatibleWith (Version logExpertVersion)
     {
         if (Requires == null || string.IsNullOrWhiteSpace(Requires.LogExpert))
         {
@@ -263,32 +263,32 @@ public class PluginManifest
         try
         {
             var requirement = Requires.LogExpert;
-            
+
             // Parse version requirement (e.g., ">=1.10.0", "~1.10.0", "1.10.0")
             if (requirement.StartsWith(">="))
             {
                 var requiredVersion = System.Version.Parse(requirement[2..].Trim());
                 return logExpertVersion >= requiredVersion;
             }
-            
+
             if (requirement.StartsWith('>'))
             {
                 var requiredVersion = System.Version.Parse(requirement[1..].Trim());
                 return logExpertVersion > requiredVersion;
             }
-            
+
             if (requirement.StartsWith("<="))
             {
                 var requiredVersion = System.Version.Parse(requirement[2..].Trim());
                 return logExpertVersion <= requiredVersion;
             }
-            
+
             if (requirement.StartsWith('<'))
             {
                 var requiredVersion = System.Version.Parse(requirement[1..].Trim());
                 return logExpertVersion < requiredVersion;
             }
-            
+
             if (requirement.StartsWith('~'))
             {
                 // Tilde range: allows patch-level changes
@@ -297,7 +297,7 @@ public class PluginManifest
                        logExpertVersion.Minor == requiredVersion.Minor &&
                        logExpertVersion >= requiredVersion;
             }
-            
+
             if (requirement.StartsWith('^'))
             {
                 // Caret range: allows minor-level changes
@@ -305,7 +305,7 @@ public class PluginManifest
                 return logExpertVersion.Major == requiredVersion.Major &&
                        logExpertVersion >= requiredVersion;
             }
-            
+
             // Exact version match
             var exactVersion = System.Version.Parse(requirement);
             return logExpertVersion == exactVersion;
@@ -329,7 +329,7 @@ public class PluginManifest
     /// <remarks>
     /// Accepts semantic versioning in the format "major.minor" or "major.minor.patch" where each component is a valid integer.
     /// </remarks>
-    private static bool IsValidVersion(string versionString)
+    private static bool IsValidVersion (string versionString)
     {
         if (string.IsNullOrWhiteSpace(versionString))
         {
@@ -349,7 +349,7 @@ public class PluginManifest
     /// <remarks>
     /// This method strips any operator prefix and validates that the remaining version string can be parsed as a valid <see cref="System.Version"/>.
     /// </remarks>
-    private static bool IsValidVersionRequirement(string requirement)
+    private static bool IsValidVersionRequirement (string requirement)
     {
         if (string.IsNullOrWhiteSpace(requirement))
         {
@@ -364,7 +364,7 @@ public class PluginManifest
             _ = System.Version.Parse(versionPart);
             return true;
         }
-        catch (Exception ex) when(ex is ArgumentException or
+        catch (Exception ex) when (ex is ArgumentException or
                                         FormatException or
                                         ArgumentNullException or
                                         ArgumentOutOfRangeException or
@@ -391,7 +391,7 @@ public class PluginManifest
     /// </list>
     /// The comparison is case-insensitive.
     /// </remarks>
-    private static bool IsValidPermission(string permission)
+    private static bool IsValidPermission (string permission)
     {
         var validPermissions = new[]
         {

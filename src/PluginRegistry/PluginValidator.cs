@@ -1,8 +1,6 @@
 using System.Reflection;
 using System.Security.Cryptography;
 
-using LogExpert.Core.Interface;
-
 using NLog;
 
 namespace LogExpert.PluginRegistry;
@@ -58,7 +56,7 @@ public class PluginValidator
     /// </summary>
     /// <param name="dllPath">Path to the plugin DLL</param>
     /// <returns>True if the plugin is valid and safe to load</returns>
-    public static bool ValidatePlugin(string dllPath)
+    public static bool ValidatePlugin (string dllPath)
     {
         return ValidatePlugin(dllPath, out _);
     }
@@ -69,7 +67,7 @@ public class PluginValidator
     /// <param name="dllPath">Path to the plugin DLL</param>
     /// <param name="manifest">Output manifest if found and valid, null otherwise</param>
     /// <returns>True if the plugin is valid and safe to load</returns>
-    public static bool ValidatePlugin(string dllPath, out PluginManifest manifest)
+    public static bool ValidatePlugin (string dllPath, out PluginManifest manifest)
     {
         manifest = null;
 
@@ -83,7 +81,7 @@ public class PluginValidator
             }
 
             var fileName = Path.GetFileName(dllPath);
-            var pluginDir = Path.GetDirectoryName(dllPath);
+            //var pluginDir = Path.GetDirectoryName(dllPath);
 
             // 2. Check if it's a known dependency (not a plugin)
             if (_knownDependencies.Contains(fileName))
@@ -100,7 +98,7 @@ public class PluginValidator
                 return false;
             }
 
-            // 4. **NEW**: Try to load and validate manifest
+            // 4. Try to load and validate manifest
             manifest = LoadAndValidateManifest(dllPath);
             if (manifest != null)
             {
@@ -119,7 +117,7 @@ public class PluginValidator
                     var permissions = PluginPermissionManager.ParsePermissions(manifest.Permissions);
                     var pluginName = Path.GetFileNameWithoutExtension(fileName);
                     PluginPermissionManager.SetPermissions(pluginName, permissions);
-                    _logger.Info("Set permissions for {PluginName}: {Permissions}", 
+                    _logger.Info("Set permissions for {PluginName}: {Permissions}",
                         pluginName, PluginPermissionManager.PermissionToString(permissions));
                 }
             }
@@ -155,7 +153,7 @@ public class PluginValidator
     /// <summary>
     /// Checks if a plugin is in the trusted whitelist.
     /// </summary>
-    public static bool IsTrustedPlugin(string fileName)
+    public static bool IsTrustedPlugin (string fileName)
     {
         var pluginName = Path.GetFileName(fileName);
         return _trustedPluginNames.Contains(pluginName);
@@ -164,7 +162,7 @@ public class PluginValidator
     /// <summary>
     /// Adds a plugin to the trusted whitelist (for custom plugins).
     /// </summary>
-    public static void AddTrustedPlugin(string fileName)
+    public static void AddTrustedPlugin (string fileName)
     {
         var pluginName = Path.GetFileName(fileName);
         if (!string.IsNullOrEmpty(pluginName))
@@ -177,7 +175,7 @@ public class PluginValidator
     /// <summary>
     /// Gets the list of trusted plugin names.
     /// </summary>
-    public static IReadOnlySet<string> GetTrustedPlugins()
+    public static IReadOnlySet<string> GetTrustedPlugins ()
     {
         return _trustedPluginNames;
     }
@@ -191,13 +189,13 @@ public class PluginValidator
     /// </summary>
     /// <param name="dllPath">Path to the plugin DLL</param>
     /// <returns>Validated manifest or null if not found/invalid</returns>
-    private static PluginManifest LoadAndValidateManifest(string dllPath)
+    private static PluginManifest LoadAndValidateManifest (string dllPath)
     {
         try
         {
             // Look for manifest file: PluginName.manifest.json
             var manifestPath = Path.ChangeExtension(dllPath, ".manifest.json");
-            
+
             if (!File.Exists(manifestPath))
             {
                 _logger.Debug("No manifest file found at: {ManifestPath}", manifestPath);
@@ -237,7 +235,7 @@ public class PluginValidator
     /// </summary>
     /// <param name="manifest">Plugin manifest</param>
     /// <returns>True if compatible, false otherwise</returns>
-    private static bool CheckVersionCompatibility(PluginManifest manifest)
+    private static bool CheckVersionCompatibility (PluginManifest manifest)
     {
         try
         {
@@ -273,7 +271,7 @@ public class PluginValidator
     /// <summary>
     /// Checks if an assembly can be loaded without throwing exceptions.
     /// </summary>
-    private static bool CanLoadAssembly(string dllPath)
+    private static bool CanLoadAssembly (string dllPath)
     {
         try
         {
@@ -296,7 +294,7 @@ public class PluginValidator
     /// <summary>
     /// Validates that the file is a valid .NET assembly.
     /// </summary>
-    private static bool IsValidDotNetAssembly(string dllPath)
+    private static bool IsValidDotNetAssembly (string dllPath)
     {
         try
         {
@@ -348,7 +346,7 @@ public class PluginValidator
     /// </summary>
     /// <param name="filePath">Path to file</param>
     /// <returns>SHA256 hash as hex string</returns>
-    public static string CalculateFileHash(string filePath)
+    public static string CalculateFileHash (string filePath)
     {
         try
         {

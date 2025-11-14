@@ -30,7 +30,7 @@ internal static class ResourceHelper
         foreach (var control in controls)
         {
             var type = control.GetType();
-            var resourceKey = $"{className}_{rescourceMainType}_{control.GetType().Name}_{control.Name}";
+            var resourceKey = $"{className}_{rescourceMainType}_{type.Name}_{control.Name}";
             var prop = resourceProperties.FirstOrDefault(p => p.Name == resourceKey);
             if (prop != null)
             {

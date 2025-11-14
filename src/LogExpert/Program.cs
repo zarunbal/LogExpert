@@ -152,7 +152,7 @@ internal static class Program
                             _logger.Error($"IpcClientChannel error: {ex}");
                             errMsg = ex;
                             counter--;
-                            
+
                             // Use Task.Delay instead of Thread.Sleep for non-blocking wait
                             if (counter > 0)
                             {

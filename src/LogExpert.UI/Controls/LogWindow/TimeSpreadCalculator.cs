@@ -28,8 +28,11 @@ internal class TimeSpreadCalculator
     private double _average;
 
     private int _contrast = 400;
+
     private int _displayHeight;
+
     private bool _enabled;
+
     private DateTime _endTimestamp;
     private int _lineCount;
     private int _maxDiff;
@@ -304,7 +307,7 @@ internal class TimeSpreadCalculator
 
                 var lineDiff = lineNum - oldLineNum;
 
-                var timestamp = $"{searchTimeStamp:HH:mm:ss.fff}";
+                //var timestamp = $"{searchTimeStamp:HH:mm:ss.fff}";
                 //_logger.Debug($"Test time {timestamp} line diff={lineDiff}"));
 
                 if (lineDiff >= 0)

@@ -175,7 +175,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
         bmp.Dispose();
-        Closing += OnLogTabWindowClosing;
+        FormClosing += OnLogTabWindowClosing;
 
         InitToolWindows();
     }

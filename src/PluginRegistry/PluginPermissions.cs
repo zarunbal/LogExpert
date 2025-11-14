@@ -56,14 +56,13 @@ public class PluginPermissionManager
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-    
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
     // Plugin permission configuration (loaded from file)
-    private static readonly Dictionary<string, PluginPermissionConfig> _pluginPermissions = new();
-    
+    private static readonly Dictionary<string, PluginPermissionConfig> _pluginPermissions = [];
+
     // Default permissions for plugins without manifest (backward compatibility)
-    private static readonly PluginPermission _defaultPermissions = 
-        PluginPermission.FileSystemRead | PluginPermission.ConfigRead;
+    private const PluginPermission DEFAULT_PERMISSIONS = PluginPermission.FileSystemRead | PluginPermission.ConfigRead;
 
     #endregion
 
@@ -75,7 +74,7 @@ public class PluginPermissionManager
     /// <param name="pluginName">Name of the plugin</param>
     /// <param name="permission">Permission to check</param>
     /// <returns>True if plugin has permission, false otherwise</returns>
-    public static bool HasPermission(string pluginName, PluginPermission permission)
+    public static bool HasPermission (string pluginName, PluginPermission permission)
     {
         if (string.IsNullOrWhiteSpace(pluginName))
         {
@@ -87,23 +86,23 @@ public class PluginPermissionManager
         if (_pluginPermissions.TryGetValue(pluginName, out var config))
         {
             var hasPermission = config.GrantedPermissions.HasFlag(permission);
-            
+
             if (!hasPermission)
             {
                 _logger.Debug("Plugin {PluginName} lacks permission: {Permission}", pluginName, permission);
             }
-            
+
             return hasPermission;
         }
 
         // No explicit configuration, use default permissions
-        var hasDefaultPermission = _defaultPermissions.HasFlag(permission);
-        
+        var hasDefaultPermission = DEFAULT_PERMISSIONS.HasFlag(permission);
+
         if (!hasDefaultPermission)
         {
             _logger.Debug("Plugin {PluginName} lacks default permission: {Permission}", pluginName, permission);
         }
-        
+
         return hasDefaultPermission;
     }
 
@@ -112,14 +111,14 @@ public class PluginPermissionManager
     /// </summary>
     /// <param name="pluginName">Name of the plugin</param>
     /// <param name="permissions">Permissions to grant</param>
-    public static void SetPermissions(string pluginName, PluginPermission permissions)
+    public static void SetPermissions (string pluginName, PluginPermission permissions)
     {
         if (string.IsNullOrWhiteSpace(pluginName))
         {
             throw new ArgumentNullException(nameof(pluginName));
         }
 
-        if (!_pluginPermissions.ContainsKey(pluginName))
+        if (!_pluginPermissions.TryGetValue(pluginName, out PluginPermissionConfig? value))
         {
             _pluginPermissions[pluginName] = new PluginPermissionConfig
             {
@@ -129,7 +128,7 @@ public class PluginPermissionManager
         }
         else
         {
-            _pluginPermissions[pluginName].GrantedPermissions = permissions;
+            value.GrantedPermissions = permissions;
         }
 
         _logger.Info("Set permissions for plugin {PluginName}: {Permissions}", pluginName, permissions);
@@ -140,7 +139,7 @@ public class PluginPermissionManager
     /// </summary>
     /// <param name="pluginName">Name of the plugin</param>
     /// <returns>Plugin permissions or default permissions if not configured</returns>
-    public static PluginPermission GetPermissions(string pluginName)
+    public static PluginPermission GetPermissions (string pluginName)
     {
         if (string.IsNullOrWhiteSpace(pluginName))
         {
@@ -152,7 +151,7 @@ public class PluginPermissionManager
             return config.GrantedPermissions;
         }
 
-        return _defaultPermissions;
+        return DEFAULT_PERMISSIONS;
     }
 
     /// <summary>
@@ -160,7 +159,7 @@ public class PluginPermissionManager
     /// </summary>
     /// <param name="permissionString">Permission string (e.g., "filesystem:read")</param>
     /// <returns>PluginPermission enum value</returns>
-    public static PluginPermission ParsePermission(string permissionString)
+    public static PluginPermission ParsePermission (string permissionString)
     {
         if (string.IsNullOrWhiteSpace(permissionString))
         {
@@ -184,7 +183,7 @@ public class PluginPermissionManager
     /// </summary>
     /// <param name="permissionStrings">List of permission strings</param>
     /// <returns>Combined PluginPermission flags</returns>
-    public static PluginPermission ParsePermissions(IEnumerable<string> permissionStrings)
+    public static PluginPermission ParsePermissions (IEnumerable<string> permissionStrings)
     {
         if (permissionStrings == null)
         {
@@ -192,7 +191,7 @@ public class PluginPermissionManager
         }
 
         var permissions = PluginPermission.None;
-        
+
         foreach (var permissionString in permissionStrings)
         {
             permissions |= ParsePermission(permissionString);
@@ -206,7 +205,7 @@ public class PluginPermissionManager
     /// </summary>
     /// <param name="permission">Permission to convert</param>
     /// <returns>Human-readable permission string</returns>
-    public static string PermissionToString(PluginPermission permission)
+    public static string PermissionToString (PluginPermission permission)
     {
         if (permission == PluginPermission.None)
         {
@@ -257,12 +256,12 @@ public class PluginPermissionManager
     /// Loads plugin permissions from configuration file.
     /// </summary>
     /// <param name="configDir">Configuration directory path</param>
-    public static void LoadPermissions(string configDir)
+    public static void LoadPermissions (string configDir)
     {
         try
         {
             var permissionsFile = Path.Combine(configDir, "plugin-permissions.json");
-            
+
             if (!File.Exists(permissionsFile))
             {
                 _logger.Debug("Plugin permissions file not found, using defaults");
@@ -275,7 +274,7 @@ public class PluginPermissionManager
             if (permissions != null)
             {
                 _pluginPermissions.Clear();
-                
+
                 foreach (var kvp in permissions)
                 {
                     _pluginPermissions[kvp.Key] = kvp.Value;
@@ -294,15 +293,15 @@ public class PluginPermissionManager
     /// Saves plugin permissions to configuration file.
     /// </summary>
     /// <param name="configDir">Configuration directory path</param>
-    public static void SavePermissions(string configDir)
+    public static void SavePermissions (string configDir)
     {
         try
         {
             var permissionsFile = Path.Combine(configDir, "plugin-permissions.json");
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(_pluginPermissions, Newtonsoft.Json.Formatting.Indented);
-            
+
             File.WriteAllText(permissionsFile, json);
-            
+
             _logger.Info("Saved permissions for {Count} plugins", _pluginPermissions.Count);
         }
         catch (Exception ex)
