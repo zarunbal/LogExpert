@@ -2584,15 +2584,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ReInitFilterParams (FilterParams filterParams)
     {
-        _filterParams.SearchText = filterParams.SearchText; // init "lowerSearchText"
-        _filterParams.RangeSearchText = filterParams.RangeSearchText; // init "lowerRangeSearchText"
-        _filterParams.IsRegex = filterParams.IsRegex;
-        _filterParams.CurrentColumnizer = CurrentColumnizer;
-        if (_filterParams.IsRegex)
+        filterParams.CurrentColumnizer = CurrentColumnizer;
+
+        if (filterParams.IsRegex)
         {
             try
             {
-                _filterParams.CreateRegex();
+                filterParams.CreateRegex();
             }
             catch (ArgumentException)
             {
@@ -5334,7 +5332,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         foreach (var col in dict.Values)
         {
-            col.Frozen = _freezeStateMap.TryGetValue(gridView, out bool found) && found;
+            col.Frozen = _freezeStateMap.TryGetValue(gridView, out bool isFrozen) && isFrozen;
 
             if (col.Index == _selectedCol)
             {

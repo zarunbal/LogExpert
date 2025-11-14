@@ -175,7 +175,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
         bmp.Dispose();
-        FormClosing += OnLogTabWindowClosing;
+        FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
     }
@@ -298,7 +298,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyTextResources ()
     {
 
-        Text = "LogExpert";
+        mainMenuStrip.Text = Resources.LogTabWindow_UI_MenuStrip_MainMenu;
+        Text = Resources.LogExpert_Common_UI_Title_LogExpert;
         checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
 
         ApplyStatusStripResources();
@@ -2205,7 +2206,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
-    private void OnLogTabWindowClosing (object sender, CancelEventArgs e)
+    private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
         try
         {

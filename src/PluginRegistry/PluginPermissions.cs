@@ -1,3 +1,7 @@
+using System.Security;
+
+using Newtonsoft.Json;
+
 using NLog;
 
 namespace LogExpert.PluginRegistry;
@@ -52,7 +56,7 @@ public enum PluginPermission
 /// <summary>
 /// Manages plugin permissions and validates permission requests.
 /// </summary>
-public class PluginPermissionManager
+public static class PluginPermissionManager
 {
     #region Fields
 
@@ -269,7 +273,7 @@ public class PluginPermissionManager
             }
 
             var json = File.ReadAllText(permissionsFile);
-            var permissions = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, PluginPermissionConfig>>(json);
+            var permissions = JsonConvert.DeserializeObject<Dictionary<string, PluginPermissionConfig>>(json);
 
             if (permissions != null)
             {
@@ -283,7 +287,15 @@ public class PluginPermissionManager
                 _logger.Info("Loaded permissions for {Count} plugins", _pluginPermissions.Count);
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         JsonException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException)
         {
             _logger.Error(ex, "Error loading plugin permissions from {ConfigDir}", configDir);
         }
@@ -298,13 +310,21 @@ public class PluginPermissionManager
         try
         {
             var permissionsFile = Path.Combine(configDir, "plugin-permissions.json");
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(_pluginPermissions, Newtonsoft.Json.Formatting.Indented);
+            var json = JsonConvert.SerializeObject(_pluginPermissions, Formatting.Indented);
 
             File.WriteAllText(permissionsFile, json);
 
             _logger.Info("Saved permissions for {Count} plugins", _pluginPermissions.Count);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         JsonException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException)
         {
             _logger.Error(ex, "Error saving plugin permissions to {ConfigDir}", configDir);
         }
@@ -321,24 +341,24 @@ public class PluginPermissionConfig
     /// <summary>
     /// Plugin name.
     /// </summary>
-    [Newtonsoft.Json.JsonProperty("pluginName")]
-    public string PluginName { get; set; }
+    [JsonProperty("pluginName")]
+    public required string PluginName { get; set; }
 
     /// <summary>
     /// Granted permissions.
     /// </summary>
-    [Newtonsoft.Json.JsonProperty("grantedPermissions")]
+    [JsonProperty("grantedPermissions")]
     public PluginPermission GrantedPermissions { get; set; }
 
     /// <summary>
     /// Whether the plugin is trusted by the user.
     /// </summary>
-    [Newtonsoft.Json.JsonProperty("trusted")]
+    [JsonProperty("trusted")]
     public bool Trusted { get; set; }
 
     /// <summary>
     /// When permissions were last modified.
     /// </summary>
-    [Newtonsoft.Json.JsonProperty("lastModified")]
+    [JsonProperty("lastModified")]
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
 }

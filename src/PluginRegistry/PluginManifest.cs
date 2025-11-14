@@ -1,3 +1,5 @@
+using System.Security;
+
 using Newtonsoft.Json;
 
 using NLog;
@@ -24,7 +26,7 @@ public class PluginManifest
     /// The name of the plugin. This value should match the plugin's DLL file name without the .dll extension.
     /// </value>
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// Plugin version (semantic versioning: major.minor.patch).
@@ -33,7 +35,7 @@ public class PluginManifest
     /// The version string following semantic versioning format (e.g., "1.0.0" or "2.1.5").
     /// </value>
     [JsonProperty("version")]
-    public string Version { get; set; }
+    public required string Version { get; set; }
 
     /// <summary>
     /// Plugin author or organization.
@@ -42,7 +44,7 @@ public class PluginManifest
     /// The name of the individual or organization that authored the plugin.
     /// </value>
     [JsonProperty("author")]
-    public string Author { get; set; }
+    public required string Author { get; set; }
 
     /// <summary>
     /// Brief description of plugin functionality.
@@ -51,7 +53,7 @@ public class PluginManifest
     /// A human-readable description explaining what the plugin does and its purpose.
     /// </value>
     [JsonProperty("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     /// <summary>
     /// LogExpert plugin API version this plugin targets.
@@ -60,7 +62,7 @@ public class PluginManifest
     /// The API version string indicating which LogExpert plugin API this plugin is designed to work with.
     /// </value>
     [JsonProperty("apiVersion")]
-    public string ApiVersion { get; set; }
+    public required string ApiVersion { get; set; }
 
     /// <summary>
     /// Requirements for running this plugin (LogExpert version, .NET version, etc.).
@@ -98,7 +100,7 @@ public class PluginManifest
     /// The name of the primary DLL file that contains the plugin implementation.
     /// </value>
     [JsonProperty("main")]
-    public string Main { get; set; }
+    public required string Main { get; set; }
 
     /// <summary>
     /// Optional: Plugin website or repository URL.
@@ -107,7 +109,7 @@ public class PluginManifest
     /// A URL pointing to the plugin's homepage, documentation, or source code repository. May be null.
     /// </value>
     [JsonProperty("url")]
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
     /// <summary>
     /// Optional: Plugin license (e.g., "MIT", "Apache-2.0").
@@ -116,7 +118,7 @@ public class PluginManifest
     /// The license identifier under which the plugin is distributed (e.g., "MIT", "Apache-2.0", "GPL-3.0"). May be null.
     /// </value>
     [JsonProperty("license")]
-    public string License { get; set; }
+    public required string License { get; set; }
 
     #endregion
 
@@ -154,7 +156,15 @@ public class PluginManifest
             _logger.Info("Loaded manifest for plugin: {PluginName} v{Version}", manifest.Name, manifest.Version);
             return manifest;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         JsonException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException)
         {
             _logger.Error(ex, "Error loading manifest from: {ManifestPath}", manifestPath);
             return null;

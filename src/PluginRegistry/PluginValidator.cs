@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Security;
 using System.Security.Cryptography;
 
 using NLog;
@@ -8,7 +9,7 @@ namespace LogExpert.PluginRegistry;
 /// <summary>
 /// Validates plugin assemblies before loading to prevent security vulnerabilities.
 /// </summary>
-public class PluginValidator
+public static class PluginValidator
 {
     #region Fields
 
@@ -143,7 +144,10 @@ public class PluginValidator
             _logger.Info("Plugin validated successfully: {FileName}", fileName);
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         BadImageFormatException)
         {
             _logger.Error(ex, "Error validating plugin: {DllPath}", dllPath);
             return false;
@@ -167,18 +171,21 @@ public class PluginValidator
         var pluginName = Path.GetFileName(fileName);
         if (!string.IsNullOrEmpty(pluginName))
         {
-            _ = _trustedPluginNames.Add(pluginName);
-            _logger.Info("Added plugin to trusted list: {PluginName}", pluginName);
+            if (_trustedPluginNames.Add(pluginName))
+            {
+                _logger.Info("Added plugin to trusted list: {PluginName}", pluginName);
+            }
+            else
+            {
+                _logger.Info("Plugin already in trusted list: {PluginName}", pluginName);
+            }
         }
     }
 
     /// <summary>
     /// Gets the list of trusted plugin names.
     /// </summary>
-    public static IReadOnlySet<string> GetTrustedPlugins ()
-    {
-        return _trustedPluginNames;
-    }
+    public static IReadOnlySet<string> TrustedPlugins => _trustedPluginNames;
 
     #endregion
 
@@ -218,12 +225,15 @@ public class PluginValidator
                 {
                     _logger.Error("  - {Error}", error);
                 }
+
                 return null;
             }
 
             return manifest;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException)
         {
             _logger.Error(ex, "Error loading manifest for: {DllPath}", dllPath);
             return null;
@@ -284,7 +294,12 @@ public class PluginValidator
             _logger.Debug(ex, "Plugin has invalid format (possibly wrong architecture): {DllPath}", dllPath);
             return false;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is FileNotFoundException or
+                                         FileLoadException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         IOException or
+                                         SecurityException)
         {
             _logger.Debug(ex, "Cannot load plugin assembly: {DllPath}", dllPath);
             return false;
@@ -315,7 +330,7 @@ public class PluginValidator
             }
 
             // Jump to PE header offset
-            stream.Seek(60, SeekOrigin.Begin);
+            _ = stream.Seek(60, SeekOrigin.Begin);
             var peHeaderOffset = reader.ReadInt32();
 
             if (peHeaderOffset >= stream.Length - 4)
@@ -324,7 +339,7 @@ public class PluginValidator
             }
 
             // Read PE signature
-            stream.Seek(peHeaderOffset, SeekOrigin.Begin);
+            _ = stream.Seek(peHeaderOffset, SeekOrigin.Begin);
             var peSignature = reader.ReadUInt32();
             if (peSignature != 0x00004550) // "PE\0\0"
             {
@@ -334,7 +349,10 @@ public class PluginValidator
             // Basic validation passed
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         ObjectDisposedException)
         {
             _logger.Debug(ex, "Error checking PE format: {DllPath}", dllPath);
             return false;
@@ -353,9 +371,19 @@ public class PluginValidator
             using var stream = File.OpenRead(filePath);
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(stream);
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            return Convert.ToHexStringLower(hashBytes);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         ArgumentNullException or
+                                         ArgumentOutOfRangeException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         NotSupportedException or
+                                         FileNotFoundException or
+                                         TargetInvocationException or
+                                         ObjectDisposedException)
         {
             _logger.Error(ex, "Error calculating file hash: {FilePath}", filePath);
             return string.Empty;

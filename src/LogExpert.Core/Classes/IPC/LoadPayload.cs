@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace LogExpert.Core.Classes.IPC;
 
 public class LoadPayload
@@ -8,8 +6,6 @@ public class LoadPayload
 
     public override string? ToString ()
     {
-        var stringBuilder = new StringBuilder();
-        _ = stringBuilder.Append(string.Join(", ", Files));
-        return stringBuilder.ToString();
+        return string.Join(", ", Files);
     }
 }

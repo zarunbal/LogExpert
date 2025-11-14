@@ -90,7 +90,7 @@ public class PluginRegistry : IPluginRegistry
     {
         _logger.Info(CultureInfo.InvariantCulture, "Loading plugins with security validation and manifest support...");
 
-        // **NEW**: Load plugin permissions from configuration
+        // Load plugin permissions from configuration
         PluginPermissionManager.LoadPermissions(_applicationConfigurationFolder);
 
         RegisteredColumnizers =
@@ -124,7 +124,7 @@ public class PluginRegistry : IPluginRegistry
         {
             try
             {
-                // **SECURITY**: Validate plugin before loading (with manifest support)
+                // Validate plugin before loading (with manifest support)
                 if (!PluginValidator.ValidatePlugin(dllName, out var manifest))
                 {
                     skippedCount++;
@@ -132,10 +132,10 @@ public class PluginRegistry : IPluginRegistry
                     continue;
                 }
 
-                // **NEW**: Log manifest information if available
+                // Log manifest information if available
                 if (manifest != null)
                 {
-                    _logger.Info("Plugin {PluginName} v{Version} by {Author}", 
+                    _logger.Info("Plugin {PluginName} v{Version} by {Author}",
                         manifest.Name, manifest.Version, manifest.Author ?? "Unknown");
                     if (manifest.Permissions != null && manifest.Permissions.Count > 0)
                     {
@@ -143,7 +143,7 @@ public class PluginRegistry : IPluginRegistry
                     }
                 }
 
-                // **SECURITY**: Load plugin with timeout and exception handling
+                // Load plugin with timeout and exception handling
                 if (LoadPluginAssemblySafe(dllName, interfaceName))
                 {
                     loadedCount++;
@@ -183,10 +183,10 @@ public class PluginRegistry : IPluginRegistry
             }
         }
 
-        _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}", 
+        _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}",
             loadedCount, skippedCount, failedCount);
-        
-        // **NEW**: Save any permission changes
+
+        // Save any permission changes
         PluginPermissionManager.SavePermissions(_applicationConfigurationFolder);
     }
 
@@ -194,14 +194,13 @@ public class PluginRegistry : IPluginRegistry
     /// Loads a plugin assembly with security measures: timeout protection and exception handling.
     /// </summary>
     /// <returns>True if plugin loaded successfully, false otherwise</returns>
-    private bool LoadPluginAssemblySafe(string dllName, string interfaceName)
+    private bool LoadPluginAssemblySafe (string dllName, string interfaceName)
     {
         try
         {
-            // **SECURITY**: Use timeout to prevent plugin hangs during loading
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var loadTask = Task.Run(() => LoadPluginAssembly(dllName, interfaceName), cts.Token);
-            
+            // Use timeout to prevent plugin hangs during loading
+            var loadTask = Task.Run(() => LoadPluginAssembly(dllName, interfaceName));
+
             // Wait for plugin to load with timeout
             if (!loadTask.Wait(TimeSpan.FromSeconds(10)))
             {
@@ -227,7 +226,7 @@ public class PluginRegistry : IPluginRegistry
 
     private void LoadPluginAssembly (string dllName, string interfaceName)
     {
-        // **SECURITY**: Log plugin loading for audit trail
+        // Log plugin loading for audit trail
         _logger.Info("Loading plugin assembly: {FileName}", Path.GetFileName(dllName));
 
         var assembly = Assembly.LoadFrom(dllName);
@@ -240,14 +239,14 @@ public class PluginRegistry : IPluginRegistry
 
             if (type.GetInterfaces().Any(i => i.FullName == interfaceName))
             {
-                // **SECURITY**: Instantiate plugin safely with timeout
+                // Instantiate plugin safely with timeout
                 if (TryInstantiatePluginSafe(type, out var instance))
                 {
                     RegisteredColumnizers.Add((ILogLineColumnizer)instance);
 
                     if (instance is IColumnizerConfigurator configurator)
                     {
-                        // **SECURITY**: Wrap config loading in try-catch
+                        // Wrap config loading in try-catch
                         try
                         {
                             configurator.LoadConfig(_applicationConfigurationFolder);
@@ -262,7 +261,7 @@ public class PluginRegistry : IPluginRegistry
                     if (instance is ILogExpertPlugin plugin)
                     {
                         _pluginList.Add(plugin);
-                        
+
                         // **SECURITY**: Wrap plugin initialization in try-catch
                         try
                         {
@@ -310,7 +309,7 @@ public class PluginRegistry : IPluginRegistry
     /// <summary>
     /// Safely instantiates a plugin with timeout protection.
     /// </summary>
-    private bool TryInstantiatePluginSafe(Type type, out object instance)
+    private bool TryInstantiatePluginSafe (Type type, out object instance)
     {
         instance = null;
 
@@ -324,9 +323,8 @@ public class PluginRegistry : IPluginRegistry
             }
 
             // **SECURITY**: Use timeout for plugin instantiation
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var instantiateTask = Task.Run(() => cti.Invoke([]), cts.Token);
-            
+            var instantiateTask = Task.Run(() => cti.Invoke([]));
+
             if (!instantiateTask.Wait(TimeSpan.FromSeconds(5)))
             {
                 _logger.Error("Plugin instantiation timed out: {TypeName}", type.Name);
@@ -441,7 +439,7 @@ public class PluginRegistry : IPluginRegistry
         return false;
     }
 
-    //TODO: Can this be delted?
+    //TODO: Can this be deleted?
     private bool TryAsFileSystem (Type type)
     {
         // file system plugins can have optional constructor with IFileSystemCallback argument
