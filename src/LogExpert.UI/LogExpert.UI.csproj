@@ -4,7 +4,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs" />
   </ItemGroup>
 
 </Project>

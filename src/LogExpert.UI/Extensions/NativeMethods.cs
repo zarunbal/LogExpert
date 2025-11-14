@@ -151,20 +151,19 @@ internal static partial class NativeMethods
 
     public static Icon LoadIconFromExe (string fileName, int index)
     {
-        nint smallIcons = new();
-        nint largeIcons = new();
-        var num = (int)ExtractIconEx(fileName, index, out largeIcons, out smallIcons, 1);
+        var num = (int)ExtractIconEx(fileName, index, out var largeIcons, out var smallIcons, 1);
+
         if (num > 0 && smallIcons != nint.Zero)
         {
             var icon = (Icon)Icon.FromHandle(smallIcons).Clone();
-            DestroyIcon(smallIcons);
+            _ = DestroyIcon(smallIcons);
             return icon;
         }
 
         if (num > 0 && largeIcons != nint.Zero)
         {
             var icon = (Icon)Icon.FromHandle(largeIcons).Clone();
-            DestroyIcon(largeIcons);
+            _ = DestroyIcon(largeIcons);
             return icon;
         }
 
@@ -173,7 +172,8 @@ internal static partial class NativeMethods
 
     public static Icon[,] ExtractIcons (string fileName)
     {
-        var iconCount = ExtractIconEx(fileName, -1, out var largeIcon, out var smallIcon, 0);
+        var iconCount = ExtractIconEx(fileName, -1, out var _, out var _, 0);
+
         if (iconCount <= 0)
         {
             return null;
@@ -187,7 +187,7 @@ internal static partial class NativeMethods
             if (smallIcons != nint.Zero)
             {
                 result[0, i] = (Icon)Icon.FromHandle(smallIcons).Clone();
-                DestroyIcon(smallIcons);
+                _ = DestroyIcon(smallIcons);
             }
             else
             {
@@ -197,7 +197,7 @@ internal static partial class NativeMethods
             if (num > 0 && largeIcons != nint.Zero)
             {
                 result[1, i] = (Icon)Icon.FromHandle(largeIcons).Clone();
-                DestroyIcon(largeIcons);
+                _ = DestroyIcon(largeIcons);
             }
             else
             {

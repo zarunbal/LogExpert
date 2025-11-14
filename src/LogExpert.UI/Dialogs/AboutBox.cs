@@ -21,21 +21,19 @@ internal partial class AboutBox : Form
 
     public AboutBox ()
     {
-        InitializeComponent();
-
         SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
-        LoadResources();
+        InitializeComponent();
+
         usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
 
-        Text = $@"About {AssemblyTitle}";
-        labelProductName.Text = AssemblyProduct;
-        labelVersion.Text = AssemblyVersion;
-        labelCopyright.Text = AssemblyCopyright;
+        //resources need the assembly to be set
+        ApplyResources();
+
         var link = "https://github.com/LogExperts/LogExpert";
         _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
 
@@ -44,21 +42,25 @@ internal partial class AboutBox : Form
         ResumeLayout();
     }
 
+    //TODO Jsons should be serialized on a central place and not in every UI component
     //Name, Version, License, Download, Source
-
     private void LoadUsedComponents ()
     {
         var json = File.ReadAllText($"{Application.StartupPath}files\\json\\usedComponents.json");
         var usedComponents = JsonConvert.DeserializeObject<UsedComponents[]>(json);
         usedComponents = usedComponents?.OrderBy(x => x.PackageId).ToArray();
         usedComponentsDataGrid.DataSource = usedComponents;
-
     }
 
-
-    private void LoadResources ()
+    private void ApplyResources ()
     {
         logoPictureBox.Image = Resources.LogLover;
+        labelProductName.Text = AssemblyProduct;
+        labelVersion.Text = AssemblyVersion;
+        labelCopyright.Text = AssemblyCopyright;
+        linkLabelURL.Text = Resources.AboutBox_UI_LinkLabel_URL;
+        okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
+        Text = $"{Resources.AboutBox_UI_Text} {AssemblyTitle}";
     }
 
     #endregion
@@ -93,7 +95,6 @@ internal partial class AboutBox : Form
                 ? $"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}.{assembly.Version.Revision}"
                 : "0.0.0.0";
         }
-
     }
 
     public string AssemblyDescription

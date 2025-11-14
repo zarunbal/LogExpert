@@ -1,6 +1,6 @@
 using System.Drawing;
-using System.Globalization;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Security;
 using System.Windows.Forms;
 
@@ -42,6 +42,8 @@ public class ConfigManager : IConfigManager
         PreserveReferencesHandling = PreserveReferencesHandling.Objects,
     };
 
+    private const string SETTINGS_FILE_NAME = "settings.json";
+
     #endregion
 
     #region cTor
@@ -78,7 +80,7 @@ public class ConfigManager : IConfigManager
     public string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "LogExpert"; //TODO: change to Path.Combine
 
     /// <summary>
-    /// Application.StartupPath + portable
+    /// Application.StartUpPath + portable
     /// </summary>
     public string PortableModeDir => Application.StartupPath + Path.DirectorySeparatorChar + "portable";
 
@@ -92,7 +94,6 @@ public class ConfigManager : IConfigManager
     IConfigManager IConfigManager.Instance => Instance;
 
     //Action<object, ConfigChangedEventArgs> IConfigManager.ConfigChanged { get => ((IConfigManager)_instance).ConfigChanged; set => ((IConfigManager)_instance).ConfigChanged = value; }
-
     //public string PortableModeSettingsFileName => ((IConfigManager)_instance).PortableModeSettingsFileName;
 
     #endregion
@@ -105,6 +106,7 @@ public class ConfigManager : IConfigManager
     /// <remarks>The method saves the settings based on the provided <paramref name="flags"/>. Ensure that the
     /// flags are correctly set to avoid saving unintended settings.</remarks>
     /// <param name="flags">The flags that determine which settings to save. This parameter cannot be null.</param>
+    [SupportedOSPlatform("windows")]
     public void Save (SettingsFlags flags)
     {
         Instance.Save(Settings, flags);
@@ -116,9 +118,10 @@ public class ConfigManager : IConfigManager
     /// <remarks>The method saves the current instance data using the provided settings. Ensure that the file
     /// path specified in <paramref name="fileInfo"/> is accessible and writable.</remarks>
     /// <param name="fileInfo">The <see cref="FileInfo"/> object representing the file to which the data will be exported. Cannot be null.</param>
+    [SupportedOSPlatform("windows")]
     public void Export (FileInfo fileInfo)
     {
-        Instance.Save(fileInfo, Settings);
+        Save(fileInfo, Settings);
     }
 
     /// <summary>
@@ -126,6 +129,7 @@ public class ConfigManager : IConfigManager
     /// </summary>
     /// <param name="fileInfo"></param>
     /// <param name="highlightSettings"></param>
+    [SupportedOSPlatform("windows")]
     public void Export (FileInfo fileInfo, SettingsFlags highlightSettings)
     {
         Instance.Save(fileInfo, Settings, highlightSettings);
@@ -138,6 +142,7 @@ public class ConfigManager : IConfigManager
     /// <param name="fileInfo">The file to import from</param>
     /// <param name="importFlags">Flags controlling what to import</param>
     /// <returns>ImportResult with operation outcome</returns>
+    [SupportedOSPlatform("windows")]
     public ImportResult Import (FileInfo fileInfo, ExportImportFlags importFlags)
     {
         _logger.Info($"Importing settings from: {fileInfo?.FullName ?? "null"}");
@@ -200,10 +205,13 @@ public class ConfigManager : IConfigManager
     }
 
     /// <summary>
-    /// Imports only the highlight settings from the specified file.
+    /// Imports the highlight settings from a file.
+    /// Throws ArgumentNullException if fileInfo is null, this should not happen.
     /// </summary>
     /// <param name="fileInfo"></param>
     /// <param name="importFlags"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    [SupportedOSPlatform("windows")]
     public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags)
     {
         ArgumentNullException.ThrowIfNull(fileInfo, nameof(fileInfo));
@@ -244,7 +252,7 @@ public class ConfigManager : IConfigManager
 
         LoadResult result;
 
-        if (!File.Exists(Path.Combine(dir, "settings.json")))
+        if (!File.Exists(Path.Combine(dir, SETTINGS_FILE_NAME)))
         {
             result = LoadOrCreateNew(null);
         }
@@ -252,7 +260,7 @@ public class ConfigManager : IConfigManager
         {
             try
             {
-                FileInfo fileInfo = new(Path.Combine(dir, "settings.json"));
+                FileInfo fileInfo = new(Path.Combine(dir, SETTINGS_FILE_NAME));
                 result = LoadOrCreateNew(fileInfo);
             }
             catch (IOException ex)
@@ -262,12 +270,12 @@ public class ConfigManager : IConfigManager
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.Error($"Access denied: {ex.Message}");
+                _logger.Error($"Access denied: {ex}");
                 result = LoadOrCreateNew(null);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                _logger.Error($"Unexpected error: {ex.Message}");
+                _logger.Error($"Access denied: {ex}");
                 result = LoadOrCreateNew(null);
             }
         }
@@ -523,6 +531,8 @@ public class ConfigManager : IConfigManager
 
         settings.Preferences.DefaultEncoding ??= System.Text.Encoding.Default.HeaderName;
 
+        settings.Preferences.DefaultLanguage ??= "en-US";
+
         if (settings.Preferences.MaximumFilterEntriesDisplayed == 0)
         {
             settings.Preferences.MaximumFilterEntriesDisplayed = 20;
@@ -543,11 +553,11 @@ public class ConfigManager : IConfigManager
     /// </summary>
     /// <param name="settings">Settings to be saved</param>
     /// <param name="flags">Settings that "changed"</param>
+    [SupportedOSPlatform("windows")]
     private void Save (Settings settings, SettingsFlags flags)
     {
         lock (_loadSaveLock)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Saving settings");
             string dir = Settings.Preferences.PortableMode ? Application.StartupPath : ConfigDir;
 
             if (!Directory.Exists(dir))
@@ -555,7 +565,7 @@ public class ConfigManager : IConfigManager
                 _ = Directory.CreateDirectory(dir);
             }
 
-            FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + "settings.json");
+            FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + SETTINGS_FILE_NAME);
             Save(fileInfo, settings);
 
             OnConfigChanged(flags);
@@ -578,13 +588,51 @@ public class ConfigManager : IConfigManager
         switch (flags)
         {
             case SettingsFlags.HighlightSettings:
-                SaveHighlightgroupsAsJSON(fileInfo, settings.Preferences.HighlightGroupList);
+                SaveHighlightGroupsAsJSON(fileInfo, settings.Preferences.HighlightGroupList);
+                break;
+            case SettingsFlags.None:
+                // No action required for SettingsFlags.None
+                break;
+            case SettingsFlags.WindowPosition:
+                // No action required for SettingsFlags.WindowPosition
+                break;
+            case SettingsFlags.FileHistory:
+                // No action required for SettingsFlags.FileHistory
+                break;
+            case SettingsFlags.FilterList:
+                // No action required for SettingsFlags.FilterList
+                break;
+            case SettingsFlags.RegexHistory:
+                // No action required for SettingsFlags.RegexHistory
+                break;
+            case SettingsFlags.ToolSettings:
+                // No action required for SettingsFlags.ToolSettings
+                break;
+            case SettingsFlags.GuiOrColors:
+                // No action required for SettingsFlags.GuiOrColors
+                break;
+            case SettingsFlags.FilterHistory:
+                // No action required for SettingsFlags.FilterHistory
+                break;
+            case SettingsFlags.All:
+                // No action required for SettingsFlags.All
+                break;
+            case SettingsFlags.Settings:
+                // No action required for SettingsFlags.Settings
+                break;
+            default:
                 break;
         }
 
         OnConfigChanged(flags);
     }
 
+    /// <summary>
+    /// Saves the settings as JSON file.
+    /// </summary>
+    /// <param name="fileInfo"></param>
+    /// <param name="settings"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     private void SaveAsJSON (FileInfo fileInfo, Settings settings)
     {
         if (!ValidateSettings(settings))
@@ -672,20 +720,20 @@ public class ConfigManager : IConfigManager
                 {
                     File.Delete(tempFile);
                 }
-                catch (Exception cleanupException) when (cleanupException is ArgumentException or
+                catch (Exception cleanUpException) when (cleanUpException is ArgumentException or
                                                                              DirectoryNotFoundException or
                                                                              IOException or
                                                                              NotSupportedException or
                                                                              PathTooLongException or
                                                                              UnauthorizedAccessException)
                 {
-                    _logger.Warn($"Failed to cleanup temp file: {cleanupException.Message}");
+                    _logger.Warn($"Failed to clean up temp file: {cleanUpException.Message}");
                 }
             }
         }
     }
 
-    private static void SaveHighlightgroupsAsJSON (FileInfo fileInfo, List<HighlightGroup> groups)
+    private static void SaveHighlightGroupsAsJSON (FileInfo fileInfo, List<HighlightGroup> groups)
     {
         using StreamWriter sw = new(fileInfo.Create());
         JsonSerializer serializer = new();
@@ -735,12 +783,13 @@ public class ConfigManager : IConfigManager
     }
 
     /// <summary>
-    /// Imports all or some of the settings/prefs stored in the input stream.
+    /// Imports all or some of the settings/preferences stored in the input stream.
     /// This will overwrite appropriate parts of the current (own) settings with the imported ones.
     /// </summary>
     /// <param name="currentSettings"></param>
     /// <param name="fileInfo"></param>
     /// <param name="flags">Flags to indicate which parts shall be imported</param>
+    [SupportedOSPlatform("windows")]
     private Settings Import (Settings currentSettings, FileInfo fileInfo, ExportImportFlags flags)
     {
         LoadResult loadResult = LoadOrCreateNew(fileInfo);
@@ -803,6 +852,7 @@ public class ConfigManager : IConfigManager
 
     // Checking if the appBounds values are outside the current virtual screen.
     // If so, the appBounds values are set to 0.
+    [SupportedOSPlatform("windows")]
     private static void SetBoundsWithinVirtualScreen (Settings settings)
     {
         Rectangle vs = SystemInformation.VirtualScreen;

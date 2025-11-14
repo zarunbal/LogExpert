@@ -1,4 +1,4 @@
-﻿namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs;
 
 partial class OpenUriDialog
 {
@@ -30,10 +30,10 @@ private void InitializeComponent()
 {
   System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OpenUriDialog));
   this.cmbUri = new System.Windows.Forms.ComboBox();
-  this.label1 = new System.Windows.Forms.Label();
+  this.labelUrl = new System.Windows.Forms.Label();
   this.okButton = new System.Windows.Forms.Button();
   this.cancelButton = new System.Windows.Forms.Button();
-  this.label2 = new System.Windows.Forms.Label();
+  this.labelExplaination = new System.Windows.Forms.Label();
   this.SuspendLayout();
   // 
   // uriComboBox
@@ -48,12 +48,12 @@ private void InitializeComponent()
   // 
   // label1
   // 
-  this.label1.AutoSize = true;
-  this.label1.Location = new System.Drawing.Point(12, 21);
-  this.label1.Name = "label1";
-  this.label1.Size = new System.Drawing.Size(32, 13);
-  this.label1.TabIndex = 1;
-  this.label1.Text = "URL:";
+  this.labelUrl.AutoSize = true;
+  this.labelUrl.Location = new System.Drawing.Point(12, 21);
+  this.labelUrl.Name = "label1";
+  this.labelUrl.Size = new System.Drawing.Size(32, 13);
+  this.labelUrl.TabIndex = 1;
+  this.labelUrl.Text = "URL:";
   // 
   // okButton
   // 
@@ -80,12 +80,12 @@ private void InitializeComponent()
   // 
   // label2
   // 
-  this.label2.AutoSize = true;
-  this.label2.Location = new System.Drawing.Point(12, 84);
-  this.label2.Name = "label2";
-  this.label2.Size = new System.Drawing.Size(410, 13);
-  this.label2.TabIndex = 4;
-  this.label2.Text = "Enter a URL which is supported by an installed file system plugin (e.g. file:// o" +
+  this.labelExplaination.AutoSize = true;
+  this.labelExplaination.Location = new System.Drawing.Point(12, 84);
+  this.labelExplaination.Name = "label2";
+  this.labelExplaination.Size = new System.Drawing.Size(410, 13);
+  this.labelExplaination.TabIndex = 4;
+  this.labelExplaination.Text = "Enter a URL which is supported by an installed file system plugin (e.g. file:// o" +
       "r sftp://)";
   // 
   // OpenUriDialog
@@ -93,10 +93,10 @@ private void InitializeComponent()
   this.AcceptButton = this.okButton;
   this.CancelButton = this.cancelButton;
   this.ClientSize = new System.Drawing.Size(475, 162);
-  this.Controls.Add(this.label2);
+  this.Controls.Add(this.labelExplaination);
   this.Controls.Add(this.cancelButton);
   this.Controls.Add(this.okButton);
-  this.Controls.Add(this.label1);
+  this.Controls.Add(this.labelUrl);
   this.Controls.Add(this.cmbUri);
   this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
   this.MaximizeBox = false;
@@ -114,8 +114,8 @@ private void InitializeComponent()
 #endregion
 
 private System.Windows.Forms.ComboBox cmbUri;
-private System.Windows.Forms.Label label1;
+private System.Windows.Forms.Label labelUrl;
 private System.Windows.Forms.Button okButton;
 private System.Windows.Forms.Button cancelButton;
-private System.Windows.Forms.Label label2;
+private System.Windows.Forms.Label labelExplaination;
 }
