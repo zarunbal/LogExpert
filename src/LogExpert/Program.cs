@@ -97,7 +97,7 @@ internal static class Program
 
             SetCulture();
 
-            _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+            _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             var pId = Process.GetCurrentProcess().SessionId;
 

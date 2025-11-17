@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace LogExpert;
+using LogExpert;
+
+namespace ColumnizerLib;
 
 public class Column : IColumn
 {

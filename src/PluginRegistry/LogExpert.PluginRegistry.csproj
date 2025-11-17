@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>
 
 </Project>

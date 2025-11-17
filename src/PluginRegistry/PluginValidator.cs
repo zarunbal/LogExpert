@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Security;
-using System.Security.Cryptography;
+
+using Newtonsoft.Json;
 
 using NLog;
 
@@ -13,9 +14,14 @@ public static class PluginValidator
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-    // Whitelist of trusted plugin file names (shipped with LogExpert)
+    private static TrustedPluginConfig _trustedPluginConfig;
+    private static readonly Lock _configLock = new();
+    private static readonly string _configDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
+    private static readonly string _configPath = Path.Combine(_configDirectory, "trusted-plugins.json");
+
+    // Whitelist of trusted plugin file names (shipped with LogExpert) - used as defaults
     private static readonly HashSet<string> _trustedPluginNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "AutoColumnizer.dll",
@@ -29,7 +35,6 @@ public static class PluginValidator
         "FlashIconHighlighter.dll",
         "SftpFileSystem.dll",
         "SftpFileSystemx86.dll",
-        "SftpFileSystemx64.dll"
     };
 
     // Known safe dependencies (not plugins themselves)
@@ -50,7 +55,188 @@ public static class PluginValidator
 
     #endregion
 
+    #region Constructor
+
+    static PluginValidator ()
+    {
+        LoadTrustedPluginConfiguration();
+    }
+
+    #endregion
+
     #region Public methods
+
+    /// <summary>
+    /// Loads trusted plugin configuration from disk.
+    /// </summary>
+    private static void LoadTrustedPluginConfiguration ()
+    {
+        lock (_configLock)
+        {
+            if (File.Exists(_configPath))
+            {
+                try
+                {
+                    var json = File.ReadAllText(_configPath);
+                    _trustedPluginConfig = JsonConvert.DeserializeObject<TrustedPluginConfig>(json);
+                    _logger.Info("Loaded trusted plugin configuration from {ConfigPath}", _configPath);
+
+                    // Validate configuration
+                    if (_trustedPluginConfig == null)
+                    {
+                        _logger.Warn("Deserialized config is null, creating default");
+                        _trustedPluginConfig = CreateDefaultConfiguration();
+                        SaveTrustedPluginConfiguration();
+                    }
+                }
+                catch (Exception ex) when (ex is IOException or
+                                                 UnauthorizedAccessException or
+                                                 ArgumentException or
+                                                 ArgumentNullException or
+                                                 PathTooLongException or
+                                                 DirectoryNotFoundException or
+                                                 NotSupportedException or
+                                                 SecurityException or
+                                                 JsonSerializationException)
+                {
+                    _logger.Error(ex, "Failed to load trusted plugin configuration, using defaults");
+                    _trustedPluginConfig = CreateDefaultConfiguration();
+                    SaveTrustedPluginConfiguration();
+                }
+            }
+            else
+            {
+                _logger.Info("No trusted plugin configuration found, creating default");
+                _trustedPluginConfig = CreateDefaultConfiguration();
+                SaveTrustedPluginConfiguration();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates default configuration with built-in trusted plugins.
+    /// </summary>
+    private static TrustedPluginConfig CreateDefaultConfiguration ()
+    {
+        return new TrustedPluginConfig
+        {
+            PluginNames = [.. _trustedPluginNames],
+            PluginHashes = GetBuiltInPluginHashes(),
+            AllowUserTrustedPlugins = true,
+            HashAlgorithm = "SHA256",
+            LastUpdated = DateTime.UtcNow
+        };
+    }
+
+    /// <summary>
+    /// Saves trusted plugin configuration to disk.
+    /// </summary>
+    private static void SaveTrustedPluginConfiguration ()
+    {
+        lock (_configLock)
+        {
+            try
+            {
+                _ = Directory.CreateDirectory(_configDirectory);
+                var json = JsonConvert.SerializeObject(_trustedPluginConfig, Formatting.Indented);
+                File.WriteAllText(_configPath, json);
+                _logger.Info("Saved trusted plugin configuration to {ConfigPath}", _configPath);
+            }
+            catch (Exception ex) when (ex is IOException or
+                                             UnauthorizedAccessException or
+                                             ArgumentException or
+                                             ArgumentNullException or
+                                             PathTooLongException or
+                                             DirectoryNotFoundException or
+                                             NotSupportedException or
+                                             SecurityException or
+                                             JsonSerializationException)
+            {
+                _logger.Error(ex, "Failed to save trusted plugin configuration");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds a plugin to the trusted list and saves the configuration.
+    /// </summary>
+    /// <param name="dllPath">Path to the plugin DLL</param>
+    /// <param name="errorMessage">Error message if operation fails</param>
+    /// <returns>True if successful, false otherwise</returns>
+    public static bool AddTrustedPlugin (string dllPath, out string errorMessage)
+    {
+        errorMessage = null;
+
+        try
+        {
+            if (!File.Exists(dllPath))
+            {
+                errorMessage = $"Plugin file not found: {dllPath}";
+                return false;
+            }
+
+            var fileName = Path.GetFileName(dllPath);
+            var hash = PluginHashCalculator.CalculateHash(dllPath);
+
+            lock (_configLock)
+            {
+                if (!_trustedPluginConfig.AllowUserTrustedPlugins)
+                {
+                    errorMessage = "User-added trusted plugins are not allowed by policy";
+                    return false;
+                }
+
+                if (!_trustedPluginConfig.PluginNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
+                {
+                    _trustedPluginConfig.PluginNames.Add(fileName);
+                }
+
+                _trustedPluginConfig.PluginHashes[fileName] = hash;
+                _trustedPluginConfig.LastUpdated = DateTime.UtcNow;
+
+                SaveTrustedPluginConfiguration();
+            }
+
+            _logger.Info("Added trusted plugin: {FileName}, Hash: {Hash}", fileName, hash);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         ArgumentException or
+                                         ArgumentNullException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException or
+                                         JsonSerializationException)
+        {
+            errorMessage = $"Error adding trusted plugin: {ex.Message}";
+            _logger.Error(ex, "Error adding trusted plugin: {DllPath}", dllPath);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Removes a plugin from the trusted list.
+    /// </summary>
+    /// <param name="fileName">Plugin file name</param>
+    /// <returns>True if removed, false if not found</returns>
+    public static bool RemoveTrustedPlugin (string fileName)
+    {
+        lock (_configLock)
+        {
+            var removed = _trustedPluginConfig.PluginNames.Remove(fileName);
+            if (removed)
+            {
+                _ = _trustedPluginConfig.PluginHashes.Remove(fileName);
+                _trustedPluginConfig.LastUpdated = DateTime.UtcNow;
+                SaveTrustedPluginConfiguration();
+                _logger.Info("Removed trusted plugin: {FileName}", fileName);
+            }
+
+            return removed;
+        }
+    }
 
     /// <summary>
     /// Validates a plugin assembly before loading.
@@ -82,7 +268,6 @@ public static class PluginValidator
             }
 
             var fileName = Path.GetFileName(dllPath);
-            //var pluginDir = Path.GetDirectoryName(dllPath);
 
             // 2. Check if it's a known dependency (not a plugin)
             if (_knownDependencies.Contains(fileName))
@@ -91,28 +276,71 @@ public static class PluginValidator
                 return false; // Not a plugin, skip it
             }
 
-            // 3. Check whitelist (trusted plugins shipped with LogExpert)
-            if (!_trustedPluginNames.Contains(fileName))
+            // 3. Calculate file hash using PluginHashCalculator
+            string fileHash;
+            try
             {
-                _logger.Warn("Plugin not in whitelist: {FileName}. Skipping for security reasons.", fileName);
-                _logger.Info("To load custom plugins, add them to the trusted plugins list in settings.");
+                fileHash = PluginHashCalculator.CalculateHash(dllPath);
+                _logger.Debug("Plugin {FileName} hash: {Hash}", fileName, fileHash);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to calculate hash for plugin: {FileName}", fileName);
                 return false;
             }
 
-            // 4. Try to load and validate manifest
+            // 4. Check trust status
+            var isTrustedByName = _trustedPluginConfig.PluginNames.Contains(fileName, StringComparer.OrdinalIgnoreCase);
+            var isTrustedByHash = _trustedPluginConfig.PluginHashes.ContainsValue(fileHash);
+
+            if (!isTrustedByName && !isTrustedByHash)
+            {
+                _logger.Warn("Plugin not trusted: {FileName}, Hash: {Hash}", fileName, fileHash);
+                _logger.Info("To trust this plugin, add it via Settings > Plugin Management");
+                return false;
+            }
+
+            // 5. Verify hash for known plugins using PluginHashCalculator
+            if (isTrustedByName && _trustedPluginConfig.PluginHashes.TryGetValue(fileName, out var expectedHash))
+            {
+                if (!PluginHashCalculator.VerifyHash(dllPath, expectedHash))
+                {
+                    _logger.Error("SECURITY: Plugin hash mismatch for {FileName}", fileName);
+                    _logger.Error("  Expected: {Expected}", expectedHash);
+                    _logger.Error("  Actual:   {Actual}", fileHash);
+                    _logger.Error("  This could indicate file tampering or corruption!");
+                    return false;
+                }
+
+                _logger.Debug("Plugin hash verified: {FileName}", fileName);
+            }
+            else if (isTrustedByHash)
+            {
+                _logger.Info("Plugin {FileName} trusted by hash: {Hash}", fileName, fileHash);
+            }
+
+            // 6. Try to load and validate manifest
             manifest = LoadAndValidateManifest(dllPath);
             if (manifest != null)
             {
                 _logger.Info("Loaded manifest for plugin: {PluginName} v{Version}", manifest.Name, manifest.Version);
 
-                // 4a. Check version compatibility
+                // 6a. Check version compatibility
                 if (!CheckVersionCompatibility(manifest))
                 {
                     _logger.Error("Plugin {PluginName} is not compatible with current LogExpert version", manifest.Name);
                     return false;
                 }
 
-                // 4b. Extract and set permissions from manifest
+                // 6b. Validate manifest paths for security
+                var pluginDirectory = Path.GetDirectoryName(dllPath);
+                if (!ValidateManifestPaths(manifest, pluginDirectory))
+                {
+                    _logger.Error("Manifest path validation failed for {Plugin}", manifest.Name);
+                    return false;
+                }
+
+                // 6c. Extract and set permissions from manifest
                 if (manifest.Permissions != null && manifest.Permissions.Count > 0)
                 {
                     var permissions = PluginPermissionManager.ParsePermissions(manifest.Permissions);
@@ -127,14 +355,14 @@ public static class PluginValidator
                 _logger.Debug("No manifest found for {FileName}, using default permissions", fileName);
             }
 
-            // 5. Verify assembly can be loaded (basic validation)
+            // 7. Verify assembly can be loaded (basic validation)
             if (!CanLoadAssembly(dllPath))
             {
                 _logger.Error("Plugin assembly cannot be loaded: {FileName}", fileName);
                 return false;
             }
 
-            // 6. Verify assembly is a valid .NET assembly
+            // 8. Verify assembly is a valid .NET assembly
             if (!IsValidDotNetAssembly(dllPath))
             {
                 _logger.Error("Plugin is not a valid .NET assembly: {FileName}", fileName);
@@ -163,33 +391,55 @@ public static class PluginValidator
         return _trustedPluginNames.Contains(pluginName);
     }
 
-    /// <summary>
-    /// Adds a plugin to the trusted whitelist (for custom plugins).
-    /// </summary>
-    public static void AddTrustedPlugin (string fileName)
-    {
-        var pluginName = Path.GetFileName(fileName);
-        if (!string.IsNullOrEmpty(pluginName))
-        {
-            if (_trustedPluginNames.Add(pluginName))
-            {
-                _logger.Info("Added plugin to trusted list: {PluginName}", pluginName);
-            }
-            else
-            {
-                _logger.Info("Plugin already in trusted list: {PluginName}", pluginName);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Gets the list of trusted plugin names.
-    /// </summary>
-    public static IReadOnlySet<string> TrustedPlugins => _trustedPluginNames;
-
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Validates that manifest paths don't escape the plugin directory (path traversal protection).
+    /// </summary>
+    /// <param name="manifest">Plugin manifest</param>
+    /// <param name="pluginDirectory">Plugin directory path</param>
+    /// <returns>True if paths are safe, false if path traversal detected</returns>
+    private static bool ValidateManifestPaths (PluginManifest manifest, string pluginDirectory)
+    {
+        try
+        {
+            var pluginDir = Path.GetFullPath(pluginDirectory);
+
+            // Validate main file path
+            var mainPath = Path.GetFullPath(Path.Combine(pluginDirectory, manifest.Main));
+
+            if (!mainPath.StartsWith(pluginDir, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Error("SECURITY: Plugin main file outside plugin directory");
+                _logger.Error("  Plugin: {Plugin}", manifest.Name);
+                _logger.Error("  Main path: {MainPath}", mainPath);
+                _logger.Error("  Expected directory: {PluginDir}", pluginDir);
+                return false;
+            }
+
+            // Validate dependency paths if they contain file references
+            if (manifest.Dependencies != null)
+            {
+                foreach (var (key, value) in manifest.Dependencies)
+                {
+                    // Check for suspicious path patterns
+                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) || key.Contains('~', StringComparison.OrdinalIgnoreCase) || value.Contains("..", StringComparison.OrdinalIgnoreCase) || value.Contains('~', StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.Warn("Suspicious path in manifest dependencies: {Key} = {Value}", key, value);
+                    }
+                }
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error validating manifest paths for {Plugin}", manifest.Name);
+            return false;
+        }
+    }
 
     /// <summary>
     /// Loads and validates a plugin manifest file.
@@ -360,35 +610,24 @@ public static class PluginValidator
     }
 
     /// <summary>
-    /// Calculates SHA256 hash of a file for integrity verification.
+    /// Gets pre-calculated SHA256 hashes for built-in plugins.
+    /// Generated: 2025-11-15 14:48:21
+    /// Note: SftpFileSystem.dll exists in both 'plugins' (x64) and 'pluginsx86' (x86) folders
     /// </summary>
-    /// <param name="filePath">Path to file</param>
-    /// <returns>SHA256 hash as hex string</returns>
-    public static string CalculateFileHash (string filePath)
+    public static Dictionary<string, string> GetBuiltInPluginHashes () => new(StringComparer.OrdinalIgnoreCase)
     {
-        try
-        {
-            using var stream = File.OpenRead(filePath);
-            using var sha256 = SHA256.Create();
-            var hashBytes = sha256.ComputeHash(stream);
-            return Convert.ToHexStringLower(hashBytes);
-        }
-        catch (Exception ex) when (ex is IOException or
-                                         UnauthorizedAccessException or
-                                         ArgumentException or
-                                         ArgumentNullException or
-                                         ArgumentOutOfRangeException or
-                                         PathTooLongException or
-                                         DirectoryNotFoundException or
-                                         NotSupportedException or
-                                         FileNotFoundException or
-                                         TargetInvocationException or
-                                         ObjectDisposedException)
-        {
-            _logger.Error(ex, "Error calculating file hash: {FilePath}", filePath);
-            return string.Empty;
-        }
-    }
+        ["AutoColumnizer.dll"] = "2A8BC004E621996B073AFF6BE041079DBFE5F63AB3CAEB83F56FFFD4CF7C797D",
+        ["CsvColumnizer.dll"] = "EDD5DDDA4908082A14FC2187C98E587F02A1412894A74F5F7E4882D6541C627C",
+        ["JsonColumnizer.dll"] = "26423E83F9B3BA76765046982E39E4F89816CAF88B11804FB42C40881E300C25",
+        ["JsonCompactColumnizer.dll"] = "DDD7095C1842D3ECCCA091DF7D9C88A4A35AA8FBF9EA2089E026A8E433CE8675",
+        ["RegexColumnizer.dll"] = "0E3F70CDC67D05F6184428E6E4EB99006AE8C47FBCEB6CB57D8AA3DDD9DC485F",
+        ["Log4jXmlColumnizer.dll"] = "6F33293CB25A7B0AE8210A0449AC2347F33A23747A4D618E5D85B1AC2E95495F",
+        ["GlassfishColumnizer.dll"] = "22474303BF57653AC7F40C9B7FC80ADBF3933A47C3972B406BE377694C6A8357",
+        ["DefaultPlugins.dll"] = "DE17A73CF1918846DAFECB6AEC42B4EE9BD75BF0A6844F93D8077A89B9B3CC66",
+        ["FlashIconHighlighter.dll"] = "B70799C3A5142BE7371899F51CCBC771F12FCAA918754F163DEEF673076F8D5C",
+        ["SftpFileSystem.dll"] = "6D7DC67035EB4B1095BA8C34EB14D5E519C062C41514675DB5F0F370B4320D89",
+        ["SftpFileSystem.dll (x86)"] = "D451740DAD45DAB2019F2507C55C979E1D181FA3EDD8E92003A70C52D37D39F1",
+    };
 
     #endregion
 }

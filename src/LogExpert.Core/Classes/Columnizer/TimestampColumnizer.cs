@@ -1,4 +1,4 @@
-using static LogExpert.Core.Classes.Columnizer.TimeFormatDeterminer;
+using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Columnizer;
 

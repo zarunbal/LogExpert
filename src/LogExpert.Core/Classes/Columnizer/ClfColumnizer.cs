@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 namespace LogExpert.Core.Classes.Columnizer;
 
 public class ClfColumnizer : ILogLineColumnizer

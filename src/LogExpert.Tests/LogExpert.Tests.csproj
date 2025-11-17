@@ -13,12 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutoColumnizer\AutoColumnizer.csproj" />
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
     <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
     <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
     <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
     <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+    <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
 
   <ItemGroup>

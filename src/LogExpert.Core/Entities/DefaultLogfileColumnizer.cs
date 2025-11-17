@@ -1,30 +1,35 @@
-﻿namespace LogExpert.Core.Entities;
+using System;
+using System.Collections.Generic;
+
+using ColumnizerLib;
+
+namespace LogExpert.Core.Entities;
 
 public class DefaultLogfileColumnizer : ILogLineColumnizer
 {
     #region ILogLineColumnizer Members
 
-    public string GetName()
+    public string GetName ()
     {
         return "Default (single line)";
     }
 
-    public string GetDescription()
+    public string GetDescription ()
     {
         return "No column splitting. The whole line is displayed in a single column.";
     }
 
-    public int GetColumnCount()
+    public int GetColumnCount ()
     {
         return 1;
     }
 
-    public string[] GetColumnNames()
+    public string[] GetColumnNames ()
     {
         return ["Text"];
     }
 
-    public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -46,7 +51,7 @@ public class DefaultLogfileColumnizer : ILogLineColumnizer
 
     public string Text => GetName();
 
-    public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+    public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
         return Priority.CanSupport;
     }
@@ -54,27 +59,27 @@ public class DefaultLogfileColumnizer : ILogLineColumnizer
 
     #region ILogLineColumnizer Not implemented Members
 
-    public bool IsTimeshiftImplemented()
+    public bool IsTimeshiftImplemented ()
     {
         return false;
     }
 
-    public void SetTimeOffset(int msecOffset)
+    public void SetTimeOffset (int msecOffset)
     {
         throw new NotImplementedException();
     }
 
-    public int GetTimeOffset()
+    public int GetTimeOffset ()
     {
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
         throw new NotImplementedException();
     }
 
-    public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
     }
 

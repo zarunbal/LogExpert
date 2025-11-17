@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 
+using ColumnizerLib;
+
 using LogExpert;
 
 using Newtonsoft.Json;

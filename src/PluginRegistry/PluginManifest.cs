@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Security;
 
 using Newtonsoft.Json;
 
 using NLog;
+
+using NuGet.Versioning;
 
 namespace LogExpert.PluginRegistry;
 
@@ -109,7 +114,7 @@ public class PluginManifest
     /// A URL pointing to the plugin's homepage, documentation, or source code repository. May be null.
     /// </value>
     [JsonProperty("url")]
-    public required string Url { get; set; }
+    public string? Url { get; set; }
 
     /// <summary>
     /// Optional: Plugin license (e.g., "MIT", "Apache-2.0").
@@ -118,7 +123,7 @@ public class PluginManifest
     /// The license identifier under which the plugin is distributed (e.g., "MIT", "Apache-2.0", "GPL-3.0"). May be null.
     /// </value>
     [JsonProperty("license")]
-    public required string License { get; set; }
+    public string? License { get; set; }
 
     #endregion
 
@@ -204,6 +209,16 @@ public class PluginManifest
             errors.Add($"Invalid version format: {Version} (expected: major.minor.patch)");
         }
 
+        if (string.IsNullOrWhiteSpace(Author))
+        {
+            errors.Add("Missing required field: author");
+        }
+
+        if (string.IsNullOrWhiteSpace(Description))
+        {
+            errors.Add("Missing required field: description");
+        }
+
         if (string.IsNullOrWhiteSpace(Main))
         {
             errors.Add("Missing required field: main");
@@ -240,28 +255,30 @@ public class PluginManifest
             }
         }
 
+        // Note: url and license are optional and don't need validation
+
         return errors.Count == 0;
     }
 
     /// <summary>
-    /// Checks if this plugin is compatible with the current LogExpert version.
+    /// Checks if this plugin is compatible with the current LogExpert version using semantic versioning.
     /// </summary>
     /// <param name="logExpertVersion">Current LogExpert version to check against</param>
-    /// <returns>True if the plugin is compatible with the specified LogExpert version; otherwise, false</returns>
+    /// <returns>True if compatible, false otherwise</returns>
     /// <remarks>
-    /// This method supports various version constraint operators:
+    /// This method supports various version constraint operators using NuGet.Versioning:
     /// <list type="bullet">
     /// <item><description><c>&gt;=</c> - Greater than or equal to</description></item>
     /// <item><description><c>&gt;</c> - Greater than</description></item>
     /// <item><description><c>&lt;=</c> - Less than or equal to</description></item>
     /// <item><description><c>&lt;</c> - Less than</description></item>
-    /// <item><description><c>~</c> - Tilde range (allows patch-level changes, e.g., ~1.2.3 matches 1.2.3, 1.2.4, but not 1.3.0)</description></item>
-    /// <item><description><c>^</c> - Caret range (allows minor-level changes, e.g., ^1.2.3 matches 1.2.3, 1.3.0, but not 2.0.0)</description></item>
-    /// <item><description>No operator - Exact version match</description></item>
+    /// <item><description><c>~</c> - Tilde range (allows patch-level changes)</description></item>
+    /// <item><description><c>^</c> - Caret range (allows minor-level changes)</description></item>
+    /// <item><description>Version ranges like [1.0, 2.0) - From 1.0 (inclusive) to 2.0 (exclusive)</description></item>
     /// </list>
+    /// Supports pre-release versions (e.g., 1.0.0-beta, 1.0.0-rc.1).
     /// If no requirement is specified in the manifest, the plugin is assumed to be compatible.
     /// </remarks>
-    /// <exception cref="Exception">Logs any exceptions that occur during version parsing but returns false instead of throwing.</exception>
     public bool IsCompatibleWith (Version logExpertVersion)
     {
         if (Requires == null || string.IsNullOrWhiteSpace(Requires.LogExpert))
@@ -272,58 +289,30 @@ public class PluginManifest
 
         try
         {
-            var requirement = Requires.LogExpert;
+            // Convert System.Version to NuGetVersion (not SemanticVersion)
+            var nugetVersion = new NuGetVersion(
+                logExpertVersion.Major,
+                logExpertVersion.Minor,
+                logExpertVersion.Build >= 0 ? logExpertVersion.Build : 0,
+                logExpertVersion.Revision >= 0 ? logExpertVersion.Revision.ToString() : null);
 
-            // Parse version requirement (e.g., ">=1.10.0", "~1.10.0", "1.10.0")
-            if (requirement.StartsWith(">="))
+            // Parse version range (supports >=, <=, ~, ^, [], () etc.)
+            var versionRange = VersionRange.Parse(Requires.LogExpert);
+            var isCompatible = versionRange.Satisfies(nugetVersion);
+
+            if (!isCompatible)
             {
-                var requiredVersion = System.Version.Parse(requirement[2..].Trim());
-                return logExpertVersion >= requiredVersion;
+                _logger.Warn("Plugin {Name} v{Version} requires LogExpert {Requirement}, current: {Current}",
+                    Name, Version, Requires.LogExpert, logExpertVersion);
             }
 
-            if (requirement.StartsWith('>'))
-            {
-                var requiredVersion = System.Version.Parse(requirement[1..].Trim());
-                return logExpertVersion > requiredVersion;
-            }
-
-            if (requirement.StartsWith("<="))
-            {
-                var requiredVersion = System.Version.Parse(requirement[2..].Trim());
-                return logExpertVersion <= requiredVersion;
-            }
-
-            if (requirement.StartsWith('<'))
-            {
-                var requiredVersion = System.Version.Parse(requirement[1..].Trim());
-                return logExpertVersion < requiredVersion;
-            }
-
-            if (requirement.StartsWith('~'))
-            {
-                // Tilde range: allows patch-level changes
-                var requiredVersion = System.Version.Parse(requirement[1..].Trim());
-                return logExpertVersion.Major == requiredVersion.Major &&
-                       logExpertVersion.Minor == requiredVersion.Minor &&
-                       logExpertVersion >= requiredVersion;
-            }
-
-            if (requirement.StartsWith('^'))
-            {
-                // Caret range: allows minor-level changes
-                var requiredVersion = System.Version.Parse(requirement[1..].Trim());
-                return logExpertVersion.Major == requiredVersion.Major &&
-                       logExpertVersion >= requiredVersion;
-            }
-
-            // Exact version match
-            var exactVersion = System.Version.Parse(requirement);
-            return logExpertVersion == exactVersion;
+            return isCompatible;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
-            _logger.Error(ex, "Error parsing version requirement: {Requirement}", Requires.LogExpert);
-            return false;
+            _logger.Error(ex, "Error checking version compatibility for {Name}: {Requirement}",
+                Name, Requires.LogExpert);
+            return false; // Fail closed on error
         }
     }
 
@@ -335,9 +324,10 @@ public class PluginManifest
     /// Validates if a version string follows semantic versioning format.
     /// </summary>
     /// <param name="versionString">The version string to validate</param>
-    /// <returns>True if the version string is valid (major.minor or major.minor.patch); otherwise, false</returns>
+    /// <returns>True if the version string is valid semantic version; otherwise, false</returns>
     /// <remarks>
-    /// Accepts semantic versioning in the format "major.minor" or "major.minor.patch" where each component is a valid integer.
+    /// Accepts semantic versioning including pre-release tags and metadata (e.g., "1.0.0-beta+build.123").
+    /// Uses NuGet.Versioning for comprehensive validation.
     /// </remarks>
     private static bool IsValidVersion (string versionString)
     {
@@ -346,18 +336,18 @@ public class PluginManifest
             return false;
         }
 
-        // Accept semantic versioning: major.minor.patch or major.minor
-        var parts = versionString.Split('.');
-        return parts.Length is not < 2 and not > 3 && parts.All(part => int.TryParse(part, out _));
+        // Try parsing as semantic version (supports pre-release tags and build metadata)
+        return SemanticVersion.TryParse(versionString, out _);
     }
 
     /// <summary>
     /// Validates if a version requirement string is properly formatted.
     /// </summary>
-    /// <param name="requirement">The version requirement string to validate (may include operators like &gt;=, ~, ^, etc.)</param>
+    /// <param name="requirement">The version requirement string to validate (may include operators like &gt;=, ~, ^, ranges, etc.)</param>
     /// <returns>True if the requirement string is valid; otherwise, false</returns>
     /// <remarks>
-    /// This method strips any operator prefix and validates that the remaining version string can be parsed as a valid <see cref="System.Version"/>.
+    /// This method uses NuGet.Versioning to validate version ranges.
+    /// Supports operators, ranges, and pre-release version constraints.
     /// </remarks>
     private static bool IsValidVersionRequirement (string requirement)
     {
@@ -366,19 +356,13 @@ public class PluginManifest
             return false;
         }
 
-        // Remove operator prefix
-        var versionPart = requirement.TrimStart('>', '<', '=', '~', '^').Trim();
-
         try
         {
-            _ = System.Version.Parse(versionPart);
+            // Try to parse as version range using NuGet.Versioning
+            _ = VersionRange.Parse(requirement);
             return true;
         }
-        catch (Exception ex) when (ex is ArgumentException or
-                                        FormatException or
-                                        ArgumentNullException or
-                                        ArgumentOutOfRangeException or
-                                        OverflowException)
+        catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
             return false;
         }

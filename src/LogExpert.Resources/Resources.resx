@@ -2138,4 +2138,136 @@ Regex search/replace on current selected line</value>
   <data name="LogTabWindow_UI_MenuStrip_MainMenu" xml:space="preserve">
     <value>Main Menu</value>
   </data>
+  <data name="PluginHashDialog_UI_Title" xml:space="preserve">
+    <value>Plugin Hash</value>
+  </data>
+  <data name="PluginHashDialog_UI_Label_PluginName" xml:space="preserve">
+    <value>Plugin: {0}</value>
+  </data>
+  <data name="PluginHashDialog_UI_Label_Hash" xml:space="preserve">
+    <value>SHA256 Hash:</value>
+  </data>
+  <data name="PluginHashDialog_UI_Button_Copy" xml:space="preserve">
+    <value>&amp;Copy</value>
+  </data>
+  <data name="PluginHashDialog_UI_Button_Close" xml:space="preserve">
+    <value>&amp;Close</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_CopySuccess" xml:space="preserve">
+    <value>Hash copied to clipboard.</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_SuccessTitle" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_CopyError" xml:space="preserve">
+    <value>Failed to copy hash: {0}</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Title" xml:space="preserve">
+    <value>Plugin Trust Management</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Label_TotalPlugins" xml:space="preserve">
+    <value>Total Plugins: {0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_GroupBox_TrustedPlugins" xml:space="preserve">
+    <value>Trusted Plugins</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_AddPlugin" xml:space="preserve">
+    <value>&amp;Add Plugin...</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_Remove" xml:space="preserve">
+    <value>&amp;Remove</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_ViewHash" xml:space="preserve">
+    <value>&amp;View Hash...</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_PluginName" xml:space="preserve">
+    <value>Plugin Name</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_HashVerified" xml:space="preserve">
+    <value>Hash Verified</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_HashPartial" xml:space="preserve">
+    <value>Hash (Partial)</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_Trusted" xml:space="preserve">
+    <value>Trusted</value>
+  </data>
+  <data name="PluginTrustDialog_UI_FileDialog_Filter" xml:space="preserve">
+    <value>Plugin Files (*.dll)|*.dll|All Files (*.*)|*.*</value>
+  </data>
+  <data name="PluginTrustDialog_UI_FileDialog_Title" xml:space="preserve">
+    <value>Select Plugin to Trust</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_LoadError" xml:space="preserve">
+    <value>Error loading configuration: {0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_AlreadyTrusted" xml:space="preserve">
+    <value>Plugin ''{0}'' is already in the trusted list.</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_AlreadyTrustedTitle" xml:space="preserve">
+    <value>Already Trusted</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmTrust" xml:space="preserve">
+    <value>Trust plugin:
+
+Name: {0}
+Path: {1}
+Hash: {2}
+
+Do you want to trust this plugin?</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmTrustTitle" xml:space="preserve">
+    <value>Confirm Trust</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmRemove" xml:space="preserve">
+    <value>Remove trust for plugin:
+
+{0}
+
+The plugin will not be loaded until re-added to the trusted list.
+
+Continue?</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmRemoveTitle" xml:space="preserve">
+    <value>Confirm Removal</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_NoHash" xml:space="preserve">
+    <value>No hash found for plugin: {0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_NoHashTitle" xml:space="preserve">
+    <value>No Hash</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SaveSuccess" xml:space="preserve">
+    <value>Plugin trust configuration saved successfully.</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SuccessTitle" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SaveError" xml:space="preserve">
+    <value>Failed to save configuration:`n`n{0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_UnsavedChanges" xml:space="preserve">
+    <value>Configuration has been modified. Discard changes?</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_UnsavedChangesTitle" xml:space="preserve">
+    <value>Unsaved Changes</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Save" xml:space="preserve">
+    <value>&amp;Save</value>
+  </data>
 </root>

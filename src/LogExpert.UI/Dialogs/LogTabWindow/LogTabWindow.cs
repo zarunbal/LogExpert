@@ -99,9 +99,21 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ConfigManager = configManager;
 
-        //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+        //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
+
+        // Add Plugin Trust Management menu item to Options menu
+        ToolStripMenuItem pluginTrustMenuItem = new("Plugin &Trust Management...")
+        {
+            Name = "pluginTrustToolStripMenuItem",
+            ToolTipText = "Manage trusted plugins and view plugin hashes"
+        };
+        pluginTrustMenuItem.Click += OnPluginTrustToolStripMenuItemClick;
+
+        // Insert after Settings menu item in Options menu
+        var settingsIndex = optionToolStripMenuItem.DropDownItems.IndexOf(settingsToolStripMenuItem);
+        optionToolStripMenuItem.DropDownItems.Insert(settingsIndex + 1, pluginTrustMenuItem);
 
         _startupFileNames = fileNames;
         _instanceNumber = instanceNumber;
@@ -2727,6 +2739,27 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnSettingsToolStripMenuItemClick (object sender, EventArgs e)
     {
         OpenSettings(0);
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void OnPluginTrustToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        using var dialog = new PluginTrustDialog(this);
+        var result = dialog.ShowDialog();
+        
+        if (result == DialogResult.OK)
+        {
+            var restartPrompt = MessageBox.Show(
+                "Plugin trust configuration updated.\n\nRestart LogExpert to apply changes?",
+                "Restart Recommended",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            
+            if (restartPrompt == DialogResult.Yes)
+            {
+                Application.Restart();
+            }
+        }
     }
 
     [SupportedOSPlatform("windows")]

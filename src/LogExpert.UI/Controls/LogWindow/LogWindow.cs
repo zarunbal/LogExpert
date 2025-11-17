@@ -4,6 +4,8 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Bookmark;

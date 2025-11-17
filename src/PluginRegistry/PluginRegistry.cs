@@ -22,18 +22,27 @@ public class PluginRegistry : IPluginRegistry
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private static PluginRegistry? _instance;
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
 
     private readonly IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
     private readonly IList<ILogExpertPlugin> _pluginList = [];
-    private readonly IDictionary<string, IKeywordAction> _registeredKeywordsDict = new Dictionary<string, IKeywordAction>();
+    private readonly Dictionary<string, IKeywordAction> _registeredKeywordsDict = [];
 
     #endregion
 
     private static string _applicationConfigurationFolder = string.Empty;
     private static int _pollingInterval = 250;
+
+    #region Events
+
+    /// <summary>
+    /// Occurs when plugin loading progress changes.
+    /// </summary>
+    public event EventHandler<PluginLoadProgressEventArgs>? PluginLoadProgress;
+
+    #endregion
 
     #region cTor
     // Private constructor to prevent instantiation
@@ -43,7 +52,7 @@ public class PluginRegistry : IPluginRegistry
         _pollingInterval = pollingInterval;
     }
 
-    public PluginRegistry Create (string applicationConfigurationFolder, int pollingInterval)
+    public static PluginRegistry Create (string applicationConfigurationFolder, int pollingInterval)
     {
         if (_instance != null)
         {
@@ -120,17 +129,62 @@ public class PluginRegistry : IPluginRegistry
         var skippedCount = 0;
         var failedCount = 0;
 
-        foreach (var dllName in Directory.EnumerateFiles(pluginDir, "*.dll"))
+        // Get list of DLL files for progress tracking
+        var dllFiles = Directory.EnumerateFiles(pluginDir, "*.dll").ToList();
+        var totalPlugins = dllFiles.Count;
+
+        // Fire Started event
+        OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+            pluginDir,
+            "Plugin Loading",
+            0,
+            totalPlugins,
+            PluginLoadStatus.Started,
+            $"Starting to load {totalPlugins} potential plugin(s)"));
+
+        var currentIndex = 0;
+        foreach (var dllName in dllFiles)
         {
+            var fileName = Path.GetFileName(dllName);
+
             try
             {
+                // Fire Validating event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Validating,
+                    "Validating plugin security and manifest"));
+
                 // Validate plugin before loading (with manifest support)
                 if (!PluginValidator.ValidatePlugin(dllName, out var manifest))
                 {
                     skippedCount++;
-                    _logger.Info("Skipped plugin (failed validation): {FileName}", Path.GetFileName(dllName));
+                    _logger.Info("Skipped plugin (failed validation): {FileName}", fileName);
+
+                    // Fire Skipped event
+                    OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                        dllName,
+                        fileName,
+                        currentIndex,
+                        totalPlugins,
+                        PluginLoadStatus.Skipped,
+                        "Failed validation (not trusted or invalid manifest)"));
+
+                    currentIndex++;
                     continue;
                 }
+
+                // Fire Validated event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Validated,
+                    manifest != null ? $"Validated: {manifest.Name} v{manifest.Version}" : "Validated successfully"));
 
                 // Log manifest information if available
                 if (manifest != null)
@@ -143,22 +197,58 @@ public class PluginRegistry : IPluginRegistry
                     }
                 }
 
+                // Fire Loading event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Loading,
+                    "Loading plugin assembly"));
+
                 // Load plugin with timeout and exception handling
                 if (LoadPluginAssemblySafe(dllName, interfaceName))
                 {
                     loadedCount++;
+
+                    // Fire Loaded event
+                    OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                        dllName,
+                        fileName,
+                        currentIndex,
+                        totalPlugins,
+                        PluginLoadStatus.Loaded,
+                        manifest != null ? $"Loaded {manifest.Name}" : "Loaded successfully"));
                 }
                 else
                 {
                     failedCount++;
+
+                    // Fire Failed event
+                    OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                        dllName,
+                        fileName,
+                        currentIndex,
+                        totalPlugins,
+                        PluginLoadStatus.Failed,
+                        "Failed to load plugin assembly (timeout or error)"));
                 }
             }
             catch (Exception ex) when (ex is BadImageFormatException or FileLoadException)
             {
                 // Can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
                 // or could be a not columnizer DLL (e.g. A DLL that is needed by a plugin).
-                _logger.Warn(ex, "Plugin load failed (bad format): {FileName}", Path.GetFileName(dllName));
+                _logger.Warn(ex, "Plugin load failed (bad format): {FileName}", fileName);
                 failedCount++;
+
+                // Fire Failed event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Failed,
+                    $"Bad format: {ex.Message}"));
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -173,21 +263,57 @@ public class PluginRegistry : IPluginRegistry
 
                 _logger.Error(ex, "Loader exception during load of dll '{0}'", dllName);
                 failedCount++;
-                // Don't throw - continue loading other plugins
+
+                // Fire Failed event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Failed,
+                    $"Dependency missing: {ex.Message}"));
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "General exception loading plugin: {FileName}", Path.GetFileName(dllName));
+                _logger.Error(ex, "General exception loading plugin: {FileName}", fileName);
                 failedCount++;
-                // Don't throw - continue loading other plugins
+
+                // Fire Failed event
+                OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+                    dllName,
+                    fileName,
+                    currentIndex,
+                    totalPlugins,
+                    PluginLoadStatus.Failed,
+                    $"Error: {ex.Message}"));
             }
+
+            currentIndex++;
         }
 
         _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}",
             loadedCount, skippedCount, failedCount);
 
+        // Fire Completed event
+        OnPluginLoadProgress(new PluginLoadProgressEventArgs(
+            pluginDir,
+            "Plugin Loading",
+            totalPlugins,
+            totalPlugins,
+            PluginLoadStatus.Completed,
+            $"Completed: {loadedCount} loaded, {skippedCount} skipped, {failedCount} failed"));
+
         // Save any permission changes
         PluginPermissionManager.SavePermissions(_applicationConfigurationFolder);
+    }
+
+    /// <summary>
+    /// Raises the PluginLoadProgress event.
+    /// </summary>
+    /// <param name="e">Event arguments containing progress information.</param>
+    protected virtual void OnPluginLoadProgress (PluginLoadProgressEventArgs e)
+    {
+        PluginLoadProgress?.Invoke(this, e);
     }
 
     /// <summary>
