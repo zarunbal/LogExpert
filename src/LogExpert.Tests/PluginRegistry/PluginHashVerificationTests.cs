@@ -328,7 +328,7 @@ public class PluginHashVerificationTests
     /// Validates plugin with a specific configuration (test helper)
     /// Note: This is a simplified version. Actual implementation may differ.
     /// </summary>
-    private bool ValidatePluginWithConfig (string pluginPath, TrustedPluginConfig config)
+    private static bool ValidatePluginWithConfig (string pluginPath, TrustedPluginConfig config)
     {
         // This is a test helper method
         // In actual implementation, you'd call PluginValidator.ValidatePlugin

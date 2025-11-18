@@ -5,10 +5,9 @@ using NUnit.Framework;
 namespace LogExpert.Tests.PluginRegistry;
 
 /// <summary>
-/// Unit tests for Path Traversal Protection (Priority 1, Task 1.3)
+/// Unit tests for Path Traversal Protection
 /// </summary>
 [TestFixture]
-[Category("Priority1")]
 [Category("PathTraversal")]
 [Category("Security")]
 public class PathTraversalProtectionTests
@@ -101,8 +100,6 @@ public class PathTraversalProtectionTests
         var result = ValidateManifestPathsHelper(manifest, _pluginDirectory);
 
         // Assert
-        // Note: This should log a warning but may still pass
-        // Adjust based on actual implementation
         Assert.That(result, Is.True, "Tilde in dependencies is detected (logged as warning)");
     }
 

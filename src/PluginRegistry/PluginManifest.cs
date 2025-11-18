@@ -410,6 +410,8 @@ public class PluginManifest
     /// <item><description>"> 1.10.0" or ">1.10.0" → "(1.10.0, )" (exclusive lower bound, no upper bound)</description></item>
     /// <item><description>"&lt;= 1.10.0" or "&lt;=1.10.0" → "(, 1.10.0]" (no lower bound, inclusive upper bound)</description></item>
     /// <item><description>"&lt; 1.10.0" or "&lt;1.10.0" → "(, 1.10.0)" (no lower bound, exclusive upper bound)</description></item>
+    /// <item><description>"~ 1.10.0" or "~1.10.0" → "[1.10.0, 1.11.0)" (allows patch updates only)</description></item>
+    /// <item><description>"^ 1.10.0" or "^1.10.0" → "[1.10.0, 2.0.0)" (allows minor and patch updates)</description></item>
     /// </list>
     /// Bracket notation and floating versions (e.g., "1.10.*") are passed through unchanged.
     /// NuGet.Versioning requires bracket notation where '[' means inclusive and '(' means exclusive.
@@ -455,8 +457,40 @@ public class PluginManifest
             var version = normalized[1..].Trim();
             normalized = $"(, {version})";
         }
-        // For other cases (like ~ or ^ which NuGet doesn't support), try to pass through
-        // NuGet will validate and throw if unsupported
+        // Handle ~ operator (allows patch updates: ~1.10.0 means >=1.10.0 <1.11.0)
+        else if (normalized.StartsWith('~'))
+        {
+            var version = normalized[1..].Trim();
+            try
+            {
+                var semVer = SemanticVersion.Parse(version);
+                var upperVersion = new SemanticVersion(semVer.Major, semVer.Minor + 1, 0);
+                normalized = $"[{version}, {upperVersion})";
+            }
+            catch (Exception ex) when (ex is ArgumentException or FormatException)
+            {
+                _logger.Warn(ex, "Failed to parse version for ~ operator: '{Version}'", version);
+                // Return original if parsing fails - will be caught by validation
+                return requirement;
+            }
+        }
+        // Handle ^ operator (allows minor and patch updates: ^1.10.0 means >=1.10.0 <2.0.0)
+        else if (normalized.StartsWith('^'))
+        {
+            var version = normalized[1..].Trim();
+            try
+            {
+                var semVer = SemanticVersion.Parse(version);
+                var upperVersion = new SemanticVersion(semVer.Major + 1, 0, 0);
+                normalized = $"[{version}, {upperVersion})";
+            }
+            catch (Exception ex) when (ex is ArgumentException or FormatException)
+            {
+                _logger.Warn(ex, "Failed to parse version for ^ operator: '{Version}'", version);
+                // Return original if parsing fails - will be caught by validation
+                return requirement;
+            }
+        }
 
         _logger.Debug("Normalized version requirement: '{Original}' → '{Normalized}'", requirement, normalized);
         return normalized;

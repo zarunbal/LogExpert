@@ -247,12 +247,17 @@ public class PluginManifestVersionParsingTests
         // Arrange - Test the EXACT input that's causing the issue
         var requirement = ">= 1.10.0";
 
-        // Act - Try to parse it directly
+        // Act - Try to parse it using proper normalization (not naive string replacement)
         try
         {
-            var normalized = requirement
-                .Replace(">= ", ">=", StringComparison.Ordinal)
-                .Trim();
+            // This is what PluginManifest.NormalizeVersionRequirement does
+            // It converts ">= 1.10.0" to "[1.10.0, )" which is NuGet bracket notation
+            var normalized = requirement.Trim();
+            if (normalized.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
+            {
+                var version = normalized[2..].Trim();
+                normalized = $"[{version}, )";
+            }
 
             TestContext.WriteLine($"Original: '{requirement}'");
             TestContext.WriteLine($"Normalized: '{normalized}'");
