@@ -14,7 +14,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 {
     #region Fields
 
-    private readonly XmlSerializer xml = new XmlSerializer(typeof(RegexColumnizerConfig));
+    private readonly XmlSerializer xml = new(typeof(RegexColumnizerConfig));
     private string[] columns;
 
     #endregion
@@ -46,9 +46,11 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        var logLine = new ColumnizedLogLine();
+        var logLine = new ColumnizedLogLine
+        {
+            ColumnValues = new IColumn[columns.Length]
+        };
 
-        logLine.ColumnValues = new IColumn[columns.Length];
         if (Regex != null)
         {
             var m = Regex.Match(line.FullLine);
@@ -190,7 +192,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         {
             Regex = RegexHelper.GetOrCreateCached(Config.Expression, RegexOptions.Compiled);
             var skip = Regex.GetGroupNames().Length == 1 ? 0 : 1;
-            columns = Regex.GetGroupNames().Skip(skip).ToArray();
+            columns = [.. Regex.GetGroupNames().Skip(skip)];
         }
         catch
         {

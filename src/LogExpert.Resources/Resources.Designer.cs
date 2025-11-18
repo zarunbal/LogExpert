@@ -4694,6 +4694,42 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to load plugin assembly (timeout or error).
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed validation (not trusted or invalid manifest).
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading plugin assembly.
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validating plugin security and manifest.
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Add Plugin....
         /// </summary>
         public static string PluginTrustDialog_UI_Button_AddPlugin {

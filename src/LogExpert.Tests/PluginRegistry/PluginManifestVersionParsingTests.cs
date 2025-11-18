@@ -1,6 +1,6 @@
-using NUnit.Framework;
-
 using LogExpert.PluginRegistry;
+
+using NUnit.Framework;
 
 namespace LogExpert.Tests.PluginRegistry;
 
@@ -8,7 +8,7 @@ namespace LogExpert.Tests.PluginRegistry;
 public class PluginManifestVersionParsingTests
 {
     [Test]
-    public void Validate_WithVersionRequirementWithSpaces_ShouldPass()
+    public void Validate_WithVersionRequirementWithSpaces_ShouldPass ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -31,7 +31,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void Validate_WithVersionRequirementWithoutSpaces_ShouldPass()
+    public void Validate_WithVersionRequirementWithoutSpaces_ShouldPass ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -66,7 +66,7 @@ public class PluginManifestVersionParsingTests
     [TestCase("~1.10.0")]
     [TestCase("^ 1.10.0")]
     [TestCase("^1.10.0")]
-    public void Validate_WithVariousVersionRequirementFormats_ShouldPass(string requirement)
+    public void Validate_WithVariousVersionRequirementFormats_ShouldPass (string requirement)
     {
         // Arrange
         var manifest = new PluginManifest
@@ -89,7 +89,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithVersionRequirementWithSpaces_ShouldWorkCorrectly()
+    public void IsCompatibleWith_WithVersionRequirementWithSpaces_ShouldWorkCorrectly ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -111,7 +111,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithCaretRange_ShouldAllowMinorUpdates()
+    public void IsCompatibleWith_WithCaretRange_ShouldAllowMinorUpdates ()
     {
         // Arrange - ^ allows minor and patch updates but not major
         var manifest = new PluginManifest
@@ -134,7 +134,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithTildeRange_ShouldAllowPatchUpdates()
+    public void IsCompatibleWith_WithTildeRange_ShouldAllowPatchUpdates ()
     {
         // Arrange - ~ allows patch updates but not minor or major
         var manifest = new PluginManifest
@@ -157,7 +157,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithGreaterThan_ShouldExcludeEqualVersion()
+    public void IsCompatibleWith_WithGreaterThan_ShouldExcludeEqualVersion ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -178,7 +178,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithLessThan_ShouldExcludeEqualVersion()
+    public void IsCompatibleWith_WithLessThan_ShouldExcludeEqualVersion ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -200,7 +200,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithNoRequirement_ShouldAlwaysBeCompatible()
+    public void IsCompatibleWith_WithNoRequirement_ShouldAlwaysBeCompatible ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -222,7 +222,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithEmptyRequirement_ShouldAlwaysBeCompatible()
+    public void IsCompatibleWith_WithEmptyRequirement_ShouldAlwaysBeCompatible ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -242,7 +242,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void DebugVersionParsing_WithExactInputFromUser()
+    public void DebugVersionParsing_WithExactInputFromUser ()
     {
         // Arrange - Test the EXACT input that's causing the issue
         var requirement = ">= 1.10.0";
@@ -273,7 +273,7 @@ public class PluginManifestVersionParsingTests
     }
 
     [Test]
-    public void Manifest_Validate_WithSpacesInRequirement_ShouldNotThrow()
+    public void Manifest_Validate_WithSpacesInRequirement_ShouldNotThrow ()
     {
         // Arrange
         var manifest = new PluginManifest

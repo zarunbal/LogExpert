@@ -2270,4 +2270,16 @@ Continue?</value>
   <data name="LogExpert_Common_UI_Button_Save" xml:space="preserve">
     <value>&amp;Save</value>
   </data>
+  <data name="PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest" xml:space="preserve">
+    <value>Validating plugin security and manifest</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest" xml:space="preserve">
+    <value>Failed validation (not trusted or invalid manifest)</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly" xml:space="preserve">
+    <value>Loading plugin assembly</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError" xml:space="preserve">
+    <value>Failed to load plugin assembly (timeout or error)</value>
+  </data>
 </root>

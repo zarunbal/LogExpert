@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
