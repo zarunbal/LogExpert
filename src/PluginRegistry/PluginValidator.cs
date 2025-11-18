@@ -10,7 +10,7 @@ namespace LogExpert.PluginRegistry;
 /// <summary>
 /// Validates plugin assemblies before loading to prevent security vulnerabilities.
 /// </summary>
-public static class PluginValidator
+public static partial class PluginValidator
 {
     #region Fields
 
@@ -607,29 +607,6 @@ public static class PluginValidator
             _logger.Debug(ex, "Error checking PE format: {DllPath}", dllPath);
             return false;
         }
-    }
-
-    /// <summary>
-    /// Gets pre-calculated SHA256 hashes for built-in plugins.
-    /// Generated: 2025-11-17 22:16:14
-    /// Note: SftpFileSystem.dll exists in both 'plugins' (x64) and 'pluginsx86' (x86) folders
-    /// </summary>
-    public static Dictionary<string, string> GetBuiltInPluginHashes ()
-    {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["AutoColumnizer.dll"] = "F64B30FB8A4DF1C587DB12E98792F3F4179707420FDF88FE7C0DABC21A95BE81",
-            ["CsvColumnizer.dll"] = "19B94F2396423345BD45A9ACA830E6608F824CC7D24287ED39C409AB1FE4F921",
-            ["JsonColumnizer.dll"] = "9830A440DC43AAF8B765BA520B3CB157C38517FEF2BB6EAB251D8914A6813AF2",
-            ["JsonCompactColumnizer.dll"] = "9E2E13DE6E130265DDE01D5BDE7D150F159A6B6736512FEA07193821608364CD",
-            ["RegexColumnizer.dll"] = "780310BF53E9D1E91D900AC76E731DC951FB4740B4875B33ABDBA7734131F9F8",
-            ["Log4jXmlColumnizer.dll"] = "EB2C2C764473BE3DAA5C263E82FD3BF0210E43818776DB888F1CE53054C74D90",
-            ["GlassfishColumnizer.dll"] = "34C4823A8507A63CEE9B5F199FE4272DC72AA3053486DB44312408132BAB3D4E",
-            ["DefaultPlugins.dll"] = "7351E7491BD038B07956A0BD3BCF259B4E5B016F9C3972984D19837B9892E3D5",
-            ["FlashIconHighlighter.dll"] = "56C87943C9676BEBBD700BABFCB80D282C9D63A763503839D4048C1F981EA624",
-            ["SftpFileSystem.dll"] = "B28133BA01B21419494203C6948C388FC7A511EA995EB9F8B20F8B84EAFD4B94",
-            ["SftpFileSystem.dll (x86)"] = "963BD8000C35A04F06D9644240E8F600A93BB12ABDA49A8FBFA220644C1A49A8",
-        };
     }
 
     #endregion
