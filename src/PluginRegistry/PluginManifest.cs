@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Security;
 
 using Newtonsoft.Json;
@@ -266,15 +263,14 @@ public class PluginManifest
     /// <param name="logExpertVersion">Current LogExpert version to check against</param>
     /// <returns>True if compatible, false otherwise</returns>
     /// <remarks>
-    /// This method supports various version constraint operators using NuGet.Versioning:
+    /// This method supports various version constraint operators (npm-style syntax is automatically converted to NuGet format):
     /// <list type="bullet">
-    /// <item><description><c>&gt;=</c> - Greater than or equal to</description></item>
-    /// <item><description><c>&gt;</c> - Greater than</description></item>
-    /// <item><description><c>&lt;=</c> - Less than or equal to</description></item>
-    /// <item><description><c>&lt;</c> - Less than</description></item>
-    /// <item><description><c>~</c> - Tilde range (allows patch-level changes)</description></item>
-    /// <item><description><c>^</c> - Caret range (allows minor-level changes)</description></item>
+    /// <item><description><c>&gt;=X.Y.Z</c> - Greater than or equal to (converted to [X.Y.Z, ))</description></item>
+    /// <item><description><c>&gt;X.Y.Z</c> - Greater than (converted to (X.Y.Z, ))</description></item>
+    /// <item><description><c>&lt;=X.Y.Z</c> - Less than or equal to (converted to (, X.Y.Z])</description></item>
+    /// <item><description><c>&lt;X.Y.Z</c> - Less than (converted to (, X.Y.Z))</description></item>
     /// <item><description>Version ranges like [1.0, 2.0) - From 1.0 (inclusive) to 2.0 (exclusive)</description></item>
+    /// <item><description>Floating versions like 1.10.* - Any patch version of 1.10</description></item>
     /// </list>
     /// Supports pre-release versions (e.g., 1.0.0-beta, 1.0.0-rc.1).
     /// If no requirement is specified in the manifest, the plugin is assumed to be compatible.
@@ -284,34 +280,53 @@ public class PluginManifest
         if (Requires == null || string.IsNullOrWhiteSpace(Requires.LogExpert))
         {
             // No requirement specified, assume compatible
+            _logger.Debug("Plugin {Name}: No version requirement, assuming compatible", Name);
             return true;
         }
 
         try
         {
-            // Convert System.Version to NuGetVersion (not SemanticVersion)
+            _logger.Debug("Checking compatibility for plugin {Name} with requirement '{Requirement}' against LogExpert {Version}", Name, Requires.LogExpert, logExpertVersion);
+
+            // Convert System.Version to NuGetVersion (stable version, not prerelease)
+            // Don't pass Revision as release label - it's not a prerelease indicator
             var nugetVersion = new NuGetVersion(
                 logExpertVersion.Major,
                 logExpertVersion.Minor,
-                logExpertVersion.Build >= 0 ? logExpertVersion.Build : 0,
-                logExpertVersion.Revision >= 0 ? logExpertVersion.Revision.ToString() : null);
+                logExpertVersion.Build >= 0 ? logExpertVersion.Build : 0);
 
-            // Parse version range (supports >=, <=, ~, ^, [], () etc.)
-            var versionRange = VersionRange.Parse(Requires.LogExpert);
+            _logger.Debug("Converted version: {NuGetVersion}", nugetVersion);
+
+            // Normalize and parse version range (supports >=, <=, ~, ^, [], () etc.)
+            var normalized = NormalizeVersionRequirement(Requires.LogExpert);
+
+            _logger.Debug("Parsing version range: '{Normalized}'", normalized);
+            var versionRange = VersionRange.Parse(normalized);
+
+            _logger.Debug("Version range parsed successfully: {VersionRange}", versionRange);
             var isCompatible = versionRange.Satisfies(nugetVersion);
 
             if (!isCompatible)
             {
-                _logger.Warn("Plugin {Name} v{Version} requires LogExpert {Requirement}, current: {Current}",
-                    Name, Version, Requires.LogExpert, logExpertVersion);
+                _logger.Warn("Plugin {Name} v{Version} requires LogExpert {Requirement}, current: {Current}", Name, Version, Requires.LogExpert, logExpertVersion);
+            }
+            else
+            {
+                _logger.Info("Plugin {Name} is compatible with LogExpert {Version}", Name, logExpertVersion);
             }
 
             return isCompatible;
         }
-        catch (Exception ex) when (ex is ArgumentException or FormatException)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException)
         {
-            _logger.Error(ex, "Error checking version compatibility for {Name}: {Requirement}",
-                Name, Requires.LogExpert);
+            _logger.Error(ex, "ArgumentException checking version compatibility for {Name}: '{Requirement}'. Details: {Message}", Name, Requires.LogExpert, ex.Message);
+            return false; // Fail closed on error
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Unexpected exception checking version compatibility for {Name}: '{Requirement}'. Type: {ExceptionType}, Details: {Message}",
+                Name, Requires.LogExpert, ex.GetType().Name, ex.Message);
             return false; // Fail closed on error
         }
     }
@@ -358,14 +373,93 @@ public class PluginManifest
 
         try
         {
+            // Normalize requirement string - remove spaces around operators
+            var normalized = NormalizeVersionRequirement(requirement);
+
+            _logger.Debug("Validating version requirement: '{Normalized}'", normalized);
+
             // Try to parse as version range using NuGet.Versioning
-            _ = VersionRange.Parse(requirement);
+            _ = VersionRange.Parse(normalized);
+
+            _logger.Debug("Version requirement is valid: '{Normalized}'", normalized);
             return true;
         }
-        catch (Exception ex) when (ex is ArgumentException or FormatException)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException)
         {
+            _logger.Warn(ex, "Invalid version requirement (ArgumentException): '{Requirement}'", requirement);
             return false;
         }
+        catch (Exception ex)
+        {
+            // Catch any other unexpected exceptions
+            _logger.Error(ex, "Unexpected exception validating version requirement: '{Requirement}'", requirement);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Normalizes a version requirement string by converting npm-style syntax to NuGet bracket notation.
+    /// </summary>
+    /// <param name="requirement">The version requirement string to normalize</param>
+    /// <returns>Normalized version requirement string in NuGet format</returns>
+    /// <remarks>
+    /// Converts npm-style operators to NuGet bracket notation:
+    /// <list type="bullet">
+    /// <item><description>">= 1.10.0" or ">=1.10.0" → "[1.10.0, )" (inclusive lower bound, no upper bound)</description></item>
+    /// <item><description>"> 1.10.0" or ">1.10.0" → "(1.10.0, )" (exclusive lower bound, no upper bound)</description></item>
+    /// <item><description>"&lt;= 1.10.0" or "&lt;=1.10.0" → "(, 1.10.0]" (no lower bound, inclusive upper bound)</description></item>
+    /// <item><description>"&lt; 1.10.0" or "&lt;1.10.0" → "(, 1.10.0)" (no lower bound, exclusive upper bound)</description></item>
+    /// </list>
+    /// Bracket notation and floating versions (e.g., "1.10.*") are passed through unchanged.
+    /// NuGet.Versioning requires bracket notation where '[' means inclusive and '(' means exclusive.
+    /// </remarks>
+    private static string NormalizeVersionRequirement (string requirement)
+    {
+        if (string.IsNullOrWhiteSpace(requirement))
+        {
+            return requirement;
+        }
+
+        var normalized = requirement.Trim();
+
+        // If it already looks like NuGet bracket notation or floating version, return as-is
+        if (normalized.StartsWith('[') || normalized.StartsWith('(') || normalized.Contains('*', StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.Debug("Normalized version requirement (already in NuGet format): '{Original}'", requirement);
+            return normalized;
+        }
+
+        // Convert npm-style operators to NuGet bracket notation
+        // Handle >= operator (inclusive lower bound)
+        if (normalized.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
+        {
+            var version = normalized[2..].Trim();
+            normalized = $"[{version}, )";
+        }
+        // Handle > operator (exclusive lower bound)
+        else if (normalized.StartsWith('>') && !normalized.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
+        {
+            var version = normalized[1..].Trim();
+            normalized = $"({version}, )";
+        }
+        // Handle <= operator (inclusive upper bound)
+        else if (normalized.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
+        {
+            var version = normalized[2..].Trim();
+            normalized = $"(, {version}]";
+        }
+        // Handle < operator (exclusive upper bound)
+        else if (normalized.StartsWith('<') && !normalized.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
+        {
+            var version = normalized[1..].Trim();
+            normalized = $"(, {version})";
+        }
+        // For other cases (like ~ or ^ which NuGet doesn't support), try to pass through
+        // NuGet will validate and throw if unsupported
+
+        _logger.Debug("Normalized version requirement: '{Original}' → '{Normalized}'", requirement, normalized);
+        return normalized;
     }
 
     /// <summary>

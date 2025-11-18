@@ -7,53 +7,6 @@ using NLog;
 namespace LogExpert.PluginRegistry;
 
 /// <summary>
-/// Defines permissions that plugins can request and use.
-/// </summary>
-[Flags]
-public enum PluginPermission
-{
-    /// <summary>
-    /// No permissions.
-    /// </summary>
-    None = 0,
-
-    /// <summary>
-    /// Permission to read files from the file system (config, log files).
-    /// </summary>
-    FileSystemRead = 1 << 0,
-
-    /// <summary>
-    /// Permission to write files to the file system (config, exports).
-    /// </summary>
-    FileSystemWrite = 1 << 1,
-
-    /// <summary>
-    /// Permission to make network connections (HTTP, SFTP, etc.).
-    /// </summary>
-    NetworkConnect = 1 << 2,
-
-    /// <summary>
-    /// Permission to read application configuration.
-    /// </summary>
-    ConfigRead = 1 << 3,
-
-    /// <summary>
-    /// Permission to write application configuration.
-    /// </summary>
-    ConfigWrite = 1 << 4,
-
-    /// <summary>
-    /// Permission to read from Windows registry.
-    /// </summary>
-    RegistryRead = 1 << 5,
-
-    /// <summary>
-    /// All permissions (for trusted plugins).
-    /// </summary>
-    All = FileSystemRead | FileSystemWrite | NetworkConnect | ConfigRead | ConfigWrite | RegistryRead
-}
-
-/// <summary>
 /// Manages plugin permissions and validates permission requests.
 /// </summary>
 public static class PluginPermissionManager
@@ -145,17 +98,11 @@ public static class PluginPermissionManager
     /// <returns>Plugin permissions or default permissions if not configured</returns>
     public static PluginPermission GetPermissions (string pluginName)
     {
-        if (string.IsNullOrWhiteSpace(pluginName))
-        {
-            return PluginPermission.None;
-        }
-
-        if (_pluginPermissions.TryGetValue(pluginName, out var config))
-        {
-            return config.GrantedPermissions;
-        }
-
-        return DEFAULT_PERMISSIONS;
+        return string.IsNullOrWhiteSpace(pluginName)
+            ? PluginPermission.None
+            : _pluginPermissions.TryGetValue(pluginName, out var config)
+                ? config.GrantedPermissions
+                : DEFAULT_PERMISSIONS;
     }
 
     /// <summary>
@@ -165,21 +112,18 @@ public static class PluginPermissionManager
     /// <returns>PluginPermission enum value</returns>
     public static PluginPermission ParsePermission (string permissionString)
     {
-        if (string.IsNullOrWhiteSpace(permissionString))
-        {
-            return PluginPermission.None;
-        }
-
-        return permissionString.ToLowerInvariant() switch
-        {
-            "filesystem:read" => PluginPermission.FileSystemRead,
-            "filesystem:write" => PluginPermission.FileSystemWrite,
-            "network:connect" => PluginPermission.NetworkConnect,
-            "config:read" => PluginPermission.ConfigRead,
-            "config:write" => PluginPermission.ConfigWrite,
-            "registry:read" => PluginPermission.RegistryRead,
-            _ => PluginPermission.None
-        };
+        return string.IsNullOrWhiteSpace(permissionString)
+            ? PluginPermission.None
+            : permissionString.ToUpperInvariant() switch
+            {
+                "FILESYSTEM:READ" => PluginPermission.FileSystemRead,
+                "FILESYSTEM:WRITE" => PluginPermission.FileSystemWrite,
+                "NETWORK:CONNECT" => PluginPermission.NetworkConnect,
+                "CONFIG:READ" => PluginPermission.ConfigRead,
+                "CONFIG:WRITE" => PluginPermission.ConfigWrite,
+                "REGISTRY:READ" => PluginPermission.RegistryRead,
+                _ => PluginPermission.None
+            };
     }
 
     /// <summary>

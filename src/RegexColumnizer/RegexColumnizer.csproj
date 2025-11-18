@@ -33,4 +33,10 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="RegexColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

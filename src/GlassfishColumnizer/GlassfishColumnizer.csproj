@@ -11,4 +11,10 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="GlassfishColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

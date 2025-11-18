@@ -65,6 +65,7 @@ public static class PluginHashCalculator
     /// <param name="filePaths">Collection of file paths to process.</param>
     /// <returns>Dictionary mapping file paths to their SHA256 hashes.</returns>
     /// <remarks>Files that cannot be processed are omitted from the result (logged but not thrown).</remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally catch all")]
     public static Dictionary<string, string> CalculateHashes (IEnumerable<string> filePaths)
     {
         ArgumentNullException.ThrowIfNull(filePaths);

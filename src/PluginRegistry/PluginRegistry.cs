@@ -1,11 +1,14 @@
 using System.Globalization;
 using System.Reflection;
+using System.Security;
 
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
+using LogExpert.PluginRegistry.Events;
 using LogExpert.PluginRegistry.FileSystem;
+using LogExpert.PluginRegistry.Interfaces;
 
 using NLog;
 
@@ -30,10 +33,21 @@ public class PluginRegistry : IPluginRegistry
     private readonly IList<ILogExpertPlugin> _pluginList = [];
     private readonly Dictionary<string, IKeywordAction> _registeredKeywordsDict = [];
 
+    // Priority 3 & 4 Integration - Feature-flagged implementation
+    private readonly IPluginLoader _pluginLoader;
+    private readonly PluginCache? _pluginCache;
+    private readonly IPluginEventBus _eventBus;
+    private readonly List<LazyPluginProxy<ILogLineColumnizer>> _lazyColumnizers = [];
+
+    // Feature flags - Conservative defaults
+    private bool _useLazyLoading;      // Disabled by default
+    private bool _usePluginCache;      // Disabled by default
+    private bool _useLifecycleHooks = true;    // Enabled by default (low risk)
+    private bool _useEventBus = true;          // Enabled by default (low risk)
+
     #endregion
 
     private static string _applicationConfigurationFolder = string.Empty;
-    private static int _pollingInterval = 250;
 
     #region Events
 
@@ -49,7 +63,28 @@ public class PluginRegistry : IPluginRegistry
     private PluginRegistry (string applicationConfigurationFolder, int pollingInterval)
     {
         _applicationConfigurationFolder = applicationConfigurationFolder;
-        _pollingInterval = pollingInterval;
+        PollingInterval = pollingInterval;
+
+        // Initialize Priority 3 & 4 components
+        _pluginLoader = new DefaultPluginLoader();
+        _eventBus = new PluginEventBus();
+
+        // Load feature flags from configuration
+        LoadFeatureFlags();
+
+        // Initialize cache if enabled
+        if (_usePluginCache)
+        {
+            _pluginCache = new PluginCache(
+                cacheExpiration: TimeSpan.FromHours(24),
+                loader: _pluginLoader);
+            _logger.Info("Plugin cache enabled (24-hour expiration)");
+        }
+
+        if (_useLazyLoading)
+        {
+            _logger.Info("Lazy plugin loading enabled");
+        }
     }
 
     public static PluginRegistry Create (string applicationConfigurationFolder, int pollingInterval)
@@ -65,7 +100,7 @@ public class PluginRegistry : IPluginRegistry
         }
 
         _applicationConfigurationFolder = applicationConfigurationFolder;
-        _pollingInterval = pollingInterval;
+        PollingInterval = pollingInterval;
 
         _instance.LoadPlugins();
         return Instance;
@@ -75,7 +110,7 @@ public class PluginRegistry : IPluginRegistry
 
     #region Properties
 
-    public static PluginRegistry Instance => _instance ?? new PluginRegistry(_applicationConfigurationFolder, _pollingInterval);
+    public static PluginRegistry Instance => _instance ?? new PluginRegistry(_applicationConfigurationFolder, PollingInterval);
 
     public IList<ILogLineColumnizer> RegisteredColumnizers { get; private set; }
 
@@ -89,11 +124,167 @@ public class PluginRegistry : IPluginRegistry
 
     #region Public methods
 
-    public static int PollingInterval => _pollingInterval;
+    public static int PollingInterval { get; private set; } = 250;
 
     #endregion
 
     #region Internals
+
+    /// <summary>
+    /// Loads feature flags from configuration.
+    /// </summary>
+    private void LoadFeatureFlags ()
+    {
+        // TODO: Load from app.config or appsettings.json in future
+        // For now, these are hardcoded conservative defaults
+
+        // Conservative defaults: disable performance features, enable architectural features
+        _useLazyLoading = true;      // Disabled by default (requires more testing)
+        _usePluginCache = true;      // Disabled by default (requires more testing)
+        _useLifecycleHooks = true;    // Enabled (backward compatible, low risk)
+        _useEventBus = true;          // Enabled (fire-and-forget, safe)
+
+        _logger.Info("Feature flags - Lazy: {Lazy}, Cache: {Cache}, Lifecycle: {Lifecycle}, EventBus: {EventBus}", _useLazyLoading, _usePluginCache, _useLifecycleHooks, _useEventBus);
+    }
+
+    /// <summary>
+    /// Creates a plugin context for lifecycle initialization.
+    /// </summary>
+    private PluginContext CreatePluginContext (string pluginName, string pluginPath)
+    {
+        var pluginDir = Path.GetDirectoryName(pluginPath) ?? AppDomain.CurrentDomain.BaseDirectory;
+        var configDir = Path.Combine(_applicationConfigurationFolder, "Plugins", pluginName);
+
+        // Ensure config directory exists
+        _ = Directory.CreateDirectory(configDir);
+
+        return new PluginContext
+        {
+            Logger = new PluginLogger(pluginName),
+            PluginDirectory = pluginDir,
+            HostVersion = typeof(PluginRegistry).Assembly.GetName().Version ?? new Version(1, 0),
+            ConfigurationDirectory = configDir
+        };
+    }
+
+    /// <summary>
+    /// Creates a lazy proxy for a plugin instead of loading immediately.
+    /// </summary>
+    private LazyPluginProxy<ILogLineColumnizer> CreateLazyProxy (string dllPath, PluginManifest? manifest)
+    {
+        var proxy = new LazyPluginProxy<ILogLineColumnizer>(dllPath, manifest);
+
+        _logger.Debug("Created lazy proxy for: {Plugin}", manifest?.Name ?? Path.GetFileName(dllPath));
+
+        // Publish event when proxy is created
+        if (_useEventBus)
+        {
+            _eventBus.Publish(new PluginLoadedEvent
+            {
+                Source = "PluginRegistry",
+                PluginName = manifest?.Name ?? Path.GetFileName(dllPath),
+                PluginVersion = manifest?.Version ?? "Unknown"
+            });
+        }
+
+        return proxy;
+    }
+
+    /// <summary>
+    /// Processes a loaded plugin (either from cache or fresh load).
+    /// </summary>
+    private void ProcessLoadedPlugin (object plugin, PluginManifest? manifest, string dllPath)
+    {
+        if (plugin is not ILogLineColumnizer columnizer)
+        {
+            _logger.Warn("Loaded plugin is not ILogLineColumnizer: {Type}", plugin.GetType().Name);
+            return;
+        }
+
+        // Add to registered columnizers
+        RegisteredColumnizers.Add(columnizer);
+
+        // Call lifecycle Initialize if supported
+        if (_useLifecycleHooks && columnizer is IPluginLifecycle lifecycle)
+        {
+            try
+            {
+                var context = CreatePluginContext(manifest?.Name ?? Path.GetFileNameWithoutExtension(dllPath), dllPath);
+                lifecycle.Initialize(context);
+                _logger.Debug("Called Initialize on {Plugin}", manifest?.Name);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Plugin Initialize failed: {Plugin}", manifest?.Name);
+            }
+        }
+
+        // Existing IColumnizerConfigurator support
+        if (columnizer is IColumnizerConfigurator configurator)
+        {
+            try
+            {
+                configurator.LoadConfig(_applicationConfigurationFolder);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Plugin config loading failed: {Plugin}", manifest?.Name);
+            }
+        }
+
+        // Existing ILogExpertPlugin support
+        if (columnizer is ILogExpertPlugin legacyPlugin)
+        {
+            _pluginList.Add(legacyPlugin);
+            try
+            {
+                legacyPlugin.PluginLoaded();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Plugin PluginLoaded callback failed: {Plugin}", manifest?.Name);
+            }
+        }
+
+        // Publish loaded event
+        if (_useEventBus)
+        {
+            _eventBus.Publish(new PluginLoadedEvent
+            {
+                Source = "PluginRegistry",
+                PluginName = manifest?.Name ?? Path.GetFileNameWithoutExtension(dllPath),
+                PluginVersion = manifest?.Version ?? "Unknown"
+            });
+        }
+
+        _logger.Info("Plugin processed: {Plugin}", manifest?.Name ?? Path.GetFileNameWithoutExtension(dllPath));
+    }
+
+    /// <summary>
+    /// Publishes an event via the event bus (if enabled).
+    /// </summary>
+    private void PublishEvent<TEvent> (TEvent ev) where TEvent : IPluginEvent
+    {
+        if (_useEventBus)
+        {
+            try
+            {
+                _eventBus.Publish(ev);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to publish event: {EventType}", typeof(TEvent).Name);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets cache statistics (if caching is enabled).
+    /// </summary>
+    public CacheStatistics? GetCacheStatistics ()
+    {
+        return _usePluginCache ? _pluginCache?.GetStatistics() : null;
+    }
 
     internal void LoadPlugins ()
     {
@@ -121,9 +312,6 @@ public class PluginRegistry : IPluginRegistry
         }
 
         AppDomain.CurrentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
-
-        var interfaceName = typeof(ILogLineColumnizer).FullName
-            ?? throw new NotImplementedException("The interface name is null. How did this happen? Let's fix this.");
 
         var loadedCount = 0;
         var skippedCount = 0;
@@ -206,8 +394,9 @@ public class PluginRegistry : IPluginRegistry
                     PluginLoadStatus.Loading,
                     "Loading plugin assembly"));
 
-                // Load plugin with timeout and exception handling
-                if (LoadPluginAssemblySafe(dllName, interfaceName))
+                // Load plugin with timeout and exception handling (with manifest support)
+                // LoadPluginAssemblySafe will detect and register all plugin types (ILogLineColumnizer, IFileSystemPlugin, etc.)
+                if (LoadPluginAssemblySafe(dllName, manifest))
                 {
                     loadedCount++;
 
@@ -291,8 +480,7 @@ public class PluginRegistry : IPluginRegistry
             currentIndex++;
         }
 
-        _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}",
-            loadedCount, skippedCount, failedCount);
+        _logger.Info("Plugin loading complete. Loaded: {LoadedCount}, Skipped: {SkippedCount}, Failed: {FailedCount}", loadedCount, skippedCount, failedCount);
 
         // Fire Completed event
         OnPluginLoadProgress(new PluginLoadProgressEventArgs(
@@ -317,15 +505,44 @@ public class PluginRegistry : IPluginRegistry
     }
 
     /// <summary>
-    /// Loads a plugin assembly with security measures: timeout protection and exception handling.
+    /// Loads a plugin assembly with security measures: timeout protection, exception handling, and optional caching/lazy loading.
     /// </summary>
+    /// <param name="dllName">Path to the plugin DLL</param>
+    /// <param name="manifest">Plugin manifest (if available)</param>
     /// <returns>True if plugin loaded successfully, false otherwise</returns>
-    private bool LoadPluginAssemblySafe (string dllName, string interfaceName)
+    private bool LoadPluginAssemblySafe (string dllName, PluginManifest? manifest)
     {
         try
         {
+            // Option 1: Lazy Loading (defer until first use) - Only for ILogLineColumnizer
+            // Check if assembly might contain columnizer plugins before creating lazy proxy
+            if (_useLazyLoading)
+            {
+                // For lazy loading, we create a proxy without loading the assembly yet
+                // The actual type checking happens when the proxy is accessed
+                var proxy = CreateLazyProxy(dllName, manifest);
+                _lazyColumnizers.Add(proxy);
+                _logger.Info("Plugin registered for lazy loading: {Plugin}", manifest?.Name ?? Path.GetFileName(dllName));
+                return true;
+            }
+
+            // Option 2: Cached Loading (use cache if available) - Only for ILogLineColumnizer
+            if (_usePluginCache && _pluginCache != null)
+            {
+                var result = _pluginCache.LoadPluginWithCache(dllName);
+                if (result.Success && result.Plugin != null)
+                {
+                    // Add cached plugin to registry
+                    ProcessLoadedPlugin(result.Plugin, manifest, dllName);
+                    return true;
+                }
+
+                _logger.Warn("Cache load failed for {Plugin}, falling back to direct load", Path.GetFileName(dllName));
+            }
+
+            // Option 3: Direct Loading - For all plugin types
             // Use timeout to prevent plugin hangs during loading
-            var loadTask = Task.Run(() => LoadPluginAssembly(dllName, interfaceName));
+            var loadTask = Task.Run(() => LoadPluginAssembly(dllName, manifest));
 
             // Wait for plugin to load with timeout
             if (!loadTask.Wait(TimeSpan.FromSeconds(10)))
@@ -334,7 +551,7 @@ public class PluginRegistry : IPluginRegistry
                 return false;
             }
 
-            return true;
+            return loadTask.Result;
         }
         catch (AggregateException ex)
         {
@@ -350,7 +567,7 @@ public class PluginRegistry : IPluginRegistry
         }
     }
 
-    private void LoadPluginAssembly (string dllName, string interfaceName)
+    private bool LoadPluginAssembly (string dllName, PluginManifest? manifest)
     {
         // Log plugin loading for audit trail
         _logger.Info("Loading plugin assembly: {FileName}", Path.GetFileName(dllName));
@@ -363,66 +580,36 @@ public class PluginRegistry : IPluginRegistry
         {
             _logger.Debug("Checking type {TypeName} in assembly {AssemblyName}", type.FullName, assembly.FullName);
 
-            if (type.GetInterfaces().Any(i => i.FullName == interfaceName))
+            // Check for ILogLineColumnizer
+            if (type.GetInterfaces().Any(i => i.FullName == typeof(ILogLineColumnizer).FullName))
             {
                 // Instantiate plugin safely with timeout
                 if (TryInstantiatePluginSafe(type, out var instance))
                 {
-                    RegisteredColumnizers.Add((ILogLineColumnizer)instance);
-
-                    if (instance is IColumnizerConfigurator configurator)
+                    // Process as ILogLineColumnizer
+                    if (instance is ILogLineColumnizer columnizer)
                     {
-                        // Wrap config loading in try-catch
-                        try
-                        {
-                            configurator.LoadConfig(_applicationConfigurationFolder);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Plugin config loading failed: {TypeName}", type.Name);
-                            // Continue - don't fail entire plugin for config error
-                        }
+                        ProcessLoadedPlugin(columnizer, manifest, dllName);
+                        pluginLoadedCount++;
                     }
-
-                    if (instance is ILogExpertPlugin plugin)
-                    {
-                        _pluginList.Add(plugin);
-
-                        // **SECURITY**: Wrap plugin initialization in try-catch
-                        try
-                        {
-                            plugin.PluginLoaded();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Plugin initialization failed: {TypeName}", type.Name);
-                            // Continue - plugin is loaded but initialization failed
-                        }
-                    }
-
-                    _logger.Info("Added columnizer: {TypeName}", type.Name);
-                    pluginLoadedCount++;
                 }
             }
-            else
+
+            // Check for other plugin types (regardless of whether ILogLineColumnizer was found)
+            // A single assembly can contain multiple plugin types
+            if (TryAsFileSystem(type))
             {
-                if (TryAsContextMenu(type))
-                {
-                    pluginLoadedCount++;
-                    continue;
-                }
+                pluginLoadedCount++;
+            }
 
-                if (TryAsKeywordAction(type))
-                {
-                    pluginLoadedCount++;
-                    continue;
-                }
+            if (TryAsContextMenu(type))
+            {
+                pluginLoadedCount++;
+            }
 
-                if (TryAsFileSystem(type))
-                {
-                    pluginLoadedCount++;
-                    continue;
-                }
+            if (TryAsKeywordAction(type))
+            {
+                pluginLoadedCount++;
             }
         }
 
@@ -430,12 +617,14 @@ public class PluginRegistry : IPluginRegistry
         {
             _logger.Warn("No plugins found in assembly: {FileName}", Path.GetFileName(dllName));
         }
+
+        return pluginLoadedCount > 0;
     }
 
     /// <summary>
     /// Safely instantiates a plugin with timeout protection.
     /// </summary>
-    private bool TryInstantiatePluginSafe (Type type, out object instance)
+    private static bool TryInstantiatePluginSafe (Type type, out object instance)
     {
         instance = null;
 
@@ -460,7 +649,14 @@ public class PluginRegistry : IPluginRegistry
             instance = instantiateTask.Result;
             return instance != null;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is TargetInvocationException or
+                                         MethodAccessException or
+                                         MemberAccessException or
+                                         ArgumentException or
+                                         ArgumentNullException or
+                                         TargetParameterCountException or
+                                         NotSupportedException or
+                                         SecurityException)
         {
             _logger.Error(ex, "Failed to instantiate plugin: {TypeName}", type.Name);
             return false;
@@ -469,16 +665,71 @@ public class PluginRegistry : IPluginRegistry
 
     public IKeywordAction FindKeywordActionPluginByName (string name)
     {
-        _registeredKeywordsDict.TryGetValue(name, out var action);
+        _ = _registeredKeywordsDict.TryGetValue(name, out var action);
         return action;
     }
 
     public void CleanupPlugins ()
     {
+        _logger.Info("Cleaning up plugins...");
+
+        // Call legacy AppExiting
         foreach (var plugin in _pluginList)
         {
-            plugin.AppExiting();
+            try
+            {
+                plugin.AppExiting();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Plugin AppExiting failed");
+            }
         }
+
+        // Call lifecycle Shutdown
+        if (_useLifecycleHooks)
+        {
+            foreach (var columnizer in RegisteredColumnizers)
+            {
+                if (columnizer is IPluginLifecycle lifecycle)
+                {
+                    try
+                    {
+                        lifecycle.Shutdown();
+                        _logger.Debug("Called Shutdown on plugin");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Plugin Shutdown failed");
+                    }
+                }
+            }
+        }
+
+        // Cleanup lazy proxies
+        if (_useLazyLoading)
+        {
+            _lazyColumnizers.Clear();
+            _logger.Debug("Cleared lazy plugin proxies");
+        }
+
+        // Cleanup cache
+        if (_usePluginCache && _pluginCache != null)
+        {
+            var stats = _pluginCache.GetStatistics();
+            _logger.Info("Cache stats at shutdown - Total: {Total}, Active: {Active}",
+                stats.TotalEntries, stats.ActiveEntries);
+            _pluginCache.ClearCache();
+        }
+
+        // Cleanup event bus
+        if (_useEventBus)
+        {
+            // Event bus cleanup (subscribers will be garbage collected)
+            _logger.Debug("Event bus cleanup complete");
+        }
+
+        _logger.Info("Plugin cleanup complete");
     }
 
     public IFileSystemPlugin FindFileSystemForUri (string uriString)

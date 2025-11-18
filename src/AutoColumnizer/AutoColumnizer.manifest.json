@@ -5,8 +5,8 @@
   "description": "Automatically detects and applies the appropriate columnizer for any log file format",
   "apiVersion": "1.0",
   "requires": {
-    "logExpert": ">=1.10.0",
-    "dotnet": ">=8.0"
+    "logExpert": ">=1.20.0",
+    "dotnet": "10.0"
   },
   "permissions": [
     "filesystem:read",

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.PluginRegistry;
@@ -89,8 +90,8 @@ internal partial class PluginTrustDialog : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
-                string.Format(Resources.PluginTrustDialog_UI_Message_LoadError, ex.Message),
+            _ = MessageBox.Show(
+                string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_LoadError, ex.Message),
                 Resources.PluginTrustDialog_UI_Message_ErrorTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
@@ -133,8 +134,8 @@ internal partial class PluginTrustDialog : Form
 
         foreach (var pluginName in _config.PluginNames)
         {
-            var hasHash = _config.PluginHashes.ContainsKey(pluginName) 
-                ? Resources.PluginTrustDialog_UI_Value_Yes 
+            var hasHash = _config.PluginHashes.ContainsKey(pluginName)
+                ? Resources.PluginTrustDialog_UI_Value_Yes
                 : Resources.PluginTrustDialog_UI_Value_No;
             var hash = _config.PluginHashes.TryGetValue(pluginName, out var h)
                 ? (h.Length > 16 ? h[..16] + "..." : h)
@@ -148,7 +149,7 @@ internal partial class PluginTrustDialog : Form
             _ = pluginListView.Items.Add(item);
         }
 
-        pluginCountLabel.Text = string.Format(Resources.PluginTrustDialog_UI_Label_TotalPlugins, _config.PluginNames.Count);
+        pluginCountLabel.Text = string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Label_TotalPlugins, _config.PluginNames.Count);
     }
 
     private void UpdateButtonStates ()
@@ -190,8 +191,8 @@ internal partial class PluginTrustDialog : Form
 
         if (_config.PluginNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
         {
-            MessageBox.Show(
-                string.Format(Resources.PluginTrustDialog_UI_Message_AlreadyTrusted, fileName),
+            _ = MessageBox.Show(
+                string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_AlreadyTrusted, fileName),
                 Resources.PluginTrustDialog_UI_Message_AlreadyTrustedTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -200,8 +201,7 @@ internal partial class PluginTrustDialog : Form
 
         var hashDisplay = hash.Length > 32 ? hash[..32] + "..." : hash;
         var result = MessageBox.Show(
-            string.Format(Resources.PluginTrustDialog_UI_Message_ConfirmTrust, 
-                fileName, openDialog.FileName, hashDisplay),
+            string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_ConfirmTrust, fileName, openDialog.FileName, hashDisplay),
             Resources.PluginTrustDialog_UI_Message_ConfirmTrustTitle,
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
@@ -228,15 +228,15 @@ internal partial class PluginTrustDialog : Form
         var pluginName = pluginListView.SelectedItems[0].Text;
 
         var result = MessageBox.Show(
-            string.Format(Resources.PluginTrustDialog_UI_Message_ConfirmRemove, pluginName),
+            string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_ConfirmRemove, pluginName),
             Resources.PluginTrustDialog_UI_Message_ConfirmRemoveTitle,
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Warning);
 
         if (result == DialogResult.Yes)
         {
-            _config.PluginNames.Remove(pluginName);
-            _config.PluginHashes.Remove(pluginName);
+            _ = _config.PluginNames.Remove(pluginName);
+            _ = _config.PluginHashes.Remove(pluginName);
             _config.LastUpdated = DateTime.UtcNow;
             _configModified = true;
 
@@ -257,12 +257,12 @@ internal partial class PluginTrustDialog : Form
         if (_config.PluginHashes.TryGetValue(pluginName, out var hash))
         {
             using var hashDialog = new PluginHashDialog(this, pluginName, hash);
-            hashDialog.ShowDialog();
+            _ = hashDialog.ShowDialog();
         }
         else
         {
-            MessageBox.Show(
-                string.Format(Resources.PluginTrustDialog_UI_Message_NoHash, pluginName),
+            _ = MessageBox.Show(
+                string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_NoHash, pluginName),
                 Resources.PluginTrustDialog_UI_Message_NoHashTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -280,11 +280,11 @@ internal partial class PluginTrustDialog : Form
 
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(_configPath)!);
+            _ = Directory.CreateDirectory(Path.GetDirectoryName(_configPath)!);
             var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
             File.WriteAllText(_configPath, json);
 
-            MessageBox.Show(
+            _ = MessageBox.Show(
                 Resources.PluginTrustDialog_UI_Message_SaveSuccess,
                 Resources.PluginTrustDialog_UI_Message_SuccessTitle,
                 MessageBoxButtons.OK,
@@ -295,8 +295,8 @@ internal partial class PluginTrustDialog : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
-                string.Format(Resources.PluginTrustDialog_UI_Message_SaveError, ex.Message),
+            _ = MessageBox.Show(
+                string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_SaveError, ex.Message),
                 Resources.PluginTrustDialog_UI_Message_ErrorTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
