@@ -85,6 +85,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{39822C1B-E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginHashGenerator.Tool", "PluginHashGenerator.Tool\PluginHashGenerator.Tool.csproj", "{B2E6D6E0-C995-8F9D-4482-869C6A5A64C0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GithubActions", "GithubActions", "{059D87DC-0895-449B-A81D-90336F7F6CD8}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build_dotnet.yml = ..\.github\workflows\build_dotnet.yml
+		..\.github\workflows\test_dotnet.yml = ..\.github\workflows\test_dotnet.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

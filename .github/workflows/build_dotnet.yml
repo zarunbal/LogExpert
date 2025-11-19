@@ -18,7 +18,8 @@ env:
 jobs:
   build:
     permissions:
-      contents: read
+      contents: write  # Changed to 'write' for committing
+      pull-requests: write  # Added for PR operations
 
     strategy:
       fail-fast: false
@@ -33,6 +34,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}  # Checkout the PR branch
 
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
@@ -42,6 +45,23 @@ jobs:
       - name: Build application
         run: |
           dotnet build ${{ env.Solution }} --nologo -v quiet -c ${{ matrix.configuration }}
+
+      - name: Generate Plugin Hashes
+        if: matrix.configuration == 'Release'
+        run: dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
+
+      - name: Commit Updated Hashes
+        if: matrix.configuration == 'Release'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/PluginRegistry/PluginHashGenerator.Generated.cs
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update plugin hashes [skip ci]"
+            git push
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
