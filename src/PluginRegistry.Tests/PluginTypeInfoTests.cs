@@ -13,11 +13,11 @@ public class PluginTypeInfoTests
         var info = new PluginTypeInfo();
 
         // Act & Assert
-        Assert.IsTrue(info.IsEmpty);
-        Assert.IsFalse(info.HasColumnizer);
-        Assert.IsFalse(info.HasFileSystem);
-        Assert.IsFalse(info.HasContextMenu);
-        Assert.IsFalse(info.HasKeywordAction);
+        Assert.That(info.IsEmpty, Is.True);
+        Assert.That(info.HasColumnizer, Is.False);
+        Assert.That(info.HasFileSystem, Is.False);
+        Assert.That(info.HasContextMenu, Is.False);
+        Assert.That(info.HasKeywordAction, Is.False);
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class PluginTypeInfoTests
         var info = new PluginTypeInfo { HasColumnizer = true };
 
         // Act & Assert
-        Assert.IsFalse(info.IsEmpty);
+        Assert.That(info.IsEmpty, Is.False);
     }
 
     [Test]
@@ -37,8 +37,8 @@ public class PluginTypeInfoTests
         var info = new PluginTypeInfo { HasColumnizer = true };
 
         // Act & Assert
-        Assert.IsTrue(info.IsSingleType);
-        Assert.AreEqual(1, info.TypeCount);
+        Assert.That(info.IsSingleType, Is.True);
+        Assert.That(info.TypeCount, Is.EqualTo(1));
     }
 
     [Test]
@@ -52,9 +52,9 @@ public class PluginTypeInfoTests
         };
 
         // Act & Assert
-        Assert.IsFalse(info.IsSingleType);
-        Assert.IsTrue(info.IsMultiType);
-        Assert.AreEqual(2, info.TypeCount);
+        Assert.That(info.IsSingleType, Is.False);
+        Assert.That(info.IsMultiType, Is.True);
+        Assert.That(info.TypeCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class PluginTypeInfoTests
         var info = new PluginTypeInfo { HasColumnizer = true };
 
         // Act & Assert
-        Assert.IsTrue(info.IsColumnizerOnly);
+        Assert.That(info.IsColumnizerOnly, Is.True);
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class PluginTypeInfoTests
         };
 
         // Act & Assert
-        Assert.IsFalse(info.IsColumnizerOnly);
+        Assert.That(info.IsColumnizerOnly, Is.False);
     }
 
     [Test]
@@ -94,9 +94,9 @@ public class PluginTypeInfoTests
         };
 
         // Act & Assert
-        Assert.AreEqual(4, info.TypeCount);
-        Assert.IsFalse(info.IsSingleType);
-        Assert.IsTrue(info.IsMultiType);
+        Assert.That(info.TypeCount, Is.EqualTo(4));
+        Assert.That(info.IsSingleType, Is.False);
+        Assert.That(info.IsMultiType, Is.True);
     }
 
     [Test]
@@ -110,8 +110,8 @@ public class PluginTypeInfoTests
         };
 
         // Act & Assert
-        Assert.IsTrue(info.IsMultiType);
-        Assert.IsFalse(info.IsSingleType);
-        Assert.IsFalse(info.IsEmpty);
+        Assert.That(info.IsMultiType, Is.True);
+        Assert.That(info.IsSingleType, Is.False);
+        Assert.That(info.IsEmpty, Is.False);
     }
 }

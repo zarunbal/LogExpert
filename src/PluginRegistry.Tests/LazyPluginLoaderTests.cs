@@ -13,16 +13,24 @@ public class LazyPluginLoaderTests
     {
         // Arrange
         var dllPath = "test.dll";
-        var manifest = new PluginManifest { Name = "TestPlugin", Version = "1.0.0" };
+        var manifest = new PluginManifest 
+        { 
+            Name = "TestPlugin", 
+            Version = "1.0.0",
+            Author = "Test",
+            Description = "Test Plugin",
+            ApiVersion = "1.0",
+            Main = "test.dll"
+        };
 
         // Act
         var loader = new LazyPluginLoader<ILogLineColumnizer>(dllPath, manifest);
 
         // Assert
-        Assert.IsNotNull(loader);
-        Assert.AreEqual(dllPath, loader.DllPath);
-        Assert.AreEqual(manifest, loader.Manifest);
-        Assert.IsFalse(loader.IsLoaded);
+        Assert.That(loader, Is.Not.Null);
+        Assert.That(loader.DllPath, Is.EqualTo(dllPath));
+        Assert.That(loader.Manifest, Is.EqualTo(manifest));
+        Assert.That(loader.IsLoaded, Is.False);
     }
 
     [Test]
@@ -35,10 +43,10 @@ public class LazyPluginLoaderTests
         var loader = new LazyPluginLoader<ILogLineColumnizer>(dllPath, null);
 
         // Assert
-        Assert.IsNotNull(loader);
-        Assert.AreEqual(dllPath, loader.DllPath);
-        Assert.IsNull(loader.Manifest);
-        Assert.IsFalse(loader.IsLoaded);
+        Assert.That(loader, Is.Not.Null);
+        Assert.That(loader.DllPath, Is.EqualTo(dllPath));
+        Assert.That(loader.Manifest, Is.Null);
+        Assert.That(loader.IsLoaded, Is.False);
     }
 
     [Test]
@@ -60,8 +68,8 @@ public class LazyPluginLoaderTests
         var instance = loader.GetInstance();
 
         // Assert
-        Assert.IsNull(instance);
-        Assert.IsTrue(loader.IsLoaded); // Marked as loaded even on failure
+        Assert.That(instance, Is.Null);
+        Assert.That(loader.IsLoaded, Is.True); // Marked as loaded even on failure
     }
 
     [Test]
@@ -76,8 +84,8 @@ public class LazyPluginLoaderTests
         var instance2 = loader.GetInstance();
 
         // Assert
-        Assert.AreSame(instance1, instance2);
-        Assert.IsTrue(loader.IsLoaded);
+        Assert.That(instance1, Is.SameAs(instance2));
+        Assert.That(loader.IsLoaded, Is.True);
     }
 
     [Test]
@@ -87,7 +95,7 @@ public class LazyPluginLoaderTests
         var loader = new LazyPluginLoader<ILogLineColumnizer>("test.dll", null);
 
         // Assert
-        Assert.IsFalse(loader.IsLoaded);
+        Assert.That(loader.IsLoaded, Is.False);
     }
 
     [Test]
@@ -101,7 +109,7 @@ public class LazyPluginLoaderTests
         _ = loader.GetInstance();
 
         // Assert
-        Assert.IsTrue(loader.IsLoaded);
+        Assert.That(loader.IsLoaded, Is.True);
     }
 
     [Test]
@@ -115,7 +123,7 @@ public class LazyPluginLoaderTests
         var result = loader.ToString();
 
         // Assert
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("LazyPluginLoader"));
         Assert.That(result, Does.Contain("ILogLineColumnizer"));
         Assert.That(result, Does.Contain("TestPlugin.dll"));
