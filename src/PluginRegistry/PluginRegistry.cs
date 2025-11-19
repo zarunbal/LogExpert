@@ -922,19 +922,16 @@ public class PluginRegistry : IPluginRegistry
         // Call lifecycle Shutdown
         if (_useLifecycleHooks)
         {
-            foreach (var columnizer in RegisteredColumnizers)
+            foreach (var lifecycle in RegisteredColumnizers.OfType<IPluginLifecycle>())
             {
-                if (columnizer is IPluginLifecycle lifecycle)
+                try
                 {
-                    try
-                    {
-                        lifecycle.Shutdown();
-                        _logger.Debug("Called Shutdown on plugin");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(ex, "Plugin Shutdown failed");
-                    }
+                    lifecycle.Shutdown();
+                    _logger.Debug("Called Shutdown on plugin");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Plugin Shutdown failed");
                 }
             }
         }

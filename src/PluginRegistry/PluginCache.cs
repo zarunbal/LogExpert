@@ -153,24 +153,11 @@ public class PluginCache
     /// <returns>Number of entries removed</returns>
     public int RemoveExpiredEntries ()
     {
+
+        var keysToRemove = _cache.Where(kvp => !IsCacheValid(kvp.Value)).Select(kvp => kvp.Key).ToList();
+
         var removedCount = 0;
-        var keysToRemove = new List<string>();
-
-        foreach (var kvp in _cache)
-        {
-            if (!IsCacheValid(kvp.Value))
-            {
-                keysToRemove.Add(kvp.Key);
-            }
-        }
-
-        foreach (var key in keysToRemove)
-        {
-            if (_cache.TryRemove(key, out _))
-            {
-                removedCount++;
-            }
-        }
+        removedCount = keysToRemove.Select(key => _cache.TryRemove(key, out _)).Count(removed => removed);
 
         if (removedCount > 0)
         {

@@ -243,12 +243,9 @@ public class PluginManifest
         // Validate permissions if present
         if (Permissions != null && Permissions.Count > 0)
         {
-            foreach (var permission in Permissions)
+            foreach (var permission in Permissions.Where(p => !IsValidPermission(p)))
             {
-                if (!IsValidPermission(permission))
-                {
-                    errors.Add($"Invalid permission: {permission}");
-                }
+                errors.Add($"Invalid permission: {permission}");
             }
         }
 

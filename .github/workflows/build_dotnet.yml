@@ -56,12 +56,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/PluginRegistry/PluginHashGenerator.Generated.cs
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
+          $hasChanges = git diff --staged --quiet; $LASTEXITCODE -ne 0
+          if ($hasChanges) {
             git commit -m "chore: update plugin hashes [skip ci]"
             git push
-          fi
+          } else {
+            Write-Host "No changes to commit"
+          }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
