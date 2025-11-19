@@ -10,21 +10,24 @@ on:
 
 env:
   Solution: src/LogExpert.sln
-  Test_Project: src/LogExpert.Tests/LogExpert.Tests.csproj
+  Test_Project_LogExpert: src/LogExpert.Tests/LogExpert.Tests.csproj
+  Test_Project_ColumnizerLib: src/ColumnizerLib.UnitTests/ColumnizerLib.UnitTests.csproj
+  Test_Project_PluginRegistry: src/PluginRegistry.Tests/PluginRegistry.Tests.csproj
+  Test_Project_RegexColumnizer: src/RegexColumnizer.UnitTests/RegexColumnizer.UnitTests.csproj
 
 jobs:
   build:
-    permissions: 
+    permissions:
       contents: read
-    
+
     strategy:
       fail-fast: false
       matrix:
         configuration: [Debug, Release]
-        
+
     runs-on: windows-latest
     name: Build Application - ${{ matrix.configuration }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
