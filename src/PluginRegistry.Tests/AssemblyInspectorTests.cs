@@ -14,8 +14,8 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.InspectAssembly(null);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.IsEmpty);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.IsEmpty, Is.True);
     }
 
     [Test]
@@ -25,8 +25,8 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.InspectAssembly(string.Empty);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.IsEmpty);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.IsEmpty, Is.True);
     }
 
     [Test]
@@ -39,8 +39,8 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.InspectAssembly(nonExistentPath);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.IsEmpty);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.IsEmpty, Is.True);
     }
 
     [Test]
@@ -56,8 +56,8 @@ public class AssemblyInspectorTests
             var result = AssemblyInspector.InspectAssembly(tempFile);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsEmpty);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.IsEmpty, Is.True);
         }
         finally
         {
@@ -78,7 +78,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(path);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(path);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(path);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -117,7 +117,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(path);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(path);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(null);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class AssemblyInspectorTests
         var result = AssemblyInspector.IsLikelyPluginAssembly(string.Empty);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     // NOTE: Integration tests that load actual plugin DLLs should be in a separate test class
