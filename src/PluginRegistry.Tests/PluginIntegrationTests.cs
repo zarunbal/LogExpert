@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using LogExpert.PluginRegistry.Interfaces;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -21,13 +12,13 @@ public class PluginIntegrationTests
     private DefaultPluginLoader _loader = null!;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
         _loader = new DefaultPluginLoader();
 
         // Use the actual plugins directory from the build output
         var binDirectory = Path.GetDirectoryName(typeof(PluginIntegrationTests).Assembly.Location)!;
-        _testPluginsDirectory = Path.Combine(binDirectory, "..", "..", "..", "..", "..", "bin", "Debug", "plugins");
+        _testPluginsDirectory = Path.Combine(binDirectory, "..", "..", "..", "..", "bin", "Debug", "plugins");
         _testPluginsDirectory = Path.GetFullPath(_testPluginsDirectory);
 
         // Verify the plugins directory exists
@@ -40,7 +31,7 @@ public class PluginIntegrationTests
     #region Loading Real Plugins
 
     [Test]
-    public void LoadPlugin_WithCsvColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -61,7 +52,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithJsonColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithJsonColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var jsonColonizerPath = Path.Combine(_testPluginsDirectory, "JsonColumnizer.dll");
@@ -82,7 +73,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithRegexColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithRegexColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var regexColonizerPath = Path.Combine(_testPluginsDirectory, "RegexColumnizer.dll");
@@ -103,7 +94,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithGlassfishColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithGlassfishColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var glassfishColonizerPath = Path.Combine(_testPluginsDirectory, "GlassfishColumnizer.dll");
@@ -124,7 +115,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithLog4jXmlColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithLog4jXmlColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var log4jColonizerPath = Path.Combine(_testPluginsDirectory, "Log4jXmlColumnizer.dll");
@@ -145,7 +136,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithJsonCompactColumnizer_ShouldLoadSuccessfully()
+    public void LoadPlugin_WithJsonCompactColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var jsonCompactPath = Path.Combine(_testPluginsDirectory, "JsonCompactColumnizer.dll");
@@ -170,7 +161,7 @@ public class PluginIntegrationTests
     #region Loading Plugins with Manifests
 
     [Test]
-    public void LoadPlugin_WhenManifestExists_ShouldLoadManifest()
+    public void LoadPlugin_WhenManifestExists_ShouldLoadManifest ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -218,7 +209,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WhenManifestDoesNotExist_ShouldStillLoadPlugin()
+    public void LoadPlugin_WhenManifestDoesNotExist_ShouldStillLoadPlugin ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -256,7 +247,7 @@ public class PluginIntegrationTests
     #region Plugin Discovery
 
     [Test]
-    public void DiscoverPlugins_InPluginsDirectory_ShouldFindMultiplePlugins()
+    public void DiscoverPlugins_InPluginsDirectory_ShouldFindMultiplePlugins ()
     {
         // Arrange
         if (!Directory.Exists(_testPluginsDirectory))
@@ -266,7 +257,7 @@ public class PluginIntegrationTests
 
         // Act
         var dllFiles = Directory.GetFiles(_testPluginsDirectory, "*.dll")
-            .Where(f => !f.Contains("ColumnizerLib.dll") && 
+            .Where(f => !f.Contains("ColumnizerLib.dll") &&
                        !f.Contains("LogExpert.Core.dll") &&
                        !f.Contains("Newtonsoft.Json.dll") &&
                        !f.Contains("Renci.SshNet.dll") &&
@@ -298,7 +289,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void DiscoverPlugins_ShouldIdentifyPluginTypes()
+    public void DiscoverPlugins_ShouldIdentifyPluginTypes ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -322,7 +313,7 @@ public class PluginIntegrationTests
     #region Error Handling
 
     [Test]
-    public void LoadPlugin_WithNonExistentFile_ShouldReturnFailure()
+    public void LoadPlugin_WithNonExistentFile_ShouldReturnFailure ()
     {
         // Arrange
         var nonExistentPath = Path.Combine(_testPluginsDirectory, "NonExistent.dll");
@@ -338,7 +329,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithInvalidDll_ShouldReturnFailure()
+    public void LoadPlugin_WithInvalidDll_ShouldReturnFailure ()
     {
         // Arrange - Create a fake DLL file with invalid content
         var invalidDllPath = Path.Combine(Path.GetTempPath(), "InvalidPlugin.dll");
@@ -365,7 +356,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void LoadPlugin_WithWrongArchitecture_ShouldReturnFailureWithBadImageFormat()
+    public void LoadPlugin_WithWrongArchitecture_ShouldReturnFailureWithBadImageFormat ()
     {
         // This test verifies that loading a DLL with wrong architecture (x86 vs x64)
         // returns proper error information
@@ -392,10 +383,13 @@ public class PluginIntegrationTests
         var result = _loader.LoadPlugin(x86Dlls.First());
 
         // Assert
-        // On x64 runtime, loading x86 DLL should fail with BadImageFormatException
+        // On x64 runtime, loading x86 DLL should fail with BadImageFormatException or return no types
+        // Note: In .NET 10+, some x86 DLLs may load but fail to find implementations
         if (Environment.Is64BitProcess && !result.Success)
         {
-            Assert.That(result.ErrorMessage, Does.Contain("format").IgnoreCase);
+            Assert.That(result.ErrorMessage, 
+                Does.Contain("format").IgnoreCase.Or.Contains("No plugin types"),
+                "Expected architecture error or no types found");
         }
     }
 
@@ -404,7 +398,7 @@ public class PluginIntegrationTests
     #region Async Loading
 
     [Test]
-    public async Task LoadPluginAsync_WithCsvColumnizer_ShouldLoadSuccessfully()
+    public async Task LoadPluginAsync_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -423,7 +417,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public async Task LoadPluginAsync_WithCancellation_ShouldRespectCancellationToken()
+    public async Task LoadPluginAsync_WithCancellation_ShouldRespectCancellationToken ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -442,7 +436,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public async Task LoadPluginAsync_MultiplePlugins_ShouldLoadConcurrently()
+    public async Task LoadPluginAsync_MultiplePlugins_ShouldLoadConcurrently ()
     {
         // Arrange
         var pluginPaths = new List<string>
@@ -461,7 +455,7 @@ public class PluginIntegrationTests
         }
 
         // Act
-        var loadTasks = pluginPaths.Select(path => 
+        var loadTasks = pluginPaths.Select(path =>
             _loader.LoadPluginAsync(path, CancellationToken.None)).ToList();
 
         var results = await Task.WhenAll(loadTasks);
@@ -476,7 +470,7 @@ public class PluginIntegrationTests
     #region Plugin Cache Integration
 
     [Test]
-    public void PluginCache_WithRealPlugin_ShouldCacheSuccessfully()
+    public void PluginCache_WithRealPlugin_ShouldCacheSuccessfully ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -503,7 +497,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void PluginCache_WithMultipleRealPlugins_ShouldCacheEachIndependently()
+    public void PluginCache_WithMultipleRealPlugins_ShouldCacheEachIndependently ()
     {
         // Arrange
         var pluginPaths = new List<string>
@@ -543,7 +537,7 @@ public class PluginIntegrationTests
     #region Plugin Validation Integration
 
     [Test]
-    public void PluginValidator_WithRealPlugin_ShouldValidateSuccessfully()
+    public void PluginValidator_WithRealPlugin_ShouldValidateSuccessfully ()
     {
         // Arrange
         var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
@@ -553,15 +547,18 @@ public class PluginIntegrationTests
             Assert.Ignore("CsvColumnizer.dll not found in plugins directory");
         }
 
+        // Trust the plugin first
+        PluginValidator.AddTrustedPlugin(csvColonizerPath, out var errorMessage);
+
         // Act
         var isValid = PluginValidator.ValidatePlugin(csvColonizerPath, out var manifest);
 
         // Assert
-        Assert.That(isValid, Is.True, "Real plugin should pass validation");
+        Assert.That(isValid, Is.True, $"Real plugin should pass validation. Error: {errorMessage}");
     }
 
     [Test]
-    public void PluginValidator_WithInvalidDll_ShouldFailValidation()
+    public void PluginValidator_WithInvalidDll_ShouldFailValidation ()
     {
         // Arrange - Create invalid DLL
         var invalidDllPath = Path.Combine(Path.GetTempPath(), "InvalidPlugin.dll");
@@ -591,7 +588,7 @@ public class PluginIntegrationTests
     #region Assembly Inspector Integration
 
     [Test]
-    public void AssemblyInspector_WithMultiplePlugins_ShouldIdentifyAllTypes()
+    public void AssemblyInspector_WithMultiplePlugins_ShouldIdentifyAllTypes ()
     {
         // Arrange
         var pluginPaths = new List<string>
@@ -613,10 +610,8 @@ public class PluginIntegrationTests
             var typeInfo = AssemblyInspector.InspectAssembly(pluginPath);
 
             Assert.That(typeInfo, Is.Not.Null, $"Should inspect {Path.GetFileName(pluginPath)}");
-            Assert.That(typeInfo.HasColumnizer, Is.True, 
-                $"{Path.GetFileName(pluginPath)} should be identified as columnizer");
-            Assert.That(typeInfo.TypeCount, Is.GreaterThan(0),
-                $"{Path.GetFileName(pluginPath)} should have plugin types");
+            Assert.That(typeInfo.HasColumnizer, Is.True, $"{Path.GetFileName(pluginPath)} should be identified as columnizer");
+            Assert.That(typeInfo.TypeCount, Is.GreaterThan(0), $"{Path.GetFileName(pluginPath)} should have plugin types");
 
             TestContext.WriteLine($"{Path.GetFileName(pluginPath)}: " +
                 $"{typeInfo.TypeCount} plugin type(s), " +
@@ -625,7 +620,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
-    public void AssemblyInspector_WithDefaultPlugins_ShouldIdentifyMultipleTypes()
+    public void AssemblyInspector_WithDefaultPlugins_ShouldIdentifyMultipleTypes ()
     {
         // Arrange
         var defaultPluginsPath = Path.Combine(_testPluginsDirectory, "DefaultPlugins.dll");
@@ -640,8 +635,7 @@ public class PluginIntegrationTests
 
         // Assert
         Assert.That(typeInfo, Is.Not.Null);
-        Assert.That(typeInfo.TypeCount, Is.GreaterThan(0), 
-            "DefaultPlugins should contain multiple plugin types");
+        Assert.That(typeInfo.TypeCount, Is.GreaterThan(0), "DefaultPlugins should contain multiple plugin types");
 
         TestContext.WriteLine($"DefaultPlugins.dll contains {typeInfo.TypeCount} plugin type(s)");
         TestContext.WriteLine($"  HasColumnizer: {typeInfo.HasColumnizer}");
