@@ -32,7 +32,7 @@ internal partial class PluginTrustDialog : Form
 
         Owner = parent;
 
-        _configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert", "trusted-plugins.json");
+        _configPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert", "trusted-plugins.json");
 
         LoadConfiguration();
         PopulatePluginList();

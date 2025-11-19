@@ -177,7 +177,7 @@ public class PluginRegistry : IPluginRegistry
         //Default FileSystem if other FileSystem Plugins cannot be loaded
         RegisteredFileSystemPlugins.Add(new LocalFileSystem());
 
-        var pluginDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins");
+        var pluginDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "plugins");
 
         if (!Directory.Exists(pluginDir))
         {
@@ -518,10 +518,10 @@ public class PluginRegistry : IPluginRegistry
     private static PluginContext CreatePluginContext (string pluginName, string pluginPath)
     {
         var pluginDir = Path.GetDirectoryName(pluginPath) ?? AppDomain.CurrentDomain.BaseDirectory;
-        var configDir = Path.Combine(_applicationConfigurationFolder, "Plugins", pluginName);
+        var configDir = Path.Join(_applicationConfigurationFolder, "Plugins", pluginName);
 
         // Ensure config directory exists
-        _ = Directory.CreateDirectory(configDir);
+        _ = Directory.CreateDirectory(Path.GetFullPath(configDir));
 
         return new PluginContext
         {
@@ -1233,8 +1233,8 @@ public class PluginRegistry : IPluginRegistry
     {
         var fileName = new AssemblyName(args.Name).Name + ".dll";
 
-        var mainDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        var pluginDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins", fileName);
+        var mainDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        var pluginDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "plugins", fileName);
 
         return File.Exists(mainDir)
             ? Assembly.LoadFrom(mainDir)

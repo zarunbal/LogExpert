@@ -208,7 +208,7 @@ public static class PluginPermissionManager
     {
         try
         {
-            var permissionsFile = Path.Combine(configDir, "plugin-permissions.json");
+            var permissionsFile = Path.Join(configDir, "plugin-permissions.json");
 
             if (!File.Exists(permissionsFile))
             {
@@ -253,7 +253,7 @@ public static class PluginPermissionManager
     {
         try
         {
-            var permissionsFile = Path.Combine(configDir, "plugin-permissions.json");
+            var permissionsFile = Path.Join(configDir, "plugin-permissions.json");
             var json = JsonConvert.SerializeObject(_pluginPermissions, Formatting.Indented);
 
             File.WriteAllText(permissionsFile, json);

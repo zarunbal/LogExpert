@@ -18,8 +18,8 @@ public class PluginRegistryTests
     public void SetUp ()
     {
         // Create test directories
-        _testDataPath = Path.Combine(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
-        _testPluginsPath = Path.Combine(_testDataPath, "plugins");
+        _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
+        _testPluginsPath = Path.Join(_testDataPath, "plugins");
         _ = Directory.CreateDirectory(_testPluginsPath);
 
         // Reset singleton for testing
@@ -101,7 +101,7 @@ public class PluginRegistryTests
     public void Create_WithNonExistentDirectory_ShouldCreateAndNotThrow ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(_testDataPath, "nonexistent");
+        var nonExistentPath = Path.Join(_testDataPath, "nonexistent");
 
         // Act & Assert
         Assert.DoesNotThrow(() => _ = PluginRegistry.Create(nonExistentPath, 250));
@@ -287,7 +287,7 @@ public class PluginRegistryTests
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
-        var testFile = Path.Combine(_testDataPath, "test.log");
+        var testFile = Path.Join(_testDataPath, "test.log");
 
         // Act
         var fileSystem = registry.FindFileSystemForUri(testFile);

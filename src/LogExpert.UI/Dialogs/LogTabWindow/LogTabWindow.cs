@@ -1086,7 +1086,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 // handle relative paths in .lxp files
                 var dir = Path.GetDirectoryName(fileName);
-                return Path.Combine(dir, persistenceData.FileName);
+                return Path.Join(dir, persistenceData.FileName);
             }
         }
 
@@ -2746,7 +2746,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         using var dialog = new PluginTrustDialog(this);
         var result = dialog.ShowDialog();
-        
+
         if (result == DialogResult.OK)
         {
             var restartPrompt = MessageBox.Show(
@@ -2754,7 +2754,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 "Restart Recommended",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
-            
+
             if (restartPrompt == DialogResult.Yes)
             {
                 Application.Restart();

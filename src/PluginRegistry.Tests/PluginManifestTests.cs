@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using LogExpert.PluginRegistry;
-using System.IO;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -14,14 +12,14 @@ public class PluginManifestTests
     private string _testDataPath = null!;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
-        _testDataPath = Path.Combine(Path.GetTempPath(), "LogExpertManifestTests", Guid.NewGuid().ToString());
+        _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertManifestTests", Guid.NewGuid().ToString());
         Directory.CreateDirectory(_testDataPath);
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
         if (Directory.Exists(_testDataPath))
         {
@@ -39,7 +37,7 @@ public class PluginManifestTests
     #region Validation Tests
 
     [Test]
-    public void Validate_WithAllRequiredFields_ShouldSucceed()
+    public void Validate_WithAllRequiredFields_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -61,7 +59,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingName_ShouldFail()
+    public void Validate_WithMissingName_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -83,7 +81,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingVersion_ShouldFail()
+    public void Validate_WithMissingVersion_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -105,7 +103,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithInvalidVersionFormat_ShouldFail()
+    public void Validate_WithInvalidVersionFormat_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -127,7 +125,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingAuthor_ShouldFail()
+    public void Validate_WithMissingAuthor_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -149,7 +147,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingDescription_ShouldFail()
+    public void Validate_WithMissingDescription_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -171,7 +169,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingMain_ShouldFail()
+    public void Validate_WithMissingMain_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -193,7 +191,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMissingApiVersion_ShouldFail()
+    public void Validate_WithMissingApiVersion_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -215,7 +213,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMultipleMissingFields_ShouldReportAll()
+    public void Validate_WithMultipleMissingFields_ShouldReportAll ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -240,7 +238,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithValidSemanticVersion_ShouldSucceed()
+    public void Validate_WithValidSemanticVersion_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -266,7 +264,7 @@ public class PluginManifestTests
     #region Version Requirement Validation Tests
 
     [Test]
-    public void Validate_WithInvalidLogExpertVersionRequirement_ShouldFail()
+    public void Validate_WithInvalidLogExpertVersionRequirement_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -289,7 +287,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithInvalidDotNetVersionRequirement_ShouldFail()
+    public void Validate_WithInvalidDotNetVersionRequirement_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -312,7 +310,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithValidVersionRequirements_ShouldSucceed()
+    public void Validate_WithValidVersionRequirements_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -339,7 +337,7 @@ public class PluginManifestTests
     #region Permission Validation Tests
 
     [Test]
-    public void Validate_WithValidPermissions_ShouldSucceed()
+    public void Validate_WithValidPermissions_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -362,7 +360,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithInvalidPermission_ShouldFail()
+    public void Validate_WithInvalidPermission_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -385,7 +383,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithMixedValidAndInvalidPermissions_ShouldFailAndReportInvalid()
+    public void Validate_WithMixedValidAndInvalidPermissions_ShouldFailAndReportInvalid ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -409,7 +407,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Validate_WithAllValidPermissions_ShouldSucceed()
+    public void Validate_WithAllValidPermissions_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -420,8 +418,8 @@ public class PluginManifestTests
             Description = "Test plugin",
             ApiVersion = "1.0",
             Main = "TestPlugin.dll",
-            Permissions = new List<string> 
-            { 
+            Permissions = new List<string>
+            {
                 "filesystem:read",
                 "filesystem:write",
                 "network:connect",
@@ -444,7 +442,7 @@ public class PluginManifestTests
     #region Version Compatibility Tests
 
     [Test]
-    public void IsCompatibleWith_WithNoRequirement_ShouldReturnTrue()
+    public void IsCompatibleWith_WithNoRequirement_ShouldReturnTrue ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -465,7 +463,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_GreaterThanOrEqual_WithCompatibleVersion_ShouldReturnTrue()
+    public void IsCompatibleWith_GreaterThanOrEqual_WithCompatibleVersion_ShouldReturnTrue ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -486,7 +484,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_GreaterThanOrEqual_WithIncompatibleVersion_ShouldReturnFalse()
+    public void IsCompatibleWith_GreaterThanOrEqual_WithIncompatibleVersion_ShouldReturnFalse ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -506,7 +504,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_ExactVersion_ShouldWorkCorrectly()
+    public void IsCompatibleWith_ExactVersion_ShouldWorkCorrectly ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -527,7 +525,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_VersionRange_ShouldRespectBounds()
+    public void IsCompatibleWith_VersionRange_ShouldRespectBounds ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -550,7 +548,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_GreaterThan_ShouldExcludeLowerBound()
+    public void IsCompatibleWith_GreaterThan_ShouldExcludeLowerBound ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -570,7 +568,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_LessThanOrEqual_ShouldIncludeUpperBound()
+    public void IsCompatibleWith_LessThanOrEqual_ShouldIncludeUpperBound ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -591,7 +589,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_LessThan_ShouldExcludeUpperBound()
+    public void IsCompatibleWith_LessThan_ShouldExcludeUpperBound ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -611,7 +609,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_TildeOperator_ShouldAllowPatchUpdates()
+    public void IsCompatibleWith_TildeOperator_ShouldAllowPatchUpdates ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -634,7 +632,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_CaretOperator_ShouldAllowMinorAndPatchUpdates()
+    public void IsCompatibleWith_CaretOperator_ShouldAllowMinorAndPatchUpdates ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -658,7 +656,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void IsCompatibleWith_WithInvalidRequirement_ShouldReturnFalse()
+    public void IsCompatibleWith_WithInvalidRequirement_ShouldReturnFalse ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -684,10 +682,10 @@ public class PluginManifestTests
     #region Load Manifest Tests
 
     [Test]
-    public void Load_WithValidJsonFile_ShouldLoadSuccessfully()
+    public void Load_WithValidJsonFile_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testDataPath, "valid.manifest.json");
+        var manifestPath = Path.Join(_testDataPath, "valid.manifest.json");
         var json = @"{
             ""name"": ""TestPlugin"",
             ""version"": ""1.0.0"",
@@ -726,10 +724,10 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Load_WithNonExistentFile_ShouldReturnNull()
+    public void Load_WithNonExistentFile_ShouldReturnNull ()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testDataPath, "nonexistent.manifest.json");
+        var manifestPath = Path.Join(_testDataPath, "nonexistent.manifest.json");
 
         // Act
         var manifest = PluginManifest.Load(manifestPath);
@@ -739,10 +737,10 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Load_WithInvalidJson_ShouldReturnNull()
+    public void Load_WithInvalidJson_ShouldReturnNull ()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testDataPath, "invalid.manifest.json");
+        var manifestPath = Path.Join(_testDataPath, "invalid.manifest.json");
         File.WriteAllText(manifestPath, "{ invalid json }");
 
         // Act
@@ -753,10 +751,10 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Load_WithEmptyFile_ShouldReturnNull()
+    public void Load_WithEmptyFile_ShouldReturnNull ()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testDataPath, "empty.manifest.json");
+        var manifestPath = Path.Join(_testDataPath, "empty.manifest.json");
         File.WriteAllText(manifestPath, "");
 
         // Act
@@ -767,10 +765,10 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Load_WithMinimalValidJson_ShouldLoadWithDefaults()
+    public void Load_WithMinimalValidJson_ShouldLoadWithDefaults ()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testDataPath, "minimal.manifest.json");
+        var manifestPath = Path.Join(_testDataPath, "minimal.manifest.json");
         var json = @"{
             ""name"": ""MinimalPlugin"",
             ""version"": ""1.0.0"",
@@ -797,7 +795,7 @@ public class PluginManifestTests
     #region Optional Fields Tests
 
     [Test]
-    public void Manifest_WithOptionalUrl_ShouldStoreCorrectly()
+    public void Manifest_WithOptionalUrl_ShouldStoreCorrectly ()
     {
         // Arrange & Act
         var manifest = new PluginManifest
@@ -816,7 +814,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Manifest_WithOptionalLicense_ShouldStoreCorrectly()
+    public void Manifest_WithOptionalLicense_ShouldStoreCorrectly ()
     {
         // Arrange & Act
         var manifest = new PluginManifest
@@ -835,7 +833,7 @@ public class PluginManifestTests
     }
 
     [Test]
-    public void Manifest_WithDependencies_ShouldStoreCorrectly()
+    public void Manifest_WithDependencies_ShouldStoreCorrectly ()
     {
         // Arrange & Act
         var manifest = new PluginManifest

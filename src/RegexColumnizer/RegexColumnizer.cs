@@ -164,7 +164,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
     public string GetConfigFile (string configDir)
     {
         var name = GetType().Name;
-        var configPath = Path.Combine(configDir, name);
+        var configPath = Path.Join(configDir, name);
         configPath = Path.ChangeExtension(configPath, "xml"); //todo change to json
         return configPath;
     }

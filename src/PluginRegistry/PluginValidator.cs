@@ -18,8 +18,8 @@ public static partial class PluginValidator
 
     private static TrustedPluginConfig _trustedPluginConfig;
     private static readonly Lock _configLock = new();
-    private static readonly string _configDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
-    private static readonly string _configPath = Path.Combine(_configDirectory, "trusted-plugins.json");
+    private static readonly string _configDirectory = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
+    private static readonly string _configPath = Path.Join(_configDirectory, "trusted-plugins.json");
 
     // Whitelist of trusted plugin file names (shipped with LogExpert) - used as defaults
     private static readonly HashSet<string> _trustedPluginNames = new(StringComparer.OrdinalIgnoreCase)
@@ -438,7 +438,7 @@ public static partial class PluginValidator
             var pluginDir = Path.GetFullPath(pluginDirectory);
 
             // Validate main file path
-            var mainPath = Path.GetFullPath(Path.Combine(pluginDirectory, manifest.Main));
+            var mainPath = Path.GetFullPath(Path.Join(pluginDirectory, manifest.Main));
 
             if (!mainPath.StartsWith(pluginDir, StringComparison.OrdinalIgnoreCase))
             {

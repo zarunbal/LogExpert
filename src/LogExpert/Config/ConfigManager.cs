@@ -78,12 +78,12 @@ public class ConfigManager : IConfigManager
         }
     }
 
-    public string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "LogExpert"; //TODO: change to Path.Combine
+    public string ConfigDir => Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
 
     /// <summary>
     /// Application.StartUpPath + portable
     /// </summary>
-    public string PortableModeDir => Application.StartupPath + Path.DirectorySeparatorChar + "portable";
+    public string PortableModeDir => Path.Join(Application.StartupPath, "portable");
 
     /// <summary>
     /// portableMode.json
@@ -235,7 +235,7 @@ public class ConfigManager : IConfigManager
 
         string dir;
 
-        if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
+        if (!File.Exists(Path.Join(PortableModeDir, PortableModeSettingsFileName)))
         {
             _logger.Info($"### {nameof(Load)}: Load settings standard mode");
             dir = ConfigDir;
@@ -253,7 +253,7 @@ public class ConfigManager : IConfigManager
 
         LoadResult result;
 
-        if (!File.Exists(Path.Combine(dir, SETTINGS_FILE_NAME)))
+        if (!File.Exists(Path.Join(dir, SETTINGS_FILE_NAME)))
         {
             result = LoadOrCreateNew(null);
         }
@@ -261,7 +261,7 @@ public class ConfigManager : IConfigManager
         {
             try
             {
-                FileInfo fileInfo = new(Path.Combine(dir, SETTINGS_FILE_NAME));
+                FileInfo fileInfo = new(Path.Join(dir, SETTINGS_FILE_NAME));
                 result = LoadOrCreateNew(fileInfo);
             }
             catch (IOException ex)

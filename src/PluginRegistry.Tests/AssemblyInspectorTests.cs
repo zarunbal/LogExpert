@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using LogExpert.PluginRegistry;
-using System.IO;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -8,7 +6,7 @@ namespace LogExpert.PluginRegistry.Tests;
 public class AssemblyInspectorTests
 {
     [Test]
-    public void InspectAssembly_WithNullPath_ReturnsEmptyInfo()
+    public void InspectAssembly_WithNullPath_ReturnsEmptyInfo ()
     {
         // Act
         var result = AssemblyInspector.InspectAssembly(null);
@@ -19,7 +17,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void InspectAssembly_WithEmptyPath_ReturnsEmptyInfo()
+    public void InspectAssembly_WithEmptyPath_ReturnsEmptyInfo ()
     {
         // Act
         var result = AssemblyInspector.InspectAssembly(string.Empty);
@@ -30,10 +28,10 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void InspectAssembly_WithNonExistentFile_ReturnsEmptyInfo()
+    public void InspectAssembly_WithNonExistentFile_ReturnsEmptyInfo ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
+        var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
 
         // Act
         var result = AssemblyInspector.InspectAssembly(nonExistentPath);
@@ -44,7 +42,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void InspectAssembly_WithInvalidDll_ReturnsEmptyInfo()
+    public void InspectAssembly_WithInvalidDll_ReturnsEmptyInfo ()
     {
         // Arrange
         var tempFile = Path.GetTempFileName();
@@ -69,7 +67,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithColumnizerInName_ReturnsTrue()
+    public void IsLikelyPluginAssembly_WithColumnizerInName_ReturnsTrue ()
     {
         // Arrange
         var path = "CsvColumnizer.dll";
@@ -82,7 +80,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithPluginInName_ReturnsTrue()
+    public void IsLikelyPluginAssembly_WithPluginInName_ReturnsTrue ()
     {
         // Arrange
         var path = "MyCustomPlugin.dll";
@@ -95,7 +93,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithFileSystemInName_ReturnsTrue()
+    public void IsLikelyPluginAssembly_WithFileSystemInName_ReturnsTrue ()
     {
         // Arrange
         var path = "SftpFileSystem.dll";
@@ -108,7 +106,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithHighlighterInName_ReturnsTrue()
+    public void IsLikelyPluginAssembly_WithHighlighterInName_ReturnsTrue ()
     {
         // Arrange
         var path = "FlashIconHighlighter.dll";
@@ -121,7 +119,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithNormalDllName_ReturnsFalse()
+    public void IsLikelyPluginAssembly_WithNormalDllName_ReturnsFalse ()
     {
         // Arrange
         var path = "System.Text.Json.dll";
@@ -134,7 +132,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithNullPath_ReturnsFalse()
+    public void IsLikelyPluginAssembly_WithNullPath_ReturnsFalse ()
     {
         // Act
         var result = AssemblyInspector.IsLikelyPluginAssembly(null);
@@ -144,7 +142,7 @@ public class AssemblyInspectorTests
     }
 
     [Test]
-    public void IsLikelyPluginAssembly_WithEmptyPath_ReturnsFalse()
+    public void IsLikelyPluginAssembly_WithEmptyPath_ReturnsFalse ()
     {
         // Act
         var result = AssemblyInspector.IsLikelyPluginAssembly(string.Empty);

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -15,14 +12,14 @@ public class PluginPermissionManagerTests
     private string _testConfigDir = string.Empty;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
-        _testConfigDir = Path.Combine(Path.GetTempPath(), $"PluginPermissionTests_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testConfigDir);
+        _testConfigDir = Path.Join(Path.GetTempPath(), $"PluginPermissionTests_{Guid.NewGuid()}");
+        _ = Directory.CreateDirectory(_testConfigDir);
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
         try
         {
@@ -40,7 +37,7 @@ public class PluginPermissionManagerTests
     #region Permission Parsing Tests
 
     [Test]
-    public void ParsePermission_WithValidFileSystemRead_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidFileSystemRead_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "filesystem:read";
@@ -53,7 +50,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithValidFileSystemWrite_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidFileSystemWrite_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "filesystem:write";
@@ -66,7 +63,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithValidNetworkConnect_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidNetworkConnect_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "network:connect";
@@ -79,7 +76,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithValidConfigRead_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidConfigRead_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "config:read";
@@ -92,7 +89,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithValidConfigWrite_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidConfigWrite_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "config:write";
@@ -105,7 +102,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithValidRegistryRead_ShouldReturnCorrectPermission()
+    public void ParsePermission_WithValidRegistryRead_ShouldReturnCorrectPermission ()
     {
         // Arrange
         var permissionString = "registry:read";
@@ -118,7 +115,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithInvalidString_ShouldReturnNone()
+    public void ParsePermission_WithInvalidString_ShouldReturnNone ()
     {
         // Arrange
         var permissionString = "invalid:permission";
@@ -131,7 +128,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithNullString_ShouldReturnNone()
+    public void ParsePermission_WithNullString_ShouldReturnNone ()
     {
         // Arrange
         string? permissionString = null;
@@ -144,7 +141,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithEmptyString_ShouldReturnNone()
+    public void ParsePermission_WithEmptyString_ShouldReturnNone ()
     {
         // Arrange
         var permissionString = "";
@@ -157,7 +154,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermission_WithCaseVariations_ShouldBeCaseInsensitive()
+    public void ParsePermission_WithCaseVariations_ShouldBeCaseInsensitive ()
     {
         // Arrange & Act & Assert
         Assert.That(PluginPermissionManager.ParsePermission("FILESYSTEM:READ"), Is.EqualTo(PluginPermission.FileSystemRead));
@@ -166,7 +163,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermissions_WithMultiplePermissions_ShouldCombineFlags()
+    public void ParsePermissions_WithMultiplePermissions_ShouldCombineFlags ()
     {
         // Arrange
         var permissionStrings = new[]
@@ -181,13 +178,13 @@ public class PluginPermissionManagerTests
 
         // Assert
         Assert.That(result, Is.EqualTo(
-            PluginPermission.FileSystemRead | 
-            PluginPermission.FileSystemWrite | 
+            PluginPermission.FileSystemRead |
+            PluginPermission.FileSystemWrite |
             PluginPermission.NetworkConnect));
     }
 
     [Test]
-    public void ParsePermissions_WithNullList_ShouldReturnNone()
+    public void ParsePermissions_WithNullList_ShouldReturnNone ()
     {
         // Arrange
         IEnumerable<string>? permissionStrings = null;
@@ -200,7 +197,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermissions_WithEmptyList_ShouldReturnNone()
+    public void ParsePermissions_WithEmptyList_ShouldReturnNone ()
     {
         // Arrange
         var permissionStrings = Array.Empty<string>();
@@ -213,7 +210,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void ParsePermissions_WithMixedValidInvalid_ShouldParseValidOnes()
+    public void ParsePermissions_WithMixedValidInvalid_ShouldParseValidOnes ()
     {
         // Arrange
         var permissionStrings = new[]
@@ -229,7 +226,7 @@ public class PluginPermissionManagerTests
 
         // Assert
         Assert.That(result, Is.EqualTo(
-            PluginPermission.FileSystemRead | 
+            PluginPermission.FileSystemRead |
             PluginPermission.NetworkConnect));
     }
 
@@ -238,7 +235,7 @@ public class PluginPermissionManagerTests
     #region Permission String Conversion Tests
 
     [Test]
-    public void PermissionToString_WithNone_ShouldReturnNone()
+    public void PermissionToString_WithNone_ShouldReturnNone ()
     {
         // Act
         var result = PluginPermissionManager.PermissionToString(PluginPermission.None);
@@ -248,7 +245,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PermissionToString_WithAll_ShouldReturnAll()
+    public void PermissionToString_WithAll_ShouldReturnAll ()
     {
         // Act
         var result = PluginPermissionManager.PermissionToString(PluginPermission.All);
@@ -258,7 +255,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PermissionToString_WithSinglePermission_ShouldReturnReadableString()
+    public void PermissionToString_WithSinglePermission_ShouldReturnReadableString ()
     {
         // Act
         var result = PluginPermissionManager.PermissionToString(PluginPermission.FileSystemRead);
@@ -268,7 +265,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PermissionToString_WithMultiplePermissions_ShouldReturnCommaSeparated()
+    public void PermissionToString_WithMultiplePermissions_ShouldReturnCommaSeparated ()
     {
         // Arrange
         var permissions = PluginPermission.FileSystemRead | PluginPermission.NetworkConnect;
@@ -283,10 +280,10 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PermissionToString_WithAllIndividualPermissions_ShouldReturnAll()
+    public void PermissionToString_WithAllIndividualPermissions_ShouldReturnAll ()
     {
         // Arrange - combine all 6 individual permissions (equals All flag)
-        var permissions = PluginPermission.FileSystemRead | 
+        var permissions = PluginPermission.FileSystemRead |
                          PluginPermission.FileSystemWrite |
                          PluginPermission.NetworkConnect |
                          PluginPermission.ConfigRead |
@@ -305,7 +302,7 @@ public class PluginPermissionManagerTests
     #region HasPermission Tests
 
     [Test]
-    public void HasPermission_WithNullPluginName_ShouldReturnFalse()
+    public void HasPermission_WithNullPluginName_ShouldReturnFalse ()
     {
         // Act
         var result = PluginPermissionManager.HasPermission(null!, PluginPermission.FileSystemRead);
@@ -315,7 +312,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void HasPermission_WithEmptyPluginName_ShouldReturnFalse()
+    public void HasPermission_WithEmptyPluginName_ShouldReturnFalse ()
     {
         // Act
         var result = PluginPermissionManager.HasPermission("", PluginPermission.FileSystemRead);
@@ -325,7 +322,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void HasPermission_WithDefaultPermissions_ShouldAllowFileSystemRead()
+    public void HasPermission_WithDefaultPermissions_ShouldAllowFileSystemRead ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -338,7 +335,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void HasPermission_WithDefaultPermissions_ShouldAllowConfigRead()
+    public void HasPermission_WithDefaultPermissions_ShouldAllowConfigRead ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -351,7 +348,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void HasPermission_WithDefaultPermissions_ShouldDenyNetworkConnect()
+    public void HasPermission_WithDefaultPermissions_ShouldDenyNetworkConnect ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -364,7 +361,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void HasPermission_WithExplicitPermissions_ShouldUseExplicitSettings()
+    public void HasPermission_WithExplicitPermissions_ShouldUseExplicitSettings ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -384,7 +381,7 @@ public class PluginPermissionManagerTests
     #region SetPermissions Tests
 
     [Test]
-    public void SetPermissions_WithValidPluginName_ShouldSetPermissions()
+    public void SetPermissions_WithValidPluginName_ShouldSetPermissions ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -404,23 +401,23 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void SetPermissions_WithNullPluginName_ShouldThrowArgumentNullException()
+    public void SetPermissions_WithNullPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             PluginPermissionManager.SetPermissions(null!, PluginPermission.FileSystemRead));
     }
 
     [Test]
-    public void SetPermissions_WithEmptyPluginName_ShouldThrowArgumentNullException()
+    public void SetPermissions_WithEmptyPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             PluginPermissionManager.SetPermissions("", PluginPermission.FileSystemRead));
     }
 
     [Test]
-    public void SetPermissions_CalledTwice_ShouldUpdatePermissions()
+    public void SetPermissions_CalledTwice_ShouldUpdatePermissions ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -444,7 +441,7 @@ public class PluginPermissionManagerTests
     #region GetPermissions Tests
 
     [Test]
-    public void GetPermissions_WithNullPluginName_ShouldReturnNone()
+    public void GetPermissions_WithNullPluginName_ShouldReturnNone ()
     {
         // Act
         var result = PluginPermissionManager.GetPermissions(null!);
@@ -454,7 +451,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void GetPermissions_WithEmptyPluginName_ShouldReturnNone()
+    public void GetPermissions_WithEmptyPluginName_ShouldReturnNone ()
     {
         // Act
         var result = PluginPermissionManager.GetPermissions("");
@@ -464,7 +461,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void GetPermissions_WithUnconfiguredPlugin_ShouldReturnDefaultPermissions()
+    public void GetPermissions_WithUnconfiguredPlugin_ShouldReturnDefaultPermissions ()
     {
         // Arrange
         var pluginName = "UnconfiguredPlugin";
@@ -477,7 +474,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void GetPermissions_WithConfiguredPlugin_ShouldReturnConfiguredPermissions()
+    public void GetPermissions_WithConfiguredPlugin_ShouldReturnConfiguredPermissions ()
     {
         // Arrange
         var pluginName = "ConfiguredPlugin";
@@ -496,12 +493,12 @@ public class PluginPermissionManagerTests
     #region Persistence Tests
 
     [Test]
-    public void SavePermissions_WithValidDirectory_ShouldCreateFile()
+    public void SavePermissions_WithValidDirectory_ShouldCreateFile ()
     {
         // Arrange
         var pluginName = "TestPlugin";
         PluginPermissionManager.SetPermissions(pluginName, PluginPermission.All);
-        var expectedFile = Path.Combine(_testConfigDir, "plugin-permissions.json");
+        var expectedFile = Path.Join(_testConfigDir, "plugin-permissions.json");
 
         // Act
         PluginPermissionManager.SavePermissions(_testConfigDir);
@@ -511,7 +508,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void SavePermissions_ThenLoadPermissions_ShouldPersistData()
+    public void SavePermissions_ThenLoadPermissions_ShouldPersistData ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -520,7 +517,7 @@ public class PluginPermissionManagerTests
 
         // Act
         PluginPermissionManager.SavePermissions(_testConfigDir);
-        
+
         // Reset by setting different permissions
         PluginPermissionManager.SetPermissions(pluginName, PluginPermission.None);
         Assert.That(PluginPermissionManager.GetPermissions(pluginName), Is.EqualTo(PluginPermission.None));
@@ -534,17 +531,17 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void LoadPermissions_WithNonExistentFile_ShouldNotThrow()
+    public void LoadPermissions_WithNonExistentFile_ShouldNotThrow ()
     {
         // Act & Assert
         Assert.DoesNotThrow(() => PluginPermissionManager.LoadPermissions(_testConfigDir));
     }
 
     [Test]
-    public void LoadPermissions_WithInvalidJson_ShouldNotThrow()
+    public void LoadPermissions_WithInvalidJson_ShouldNotThrow ()
     {
         // Arrange
-        var permissionsFile = Path.Combine(_testConfigDir, "plugin-permissions.json");
+        var permissionsFile = Path.Join(_testConfigDir, "plugin-permissions.json");
         File.WriteAllText(permissionsFile, "{ invalid json content }");
 
         // Act & Assert
@@ -552,7 +549,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void SavePermissions_WithInvalidDirectory_ShouldNotThrow()
+    public void SavePermissions_WithInvalidDirectory_ShouldNotThrow ()
     {
         // Arrange
         var invalidDir = "Z:\\NonExistent\\Directory\\Path";
@@ -562,7 +559,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void SavePermissions_WithMultiplePlugins_ShouldSaveAll()
+    public void SavePermissions_WithMultiplePlugins_ShouldSaveAll ()
     {
         // Arrange
         PluginPermissionManager.SetPermissions("Plugin1", PluginPermission.FileSystemRead);
@@ -571,7 +568,7 @@ public class PluginPermissionManagerTests
 
         // Act
         PluginPermissionManager.SavePermissions(_testConfigDir);
-        
+
         // Reset permissions
         PluginPermissionManager.SetPermissions("Plugin1", PluginPermission.None);
         PluginPermissionManager.SetPermissions("Plugin2", PluginPermission.None);
@@ -591,7 +588,7 @@ public class PluginPermissionManagerTests
     #region Permission Flag Tests
 
     [Test]
-    public void PluginPermission_AllFlag_ShouldIncludeAllPermissions()
+    public void PluginPermission_AllFlag_ShouldIncludeAllPermissions ()
     {
         // Arrange
         var all = PluginPermission.All;
@@ -606,7 +603,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PluginPermission_NoneFlag_ShouldNotIncludeAnyPermissions()
+    public void PluginPermission_NoneFlag_ShouldNotIncludeAnyPermissions ()
     {
         // Arrange
         var none = PluginPermission.None;
@@ -621,7 +618,7 @@ public class PluginPermissionManagerTests
     }
 
     [Test]
-    public void PluginPermission_CombinedFlags_ShouldWorkCorrectly()
+    public void PluginPermission_CombinedFlags_ShouldWorkCorrectly ()
     {
         // Arrange
         var combined = PluginPermission.FileSystemRead | PluginPermission.FileSystemWrite;

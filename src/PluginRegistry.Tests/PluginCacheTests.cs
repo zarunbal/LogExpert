@@ -21,8 +21,8 @@ public class PluginCacheTests
     public void SetUp ()
     {
         // Create test directories
-        _testDataPath = Path.Combine(Path.GetTempPath(), "LogExpertCacheTests", Guid.NewGuid().ToString());
-        _testPluginsPath = Path.Combine(_testDataPath, "plugins");
+        _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertCacheTests", Guid.NewGuid().ToString());
+        _testPluginsPath = Path.Join(_testDataPath, "plugins");
         _ = Directory.CreateDirectory(_testPluginsPath);
 
         // Create mock loader
@@ -100,7 +100,7 @@ public class PluginCacheTests
     {
         // Arrange
         var cache = new PluginCache();
-        var nonExistentPath = Path.Combine(_testPluginsPath, "NonExistent.dll");
+        var nonExistentPath = Path.Join(_testPluginsPath, "NonExistent.dll");
 
         // Act
         var result = cache.LoadPluginWithCache(nonExistentPath);
@@ -344,7 +344,7 @@ public class PluginCacheTests
     {
         // Arrange
         var cache = new PluginCache();
-        var nonExistentPath = Path.Combine(_testPluginsPath, "NonExistent.dll");
+        var nonExistentPath = Path.Join(_testPluginsPath, "NonExistent.dll");
 
         // Act
         var isCached = cache.IsCached(nonExistentPath);
@@ -610,7 +610,7 @@ public class PluginCacheTests
     /// </summary>
     private string CreateDummyPlugin (string fileName, string content = "Dummy Plugin Content")
     {
-        var path = Path.Combine(_testPluginsPath, fileName);
+        var path = Path.Join(_testPluginsPath, fileName);
         File.WriteAllText(path, content);
         return path;
     }

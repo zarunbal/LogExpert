@@ -20,8 +20,8 @@ public class PluginValidatorTests
     public void SetUp()
     {
         // Create test directories
-        _testDataPath = Path.Combine(Path.GetTempPath(), "LogExpertValidatorTests", Guid.NewGuid().ToString());
-        _testPluginsPath = Path.Combine(_testDataPath, "plugins");
+        _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertValidatorTests", Guid.NewGuid().ToString());
+        _testPluginsPath = Path.Join(_testDataPath, "plugins");
         Directory.CreateDirectory(_testPluginsPath);
     }
 
@@ -48,7 +48,7 @@ public class PluginValidatorTests
     public void ValidatePlugin_WithNonExistentFile_ShouldReturnFalse()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "NonExistent.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "NonExistent.dll");
 
         // Act
         var result = PluginValidator.ValidatePlugin(pluginPath);
@@ -61,7 +61,7 @@ public class PluginValidatorTests
     public void ValidatePlugin_WithValidFile_WithoutManifest_ShouldValidateBasics()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath);
 
         // Act
@@ -76,8 +76,8 @@ public class PluginValidatorTests
     public void ValidatePlugin_WithManifestOut_ShouldPopulateManifest()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
-        var manifestPath = Path.Combine(_testPluginsPath, "TestPlugin.manifest.json");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
+        var manifestPath = Path.Join(_testPluginsPath, "TestPlugin.manifest.json");
         
         CreateDummyDll(pluginPath);
         CreateValidManifest(manifestPath, "TestPlugin");
@@ -98,7 +98,7 @@ public class PluginValidatorTests
     public void CalculateHash_WithSameFile_ShouldReturnConsistentHash()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Test Content");
 
         // Act
@@ -114,7 +114,7 @@ public class PluginValidatorTests
     public void CalculateHash_WithModifiedFile_ShouldReturnDifferentHash()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Original Content");
         var hash1 = PluginHashCalculator.CalculateHash(pluginPath);
 
@@ -132,7 +132,7 @@ public class PluginValidatorTests
     public void CalculateHash_WithMissingFile_ShouldThrowFileNotFoundException()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "NonExistent.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "NonExistent.dll");
 
         // Act & Assert
         Assert.That(() => PluginHashCalculator.CalculateHash(pluginPath), 
@@ -144,7 +144,7 @@ public class PluginValidatorTests
     public void CalculateHash_WithEmptyFile_ShouldReturnValidHash()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "Empty.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "Empty.dll");
         File.Create(pluginPath).Dispose();
 
         // Act
@@ -161,7 +161,7 @@ public class PluginValidatorTests
     public void VerifyHash_WithMatchingHash_ShouldReturnTrue()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Test Content");
         var expectedHash = PluginHashCalculator.CalculateHash(pluginPath);
 
@@ -176,7 +176,7 @@ public class PluginValidatorTests
     public void VerifyHash_WithMismatchedHash_ShouldReturnFalse()
     {
         // Arrange
-        var pluginPath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Test Content");
         var wrongHash = "0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -195,7 +195,7 @@ public class PluginValidatorTests
     public void LoadManifest_WithValidManifest_ShouldSucceed()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testPluginsPath, "TestPlugin.manifest.json");
+        var manifestPath = Path.Join(_testPluginsPath, "TestPlugin.manifest.json");
         CreateValidManifest(manifestPath, "TestPlugin");
 
         // Act
@@ -211,7 +211,7 @@ public class PluginValidatorTests
     public void LoadManifest_WithMissingFile_ShouldReturnNull()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testPluginsPath, "NonExistent.manifest.json");
+        var manifestPath = Path.Join(_testPluginsPath, "NonExistent.manifest.json");
 
         // Act
         var manifest = PluginManifest.Load(manifestPath);
@@ -224,7 +224,7 @@ public class PluginValidatorTests
     public void LoadManifest_WithInvalidJson_ShouldReturnNull()
     {
         // Arrange
-        var manifestPath = Path.Combine(_testPluginsPath, "Invalid.manifest.json");
+        var manifestPath = Path.Join(_testPluginsPath, "Invalid.manifest.json");
         File.WriteAllText(manifestPath, "{ invalid json content");
 
         // Act
@@ -239,7 +239,7 @@ public class PluginValidatorTests
     {
         // Arrange - create a minimal manifest missing some fields
         // Note: C# required properties with object initializer will use defaults for missing JSON fields
-        var manifestPath = Path.Combine(_testPluginsPath, "Incomplete.manifest.json");
+        var manifestPath = Path.Join(_testPluginsPath, "Incomplete.manifest.json");
         var incompleteJson = @"{
             ""description"": ""Has description but missing name, version, etc.""
         }";
@@ -263,7 +263,7 @@ public class PluginValidatorTests
     public void LoadManifest_WithMinimalFields_ShouldUseDefaults()
     {
         // Arrange - create manifest with only required fields
-        var manifestPath = Path.Combine(_testPluginsPath, "Minimal.manifest.json");
+        var manifestPath = Path.Join(_testPluginsPath, "Minimal.manifest.json");
         CreateValidManifest(manifestPath, "MinimalPlugin");
 
         // Act
@@ -285,7 +285,7 @@ public class PluginValidatorTests
     public void ValidatePluginPath_WithRelativePath_ShouldBeAllowed()
     {
         // Arrange
-        var relativePath = Path.Combine("plugins", "TestPlugin.dll");
+        var relativePath = Path.Join("plugins", "TestPlugin.dll");
 
         // Act & Assert
         // This test verifies that relative paths within the plugins directory are acceptable
@@ -296,7 +296,7 @@ public class PluginValidatorTests
     public void ValidatePluginPath_WithAbsolutePath_ShouldBeAllowed()
     {
         // Arrange
-        var absolutePath = Path.Combine(_testPluginsPath, "TestPlugin.dll");
+        var absolutePath = Path.Join(_testPluginsPath, "TestPlugin.dll");
 
         // Act & Assert
         Assert.That(() => Path.GetFullPath(absolutePath), Throws.Nothing);
@@ -307,7 +307,7 @@ public class PluginValidatorTests
     public void ValidatePluginPath_WithPathTraversal_ShouldBeDetectable()
     {
         // Arrange
-        var traversalPath = Path.Combine(_testPluginsPath, "..", "..", "system32", "malicious.dll");
+        var traversalPath = Path.Join(_testPluginsPath, "..", "..", "system32", "malicious.dll");
 
         // Act
         var normalizedPath = Path.GetFullPath(traversalPath);

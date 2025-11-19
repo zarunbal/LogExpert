@@ -43,10 +43,10 @@ public class PluginHashVerificationTests
     public void SetUp ()
     {
         // Create temporary test directory
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpert_Tests_" + Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_Tests_" + Guid.NewGuid().ToString());
         _ = Directory.CreateDirectory(_testDirectory);
 
-        _testConfigPath = Path.Combine(_testDirectory, "trusted-plugins.json");
+        _testConfigPath = Path.Join(_testDirectory, "trusted-plugins.json");
 
         // Create test configuration
         _testConfig = new TrustedPluginConfig
@@ -408,7 +408,7 @@ public class PluginHashVerificationTests
     /// </summary>
     private string CreateTestPlugin (string fileName, string content)
     {
-        var pluginPath = Path.Combine(_testDirectory, fileName);
+        var pluginPath = Path.Join(_testDirectory, fileName);
         File.WriteAllText(pluginPath, content);
         return pluginPath;
     }

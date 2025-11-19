@@ -39,7 +39,7 @@ internal class Program
             var pluginPaths = new List<string>();
             
             // Check plugins folder
-            var pluginsDir = Path.Combine(outputPath, "plugins");
+            var pluginsDir = Path.Join(outputPath, "plugins");
             if (Directory.Exists(pluginsDir))
             {
                 pluginPaths.AddRange(Directory.GetFiles(pluginsDir, "*.dll"));
@@ -47,7 +47,7 @@ internal class Program
             }
 
             // Check pluginsx86 folder
-            var pluginsx86Dir = Path.Combine(outputPath, "pluginsx86");
+            var pluginsx86Dir = Path.Join(outputPath, "pluginsx86");
             if (Directory.Exists(pluginsx86Dir))
             {
                 var x86Plugins = Directory.GetFiles(pluginsx86Dir, "*.dll");

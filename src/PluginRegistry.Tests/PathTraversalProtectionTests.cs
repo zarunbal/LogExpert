@@ -19,8 +19,8 @@ public class PathTraversalProtectionTests
     public void SetUp ()
     {
         // Create test directory structure
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpert_PathTests_" + Guid.NewGuid().ToString());
-        _pluginDirectory = Path.Combine(_testDirectory, "plugins", "MyPlugin");
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_PathTests_" + Guid.NewGuid().ToString());
+        _pluginDirectory = Path.Join(_testDirectory, "plugins", "MyPlugin");
         _ = Directory.CreateDirectory(_pluginDirectory);
     }
 
@@ -409,7 +409,7 @@ public class PathTraversalProtectionTests
             var pluginDir = Path.GetFullPath(pluginDirectory);
 
             // Validate main file path
-            var mainPath = Path.GetFullPath(Path.Combine(pluginDirectory, manifest.Main));
+            var mainPath = Path.GetFullPath(Path.Join(pluginDirectory, manifest.Main));
 
             if (!mainPath.StartsWith(pluginDir, StringComparison.OrdinalIgnoreCase))
             {

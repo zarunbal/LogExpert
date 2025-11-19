@@ -12,7 +12,7 @@ public class PerformanceTests
     [SetUp]
     public void Setup ()
     {
-        _testPluginDirectory = Path.Combine(Path.GetTempPath(), "LogExpertTestPlugins");
+        _testPluginDirectory = Path.Join(Path.GetTempPath(), "LogExpertTestPlugins");
         _ = Directory.CreateDirectory(_testPluginDirectory);
     }
 

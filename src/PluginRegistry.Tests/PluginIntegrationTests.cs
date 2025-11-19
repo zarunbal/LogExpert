@@ -18,7 +18,7 @@ public class PluginIntegrationTests
 
         // Use the actual plugins directory from the build output
         var binDirectory = Path.GetDirectoryName(typeof(PluginIntegrationTests).Assembly.Location)!;
-        _testPluginsDirectory = Path.Combine(binDirectory, "..", "..", "..", "..", "bin", "Debug", "plugins");
+        _testPluginsDirectory = Path.Join(binDirectory, "..", "..", "..", "..", "bin", "Debug", "plugins");
         _testPluginsDirectory = Path.GetFullPath(_testPluginsDirectory);
 
         // Verify the plugins directory exists
@@ -35,7 +35,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -57,7 +57,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithJsonColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var jsonColonizerPath = Path.Combine(_testPluginsDirectory, "JsonColumnizer.dll");
+        var jsonColonizerPath = Path.Join(_testPluginsDirectory, "JsonColumnizer.dll");
 
         if (!File.Exists(jsonColonizerPath))
         {
@@ -79,7 +79,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithRegexColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var regexColonizerPath = Path.Combine(_testPluginsDirectory, "RegexColumnizer.dll");
+        var regexColonizerPath = Path.Join(_testPluginsDirectory, "RegexColumnizer.dll");
 
         if (!File.Exists(regexColonizerPath))
         {
@@ -101,7 +101,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithGlassfishColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var glassfishColonizerPath = Path.Combine(_testPluginsDirectory, "GlassfishColumnizer.dll");
+        var glassfishColonizerPath = Path.Join(_testPluginsDirectory, "GlassfishColumnizer.dll");
 
         if (!File.Exists(glassfishColonizerPath))
         {
@@ -123,7 +123,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithLog4jXmlColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var log4jColonizerPath = Path.Combine(_testPluginsDirectory, "Log4jXmlColumnizer.dll");
+        var log4jColonizerPath = Path.Join(_testPluginsDirectory, "Log4jXmlColumnizer.dll");
 
         if (!File.Exists(log4jColonizerPath))
         {
@@ -145,7 +145,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithJsonCompactColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var jsonCompactPath = Path.Combine(_testPluginsDirectory, "JsonCompactColumnizer.dll");
+        var jsonCompactPath = Path.Join(_testPluginsDirectory, "JsonCompactColumnizer.dll");
 
         if (!File.Exists(jsonCompactPath))
         {
@@ -172,7 +172,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WhenManifestExists_ShouldLoadManifest ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
         var manifestPath = Path.ChangeExtension(csvColonizerPath, ".manifest.json");
 
         if (!File.Exists(csvColonizerPath))
@@ -228,7 +228,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WhenManifestDoesNotExist_ShouldStillLoadPlugin ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
         var manifestPath = Path.ChangeExtension(csvColonizerPath, ".manifest.json");
 
         if (!File.Exists(csvColonizerPath))
@@ -310,7 +310,7 @@ public class PluginIntegrationTests
     public void DiscoverPlugins_ShouldIdentifyPluginTypes ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -334,7 +334,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithNonExistentFile_ShouldReturnFailure ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(_testPluginsDirectory, "NonExistent.dll");
+        var nonExistentPath = Path.Join(_testPluginsDirectory, "NonExistent.dll");
 
         // Act
         var result = _loader.LoadPlugin(nonExistentPath);
@@ -350,7 +350,7 @@ public class PluginIntegrationTests
     public void LoadPlugin_WithInvalidDll_ShouldReturnFailure ()
     {
         // Arrange - Create a fake DLL file with invalid content
-        var invalidDllPath = Path.Combine(Path.GetTempPath(), "InvalidPlugin.dll");
+        var invalidDllPath = Path.Join(Path.GetTempPath(), "InvalidPlugin.dll");
         File.WriteAllText(invalidDllPath, "This is not a valid DLL file");
 
         try
@@ -382,7 +382,7 @@ public class PluginIntegrationTests
         // Note: This test is platform-specific and may be skipped
 
         // Arrange
-        var pluginsx86Dir = Path.Combine(_testPluginsDirectory, "..", "pluginsx86");
+        var pluginsx86Dir = Path.Join(_testPluginsDirectory, "..", "pluginsx86");
 
         if (!Directory.Exists(pluginsx86Dir))
         {
@@ -419,7 +419,7 @@ public class PluginIntegrationTests
     public async Task LoadPluginAsync_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -439,7 +439,7 @@ public class PluginIntegrationTests
     public async Task LoadPluginAsync_WithCancellation_ShouldRespectCancellationToken ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -462,9 +462,9 @@ public class PluginIntegrationTests
         // Arrange
         var pluginPaths = new List<string>
         {
-            Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "JsonColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "RegexColumnizer.dll")
+            Path.Join(_testPluginsDirectory, "CsvColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "JsonColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "RegexColumnizer.dll")
         };
 
         // Filter to only existing files
@@ -494,7 +494,7 @@ public class PluginIntegrationTests
     public void PluginCache_WithRealPlugin_ShouldCacheSuccessfully ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -524,9 +524,9 @@ public class PluginIntegrationTests
         // Arrange
         var pluginPaths = new List<string>
         {
-            Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "JsonColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "RegexColumnizer.dll")
+            Path.Join(_testPluginsDirectory, "CsvColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "JsonColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "RegexColumnizer.dll")
         }.Where(File.Exists).ToList();
 
         if (pluginPaths.Count < 2)
@@ -563,7 +563,7 @@ public class PluginIntegrationTests
     public void PluginValidator_WithRealPlugin_ShouldValidateSuccessfully ()
     {
         // Arrange
-        var csvColonizerPath = Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll");
+        var csvColonizerPath = Path.Join(_testPluginsDirectory, "CsvColumnizer.dll");
 
         if (!File.Exists(csvColonizerPath))
         {
@@ -584,7 +584,7 @@ public class PluginIntegrationTests
     public void PluginValidator_WithInvalidDll_ShouldFailValidation ()
     {
         // Arrange - Create invalid DLL
-        var invalidDllPath = Path.Combine(Path.GetTempPath(), "InvalidPlugin.dll");
+        var invalidDllPath = Path.Join(Path.GetTempPath(), "InvalidPlugin.dll");
         File.WriteAllText(invalidDllPath, "Not a valid DLL");
 
         try
@@ -617,10 +617,10 @@ public class PluginIntegrationTests
         // Arrange
         var pluginPaths = new List<string>
         {
-            Path.Combine(_testPluginsDirectory, "CsvColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "JsonColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "RegexColumnizer.dll"),
-            Path.Combine(_testPluginsDirectory, "GlassfishColumnizer.dll")
+            Path.Join(_testPluginsDirectory, "CsvColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "JsonColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "RegexColumnizer.dll"),
+            Path.Join(_testPluginsDirectory, "GlassfishColumnizer.dll")
         }.Where(File.Exists).ToList();
 
         if (pluginPaths.Count == 0)
@@ -648,7 +648,7 @@ public class PluginIntegrationTests
     public void AssemblyInspector_WithDefaultPlugins_ShouldIdentifyMultipleTypes ()
     {
         // Arrange
-        var defaultPluginsPath = Path.Combine(_testPluginsDirectory, "DefaultPlugins.dll");
+        var defaultPluginsPath = Path.Join(_testPluginsDirectory, "DefaultPlugins.dll");
 
         if (!File.Exists(defaultPluginsPath))
         {

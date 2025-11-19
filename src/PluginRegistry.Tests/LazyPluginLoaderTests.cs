@@ -1,7 +1,4 @@
 using NUnit.Framework;
-using LogExpert.PluginRegistry;
-using System.IO;
-using LogExpert.Core.Interface;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -9,13 +6,13 @@ namespace LogExpert.PluginRegistry.Tests;
 public class LazyPluginLoaderTests
 {
     [Test]
-    public void Constructor_WithValidPath_CreatesInstance()
+    public void Constructor_WithValidPath_CreatesInstance ()
     {
         // Arrange
         var dllPath = "test.dll";
-        var manifest = new PluginManifest 
-        { 
-            Name = "TestPlugin", 
+        var manifest = new PluginManifest
+        {
+            Name = "TestPlugin",
             Version = "1.0.0",
             Author = "Test",
             Description = "Test Plugin",
@@ -34,7 +31,7 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void Constructor_WithNullManifest_CreatesInstance()
+    public void Constructor_WithNullManifest_CreatesInstance ()
     {
         // Arrange
         var dllPath = "test.dll";
@@ -50,7 +47,7 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void Constructor_WithNullPath_ThrowsArgumentNullException()
+    public void Constructor_WithNullPath_ThrowsArgumentNullException ()
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
@@ -58,10 +55,10 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void GetInstance_WithNonExistentFile_ReturnsNull()
+    public void GetInstance_WithNonExistentFile_ReturnsNull ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
+        var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
         var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
 
         // Act
@@ -73,10 +70,10 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void GetInstance_CalledTwice_ReturnsSameInstance()
+    public void GetInstance_CalledTwice_ReturnsSameInstance ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
+        var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
         var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
 
         // Act
@@ -89,7 +86,7 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void IsLoaded_BeforeGetInstance_ReturnsFalse()
+    public void IsLoaded_BeforeGetInstance_ReturnsFalse ()
     {
         // Arrange
         var loader = new LazyPluginLoader<ILogLineColumnizer>("test.dll", null);
@@ -99,10 +96,10 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void IsLoaded_AfterGetInstance_ReturnsTrue()
+    public void IsLoaded_AfterGetInstance_ReturnsTrue ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
+        var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
         var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
 
         // Act
@@ -113,7 +110,7 @@ public class LazyPluginLoaderTests
     }
 
     [Test]
-    public void ToString_ReturnsFormattedString()
+    public void ToString_ReturnsFormattedString ()
     {
         // Arrange
         var dllPath = "C:\\plugins\\TestPlugin.dll";

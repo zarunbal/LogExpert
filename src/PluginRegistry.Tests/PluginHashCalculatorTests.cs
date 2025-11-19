@@ -13,9 +13,9 @@ public class PluginHashCalculatorTests
     [SetUp]
     public void SetUp ()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpertPluginHashTests");
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertPluginHashTests");
         _ = Directory.CreateDirectory(_testDirectory);
-        _testFilePath = Path.Combine(_testDirectory, "test-plugin.dll");
+        _testFilePath = Path.Join(_testDirectory, "test-plugin.dll");
     }
 
     [TearDown]
@@ -71,8 +71,8 @@ public class PluginHashCalculatorTests
     public void CalculateHash_DifferentContent_ReturnsDifferentHash ()
     {
         // Arrange
-        var testFile1 = Path.Combine(_testDirectory, "plugin1.dll");
-        var testFile2 = Path.Combine(_testDirectory, "plugin2.dll");
+        var testFile1 = Path.Join(_testDirectory, "plugin1.dll");
+        var testFile2 = Path.Join(_testDirectory, "plugin2.dll");
         File.WriteAllText(testFile1, "Content 1");
         File.WriteAllText(testFile2, "Content 2");
 
@@ -88,7 +88,7 @@ public class PluginHashCalculatorTests
     public void CalculateHash_FileNotFound_ThrowsFileNotFoundException ()
     {
         // Arrange
-        var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.dll");
+        var nonExistentPath = Path.Join(_testDirectory, "nonexistent.dll");
 
         // Act & Assert
         _ = Assert.Throws<FileNotFoundException>(() =>
@@ -223,9 +223,9 @@ public class PluginHashCalculatorTests
     public void CalculateHashes_MultipleFiles_ReturnsAllHashes ()
     {
         // Arrange
-        var file1 = Path.Combine(_testDirectory, "plugin1.dll");
-        var file2 = Path.Combine(_testDirectory, "plugin2.dll");
-        var file3 = Path.Combine(_testDirectory, "plugin3.dll");
+        var file1 = Path.Join(_testDirectory, "plugin1.dll");
+        var file2 = Path.Join(_testDirectory, "plugin2.dll");
+        var file3 = Path.Join(_testDirectory, "plugin3.dll");
 
         File.WriteAllText(file1, "Content 1");
         File.WriteAllText(file2, "Content 2");
@@ -262,9 +262,9 @@ public class PluginHashCalculatorTests
     public void CalculateHashes_SomeFilesNotFound_OmitsFailedFiles ()
     {
         // Arrange
-        var file1 = Path.Combine(_testDirectory, "plugin1.dll");
-        var file2 = Path.Combine(_testDirectory, "nonexistent.dll");
-        var file3 = Path.Combine(_testDirectory, "plugin3.dll");
+        var file1 = Path.Join(_testDirectory, "plugin1.dll");
+        var file2 = Path.Join(_testDirectory, "nonexistent.dll");
+        var file3 = Path.Join(_testDirectory, "plugin3.dll");
 
         File.WriteAllText(file1, "Content 1");
         File.WriteAllText(file3, "Content 3");
@@ -294,7 +294,7 @@ public class PluginHashCalculatorTests
     public void CalculateHash_LargeFile_CalculatesSuccessfully ()
     {
         // Arrange
-        var largeFilePath = Path.Combine(_testDirectory, "large-plugin.dll");
+        var largeFilePath = Path.Join(_testDirectory, "large-plugin.dll");
 
         // Create a 10MB file
         using (var stream = File.Create(largeFilePath))

@@ -14,7 +14,7 @@ public class CSVColumnizerTest
     public void Instantiat_CSVFile_BuildCorrectColumnizer (string filename, string[] expectedHeaders)
     {
         CsvColumnizer.CsvColumnizer csvColumnizer = new();
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, filename);
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, LogExpert.PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
         var line = reader.GetLogLine(0);
