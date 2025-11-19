@@ -78,7 +78,7 @@ public class PathTraversalProtectionTests
     }
 
     [Test]
-    [Description("Verify path with ~ is detected")]
+    [Description("Verify path with ~ is detected and rejected")]
     public void ValidateManifestPaths_TildePath_Detected ()
     {
         // Arrange
@@ -100,7 +100,7 @@ public class PathTraversalProtectionTests
         var result = ValidateManifestPathsHelper(manifest, _pluginDirectory);
 
         // Assert
-        Assert.That(result, Is.True, "Tilde in dependencies is detected (logged as warning)");
+        Assert.That(result, Is.False, "Tilde in dependencies should be rejected (security issue)");
     }
 
     [Test]
@@ -324,7 +324,7 @@ public class PathTraversalProtectionTests
     }
 
     [Test]
-    [Description("Verify dependencies with suspicious paths are detected")]
+    [Description("Verify dependencies with suspicious paths are detected and rejected")]
     public void ValidateManifestPaths_SuspiciousDependencies_Detected ()
     {
         // Arrange
@@ -347,8 +347,7 @@ public class PathTraversalProtectionTests
         var result = ValidateManifestPathsHelper(manifest, _pluginDirectory);
 
         // Assert
-        // This should log warnings - exact behavior depends on implementation
-        Assert.That(result, Is.True, "Suspicious dependency paths are detected and logged");
+        Assert.That(result, Is.False, "Suspicious dependency paths should be rejected (security issue)");
     }
 
     [Test]
@@ -408,7 +407,13 @@ public class PathTraversalProtectionTests
         {
             var pluginDir = Path.GetFullPath(pluginDirectory);
 
-            // Validate main file path
+            // Check if Main path is absolute, UNC, or rooted - these should be rejected immediately
+            if (Path.IsPathRooted(manifest.Main) || manifest.Main.StartsWith("\\\\", StringComparison.Ordinal) || manifest.Main.StartsWith("//", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            // Validate main file path - use Path.Join to match actual implementation
             var mainPath = Path.GetFullPath(Path.Join(pluginDirectory, manifest.Main));
 
             if (!mainPath.StartsWith(pluginDir, StringComparison.OrdinalIgnoreCase))
@@ -421,11 +426,14 @@ public class PathTraversalProtectionTests
             {
                 foreach (var (key, value) in manifest.Dependencies)
                 {
-                    // Check for suspicious path patterns
-                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) || key.Contains('~', StringComparison.OrdinalIgnoreCase) || value.Contains("..", StringComparison.OrdinalIgnoreCase) || value.Contains('~', StringComparison.OrdinalIgnoreCase))
+                    // Check for suspicious path patterns - actual implementation REJECTS these
+                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) || 
+                        key.Contains('~', StringComparison.OrdinalIgnoreCase) || 
+                        value.Contains("..", StringComparison.OrdinalIgnoreCase) || 
+                        value.Contains('~', StringComparison.OrdinalIgnoreCase))
                     {
-                        // In actual implementation, this logs a warning
-                        // For test purposes, we just continue
+                        // In actual implementation, this returns FALSE (rejects the plugin)
+                        return false;
                     }
                 }
             }
