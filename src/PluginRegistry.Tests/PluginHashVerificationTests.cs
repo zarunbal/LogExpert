@@ -16,7 +16,28 @@ public class PluginHashVerificationTests
 {
     private string _testDirectory;
     private string _testConfigPath;
+
     private TrustedPluginConfig _testConfig;
+
+    private static readonly Dictionary<string, string> _builtInPlugins = new()
+    {
+        // Plugins in the main 'plugins' folder
+        ["AutoColumnizer.dll"] = "plugins",
+        ["CsvColumnizer.dll"] = "plugins",
+        ["JsonColumnizer.dll"] = "plugins",
+        ["JsonCompactColumnizer.dll"] = "plugins",
+        ["RegexColumnizer.dll"] = "plugins",
+        ["Log4jXmlColumnizer.dll"] = "plugins",
+        ["GlassfishColumnizer.dll"] = "plugins",
+        ["DefaultPlugins.dll"] = "plugins",
+        ["FlashIconHighlighter.dll"] = "plugins",
+
+        // SFTP plugin (x64) in plugins folder
+        ["SftpFileSystem.dll"] = "plugins",
+
+        // SFTP plugin (x86) in pluginsx86 folder - same DLL name, different folder
+        ["SftpFileSystem.dll (x86)"] = "pluginsx86"
+    };
 
     [SetUp]
     public void SetUp ()
@@ -285,7 +306,7 @@ public class PluginHashVerificationTests
         config.PluginHashes["SomeOtherPlugin.dll"] = hash;
 
         // Act
-        var result = ValidatePluginWithConfig(pluginPath, config);
+        _ = ValidatePluginWithConfig(pluginPath, config);
 
         // Assert
         // Note: This test assumes hash-based trust is supported
@@ -312,6 +333,74 @@ public class PluginHashVerificationTests
         Assert.That(config.LastUpdated, Is.LessThan(afterTime), "LastUpdated should be before after time");
     }
 
+    [Test]
+    [Explicit("Run manually to get plugin hashes, plugin hashes will be created when a release is built")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    public void VerifyAllPluginsHaveHashes ()
+    {
+        // Arrange
+        var builtInHashes = PluginValidator.GetBuiltInPluginHashes();
+
+        // Act & Assert - Verify that GetBuiltInPluginHashes() returns data
+        Assert.That(builtInHashes, Is.Not.Null, "GetBuiltInPluginHashes() should not return null");
+        Assert.That(builtInHashes.Count, Is.GreaterThan(0), "GetBuiltInPluginHashes() should return at least one hash");
+
+        // Verify all built-in plugins have hashes
+        var missingHashes = new List<string>();
+        var foundHashes = new List<string>();
+
+        foreach (var pluginKey in _builtInPlugins.Keys)
+        {
+            if (builtInHashes.TryGetValue(pluginKey, out string? hash))
+            {
+                foundHashes.Add(pluginKey);
+                Assert.That(hash, Is.Not.Null.And.Not.Empty, $"Hash for {pluginKey} should not be null or empty");
+
+                // Verify hash looks like a valid SHA256 (64 hex characters)
+                Assert.That(hash, Has.Length.EqualTo(64), $"Hash for {pluginKey} should be 64 characters (SHA256)");
+                Assert.That(hash, Does.Match("^[A-Fa-f0-9]{64}$"), $"Hash for {pluginKey} should be valid hexadecimal");
+            }
+            else
+            {
+                missingHashes.Add(pluginKey);
+            }
+        }
+
+        // Report findings
+        Console.WriteLine($"  Verification Results:");
+        Console.WriteLine($"  Total plugins: {_builtInPlugins.Count}");
+        Console.WriteLine($"  Plugins with hashes: {foundHashes.Count}");
+        Console.WriteLine($"  Missing hashes: {missingHashes.Count}");
+        Console.WriteLine();
+
+        if (foundHashes.Count > 0)
+        {
+            Console.WriteLine("✓ Plugins with hashes:");
+            foreach (var plugin in foundHashes)
+            {
+                var hash = builtInHashes[plugin];
+                Console.WriteLine($"  - {plugin}: {hash[..16]}...");
+            }
+
+            Console.WriteLine();
+        }
+
+        if (missingHashes.Count > 0)
+        {
+            Console.WriteLine("✗ Plugins missing hashes:");
+            foreach (var plugin in missingHashes)
+            {
+                Console.WriteLine($"  - {plugin}");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Run GenerateBuiltInPluginHashes() test to generate missing hashes.");
+        }
+
+        // Final assertion
+        Assert.That(missingHashes, Is.Empty, $"All {_builtInPlugins.Count} built-in plugins should have hashes. Missing: {string.Join(", ", missingHashes)}");
+    }
+
     #region Helper Methods
 
     /// <summary>
@@ -335,7 +424,9 @@ public class PluginHashVerificationTests
         // with the config properly loaded
 
         if (!File.Exists(pluginPath))
+        {
             return false;
+        }
 
         var fileName = Path.GetFileName(pluginPath);
         var fileHash = PluginHashCalculator.CalculateHash(pluginPath);

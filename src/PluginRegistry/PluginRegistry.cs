@@ -221,19 +221,19 @@ public class PluginRegistry : IPluginRegistry
                     Resources.PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest));
 
                 // Validate plugin before loading (with manifest support)
-                if (!PluginValidator.ValidatePlugin(dllName, out var manifest))
+                if (!PluginValidator.ValidatePlugin(dllName, out var manifest, out var errorMessage))
                 {
                     skippedCount++;
                     _logger.Info("Skipped plugin (failed validation): {FileName}", fileName);
 
-                    // Fire Skipped event
+                    // Fire Skipped event with user-friendly error message
                     OnPluginLoadProgress(new PluginLoadProgressEventArgs(
                         dllName,
                         fileName,
                         currentIndex,
                         totalPlugins,
                         PluginLoadStatus.Skipped,
-                        Resources.PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest));
+                        errorMessage ?? Resources.PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest));
 
                     currentIndex++;
                     continue;
@@ -301,6 +301,7 @@ public class PluginRegistry : IPluginRegistry
             {
                 // Can happen when a 32bit-only DLL is loaded on a 64bit system (or vice versa)
                 // or could be a not columnizer DLL (e.g. A DLL that is needed by a plugin).
+                var errorMsg = PluginErrorMessages.BadImageFormat(fileName, Environment.Is64BitProcess);
                 _logger.Warn(ex, "Plugin load failed (bad format): {FileName}", fileName);
                 failedCount++;
 
@@ -311,16 +312,26 @@ public class PluginRegistry : IPluginRegistry
                     currentIndex,
                     totalPlugins,
                     PluginLoadStatus.Failed,
-                    $"Bad format: {ex.Message}"));
+                    errorMsg));
             }
             catch (ReflectionTypeLoadException ex)
             {
                 // can happen when a dll dependency is missing
+                string errorMsg = Resources.PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError;
+
                 if (ex.LoaderExceptions != null && ex.LoaderExceptions.Length != 0)
                 {
                     foreach (var loaderException in ex.LoaderExceptions)
                     {
                         _logger.Error(loaderException, "Plugin load failed with '{0}'", dllName);
+                    }
+
+                    // Extract dependency name from first exception if possible
+                    var firstException = ex.LoaderExceptions[0];
+                    if (firstException is FileNotFoundException fileNotFound &&
+                        !string.IsNullOrEmpty(fileNotFound.FileName))
+                    {
+                        errorMsg = PluginErrorMessages.MissingDependency(fileName, fileNotFound.FileName);
                     }
                 }
 
@@ -334,10 +345,11 @@ public class PluginRegistry : IPluginRegistry
                     currentIndex,
                     totalPlugins,
                     PluginLoadStatus.Failed,
-                    $"Dependency missing: {ex.Message}"));
+                    errorMsg));
             }
             catch (Exception ex)
             {
+                var errorMsg = PluginErrorMessages.GenericError("loading", fileName, ex);
                 _logger.Error(ex, "General exception loading plugin: {FileName}", fileName);
                 failedCount++;
 
@@ -348,7 +360,7 @@ public class PluginRegistry : IPluginRegistry
                     currentIndex,
                     totalPlugins,
                     PluginLoadStatus.Failed,
-                    $"Error: {ex.Message}"));
+                    errorMsg));
             }
 
             currentIndex++;
@@ -704,7 +716,8 @@ public class PluginRegistry : IPluginRegistry
 
             if (!loadTask.Wait(TimeSpan.FromSeconds(10)))
             {
-                _logger.Error("Plugin loading timed out: {FileName}", Path.GetFileName(dllName));
+                var errorMsg = PluginErrorMessages.PluginLoadTimeout(Path.GetFileName(dllName), 10);
+                _logger.Error(errorMsg);
                 return false;
             }
 
@@ -795,7 +808,8 @@ public class PluginRegistry : IPluginRegistry
 
             if (!instantiateTask.Wait(TimeSpan.FromSeconds(5)))
             {
-                _logger.Error("Plugin instantiation timed out: {TypeName}", type.Name);
+                var errorMsg = PluginErrorMessages.PluginLoadTimeout(type.Name, 5);
+                _logger.Error(errorMsg);
                 return false;
             }
 
@@ -811,7 +825,8 @@ public class PluginRegistry : IPluginRegistry
                                          NotSupportedException or
                                          SecurityException)
         {
-            _logger.Error(ex, "Failed to instantiate plugin: {TypeName}", type.Name);
+            var errorMsg = PluginErrorMessages.InstantiationFailed(type.Assembly.GetName().Name, type.FullName);
+            _logger.Error(ex, errorMsg);
             return false;
         }
     }
@@ -1224,17 +1239,11 @@ public class PluginRegistry : IPluginRegistry
         var mainDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
         var pluginDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins", fileName);
 
-        if (File.Exists(mainDir))
-        {
-            return Assembly.LoadFrom(mainDir);
-        }
-
-        if (File.Exists(pluginDir))
-        {
-            return Assembly.LoadFrom(pluginDir);
-        }
-
-        return null;
+        return File.Exists(mainDir)
+            ? Assembly.LoadFrom(mainDir)
+            : File.Exists(pluginDir)
+                ? Assembly.LoadFrom(pluginDir)
+                : null;
     }
 
     #endregion

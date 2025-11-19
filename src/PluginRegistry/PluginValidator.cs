@@ -171,7 +171,7 @@ public static partial class PluginValidator
         {
             if (!File.Exists(dllPath))
             {
-                errorMessage = $"Plugin file not found: {dllPath}";
+                errorMessage = PluginErrorMessages.PluginFileNotFound(dllPath);
                 return false;
             }
 
@@ -182,7 +182,7 @@ public static partial class PluginValidator
             {
                 if (!_trustedPluginConfig.AllowUserTrustedPlugins)
                 {
-                    errorMessage = "User-added trusted plugins are not allowed by policy";
+                    errorMessage = PluginErrorMessages.UserPluginsNotAllowed();
                     return false;
                 }
 
@@ -210,7 +210,7 @@ public static partial class PluginValidator
                                          SecurityException or
                                          JsonSerializationException)
         {
-            errorMessage = $"Error adding trusted plugin: {ex.Message}";
+            errorMessage = PluginErrorMessages.GenericError("adding trusted plugin", Path.GetFileName(dllPath), ex);
             _logger.Error(ex, "Error adding trusted plugin: {DllPath}", dllPath);
             return false;
         }
@@ -245,7 +245,7 @@ public static partial class PluginValidator
     /// <returns>True if the plugin is valid and safe to load</returns>
     public static bool ValidatePlugin (string dllPath)
     {
-        return ValidatePlugin(dllPath, out _);
+        return ValidatePlugin(dllPath, out _, out _);
     }
 
     /// <summary>
@@ -256,13 +256,27 @@ public static partial class PluginValidator
     /// <returns>True if the plugin is valid and safe to load</returns>
     public static bool ValidatePlugin (string dllPath, out PluginManifest manifest)
     {
+        return ValidatePlugin(dllPath, out manifest, out _);
+    }
+
+    /// <summary>
+    /// Validates a plugin assembly before loading with manifest information.
+    /// </summary>
+    /// <param name="dllPath">Path to the plugin DLL</param>
+    /// <param name="manifest">Output manifest if found and valid, null otherwise</param>
+    /// <param name="errorMessage">User-friendly error message if validation fails</param>
+    /// <returns>True if the plugin is valid and safe to load</returns>
+    public static bool ValidatePlugin (string dllPath, out PluginManifest manifest, out string errorMessage)
+    {
         manifest = null;
+        errorMessage = null;
 
         try
         {
             // 1. Check if file exists
             if (!File.Exists(dllPath))
             {
+                errorMessage = PluginErrorMessages.PluginFileNotFound(dllPath);
                 _logger.Warn("Plugin file does not exist: {DllPath}", dllPath);
                 return false;
             }
@@ -283,8 +297,11 @@ public static partial class PluginValidator
                 fileHash = PluginHashCalculator.CalculateHash(dllPath);
                 _logger.Debug("Plugin {FileName} hash: {Hash}", fileName, fileHash);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException or
+                                             FileNotFoundException or
+                                             ArgumentNullException)
             {
+                errorMessage = PluginErrorMessages.GenericError("hash calculation", fileName, ex);
                 _logger.Error(ex, "Failed to calculate hash for plugin: {FileName}", fileName);
                 return false;
             }
@@ -295,8 +312,8 @@ public static partial class PluginValidator
 
             if (!isTrustedByName && !isTrustedByHash)
             {
+                errorMessage = PluginErrorMessages.PluginNotTrusted(fileName, fileHash);
                 _logger.Warn("Plugin not trusted: {FileName}, Hash: {Hash}", fileName, fileHash);
-                _logger.Info("To trust this plugin, add it via Settings > Plugin Management");
                 return false;
             }
 
@@ -305,6 +322,7 @@ public static partial class PluginValidator
             {
                 if (!PluginHashCalculator.VerifyHash(dllPath, expectedHash))
                 {
+                    errorMessage = PluginErrorMessages.PluginHashMismatch(fileName, expectedHash, fileHash);
                     _logger.Error("SECURITY: Plugin hash mismatch for {FileName}", fileName);
                     _logger.Error("  Expected: {Expected}", expectedHash);
                     _logger.Error("  Actual:   {Actual}", fileHash);
@@ -320,22 +338,23 @@ public static partial class PluginValidator
             }
 
             // 6. Try to load and validate manifest
-            manifest = LoadAndValidateManifest(dllPath);
+            manifest = LoadAndValidateManifest(dllPath, out var manifestErrors);
             if (manifest != null)
             {
                 _logger.Info("Loaded manifest for plugin: {PluginName} v{Version}", manifest.Name, manifest.Version);
 
                 // 6a. Check version compatibility
-                if (!CheckVersionCompatibility(manifest))
+                if (!CheckVersionCompatibility(manifest, out var versionError))
                 {
+                    errorMessage = versionError;
                     _logger.Error("Plugin {PluginName} is not compatible with current LogExpert version", manifest.Name);
                     return false;
                 }
 
                 // 6b. Validate manifest paths for security
-                var pluginDirectory = Path.GetDirectoryName(dllPath);
-                if (!ValidateManifestPaths(manifest, pluginDirectory))
+                if (!ValidateManifestPaths(manifest, Path.GetDirectoryName(dllPath), out var pathError))
                 {
+                    errorMessage = pathError;
                     _logger.Error("Manifest path validation failed for {Plugin}", manifest.Name);
                     return false;
                 }
@@ -346,9 +365,14 @@ public static partial class PluginValidator
                     var permissions = PluginPermissionManager.ParsePermissions(manifest.Permissions);
                     var pluginName = Path.GetFileNameWithoutExtension(fileName);
                     PluginPermissionManager.SetPermissions(pluginName, permissions);
-                    _logger.Info("Set permissions for {PluginName}: {Permissions}",
-                        pluginName, PluginPermissionManager.PermissionToString(permissions));
+                    _logger.Info("Set permissions for {PluginName}: {Permissions}", pluginName, PluginPermissionManager.PermissionToString(permissions));
                 }
+            }
+            else if (manifestErrors != null && manifestErrors.Count > 0)
+            {
+                errorMessage = PluginErrorMessages.InvalidManifest(fileName, manifestErrors);
+                _logger.Error("Invalid manifest for {FileName}", fileName);
+                return false;
             }
             else
             {
@@ -356,8 +380,9 @@ public static partial class PluginValidator
             }
 
             // 7. Verify assembly can be loaded (basic validation)
-            if (!CanLoadAssembly(dllPath))
+            if (!CanLoadAssembly(dllPath, out var loadError))
             {
+                errorMessage = loadError;
                 _logger.Error("Plugin assembly cannot be loaded: {FileName}", fileName);
                 return false;
             }
@@ -365,6 +390,7 @@ public static partial class PluginValidator
             // 8. Verify assembly is a valid .NET assembly
             if (!IsValidDotNetAssembly(dllPath))
             {
+                errorMessage = PluginErrorMessages.AssemblyLoadFailed(fileName, "Not a valid .NET assembly");
                 _logger.Error("Plugin is not a valid .NET assembly: {FileName}", fileName);
                 return false;
             }
@@ -377,6 +403,7 @@ public static partial class PluginValidator
                                          ArgumentException or
                                          BadImageFormatException)
         {
+            errorMessage = PluginErrorMessages.GenericError("validation", Path.GetFileName(dllPath), ex);
             _logger.Error(ex, "Error validating plugin: {DllPath}", dllPath);
             return false;
         }
@@ -400,9 +427,12 @@ public static partial class PluginValidator
     /// </summary>
     /// <param name="manifest">Plugin manifest</param>
     /// <param name="pluginDirectory">Plugin directory path</param>
+    /// <param name="errorMessage">User-friendly error message if validation fails</param>
     /// <returns>True if paths are safe, false if path traversal detected</returns>
-    private static bool ValidateManifestPaths (PluginManifest manifest, string pluginDirectory)
+    private static bool ValidateManifestPaths (PluginManifest manifest, string pluginDirectory, out string errorMessage)
     {
+        errorMessage = null;
+
         try
         {
             var pluginDir = Path.GetFullPath(pluginDirectory);
@@ -412,6 +442,7 @@ public static partial class PluginValidator
 
             if (!mainPath.StartsWith(pluginDir, StringComparison.OrdinalIgnoreCase))
             {
+                errorMessage = PluginErrorMessages.PathTraversalDetected(manifest.Name, manifest.Main);
                 _logger.Error("SECURITY: Plugin main file outside plugin directory");
                 _logger.Error("  Plugin: {Plugin}", manifest.Name);
                 _logger.Error("  Main path: {MainPath}", mainPath);
@@ -425,17 +456,29 @@ public static partial class PluginValidator
                 foreach (var (key, value) in manifest.Dependencies)
                 {
                     // Check for suspicious path patterns
-                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) || key.Contains('~', StringComparison.OrdinalIgnoreCase) || value.Contains("..", StringComparison.OrdinalIgnoreCase) || value.Contains('~', StringComparison.OrdinalIgnoreCase))
+                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) ||
+                        key.Contains('~', StringComparison.OrdinalIgnoreCase) ||
+                        value.Contains("..", StringComparison.OrdinalIgnoreCase) ||
+                        value.Contains('~', StringComparison.OrdinalIgnoreCase))
                     {
+                        errorMessage = PluginErrorMessages.PathTraversalDetected(manifest.Name, $"{key} = {value}");
                         _logger.Warn("Suspicious path in manifest dependencies: {Key} = {Value}", key, value);
+                        return false;
                     }
                 }
             }
 
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         SecurityException or
+                                         ArgumentNullException or
+                                         PathTooLongException or
+                                         IOException or
+                                         UnauthorizedAccessException or
+                                         NotSupportedException)
         {
+            errorMessage = PluginErrorMessages.GenericError("manifest path validation", manifest.Name, ex);
             _logger.Error(ex, "Error validating manifest paths for {Plugin}", manifest.Name);
             return false;
         }
@@ -445,9 +488,12 @@ public static partial class PluginValidator
     /// Loads and validates a plugin manifest file.
     /// </summary>
     /// <param name="dllPath">Path to the plugin DLL</param>
+    /// <param name="validationErrors">List of validation errors if manifest is invalid</param>
     /// <returns>Validated manifest or null if not found/invalid</returns>
-    private static PluginManifest LoadAndValidateManifest (string dllPath)
+    private static PluginManifest LoadAndValidateManifest (string dllPath, out List<string> validationErrors)
     {
+        validationErrors = null;
+
         try
         {
             // Look for manifest file: PluginName.manifest.json
@@ -463,6 +509,7 @@ public static partial class PluginValidator
             var manifest = PluginManifest.Load(manifestPath);
             if (manifest == null)
             {
+                validationErrors = ["Failed to deserialize manifest file"];
                 _logger.Error("Failed to load manifest from: {ManifestPath}", manifestPath);
                 return null;
             }
@@ -470,6 +517,7 @@ public static partial class PluginValidator
             // Validate manifest
             if (!manifest.Validate(out var errors))
             {
+                validationErrors = errors;
                 _logger.Error("Manifest validation failed for {ManifestPath}:", manifestPath);
                 foreach (var error in errors)
                 {
@@ -485,6 +533,7 @@ public static partial class PluginValidator
                                          UnauthorizedAccessException or
                                          ArgumentException)
         {
+            validationErrors = [$"Error loading manifest: {ex.Message}"];
             _logger.Error(ex, "Error loading manifest for: {DllPath}", dllPath);
             return null;
         }
@@ -494,9 +543,12 @@ public static partial class PluginValidator
     /// Checks if the plugin is compatible with the current LogExpert version.
     /// </summary>
     /// <param name="manifest">Plugin manifest</param>
+    /// <param name="errorMessage">User-friendly error message if incompatible</param>
     /// <returns>True if compatible, false otherwise</returns>
-    private static bool CheckVersionCompatibility (PluginManifest manifest)
+    private static bool CheckVersionCompatibility (PluginManifest manifest, out string errorMessage)
     {
+        errorMessage = null;
+
         try
         {
             // Get current LogExpert version
@@ -512,8 +564,13 @@ public static partial class PluginValidator
             // Check compatibility
             if (!manifest.IsCompatibleWith(version))
             {
-                _logger.Error("Plugin {PluginName} requires LogExpert {Requirement}, but current version is {CurrentVersion}",
-                    manifest.Name, manifest.Requires?.LogExpert ?? "unknown", version);
+                errorMessage = PluginErrorMessages.VersionIncompatible(
+                    manifest.Name,
+                    manifest.Version ?? "Unknown",
+                    manifest.Requires?.LogExpert ?? "Unknown",
+                    version.ToString());
+
+                _logger.Error("Plugin {PluginName} requires LogExpert {Requirement}, but current version is {CurrentVersion}", manifest.Name, manifest.Requires?.LogExpert ?? "unknown", version);
                 return false;
             }
 
@@ -531,8 +588,11 @@ public static partial class PluginValidator
     /// <summary>
     /// Checks if an assembly can be loaded without throwing exceptions.
     /// </summary>
-    private static bool CanLoadAssembly (string dllPath)
+    private static bool CanLoadAssembly (string dllPath, out string errorMessage)
     {
+        errorMessage = null;
+        var fileName = Path.GetFileName(dllPath);
+
         try
         {
             // Try to get assembly name without loading it fully
@@ -541,6 +601,7 @@ public static partial class PluginValidator
         }
         catch (BadImageFormatException ex)
         {
+            errorMessage = PluginErrorMessages.BadImageFormat(fileName, Environment.Is64BitProcess);
             _logger.Debug(ex, "Plugin has invalid format (possibly wrong architecture): {DllPath}", dllPath);
             return false;
         }
@@ -551,6 +612,7 @@ public static partial class PluginValidator
                                          IOException or
                                          SecurityException)
         {
+            errorMessage = PluginErrorMessages.AssemblyLoadFailed(fileName, ex.Message);
             _logger.Debug(ex, "Cannot load plugin assembly: {DllPath}", dllPath);
             return false;
         }

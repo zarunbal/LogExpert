@@ -31,6 +31,7 @@ public class PluginIntegrationTests
     #region Loading Real Plugins
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -52,6 +53,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithJsonColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -73,6 +75,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithRegexColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -94,6 +97,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithGlassfishColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -115,6 +119,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithLog4jXmlColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -136,6 +141,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithJsonCompactColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -161,6 +167,8 @@ public class PluginIntegrationTests
     #region Loading Plugins with Manifests
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Test")]
     public void LoadPlugin_WhenManifestExists_ShouldLoadManifest ()
     {
         // Arrange
@@ -203,12 +211,20 @@ public class PluginIntegrationTests
             // Cleanup - only delete if we created it
             if (File.Exists(manifestPath))
             {
-                try { File.Delete(manifestPath); } catch { /* Ignore cleanup errors */ }
+                try
+                {
+                    File.Delete(manifestPath);
+                }
+                catch
+                {
+                    /* Ignore cleanup errors */
+                }
             }
         }
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WhenManifestDoesNotExist_ShouldStillLoadPlugin ()
     {
         // Arrange
@@ -247,6 +263,7 @@ public class PluginIntegrationTests
     #region Plugin Discovery
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void DiscoverPlugins_InPluginsDirectory_ShouldFindMultiplePlugins ()
     {
         // Arrange
@@ -257,13 +274,13 @@ public class PluginIntegrationTests
 
         // Act
         var dllFiles = Directory.GetFiles(_testPluginsDirectory, "*.dll")
-            .Where(f => !f.Contains("ColumnizerLib.dll") &&
-                       !f.Contains("LogExpert.Core.dll") &&
-                       !f.Contains("Newtonsoft.Json.dll") &&
-                       !f.Contains("Renci.SshNet.dll") &&
-                       !f.Contains("CsvHelper.dll") &&
-                       !f.Contains("BouncyCastle") &&
-                       !f.Contains("Microsoft.Extensions"))
+            .Where(f => !f.Contains("ColumnizerLib.dll", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("LogExpert.Core.dll", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("Newtonsoft.Json.dll", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("Renci.SshNet.dll", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("CsvHelper.dll", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("BouncyCastle", StringComparison.OrdinalIgnoreCase) &&
+                       !f.Contains("Microsoft.Extensions", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         // Assert
@@ -289,6 +306,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void DiscoverPlugins_ShouldIdentifyPluginTypes ()
     {
         // Arrange
@@ -356,6 +374,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void LoadPlugin_WithWrongArchitecture_ShouldReturnFailureWithBadImageFormat ()
     {
         // This test verifies that loading a DLL with wrong architecture (x86 vs x64)
@@ -371,7 +390,7 @@ public class PluginIntegrationTests
         }
 
         var x86Dlls = Directory.GetFiles(pluginsx86Dir, "*.dll")
-            .Where(f => !f.Contains("ColumnizerLib.dll"))
+            .Where(f => !f.Contains("ColumnizerLib.dll", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         if (x86Dlls.Count == 0)
@@ -387,9 +406,7 @@ public class PluginIntegrationTests
         // Note: In .NET 10+, some x86 DLLs may load but fail to find implementations
         if (Environment.Is64BitProcess && !result.Success)
         {
-            Assert.That(result.ErrorMessage, 
-                Does.Contain("format").IgnoreCase.Or.Contains("No plugin types"),
-                "Expected architecture error or no types found");
+            Assert.That(result.ErrorMessage, Does.Contain("format").IgnoreCase.Or.Contains("No plugin types"), "Expected architecture error or no types found");
         }
     }
 
@@ -398,6 +415,7 @@ public class PluginIntegrationTests
     #region Async Loading
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public async Task LoadPluginAsync_WithCsvColumnizer_ShouldLoadSuccessfully ()
     {
         // Arrange
@@ -409,7 +427,7 @@ public class PluginIntegrationTests
         }
 
         // Act
-        var result = await _loader.LoadPluginAsync(csvColonizerPath, CancellationToken.None);
+        var result = await _loader.LoadPluginAsync(csvColonizerPath, CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -417,6 +435,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public async Task LoadPluginAsync_WithCancellation_ShouldRespectCancellationToken ()
     {
         // Arrange
@@ -427,15 +446,17 @@ public class PluginIntegrationTests
             Assert.Ignore("CsvColumnizer.dll not found in plugins directory");
         }
 
-        var cts = new CancellationTokenSource();
-        cts.Cancel(); // Cancel immediately
+        using var cts = new CancellationTokenSource();
+        {
+            await cts.CancelAsync().ConfigureAwait(false); // Cancel immediately
 
-        // Act & Assert
-        Assert.ThrowsAsync<TaskCanceledException>(async () =>
-            await _loader.LoadPluginAsync(csvColonizerPath, cts.Token));
+            // Act & Assert
+            _ = Assert.ThrowsAsync<TaskCanceledException>(async () => await _loader.LoadPluginAsync(csvColonizerPath, cts.Token).ConfigureAwait(false));
+        }
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public async Task LoadPluginAsync_MultiplePlugins_ShouldLoadConcurrently ()
     {
         // Arrange
@@ -447,7 +468,7 @@ public class PluginIntegrationTests
         };
 
         // Filter to only existing files
-        pluginPaths = pluginPaths.Where(File.Exists).ToList();
+        pluginPaths = [.. pluginPaths.Where(File.Exists)];
 
         if (pluginPaths.Count == 0)
         {
@@ -455,10 +476,9 @@ public class PluginIntegrationTests
         }
 
         // Act
-        var loadTasks = pluginPaths.Select(path =>
-            _loader.LoadPluginAsync(path, CancellationToken.None)).ToList();
+        var loadTasks = pluginPaths.Select(path => _loader.LoadPluginAsync(path, CancellationToken.None)).ToList();
 
-        var results = await Task.WhenAll(loadTasks);
+        var results = await Task.WhenAll(loadTasks).ConfigureAwait(false);
 
         // Assert
         Assert.That(results.Length, Is.EqualTo(pluginPaths.Count));
@@ -470,6 +490,7 @@ public class PluginIntegrationTests
     #region Plugin Cache Integration
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void PluginCache_WithRealPlugin_ShouldCacheSuccessfully ()
     {
         // Arrange
@@ -497,6 +518,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void PluginCache_WithMultipleRealPlugins_ShouldCacheEachIndependently ()
     {
         // Arrange
@@ -537,6 +559,7 @@ public class PluginIntegrationTests
     #region Plugin Validation Integration
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void PluginValidator_WithRealPlugin_ShouldValidateSuccessfully ()
     {
         // Arrange
@@ -548,10 +571,10 @@ public class PluginIntegrationTests
         }
 
         // Trust the plugin first
-        PluginValidator.AddTrustedPlugin(csvColonizerPath, out var errorMessage);
+        _ = PluginValidator.AddTrustedPlugin(csvColonizerPath, out var errorMessage);
 
         // Act
-        var isValid = PluginValidator.ValidatePlugin(csvColonizerPath, out var manifest);
+        var isValid = PluginValidator.ValidatePlugin(csvColonizerPath, out var _);
 
         // Assert
         Assert.That(isValid, Is.True, $"Real plugin should pass validation. Error: {errorMessage}");
@@ -588,6 +611,7 @@ public class PluginIntegrationTests
     #region Assembly Inspector Integration
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void AssemblyInspector_WithMultiplePlugins_ShouldIdentifyAllTypes ()
     {
         // Arrange
@@ -620,6 +644,7 @@ public class PluginIntegrationTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void AssemblyInspector_WithDefaultPlugins_ShouldIdentifyMultipleTypes ()
     {
         // Arrange

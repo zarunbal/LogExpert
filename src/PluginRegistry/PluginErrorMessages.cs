@@ -22,7 +22,7 @@ public static class PluginErrorMessages
     public static string PluginNotTrusted (string pluginName, string hash)
     {
         return $"Plugin '{pluginName}' is not in the trusted plugins list.\n\n" +
-               $"Hash: {hash.Substring(0, Math.Min(32, hash.Length))}...\n\n" +
+               $"Hash: {hash[..Math.Min(32, hash.Length)]}...\n\n" +
                "To trust this plugin:\n" +
                "1. Go to Options > Plugin Trust Management\n" +
                "2. Click 'Add Plugin' and select the plugin file\n" +
@@ -37,8 +37,8 @@ public static class PluginErrorMessages
     public static string PluginHashMismatch (string pluginName, string expectedHash, string actualHash)
     {
         return $"SECURITY ALERT: Plugin '{pluginName}' has been modified!\n\n" +
-               $"Expected hash: {expectedHash.Substring(0, Math.Min(32, expectedHash.Length))}...\n" +
-               $"Actual hash:   {actualHash.Substring(0, Math.Min(32, actualHash.Length))}...\n\n" +
+               $"Expected hash: {expectedHash[..Math.Min(32, expectedHash.Length)]}...\n" +
+               $"Actual hash:   {actualHash[..Math.Min(32, actualHash.Length)]}...\n\n" +
                "This plugin file may have been tampered with or corrupted.\n\n" +
                "For your security:\n" +
                "• Do NOT load this plugin\n" +
@@ -52,7 +52,7 @@ public static class PluginErrorMessages
     /// </summary>
     public static string InvalidManifest (string pluginName, List<string> errors)
     {
-        var errorList = string.Join("\n• ", errors.Select(e => e));
+        var errorList = string.Join("\n• ", errors);
         return $"Plugin '{pluginName}' has an invalid manifest:\n\n" +
                $"• {errorList}\n\n" +
                "The plugin cannot be loaded. Contact the plugin developer for an updated version.";

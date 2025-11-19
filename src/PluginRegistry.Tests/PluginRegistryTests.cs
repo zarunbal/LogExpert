@@ -1,9 +1,6 @@
-using NUnit.Framework;
-using LogExpert.PluginRegistry;
-using LogExpert.Core.Interface;
-using Moq;
-using System.IO;
 using System.Reflection;
+
+using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -18,19 +15,20 @@ public class PluginRegistryTests
     private string _testPluginsPath = null!;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
         // Create test directories
         _testDataPath = Path.Combine(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
         _testPluginsPath = Path.Combine(_testDataPath, "plugins");
-        Directory.CreateDirectory(_testPluginsPath);
+        _ = Directory.CreateDirectory(_testPluginsPath);
 
         // Reset singleton for testing
         ResetPluginRegistrySingleton();
     }
 
     [TearDown]
-    public void TearDown()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
+    public void TearDown ()
     {
         // Clean up test directories
         if (Directory.Exists(_testDataPath))
@@ -49,17 +47,16 @@ public class PluginRegistryTests
     /// <summary>
     /// Uses reflection to reset the singleton instance for testing.
     /// </summary>
-    private void ResetPluginRegistrySingleton()
+    private static void ResetPluginRegistrySingleton ()
     {
-        var instanceField = typeof(PluginRegistry).GetField("_instance", 
-            BindingFlags.Static | BindingFlags.NonPublic);
+        var instanceField = typeof(PluginRegistry).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic);
         instanceField?.SetValue(null, null);
     }
 
     #region Initialization Tests
 
     [Test]
-    public void Create_ShouldReturnInstance()
+    public void Create_ShouldReturnInstance ()
     {
         // Act
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -70,7 +67,7 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void Create_ShouldReturnSameInstanceOnMultipleCalls()
+    public void Create_ShouldReturnSameInstanceOnMultipleCalls ()
     {
         // Act
         var registry1 = PluginRegistry.Create(_testDataPath, 250);
@@ -81,39 +78,33 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void Create_ShouldSetPollingInterval()
+    public void Create_ShouldSetPollingInterval ()
     {
         // Arrange
         int expectedInterval = 500;
 
         // Act
-        var registry = PluginRegistry.Create(_testDataPath, expectedInterval);
+        _ = PluginRegistry.Create(_testDataPath, expectedInterval);
 
         // Assert
         Assert.That(PluginRegistry.PollingInterval, Is.EqualTo(expectedInterval));
     }
 
     [Test]
-    public void Create_WithEmptyPluginDirectory_ShouldNotThrow()
+    public void Create_WithEmptyPluginDirectory_ShouldNotThrow ()
     {
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-        {
-            var registry = PluginRegistry.Create(_testDataPath, 250);
-        });
+        Assert.DoesNotThrow(() => _ = PluginRegistry.Create(_testDataPath, 250));
     }
 
     [Test]
-    public void Create_WithNonExistentDirectory_ShouldCreateAndNotThrow()
+    public void Create_WithNonExistentDirectory_ShouldCreateAndNotThrow ()
     {
         // Arrange
         var nonExistentPath = Path.Combine(_testDataPath, "nonexistent");
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-        {
-            var registry = PluginRegistry.Create(nonExistentPath, 250);
-        });
+        Assert.DoesNotThrow(() => _ = PluginRegistry.Create(nonExistentPath, 250));
     }
 
     #endregion
@@ -121,7 +112,7 @@ public class PluginRegistryTests
     #region Property Tests
 
     [Test]
-    public void RegisteredColumnizers_ShouldReturnEmptyListInitially()
+    public void RegisteredColumnizers_ShouldReturnEmptyListInitially ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -135,7 +126,7 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void RegisteredFileSystemPlugins_ShouldHaveDefaultFileSystem()
+    public void RegisteredFileSystemPlugins_ShouldHaveDefaultFileSystem ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -149,7 +140,7 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void RegisteredContextMenuPlugins_ShouldNotBeNull()
+    public void RegisteredContextMenuPlugins_ShouldNotBeNull ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -162,7 +153,7 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void RegisteredKeywordActions_ShouldReturnEmptyListInitially()
+    public void RegisteredKeywordActions_ShouldReturnEmptyListInitially ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -179,29 +170,23 @@ public class PluginRegistryTests
     #region Plugin Loading Tests
 
     [Test]
-    public void LoadPlugins_WithEmptyDirectory_ShouldCompleteSuccessfully()
+    public void LoadPlugins_WithEmptyDirectory_ShouldCompleteSuccessfully ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
         var progressEvents = new List<string>();
 
-        registry.PluginLoadProgress += (sender, args) =>
-        {
-            progressEvents.Add($"{args.PluginName}: {args.Status}");
-        };
+        registry.PluginLoadProgress += (sender, args) => progressEvents.Add($"{args.PluginName}: {args.Status}");
 
         // Act
-        Assert.DoesNotThrow(() =>
-        {
-            var columnizers = registry.RegisteredColumnizers;
-        });
+        Assert.DoesNotThrow(() => _ = registry.RegisteredColumnizers);
 
         // Assert
         // No plugins should be loaded, but no exception should be thrown
     }
 
     [Test]
-    public void RegisteredColumnizers_ShouldContainDefaultColumnizers()
+    public void RegisteredColumnizers_ShouldContainDefaultColumnizers ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -219,7 +204,7 @@ public class PluginRegistryTests
     #region Thread Safety Tests
 
     [Test]
-    public void Create_CalledConcurrently_ShouldReturnSameInstance()
+    public void Create_CalledConcurrently_ShouldReturnSameInstance ()
     {
         // Arrange
         var instances = new PluginRegistry[10];
@@ -246,7 +231,8 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void RegisteredColumnizers_AccessedConcurrently_ShouldNotThrow()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
+    public void RegisteredColumnizers_AccessedConcurrently_ShouldNotThrow ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -284,7 +270,7 @@ public class PluginRegistryTests
     #region Additional Properties Tests
 
     [Test]
-    public void RegisteredKeywordActions_ShouldNotBeNull()
+    public void RegisteredKeywordActions_ShouldNotBeNull ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);
@@ -297,7 +283,7 @@ public class PluginRegistryTests
     }
 
     [Test]
-    public void FindFileSystemForUri_WithFileUri_ShouldReturnLocalFileSystem()
+    public void FindFileSystemForUri_WithFileUri_ShouldReturnLocalFileSystem ()
     {
         // Arrange
         var registry = PluginRegistry.Create(_testDataPath, 250);

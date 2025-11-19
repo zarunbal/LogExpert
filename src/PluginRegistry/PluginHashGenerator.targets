@@ -6,22 +6,21 @@
 
   <!-- Target to generate plugin hashes during build -->
   <Target Name="GeneratePluginHashes" 
-          BeforeTargets="CoreCompile" 
-          Condition="'$(GeneratePluginHashesEnabled)' == 'true' AND '$(Configuration)' == 'Release'"
-          Inputs="$(OutputPath)plugins\*.dll;$(OutputPath)pluginsx86\*.dll" 
-          Outputs="$(PluginHashGeneratorFile)">
+          AfterTargets="Build" 
+          Condition="'$(GeneratePluginHashesEnabled)' == 'true' AND '$(Configuration)' == 'Release' AND Exists('$(OutputPath)plugins')">
     
     <Message Text="Generating plugin hashes from $(OutputPath)plugins..." Importance="high" />
     
     <!-- Run the hash generator tool -->
-    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)..\build\PluginHashGenerator.Tool\PluginHashGenerator.Tool.csproj -- &quot;$(OutputPath)&quot; &quot;$(PluginHashGeneratorFile)&quot; $(Configuration)" 
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)..\PluginHashGenerator.Tool\PluginHashGenerator.Tool.csproj -- &quot;$(OutputPath)&quot; &quot;$(PluginHashGeneratorFile)&quot; $(Configuration)" 
           WorkingDirectory="$(MSBuildThisFileDirectory).."
-          ContinueOnError="false" />
+          ContinueOnError="false"
+          IgnoreExitCode="false" />
           
     <Message Text="Plugin hash file generated: $(PluginHashGeneratorFile)" Importance="high" />
   </Target>
 
-  <!-- Make the generated file part of the compilation -->
+  <!-- Make the generated file part of the compilation if it exists -->
   <ItemGroup>
     <Compile Include="$(PluginHashGeneratorFile)" Condition="Exists('$(PluginHashGeneratorFile)')" />
   </ItemGroup>
