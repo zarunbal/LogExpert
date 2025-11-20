@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
@@ -103,18 +102,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
 
-        // Add Plugin Trust Management menu item to Options menu
-        ToolStripMenuItem pluginTrustMenuItem = new("Plugin &Trust Management...")
-        {
-            Name = "pluginTrustToolStripMenuItem",
-            ToolTipText = "Manage trusted plugins and view plugin hashes"
-        };
-        pluginTrustMenuItem.Click += OnPluginTrustToolStripMenuItemClick;
-
-        // Insert after Settings menu item in Options menu
-        var settingsIndex = optionToolStripMenuItem.DropDownItems.IndexOf(settingsToolStripMenuItem);
-        optionToolStripMenuItem.DropDownItems.Insert(settingsIndex + 1, pluginTrustMenuItem);
-
         _startupFileNames = fileNames;
         _instanceNumber = instanceNumber;
         _showInstanceNumbers = showInstanceNumbers;
@@ -178,15 +165,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dragControlDateTime.Visible = false;
         loadProgessBar.Visible = false;
 
-        // get a reference to the current assembly
-        var a = Assembly.GetExecutingAssembly();
-
-        // get a list of resource names from the manifest
-        var resNames = a.GetManifestResourceNames();
-
-        var bmp = Resources.Deceased;
+        using var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
-        bmp.Dispose();
+
         FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
@@ -347,6 +328,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         toolStripButtonBubbles.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles;
         toolStripButtonTail.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonTail;
         checkBoxFollowTail.Text = Resources.LogTabWindow_UI_CheckBox_checkBoxFollowTail;
+        pluginTrustManagementToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement;
     }
 
     private void ApplyContextMenuResources ()
@@ -419,7 +401,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         loglevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem;
         warnLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
         infoLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
-        debugLogLevelToolStripMenuItem1.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1;
+        debugLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem;
         disableWordHighlightModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem;
     }
 
@@ -436,6 +418,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyToolTips ()
     {
         //TODO use ToolTip class instead of ToolTipText
+        pluginTrustManagementToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement;
         timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
         openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
         newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;

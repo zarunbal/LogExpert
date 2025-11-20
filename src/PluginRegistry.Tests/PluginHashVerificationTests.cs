@@ -43,7 +43,7 @@ public class PluginHashVerificationTests
     public void SetUp ()
     {
         // Create temporary test directory
-        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_Tests_" + Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_Tests_" + Guid.NewGuid());
         _ = Directory.CreateDirectory(_testDirectory);
 
         _testConfigPath = Path.Join(_testDirectory, "trusted-plugins.json");
@@ -443,15 +443,9 @@ public class PluginHashVerificationTests
         }
 
         // Verify hash if plugin is in trusted list
-        if (isTrustedByName && config.PluginHashes.TryGetValue(fileName, out var expectedHash))
-        {
-            if (!expectedHash.Equals(fileHash, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return !isTrustedByName ||
+               !config.PluginHashes.TryGetValue(fileName, out var expectedHash) ||
+                expectedHash.Equals(fileHash, StringComparison.OrdinalIgnoreCase);
     }
 
     #endregion

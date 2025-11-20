@@ -19,7 +19,7 @@ public class PathTraversalProtectionTests
     public void SetUp ()
     {
         // Create test directory structure
-        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_PathTests_" + Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpert_PathTests_" + Guid.NewGuid());
         _pluginDirectory = Path.Join(_testDirectory, "plugins", "MyPlugin");
         _ = Directory.CreateDirectory(_pluginDirectory);
     }
@@ -427,9 +427,9 @@ public class PathTraversalProtectionTests
                 foreach (var (key, value) in manifest.Dependencies)
                 {
                     // Check for suspicious path patterns - actual implementation REJECTS these
-                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) || 
-                        key.Contains('~', StringComparison.OrdinalIgnoreCase) || 
-                        value.Contains("..", StringComparison.OrdinalIgnoreCase) || 
+                    if (key.Contains("..", StringComparison.OrdinalIgnoreCase) ||
+                        key.Contains('~', StringComparison.OrdinalIgnoreCase) ||
+                        value.Contains("..", StringComparison.OrdinalIgnoreCase) ||
                         value.Contains('~', StringComparison.OrdinalIgnoreCase))
                     {
                         // In actual implementation, this returns FALSE (rejects the plugin)

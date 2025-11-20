@@ -1077,7 +1077,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem" xml:space="preserve">
 		<value>Info</value>
 	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1" xml:space="preserve">
+  <data name="LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem" xml:space="preserve">
 		<value>Debug</value>
 	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem" xml:space="preserve">
@@ -1886,251 +1886,11 @@ Regex-Suche/Ersetzen in der aktuell ausgewählten Zeile</value>
   <data name="ParamRequesterDialog_UI_Label_ValueForParameter" xml:space="preserve">
 		<value>Wert für Parameter:</value>
 	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem" xml:space="preserve">
-		<value>Datei</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem" xml:space="preserve">
-		<value>Öffnen...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem" xml:space="preserve">
-		<value>URL öffnen...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem" xml:space="preserve">
-		<value>Datei schließen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem" xml:space="preserve">
-		<value>Neu laden</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem" xml:space="preserve">
-		<value>Neuer Tab aus Zwischenablage</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem" xml:space="preserve">
-		<value>Mehrere Dateien</value>
-	</data>
-  <data name="LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem" xml:space="preserve">
-		<value>Mehrere Dateien aktivieren</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem" xml:space="preserve">
-		<value>Dateinamensmaske...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem" xml:space="preserve">
-		<value>Sitzung laden...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem" xml:space="preserve">
-		<value>Sitzung speichern...</value>
-	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem" xml:space="preserve">
 		<value>Lesezeichen exportieren...</value>
 	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem" xml:space="preserve">
-		<value>Zuletzt verwendet</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem" xml:space="preserve">
-		<value>Beenden</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem" xml:space="preserve">
-		<value>Ansicht/Navigation</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem" xml:space="preserve">
-		<value>Gehe zu Zeile...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem" xml:space="preserve">
-		<value>Suchen...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem" xml:space="preserve">
-		<value>Filter</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem" xml:space="preserve">
-		<value>Lesezeichen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem" xml:space="preserve">
-		<value>Lesezeichen umschalten</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem" xml:space="preserve">
-		<value>Zum nächsten springen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem" xml:space="preserve">
-		<value>Zum vorherigen springen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem" xml:space="preserve">
-		<value>Lesezeichenliste</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem" xml:space="preserve">
-		<value>Spaltensuche</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem" xml:space="preserve">
-		<value>Kodierung</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
-		<value>ASCII</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
-		<value>ANSI</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
-		<value>ISO-8859-1</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
-		<value>UTF8</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
-		<value>Unicode</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem" xml:space="preserve">
-		<value>Zeitverschiebung</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
-		<value>+00:00:00.000</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
-		<value>In Tab kopieren</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
-		<value>Optionen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem" xml:space="preserve">
-		<value>Spaltenparser...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem" xml:space="preserve">
-		<value>Hervorhebung und Trigger...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem" xml:space="preserve">
-		<value>Einstellungen...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem" xml:space="preserve">
-		<value>Zellenauswahlmodus</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem" xml:space="preserve">
-		<value>Immer im Vordergrund</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_hideLineColumnToolStripMenuItem" xml:space="preserve">
-		<value>Zeilenspalte ausblenden</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem" xml:space="preserve">
-		<value>Instanz sperren</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem" xml:space="preserve">
-		<value>Werkzeuge</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem" xml:space="preserve">
-		<value>Konfigurieren...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem" xml:space="preserve">
-		<value>Hilfe</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem" xml:space="preserve">
-		<value>Hilfe anzeigen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem" xml:space="preserve">
-		<value>Über</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem" xml:space="preserve">
-		<value>Debuggen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem" xml:space="preserve">
-		<value>LogBuffer-Info ausgeben</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_dumpBufferDiagnosticToolStripMenuItem" xml:space="preserve">
-		<value>Puffer-Diagnose ausgeben</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_runGCToolStripMenuItem" xml:space="preserve">
-		<value>Garbage Collection ausführen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem" xml:space="preserve">
-		<value>GC-Info ausgeben</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionGUIThreadToolStripMenuItem" xml:space="preserve">
-		<value>Exception werfen (GUI-Thread)</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem" xml:space="preserve">
-		<value>Exception werfen (Asynchroner Delegat)</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem" xml:space="preserve">
-		<value>Exception werfen (Hintergrund-Thread)</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem" xml:space="preserve">
-		<value>Protokollstufe</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem" xml:space="preserve">
-		<value>Warnung</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem" xml:space="preserve">
-		<value>Info</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1" xml:space="preserve">
-		<value>Debug</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem" xml:space="preserve">
-		<value>Wort-Hervorhebungsmodus deaktivieren</value>
-	</data>
-  <data name="LogTabWindow_UI_Label_labelLines" xml:space="preserve">
-		<value>0</value>
-	</data>
-  <data name="LogTabWindow_UI_Label_labelSize" xml:space="preserve">
-		<value>0</value>
-	</data>
-  <data name="LogTabWindow_UI_Label_labelCurrentLine" xml:space="preserve">
-		<value>Z:</value>
-	</data>
-  <data name="LogTabWindow_UI_Label_labelStatus" xml:space="preserve">
-		<value>Bereit</value>
-	</data>
-  <data name="LogTabWindow_UI_CheckBox_Host" xml:space="preserve">
-		<value>Ende folgen</value>
-	</data>
   <data name="LogTabWindow_UI_ToolStripContainer_toolStripContainer" xml:space="preserve">
 		<value>toolStripContainer1</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonOpen" xml:space="preserve">
-		<value>Datei öffnen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonSearch" xml:space="preserve">
-		<value>Suchen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonFilter" xml:space="preserve">
-		<value>Filter</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark" xml:space="preserve">
-		<value>Lesezeichen umschalten</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonUp" xml:space="preserve">
-		<value>Vorheriges Lesezeichen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonDown" xml:space="preserve">
-		<value>Nächstes Lesezeichen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles" xml:space="preserve">
-		<value>Lesezeichen-Blasen anzeigen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonTail" xml:space="preserve">
-		<value>Ende</value>
-	</data>
-  <data name="LogTabWindow_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
-		<value>Ende folgen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem" xml:space="preserve">
-		<value>Diesen Tab schließen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_closeOtherTabsToolStripMenuItem" xml:space="preserve">
-		<value>Andere Tabs schließen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_closeAllTabsToolStripMenuItem" xml:space="preserve">
-		<value>Alle Tabs schließen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_tabColorToolStripMenuItem" xml:space="preserve">
-		<value>Tab-Farbe...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem" xml:space="preserve">
-		<value>Tab umbenennen...</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_copyPathToClipboardToolStripMenuItem" xml:space="preserve">
-		<value>Pfad in Zwischenablage kopieren</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_findInExplorerToolStripMenuItem" xml:space="preserve">
-		<value>Im Explorer suchen</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_truncateFileToolStripMenuItem" xml:space="preserve">
-		<value>Datei kürzen</value>
 	</data>
   <data name="PluginHashDialog_UI_Title" xml:space="preserve">
     <value>Plugin-Hash</value>
@@ -2251,5 +2011,26 @@ Regex-Suche/Ersetzen in der aktuell ausgewählten Zeile</value>
   </data>
   <data name="LogExpert_Common_UI_Button_Save" xml:space="preserve">
     <value>&amp;Speichern</value>
+  </data>
+  <data name="LogTabWindow_UI_MenuStrip_MainMenu" xml:space="preserve">
+    <value>Hauptmenu</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest" xml:space="preserve">
+    <value>Validierung Pluginsicherheit und Manifest</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest" xml:space="preserve">
+    <value>Validierung fehlgeschlagen (nicht vertrauenswürdig oder invalides Manifest)</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly" xml:space="preserve">
+    <value>Laden der Pluginassembly</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError" xml:space="preserve">
+    <value>Laden der Pluginassembly fehlgeschlagen (Timout oder Fehler)</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement" xml:space="preserve">
+    <value>Manage vertrauenswürdige Plugins und Anzeige der Hashes</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement" xml:space="preserve">
+    <value>Plugin &amp;Trust Management...</value>
   </data>
 </root>

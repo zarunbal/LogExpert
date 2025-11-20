@@ -1529,27 +1529,9 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Follow tail.
         /// </summary>
-        public static string LogTabWindow_UI_CheckBox_checkBoxFollowTail_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_CheckBox_checkBoxFollowTail_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Follow tail.
-        /// </summary>
         public static string LogTabWindow_UI_CheckBox_Host {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_CheckBox_Host", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Follow tail.
-        /// </summary>
-        public static string LogTabWindow_UI_CheckBox_Host_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_CheckBox_Host_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1572,29 +1554,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L:.
-        /// </summary>
-        public static string LogTabWindow_UI_Label_labelCurrentLine_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_Label_labelCurrentLine_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 0.
         /// </summary>
         public static string LogTabWindow_UI_Label_labelLines {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_Label_labelLines", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 0.
-        /// </summary>
-        public static string LogTabWindow_UI_Label_labelLines_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_Label_labelLines_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1608,29 +1572,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.
-        /// </summary>
-        public static string LogTabWindow_UI_Label_labelSize_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_Label_labelSize_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Ready.
         /// </summary>
         public static string LogTabWindow_UI_Label_labelStatus {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_Label_labelStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ready.
-        /// </summary>
-        public static string LogTabWindow_UI_Label_labelStatus_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_Label_labelStatus_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1734,29 +1680,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable MultiFile.
-        /// </summary>
-        public static string LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Toggle Bookmark.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Toggle Bookmark.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1770,29 +1698,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show bookmark bubbles.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Next Bookmark.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripButton_toolStripButtonDown {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonDown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Next Bookmark.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonDown_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonDown_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1806,29 +1716,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonFilter_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonFilter_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open File.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripButton_toolStripButtonOpen {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonOpen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open File.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonOpen_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonOpen_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1842,15 +1734,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonSearch_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonSearch_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to tail.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripButton_toolStripButtonTail {
@@ -1860,29 +1743,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to tail.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonTail_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonTail_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Previous Bookmark.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripButton_toolStripButtonUp {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonUp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Previous Bookmark.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripButton_toolStripButtonUp_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripButton_toolStripButtonUp_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -1968,29 +1833,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Always on top.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Always on top.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2004,29 +1851,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bookmarks.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cell select mode.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cell select mode.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2040,29 +1869,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Close all tabs.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_closeAllTabsToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeAllTabsToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Close File.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Close File.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2076,29 +1887,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Close other tabs.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_closeOtherTabsToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeOtherTabsToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Close this tab.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Close this tab.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2112,29 +1905,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Column finder.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Columnizer....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Columnizer....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2148,30 +1923,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configure....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy to Tab.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy to Tab.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem_Dupl" +
-                        "icate[1]", resourceCulture);
             }
         }
         
@@ -2185,12 +1941,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy path to clipboard.
+        ///   Looks up a localized string similar to Debug.
         /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_copyPathToClipboardToolStripMenuItem_Duplicate_1_ {
+        public static string LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem {
             get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_copyPathToClipboardToolStripMenuItem_Duplicate[" +
-                        "1]", resourceCulture);
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem", resourceCulture);
             }
         }
         
@@ -2204,48 +1959,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Debug.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Debug.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1 {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Debug.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Disable word highlight mode.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disable word highlight mode.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem_Dupli" +
-                        "cate[1]", resourceCulture);
             }
         }
         
@@ -2259,31 +1977,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dump buffer diagnostic.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_dumpBufferDiagnosticToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_dumpBufferDiagnosticToolStripMenuItem_Duplicate" +
-                        "[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Dump LogBuffer info.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dump LogBuffer info.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem_Duplicate[1]" +
-                        "", resourceCulture);
             }
         }
         
@@ -2297,29 +1995,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ANSI.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ASCII.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ASCII.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2333,29 +2013,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ISO-8859-1.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Encoding.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Encoding.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2369,15 +2031,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unicode.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to UTF8.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem {
@@ -2387,29 +2040,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UTF8.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Exit.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exit.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2432,29 +2067,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Filter.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Filter.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2468,29 +2085,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Find in Explorer.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_findInExplorerToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_findInExplorerToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Dump GC info.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dump GC info.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2504,29 +2103,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Go to line....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Help.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2540,29 +2121,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hide line column.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_hideLineColumnToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_hideLineColumnToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Highlighting and triggers....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Highlighting and triggers....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2576,29 +2139,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Info.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Jump to next.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Jump to next.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2612,29 +2157,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Jump to prev.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Last used.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Last used.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2648,29 +2175,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load session....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Lock instance.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Lock instance.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2684,29 +2193,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Loglevel.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to File name mask....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File name mask....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2720,29 +2211,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MultiFile.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to New tab from clipboard.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to New tab from clipboard.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2756,29 +2229,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open URL....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open URL....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2792,29 +2247,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Options.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Reload.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Reload.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2828,29 +2265,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run GC.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_runGCToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_runGCToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Save session....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save session....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2864,29 +2283,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Settings....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2900,29 +2301,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bookmark list.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show help.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show help.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -2936,15 +2319,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tab color....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_tabColorToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_tabColorToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Tab rename....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem {
@@ -2954,11 +2328,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tab rename....
+        ///   Looks up a localized string similar to Plugin &amp;Trust Management....
         /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem_Duplicate_1_ {
+        public static string LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement {
             get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem_Duplicate[1]", resourceCulture);
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement", resourceCulture);
             }
         }
         
@@ -2973,31 +2347,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Throw exception (background thread).
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem" +
-                        "_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Throw exception (Async delegate).
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Throw exception (Async delegate).
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem_Dup" +
-                        "licate[1]", resourceCulture);
             }
         }
         
@@ -3011,30 +2365,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Throw exception (GUI Thread).
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_throwExceptionGUIThreadToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_throwExceptionGUIThreadToolStripMenuItem_Duplic" +
-                        "ate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Timeshift.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timeshift.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -3048,29 +2383,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Toggle Bookmark.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Tools.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tools.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -3184,6 +2501,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage trusted plugins and view plugin hashes.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save a session (all open tabs).
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem {
@@ -3256,29 +2582,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Truncate File.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_truncateFileToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_truncateFileToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to View/Navigate.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to View/Navigate.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem_Duplicate[1]", resourceCulture);
             }
         }
         
@@ -3292,29 +2600,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warn.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem_Duplicate[1]", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to +00:00:00.000.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to +00:00:00.000.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox_Duplicate_1_ {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox_Duplicate[1]", resourceCulture);
             }
         }
         

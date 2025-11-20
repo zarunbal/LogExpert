@@ -63,8 +63,7 @@ public class ColumnizerPickerTest
 
     [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer))]
     [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", typeof(SquareBracketColumnizer))]
-    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (
-        string fileName, Type columnizerType)
+    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
@@ -81,11 +80,8 @@ public class ColumnizerPickerTest
     }
 
     [TestCase(@".\TestData\FileNotExists.txt", typeof(DefaultLogfileColumnizer))]
-    public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer (
-        string fileName, Type columnizerType)
+    public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
-        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
-
         // TODO: When DI container is ready, we can mock this set up.
         PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer());
         var result = ColumnizerPicker.DecideColumnizerByName(fileName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
@@ -95,11 +91,8 @@ public class ColumnizerPickerTest
 
     [TestCase(@"Invalid Name", typeof(DefaultLogfileColumnizer))]
     [TestCase(@"JSON Columnizer", typeof(JsonColumnizer.JsonColumnizer))]
-    public void DecideColumnizerByName_ValidTextFile_ReturnCorrectColumnizer (
-        string columnizerName, Type columnizerType)
+    public void DecideColumnizerByName_ValidTextFile_ReturnCorrectColumnizer (string columnizerName, Type columnizerType)
     {
-        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, columnizerName);
-
         // TODO: When DI container is ready, we can mock this set up.
         PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonColumnizer.JsonColumnizer());
 

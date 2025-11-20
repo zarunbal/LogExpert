@@ -138,12 +138,10 @@ public class PluginRegistry : IPluginRegistry
                         InitializePluginIfNeeded(instance, loader.Manifest, loader.DllPath);
 
                         // Add to keyword actions dictionary if applicable
-                        if (instance is IKeywordAction keywordAction)
+                        if (instance is IKeywordAction keywordAction &&
+                            !_registeredKeywordsDict.ContainsKey(keywordAction.GetName()))
                         {
-                            if (!_registeredKeywordsDict.ContainsKey(keywordAction.GetName()))
-                            {
-                                _registeredKeywordsDict.Add(keywordAction.GetName(), keywordAction);
-                            }
+                            _registeredKeywordsDict.Add(keywordAction.GetName(), keywordAction);
                         }
                     }
                 }
