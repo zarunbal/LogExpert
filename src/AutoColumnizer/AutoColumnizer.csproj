@@ -10,4 +10,10 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="AutoColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

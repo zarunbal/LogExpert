@@ -598,6 +598,8 @@ internal partial class HighlightDialog : Form
             comboBox.CustomColor = colorDialog.Color;
             comboBox.SelectedIndex = 0;
         }
+
+        colorDialog.Dispose();
     }
 
     private void Dirty ()

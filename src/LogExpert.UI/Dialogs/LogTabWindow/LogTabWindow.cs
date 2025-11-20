@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
@@ -99,7 +98,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ConfigManager = configManager;
 
-        //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+        //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
 
@@ -166,16 +165,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dragControlDateTime.Visible = false;
         loadProgessBar.Visible = false;
 
-        // get a reference to the current assembly
-        var a = Assembly.GetExecutingAssembly();
-
-        // get a list of resource names from the manifest
-        var resNames = a.GetManifestResourceNames();
-
-        var bmp = Resources.Deceased;
+        using var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
-        bmp.Dispose();
-        Closing += OnLogTabWindowClosing;
+
+        FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
     }
@@ -298,8 +291,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyTextResources ()
     {
 
-        mainMenuStrip.Text = "menuStrip1";
-        Text = "LogExpert";
+        mainMenuStrip.Text = Resources.LogTabWindow_UI_MenuStrip_MainMenu;
+        Text = Resources.LogExpert_Common_UI_Title_LogExpert;
         checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
 
         ApplyStatusStripResources();
@@ -335,6 +328,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         toolStripButtonBubbles.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles;
         toolStripButtonTail.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonTail;
         checkBoxFollowTail.Text = Resources.LogTabWindow_UI_CheckBox_checkBoxFollowTail;
+        pluginTrustManagementToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement;
     }
 
     private void ApplyContextMenuResources ()
@@ -405,9 +399,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         throwExceptionbackgroundThToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem;
         throwExceptionBackgroundThreadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem;
         loglevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem;
-        warnToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
-        infoToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
-        debugToolStripMenuItem1.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1;
+        warnLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
+        infoLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
+        debugLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem;
         disableWordHighlightModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem;
     }
 
@@ -424,6 +418,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyToolTips ()
     {
         //TODO use ToolTip class instead of ToolTipText
+        pluginTrustManagementToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement;
         timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
         openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
         newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
@@ -1074,7 +1069,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 // handle relative paths in .lxp files
                 var dir = Path.GetDirectoryName(fileName);
-                return Path.Combine(dir, persistenceData.FileName);
+                return Path.Join(dir, persistenceData.FileName);
             }
         }
 
@@ -2206,7 +2201,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
-    private void OnLogTabWindowClosing (object sender, CancelEventArgs e)
+    private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
         try
         {
@@ -2730,6 +2725,27 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
+    private void OnPluginTrustToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        using var dialog = new PluginTrustDialog(this);
+        var result = dialog.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var restartPrompt = MessageBox.Show(
+                "Plugin trust configuration updated.\n\nRestart LogExpert to apply changes?",
+                "Restart Recommended",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (restartPrompt == DialogResult.Yes)
+            {
+                Application.Restart();
+            }
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
     private void OnDateTimeDragControlValueDragged (object sender, EventArgs e)
     {
         if (CurrentLogWindow != null)
@@ -3113,7 +3129,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         //_logger.Get_logger().LogLevel = _logger.Level.INFO;
     }
 
-    private void OnDebugToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnDebugLogLevelToolStripMenuItemClick (object sender, EventArgs e)
     {
         //_logger.Get_logger().LogLevel = _logger.Level.DEBUG;
     }

@@ -15,11 +15,11 @@ public class JsonCompactColumnizerTest
     public void GetPriority_HappyFile_PriorityMatches (string fileName, Priority priority)
     {
         var jsonCompactColumnizer = new JsonColumnizer.JsonCompactColumnizer();
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, LogExpert.PluginRegistry.PluginRegistry.Instance);
         logFileReader.ReadFiles();
-        List<ILogLine> loglines = new()
-        {
+        List<ILogLine> loglines =
+        [
             // Sampling a few lines to select the correct columnizer
             logFileReader.GetLogLine(0),
             logFileReader.GetLogLine(1),
@@ -31,7 +31,7 @@ public class JsonCompactColumnizerTest
             logFileReader.GetLogLine(100),
             logFileReader.GetLogLine(200),
             logFileReader.GetLogLine(400)
-        };
+        ];
 
         var result = jsonCompactColumnizer.GetPriority(path, loglines);
         Assert.That(result, Is.EqualTo(priority));

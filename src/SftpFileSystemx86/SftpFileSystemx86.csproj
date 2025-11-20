@@ -42,6 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\SftpFileSystemx64\SftpFileSystem.manifest.json" Link="SftpFileSystem.manifest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx" Link="ConfigDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx" Link="FailedKeyDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx" Link="LoginDialog.resx" />

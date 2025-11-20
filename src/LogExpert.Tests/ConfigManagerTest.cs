@@ -25,9 +25,9 @@ public class ConfigManagerTest
     public void SetUp ()
     {
         // Create isolated test directory for each test
-        _testDir = Path.Combine(Path.GetTempPath(), "LogExpert_Test_" + Guid.NewGuid().ToString("N"));
+        _testDir = Path.Join(Path.GetTempPath(), "LogExpert_Test_" + Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_testDir);
-        _testSettingsFile = new FileInfo(Path.Combine(_testDir, "settings.json"));
+        _testSettingsFile = new FileInfo(Path.Join(_testDir, "settings.json"));
     }
 
     [TearDown]

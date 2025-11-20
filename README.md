@@ -4,7 +4,7 @@ This is a clone from (no longer exists) <https://logexpert.codeplex.com/>
 
 ## Overview
 
-LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
+LogExpert is a Windows feature rich tail program (a GUI replacement for the Unix tail command) with support for plugins, highlighting, filtering, bookmarking, columnizing and more.
 
 Summary of (most) features:
 

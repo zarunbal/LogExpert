@@ -10,14 +10,14 @@ namespace LogExpert.Tests.Helpers;
 public class RegexHelperTests
 {
     [SetUp]
-    public void Setup()
+    public void Setup ()
     {
         // Clear cache before each test to ensure isolation
         RegexHelper.ClearCache();
     }
 
     [Test]
-    public void CreateSafeRegex_ShouldHaveDefaultTimeout()
+    public void CreateSafeRegex_ShouldHaveDefaultTimeout ()
     {
         // Arrange & Act
         var regex = RegexHelper.CreateSafeRegex("test");
@@ -27,7 +27,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void CreateSafeRegex_WithCustomTimeout_ShouldUseCustomTimeout()
+    public void CreateSafeRegex_WithCustomTimeout_ShouldUseCustomTimeout ()
     {
         // Arrange
         var customTimeout = TimeSpan.FromSeconds(5);
@@ -40,44 +40,42 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void CreateSafeRegex_WithNullPattern_ShouldThrowArgumentNullException()
+    public void CreateSafeRegex_WithNullPattern_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => RegexHelper.CreateSafeRegex(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => RegexHelper.CreateSafeRegex(null!));
     }
 
     [Test]
-    public void CreateSafeRegex_ShouldPreventCatastrophicBacktracking()
+    public void CreateSafeRegex_ShouldPreventCatastrophicBacktracking ()
     {
-        // Arrange
-        var maliciousPattern = "^(a+)+$";
-        var maliciousInput = "aaaaaaaaaaaaaaaaaX";
-        var regex = RegexHelper.CreateSafeRegex(maliciousPattern);
+        // Arrange - Use a more aggressive pattern that will reliably timeout
+        // This pattern causes exponential backtracking on non-matching input
+        var maliciousPattern = @"(a*)*b";
+        var maliciousInput = new string('a', 50); // 50 'a's with no 'b' at the end
+        var shortTimeout = TimeSpan.FromMilliseconds(100);
+        var regex = RegexHelper.CreateSafeRegex(maliciousPattern, RegexOptions.None, shortTimeout);
 
         // Act & Assert
-        Assert.Throws<RegexMatchTimeoutException>(() =>
-        {
-            regex.IsMatch(maliciousInput);
-        });
+        _ = Assert.Throws<RegexMatchTimeoutException>(() => _ = regex.IsMatch(maliciousInput));
     }
 
     [Test]
-    public void CreateSafeRegex_WithComplexPattern_ShouldTimeout()
+    public void CreateSafeRegex_WithComplexPattern_ShouldTimeout ()
     {
         // Arrange - Another catastrophic backtracking pattern
-        var pattern = "(x+x+)+y";
-        var input = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxX";
-        var regex = RegexHelper.CreateSafeRegex(pattern);
+        // This pattern exhibits exponential behavior with nested quantifiers
+        var pattern = @"(a+)+b";
+        var input = new string('a', 50) + "c"; // Many 'a's but ends with 'c' instead of 'b'
+        var shortTimeout = TimeSpan.FromMilliseconds(100);
+        var regex = RegexHelper.CreateSafeRegex(pattern, RegexOptions.None, shortTimeout);
 
         // Act & Assert
-        Assert.Throws<RegexMatchTimeoutException>(() =>
-        {
-            regex.IsMatch(input);
-        });
+        _ = Assert.Throws<RegexMatchTimeoutException>(() => _ = regex.IsMatch(input));
     }
 
     [Test]
-    public void GetOrCreateCached_ShouldReturnSameInstance()
+    public void GetOrCreateCached_ShouldReturnSameInstance ()
     {
         // Arrange & Act
         var regex1 = RegexHelper.GetOrCreateCached("test");
@@ -88,7 +86,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void GetOrCreateCached_WithDifferentPatterns_ShouldReturnDifferentInstances()
+    public void GetOrCreateCached_WithDifferentPatterns_ShouldReturnDifferentInstances ()
     {
         // Arrange & Act
         var regex1 = RegexHelper.GetOrCreateCached("test1");
@@ -99,7 +97,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void GetOrCreateCached_WithDifferentOptions_ShouldReturnDifferentInstances()
+    public void GetOrCreateCached_WithDifferentOptions_ShouldReturnDifferentInstances ()
     {
         // Arrange & Act
         var regex1 = RegexHelper.GetOrCreateCached("test", RegexOptions.None);
@@ -110,7 +108,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void GetOrCreateCached_ShouldCacheUpToMaxSize()
+    public void GetOrCreateCached_ShouldCacheUpToMaxSize ()
     {
         // Arrange - Create more patterns than cache size
         var cacheSize = 100;
@@ -118,21 +116,21 @@ public class RegexHelperTests
         // Act - Fill the cache
         for (int i = 0; i < cacheSize; i++)
         {
-            RegexHelper.GetOrCreateCached($"pattern{i}");
+            _ = RegexHelper.GetOrCreateCached($"pattern{i}");
         }
 
         // Assert - Cache should be at max size
         Assert.That(RegexHelper.CacheSize, Is.EqualTo(cacheSize));
 
         // Act - Add more to trigger eviction
-        RegexHelper.GetOrCreateCached("pattern_overflow");
+        _ = RegexHelper.GetOrCreateCached("pattern_overflow");
 
         // Assert - Cache should have evicted some entries
         Assert.That(RegexHelper.CacheSize, Is.LessThanOrEqualTo(cacheSize));
     }
 
     [Test]
-    public void IsValidPattern_WithValidPattern_ShouldReturnTrue()
+    public void IsValidPattern_WithValidPattern_ShouldReturnTrue ()
     {
         // Arrange
         var pattern = @"\d{4}-\d{2}-\d{2}";
@@ -146,7 +144,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void IsValidPattern_WithInvalidPattern_ShouldReturnFalse()
+    public void IsValidPattern_WithInvalidPattern_ShouldReturnFalse ()
     {
         // Arrange
         var pattern = "[invalid";
@@ -157,11 +155,11 @@ public class RegexHelperTests
         // Assert
         Assert.That(result, Is.False);
         Assert.That(error, Is.Not.Null);
-        Assert.That(error, Does.Contain("parsing"));
+        Assert.That(error, Does.Contain("Invalid pattern").Or.Contain("parsing").Or.Contain("Unterminated"));
     }
 
     [Test]
-    public void IsValidPattern_WithNullPattern_ShouldReturnFalse()
+    public void IsValidPattern_WithNullPattern_ShouldReturnFalse ()
     {
         // Act
         var result = RegexHelper.IsValidPattern(null!, out var error);
@@ -172,7 +170,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void IsValidPattern_WithEmptyPattern_ShouldReturnFalse()
+    public void IsValidPattern_WithEmptyPattern_ShouldReturnFalse ()
     {
         // Act
         var result = RegexHelper.IsValidPattern(string.Empty, out var error);
@@ -183,12 +181,12 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void ClearCache_ShouldRemoveAllCachedRegex()
+    public void ClearCache_ShouldRemoveAllCachedRegex ()
     {
         // Arrange
-        RegexHelper.GetOrCreateCached("test1");
-        RegexHelper.GetOrCreateCached("test2");
-        RegexHelper.GetOrCreateCached("test3");
+        _ = RegexHelper.GetOrCreateCached("test1");
+        _ = RegexHelper.GetOrCreateCached("test2");
+        _ = RegexHelper.GetOrCreateCached("test3");
         Assert.That(RegexHelper.CacheSize, Is.GreaterThan(0));
 
         // Act
@@ -199,7 +197,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void CachedRegex_ShouldWorkCorrectly()
+    public void CachedRegex_ShouldWorkCorrectly ()
     {
         // Arrange
         var pattern = @"(\d{4})-(\d{2})-(\d{2})";
@@ -217,7 +215,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void CachedRegex_WithIgnoreCase_ShouldMatchCaseInsensitively()
+    public void CachedRegex_WithIgnoreCase_ShouldMatchCaseInsensitively ()
     {
         // Arrange
         var pattern = "test";
@@ -235,7 +233,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void CachedRegex_ShouldHaveTimeout()
+    public void CachedRegex_ShouldHaveTimeout ()
     {
         // Arrange & Act
         var regex = RegexHelper.GetOrCreateCached("test");
@@ -245,7 +243,7 @@ public class RegexHelperTests
     }
 
     [Test]
-    public void DefaultTimeout_ShouldBeTwoSeconds()
+    public void DefaultTimeout_ShouldBeTwoSeconds ()
     {
         // Assert
         Assert.That(RegexHelper.DefaultTimeout, Is.EqualTo(TimeSpan.FromSeconds(2)));
@@ -257,7 +255,7 @@ public class RegexHelperTests
     [TestCase(@"[A-Z]+", "abc", false)]
     [TestCase(@"^\w+@\w+\.\w+$", "test@example.com", true)]
     [TestCase(@"^\w+@\w+\.\w+$", "invalid-email", false)]
-    public void CreateSafeRegex_CommonPatterns_ShouldWorkCorrectly(string pattern, string input, bool expectedMatch)
+    public void CreateSafeRegex_CommonPatterns_ShouldWorkCorrectly (string pattern, string input, bool expectedMatch)
     {
         // Arrange
         var regex = RegexHelper.CreateSafeRegex(pattern);

@@ -15,4 +15,10 @@
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="JsonCompactColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

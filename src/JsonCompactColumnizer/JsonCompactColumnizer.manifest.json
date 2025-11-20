@@ -1,0 +1,21 @@
+{
+  "name": "JsonCompactColumnizer",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Parses Serilog.Formatting.Compact JSON format log files with structured logging support",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "config:read"
+  ],
+  "dependencies": {
+    "Newtonsoft.Json": "13.0.0"
+  },
+  "main": "JsonCompactColumnizer.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

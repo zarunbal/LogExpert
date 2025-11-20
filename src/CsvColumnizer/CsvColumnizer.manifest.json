@@ -1,0 +1,21 @@
+{
+  "name": "CsvColumnizer",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Parses CSV (Comma-Separated Values) log files into columns with configurable delimiters and quote characters",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "config:read"
+  ],
+  "dependencies": {
+    "CsvHelper": "30.0.0"
+  },
+  "main": "CsvColumnizer.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

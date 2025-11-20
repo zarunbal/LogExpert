@@ -1,0 +1,19 @@
+{
+  "name": "Log4jXmlColumnizer",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Parses Log4j XML formatted log files with support for hierarchical log events",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "config:read"
+  ],
+  "dependencies": {},
+  "main": "Log4jXmlColumnizer.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}
