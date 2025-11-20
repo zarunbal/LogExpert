@@ -7,6 +7,8 @@ using ColumnizerLib;
 using LogExpert;
 using LogExpert.Core.Helpers;
 
+using Newtonsoft.Json;
+
 [assembly: SupportedOSPlatform("windows")]
 namespace RegexColumnizer;
 
@@ -14,14 +16,14 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 {
     #region Fields
 
-    private readonly XmlSerializer xml = new(typeof(RegexColumnizerConfig));
+    private readonly XmlSerializer _xml = new(typeof(RegexColumnizerConfig));
     private string[] columns;
-
+    private RegexColumnizerConfig _config;
     #endregion
 
     #region Properties
 
-    public RegexColumnizerConfig Config { get; private set; }
+    public RegexColumnizerConfig Config { get => field; private set => field = value; }
 
     public Regex Regex { get; private set; }
 
@@ -31,13 +33,12 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public string GetName ()
     {
-        if (Config == null || string.IsNullOrWhiteSpace(Config.Name))
-        {
-            return GetNameInternal();
-        }
-
-        return Config.Name;
+        return _config == null ||
+               string.IsNullOrWhiteSpace(_config.Name)
+                    ? GetNameInternal()
+                    : _config.Name;
     }
+
     public string GetDescription () => "Columns are filled by regular expression named capture groups";
 
     public int GetColumnCount () => columns.Length;
@@ -126,46 +127,89 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public void Configure (ILogLineColumnizerCallback callback, string configDir)
     {
-        var dialog = new RegexColumnizerConfigDialog { Config = Config };
-        if (dialog.ShowDialog() == DialogResult.OK)
-        {
-            var configFile = GetConfigFile(configDir);
-            using (var w = new FileStream(configFile, FileMode.Create))
-            {
-                xml.Serialize(w, dialog.Config);
-            }
+        FileInfo fileInfo = new(Path.Join(configDir, GetName(), ".json"));
 
-            Init(dialog.Config);
+        RegexColumnizerConfigDialog dlg = new(_config);
+        if (dlg.ShowDialog() == DialogResult.OK)
+        {
+            using StreamWriter sw = new(fileInfo.Create());
+            JsonSerializer serializer = new();
+            serializer.Serialize(sw, _config);
+            _config = dlg.Config;
+            Init();
         }
     }
 
     public void LoadConfig (string configDir)
     {
-        var configFile = GetConfigFile(configDir);
-        RegexColumnizerConfig config;
+        var configFile = GetConfigFileJSON(configDir);
+
         if (!File.Exists(configFile))
         {
-            config = new RegexColumnizerConfig
+            configFile = GetConfigFileXML(configDir);
+
+            if (!File.Exists(configFile))
             {
-                Name = GetName()
-            };
+                _config = new RegexColumnizerConfig
+                {
+                    Name = GetName()
+                };
+            }
+            else
+            {
+                try
+                {
+                    using var reader = new StreamReader(configFile);
+                    _config = _xml.Deserialize(reader) as RegexColumnizerConfig;
+                }
+                catch (Exception ex) when (ex is InvalidOperationException or
+                                                 IOException or
+                                                 ArgumentException or
+                                                 ArgumentNullException or
+                                                 FileNotFoundException or
+                                                 DirectoryNotFoundException)
+                {
+                    _ = MessageBox.Show(ex.Message, "Deserialize");
+                    _config = new RegexColumnizerConfig
+                    {
+                        Name = GetName()
+                    };
+                }
+            }
         }
         else
         {
-            using (var reader = new StreamReader(configFile))
+            try
             {
-                config = xml.Deserialize(reader) as RegexColumnizerConfig;
+                _config = JsonConvert.DeserializeObject<RegexColumnizerConfig>(File.ReadAllText(configFile));
+            }
+            catch (JsonException ex)
+            {
+                _ = MessageBox.Show(ex.Message, "Deserialize");
+                _config = new RegexColumnizerConfig
+                {
+                    Name = GetName()
+                };
             }
         }
 
-        Init(config);
+        Init();
     }
 
-    public string GetConfigFile (string configDir)
+    [Obsolete("XML Configuration is deprecated, use JSON instead")]
+    private string GetConfigFileXML (string configDir)
     {
         var name = GetType().Name;
         var configPath = Path.Join(configDir, name);
-        configPath = Path.ChangeExtension(configPath, "xml"); //todo change to json
+        configPath = Path.ChangeExtension(configPath, "xml");
+        return configPath;
+    }
+
+    private string GetConfigFileJSON (string configDir)
+    {
+        var name = GetType().Name;
+        var configPath = Path.Join(configDir, name);
+        configPath = Path.ChangeExtension(configPath, "json");
         return configPath;
     }
 
@@ -184,13 +228,11 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     protected abstract string GetNameInternal ();
 
-    public void Init (RegexColumnizerConfig config)
+    public void Init ()
     {
-        Config = config;
-
         try
         {
-            Regex = RegexHelper.GetOrCreateCached(Config.Expression, RegexOptions.Compiled);
+            Regex = RegexHelper.GetOrCreateCached(_config.Expression, RegexOptions.Compiled);
             var skip = Regex.GetGroupNames().Length == 1 ? 0 : 1;
             columns = [.. Regex.GetGroupNames().Skip(skip)];
         }

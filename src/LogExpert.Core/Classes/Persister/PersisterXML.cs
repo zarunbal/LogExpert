@@ -13,6 +13,7 @@ namespace LogExpert.Core.Classes.Persister;
 /// <summary>
 /// Persister for XML format persistence data.
 /// </summary>
+[Obsolete("XML persistence is deprecated and will be removed in future versions. This is a fallback for older Versions")]
 public static class PersisterXML
 {
     #region Fields

@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using System.Linq;
 
 using ColumnizerLib;
 
@@ -73,21 +71,23 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        ColumnizedLogLine cLogLine = new();
-        cLogLine.LogLine = line;
+        ColumnizedLogLine cLogLine = new()
+        {
+            LogLine = line
+        };
 
         var temp = line.FullLine;
 
         var columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
-        cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
 
         // delete '[#|' and '|#]'
-        if (temp.StartsWith("[#|"))
+        if (temp.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[3..];
         }
 
-        if (temp.EndsWith("|#]"))
+        if (temp.EndsWith("|#]", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[..^3];
         }
@@ -108,7 +108,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
                     columns[1].FullValue = temp;
                 }
 
-                var newDate = dateTime.ToString(DATETIME_FORMAT_OUT);
+                var newDate = dateTime.ToString(DATETIME_FORMAT_OUT, CultureInfo.InvariantCulture);
                 columns[0].FullValue = newDate;
             }
             catch (Exception)
@@ -156,12 +156,12 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         var temp = logLine.FullLine;
 
         // delete '[#|' and '|#]'
-        if (temp.StartsWith("[#|"))
+        if (temp.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[3..];
         }
 
-        if (temp.EndsWith("|#]"))
+        if (temp.EndsWith("|#]", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[..^3];
         }
@@ -172,7 +172,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         }
 
         var endIndex = temp.IndexOf(separatorChar, 1);
-        if (endIndex > 28 || endIndex < 0)
+        if (endIndex is > 28 or < 0)
         {
             return DateTime.MinValue;
         }
@@ -182,12 +182,9 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         try
         {
             // convert glassfish timestamp into a readable format:
-            if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out var timestamp))
-            {
-                return timestamp.AddMilliseconds(timeOffset);
-            }
-
-            return DateTime.MinValue;
+            return DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out var timestamp)
+                ? timestamp.AddMilliseconds(timeOffset)
+                : DateTime.MinValue;
         }
         catch (Exception)
         {

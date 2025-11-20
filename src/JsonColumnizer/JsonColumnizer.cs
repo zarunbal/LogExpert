@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using ColumnizerLib;
 
 using LogExpert;
@@ -112,7 +108,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
         columns.Last().FullValue = line.FullLine;
 
-        cLogLine.ColumnValues = columns.Select(a => (IColumn)a).ToArray();
+        cLogLine.ColumnValues = [.. columns.Select(a => (IColumn)a)];
 
         return cLogLine;
     }

@@ -1,22 +1,16 @@
-using System;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 using LogExpert.Core.Helpers;
-using System.Data;
-using System.Text.RegularExpressions;
 
 namespace RegexColumnizer;
 
 public partial class RegexColumnizerConfigDialog : Form
 {
-    public RegexColumnizerConfigDialog ()
+    public RegexColumnizerConfigDialog (RegexColumnizerConfig config)
     {
         SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
@@ -25,6 +19,8 @@ public partial class RegexColumnizerConfigDialog : Form
         ApplyResources();
 
         ResumeLayout();
+
+        Config = config;
     }
 
     private void ApplyResources ()
@@ -38,9 +34,6 @@ public partial class RegexColumnizerConfigDialog : Form
         btnOk.Text = Resources.RegexColumnizerConfigDialog_UI_Button_OK;
         btnCancel.Text = Resources.RegexColumnizerConfigDialog_UI_Button_Cancel;
     }
-
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public RegexColumnizerConfig Config { get; set; }
 
     private void OnBtnOkClick (object sender, EventArgs e)
     {
@@ -60,8 +53,10 @@ public partial class RegexColumnizerConfigDialog : Form
 
     private void OnButtonCheckClick (object sender, EventArgs e)
     {
-        Check();
+        _ = Check();
     }
+
+    public RegexColumnizerConfig Config { get; }
 
     private bool Check ()
     {
@@ -76,7 +71,7 @@ public partial class RegexColumnizerConfigDialog : Form
 
             for (var i = offset; i < groupNames.Length; i++)
             {
-                table.Columns.Add(groupNames[i]);
+                _ = table.Columns.Add(groupNames[i]);
             }
 
             if (!string.IsNullOrEmpty(tbTestLine.Text))
