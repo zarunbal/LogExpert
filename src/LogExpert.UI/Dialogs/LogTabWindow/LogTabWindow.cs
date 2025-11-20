@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
@@ -95,9 +94,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         InitializeComponent();
 
+        ApplyTextResources();
+
         ConfigManager = configManager;
 
-        //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+        //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
 
@@ -141,18 +142,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _tabStringFormat.LineAlignment = StringAlignment.Center;
         _tabStringFormat.Alignment = StringAlignment.Near;
 
-        ToolStripControlHost host = new(checkBoxFollowTail);
-
-        host.Padding = new Padding(20, 0, 0, 0);
-        host.BackColor = Color.FromKnownColor(KnownColor.Transparent);
+        ToolStripControlHost host = new(checkBoxFollowTail)
+        {
+            Padding = new Padding(20, 0, 0, 0),
+            BackColor = Color.FromKnownColor(KnownColor.Transparent)
+        };
 
         var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
-        toolStripEncodingASCIIItem.Text = Encoding.ASCII.HeaderName;
-        toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
-        toolStripEncodingISO88591Item.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
-        toolStripEncodingUTF8Item.Text = Encoding.UTF8.HeaderName;
-        toolStripEncodingUTF16Item.Text = Encoding.Unicode.HeaderName;
+        encodingASCIIToolStripMenuItem.Text = Encoding.ASCII.HeaderName;
+        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
+        encodingISO88591toolStripMenuItem.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
+        encodingUTF8toolStripMenuItem.Text = Encoding.UTF8.HeaderName;
+        encodingUTF16toolStripMenuItem.Text = Encoding.Unicode.HeaderName;
 
         if (index != -1)
         {
@@ -163,16 +165,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dragControlDateTime.Visible = false;
         loadProgessBar.Visible = false;
 
-        // get a reference to the current assembly
-        var a = Assembly.GetExecutingAssembly();
-
-        // get a list of resource names from the manifest
-        var resNames = a.GetManifestResourceNames();
-
-        var bmp = Resources.Deceased;
+        using var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
-        bmp.Dispose();
-        Closing += OnLogTabWindowClosing;
+
+        FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
     }
@@ -208,6 +204,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region Properties
 
     [SupportedOSPlatform("windows")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public LogWindow.LogWindow CurrentLogWindow
     {
         get => _currentLogWindow;
@@ -225,7 +222,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     //  get { return ConfigManager.Settings; }
     //}
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ILogExpertProxy LogExpertProxy { get; set; }
+
     public IConfigManager ConfigManager { get; }
 
     #endregion
@@ -289,6 +288,187 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         return AddFileTab(fileName, true, title, false, null);
     }
 
+    private void ApplyTextResources ()
+    {
+
+        mainMenuStrip.Text = Resources.LogTabWindow_UI_MenuStrip_MainMenu;
+        Text = Resources.LogExpert_Common_UI_Title_LogExpert;
+        checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
+
+        ApplyStatusStripResources();
+        ApplyContextMenuResources();
+        ApplyToolStripResources();
+        ApplyTabContextMenuResources();
+
+        ApplyToolTips();
+    }
+
+    private void ApplyTabContextMenuResources ()
+    {
+        closeThisTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem;
+        closeOtherTabsToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_closeOtherTabsToolStripMenuItem;
+        closeAllTabsToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_closeAllTabsToolStripMenuItem;
+        tabColorToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_tabColorToolStripMenuItem;
+        tabRenameToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem;
+        copyPathToClipboardToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyPathToClipboardToolStripMenuItem;
+        findInExplorerToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_findInExplorerToolStripMenuItem;
+        truncateFileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_truncateFileToolStripMenuItem;
+    }
+
+    private void ApplyToolStripResources ()
+    {
+        checkBoxHost.Text = Resources.LogTabWindow_UI_CheckBox_Host;
+        toolStripContainer.Text = Resources.LogTabWindow_UI_ToolStripContainer_toolStripContainer;
+        toolStripButtonOpen.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonOpen;
+        toolStripButtonSearch.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonSearch;
+        toolStripButtonFilter.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonFilter;
+        toolStripButtonBookmark.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark;
+        toolStripButtonUp.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonUp;
+        toolStripButtonDown.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonDown;
+        toolStripButtonBubbles.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles;
+        toolStripButtonTail.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonTail;
+        checkBoxFollowTail.Text = Resources.LogTabWindow_UI_CheckBox_checkBoxFollowTail;
+        pluginTrustManagementToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement;
+    }
+
+    private void ApplyContextMenuResources ()
+    {
+        //File menu
+        fileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem;
+        openToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem;
+        openURIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem;
+        closeFileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem;
+        reloadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem;
+        newFromClipboardToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem;
+        multiFileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem;
+        multiFileEnabledStripMenuItem.Text = Resources.LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem;
+        multifileMaskToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem;
+        loadProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem;
+        saveProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem;
+        exportBookmarksToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem;
+        lastUsedToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem;
+        exitToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem;
+
+        //View/Navigate menu
+        viewNavigateToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem;
+        goToLineToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem;
+        searchToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem;
+        filterToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem;
+        bookmarksToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem;
+        toggleBookmarkToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem;
+        jumpToNextToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem;
+        jumpToPrevToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem;
+        showBookmarkListToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem;
+        columnFinderToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem;
+        encodingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem;
+        encodingASCIIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem;
+        encodingANSIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem;
+        encodingISO88591toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem;
+        encodingUTF8toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem;
+        encodingUTF16toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem;
+        timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
+        timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
+        copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
+
+        //Options menu
+        optionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem;
+        columnizerToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem;
+        hilightingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem;
+        settingsToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem;
+        cellSelectModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem;
+        alwaysOnTopToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem;
+        hideLineColumnToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_hideLineColumnToolStripMenuItem;
+        lockInstanceToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem;
+
+        //Tools Menu
+        toolsToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem;
+        configureToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem;
+
+        //Help Menu
+        helpToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem;
+        showHelpToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem;
+        aboutToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem;
+
+        //Debug Menu
+        debugToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem;
+        dumpLogBufferInfoToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem;
+        dumpBufferDiagnosticToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_dumpBufferDiagnosticToolStripMenuItem;
+        runGCToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_runGCToolStripMenuItem;
+        gCInfoToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem;
+        throwExceptionGUIThreadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionGUIThreadToolStripMenuItem;
+        throwExceptionbackgroundThToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem;
+        throwExceptionBackgroundThreadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem;
+        loglevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem;
+        warnLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
+        infoLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
+        debugLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem;
+        disableWordHighlightModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem;
+    }
+
+    private void ApplyStatusStripResources ()
+    {
+        labelLines.Text = Resources.LogTabWindow_UI_Label_labelLines;
+        labelSize.Text = Resources.LogTabWindow_UI_Label_labelSize;
+        labelCurrentLine.Text = Resources.LogTabWindow_UI_Label_labelCurrentLine;
+        labelStatus.Text = Resources.LogTabWindow_UI_Label_labelStatus;
+    }
+
+    #region Resources Map
+
+    private void ApplyToolTips ()
+    {
+        //TODO use ToolTip class instead of ToolTipText
+        pluginTrustManagementToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement;
+        timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
+        openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
+        newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
+        multiFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem;
+        loadProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
+        saveProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
+        timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
+        copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
+        cellSelectModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem;
+        lockInstanceToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem;
+        toolsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_toolsToolStripMenuItem;
+        toolStripButtonSearch.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonSearch;
+        toolStripButtonOpen.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonOpen;
+        toolStripButtonDown.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonDown;
+        toolStripButtonUp.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonUp;
+        toolStripButtonBookmark.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonBookmark;
+        toolStripButtonFilter.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonFilter;
+        highlightGroupsToolStripComboBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripComboBox_ToolTip_highlightGroupsToolStripComboBox;
+        tabRenameToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabRenameToolStripMenuItem;
+        closeAllTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeAllTabsToolStripMenuItem;
+        closeOtherTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeOtherTabsToolStripMenuItem;
+        tabColorToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabColorToolStripMenuItem;
+        findInExplorerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_findInExplorerToolStripMenuItem;
+        copyPathToClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem;
+        truncateFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem;
+    }
+
+    /// <summary>
+    /// Creates a mapping of UI controls to their corresponding tooltip text.
+    /// </summary>
+    /// <remarks>This method initializes a dictionary with predefined tooltips for specific UI controls.
+    /// Additional tooltips can be added to the dictionary as needed.</remarks>
+    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
+    /// strings representing the tooltip text for each control.</returns>
+    //private Dictionary<Control, string> GetToolTipMap ()
+    //{
+
+    //    return new Dictionary<Control, string>
+    //    {
+    //        { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage },
+    //        { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
+    //        { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
+    //        { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
+    //        { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
+    //    };
+    //}
+
+    #endregion
+
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
     {
@@ -297,12 +477,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ToolTip tip = new(components);
 
-            tip.SetToolTip(logWin,
-                "Filter: \"" + pipe.FilterParams.SearchText + "\"" +
-                (pipe.FilterParams.IsInvert ? " (Invert match)" : "") +
-                (pipe.FilterParams.ColumnRestrict ? "\nColumn restrict" : "")
-            );
-
+            //Resources.LogTabWindow_UI_LogWindow_ToolTip_Filter
+            var isInvertText = pipe.FilterParams.IsInvert ? Resources.LogTabWindow_UI_LogWindow_ToolTip_InvertMatch : string.Empty;
+            var isColumnRestrictText = pipe.FilterParams.ColumnRestrict ? Resources.LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict : string.Empty;
+            tip.SetToolTip(logWin, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_ToolTip_Filter, pipe.FilterParams.SearchText, isInvertText, isColumnRestrictText));
             tip.AutomaticDelay = 10;
             tip.AutoPopDelay = 5000;
             var data = logWin.Tag as LogWindowData;
@@ -520,8 +698,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 catch (ArgumentException e)
                 {
-                    _logger.Error(e, "RegEx-error while finding columnizer: ");
-                    // occurs on invalid regex patterns
+                    _logger.Error($"RegEx-error while finding columnizer: {e}");
                 }
             }
         }
@@ -545,8 +722,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 catch (ArgumentException e)
                 {
-                    _logger.Error(e, "RegEx-error while finding columnizer: ");
-                    // occurs on invalid regex patterns
+                    _logger.Error($"RegEx-error while finding columnizer: {e}");
                 }
             }
         }
@@ -565,14 +741,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _ = NativeMethods.SetForegroundWindow(Handle);
         if (WindowState == FormWindowState.Minimized)
         {
-            if (_wasMaximized)
-            {
-                WindowState = FormWindowState.Maximized;
-            }
-            else
-            {
-                WindowState = FormWindowState.Normal;
-            }
+            WindowState = _wasMaximized
+                ? FormWindowState.Maximized
+                : FormWindowState.Normal;
         }
     }
 
@@ -585,14 +756,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        if (isEnabled)
-        {
-            data.TailState = 0;
-        }
-        else
-        {
-            data.TailState = offByTrigger ? 2 : 1;
-        }
+        data.TailState = isEnabled
+            ? 0
+            : offByTrigger
+                ? 2
+                : 1;
 
         if (Preferences.ShowTailState)
         {
@@ -646,11 +814,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 writer.Close();
             }
 
-            var title = "Clipboard";
+            var title = Resources.LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard;
             var logWindow = AddTempFileTab(fileName, title);
-            if (logWindow.Tag is LogWindowData data)
+            if (logWindow.Tag is LogWindowData)
             {
-                SetTooltipText(logWindow, "Pasted on " + DateTime.Now);
+                SetTooltipText(logWindow, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn, DateTime.Now));
             }
         }
     }
@@ -743,7 +911,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
             catch (ArgumentException)
             {
-                _logger.Warn(CultureInfo.InvariantCulture, "Encoding " + ConfigManager.Settings.Preferences.DefaultEncoding + " is not a valid encoding");
+                //ConfigManager.Settings.Preferences.DefaultEncoding
+                _logger.Warn($"### FillDefaultEncodingFromSettings: Encoding {ConfigManager.Settings.Preferences.DefaultEncoding} is not a valid encoding");
                 encodingOptions.DefaultEncoding = null;
             }
         }
@@ -756,7 +925,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             if (!string.IsNullOrEmpty(fileName))
             {
-                if (fileName.EndsWith(".lxj"))
+                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
                 {
                     LoadProject(fileName, false);
                 }
@@ -875,7 +1044,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// <returns></returns>
     private string FindFilenameForSettings (string fileName)
     {
-        if (fileName.EndsWith(".lxp", StringComparison.InvariantCulture))
+        if (fileName.EndsWith(".lxp"))
         {
             var persistenceData = Persister.Load(fileName);
             if (persistenceData == null)
@@ -900,7 +1069,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 // handle relative paths in .lxp files
                 var dir = Path.GetDirectoryName(fileName);
-                return Path.Combine(dir, persistenceData.FileName);
+                return Path.Join(dir, persistenceData.FileName);
             }
         }
 
@@ -916,6 +1085,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ToolStripItem item = new ToolStripMenuItem(file);
             _ = strip.Items.Add(item);
+
         }
 
         strip.ItemClicked += OnHistoryItemClicked;
@@ -959,7 +1129,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             Owner = this,
             TopMost = TopMost,
             HighlightGroupList = HighlightGroupList,
-            PreSelectedGroupName = groupsComboBoxHighlightGroups.Text
+            PreSelectedGroupName = highlightGroupsToolStripComboBox.Text
         };
 
         var res = dlg.ShowDialog();
@@ -977,14 +1147,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void FillHighlightComboBox ()
     {
-        var currentGroupName = groupsComboBoxHighlightGroups.Text;
-        groupsComboBoxHighlightGroups.Items.Clear();
+        var currentGroupName = highlightGroupsToolStripComboBox.Text;
+        highlightGroupsToolStripComboBox.Items.Clear();
         foreach (var group in HighlightGroupList)
         {
-            _ = groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
+            _ = highlightGroupsToolStripComboBox.Items.Add(group.GroupName);
             if (group.GroupName.Equals(currentGroupName, StringComparison.Ordinal))
             {
-                groupsComboBoxHighlightGroups.Text = group.GroupName;
+                highlightGroupsToolStripComboBox.Text = group.GroupName;
             }
         }
     }
@@ -1013,7 +1183,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
                 catch (SecurityException e)
                 {
-                    _logger.Warn(e, "Insufficient rights for GetFolderPath(): ");
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage, nameof(Environment.GetFolderPath), e));
                     // no initial directory if insufficient rights
                 }
             }
@@ -1044,7 +1214,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (names.Length == 1)
         {
-            if (names[0].EndsWith(".lxj"))
+            if (names[0].EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
                 LoadProject(names[0], true);
                 return;
@@ -1192,8 +1362,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             mainMenuStrip.Enabled = true;
             timeshiftToolStripMenuItem.Enabled = false;
             timeshiftToolStripMenuItem.Checked = false;
-            timeshiftMenuTextBox.Text = "";
-            timeshiftMenuTextBox.Enabled = false;
+            timeshiftToolStripTextBox.Text = string.Empty;
+            timeshiftToolStripTextBox.Enabled = false;
             multiFileToolStripMenuItem.Enabled = false;
             cellSelectModeToolStripMenuItem.Checked = false;
             cellSelectModeToolStripMenuItem.Enabled = false;
@@ -1222,6 +1392,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         DisconnectBookmarkWindow(logWindow);
     }
 
+    //TODO Find out if logwindow is necessary here
     private void DisconnectBookmarkWindow (LogWindow.LogWindow logWindow)
     {
         _bookmarkWindow.SetBookmarkData(null);
@@ -1229,15 +1400,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void GuiStateUpdateWorker (GuiStateArgs e)
+    private void GuiStateUpdateWorker (GuiStateEventArgs e)
     {
         _skipEvents = true;
         checkBoxFollowTail.Checked = e.FollowTail;
         mainMenuStrip.Enabled = e.MenuEnabled;
         timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
         timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;
-        timeshiftMenuTextBox.Text = e.TimeshiftText;
-        timeshiftMenuTextBox.Enabled = e.TimeshiftEnabled;
+        timeshiftToolStripTextBox.Text = e.TimeshiftText;
+        timeshiftToolStripTextBox.Enabled = e.TimeshiftEnabled;
         multiFileToolStripMenuItem.Enabled = e.MultiFileEnabled; // disabled for temp files
         multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
         multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
@@ -1260,7 +1431,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
-        groupsComboBoxHighlightGroups.Text = e.HighlightGroupName;
+        highlightGroupsToolStripComboBox.Text = e.HighlightGroupName;
         columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
 
         _skipEvents = false;
@@ -1280,7 +1451,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error during ProgressBarUpdateWorker value {0}, min {1}, max {2}, visible {3}", e.Value, e.MinValue, e.MaxValue, e.Visible);
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible, ex));
             }
 
             _ = Invoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
@@ -1296,11 +1467,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
             labelStatus.Text = e.StatusText;
             labelStatus.Size = TextRenderer.MeasureText(labelStatus.Text, labelStatus.Font);
-            labelLines.Text = $" {e.LineCount} lines";
+            labelLines.Text = $"{e.LineCount} {Resources.LogTabWindow_StatusLineText_lowerCase_Lines}";
             labelLines.Size = TextRenderer.MeasureText(labelLines.Text, labelLines.Font);
             labelSize.Text = Util.GetFileSizeAsText(e.FileSize);
             labelSize.Size = TextRenderer.MeasureText(labelSize.Text, labelSize.Font);
-            labelCurrentLine.Text = $"Line: {e.CurrentLineNum}";
+            labelCurrentLine.Text = $"{Resources.LogTabWindow_StatusLineText_UpperCase_Lines} {e.CurrentLineNum}";
             labelCurrentLine.Size = TextRenderer.MeasureText(labelCurrentLine.Text, labelCurrentLine.Font);
             if (statusStrip.InvokeRequired)
             {
@@ -1518,11 +1689,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void RefreshEncodingMenuBar (Encoding encoding)
     {
-        toolStripEncodingASCIIItem.Checked = false;
-        toolStripEncodingANSIItem.Checked = false;
-        toolStripEncodingUTF8Item.Checked = false;
-        toolStripEncodingUTF16Item.Checked = false;
-        toolStripEncodingISO88591Item.Checked = false;
+        encodingASCIIToolStripMenuItem.Checked = false;
+        encodingANSIToolStripMenuItem.Checked = false;
+        encodingUTF8toolStripMenuItem.Checked = false;
+        encodingUTF16toolStripMenuItem.Checked = false;
+        encodingISO88591toolStripMenuItem.Checked = false;
 
         if (encoding == null)
         {
@@ -1531,26 +1702,26 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (encoding is ASCIIEncoding)
         {
-            toolStripEncodingASCIIItem.Checked = true;
+            encodingASCIIToolStripMenuItem.Checked = true;
         }
         else if (encoding.Equals(Encoding.Default))
         {
-            toolStripEncodingANSIItem.Checked = true;
+            encodingANSIToolStripMenuItem.Checked = true;
         }
         else if (encoding is UTF8Encoding)
         {
-            toolStripEncodingUTF8Item.Checked = true;
+            encodingUTF8toolStripMenuItem.Checked = true;
         }
         else if (encoding is UnicodeEncoding)
         {
-            toolStripEncodingUTF16Item.Checked = true;
+            encodingUTF16toolStripMenuItem.Checked = true;
         }
         else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
         {
-            toolStripEncodingISO88591Item.Checked = true;
+            encodingISO88591toolStripMenuItem.Checked = true;
         }
 
-        toolStripEncodingANSIItem.Text = Encoding.Default.HeaderName;
+        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1572,7 +1743,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void NotifyWindowsForChangedPrefs (SettingsFlags flags)
     {
-        _logger.Info(CultureInfo.InvariantCulture, "The preferences have changed");
         ApplySettings(ConfigManager.Settings, flags);
 
         var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
@@ -1715,7 +1885,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var columnizer = ColumnizerPicker.DecideColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
-            _logger.Info(CultureInfo.InvariantCulture, "Starting external tool with sysout redirection: {0} {1}", cmd, args);
+            //_logger.Info($"Starting external tool with sysout redirection: {cmd} {args}"));
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             //process.OutputDataReceived += pipe.DataReceivedEventHandler;
@@ -1723,10 +1893,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 _ = process.Start();
             }
-            catch (Win32Exception e)
+            catch (Exception e) when (e is Win32Exception or
+                                            InvalidOperationException or
+                                            ObjectDisposedException or
+                                            PlatformNotSupportedException)
             {
                 _logger.Error(e);
-                _ = MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
@@ -1735,7 +1908,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var logWin = AddTempFileTab(pipe.FileName,
                 CurrentLogWindow.IsTempFile
                     ? CurrentLogWindow.TempTitleName
-                    : Util.GetNameFromPath(CurrentLogWindow.FileName) + "->E");
+                    : $"{Util.GetNameFromPath(CurrentLogWindow.FileName)}{Resources.LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix}");
             logWin.ForceColumnizer(columnizer);
 
             process.Exited += pipe.ProcessExitedEventHandler;
@@ -1743,17 +1916,18 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         else
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Starting external tool: {0} {1}", cmd, args);
-
             try
             {
                 startInfo.UseShellExecute = false;
                 _ = process.Start();
             }
-            catch (Exception e)
+            catch (Exception e) when (e is Win32Exception or
+                                            InvalidOperationException or
+                                            ObjectDisposedException or
+                                            PlatformNotSupportedException)
             {
                 _logger.Error(e);
-                _ = MessageBox.Show(e.Message);
+                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
     }
@@ -1764,7 +1938,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         IList<Form> closeList = [];
         lock (_logWindowList)
         {
-            foreach (DockContent content in dockPanel.Contents)
+            foreach (var content in dockPanel.Contents.Cast<DockContent>())
             {
                 if (content is LogWindow.LogWindow window)
                 {
@@ -1779,7 +1953,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    //TODO Reimplement
+    //TODO Reimplementation needs a new UI Framework since, DockpanelSuite has no easy way to change TabColor
     private void SetTabColor (LogWindow.LogWindow logWindow, Color color)
     {
         //tabPage.BackLowColor = color;
@@ -1838,7 +2012,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void ApplySelectedHighlightGroup ()
     {
-        var groupName = groupsComboBoxHighlightGroups.Text;
+        var groupName = highlightGroupsToolStripComboBox.Text;
         CurrentLogWindow?.SetCurrentHighlightGroup(groupName);
     }
 
@@ -1905,12 +2079,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ThrowExceptionFx ()
     {
-        throw new Exception("This is a test exception thrown by an async delegate");
+        throw new Exception(Resources.LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate);
     }
 
     private void ThrowExceptionThreadFx ()
     {
-        throw new Exception("This is a test exception thrown by a background thread");
+        throw new Exception(Resources.LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread);
     }
 
     private string SaveLayout ()
@@ -1948,7 +2122,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return _bookmarkWindow;
         }
 
-        if (persistString.StartsWith(WindowTypes.LogWindow.ToString()))
+        if (persistString.StartsWith(WindowTypes.LogWindow.ToString(), StringComparison.OrdinalIgnoreCase))
         {
             var fileName = persistString[(WindowTypes.LogWindow.ToString().Length + 1)..];
             var win = FindWindowForFile(fileName);
@@ -1957,7 +2131,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 return win;
             }
 
-            _logger.Warn($"Layout data contains non-existing LogWindow for {fileName}");
+            //_logger.Warn("Layout data contains non-existing LogWindow for {fileName}"));
         }
 
         return null;
@@ -2000,7 +2174,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             foreach (var name in tmpList)
             {
-                if (string.IsNullOrEmpty(name) == false)
+                if (!string.IsNullOrEmpty(name))
                 {
                     AddFileTab(name, false, null, false, null);
                 }
@@ -2020,12 +2194,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         FillHighlightComboBox();
         FillToolLauncherBar();
+
+        //TODO Change to Debug and true
 #if !DEBUG
         debugToolStripMenuItem.Visible = false;
 #endif
     }
 
-    private void OnLogTabWindowClosing (object sender, CancelEventArgs e)
+    private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
         try
         {
@@ -2071,7 +2247,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnHistoryItemClicked (object sender, ToolStripItemClickedEventArgs e)
     {
-        if (string.IsNullOrEmpty(e.ClickedItem.Text) == false)
+        if (!string.IsNullOrEmpty(e.ClickedItem.Text))
         {
             _ = AddFileTab(e.ClickedItem.Text, false, null, false, null);
         }
@@ -2200,7 +2376,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
 #if DEBUG
         var formats = e.Data.GetFormats();
-        var s = "Dragging something over LogExpert. Formats:  ";
+        var s = "Dragging something over LogExpert. Formats: ";
         foreach (var format in formats)
         {
             s += format;
@@ -2228,7 +2404,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
 #if DEBUG
         var formats = e.Data.GetFormats();
-        var s = "Dropped formats:  ";
+        var s = "Dropped formats: ";
         foreach (var format in formats)
         {
             s += format;
@@ -2256,10 +2432,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (!_skipEvents && CurrentLogWindow != null)
         {
-            CurrentLogWindow.SetTimeshiftValue(timeshiftMenuTextBox.Text);
-            timeshiftMenuTextBox.Enabled = timeshiftToolStripMenuItem.Checked;
+            CurrentLogWindow.SetTimeshiftValue(timeshiftToolStripTextBox.Text);
+            timeshiftToolStripTextBox.Enabled = timeshiftToolStripMenuItem.Checked;
             CurrentLogWindow.TimeshiftEnabled(timeshiftToolStripMenuItem.Checked,
-                timeshiftMenuTextBox.Text);
+                timeshiftToolStripTextBox.Text);
         }
     }
 
@@ -2287,7 +2463,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnGuiStateUpdate (object sender, GuiStateArgs e)
+    private void OnGuiStateUpdate (object sender, GuiStateEventArgs e)
     {
         _ = BeginInvoke(GuiStateUpdateWorker, e);
     }
@@ -2369,7 +2545,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (e.KeyCode == Keys.Enter)
         {
             e.Handled = true;
-            CurrentLogWindow.SetTimeshiftValue(timeshiftMenuTextBox.Text);
+            CurrentLogWindow.SetTimeshiftValue(timeshiftToolStripTextBox.Text);
         }
     }
 
@@ -2476,10 +2652,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var icon = GetIcon(data.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
         }
-        else
-        {
-            _logger.Warn(CultureInfo.InvariantCulture, "Received SyncModeChanged event while disposing. Event ignored.");
-        }
+        //else
+        //{
+        //    _logger.Warn("Received SyncModeChanged event while disposing. Event ignored.");
+        //}
     }
 
     [SupportedOSPlatform("windows")]
@@ -2549,6 +2725,27 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
+    private void OnPluginTrustToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        using var dialog = new PluginTrustDialog(this);
+        var result = dialog.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var restartPrompt = MessageBox.Show(
+                "Plugin trust configuration updated.\n\nRestart LogExpert to apply changes?",
+                "Restart Recommended",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (restartPrompt == DialogResult.Yes)
+            {
+                Application.Restart();
+            }
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
     private void OnDateTimeDragControlValueDragged (object sender, EventArgs e)
     {
         if (CurrentLogWindow != null)
@@ -2560,7 +2757,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnDateTimeDragControlValueChanged (object sender, EventArgs e)
     {
-        _ = (CurrentLogWindow?.ScrollToTimestamp(dragControlDateTime.DateTime, true, true));
+        _ = CurrentLogWindow?.ScrollToTimestamp(dragControlDateTime.DateTime, true, true);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2634,12 +2831,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnShowHelpToolStripMenuItemClick (object sender, EventArgs e)
     {
-        Help.ShowHelp(this, "LogExpert.chm");
+        Help.ShowHelp(this, Resources.LogTabWindow_HelpFile);
     }
 
     private void OnHideLineColumnToolStripMenuItemClick (object sender, EventArgs e)
     {
         ConfigManager.Settings.HideLineColumn = hideLineColumnToolStripMenuItem.Checked;
+
         lock (_logWindowList)
         {
             foreach (var logWin in _logWindowList)
@@ -2740,7 +2938,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         SaveFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = @"LogExpert session (*.lxj)|*.lxj"
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -2752,7 +2950,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 foreach (var logWindow in dockPanel.Contents.OfType<LogWindow.LogWindow>())
                 {
-                    var persistenceFileName = logWindow?.SavePersistenceData(true);
+                    var persistenceFileName = logWindow?.SavePersistenceDataAndReturnFileName(true);
                     if (persistenceFileName != null)
                     {
                         fileNames.Add(persistenceFileName);
@@ -2765,6 +2963,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
+
             ProjectPersister.SaveProjectData(fileName, projectData);
         }
     }
@@ -2775,7 +2974,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         OpenFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = @"LogExpert sessions (*.lxj)|*.lxj"
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -2901,7 +3100,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnThrowExceptionGUIThreadToolStripMenuItemClick (object sender, EventArgs e)
     {
-        throw new Exception("This is a test exception thrown by the GUI thread");
+        throw new Exception(Resources.LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread);
     }
 
     private void OnThrowExceptionBackgroundThToolStripMenuItemClick (object sender, EventArgs e)
@@ -2930,7 +3129,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         //_logger.Get_logger().LogLevel = _logger.Level.INFO;
     }
 
-    private void OnDebugToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnDebugLogLevelToolStripMenuItemClick (object sender, EventArgs e)
     {
         //_logger.Get_logger().LogLevel = _logger.Level.DEBUG;
     }

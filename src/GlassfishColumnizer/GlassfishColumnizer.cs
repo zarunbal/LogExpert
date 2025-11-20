@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.Linq;
 
+using ColumnizerLib;
+
 using LogExpert;
 
 namespace GlassfishColumnizer;

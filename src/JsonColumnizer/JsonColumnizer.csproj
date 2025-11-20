@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
 
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <AssemblyTitle>JsonColumnizer</AssemblyTitle>
@@ -12,6 +12,12 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="JsonColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

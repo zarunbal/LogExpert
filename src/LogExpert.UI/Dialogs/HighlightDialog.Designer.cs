@@ -65,7 +65,7 @@ partial class HighlightDialog
         checkBoxStopTail = new CheckBox();
         checkBoxBookmark = new CheckBox();
         helpProvider = new HelpProvider();
-        groupBox4 = new GroupBox();
+        groupBoxGroups = new GroupBox();
         btnImportGroup = new Button();
         btnExportGroup = new Button();
         btnMoveGroupDown = new Button();
@@ -80,7 +80,7 @@ partial class HighlightDialog
         groupBoxLineMatchCriteria.SuspendLayout();
         groupBoxColoring.SuspendLayout();
         groupBoxActions.SuspendLayout();
-        groupBox4.SuspendLayout();
+        groupBoxGroups.SuspendLayout();
         pnlBackground.SuspendLayout();
         SuspendLayout();
         // 
@@ -490,24 +490,24 @@ partial class HighlightDialog
         // 
         // groupBox4
         // 
-        groupBox4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        groupBox4.Controls.Add(btnImportGroup);
-        groupBox4.Controls.Add(btnExportGroup);
-        groupBox4.Controls.Add(btnMoveGroupDown);
-        groupBox4.Controls.Add(btnMoveGroupUp);
-        groupBox4.Controls.Add(labelAssignNamesToGroups);
-        groupBox4.Controls.Add(btnCopyGroup);
-        groupBox4.Controls.Add(btnDeleteGroup);
-        groupBox4.Controls.Add(btnNewGroup);
-        groupBox4.Controls.Add(comboBoxGroups);
-        groupBox4.Location = new Point(18, 5);
-        groupBox4.Margin = new Padding(4, 5, 4, 5);
-        groupBox4.Name = "groupBox4";
-        groupBox4.Padding = new Padding(4, 5, 4, 5);
-        groupBox4.Size = new Size(607, 114);
-        groupBox4.TabIndex = 22;
-        groupBox4.TabStop = false;
-        groupBox4.Text = "Groups";
+        groupBoxGroups.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        groupBoxGroups.Controls.Add(btnImportGroup);
+        groupBoxGroups.Controls.Add(btnExportGroup);
+        groupBoxGroups.Controls.Add(btnMoveGroupDown);
+        groupBoxGroups.Controls.Add(btnMoveGroupUp);
+        groupBoxGroups.Controls.Add(labelAssignNamesToGroups);
+        groupBoxGroups.Controls.Add(btnCopyGroup);
+        groupBoxGroups.Controls.Add(btnDeleteGroup);
+        groupBoxGroups.Controls.Add(btnNewGroup);
+        groupBoxGroups.Controls.Add(comboBoxGroups);
+        groupBoxGroups.Location = new Point(18, 5);
+        groupBoxGroups.Margin = new Padding(4, 5, 4, 5);
+        groupBoxGroups.Name = "groupBox4";
+        groupBoxGroups.Padding = new Padding(4, 5, 4, 5);
+        groupBoxGroups.Size = new Size(607, 114);
+        groupBoxGroups.TabIndex = 22;
+        groupBoxGroups.TabStop = false;
+        groupBoxGroups.Text = "Groups";
         // 
         // btnImportGroup
         // 
@@ -641,7 +641,7 @@ partial class HighlightDialog
         pnlBackground.Controls.Add(groupBoxLineMatchCriteria);
         pnlBackground.Controls.Add(groupBoxColoring);
         pnlBackground.Controls.Add(groupBoxActions);
-        pnlBackground.Controls.Add(groupBox4);
+        pnlBackground.Controls.Add(groupBoxGroups);
         pnlBackground.Dock = DockStyle.Fill;
         pnlBackground.Location = new Point(0, 0);
         pnlBackground.Name = "pnlBackground";
@@ -674,8 +674,8 @@ partial class HighlightDialog
         groupBoxColoring.PerformLayout();
         groupBoxActions.ResumeLayout(false);
         groupBoxActions.PerformLayout();
-        groupBox4.ResumeLayout(false);
-        groupBox4.PerformLayout();
+        groupBoxGroups.ResumeLayout(false);
+        groupBoxGroups.PerformLayout();
         pnlBackground.ResumeLayout(false);
         ResumeLayout(false);
     }
@@ -710,7 +710,7 @@ partial class HighlightDialog
     private System.Windows.Forms.CheckBox checkBoxPlugin;
     private System.Windows.Forms.Button btnSelectPlugin;
     private System.Windows.Forms.Button btnBookmarkComment;
-    private System.Windows.Forms.GroupBox groupBox4;
+    private System.Windows.Forms.GroupBox groupBoxGroups;
     private System.Windows.Forms.ComboBox comboBoxGroups;
     private System.Windows.Forms.Button btnDeleteGroup;
     private System.Windows.Forms.Button btnNewGroup;

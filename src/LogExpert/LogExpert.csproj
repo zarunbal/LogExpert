@@ -9,7 +9,7 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
 

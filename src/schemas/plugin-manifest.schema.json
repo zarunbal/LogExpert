@@ -1,0 +1,260 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://logexpert.com/schemas/plugin-manifest.json",
+  "title": "LogExpert Plugin Manifest",
+  "description": "Schema for LogExpert plugin manifest files",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "author",
+    "description",
+    "apiVersion",
+    "main"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (must match DLL filename without extension)",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 100,
+      "examples": [
+        "MyCustomColumnizer",
+        "AwesomeLogParser"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version number",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.]+)?(\\+[a-zA-Z0-9.]+)?$",
+      "examples": [
+        "1.0.0",
+        "2.1.3-beta",
+        "1.0.0-rc.1+build.123"
+      ]
+    },
+    "author": {
+      "type": "string",
+      "description": "Plugin author name or organization",
+      "minLength": 1,
+      "maxLength": 200,
+      "examples": [
+        "John Doe",
+        "Acme Corporation"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of what the plugin does",
+      "minLength": 10,
+      "maxLength": 500,
+      "examples": [
+        "Parses custom application log format with JSON structure",
+        "Adds context menu integration with external monitoring tools"
+      ]
+    },
+    "apiVersion": {
+      "type": "string",
+      "description": "LogExpert plugin API version this plugin is built against",
+      "pattern": "^\\d+\\.\\d+$",
+      "examples": [
+        "1.0",
+        "2.0"
+      ]
+    },
+    "main": {
+      "type": "string",
+      "description": "Main DLL filename",
+      "pattern": "^[A-Za-z0-9_-]+\\.dll$",
+      "examples": [
+        "MyPlugin.dll",
+        "CustomColumnizer.dll"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to plugin website, documentation, or repository",
+      "examples": [
+        "https://github.com/username/plugin",
+        "https://mywebsite.com/logexpert-plugin"
+      ]
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier",
+      "pattern": "^[A-Za-z0-9.-]+$",
+      "examples": [
+        "MIT",
+        "Apache-2.0",
+        "GPL-3.0",
+        "BSD-3-Clause",
+        "Proprietary"
+      ]
+    },
+    "requires": {
+      "type": "object",
+      "description": "Version requirements for LogExpert and runtime",
+      "properties": {
+        "logExpert": {
+          "type": "string",
+          "description": "LogExpert version requirement (supports semver ranges)",
+          "examples": [
+            ">=1.10.0",
+            "^1.10.0",
+            "~1.10.0",
+            ">=1.10.0 <2.0.0"
+          ]
+        },
+        "dotnet": {
+          "type": "string",
+          "description": ".NET runtime version requirement",
+          "examples": [
+            ">=8.0.0",
+            "^8.0.0"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissions": {
+      "type": "array",
+      "description": "List of permissions required by the plugin",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "filesystem:read",
+          "filesystem:write",
+          "network:connect",
+          "config:read",
+          "config:write",
+          "registry:read"
+        ],
+        "description": "Permission identifier"
+      },
+      "examples": [
+        [
+          "filesystem:read"
+        ],
+        [
+          "filesystem:read",
+          "network:connect"
+        ]
+      ]
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "External NuGet package dependencies and their versions",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[>=<~^]?\\d+\\.\\d+\\.\\d+.*$",
+        "description": "Version requirement (supports NuGet version ranges)"
+      },
+      "examples": [
+        {
+          "Newtonsoft.Json": "13.0.3",
+          "NLog": ">=5.0.0"
+        }
+      ]
+    },
+    "category": {
+      "type": "string",
+      "description": "Plugin category for organization",
+      "enum": [
+        "columnizer",
+        "context-menu",
+        "keyword-action",
+        "filesystem",
+        "utility"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for discovery and categorization",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$",
+        "minLength": 2,
+        "maxLength": 30
+      },
+      "maxItems": 10,
+      "examples": [
+        [
+          "json",
+          "structured-logs",
+          "parser"
+        ],
+        [
+          "csv",
+          "data-analysis"
+        ]
+      ]
+    },
+    "icon": {
+      "type": "string",
+      "description": "Path to plugin icon file (relative to manifest)",
+      "pattern": "^[A-Za-z0-9_-]+\\.(png|ico)$",
+      "examples": [
+        "icon.png",
+        "plugin-icon.ico"
+      ]
+    },
+    "changelog": {
+      "type": "string",
+      "description": "Path to changelog file or URL",
+      "examples": [
+        "CHANGELOG.md",
+        "https://github.com/user/plugin/releases"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "name": "JsonColumnizer",
+      "version": "1.2.0",
+      "author": "LogExpert Team",
+      "description": "Parses JSON structured log files",
+      "apiVersion": "2.0",
+      "main": "JsonColumnizer.dll",
+      "url": "https://github.com/LogExperts/LogExpert",
+      "license": "MIT",
+      "requires": {
+        "logExpert": ">=1.10.0",
+        "dotnet": ">=8.0.0"
+      },
+      "permissions": [
+        "filesystem:read"
+      ],
+      "dependencies": {
+        "Newtonsoft.Json": "13.0.3"
+      },
+      "category": "columnizer",
+      "tags": [
+        "json",
+        "structured-logs"
+      ]
+    },
+    {
+      "name": "CustomContextMenu",
+      "version": "1.0.0-beta",
+      "author": "John Doe",
+      "description": "Adds custom analysis actions to context menu",
+      "apiVersion": "2.0",
+      "main": "CustomContextMenu.dll",
+      "url": "https://example.com/plugin",
+      "license": "Apache-2.0",
+      "requires": {
+        "logExpert": "^1.10.0"
+      },
+      "permissions": [
+        "filesystem:read",
+        "network:connect"
+      ],
+      "category": "context-menu"
+    }
+  ]
+}

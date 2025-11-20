@@ -16,12 +16,12 @@ public class SquareBracketColumnizerTest
     public void GetPriority_HappyFile_ColumnCountMatches (string fileName, int count)
     {
         SquareBracketColumnizer squareBracketColumnizer = new();
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, LogExpert.PluginRegistry.PluginRegistry.Instance);
         logFileReader.ReadFiles();
-        List<ILogLine> loglines = new()
-        {
+        List<ILogLine> loglines =
+        [
             // Sampling a few lines to select the correct columnizer
             logFileReader.GetLogLine(0),
             logFileReader.GetLogLine(1),
@@ -33,7 +33,7 @@ public class SquareBracketColumnizerTest
             logFileReader.GetLogLine(100),
             logFileReader.GetLogLine(200),
             logFileReader.GetLogLine(400)
-        };
+        ];
 
         squareBracketColumnizer.GetPriority(path, loglines);
         Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));

@@ -3,7 +3,8 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
-using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Classes.JsonConverters;
+using LogExpert.Core.Helpers;
 
 using Newtonsoft.Json;
 
@@ -130,12 +131,12 @@ public class FilterParams : ICloneable
     {
         if (SearchText != null)
         {
-            Regex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            Regex = RegexHelper.GetOrCreateCached(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         }
 
         if (RangeSearchText != null && IsRangeSearch)
         {
-            RangeRex = new Regex(RangeSearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            RangeRex = RegexHelper.GetOrCreateCached(RangeSearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         }
     }
 

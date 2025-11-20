@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
+
+using ColumnizerLib;
 
 using CsvHelper;
 
@@ -216,7 +213,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public void LoadConfig (string configDir)
     {
-        var configPath = Path.Combine(configDir, CONFIGFILENAME);
+        var configPath = Path.Join(configDir, CONFIGFILENAME);
 
         if (!File.Exists(configPath))
         {

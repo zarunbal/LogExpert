@@ -1,2 +1,0 @@
-Add Copilot Instruction txt
-Add Copilot HELP md for description what it does

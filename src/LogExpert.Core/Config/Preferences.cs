@@ -26,7 +26,7 @@ public class Preferences
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 
-    public DragOrientationsEnum TimestampControlDragOrientation { get; set; } = DragOrientationsEnum.Horizontal;
+    public DragOrientations TimestampControlDragOrientation { get; set; } = DragOrientations.Horizontal;
 
     public bool TimestampControl { get; set; }
 
@@ -92,6 +92,8 @@ public class Preferences
     public List<ColumnizerMaskEntry> ColumnizerMaskList { get; set; } = [];
 
     public string DefaultEncoding { get; set; }
+
+    public string DefaultLanguage { get; set; } = "en-US";
 
     public bool FilterSync { get; set; } = true;
 

@@ -84,12 +84,7 @@ internal class ArgParser (string argTemplate)
                     end = end2;
                 }
 
-                ParamRequesterDialog dlg = new()
-                {
-                    ParamName = ask,
-                    Values = values
-                };
-
+                ParamRequesterDialog dlg = new(ask, values);
                 var res = dlg.ShowDialog(parent);
 
                 if (res is DialogResult.OK)
