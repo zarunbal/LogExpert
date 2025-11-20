@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.Versioning;
+using System.Security;
 
 using LogExpert.PluginRegistry;
 
@@ -51,7 +52,7 @@ internal partial class PluginTrustDialog : Form
         Text = Resources.PluginTrustDialog_UI_Title;
 
         // Labels
-        pluginCountLabel.Text = string.Format(Resources.PluginTrustDialog_UI_Label_TotalPlugins, 0);
+        pluginCountLabel.Text = string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Label_TotalPlugins, 0);
         groupBoxPlugins.Text = Resources.PluginTrustDialog_UI_GroupBox_TrustedPlugins;
 
         // Buttons
@@ -88,7 +89,16 @@ internal partial class PluginTrustDialog : Form
                 // If user makes changes, they'll be saved then
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         IOException or
+                                         UnauthorizedAccessException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException or
+                                         JsonException)
         {
             _ = MessageBox.Show(
                 string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_LoadError, ex.Message),
@@ -162,7 +172,9 @@ internal partial class PluginTrustDialog : Form
     private bool HasHashForSelection ()
     {
         if (pluginListView.SelectedItems.Count == 0)
+        {
             return false;
+        }
 
         var pluginName = pluginListView.SelectedItems[0].Text;
         return _config.PluginHashes.ContainsKey(pluginName);
@@ -293,7 +305,16 @@ internal partial class PluginTrustDialog : Form
             DialogResult = DialogResult.OK;
             Close();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException or
+                                         PathTooLongException or
+                                         DirectoryNotFoundException or
+                                         IOException or
+                                         UnauthorizedAccessException or
+                                         FileNotFoundException or
+                                         NotSupportedException or
+                                         SecurityException or
+                                         JsonException)
         {
             _ = MessageBox.Show(
                 string.Format(CultureInfo.InvariantCulture, Resources.PluginTrustDialog_UI_Message_SaveError, ex.Message),
