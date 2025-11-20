@@ -748,18 +748,12 @@ public class PluginRegistry : IPluginRegistry
             _logger.Debug("Checking type {TypeName} in assembly {AssemblyName}", type.FullName, assembly.FullName);
 
             // Check for ILogLineColumnizer
-            if (type.GetInterfaces().Any(i => i.FullName == typeof(ILogLineColumnizer).FullName))
+            if (type.GetInterfaces().Any(i => i.FullName == typeof(ILogLineColumnizer).FullName) &&
+                TryInstantiatePluginSafe(type, out var instance) &&
+                instance is ILogLineColumnizer columnizer)
             {
-                // Instantiate plugin safely with timeout
-                if (TryInstantiatePluginSafe(type, out var instance))
-                {
-                    // Process as ILogLineColumnizer
-                    if (instance is ILogLineColumnizer columnizer)
-                    {
-                        ProcessLoadedPlugin(columnizer, manifest, dllName);
-                        pluginLoadedCount++;
-                    }
-                }
+                ProcessLoadedPlugin(columnizer, manifest, dllName);
+                pluginLoadedCount++;
             }
 
             // Check for other plugin types (regardless of whether ILogLineColumnizer was found)
@@ -828,7 +822,6 @@ public class PluginRegistry : IPluginRegistry
             return false;
         }
     }
-
 
     /// <summary>
     /// Processes a loaded plugin (either from cache or fresh load).

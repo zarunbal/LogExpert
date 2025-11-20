@@ -52,7 +52,7 @@ To enable/disable:
 dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
 ```
 
-**Important**: The target requires that plugins have already been bitten and are present in the output directory. Make sure to build the entire solution first:
+**Important**: The target requires that plugins have already been built and are present in the output directory. Make sure to build the entire solution first:
 
 ```powershell
 # 1. Build all projects (including plugins) in Release mode

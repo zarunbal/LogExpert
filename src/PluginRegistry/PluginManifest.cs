@@ -317,7 +317,7 @@ public class PluginManifest
         catch (Exception ex) when (ex is ArgumentException or
                                          FormatException)
         {
-            _logger.Error(ex, "ArgumentException checking version compatibility for {Name}: '{Requirement}'. Details: {Message}", Name, Requires.LogExpert, ex.Message);
+            _logger.Error(ex, "ArgumentException/FormatException checking version compatibility for {Name}: '{Requirement}'. Details: {Message}", Name, Requires.LogExpert, ex.Message);
             return false; // Fail closed on error
         }
         catch (Exception ex)

@@ -582,6 +582,6 @@ Contributions welcome! If you create a useful plugin, consider:
 
 ---
 
-**Happy Plugin Development!** ??
+**Happy Plugin Development!**
 
 *This guide is for LogExpert 1.11.0 and later.*
