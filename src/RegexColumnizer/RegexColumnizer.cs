@@ -23,8 +23,6 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     #region Properties
 
-    public RegexColumnizerConfig Config { get => field; private set => field = value; }
-
     public Regex Regex { get; private set; }
 
     #endregion
@@ -33,10 +31,9 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public string GetName ()
     {
-        return _config == null ||
-               string.IsNullOrWhiteSpace(_config.Name)
-                    ? GetNameInternal()
-                    : _config.Name;
+        return string.IsNullOrWhiteSpace(_config?.Name)
+            ? GetNameInternal()
+            : _config.Name;
     }
 
     public string GetDescription () => "Columns are filled by regular expression named capture groups";
@@ -127,16 +124,65 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public void Configure (ILogLineColumnizerCallback callback, string configDir)
     {
-        FileInfo fileInfo = new(Path.Join(configDir, GetName(), ".json"));
+        // Validate inputs
+        if (string.IsNullOrWhiteSpace(configDir))
+        {
+            throw new ArgumentException("Configuration directory cannot be null or empty", nameof(configDir));
+        }
+
+        string name = GetName();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Columnizer name cannot be null or empty");
+        }
+
+        // Ensure directory exists
+        if (!Directory.Exists(configDir))
+        {
+            try
+            {
+                _ = Directory.CreateDirectory(configDir);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _ = MessageBox.Show($"Failed to create configuration directory: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        string filePath = Path.Combine(configDir, $"{name}.json");
 
         RegexColumnizerConfigDialog dlg = new(_config);
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            using StreamWriter sw = new(fileInfo.Create());
-            JsonSerializer serializer = new();
-            serializer.Serialize(sw, _config);
-            _config = dlg.Config;
-            Init();
+            try
+            {
+                // Only validate regex if expression is provided (empty is allowed and uses default)
+                if (!string.IsNullOrWhiteSpace(dlg.Config.Expression))
+                {
+                    // Test regex compilation to catch errors early
+                    _ = RegexHelper.CreateSafeRegex(dlg.Config.Expression);
+                }
+
+                // Save configuration
+                string json = JsonConvert.SerializeObject(dlg.Config, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+
+                _config = dlg.Config;
+                Init();
+            }
+            catch (RegexMatchTimeoutException ex)
+            {
+                _ = MessageBox.Show($"Regex pattern may cause performance issues: {ex.Message}", "Configuration Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (ArgumentException ex)
+            {
+                _ = MessageBox.Show($"Invalid regex pattern: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _ = MessageBox.Show($"Failed to save configuration: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 
@@ -181,7 +227,11 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         {
             try
             {
-                _config = JsonConvert.DeserializeObject<RegexColumnizerConfig>(File.ReadAllText(configFile));
+                string jsonContent = File.ReadAllText(configFile);
+
+                _config = JsonConvert.DeserializeObject<RegexColumnizerConfig>(jsonContent)
+                    ?? new RegexColumnizerConfig { Name = GetName() };
+
             }
             catch (JsonException ex)
             {
@@ -196,10 +246,47 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         Init();
     }
 
+    /// <summary>
+    /// Validates that the columnizer name contains no path separators or invalid characters
+    /// to prevent path traversal attacks (SEC-02)
+    /// </summary>
+    private static void ValidateColumnizerName (string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Columnizer name cannot be null or empty");
+        }
+
+        // Check for path separators (both Windows and Unix)
+        if (name.Contains(Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+            name.Contains(Path.AltDirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+            name.Contains('/', StringComparison.OrdinalIgnoreCase) ||
+            name.Contains('\\', StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"Columnizer name '{name}' contains path separators which are not allowed");
+        }
+
+        // Check for invalid filename characters
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        if (name.IndexOfAny(invalidChars) >= 0)
+        {
+            throw new InvalidOperationException($"Columnizer name '{name}' contains invalid filename characters");
+        }
+
+        // Check for path traversal patterns
+        if (name.Contains("..", StringComparison.OrdinalIgnoreCase) || name.Contains('~', StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                $"Columnizer name '{name}' contains path traversal patterns which are not allowed");
+        }
+    }
+
     [Obsolete("XML Configuration is deprecated, use JSON instead")]
     private string GetConfigFileXML (string configDir)
     {
         var name = GetType().Name;
+        ValidateColumnizerName(name);
+
         var configPath = Path.Join(configDir, name);
         configPath = Path.ChangeExtension(configPath, "xml");
         return configPath;
@@ -208,6 +295,8 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
     private string GetConfigFileJSON (string configDir)
     {
         var name = GetType().Name;
+        ValidateColumnizerName(name);
+
         var configPath = Path.Join(configDir, name);
         configPath = Path.ChangeExtension(configPath, "json");
         return configPath;
@@ -236,14 +325,17 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             var skip = Regex.GetGroupNames().Length == 1 ? 0 : 1;
             columns = [.. Regex.GetGroupNames().Skip(skip)];
         }
-        catch
+        catch (Exception ex)
         {
             Regex = null;
+            columns = ["text"];
         }
     }
 
     #endregion
 }
+
+#region RegexColumnizer Implementations
 
 public class Regex1Columnizer : BaseRegexColumnizer
 {
@@ -289,3 +381,5 @@ public class Regex9Columnizer : BaseRegexColumnizer
 {
     protected override string GetNameInternal () => "Regex9";
 }
+
+#endregion

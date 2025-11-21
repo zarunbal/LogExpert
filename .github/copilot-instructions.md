@@ -36,12 +36,12 @@
 ## Build Instructions
 
 ### Prerequisites
-**CRITICAL**: This project requires Windows development environment and .NET 9.0.301 SDK or compatible.
+**CRITICAL**: This project requires Windows development environment and .NET 10.0.100 SDK or compatible.
 
 ### Environment Setup
-1. **Install .NET SDK**: Project requires .NET 9.0.301 SDK (specified in `global.json`)
-2. **Windows Environment**: Build targets `net8.0-windows` and uses Windows Forms
-3. **Visual Studio**: Recommended Visual Studio 2017+ or Visual Studio Code with C# extension
+1. **Install .NET SDK**: Project requires .NET 10.0.100 SDK (specified in `global.json`)
+2. **Windows Environment**: Build targets `net10.0-windows` and uses Windows Forms
+3. **Visual Studio**: Recommended Visual Studio 2026+ or Visual Studio Code with C# extension
 4. **Optional Dependencies**:
    - Chocolatey (for packaging)
    - Inno Setup 5 or 6 (for setup creation)

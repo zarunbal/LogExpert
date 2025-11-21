@@ -42,7 +42,6 @@ public partial class RegexColumnizerConfigDialog : Form
             Config.Expression = tbExpression.Text;
             Config.Name = tbName.Text;
         }
-
     }
 
     private void RegexColumnizerConfigDialog_Load (object sender, EventArgs e)
