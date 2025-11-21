@@ -1,12 +1,10 @@
-﻿using LogExpert.Core.Classes.Log;
+using System.Text;
+
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
 
 using NUnit.Framework;
-
-using System;
-using System.IO;
-using System.Text;
 
 namespace LogExpert.Tests;
 
@@ -14,25 +12,27 @@ namespace LogExpert.Tests;
 internal class ReaderTest
 {
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
     }
 
     [OneTimeSetUp]
-    public void Boot()
+    public void Boot ()
     {
     }
 
-    private void CompareReaderImplementationsInternal(string fileName, Encoding enc, int maxPosition)
+    private void CompareReaderImplementationsInternal (string fileName, Encoding enc, int maxPosition)
     {
         var path = Environment.CurrentDirectory + "\\data\\";
-        EncodingOptions encOpts = new();
-        encOpts.Encoding = enc;
+        EncodingOptions encOpts = new()
+        {
+            Encoding = enc
+        };
 
         using Stream s1 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read);
         using Stream s2 = new FileStream(path + fileName, FileMode.Open, FileAccess.Read);
-        using ILogStreamReader r1 = new PositionAwareStreamReaderLegacy(s1, encOpts);
-        using ILogStreamReader r2 = new PositionAwareStreamReaderSystem(s2, encOpts);
+        using ILogStreamReader r1 = new PositionAwareStreamReaderLegacy(s1, encOpts, 500);
+        using ILogStreamReader r2 = new PositionAwareStreamReaderSystem(s2, encOpts, 500);
         for (var lineNum = 0; ; lineNum++)
         {
             var line1 = r1.ReadLine();

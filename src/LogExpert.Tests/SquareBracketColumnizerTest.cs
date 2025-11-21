@@ -18,7 +18,7 @@ public class SquareBracketColumnizerTest
         SquareBracketColumnizer squareBracketColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, LogExpert.PluginRegistry.PluginRegistry.Instance);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance, 500);
         logFileReader.ReadFiles();
         List<ILogLine> loglines =
         [
@@ -35,7 +35,7 @@ public class SquareBracketColumnizerTest
             logFileReader.GetLogLine(400)
         ];
 
-        squareBracketColumnizer.GetPriority(path, loglines);
+        _ = squareBracketColumnizer.GetPriority(path, loglines);
         Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
     }
 
