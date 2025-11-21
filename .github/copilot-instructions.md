@@ -17,7 +17,7 @@
 - Serilog.Formatting.Compact format support
 
 ### Technology Stack
-- **Primary Language**: C# (.NET 8.0-windows target framework)
+- **Primary Language**: C# (.NET 10.0-windows target framework)
 - **UI Framework**: Windows Forms 
 - **Build System**: Nuke Build System with MSBuild
 - **Target Platform**: Windows (requires Windows-specific dependencies)
@@ -88,7 +88,7 @@ dotnet test --no-build --verbosity normal
    - **Workaround**: Use Windows environment or Windows Subsystem for Linux with proper .NET Windows SDK
 
 2. **.NET Version Mismatch**:
-   - Project requires .NET 9.0.301 but may encounter .NET 8.0 environments
+   - Project requires .NET 10.0.100 but may encounter .NET 8.0 environments
    - **Workaround**: Nuke build system automatically downloads correct SDK version
 
 3. **Build Timing**:
@@ -176,7 +176,7 @@ LogExpert/
 2. **`.github/workflows/test_dotnet.yml`**:
    - Runs on push to Development branch
    - Executes unit tests
-   - Uses .NET 9.0.x SDK
+   - Uses .NET 10.0.x SDK
 
 #### AppVeyor Integration
 - **`appveyor.yml`**: Legacy CI configuration
@@ -224,7 +224,7 @@ Key external dependencies (managed via Directory.Packages.props):
 #### Adding Dependencies
 1. Update `src/Directory.Packages.props` for version management
 2. Add `<PackageReference>` in specific project files
-3. Ensure compatibility with .NET 8.0 target framework
+3. Ensure compatibility with .NET 10.0 target framework
 
 ### Build Troubleshooting
 - **Missing Windows SDK**: Ensure Windows development environment

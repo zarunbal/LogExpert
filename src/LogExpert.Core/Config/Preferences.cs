@@ -14,7 +14,30 @@ public class Preferences
 
     public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
 
+    /// <summary>
+    /// Maximum length of lines that can be read from log files at the reader level.
+    /// Lines exceeding this length will be truncated during file reading operations.
+    /// This setting protects against memory issues and performance degradation from extremely long lines.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This property controls line truncation at the I/O reader level before lines are processed by columnizers.
+    /// It is implemented in <see cref="LogExpert.Core.Classes.Log.PositionAwareStreamReaderSystem"/> 
+    /// and <see cref="LogExpert.Core.Classes.Log.PositionAwareStreamReaderLegacy"/>.
+    /// </para>
+    /// <para>
+    /// Related property: <see cref="MaxDisplayLength"/> controls display-level truncation in UI columns,
+    /// which must not exceed this value. Default is 20000 characters.
+    /// </para>
+    /// </remarks>
     public int MaxLineLength { get; set; } = 20000;
+
+    /// <summary>
+    /// Maximum length of text displayed in columns before truncation with "...".
+    /// This is separate from <see cref="MaxLineLength"/> which controls reader-level line reading.
+    /// Must not exceed <see cref="MaxLineLength"/>. Default is 20000 characters.
+    /// </summary>
+    public int MaxDisplayLength { get; set; } = 20000;
 
     public bool AllowOnlyOneInstance { get; set; }
 

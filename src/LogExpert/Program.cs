@@ -99,6 +99,8 @@ internal static class Program
 
             _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
+            ColumnizerLib.Column.SetMaxDisplayLength(ConfigManager.Instance.Settings.Preferences.MaxDisplayLength);
+
             var pId = Process.GetCurrentProcess().SessionId;
 
             try

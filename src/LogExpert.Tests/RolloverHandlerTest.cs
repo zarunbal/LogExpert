@@ -23,7 +23,7 @@ internal class RolloverHandlerTest : RolloverHandlerTestBase
 
         ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
         RolloverFilenameHandler handler = new(info, options);
-        var fileList = handler.GetNameList(LogExpert.PluginRegistry.PluginRegistry.Instance);
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
 
         Assert.That(fileList, Is.EqualTo(files));
 
@@ -44,7 +44,7 @@ internal class RolloverHandlerTest : RolloverHandlerTestBase
 
         ILogFileInfo info = new LogFileInfo(new Uri(firstFile));
         RolloverFilenameHandler handler = new(info, options);
-        var fileList = handler.GetNameList(LogExpert.PluginRegistry.PluginRegistry.Instance);
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
 
         Assert.That(fileList, Is.EqualTo(files));
 

@@ -93,7 +93,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
         ConfigureDockPanel();
+
         ApplyTextResources();
 
         ConfigManager = configManager;
@@ -288,7 +290,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         return AddFileTab(fileName, true, title, false, null);
     }
 
-
     private void ConfigureDockPanel ()
     {
         var autoHideStripSkin1 = new AutoHideStripSkin();
@@ -354,6 +355,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
         dockPanel.ActiveAutoHideContent = null;
     }
+
 
     private void ApplyTextResources ()
     {
