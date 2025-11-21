@@ -16,16 +16,16 @@ public partial class RegexColumnizerConfigDialog : Form
 
         InitializeComponent();
 
+        Config = config;
+
         ApplyResources();
 
         ResumeLayout();
-
-        Config = config;
     }
 
     private void ApplyResources ()
     {
-        Text = Resources.RegexColumnizerConfigDialog_UI_Title;
+        Text = Resources.RegexColumnizerConfigDialog_UI_Title + Config.Name;
         lblRegEx.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Regex;
         label2.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Name;
         gbTestZone.Text = Resources.RegexColumnizerConfigDialog_UI_GroupBox_TestZone;
@@ -40,14 +40,14 @@ public partial class RegexColumnizerConfigDialog : Form
         if (Check())
         {
             Config.Expression = tbExpression.Text;
-            Config.Name = tbName.Text;
+            Config.CustomName = tbName.Text;
         }
     }
 
     private void RegexColumnizerConfigDialog_Load (object sender, EventArgs e)
     {
         tbExpression.Text = Config.Expression;
-        tbName.Text = Config.Name;
+        tbName.Text = Config.CustomName;
     }
 
     private void OnButtonCheckClick (object sender, EventArgs e)

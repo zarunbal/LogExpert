@@ -72,6 +72,11 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         return "CSV Columnizer";
     }
 
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
     public string GetDescription ()
     {
         return "Splits CSV files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the CsvHelper. https://github.com/JoshClose/CsvHelper. \r\n";

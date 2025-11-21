@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Reflection;
 
 using LogExpert.Core.Classes.Attributes;
@@ -12,7 +10,7 @@ namespace LogExpert.Core.Classes.JsonConverters;
 /// <summary>
 /// Custom JsonConverter for ILogLineColumnizer implementations.
 /// Serializes only properties marked with [JsonColumnizerProperty].
-/// Uses GetName() for type identification.
+/// Uses AssemblyQualifiedName for reliable type identification and GetName() for display purposes.
 /// </summary>
 public class ColumnizerJsonConverter : JsonConverter
 {
@@ -44,8 +42,12 @@ public class ColumnizerJsonConverter : JsonConverter
         }
 
         writer.WriteStartObject();
-        writer.WritePropertyName("Type");
+        writer.WritePropertyName("TypeName");
+        writer.WriteValue(type.AssemblyQualifiedName);
+        writer.WritePropertyName("DisplayName");
         writer.WriteValue(columnizer.GetName());
+        writer.WritePropertyName("CustomName");
+        writer.WriteValue(columnizer.GetCustomName());
         writer.WritePropertyName("State");
         stateObj.WriteTo(writer);
         writer.WriteEndObject();
@@ -61,17 +63,58 @@ public class ColumnizerJsonConverter : JsonConverter
         }
 
         var jObject = JObject.Load(reader);
-        var typeName = jObject["Type"]?.ToString();
-        if (typeName == null || jObject["State"] is not JObject state)
+
+        // Try new format first (TypeName)
+        var typeName = jObject["TypeName"]?.ToString();
+
+        // Fall back to old format (Type) for backward compatibility
+        if (string.IsNullOrEmpty(typeName))
+        {
+            var displayName = jObject["Type"]?.ToString();
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                // Try to find by display name (old behavior)
+                var foundType = FindColumnizerTypeByName(displayName);
+                if (foundType != null)
+                {
+                    typeName = foundType.AssemblyQualifiedName;
+                }
+            }
+        }
+
+        if (string.IsNullOrEmpty(typeName) || jObject["State"] is not JObject state)
         {
             return null;
         }
 
-        // Find the columnizer type by GetName()
-        var columnizerType = FindColumnizerTypeByName(typeName) ?? throw new JsonSerializationException($"Columnizer type '{typeName}' not found.");
+        // Load the type
+        Type columnizerType;
+        try
+        {
+            columnizerType = Type.GetType(typeName, throwOnError: false);
+
+            // If Type.GetType fails, try finding it manually
+            if (columnizerType == null)
+            {
+                columnizerType = FindColumnizerTypeByAssemblyQualifiedName(typeName);
+            }
+
+            if (columnizerType == null)
+            {
+                throw new JsonSerializationException($"Columnizer type '{typeName}' could not be loaded.");
+            }
+        }
+        catch (Exception ex) when (ex is ArgumentException or
+                                        FileNotFoundException or
+                                        FileLoadException or
+                                        BadImageFormatException)
+        {
+            throw new JsonSerializationException($"Failed to load columnizer type '{typeName}'.", ex);
+        }
 
         var instance = Activator.CreateInstance(columnizerType);
 
+        // Restore state properties
         foreach (var prop in columnizerType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             if (prop.GetCustomAttribute<JsonColumnizerPropertyAttribute>() != null && prop.CanWrite)
@@ -93,10 +136,21 @@ public class ColumnizerJsonConverter : JsonConverter
         // Search all loaded assemblies for a type implementing ILogLineColumnizer with matching GetName()
         foreach (var currentAssembly in AppDomain.CurrentDomain.GetAssemblies())
         {
+            var tempList = currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+            var test = string.Empty;
+
             foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
             {
                 try
                 {
+                    // First check if the type name matches (e.g., "Regex1Columnizer")
+                    if (type.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return type;
+                    }
+
+                    // Then check if the GetName() matches (e.g., "Regex1")
                     if (Activator.CreateInstance(type) is ILogLineColumnizer instance && instance.GetName() == name)
                     {
                         return type;
@@ -113,6 +167,49 @@ public class ColumnizerJsonConverter : JsonConverter
                 {
                     // intentionally ignored
                 }
+            }
+        }
+
+        return null;
+    }
+
+    private static Type FindColumnizerTypeByAssemblyQualifiedName (string assemblyQualifiedName)
+    {
+        // Extract the type name without version/culture/token for more flexible matching
+        var typeNameParts = assemblyQualifiedName.Split(',');
+        if (typeNameParts.Length < 2)
+        {
+            return null;
+        }
+
+        var typeName = typeNameParts[0].Trim();
+        var assemblyName = typeNameParts[1].Trim();
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (assembly.GetName().Name == assemblyName)
+            {
+                var type = assembly.GetType(typeName);
+                if (type != null && typeof(ILogLineColumnizer).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                {
+                    return type;
+                }
+            }
+        }
+
+        // Fallback: try to find by simple type name (without namespace) across all assemblies
+        var simpleTypeName = typeName.Contains('.', StringComparison.OrdinalIgnoreCase) ? typeName[(typeName.LastIndexOf('.') + 1)..] : typeName;
+
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            foreach (var type in assembly.GetTypes().Where(t =>
+                typeof(ILogLineColumnizer).IsAssignableFrom(t) &&
+                !t.IsInterface &&
+                !t.IsAbstract &&
+                t.Name.Equals(simpleTypeName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return type;
             }
         }
 

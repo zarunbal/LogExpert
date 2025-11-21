@@ -2413,7 +2413,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (_reloadMemento == null)
             {
-                PreselectColumnizer(persistenceData.ColumnizerName);
+                PreselectColumnizer(persistenceData.Columnizer?.GetName());
             }
 
             FollowTailChanged(persistenceData.FollowTail, false);
@@ -5081,7 +5081,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private static void FilterRestore (LogWindow newWin, PersistenceData persistenceData)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         if (columnizer != null)
         {
@@ -6270,7 +6270,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             FileName = FileName,
             TabName = Text,
             SessionFileName = SessionFileName,
-            ColumnizerName = CurrentColumnizer.GetName(),
+            Columnizer = CurrentColumnizer,
             LineCount = _logFileReader.LineCount
         };
 

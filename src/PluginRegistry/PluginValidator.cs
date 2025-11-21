@@ -307,8 +307,14 @@ public static partial class PluginValidator
             }
 
             // 4. Check trust status
+            // In Debug mode we trust the plugins (so testing and developing is possible)
+#if DEBUG
+            var isTrustedByName = true;
+            var isTrustedByHash = true;
+#else
             var isTrustedByName = _trustedPluginConfig.PluginNames.Contains(fileName, StringComparer.OrdinalIgnoreCase);
             var isTrustedByHash = _trustedPluginConfig.PluginHashes.ContainsValue(fileHash);
+#endif
 
             if (!isTrustedByName && !isTrustedByHash)
             {

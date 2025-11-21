@@ -192,5 +192,10 @@ public class ClfColumnizer : ILogLineColumnizer
         return cLogLine;
     }
 
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
     #endregion
 }

@@ -93,7 +93,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
-
+        ConfigureDockPanel();
         ApplyTextResources();
 
         ConfigManager = configManager;
@@ -286,6 +286,73 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public LogWindow.LogWindow AddTempFileTab (string fileName, string title)
     {
         return AddFileTab(fileName, true, title, false, null);
+    }
+
+
+    private void ConfigureDockPanel ()
+    {
+        var autoHideStripSkin1 = new AutoHideStripSkin();
+        var dockPanelGradient1 = new DockPanelGradient();
+        var tabGradient1 = new TabGradient();
+        var dockPaneStripSkin1 = new DockPaneStripSkin();
+        var dockPaneStripGradient1 = new DockPaneStripGradient();
+        var tabGradient2 = new TabGradient();
+        var dockPanelGradient2 = new DockPanelGradient();
+        var tabGradient3 = new TabGradient();
+        var dockPaneStripToolWindowGradient1 = new DockPaneStripToolWindowGradient();
+        var tabGradient4 = new TabGradient();
+        var tabGradient5 = new TabGradient();
+        var dockPanelGradient3 = new DockPanelGradient();
+        var tabGradient6 = new TabGradient();
+        var tabGradient7 = new TabGradient();
+
+        dockPanelGradient1.EndColor = SystemColors.Control;
+        dockPanelGradient1.StartColor = SystemColors.Control;
+        autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
+        tabGradient1.EndColor = SystemColors.Control;
+        tabGradient1.StartColor = SystemColors.Control;
+        tabGradient1.TextColor = SystemColors.ControlText;
+        autoHideStripSkin1.TabGradient = tabGradient1;
+        autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
+        tabGradient2.EndColor = SystemColors.Control;
+        tabGradient2.StartColor = SystemColors.Control;
+        tabGradient2.TextColor = SystemColors.ControlText;
+        dockPaneStripGradient1.ActiveTabGradient = tabGradient2;
+        dockPanelGradient2.EndColor = SystemColors.Control;
+        dockPanelGradient2.StartColor = SystemColors.Control;
+        dockPaneStripGradient1.DockStripGradient = dockPanelGradient2;
+        tabGradient3.EndColor = SystemColors.ControlLight;
+        tabGradient3.StartColor = SystemColors.ControlLight;
+        tabGradient3.TextColor = SystemColors.ControlText;
+        dockPaneStripGradient1.InactiveTabGradient = tabGradient3;
+        dockPaneStripSkin1.DocumentGradient = dockPaneStripGradient1;
+        dockPaneStripSkin1.TextFont = new Font("Segoe UI", 9F);
+        tabGradient4.EndColor = SystemColors.ActiveCaption;
+        tabGradient4.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+        tabGradient4.StartColor = SystemColors.GradientActiveCaption;
+        tabGradient4.TextColor = SystemColors.ActiveCaptionText;
+        dockPaneStripToolWindowGradient1.ActiveCaptionGradient = tabGradient4;
+        tabGradient5.EndColor = SystemColors.Control;
+        tabGradient5.StartColor = SystemColors.Control;
+        tabGradient5.TextColor = SystemColors.ControlText;
+        dockPaneStripToolWindowGradient1.ActiveTabGradient = tabGradient5;
+        dockPanelGradient3.EndColor = SystemColors.ControlLight;
+        dockPanelGradient3.StartColor = SystemColors.ControlLight;
+        dockPaneStripToolWindowGradient1.DockStripGradient = dockPanelGradient3;
+        tabGradient6.EndColor = SystemColors.InactiveCaption;
+        tabGradient6.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+        tabGradient6.StartColor = SystemColors.GradientInactiveCaption;
+        tabGradient6.TextColor = SystemColors.InactiveCaptionText;
+        dockPaneStripToolWindowGradient1.InactiveCaptionGradient = tabGradient6;
+        tabGradient7.EndColor = Color.Transparent;
+        tabGradient7.StartColor = Color.Transparent;
+        tabGradient7.TextColor = SystemColors.Control;
+        dockPaneStripToolWindowGradient1.InactiveTabGradient = tabGradient7;
+        dockPaneStripSkin1.ToolWindowGradient = dockPaneStripToolWindowGradient1;
+        dockPanel.Theme = new VS2015LightTheme();
+        dockPanel.Theme.Skin.DockPaneStripSkin = dockPaneStripSkin1;
+        dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
+        dockPanel.ActiveAutoHideContent = null;
     }
 
     private void ApplyTextResources ()

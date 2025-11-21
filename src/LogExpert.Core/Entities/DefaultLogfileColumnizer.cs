@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using ColumnizerLib;
 
 namespace LogExpert.Core.Entities;
@@ -81,6 +78,11 @@ public class DefaultLogfileColumnizer : ILogLineColumnizer
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     #endregion

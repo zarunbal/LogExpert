@@ -43,7 +43,7 @@ public class RegexColumnizerLoadConfigTests
         // Assert
         Assert.That(columnizer.GetName(), Is.EqualTo("Test From JSON"));
         Assert.That(columnizer.GetColumnCount(), Is.EqualTo(2));
-        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(new[] { "col1", "col2" }));
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["col1", "col2"]));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class RegexColumnizerLoadConfigTests
 
         // Assert
         Assert.That(columnizer.GetName(), Is.EqualTo("From JSON"));
-        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(new[] { "json" }));
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["json"]));
     }
 
     [Test]
@@ -253,6 +253,6 @@ public class RegexColumnizerLoadConfigTests
 
         // Assert
         Assert.That(columnizer.GetName(), Is.EqualTo("Second Config"));
-        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(new[] { "col2" }));
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["col2"]));
     }
 }

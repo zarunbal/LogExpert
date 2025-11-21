@@ -216,5 +216,10 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         return cLogLine;
     }
 
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
     #endregion
 }

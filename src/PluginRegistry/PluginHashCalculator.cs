@@ -31,7 +31,6 @@ public static class PluginHashCalculator
             using var stream = File.OpenRead(filePath);
             var hashBytes = sha256.ComputeHash(stream);
 
-            // Convert to uppercase hex string without hyphens
             return Convert.ToHexString(hashBytes);
         }
         catch (UnauthorizedAccessException ex)
@@ -50,6 +49,10 @@ public static class PluginHashCalculator
     /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
     public static bool VerifyHash (string filePath, string expectedHash)
     {
+        // In Debug mode we trust the plugins (so testing and developing is possible)
+#if DEBUG
+        return true;
+#else
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedHash);
 
@@ -57,6 +60,7 @@ public static class PluginHashCalculator
 
         // Case-insensitive comparison
         return string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase);
+#endif
     }
 
     /// <summary>
@@ -65,7 +69,6 @@ public static class PluginHashCalculator
     /// <param name="filePaths">Collection of file paths to process.</param>
     /// <returns>Dictionary mapping file paths to their SHA256 hashes.</returns>
     /// <remarks>Files that cannot be processed are omitted from the result (logged but not thrown).</remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally catch all")]
     public static Dictionary<string, string> CalculateHashes (IEnumerable<string> filePaths)
     {
         ArgumentNullException.ThrowIfNull(filePaths);
@@ -79,7 +82,10 @@ public static class PluginHashCalculator
                 var hash = CalculateHash(filePath);
                 results[filePath] = hash;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentNullException or
+                                             ArgumentException or
+                                             FileNotFoundException or
+                                             IOException)
             {
                 // Skip files that cannot be processed
                 // Caller should check for missing entries if needed

@@ -36,6 +36,13 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             : _config.Name;
     }
 
+    public string GetCustomName ()
+    {
+        return string.IsNullOrWhiteSpace(_config?.CustomName)
+            ? GetNameInternal()
+            : _config.CustomName;
+    }
+
     public string GetDescription () => "Columns are filled by regular expression named capture groups";
 
     public int GetColumnCount () => columns.Length;

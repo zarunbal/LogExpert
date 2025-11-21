@@ -16,7 +16,7 @@ public class RegexColumnizerBasicTests
     [TestCase("5 test message", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 2)]
     [TestCase("Error in com.example.core", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 2)]
     [TestCase("Simple line", @"(?'text'.*)", 1)]
-    public void SplitLine_ColumnCountMatches(string lineToParse, string regex, int expectedNumberOfColumns)
+    public void SplitLine_ColumnCountMatches (string lineToParse, string regex, int expectedNumberOfColumns)
     {
         var columnizer = CreateInitializedColumnizer(regex);
 
@@ -31,7 +31,7 @@ public class RegexColumnizerBasicTests
     [TestCase("5 test message", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 1, "test message")]
     [TestCase("Error in com.example.core", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 0, "")] // doesn't match regex so should be empty
     [TestCase("Error in com.example.core", @"^(?'time'[\d]+)\s+(?'Message'.+)$", 1, "Error in com.example.core")]
-    public void SplitLine_ColumnValues(string lineToParse, string regex, int columnIndexToTest,
+    public void SplitLine_ColumnValues (string lineToParse, string regex, int columnIndexToTest,
         string expectedColumnValue)
     {
         var columnizer = CreateInitializedColumnizer(regex);
@@ -43,17 +43,17 @@ public class RegexColumnizerBasicTests
     }
 
     [Test]
-    public void GetColumnNames_ExtractsNamedGroups()
+    public void GetColumnNames_ExtractsNamedGroups ()
     {
         var columnizer = CreateInitializedColumnizer(@"^(?<time>\d+)\s+(?<level>\w+)\s+(?<message>.*)$");
 
         var columnNames = columnizer.GetColumnNames();
 
-        Assert.That(columnNames, Is.EqualTo(new[] { "time", "level", "message" }));
+        Assert.That(columnNames, Is.EqualTo(["time", "level", "message"]));
     }
 
     [Test]
-    public void GetColumnCount_ReturnsCorrectCount()
+    public void GetColumnCount_ReturnsCorrectCount ()
     {
         var columnizer = CreateInitializedColumnizer(@"^(?<col1>\w+)\s+(?<col2>\w+)$");
 
@@ -61,7 +61,7 @@ public class RegexColumnizerBasicTests
     }
 
     [Test]
-    public void GetName_ReturnsConfiguredName()
+    public void GetName_ReturnsConfiguredName ()
     {
         var columnizer = CreateInitializedColumnizer(@"(?<text>.*)", "Custom Name");
 
@@ -69,7 +69,7 @@ public class RegexColumnizerBasicTests
     }
 
     [Test]
-    public void GetName_ReturnsDefaultWhenNotConfigured()
+    public void GetName_ReturnsDefaultWhenNotConfigured ()
     {
         var columnizer = new Regex1Columnizer();
         columnizer.LoadConfig(Path.GetTempPath()); // Load with defaults
@@ -78,7 +78,7 @@ public class RegexColumnizerBasicTests
     }
 
     [Test]
-    public void SplitLine_NonMatchingLine_PlacesInLastColumn()
+    public void SplitLine_NonMatchingLine_PlacesInLastColumn ()
     {
         var columnizer = CreateInitializedColumnizer(@"^(?<digits>\d+)\s+(?<text>.*)$");
         TestLogLine testLogLine = new(1, "No digits at start");
@@ -92,7 +92,7 @@ public class RegexColumnizerBasicTests
     }
 
     [Test]
-    public void SplitLine_EmptyLine_HandlesGracefully()
+    public void SplitLine_EmptyLine_HandlesGracefully ()
     {
         var columnizer = CreateInitializedColumnizer(@"(?<text>.*)");
         TestLogLine testLogLine = new(1, "");
@@ -103,7 +103,7 @@ public class RegexColumnizerBasicTests
         Assert.That(parsedLogLine.ColumnValues[0].Text, Is.Empty);
     }
 
-    private Regex1Columnizer CreateInitializedColumnizer(string regex, string name = "Test regex")
+    private Regex1Columnizer CreateInitializedColumnizer (string regex, string name = "Test regex")
     {
         RegexColumnizerConfig columnizerConfig = new()
         {
@@ -112,20 +112,20 @@ public class RegexColumnizerBasicTests
         };
 
         Regex1Columnizer columnizer = new();
-        
+
         // Use reflection to set private _config field and call Init()
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, columnizerConfig);
-        
+
         columnizer.Init();
-        
+
         return columnizer;
     }
 
     private class TestLogLine : ILogLine
     {
-        public TestLogLine(int lineNumber, string fullLine)
+        public TestLogLine (int lineNumber, string fullLine)
         {
             LineNumber = lineNumber;
             FullLine = fullLine;

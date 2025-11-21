@@ -25,9 +25,8 @@ public class ConfigManager : IConfigManager
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly object _monitor = new();
-    private static ConfigManager _instance;
-    private readonly object _loadSaveLock = new();
+    private static readonly Lock _monitor = new();
+    private readonly Lock _loadSaveLock = new();
     private Settings _settings;
 
     private static readonly JsonSerializerSettings _jsonSettings = new()
@@ -71,10 +70,10 @@ public class ConfigManager : IConfigManager
         {
             lock (_monitor)
             {
-                _instance ??= new ConfigManager();
+                field ??= new ConfigManager();
             }
 
-            return _instance;
+            return field;
         }
     }
 

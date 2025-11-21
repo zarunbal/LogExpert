@@ -59,6 +59,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         return "Log4j XML";
     }
 
+    public string GetCustomName () => GetName();
+
     public string GetDescription ()
     {
         return "Reads and formats XML log files written with log4j.";

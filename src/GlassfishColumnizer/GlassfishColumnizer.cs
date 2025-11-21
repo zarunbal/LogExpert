@@ -13,7 +13,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
     public const int COLUMN_COUNT = 2;
     private const string DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.fffzzzz";
     private const string DATETIME_FORMAT_OUT = "yyyy-MM-dd HH:mm:ss.fff";
-    private const char separatorChar = '|';
+    private const char SEPARATOR_CHAR = '|';
 
     private static readonly XmlConfig xmlConfig = new();
 
@@ -42,7 +42,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
     {
         GlassFishLogLine line = new()
         {
-            FullLine = logLine.FullLine.Replace(separatorChar, '|'),
+            FullLine = logLine.FullLine.Replace(SEPARATOR_CHAR, '|'),
             LineNumber = logLine.LineNumber
         };
 
@@ -51,7 +51,12 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public string GetName ()
     {
-        return "Classfish";
+        return "Glassfish";
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     public string GetDescription ()
@@ -171,7 +176,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
             return DateTime.MinValue;
         }
 
-        var endIndex = temp.IndexOf(separatorChar, 1);
+        var endIndex = temp.IndexOf(SEPARATOR_CHAR, 1);
         if (endIndex is > 28 or < 0)
         {
             return DateTime.MinValue;
