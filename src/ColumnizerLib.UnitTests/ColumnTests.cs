@@ -11,24 +11,27 @@ namespace ColumnizerLib.UnitTests;
 public class ColumnTests
 {
     [Test]
-    public void Column_LineCutOff ()
+    public void Column_NoTruncationAtDisplayLevel ()
     {
-        var expectedFullValue = new StringBuilder().Append('6', 4675).Append("1234").ToString();
-        var expectedDisplayValue = expectedFullValue[..4675] + "..."; // Using substring shorthand
+        // Line truncation is now handled at the reader level (PositionAwareStreamReader)
+        // based on the configurable MaxLineLength setting. The Column class no longer
+        // truncates DisplayValue, allowing full lines to be displayed and copied.
+        var longValue = new StringBuilder().Append('6', 10000).ToString();
 
         Column column = new()
         {
-            FullValue = expectedFullValue
+            FullValue = longValue
         };
 
-        Assert.That(column.DisplayValue, Is.EqualTo(expectedDisplayValue));
-        Assert.That(column.FullValue, Is.EqualTo(expectedFullValue));
+        // DisplayValue should equal FullValue (no truncation at display level)
+        Assert.That(column.DisplayValue, Is.EqualTo(column.FullValue));
+        Assert.That(column.DisplayValue.Length, Is.EqualTo(10000));
     }
 
     [Test]
-    public void Column_NoLineCutOff ()
+    public void Column_ShortLine ()
     {
-        var expected = new StringBuilder().Append('6', 4675).ToString();
+        var expected = new StringBuilder().Append('6', 100).ToString();
         Column column = new()
         {
             FullValue = expected

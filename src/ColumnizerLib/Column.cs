@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using LogExpert;
 
 namespace ColumnizerLib;
@@ -9,7 +6,7 @@ public class Column : IColumn
 {
     #region Fields
 
-    private const int MAXLENGTH = 4678 - 3;
+    private const int MAXLENGTH = 20_000 - 3;
     private const string REPLACEMENT = "...";
 
     private static readonly List<Func<string, string>> _replacements = [
@@ -19,8 +16,12 @@ public class Column : IColumn
                 //shorten string if it exceeds maxLength
                 input => input.Length > MAXLENGTH
                         ? string.Concat(input.AsSpan(0, MAXLENGTH), REPLACEMENT)
-                        : input
+                        : input,
+                input => input.Replace("\t", "  ", StringComparison.Ordinal)
     ];
+
+    // Note: MaxLineLength configuration is now enforced at the reader level,
+    // not at the display level. This allows full lines to be displayed and copied.
 
     private string _fullValue;
 

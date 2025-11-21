@@ -16,7 +16,7 @@ public class JsonCompactColumnizerTest
     {
         var jsonCompactColumnizer = new JsonColumnizer.JsonCompactColumnizer();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, LogExpert.PluginRegistry.PluginRegistry.Instance);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance, 500);
         logFileReader.ReadFiles();
         List<ILogLine> loglines =
         [

@@ -759,6 +759,7 @@ internal partial class SettingsDialog : Form
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
         Preferences.ShowErrorMessageAllowOnlyOneInstances = checkBoxShowErrorMessageOnlyOneInstance.Checked;
         Preferences.DarkMode = checkBoxDarkMode.Checked;
+        Preferences.MaxLineLength = (int)upDownMaximumLineLength.Value;
 
         SavePluginSettings();
         SaveHighlightMaskList();

@@ -36,7 +36,7 @@ internal class LocalFileSystemTest : RolloverHandlerTestBase
     [Test]
     public void TestUriToFileStream()
     {
-        var dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         var fullName = CreateFile(dInfo, "test.log");
 
         LocalFileSystem fs = new();
