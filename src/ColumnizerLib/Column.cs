@@ -16,14 +16,8 @@ public class Column : IColumn
                 //shorten string if it exceeds maxLength
                 input => input.Length > MAXLENGTH
                         ? string.Concat(input.AsSpan(0, MAXLENGTH), REPLACEMENT)
-                        : input,
-                input => input.Replace("\t", "  ", StringComparison.Ordinal)
+                        : input
     ];
-
-    // Note: MaxLineLength configuration is now enforced at the reader level,
-    // not at the display level. This allows full lines to be displayed and copied.
-
-    private string _fullValue;
 
     #endregion
 
@@ -41,6 +35,9 @@ public class Column : IColumn
         {
             //Everything below Win8 the installed fonts seems to not to support reliabel
             //Replace null char with space
+            //.net 10 does no longer support windows lower then windows 10
+            //TODO: remove if with one of the next releases
+            //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
             _replacements.Add(input => input.Replace("\0", " ", StringComparison.Ordinal));
         }
 
@@ -57,10 +54,10 @@ public class Column : IColumn
 
     public string FullValue
     {
-        get => _fullValue;
+        get;
         set
         {
-            _fullValue = value;
+            field = value;
 
             var temp = FullValue;
 
