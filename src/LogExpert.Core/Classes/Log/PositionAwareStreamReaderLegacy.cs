@@ -6,7 +6,7 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
 {
     #region Fields
 
-    private readonly char[] _charBuffer = new char[MaximumLineLength];
+    private readonly char[] _charBuffer = new char[maximumLineLength];
 
     private int _charBufferPos;
     private bool _crDetect;
@@ -14,7 +14,6 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
     public override bool IsDisposed { get; protected set; }
 
     #endregion
-
     #region cTor
 
     #endregion
