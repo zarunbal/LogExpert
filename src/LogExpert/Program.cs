@@ -99,6 +99,11 @@ internal static class Program
 
             _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
+            // Initialize Column display max length from configuration
+            // Phase 1: Use same value as MaxLineLength (reader level)
+            // Phase 2: Will be made separately configurable
+            ColumnizerLib.Column.SetMaxDisplayLength(ConfigManager.Instance.Settings.Preferences.MaxLineLength);
+
             var pId = Process.GetCurrentProcess().SessionId;
 
             try
