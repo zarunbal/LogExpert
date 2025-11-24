@@ -1,7 +1,7 @@
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 
-using LogExpert.Config;
+using LogExpert.Configuration;
 using LogExpert.Core.Interface;
 using LogExpert.UI.Extensions.LogWindow;
 

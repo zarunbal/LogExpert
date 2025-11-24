@@ -110,7 +110,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         Load += OnLogTabWindowLoad;
 
-        configManager.Instance.ConfigChanged += OnConfigChanged;
+        ConfigManager.ConfigChanged += OnConfigChanged;
         HighlightGroupList = configManager.Settings.Preferences.HighlightGroupList;
 
         Rectangle led = new(0, 0, 8, 2);
@@ -2290,7 +2290,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             DestroyBookmarkWindow();
 
-            ConfigManager.Instance.ConfigChanged -= OnConfigChanged;
+            ConfigManager.ConfigChanged -= OnConfigChanged;
 
             SaveWindowPosition();
             ConfigManager.Save(SettingsFlags.WindowPosition | SettingsFlags.FileHistory);

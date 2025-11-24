@@ -136,10 +136,6 @@ public class ColumnizerJsonConverter : JsonConverter
         // Search all loaded assemblies for a type implementing ILogLineColumnizer with matching GetName()
         foreach (var currentAssembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            var tempList = currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-
-            var test = string.Empty;
-
             foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
             {
                 try
@@ -199,7 +195,6 @@ public class ColumnizerJsonConverter : JsonConverter
 
         // Fallback: try to find by simple type name (without namespace) across all assemblies
         var simpleTypeName = typeName.Contains('.', StringComparison.OrdinalIgnoreCase) ? typeName[(typeName.LastIndexOf('.') + 1)..] : typeName;
-
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
