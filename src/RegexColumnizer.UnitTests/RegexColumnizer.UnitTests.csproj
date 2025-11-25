@@ -26,4 +26,13 @@
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestData\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

@@ -17,7 +17,7 @@
 - Serilog.Formatting.Compact format support
 
 ### Technology Stack
-- **Primary Language**: C# (.NET 8.0-windows target framework)
+- **Primary Language**: C# (.NET 10.0-windows target framework)
 - **UI Framework**: Windows Forms 
 - **Build System**: Nuke Build System with MSBuild
 - **Target Platform**: Windows (requires Windows-specific dependencies)
@@ -36,12 +36,12 @@
 ## Build Instructions
 
 ### Prerequisites
-**CRITICAL**: This project requires Windows development environment and .NET 9.0.301 SDK or compatible.
+**CRITICAL**: This project requires Windows development environment and .NET 10.0.100 SDK or compatible.
 
 ### Environment Setup
-1. **Install .NET SDK**: Project requires .NET 9.0.301 SDK (specified in `global.json`)
-2. **Windows Environment**: Build targets `net8.0-windows` and uses Windows Forms
-3. **Visual Studio**: Recommended Visual Studio 2017+ or Visual Studio Code with C# extension
+1. **Install .NET SDK**: Project requires .NET 10.0.100 SDK (specified in `global.json`)
+2. **Windows Environment**: Build targets `net10.0-windows` and uses Windows Forms
+3. **Visual Studio**: Recommended Visual Studio 2026+ or Visual Studio Code with C# extension
 4. **Optional Dependencies**:
    - Chocolatey (for packaging)
    - Inno Setup 5 or 6 (for setup creation)
@@ -88,7 +88,7 @@ dotnet test --no-build --verbosity normal
    - **Workaround**: Use Windows environment or Windows Subsystem for Linux with proper .NET Windows SDK
 
 2. **.NET Version Mismatch**:
-   - Project requires .NET 9.0.301 but may encounter .NET 8.0 environments
+   - Project requires .NET 10.0.100 but may encounter .NET 8.0 environments
    - **Workaround**: Nuke build system automatically downloads correct SDK version
 
 3. **Build Timing**:
@@ -176,7 +176,7 @@ LogExpert/
 2. **`.github/workflows/test_dotnet.yml`**:
    - Runs on push to Development branch
    - Executes unit tests
-   - Uses .NET 9.0.x SDK
+   - Uses .NET 10.0.x SDK
 
 #### AppVeyor Integration
 - **`appveyor.yml`**: Legacy CI configuration
@@ -224,7 +224,7 @@ Key external dependencies (managed via Directory.Packages.props):
 #### Adding Dependencies
 1. Update `src/Directory.Packages.props` for version management
 2. Add `<PackageReference>` in specific project files
-3. Ensure compatibility with .NET 8.0 target framework
+3. Ensure compatibility with .NET 10.0 target framework
 
 ### Build Troubleshooting
 - **Missing Windows SDK**: Ensure Windows development environment

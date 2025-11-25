@@ -1,26 +1,22 @@
-using System;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 using LogExpert.Core.Helpers;
-using System.Data;
-using System.Text.RegularExpressions;
 
 namespace RegexColumnizer;
 
 public partial class RegexColumnizerConfigDialog : Form
 {
-    public RegexColumnizerConfigDialog ()
+    public RegexColumnizerConfigDialog (RegexColumnizerConfig config)
     {
         SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
+        Config = config;
 
         ApplyResources();
 
@@ -29,7 +25,7 @@ public partial class RegexColumnizerConfigDialog : Form
 
     private void ApplyResources ()
     {
-        Text = Resources.RegexColumnizerConfigDialog_UI_Title;
+        Text = Resources.RegexColumnizerConfigDialog_UI_Title + Config.Name;
         lblRegEx.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Regex;
         label2.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Name;
         gbTestZone.Text = Resources.RegexColumnizerConfigDialog_UI_GroupBox_TestZone;
@@ -39,29 +35,27 @@ public partial class RegexColumnizerConfigDialog : Form
         btnCancel.Text = Resources.RegexColumnizerConfigDialog_UI_Button_Cancel;
     }
 
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public RegexColumnizerConfig Config { get; set; }
-
     private void OnBtnOkClick (object sender, EventArgs e)
     {
         if (Check())
         {
             Config.Expression = tbExpression.Text;
-            Config.Name = tbName.Text;
+            Config.CustomName = tbName.Text;
         }
-
     }
 
     private void RegexColumnizerConfigDialog_Load (object sender, EventArgs e)
     {
         tbExpression.Text = Config.Expression;
-        tbName.Text = Config.Name;
+        tbName.Text = Config.CustomName;
     }
 
     private void OnButtonCheckClick (object sender, EventArgs e)
     {
-        Check();
+        _ = Check();
     }
+
+    public RegexColumnizerConfig Config { get; }
 
     private bool Check ()
     {
@@ -76,7 +70,7 @@ public partial class RegexColumnizerConfigDialog : Form
 
             for (var i = offset; i < groupNames.Length; i++)
             {
-                table.Columns.Add(groupNames[i]);
+                _ = table.Columns.Add(groupNames[i]);
             }
 
             if (!string.IsNullOrEmpty(tbTestLine.Text))

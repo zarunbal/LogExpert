@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 using LogExpert.Classes;
 using LogExpert.Classes.CommandLine;
-using LogExpert.Config;
+using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
 using LogExpert.UI.Dialogs;
@@ -54,6 +54,9 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+        // Initialize ConfigManager with application-specific paths and screen information
+        ConfigManager.Instance.Initialize(Application.StartupPath, SystemInformation.VirtualScreen);
+
         _logger.Info(CultureInfo.InvariantCulture, $"\r\n============================================================================\r\nLogExpert {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} started.\r\n============================================================================");
 
         CancellationTokenSource cts = new();
@@ -94,9 +97,11 @@ internal static class Program
                 }
             }
 
+            _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+
             SetCulture();
 
-            _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+            ColumnizerLib.Column.SetMaxDisplayLength(ConfigManager.Instance.Settings.Preferences.MaxDisplayLength);
 
             var pId = Process.GetCurrentProcess().SessionId;
 
@@ -151,7 +156,7 @@ internal static class Program
                             _logger.Error($"IpcClientChannel error: {ex}");
                             errMsg = ex;
                             counter--;
-                            
+
                             // Use Task.Delay instead of Thread.Sleep for non-blocking wait
                             if (counter > 0)
                             {

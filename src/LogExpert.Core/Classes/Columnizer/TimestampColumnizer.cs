@@ -1,4 +1,4 @@
-using static LogExpert.Core.Classes.Columnizer.TimeFormatDeterminer;
+using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
@@ -86,6 +86,8 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
     {
         return "Timestamp Columnizer";
     }
+
+    public string GetCustomName () => GetName();
 
     public string GetDescription ()
     {

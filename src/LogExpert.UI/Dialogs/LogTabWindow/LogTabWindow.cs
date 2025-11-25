@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
@@ -95,11 +94,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         InitializeComponent();
 
+        ConfigureDockPanel();
+
         ApplyTextResources();
 
         ConfigManager = configManager;
 
-        //Fix MainMenu and externalToolsToolStrip.Location, if the location has unintentionally been changed in the designer
+        //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
 
@@ -109,7 +110,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         Load += OnLogTabWindowLoad;
 
-        configManager.Instance.ConfigChanged += OnConfigChanged;
+        ConfigManager.ConfigChanged += OnConfigChanged;
         HighlightGroupList = configManager.Settings.Preferences.HighlightGroupList;
 
         Rectangle led = new(0, 0, 8, 2);
@@ -166,16 +167,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dragControlDateTime.Visible = false;
         loadProgessBar.Visible = false;
 
-        // get a reference to the current assembly
-        var a = Assembly.GetExecutingAssembly();
-
-        // get a list of resource names from the manifest
-        var resNames = a.GetManifestResourceNames();
-
-        var bmp = Resources.Deceased;
+        using var bmp = Resources.Deceased;
         _deadIcon = Icon.FromHandle(bmp.GetHicon());
-        bmp.Dispose();
-        Closing += OnLogTabWindowClosing;
+
+        FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
     }
@@ -293,11 +288,78 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         return AddFileTab(fileName, true, title, false, null);
     }
 
+    private void ConfigureDockPanel ()
+    {
+        var autoHideStripSkin1 = new AutoHideStripSkin();
+        var dockPanelGradient1 = new DockPanelGradient();
+        var tabGradient1 = new TabGradient();
+        var dockPaneStripSkin1 = new DockPaneStripSkin();
+        var dockPaneStripGradient1 = new DockPaneStripGradient();
+        var tabGradient2 = new TabGradient();
+        var dockPanelGradient2 = new DockPanelGradient();
+        var tabGradient3 = new TabGradient();
+        var dockPaneStripToolWindowGradient1 = new DockPaneStripToolWindowGradient();
+        var tabGradient4 = new TabGradient();
+        var tabGradient5 = new TabGradient();
+        var dockPanelGradient3 = new DockPanelGradient();
+        var tabGradient6 = new TabGradient();
+        var tabGradient7 = new TabGradient();
+
+        dockPanelGradient1.EndColor = SystemColors.Control;
+        dockPanelGradient1.StartColor = SystemColors.Control;
+        autoHideStripSkin1.DockStripGradient = dockPanelGradient1;
+        tabGradient1.EndColor = SystemColors.Control;
+        tabGradient1.StartColor = SystemColors.Control;
+        tabGradient1.TextColor = SystemColors.ControlText;
+        autoHideStripSkin1.TabGradient = tabGradient1;
+        autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
+        tabGradient2.EndColor = SystemColors.Control;
+        tabGradient2.StartColor = SystemColors.Control;
+        tabGradient2.TextColor = SystemColors.ControlText;
+        dockPaneStripGradient1.ActiveTabGradient = tabGradient2;
+        dockPanelGradient2.EndColor = SystemColors.Control;
+        dockPanelGradient2.StartColor = SystemColors.Control;
+        dockPaneStripGradient1.DockStripGradient = dockPanelGradient2;
+        tabGradient3.EndColor = SystemColors.ControlLight;
+        tabGradient3.StartColor = SystemColors.ControlLight;
+        tabGradient3.TextColor = SystemColors.ControlText;
+        dockPaneStripGradient1.InactiveTabGradient = tabGradient3;
+        dockPaneStripSkin1.DocumentGradient = dockPaneStripGradient1;
+        dockPaneStripSkin1.TextFont = new Font("Segoe UI", 9F);
+        tabGradient4.EndColor = SystemColors.ActiveCaption;
+        tabGradient4.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+        tabGradient4.StartColor = SystemColors.GradientActiveCaption;
+        tabGradient4.TextColor = SystemColors.ActiveCaptionText;
+        dockPaneStripToolWindowGradient1.ActiveCaptionGradient = tabGradient4;
+        tabGradient5.EndColor = SystemColors.Control;
+        tabGradient5.StartColor = SystemColors.Control;
+        tabGradient5.TextColor = SystemColors.ControlText;
+        dockPaneStripToolWindowGradient1.ActiveTabGradient = tabGradient5;
+        dockPanelGradient3.EndColor = SystemColors.ControlLight;
+        dockPanelGradient3.StartColor = SystemColors.ControlLight;
+        dockPaneStripToolWindowGradient1.DockStripGradient = dockPanelGradient3;
+        tabGradient6.EndColor = SystemColors.InactiveCaption;
+        tabGradient6.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+        tabGradient6.StartColor = SystemColors.GradientInactiveCaption;
+        tabGradient6.TextColor = SystemColors.InactiveCaptionText;
+        dockPaneStripToolWindowGradient1.InactiveCaptionGradient = tabGradient6;
+        tabGradient7.EndColor = Color.Transparent;
+        tabGradient7.StartColor = Color.Transparent;
+        tabGradient7.TextColor = SystemColors.Control;
+        dockPaneStripToolWindowGradient1.InactiveTabGradient = tabGradient7;
+        dockPaneStripSkin1.ToolWindowGradient = dockPaneStripToolWindowGradient1;
+        dockPanel.Theme = new VS2015LightTheme();
+        dockPanel.Theme.Skin.DockPaneStripSkin = dockPaneStripSkin1;
+        dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
+        dockPanel.ActiveAutoHideContent = null;
+    }
+
+
     private void ApplyTextResources ()
     {
 
-        mainMenuStrip.Text = "menuStrip1";
-        Text = "LogExpert";
+        mainMenuStrip.Text = Resources.LogTabWindow_UI_MenuStrip_MainMenu;
+        Text = Resources.LogExpert_Common_UI_Title_LogExpert;
         checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
 
         ApplyStatusStripResources();
@@ -333,6 +395,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         toolStripButtonBubbles.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles;
         toolStripButtonTail.Text = Resources.LogTabWindow_UI_ToolStripButton_toolStripButtonTail;
         checkBoxFollowTail.Text = Resources.LogTabWindow_UI_CheckBox_checkBoxFollowTail;
+        pluginTrustManagementToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement;
     }
 
     private void ApplyContextMenuResources ()
@@ -403,9 +466,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         throwExceptionbackgroundThToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem;
         throwExceptionBackgroundThreadToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem;
         loglevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem;
-        warnToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
-        infoToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
-        debugToolStripMenuItem1.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1;
+        warnLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem;
+        infoLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem;
+        debugLogLevelToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem;
         disableWordHighlightModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem;
     }
 
@@ -422,6 +485,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void ApplyToolTips ()
     {
         //TODO use ToolTip class instead of ToolTipText
+        pluginTrustManagementToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement;
         timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
         openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
         newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
@@ -1085,7 +1149,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 // handle relative paths in .lxp files
                 var dir = Path.GetDirectoryName(fileName);
-                return Path.Combine(dir, persistenceData.FileName);
+                return Path.Join(dir, persistenceData.FileName);
             }
         }
 
@@ -2223,7 +2287,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
-    private void OnLogTabWindowClosing (object sender, CancelEventArgs e)
+    private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
         try
         {
@@ -2243,7 +2307,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             DestroyBookmarkWindow();
 
-            ConfigManager.Instance.ConfigChanged -= OnConfigChanged;
+            ConfigManager.ConfigChanged -= OnConfigChanged;
 
             SaveWindowPosition();
             ConfigManager.Save(SettingsFlags.WindowPosition | SettingsFlags.FileHistory);
@@ -2747,6 +2811,27 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
+    private void OnPluginTrustToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        using var dialog = new PluginTrustDialog(this);
+        var result = dialog.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var restartPrompt = MessageBox.Show(
+                "Plugin trust configuration updated.\n\nRestart LogExpert to apply changes?",
+                "Restart Recommended",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (restartPrompt == DialogResult.Yes)
+            {
+                Application.Restart();
+            }
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
     private void OnDateTimeDragControlValueDragged (object sender, EventArgs e)
     {
         if (CurrentLogWindow != null)
@@ -3130,7 +3215,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         //_logger.Get_logger().LogLevel = _logger.Level.INFO;
     }
 
-    private void OnDebugToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnDebugLogLevelToolStripMenuItemClick (object sender, EventArgs e)
     {
         //_logger.Get_logger().LogLevel = _logger.Level.DEBUG;
     }

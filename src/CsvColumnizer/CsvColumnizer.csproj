@@ -39,4 +39,10 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="CsvColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

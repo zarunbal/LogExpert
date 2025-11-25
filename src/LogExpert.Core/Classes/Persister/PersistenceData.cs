@@ -15,6 +15,16 @@ public class PersistenceData
 
     public bool BookmarkListVisible { get; set; }
 
+    /// <summary>
+    /// The columnizer to use for this session. This property stores the entire columnizer configuration including any custom names.
+    /// </summary>
+    [JsonConverter(typeof(ColumnizerJsonConverter))]
+    public ILogLineColumnizer Columnizer { get; set; }
+
+    /// <summary>
+    /// Deprecated: Use Columnizer property instead. This is kept for backward compatibility with old session files.
+    /// </summary>
+    [Obsolete("Use Columnizer property instead. This property is kept for backward compatibility.")]
     public string ColumnizerName { get; set; }
 
     public int CurrentLine { get; set; } = -1;

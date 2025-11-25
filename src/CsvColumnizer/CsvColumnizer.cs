@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
+
+using ColumnizerLib;
 
 using CsvHelper;
 
@@ -64,17 +61,20 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
             return null; // hide from LogExpert
         }
 
-        if (_config.CommentChar != ' ' && logLine.StartsWith("" + _config.CommentChar))
-        {
-            return null;
-        }
-
-        return logLine;
+        return _config.CommentChar != ' ' &&
+               logLine.StartsWith("" + _config.CommentChar, StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : logLine;
     }
 
     public string GetName ()
     {
         return "CSV Columnizer";
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     public string GetDescription ()
@@ -108,12 +108,9 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        if (_isValidCsv)
-        {
-            return SplitCsvLine(line);
-        }
-
-        return CreateColumnizedLogLine(line);
+        return _isValidCsv
+            ? SplitCsvLine(line)
+            : CreateColumnizedLogLine(line);
     }
 
     private static ColumnizedLogLine CreateColumnizedLogLine (ILogLine line)
@@ -122,6 +119,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         {
             LogLine = line
         };
+
         cLogLine.ColumnValues = [new Column { FullValue = line.FullLine, Parent = cLogLine }];
         return cLogLine;
     }
@@ -156,13 +154,15 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         if (_isValidCsv) // see PreProcessLine()
         {
             _columnList.Clear();
-            var line = _config.HasFieldNames ? _firstLine : callback.GetLogLine(0);
+            var line = _config.HasFieldNames
+                ? _firstLine
+                : callback.GetLogLine(0);
 
             if (line != null)
             {
                 using CsvReader csv = new(new StringReader(line.FullLine), _config.ReaderConfiguration);
-                csv.Read();
-                csv.ReadHeader();
+                _ = csv.Read();
+                _ = csv.ReadHeader();
 
                 var fieldCount = csv.Parser.Count;
 
@@ -216,7 +216,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public void LoadConfig (string configDir)
     {
-        var configPath = Path.Combine(configDir, CONFIGFILENAME);
+        var configPath = Path.Join(configDir, CONFIGFILENAME);
 
         if (!File.Exists(configPath))
         {
@@ -232,7 +232,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Error while deserializing config data: {e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show($"Error while deserializing config data: {e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 _config = new CsvColumnizerConfig();
                 _config.InitDefaults();
             }
@@ -255,7 +255,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     #region Private Methods
 
-    private IColumnizedLogLine SplitCsvLine (ILogLine line)
+    private ColumnizedLogLine SplitCsvLine (ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -263,8 +263,8 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         };
 
         using CsvReader csv = new(new StringReader(line.FullLine), _config.ReaderConfiguration);
-        csv.Read();
-        csv.ReadHeader();
+        _ = csv.Read();
+        _ = csv.ReadHeader();
 
         //we only read line by line and not the whole file so it is always the header
         var records = csv.HeaderRecord;
@@ -278,7 +278,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
                 columns.Add(new Column { FullValue = record, Parent = cLogLine });
             }
 
-            cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
         }
 
         return cLogLine;

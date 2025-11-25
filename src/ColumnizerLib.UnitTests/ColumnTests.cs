@@ -10,31 +10,74 @@ namespace ColumnizerLib.UnitTests;
 [TestFixture]
 public class ColumnTests
 {
-    [Test]
-    public void Column_LineCutOff ()
+    [SetUp]
+    public void SetUp()
     {
-        var expectedFullValue = new StringBuilder().Append('6', 4675).Append("1234").ToString();
-        var expectedDisplayValue = expectedFullValue[..4675] + "..."; // Using substring shorthand
-
-        Column column = new()
-        {
-            FullValue = expectedFullValue
-        };
-
-        Assert.That(column.DisplayValue, Is.EqualTo(expectedDisplayValue));
-        Assert.That(column.FullValue, Is.EqualTo(expectedFullValue));
+        // Reset to default before each test
+        Column.SetMaxDisplayLength(20_000);
     }
 
     [Test]
-    public void Column_NoLineCutOff ()
+    public void Column_DisplayMaxLength_DefaultIs20000()
     {
-        var expected = new StringBuilder().Append('6', 4675).ToString();
+        Assert.That(Column.GetMaxDisplayLength(), Is.EqualTo(20_000));
+    }
+
+    [Test]
+    public void Column_DisplayMaxLength_CanBeConfigured()
+    {
+        Column.SetMaxDisplayLength(50_000);
+        Assert.That(Column.GetMaxDisplayLength(), Is.EqualTo(50_000));
+        
+        // Reset for other tests
+        Column.SetMaxDisplayLength(20_000);
+    }
+
+    [Test]
+    public void Column_DisplayMaxLength_EnforcesMinimum()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => Column.SetMaxDisplayLength(500));
+    }
+
+    [Test]
+    public void Column_TruncatesAtConfiguredDisplayLength()
+    {
+        Column.SetMaxDisplayLength(10_000);
+        
+        // Create a line longer than the display max length
+        var longValue = new StringBuilder().Append('X', 15_000).ToString();
+        
         Column column = new()
         {
-            FullValue = expected
+            FullValue = longValue
+        };
+
+        // FullValue should contain the full line
+        Assert.That(column.FullValue, Is.EqualTo(longValue));
+        Assert.That(column.FullValue.Length, Is.EqualTo(15_000));
+        
+        // DisplayValue should be truncated at 10,000 with "..." appended
+        Assert.That(column.DisplayValue.Length, Is.EqualTo(10_003)); // 10000 + "..."
+        Assert.That(column.DisplayValue.EndsWith("..."), Is.True);
+        Assert.That(column.DisplayValue.StartsWith("XXX"), Is.True);
+        
+        // Reset for other tests
+        Column.SetMaxDisplayLength(20_000);
+    }
+
+    [Test]
+    public void Column_NoTruncationWhenBelowLimit()
+    {
+        Column.SetMaxDisplayLength(20_000);
+        
+        var normalValue = new StringBuilder().Append('Y', 5_000).ToString();
+        Column column = new()
+        {
+            FullValue = normalValue
         };
 
         Assert.That(column.DisplayValue, Is.EqualTo(column.FullValue));
+        Assert.That(column.DisplayValue.Length, Is.EqualTo(5_000));
     }
 
     [Test]

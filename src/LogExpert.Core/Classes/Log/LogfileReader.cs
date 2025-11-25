@@ -29,8 +29,13 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private ReaderWriterLock _bufferListLock;
     private bool _contentDeleted;
     private int _currLineCount;
+
+    private readonly int _maximumLineLength;
+
     private ReaderWriterLock _disposeLock;
+
     private EncodingOptions _encodingOptions;
+
     private long _fileLength;
     private Task _garbageCollectorTask;
     private Task _monitorTask;
@@ -50,20 +55,20 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     #region cTor
 
     /// Public constructor for single file.
-    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
-    : this([fileName], encodingOptions, multiFile, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry)
+    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
+    : this([fileName], encodingOptions, multiFile, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry, maximumLineLength)
     {
     }
 
     /// Public constructor for multiple files.
-    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
-        : this(fileNames, encodingOptions, true, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry)
+    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
+        : this(fileNames, encodingOptions, true, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry, maximumLineLength)
     {
         // In this overload, we assume multiFile is always true.
     }
 
     // Single private constructor that contains the common initialization logic.
-    private LogfileReader (string[] fileNames, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
+    private LogfileReader (string[] fileNames, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
     {
         // Validate input: at least one file must be provided.
         if (fileNames == null || fileNames.Length < 1)
@@ -71,6 +76,13 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             throw new ArgumentException("Must provide at least one file.", nameof(fileNames));
         }
 
+        //Set default maximum line length if invalid value provided.
+        if (maximumLineLength <= 0)
+        {
+            maximumLineLength = 500;
+        }
+
+        _maximumLineLength = maximumLineLength;
         _useNewReader = useNewReader;
         EncodingOptions = encodingOptions;
         _max_buffers = bufferCount;
@@ -1535,9 +1547,12 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     private void FireChangeEvent ()
     {
-        LogEventArgs args = new();
-        args.PrevFileSize = FileSize;
-        args.PrevLineCount = LineCount;
+        LogEventArgs args = new()
+        {
+            PrevFileSize = FileSize,
+            PrevLineCount = LineCount
+        };
+
         var newSize = _fileLength;
         if (newSize < FileSize || _isDeleted)
         {
@@ -1604,12 +1619,9 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions, bool useSystemReader)
     {
-        if (useSystemReader)
-        {
-            return new PositionAwareStreamReaderSystem(stream, encodingOptions);
-        }
-
-        return new PositionAwareStreamReaderLegacy(stream, encodingOptions);
+        return useSystemReader
+            ? new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength)
+            : new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength);
     }
 
     private bool ReadLine (ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)

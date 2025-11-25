@@ -453,8 +453,7 @@ namespace LogExpert.UI.Controls.LogWindow
             advancedFilterSplitContainer.Panel2.Controls.Add(panelBackgroundAdvancedFilterSplitContainer);
             advancedFilterSplitContainer.Panel2MinSize = 50;
             advancedFilterSplitContainer.Size = new Size(1855, 561);
-            advancedFilterSplitContainer.SplitterDistance = 110;
-            advancedFilterSplitContainer.Panel2Collapsed = true;
+            advancedFilterSplitContainer.SplitterDistance = 170;
             advancedFilterSplitContainer.SplitterWidth = 2;
             advancedFilterSplitContainer.TabIndex = 2;
             // 
@@ -480,11 +479,11 @@ namespace LogExpert.UI.Controls.LogWindow
             pnlProFilter.Size = new Size(1852, 80);
             pnlProFilter.TabIndex = 0;
             // 
-            // columnButton
+            // btnColumn
             // 
             btnColumn.Enabled = false;
             btnColumn.Location = new Point(750, 41);
-            btnColumn.Name = "columnButton";
+            btnColumn.Name = "btnColumn";
             btnColumn.Size = new Size(85, 35);
             btnColumn.TabIndex = 15;
             btnColumn.Text = "Columns...";
@@ -536,16 +535,16 @@ namespace LogExpert.UI.Controls.LogWindow
             columnNamesLabel.TabIndex = 11;
             columnNamesLabel.Text = "column names";
             // 
-            // fuzzyLabel
+            // lblfuzzy
             // 
             lblfuzzy.AutoSize = true;
             lblfuzzy.Location = new Point(502, 38);
-            lblfuzzy.Name = "fuzzyLabel";
+            lblfuzzy.Name = "lblfuzzy";
             lblfuzzy.Size = new Size(56, 13);
             lblfuzzy.TabIndex = 11;
             lblfuzzy.Text = "Fuzzyness";
             // 
-            // fuzzyKnobControl
+            // knobControlFuzzy
             // 
             knobControlFuzzy.DragSensitivity = 6;
             knobControlFuzzy.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -553,7 +552,7 @@ namespace LogExpert.UI.Controls.LogWindow
             knobControlFuzzy.Margin = new Padding(2);
             knobControlFuzzy.MaxValue = 0;
             knobControlFuzzy.MinValue = 0;
-            knobControlFuzzy.Name = "fuzzyKnobControl";
+            knobControlFuzzy.Name = "knobControlFuzzy";
             knobControlFuzzy.Size = new Size(17, 29);
             knobControlFuzzy.TabIndex = 10;
             helpToolTip.SetToolTip(knobControlFuzzy, "Fuzzy search level (0 = fuzzy off)");
@@ -590,7 +589,7 @@ namespace LogExpert.UI.Controls.LogWindow
             lblBackSpread.TabIndex = 6;
             lblBackSpread.Text = "Back Spread ";
             // 
-            // filterKnobBackSpread
+            // knobControlFilterBackSpread
             // 
             knobControlFilterBackSpread.DragSensitivity = 3;
             knobControlFilterBackSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -598,7 +597,7 @@ namespace LogExpert.UI.Controls.LogWindow
             knobControlFilterBackSpread.Margin = new Padding(2);
             knobControlFilterBackSpread.MaxValue = 0;
             knobControlFilterBackSpread.MinValue = 0;
-            knobControlFilterBackSpread.Name = "filterKnobBackSpread";
+            knobControlFilterBackSpread.Name = "knobControlFilterBackSpread";
             knobControlFilterBackSpread.Size = new Size(17, 29);
             knobControlFilterBackSpread.TabIndex = 5;
             helpToolTip.SetToolTip(knobControlFilterBackSpread, "Add preceding lines to search result (Drag up/down, press Shift for finer pitch)");
@@ -613,7 +612,7 @@ namespace LogExpert.UI.Controls.LogWindow
             lblForeSpread.TabIndex = 2;
             lblForeSpread.Text = "Fore Spread";
             // 
-            // filterKnobForeSpread
+            // knobControlFilterForeSpread
             // 
             knobControlFilterForeSpread.DragSensitivity = 3;
             knobControlFilterForeSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -621,7 +620,7 @@ namespace LogExpert.UI.Controls.LogWindow
             knobControlFilterForeSpread.Margin = new Padding(2);
             knobControlFilterForeSpread.MaxValue = 0;
             knobControlFilterForeSpread.MinValue = 0;
-            knobControlFilterForeSpread.Name = "filterKnobForeSpread";
+            knobControlFilterForeSpread.Name = "knobControlFilterForeSpread";
             knobControlFilterForeSpread.Size = new Size(17, 29);
             knobControlFilterForeSpread.TabIndex = 1;
             helpToolTip.SetToolTip(knobControlFilterForeSpread, "Add following lines to search result (Drag up/down, press Shift for finer pitch)");
@@ -645,7 +644,7 @@ namespace LogExpert.UI.Controls.LogWindow
             panelBackgroundAdvancedFilterSplitContainer.Dock = DockStyle.Fill;
             panelBackgroundAdvancedFilterSplitContainer.Location = new Point(0, 0);
             panelBackgroundAdvancedFilterSplitContainer.Name = "panelBackgroundAdvancedFilterSplitContainer";
-            panelBackgroundAdvancedFilterSplitContainer.Size = new Size(1855, 474);
+            panelBackgroundAdvancedFilterSplitContainer.Size = new Size(1855, 389);
             panelBackgroundAdvancedFilterSplitContainer.TabIndex = 7;
             // 
             // btnToggleHighlightPanel
@@ -678,8 +677,8 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             highlightSplitContainer.Panel2.Controls.Add(highlightSplitContainerBackPanel);
             highlightSplitContainer.Panel2MinSize = 350;
-            highlightSplitContainer.Size = new Size(1829, 471);
-            highlightSplitContainer.SplitterDistance = 1475;
+            highlightSplitContainer.Size = new Size(1826, 378);
+            highlightSplitContainer.SplitterDistance = 1472;
             highlightSplitContainer.TabIndex = 2;
             // 
             // filterGridView
@@ -712,7 +711,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterGridView.ShowCellToolTips = false;
             filterGridView.ShowEditingIcon = false;
             filterGridView.ShowRowErrors = false;
-            filterGridView.Size = new Size(1473, 469);
+            filterGridView.Size = new Size(1470, 376);
             filterGridView.TabIndex = 1;
             filterGridView.VirtualMode = true;
             filterGridView.CellContextMenuStripNeeded += OnFilterGridViewCellContextMenuStripNeeded;
@@ -764,7 +763,7 @@ namespace LogExpert.UI.Controls.LogWindow
             highlightSplitContainerBackPanel.Dock = DockStyle.Fill;
             highlightSplitContainerBackPanel.Location = new Point(0, 0);
             highlightSplitContainerBackPanel.Name = "highlightSplitContainerBackPanel";
-            highlightSplitContainerBackPanel.Size = new Size(348, 469);
+            highlightSplitContainerBackPanel.Size = new Size(348, 376);
             highlightSplitContainerBackPanel.TabIndex = 1;
             // 
             // hideFilterListOnLoadCheckBox
@@ -779,12 +778,12 @@ namespace LogExpert.UI.Controls.LogWindow
             hideFilterListOnLoadCheckBox.UseVisualStyleBackColor = true;
             hideFilterListOnLoadCheckBox.MouseClick += OnHideFilterListOnLoadCheckBoxMouseClick;
             // 
-            // filterDownButton
+            // btnFilterDown
             // 
             btnFilterDown.BackgroundImage = LogExpert.Resources.ArrowDown;
             btnFilterDown.BackgroundImageLayout = ImageLayout.Stretch;
             btnFilterDown.Location = new Point(296, 85);
-            btnFilterDown.Name = "filterDownButton";
+            btnFilterDown.Name = "btnFilterDown";
             btnFilterDown.Size = new Size(35, 35);
             btnFilterDown.TabIndex = 19;
             helpToolTip.SetToolTip(btnFilterDown, "Move the selected entry down in the list");
@@ -792,12 +791,12 @@ namespace LogExpert.UI.Controls.LogWindow
             btnFilterDown.SizeChanged += OnButtonSizeChanged;
             btnFilterDown.Click += OnFilterDownButtonClick;
             // 
-            // filterUpButton
+            // btnFilterUp
             // 
             btnFilterUp.BackgroundImage = LogExpert.Resources.ArrowUp;
             btnFilterUp.BackgroundImageLayout = ImageLayout.Stretch;
             btnFilterUp.Location = new Point(258, 85);
-            btnFilterUp.Name = "filterUpButton";
+            btnFilterUp.Name = "btnFilterUp";
             btnFilterUp.Size = new Size(35, 35);
             btnFilterUp.TabIndex = 18;
             helpToolTip.SetToolTip(btnFilterUp, "Move the selected entry up in the list");
@@ -818,27 +817,27 @@ namespace LogExpert.UI.Controls.LogWindow
             filterOnLoadCheckBox.KeyPress += OnFilterOnLoadCheckBoxKeyPress;
             filterOnLoadCheckBox.MouseClick += OnFilterOnLoadCheckBoxMouseClick;
             // 
-            // saveFilterButton
+            // bntSaveFilter
             // 
             bntSaveFilter.Location = new Point(258, 11);
-            bntSaveFilter.Name = "saveFilterButton";
+            bntSaveFilter.Name = "bntSaveFilter";
             bntSaveFilter.Size = new Size(75, 35);
             bntSaveFilter.TabIndex = 16;
             bntSaveFilter.Text = "Save filter";
             bntSaveFilter.UseVisualStyleBackColor = true;
             bntSaveFilter.Click += OnSaveFilterButtonClick;
             // 
-            // deleteFilterButton
+            // btnDeleteFilter
             // 
             btnDeleteFilter.Location = new Point(258, 47);
-            btnDeleteFilter.Name = "deleteFilterButton";
+            btnDeleteFilter.Name = "btnDeleteFilter";
             btnDeleteFilter.Size = new Size(75, 35);
             btnDeleteFilter.TabIndex = 3;
             btnDeleteFilter.Text = "Delete";
             btnDeleteFilter.UseVisualStyleBackColor = true;
             btnDeleteFilter.Click += OnDeleteFilterButtonClick;
             // 
-            // filterListBox
+            // listBoxFilter
             // 
             listBoxFilter.ContextMenuStrip = filterListContextMenuStrip;
             listBoxFilter.Dock = DockStyle.Left;
@@ -848,8 +847,8 @@ namespace LogExpert.UI.Controls.LogWindow
             listBoxFilter.IntegralHeight = false;
             listBoxFilter.ItemHeight = 25;
             listBoxFilter.Location = new Point(0, 0);
-            listBoxFilter.Name = "filterListBox";
-            listBoxFilter.Size = new Size(252, 469);
+            listBoxFilter.Name = "listBoxFilter";
+            listBoxFilter.Size = new Size(252, 376);
             listBoxFilter.TabIndex = 0;
             helpToolTip.SetToolTip(listBoxFilter, "Doubleclick to load a saved filter");
             listBoxFilter.DrawItem += OnFilterListBoxDrawItem;
@@ -930,13 +929,12 @@ namespace LogExpert.UI.Controls.LogWindow
             lblTextFilter.TabIndex = 3;
             lblTextFilter.Text = "Text &filter:";
             // 
-            // advancedButton
+            // btnAdvanced
             // 
             btnAdvanced.DialogResult = DialogResult.Cancel;
-            btnAdvanced.Image = (Image)resources.GetObject("advancedButton.Image");
             btnAdvanced.ImageAlign = ContentAlignment.MiddleRight;
             btnAdvanced.Location = new Point(539, 5);
-            btnAdvanced.Name = "advancedButton";
+            btnAdvanced.Name = "btnAdvanced";
             btnAdvanced.Size = new Size(110, 35);
             btnAdvanced.TabIndex = 17;
             btnAdvanced.Text = "Show advanced...";
@@ -1005,7 +1003,6 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSearchButton
             // 
-            filterSearchButton.Image = (Image)resources.GetObject("filterSearchButton.Image");
             filterSearchButton.ImageAlign = ContentAlignment.MiddleRight;
             filterSearchButton.Location = new Point(3, 5);
             filterSearchButton.Name = "filterSearchButton";
@@ -1155,7 +1152,6 @@ namespace LogExpert.UI.Controls.LogWindow
             Controls.Add(splitContainerLogWindow);
             Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.None;
-            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(0);
             MaximizeBox = false;
             MinimizeBox = false;

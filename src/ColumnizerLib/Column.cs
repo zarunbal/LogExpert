@@ -1,26 +1,26 @@
-using System;
-using System.Collections.Generic;
+using LogExpert;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 public class Column : IColumn
 {
     #region Fields
 
-    private const int MAXLENGTH = 4678 - 3;
     private const string REPLACEMENT = "...";
+
+    // Display-level maximum line length (separate from reader-level limit)
+    // Can be configured via SetMaxDisplayLength()
+    private static int _maxDisplayLength = 20_000;
 
     private static readonly List<Func<string, string>> _replacements = [
         //replace tab with 3 spaces, from old coding. Needed???
                 input => input.Replace("\t", "  ", StringComparison.Ordinal),
 
                 //shorten string if it exceeds maxLength
-                input => input.Length > MAXLENGTH
-                        ? string.Concat(input.AsSpan(0, MAXLENGTH), REPLACEMENT)
+                input => input.Length > _maxDisplayLength
+                        ? string.Concat(input.AsSpan(0, _maxDisplayLength), REPLACEMENT)
                         : input
     ];
-
-    private string _fullValue;
 
     #endregion
 
@@ -38,6 +38,9 @@ public class Column : IColumn
         {
             //Everything below Win8 the installed fonts seems to not to support reliabel
             //Replace null char with space
+            //.net 10 does no longer support windows lower then windows 10
+            //TODO: remove if with one of the next releases
+            //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
             _replacements.Add(input => input.Replace("\0", " ", StringComparison.Ordinal));
         }
 
@@ -54,10 +57,10 @@ public class Column : IColumn
 
     public string FullValue
     {
-        get => _fullValue;
+        get;
         set
         {
-            _fullValue = value;
+            field = value;
 
             var temp = FullValue;
 
@@ -77,6 +80,26 @@ public class Column : IColumn
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Configures the maximum display length for all Column instances.
+    /// This is separate from the reader-level MaxLineLength.
+    /// </summary>
+    /// <param name="maxLength">Maximum length for displayed content. Must be at least 1000.</param>
+    public static void SetMaxDisplayLength (int maxLength)
+    {
+        if (maxLength < 1000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxLength), "Maximum display length must be at least 1000 characters.");
+        }
+
+        _maxDisplayLength = maxLength;
+    }
+
+    /// <summary>
+    /// Gets the current maximum display length setting.
+    /// </summary>
+    public static int GetMaxDisplayLength () => _maxDisplayLength;
 
     public static Column[] CreateColumns (int count, IColumnizedLogLine parent)
     {
