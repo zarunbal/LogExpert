@@ -1,6 +1,9 @@
 using System.Runtime.Versioning;
+
 using LogExpert;
+
 using Moq;
+
 using NUnit.Framework;
 
 [assembly: SupportedOSPlatform("windows")]
@@ -12,14 +15,14 @@ public class RegexColumnizerErrorHandlingTests
     private string _testDirectory;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"LogExpertTest_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+        _testDirectory = Path.Join(Path.GetTempPath(), $"LogExpertTest_{Guid.NewGuid()}");
+        _ = Directory.CreateDirectory(_testDirectory);
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
         if (Directory.Exists(_testDirectory))
         {
@@ -35,7 +38,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void Init_InvalidRegex_SetsRegexToNullAndUsesEmptyColumns()
+    public void Init_InvalidRegex_SetsRegexToNullAndUsesEmptyColumns ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -45,8 +48,8 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
@@ -60,7 +63,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void Init_CatastrophicBacktracking_HandledByRegexHelper()
+    public void Init_CatastrophicBacktracking_HandledByRegexHelper ()
     {
         // Arrange - This pattern can cause catastrophic backtracking
         var config = new RegexColumnizerConfig
@@ -70,8 +73,8 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
@@ -85,19 +88,19 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void SplitLine_NullRegex_PlacesEntireLineInFirstColumn()
+    public void SplitLine_NullRegex_PlacesEntireLineInFirstColumn ()
     {
         // Arrange
         var columnizer = new Regex1Columnizer();
-        
+
         // Set invalid regex to make Regex null
         var config = new RegexColumnizerConfig
         {
             Expression = "(?<invalid",
             Name = "Test"
         };
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
         columnizer.Init();
@@ -115,10 +118,10 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void LoadConfig_CorruptJsonFile_DisplaysErrorAndUsesDefaults()
+    public void LoadConfig_CorruptJsonFile_DisplaysErrorAndUsesDefaults ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "{ corrupt json content }");
 
         var columnizer = new Regex1Columnizer();
@@ -132,7 +135,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void LoadConfig_FileSystemError_HandlesGracefully()
+    public void LoadConfig_FileSystemError_HandlesGracefully ()
     {
         // Arrange
         string invalidPath = "Z:\\NonExistent\\Path\\That\\Does\\Not\\Exist";
@@ -147,7 +150,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void LoadConfig_EmptyConfigDirectory_UsesDefaults()
+    public void LoadConfig_EmptyConfigDirectory_UsesDefaults ()
     {
         // Arrange
         var columnizer = new Regex1Columnizer();
@@ -161,10 +164,10 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void LoadConfig_CorruptXmlFile_DisplaysErrorAndUsesDefaults()
+    public void LoadConfig_CorruptXmlFile_DisplaysErrorAndUsesDefaults ()
     {
         // Arrange
-        string xmlPath = Path.Combine(_testDirectory, "Regex1Columnizer.xml");
+        string xmlPath = Path.Join(_testDirectory, "Regex1Columnizer.xml");
         File.WriteAllText(xmlPath, "<InvalidXml>No closing tag");
 
         var columnizer = new Regex1Columnizer();
@@ -177,7 +180,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void SplitLine_EmptyColumnValues_HandlesGracefully()
+    public void SplitLine_EmptyColumnValues_HandlesGracefully ()
     {
         // Arrange
         var columnizer = CreateColumnizer(@"^(?<col1>\d*)\s+(?<col2>\w*)$");
@@ -192,7 +195,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void SplitLine_VeryComplexRegex_CompletesInReasonableTime()
+    public void SplitLine_VeryComplexRegex_CompletesInReasonableTime ()
     {
         // Arrange - Complex but safe regex
         var columnizer = CreateColumnizer(
@@ -201,8 +204,8 @@ public class RegexColumnizerErrorHandlingTests
             @"\[(?<thread>[^\]]+)\]\s+" +
             @"(?<logger>[^\s]+)\s+" +
             @"(?<message>.*)$");
-        
-        var testLogLine = new TestLogLine(1, 
+
+        var testLogLine = new TestLogLine(1,
             "2023-11-21 14:30:45,123 ERROR [main-thread-1] com.example.MyClass Error message here");
 
         // Act
@@ -216,7 +219,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void GetName_ConfigNameIsNull_ReturnsDefaultName()
+    public void GetName_ConfigNameIsNull_ReturnsDefaultName ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -226,8 +229,8 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
@@ -239,7 +242,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void GetName_ConfigNameIsWhitespace_ReturnsDefaultName()
+    public void GetName_ConfigNameIsWhitespace_ReturnsDefaultName ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -249,8 +252,8 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
@@ -262,7 +265,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void Init_EmptyExpression_HandlesGracefully()
+    public void Init_EmptyExpression_HandlesGracefully ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -272,8 +275,8 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
@@ -288,7 +291,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void SplitLine_MultipleNonMatchingLines_HandlesConsistently()
+    public void SplitLine_MultipleNonMatchingLines_HandlesConsistently ()
     {
         // Arrange
         var columnizer = CreateColumnizer(@"^(?<number>\d+)\s+(?<text>.*)$");
@@ -303,14 +306,14 @@ public class RegexColumnizerErrorHandlingTests
         foreach (var line in lines)
         {
             var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), line);
-            
+
             Assert.That(result.ColumnValues.Length, Is.EqualTo(2));
             Assert.That(result.ColumnValues[0].Text, Is.Empty); // First column empty
             Assert.That(result.ColumnValues[1].Text, Is.EqualTo(line.FullLine)); // Full line in last column
         }
     }
 
-    private Regex1Columnizer CreateColumnizer(string regex)
+    private Regex1Columnizer CreateColumnizer (string regex)
     {
         var config = new RegexColumnizerConfig
         {
@@ -319,34 +322,34 @@ public class RegexColumnizerErrorHandlingTests
         };
 
         var columnizer = new Regex1Columnizer();
-        
-        var configField = typeof(BaseRegexColumnizer).GetField("_config", 
+
+        var configField = typeof(BaseRegexColumnizer).GetField("_config",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
-        
+
         columnizer.Init();
-        
+
         return columnizer;
     }
 
     #region Security Tests (SEC-02)
 
     [Test]
-    public void Configure_ValidatesPathTraversal_WithDoubleDots()
+    public void Configure_ValidatesPathTraversal_WithDoubleDots ()
     {
         // This test ensures that GetConfigFileJSON validates the columnizer name
         // We can't directly test private methods, but Configure calls GetConfigFileJSON
         // Since columnizer name comes from GetType().Name, this is more of a defensive test
-        
+
         // Arrange
         var columnizer = new Regex1Columnizer();
-        string testDir = Path.Combine(_testDirectory, "security_test");
+        string testDir = Path.Join(_testDirectory, "security_test");
         _ = Directory.CreateDirectory(testDir);
 
         // Act & Assert - Normal operation should work fine
         // The security validation happens inside GetConfigFileJSON
         Assert.DoesNotThrow(() => columnizer.LoadConfig(testDir));
-        
+
         // Cleanup
         if (Directory.Exists(testDir))
         {
@@ -355,18 +358,18 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [Test]
-    public void Configure_ConfigDirectoryWithSpecialChars_HandledCorrectly()
+    public void Configure_ConfigDirectoryWithSpecialChars_HandledCorrectly ()
     {
         // Arrange
         var columnizer = new Regex1Columnizer();
-        
+
         // Test with directory containing spaces and valid special characters
-        string testDir = Path.Combine(_testDirectory, "test config (v1.0)");
+        string testDir = Path.Join(_testDirectory, "test config (v1.0)");
         _ = Directory.CreateDirectory(testDir);
 
         // Act & Assert - Should handle directory names with spaces and parentheses
         Assert.DoesNotThrow(() => columnizer.LoadConfig(testDir));
-        
+
         // Cleanup
         if (Directory.Exists(testDir))
         {
@@ -378,7 +381,7 @@ public class RegexColumnizerErrorHandlingTests
 
     private class TestLogLine : ILogLine
     {
-        public TestLogLine(int lineNumber, string fullLine)
+        public TestLogLine (int lineNumber, string fullLine)
         {
             LineNumber = lineNumber;
             FullLine = fullLine;

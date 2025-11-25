@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+
 using NUnit.Framework;
 
 [assembly: SupportedOSPlatform("windows")]
@@ -10,14 +11,14 @@ public class RegexColumnizerLoadConfigTests
     private string _testDirectory;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"LogExpertTest_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+        _testDirectory = Path.Join(Path.GetTempPath(), $"LogExpertTest_{Guid.NewGuid()}");
+        _ = Directory.CreateDirectory(_testDirectory);
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
         if (Directory.Exists(_testDirectory))
         {
@@ -26,10 +27,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_JsonExists_LoadsFromJson()
+    public void LoadConfig_JsonExists_LoadsFromJson ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, @"{
   ""Name"": ""Test From JSON"",
   ""Expression"": ""^(?<col1>\\w+)\\s+(?<col2>\\w+)$""
@@ -47,10 +48,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_XmlExists_LoadsFromXml()
+    public void LoadConfig_XmlExists_LoadsFromXml ()
     {
         // Arrange
-        string xmlPath = Path.Combine(_testDirectory, "Regex1Columnizer.xml");
+        string xmlPath = Path.Join(_testDirectory, "Regex1Columnizer.xml");
         File.WriteAllText(xmlPath, @"<?xml version=""1.0""?>
 <RegexColumnizerConfig xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <Expression>^(?&lt;text&gt;.*)$</Expression>
@@ -68,7 +69,7 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_NoConfigExists_UsesDefaults()
+    public void LoadConfig_NoConfigExists_UsesDefaults ()
     {
         // Arrange
         var columnizer = new Regex1Columnizer();
@@ -82,12 +83,12 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_BothJsonAndXmlExist_PrefersJson()
+    public void LoadConfig_BothJsonAndXmlExist_PrefersJson ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
-        string xmlPath = Path.Combine(_testDirectory, "Regex1Columnizer.xml");
-        
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
+        string xmlPath = Path.Join(_testDirectory, "Regex1Columnizer.xml");
+
         File.WriteAllText(jsonPath, @"{
   ""Name"": ""From JSON"",
   ""Expression"": ""(?<json>.*)""
@@ -110,10 +111,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_CorruptJsonFile_FallsBackToDefault()
+    public void LoadConfig_CorruptJsonFile_FallsBackToDefault ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "{ this is not valid json }");
 
         var columnizer = new Regex1Columnizer();
@@ -126,10 +127,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_NullJsonContent_FallsBackToDefault()
+    public void LoadConfig_NullJsonContent_FallsBackToDefault ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "null");
 
         var columnizer = new Regex1Columnizer();
@@ -143,10 +144,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_EmptyJsonObject_LoadsWithDefaults()
+    public void LoadConfig_EmptyJsonObject_LoadsWithDefaults ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "{}");
 
         var columnizer = new Regex1Columnizer();
@@ -159,10 +160,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_InvalidRegexInJson_HandlesGracefully()
+    public void LoadConfig_InvalidRegexInJson_HandlesGracefully ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, @"{
   ""Name"": ""Invalid Regex"",
   ""Expression"": ""(?<unclosed""
@@ -178,12 +179,12 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_DifferentColumnizerInstances_LoadSeparateConfigs()
+    public void LoadConfig_DifferentColumnizerInstances_LoadSeparateConfigs ()
     {
         // Arrange
-        string json1Path = Path.Combine(_testDirectory, "Regex1Columnizer.json");
-        string json2Path = Path.Combine(_testDirectory, "Regex2Columnizer.json");
-        
+        string json1Path = Path.Join(_testDirectory, "Regex1Columnizer.json");
+        string json2Path = Path.Join(_testDirectory, "Regex2Columnizer.json");
+
         File.WriteAllText(json1Path, @"{
   ""Name"": ""Config1"",
   ""Expression"": ""(?<col1>.*)""
@@ -207,10 +208,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_ComplexRegexWithMultipleGroups_ParsesCorrectly()
+    public void LoadConfig_ComplexRegexWithMultipleGroups_ParsesCorrectly ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, @"{
   ""Name"": ""Apache Log Parser"",
   ""Expression"": ""^(?<ip>\\S+)\\s+\\S+\\s+(?<user>\\S+)\\s+\\[(?<datetime>[^\\]]+)\\]\\s+\""(?<method>\\S+)\\s+(?<path>\\S+)\\s+(?<protocol>\\S+)\""\\s+(?<status>\\d+)\\s+(?<size>\\d+)""
@@ -228,10 +229,10 @@ public class RegexColumnizerLoadConfigTests
     }
 
     [Test]
-    public void LoadConfig_CalledMultipleTimes_ReloadsConfiguration()
+    public void LoadConfig_CalledMultipleTimes_ReloadsConfiguration ()
     {
         // Arrange
-        string jsonPath = Path.Combine(_testDirectory, "Regex1Columnizer.json");
+        string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, @"{
   ""Name"": ""First Config"",
   ""Expression"": ""(?<col1>.*)""
@@ -239,7 +240,7 @@ public class RegexColumnizerLoadConfigTests
 
         var columnizer = new Regex1Columnizer();
         columnizer.LoadConfig(_testDirectory);
-        
+
         Assert.That(columnizer.GetName(), Is.EqualTo("First Config"));
 
         // Modify config file
