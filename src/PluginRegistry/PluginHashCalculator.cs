@@ -9,6 +9,17 @@ namespace LogExpert.PluginRegistry;
 public static class PluginHashCalculator
 {
     /// <summary>
+    /// When true, hash verification is bypassed (useful for development and testing).
+    /// Default is true in DEBUG builds, false in RELEASE builds.
+    /// </summary>
+    public static bool BypassHashVerification { get; set; } =
+#if DEBUG
+        true;
+#else
+        false;
+#endif
+
+    /// <summary>
     /// Calculates the SHA256 hash of a plugin DLL file.
     /// </summary>
     /// <param name="filePath">Full path to the plugin DLL file.</param>
@@ -47,12 +58,18 @@ public static class PluginHashCalculator
     /// <returns>True if the file's hash matches the expected hash, false otherwise.</returns>
     /// <exception cref="ArgumentNullException">Thrown when filePath or expectedHash is null or empty.</exception>
     /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
+    /// <remarks>
+    /// When <see cref="BypassHashVerification"/> is true, this method always returns true
+    /// to facilitate development and testing scenarios.
+    /// </remarks>
     public static bool VerifyHash (string filePath, string expectedHash)
     {
-        // In Debug mode we trust the plugins (so testing and developing is possible)
-#if DEBUG
-        return true;
-#else
+        // Allow bypassing hash verification for development and testing
+        if (BypassHashVerification)
+        {
+            return true;
+        }
+
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedHash);
 
@@ -60,7 +77,6 @@ public static class PluginHashCalculator
 
         // Case-insensitive comparison
         return string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase);
-#endif
     }
 
     /// <summary>

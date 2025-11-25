@@ -9,6 +9,7 @@ public class PluginHashCalculatorTests
 {
     private string _testDirectory;
     private string _testFilePath;
+    private bool _originalBypassSetting;
 
     [SetUp]
     public void SetUp ()
@@ -16,12 +17,18 @@ public class PluginHashCalculatorTests
         _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertPluginHashTests");
         _ = Directory.CreateDirectory(_testDirectory);
         _testFilePath = Path.Join(_testDirectory, "test-plugin.dll");
+
+        // Save original bypass setting and disable it for tests that need actual verification
+        _originalBypassSetting = PluginHashCalculator.BypassHashVerification;
     }
 
     [TearDown]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit testcases")]
     public void TearDown ()
     {
+        // Restore original bypass setting
+        PluginHashCalculator.BypassHashVerification = _originalBypassSetting;
+
         try
         {
             if (Directory.Exists(_testDirectory))
@@ -121,6 +128,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_MatchingHash_ReturnsTrue ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var testContent = "Test content for hash verification";
         File.WriteAllText(_testFilePath, testContent);
         var expectedHash = PluginHashCalculator.CalculateHash(_testFilePath);
@@ -136,6 +144,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_MismatchedHash_ReturnsFalse ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var testContent = "Test content";
         File.WriteAllText(_testFilePath, testContent);
         var wrongHash = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
@@ -151,6 +160,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_CaseInsensitiveUpperCase_ReturnsTrue ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var testContent = "Test content";
         File.WriteAllText(_testFilePath, testContent);
         var hash = PluginHashCalculator.CalculateHash(_testFilePath);
@@ -168,6 +178,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_CaseInsensitiveLowerCase_ReturnsTrue ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var testContent = "Test content";
         File.WriteAllText(_testFilePath, testContent);
         var hash = PluginHashCalculator.CalculateHash(_testFilePath);
@@ -184,6 +195,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_ModifiedFile_ReturnsFalse ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var originalContent = "Original content";
         File.WriteAllText(_testFilePath, originalContent);
         var originalHash = PluginHashCalculator.CalculateHash(_testFilePath);
@@ -203,6 +215,7 @@ public class PluginHashCalculatorTests
     public void VerifyHash_NullExpectedHash_ThrowsArgumentNullException ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         File.WriteAllText(_testFilePath, "Test content");
 
         // Act & Assert
@@ -213,10 +226,27 @@ public class PluginHashCalculatorTests
     public void VerifyHash_EmptyExpectedHash_ThrowsArgumentException ()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         File.WriteAllText(_testFilePath, "Test content");
 
         // Act & Assert
         _ = Assert.Throws<ArgumentException>(() => PluginHashCalculator.VerifyHash(_testFilePath, string.Empty));
+    }
+
+    [Test]
+    public void VerifyHash_WithBypassEnabled_AlwaysReturnsTrue ()
+    {
+        // Arrange
+        PluginHashCalculator.BypassHashVerification = true;
+        var testContent = "Test content";
+        File.WriteAllText(_testFilePath, testContent);
+        var wrongHash = "WRONGHASH123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456";
+
+        // Act
+        var result = PluginHashCalculator.VerifyHash(_testFilePath, wrongHash);
+
+        // Assert
+        Assert.That(result, Is.True, "Bypass mode should always return true");
     }
 
     [Test]

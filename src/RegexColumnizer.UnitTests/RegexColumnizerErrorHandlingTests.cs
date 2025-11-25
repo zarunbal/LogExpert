@@ -22,6 +22,7 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     [TearDown]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void TearDown ()
     {
         if (Directory.Exists(_testDirectory))
@@ -54,7 +55,7 @@ public class RegexColumnizerErrorHandlingTests
         configField?.SetValue(columnizer, config);
 
         // Act - Should not throw
-        Assert.DoesNotThrow(() => columnizer.Init());
+        Assert.DoesNotThrow(columnizer.Init);
 
         // Assert - Regex should be null
         var regexProperty = typeof(BaseRegexColumnizer).GetProperty("Regex");
@@ -80,7 +81,7 @@ public class RegexColumnizerErrorHandlingTests
 
         // Act - Should complete quickly due to RegexHelper timeout protection
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        Assert.DoesNotThrow(() => columnizer.Init());
+        Assert.DoesNotThrow(columnizer.Init);
         stopwatch.Stop();
 
         // Assert - Should complete in reasonable time (RegexHelper has timeout)
@@ -281,7 +282,7 @@ public class RegexColumnizerErrorHandlingTests
         configField?.SetValue(columnizer, config);
 
         // Act - Should not throw
-        Assert.DoesNotThrow(() => columnizer.Init());
+        Assert.DoesNotThrow(columnizer.Init);
 
         // Assert - Regex might be null or default
         var regexProperty = typeof(BaseRegexColumnizer).GetProperty("Regex");
