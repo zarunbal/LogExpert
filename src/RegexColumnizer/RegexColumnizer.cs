@@ -157,7 +157,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             }
         }
 
-        string filePath = Path.Combine(configDir, $"{name}.json");
+        string filePath = Path.Join(configDir, $"{name}Columnizer.json");
 
         RegexColumnizerConfigDialog dlg = new(_config);
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -283,8 +283,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         // Check for path traversal patterns
         if (name.Contains("..", StringComparison.OrdinalIgnoreCase) || name.Contains('~', StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException(
-                $"Columnizer name '{name}' contains path traversal patterns which are not allowed");
+            throw new InvalidOperationException($"Columnizer name '{name}' contains path traversal patterns which are not allowed");
         }
     }
 
@@ -329,10 +328,16 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         try
         {
             Regex = RegexHelper.GetOrCreateCached(_config.Expression, RegexOptions.Compiled);
-            var skip = Regex.GetGroupNames().Length == 1 ? 0 : 1;
+            var skip = Regex.GetGroupNames().Length == 1
+                ? 0
+                : 1;
+
             columns = [.. Regex.GetGroupNames().Skip(skip)];
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException or
+                                         OverflowException or
+                                         RegexParseException)
         {
             Regex = null;
             columns = ["text"];

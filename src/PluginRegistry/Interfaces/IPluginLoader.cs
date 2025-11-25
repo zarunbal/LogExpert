@@ -35,9 +35,14 @@ public class PluginLoadResult
     public bool Success { get; set; }
     
     /// <summary>
-    /// The loaded plugin instance, if successful.
+    /// The loaded plugin instance, if successful (for backward compatibility, returns first plugin).
     /// </summary>
     public object? Plugin { get; set; }
+    
+    /// <summary>
+    /// All loaded plugin instances when an assembly contains multiple plugins.
+    /// </summary>
+    public List<object>? AllPlugins { get; set; }
     
     /// <summary>
     /// The plugin manifest, if available.

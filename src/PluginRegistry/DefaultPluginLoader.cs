@@ -14,7 +14,7 @@ public class DefaultPluginLoader : IPluginLoader
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
-    /// Loads a plugin from the specified assembly path.
+    /// Loads all plugins from the specified assembly path.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catch Unexpected errors")]
     public PluginLoadResult LoadPlugin (string assemblyPath)
@@ -61,30 +61,45 @@ public class DefaultPluginLoader : IPluginLoader
 
             _logger.Debug("Found {Count} plugin type(s) in assembly", pluginTypes.Count);
 
-            // Instantiate first plugin type
-            var pluginType = pluginTypes.First();
-            _logger.Debug("Instantiating plugin type: {Type}", pluginType.FullName);
+            // Instantiate ALL plugin types, not just the first one
+            var plugins = new List<object>();
 
-            var plugin = Activator.CreateInstance(pluginType);
-
-            if (plugin == null)
+            foreach (var pluginType in pluginTypes)
             {
-                _logger.Error("Failed to instantiate plugin type: {Type}", pluginType.FullName);
+                _logger.Debug("Instantiating plugin type: {Type}", pluginType.FullName);
+
+                var plugin = Activator.CreateInstance(pluginType);
+
+                if (plugin == null)
+                {
+                    _logger.Error("Failed to instantiate plugin type: {Type}", pluginType.FullName);
+                    continue; // Skip this plugin but continue with others
+                }
+
+                plugins.Add(plugin);
+                _logger.Info("Successfully instantiated plugin: {Type}", pluginType.Name);
+            }
+
+            if (plugins.Count == 0)
+            {
                 return new PluginLoadResult
                 {
                     Success = false,
-                    ErrorMessage = $"Failed to create instance of plugin type: {pluginType.FullName}",
+                    ErrorMessage = $"Failed to create instances of any plugin types in assembly",
                     Manifest = manifest
                 };
             }
 
-            _logger.Info("Successfully loaded plugin: {Type}", pluginType.Name);
+            _logger.Info("Successfully loaded {Count} plugin(s) from assembly", plugins.Count);
 
+            // For backward compatibility, return the first plugin instance
+            // The PluginRegistry will handle loading all types via LoadPluginAssembly
             return new PluginLoadResult
             {
                 Success = true,
-                Plugin = plugin,
-                Manifest = manifest
+                Plugin = plugins.First(),
+                Manifest = manifest,
+                AllPlugins = plugins
             };
         }
         catch (FileNotFoundException ex)

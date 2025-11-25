@@ -92,6 +92,7 @@ public class ColumnizerJsonConverter : JsonConverter
         try
         {
             columnizerType = Type.GetType(typeName, throwOnError: false);
+            //FindColumnizerTypeByAssemblyQualifiedName(typeName);
 
             // If Type.GetType fails, try finding it manually
             if (columnizerType == null)
@@ -134,6 +135,7 @@ public class ColumnizerJsonConverter : JsonConverter
     private static Type FindColumnizerTypeByName (string name)
     {
         // Search all loaded assemblies for a type implementing ILogLineColumnizer with matching GetName()
+
         foreach (var currentAssembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
@@ -181,15 +183,12 @@ public class ColumnizerJsonConverter : JsonConverter
         var typeName = typeNameParts[0].Trim();
         var assemblyName = typeNameParts[1].Trim();
 
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == assemblyName))
         {
-            if (assembly.GetName().Name == assemblyName)
+            var type = assembly.GetType(typeName);
+            if (type != null && typeof(ILogLineColumnizer).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             {
-                var type = assembly.GetType(typeName);
-                if (type != null && typeof(ILogLineColumnizer).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-                {
-                    return type;
-                }
+                return type;
             }
         }
 
