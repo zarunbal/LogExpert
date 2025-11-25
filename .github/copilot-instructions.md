@@ -36,7 +36,7 @@
 ## Build Instructions
 
 ### Prerequisites
-**CRITICAL**: This project requires Windows development environment and .NET 9.0.301 SDK or compatible.
+**CRITICAL**: This project requires Windows development environment and .NET 10.0.100 SDK or compatible.
 
 ### Environment Setup
 1. **Install .NET SDK**: Project requires .NET 10.0.100 SDK (specified in `global.json`)

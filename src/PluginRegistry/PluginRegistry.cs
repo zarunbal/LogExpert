@@ -673,10 +673,27 @@ public class PluginRegistry : IPluginRegistry
             if (_usePluginCache && _pluginCache != null)
             {
                 var result = _pluginCache.LoadPluginWithCache(dllName);
-                if (result.Success && result.Plugin != null)
+
+                if (result.Success)
                 {
-                    ProcessLoadedPlugin(result.Plugin, manifest, dllName);
-                    return true;
+                    // Process ALL plugins from the result, not just the first one
+                    if (result.AllPlugins != null && result.AllPlugins.Count > 0)
+                    {
+                        _logger.Info("Processing {Count} plugin(s) from cache for {FileName}", result.AllPlugins.Count, Path.GetFileName(dllName));
+
+                        foreach (var plugin in result.AllPlugins)
+                        {
+                            ProcessLoadedPlugin(plugin, manifest, dllName);
+                        }
+
+                        return true;
+                    }
+                    else if (result.Plugin != null)
+                    {
+                        // Fallback for backward compatibility
+                        ProcessLoadedPlugin(result.Plugin, manifest, dllName);
+                        return true;
+                    }
                 }
 
                 _logger.Warn("Cache load failed for {Plugin}, falling back to direct load", Path.GetFileName(dllName));

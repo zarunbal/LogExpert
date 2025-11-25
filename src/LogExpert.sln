@@ -80,6 +80,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.PluginRegistry.Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{39822C1B-E4C6-40F3-86C4-74C68BDEF3D0}"
 	ProjectSection(SolutionItems) = preProject
+		docs\PLUGIN_DEVELOPMENT_GUIDE.md = docs\PLUGIN_DEVELOPMENT_GUIDE.md
 		docs\PLUGIN_HASH_MANAGEMENT.md = docs\PLUGIN_HASH_MANAGEMENT.md
 	EndProjectSection
 EndProject
@@ -90,6 +91,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GithubActions", "GithubActi
 		..\.github\workflows\build_dotnet.yml = ..\.github\workflows\build_dotnet.yml
 		..\.github\workflows\test_dotnet.yml = ..\.github\workflows\test_dotnet.yml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Configuration", "LogExpert.Configuration\LogExpert.Configuration.csproj", "{9EBCD259-B704-4E1B-81D9-A9DCFD9F62DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -191,6 +194,10 @@ Global
 		{B2E6D6E0-C995-8F9D-4482-869C6A5A64C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2E6D6E0-C995-8F9D-4482-869C6A5A64C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2E6D6E0-C995-8F9D-4482-869C6A5A64C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EBCD259-B704-4E1B-81D9-A9DCFD9F62DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EBCD259-B704-4E1B-81D9-A9DCFD9F62DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EBCD259-B704-4E1B-81D9-A9DCFD9F62DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EBCD259-B704-4E1B-81D9-A9DCFD9F62DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

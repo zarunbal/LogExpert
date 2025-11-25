@@ -87,6 +87,8 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         return "Timestamp Columnizer";
     }
 
+    public string GetCustomName () => GetName();
+
     public string GetDescription ()
     {
         return "Splits every line into 3 fields: Date, Time and the rest of the log message";

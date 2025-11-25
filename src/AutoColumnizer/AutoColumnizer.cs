@@ -1,5 +1,3 @@
-using System;
-
 using LogExpert;
 
 namespace AutoColumnizer;
@@ -18,6 +16,11 @@ public class AutoColumnizer : ILogLineColumnizer
     public string GetName ()
     {
         return "Auto Columnizer";
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     public string GetDescription ()

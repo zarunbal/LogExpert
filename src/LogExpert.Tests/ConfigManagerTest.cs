@@ -1,6 +1,6 @@
 using System.Reflection;
 
-using LogExpert.Config;
+using LogExpert.Configuration;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -20,6 +20,7 @@ public class ConfigManagerTest
 {
     private string _testDir;
     private FileInfo _testSettingsFile;
+    private ConfigManager _configManager;
 
     [SetUp]
     public void SetUp ()
@@ -28,6 +29,10 @@ public class ConfigManagerTest
         _testDir = Path.Join(Path.GetTempPath(), "LogExpert_Test_" + Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_testDir);
         _testSettingsFile = new FileInfo(Path.Join(_testDir, "settings.json"));
+
+        // Initialize ConfigManager for testing
+        _configManager = ConfigManager.Instance;
+        _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
     }
 
     [TearDown]
@@ -74,7 +79,7 @@ public class ConfigManagerTest
 
         return method == null
             ? throw new Exception($"Instance method {methodName} not found")
-            : (T)method.Invoke(ConfigManager.Instance, parameters);
+            : (T)method.Invoke(_configManager, parameters);
     }
 
     /// <summary>
@@ -85,7 +90,7 @@ public class ConfigManagerTest
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new Exception($"Instance method {methodName} not found");
 
-        method.Invoke(ConfigManager.Instance, parameters);
+        method.Invoke(_configManager, parameters);
     }
 
     /// <summary>
@@ -266,7 +271,7 @@ public class ConfigManagerTest
         // Verify content
         string json = File.ReadAllText(_testSettingsFile.FullName);
         Assert.That(json, Does.Contain("AlwaysOnTop"));
-        Assert.That(json, Does.Contain("TEST_FILTER").Or.Contain("ERROR"));
+        Assert.That(json, Does.Contain("ERROR").Or.Contain("WARNING"));
     }
 
     [Test]
@@ -359,8 +364,12 @@ public class ConfigManagerTest
         Settings settings = null;
 
         // Act & Assert
-        _ = Assert.Throws<TargetInvocationException>(() => InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings), "Saving null settings should throw exception");
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings),
+            "Saving null settings should throw exception");
 
+        // The inner exception should be InvalidOperationException from ValidateSettings
+        Assert.That(ex.InnerException, Is.InstanceOf<InvalidOperationException>());
         Assert.That(_testSettingsFile.Exists, Is.False, "File should not be created if validation fails");
     }
 
@@ -457,7 +466,8 @@ public class ConfigManagerTest
         Assert.That(loadResult, Is.Not.Null);
         Assert.That(loadResult.Settings, Is.Not.Null, "Should return valid settings object, not null");
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null, "Settings should have preferences");
-        // Empty file triggers recovery, may create new settings
+        // Empty file triggers recovery, creates new settings with critical failure
+        Assert.That(loadResult.CriticalFailure, Is.True, "Empty file should be treated as critical failure");
     }
 
     [Test]
@@ -475,6 +485,8 @@ public class ConfigManagerTest
         Assert.That(loadResult, Is.Not.Null);
         Assert.That(loadResult.Settings, Is.Not.Null, "Should not return null settings");
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null);
+        // Null deserialization is treated as critical failure
+        Assert.That(loadResult.CriticalFailure, Is.True);
     }
 
     [Test]
@@ -526,6 +538,7 @@ public class ConfigManagerTest
         Assert.That(loadResult.Settings, Is.Not.Null, "Should return valid settings object");
         // Without backup, will return CriticalFailure or create new settings
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null);
+        Assert.That(loadResult.CriticalFailure, Is.True, "Invalid JSON should result in critical failure");
     }
 
     #endregion

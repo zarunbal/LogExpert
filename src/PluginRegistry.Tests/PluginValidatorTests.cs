@@ -15,6 +15,7 @@ public class PluginValidatorTests
 {
     private string _testDataPath = null!;
     private string _testPluginsPath = null!;
+    private bool _originalBypassSetting;
 
     [SetUp]
     public void SetUp()
@@ -23,11 +24,17 @@ public class PluginValidatorTests
         _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertValidatorTests", Guid.NewGuid().ToString());
         _testPluginsPath = Path.Join(_testDataPath, "plugins");
         Directory.CreateDirectory(_testPluginsPath);
+
+        // Save original bypass setting
+        _originalBypassSetting = PluginHashCalculator.BypassHashVerification;
     }
 
     [TearDown]
     public void TearDown()
     {
+        // Restore original bypass setting
+        PluginHashCalculator.BypassHashVerification = _originalBypassSetting;
+
         // Clean up test directories
         if (Directory.Exists(_testDataPath))
         {
@@ -161,6 +168,7 @@ public class PluginValidatorTests
     public void VerifyHash_WithMatchingHash_ShouldReturnTrue()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Test Content");
         var expectedHash = PluginHashCalculator.CalculateHash(pluginPath);
@@ -176,6 +184,7 @@ public class PluginValidatorTests
     public void VerifyHash_WithMismatchedHash_ShouldReturnFalse()
     {
         // Arrange
+        PluginHashCalculator.BypassHashVerification = false;
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         CreateDummyDll(pluginPath, content: "Test Content");
         var wrongHash = "0000000000000000000000000000000000000000000000000000000000000000";

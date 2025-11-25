@@ -107,6 +107,8 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
         return "Square Bracket Columnizer";
     }
 
+    public string GetCustomName () => GetName();
+
     public string GetDescription ()
     {
         return "Splits every line into n fields: Date, Time and the rest of the log message";

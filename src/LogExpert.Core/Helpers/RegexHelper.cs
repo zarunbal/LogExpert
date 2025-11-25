@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
@@ -18,7 +17,7 @@ public static class RegexHelper
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(2);
 
     private static readonly ConcurrentDictionary<RegexCacheKey, Regex> _cache = new();
-    private const int MaxCacheSize = 100;
+    private const int MAX_CACHE_SIZE = 100;
 
     /// <summary>
     /// Creates a regex with timeout protection.
@@ -29,17 +28,11 @@ public static class RegexHelper
     /// <returns>A Regex instance with timeout protection.</returns>
     /// <exception cref="ArgumentNullException">Thrown if pattern is null.</exception>
     /// <exception cref="ArgumentException">Thrown if pattern is invalid.</exception>
-    public static Regex CreateSafeRegex(
-        string pattern,
-        RegexOptions options = RegexOptions.None,
-        TimeSpan? timeout = null)
+    public static Regex CreateSafeRegex (string pattern, RegexOptions options = RegexOptions.None, TimeSpan? timeout = null)
     {
         ArgumentNullException.ThrowIfNull(pattern);
 
-        return new Regex(
-            pattern,
-            options,
-            timeout ?? DefaultTimeout);
+        return new Regex(pattern, options, timeout ?? DefaultTimeout);
     }
 
     /// <summary>
@@ -49,16 +42,14 @@ public static class RegexHelper
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="options">Regex options to use.</param>
     /// <returns>A cached Regex instance with timeout protection.</returns>
-    public static Regex GetOrCreateCached(
-        string pattern,
-        RegexOptions options = RegexOptions.None)
+    public static Regex GetOrCreateCached (string pattern, RegexOptions options = RegexOptions.None)
     {
         var key = new RegexCacheKey(pattern, options);
 
         return _cache.GetOrAdd(key, k =>
         {
             // Evict oldest entries if cache is full
-            if (_cache.Count >= MaxCacheSize)
+            if (_cache.Count >= MAX_CACHE_SIZE)
             {
                 TrimCache();
             }
@@ -73,7 +64,7 @@ public static class RegexHelper
     /// <param name="pattern">The pattern to validate.</param>
     /// <param name="error">Output parameter containing error message if validation fails.</param>
     /// <returns>True if the pattern is valid, false otherwise.</returns>
-    public static bool IsValidPattern(string pattern, out string? error)
+    public static bool IsValidPattern (string pattern, out string? error)
     {
         if (string.IsNullOrEmpty(pattern))
         {
@@ -103,7 +94,7 @@ public static class RegexHelper
     /// <summary>
     /// Clears the regex cache. Useful for testing or memory management.
     /// </summary>
-    public static void ClearCache()
+    public static void ClearCache ()
     {
         _cache.Clear();
     }
@@ -113,15 +104,15 @@ public static class RegexHelper
     /// </summary>
     public static int CacheSize => _cache.Count;
 
-    private static void TrimCache()
+    private static void TrimCache ()
     {
         // Keep most recent 50 entries (half of max)
-        var toRemove = _cache.Keys.Take(_cache.Count - MaxCacheSize / 2).ToList();
+        var toRemove = _cache.Keys.Take(_cache.Count - MAX_CACHE_SIZE / 2).ToList();
         foreach (var key in toRemove)
         {
-            _cache.TryRemove(key, out _);
+            _ = _cache.TryRemove(key, out _);
         }
     }
 
-    private record RegexCacheKey(string Pattern, RegexOptions Options);
+    private record RegexCacheKey (string Pattern, RegexOptions Options);
 }

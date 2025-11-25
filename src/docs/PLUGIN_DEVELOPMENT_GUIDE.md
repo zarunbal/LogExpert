@@ -218,17 +218,17 @@ Create a manifest file to provide metadata about your plugin.
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `name` | ? Yes | Plugin name (must match DLL without extension) |
-| `version` | ? Yes | Semantic version (e.g., "1.0.0") |
-| `author` | ? Yes | Your name or organization |
-| `description` | ? Yes | Brief description of plugin functionality |
-| `apiVersion` | ? Yes | LogExpert API version (current: "2.0") |
-| `main` | ? Yes | Main DLL filename |
-| `url` | ? No | Plugin website or repository |
-| `license` | ? No | License identifier (e.g., "MIT", "Apache-2.0") |
-| `requires` | ? No | Version requirements |
-| `permissions` | ? No | Required permissions |
-| `dependencies` | ? No | External dependencies |
+| `name` | Yes | Plugin name (must match DLL without extension) |
+| `version` | Yes | Semantic version (e.g., "1.0.0") |
+| `author` | Yes | Your name or organization |
+| `description` | Yes | Brief description of plugin functionality |
+| `apiVersion` | Yes | LogExpert API version (current: "2.0") |
+| `main` | Yes | Main DLL filename |
+| `url` | No | Plugin website or repository |
+| `license` | No | License identifier (e.g., "MIT", "Apache-2.0") |
+| `requires` | No | Version requirements |
+| `permissions` | No | Required permissions |
+| `dependencies` | No | External dependencies |
 
 ---
 
