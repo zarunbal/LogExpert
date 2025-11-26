@@ -69,7 +69,6 @@ internal static class LockFinder
         try
         {
             uint pnProcInfo = 0;
-            var rebootReason = Vanara.PInvoke.RstrtMgr.RM_REBOOT_REASON.RmRebootReasonNone;
             string[] resources = [path];
 
             res = Vanara.PInvoke.RstrtMgr.RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
@@ -78,7 +77,7 @@ internal static class LockFinder
                 throw new LockFinderException(Resources.Lockfinder_Exception_CouldNotRegisterResource);
             }
 
-            res = Vanara.PInvoke.RstrtMgr.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, out rebootReason);
+            res = Vanara.PInvoke.RstrtMgr.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, out Vanara.PInvoke.RstrtMgr.RM_REBOOT_REASON rebootReason);
 
             const int ERROR_MORE_DATA = 234;
             if (res == ERROR_MORE_DATA)
