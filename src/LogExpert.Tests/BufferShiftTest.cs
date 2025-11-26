@@ -23,7 +23,6 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         Cleanup();
     }
 
-
     [Test]
     public void TestShiftBuffers1 ()
     {
@@ -80,7 +79,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
 
-        foreach (LogFileInfo li in lil)
+        foreach (LogFileInfo li in lil.Cast<LogFileInfo>())
         {
             var fileName = enumerator.Current;
             Assert.That(li.FullName, Is.EqualTo(fileName));

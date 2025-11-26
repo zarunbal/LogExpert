@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// If your context menu plugin or keyword action plugin has some configuration it should 

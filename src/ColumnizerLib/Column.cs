@@ -1,5 +1,3 @@
-using LogExpert;
-
 namespace ColumnizerLib;
 
 public class Column : IColumn
@@ -90,7 +88,7 @@ public class Column : IColumn
     {
         if (maxLength < 1000)
         {
-            throw new ArgumentOutOfRangeException(nameof(maxLength), "Maximum display length must be at least 1000 characters.");
+            throw new ArgumentOutOfRangeException(nameof(maxLength), Resources.Column_Error_Messages_MaximumDisplayLengthMustBeAtLeast1000Characters);
         }
 
         _maxDisplayLength = maxLength;

@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
 using System.Collections.Generic;

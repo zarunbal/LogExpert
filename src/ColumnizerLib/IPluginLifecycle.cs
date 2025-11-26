@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Defines lifecycle events for plugins.

@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using LogExpert.PluginRegistry;
 
-namespace LogExpert.Tests;
+namespace LogExpert.PluginRegistry.Tests;
 
 [TestFixture]
 public class PluginLoadProgressTests

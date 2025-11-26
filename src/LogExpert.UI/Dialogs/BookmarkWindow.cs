@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;

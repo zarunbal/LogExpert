@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Provides context information to plugins during initialization.

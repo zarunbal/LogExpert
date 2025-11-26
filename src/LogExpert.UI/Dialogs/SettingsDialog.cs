@@ -3,6 +3,8 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
@@ -643,7 +645,7 @@ internal partial class SettingsDialog : Form
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                _ = NativeMethods.DestroyIcon(icon.Handle);
+                _ = Vanara.PInvoke.User32.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -1058,7 +1060,7 @@ internal partial class SettingsDialog : Form
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnBtnIconClick (object sender, EventArgs e)
+    private void OnBtnToolIconClick (object sender, EventArgs e)
     {
         if (_selectedTool != null)
         {

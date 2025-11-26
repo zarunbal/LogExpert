@@ -5,6 +5,7 @@ using System.Runtime.Versioning;
 using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
 using LogExpert.Dialogs;
+using ColumnizerLib;
 
 namespace LogExpert.UI.Controls.LogWindow;
 

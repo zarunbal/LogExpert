@@ -1,6 +1,6 @@
 using System;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This helper struct holds a log line and its line number (zero based).

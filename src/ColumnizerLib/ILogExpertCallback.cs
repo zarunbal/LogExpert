@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This callback interface is implemented by LogExpert. You can use it e.g. when implementing a

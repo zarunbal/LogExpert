@@ -264,7 +264,7 @@ public class ConfigManager : IConfigManager
     {
         if (!_isInitialized)
         {
-            throw new InvalidOperationException("ConfigManager must be initialized before use. Call ConfigManager.Instance.Initialize() first.");
+            throw new InvalidOperationException(Resources.ConfigManager_Error_Messages_InvalidOperation_EnsureInitialized);
         }
     }
 
@@ -275,8 +275,6 @@ public class ConfigManager : IConfigManager
     private Settings Load ()
     {
         EnsureInitialized();
-
-        _logger.Info($"### {nameof(Load)}: Loading settings");
 
         string dir;
 
@@ -374,14 +372,14 @@ public class ConfigManager : IConfigManager
 
                     if (string.IsNullOrWhiteSpace(json))
                     {
-                        throw new InvalidDataException("Settings file is empty");
+                        throw new InvalidDataException(Resources.ConfigManager_Error_Messages_InvalidData_SettingsFileIsEmpty);
                     }
 
                     settings = JsonConvert.DeserializeObject<Settings>(json, _jsonSettings);
 
                     if (settings == null)
                     {
-                        throw new JsonSerializationException("Deserialization returned null");
+                        throw new JsonSerializationException(Resources.ConfigManager_Error_Messages_JSONSerialization_DeserializationReturnedNull);
                     }
 
                     _logger.Info("Settings loaded successfully");
@@ -684,7 +682,7 @@ public class ConfigManager : IConfigManager
         if (!ValidateSettings(settings))
         {
             _logger.Error("Settings validation failed - refusing to save");
-            throw new InvalidOperationException("Settings validation failed - refusing to save potentially corrupted data");
+            throw new InvalidOperationException(Resources.ConfigManager_Error_Messages_InvalidOperation_SettingsValidationFailed);
         }
 
         settings.VersionBuild = Assembly.GetExecutingAssembly().GetName().Version.Build;

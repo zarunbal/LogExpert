@@ -10,6 +10,7 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>LogExpert.Tests</AssemblyTitle>
+    <RootNamespace>LogExpert.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <AssemblyTitle>GlassfishColumnizer</AssemblyTitle>
     <Description>Glassfish logfile support for LogExpert</Description>
+    <RootNamespace>GlassfishColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,8 +2,10 @@ using System.Runtime.Versioning;
 
 using NUnit.Framework;
 
+using RegexColumnizer;
+
 [assembly: SupportedOSPlatform("windows")]
-namespace RegexColumnizer.UnitTests;
+namespace LogExpert.RegexColumnizer.Tests;
 
 [TestFixture]
 public class RegexColumnizerLoadConfigTests

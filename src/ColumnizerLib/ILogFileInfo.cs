@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Interface which represents a file in LogExpert. 'File' could be anything that represents text data to be displayed in LogExpert.

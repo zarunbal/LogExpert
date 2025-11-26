@@ -40,7 +40,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  
   <!-- CsvColumnizerConfigDlg Resources -->
   <data name="CsvColumnizerConfigDlg_UI_Title" xml:space="preserve">
     <value>CSV Columnizer Configuration</value>
@@ -74,5 +73,17 @@
   </data>
   <data name="CsvColumnizerConfigDlg_UI_Button_Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="CsvColumnizer_UI_Title_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="CsvColumnizer_UI_Message_ErrorWhileDeserializing" xml:space="preserve">
+    <value>Error while deserializing config data: {0}</value>
+  </data>
+  <data name="CsvColumnizer_Description" xml:space="preserve">
+    <value>Splits CSV files into columns.
+
+Credits:
+This Columnizer uses the CsvHelper. https://github.com/JoshClose/CsvHelper.</value>
   </data>
 </root>

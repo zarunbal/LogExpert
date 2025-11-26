@@ -1,10 +1,10 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 using ColumnizerLib;
 
-using LogExpert;
 using LogExpert.Core.Helpers;
 
 using Newtonsoft.Json;
@@ -43,7 +43,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             : _config.CustomName;
     }
 
-    public string GetDescription () => "Columns are filled by regular expression named capture groups";
+    public string GetDescription () => Resources.RegexColumnizer_Description;
 
     public int GetColumnCount () => columns.Length;
 
@@ -79,7 +79,6 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
                     Parent = logLine,
                     FullValue = line.FullLine
                 };
-
 
                 //Fill other columns with empty string to avoid null pointer exceptions in unexpected places
                 for (var i = 0; i < columns.Length - 1; i++)
@@ -134,13 +133,13 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         // Validate inputs
         if (string.IsNullOrWhiteSpace(configDir))
         {
-            throw new ArgumentException("Configuration directory cannot be null or empty", nameof(configDir));
+            throw new ArgumentException(Resources.RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty, nameof(configDir));
         }
 
         string name = GetName();
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new InvalidOperationException("Columnizer name cannot be null or empty");
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty);
         }
 
         // Ensure directory exists
@@ -150,9 +149,13 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             {
                 _ = Directory.CreateDirectory(configDir);
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException or
+                                             UnauthorizedAccessException)
             {
-                _ = MessageBox.Show($"Failed to create configuration directory: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory, ex.Message),
+                                    Resources.RegexColumnizer_UI_Title_Error,
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
                 return;
             }
         }
@@ -180,15 +183,15 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             }
             catch (RegexMatchTimeoutException ex)
             {
-                _ = MessageBox.Show($"Regex pattern may cause performance issues: {ex.Message}", "Configuration Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_RegexTimeout, ex.Message), Resources.RegexColumnizer_UI_Title_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (ArgumentException ex)
             {
-                _ = MessageBox.Show($"Invalid regex pattern: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_InvalidRegexPattern, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                _ = MessageBox.Show($"Failed to save configuration: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToSaveConfiguration, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
@@ -222,7 +225,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
                                                  FileNotFoundException or
                                                  DirectoryNotFoundException)
                 {
-                    _ = MessageBox.Show(ex.Message, "Deserialize");
+                    _ = MessageBox.Show(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize);
                     _config = new RegexColumnizerConfig
                     {
                         Name = GetName()
@@ -242,7 +245,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             }
             catch (JsonException ex)
             {
-                _ = MessageBox.Show(ex.Message, "Deserialize");
+                _ = MessageBox.Show(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize);
                 _config = new RegexColumnizerConfig
                 {
                     Name = GetName()
@@ -261,7 +264,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new InvalidOperationException("Columnizer name cannot be null or empty");
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty);
         }
 
         // Check for path separators (both Windows and Unix)
@@ -270,20 +273,20 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             name.Contains('/', StringComparison.OrdinalIgnoreCase) ||
             name.Contains('\\', StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException($"Columnizer name '{name}' contains path separators which are not allowed");
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNotAllowed);
         }
 
         // Check for invalid filename characters
         char[] invalidChars = Path.GetInvalidFileNameChars();
         if (name.IndexOfAny(invalidChars) >= 0)
         {
-            throw new InvalidOperationException($"Columnizer name '{name}' contains invalid filename characters");
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters);
         }
 
         // Check for path traversal patterns
         if (name.Contains("..", StringComparison.OrdinalIgnoreCase) || name.Contains('~', StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException($"Columnizer name '{name}' contains path traversal patterns which are not allowed");
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhichAreNotAllowed);
         }
     }
 

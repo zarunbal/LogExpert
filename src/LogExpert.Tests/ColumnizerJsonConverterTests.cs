@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Attributes;
 using LogExpert.Core.Classes.JsonConverters;
 
@@ -23,18 +25,30 @@ public class MockColumnizer : ILogLineColumnizer
 
     public int GetColumnCount () => 1;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
     public string GetColumnName (int column) => "Col";
 
-    public string GetColumnValue (LogExpert.ILogLine line, int column) => "";
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
+    public string GetColumnValue (ILogLine line, int column) => "";
 
     public bool IsTimeshiftImplemented () => false;
 
-    public void PushValue (LogExpert.ILogLine line, int column, string value) { }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
+    public void PushValue (ILogLine line, int column, string value) { }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
     public void SetColumnNames (string[] names) { }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
     public void SetParameters (string param) { }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
     public void SetConfig (object config) { }
 
     public string[] GetColumnNames () => throw new NotImplementedException();
@@ -53,6 +67,7 @@ public class MockColumnizer : ILogLineColumnizer
 public class MockColumnizerWithCustomName : ILogLineColumnizer
 {
     [JsonColumnizerProperty]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1721:Property names should not match get methods", Justification = "Unit Test")]
     public string CustomName { get; set; } = "DefaultName";
 
     [JsonColumnizerProperty]

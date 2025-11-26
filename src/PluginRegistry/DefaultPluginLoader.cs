@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using ColumnizerLib;
+
 using LogExpert.PluginRegistry.Interfaces;
 
 using NLog;

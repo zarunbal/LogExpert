@@ -1,8 +1,10 @@
+using ColumnizerLib;
+
 using LogExpert.PluginRegistry;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.PluginRegistry;
+namespace LogExpert.PluginRegistry.Tests;
 
 [TestFixture]
 public class PerformanceTests

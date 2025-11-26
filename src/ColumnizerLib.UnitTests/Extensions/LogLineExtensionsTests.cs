@@ -1,9 +1,9 @@
-﻿using LogExpert;
-using LogExpert.Extensions;
+using ColumnizerLib;
+using ColumnizerLib.Extensions;
 
 using NUnit.Framework;
 
-namespace ColumnizerLib.UnitTests.Extensions;
+namespace LogExpert.ColumnizerLib.Tests.Extensions;
 
 [TestFixture]
 
@@ -19,7 +19,8 @@ internal class LogLineExtensionsTests
     }
 
     [Test]
-    public void ToClipBoardText_ReturnsExpected()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    public void ToClipBoardText_ReturnsExpected ()
     {
         var underTest = new TestingLogLine
         {

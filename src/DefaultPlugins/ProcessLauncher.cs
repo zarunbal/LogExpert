@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 
+using ColumnizerLib;
+
 namespace LogExpert;
 
 internal class ProcessLauncher : IKeywordAction

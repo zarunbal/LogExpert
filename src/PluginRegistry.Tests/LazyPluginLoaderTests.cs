@@ -1,3 +1,7 @@
+using ColumnizerLib;
+
+using LogExpert.PluginRegistry;
+
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;

@@ -4512,6 +4512,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid regex pattern: {0}.
+        /// </summary>
+        public static string SearchDialog_UI_Error_InvalidRegexPattern {
+            get {
+                return ResourceManager.GetString("SearchDialog_UI_Error_InvalidRegexPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search text is empty.
         /// </summary>
         public static string SearchDialog_UI_Error_SearchTextEmpty {

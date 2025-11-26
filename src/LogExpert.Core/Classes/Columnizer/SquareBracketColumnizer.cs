@@ -67,12 +67,12 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
 
         try
         {
-            var dateTime = DateTime.ParseExact(
-                cols.ColumnValues[0].FullValue + " " + cols.ColumnValues[1].FullValue, formatInfo.DateTimeFormat,
-                formatInfo.CultureInfo);
+            var dateTime = DateTime.ParseExact(cols.ColumnValues[0].FullValue + " " + cols.ColumnValues[1].FullValue, formatInfo.DateTimeFormat, formatInfo.CultureInfo);
             return dateTime;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }
@@ -147,7 +147,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             columnNames.Insert(columnNames.Count - 1, $"Source{i++}");
         }
 
-        return columnNames.ToArray();
+        return [.. columnNames];
     }
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
@@ -203,7 +203,9 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
                     SquareSplit(ref columns, temp, dateLen, timeLen, endPos, clogLine);
                 }
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             FormatException or
+                                             ArgumentOutOfRangeException)
             {
                 columns[0].FullValue = "n/a";
                 columns[1].FullValue = "n/a";
@@ -211,12 +213,12 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             }
         }
 
-        clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+        clogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
 
         return clogLine;
     }
 
-    void SquareSplit (ref Column[] columns, string line, int dateLen, int timeLen, int dateTimeEndPos, ColumnizedLogLine clogLine)
+    private void SquareSplit (ref Column[] columns, string line, int dateLen, int timeLen, int dateTimeEndPos, ColumnizedLogLine clogLine)
     {
         List<Column> columnList = [];
         var restColumn = _columnCount;
@@ -252,7 +254,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             columnList.Insert(columnList.Count - 1, new Column { FullValue = "", Parent = clogLine });
         }
 
-        columns = columnList.ToArray();
+        columns = [.. columnList];
     }
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
