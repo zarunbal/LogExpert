@@ -1,4 +1,4 @@
-using LogExpert;
+using ColumnizerLib;
 
 namespace AutoColumnizer;
 

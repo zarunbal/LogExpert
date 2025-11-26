@@ -8,7 +8,7 @@ using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Extensions;
 
-internal class LockFinder
+internal static class LockFinder
 {
 
     /// <summary>
@@ -26,7 +26,7 @@ internal class LockFinder
     {
         var list = FindLockProcesses(path);
         return list.Count == 0
-            ? throw new Exception(Resources.Lockfinder_Exception_NoProcessesAreLockingThePathSpecified)
+            ? throw new LockFinderException(Resources.Lockfinder_Exception_NoProcessesAreLockingThePathSpecified)
             : list[0].ProcessName;
     }
 
@@ -53,37 +53,40 @@ internal class LockFinder
     /// <returns>List of processes holding file lock to path</returns>
     /// <exception cref="Exception"></exception>
     [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Constants always Upper Case")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally Catch All")]
     public static List<Process> FindLockProcesses (string path)
     {
-        var key = Guid.NewGuid().ToString();
+        var key = new System.Text.StringBuilder(Guid.NewGuid().ToString());
         var processes = new List<Process>();
 
-        var res = NativeMethods.RmStartSession(out var handle, 0, key);
+        var res = Vanara.PInvoke.RstrtMgr.RmStartSession(out var handle, 0, key);
         if (res != 0)
         {
-            throw new Exception(Resources.Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker);
+            throw new LockFinderException(Resources.Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker);
         }
 
         try
         {
             uint pnProcInfo = 0;
-            uint lpdwRebootReasons = NativeMethods.RmRebootReasonNone;
+            var rebootReason = Vanara.PInvoke.RstrtMgr.RM_REBOOT_REASON.RmRebootReasonNone;
             string[] resources = [path];
 
-            res = NativeMethods.RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
+            res = Vanara.PInvoke.RstrtMgr.RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
             if (res != 0)
             {
-                throw new Exception(Resources.Lockfinder_Exception_CouldNotRegisterResource);
+                throw new LockFinderException(Resources.Lockfinder_Exception_CouldNotRegisterResource);
             }
 
-            res = NativeMethods.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
+            res = Vanara.PInvoke.RstrtMgr.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, out rebootReason);
+
             const int ERROR_MORE_DATA = 234;
             if (res == ERROR_MORE_DATA)
             {
-                var processInfo = new NativeMethods.RM_PROCESS_INFO[pnProcInfoNeeded];
+                var processInfo = new Vanara.PInvoke.RstrtMgr.RM_PROCESS_INFO[pnProcInfoNeeded];
                 pnProcInfo = pnProcInfoNeeded;
                 // Get the list.
-                res = NativeMethods.RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
+                res = Vanara.PInvoke.RstrtMgr.RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, out rebootReason);
                 if (res == 0)
                 {
                     processes = new List<Process>((int)pnProcInfo);
@@ -91,20 +94,19 @@ internal class LockFinder
                     {
                         try
                         {
-                            processes.Add(Process.GetProcessById(processInfo[i].
-                                Process.dwProcessId));
+                            processes.Add(Process.GetProcessById((int)processInfo[i].Process.dwProcessId));
                         }
                         catch (ArgumentException) { }
                     }
                 }
                 else
                 {
-                    throw new Exception(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResource);
+                    throw new LockFinderException(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResource);
                 }
             }
             else if (res != 0)
             {
-                throw new Exception(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult);
+                throw new LockFinderException(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult);
             }
         }
         catch (Exception e)
@@ -113,7 +115,7 @@ internal class LockFinder
         }
         finally
         {
-            Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, Resources.Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle, NativeMethods.RmEndSession(handle)));
+            Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, Resources.Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle, Vanara.PInvoke.RstrtMgr.RmEndSession(handle)));
         }
 
         return processes;

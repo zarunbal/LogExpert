@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Implement this interface to add a menu entry to the context menu of LogExpert.

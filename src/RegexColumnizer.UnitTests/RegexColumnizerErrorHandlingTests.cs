@@ -1,13 +1,15 @@
 using System.Runtime.Versioning;
 
-using LogExpert;
+using ColumnizerLib;
 
 using Moq;
 
 using NUnit.Framework;
 
+using RegexColumnizer;
+
 [assembly: SupportedOSPlatform("windows")]
-namespace RegexColumnizer.UnitTests;
+namespace LogExpert.RegexColumnizer.Tests;
 
 [TestFixture]
 public class RegexColumnizerErrorHandlingTests
@@ -184,7 +186,7 @@ public class RegexColumnizerErrorHandlingTests
     public void SplitLine_EmptyColumnValues_HandlesGracefully ()
     {
         // Arrange
-        var columnizer = CreateColumnizer(@"^(?<col1>\d*)\s+(?<col2>\w*)$");
+        var columnizer = TestLogLine.CreateColumnizer(@"^(?<col1>\d*)\s+(?<col2>\w*)$");
         var testLogLine = new TestLogLine(1, "   "); // Only whitespace
 
         // Act
@@ -199,7 +201,7 @@ public class RegexColumnizerErrorHandlingTests
     public void SplitLine_VeryComplexRegex_CompletesInReasonableTime ()
     {
         // Arrange - Complex but safe regex
-        var columnizer = CreateColumnizer(
+        var columnizer = TestLogLine.CreateColumnizer(
             @"^(?<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2},\d{3})\s+" +
             @"(?<level>DEBUG|INFO|WARN|ERROR|FATAL)\s+" +
             @"\[(?<thread>[^\]]+)\]\s+" +
@@ -295,7 +297,7 @@ public class RegexColumnizerErrorHandlingTests
     public void SplitLine_MultipleNonMatchingLines_HandlesConsistently ()
     {
         // Arrange
-        var columnizer = CreateColumnizer(@"^(?<number>\d+)\s+(?<text>.*)$");
+        var columnizer = TestLogLine.CreateColumnizer(@"^(?<number>\d+)\s+(?<text>.*)$");
         var lines = new[]
         {
             new TestLogLine(1, "No numbers here"),
@@ -312,25 +314,6 @@ public class RegexColumnizerErrorHandlingTests
             Assert.That(result.ColumnValues[0].Text, Is.Empty); // First column empty
             Assert.That(result.ColumnValues[1].Text, Is.EqualTo(line.FullLine)); // Full line in last column
         }
-    }
-
-    private Regex1Columnizer CreateColumnizer (string regex)
-    {
-        var config = new RegexColumnizerConfig
-        {
-            Expression = regex,
-            Name = "Test Columnizer"
-        };
-
-        var columnizer = new Regex1Columnizer();
-
-        var configField = typeof(BaseRegexColumnizer).GetField("_config",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        configField?.SetValue(columnizer, config);
-
-        columnizer.Init();
-
-        return columnizer;
     }
 
     #region Security Tests (SEC-02)
@@ -379,17 +362,4 @@ public class RegexColumnizerErrorHandlingTests
     }
 
     #endregion
-
-    private class TestLogLine : ILogLine
-    {
-        public TestLogLine (int lineNumber, string fullLine)
-        {
-            LineNumber = lineNumber;
-            FullLine = fullLine;
-        }
-
-        public string FullLine { get; set; }
-        public int LineNumber { get; set; }
-        public string Text { get; set; }
-    }
 }

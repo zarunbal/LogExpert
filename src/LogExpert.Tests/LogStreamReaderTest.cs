@@ -96,7 +96,6 @@ public class LogStreamReaderTest
             lineCount += 1;
         }
 
-
         Assert.That(expectedLines, Is.EqualTo(lineCount), $"Unexpected lines:\n{text}");
     }
 }

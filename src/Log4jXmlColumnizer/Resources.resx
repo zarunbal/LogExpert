@@ -40,7 +40,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  
   <!-- Log4jXmlColumnizerConfigDlg Resources -->
   <data name="Log4jXmlColumnizerConfigDlg_UI_Title" xml:space="preserve">
     <value>Log4j XML Columnizer</value>
@@ -66,5 +65,8 @@
   </data>
   <data name="Log4jXmlColumnizerConfigDlg_UI_Button_Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="Log4jXmlColumnizer_UI_Title_Deserialize" xml:space="preserve">
+    <value>Deserialize</value>
   </data>
 </root>

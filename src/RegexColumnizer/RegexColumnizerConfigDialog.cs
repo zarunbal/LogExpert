@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using LogExpert.Core.Helpers;
@@ -84,9 +85,14 @@ public partial class RegexColumnizerConfigDialog : Form
 
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException or
+                                         RegexMatchTimeoutException or
+                                         InvalidCastException or
+                                         ConstraintException or
+                                         NoNullAllowedException)
         {
-            _ = MessageBox.Show($@"Invalid Regex !{Environment.NewLine}{ex.Message}", @"Regex Columnizer Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex, Environment.NewLine, ex.Message), Resources.RegexColumnizerConfigDialog_UI_Error_Title, MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
         finally

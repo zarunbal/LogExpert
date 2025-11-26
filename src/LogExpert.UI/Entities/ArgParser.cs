@@ -2,6 +2,8 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes;
 using LogExpert.Dialogs;
 

@@ -1,4 +1,6 @@
-﻿namespace LogExpert.Core.EventArguments;
+using ColumnizerLib;
+
+namespace LogExpert.Core.EventArguments;
 
 public class ColumnizerEventArgs(ILogLineColumnizer columnizer) : System.EventArgs
 {

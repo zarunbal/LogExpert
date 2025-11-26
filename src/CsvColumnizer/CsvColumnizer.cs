@@ -1,11 +1,11 @@
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Security;
 
 using ColumnizerLib;
 
 using CsvHelper;
-
-using LogExpert;
 
 using Newtonsoft.Json;
 
@@ -79,7 +79,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public string GetDescription ()
     {
-        return "Splits CSV files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the CsvHelper. https://github.com/JoshClose/CsvHelper. \r\n";
+        return Resources.CsvColumnizer_Description;
     }
 
     public int GetColumnCount ()
@@ -230,9 +230,18 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
                 _config = JsonConvert.DeserializeObject<CsvColumnizerConfig>(File.ReadAllText(configPath));
                 _config.ConfigureReaderConfiguration();
             }
-            catch (Exception e)
+            catch (Exception ex) when (ex is JsonException or
+                                             ArgumentException or
+                                             ArgumentNullException or
+                                             PathTooLongException or
+                                             DirectoryNotFoundException or
+                                             IOException or
+                                             UnauthorizedAccessException or
+                                             FileNotFoundException or
+                                             NotSupportedException or
+                                             SecurityException)
             {
-                _ = MessageBox.Show($"Error while deserializing config data: {e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.CsvColumnizer_UI_Message_ErrorWhileDeserializing, ex.Message), Resources.CsvColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 _config = new CsvColumnizerConfig();
                 _config.InitDefaults();
             }

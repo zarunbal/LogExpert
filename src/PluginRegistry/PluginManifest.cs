@@ -93,7 +93,7 @@ public class PluginManifest
     /// Defaults to an empty dictionary.
     /// </value>
     [JsonProperty("dependencies")]
-    public Dictionary<string, string> Dependencies { get; set; } = new();
+    public Dictionary<string, string> Dependencies { get; set; } = [];
 
     /// <summary>
     /// Main DLL file name.
@@ -272,6 +272,7 @@ public class PluginManifest
     /// Supports pre-release versions (e.g., 1.0.0-beta, 1.0.0-rc.1).
     /// If no requirement is specified in the manifest, the plugin is assumed to be compatible.
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unexpected exception checking version compatibility")]
     public bool IsCompatibleWith (Version logExpertVersion)
     {
         if (Requires == null || string.IsNullOrWhiteSpace(Requires.LogExpert))

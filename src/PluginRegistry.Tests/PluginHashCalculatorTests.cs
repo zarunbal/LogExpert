@@ -1,8 +1,6 @@
-using LogExpert.PluginRegistry;
-
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.PluginRegistry.Tests;
 
 [TestFixture]
 public class PluginHashCalculatorTests
@@ -108,7 +106,6 @@ public class PluginHashCalculatorTests
         // Act & Assert
         _ = Assert.Throws<ArgumentException>(() => PluginHashCalculator.CalculateHash(string.Empty));
     }
-
 
     [Test]
     public void CalculateHash_NullPath_ThrowsArgumentNullException ()

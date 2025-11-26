@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This is the interface for a Columnizer which supports XML log files. This interface extends

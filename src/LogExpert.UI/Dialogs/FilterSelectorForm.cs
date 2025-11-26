@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Interface;
 
 namespace LogExpert.Dialogs;
@@ -86,7 +88,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     #region Events handler
 
-    private void OnFilterComboBoxFormat(object sender, ListControlConvertEventArgs e)
+    private void OnFilterComboBoxFormat (object sender, ListControlConvertEventArgs e)
     {
         if (e.ListItem is ILogLineColumnizer columnizer)
         {
@@ -108,7 +110,6 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
         commentTextBox.Text = description;
         configButton.Enabled = SelectedColumnizer is IColumnizerConfigurator;
     }
-
 
     //TODO: Check if this logic can be removed from this class and remove all the config manager instances from here.
     private void OnConfigButtonClick (object sender, EventArgs e)

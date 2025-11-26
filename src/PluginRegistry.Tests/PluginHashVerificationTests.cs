@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.PluginRegistry;
+namespace LogExpert.PluginRegistry.Tests;
 
 /// <summary>
 /// Unit tests for Plugin Hash Verification (Priority 1, Task 1.1)

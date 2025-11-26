@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Reflection;
 using System.Security;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
@@ -602,13 +604,18 @@ public class PluginRegistry : IPluginRegistry
         {
             try
             {
-                var context = CreatePluginContext(
-                    manifest?.Name ?? Path.GetFileNameWithoutExtension(dllPath),
-                    dllPath);
+                var context = CreatePluginContext(manifest?.Name ?? Path.GetFileNameWithoutExtension(dllPath), dllPath);
                 lifecycle.Initialize(context);
                 _logger.Debug("Initialized lazy-loaded plugin: {Plugin}", manifest?.Name);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             ArgumentNullException or
+                                             PathTooLongException or
+                                             NotSupportedException or
+                                             SecurityException or
+                                             IOException or
+                                             UnauthorizedAccessException or
+                                             DirectoryNotFoundException)
             {
                 _logger.Error(ex, "Failed to initialize lazy-loaded plugin");
             }

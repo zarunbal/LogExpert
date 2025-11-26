@@ -1,23 +1,27 @@
-﻿namespace LogExpert.PluginRegistry.FileSystem;
+using ColumnizerLib;
+
+namespace LogExpert.PluginRegistry.FileSystem;
 
 public class LocalFileSystem : IFileSystemPlugin
 {
     #region IFileSystemPlugin Member
 
-    public bool CanHandleUri(string uriString)
+    public bool CanHandleUri (string uriString)
     {
         try
         {
             Uri uri = new(uriString);
             return uri.IsFile;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is UriFormatException or
+                                         ArgumentNullException or
+                                         ArgumentException)
         {
             return false;
         }
     }
 
-    public ILogFileInfo GetLogfileInfo(string uriString)
+    public ILogFileInfo GetLogfileInfo (string uriString)
     {
         Uri uri = new(uriString);
         if (uri.IsFile)

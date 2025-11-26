@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Attributes;
 
 using Newtonsoft.Json;

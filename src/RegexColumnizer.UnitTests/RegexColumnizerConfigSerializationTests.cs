@@ -1,15 +1,19 @@
 using System.Runtime.Versioning;
+
 using Newtonsoft.Json;
+
 using NUnit.Framework;
 
+using RegexColumnizer;
+
 [assembly: SupportedOSPlatform("windows")]
-namespace RegexColumnizer.UnitTests;
+namespace LogExpert.RegexColumnizer.Tests;
 
 [TestFixture]
 public class RegexColumnizerConfigSerializationTests
 {
     [Test]
-    public void SerializeToJson_ProducesValidJson()
+    public void SerializeToJson_ProducesValidJson ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -25,14 +29,14 @@ public class RegexColumnizerConfigSerializationTests
         Assert.That(json, Does.Contain("Test Config"));
         // JSON escapes backslashes, so \d becomes \\d
         Assert.That(json, Does.Contain(@"^(?<time>\\d+)\\s+(?<message>.*)$"));
-        
+
         // Verify it's valid JSON
         var deserialized = JsonConvert.DeserializeObject<RegexColumnizerConfig>(json);
         Assert.That(deserialized, Is.Not.Null);
     }
 
     [Test]
-    public void DeserializeFromJson_RestoresConfiguration()
+    public void DeserializeFromJson_RestoresConfiguration ()
     {
         // Arrange
         string json = @"{
@@ -50,7 +54,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void DeserializeFromJson_EmptyObject_UsesDefaults()
+    public void DeserializeFromJson_EmptyObject_UsesDefaults ()
     {
         // Arrange
         string json = "{}";
@@ -64,18 +68,17 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void DeserializeFromJson_InvalidJson_ThrowsException()
+    public void DeserializeFromJson_InvalidJson_ThrowsException ()
     {
         // Arrange
         string invalidJson = "{ invalid json }";
 
         // Act & Assert
-        Assert.Throws<JsonReaderException>(() =>
-            JsonConvert.DeserializeObject<RegexColumnizerConfig>(invalidJson));
+        _ = Assert.Throws<JsonReaderException>(() => JsonConvert.DeserializeObject<RegexColumnizerConfig>(invalidJson));
     }
 
     [Test]
-    public void DeserializeFromJson_Null_ReturnsNull()
+    public void DeserializeFromJson_Null_ReturnsNull ()
     {
         // Arrange
         string json = "null";
@@ -88,7 +91,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void RoundTrip_PreservesAllProperties()
+    public void RoundTrip_PreservesAllProperties ()
     {
         // Arrange
         var original = new RegexColumnizerConfig
@@ -107,7 +110,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void SerializeToJson_WithIndentation_ProducesReadableOutput()
+    public void SerializeToJson_WithIndentation_ProducesReadableOutput ()
     {
         // Arrange
         var config = new RegexColumnizerConfig
@@ -125,7 +128,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void DeserializeFromJson_MissingName_AllowsNull()
+    public void DeserializeFromJson_MissingName_AllowsNull ()
     {
         // Arrange
         string json = @"{ ""Expression"": ""(?<text>.*)""  }";
@@ -140,7 +143,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void DeserializeFromJson_MissingExpression_UsesDefault()
+    public void DeserializeFromJson_MissingExpression_UsesDefault ()
     {
         // Arrange
         string json = @"{ ""Name"": ""Test"" }";
@@ -155,7 +158,7 @@ public class RegexColumnizerConfigSerializationTests
     }
 
     [Test]
-    public void SerializeToJson_SpecialCharacters_EscapedProperly()
+    public void SerializeToJson_SpecialCharacters_EscapedProperly ()
     {
         // Arrange
         var config = new RegexColumnizerConfig

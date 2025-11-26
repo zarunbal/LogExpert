@@ -8,6 +8,7 @@
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>CsvColumnizer</AssemblyTitle>
+    <RootNamespace>CsvColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,7 @@
     <EmbeddedResource Update="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>CsvColumnizer</CustomToolNamespace>
+      <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
     
     <EmbeddedResource Update="Resources.de.resx">

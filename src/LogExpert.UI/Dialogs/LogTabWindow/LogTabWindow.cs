@@ -6,6 +6,8 @@ using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Filter;
@@ -356,7 +358,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.ActiveAutoHideContent = null;
     }
 
-
     private void ApplyTextResources ()
     {
 
@@ -482,8 +483,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         labelStatus.Text = Resources.LogTabWindow_UI_Label_labelStatus;
     }
 
-    #region Resources Map
-
     private void ApplyToolTips ()
     {
         //TODO use ToolTip class instead of ToolTipText
@@ -515,28 +514,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         copyPathToClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem;
         truncateFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem;
     }
-
-    /// <summary>
-    /// Creates a mapping of UI controls to their corresponding tooltip text.
-    /// </summary>
-    /// <remarks>This method initializes a dictionary with predefined tooltips for specific UI controls.
-    /// Additional tooltips can be added to the dictionary as needed.</remarks>
-    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
-    /// strings representing the tooltip text for each control.</returns>
-    //private Dictionary<Control, string> GetToolTipMap ()
-    //{
-
-    //    return new Dictionary<Control, string>
-    //    {
-    //        { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage },
-    //        { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
-    //        { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
-    //        { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
-    //        { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
-    //    };
-    //}
-
-    #endregion
 
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
@@ -807,7 +784,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public void SetForeground ()
     {
-        _ = NativeMethods.SetForegroundWindow(Handle);
+        _ = Vanara.PInvoke.User32.SetForegroundWindow(Handle);
         if (WindowState == FormWindowState.Minimized)
         {
             WindowState = _wasMaximized
@@ -1523,7 +1500,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible, ex));
             }
 
-            _ = Invoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
+            _ = Invoke(new MethodInvoker(statusStrip.Refresh));
         }
     }
 
@@ -1542,9 +1519,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             labelSize.Size = TextRenderer.MeasureText(labelSize.Text, labelSize.Font);
             labelCurrentLine.Text = $"{Resources.LogTabWindow_StatusLineText_UpperCase_Lines} {e.CurrentLineNum}";
             labelCurrentLine.Size = TextRenderer.MeasureText(labelCurrentLine.Text, labelCurrentLine.Font);
+
             if (statusStrip.InvokeRequired)
             {
-                _ = statusStrip.BeginInvoke(new System.Windows.Forms.MethodInvoker(statusStrip.Refresh));
+                _ = statusStrip.BeginInvoke(new MethodInvoker(statusStrip.Refresh));
             }
             else
             {
@@ -1623,7 +1601,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // a managed copy of icon. then the unmanaged win32 handle is destroyed
         var iconHandle = bmp.GetHicon();
         var icon = Icon.FromHandle(iconHandle).Clone() as Icon;
-        _ = NativeMethods.DestroyIcon(iconHandle);
+        _ = Vanara.PInvoke.User32.DestroyIcon(iconHandle);
 
         gfx.Dispose();
         bmp.Dispose();
@@ -1896,7 +1874,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 ? ToolStripItemDisplayStyle.ImageAndText
                 : ToolStripItemDisplayStyle.Image;
 
-            _ = NativeMethods.DestroyIcon(icon.Handle);
+            _ = Vanara.PInvoke.User32.DestroyIcon(icon.Handle);
             icon.Dispose();
         }
 
@@ -2146,11 +2124,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _logger.Info(CultureInfo.InvariantCulture, "----------------------------");
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "For Debug Purposes")]
     private void ThrowExceptionFx ()
     {
         throw new Exception(Resources.LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "For Debug Purposes")]
     private void ThrowExceptionThreadFx ()
     {
         throw new Exception(Resources.LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread);
@@ -2459,14 +2439,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogWindowDragOver (object sender, DragEventArgs e)
     {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
-        {
-            e.Effect = DragDropEffects.None;
-        }
-        else
-        {
-            e.Effect = DragDropEffects.Copy;
-        }
+        e.Effect = !e.Data.GetDataPresent(DataFormats.FileDrop)
+            ? DragDropEffects.None
+            : DragDropEffects.Copy;
     }
 
     private void OnLogWindowDragDrop (object sender, DragEventArgs e)
@@ -2647,8 +2622,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 //if (this.dockPanel.ActiveContent != null &&
                 //    this.dockPanel.ActiveContent != sender || data.tailState != 0)
-                if (CurrentLogWindow != null &&
-                    CurrentLogWindow != sender || data.TailState != 0)
+                if ((CurrentLogWindow != null &&
+                    CurrentLogWindow != sender) || data.TailState != 0)
                 {
                     data.Dirty = true;
                 }
@@ -3056,10 +3031,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnToolStripButtonBubblesClick (object sender, EventArgs e)
     {
-        if (CurrentLogWindow != null)
-        {
-            CurrentLogWindow.ShowBookmarkBubbles = toolStripButtonBubbles.Checked;
-        }
+        CurrentLogWindow?.ShowBookmarkBubbles = toolStripButtonBubbles.Checked;
     }
 
     [SupportedOSPlatform("windows")]
@@ -3110,7 +3082,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             ShowHighlightSettingsDialog();
         }
     }
-
 
     private void OnConfigChanged (object sender, ConfigChangedEventArgs e)
     {
@@ -3167,6 +3138,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         OpenSettings(2);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "For Debug Purposes")]
     private void OnThrowExceptionGUIThreadToolStripMenuItemClick (object sender, EventArgs e)
     {
         throw new Exception(Resources.LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread);

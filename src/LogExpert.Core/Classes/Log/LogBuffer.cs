@@ -1,4 +1,6 @@
-﻿using NLog;
+using ColumnizerLib;
+
+using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 

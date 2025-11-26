@@ -1,4 +1,4 @@
-using JsonColumnizer;
+using ColumnizerLib;
 
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
@@ -61,7 +61,7 @@ public class ColumnizerPickerTest
     }
 
 
-    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer))]
+    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer.JsonCompactColumnizer))]
     [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", typeof(SquareBracketColumnizer))]
     public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
@@ -73,7 +73,7 @@ public class ColumnizerPickerTest
         _ = autoColumnizer.Setup(a => a.GetName()).Returns("Auto Columnizer");
 
         // TODO: When DI container is ready, we can mock this set up.
-        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer());
+        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer());
         var result = ColumnizerPicker.FindReplacementForAutoColumnizer(fileName, reader, autoColumnizer.Object, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(columnizerType, Is.EqualTo(result.GetType()));
@@ -83,7 +83,7 @@ public class ColumnizerPickerTest
     public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
         // TODO: When DI container is ready, we can mock this set up.
-        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer());
+        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer());
         var result = ColumnizerPicker.DecideColumnizerByName(fileName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(columnizerType, Is.EqualTo(result.GetType()));

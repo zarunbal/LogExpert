@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using LogExpert.PluginRegistry;
 using LogExpert.PluginRegistry.Interfaces;
 
 using NUnit.Framework;

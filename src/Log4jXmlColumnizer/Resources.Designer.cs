@@ -39,7 +39,7 @@ namespace Log4jXmlColumnizer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LogExpert.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Log4jXmlColumnizer.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace Log4jXmlColumnizer {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialize.
+        /// </summary>
+        public static string Log4jXmlColumnizer_UI_Title_Deserialize {
+            get {
+                return ResourceManager.GetString("Log4jXmlColumnizer_UI_Title_Deserialize", resourceCulture);
             }
         }
         
