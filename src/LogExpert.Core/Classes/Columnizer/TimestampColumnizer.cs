@@ -24,7 +24,6 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         return timeOffset;
     }
 
-
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
         var cols = SplitLine(callback, line);
@@ -51,12 +50,13 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
                 formatInfo.CultureInfo);
             return dateTime;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }
     }
-
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
@@ -110,8 +110,10 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
         // 03.01.2008 14:48:00.066 <rest of line>
 
-        ColumnizedLogLine clogLine = new();
-        clogLine.LogLine = line;
+        ColumnizedLogLine clogLine = new()
+        {
+            LogLine = line
+        };
 
         var columns = new Column[3]
         {
@@ -141,23 +143,21 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
                 if (formatInfo.IgnoreFirstChar)
                 {
                     // First character is a bracket and should be ignored
-                    var dateTime = DateTime.ParseExact(temp.Substring(1, endPos), formatInfo.DateTimeFormat,
-                        formatInfo.CultureInfo);
+                    var dateTime = DateTime.ParseExact(temp.Substring(1, endPos), formatInfo.DateTimeFormat, formatInfo.CultureInfo);
                     dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, timeOffset));
                     var newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
-                    columns[0].FullValue = newDate.Substring(0, dateLen); // date
+                    columns[0].FullValue = newDate[..dateLen]; // date
                     columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos + 2); // rest of line
+                    columns[2].FullValue = temp[(endPos + 2)..]; // rest of line
                 }
                 else
                 {
-                    var dateTime = DateTime.ParseExact(temp.Substring(0, endPos), formatInfo.DateTimeFormat,
-                        formatInfo.CultureInfo);
+                    var dateTime = DateTime.ParseExact(temp[..endPos], formatInfo.DateTimeFormat, formatInfo.CultureInfo);
                     dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, timeOffset));
                     var newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
-                    columns[0].FullValue = newDate.Substring(0, dateLen); // date
+                    columns[0].FullValue = newDate[..dateLen]; // date
                     columns[1].FullValue = newDate.Substring(dateLen + 1, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    columns[2].FullValue = temp[endPos..]; // rest of line
                 }
             }
             else
@@ -167,17 +167,19 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
                     // First character is a bracket and should be ignored
                     columns[0].FullValue = temp.Substring(1, dateLen); // date
                     columns[1].FullValue = temp.Substring(dateLen + 2, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos + 2); // rest of line
+                    columns[2].FullValue = temp[(endPos + 2)..]; // rest of line
                 }
                 else
                 {
-                    columns[0].FullValue = temp.Substring(0, dateLen); // date
+                    columns[0].FullValue = temp[..dateLen]; // date
                     columns[1].FullValue = temp.Substring(dateLen + 1, timeLen); // time
-                    columns[2].FullValue = temp.Substring(endPos); // rest of line
+                    columns[2].FullValue = temp[endPos..]; // rest of line
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             columns[0].FullValue = "n/a";
             columns[1].FullValue = "n/a";

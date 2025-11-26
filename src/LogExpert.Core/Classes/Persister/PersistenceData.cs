@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Entities;

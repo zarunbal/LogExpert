@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 namespace LogExpert.PluginRegistry;
 
 /// <summary>

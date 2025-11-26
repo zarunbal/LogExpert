@@ -4,6 +4,7 @@
 
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <AssemblyTitle>JsonColumnizer</AssemblyTitle>
+    <RootNamespace>JsonColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

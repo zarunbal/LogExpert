@@ -1,8 +1,4 @@
 using NUnit.Framework;
-using LogExpert.PluginRegistry;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -18,19 +14,20 @@ public class PluginValidatorTests
     private bool _originalBypassSetting;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
         // Create test directories
         _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertValidatorTests", Guid.NewGuid().ToString());
         _testPluginsPath = Path.Join(_testDataPath, "plugins");
-        Directory.CreateDirectory(_testPluginsPath);
+        _ = Directory.CreateDirectory(_testPluginsPath);
 
         // Save original bypass setting
         _originalBypassSetting = PluginHashCalculator.BypassHashVerification;
     }
 
     [TearDown]
-    public void TearDown()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Test")]
+    public void TearDown ()
     {
         // Restore original bypass setting
         PluginHashCalculator.BypassHashVerification = _originalBypassSetting;
@@ -52,7 +49,7 @@ public class PluginValidatorTests
     #region Plugin Validation Tests
 
     [Test]
-    public void ValidatePlugin_WithNonExistentFile_ShouldReturnFalse()
+    public void ValidatePlugin_WithNonExistentFile_ShouldReturnFalse ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "NonExistent.dll");
@@ -65,7 +62,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidatePlugin_WithValidFile_WithoutManifest_ShouldValidateBasics()
+    public void ValidatePlugin_WithValidFile_WithoutManifest_ShouldValidateBasics ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
@@ -80,12 +77,12 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidatePlugin_WithManifestOut_ShouldPopulateManifest()
+    public void ValidatePlugin_WithManifestOut_ShouldPopulateManifest ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
         var manifestPath = Path.Join(_testPluginsPath, "TestPlugin.manifest.json");
-        
+
         CreateDummyDll(pluginPath);
         CreateValidManifest(manifestPath, "TestPlugin");
 
@@ -102,7 +99,7 @@ public class PluginValidatorTests
     #region Hash Calculation Tests
 
     [Test]
-    public void CalculateHash_WithSameFile_ShouldReturnConsistentHash()
+    public void CalculateHash_WithSameFile_ShouldReturnConsistentHash ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
@@ -118,7 +115,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void CalculateHash_WithModifiedFile_ShouldReturnDifferentHash()
+    public void CalculateHash_WithModifiedFile_ShouldReturnDifferentHash ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "TestPlugin.dll");
@@ -136,19 +133,19 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void CalculateHash_WithMissingFile_ShouldThrowFileNotFoundException()
+    public void CalculateHash_WithMissingFile_ShouldThrowFileNotFoundException ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "NonExistent.dll");
 
         // Act & Assert
-        Assert.That(() => PluginHashCalculator.CalculateHash(pluginPath), 
-            Throws.TypeOf<FileNotFoundException>(), 
+        Assert.That(() => PluginHashCalculator.CalculateHash(pluginPath),
+            Throws.TypeOf<FileNotFoundException>(),
             "Should throw FileNotFoundException for non-existent file");
     }
 
     [Test]
-    public void CalculateHash_WithEmptyFile_ShouldReturnValidHash()
+    public void CalculateHash_WithEmptyFile_ShouldReturnValidHash ()
     {
         // Arrange
         var pluginPath = Path.Join(_testPluginsPath, "Empty.dll");
@@ -165,7 +162,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void VerifyHash_WithMatchingHash_ShouldReturnTrue()
+    public void VerifyHash_WithMatchingHash_ShouldReturnTrue ()
     {
         // Arrange
         PluginHashCalculator.BypassHashVerification = false;
@@ -181,7 +178,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void VerifyHash_WithMismatchedHash_ShouldReturnFalse()
+    public void VerifyHash_WithMismatchedHash_ShouldReturnFalse ()
     {
         // Arrange
         PluginHashCalculator.BypassHashVerification = false;
@@ -201,7 +198,7 @@ public class PluginValidatorTests
     #region Manifest Loading Tests
 
     [Test]
-    public void LoadManifest_WithValidManifest_ShouldSucceed()
+    public void LoadManifest_WithValidManifest_ShouldSucceed ()
     {
         // Arrange
         var manifestPath = Path.Join(_testPluginsPath, "TestPlugin.manifest.json");
@@ -217,7 +214,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void LoadManifest_WithMissingFile_ShouldReturnNull()
+    public void LoadManifest_WithMissingFile_ShouldReturnNull ()
     {
         // Arrange
         var manifestPath = Path.Join(_testPluginsPath, "NonExistent.manifest.json");
@@ -230,7 +227,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void LoadManifest_WithInvalidJson_ShouldReturnNull()
+    public void LoadManifest_WithInvalidJson_ShouldReturnNull ()
     {
         // Arrange
         var manifestPath = Path.Join(_testPluginsPath, "Invalid.manifest.json");
@@ -244,7 +241,8 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void LoadManifest_WithMissingRequiredFields_LoadsWithDefaults()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    public void LoadManifest_WithMissingRequiredFields_LoadsWithDefaults ()
     {
         // Arrange - create a minimal manifest missing some fields
         // Note: C# required properties with object initializer will use defaults for missing JSON fields
@@ -269,7 +267,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void LoadManifest_WithMinimalFields_ShouldUseDefaults()
+    public void LoadManifest_WithMinimalFields_ShouldUseDefaults ()
     {
         // Arrange - create manifest with only required fields
         var manifestPath = Path.Join(_testPluginsPath, "Minimal.manifest.json");
@@ -291,7 +289,7 @@ public class PluginValidatorTests
     #region Path Validation Tests
 
     [Test]
-    public void ValidatePluginPath_WithRelativePath_ShouldBeAllowed()
+    public void ValidatePluginPath_WithRelativePath_ShouldBeAllowed ()
     {
         // Arrange
         var relativePath = Path.Join("plugins", "TestPlugin.dll");
@@ -302,7 +300,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidatePluginPath_WithAbsolutePath_ShouldBeAllowed()
+    public void ValidatePluginPath_WithAbsolutePath_ShouldBeAllowed ()
     {
         // Arrange
         var absolutePath = Path.Join(_testPluginsPath, "TestPlugin.dll");
@@ -313,7 +311,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidatePluginPath_WithPathTraversal_ShouldBeDetectable()
+    public void ValidatePluginPath_WithPathTraversal_ShouldBeDetectable ()
     {
         // Arrange
         var traversalPath = Path.Join(_testPluginsPath, "..", "..", "system32", "malicious.dll");
@@ -332,7 +330,7 @@ public class PluginValidatorTests
     #region Version Compatibility Tests
 
     [Test]
-    public void ValidateVersionCompatibility_WithCompatibleVersion_ShouldSucceed()
+    public void ValidateVersionCompatibility_WithCompatibleVersion_ShouldSucceed ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -355,7 +353,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidateVersionCompatibility_WithIncompatibleVersion_ShouldFail()
+    public void ValidateVersionCompatibility_WithIncompatibleVersion_ShouldFail ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -378,7 +376,7 @@ public class PluginValidatorTests
     }
 
     [Test]
-    public void ValidateVersionCompatibility_WithVersionRange_ShouldValidateCorrectly()
+    public void ValidateVersionCompatibility_WithVersionRange_ShouldValidateCorrectly ()
     {
         // Arrange
         var manifest = new PluginManifest
@@ -406,7 +404,7 @@ public class PluginValidatorTests
     /// <summary>
     /// Creates a dummy DLL file for testing (not a real assembly).
     /// </summary>
-    private void CreateDummyDll(string path, string content = "Dummy DLL Content")
+    private static void CreateDummyDll (string path, string content = "Dummy DLL Content")
     {
         File.WriteAllText(path, content);
     }
@@ -414,7 +412,7 @@ public class PluginValidatorTests
     /// <summary>
     /// Creates a valid plugin manifest file for testing.
     /// </summary>
-    private void CreateValidManifest(string path, string pluginName)
+    private static void CreateValidManifest (string path, string pluginName)
     {
         var manifest = @$"{{
             ""name"": ""{pluginName}"",

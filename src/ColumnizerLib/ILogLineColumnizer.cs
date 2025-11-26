@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 ///<summary>
 /// This interface defines a so-called 'Columnizer' for LogExpert.

@@ -2048,4 +2048,7 @@ Continue?</value>
   <data name="LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement" xml:space="preserve">
     <value>Plugin &amp;Trust Management...</value>
   </data>
+  <data name="SearchDialog_UI_Error_InvalidRegexPattern" xml:space="preserve">
+    <value>Invalid regex pattern: {0}</value>
+  </data>
 </root>

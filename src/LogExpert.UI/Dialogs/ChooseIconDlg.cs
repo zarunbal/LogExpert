@@ -61,14 +61,14 @@ internal partial class ChooseIconDlg : Form
 
         ImageList imageList = new();
 
-        if (icons.GetLength(0) > 0)
+        if (icons.Length > 0)
         {
-            imageList.ImageSize = icons[1, 0].Size;
+            imageList.ImageSize = icons[1][0].Size;
             iconListView.LargeImageList = imageList;
 
-            for (var i = 0; i < icons.GetLength(1); ++i)
+            for (var i = 0; i < icons[1].Length; ++i)
             {
-                imageList.Images.Add(icons[1, i]);
+                imageList.Images.Add(icons[1][i]);
                 ListViewItem item = new()
                 {
                     ImageIndex = i

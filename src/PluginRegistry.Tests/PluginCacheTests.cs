@@ -1,3 +1,4 @@
+using LogExpert.PluginRegistry;
 using LogExpert.PluginRegistry.Interfaces;
 
 using Moq;

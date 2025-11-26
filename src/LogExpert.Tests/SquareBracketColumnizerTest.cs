@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
@@ -38,5 +40,4 @@ public class SquareBracketColumnizerTest
         _ = squareBracketColumnizer.GetPriority(path, loglines);
         Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
     }
-
 }

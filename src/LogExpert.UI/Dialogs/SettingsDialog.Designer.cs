@@ -842,6 +842,7 @@ partial class SettingsDialog
         listBoxTools.Name = "listBoxTools";
         listBoxTools.Size = new Size(406, 148);
         listBoxTools.TabIndex = 0;
+        listBoxTools.DisplayMember = "Name";
         listBoxTools.SelectedIndexChanged += OnListBoxToolSelectedIndexChanged;
         // 
         // groupBoxToolSettings
@@ -910,7 +911,7 @@ partial class SettingsDialog
         buttonIcon.Text = "   Icon...";
         buttonIcon.TextImageRelation = TextImageRelation.ImageBeforeText;
         buttonIcon.UseVisualStyleBackColor = true;
-        buttonIcon.Click += OnBtnIconClick;
+        buttonIcon.Click += OnBtnToolIconClick;
         // 
         // labelToolName
         // 
@@ -1221,7 +1222,7 @@ partial class SettingsDialog
         labelNoteMultiFile.Name = "labelNoteMultiFile";
         labelNoteMultiFile.Size = new Size(705, 82);
         labelNoteMultiFile.TabIndex = 1;
-        labelNoteMultiFile.Text = resources.GetString("labelNoteMultiFile.Text");
+        labelNoteMultiFile.Text = "Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (<filename>, <filename>.1, <filename>.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.";
         // 
         // groupBoxWhenOpeningMultiFile
         // 

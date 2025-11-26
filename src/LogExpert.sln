@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SftpFileSystemx64", "SftpFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer", "RegexColumnizer\RegexColumnizer.csproj", "{B5A7DFA4-48A8-4616-8008-7441699EC946}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColumnizerLib.UnitTests", "ColumnizerLib.UnitTests\ColumnizerLib.UnitTests.csproj", "{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert.ColumnizerLib.Tests", "ColumnizerLib.UnitTests\LogExpert.ColumnizerLib.Tests.csproj", "{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert.Tests", "LogExpert.Tests\LogExpert.Tests.csproj", "{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -60,7 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2
 		setup\LogExpertInstaller.iss = setup\LogExpertInstaller.iss
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogExpert.RegexColumnizer.Tests", "RegexColumnizer.UnitTests\LogExpert.RegexColumnizer.Tests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Core", "LogExpert.Core\LogExpert.Core.csproj", "{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}"
 EndProject

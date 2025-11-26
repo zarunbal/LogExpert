@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.Callback;

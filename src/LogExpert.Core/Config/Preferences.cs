@@ -22,8 +22,8 @@ public class Preferences
     /// <remarks>
     /// <para>
     /// This property controls line truncation at the I/O reader level before lines are processed by columnizers.
-    /// It is implemented in <see cref="LogExpert.Core.Classes.Log.PositionAwareStreamReaderSystem"/> 
-    /// and <see cref="LogExpert.Core.Classes.Log.PositionAwareStreamReaderLegacy"/>.
+    /// It is implemented in <see cref="Classes.Log.PositionAwareStreamReaderSystem"/>
+    /// and <see cref="Classes.Log.PositionAwareStreamReaderLegacy"/>.
     /// </para>
     /// <para>
     /// Related property: <see cref="MaxDisplayLength"/> controls display-level truncation in UI columns,
@@ -114,7 +114,7 @@ public class Preferences
 
     public List<ColumnizerMaskEntry> ColumnizerMaskList { get; set; } = [];
 
-    public string DefaultEncoding { get; set; }
+    public string DefaultEncoding { get; set; } = "utf-8";
 
     public string DefaultLanguage { get; set; } = "en-US";
 

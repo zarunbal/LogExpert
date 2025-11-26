@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Service interface implemented by LogExpert. This can be used by IFileSystemPlugin implementations to get certain services.

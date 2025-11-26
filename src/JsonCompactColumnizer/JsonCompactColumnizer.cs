@@ -1,15 +1,15 @@
 using ColumnizerLib;
 
-using LogExpert;
+using JsonColumnizer;
 
 using Newtonsoft.Json.Linq;
 
-namespace JsonColumnizer;
+namespace JsonCompactColumnizer;
 
 /// <summary>
 ///     This Columnizer can parse JSON files.
 /// </summary>
-public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
+public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerPriority
 {
     #region Public methods
 
@@ -20,7 +20,7 @@ public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
 
     public override string GetDescription ()
     {
-        return "A JSON columnier for Serilog.Formatting.Compact format.";
+        return Resources.JsonCompactColumnizer_Description;
     }
 
     public override void Selected (ILogLineColumnizerCallback callback)
@@ -34,6 +34,7 @@ public class JsonCompactColumnizer : JsonColumnizer, IColumnizerPriority
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Ignore errors when determine priority.")]
     public override Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
         var result = Priority.NotSupport;

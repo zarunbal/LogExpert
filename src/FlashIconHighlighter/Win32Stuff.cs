@@ -1,4 +1,3 @@
-﻿using System;
 using System.Runtime.InteropServices;
 
 namespace FlashIconHighlighter;
@@ -17,12 +16,13 @@ public struct FLASHWINFO
     public int dwTimeout;
 }
 
-public partial class Win32Stuff
+public static partial class Win32Stuff
 {
     #region Public methods
 
     [LibraryImport("user32.dll")]
-    public static partial int FlashWindowEx(ref FLASHWINFO pwfi);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    public static partial int FlashWindowEx (ref FLASHWINFO pwfi);
 
     #endregion
 }

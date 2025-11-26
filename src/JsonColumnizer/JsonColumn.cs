@@ -1,6 +1,6 @@
-﻿namespace JsonColumnizer;
+namespace JsonColumnizer;
 
-public class JsonColumn(string name)
+public class JsonColumn (string name)
 {
     #region Properties
 

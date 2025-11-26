@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Security;
 
+using ColumnizerLib;
+
 using NLog;
 
 namespace LogExpert.PluginRegistry;

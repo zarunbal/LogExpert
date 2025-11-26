@@ -39,7 +39,7 @@ namespace RegexColumnizer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LogExpert.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RegexColumnizer.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,135 @@ namespace RegexColumnizer {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Regex !{0}{1}.
+        /// </summary>
+        public static string RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration directory cannot be null or empty.
+        /// </summary>
+        public static string RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columns are filled by regular expression named capture groups.
+        /// </summary>
+        public static string RegexColumnizer_Description {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer name cannot be null or empty.
+        /// </summary>
+        public static string RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer name &apos;{0}&apos; contains invalid filename characters.
+        /// </summary>
+        public static string RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters" +
+                        "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer name &apos;{0}&apos; contains path separators which are not allowed.
+        /// </summary>
+        public static string RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNotAllowed {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNot" +
+                        "Allowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer name &apos;{0}&apos; contains path traversal patterns which are not allowed.
+        /// </summary>
+        public static string RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhichAreNotAllowed {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhic" +
+                        "hAreNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create configuration directory: {0}.
+        /// </summary>
+        public static string RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save configuration: {0}.
+        /// </summary>
+        public static string RegexColumnizer_UI_Message_FailedToSaveConfiguration {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Message_FailedToSaveConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid regex pattern: {0}.
+        /// </summary>
+        public static string RegexColumnizer_UI_Message_InvalidRegexPattern {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Message_InvalidRegexPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regex pattern may cause performance issues: {0}.
+        /// </summary>
+        public static string RegexColumnizer_UI_Message_RegexTimeout {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Message_RegexTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialize.
+        /// </summary>
+        public static string RegexColumnizer_UI_Title_Deserialize {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Title_Deserialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration Error.
+        /// </summary>
+        public static string RegexColumnizer_UI_Title_Error {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Title_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration Warning.
+        /// </summary>
+        public static string RegexColumnizer_UI_Title_Warning {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_UI_Title_Warning", resourceCulture);
             }
         }
         
@@ -84,6 +213,15 @@ namespace RegexColumnizer {
         public static string RegexColumnizerConfigDialog_UI_Button_OK {
             get {
                 return ResourceManager.GetString("RegexColumnizerConfigDialog_UI_Button_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regex Columnizer Configuration.
+        /// </summary>
+        public static string RegexColumnizerConfigDialog_UI_Error_Title {
+            get {
+                return ResourceManager.GetString("RegexColumnizerConfigDialog_UI_Error_Title", resourceCulture);
             }
         }
         

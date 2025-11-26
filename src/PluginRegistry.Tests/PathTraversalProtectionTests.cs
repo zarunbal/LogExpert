@@ -2,7 +2,7 @@ using LogExpert.PluginRegistry;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.PluginRegistry;
+namespace LogExpert.PluginRegistry.Tests;
 
 /// <summary>
 /// Unit tests for Path Traversal Protection

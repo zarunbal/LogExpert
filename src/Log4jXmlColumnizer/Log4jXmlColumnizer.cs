@@ -105,7 +105,9 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 var newDate = dateTime.ToString(DATETIME_FORMAT, CultureInfo.InvariantCulture);
                 columns[0].FullValue = newDate;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             FormatException or
+                                             ArgumentOutOfRangeException)
             {
                 columns[0].FullValue = "n/a";
             }
@@ -140,7 +142,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
         var filteredColumns = MapColumns(columns);
 
-        clogLine.ColumnValues = filteredColumns.Select(a => a as IColumn).ToArray();
+        clogLine.ColumnValues = [.. filteredColumns.Select(a => a as IColumn)];
 
         return clogLine;
     }
@@ -197,7 +199,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 return DateTime.MinValue;
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }
@@ -258,7 +261,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
             }
             catch (SerializationException e)
             {
-                _ = MessageBox.Show(e.Message, "Deserialize");
+                _ = MessageBox.Show(e.Message, Resources.Log4jXmlColumnizer_UI_Title_Deserialize);
                 _config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
             }
         }
@@ -279,7 +282,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     #region Private Methods
 
-    private string[] GetAllColumnNames () => ["Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"];
+    private static string[] GetAllColumnNames () => ["Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"];
 
     /// <summary>
     /// Returns only the columns which are "active". The order of the columns depends on the column order in the config

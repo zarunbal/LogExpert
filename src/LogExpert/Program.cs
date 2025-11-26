@@ -8,7 +8,6 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
-
 using LogExpert.Classes;
 using LogExpert.Classes.CommandLine;
 using LogExpert.Configuration;

@@ -2,8 +2,6 @@ using System.Globalization;
 
 using ColumnizerLib;
 
-using LogExpert;
-
 namespace GlassfishColumnizer;
 
 internal class GlassfishColumnizer : ILogLineXmlColumnizer
@@ -15,7 +13,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
     private const string DATETIME_FORMAT_OUT = "yyyy-MM-dd HH:mm:ss.fff";
     private const char SEPARATOR_CHAR = '|';
 
-    private static readonly XmlConfig xmlConfig = new();
+    private static readonly XmlConfig _xmlConfig = new();
 
     private readonly char[] trimChars = ['|'];
     private readonly CultureInfo cultureInfo = new("en-US");
@@ -35,7 +33,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public IXmlLogConfiguration GetXmlLogConfiguration ()
     {
-        return xmlConfig;
+        return _xmlConfig;
     }
 
     public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
@@ -116,7 +114,9 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
                 var newDate = dateTime.ToString(DATETIME_FORMAT_OUT, CultureInfo.InvariantCulture);
                 columns[0].FullValue = newDate;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             FormatException or
+                                             ArgumentOutOfRangeException)
             {
                 columns[0].FullValue = "n/a";
             }
@@ -191,7 +191,9 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
                 ? timestamp.AddMilliseconds(timeOffset)
                 : DateTime.MinValue;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }

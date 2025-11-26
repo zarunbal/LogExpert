@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using NLog;
 
 namespace LogExpert.PluginRegistry.FileSystem;

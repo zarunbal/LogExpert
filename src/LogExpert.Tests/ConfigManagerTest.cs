@@ -61,7 +61,8 @@ public class ConfigManagerTest
     /// <summary>
     /// Invokes a private static method using reflection.
     /// </summary>
-    private T InvokePrivateStaticMethod<T> (string methodName, params object[] parameters)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
+    private static T InvokePrivateStaticMethod<T> (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -73,6 +74,7 @@ public class ConfigManagerTest
     /// <summary>
     /// Invokes a private instance method using reflection.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private T InvokePrivateInstanceMethod<T> (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
@@ -85,18 +87,19 @@ public class ConfigManagerTest
     /// <summary>
     /// Invokes a private instance method with no return value using reflection.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private void InvokePrivateInstanceMethod (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new Exception($"Instance method {methodName} not found");
 
-        method.Invoke(_configManager, parameters);
+        _ = method.Invoke(_configManager, parameters);
     }
 
     /// <summary>
     /// Creates a basic test Settings object with valid defaults.
     /// </summary>
-    private Settings CreateTestSettings ()
+    private static Settings CreateTestSettings ()
     {
         var settings = new Settings
         {
@@ -109,7 +112,7 @@ public class ConfigManagerTest
     /// <summary>
     /// Creates a populated Settings object with sample data.
     /// </summary>
-    private Settings CreatePopulatedSettings ()
+    private static Settings CreatePopulatedSettings ()
     {
         Settings settings = CreateTestSettings();
         settings.FilterList.Add(new FilterParams { SearchText = "ERROR" });
@@ -122,7 +125,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 1: Import Validation Tests
+    #region Import Validation Tests
 
     [Test]
     [Category("ImportValidation")]
@@ -249,7 +252,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 2: Atomic Write Tests
+    #region Atomic Write Tests
 
     [Test]
     [Category("AtomicWrite")]
@@ -325,6 +328,7 @@ public class ConfigManagerTest
     [Test]
     [Category("AtomicWrite")]
     [Description("SaveAsJSON should save complete valid JSON that can be deserialized")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void SaveAsJSON_SavesCompleteValidJSON ()
     {
         // Arrange
@@ -358,6 +362,7 @@ public class ConfigManagerTest
     [Test]
     [Category("AtomicWrite")]
     [Description("SaveAsJSON validation should prevent saving null settings")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void SaveAsJSON_ValidationFailure_PreventsNullSettingsSave ()
     {
         // Arrange
@@ -365,8 +370,7 @@ public class ConfigManagerTest
 
         // Act & Assert
         var ex = Assert.Throws<TargetInvocationException>(() =>
-            InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings),
-            "Saving null settings should throw exception");
+            InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings), "Saving null settings should throw exception");
 
         // The inner exception should be InvalidOperationException from ValidateSettings
         Assert.That(ex.InnerException, Is.InstanceOf<InvalidOperationException>());
@@ -407,7 +411,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 3: Deserialization Recovery Tests
+    #region Deserialization Recovery Tests
 
     [Test]
     [Category("DeserializationRecovery")]
@@ -543,7 +547,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 4: Integration Tests
+    #region Integration Tests
 
     [Test]
     [Category("Integration")]

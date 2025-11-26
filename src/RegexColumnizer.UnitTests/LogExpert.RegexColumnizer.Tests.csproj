@@ -3,17 +3,11 @@
     <TargetFramework>net10.0-windows</TargetFramework>
 
     <IsTestProject>true</IsTestProject>
-    
-    
+
     <OutputPath>bin\$(Configuration)</OutputPath>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-  </PropertyGroup>
-  <PropertyGroup>
-    
-  </PropertyGroup>
-  <PropertyGroup>
-    
-    <AssemblyTitle>RegexColumnizer.UnitTests</AssemblyTitle>
+    <AssemblyTitle>RegexColumnizer.Tests</AssemblyTitle>
+    <RootNamespace>LogExpert.RegexColumnizer.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

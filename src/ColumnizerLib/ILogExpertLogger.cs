@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Simple Logger interface to let plugins log into LogExpert's application log file.

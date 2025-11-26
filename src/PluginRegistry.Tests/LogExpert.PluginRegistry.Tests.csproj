@@ -9,6 +9,7 @@
     <AssemblyTitle>LogExpert.PluginRegistry.Tests</AssemblyTitle>
     <Company>Microsoft</Company>
     <OutputPath>bin\$(Configuration)</OutputPath>
+    <RootNamespace>LogExpert.PluginRegistry.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />

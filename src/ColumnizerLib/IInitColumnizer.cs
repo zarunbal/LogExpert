@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Implement this interface in your columnizer if you need to do some initialization work 
