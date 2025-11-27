@@ -12,6 +12,15 @@ public class Preferences
 
     public bool PortableMode { get; set; }
 
+    /// <summary>
+    /// OBSOLETE: This setting is no longer used. It was originally intended to show an error dialog when "Allow Only One Instance" was enabled,
+    /// but this behavior was incorrect (showed dialog on success instead of failure). The feature now works silently on success and only shows
+    /// a warning on IPC failure. This property is kept for backward compatibility with old settings files but is no longer used or saved.
+    /// Will be removed in a future version.
+    /// </summary>
+    [Obsolete("This setting is no longer used and will be removed in a future version. The 'Allow Only One Instance' feature now works silently.")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
 
     /// <summary>

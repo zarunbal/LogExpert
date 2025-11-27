@@ -93,17 +93,23 @@ internal class LogExpertProxy : ILogExpertProxy
     [SupportedOSPlatform("windows")]
     public void NewWindowOrLockedWindow (string[] fileNames)
     {
+        // Lock Instance has priority
+        // Check for locked window first
         foreach (var logWin in _windowList)
         {
             if (AbstractLogTabWindow.StaticData.CurrentLockedMainWindow == logWin)
             {
+                _logger.Info("Loading files in locked window");
                 _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
                 logWin.LoadFiles(fileNames);
                 return;
             }
         }
-        // No locked window was found --> create a new one
-        NewWindow(fileNames);
+
+        // No locked window found
+        // Load in most recent window (not new window)
+        _logger.Info("No locked window, loading files in most recent window");
+        LoadFiles(fileNames); // Uses most recent window
     }
 
     [SupportedOSPlatform("windows")]
