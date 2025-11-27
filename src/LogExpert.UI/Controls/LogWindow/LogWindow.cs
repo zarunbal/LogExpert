@@ -179,7 +179,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         listBoxFilter.DrawMode = DrawMode.OwnerDrawVariable;
         listBoxFilter.MeasureItem += MeasureItem;
 
-        Closing += OnLogWindowClosing;
+        FormClosing += OnLogWindowClosing;
         Disposed += OnLogWindowDisposed;
         Load += OnLogWindowLoad;
 
@@ -466,6 +466,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ApplyCheckBoxResources();
         ApplyToolStripMenuItemResources();
         ApplyToolTipsResources();
+        ApplyResourceImages();
+    }
+
+    private void ApplyResourceImages ()
+    {
+        pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
+        btnFilterDown.BackgroundImage = Resources.ArrowDown;
+        btnFilterUp.BackgroundImage = Resources.ArrowUp;
+        btnToggleHighlightPanel.Image = Resources.Arrow_menu_open;
     }
 
     private void ApplyCheckBoxResources ()
@@ -1693,7 +1702,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-
         var col = gridView.Columns[_selectedCol];
         moveLeftToolStripMenuItem.Enabled = col != null && col.DisplayIndex > 0;
         moveRightToolStripMenuItem.Enabled = col != null && col.DisplayIndex < gridView.Columns.Count - 1;
@@ -1767,7 +1775,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         var gridView = columnContextMenuStrip.SourceControl as BufferedDataGridView;
         var col = gridView.Columns[_selectedCol];
-        col?.DisplayIndex = gridView.Columns.Count - 1;
+        _ = col?.DisplayIndex = gridView.Columns.Count - 1;
     }
 
     [SupportedOSPlatform("windows")]
@@ -3265,7 +3273,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CurrentColumnizer = columnizer;
             _freezeStateMap.Clear();
 
-            _logFileReader?.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer columnizer1
+            _ = _logFileReader?.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer columnizer1
                     ? columnizer1
                     : null;
 
@@ -4209,7 +4217,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ResetFilterControls ()
     {
-        filterComboBox.Text = "";
+        filterComboBox.Text = string.Empty;
         filterCaseSensitiveCheckBox.Checked = false;
         filterRegexCheckBox.Checked = false;
         //this.filterTailCheckBox.Checked = this.Preferences.filterTail;
@@ -4219,7 +4227,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         rangeCheckBox.Checked = false;
         columnRestrictCheckBox.Checked = false;
         knobControlFuzzy.Value = 0;
-        filterRangeComboBox.Text = "";
+        filterRangeComboBox.Text = string.Empty;
     }
 
     [SupportedOSPlatform("windows")]
@@ -4781,17 +4789,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return true;
         }
 
-        if (filterParams.FuzzyValue != knobControlFuzzy.Value)
-        {
-            return true;
-        }
-
-        if (filterParams.ColumnRestrict != columnRestrictCheckBox.Checked)
-        {
-            return true;
-        }
-
-        return filterParams.IsCaseSensitive != filterCaseSensitiveCheckBox.Checked;
+        return filterParams.FuzzyValue != knobControlFuzzy.Value ||
+            filterParams.ColumnRestrict != columnRestrictCheckBox.Checked ||
+            filterParams.IsCaseSensitive != filterCaseSensitiveCheckBox.Checked;
     }
 
     [SupportedOSPlatform("windows")]
@@ -5311,7 +5311,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     }
 
                     // skip first two columns: marker + line number
-                    names.Append(dataGridView.Columns[2 + colIndex].HeaderText);
+                    _ = names.Append(dataGridView.Columns[2 + colIndex].HeaderText);
                 }
             }
         }
