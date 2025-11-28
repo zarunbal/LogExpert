@@ -2051,4 +2051,12 @@ Continue?</value>
   <data name="SearchDialog_UI_Error_InvalidRegexPattern" xml:space="preserve">
     <value>Invalid regex pattern: {0}</value>
   </data>
+  <data name="LogTabWindow_UI_Message_PluginTrustConfigurationUpdate" xml:space="preserve">
+    <value>Plugin trust configuration updated.
+
+Restart LogExpert to apply changes?</value>
+  </data>
+  <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
+    <value>Restart Recommended</value>
+  </data>
 </root>

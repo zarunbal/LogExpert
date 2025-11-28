@@ -35,7 +35,6 @@ namespace LogExpert.UI.Controls.LogWindow
         private void InitializeComponent ()
         {
             components = new System.ComponentModel.Container();
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWindow));
             splitContainerLogWindow = new SplitContainer();
             tableLayoutPanel1 = new TableLayoutPanel();
             columnFinderPanel = new Panel();
@@ -453,7 +452,7 @@ namespace LogExpert.UI.Controls.LogWindow
             advancedFilterSplitContainer.Panel2.Controls.Add(panelBackgroundAdvancedFilterSplitContainer);
             advancedFilterSplitContainer.Panel2MinSize = 50;
             advancedFilterSplitContainer.Size = new Size(1855, 561);
-            advancedFilterSplitContainer.SplitterDistance = 170;
+            advancedFilterSplitContainer.SplitterDistance = 103;
             advancedFilterSplitContainer.SplitterWidth = 2;
             advancedFilterSplitContainer.TabIndex = 2;
             // 
@@ -573,7 +572,6 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // pnlProFilterLabel
             // 
-            pnlProFilterLabel.BackgroundImage = LogExpert.Resources.Pro_Filter;
             pnlProFilterLabel.BackgroundImageLayout = ImageLayout.Center;
             pnlProFilterLabel.Location = new Point(5, 7);
             pnlProFilterLabel.Name = "pnlProFilterLabel";
@@ -644,13 +642,12 @@ namespace LogExpert.UI.Controls.LogWindow
             panelBackgroundAdvancedFilterSplitContainer.Dock = DockStyle.Fill;
             panelBackgroundAdvancedFilterSplitContainer.Location = new Point(0, 0);
             panelBackgroundAdvancedFilterSplitContainer.Name = "panelBackgroundAdvancedFilterSplitContainer";
-            panelBackgroundAdvancedFilterSplitContainer.Size = new Size(1855, 389);
+            panelBackgroundAdvancedFilterSplitContainer.Size = new Size(1855, 456);
             panelBackgroundAdvancedFilterSplitContainer.TabIndex = 7;
             // 
             // btnToggleHighlightPanel
             // 
             btnToggleHighlightPanel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnToggleHighlightPanel.Image = LogExpert.Resources.Arrow_menu_open;
             btnToggleHighlightPanel.Location = new Point(1832, 1);
             btnToggleHighlightPanel.Name = "btnToggleHighlightPanel";
             btnToggleHighlightPanel.Size = new Size(20, 21);
@@ -677,7 +674,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             highlightSplitContainer.Panel2.Controls.Add(highlightSplitContainerBackPanel);
             highlightSplitContainer.Panel2MinSize = 350;
-            highlightSplitContainer.Size = new Size(1826, 378);
+            highlightSplitContainer.Size = new Size(1826, 445);
             highlightSplitContainer.SplitterDistance = 1472;
             highlightSplitContainer.TabIndex = 2;
             // 
@@ -711,7 +708,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterGridView.ShowCellToolTips = false;
             filterGridView.ShowEditingIcon = false;
             filterGridView.ShowRowErrors = false;
-            filterGridView.Size = new Size(1470, 376);
+            filterGridView.Size = new Size(1470, 443);
             filterGridView.TabIndex = 1;
             filterGridView.VirtualMode = true;
             filterGridView.CellContextMenuStripNeeded += OnFilterGridViewCellContextMenuStripNeeded;
@@ -763,7 +760,7 @@ namespace LogExpert.UI.Controls.LogWindow
             highlightSplitContainerBackPanel.Dock = DockStyle.Fill;
             highlightSplitContainerBackPanel.Location = new Point(0, 0);
             highlightSplitContainerBackPanel.Name = "highlightSplitContainerBackPanel";
-            highlightSplitContainerBackPanel.Size = new Size(348, 376);
+            highlightSplitContainerBackPanel.Size = new Size(348, 443);
             highlightSplitContainerBackPanel.TabIndex = 1;
             // 
             // hideFilterListOnLoadCheckBox
@@ -780,7 +777,6 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // btnFilterDown
             // 
-            btnFilterDown.BackgroundImage = LogExpert.Resources.ArrowDown;
             btnFilterDown.BackgroundImageLayout = ImageLayout.Stretch;
             btnFilterDown.Location = new Point(296, 85);
             btnFilterDown.Name = "btnFilterDown";
@@ -793,7 +789,6 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // btnFilterUp
             // 
-            btnFilterUp.BackgroundImage = LogExpert.Resources.ArrowUp;
             btnFilterUp.BackgroundImageLayout = ImageLayout.Stretch;
             btnFilterUp.Location = new Point(258, 85);
             btnFilterUp.Name = "btnFilterUp";
@@ -848,7 +843,7 @@ namespace LogExpert.UI.Controls.LogWindow
             listBoxFilter.ItemHeight = 25;
             listBoxFilter.Location = new Point(0, 0);
             listBoxFilter.Name = "listBoxFilter";
-            listBoxFilter.Size = new Size(252, 376);
+            listBoxFilter.Size = new Size(252, 443);
             listBoxFilter.TabIndex = 0;
             helpToolTip.SetToolTip(listBoxFilter, "Doubleclick to load a saved filter");
             listBoxFilter.DrawItem += OnFilterListBoxDrawItem;
@@ -910,11 +905,10 @@ namespace LogExpert.UI.Controls.LogWindow
             // filterComboBox
             // 
             filterComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            filterComboBox.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             filterComboBox.FormattingEnabled = true;
             filterComboBox.Location = new Point(89, 5);
             filterComboBox.Name = "filterComboBox";
-            filterComboBox.Size = new Size(426, 26);
+            filterComboBox.Size = new Size(426, 21);
             filterComboBox.TabIndex = 4;
             helpToolTip.SetToolTip(filterComboBox, "Search string for the filter");
             filterComboBox.TextChanged += OnFilterComboBoxTextChanged;

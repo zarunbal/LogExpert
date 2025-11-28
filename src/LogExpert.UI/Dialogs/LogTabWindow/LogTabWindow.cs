@@ -316,7 +316,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         tabGradient1.StartColor = SystemColors.Control;
         tabGradient1.TextColor = SystemColors.ControlText;
         autoHideStripSkin1.TabGradient = tabGradient1;
-        autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
+        autoHideStripSkin1.TextFont = new Font("Segoe UI", 9F);
         tabGradient2.EndColor = SystemColors.Control;
         tabGradient2.StartColor = SystemColors.Control;
         tabGradient2.TextColor = SystemColors.ControlText;
@@ -356,6 +356,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.Theme.Skin.DockPaneStripSkin = dockPaneStripSkin1;
         dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
         dockPanel.ActiveAutoHideContent = null;
+        dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
     }
 
     private void ApplyTextResources ()
@@ -810,7 +811,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (Preferences.ShowTailState)
         {
-            var icon = GetIcon(data.DiffSum, data);
+            var icon = GetLedIcon(data.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
         }
     }
@@ -942,7 +943,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ResumeLayout();
     }
 
-    private void SetTooltipText (LogWindow.LogWindow logWindow, string logFileName)
+    private static void SetTooltipText (LogWindow.LogWindow logWindow, string logFileName)
     {
         logWindow.ToolTipText = logFileName;
     }
@@ -1088,9 +1089,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    private string FindFilenameForSettings (string fileName)
+    private static string FindFilenameForSettings (string fileName)
     {
-        if (fileName.EndsWith(".lxp"))
+        if (fileName.EndsWith(".lxp", StringComparison.OrdinalIgnoreCase))
         {
             var persistenceData = Persister.Load(fileName);
             if (persistenceData == null)
@@ -1640,7 +1641,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void FileRespawned (LogWindow.LogWindow logWin)
     {
         var data = logWin.Tag as LogWindowData;
-        var icon = GetIcon(0, data);
+        var icon = GetLedIcon(0, data);
         _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
     }
 
@@ -1653,11 +1654,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             data.DiffSum = DIFF_MAX;
         }
 
-        var icon = GetIcon(data.DiffSum, data);
+        var icon = GetLedIcon(data.DiffSum, data);
         _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
     }
 
-    private int GetLevelFromDiff (int diff)
+    private static int GetLevelFromDiff (int diff)
     {
         if (diff > 60)
         {
@@ -1705,7 +1706,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                             data.DiffSum = 0;
                         }
 
-                        var icon = GetIcon(data.DiffSum, data);
+                        var icon = GetLedIcon(data.DiffSum, data);
                         _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
                     }
                 }
@@ -1723,7 +1724,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    private Icon GetIcon (int diff, LogWindowData data)
+    private Icon GetLedIcon (int diff, LogWindowData data)
     {
         var icon =
             _ledIcons[
@@ -1855,14 +1856,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             foreach (var logWindow in _logWindowList)
             {
                 var data = logWindow.Tag as LogWindowData;
-                var icon = GetIcon(data.DiffSum, data);
+                var icon = GetLedIcon(data.DiffSum, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
             }
         }
     }
 
     [SupportedOSPlatform("windows")]
-    private void SetToolIcon (ToolEntry entry, ToolStripItem item)
+    private static void SetToolIcon (ToolEntry entry, ToolStripItem item)
     {
         var icon = NativeMethods.LoadIconFromExe(entry.IconFile, entry.IconIndex);
 
@@ -2001,7 +2002,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     //TODO Reimplementation needs a new UI Framework since, DockpanelSuite has no easy way to change TabColor
-    private void SetTabColor (LogWindow.LogWindow logWindow, Color color)
+    private static void SetTabColor (LogWindow.LogWindow logWindow, Color color)
     {
         //tabPage.BackLowColor = color;
         //tabPage.BackLowColorDisabled = Color.FromArgb(255,
@@ -2106,14 +2107,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         externalToolsToolStrip.Visible = num > 0; // do not show bar if no tool uses it
     }
 
-    private void RunGC ()
+    private static void RunGC ()
     {
         _logger.Info($"Running GC. Used mem before: {GC.GetTotalMemory(false):N0}");
         GC.Collect();
         _logger.Info($"GC done.    Used mem after:  {GC.GetTotalMemory(true):N0}");
     }
 
-    private void DumpGCInfo ()
+    private static void DumpGCInfo ()
     {
         _logger.Info($"-------- GC info -----------\r\nUsed mem: {GC.GetTotalMemory(false):N0}");
         for (var i = 0; i < GC.MaxGeneration; ++i)
@@ -2628,7 +2629,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     data.Dirty = true;
                 }
 
-                var icon = GetIcon(diff, data);
+                var icon = GetLedIcon(diff, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
         }
@@ -2680,7 +2681,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
                 data.Dirty = false;
-                var icon = GetIcon(data.DiffSum, data);
+                var icon = GetLedIcon(data.DiffSum, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
         }
@@ -2693,7 +2694,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
             data.SyncMode = e.IsTimeSynced ? 1 : 0;
-            var icon = GetIcon(data.DiffSum, data);
+            var icon = GetLedIcon(data.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
         }
         //else
@@ -2756,7 +2757,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (CurrentLogWindow != null)
         {
             var data = CurrentLogWindow.Tag as LogWindowData;
-            var icon = GetIcon(0, data);
+            var icon = GetLedIcon(0, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), CurrentLogWindow, icon);
             CurrentLogWindow.Reload();
         }
@@ -2777,8 +2778,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (result == DialogResult.OK)
         {
             var restartPrompt = MessageBox.Show(
-                "Plugin trust configuration updated.\n\nRestart LogExpert to apply changes?",
-                "Restart Recommended",
+                Resources.LogTabWindow_UI_Message_PluginTrustConfigurationUpdate,
+                Resources.LogTabWindow_UI_Title_RestartRecommended,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
@@ -3031,7 +3032,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnToolStripButtonBubblesClick (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ShowBookmarkBubbles = toolStripButtonBubbles.Checked;
+        _ = CurrentLogWindow?.ShowBookmarkBubbles = toolStripButtonBubbles.Checked;
     }
 
     [SupportedOSPlatform("windows")]
