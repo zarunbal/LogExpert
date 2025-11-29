@@ -1653,6 +1653,17 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Plugin trust configuration updated.
+        ///
+        ///Restart LogExpert to apply changes?.
+        /// </summary>
+        public static string LogTabWindow_UI_Message_PluginTrustConfigurationUpdate {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_PluginTrustConfigurationUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LogExpert session {0}.
         /// </summary>
         public static string LogTabWindow_UI_Project_Session_Default_Filter {
@@ -1676,6 +1687,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart Recommended.
+        /// </summary>
+        public static string LogTabWindow_UI_Title_RestartRecommended {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Title_RestartRecommended", resourceCulture);
             }
         }
         
