@@ -39,8 +39,7 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-
-    [Solution] readonly Solution Solution;
+    [Solution(GenerateProjects = true)] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion(UpdateBuildNumber = true)]
     readonly Nuke.Common.Tools.GitVersion.GitVersion GitVersion;
@@ -63,6 +62,8 @@ partial class Build : NukeBuild
 
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
+    AbsolutePath LicenseDirectory => RootDirectory / "Licenses";
+
     AbsolutePath InnoSetupScript => SourceDirectory / "setup" / "LogExpertInstaller.iss";
 
     string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
@@ -78,7 +79,7 @@ partial class Build : NukeBuild
                 patch = AppVeyor.Instance.BuildNumber;
             }
 
-            return new Version(1, 20, 0, patch);
+            return new Version(1, 21, 0, patch);
         }
     }
 
@@ -97,7 +98,7 @@ partial class Build : NukeBuild
 
     [PathVariable("choco.exe")] readonly Tool Chocolatey;
 
-    [Parameter("Exlcude directory glob")]
+    [Parameter("Exclude directory glob")]
     string[] ExcludeDirectoryGlob => ["**/pluginsx86"];
 
     [Parameter("My variable", Name = "my_variable")] string MyVariable = null;
@@ -289,8 +290,8 @@ partial class Build : NukeBuild
         {
             string[] files = ["SftpFileSystem.dll", "Renci.SshNet.dll"];
 
-            OutputDirectory.GlobFiles(files.Select(a => $"plugins/{a}").ToArray()).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex64, ExistsPolicy.FileOverwrite));
-            OutputDirectory.GlobFiles(files.Select(a => $"pluginsx86/{a}").ToArray()).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex86, ExistsPolicy.FileOverwrite));
+            OutputDirectory.GlobFiles([.. files.Select(a => $"plugins/{a}")]).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex64, ExistsPolicy.FileOverwrite));
+            OutputDirectory.GlobFiles([.. files.Select(a => $"pluginsx86/{a}")]).ForEach(file => file.CopyToDirectory(SftpFileSystemPackagex86, ExistsPolicy.FileOverwrite));
 
             CompressionExtensions.ZipTo(SftpFileSystemPackagex64, BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip");
             CompressionExtensions.ZipTo(SftpFileSystemPackagex86, BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip");
@@ -326,7 +327,7 @@ partial class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
@@ -384,7 +385,6 @@ partial class Build : NukeBuild
                 {
                     s = s.SetApiKey(NugetApiKey)
                         .SetSource("https://api.nuget.org/v3/index.json")
-                        .SetApiKey(NugetApiKey)
                         .SetTargetPath(file);
 
                     return s;
@@ -410,10 +410,10 @@ partial class Build : NukeBuild
         .Requires(() => GitHubApiKey)
         .Executes(() =>
         {
-            var repositoryInfo = GetGitHubRepositoryInfo(GitRepository);
+            var (gitHubOwner, repositoryName) = GetGitHubRepositoryInfo(GitRepository);
 
             Task task = PublishRelease(s => s
-                .SetArtifactPaths(BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg", "**/LogExpert-Setup*.exe").Select(a => a.ToString()).ToArray())
+                .SetArtifactPaths([.. BinDirectory.GlobFiles("**/*.zip", "**/*.nupkg", "**/LogExpert-Setup*.exe").Select(a => a.ToString())])
                 .SetCommitSha(GitVersion.Sha)
                 .SetReleaseNotes($"# Changes\r\n" +
                                  $"# Bugfixes\r\n" +
@@ -421,8 +421,8 @@ partial class Build : NukeBuild
                                  $"Thanks to the contributors!\r\n" +
                                  $"# Infos\r\n" +
                                  $"It might be necessary to unblock the Executables / Dlls to get everything working, especially Plugins (see #55, #13, #8).")
-                .SetRepositoryName(repositoryInfo.repositoryName)
-                .SetRepositoryOwner(repositoryInfo.gitHubOwner)
+                .SetRepositoryName(repositoryName)
+                .SetRepositoryOwner(gitHubOwner)
                 .SetTag($"v{VersionString}")
                 .SetToken(GitHubApiKey)
                 .SetName(VersionString)
@@ -479,6 +479,25 @@ partial class Build : NukeBuild
             logExpertDocuments.DeleteDirectory();
         });
 
+    Target CopyLicenses => _ => _
+    .DependsOn(Compile)
+    .Executes(() =>
+    {
+        if (LicenseDirectory.DirectoryExists())
+        {
+            Log.Information("Copying license files to output directory");
+
+            // Copy to main output directory
+            LicenseDirectory.Copy(OutputDirectory / "Licenses", ExistsPolicy.MergeAndOverwriteIfNewer);
+
+            Log.Information($"Licenses copied to {OutputDirectory / "Licenses"}");
+        }
+        else
+        {
+            Log.Warning($"License directory not found at: {LicenseDirectory}");
+        }
+    });
+
     private void ExecuteInnoSetup (AbsolutePath innoPath)
     {
         Process proc = new();
@@ -497,7 +516,7 @@ partial class Build : NukeBuild
 
         if (proc.ExitCode != 0)
         {
-            Nuke.Common.Assert.True(true, $"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+            Assert.True(true, $"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
         }
     }
 
@@ -511,7 +530,7 @@ partial class Build : NukeBuild
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
 
-        AbsolutePath template = $"{Regex.Replace(path, "\\.template$", "")}";
+        AbsolutePath template = $"{TemplateRegex().Replace(path, "")}";
         template.WriteAllText(text);
         if (deleteTemplate)
         {
@@ -533,4 +552,7 @@ partial class Build : NukeBuild
 
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex SFTPPlugin ();
+
+    [GeneratedRegex("\\.template$")]
+    private static partial Regex TemplateRegex ();
 }
