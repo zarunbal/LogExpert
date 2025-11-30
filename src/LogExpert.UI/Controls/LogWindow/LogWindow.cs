@@ -5695,8 +5695,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (!prepared)
                 {
                     msgToFind = GetMsgForLine(srcLine);
-                    regex = new Regex("\\d");
-                    regex2 = new Regex("\\W");
+                    regex = ReplaceDigit();
+                    regex2 = ReplaceNonWordCharacters();
                     msgToFind = msgToFind.ToLower(culture);
                     msgToFind = regex.Replace(msgToFind, "0");
                     msgToFind = regex2.Replace(msgToFind, " ");
@@ -7915,6 +7915,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         RefreshAllGrids();
     }
+
+    //Replace any digit, to normalize numbers
+    [GeneratedRegex("\\d")]
+    private static partial Regex ReplaceDigit ();
+
+    //Replace any non-word character, anything that is not a letter, digit or underscore
+    [GeneratedRegex("\\W")]
+    private static partial Regex ReplaceNonWordCharacters ();
 
     #endregion
 }
