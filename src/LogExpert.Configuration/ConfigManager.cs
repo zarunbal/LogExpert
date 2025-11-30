@@ -1016,10 +1016,7 @@ public class ConfigManager : IConfigManager
         {
             // For 'Other', we consider the settings valid if Preferences object exists
             // This covers font settings, colors, and other preference data
-            if (settings.Preferences != null)
-            {
-                hasAnyRelevantData = true;
-            }
+            hasAnyRelevantData = true;
         }
 
         // Return true (isEmpty) if no relevant data was found in any checked section
