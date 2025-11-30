@@ -137,7 +137,7 @@ public class ConfigManagerTest
         Settings settings = null;
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.True, "Null settings should be detected as empty/default");
@@ -152,7 +152,7 @@ public class ConfigManagerTest
         Settings settings = CreateTestSettings();
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.True, "Empty settings should be detected as empty/default");
@@ -168,7 +168,7 @@ public class ConfigManagerTest
         settings.FilterList.Add(new FilterParams { SearchText = "TEST_FILTER" });
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with filters should not be empty/default");
@@ -184,7 +184,7 @@ public class ConfigManagerTest
         settings.SearchHistoryList.Add("test search");
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with search history should not be empty/default");
@@ -200,7 +200,7 @@ public class ConfigManagerTest
         settings.Preferences.HighlightGroupList.Add(new HighlightGroup { GroupName = "Test" });
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with highlights should not be empty/default");
@@ -708,8 +708,7 @@ public class ConfigManagerTest
         Assert.That(result.Success, Is.True);
 
         Settings updatedSettings = _configManager.Settings;
-        Assert.That(updatedSettings.Preferences.FontSize, Is.EqualTo(12),
-            "Preferences should be merged from import file");
+        Assert.That(updatedSettings.Preferences.FontSize, Is.EqualTo(12), "Preferences should be merged from import file");
     }
 
     [Test]
@@ -760,7 +759,7 @@ public class ConfigManagerTest
         FileInfo importFile = new(importFilePath);
 
         // Act
-        ImportResult result = _configManager.Import(importFile, ExportImportFlags.ColumnizerMasks | ExportImportFlags.KeepExisting);
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All | ExportImportFlags.KeepExisting);
 
         // Assert
         Assert.That(result, Is.Not.Null);

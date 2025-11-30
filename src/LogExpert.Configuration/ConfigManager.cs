@@ -83,9 +83,8 @@ public class ConfigManager : IConfigManager
     {
         get
         {
-            field ??= Load();
-
-            return field;
+            _settings ??= Load();
+            return _settings;
         }
     }
 
@@ -208,7 +207,7 @@ public class ConfigManager : IConfigManager
             return ImportResult.Failed("Import Failed", $"Import file is invalid or corrupted:\n\n{ex.Message}\n\nImport canceled.");
         }
 
-        if (SettingsAreEmptyOrDefault(importedSettings))
+        if (SettingsAreEmptyOrDefault(importedSettings, importFlags))
         {
             _logger.Warn("Import file appears to contain empty or default settings");
 
@@ -502,6 +501,7 @@ public class ConfigManager : IConfigManager
     /// <summary>
     /// Initialize settings with required default values
     /// </summary>
+
     private static Settings InitializeSettings (Settings settings)
     {
         settings.Preferences ??= new Preferences();
@@ -841,19 +841,42 @@ public class ConfigManager : IConfigManager
         Settings ownSettings = ObjectClone.Clone(currentSettings);
         Settings newSettings;
 
-        // at first check for 'Other' as this are the most options.
+        // Check for 'All' flag first - import everything
+        if (flags.HasFlag(ExportImportFlags.All))
+        {
+            // For All, start with imported settings and selectively keep some current data if KeepExisting is set
+            newSettings = ObjectClone.Clone(importSettings);
+
+            if (flags.HasFlag(ExportImportFlags.KeepExisting))
+            {
+                // Merge with existing settings
+                newSettings.FilterList = ReplaceOrKeepExisting(flags, ownSettings.FilterList, importSettings.FilterList);
+                newSettings.FileHistoryList = ReplaceOrKeepExisting(flags, ownSettings.FileHistoryList, importSettings.FileHistoryList);
+                newSettings.SearchHistoryList = ReplaceOrKeepExisting(flags, ownSettings.SearchHistoryList, importSettings.SearchHistoryList);
+                newSettings.FilterHistoryList = ReplaceOrKeepExisting(flags, ownSettings.FilterHistoryList, importSettings.FilterHistoryList);
+                newSettings.FilterRangeHistoryList = ReplaceOrKeepExisting(flags, ownSettings.FilterRangeHistoryList, importSettings.FilterRangeHistoryList);
+
+                newSettings.Preferences.HighlightGroupList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightGroupList, importSettings.Preferences.HighlightGroupList);
+                newSettings.Preferences.ColumnizerMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ColumnizerMaskList, importSettings.Preferences.ColumnizerMaskList);
+                newSettings.Preferences.HighlightMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightMaskList, importSettings.Preferences.HighlightMaskList);
+                newSettings.Preferences.ToolEntries = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ToolEntries, importSettings.Preferences.ToolEntries);
+            }
+
+            return newSettings;
+        }
+
+        // For partial imports, start with current settings and selectively update
+        newSettings = ownSettings;
+
+        // Check for 'Other' as this covers most preference options
         if ((flags & ExportImportFlags.Other) == ExportImportFlags.Other)
         {
-            newSettings = ownSettings;
             newSettings.Preferences = ObjectClone.Clone(importSettings.Preferences);
+            // Preserve specific lists that have their own flags
             newSettings.Preferences.ColumnizerMaskList = ownSettings.Preferences.ColumnizerMaskList;
             newSettings.Preferences.HighlightMaskList = ownSettings.Preferences.HighlightMaskList;
             newSettings.Preferences.HighlightGroupList = ownSettings.Preferences.HighlightGroupList;
             newSettings.Preferences.ToolEntries = ownSettings.Preferences.ToolEntries;
-        }
-        else
-        {
-            newSettings = ownSettings;
         }
 
         if ((flags & ExportImportFlags.ColumnizerMasks) == ExportImportFlags.ColumnizerMasks)
@@ -909,12 +932,14 @@ public class ConfigManager : IConfigManager
     }
 
     /// <summary>
-    /// Checks if settings object appears to be empty or default.
-    /// This helps detect corrupted or uninitialized settings files.
+    /// Checks if settings object appears to be empty or default, considering the import flags.
+    /// For full imports, all sections are checked. For partial imports, only relevant sections are validated.
+    /// This helps detect corrupted files while allowing legitimate partial imports.
     /// </summary>
     /// <param name="settings">Settings object to validate</param>
-    /// <returns>True if settings appear empty/default, false if they contain user data</returns>
-    private static bool SettingsAreEmptyOrDefault (Settings settings)
+    /// <param name="importFlags">Flags indicating which sections are being imported</param>
+    /// <returns>True if the relevant settings sections appear empty/default, false if they contain user data</returns>
+    private static bool SettingsAreEmptyOrDefault (Settings settings, ExportImportFlags importFlags)
     {
         if (settings == null)
         {
@@ -926,17 +951,79 @@ public class ConfigManager : IConfigManager
             return true;
         }
 
-        var filterCount = settings.FilterList?.Count ?? 0;
-        var historyCount = settings.FileHistoryList?.Count ?? 0;
-        var searchHistoryCount = settings.SearchHistoryList?.Count ?? 0;
-        var highlightCount = settings.Preferences.HighlightGroupList?.Count ?? 0;
-        var columnizerMaskCount = settings.Preferences.ColumnizerMaskList?.Count ?? 0;
+        // For full imports or when no specific flags are set, check all sections
+        if (importFlags is ExportImportFlags.All or ExportImportFlags.None)
+        {
+            var filterCount = settings.FilterList?.Count ?? 0;
+            var historyCount = settings.FileHistoryList?.Count ?? 0;
+            var searchHistoryCount = settings.SearchHistoryList?.Count ?? 0;
+            var highlightCount = settings.Preferences.HighlightGroupList?.Count ?? 0;
+            var columnizerMaskCount = settings.Preferences.ColumnizerMaskList?.Count ?? 0;
 
-        return filterCount == 0 &&
-               historyCount == 0 &&
-               searchHistoryCount == 0 &&
-               highlightCount == 0 &&
-               columnizerMaskCount == 0;
+            return filterCount == 0 &&
+                   historyCount == 0 &&
+                   searchHistoryCount == 0 &&
+                   highlightCount == 0 &&
+                   columnizerMaskCount == 0;
+        }
+
+        // For partial imports, check only the sections being imported
+        // At least one relevant section must have data for the import to be valid
+        bool hasAnyRelevantData = false;
+
+        // Check HighlightSettings flag
+        if (importFlags.HasFlag(ExportImportFlags.HighlightSettings))
+        {
+            var highlightCount = settings.Preferences.HighlightGroupList?.Count ?? 0;
+            if (highlightCount > 0)
+            {
+                hasAnyRelevantData = true;
+            }
+        }
+
+        // Check ColumnizerMasks flag
+        if (importFlags.HasFlag(ExportImportFlags.ColumnizerMasks))
+        {
+            var columnizerMaskCount = settings.Preferences.ColumnizerMaskList?.Count ?? 0;
+            if (columnizerMaskCount > 0)
+            {
+                hasAnyRelevantData = true;
+            }
+        }
+
+        // Check HighlightMasks flag
+        if (importFlags.HasFlag(ExportImportFlags.HighlightMasks))
+        {
+            var highlightMaskCount = settings.Preferences.HighlightMaskList?.Count ?? 0;
+            if (highlightMaskCount > 0)
+            {
+                hasAnyRelevantData = true;
+            }
+        }
+
+        // Check ToolEntries flag
+        if (importFlags.HasFlag(ExportImportFlags.ToolEntries))
+        {
+            var toolEntriesCount = settings.Preferences.ToolEntries?.Count ?? 0;
+            if (toolEntriesCount > 0)
+            {
+                hasAnyRelevantData = true;
+            }
+        }
+
+        // Check Other flag (preferences/settings that don't fall into specific categories)
+        if (importFlags.HasFlag(ExportImportFlags.Other))
+        {
+            // For 'Other', we consider the settings valid if Preferences object exists
+            // This covers font settings, colors, and other preference data
+            if (settings.Preferences != null)
+            {
+                hasAnyRelevantData = true;
+            }
+        }
+
+        // Return true (isEmpty) if no relevant data was found in any checked section
+        return !hasAnyRelevantData;
     }
 
     /// <summary>
@@ -959,11 +1046,12 @@ public class ConfigManager : IConfigManager
             return false;
         }
 
-        if (SettingsAreEmptyOrDefault(settings))
+        // For save operations, always validate all sections (use ExportImportFlags.All)
+        if (SettingsAreEmptyOrDefault(settings, ExportImportFlags.All))
         {
             _logger.Warn("Settings appear to be empty - this may indicate data loss");
 
-            if (_settings != null && !SettingsAreEmptyOrDefault(_settings))
+            if (_settings != null && !SettingsAreEmptyOrDefault(_settings, ExportImportFlags.All))
             {
                 _logger.Warn($"Previous settings: " +
                     $"Filters={_settings.FilterList?.Count ?? 0}, " +
