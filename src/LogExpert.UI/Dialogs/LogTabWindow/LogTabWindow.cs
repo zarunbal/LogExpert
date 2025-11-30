@@ -2814,6 +2814,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnLogTabWindowActivated (object sender, EventArgs e)
     {
+        LogExpertProxy?.NotifyWindowActivated(this);
         CurrentLogWindow?.AppFocusGained();
     }
 

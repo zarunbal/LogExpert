@@ -19,6 +19,8 @@ internal class LogExpertProxy : ILogExpertProxy
 
     [NonSerialized] private ILogTabWindow _firstLogTabWindow;
 
+    [NonSerialized] private ILogTabWindow _mostRecentActiveWindow; // ⭐ PHASE 2: Track most recently activated window
+
     [NonSerialized] private int _logWindowIndex = 1;
 
     #endregion
@@ -59,9 +61,22 @@ internal class LogExpertProxy : ILogExpertProxy
 
     public void LoadFiles (string[] fileNames)
     {
-        var logWin = _windowList[^1];
+        // Use most recently ACTIVATED window, fallback to most recently created
+        var logWin = _mostRecentActiveWindow ?? _windowList[^1];
+        _logger.Info($"Loading files in {(_mostRecentActiveWindow != null ? "most recently activated" : "most recently created")} window");
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
         logWin.LoadFiles(fileNames);
+    }
+
+    /// <summary>
+    /// Notifies the proxy that a window has been activated by the user.
+    /// This is used to track which window should receive new files when "Allow Only One Instance" is enabled.
+    /// </summary>
+    /// <param name="window">The window that was activated</param>
+    public void NotifyWindowActivated (ILogTabWindow window)
+    {
+        _mostRecentActiveWindow = window;
+        _logger.Debug($"Most recent active window updated: {window}");
     }
 
     [SupportedOSPlatform("windows")]
@@ -93,17 +108,23 @@ internal class LogExpertProxy : ILogExpertProxy
     [SupportedOSPlatform("windows")]
     public void NewWindowOrLockedWindow (string[] fileNames)
     {
+        // Lock Instance has priority
+        // Check for locked window first
         foreach (var logWin in _windowList)
         {
             if (AbstractLogTabWindow.StaticData.CurrentLockedMainWindow == logWin)
             {
+                _logger.Info("Loading files in locked window");
                 _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
                 logWin.LoadFiles(fileNames);
                 return;
             }
         }
-        // No locked window was found --> create a new one
-        NewWindow(fileNames);
+
+        // No locked window found
+        // Load in most recent window (not new window)
+        _logger.Info("No locked window, loading files in most recent window");
+        LoadFiles(fileNames); // Uses most recent window
     }
 
     [SupportedOSPlatform("windows")]

@@ -13,7 +13,6 @@ using LogExpert.Classes.CommandLine;
 using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
-using LogExpert.Dialogs;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions.LogWindow;
 
@@ -137,6 +136,7 @@ internal static class Program
                 {
                     var counter = 3;
                     Exception errMsg = null;
+                    bool ipcSucceeded = false;
 
                     var settings = ConfigManager.Instance.Settings;
                     while (counter > 0)
@@ -146,6 +146,7 @@ internal static class Program
                             var wi = WindowsIdentity.GetCurrent();
                             var command = SerializeCommandIntoNonFormattedJSON(absoluteFilePaths, settings.Preferences.AllowOnlyOneInstance);
                             SendCommandToServer(command);
+                            ipcSucceeded = true;
                             break;
                         }
                         catch (Exception ex) when (ex is ArgumentNullException
@@ -157,7 +158,6 @@ internal static class Program
                             errMsg = ex;
                             counter--;
 
-                            // Use Task.Delay instead of Thread.Sleep for non-blocking wait
                             if (counter > 0)
                             {
                                 Task.Delay(500).Wait();
@@ -165,21 +165,28 @@ internal static class Program
                         }
                     }
 
-                    if (counter == 0)
+                    // Handle IPC failure
+                    if (!ipcSucceeded)
                     {
                         _logger.Error($"IpcClientChannel error, giving up: {errMsg}");
-                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.LogExpert_Common_UI_Title_LogExpert);
-                    }
 
-                    //Dont create a new separated instance of LogExpert if the settings allows only one instance
-                    if (settings.Preferences.AllowOnlyOneInstance && settings.Preferences.ShowErrorMessageAllowOnlyOneInstances)
+                        // Show error, then create new instance (fallback)
+                        _ = MessageBox.Show(
+                            string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg),
+                            Resources.LogExpert_Common_UI_Title_LogExpert,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+
+                        _logger.Warn("IPC failed, creating new instance as fallback");
+                        // Fall through to create new instance
+                    }
+                    else
                     {
-                        AllowOnlyOneInstanceErrorDialog a = new();
-                        if (a.ShowDialog() == DialogResult.OK)
-                        {
-                            settings.Preferences.ShowErrorMessageAllowOnlyOneInstances = !a.DoNotShowThisMessageAgain;
-                            ConfigManager.Instance.Save(SettingsFlags.All);
-                        }
+                        // IPC succeeded - exit this instance
+                        _logger.Info("Files sent to existing instance via IPC, exiting");
+                        mutex.Close();
+                        cts.Cancel();
+                        return;
                     }
                 }
 
