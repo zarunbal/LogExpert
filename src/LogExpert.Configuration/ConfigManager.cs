@@ -196,7 +196,7 @@ public class ConfigManager : IConfigManager
             // Handle any critical errors from loading
             if (loadResult.CriticalFailure)
             {
-                return ImportResult.Failed("Import Failed", $"Import file is invalid or corrupted:\n\n{loadResult.CriticalMessage}\n\nImport cancelled.");
+                return ImportResult.Failed("Import Failed", $"Import file is invalid or corrupted:\n\n{loadResult.CriticalMessage}\n\nImport canceled.");
             }
 
             importedSettings = loadResult.Settings;
@@ -205,7 +205,7 @@ public class ConfigManager : IConfigManager
                                          JsonSerializationException)
         {
             _logger.Error($"Import file is invalid or corrupted: {ex}");
-            return ImportResult.Failed("Import Failed", $"Import file is invalid or corrupted:\n\n{ex.Message}\n\nImport cancelled.");
+            return ImportResult.Failed("Import Failed", $"Import file is invalid or corrupted:\n\n{ex.Message}\n\nImport canceled.");
         }
 
         if (SettingsAreEmptyOrDefault(importedSettings))
@@ -228,8 +228,8 @@ public class ConfigManager : IConfigManager
             $"History={importedSettings.FileHistoryList?.Count ?? 0}, " +
             $"Highlights={importedSettings.Preferences?.HighlightGroupList?.Count ?? 0}");
 
-        // Proceed with import
-        Instance._settings = Instance.Import(Instance._settings, fileInfo, importFlags);
+        // Proceed with import - Use Settings property to ensure _settings is initialized
+        _settings = Instance.Import(Instance.Settings, fileInfo, importFlags);
         Save(SettingsFlags.All);
 
         _logger.Info("Import completed successfully");
