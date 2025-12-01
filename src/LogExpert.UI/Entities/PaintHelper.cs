@@ -78,7 +78,7 @@ internal static class PaintHelper
                             Alignment = StringAlignment.Center
                         };
 
-                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
+                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
                         using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
                     }
