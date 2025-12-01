@@ -6,6 +6,8 @@ using System.Runtime.Versioning;
 //using System.Windows.Forms;
 using System.Xml;
 
+using ColumnizerLib;
+
 using Newtonsoft.Json;
 
 //See Logexpert Help Eminus Plugin for more information

@@ -64,4 +64,49 @@
   <data name="RegexColumnizerConfigDialog_UI_Button_Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="RegexColumnizer_Description" xml:space="preserve">
+    <value>Spalten werden durch reguläre Ausdrücke mit dem Namen Capture-Gruppen gefüllt</value>
+  </data>
+  <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Das Konfigurationsverzeichnis darf nicht null oder leer sein</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Name des Columnizers darf nicht null oder leer sein</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Error" xml:space="preserve">
+    <value>Konfigurationsfehler</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Warning" xml:space="preserve">
+    <value>Konfigurationswarnung</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Deserialize" xml:space="preserve">
+    <value>Deserialisieren</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_RegexTimeout" xml:space="preserve">
+    <value>Regex-Muster kann Leistungsprobleme verursachen: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_InvalidRegexPattern" xml:space="preserve">
+    <value>Ungültiges Regex-Muster: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_FailedToSaveConfiguration" xml:space="preserve">
+    <value>Konfiguration konnte nicht gespeichert werden: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory" xml:space="preserve">
+    <value>Konfigurationsverzeichnis konnte nicht erstellt werden: {0}</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNotAllowed" xml:space="preserve">
+    <value>Der Columnizer-Name „{0}“ enthält Pfadtrennzeichen, die nicht zulässig sind</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters" xml:space="preserve">
+    <value>Der Columnizer-Name „{0}“ enthält ungültige Dateinamenzeichen</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhichAreNotAllowed" xml:space="preserve">
+    <value>Der Columnizer-Name „{0}“ enthält Pfaddurchlaufmuster, die nicht zulässig sind</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Error_Title" xml:space="preserve">
+    <value>Konfiguration des Regex-Columnizers</value>
+  </data>
+  <data name="RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex" xml:space="preserve">
+    <value>Ungültige Regex!{0}{1}</value>
+  </data>
 </root>

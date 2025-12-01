@@ -6,6 +6,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
+    <AssemblyTitle>Log4jXmlColumnizer</AssemblyTitle>
+    <RootNamespace>Log4jXmlColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,9 +26,9 @@
     <EmbeddedResource Update="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>Log4jXmlColumnizer</CustomToolNamespace>
+      <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    
+
     <EmbeddedResource Update="Resources.de.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
@@ -38,5 +40,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Log4jXmlColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

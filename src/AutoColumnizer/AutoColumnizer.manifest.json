@@ -1,0 +1,19 @@
+{
+  "name": "AutoColumnizer",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Automatically detects and applies the appropriate columnizer for any log file format",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.20.0",
+    "dotnet": "10.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "config:read"
+  ],
+  "dependencies": {},
+  "main": "AutoColumnizer.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

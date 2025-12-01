@@ -15,12 +15,10 @@ internal partial class TimeSpreadingControl : UserControl
 
     private Bitmap _bitmap = new(1, 1);
     private int _displayHeight = 1;
-    private readonly int _edgeOffset = (int)NativeMethods.GetSystemMetricsForDpi(NativeMethods.SM_CYVSCROLL);
+    private readonly int _edgeOffset = Vanara.PInvoke.User32.GetSystemMetricsForDpi(Vanara.PInvoke.User32.SystemMetric.SM_CYVSCROLL, NativeMethods.SM_CYVSCROLL);
     private int _lastMouseY;
-    private readonly object _monitor = new();
+    private readonly Lock _monitor = new();
     private int _rectHeight = 1;
-
-    private TimeSpreadCalculator _timeSpreadCalc;
     private readonly ToolTip _toolTip;
 
     #endregion
@@ -65,13 +63,13 @@ internal partial class TimeSpreadingControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     internal TimeSpreadCalculator TimeSpreadCalc
     {
-        get => _timeSpreadCalc;
+        get;
         set
         {
             //timeSpreadCalc.CalcDone -= timeSpreadCalc_CalcDone;
-            _timeSpreadCalc = value;
-            _timeSpreadCalc.CalcDone += OnTimeSpreadCalcCalcDone;
-            _timeSpreadCalc.StartCalc += OnTimeSpreadCalcStartCalc;
+            field = value;
+            field.CalcDone += OnTimeSpreadCalcCalcDone;
+            field.StartCalc += OnTimeSpreadCalcStartCalc;
         }
     }
 
@@ -135,7 +133,7 @@ internal partial class TimeSpreadingControl : UserControl
             return;
         }
 
-        _timeSpreadCalc.Contrast += (_lastMouseY - e.Y) * 5;
+        TimeSpreadCalc.Contrast += (_lastMouseY - e.Y) * 5;
         _lastMouseY = e.Y;
     }
 

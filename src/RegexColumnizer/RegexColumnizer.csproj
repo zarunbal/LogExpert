@@ -6,6 +6,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
+    <AssemblyTitle>RegexColumnizer</AssemblyTitle>
+    <RootNamespace>RegexColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +19,7 @@
     <EmbeddedResource Update="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>RegexColumnizer</CustomToolNamespace>
+      <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
     
     <EmbeddedResource Update="Resources.de.resx">
@@ -31,6 +33,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="RegexColumnizer.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

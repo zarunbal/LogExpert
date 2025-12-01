@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 ///<summary>
 ///This is a callback interface. Some of the ILogLineColumnizer functions

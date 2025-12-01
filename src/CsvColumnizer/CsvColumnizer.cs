@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
+using System.Security;
+
+using ColumnizerLib;
 
 using CsvHelper;
-
-using LogExpert;
 
 using Newtonsoft.Json;
 
@@ -64,12 +61,10 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
             return null; // hide from LogExpert
         }
 
-        if (_config.CommentChar != ' ' && logLine.StartsWith("" + _config.CommentChar))
-        {
-            return null;
-        }
-
-        return logLine;
+        return _config.CommentChar != ' ' &&
+               logLine.StartsWith("" + _config.CommentChar, StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : logLine;
     }
 
     public string GetName ()
@@ -77,9 +72,14 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         return "CSV Columnizer";
     }
 
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
     public string GetDescription ()
     {
-        return "Splits CSV files into columns.\r\n\r\nCredits:\r\nThis Columnizer uses the CsvHelper. https://github.com/JoshClose/CsvHelper. \r\n";
+        return Resources.CsvColumnizer_Description;
     }
 
     public int GetColumnCount ()
@@ -108,12 +108,9 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        if (_isValidCsv)
-        {
-            return SplitCsvLine(line);
-        }
-
-        return CreateColumnizedLogLine(line);
+        return _isValidCsv
+            ? SplitCsvLine(line)
+            : CreateColumnizedLogLine(line);
     }
 
     private static ColumnizedLogLine CreateColumnizedLogLine (ILogLine line)
@@ -122,6 +119,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         {
             LogLine = line
         };
+
         cLogLine.ColumnValues = [new Column { FullValue = line.FullLine, Parent = cLogLine }];
         return cLogLine;
     }
@@ -156,13 +154,15 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         if (_isValidCsv) // see PreProcessLine()
         {
             _columnList.Clear();
-            var line = _config.HasFieldNames ? _firstLine : callback.GetLogLine(0);
+            var line = _config.HasFieldNames
+                ? _firstLine
+                : callback.GetLogLine(0);
 
             if (line != null)
             {
                 using CsvReader csv = new(new StringReader(line.FullLine), _config.ReaderConfiguration);
-                csv.Read();
-                csv.ReadHeader();
+                _ = csv.Read();
+                _ = csv.ReadHeader();
 
                 var fieldCount = csv.Parser.Count;
 
@@ -216,7 +216,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     public void LoadConfig (string configDir)
     {
-        var configPath = Path.Combine(configDir, CONFIGFILENAME);
+        var configPath = Path.Join(configDir, CONFIGFILENAME);
 
         if (!File.Exists(configPath))
         {
@@ -230,9 +230,18 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
                 _config = JsonConvert.DeserializeObject<CsvColumnizerConfig>(File.ReadAllText(configPath));
                 _config.ConfigureReaderConfiguration();
             }
-            catch (Exception e)
+            catch (Exception ex) when (ex is JsonException or
+                                             ArgumentException or
+                                             ArgumentNullException or
+                                             PathTooLongException or
+                                             DirectoryNotFoundException or
+                                             IOException or
+                                             UnauthorizedAccessException or
+                                             FileNotFoundException or
+                                             NotSupportedException or
+                                             SecurityException)
             {
-                MessageBox.Show($"Error while deserializing config data: {e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.CsvColumnizer_UI_Message_ErrorWhileDeserializing, ex.Message), Resources.CsvColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 _config = new CsvColumnizerConfig();
                 _config.InitDefaults();
             }
@@ -255,7 +264,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
     #region Private Methods
 
-    private IColumnizedLogLine SplitCsvLine (ILogLine line)
+    private ColumnizedLogLine SplitCsvLine (ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -263,8 +272,8 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         };
 
         using CsvReader csv = new(new StringReader(line.FullLine), _config.ReaderConfiguration);
-        csv.Read();
-        csv.ReadHeader();
+        _ = csv.Read();
+        _ = csv.ReadHeader();
 
         //we only read line by line and not the whole file so it is always the header
         var records = csv.HeaderRecord;
@@ -278,7 +287,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
                 columns.Add(new Column { FullValue = record, Parent = cLogLine });
             }
 
-            cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
         }
 
         return cLogLine;

@@ -1,27 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
 
     <IsTestProject>true</IsTestProject>
-    
-    
+    <AssemblyTitle>ColumnizerLib.Tests</AssemblyTitle>
+    <Company>Microsoft</Company>
     <OutputPath>bin\$(Configuration)</OutputPath>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>LogExpert.ColumnizerLib.Tests</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup>
-    
-  </PropertyGroup>
-  <PropertyGroup>
-    
-    <AssemblyTitle>RegexColumnizer.UnitTests</AssemblyTitle>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\RegexColumnizer\RegexColumnizer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

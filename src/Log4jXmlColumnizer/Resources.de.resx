@@ -65,4 +65,7 @@
   <data name="Log4jXmlColumnizerConfigDlg_UI_Button_Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="Log4jXmlColumnizer_UI_Title_Deserialize" xml:space="preserve">
+    <value>Deserialisieren</value>
+  </data>
 </root>

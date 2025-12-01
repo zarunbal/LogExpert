@@ -29,11 +29,14 @@ partial class SettingsDialog
     private void InitializeComponent ()
     {
         components = new System.ComponentModel.Container();
+        var resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
         tabControlSettings = new TabControl();
         tabPageViewSettings = new TabPage();
         labelWarningMaximumLineLength = new Label();
         upDownMaximumLineLength = new NumericUpDown();
         labelMaximumLineLength = new Label();
+        upDownMaxDisplayLength = new NumericUpDown();
+        labelMaxDisplayLength = new Label();
         upDownMaximumFilterEntriesDisplayed = new NumericUpDown();
         labelMaximumFilterEntriesDisplayed = new Label();
         upDownMaximumFilterEntries = new NumericUpDown();
@@ -158,6 +161,7 @@ partial class SettingsDialog
         tabControlSettings.SuspendLayout();
         tabPageViewSettings.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)upDownMaxDisplayLength).BeginInit();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntriesDisplayed).BeginInit();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntries).BeginInit();
         groupBoxMisc.SuspendLayout();
@@ -216,6 +220,8 @@ partial class SettingsDialog
         tabPageViewSettings.Controls.Add(labelWarningMaximumLineLength);
         tabPageViewSettings.Controls.Add(upDownMaximumLineLength);
         tabPageViewSettings.Controls.Add(labelMaximumLineLength);
+        tabPageViewSettings.Controls.Add(upDownMaxDisplayLength);
+        tabPageViewSettings.Controls.Add(labelMaxDisplayLength);
         tabPageViewSettings.Controls.Add(upDownMaximumFilterEntriesDisplayed);
         tabPageViewSettings.Controls.Add(labelMaximumFilterEntriesDisplayed);
         tabPageViewSettings.Controls.Add(upDownMaximumFilterEntries);
@@ -237,7 +243,7 @@ partial class SettingsDialog
         // labelWarningMaximumLineLength
         // 
         labelWarningMaximumLineLength.AutoSize = true;
-        labelWarningMaximumLineLength.Location = new Point(446, 118);
+        labelWarningMaximumLineLength.Location = new Point(446, 101);
         labelWarningMaximumLineLength.Name = "labelWarningMaximumLineLength";
         labelWarningMaximumLineLength.Size = new Size(483, 15);
         labelWarningMaximumLineLength.TabIndex = 16;
@@ -245,7 +251,7 @@ partial class SettingsDialog
         // 
         // upDownMaximumLineLength
         // 
-        upDownMaximumLineLength.Location = new Point(762, 138);
+        upDownMaximumLineLength.Location = new Point(762, 121);
         upDownMaximumLineLength.Margin = new Padding(4, 5, 4, 5);
         upDownMaximumLineLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
         upDownMaximumLineLength.Minimum = new decimal(new int[] { 20000, 0, 0, 0 });
@@ -253,20 +259,43 @@ partial class SettingsDialog
         upDownMaximumLineLength.Size = new Size(106, 23);
         upDownMaximumLineLength.TabIndex = 15;
         upDownMaximumLineLength.Value = new decimal(new int[] { 20000, 0, 0, 0 });
+        upDownMaximumLineLength.ValueChanged += OnUpDownMaximumLineLengthValueChanged;
         // 
         // labelMaximumLineLength
         // 
         labelMaximumLineLength.AutoSize = true;
-        labelMaximumLineLength.Location = new Point(467, 140);
+        labelMaximumLineLength.Location = new Point(467, 123);
         labelMaximumLineLength.Margin = new Padding(4, 0, 4, 0);
         labelMaximumLineLength.Name = "labelMaximumLineLength";
         labelMaximumLineLength.Size = new Size(218, 15);
         labelMaximumLineLength.TabIndex = 14;
         labelMaximumLineLength.Text = "Maximum Line Length (restart required)";
         // 
+        // upDownMaxDisplayLength
+        // 
+        upDownMaxDisplayLength.Location = new Point(762, 149);
+        upDownMaxDisplayLength.Margin = new Padding(4, 5, 4, 5);
+        upDownMaxDisplayLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+        upDownMaxDisplayLength.Minimum = new decimal(new int[] { 1000, 0, 0, 0 });
+        upDownMaxDisplayLength.Name = "upDownMaxDisplayLength";
+        upDownMaxDisplayLength.Size = new Size(106, 23);
+        upDownMaxDisplayLength.TabIndex = 18;
+        upDownMaxDisplayLength.Value = new decimal(new int[] { 20000, 0, 0, 0 });
+        upDownMaxDisplayLength.ValueChanged += OnUpDownMaxDisplayLengthValueChanged;
+        // 
+        // labelMaxDisplayLength
+        // 
+        labelMaxDisplayLength.AutoSize = true;
+        labelMaxDisplayLength.Location = new Point(467, 151);
+        labelMaxDisplayLength.Margin = new Padding(4, 0, 4, 0);
+        labelMaxDisplayLength.Name = "labelMaxDisplayLength";
+        labelMaxDisplayLength.Size = new Size(234, 15);
+        labelMaxDisplayLength.TabIndex = 17;
+        labelMaxDisplayLength.Text = "Maximum Display Length (restart required)";
+        // 
         // upDownMaximumFilterEntriesDisplayed
         // 
-        upDownMaximumFilterEntriesDisplayed.Location = new Point(762, 86);
+        upDownMaximumFilterEntriesDisplayed.Location = new Point(762, 69);
         upDownMaximumFilterEntriesDisplayed.Margin = new Padding(4, 5, 4, 5);
         upDownMaximumFilterEntriesDisplayed.Maximum = new decimal(new int[] { 30, 0, 0, 0 });
         upDownMaximumFilterEntriesDisplayed.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
@@ -278,7 +307,7 @@ partial class SettingsDialog
         // labelMaximumFilterEntriesDisplayed
         // 
         labelMaximumFilterEntriesDisplayed.AutoSize = true;
-        labelMaximumFilterEntriesDisplayed.Location = new Point(467, 88);
+        labelMaximumFilterEntriesDisplayed.Location = new Point(467, 71);
         labelMaximumFilterEntriesDisplayed.Margin = new Padding(4, 0, 4, 0);
         labelMaximumFilterEntriesDisplayed.Name = "labelMaximumFilterEntriesDisplayed";
         labelMaximumFilterEntriesDisplayed.Size = new Size(180, 15);
@@ -287,7 +316,7 @@ partial class SettingsDialog
         // 
         // upDownMaximumFilterEntries
         // 
-        upDownMaximumFilterEntries.Location = new Point(762, 59);
+        upDownMaximumFilterEntries.Location = new Point(762, 42);
         upDownMaximumFilterEntries.Margin = new Padding(4, 5, 4, 5);
         upDownMaximumFilterEntries.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
         upDownMaximumFilterEntries.Name = "upDownMaximumFilterEntries";
@@ -298,7 +327,7 @@ partial class SettingsDialog
         // labelMaximumFilterEntries
         // 
         labelMaximumFilterEntries.AutoSize = true;
-        labelMaximumFilterEntries.Location = new Point(467, 61);
+        labelMaximumFilterEntries.Location = new Point(467, 44);
         labelMaximumFilterEntries.Margin = new Padding(4, 0, 4, 0);
         labelMaximumFilterEntries.Name = "labelMaximumFilterEntries";
         labelMaximumFilterEntries.Size = new Size(127, 15);
@@ -308,7 +337,7 @@ partial class SettingsDialog
         // labelDefaultEncoding
         // 
         labelDefaultEncoding.AutoSize = true;
-        labelDefaultEncoding.Location = new Point(467, 34);
+        labelDefaultEncoding.Location = new Point(467, 17);
         labelDefaultEncoding.Margin = new Padding(4, 0, 4, 0);
         labelDefaultEncoding.Name = "labelDefaultEncoding";
         labelDefaultEncoding.Size = new Size(98, 15);
@@ -319,7 +348,7 @@ partial class SettingsDialog
         // 
         comboBoxEncoding.DropDownStyle = ComboBoxStyle.DropDownList;
         comboBoxEncoding.FormattingEnabled = true;
-        comboBoxEncoding.Location = new Point(691, 26);
+        comboBoxEncoding.Location = new Point(691, 9);
         comboBoxEncoding.Margin = new Padding(4, 5, 4, 5);
         comboBoxEncoding.Name = "comboBoxEncoding";
         comboBoxEncoding.Size = new Size(177, 23);
@@ -813,6 +842,7 @@ partial class SettingsDialog
         listBoxTools.Name = "listBoxTools";
         listBoxTools.Size = new Size(406, 148);
         listBoxTools.TabIndex = 0;
+        listBoxTools.DisplayMember = "Name";
         listBoxTools.SelectedIndexChanged += OnListBoxToolSelectedIndexChanged;
         // 
         // groupBoxToolSettings
@@ -881,7 +911,7 @@ partial class SettingsDialog
         buttonIcon.Text = "   Icon...";
         buttonIcon.TextImageRelation = TextImageRelation.ImageBeforeText;
         buttonIcon.UseVisualStyleBackColor = true;
-        buttonIcon.Click += OnBtnIconClick;
+        buttonIcon.Click += OnBtnToolIconClick;
         // 
         // labelToolName
         // 
@@ -1275,7 +1305,6 @@ partial class SettingsDialog
         listBoxPlugin.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         listBoxPlugin.DisplayMember = "Text";
         listBoxPlugin.FormattingEnabled = true;
-        listBoxPlugin.ItemHeight = 15;
         listBoxPlugin.Location = new Point(9, 29);
         listBoxPlugin.Margin = new Padding(4, 5, 4, 5);
         listBoxPlugin.Name = "listBoxPlugin";
@@ -1671,6 +1700,7 @@ partial class SettingsDialog
         tabPageViewSettings.ResumeLayout(false);
         tabPageViewSettings.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).EndInit();
+        ((System.ComponentModel.ISupportInitialize)upDownMaxDisplayLength).EndInit();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntriesDisplayed).EndInit();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntries).EndInit();
         groupBoxMisc.ResumeLayout(false);
@@ -1847,6 +1877,8 @@ partial class SettingsDialog
     private System.Windows.Forms.NumericUpDown upDownMaximumLineLength;
     private System.Windows.Forms.Label labelMaximumLineLength;
     private System.Windows.Forms.Label labelWarningMaximumLineLength;
+    private System.Windows.Forms.NumericUpDown upDownMaxDisplayLength;
+    private System.Windows.Forms.Label labelMaxDisplayLength;
     private Label labelLanguage;
     private ComboBox comboBoxLanguage;
 }

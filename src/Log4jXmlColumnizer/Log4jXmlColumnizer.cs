@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
+
+using ColumnizerLib;
 
 using LogExpert;
 
@@ -21,8 +18,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
     public const int COLUMN_COUNT = 9;
     protected const string DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss.fff";
 
-    private static readonly XmlConfig xmlConfig = new();
-    private const char separatorChar = '\xFFFD';
+    private static readonly XmlConfig _xmlConfig = new();
+    private const char SEPARATOR_CHAR = '\xFFFD';
     private readonly char[] trimChars = ['\xFFFD'];
     private Log4jXmlColumnizerConfig _config;
     private readonly CultureInfo _cultureInfo = new("de-DE");
@@ -43,14 +40,14 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public IXmlLogConfiguration GetXmlLogConfiguration ()
     {
-        return xmlConfig;
+        return _xmlConfig;
     }
 
     public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
     {
         Log4JLogLine line = new()
         {
-            FullLine = logLine.FullLine.Replace(separatorChar, '|'),
+            FullLine = logLine.FullLine.Replace(SEPARATOR_CHAR, '|'),
             LineNumber = logLine.LineNumber
         };
 
@@ -61,6 +58,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
     {
         return "Log4j XML";
     }
+
+    public string GetCustomName () => GetName();
 
     public string GetDescription ()
     {
@@ -79,8 +78,10 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        ColumnizedLogLine clogLine = new();
-        clogLine.LogLine = line;
+        ColumnizedLogLine clogLine = new()
+        {
+            LogLine = line
+        };
 
         var columns = Column.CreateColumns(COLUMN_COUNT, clogLine);
 
@@ -101,10 +102,12 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                     columns[8].FullValue = line.FullLine;
                 }
 
-                var newDate = dateTime.ToString(DATETIME_FORMAT);
+                var newDate = dateTime.ToString(DATETIME_FORMAT, CultureInfo.InvariantCulture);
                 columns[0].FullValue = newDate;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             FormatException or
+                                             ArgumentOutOfRangeException)
             {
                 columns[0].FullValue = "n/a";
             }
@@ -116,14 +119,14 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
             if (cols.Length != COLUMN_COUNT)
             {
-                columns[0].FullValue = "";
-                columns[1].FullValue = "";
-                columns[2].FullValue = "";
-                columns[3].FullValue = "";
-                columns[4].FullValue = "";
-                columns[5].FullValue = "";
-                columns[6].FullValue = "";
-                columns[7].FullValue = "";
+                columns[0].FullValue = string.Empty;
+                columns[1].FullValue = string.Empty;
+                columns[2].FullValue = string.Empty;
+                columns[3].FullValue = string.Empty;
+                columns[4].FullValue = string.Empty;
+                columns[5].FullValue = string.Empty;
+                columns[6].FullValue = string.Empty;
+                columns[7].FullValue = string.Empty;
                 columns[8].FullValue = line.FullLine;
             }
             else
@@ -139,12 +142,10 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
         var filteredColumns = MapColumns(columns);
 
-        clogLine.ColumnValues = filteredColumns.Select(a => a as IColumn).ToArray();
-
+        clogLine.ColumnValues = [.. filteredColumns.Select(a => a as IColumn)];
 
         return clogLine;
     }
-
 
     public bool IsTimeshiftImplemented ()
     {
@@ -168,14 +169,14 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
             return DateTime.MinValue;
         }
 
-        var endIndex = line.FullLine.IndexOf(separatorChar, 1);
+        var endIndex = line.FullLine.IndexOf(SEPARATOR_CHAR, 1);
 
-        if (endIndex > 20 || endIndex < 0)
+        if (endIndex is > 20 or < 0)
         {
             return DateTime.MinValue;
         }
 
-        var value = line.FullLine.Substring(0, endIndex);
+        var value = line.FullLine[..endIndex];
 
         try
         {
@@ -198,7 +199,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 return DateTime.MinValue;
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }
@@ -238,9 +240,9 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public void LoadConfig (string configDir)
     {
-        var configPath = configDir + Path.DirectorySeparatorChar + "log4jxmlcolumnizer.json";
+        var configPath = Path.Join(configDir, "log4jxmlcolumnizer.json");
 
-        FileInfo fileInfo = new(configDir + Path.DirectorySeparatorChar + "log4jxmlcolumnizer.json");
+        FileInfo fileInfo = new(configPath);
 
         if (!File.Exists(configPath))
         {
@@ -250,7 +252,8 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         {
             try
             {
-                _config = JsonConvert.DeserializeObject<Log4jXmlColumnizerConfig>(File.ReadAllText($"{fileInfo.FullName}"));
+                _config = JsonConvert.DeserializeObject<Log4jXmlColumnizerConfig>(File.ReadAllText(fileInfo.FullName));
+
                 if (_config.ColumnList.Count < COLUMN_COUNT)
                 {
                     _config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
@@ -258,7 +261,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
             }
             catch (SerializationException e)
             {
-                MessageBox.Show(e.Message, "Deserialize");
+                _ = MessageBox.Show(e.Message, Resources.Log4jXmlColumnizer_UI_Title_Deserialize);
                 _config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
             }
         }
@@ -279,7 +282,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     #region Private Methods
 
-    private string[] GetAllColumnNames () => ["Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"];
+    private static string[] GetAllColumnNames () => ["Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"];
 
     /// <summary>
     /// Returns only the columns which are "active". The order of the columns depends on the column order in the config
@@ -305,7 +308,6 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
             index++;
         }
-
 
         return [.. output];
     }

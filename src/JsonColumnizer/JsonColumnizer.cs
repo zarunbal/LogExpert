@@ -1,4 +1,4 @@
-using LogExpert;
+using ColumnizerLib;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -106,7 +106,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
         columns.Last().FullValue = line.FullLine;
 
-        cLogLine.ColumnValues = columns.Select(a => (IColumn)a).ToArray();
+        cLogLine.ColumnValues = [.. columns.Select(a => (IColumn)a)];
 
         return cLogLine;
     }
@@ -212,6 +212,11 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         cLogLine.ColumnValues = [.. returnColumns];
 
         return cLogLine;
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     #endregion

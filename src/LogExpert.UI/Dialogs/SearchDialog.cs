@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
-using System.Text.RegularExpressions;
 
 using LogExpert.Core.Helpers;
 using LogExpert.Entities;
@@ -137,7 +136,7 @@ internal partial class SearchDialog : Form
                 // Use RegexHelper for safer validation with timeout protection
                 if (!RegexHelper.IsValidPattern(comboBoxSearchFor.Text, out var error))
                 {
-                    throw new ArgumentException($"Invalid regex pattern: {error}");
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.SearchDialog_UI_Error_InvalidRegexPattern, error));
                 }
             }
 

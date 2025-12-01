@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 
-using LogExpert;
+using ColumnizerLib;
 
 [assembly: SupportedOSPlatform("windows")]
 namespace FlashIconHighlighter;

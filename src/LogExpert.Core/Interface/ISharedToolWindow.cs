@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Config;
 
 namespace LogExpert.Core.Interface;

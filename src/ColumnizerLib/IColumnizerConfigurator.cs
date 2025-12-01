@@ -1,5 +1,4 @@
-﻿
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// A Columnizer can implement this interface if it has to show an own settings dialog to the user.

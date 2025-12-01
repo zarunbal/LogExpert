@@ -29,6 +29,13 @@ public interface ILogExpertProxy
     /// <param name="logWin"></param>
     void WindowClosed(ILogTabWindow logWin);
 
+    /// <summary>
+    /// Notifies the proxy that a window has been activated by the user.
+    /// Used to track which window should receive new files when "Allow Only One Instance" is enabled.
+    /// </summary>
+    /// <param name="window">The window that was activated</param>
+    void NotifyWindowActivated(ILogTabWindow window);
+
     int GetLogWindowCount();
 
     #endregion

@@ -1,4 +1,6 @@
-﻿namespace LogExpert.Core.EventArguments;
+using ColumnizerLib;
+
+namespace LogExpert.Core.EventArguments;
 
 public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineColumnizer columnizer,
     ILogExpertCallback callback) : System.EventArgs

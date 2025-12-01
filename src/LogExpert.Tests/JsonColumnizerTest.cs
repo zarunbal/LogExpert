@@ -12,20 +12,20 @@ public class JsonColumnizerTest
     public void GetColumnNames_HappyFile_ColumnNameMatches (string fileName, string expectedHeaders)
     {
         var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var line = reader.GetLogLine(0);
         if (line != null)
         {
-            jsonColumnizer.SplitLine(null, line);
+            _ = jsonColumnizer.SplitLine(null, line);
         }
 
         line = reader.GetLogLine(1);
         if (line != null)
         {
-            jsonColumnizer.SplitLine(null, line);
+            _ = jsonColumnizer.SplitLine(null, line);
         }
 
         var columnHeaders = jsonColumnizer.GetColumnNames();

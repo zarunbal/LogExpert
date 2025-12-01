@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Interface;
 
 namespace LogExpert.Dialogs;
@@ -32,6 +34,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
         ConfigManager = configManager;
 
         filterComboBox.SelectedIndexChanged += OnFilterComboBoxSelectedIndexChanged;
+        filterComboBox.Format += OnFilterComboBoxFormat;
 
         // for the currently selected columnizer use the current instance and not the template instance from
         // columnizer registry. This ensures that changes made in columnizer config dialogs
@@ -85,6 +88,14 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     #region Events handler
 
+    private void OnFilterComboBoxFormat (object sender, ListControlConvertEventArgs e)
+    {
+        if (e.ListItem is ILogLineColumnizer columnizer)
+        {
+            e.Value = columnizer.GetName();
+        }
+    }
+
     private void OnFilterComboBoxSelectedIndexChanged (object sender, EventArgs e)
     {
         var col = _columnizerList[filterComboBox.SelectedIndex];
@@ -100,8 +111,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
         configButton.Enabled = SelectedColumnizer is IColumnizerConfigurator;
     }
 
-
-    //TODO: Check if this logic can be remoed from this class and remove all the config manager instances from here.
+    //TODO: Check if this logic can be removed from this class and remove all the config manager instances from here.
     private void OnConfigButtonClick (object sender, EventArgs e)
     {
         if (SelectedColumnizer is IColumnizerConfigurator configurator)

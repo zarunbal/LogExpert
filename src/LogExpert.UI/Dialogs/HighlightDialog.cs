@@ -4,6 +4,8 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Helpers;
@@ -598,6 +600,8 @@ internal partial class HighlightDialog : Form
             comboBox.CustomColor = colorDialog.Color;
             comboBox.SelectedIndex = 0;
         }
+
+        colorDialog.Dispose();
     }
 
     private void Dirty ()

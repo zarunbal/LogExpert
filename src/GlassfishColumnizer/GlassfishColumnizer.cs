@@ -1,8 +1,6 @@
-using System;
 using System.Globalization;
-using System.Linq;
 
-using LogExpert;
+using ColumnizerLib;
 
 namespace GlassfishColumnizer;
 
@@ -13,9 +11,9 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
     public const int COLUMN_COUNT = 2;
     private const string DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.fffzzzz";
     private const string DATETIME_FORMAT_OUT = "yyyy-MM-dd HH:mm:ss.fff";
-    private const char separatorChar = '|';
+    private const char SEPARATOR_CHAR = '|';
 
-    private static readonly XmlConfig xmlConfig = new();
+    private static readonly XmlConfig _xmlConfig = new();
 
     private readonly char[] trimChars = ['|'];
     private readonly CultureInfo cultureInfo = new("en-US");
@@ -35,14 +33,14 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public IXmlLogConfiguration GetXmlLogConfiguration ()
     {
-        return xmlConfig;
+        return _xmlConfig;
     }
 
     public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
     {
         GlassFishLogLine line = new()
         {
-            FullLine = logLine.FullLine.Replace(separatorChar, '|'),
+            FullLine = logLine.FullLine.Replace(SEPARATOR_CHAR, '|'),
             LineNumber = logLine.LineNumber
         };
 
@@ -51,7 +49,12 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public string GetName ()
     {
-        return "Classfish";
+        return "Glassfish";
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     public string GetDescription ()
@@ -71,21 +74,23 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
 
     public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        ColumnizedLogLine cLogLine = new();
-        cLogLine.LogLine = line;
+        ColumnizedLogLine cLogLine = new()
+        {
+            LogLine = line
+        };
 
         var temp = line.FullLine;
 
         var columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
-        cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
 
         // delete '[#|' and '|#]'
-        if (temp.StartsWith("[#|"))
+        if (temp.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[3..];
         }
 
-        if (temp.EndsWith("|#]"))
+        if (temp.EndsWith("|#]", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[..^3];
         }
@@ -106,10 +111,12 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
                     columns[1].FullValue = temp;
                 }
 
-                var newDate = dateTime.ToString(DATETIME_FORMAT_OUT);
+                var newDate = dateTime.ToString(DATETIME_FORMAT_OUT, CultureInfo.InvariantCulture);
                 columns[0].FullValue = newDate;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentException or
+                                             FormatException or
+                                             ArgumentOutOfRangeException)
             {
                 columns[0].FullValue = "n/a";
             }
@@ -154,12 +161,12 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         var temp = logLine.FullLine;
 
         // delete '[#|' and '|#]'
-        if (temp.StartsWith("[#|"))
+        if (temp.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[3..];
         }
 
-        if (temp.EndsWith("|#]"))
+        if (temp.EndsWith("|#]", StringComparison.OrdinalIgnoreCase))
         {
             temp = temp[..^3];
         }
@@ -169,8 +176,8 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
             return DateTime.MinValue;
         }
 
-        var endIndex = temp.IndexOf(separatorChar, 1);
-        if (endIndex > 28 || endIndex < 0)
+        var endIndex = temp.IndexOf(SEPARATOR_CHAR, 1);
+        if (endIndex is > 28 or < 0)
         {
             return DateTime.MinValue;
         }
@@ -180,14 +187,13 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         try
         {
             // convert glassfish timestamp into a readable format:
-            if (DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out var timestamp))
-            {
-                return timestamp.AddMilliseconds(timeOffset);
-            }
-
-            return DateTime.MinValue;
+            return DateTime.TryParseExact(value, DATETIME_FORMAT, cultureInfo, DateTimeStyles.None, out var timestamp)
+                ? timestamp.AddMilliseconds(timeOffset)
+                : DateTime.MinValue;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }

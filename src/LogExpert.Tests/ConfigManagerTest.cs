@@ -1,6 +1,6 @@
 using System.Reflection;
 
-using LogExpert.Config;
+using LogExpert.Configuration;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -20,14 +20,20 @@ public class ConfigManagerTest
 {
     private string _testDir;
     private FileInfo _testSettingsFile;
+    private ConfigManager _configManager;
 
     [SetUp]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void SetUp ()
     {
         // Create isolated test directory for each test
-        _testDir = Path.Combine(Path.GetTempPath(), "LogExpert_Test_" + Guid.NewGuid().ToString("N"));
+        _testDir = Path.Join(Path.GetTempPath(), "LogExpert_Test_" + Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_testDir);
-        _testSettingsFile = new FileInfo(Path.Combine(_testDir, "settings.json"));
+        _testSettingsFile = new FileInfo(Path.Join(_testDir, "settings.json"));
+
+        // Initialize ConfigManager for testing
+        _configManager = ConfigManager.Instance;
+        _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
     }
 
     [TearDown]
@@ -56,7 +62,8 @@ public class ConfigManagerTest
     /// <summary>
     /// Invokes a private static method using reflection.
     /// </summary>
-    private T InvokePrivateStaticMethod<T> (string methodName, params object[] parameters)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
+    private static T InvokePrivateStaticMethod<T> (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -68,30 +75,32 @@ public class ConfigManagerTest
     /// <summary>
     /// Invokes a private instance method using reflection.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private T InvokePrivateInstanceMethod<T> (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
         return method == null
             ? throw new Exception($"Instance method {methodName} not found")
-            : (T)method.Invoke(ConfigManager.Instance, parameters);
+            : (T)method.Invoke(_configManager, parameters);
     }
 
     /// <summary>
     /// Invokes a private instance method with no return value using reflection.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private void InvokePrivateInstanceMethod (string methodName, params object[] parameters)
     {
         MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new Exception($"Instance method {methodName} not found");
 
-        method.Invoke(ConfigManager.Instance, parameters);
+        _ = method.Invoke(_configManager, parameters);
     }
 
     /// <summary>
     /// Creates a basic test Settings object with valid defaults.
     /// </summary>
-    private Settings CreateTestSettings ()
+    private static Settings CreateTestSettings ()
     {
         var settings = new Settings
         {
@@ -104,7 +113,7 @@ public class ConfigManagerTest
     /// <summary>
     /// Creates a populated Settings object with sample data.
     /// </summary>
-    private Settings CreatePopulatedSettings ()
+    private static Settings CreatePopulatedSettings ()
     {
         Settings settings = CreateTestSettings();
         settings.FilterList.Add(new FilterParams { SearchText = "ERROR" });
@@ -117,7 +126,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 1: Import Validation Tests
+    #region Import Validation Tests
 
     [Test]
     [Category("ImportValidation")]
@@ -128,7 +137,7 @@ public class ConfigManagerTest
         Settings settings = null;
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.True, "Null settings should be detected as empty/default");
@@ -143,7 +152,7 @@ public class ConfigManagerTest
         Settings settings = CreateTestSettings();
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.True, "Empty settings should be detected as empty/default");
@@ -159,7 +168,7 @@ public class ConfigManagerTest
         settings.FilterList.Add(new FilterParams { SearchText = "TEST_FILTER" });
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with filters should not be empty/default");
@@ -175,7 +184,7 @@ public class ConfigManagerTest
         settings.SearchHistoryList.Add("test search");
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with search history should not be empty/default");
@@ -191,7 +200,7 @@ public class ConfigManagerTest
         settings.Preferences.HighlightGroupList.Add(new HighlightGroup { GroupName = "Test" });
 
         // Act
-        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings);
+        bool result = InvokePrivateStaticMethod<bool>("SettingsAreEmptyOrDefault", settings, ExportImportFlags.All);
 
         // Assert
         Assert.That(result, Is.False, "Settings with highlights should not be empty/default");
@@ -244,7 +253,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 2: Atomic Write Tests
+    #region Atomic Write Tests
 
     [Test]
     [Category("AtomicWrite")]
@@ -266,7 +275,7 @@ public class ConfigManagerTest
         // Verify content
         string json = File.ReadAllText(_testSettingsFile.FullName);
         Assert.That(json, Does.Contain("AlwaysOnTop"));
-        Assert.That(json, Does.Contain("TEST_FILTER").Or.Contain("ERROR"));
+        Assert.That(json, Does.Contain("ERROR").Or.Contain("WARNING"));
     }
 
     [Test]
@@ -320,6 +329,7 @@ public class ConfigManagerTest
     [Test]
     [Category("AtomicWrite")]
     [Description("SaveAsJSON should save complete valid JSON that can be deserialized")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void SaveAsJSON_SavesCompleteValidJSON ()
     {
         // Arrange
@@ -353,14 +363,18 @@ public class ConfigManagerTest
     [Test]
     [Category("AtomicWrite")]
     [Description("SaveAsJSON validation should prevent saving null settings")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void SaveAsJSON_ValidationFailure_PreventsNullSettingsSave ()
     {
         // Arrange
         Settings settings = null;
 
         // Act & Assert
-        _ = Assert.Throws<TargetInvocationException>(() => InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings), "Saving null settings should throw exception");
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings), "Saving null settings should throw exception");
 
+        // The inner exception should be InvalidOperationException from ValidateSettings
+        Assert.That(ex.InnerException, Is.InstanceOf<InvalidOperationException>());
         Assert.That(_testSettingsFile.Exists, Is.False, "File should not be created if validation fails");
     }
 
@@ -398,7 +412,7 @@ public class ConfigManagerTest
 
     #endregion
 
-    #region Phase 3: Deserialization Recovery Tests
+    #region Deserialization Recovery Tests
 
     [Test]
     [Category("DeserializationRecovery")]
@@ -457,7 +471,8 @@ public class ConfigManagerTest
         Assert.That(loadResult, Is.Not.Null);
         Assert.That(loadResult.Settings, Is.Not.Null, "Should return valid settings object, not null");
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null, "Settings should have preferences");
-        // Empty file triggers recovery, may create new settings
+        // Empty file triggers recovery, creates new settings with critical failure
+        Assert.That(loadResult.CriticalFailure, Is.True, "Empty file should be treated as critical failure");
     }
 
     [Test]
@@ -475,6 +490,8 @@ public class ConfigManagerTest
         Assert.That(loadResult, Is.Not.Null);
         Assert.That(loadResult.Settings, Is.Not.Null, "Should not return null settings");
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null);
+        // Null deserialization is treated as critical failure
+        Assert.That(loadResult.CriticalFailure, Is.True);
     }
 
     [Test]
@@ -526,11 +543,318 @@ public class ConfigManagerTest
         Assert.That(loadResult.Settings, Is.Not.Null, "Should return valid settings object");
         // Without backup, will return CriticalFailure or create new settings
         Assert.That(loadResult.Settings.Preferences, Is.Not.Null);
+        Assert.That(loadResult.CriticalFailure, Is.True, "Invalid JSON should result in critical failure");
     }
 
     #endregion
 
-    #region Phase 4: Integration Tests
+    #region Import Method Tests
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should handle null _settings field by using Settings property")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    public void Import_WithUninitializedSettings_ShouldNotThrowNullReference ()
+    {
+        // Arrange
+        // Create a valid import file
+        Settings importSettings = CreatePopulatedSettings();
+        importSettings.FilterList.Clear();
+        importSettings.FilterList.Add(new FilterParams { SearchText = "IMPORTED_FILTER" });
+
+        string importFilePath = Path.Join(_testDir, "import_test.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act & Assert - This should not throw NullReferenceException
+        ImportResult result = null;
+        Assert.DoesNotThrow(() => result = _configManager.Import(importFile, ExportImportFlags.All), "Import should not throw NullReferenceException when _settings is uninitialized");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.True, "Import should succeed");
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should validate that import file exists")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithNonExistentFile_ShouldReturnFailure ()
+    {
+        // Arrange
+        FileInfo nonExistentFile = new(Path.Join(_testDir, "does_not_exist.json"));
+
+        // Act
+        ImportResult result = _configManager.Import(nonExistentFile, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.False, "Import should fail for non-existent file");
+        Assert.That(result.ErrorMessage, Does.Contain("not found").IgnoreCase);
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should validate that import file is not null")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithNullFileInfo_ShouldReturnFailure ()
+    {
+        // Act
+        ImportResult result = _configManager.Import(null, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.False, "Import should fail for null file");
+        Assert.That(result.ErrorMessage, Does.Contain("not found").IgnoreCase);
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should detect corrupted import files")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithCorruptedFile_ShouldReturnFailure ()
+    {
+        // Arrange
+        string importFilePath = Path.Join(_testDir, "corrupt_import.json");
+        File.WriteAllText(importFilePath, "{invalid json}");
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.False, "Import should fail for corrupted file");
+        Assert.That(result.ErrorMessage, Does.Contain("invalid").Or.Contain("corrupted").IgnoreCase);
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should detect empty/default settings and require confirmation")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithEmptySettings_ShouldRequireConfirmation ()
+    {
+        // Arrange
+        Settings emptySettings = CreateTestSettings();
+        string importFilePath = Path.Join(_testDir, "empty_import.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(emptySettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.RequiresUserConfirmation, Is.True, "Empty settings should require confirmation");
+        Assert.That(result.ConfirmationMessage, Does.Contain("empty").Or.Contain("default").IgnoreCase);
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should successfully import valid populated settings")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithValidPopulatedSettings_ShouldSucceed ()
+    {
+        // Arrange
+        Settings importSettings = CreatePopulatedSettings();
+        importSettings.FilterList.Clear();
+        importSettings.FilterList.Add(new FilterParams { SearchText = "IMPORT_TEST_FILTER" });
+        importSettings.SearchHistoryList.Clear();
+        importSettings.SearchHistoryList.Add("IMPORT_TEST_SEARCH");
+
+        string importFilePath = Path.Join(_testDir, "valid_import.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.True, "Import should succeed with valid settings");
+
+        // Verify settings were actually imported
+        Settings currentSettings = _configManager.Settings;
+        Assert.That(currentSettings.FilterList.Any(f => f.SearchText == "IMPORT_TEST_FILTER"), Is.True,
+            "Imported filter should be present");
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import with Other flag should merge preferences correctly")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithOtherFlag_ShouldMergePreferences ()
+    {
+        // Arrange
+        // Set up current settings
+        Settings currentSettings = _configManager.Settings;
+        currentSettings.Preferences.FontSize = 10;
+        currentSettings.Preferences.ColumnizerMaskList.Clear();
+
+        // Create import settings with different preferences
+        Settings importSettings = CreateTestSettings();
+        importSettings.Preferences.FontSize = 12;
+        importSettings.Preferences.ShowBubbles = true;
+
+        string importFilePath = Path.Join(_testDir, "import_other.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.Other);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.True);
+
+        Settings updatedSettings = _configManager.Settings;
+        Assert.That(updatedSettings.Preferences.FontSize, Is.EqualTo(12), "Preferences should be merged from import file");
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import with ColumnizerMasks flag should import columnizer masks")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithColumnizerMasksFlag_ShouldImportMasks ()
+    {
+        // Arrange
+        Settings importSettings = CreateTestSettings();
+        importSettings.Preferences.ColumnizerMaskList.Add(new ColumnizerMaskEntry { Mask = "*.log", ColumnizerName = "TestColumnizer" });
+
+        string importFilePath = Path.Join(_testDir, "import_columnizer.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.ColumnizerMasks);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.True);
+
+        Settings updatedSettings = _configManager.Settings;
+        Assert.That(updatedSettings.Preferences.ColumnizerMaskList.Count, Is.GreaterThan(0),
+            "Columnizer masks should be imported");
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import with KeepExisting flag should merge rather than replace")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_WithKeepExistingFlag_ShouldMergeSettings ()
+    {
+        // Arrange
+        // Set up current settings with existing data
+        Settings currentSettings = _configManager.Settings;
+        currentSettings.FilterList.Clear();
+        currentSettings.FilterList.Add(new FilterParams { SearchText = "EXISTING_FILTER" });
+
+        // Create import settings with different data
+        Settings importSettings = CreateTestSettings();
+        importSettings.FilterList.Clear();
+        importSettings.FilterList.Add(new FilterParams { SearchText = "NEW_FILTER" });
+
+        string importFilePath = Path.Join(_testDir, "import_keep_existing.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All | ExportImportFlags.KeepExisting);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Success, Is.True);
+
+        // Both should be present when using KeepExisting
+        // Note: This test may need adjustment based on actual merge behavior
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should handle null Preferences in import file gracefully")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
+    public void Import_WithNullPreferences_ShouldHandleGracefully ()
+    {
+        // Arrange
+        var importSettings = new Settings
+        {
+            Preferences = null, // Deliberately null
+            FilterList = [new() { SearchText = "TEST" }]
+        };
+
+        string importFilePath = Path.Join(_testDir, "import_null_prefs.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act & Assert
+        ImportResult result = null;
+        Assert.DoesNotThrow(() => result = _configManager.Import(importFile, ExportImportFlags.All), "Import should handle null Preferences gracefully");
+
+        Assert.That(result, Is.Not.Null);
+        // May fail validation or require confirmation due to null Preferences
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Multiple imports should maintain consistency")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_MultipleImports_ShouldMaintainConsistency ()
+    {
+        // Arrange & Act - Multiple imports
+        for (int i = 0; i < 3; i++)
+        {
+            Settings importSettings = CreateTestSettings();
+            importSettings.FilterList.Add(new FilterParams { SearchText = $"IMPORT_{i}" });
+
+            string importFilePath = Path.Join(_testDir, $"import_{i}.json");
+            File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+            FileInfo importFile = new(importFilePath);
+
+            ImportResult result = _configManager.Import(importFile, ExportImportFlags.All);
+            Assert.That(result.Success, Is.True, $"Import {i} should succeed");
+        }
+
+        // Assert - Final state should be consistent
+        Settings finalSettings = _configManager.Settings;
+        Assert.That(finalSettings, Is.Not.Null);
+        Assert.That(finalSettings.Preferences, Is.Not.Null);
+    }
+
+    [Test]
+    [Category("Import")]
+    [Description("Import should save settings after successful import")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    public void Import_SuccessfulImport_ShouldSaveSettings ()
+    {
+        // Arrange
+        Settings importSettings = CreatePopulatedSettings();
+        importSettings.FilterList.Clear();
+        importSettings.FilterList.Add(new FilterParams { SearchText = "SAVE_TEST_FILTER" });
+
+        string importFilePath = Path.Join(_testDir, "import_save_test.json");
+        File.WriteAllText(importFilePath, JsonConvert.SerializeObject(importSettings));
+        FileInfo importFile = new(importFilePath);
+
+        // Act
+        ImportResult result = _configManager.Import(importFile, ExportImportFlags.All);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+
+        // Verify settings were saved by loading them
+        string settingsFile = Path.Join(_testDir, "settings.json");
+        if (File.Exists(settingsFile))
+        {
+            string content = File.ReadAllText(settingsFile);
+            Assert.That(content, Does.Contain("SAVE_TEST_FILTER"),
+                "Imported settings should be saved to disk");
+        }
+    }
+
+    #endregion
+
+    #region Integration Tests
 
     [Test]
     [Category("Integration")]

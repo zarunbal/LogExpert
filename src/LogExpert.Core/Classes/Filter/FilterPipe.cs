@@ -1,5 +1,8 @@
 using System.Globalization;
 using System.Text;
+
+using ColumnizerLib;
+
 using LogExpert.Core.Interface;
 using NLog;
 

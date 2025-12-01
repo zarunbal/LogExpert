@@ -1,4 +1,4 @@
-namespace LogExpert.Extensions;
+namespace ColumnizerLib.Extensions;
 
 //TODO: Move this to LogExpert.UI, change to internal and fix tests
 public static class LogLineExtensions

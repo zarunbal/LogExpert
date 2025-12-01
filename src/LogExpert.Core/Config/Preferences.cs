@@ -12,9 +12,41 @@ public class Preferences
 
     public bool PortableMode { get; set; }
 
+    /// <summary>
+    /// OBSOLETE: This setting is no longer used. It was originally intended to show an error dialog when "Allow Only One Instance" was enabled,
+    /// but this behavior was incorrect (showed dialog on success instead of failure). The feature now works silently on success and only shows
+    /// a warning on IPC failure. This property is kept for backward compatibility with old settings files but is no longer used or saved.
+    /// Will be removed in a future version.
+    /// </summary>
+    [Obsolete("This setting is no longer used and will be removed in a future version. The 'Allow Only One Instance' feature now works silently.")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
 
+    /// <summary>
+    /// Maximum length of lines that can be read from log files at the reader level.
+    /// Lines exceeding this length will be truncated during file reading operations.
+    /// This setting protects against memory issues and performance degradation from extremely long lines.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This property controls line truncation at the I/O reader level before lines are processed by columnizers.
+    /// It is implemented in <see cref="Classes.Log.PositionAwareStreamReaderSystem"/>
+    /// and <see cref="Classes.Log.PositionAwareStreamReaderLegacy"/>.
+    /// </para>
+    /// <para>
+    /// Related property: <see cref="MaxDisplayLength"/> controls display-level truncation in UI columns,
+    /// which must not exceed this value. Default is 20000 characters.
+    /// </para>
+    /// </remarks>
     public int MaxLineLength { get; set; } = 20000;
+
+    /// <summary>
+    /// Maximum length of text displayed in columns before truncation with "...".
+    /// This is separate from <see cref="MaxLineLength"/> which controls reader-level line reading.
+    /// Must not exceed <see cref="MaxLineLength"/>. Default is 20000 characters.
+    /// </summary>
+    public int MaxDisplayLength { get; set; } = 20000;
 
     public bool AllowOnlyOneInstance { get; set; }
 
@@ -91,7 +123,7 @@ public class Preferences
 
     public List<ColumnizerMaskEntry> ColumnizerMaskList { get; set; } = [];
 
-    public string DefaultEncoding { get; set; }
+    public string DefaultEncoding { get; set; } = "utf-8";
 
     public string DefaultLanguage { get; set; } = "en-US";
 

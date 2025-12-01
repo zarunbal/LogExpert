@@ -39,7 +39,7 @@ namespace CsvColumnizer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LogExpert.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CsvColumnizer.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,36 @@ namespace CsvColumnizer {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Splits CSV files into columns.
+        ///
+        ///Credits:
+        ///This Columnizer uses the CsvHelper. https://github.com/JoshClose/CsvHelper..
+        /// </summary>
+        public static string CsvColumnizer_Description {
+            get {
+                return ResourceManager.GetString("CsvColumnizer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while deserializing config data: {0}.
+        /// </summary>
+        public static string CsvColumnizer_UI_Message_ErrorWhileDeserializing {
+            get {
+                return ResourceManager.GetString("CsvColumnizer_UI_Message_ErrorWhileDeserializing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string CsvColumnizer_UI_Title_Error {
+            get {
+                return ResourceManager.GetString("CsvColumnizer_UI_Title_Error", resourceCulture);
             }
         }
         

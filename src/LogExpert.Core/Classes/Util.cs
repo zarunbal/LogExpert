@@ -3,6 +3,8 @@ using System.Drawing;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Filter;
 
 namespace LogExpert.Core.Classes;

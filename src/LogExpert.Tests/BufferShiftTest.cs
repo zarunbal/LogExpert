@@ -23,7 +23,6 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         Cleanup();
     }
 
-
     [Test]
     public void TestShiftBuffers1 ()
     {
@@ -41,21 +40,21 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             Encoding = Encoding.Default
         };
 
-        PluginRegistry.PluginRegistry.Instance.Create(TestDirectory.FullName, 500);
-        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, false, PluginRegistry.PluginRegistry.Instance);
+        _ = PluginRegistry.PluginRegistry.Create(TestDirectory.FullName, 500);
+        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, false, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var lil = reader.GetLogFileInfoList();
         Assert.That(lil.Count, Is.EqualTo(files.Count));
 
         var enumerator = files.GetEnumerator();
-        enumerator.MoveNext();
+        _ = enumerator.MoveNext();
 
         foreach (var li in lil.Cast<LogFileInfo>())
         {
             var fileName = enumerator.Current;
             Assert.That(li.FullName, Is.EqualTo(fileName));
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
         var oldCount = lil.Count;
@@ -66,7 +65,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
         // Simulate rollover detection
         //
-        reader.ShiftBuffers();
+        _ = reader.ShiftBuffers();
 
         lil = reader.GetLogFileInfoList();
 
@@ -78,20 +77,20 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         //
         Assert.That(lil.Count, Is.EqualTo(files.Count));
         enumerator = files.GetEnumerator();
-        enumerator.MoveNext();
+        _ = enumerator.MoveNext();
 
-        foreach (LogFileInfo li in lil)
+        foreach (LogFileInfo li in lil.Cast<LogFileInfo>())
         {
             var fileName = enumerator.Current;
             Assert.That(li.FullName, Is.EqualTo(fileName));
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
         // Check if file buffers have correct files. Assuming here that one buffer fits for a
         // complete file
         //
         enumerator = files.GetEnumerator();
-        enumerator.MoveNext();
+        _ = enumerator.MoveNext();
 
         var logBuffers = reader.GetBufferList();
         var startLine = 0;
@@ -101,14 +100,14 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             Assert.That(enumerator.Current, Is.EqualTo(logBuffer.FileInfo.FullName));
             Assert.That(logBuffer.StartLine, Is.EqualTo(startLine));
             startLine += 10;
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
         // Checking file content
         //
         enumerator = files.GetEnumerator();
-        enumerator.MoveNext();
-        enumerator.MoveNext(); // move to 2nd entry. The first file now contains 2nd file's content (because rollover)
+        _ = enumerator.MoveNext();
+        _ = enumerator.MoveNext(); // move to 2nd entry. The first file now contains 2nd file's content (because rollover)
         logBuffers = reader.GetBufferList();
         int i;
 
@@ -117,10 +116,10 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineOfBlock(0);
             Assert.That(line.FullLine.Contains(enumerator.Current, StringComparison.Ordinal));
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
-        enumerator.MoveNext();
+        _ = enumerator.MoveNext();
         // the last 2 files now contain the content of the previously watched file
         for (; i < logBuffers.Count; ++i)
         {
@@ -137,7 +136,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
         // Simulate rollover detection
         //
-        reader.ShiftBuffers();
+        _ = reader.ShiftBuffers();
         lil = reader.GetLogFileInfoList();
 
         Assert.That(lil.Count, Is.EqualTo(oldCount)); // same count because oldest file is deleted

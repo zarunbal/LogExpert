@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
 using LogExpert.Dialogs;

@@ -1407,6 +1407,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Save.
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_Save {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deserialize.
         /// </summary>
         public static string LogExpert_Common_UI_Title_Deserialize {
@@ -1626,11 +1635,31 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Main Menu.
+        /// </summary>
+        public static string LogTabWindow_UI_MenuStrip_MainMenu {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_MenuStrip_MainMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to menuStrip1.
         /// </summary>
         public static string LogTabWindow_UI_MenuStrip_mainMenuStrip {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_MenuStrip_mainMenuStrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin trust configuration updated.
+        ///
+        ///Restart LogExpert to apply changes?.
+        /// </summary>
+        public static string LogTabWindow_UI_Message_PluginTrustConfigurationUpdate {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_PluginTrustConfigurationUpdate", resourceCulture);
             }
         }
         
@@ -1658,6 +1687,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart Recommended.
+        /// </summary>
+        public static string LogTabWindow_UI_Title_RestartRecommended {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Title_RestartRecommended", resourceCulture);
             }
         }
         
@@ -1925,18 +1963,18 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Debug.
         /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem {
+        public static string LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem {
             get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem", resourceCulture);
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Debug.
         /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1 {
+        public static string LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem {
             get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem1", resourceCulture);
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem", resourceCulture);
             }
         }
         
@@ -2310,6 +2348,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Plugin &amp;Trust Management....
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Throw exception (background thread).
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem {
@@ -2470,6 +2517,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage trusted plugins and view plugin hashes.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement", resourceCulture);
             }
         }
         
@@ -3867,6 +3923,405 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Close.
+        /// </summary>
+        public static string PluginHashDialog_UI_Button_Close {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Button_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Copy.
+        /// </summary>
+        public static string PluginHashDialog_UI_Button_Copy {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Button_Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SHA256 Hash:.
+        /// </summary>
+        public static string PluginHashDialog_UI_Label_Hash {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Label_Hash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin: {0}.
+        /// </summary>
+        public static string PluginHashDialog_UI_Label_PluginName {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Label_PluginName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to copy hash: {0}.
+        /// </summary>
+        public static string PluginHashDialog_UI_Message_CopyError {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Message_CopyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash copied to clipboard..
+        /// </summary>
+        public static string PluginHashDialog_UI_Message_CopySuccess {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Message_CopySuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string PluginHashDialog_UI_Message_ErrorTitle {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Message_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string PluginHashDialog_UI_Message_SuccessTitle {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Message_SuccessTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin Hash.
+        /// </summary>
+        public static string PluginHashDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("PluginHashDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load plugin assembly (timeout or error).
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed validation (not trusted or invalid manifest).
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading plugin assembly.
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validating plugin security and manifest.
+        /// </summary>
+        public static string PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest {
+            get {
+                return ResourceManager.GetString("PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Add Plugin....
+        /// </summary>
+        public static string PluginTrustDialog_UI_Button_AddPlugin {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Button_AddPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Remove.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Button_Remove {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Button_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;View Hash....
+        /// </summary>
+        public static string PluginTrustDialog_UI_Button_ViewHash {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Button_ViewHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash (Partial).
+        /// </summary>
+        public static string PluginTrustDialog_UI_Column_HashPartial {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Column_HashPartial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash Verified.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Column_HashVerified {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Column_HashVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin Name.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Column_PluginName {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Column_PluginName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Column_Status {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Column_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin Files (*.dll)|*.dll|All Files (*.*)|*.*.
+        /// </summary>
+        public static string PluginTrustDialog_UI_FileDialog_Filter {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_FileDialog_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Plugin to Trust.
+        /// </summary>
+        public static string PluginTrustDialog_UI_FileDialog_Title {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_FileDialog_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trusted Plugins.
+        /// </summary>
+        public static string PluginTrustDialog_UI_GroupBox_TrustedPlugins {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_GroupBox_TrustedPlugins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total Plugins: {0}.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Label_TotalPlugins {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Label_TotalPlugins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin &apos;&apos;{0}&apos;&apos; is already in the trusted list..
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_AlreadyTrusted {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_AlreadyTrusted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Already Trusted.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_AlreadyTrustedTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_AlreadyTrustedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove trust for plugin:
+        ///
+        ///{0}
+        ///
+        ///The plugin will not be loaded until re-added to the trusted list.
+        ///
+        ///Continue?.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_ConfirmRemove {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_ConfirmRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm Removal.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_ConfirmRemoveTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_ConfirmRemoveTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trust plugin:
+        ///
+        ///Name: {0}
+        ///Path: {1}
+        ///Hash: {2}
+        ///
+        ///Do you want to trust this plugin?.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_ConfirmTrust {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_ConfirmTrust", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm Trust.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_ConfirmTrustTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_ConfirmTrustTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_ErrorTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading configuration: {0}.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_LoadError {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_LoadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No hash found for plugin: {0}.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_NoHash {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_NoHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Hash.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_NoHashTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_NoHashTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save configuration:`n`n{0}.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_SaveError {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_SaveError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin trust configuration saved successfully..
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_SaveSuccess {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_SaveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_SuccessTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_SuccessTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration has been modified. Discard changes?.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_UnsavedChanges {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_UnsavedChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsaved Changes.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Message_UnsavedChangesTitle {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Message_UnsavedChangesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugin Trust Management.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Value_No {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Value_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trusted.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Value_Trusted {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Value_Trusted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string PluginTrustDialog_UI_Value_Yes {
+            get {
+                return ResourceManager.GetString("PluginTrustDialog_UI_Value_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Pro_Filter {
@@ -4073,6 +4528,15 @@ namespace LogExpert {
         public static string SearchDialog_UI_Error_CreatingSearchParameter {
             get {
                 return ResourceManager.GetString("SearchDialog_UI_Error_CreatingSearchParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid regex pattern: {0}.
+        /// </summary>
+        public static string SearchDialog_UI_Error_InvalidRegexPattern {
+            get {
+                return ResourceManager.GetString("SearchDialog_UI_Error_InvalidRegexPattern", resourceCulture);
             }
         }
         

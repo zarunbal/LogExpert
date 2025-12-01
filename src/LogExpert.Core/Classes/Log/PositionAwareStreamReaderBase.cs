@@ -8,8 +8,6 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 {
     #region Fields
 
-    private const int MAX_LINE_LEN = 20000;
-
     private static readonly Encoding[] _preambleEncodings = [Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32];
 
     private readonly BufferedStream _stream;
@@ -24,9 +22,11 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     #region cTor
 
-    protected PositionAwareStreamReaderBase (Stream stream, EncodingOptions encodingOptions)
+    protected PositionAwareStreamReaderBase (Stream stream, EncodingOptions encodingOptions, int maximumLineLength)
     {
         _stream = new BufferedStream(stream);
+
+        MaximumLineLength = maximumLineLength;
 
         _preambleLength = DetectPreambleLengthAndEncoding(out var detectedEncoding);
 
@@ -61,7 +61,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
             _position = value; //  +Encoding.GetPreamble().Length;      // 1
             //stream.Seek(pos, SeekOrigin.Begin);     // 2
             //stream.Seek(pos + Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
-            _stream.Seek(_position + _preambleLength, SeekOrigin.Begin); // 4
+            _ = _stream.Seek(_position + _preambleLength, SeekOrigin.Begin); // 4
 
             ResetReader();
         }
@@ -71,8 +71,11 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     public sealed override bool IsBufferComplete => true;
 
-    //Refactor this needs to be given and should not be added like this
-    protected static int MaxLineLen => 500;//ConfigManager.Settings.Preferences.MaxLineLength;
+    protected static int MaximumLineLength
+    {
+        get => field;
+        private set => field = value;
+    }
 
     #endregion
 
@@ -89,7 +92,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
             _stream.Dispose();
             _reader.Dispose();
             IsDisposed = true;
-}
+        }
     }
 
     //TODO This is unsafe and should be refactored
@@ -188,21 +191,14 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         return 0;
     }
 
-    private Encoding GetUsedEncoding (EncodingOptions encodingOptions, Encoding detectedEncoding)
+    private static Encoding GetUsedEncoding (EncodingOptions encodingOptions, Encoding detectedEncoding)
     {
-        if (encodingOptions.Encoding != null)
-        {
-            return encodingOptions.Encoding;
-        }
-
-        if (detectedEncoding != null)
-        {
-            return detectedEncoding;
-        }
-
-        return encodingOptions.DefaultEncoding ?? Encoding.Default;
+        return encodingOptions.Encoding ??
+               detectedEncoding ??
+               encodingOptions.DefaultEncoding ??
+               Encoding.Default;
     }
-    private int GetPosIncPrecomputed (Encoding usedEncoding)
+    private static int GetPosIncPrecomputed (Encoding usedEncoding)
     {
         switch (usedEncoding)
         {

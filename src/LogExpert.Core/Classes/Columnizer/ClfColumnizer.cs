@@ -1,11 +1,14 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 namespace LogExpert.Core.Classes.Columnizer;
 
 public class ClfColumnizer : ILogLineColumnizer
 {
-    private const string DateTimeFormat = "dd/MMM/yyyy:HH:mm:ss zzz";
+    private const string DATE_TIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss zzz";
+
     #region Fields
 
     private readonly Regex _lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
@@ -57,10 +60,12 @@ public class ClfColumnizer : ILogLineColumnizer
 
         try
         {
-            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, DateTimeFormat, _cultureInfo);
+            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, DATE_TIME_FORMAT, _cultureInfo);
             return dateTime;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
         {
             return DateTime.MinValue;
         }
@@ -72,10 +77,8 @@ public class ClfColumnizer : ILogLineColumnizer
         {
             try
             {
-                var newDateTime =
-                    DateTime.ParseExact(value, DateTimeFormat, _cultureInfo);
-                var oldDateTime =
-                    DateTime.ParseExact(oldValue, DateTimeFormat, _cultureInfo);
+                var newDateTime = DateTime.ParseExact(value, DATE_TIME_FORMAT, _cultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue, DATE_TIME_FORMAT, _cultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 _timeOffset = (int)(mSecsNew - mSecsOld);
@@ -161,12 +164,14 @@ public class ClfColumnizer : ILogLineColumnizer
                     {
                         try
                         {
-                            var dateTime = DateTime.ParseExact(dateTimeStr, DateTimeFormat, _cultureInfo);
+                            var dateTime = DateTime.ParseExact(dateTimeStr, DATE_TIME_FORMAT, _cultureInfo);
                             dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
-                            var newDate = dateTime.ToString(DateTimeFormat, _cultureInfo);
+                            var newDate = dateTime.ToString(DATE_TIME_FORMAT, _cultureInfo);
                             columns[2].FullValue = newDate;
                         }
-                        catch (Exception)
+                        catch (Exception ex) when (ex is ArgumentException or
+                                                         FormatException or
+                                                         ArgumentOutOfRangeException)
                         {
                             columns[2].FullValue = "n/a";
                         }
@@ -188,6 +193,11 @@ public class ClfColumnizer : ILogLineColumnizer
         }
 
         return cLogLine;
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     #endregion

@@ -8,7 +8,7 @@ namespace LogExpert.Core.Classes.Log;
 /// UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be determined.
 /// Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
 /// </summary>
-public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
+public class PositionAwareStreamReaderSystem (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : PositionAwareStreamReaderBase(stream, encodingOptions, maximumLineLength)
 {
     #region Fields
 
@@ -23,16 +23,11 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
 
     #region cTor
 
-    public PositionAwareStreamReaderSystem(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
-    {
-
-    }
-
     #endregion
 
     #region Public methods
 
-    public override string ReadLine()
+    public override string ReadLine ()
     {
         var reader = GetStreamReader();
 
@@ -47,9 +42,9 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
         {
             MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
 
-            if (line.Length > MaxLineLen)
+            if (line.Length > MaximumLineLength)
             {
-                line = line.Remove(MaxLineLen);
+                line = line[..MaximumLineLength];
             }
         }
 
@@ -60,7 +55,7 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
 
     #region Private Methods
 
-    private int GuessNewLineSequenceLength(StreamReader reader)
+    private int GuessNewLineSequenceLength (StreamReader reader)
     {
         var currentPos = Position;
 

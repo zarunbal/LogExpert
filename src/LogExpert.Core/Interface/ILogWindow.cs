@@ -1,39 +1,237 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
 
 namespace LogExpert.Core.Interface;
 
-//TODO: Add documentation
+/// <summary>
+/// Represents a log window that displays and manages a log file in LogExpert.
+/// This interface provides access to log file content, timestamp operations, line selection,
+/// and persistence functionality.
+/// </summary>
+/// <remarks>
+/// This interface is primarily implemented by the LogWindow class in LogExpert.UI.
+/// It serves as an abstraction layer between the core functionality and the UI layer,
+/// allowing for loose coupling between components.
+/// </remarks>
 public interface ILogWindow
 {
+    /// <summary>
+    /// Gets the file name of the log file that contains the specified line number.
+    /// </summary>
+    /// <param name="lineNum">The zero-based line number.</param>
+    /// <returns>The file name (without path) of the log file containing the specified line.
+    /// In multi-file mode, this may return different file names for different line numbers.</returns>
+    /// <remarks>
+    /// This method is particularly useful in multi-file mode where multiple log files
+    /// are viewed together as one virtual file.
+    /// </remarks>
     string GetCurrentFileName (int lineNum);
 
+    /// <summary>
+    /// Gets the log line at the specified line number.
+    /// </summary>
+    /// <param name="lineNum">The zero-based line number to retrieve.</param>
+    /// <returns>
+    /// An <see cref="ILogLine"/> object containing the line content and metadata,
+    /// or <c>null</c> if the line number is out of range or the line cannot be retrieved.
+    /// </returns>
+    /// <remarks>
+    /// This method retrieves lines from the internal buffer cache and may trigger
+    /// disk reads if the line is not currently cached.
+    /// </remarks>
     ILogLine GetLine (int lineNum);
 
+    /// <summary>
+    /// Gets the log line at the specified line number asynchronously, with a timeout.
+    /// </summary>
+    /// <param name="lineNum">The zero-based line number to retrieve.</param>
+    /// <returns>
+    /// An <see cref="ILogLine"/> object containing the line content and metadata,
+    /// or <c>null</c> if the operation times out or the line cannot be retrieved.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// This method waits for up to 1 second for the line to be loaded. If the line
+    /// is not available within that time, it returns <c>null</c>. This prevents
+    /// the GUI thread from freezing when files are slow to load (e.g., from network shares
+    /// or when files have been deleted).
+    /// </para>
+    /// <para>
+    /// After detecting a timeout, the method enters a 'fast fail mode' where subsequent
+    /// calls return <c>null</c> immediately. A background operation checks if the issue
+    /// is resolved and exits fast fail mode when the file becomes accessible again.
+    /// </para>
+    /// </remarks>
     ILogLine GetLogLineWithWait (int lineNum);
 
+    /// <summary>
+    /// Gets the timestamp for the line at or after the specified line number,
+    /// searching forward through the file.
+    /// </summary>
+    /// <param name="lineNum">
+    /// A reference to the line number to start searching from.
+    /// This value is updated to the line number where the timestamp was found.
+    /// </param>
+    /// <param name="roundToSeconds">
+    /// If <c>true</c>, the returned timestamp is rounded to the nearest second.
+    /// </param>
+    /// <returns>
+    /// The timestamp of the line at or after the specified line number,
+    /// or <see cref="DateTime.MinValue"/> if no valid timestamp is found.
+    /// </returns>
+    /// <remarks>
+    /// Not all log lines may contain timestamps. This method searches forward
+    /// from the given line number until it finds a line with a valid timestamp.
+    /// The <paramref name="lineNum"/> parameter is updated to reflect the line
+    /// where the timestamp was found.
+    /// </remarks>
     //TODO Find a way to not use a referenced int (https://github.com/LogExperts/LogExpert/issues/404)
     DateTime GetTimestampForLineForward (ref int lineNum, bool roundToSeconds);
 
+    /// <summary>
+    /// Gets the timestamp for the line at or before the specified line number,
+    /// searching backward through the file.
+    /// </summary>
+    /// <param name="lastLineNum">
+    /// A reference to the line number to start searching from.
+    /// This value is updated to the line number where the timestamp was found.
+    /// </param>
+    /// <param name="roundToSeconds">
+    /// If <c>true</c>, the returned timestamp is rounded to the nearest second.
+    /// </param>
+    /// <returns>
+    /// The timestamp of the line at or before the specified line number,
+    /// or <see cref="DateTime.MinValue"/> if no valid timestamp is found.
+    /// </returns>
+    /// <remarks>
+    /// Not all log lines may contain timestamps. This method searches backward
+    /// from the given line number until it finds a line with a valid timestamp.
+    /// The <paramref name="lastLineNum"/> parameter is updated to reflect the line
+    /// where the timestamp was found.
+    /// </remarks>
     //TODO Find a way to not use a referenced int (https://github.com/LogExperts/LogExpert/issues/404)
     DateTime GetTimestampForLine (ref int lastLineNum, bool roundToSeconds);
 
+    /// <summary>
+    /// Finds the line number that corresponds to the specified timestamp within
+    /// the given range, using a binary search algorithm.
+    /// </summary>
+    /// <param name="lineNum">The starting line number for the search.</param>
+    /// <param name="rangeStart">The first line number of the search range (inclusive).</param>
+    /// <param name="rangeEnd">The last line number of the search range (inclusive).</param>
+    /// <param name="timestamp">The timestamp to search for.</param>
+    /// <param name="roundToSeconds">
+    /// If <c>true</c>, timestamps are rounded to seconds for comparison.
+    /// </param>
+    /// <returns>
+    /// The line number of the line with a timestamp closest to the specified timestamp,
+    /// or -1 if no matching line is found within the range.
+    /// </returns>
+    /// <remarks>
+    /// This method is used for timestamp-based navigation and synchronization between
+    /// multiple log windows. It performs a binary search for optimal performance.
+    /// </remarks>
     int FindTimestampLineInternal (int lineNum, int rangeStart, int rangeEnd, DateTime timestamp, bool roundToSeconds);
 
+    /// <summary>
+    /// Selects the specified line in the log view and optionally scrolls to make it visible.
+    /// </summary>
+    /// <param name="lineNum">The zero-based line number to select.</param>
+    /// <param name="triggerSyncCall">
+    /// If <c>true</c>, triggers timestamp synchronization with other log windows
+    /// that are in sync mode.
+    /// </param>
+    /// <param name="shouldScroll">
+    /// If <c>true</c>, scrolls the view to ensure the selected line is visible.
+    /// </param>
+    /// <remarks>
+    /// This method is used for programmatic line selection, such as when jumping
+    /// to bookmarks, navigating through search results, or synchronizing with other windows.
+    /// </remarks>
     void SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll);
 
+    /// <summary>
+    /// Gets the persistence data for this log window, which can be saved and later restored.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="PersistenceData"/> object containing the current state of the window,
+    /// including the current line, filters, columnizer configuration, and other settings.
+    /// </returns>
+    /// <remarks>
+    /// This data is used to restore the log window state between sessions, including
+    /// the current scroll position, active filters, and columnizer settings.
+    /// </remarks>
     PersistenceData GetPersistenceData ();
 
+    /// <summary>
+    /// Creates a new temporary file tab with the specified content.
+    /// </summary>
+    /// <param name="fileName">The path to the temporary file to display.</param>
+    /// <param name="title">The title to display on the tab.</param>
+    /// <remarks>
+    /// Temporary file tabs are used for displaying filtered content, search results,
+    /// or other derived views of the original log file.
+    /// </remarks>
     void AddTempFileTab (string fileName, string title);
 
+    /// <summary>
+    /// Creates a new tab containing the specified list of log line entries.
+    /// </summary>
+    /// <param name="lineEntryList">
+    /// A list of <see cref="LineEntry"/> objects containing the lines and their
+    /// original line numbers to display in the new tab.
+    /// </param>
+    /// <param name="title">The title to display on the tab.</param>
+    /// <remarks>
+    /// This method is used to pipe filtered or selected content into a new tab
+    /// without creating a physical file. The new tab maintains references to the
+    /// original line numbers for context.
+    /// </remarks>
     void WritePipeTab (IList<LineEntry> lineEntryList, string title);
 
+    /// <summary>
+    /// Activates this log window and brings it to the foreground.
+    /// </summary>
+    /// <remarks>
+    /// This method is typically called when switching between multiple log windows
+    /// or when a background operation completes and needs to notify the user.
+    /// </remarks>
     void Activate ();
 
+    /// <summary>
+    /// Gets the <see cref="LogfileReader"/> instance that provides access to the
+    /// underlying log file content.
+    /// </summary>
+    /// <value>
+    /// The <see cref="LogfileReader"/> that manages file access, buffering, and
+    /// multi-file coordination for this log window.
+    /// </value>
+    /// <remarks>
+    /// The LogfileReader handles all file I/O operations, including reading lines,
+    /// monitoring for file changes, and managing the buffer cache.
+    /// </remarks>
     LogfileReader LogFileReader { get; }
 
+    /// <summary>
+    /// Gets the text content of the currently selected cell or line.
+    /// </summary>
+    /// <value>
+    /// The text content of the current selection, or an empty string if nothing is selected.
+    /// </value>
     string Text { get; }
 
+    /// <summary>
+    /// Gets the file name (with full path) of the primary log file being displayed.
+    /// </summary>
+    /// <value>
+    /// The full file path of the log file, or an empty string if no file is loaded.
+    /// </value>
+    /// <remarks>
+    /// In multi-file mode, this returns the path of the first file in the multi-file set.
+    /// Use <see cref="GetCurrentFileName"/> to get the file name for a specific line number.
+    /// </remarks>
     string FileName { get; }
 
     //event EventHandler<LogEventArgs> FileSizeChanged; //TODO: All handlers should be moved to Core

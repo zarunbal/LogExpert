@@ -2,14 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LogExpert.PluginRegistry</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePluginHashesEnabled>true</GeneratePluginHashesEnabled>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NLog" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>
+
+  <!-- Import the PluginHashGenerator targets -->
+  <Import Project="PluginHashGenerator.targets" />
 
 </Project>

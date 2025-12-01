@@ -1,0 +1,22 @@
+{
+  "name": "SftpFileSystem",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "File system plugin for reading log files via SFTP/SSH protocol from remote servers",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "network:connect",
+    "config:read"
+  ],
+  "dependencies": {
+    "Renci.SshNet": "2020.0.0"
+  },
+  "main": "SftpFileSystem.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

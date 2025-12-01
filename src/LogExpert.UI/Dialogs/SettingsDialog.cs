@@ -3,6 +3,8 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
@@ -207,6 +209,10 @@ internal partial class SettingsDialog : Form
         }
 
         upDownMaximumLineLength.Value = Preferences.MaxLineLength;
+        upDownMaxDisplayLength.Value = Preferences.MaxDisplayLength;
+
+        // Ensure MaxDisplayLength doesn't exceed MaxLineLength
+        upDownMaxDisplayLength.Maximum = Math.Min(upDownMaxDisplayLength.Maximum, upDownMaximumLineLength.Value);
 
         upDownMaximumFilterEntriesDisplayed.Value = Preferences.MaximumFilterEntriesDisplayed;
         upDownMaximumFilterEntries.Value = Preferences.MaximumFilterEntries;
@@ -636,7 +642,7 @@ internal partial class SettingsDialog : Form
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                _ = NativeMethods.DestroyIcon(icon.Handle);
+                _ = Vanara.PInvoke.User32.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -759,6 +765,8 @@ internal partial class SettingsDialog : Form
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
         Preferences.ShowErrorMessageAllowOnlyOneInstances = checkBoxShowErrorMessageOnlyOneInstance.Checked;
         Preferences.DarkMode = checkBoxDarkMode.Checked;
+        Preferences.MaxLineLength = (int)upDownMaximumLineLength.Value;
+        Preferences.MaxDisplayLength = Math.Min((int)upDownMaxDisplayLength.Value, (int)upDownMaximumLineLength.Value);
 
         SavePluginSettings();
         SaveHighlightMaskList();
@@ -1049,7 +1057,7 @@ internal partial class SettingsDialog : Form
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnBtnIconClick (object sender, EventArgs e)
+    private void OnBtnToolIconClick (object sender, EventArgs e)
     {
         if (_selectedTool != null)
         {
@@ -1180,6 +1188,27 @@ internal partial class SettingsDialog : Form
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
             _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.LogExpert_Common_UI_Title_LogExpert);
+        }
+    }
+
+    private void OnUpDownMaxDisplayLengthValueChanged (object sender, EventArgs e)
+    {
+        // Ensure MaxDisplayLength doesn't exceed MaxLineLength
+        if (upDownMaxDisplayLength.Value > upDownMaximumLineLength.Value)
+        {
+            upDownMaxDisplayLength.Value = upDownMaximumLineLength.Value;
+        }
+    }
+
+    private void OnUpDownMaximumLineLengthValueChanged (object sender, EventArgs e)
+    {
+        // When MaxLineLength changes, update the maximum allowed for MaxDisplayLength
+        upDownMaxDisplayLength.Maximum = Math.Min(1000000, upDownMaximumLineLength.Value);
+
+        // If current MaxDisplayLength exceeds new MaxLineLength, adjust it
+        if (upDownMaxDisplayLength.Value > upDownMaximumLineLength.Value)
+        {
+            upDownMaxDisplayLength.Value = upDownMaximumLineLength.Value;
         }
     }
 

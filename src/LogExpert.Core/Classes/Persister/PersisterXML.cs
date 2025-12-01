@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
@@ -13,6 +14,7 @@ namespace LogExpert.Core.Classes.Persister;
 /// <summary>
 /// Persister for XML format persistence data.
 /// </summary>
+[Obsolete("XML persistence is deprecated and will be removed in future versions. This is a fallback for older Versions")]
 public static class PersisterXML
 {
     #region Fields
@@ -230,7 +232,7 @@ public static class PersisterXML
         var sLineCount = fileElement.GetAttribute("lineCount");
         if (sLineCount != null && sLineCount.Length > 0)
         {
-            persistenceData.LineCount = int.Parse(sLineCount);
+            persistenceData.LineCount = int.Parse(sLineCount, CultureInfo.InvariantCulture);
         }
 
         persistenceData.FilterParamsList = ReadFilter(fileElement);
@@ -363,11 +365,11 @@ public static class PersisterXML
                     continue;
                 }
 
-                var lineNum = int.Parse(line);
+                var lineNum = int.Parse(line, CultureInfo.InvariantCulture);
 
                 Entities.Bookmark bookmark = new(lineNum)
                 {
-                    OverlayOffset = new Size(int.Parse(posX), int.Parse(posY))
+                    OverlayOffset = new Size(int.Parse(posX, CultureInfo.InvariantCulture), int.Parse(posY, CultureInfo.InvariantCulture))
                 };
 
                 if (text != null)
@@ -426,8 +428,8 @@ public static class PersisterXML
                     }
                 }
 
-                var lineNum = int.Parse(line);
-                var heightValue = int.Parse(height);
+                var lineNum = int.Parse(line, CultureInfo.InvariantCulture);
+                var heightValue = int.Parse(height, CultureInfo.InvariantCulture);
                 rowHeightList.Add(lineNum, new RowHeightEntry(lineNum, heightValue));
             }
         }
@@ -453,7 +455,7 @@ public static class PersisterXML
         value = GetOptionsAttribute(optionsNode, "multifile", "maxDays");
         try
         {
-            persistenceData.MultiFileMaxDays = value != null ? short.Parse(value) : 0;
+            persistenceData.MultiFileMaxDays = value != null ? short.Parse(value, CultureInfo.InvariantCulture) : 0;
         }
         catch (Exception ex) when (ex is ArgumentNullException or
                                         FormatException or
@@ -484,13 +486,13 @@ public static class PersisterXML
         value = GetOptionsAttribute(optionsNode, "currentline", "line");
         if (value != null)
         {
-            persistenceData.CurrentLine = int.Parse(value);
+            persistenceData.CurrentLine = int.Parse(value, CultureInfo.InvariantCulture);
         }
 
         value = GetOptionsAttribute(optionsNode, "firstDisplayedLine", "line");
         if (value != null)
         {
-            persistenceData.FirstDisplayedLine = int.Parse(value);
+            persistenceData.FirstDisplayedLine = int.Parse(value, CultureInfo.InvariantCulture);
         }
 
         value = GetOptionsAttribute(optionsNode, "filter", "visible");
@@ -500,7 +502,7 @@ public static class PersisterXML
         value = GetOptionsAttribute(optionsNode, "filter", "position");
         if (value != null)
         {
-            persistenceData.FilterPosition = int.Parse(value);
+            persistenceData.FilterPosition = int.Parse(value, CultureInfo.InvariantCulture);
         }
 
         value = GetOptionsAttribute(optionsNode, "bookmarklist", "visible");
@@ -508,7 +510,7 @@ public static class PersisterXML
         value = GetOptionsAttribute(optionsNode, "bookmarklist", "position");
         if (value != null)
         {
-            persistenceData.BookmarkListPosition = int.Parse(value);
+            persistenceData.BookmarkListPosition = int.Parse(value, CultureInfo.InvariantCulture);
         }
 
         value = GetOptionsAttribute(optionsNode, "followTail", "enabled");

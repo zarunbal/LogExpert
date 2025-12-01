@@ -4,6 +4,9 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+using ColumnizerLib.Extensions;
+
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Bookmark;
@@ -18,7 +21,6 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interface;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
-using LogExpert.Extensions;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -48,14 +50,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly Image _advancedButtonImage;
 
-    private readonly object _bookmarkLock = new();
+    private readonly Lock _bookmarkLock = new();
     private readonly BookmarkDataProvider _bookmarkProvider = new();
 
     private readonly IList<IBackgroundProcessCancelHandler> _cancelHandlerList = [];
 
-    private readonly object _currentColumnizerLock = new();
+    private readonly Lock _currentColumnizerLock = new();
 
-    private readonly object _currentHighlightGroupLock = new();
+    private readonly Lock _currentHighlightGroupLock = new();
 
     private readonly EventWaitHandle _externaLoadingFinishedEvent = new ManualResetEvent(false);
 
@@ -78,11 +80,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
 
     private readonly ProgressEventArgs _progressEventArgs = new();
-    private readonly object _reloadLock = new();
+    private readonly Lock _reloadLock = new();
     private readonly Image _searchButtonImage;
     private readonly StatusLineEventArgs _statusEventArgs = new();
 
-    private readonly object _tempHighlightEntryListLock = new();
+    private readonly Lock _tempHighlightEntryListLock = new();
 
     private readonly Task _timeShiftSyncTask;
     private readonly CancellationTokenSource cts = new();
@@ -93,11 +95,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly TimeSpreadCalculator _timeSpreadCalc;
 
-    private readonly object _timeSyncListLock = new();
+    private readonly Lock _timeSyncListLock = new();
 
     private ColumnCache _columnCache = new();
-
-    private ILogLineColumnizer _currentColumnizer;
 
     //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
     private HighlightGroup _currentHighlightGroup = new();
@@ -116,7 +116,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private bool _isErrorShowing;
     private bool _isLoadError;
     private bool _isLoading;
-    private bool _isMultiFile;
     private bool _isSearching;
     private bool _isTimestampDisplaySyncing;
     private List<int> _lastFilterLinesList = [];
@@ -180,7 +179,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         listBoxFilter.DrawMode = DrawMode.OwnerDrawVariable;
         listBoxFilter.MeasureItem += MeasureItem;
 
-        Closing += OnLogWindowClosing;
+        FormClosing += OnLogWindowClosing;
         Disposed += OnLogWindowDisposed;
         Load += OnLogWindowLoad;
 
@@ -324,13 +323,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public ILogLineColumnizer CurrentColumnizer
     {
-        get => _currentColumnizer;
+        get;
         private set
         {
             lock (_currentColumnizerLock)
             {
-                _currentColumnizer = value;
-                _logger.Debug($"Setting columnizer {_currentColumnizer.GetName()}");
+                field = value;
+                _logger.Debug($"Setting columnizer {field.GetName()}");
             }
         }
     }
@@ -358,8 +357,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public bool IsMultiFile
     {
-        get => _isMultiFile;
-        private set => _guiStateArgs.IsMultiFileActive = _isMultiFile = value;
+        get;
+        private set => _guiStateArgs.IsMultiFileActive = field = value;
     }
 
     public bool IsTempFile { get; }
@@ -467,6 +466,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ApplyCheckBoxResources();
         ApplyToolStripMenuItemResources();
         ApplyToolTipsResources();
+        ApplyResourceImages();
+    }
+
+    private void ApplyResourceImages ()
+    {
+        pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
+        btnFilterDown.BackgroundImage = Resources.ArrowDown;
+        btnFilterUp.BackgroundImage = Resources.ArrowUp;
+        btnToggleHighlightPanel.Image = Resources.Arrow_menu_open;
     }
 
     private void ApplyCheckBoxResources ()
@@ -870,13 +878,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogWindowClosing (object sender, CancelEventArgs e)
     {
-        if (Preferences.AskForClose)
+        if (Preferences.AskForClose &&
+            MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
         {
-            if (MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-            {
-                e.Cancel = true;
-                return;
-            }
+            e.Cancel = true;
+            return;
         }
 
         SavePersistenceData(false);
@@ -1614,7 +1620,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnColumnButtonClick (object sender, EventArgs e)
     {
-        _filterParams.CurrentColumnizer = _currentColumnizer;
+        _filterParams.CurrentColumnizer = CurrentColumnizer;
         FilterColumnChooser chooser = new(_filterParams);
         if (chooser.ShowDialog() == DialogResult.OK)
         {
@@ -1696,7 +1702,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-
         var col = gridView.Columns[_selectedCol];
         moveLeftToolStripMenuItem.Enabled = col != null && col.DisplayIndex > 0;
         moveRightToolStripMenuItem.Enabled = col != null && col.DisplayIndex < gridView.Columns.Count - 1;
@@ -1770,10 +1775,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         var gridView = columnContextMenuStrip.SourceControl as BufferedDataGridView;
         var col = gridView.Columns[_selectedCol];
-        if (col != null)
-        {
-            col.DisplayIndex = gridView.Columns.Count - 1;
-        }
+        _ = col?.DisplayIndex = gridView.Columns.Count - 1;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1794,7 +1796,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var col = gridView.Columns[_selectedCol];
         if (col != null && col.DisplayIndex < gridView.Columns.Count - 1)
         {
-            col.DisplayIndex = col.DisplayIndex + 1;
+            col.DisplayIndex++;
         }
     }
 
@@ -2413,7 +2415,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (_reloadMemento == null)
             {
-                PreselectColumnizer(persistenceData.ColumnizerName);
+                PreselectColumnizer(persistenceData.Columnizer?.GetName());
             }
 
             FollowTailChanged(persistenceData.FollowTail, false);
@@ -2485,6 +2487,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var persistenceData = ForcedPersistenceFileName == null
                 ? Persister.LoadPersistenceData(FileName, Preferences)
                 : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
+
+            if (persistenceData == null)
+            {
+                _logger.Info($"No persistence data for {FileName} found.");
+                return;
+            }
 
             if (persistenceData.LineCount > _logFileReader.LineCount)
             {
@@ -2586,9 +2594,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ReInitFilterParams (FilterParams filterParams)
     {
-        filterParams.SearchText = filterParams.SearchText; // init "lowerSearchText"
-        filterParams.RangeSearchText = filterParams.RangeSearchText; // init "lowerRangeSearchText"
         filterParams.CurrentColumnizer = CurrentColumnizer;
+
         if (filterParams.IsRegex)
         {
             try
@@ -3266,12 +3273,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CurrentColumnizer = columnizer;
             _freezeStateMap.Clear();
 
-            if (_logFileReader != null)
-            {
-                _logFileReader.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer columnizer1
+            _ = _logFileReader?.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer columnizer1
                     ? columnizer1
                     : null;
-            }
 
             // always reload when choosing XML columnizers
             if (_logFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
@@ -3281,7 +3285,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
 
             // Reload when choosing no XML columnizer but previous columnizer was XML
-            if (_logFileReader != null && !(CurrentColumnizer is ILogLineXmlColumnizer) && oldColumnizerIsXmlType)
+            if (_logFileReader != null && CurrentColumnizer is not ILogLineXmlColumnizer && oldColumnizerIsXmlType)
             {
                 _logFileReader.IsXmlMode = false;
                 //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -4130,7 +4134,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /**
    * Shift bookmarks after a logfile rollover
    */
-
     private void ShiftBookmarks (int offset)
     {
         _bookmarkProvider.ShiftBookmarks(offset);
@@ -4214,7 +4217,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ResetFilterControls ()
     {
-        filterComboBox.Text = "";
+        filterComboBox.Text = string.Empty;
         filterCaseSensitiveCheckBox.Checked = false;
         filterRegexCheckBox.Checked = false;
         //this.filterTailCheckBox.Checked = this.Preferences.filterTail;
@@ -4224,7 +4227,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         rangeCheckBox.Checked = false;
         columnRestrictCheckBox.Checked = false;
         knobControlFuzzy.Value = 0;
-        filterRangeComboBox.Text = "";
+        filterRangeComboBox.Text = string.Empty;
     }
 
     [SupportedOSPlatform("windows")]
@@ -4786,17 +4789,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return true;
         }
 
-        if (filterParams.FuzzyValue != knobControlFuzzy.Value)
-        {
-            return true;
-        }
-
-        if (filterParams.ColumnRestrict != columnRestrictCheckBox.Checked)
-        {
-            return true;
-        }
-
-        return filterParams.IsCaseSensitive != filterCaseSensitiveCheckBox.Checked;
+        return filterParams.FuzzyValue != knobControlFuzzy.Value ||
+            filterParams.ColumnRestrict != columnRestrictCheckBox.Checked ||
+            filterParams.IsCaseSensitive != filterCaseSensitiveCheckBox.Checked;
     }
 
     [SupportedOSPlatform("windows")]
@@ -5076,7 +5071,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private static void FilterRestore (LogWindow newWin, PersistenceData persistenceData)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         if (columnizer != null)
         {
@@ -5177,7 +5172,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             foreach (var lineNum in lineNumList)
             {
                 var line = _logFileReader.GetLogLine(lineNum);
-                if (_currentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
+                if (CurrentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
                 {
                     callback.LineNum = lineNum;
                     line = xmlColumnizer.GetLineTextForClipboard(line, callback);
@@ -5302,7 +5297,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private string CalculateColumnNames (FilterParams filter)
     {
-        var names = string.Empty;
+        var names = new StringBuilder();
 
         if (filter.ColumnRestrict)
         {
@@ -5312,16 +5307,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (names.Length > 0)
                     {
-                        names += ", ";
+                        _ = names.Append(", ");
                     }
 
                     // skip first two columns: marker + line number
-                    names += dataGridView.Columns[2 + colIndex].HeaderText;
+                    _ = names.Append(dataGridView.Columns[2 + colIndex].HeaderText);
                 }
             }
         }
 
-        return names;
+        return names.ToString();
     }
 
     [SupportedOSPlatform("windows")]
@@ -5335,7 +5330,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         foreach (var col in dict.Values)
         {
-            col.Frozen = _freezeStateMap.ContainsKey(gridView) && _freezeStateMap[gridView];
+            col.Frozen = _freezeStateMap.TryGetValue(gridView, out bool isFrozen) && isFrozen;
 
             if (col.Index == _selectedCol)
             {
@@ -6130,7 +6125,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             try
             {
-                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance);
+                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
             }
             catch (LogFileException lfe)
             {
@@ -6193,7 +6188,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         EncodingOptions = encodingOptions;
         _columnCache = new ColumnCache();
 
-        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance);
+        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
 
         RegisterLogFileReaderEvents();
         _logFileReader.StartMonitoring();
@@ -6265,7 +6260,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             FileName = FileName,
             TabName = Text,
             SessionFileName = SessionFileName,
-            ColumnizerName = CurrentColumnizer.GetName(),
+            Columnizer = CurrentColumnizer,
             LineCount = _logFileReader.LineCount
         };
 
@@ -6729,6 +6724,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "Only Add if a new Key is introduced")]
     public void OnLogWindowKeyDown (object sender, KeyEventArgs e)
     {
         if (_isErrorShowing)
@@ -7734,6 +7730,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileExportingBookmarkList, e.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
+
+        dlg.Dispose();
     }
 
     public void ImportBookmarkList ()
@@ -7788,6 +7786,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_ErrorWhileImportingBookmarkList, e.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
             }
         }
+
+        dlg.Dispose();
     }
 
     public bool IsAdvancedOptionActive ()

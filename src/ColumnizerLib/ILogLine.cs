@@ -1,4 +1,4 @@
-﻿namespace LogExpert;
+namespace ColumnizerLib;
 
 public interface ILogLine : ITextValue
 {
