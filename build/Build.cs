@@ -34,7 +34,7 @@ partial class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main () => Execute<Build>(x => x.Test);
+    public static int Main() => Execute<Build>(x => x.Test);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -120,7 +120,7 @@ partial class Build : NukeBuild
         ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
     ];
 
-    protected override void OnBuildInitialized ()
+    protected override void OnBuildInitialized()
     {
         SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
 
@@ -498,7 +498,7 @@ partial class Build : NukeBuild
         }
     });
 
-    private void ExecuteInnoSetup (AbsolutePath innoPath)
+    private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
         Process proc = new();
 
@@ -520,12 +520,12 @@ partial class Build : NukeBuild
         }
     }
 
-    private string ReplaceVersionMatch (Match match, string replacement)
+    private string ReplaceVersionMatch(Match match, string replacement)
     {
         return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
     }
 
-    private void TransformTemplateFile (AbsolutePath path, bool deleteTemplate)
+    private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
     {
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
@@ -539,20 +539,20 @@ partial class Build : NukeBuild
     }
 
     [GeneratedRegex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyInformationalVersion ();
+    private static partial Regex AssemblyInformationalVersion();
 
     [GeneratedRegex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyVersion ();
+    private static partial Regex AssemblyVersion();
 
     [GeneratedRegex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])")]
-    private static partial Regex AssemblyConfiguration ();
+    private static partial Regex AssemblyConfiguration();
 
     [GeneratedRegex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyFileVersion ();
+    private static partial Regex AssemblyFileVersion();
 
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
-    private static partial Regex SFTPPlugin ();
+    private static partial Regex SFTPPlugin();
 
     [GeneratedRegex("\\.template$")]
-    private static partial Regex TemplateRegex ();
+    private static partial Regex TemplateRegex();
 }

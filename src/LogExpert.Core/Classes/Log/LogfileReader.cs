@@ -21,7 +21,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private readonly string _fileName;
     private readonly int _max_buffers;
     private readonly int _maxLinesPerBuffer;
-    private readonly object _monitor = new();
+    private readonly Lock _monitor = new();
     private readonly MultiFileOptions _multiFileOptions;
     private readonly IPluginRegistry _pluginRegistry;
     private readonly CancellationTokenSource _cts = new();
