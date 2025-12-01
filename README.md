@@ -34,8 +34,8 @@ Or Install via chocolatey
 
 Requirements
 
-* <https://dotnet.microsoft.com/en-us/download/dotnet/8.0>
-* .NET 8 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer> or <https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x86-installer>)
+* <https://dotnet.microsoft.com/en-us/download>
+* .NET 10 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.0-windows-x64-installer>)
 
 ## CI
 
@@ -54,7 +54,14 @@ This is a continous integration build. So always the latest and greates changes.
 Nuke.build Requirements
 
 * Chocolatey must be installed
-* Optional for Setup Inno Script 5 or 6
+* Optional for Setup Inno Script 6.6.1
+
+## Resources / Translations
+If you want to contribute translations or add new languages please use the ResXResourceManager Extension to add new or missing
+translations for either German / English. With this extension its easy to add a new language as well:
+[ResXResourceManager](https://github.com/dotnet/ResXResourceManager/tree/master)
+
+After creating a new language resource please create a new pull request.
 
 ## Pull Request
 
@@ -67,7 +74,6 @@ Please checkout the wiki for FAQ / HELP / Informations / Examples
 ## High DPI
 
 * dont use AutoScaleMode for single GUI controls like Buttons etc.
-
 * dont use AutoScaleDimensions for single GUI controls like Buttons etc.
 
 <https://github.com/LogExperts/LogExpert/wiki>

@@ -12,7 +12,7 @@ public class FilterStarter
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly ColumnizerCallback _callback;
     private readonly SortedDictionary<int, int> _filterHitDict;

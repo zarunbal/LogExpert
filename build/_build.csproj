@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="chocolatey" Version="2.5.1" />
-    <PackageReference Include="GitVersion.Core" Version="6.5.0" />
+    <PackageReference Include="GitVersion.Core" Version="6.5.1" />
     <PackageReference Include="Microsoft.Build" Version="18.0.2" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.0.2" />
     <PackageReference Include="NuGet.CommandLine" Version="7.0.1">
