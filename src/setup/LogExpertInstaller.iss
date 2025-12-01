@@ -11,7 +11,7 @@
 ; Path of the inno setup file
 #define AppPath SourcePath
 #define SetupName "LogExpert.Installer"
-#define ReleaseFolder = "..\..\bin\Debug"
+#define ReleaseFolder = "..\..\bin\Release"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -27,7 +27,7 @@ AppVerName={#AppName} {#AppVersion}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
-DefaultDirName={pf}\{#AppName}
+DefaultDirName={commonpf}\{#AppName}
 DefaultGroupName={#AppName}
 AllowNoIcons=yes
 
@@ -191,8 +191,13 @@ Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(
 
 [Code]
 function InitializeSetup(): Boolean;
+var ErrCode: integer;
 begin
-    Dependency_ForceX86 := False;
-    Dependency_AddDotNet100Desktop;
+    if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 0) then begin
+      if MsgBox('.net 10 64Bit is missing do you want to download it from https://dotnet.microsoft.com/download/dotnet/10.0 ?', mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        ShellExecAsOriginalUser('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOW, ewNoWait, ErrCode);
+      end;
+    end;
     Result := True;
 end;

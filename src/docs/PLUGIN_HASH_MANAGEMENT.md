@@ -6,7 +6,7 @@ LogExpert uses SHA256 hashes to verify plugin integrity and prevent tampering. W
 
 ## Automated Process
 
-### Option 1: Using the Hash Generator Tool (Recommended)
+### Option 1: Using the Hash Generator Tool (Manual)
 
 After building plugins:
 
@@ -21,7 +21,7 @@ This will:
 - Generate `PluginHashGenerator.Generated.cs` with the `GetBuiltInPluginHashes()` method
 - Automatically integrate with the partial class `PluginValidator`
 
-### Option 2: MSBuild Integration (Automatic)
+### Option 2: MSBuild Integration (Automatic during regular builds)
 
 The plugin hashes are automatically regenerated during Release builds if `GeneratePluginHashesEnabled` is set to `true`.
 
@@ -63,12 +63,49 @@ dotnet build src/LogExpert.sln --configuration Release
 dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
 ```
 
-### Option 3: Nuke Build Target
+### Option 3: Nuke Build Integration (Recommended for Release builds)
+
+The Nuke build system now includes automatic plugin hash generation as part of the Release build process.
+
+**When Does It Run?**
+- Automatically as part of the `Pack` target when building in Release configuration
+- Can be run independently via the `GeneratePluginHashes` target
+- Only runs when building in Release configuration
+- Skips generation if no plugins directories exist
+
+**Usage Examples:**
 
 ```powershell
 # From repository root
-./build.ps1 --target GeneratePluginHashes
+
+# Full release build with hash generation
+./build.ps1 --target Pack --configuration Release
+
+# Only generate plugin hashes (after plugins are built)
+./build.ps1 --target GeneratePluginHashes --configuration Release
+
+# Complete release workflow
+./build.ps1 --target Clean Compile GeneratePluginHashes Pack --configuration Release
 ```
+
+**What the Nuke target does:**
+1. Checks if plugins exist in `bin/Release/plugins` or `bin/Release/pluginsx86`
+2. Runs the PluginHashGenerator.Tool to scan and hash all plugin DLLs
+3. Generates `PluginHashGenerator.Generated.cs` with updated hashes
+4. Rebuilds the PluginRegistry project to include the newly generated file
+5. Logs detailed information about the process
+
+**Integration with other targets:**
+- `GeneratePluginHashes` runs **after** `Compile`
+- `Pack` target **depends on** `GeneratePluginHashes` (along with other packaging tasks)
+- When creating installers/packages, hashes are always up-to-date
+
+**Benefits:**
+- ✅ Ensures hashes are always generated during Release packaging
+- ✅ No manual intervention needed for release builds
+- ✅ Prevents shipping releases with outdated or missing hashes
+- ✅ Integrated logging for troubleshooting
+- ✅ Automatically rebuilds PluginRegistry to include generated file
 
 ## File Structure
 
@@ -82,6 +119,8 @@ src/
 ├── PluginHashGenerator.Tool/
 │   ├── Program.cs                       # Hash generator implementation
 │   └── PluginHashGenerator.Tool.csproj
+build/
+└── Build.cs                              # Nuke build with GeneratePluginHashes target
 ```
 
 ## Generated Code Example
@@ -219,8 +258,21 @@ dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.cspro
 ```
 ## Quick Start Guide
 
-After modifying plugins, regenerate hashes:
+### For Regular Development (Debug builds)
+No action needed - hashes are bypassed in Debug configuration.
 
+### For Release Builds
+
+**Using Nuke Build (Recommended):**
+```powershell
+# From repository root
+cd G:\Github\LogExpert
+
+# Full release build (hashes generated automatically)
+./build.ps1 --target Pack --configuration Release
+```
+
+**Manual Process:**
 ```powershell
 # 1. Build the tool first (if not already built)
 cd G:\Github\LogExpert
@@ -234,3 +286,15 @@ dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.cspro
 
 # 4. Rebuild to include the generated file
 dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj --configuration Release
+```
+
+### After Modifying Plugins
+
+If you modify any plugin code, regenerate hashes before creating a release:
+
+```powershell
+# Rebuild and regenerate hashes
+./build.ps1 --target Clean Compile GeneratePluginHashes --configuration Release
+
+# Or just regenerate if already built
+./build.ps1 --target GeneratePluginHashes --configuration Release

@@ -34,7 +34,7 @@ partial class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>(x => x.Test);
+    public static int Main () => Execute<Build>(x => x.Test);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -120,7 +120,7 @@ partial class Build : NukeBuild
         ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
     ];
 
-    protected override void OnBuildInitialized()
+    protected override void OnBuildInitialized ()
     {
         SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
 
@@ -189,6 +189,58 @@ partial class Build : NukeBuild
                 .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
                 .SetConfiguration(Configuration)
                 .SetMaxCpuCount(Environment.ProcessorCount));
+        });
+
+    AbsolutePath PluginHashGeneratorProject => SourceDirectory / "PluginHashGenerator.Tool" / "PluginHashGenerator.Tool.csproj";
+
+    AbsolutePath PluginHashGeneratedFile => SourceDirectory / "PluginRegistry" / "PluginHashGenerator.Generated.cs";
+
+    Target GeneratePluginHashes => _ => _
+        .After(Compile)
+        .OnlyWhenStatic(() => Configuration == Configuration.Release)
+        .Executes(() =>
+        {
+            var pluginsDir = OutputDirectory / "plugins";
+            var pluginsx86Dir = OutputDirectory / "pluginsx86";
+
+            // Check if any plugins exist
+            if (!pluginsDir.DirectoryExists() && !pluginsx86Dir.DirectoryExists())
+            {
+                Log.Warning("No plugins directories found. Skipping plugin hash generation.");
+                return;
+            }
+
+            Log.Information("Generating plugin hashes...");
+            Log.Information($"  Output Path: {OutputDirectory}");
+            Log.Information($"  Target File: {PluginHashGeneratedFile}");
+            Log.Information($"  Configuration: {Configuration}");
+
+            try
+            {
+                DotNetRun(s => s
+                    .SetProjectFile(PluginHashGeneratorProject)
+                    .SetApplicationArguments([OutputDirectory, PluginHashGeneratedFile, Configuration])
+                    .SetProcessWorkingDirectory(RootDirectory));
+
+                Log.Information("Plugin hashes generated successfully");
+
+                // Rebuild PluginRegistry project to include the generated file
+                // IMPORTANT: Set OutputPath to match the main build output directory
+                Log.Information("Rebuilding PluginRegistry to include generated hashes...");
+                MSBuild(s => s
+                    .SetTargetPath(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
+                    .SetTargets("Build")
+                    .SetConfiguration(Configuration)
+                    .SetProperty("OutputPath", OutputDirectory)
+                    .SetMaxCpuCount(Environment.ProcessorCount));
+
+                Log.Information("PluginRegistry rebuilt successfully to {OutputDir}", OutputDirectory);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to generate plugin hashes");
+                throw;
+            }
         });
 
     Target Test => _ => _
@@ -308,42 +360,25 @@ partial class Build : NukeBuild
                 .SetVersion(VersionString));
         });
 
-    Target ColumnizerLibCreateNuget => _ => _
-        .DependsOn(Compile, Test)
-        .Executes(() =>
-        {
-            var columnizerFolder = SourceDirectory / "ColumnizerLib";
-
-            NuGetTasks.NuGetPack(s =>
-            {
-                s = s.SetTargetPath(columnizerFolder / "ColumnizerLib.csproj")
-                    .EnableBuild()
-                    .SetConfiguration(Configuration)
-                    .SetProperty("version", VersionString)
-                    .SetOutputDirectory(BinDirectory);
-
-                return s;
-            });
-        });
-
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, GeneratePluginHashes, CreateSetup);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
         .After(Test)
         .Executes(() =>
         {
-            OutputDirectory.Copy(SetupDirectory, ExistsPolicy.DirectoryMerge);
+            OutputDirectory.Copy(SetupDirectory, ExistsPolicy.MergeAndOverwriteIfNewer);
             SetupDirectory.GlobFiles(ExcludeFileGlob).ForEach(file => file.DeleteFile());
 
             SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
         });
 
     Target CreateSetup => _ => _
-        .DependsOn(CopyFilesForSetup, ChangeVersionNumber)
+        .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile)
         .Before(Publish)
-        .OnlyWhenStatic(() => Configuration == "Release")
+        .After(GeneratePluginHashes)
+        .OnlyWhenStatic(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
             var publishCombinations =
@@ -498,7 +533,7 @@ partial class Build : NukeBuild
         }
     });
 
-    private void ExecuteInnoSetup(AbsolutePath innoPath)
+    private void ExecuteInnoSetup (AbsolutePath innoPath)
     {
         Process proc = new();
 
@@ -520,12 +555,12 @@ partial class Build : NukeBuild
         }
     }
 
-    private string ReplaceVersionMatch(Match match, string replacement)
+    private string ReplaceVersionMatch (Match match, string replacement)
     {
         return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
     }
 
-    private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
+    private void TransformTemplateFile (AbsolutePath path, bool deleteTemplate)
     {
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
@@ -539,20 +574,20 @@ partial class Build : NukeBuild
     }
 
     [GeneratedRegex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyInformationalVersion();
+    private static partial Regex AssemblyInformationalVersion ();
 
     [GeneratedRegex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyVersion();
+    private static partial Regex AssemblyVersion ();
 
     [GeneratedRegex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])")]
-    private static partial Regex AssemblyConfiguration();
+    private static partial Regex AssemblyConfiguration ();
 
     [GeneratedRegex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyFileVersion();
+    private static partial Regex AssemblyFileVersion ();
 
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
-    private static partial Regex SFTPPlugin();
+    private static partial Regex SFTPPlugin ();
 
     [GeneratedRegex("\\.template$")]
-    private static partial Regex TemplateRegex();
+    private static partial Regex TemplateRegex ();
 }
