@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace LogExpert.Core.Interface;
 
@@ -16,8 +16,9 @@ public interface ILogStreamReader : IDisposable
 
     #region Public methods
 
-    int ReadChar();
-    string ReadLine();
+    int ReadChar ();
+
+    string ReadLine ();
 
     #endregion
 }

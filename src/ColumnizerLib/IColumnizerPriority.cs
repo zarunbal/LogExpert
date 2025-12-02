@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace ColumnizerLib;
 
 public interface IColumnizerPriority
@@ -13,5 +8,5 @@ public interface IColumnizerPriority
     /// <param name="samples"></param>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    Priority GetPriority(string fileName, IEnumerable<ILogLine> samples);
+    Priority GetPriority (string fileName, IEnumerable<ILogLine> samples);
 }

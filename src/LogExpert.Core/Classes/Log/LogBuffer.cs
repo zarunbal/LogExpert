@@ -8,13 +8,13 @@ public class LogBuffer
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
 #if DEBUG
-    private readonly IList<long> _filePositions = new List<long>(); // file position for every line
+    private readonly IList<long> _filePositions = []; // file position for every line
 #endif
 
-    private readonly IList<ILogLine> _logLines = new List<ILogLine>();
+    private readonly IList<ILogLine> _logLines = [];
     private int MAX_LINES = 500;
     private long _size;
 
@@ -24,7 +24,8 @@ public class LogBuffer
 
     //public LogBuffer() { }
 
-    public LogBuffer(ILogFileInfo fileInfo, int maxLines)
+    //Dont use Primary Constructor, MAX_LINES will not be initialized correctly
+    public LogBuffer (ILogFileInfo fileInfo, int maxLines)
     {
         FileInfo = fileInfo;
         MAX_LINES = maxLines;
@@ -70,7 +71,7 @@ public class LogBuffer
 
     #region Public methods
 
-    public void AddLine(ILogLine line, long filePos)
+    public void AddLine (ILogLine line, long filePos)
     {
         _logLines.Add(line);
 #if DEBUG
@@ -80,13 +81,13 @@ public class LogBuffer
         IsDisposed = false;
     }
 
-    public void ClearLines()
+    public void ClearLines ()
     {
         _logLines.Clear();
         LineCount = 0;
     }
 
-    public void DisposeContent()
+    public void DisposeContent ()
     {
         _logLines.Clear();
         IsDisposed = true;
@@ -95,7 +96,7 @@ public class LogBuffer
 #endif
     }
 
-    public ILogLine GetLineOfBlock(int num)
+    public ILogLine GetLineOfBlock (int num)
     {
         if (num < _logLines.Count && num >= 0)
         {
@@ -110,15 +111,11 @@ public class LogBuffer
 #if DEBUG
     public long DisposeCount { get; private set; }
 
-
-    public long GetFilePosForLineOfBlock(int line)
+    public long GetFilePosForLineOfBlock (int line)
     {
-        if (line >= 0 && line < _filePositions.Count)
-        {
-            return _filePositions[line];
-        }
-
-        return -1;
+        return line >= 0 && line < _filePositions.Count
+            ? _filePositions[line]
+            : -1;
     }
 
 #endif

@@ -104,7 +104,9 @@ public class ColumnizerPickerTest
     private class TestLogLine : ILogLine
     {
         public string Text => FullLine;
+
         public string FullLine { get; set; }
+
         public int LineNumber { get; set; }
     }
 }

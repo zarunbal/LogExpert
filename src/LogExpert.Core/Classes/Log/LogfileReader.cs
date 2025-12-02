@@ -1834,11 +1834,4 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     #endregion Event Handlers
-
-    #region Records
-    private record LogLine (string FullLine, int LineNumber) : ILogLine
-    {
-        public string Text => FullLine;
-    }
-    #endregion Records
 }
