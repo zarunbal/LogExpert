@@ -12,7 +12,7 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 
-public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
+public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 {
     #region Fields
 
@@ -1621,13 +1621,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return IsXmlMode ? new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig) : reader;
     }
 
-    public enum ReaderType
-    {
-        Legacy,
-        System,
-        Channel
-    }
-
     private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions)
     {
         return _readerType switch
@@ -1635,6 +1628,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
             ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
             ReaderType.Channel => new PositionAwareStreamReaderChannel(stream, encodingOptions, _maximumLineLength),
+            ReaderType.Pipeline => new PositionAwareStreamReaderPipeline(stream, encodingOptions, _maximumLineLength),
             _ => throw new ArgumentOutOfRangeException(nameof(ReaderType), _readerType, null)
         };
     }
