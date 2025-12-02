@@ -99,6 +99,7 @@ internal static class Program
             _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             SetCulture();
+            SetDarkMode();
 
             ColumnizerLib.Column.SetMaxDisplayLength(ConfigManager.Instance.Settings.Preferences.MaxDisplayLength);
 
@@ -212,6 +213,20 @@ internal static class Program
         {
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficientRights, se.Message), Resources.LogExpert_Common_UI_Title_Error);
             cts.Cancel();
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void SetDarkMode ()
+    {
+        var darkModeEnabled = ConfigManager.Instance.Settings.Preferences.DarkMode;
+        if (darkModeEnabled)
+        {
+            Application.SetColorMode(SystemColorMode.Dark);
+        }
+        else
+        {
+            Application.SetColorMode(SystemColorMode.System);
         }
     }
 

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Runtime.Versioning;
 
@@ -6,7 +7,6 @@ using LogExpert.Core.EventArguments;
 using LogExpert.UI.Controls;
 
 using NLog;
-using System.ComponentModel;
 
 namespace LogExpert.Dialogs;
 
@@ -246,6 +246,7 @@ internal partial class BufferedDataGridView : DataGridView
             foreach (var overlay in _overlayList.Values)
             {
                 var textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
+
                 Rectangle rectBubble = new(overlay.Position, new Size((int)textSize.Width, (int)textSize.Height));
                 rectBubble.Offset(60, -(rectBubble.Height + 40));
                 rectBubble.Inflate(3, 3);
@@ -254,6 +255,7 @@ internal partial class BufferedDataGridView : DataGridView
                 myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
                 myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
                 e.Graphics.SetClip(rectBubble, CombineMode.Union);
+
                 RectangleF textRect = new(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
                 myBuffer.Graphics.FillRectangle(_brush, rectBubble);
                 //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));

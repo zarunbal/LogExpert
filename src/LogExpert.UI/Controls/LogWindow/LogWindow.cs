@@ -230,8 +230,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //this.filterUpdateThread.Start();
 
         _advancedButtonImage = btnAdvanced.Image;
-        _searchButtonImage = filterSearchButton.Image;
-        filterSearchButton.Image = null;
+        _searchButtonImage = btnfilterSearch.Image;
+        btnfilterSearch.Image = null;
 
         dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
         markEditModeToolStripMenuItem.Enabled = true;
@@ -504,11 +504,29 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void ApplyButtonResources ()
     {
         btnColumn.Text = Resources.LogWindow_UI_Button_Column;
+        btnColumn.AutoSize = true;
+        btnColumn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
         btnFilterToTab.Text = Resources.LogWindow_UI_Button_FilterToTab;
+        btnFilterToTab.AutoSize = true;
+        btnFilterToTab.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
         bntSaveFilter.Text = Resources.LogWindow_UI_Button_SaveFilter;
+        bntSaveFilter.AutoSize = true;
+        bntSaveFilter.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
         btnDeleteFilter.Text = Resources.LogWindow_UI_Button_Delete;
+        btnDeleteFilter.AutoSize = true;
+        btnDeleteFilter.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
         btnAdvanced.Text = Resources.LogWindow_UI_Button_ShowAdvanced;
-        filterSearchButton.Text = Resources.LogWindow_UI_Button_Search;
+        btnAdvanced.AutoSize = true;
+        btnAdvanced.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
+        btnfilterSearch.Text = Resources.LogWindow_UI_Button_Search;
+        btnfilterSearch.AutoSize = true;
+        btnfilterSearch.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
     }
 
     private void ApplyToolStripMenuItemResources ()
@@ -572,7 +590,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         helpToolTip.SetToolTip(filterTailCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterTail);
         helpToolTip.SetToolTip(filterRegexCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterRegex);
         helpToolTip.SetToolTip(filterCaseSensitiveCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive);
-        helpToolTip.SetToolTip(filterSearchButton, Resources.LogWindow_UI_Button_ToolTip_Search);
+        helpToolTip.SetToolTip(btnfilterSearch, Resources.LogWindow_UI_Button_ToolTip_Search);
         helpToolTip.SetToolTip(columnComboBox, Resources.LogWindow_UI_ColumnComboBox_ToolTip);
     }
 
@@ -588,7 +606,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     internal void ChangeMultifileMask ()
     {
-        MultiFileMaskDialog dlg = new(this, FileName)
+        MultiFileMaskDialog dlg = new(FileName)
         {
             Owner = this,
             MaxDays = _multiFileOptions.MaxDayTry,
@@ -1627,7 +1645,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 
             //CheckForFilterDirty(); //!!!GBro: Indicate to redo the search if search columns were changed
-            filterSearchButton.Image = _searchButtonImage;
+            btnfilterSearch.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
         }
     }
@@ -2078,7 +2096,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             ApplyFilterParams();
             CheckForAdvancedButtonDirty();
             CheckForFilterDirty();
-            filterSearchButton.Image = _searchButtonImage;
+            btnfilterSearch.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
             if (hideFilterListOnLoadCheckBox.Checked)
             {
@@ -4238,7 +4256,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _filterParams.SearchText = string.Empty;
             _filterParams.IsRangeSearch = false;
             ClearFilterList();
-            filterSearchButton.Image = null;
+            btnfilterSearch.Image = null;
             ResetFilterControls();
             bntSaveFilter.Enabled = false;
             return;
@@ -4318,7 +4336,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _shouldCancel = false;
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_FilterSearch_Filtering);
-        filterSearchButton.Enabled = false;
+        btnfilterSearch.Enabled = false;
         ClearFilterList();
 
         _progressEventArgs.MinValue = 0;
@@ -4641,7 +4659,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = filterGridView.Focus();
             }
 
-            filterSearchButton.Enabled = true;
+            btnfilterSearch.Enabled = true;
         }
         catch (NullReferenceException e)
         {
@@ -4736,12 +4754,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (IsFilterSearchDirty(_filterParams))
         {
-            filterSearchButton.Image = _searchButtonImage;
+            btnfilterSearch.Image = _searchButtonImage;
             bntSaveFilter.Enabled = false;
         }
         else
         {
-            filterSearchButton.Image = null;
+            btnfilterSearch.Image = null;
             bntSaveFilter.Enabled = true;
         }
     }
@@ -4943,7 +4961,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void FilterToTab ()
     {
-        filterSearchButton.Enabled = false;
+        btnfilterSearch.Enabled = false;
         _ = Task.Run(WriteFilterToTab);
     }
 
@@ -5040,7 +5058,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _guiStateArgs.MenuEnabled = true;
         SendGuiStateUpdate();
         StatusLineText("");
-        filterSearchButton.Enabled = true;
+        btnfilterSearch.Enabled = true;
     }
 
     /// <summary>

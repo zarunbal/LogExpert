@@ -105,7 +105,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterTailCheckBox = new CheckBox();
             filterRegexCheckBox = new CheckBox();
             filterCaseSensitiveCheckBox = new CheckBox();
-            filterSearchButton = new Button();
+            btnfilterSearch = new Button();
             bookmarkContextMenuStrip = new ContextMenuStrip(components);
             deleteBookmarksToolStripMenuItem = new ToolStripMenuItem();
             columnContextMenuStrip = new ContextMenuStrip(components);
@@ -892,7 +892,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterSplitContainer.Panel2.Controls.Add(filterTailCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterRegexCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
-            filterSplitContainer.Panel2.Controls.Add(filterSearchButton);
+            filterSplitContainer.Panel2.Controls.Add(btnfilterSearch);
             filterSplitContainer.Panel2MinSize = 550;
             filterSplitContainer.Size = new Size(1855, 46);
             filterSplitContainer.SplitterDistance = 518;
@@ -997,15 +997,15 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSearchButton
             // 
-            filterSearchButton.ImageAlign = ContentAlignment.MiddleRight;
-            filterSearchButton.Location = new Point(3, 5);
-            filterSearchButton.Name = "filterSearchButton";
-            filterSearchButton.Size = new Size(128, 35);
-            filterSearchButton.TabIndex = 11;
-            filterSearchButton.Text = "Search";
-            helpToolTip.SetToolTip(filterSearchButton, "Start the filter search");
-            filterSearchButton.UseVisualStyleBackColor = true;
-            filterSearchButton.Click += OnFilterSearchButtonClick;
+            btnfilterSearch.ImageAlign = ContentAlignment.MiddleRight;
+            btnfilterSearch.Location = new Point(3, 5);
+            btnfilterSearch.Name = "filterSearchButton";
+            btnfilterSearch.Size = new Size(128, 35);
+            btnfilterSearch.TabIndex = 11;
+            btnfilterSearch.Text = "Search";
+            helpToolTip.SetToolTip(btnfilterSearch, "Start the filter search");
+            btnfilterSearch.UseVisualStyleBackColor = true;
+            btnfilterSearch.Click += OnFilterSearchButtonClick;
             // 
             // bookmarkContextMenuStrip
             // 
@@ -1280,7 +1280,7 @@ namespace LogExpert.UI.Controls.LogWindow
         private System.Windows.Forms.CheckBox filterTailCheckBox;
         private System.Windows.Forms.CheckBox filterRegexCheckBox;
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
-        private System.Windows.Forms.Button filterSearchButton;
+        private System.Windows.Forms.Button btnfilterSearch;
         private System.Windows.Forms.Panel panelBackgroundAdvancedFilterSplitContainer;
         private ToolStripSeparator pluginSeparator;
         private ToolStripSeparator menuToolStripSeparator1;

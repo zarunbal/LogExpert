@@ -14,23 +14,26 @@ internal interface ILogPaintContextUI : ILogPaintContext
     #region Properties
 
     Font MonospacedFont { get; } // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+
     Font NormalFont { get; }
+
     Font BoldFont { get; }
+
     Color BookmarkColor { get; }
 
     #endregion
 
     #region Public methods
 
-    ILogLine GetLogLine(int lineNum);
+    ILogLine GetLogLine (int lineNum);
 
-    IColumn GetCellValue(int rowIndex, int columnIndex);
+    IColumn GetCellValue (int rowIndex, int columnIndex);
 
-    Bookmark GetBookmarkForLine(int lineNum);
+    Bookmark GetBookmarkForLine (int lineNum);
 
-    HighlightEntry FindHighlightEntry(ITextValue line, bool noWordMatches);
+    HighlightEntry FindHighlightEntry (ITextValue line, bool noWordMatches);
 
-    IList<HighlightMatchEntry> FindHighlightMatches(ITextValue line);
+    IList<HighlightMatchEntry> FindHighlightMatches (ITextValue line);
 
     #endregion
 }

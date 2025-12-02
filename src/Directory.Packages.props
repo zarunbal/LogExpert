@@ -23,6 +23,7 @@
     <PackageVersion Include="SSH.NET" Version="2025.1.0" />
     <PackageVersion Include="System.Drawing.Common" Version="10.0.0" />
     <PackageVersion Include="System.Resources.Extensions" Version="10.0.0" />
+    <PackageVersion Include="Vanara.Library" Version="4.2.1" />
     <PackageVersion Include="Vanara.PInvoke.DwmApi" Version="4.2.1" />
     <PackageVersion Include="Vanara.PInvoke.RstrtMgr" Version="4.2.1" />
     <PackageVersion Include="Vanara.PInvoke.Shell32" Version="4.2.1" />

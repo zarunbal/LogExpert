@@ -21,4 +21,10 @@
     <PackageReference Include="SSH.NET" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SftpFileSystem.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
