@@ -18,6 +18,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <PackageReference Include="DockPanelSuite.ThemeVS2015" />
+    <PackageReference Include="Vanara.Library" />
     <PackageReference Include="Vanara.PInvoke.RstrtMgr" />
     <PackageReference Include="Vanara.PInvoke.Shell32" />
     <PackageReference Include="Vanara.PInvoke.User32" />

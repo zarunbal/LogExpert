@@ -12,11 +12,9 @@ internal partial class MultiFileMaskDialog : Form
 
     #region cTor
 
-    public MultiFileMaskDialog (Form parent, string fileName)
+    public MultiFileMaskDialog (string fileName)
     {
         SuspendLayout();
-
-        Parent = parent;
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
