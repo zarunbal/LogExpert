@@ -606,7 +606,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     internal void ChangeMultifileMask ()
     {
-        MultiFileMaskDialog dlg = new(this, FileName)
+        MultiFileMaskDialog dlg = new(FileName)
         {
             Owner = this,
             MaxDays = _multiFileOptions.MaxDayTry,
