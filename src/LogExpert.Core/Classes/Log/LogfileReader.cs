@@ -25,7 +25,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private readonly MultiFileOptions _multiFileOptions;
     private readonly IPluginRegistry _pluginRegistry;
     private readonly CancellationTokenSource _cts = new();
-    private readonly bool _useNewReader;
+    private readonly ReaderType _readerType;
 
     private IList<LogBuffer> _bufferList;
     private ReaderWriterLock _bufferListLock;
@@ -80,7 +80,8 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         _maximumLineLength = maximumLineLength;
-        _useNewReader = useNewReader;
+        //_readerType = useNewReader ? ReaderType.System : ReaderType.Legacy;
+        _readerType = ReaderType.Channel;
         EncodingOptions = encodingOptions;
         _max_buffers = bufferCount;
         _maxLinesPerBuffer = linesPerBuffer;
@@ -915,7 +916,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             using var fileStream = logFileInfo.OpenStream();
             try
             {
-                using var reader = GetLogStreamReader(fileStream, EncodingOptions, _useNewReader);
+                using var reader = GetLogStreamReader(fileStream, EncodingOptions);
                 reader.Position = filePos;
                 _fileLength = logFileInfo.Length;
 
@@ -1310,7 +1311,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
             try
             {
-                var reader = GetLogStreamReader(fileStream, EncodingOptions, _useNewReader);
+                var reader = GetLogStreamReader(fileStream, EncodingOptions);
 
                 var filePos = logBuffer.StartPos;
                 reader.Position = logBuffer.StartPos;
@@ -1613,18 +1614,29 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
-    private ILogStreamReader GetLogStreamReader (Stream stream, EncodingOptions encodingOptions, bool useNewReader)
+    private ILogStreamReader GetLogStreamReader (Stream stream, EncodingOptions encodingOptions)
     {
-        var reader = CreateLogStreamReader(stream, encodingOptions, useNewReader);
+        var reader = CreateLogStreamReader(stream, encodingOptions);
 
         return IsXmlMode ? new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig) : reader;
     }
 
-    private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions, bool useSystemReader)
+    public enum ReaderType
     {
-        return useSystemReader
-            ? new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength)
-            : new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength);
+        Legacy,
+        System,
+        Channel
+    }
+
+    private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions)
+    {
+        return _readerType switch
+        {
+            ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
+            ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
+            ReaderType.Channel => new PositionAwareStreamReaderChannel(stream, encodingOptions, _maximumLineLength),
+            _ => throw new ArgumentOutOfRangeException(nameof(ReaderType), _readerType, null)
+        };
     }
 
     private bool ReadLine (ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)

@@ -254,7 +254,7 @@ partial class SettingsDialog
         upDownMaximumLineLength.Location = new Point(762, 121);
         upDownMaximumLineLength.Margin = new Padding(4, 5, 4, 5);
         upDownMaximumLineLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
-        upDownMaximumLineLength.Minimum = new decimal(new int[] { 20000, 0, 0, 0 });
+        upDownMaximumLineLength.Minimum = new decimal(new int[] { 1000, 0, 0, 0 });
         upDownMaximumLineLength.Name = "upDownMaximumLineLength";
         upDownMaximumLineLength.Size = new Size(106, 23);
         upDownMaximumLineLength.TabIndex = 15;
