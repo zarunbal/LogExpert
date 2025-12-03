@@ -2405,7 +2405,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences)
+                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, Application.StartupPath)
                 : Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -2503,7 +2503,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceData(FileName, Preferences)
+                ? Persister.LoadPersistenceData(FileName, Preferences, Application.StartupPath)
                 : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -6240,7 +6240,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var persistenceData = GetPersistenceData();
 
             return ForcedPersistenceFileName == null
-                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences)
+                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, Application.StartupPath)
                 : Persister.SavePersistenceDataWithFixedName(ForcedPersistenceFileName, persistenceData);
         }
         catch (IOException e)

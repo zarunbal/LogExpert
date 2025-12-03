@@ -9,6 +9,7 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Persister;
 
+//Todo Move Persister to its own assembly LogExpert.Persister
 public static class Persister
 {
     #region Fields
@@ -46,12 +47,13 @@ public static class Persister
     /// <param name="preferences">The user preferences that determine the save location and other settings. This parameter cannot be <see
     /// langword="null"/>.</param>
     /// <returns>The full path of the file where the persistence data was saved.</returns>
-    public static string SavePersistenceData (string logFileName, PersistenceData persistenceData, Preferences preferences)
+    public static string SavePersistenceData (string logFileName, PersistenceData persistenceData, Preferences preferences, string applicationStartupPath)
     {
         ArgumentNullException.ThrowIfNull(preferences);
         ArgumentNullException.ThrowIfNull(persistenceData);
+        ArgumentException.ThrowIfNullOrWhiteSpace(applicationStartupPath);
 
-        var fileName = persistenceData.SessionFileName ?? BuildPersisterFileName(logFileName, preferences);
+        var fileName = persistenceData.SessionFileName ?? BuildPersisterFileName(logFileName, preferences, applicationStartupPath);
 
         if (preferences.SaveLocation == SessionSaveLocation.SameDir)
         {
@@ -82,10 +84,12 @@ public static class Persister
     /// <param name="logFileName">The name of the log file to load persistence data from. This value cannot be null.</param>
     /// <param name="preferences">The preferences used to determine the file path and loading behaviour. This value cannot be null.</param>
     /// <returns>The loaded <see cref="PersistenceData"/> object containing the persistence information.</returns>
-    public static PersistenceData LoadPersistenceData (string logFileName, Preferences preferences)
+    public static PersistenceData LoadPersistenceData (string logFileName, Preferences preferences, string applicationStartupPath)
     {
         ArgumentNullException.ThrowIfNull(preferences);
-        var fileName = BuildPersisterFileName(logFileName, preferences);
+        ArgumentNullException.ThrowIfNull(applicationStartupPath);
+
+        var fileName = BuildPersisterFileName(logFileName, preferences, applicationStartupPath);
         return LoadInternal(fileName);
     }
 
@@ -95,10 +99,12 @@ public static class Persister
     /// <param name="logFileName">The name of the log file used to determine the persistence data file.</param>
     /// <param name="preferences">The preferences that influence the file name generation. Cannot be <see langword="null"/>.</param>
     /// <returns>A <see cref="PersistenceData"/> object containing the loaded data.</returns>
-    public static PersistenceData LoadPersistenceDataOptionsOnly (string logFileName, Preferences preferences)
+    public static PersistenceData LoadPersistenceDataOptionsOnly (string logFileName, Preferences preferences, string applicationStartupPath)
     {
         ArgumentNullException.ThrowIfNull(preferences);
-        var fileName = BuildPersisterFileName(logFileName, preferences);
+        ArgumentNullException.ThrowIfNull(applicationStartupPath);
+
+        var fileName = BuildPersisterFileName(logFileName, preferences, applicationStartupPath);
         return LoadInternal(fileName);
     }
 
@@ -149,7 +155,7 @@ public static class Persister
     /// <param name="preferences">The preferences that determine the save location and directory structure for the persister file.</param>
     /// <returns>The full file path of the persister file, including the directory and file name, based on the specified log file
     /// name and preferences.</returns>
-    private static string BuildPersisterFileName (string logFileName, Preferences preferences)
+    private static string BuildPersisterFileName (string logFileName, Preferences preferences, string applicationStartupPath)
     {
         string dir;
         string file;
@@ -180,8 +186,7 @@ public static class Persister
                 }
             case SessionSaveLocation.ApplicationStartupDir:
                 {
-                    //TODO Add Application.StartupPath as Variable
-                    dir = string.Empty;// Application.StartupPath + Path.DirectorySeparatorChar + "sessionfiles";
+                    dir = Path.Join(applicationStartupPath, "sessionFiles");
                     file = dir + Path.DirectorySeparatorChar + BuildSessionFileNameFromPath(logFileName);
                     break;
                 }
@@ -213,12 +218,13 @@ public static class Persister
     /// underscores, and the file name is appended with the ".lxp" extension.</returns>
     private static string BuildSessionFileNameFromPath (string logFileName)
     {
-        var result = logFileName;
-        result = result.Replace(Path.DirectorySeparatorChar, '_');
-        result = result.Replace(Path.AltDirectorySeparatorChar, '_');
-        result = result.Replace(Path.VolumeSeparatorChar, '_');
-        result += ".lxp";
-        return result;
+        var result = new StringBuilder();
+        _ = result.Append(logFileName);
+        _ = result.Replace(Path.DirectorySeparatorChar, '_');
+        _ = result.Replace(Path.AltDirectorySeparatorChar, '_');
+        _ = result.Replace(Path.VolumeSeparatorChar, '_');
+        _ = result.Append(".lxp");
+        return result.ToString();
     }
 
     /// <summary>
