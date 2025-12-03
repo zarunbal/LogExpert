@@ -14,15 +14,15 @@ public class PersisterTests
     public void Setup ()
     {
         // Create temporary test directory
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
         _ = Directory.CreateDirectory(_testDirectory);
 
         // Create a subdirectory to simulate application startup path
-        _applicationStartupPath = Path.Combine(_testDirectory, "ApplicationPath");
+        _applicationStartupPath = Path.Join(_testDirectory, "ApplicationPath");
         _ = Directory.CreateDirectory(_applicationStartupPath);
 
         // Create a test log file
-        _logFileName = Path.Combine(_testDirectory, "test.log");
+        _logFileName = Path.Join(_testDirectory, "test.log");
         File.WriteAllText(_logFileName, "Test log content");
     }
 
@@ -64,7 +64,7 @@ public class PersisterTests
         var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _applicationStartupPath);
 
         // Assert
-        var expectedDirectory = Path.Combine(_applicationStartupPath, "sessionFiles");
+        var expectedDirectory = Path.Join(_applicationStartupPath, "sessionFiles");
         Assert.That(Directory.Exists(expectedDirectory), Is.True, "sessionFiles directory should be created");
         Assert.That(savedFileName, Does.StartWith(expectedDirectory), "Saved file should be in sessionFiles directory");
     }
@@ -192,7 +192,7 @@ public class PersisterTests
     public void SavePersistenceData_WithOwnDir_DoesNotUseApplicationStartupPath ()
     {
         // Arrange
-        var customDirectory = Path.Combine(_testDirectory, "CustomSessionDir");
+        var customDirectory = Path.Join(_testDirectory, "CustomSessionDir");
         _ = Directory.CreateDirectory(customDirectory);
 
         var preferences = new Preferences
@@ -257,7 +257,7 @@ public class PersisterTests
             SaveLocation = SessionSaveLocation.ApplicationStartupDir
         };
 
-        var nonExistentFile = Path.Combine(_testDirectory, "nonexistent.log");
+        var nonExistentFile = Path.Join(_testDirectory, "nonexistent.log");
 
         // Act
         var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(nonExistentFile, preferences, _applicationStartupPath);
@@ -458,7 +458,7 @@ public class PersisterTests
     public void SavePersistenceData_WithApplicationStartupDir_SpecialCharactersInPath_HandlesCorrectly ()
     {
         // Arrange
-        var specialPath = Path.Combine(_testDirectory, "Special Path With Spaces & Symbols");
+        var specialPath = Path.Join(_testDirectory, "Special Path With Spaces & Symbols");
         _ = Directory.CreateDirectory(specialPath);
 
         var preferences = new Preferences
@@ -486,7 +486,7 @@ public class PersisterTests
     public void SavePersistenceData_WithApplicationStartupDir_UnicodeCharactersInPath_HandlesCorrectly ()
     {
         // Arrange
-        var unicodePath = Path.Combine(_testDirectory, "Пути_日本語_Ελληνικά");
+        var unicodePath = Path.Join(_testDirectory, "Пути_日本語_Ελληνικά");
         _ = Directory.CreateDirectory(unicodePath);
 
         var preferences = new Preferences
@@ -517,7 +517,7 @@ public class PersisterTests
         var longPath = _applicationStartupPath;
         for (int i = 0; i < 10; i++)
         {
-            longPath = Path.Combine(longPath, $"SubDirectory{i}");
+            longPath = Path.Join(longPath, $"SubDirectory{i}");
         }
 
         _ = Directory.CreateDirectory(longPath);
@@ -590,7 +590,7 @@ public class PersisterTests
         // Create multiple log files
         for (int i = 0; i < 5; i++)
         {
-            var logFile = Path.Combine(_testDirectory, $"concurrent_test_{i}.log");
+            var logFile = Path.Join(_testDirectory, $"concurrent_test_{i}.log");
             File.WriteAllText(logFile, $"Test log {i}");
             logFiles.Add(logFile);
         }
@@ -629,7 +629,7 @@ public class PersisterTests
     public void SavePersistenceData_ApplicationStartupDirNotExists_CreatesDirectory ()
     {
         // Arrange
-        var nonExistentAppPath = Path.Combine(_testDirectory, "NonExistentAppPath");
+        var nonExistentAppPath = Path.Join(_testDirectory, "NonExistentAppPath");
         // Don't create the directory - let Persister create it
 
         var preferences = new Preferences
@@ -647,7 +647,7 @@ public class PersisterTests
         var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, nonExistentAppPath);
 
         // Assert
-        var expectedDirectory = Path.Combine(nonExistentAppPath, "sessionFiles");
+        var expectedDirectory = Path.Join(nonExistentAppPath, "sessionFiles");
         Assert.That(Directory.Exists(expectedDirectory), Is.True, "Should create sessionFiles directory");
         Assert.That(File.Exists(savedFileName), Is.True, "Should create persistence file");
     }
