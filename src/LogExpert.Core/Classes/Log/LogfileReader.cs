@@ -29,11 +29,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private readonly ReaderType _readerType;
 
     private IList<LogBuffer> _bufferList;
-    private ReaderWriterLock _bufferListLock;
     private bool _contentDeleted;
     private readonly int _maximumLineLength;
 
-    private ReaderWriterLock _disposeLock;
+    private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.NoRecursion);
+    private readonly ReaderWriterLockSlim _disposeLock = new(LockRecursionPolicy.SupportsRecursion);
+    private readonly ReaderWriterLockSlim _lruCacheDictLock = new(LockRecursionPolicy.NoRecursion);
+
     private long _fileLength;
     private Task _garbageCollectorTask;
     private Task _monitorTask;
@@ -43,7 +45,6 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private bool _isLineCountDirty = true;
     private IList<ILogFileInfo> _logFileInfoList = [];
     private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
-    private ReaderWriterLock _lruCacheDictLock;
     private bool _shouldStop;
     private bool _disposed;
     private ILogFileInfo _watchedILogFileInfo;
@@ -334,14 +335,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                     }
                 }
 
-                _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+                AcquireLruCacheDictWriterLock();
                 _logger.Info(CultureInfo.InvariantCulture, "Adjusting StartLine values in {0} buffers by offset {1}", _bufferList.Count, offset);
                 foreach (var buffer in _bufferList)
                 {
                     SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
                 }
 
-                _lruCacheDictLock.ReleaseWriterLock();
+                ReleaseLRUCacheDictWriterLock();
 #if DEBUG
                 if (_bufferList.Count > 0)
                 {
@@ -381,6 +382,34 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() end. offset={0}", offset);
         ReleaseBufferListWriterLock();
         return offset;
+    }
+
+    private void AcquireBufferListReaderLock ()
+    {
+        if (!_bufferListLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Reader lock wait timed out, forcing entry");
+            _bufferListLock.EnterReadLock();
+        }
+    }
+
+    private void ReleaseBufferListReaderLock ()
+    {
+        _bufferListLock.ExitReadLock();
+    }
+
+    private void ReleaseBufferListWriterLock ()
+    {
+        _bufferListLock.ExitWriteLock();
+    }
+
+    private void AcquireBufferListWriterLock ()
+    {
+        if (!_bufferListLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Writer lock wait timed out");
+            _bufferListLock.EnterWriteLock();
+        }
     }
 
     public ILogLine GetLogLine (int lineNum)
@@ -614,8 +643,8 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
         _logger.Info(CultureInfo.InvariantCulture, "Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
         AcquireBufferListWriterLock();
-        _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-        _disposeLock.AcquireWriterLock(Timeout.Infinite);
+        AcquireLruCacheDictWriterLock();
+        AcquireDisposeWriterLock();
 
         foreach (var logBuffer in _bufferList)
         {
@@ -628,8 +657,8 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _lruCacheDict.Clear();
         _bufferList.Clear();
 
-        _disposeLock.ReleaseWriterLock();
-        _lruCacheDictLock.ReleaseWriterLock();
+        ReleaseDisposeWriterLock();
+        ReleaseLRUCacheDictWriterLock();
         ReleaseBufferListWriterLock();
         GC.Collect();
         _contentDeleted = true;
@@ -684,11 +713,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
-        _disposeLock.AcquireReaderLock(Timeout.Infinite);
+        AcquireDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "Buffer info for line {0}", lineNum);
         DumpBufferInfos(buffer);
         _logger.Info(CultureInfo.InvariantCulture, "File pos for current line: {0}", buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
-        _disposeLock.ReleaseReaderLock();
+        AcquireDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
         ReleaseBufferListReaderLock();
     }
@@ -698,10 +727,10 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     public void LogBufferDiagnostic ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "-------- Buffer diagnostics -------");
-        _lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
+        AcquireLruCacheDictReaderLock();
         var cacheCount = _lruCacheDict.Count;
         _logger.Info(CultureInfo.InvariantCulture, "LRU entries: {0}", cacheCount);
-        _lruCacheDictLock.ReleaseReaderLock();
+        ReleaseLRUCacheDictReaderLock();
 
         AcquireBufferListReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "File: {0}\r\nBuffer count: {1}\r\nDisposed buffers: {2}", _fileName, _bufferList.Count, _bufferList.Count - cacheCount);
@@ -712,7 +741,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         for (var i = 0; i < _bufferList.Count; ++i)
         {
             var buffer = _bufferList[i];
-            _disposeLock.AcquireReaderLock(Timeout.Infinite);
+            AcquireDisposeReaderLock();
             if (buffer.StartLine != lineNum)
             {
                 _logger.Error("Start line of buffer is: {0}, expected: {1}", buffer.StartLine, lineNum);
@@ -724,7 +753,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             disposeSum += buffer.DisposeCount;
             maxDispose = Math.Max(maxDispose, buffer.DisposeCount);
             minDispose = Math.Min(minDispose, buffer.DisposeCount);
-            _disposeLock.ReleaseReaderLock();
+            ReleaseDisposeReaderLock();
         }
 
         ReleaseBufferListReaderLock();
@@ -765,7 +794,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-        _disposeLock.AcquireReaderLock(Timeout.Infinite);
+        AcquireDisposeReaderLock();
         if (logBuffer.IsDisposed)
         {
             var cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
@@ -778,7 +807,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         var line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
-        _disposeLock.ReleaseReaderLock();
+        ReleaseDisposeReaderLock();
         ReleaseBufferListReaderLock();
 
         return Task.FromResult(line);
@@ -790,9 +819,6 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         //_bufferLru = new List<LogBuffer>(_max_buffers + 1);
         //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
         _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(_max_buffers + 1);
-        _lruCacheDictLock = new ReaderWriterLock();
-        _bufferListLock = new ReaderWriterLock();
-        _disposeLock = new ReaderWriterLock();
     }
 
     private void StartGCThread ()
@@ -855,7 +881,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         LogBuffer lastRemovedBuffer = null;
         IList<LogBuffer> deleteList = [];
         AcquireBufferListWriterLock();
-        _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+        AcquireLruCacheDictWriterLock();
         if (matchNamesOnly)
         {
             foreach (var buffer in _bufferList)
@@ -884,7 +910,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             RemoveFromBufferList(buffer);
         }
 
-        _lruCacheDictLock.ReleaseWriterLock();
+        ReleaseLRUCacheDictWriterLock();
         ReleaseBufferListWriterLock();
         if (lastRemovedBuffer == null)
         {
@@ -926,43 +952,64 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
                 var lineNum = startLine;
                 LogBuffer logBuffer;
-                AcquireBufferListReaderLock();
-                if (_bufferList.Count == 0)
+                AcquireBufferListUpgradeableReadLock();
+                try
                 {
-                    logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
-                    {
-                        StartLine = startLine,
-                        StartPos = filePos
-                    };
-                    var cookie = UpgradeBufferListLockToWriter();
-                    AddBufferToList(logBuffer);
-                    DowngradeBufferListLockFromWriter(ref cookie);
-                }
-                else
-                {
-                    logBuffer = _bufferList[_bufferList.Count - 1];
-
-                    if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName, StringComparison.Ordinal))
+                    if (_bufferList.Count == 0)
                     {
                         logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
                         {
                             StartLine = startLine,
                             StartPos = filePos
                         };
-                        var cookie = UpgradeBufferListLockToWriter();
-                        AddBufferToList(logBuffer);
-                        DowngradeBufferListLockFromWriter(ref cookie);
-                    }
+                        UpgradeToWriterLock();
+                        try
+                        {
+                            AddBufferToList(logBuffer);
+                        }
+                        finally
+                        {
 
-                    _disposeLock.AcquireReaderLock(Timeout.Infinite);
-                    if (logBuffer.IsDisposed)
+                            DowngradeFromWriterLock();
+                        }
+                    }
+                    else
                     {
-                        var cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
-                        ReReadBuffer(logBuffer);
-                        _disposeLock.DowngradeFromWriterLock(ref cookie);
-                    }
+                        logBuffer = _bufferList[_bufferList.Count - 1];
 
-                    _disposeLock.ReleaseReaderLock();
+                        if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName, StringComparison.Ordinal))
+                        {
+                            logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
+                            {
+                                StartLine = startLine,
+                                StartPos = filePos
+                            };
+
+                            UpgradeToWriterLock();
+                            try
+                            {
+                                AddBufferToList(logBuffer);
+                            }
+                            finally
+                            {
+                                DowngradeFromWriterLock();
+                            }
+                        }
+
+                        AcquireDisposeReaderLock();
+                        if (logBuffer.IsDisposed)
+                        {
+                            var cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                            ReReadBuffer(logBuffer);
+                            _disposeLock.DowngradeFromWriterLock(ref cookie);
+                        }
+
+                        ReleaseDisposeReaderLock();
+                    }
+                }
+                finally
+                {
+                    ReleaseBufferListUpgradeableReadLock();
                 }
 
                 Monitor.Enter(logBuffer); // Lock the buffer
@@ -1055,7 +1102,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     private void UpdateLruCache (LogBuffer logBuffer)
     {
-        _lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
+        AcquireLruCacheDictReaderLock();
         if (_lruCacheDict.TryGetValue(logBuffer.StartLine, out var cacheEntry))
         {
             cacheEntry.Touch();
@@ -1091,7 +1138,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         _logger.Warn(CultureInfo.InvariantCulture, "Ooops? Cannot find the already existing entry in LRU.");
                     }
 #endif
-                    _lruCacheDictLock.ReleaseLock();
+                    ReleaseLRUCacheDictWriterLock();
                     throw;
                 }
             }
@@ -1099,7 +1146,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             _lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
         }
 
-        _lruCacheDictLock.ReleaseReaderLock();
+        ReleaseLRUCacheDictReaderLock();
     }
 
     /// <summary>
@@ -1134,7 +1181,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 #endif
         _logger.Debug(CultureInfo.InvariantCulture, "Starting garbage collection");
         var threshold = 10;
-        _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+        AcquireLruCacheDictWriterLock();
         var diff = 0;
         if (_lruCacheDict.Count - (_max_buffers + threshold) > 0)
         {
@@ -1156,7 +1203,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             }
 
             // remove first <diff> entries (least usage)
-            _disposeLock.AcquireWriterLock(Timeout.Infinite);
+            AcquireDisposeWriterLock();
             for (var i = 0; i < diff; ++i)
             {
                 if (i >= useSorterList.Count)
@@ -1170,10 +1217,10 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 entry.LogBuffer.DisposeContent();
             }
 
-            _disposeLock.ReleaseWriterLock();
+            ReleaseDisposeWriterLock();
         }
 
-        _lruCacheDictLock.ReleaseWriterLock();
+        ReleaseLRUCacheDictWriterLock();
 #if DEBUG
         if (diff > 0)
         {
@@ -1288,16 +1335,16 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         //  this.lruDict.Clear();
         //}
         _logger.Info(CultureInfo.InvariantCulture, "Clearing LRU cache.");
-        _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-        _disposeLock.AcquireWriterLock(Timeout.Infinite);
+        AcquireLruCacheDictWriterLock();
+        AcquireDisposeWriterLock();
         foreach (var entry in _lruCacheDict.Values)
         {
             entry.LogBuffer.DisposeContent();
         }
 
         _lruCacheDict.Clear();
-        _disposeLock.ReleaseWriterLock();
-        _lruCacheDictLock.ReleaseWriterLock();
+        ReleaseDisposeWriterLock();
+        ReleaseLRUCacheDictWriterLock();
         _logger.Info(CultureInfo.InvariantCulture, "Clearing done.");
     }
 
@@ -1680,92 +1727,130 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return true;
     }
 
-    private void AcquireBufferListReaderLock ()
+    private void AcquireBufferListUpgradeableReadLock ()
     {
-        try
+        if (!_bufferListLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
         {
-            _bufferListLock.AcquireReaderLock(10000);
-#if DEBUG && TRACE_LOCKS
-    StackTrace st = new StackTrace(true);
-    StackFrame callerFrame = st.GetFrame(2);
-    this.bufferListLockInfo =
-"Read lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-#endif
-        }
-        catch (ApplicationException e)
-        {
-            _logger.Warn(e, "Reader lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG && TRACE_LOCKS
-    _logger.logInfo(this.bufferListLockInfo);
-#endif
-            _bufferListLock.AcquireReaderLock(Timeout.Infinite);
+            _logger.Warn("Upgradeable read lock timed out");
+            _bufferListLock.EnterUpgradeableReadLock();
         }
     }
 
-    private void ReleaseBufferListReaderLock ()
+    private void AcquireLruCacheDictReaderLock ()
     {
-        _bufferListLock.ReleaseReaderLock();
-    }
-
-    private void AcquireBufferListWriterLock ()
-    {
-        try
+        if (!_lruCacheDictLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
         {
-            _bufferListLock.AcquireWriterLock(10000);
-#if DEBUG && TRACE_LOCKS
-    StackTrace st = new StackTrace(true);
-    StackFrame callerFrame = st.GetFrame(1);
-    this.bufferListLockInfo =
-"Write lock from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
-    callerFrame.GetFileName();
-#endif
-        }
-        catch (ApplicationException e)
-        {
-            _logger.Warn(e, "Writer lock wait for bufferList timed out. Now trying infinite.");
-#if DEBUG && TRACE_LOCKS
-    _logger.logInfo(this.bufferListLockInfo);
-#endif
-            _bufferListLock.AcquireWriterLock(Timeout.Infinite);
+            _logger.Warn("LRU cache dict reader lock timed out");
+            _lruCacheDictLock.EnterReadLock();
         }
     }
 
-    private void ReleaseBufferListWriterLock ()
+    private void AcquireDisposeReaderLock ()
     {
-        _bufferListLock.ReleaseWriterLock();
+        if (!_disposeLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Dispose reader lock timed out");
+            _disposeLock.EnterReadLock();
+        }
     }
 
-    private LockCookie UpgradeBufferListLockToWriter ()
+    private void ReleaseLRUCacheDictWriterLock ()
     {
-        try
+        _lruCacheDictLock.ExitWriteLock();
+    }
+
+    private void ReleaseDisposeWriterLock ()
+    {
+        _disposeLock.ExitWriteLock();
+    }
+
+    private void ReleaseLRUCacheDictReaderLock ()
+    {
+        _lruCacheDictLock.ExitReadLock();
+    }
+
+    private void ReleaseDisposeReaderLock ()
+    {
+        _disposeLock.ExitReadLock();
+    }
+
+    private void AcquireDisposeWriterLock ()
+    {
+        if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
         {
-            var cookie = _bufferListLock.UpgradeToWriterLock(10000);
+            _logger.Warn("Dispose writer lock timed out");
+            _disposeLock.EnterWriteLock();
+        }
+    }
+
+    private void AcquireLruCacheDictWriterLock ()
+    {
+        if (!_lruCacheDictLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("LRU cache dict writer lock timed out");
+            _lruCacheDictLock.EnterWriteLock();
+        }
+    }
+
+    private void ReleaseBufferListUpgradeableReadLock ()
+    {
+        _bufferListLock.ExitUpgradeableReadLock();
+    }
+
+    private void UpgradeToWriterLock ()
+    {
+        if (!_bufferListLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Writer lock upgrade timed out");
+            _bufferListLock.EnterWriteLock();
+        }
+    }
+
+    private void DowngradeBufferListLockToReader ()
+    {
+        // Exit writer lock
+        _bufferListLock.ExitWriteLock();
+
+        // Re-acquire reader lock
+        if (!_bufferListLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Reader lock downgrade timed out");
+            _bufferListLock.EnterReadLock();
+        }
+
+#if DEBUG && TRACE_LOCKS
+  StackTrace st = new StackTrace(true);
+  StackFrame callerFrame = st.GetFrame(2);
+  this.bufferListLockInfo +=
+", downgraded to reader from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
+#endif
+    }
+
+    private void DowngradeFromWriterLock ()
+    {
+        // Exit writer lock (automatically back to upgradeable read)
+        _bufferListLock.ExitWriteLock();
+    }
+
+    private void UpgradeBufferListLockToWriter ()
+    {
+        _bufferListLock.ExitReadLock();
+
+        // Then acquire writer lock
+        if (!_bufferListLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        {
+            _logger.Warn("Writer lock upgrade timed out");
+            _bufferListLock.EnterWriteLock();
+        }
+
 #if DEBUG && TRACE_LOCKS
     StackTrace st = new StackTrace(true);
     StackFrame callerFrame = st.GetFrame(2);
     this.bufferListLockInfo +=
 ", upgraded to writer from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
 #endif
-            return cookie;
-        }
-        catch (ApplicationException e)
-        {
-            _logger.Warn(e, "Writer lock update wait for bufferList timed out. Now trying infinite.");
 #if DEBUG && TRACE_LOCKS
     _logger.logInfo(this.bufferListLockInfo);
-#endif
-            return _bufferListLock.UpgradeToWriterLock(Timeout.Infinite);
-        }
-    }
-
-    private void DowngradeBufferListLockFromWriter (ref LockCookie cookie)
-    {
-        _bufferListLock.DowngradeFromWriterLock(ref cookie);
-#if DEBUG && TRACE_LOCKS
-  StackTrace st = new StackTrace(true);
-  StackFrame callerFrame = st.GetFrame(2);
-  this.bufferListLockInfo +=
-", downgraded to reader from " + callerFrame.GetMethod().DeclaringType.Name + "." + callerFrame.GetMethod().Name + "() " + callerFrame.GetFileLineNumber();
 #endif
     }
 
