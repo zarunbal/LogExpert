@@ -5010,20 +5010,20 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Slower but more compatible with strange linefeeds and encodings.
-        /// </summary>
-        public static string SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader {
-            get {
-                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to If this mode is activated, the save file will be loaded from the Executable Location.
         /// </summary>
         public static string SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Reader  algorithm.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp", resourceCulture);
             }
         }
         

@@ -893,8 +893,8 @@
   <data name="SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir" xml:space="preserve">
 		<value>Wähle ein Verzeichnis für die LogExpert Sessiondateien</value>
 	</data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader" xml:space="preserve">
-		<value>Langsamer dafür mehr kompatible mit unbekannten Zeilenfeeds und Encodings</value>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp" xml:space="preserve">
+		<value>Dateiauslese algorithmus</value>
 	</data>
   <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
 		<value>Bei Aktivierung des Modus, wird die gespeicherte Datei aus dem Verzeichnis der Executable geladen</value>

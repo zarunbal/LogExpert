@@ -983,8 +983,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
         <value>If this mode is activated, the save file will be loaded from the Executable Location</value>
     </data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader" xml:space="preserve">
-        <value>Slower but more compatible with strange linefeeds and encodings</value>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp" xml:space="preserve">
+        <value>File Reader  algorithm</value>
     </data>
   <data name="SettingsDialog_Form_Text" xml:space="preserve">
         <value>Settings</value>

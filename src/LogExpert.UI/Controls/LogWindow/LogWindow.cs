@@ -6143,7 +6143,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             try
             {
-                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
+                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
             }
             catch (LogFileException lfe)
             {
@@ -6206,7 +6206,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         EncodingOptions = encodingOptions;
         _columnCache = new ColumnCache();
 
-        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, !Preferences.UseLegacyReader, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
+        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
 
         RegisterLogFileReaderEvents();
         _logFileReader.StartMonitoring();

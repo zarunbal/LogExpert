@@ -10,7 +10,7 @@ namespace LogExpert.Core.Classes.Log;
 /// Experimental channel-based reader that produces lines in a background task and feeds them through a bounded Channel.
 /// The class is intentionally self-contained so that it can be wired in parallel to the existing PositionAware readers.
 /// </summary>
-internal sealed class PositionAwareStreamReaderChannel : LogStreamReaderBase
+public class PositionAwareStreamReaderChannel : LogStreamReaderBase
 {
     private const int DEFAULT_BYTE_BUFFER_SIZE = 64 * 1024;
     private const int DEFAULT_CHANNEL_CAPACITY = 128;

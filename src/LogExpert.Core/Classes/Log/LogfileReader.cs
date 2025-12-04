@@ -5,6 +5,7 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes.xml;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interface;
 
@@ -52,20 +53,20 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     #region cTor
 
     /// Public constructor for single file.
-    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
-    : this([fileName], encodingOptions, multiFile, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry, maximumLineLength)
+    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, ReaderType readerType, IPluginRegistry pluginRegistry, int maximumLineLength)
+    : this([fileName], encodingOptions, multiFile, bufferCount, linesPerBuffer, multiFileOptions, readerType, pluginRegistry, maximumLineLength)
     {
     }
 
     /// Public constructor for multiple files.
-    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
-        : this(fileNames, encodingOptions, true, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry, maximumLineLength)
+    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, ReaderType readerType, IPluginRegistry pluginRegistry, int maximumLineLength)
+        : this(fileNames, encodingOptions, true, bufferCount, linesPerBuffer, multiFileOptions, readerType, pluginRegistry, maximumLineLength)
     {
         // In this overload, we assume multiFile is always true.
     }
 
     // Single private constructor that contains the common initialization logic.
-    private LogfileReader (string[] fileNames, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry, int maximumLineLength)
+    private LogfileReader (string[] fileNames, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, ReaderType readerType, IPluginRegistry pluginRegistry, int maximumLineLength)
     {
         // Validate input: at least one file must be provided.
         if (fileNames == null || fileNames.Length < 1)
@@ -80,8 +81,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         _maximumLineLength = maximumLineLength;
-        //_readerType = useNewReader ? ReaderType.System : ReaderType.Legacy;
-        _readerType = ReaderType.Channel;
+        _readerType = readerType;
         EncodingOptions = encodingOptions;
         _max_buffers = bufferCount;
         _maxLinesPerBuffer = linesPerBuffer;
@@ -193,6 +193,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     //TODO: Make this private
     public void ReadFiles ()
     {
+        _lastProgressUpdate = DateTime.MinValue;
         FileSize = 0;
         LineCount = 0;
         //this.lastReturnedLine = "";
@@ -909,6 +910,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _ = _bufferList.Remove(buffer);
     }
 
+    private DateTime _lastProgressUpdate = DateTime.MinValue;
+    private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
+
     private void ReadToBufferList (ILogFileInfo logFileInfo, long filePos, int startLine)
     {
         try
@@ -985,7 +989,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                     lineCount++;
                     if (lineCount > _maxLinesPerBuffer && reader.IsBufferComplete)
                     {
-                        OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
+                        var now = DateTime.Now;
+                        bool shouldFireLoadFileEvent = (now - _lastProgressUpdate).TotalMilliseconds >= PROGRESS_UPDATE_INTERVAL_MS;
+
+                        if (shouldFireLoadFileEvent)
+                        {
+                            OnLoadFile(new LoadFileEventArgs(logFileInfo.FullName, filePos, false, logFileInfo.Length, false));
+                            _lastProgressUpdate = now;
+                        }
 
                         Monitor.Exit(logBuffer);
                         logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer);
@@ -1629,7 +1640,8 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
             ReaderType.Channel => new PositionAwareStreamReaderChannel(stream, encodingOptions, _maximumLineLength),
             ReaderType.Pipeline => new PositionAwareStreamReaderPipeline(stream, encodingOptions, _maximumLineLength),
-            _ => throw new ArgumentOutOfRangeException(nameof(ReaderType), _readerType, null)
+            _ => //Default will be Pipeline
+                 new PositionAwareStreamReaderPipeline(stream, encodingOptions, _maximumLineLength)
         };
     }
 
