@@ -18,10 +18,5 @@ public enum ReaderType
     /// <summary>
     /// System.IO.StreamReader based implementation.
     /// </summary>
-    System,
-
-    /// <summary>
-    /// Channel-based asynchronous reader implementation.
-    /// </summary>
-    Channel
+    System
 }

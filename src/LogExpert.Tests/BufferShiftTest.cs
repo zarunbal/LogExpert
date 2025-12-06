@@ -2,6 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 using LogExpert.PluginRegistry.FileSystem;
 
 using NUnit.Framework;
@@ -24,7 +25,10 @@ internal class BufferShiftTest : RolloverHandlerTestBase
     }
 
     [Test]
-    public void TestShiftBuffers1 ()
+    [TestCase(ReaderType.Pipeline)]
+    [TestCase(ReaderType.System)]
+    //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
+    public void TestShiftBuffers1 (ReaderType readerType)
     {
         var linesPerFile = 10;
         MultiFileOptions options = new()
@@ -41,7 +45,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         };
 
         _ = PluginRegistry.PluginRegistry.Create(TestDirectory.FullName, 500);
-        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, false, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, readerType, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var lil = reader.GetLogFileInfoList();

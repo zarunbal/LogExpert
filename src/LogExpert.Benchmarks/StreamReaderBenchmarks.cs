@@ -88,14 +88,6 @@ public class StreamReaderBenchmarks
     }
 
     [Benchmark]
-    public void Channel_ReadAll_Small ()
-    {
-        using var stream = new MemoryStream(_smallTestData);
-        using var reader = new PositionAwareStreamReaderChannel(stream, new EncodingOptions(), 10000);
-        ReadAllLines(reader);
-    }
-
-    [Benchmark]
     public void Pipeline_ReadAll_Small ()
     {
         using var stream = new MemoryStream(_smallTestData);
@@ -116,14 +108,6 @@ public class StreamReaderBenchmarks
     {
         using var stream = new MemoryStream(_mediumTestData);
         using var reader = new PositionAwareStreamReaderSystem(stream, new EncodingOptions(), 10000);
-        ReadAllLines(reader);
-    }
-
-    [Benchmark]
-    public void Channel_ReadAll_Medium ()
-    {
-        using var stream = new MemoryStream(_mediumTestData);
-        using var reader = new PositionAwareStreamReaderChannel(stream, new EncodingOptions(), 10000);
         ReadAllLines(reader);
     }
 
@@ -152,14 +136,6 @@ public class StreamReaderBenchmarks
     }
 
     [Benchmark]
-    public void Channel_ReadAll_Large ()
-    {
-        using var stream = new MemoryStream(_largeTestData);
-        using var reader = new PositionAwareStreamReaderChannel(stream, new EncodingOptions(), 10000);
-        ReadAllLines(reader);
-    }
-
-    [Benchmark]
     public void Pipeline_ReadAll_Large ()
     {
         using var stream = new MemoryStream(_largeTestData);
@@ -176,37 +152,10 @@ public class StreamReaderBenchmarks
     }
 
     [Benchmark]
-    public void Channel_ReadAll_Unicode ()
-    {
-        using var stream = new MemoryStream(_unicodeTestData);
-        using var reader = new PositionAwareStreamReaderChannel(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, 10000);
-        ReadAllLines(reader);
-    }
-
-    [Benchmark]
     public void Pipeline_Seek_And_Read ()
     {
         using var stream = new MemoryStream(_mediumTestData);
         using var reader = new PositionAwareStreamReaderPipeline(stream, new EncodingOptions(), 10000);
-
-        // Read first 100 lines
-        for (int i = 0; i < 100; i++)
-        {
-            _ = reader.ReadLine();
-        }
-
-        // Seek back to beginning
-        reader.Position = 0;
-
-        // Read all lines
-        ReadAllLines(reader);
-    }
-
-    [Benchmark]
-    public void Channel_Seek_And_Read ()
-    {
-        using var stream = new MemoryStream(_mediumTestData);
-        using var reader = new PositionAwareStreamReaderChannel(stream, new EncodingOptions(), 10000);
 
         // Read first 100 lines
         for (int i = 0; i < 100; i++)
