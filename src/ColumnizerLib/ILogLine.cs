@@ -39,6 +39,7 @@ public interface ILogLine : ITextValue
 /// </para>
 /// </remarks>
 public readonly struct LogLine (string fullLine, int lineNumber) : ILogLine
+{
     public string FullLine { get; } = fullLine;
 
     public int LineNumber { get; } = lineNumber;
