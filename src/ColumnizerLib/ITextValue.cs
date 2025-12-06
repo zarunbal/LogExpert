@@ -14,7 +14,7 @@ public interface ITextValue
 
 public static class TextValueExtensions
 {
-    [Obsolete("Use FullLine property directly")]
+    [Obsolete("Use ILogLine.FullLine property directly instead of this extension method")]
     public static string GetText (this ILogLine logLine) => logLine.FullLine;
 
     [Obsolete("Use DisplayValue property directly")]
