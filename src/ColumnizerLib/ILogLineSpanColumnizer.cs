@@ -1,6 +1,5 @@
 namespace ColumnizerLib;
 
-// ColumnizerLib/ILogLineSpanColumnizer.cs
 public interface ILogLineSpanColumnizer : ILogLineColumnizer
 {
     /// <summary>
