@@ -1060,7 +1060,8 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Information</value>
 	</data>
   <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
-		<value>LogExpert besitzt nicht alle Systemrechte. Vielleicht wurde LogExpert aus einem Netzwerklaufwerk gestartet. Bitte LogExpert von einem lokalen Laufwerk starten!\n ({0})</value>
+		<value>LogExpert besitzt nicht alle Systemrechte. Vielleicht wurde LogExpert aus einem Netzwerklaufwerk gestartet. Bitte LogExpert von einem lokalen Laufwerk starten!
+		({0})</value>
 	</data>
   <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag" xml:space="preserve">
 		<value>Horizontal verschieben</value>
@@ -1499,7 +1500,8 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Suchtext ist leer</value>
 	</data>
   <data name="SearchDialog_UI_Error_CreatingSearchParameter" xml:space="preserve">
-		<value>Fehler beim Erstellen des Suchparameters\r\n{0}</value>
+		<value>Fehler beim Erstellen des Suchparameters
+		{0}</value>
 	</data>
   <data name="LogExpert_Common_UI_Button_Apply" xml:space="preserve">
 		<value>Ü&amp;bernehmen</value>
@@ -1658,7 +1660,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Block Zeilen:</value>
 	</data>
   <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-		<value>Diese Funktion befindet sich in der Pre-Beta-Phase und funktioniert nicht :)\r\nVerwendung: Wählen Sie einen Bereich im Protokollfenster aus und klicken Sie auf „Recalc“. \r\nDadurch wird nach Textbereichen gesucht, die dem ausgewählten Bereich ähneln.</value>
+		<value>Diese Funktion befindet sich in der Pre-Beta-Phase und funktioniert nicht :)
+		Verwendung: Wählen Sie einen Bereich im Protokollfenster aus und klicken Sie auf „Recalc“. 
+		Dadurch wird nach Textbereichen gesucht, die dem ausgewählten Bereich ähneln.</value>
 	</data>
   <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
 		<value>Fuzzy</value>
@@ -1682,13 +1686,14 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Bereich setzen</value>
 	</data>
   <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-		<value>Start: {0}\nEnde: {1}</value>
+		<value>Start: {0}
+		Ende: {1}</value>
 	</data>
   <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
 		<value>Sitzung laden</value>
 	</data>
   <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
-		<value>Das Wiederherstellen des Layouts erfordert eine leere Arbeitsfläche.\n\n</value>
+		<value>Das Wiederherstellen des Layouts erfordert eine leere Arbeitsfläche.</value>
 	</data>
   <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
 		<value>Bitte wählen Sie, wie Sie fortfahren möchten:</value>
@@ -1778,7 +1783,7 @@ Alle anderen Zeichen werden benutzt wie sie angegeben sind</value>
 		<value>Konfigurieren...</value>
 	</data>
   <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Format" xml:space="preserve">
-		<value>\r\nUnterstützt Zeitverschiebung: {0}</value>
+		<value>Unterstützt Zeitverschiebung: {0}</value>
 	</data>
   <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Yes" xml:space="preserve">
 		<value>Ja</value>

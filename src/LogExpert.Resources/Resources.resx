@@ -200,7 +200,8 @@
         <value>Config file not found</value>
     </data>
   <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
-        <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0})</value>
+        <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.
+		({0})</value>
     </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\bmp\Pro_Filter.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -254,7 +255,8 @@
         <value>[Default]</value>
     </data>
   <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
-        <value>Error during save of entry.\r\n{0}</value>
+        <value>Error during save of entry.
+		{0}</value>
     </data>
   <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
         <value>No processes are locking the path specified</value>
@@ -1525,7 +1527,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Search</value>
     </data>
   <data name="SearchDialog_UI_Error_CreatingSearchParameter" xml:space="preserve">
-        <value>Error during creation of search parameter\r\n{0}</value>
+        <value>Error during creation of search parameter
+		{0}</value>
     </data>
   <data name="SearchDialog_UI_Error_SearchTextEmpty" xml:space="preserve">
         <value>Search text is empty</value>
@@ -1660,7 +1663,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Block lines:</value>
     </data>
   <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-        <value>This feature is pre-beta and does not work :)\r\nUsage: Select a range in the log window and press \"Recalc\". \r\nThis will search for text ranges similar to the selected one.</value>
+        <value>This feature is pre-beta and does not work :)
+		Usage: Select a range in the log window and press "Recalc". 
+		This will search for text ranges similar to the selected one.</value>
     </data>
   <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
         <value>Fuzzy</value>
@@ -1684,13 +1689,14 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Set range</value>
     </data>
   <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-        <value>Start: {0}\nEnd: {1}</value>
+        <value>Start: {0}
+		End: {1}</value>
     </data>
   <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
         <value>Loading Session</value>
     </data>
   <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
-        <value>Restoring layout requires an empty workbench.\n\n</value>
+        <value>Restoring layout requires an empty workbench.</value>
     </data>
   <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
         <value>Please choose how to proceed:</value>
@@ -1780,7 +1786,7 @@ all other chars will be used as given</value>
         <value>Config...</value>
     </data>
   <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Format" xml:space="preserve">
-        <value>\r\nSupports timeshift: {0}</value>
+        <value>Supports timeshift: {0}</value>
     </data>
   <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Yes" xml:space="preserve">
         <value>Yes</value>
