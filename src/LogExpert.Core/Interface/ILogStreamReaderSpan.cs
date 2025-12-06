@@ -1,6 +1,6 @@
 namespace LogExpert.Core.Interface;
 
-internal interface ILogStreamReaderSpan : ILogStreamReader
+public interface ILogStreamReaderSpan : ILogStreamReader
 {
 
     bool TryReadLine (out ReadOnlyMemory<char> lineMemory);
