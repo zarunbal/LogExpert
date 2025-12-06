@@ -4,10 +4,11 @@ using System.IO.Pipelines;
 using System.Text;
 
 using LogExpert.Core.Entities;
+using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.Classes.Log;
 
-public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
+public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStreamReaderSpan
 {
     private const int DEFAULT_BYTE_BUFFER_SIZE = 64 * 1024; // 64 KB
     private const int MINIMUM_READ_AHEAD_SIZE = 4 * 1024; // 4 KB
@@ -29,6 +30,8 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
     private readonly int _byteBufferSize;
     private readonly int _charBufferSize;
     private readonly long _preambleLength;
+
+    private LineSegment? _currentSegment;
 
     private PipeReader _pipeReader;
     private CancellationTokenSource _cts;
@@ -99,42 +102,49 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
 
     public override string ReadLine ()
     {
-        ObjectDisposedException.ThrowIf(IsDisposed, GetType());
-
-        // Check for producer exception
-        var producerEx = Volatile.Read(ref _producerException);
-        if (producerEx != null)
+        if (TryReadLine(out var lineMemory))
         {
-            throw new InvalidOperationException("Producer task encountered an error.", producerEx);
+            return new string(lineMemory.Span); // Only allocate when explicitly requested
         }
 
-        LineSegment segment;
-        try
-        {
-            // BlockingCollection.Take() blocks until an item is available or collection is completed
-            // This eliminates the race condition present in the semaphore + queue approach
-            segment = _lineQueue.Take(_cts?.Token ?? CancellationToken.None);
-        }
-        catch (OperationCanceledException)
-        {
-            return null;
-        }
-        catch (InvalidOperationException) // Thrown when collection is marked as completed and empty
-        {
-            return null;
-        }
+        return null;
 
-        using (segment)
-        {
-            if (segment.IsEof)
-            {
-                return null;
-            }
+        //ObjectDisposedException.ThrowIf(IsDisposed, GetType());
 
-            var line = new string(segment.Buffer, 0, segment.Length);
-            _ = Interlocked.Exchange(ref _position, segment.ByteOffset + segment.ByteLength);
-            return line;
-        }
+        //// Check for producer exception
+        //var producerEx = Volatile.Read(ref _producerException);
+        //if (producerEx != null)
+        //{
+        //    throw new InvalidOperationException("Producer task encountered an error.", producerEx);
+        //}
+
+        //LineSegment segment;
+        //try
+        //{
+        //    // BlockingCollection.Take() blocks until an item is available or collection is completed
+        //    // This eliminates the race condition present in the semaphore + queue approach
+        //    segment = _lineQueue.Take(_cts?.Token ?? CancellationToken.None);
+        //}
+        //catch (OperationCanceledException)
+        //{
+        //    return null;
+        //}
+        //catch (InvalidOperationException) // Thrown when collection is marked as completed and empty
+        //{
+        //    return null;
+        //}
+
+        //using (segment)
+        //{
+        //    if (segment.IsEof)
+        //    {
+        //        return null;
+        //    }
+
+        //    var line = new string(segment.Buffer, 0, segment.Length);
+        //    _ = Interlocked.Exchange(ref _position, segment.ByteOffset + segment.ByteLength);
+        //    return line;
+        //}
     }
 
     protected override void Dispose (bool disposing)
@@ -619,6 +629,42 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
         }
 
         return (0, null);
+    }
+
+    public bool TryReadLine (out ReadOnlyMemory<char> lineMemory)
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, GetType());
+
+        var producerEx = Volatile.Read(ref _producerException);
+        if (producerEx != null)
+        {
+            throw new InvalidOperationException("Producer task encountered an error.", producerEx);
+        }
+
+        if (!_lineQueue.TryTake(out var segment, 100, _cts?.Token ?? CancellationToken.None))
+        {
+            lineMemory = default;
+            return false;
+        }
+
+        // Store segment for lifetime management
+        _currentSegment?.Dispose();
+        _currentSegment = segment;
+
+        if (segment.IsEof)
+        {
+            lineMemory = default;
+            return false;
+        }
+
+        lineMemory = new ReadOnlyMemory<char>(segment.Buffer, 0, segment.Length);
+        _ = Interlocked.Exchange(ref _position, segment.ByteOffset + segment.ByteLength);
+        return true;
+    }
+
+    public void ReturnMemory (ReadOnlyMemory<char> memory)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
