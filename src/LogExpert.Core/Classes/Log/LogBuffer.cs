@@ -24,7 +24,8 @@ public class LogBuffer
 
     //public LogBuffer() { }
 
-    //Dont use Primary Constructor, MAX_LINES will not be initialized correctly
+    // Don't use a primary constructor here: field initializers (like MAX_LINES) run before primary constructor parameters are assigned,
+    // so MAX_LINES would always be set to its default value before the constructor body can assign it. Use a regular constructor instead.
     public LogBuffer (ILogFileInfo fileInfo, int maxLines)
     {
         FileInfo = fileInfo;
