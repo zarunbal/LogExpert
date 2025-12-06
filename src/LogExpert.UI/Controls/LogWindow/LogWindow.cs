@@ -7934,7 +7934,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         RefreshAllGrids();
     }
 
-    //Replace any digit, to normalize numbers
+    //Replace any digit, to normalize numbers.
     [GeneratedRegex("\\d")]
     private static partial Regex ReplaceDigit ();
 

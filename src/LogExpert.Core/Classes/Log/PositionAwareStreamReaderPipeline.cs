@@ -157,6 +157,7 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
                     {
                         segment.Dispose();
                     }
+
                     _lineQueue.Dispose();
                 }
 
@@ -200,6 +201,13 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
         }
     }
 
+    /// <summary>
+    /// Cancels the current pipeline operation and releases associated resources. This method should be called while
+    /// holding the appropriate lock to ensure thread safety.
+    /// </summary>
+    /// <remarks>This method cancels any ongoing producer task, marks the internal queue as complete to
+    /// unblock waiting consumers, and disposes of pipeline resources. It is intended for internal use and must be
+    /// invoked only when the pipeline is in a valid state for cancellation.</remarks>
     private void CancelPipelineLocked ()
     {
         if (_cts == null)
@@ -226,7 +234,7 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
         }
         finally
         {
-            _cts?.Dispose();
+            _cts.Dispose();
             _cts = null;
         }
 
@@ -444,15 +452,12 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase
                 }
 
                 // If still no space, force process current content as truncated line
-                if (charsInBuffer >= _charBufferSize - 100)
+                if (charsInBuffer >= _charBufferSize - 100 && charsInBuffer > 0)
                 {
-                    if (charsInBuffer > 0)
-                    {
-                        var segment = CreateSegment(charBuffer, 0, charsInBuffer, 0, byteOffset);
-                        byteOffset += segment.ByteLength;
-                        EnqueueLine(segment);
-                        charsInBuffer = 0;
-                    }
+                    var segment = CreateSegment(charBuffer, 0, charsInBuffer, 0, byteOffset);
+                    byteOffset += segment.ByteLength;
+                    EnqueueLine(segment);
+                    charsInBuffer = 0;
                 }
 
                 charsAvailable = _charBufferSize - charsInBuffer;
