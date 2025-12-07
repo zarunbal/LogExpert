@@ -8,7 +8,7 @@ using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.Classes.Log;
 
-public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStreamReaderSpan
+public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStreamReaderMemory
 {
     private const int DEFAULT_BYTE_BUFFER_SIZE = 64 * 1024; // 64 KB
     private const int MINIMUM_READ_AHEAD_SIZE = 4 * 1024; // 4 KB
@@ -416,7 +416,8 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStream
         var remaining = localCharsInBuffer - searchIndex;
         if (remaining > 0 && searchIndex > 0)
         {
-            Array.Copy(charBuffer, searchIndex, charBuffer, 0, remaining);
+            charBuffer.AsSpan(searchIndex, remaining).CopyTo(charBuffer.AsSpan(0, remaining));
+            //Array.Copy(charBuffer, searchIndex, charBuffer, 0, remaining);
         }
 
         return (remaining, localByteOffset);
@@ -446,7 +447,8 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStream
                         var remaining = charsInBuffer - searchIndex;
                         if (remaining > 0 && searchIndex > 0)
                         {
-                            Array.Copy(charBuffer, searchIndex, charBuffer, 0, remaining);
+                            charBuffer.AsSpan(searchIndex, remaining).CopyTo(charBuffer.AsSpan(0, remaining));
+                            //Array.Copy(charBuffer, searchIndex, charBuffer, 0, remaining);
                         }
 
                         charsInBuffer = remaining;
@@ -580,7 +582,8 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStream
         // Copy line content (excluding newline)
         if (logicalLength > 0)
         {
-            Array.Copy(source, start, buffer, 0, logicalLength);
+            source.AsSpan(start, logicalLength).CopyTo(buffer.AsSpan(0, logicalLength));
+            //Array.Copy(source, start, buffer, 0, logicalLength);
         }
 
         return new LineSegment(buffer, logicalLength, byteOffset, byteLength, truncated, false);
