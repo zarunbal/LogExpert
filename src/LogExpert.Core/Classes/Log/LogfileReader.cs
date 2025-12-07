@@ -1054,7 +1054,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
 
-                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
+                while (ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
                 {
                     if (_shouldStop)
                     {
@@ -1447,7 +1447,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                 logBuffer.ClearLines();
 
-                while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out var line))
+                while (ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out var line))
                 {
                     if (lineCount >= maxLinesCount)
                     {
@@ -1759,9 +1759,8 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         {
             ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
             ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
-            ReaderType.Pipeline => new PositionAwareStreamReaderPipeline(stream, encodingOptions, _maximumLineLength),
-            _ => //Default will be Pipeline
-                 new PositionAwareStreamReaderPipeline(stream, encodingOptions, _maximumLineLength)
+            //Default will be System
+            _ => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
         };
     }
 
@@ -1798,6 +1797,23 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
         outLine = line;
         return true;
+    }
+
+    private bool ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)
+    {
+        if (reader is ILogStreamReaderMemory memoryReader)
+        {
+            if (memoryReader.TryReadLine(out var lineMemory))
+            {
+                var line = lineMemory.ToString(); // Still converts to string
+                                                  // ... preprocessing ...
+                memoryReader.ReturnMemory(lineMemory);
+                outLine = line;
+                return true;
+            }
+        }
+
+        return ReadLine(reader, lineNum, realLineNum, out outLine);
     }
 
     private void AcquireBufferListUpgradeableReadLock ()

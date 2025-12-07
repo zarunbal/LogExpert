@@ -14,6 +14,8 @@ public class LogBuffer
     private readonly IList<long> _filePositions = []; // file position for every line
 #endif
 
+    private readonly List<ILogLineMemory> _lineList = new();
+
     private readonly IList<ILogLine> _logLines = [];
     private int MAX_LINES = 500;
     private long _size;

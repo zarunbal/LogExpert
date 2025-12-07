@@ -38,13 +38,24 @@ public interface ILogLine : ITextValue
 /// was replaced to better align with these performance and semantic requirements.
 /// </para>
 /// </remarks>
-public readonly struct LogLine (string fullLine, int lineNumber) : ILogLine
+public class LogLine (string fullLine, int lineNumber) : ILogLineMemory
 {
-    public string FullLine { get; } = fullLine;
+    private readonly ReadOnlyMemory<char> _lineMemory;
+    private string _cachedString;
+
+    public LogLine (ReadOnlyMemory<char> lineMemory, int lineNumber) : this(lineMemory.ToString(), lineNumber)
+    {
+        FullLineMemory = lineMemory;
+        LineNumber = lineNumber;
+    }
+
+    public string FullLine => _cachedString ??= _lineMemory.ToString();
 
     public int LineNumber { get; } = lineNumber;
 
     public string Text => FullLine;
+
+    public ReadOnlyMemory<char> FullLineMemory { get; }
 
     public override bool Equals (object obj)
     {

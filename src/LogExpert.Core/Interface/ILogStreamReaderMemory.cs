@@ -6,7 +6,7 @@ public interface ILogStreamReaderMemory : ILogStreamReader
     /// <summary>
     /// Attempts to read the next line from the stream.
     /// </summary>
-    /// <param name="lineSpan">
+    /// <param name="lineMemory">
     /// When this method returns <c>true</c>, contains a <see cref="ReadOnlyMemory{Char}"/> representing the next line read from the stream.
     /// The memory is only valid until the next call to <see cref="TryReadLine"/> or until <see cref="ReturnMemory"/> is called.
     /// </param>
@@ -17,7 +17,7 @@ public interface ILogStreamReaderMemory : ILogStreamReader
     /// The returned memory is only valid until the next call to <see cref="TryReadLine"/> or until <see cref="ReturnMemory"/> is called.
     /// This method is not guaranteed to be thread-safe; concurrent access should be synchronized externally.
     /// </remarks>
-    bool TryReadLine (out ReadOnlyMemory<char> lineSpan);
+    bool TryReadLine (out ReadOnlyMemory<char> lineMemory);
 
     /// <summary>
     /// Returns the memory buffer previously obtained from <see cref="TryReadLine"/> to the underlying pool or resource manager.
