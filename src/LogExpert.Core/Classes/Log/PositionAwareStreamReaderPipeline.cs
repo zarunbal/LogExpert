@@ -511,43 +511,40 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStream
         int available,
         bool allowStandaloneCr)
     {
-        var end = start + available;
+        var span = buffer.AsSpan(start, available);
 
-        for (var i = start; i < end; i++)
+        //Vectorized Search for \n
+        var lfIndex = span.IndexOf('\n');
+        if (lfIndex != -1)
         {
-            var current = buffer[i];
-
-            if (current == '\n')
+            // Found \n - check if preceded by \r
+            if (lfIndex > 0 && span[lfIndex - 1] == '\r')
             {
-                // Check if preceded by \r for \r\n
-                if (i > start && buffer[i - 1] == '\r')
-                {
-                    return (newLineIndex: i - 1, newLineChars: 2);
-                }
-                return (newLineIndex: i, newLineChars: 1);
+                return (newLineIndex: start + lfIndex - 1, newLineChars: 2);
             }
 
-            if (current == '\r')
+            return (newLineIndex: start + lfIndex, newLineChars: 1);
+        }
+
+        //Vectorized search for \r
+        var crIndex = span.IndexOf('\r');
+        if (crIndex != -1)
+        {
+            // Check if at end of buffer
+            if (crIndex + 1 >= span.Length)
             {
-                // Check if at end of buffer
-                if (i + 1 >= end)
+                if (allowStandaloneCr)
                 {
-                    // If this is the final buffer, treat as standalone \r
-                    if (allowStandaloneCr)
-                    {
-                        return (newLineIndex: i, newLineChars: 1);
-                    }
-                    // Otherwise wait for more data to determine if it's \r\n
-                    break;
+                    return (newLineIndex: start + crIndex, newLineChars: 1);
                 }
 
-                // Check next char
-                if (buffer[i + 1] != '\n')
-                {
-                    // Standalone \r
-                    return (newLineIndex: i, newLineChars: 1);
-                }
-                // Will be handled as \r\n when we reach the \n
+                return (newLineIndex: -1, newLineChars: 0);
+            }
+
+            // Check next char
+            if (span[crIndex + 1] != '\n')
+            {
+                return (newLineIndex: start + crIndex, newLineChars: 1);
             }
         }
 
