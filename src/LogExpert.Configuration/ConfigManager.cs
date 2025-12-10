@@ -807,7 +807,8 @@ public class ConfigManager : IConfigManager
                                        NotSupportedException or
                                        PathTooLongException or
                                        UnauthorizedAccessException or
-                                       SecurityException)
+                                       SecurityException or
+                                       JsonSerializationException)
         {
             _logger.Error($"Error while deserializing config data: {e}");
             newGroups = [];

@@ -2015,7 +2015,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
-        var projectData = ProjectPersister.LoadProjectData(projectFileName);
+        var projectData = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
         var hasLayoutData = projectData.TabLayoutXml != null;
 
         if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)

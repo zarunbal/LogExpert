@@ -1,5 +1,7 @@
 using System.Text;
 
+using LogExpert.Core.Interface;
+
 using Newtonsoft.Json;
 
 using NLog;
@@ -17,7 +19,7 @@ public static class ProjectPersister
     /// </summary>
     /// <param name="projectFileName"></param>
     /// <returns></returns>
-    public static ProjectData LoadProjectData (string projectFileName)
+    public static ProjectData LoadProjectData (string projectFileName, IPluginRegistry pluginRegistry)
     {
         try
         {
@@ -27,7 +29,12 @@ public static class ProjectPersister
             };
 
             var json = File.ReadAllText(projectFileName, Encoding.UTF8);
-            return JsonConvert.DeserializeObject<ProjectData>(json, settings);
+            var projectData = JsonConvert.DeserializeObject<ProjectData>(json, settings);
+
+            var hasLayout = projectData.TabLayoutXml != null;
+            var validationResult = ProjectFileValidator.ValidateProject(projectData, pluginRegistry);
+
+            return projectData;
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or
                                          IOException or
