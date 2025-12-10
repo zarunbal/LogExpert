@@ -579,7 +579,8 @@ internal partial class HighlightDialog : Form
             }
 
             // Use RegexHelper for safer validation with timeout protection
-            if (!RegexHelper.IsValidPattern(textBoxSearchString.Text, out var error))
+            var (isValid, error) = RegexHelper.IsValidPattern(textBoxSearchString.Text);
+            if (!isValid)
             {
                 throw new ArgumentException(error ?? Resources.HighlightDialog_RegexError);
             }

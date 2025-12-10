@@ -186,8 +186,6 @@ public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStream
         // Create PipeReader
         _pipeReader = PipeReader.Create(_stream, _streamPipeReaderOptions);
 
-        // CRITICAL: Create a NEW BlockingCollection instance
-        // Once CompleteAdding() is called, a BlockingCollection cannot be reused
         _lineQueue = new BlockingCollection<LineSegment>(new ConcurrentQueue<LineSegment>(), DEFAULT_CHANNEL_CAPACITY);
 
         Volatile.Write(ref _producerException, null);

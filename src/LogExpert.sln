@@ -103,6 +103,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance"
 		docs\performance\BENCHMARK_SUMMARY.md = docs\performance\BENCHMARK_SUMMARY.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "help", "help", "{9FC7BC64-CE77-45DF-B8AC-10F1D0336E76}"
+	ProjectSection(SolutionItems) = preProject
+		HelpSmith\LogExpert.chm = HelpSmith\LogExpert.chm
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -236,6 +241,7 @@ Global
 		{CAD17410-CE8C-4FE5-91DE-1B3DE2945135} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 		{1046779B-500D-8260-33BA-BC778C4B836F} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 		{C83F15B6-F6E0-4526-A5C5-47806772E49A} = {39822C1B-E4C6-40F3-86C4-74C68BDEF3D0}
+		{9FC7BC64-CE77-45DF-B8AC-10F1D0336E76} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15924D5F-B90B-4BC7-9E7D-BCCB62EBABAD}
