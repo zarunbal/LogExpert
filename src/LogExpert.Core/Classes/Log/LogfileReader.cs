@@ -983,7 +983,6 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             var lineNum = startLine;
             LogBuffer logBuffer;
 
-
             AcquireBufferListUpgradeableReadLock();
 
             try
@@ -1054,7 +1053,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
 
-                while (ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
+                var (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+
+                while (success)
                 {
                     if (_shouldStop)
                     {
@@ -1116,10 +1117,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         }
                     }
 
-                    LogLine logLine = new(line, logBuffer.StartLine + logBuffer.LineCount);
+                    LogLine logLine = new(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
                     logBuffer.AddLine(logLine, filePos);
                     filePos = reader.Position;
                     lineNum++;
+
+                    (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                 }
 
                 logBuffer.Size = filePos - logBuffer.StartPos;
@@ -1447,7 +1450,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                 logBuffer.ClearLines();
 
-                while (ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount, out var line))
+                var (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+
+                while (success)
                 {
                     if (lineCount >= maxLinesCount)
                     {
@@ -1460,11 +1465,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         continue;
                     }
 
-                    LogLine logLine = new(line, logBuffer.StartLine + logBuffer.LineCount);
+                    LogLine logLine = new(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
 
                     logBuffer.AddLine(logLine, filePos);
                     filePos = reader.Position;
                     lineCount++;
+
+                    (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                 }
 
                 if (maxLinesCount != logBuffer.LineCount)
@@ -1799,7 +1806,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return true;
     }
 
-    private bool ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)
+    private (bool Success, ReadOnlyMemory<char> LineMemory, string Line) ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum)
     {
         if (reader is ILogStreamReaderMemory memoryReader)
         {
@@ -1807,13 +1814,18 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             {
                 var line = lineMemory.ToString(); // Still converts to string
                                                   // ... preprocessing ...
+
+                if (PreProcessColumnizer != null)
+                {
+                    line = PreProcessColumnizer.PreProcessLine(line, lineNum, realLineNum);
+                }
+
                 memoryReader.ReturnMemory(lineMemory);
-                outLine = line;
-                return true;
+                return (true, lineMemory, line);
             }
         }
 
-        return ReadLine(reader, lineNum, realLineNum, out outLine);
+        return (ReadLine(reader, lineNum, realLineNum, out var outLine), null, outLine);
     }
 
     private void AcquireBufferListUpgradeableReadLock ()

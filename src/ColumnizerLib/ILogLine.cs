@@ -38,10 +38,15 @@ public interface ILogLine : ITextValue
 /// was replaced to better align with these performance and semantic requirements.
 /// </para>
 /// </remarks>
-public class LogLine (string fullLine, int lineNumber) : ILogLineMemory
+public class LogLine : ILogLineMemory
 {
     private readonly ReadOnlyMemory<char> _lineMemory;
-    private string _cachedString;
+
+    public LogLine (string fullLine, int lineNumber)
+    {
+        FullLine = fullLine;
+        LineNumber = lineNumber;
+    }
 
     public LogLine (ReadOnlyMemory<char> lineMemory, int lineNumber) : this(lineMemory.ToString(), lineNumber)
     {
@@ -49,9 +54,9 @@ public class LogLine (string fullLine, int lineNumber) : ILogLineMemory
         LineNumber = lineNumber;
     }
 
-    public string FullLine => _cachedString ??= _lineMemory.ToString();
+    public string FullLine => field ??= _lineMemory.ToString();
 
-    public int LineNumber { get; } = lineNumber;
+    public int LineNumber { get; }
 
     public string Text => FullLine;
 
