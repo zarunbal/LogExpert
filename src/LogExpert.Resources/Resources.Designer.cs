@@ -1443,6 +1443,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must provide at least one file..
+        /// </summary>
+        public static string LogfileReader_Error_Message_MustProvideAtLeastOneFile {
+            get {
+                return ResourceManager.GetString("LogfileReader_Error_Message_MustProvideAtLeastOneFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error in {0}: {1}.
         /// </summary>
         public static string Logger_Error_In_Function {

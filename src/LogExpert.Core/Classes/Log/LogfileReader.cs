@@ -28,6 +28,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private readonly CancellationTokenSource _cts = new();
     private readonly ReaderType _readerType;
 
+    private DateTime _lastProgressUpdate = DateTime.MinValue;
+    private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
+
     private IList<LogBuffer> _bufferList;
     private bool _contentDeleted;
     private readonly int _maximumLineLength;
@@ -72,7 +75,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         // Validate input: at least one file must be provided.
         if (fileNames == null || fileNames.Length < 1)
         {
-            throw new ArgumentException("Must provide at least one file.", nameof(fileNames));
+            throw new ArgumentException(Resources.LogfileReader_Error_Message_MustProvideAtLeastOneFile, nameof(fileNames));
         }
 
         //Set default maximum line length if invalid value provided.
@@ -133,6 +136,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #region Properties
 
+    /// <summary>
+    /// Gets the total number of lines contained in all buffers.
+    /// </summary>
+    /// <remarks>The value is recalculated on demand if the underlying buffers have changed since the last
+    /// access. Accessing this property is thread-safe.</remarks>
     public int LineCount
     {
         get
@@ -167,20 +175,41 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         private set;
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the current operation involves multiple files.
+    /// </summary>
     public bool IsMultiFile { get; }
 
+    /// <summary>
+    /// Gets the character encoding currently used for reading or writing operations.
+    /// </summary>
     public Encoding CurrentEncoding { get; private set; }
 
+    /// <summary>
+    /// Gets the size of the file, in bytes.
+    /// </summary>
     public long FileSize { get; private set; }
 
     //TODO: Change to private field. No need for a property.
+    /// <summary>
+    /// Gets or sets a value indicating whether XML mode is enabled.
+    /// </summary>
     public bool IsXmlMode { get; set; }
 
     //TODO: Change to private field. No need for a property.
+    /// <summary>
+    /// Gets or sets the XML log configuration used to control logging behavior and settings.
+    /// </summary>
     public IXmlLogConfiguration XmlLogConfig { get; set; }
 
+    /// <summary>
+    /// Gets or sets the columnizer used to preprocess data before further processing.
+    /// </summary>
     public IPreProcessColumnizer PreProcessColumnizer { get; set; }
 
+    /// <summary>
+    /// Gets or sets the encoding options used for text processing operations.
+    /// </summary>
     private EncodingOptions EncodingOptions
     {
         get;
@@ -201,8 +230,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     #region Public methods
 
     /// <summary>
+    /// Reads all log files and refreshes the internal buffer and related state to reflect the current contents of the
+    /// files.
     /// Public for unit test reasons
     /// </summary>
+    /// <remarks>This method resets file size and line count tracking, clears any cached data, and repopulates
+    /// the buffer with the latest data from the log files. If an I/O error occurs while reading the files, the internal
+    /// state is updated to indicate that the files are unavailable. After reading, a file size changed event is raised
+    /// to notify listeners of the update.</remarks>
     //TODO: Make this private
     public void ReadFiles ()
     {
@@ -252,9 +287,15 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     /// <summary>
+    /// Synchronizes the internal buffer state with the current set of log files, updating or removing buffers as
+    /// necessary to reflect file changes.
     /// Public for unit tests.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>Call this method after external changes to the underlying log files, such as file rotation or
+    /// deletion, to ensure the buffer accurately represents the current log file set. This method may remove, update,
+    /// or re-read buffers to match the current files. Thread safety is ensured during the operation.</remarks>
+    /// <returns>The total number of lines removed from the buffer as a result of deleted or replaced log files. Returns 0 if no
+    /// lines were removed.</returns>
     //TODO: Make this private
     public int ShiftBuffers ()
     {
@@ -413,6 +454,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return offset;
     }
 
+    /// <summary>
+    /// Acquires a read lock on the buffer list, waiting up to 10 seconds before forcing entry if the lock is not
+    /// immediately available.
+    /// </summary>
+    /// <remarks>If the read lock cannot be acquired within 10 seconds, the method will forcibly enter the
+    /// lock and log a warning. Callers should ensure that holding the read lock for extended periods does not block
+    /// other operations.</remarks>
     private void AcquireBufferListReaderLock ()
     {
         if (!_bufferListLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
@@ -422,21 +470,43 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases the reader lock on the buffer list, allowing other threads to acquire write access.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that require read access to the buffer list.
+    /// Failing to release the reader lock may result in deadlocks or prevent other threads from obtaining write
+    /// access.</remarks>
     private void ReleaseBufferListReaderLock ()
     {
         _bufferListLock.ExitReadLock();
     }
 
+    /// <summary>
+    /// Releases the writer lock on the buffer list, allowing other threads to acquire the lock.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that required exclusive access to the buffer
+    /// list. Failing to release the writer lock may result in deadlocks or reduced concurrency.</remarks>
     private void ReleaseBufferListWriterLock ()
     {
         _bufferListLock.ExitWriteLock();
     }
 
+    /// <summary>
+    /// Releases an upgradeable read lock held by the current thread on the associated lock object.
+    /// </summary>
+    /// <remarks>Call this method to exit an upgradeable read lock previously acquired on the underlying lock.
+    /// Failing to release the lock may result in deadlocks or resource contention.</remarks>
     private void ReleaseDisposeUpgradeableReadLock ()
     {
         _disposeLock.ExitUpgradeableReadLock();
     }
 
+    /// <summary>
+    /// Acquires the writer lock for the buffer list, blocking the calling thread until the lock is obtained.
+    /// </summary>
+    /// <remarks>If the writer lock cannot be acquired within 10 seconds, a warning is logged and the method
+    /// will continue to wait until the lock becomes available. This method should be used to ensure exclusive access to
+    /// the buffer list when performing write operations.</remarks>
     private void AcquireBufferListWriterLock ()
     {
         if (!_bufferListLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -446,6 +516,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Retrieves the log line at the specified zero-based line number.
+    /// </summary>
+    /// <remarks>This method blocks until the log line is available. If the specified line number is out of
+    /// range, an exception may be thrown.</remarks>
+    /// <param name="lineNum">The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
+    /// number of log lines.</param>
+    /// <returns>An object representing the log line at the specified index.</returns>
     public ILogLine GetLogLine (int lineNum)
     {
         return GetLogLineInternal(lineNum).Result;
@@ -558,6 +636,15 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return result;
     }
 
+    /// <summary>
+    /// Finds the starting line number of the previous file segment before the specified line number across multiple
+    /// files.
+    /// </summary>
+    /// <remarks>This method is useful when navigating through a collection of files represented as contiguous
+    /// line segments. If the specified line number is within the first file segment, the method returns -1 to indicate
+    /// that there is no previous file segment.</remarks>
+    /// <param name="lineNum">The line number for which to locate the previous file segment. Must be a valid line number within the buffer.</param>
+    /// <returns>The starting line number of the previous file segment if one exists; otherwise, -1.</returns>
     public int GetPrevMultiFileLine (int lineNum)
     {
         var result = -1;
@@ -610,6 +697,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return result;
     }
 
+    /// <summary>
+    /// Begins monitoring by starting the background monitoring process.
+    /// </summary>
+    /// <remarks>This method initiates monitoring if it is not already running. To stop monitoring, call the
+    /// corresponding stop method if available. This method is not thread-safe; ensure that it is not called
+    /// concurrently with other monitoring control methods.</remarks>
     public void StartMonitoring ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "startMonitoring()");
@@ -617,6 +710,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _shouldStop = false;
     }
 
+    /// <summary>
+    /// Stops monitoring the log file and terminates any background monitoring or cleanup tasks.
+    /// </summary>
+    /// <remarks>Call this method to halt all ongoing monitoring activity and release associated resources.
+    /// After calling this method, monitoring cannot be resumed without restarting the monitoring process.</remarks>
     public void StopMonitoring ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "stopMonitoring()");
@@ -733,6 +831,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
 #if DEBUG
 
+    /// <summary>
+    /// Logs detailed buffer information for the specified line number to the debug output.
+    /// </summary>
+    /// <remarks>This method is intended for debugging purposes and is only available in debug builds. It logs
+    /// buffer details and file position information to assist with diagnostics.</remarks>
+    /// <param name="lineNum">The zero-based line number for which buffer information is logged.</param>
     public void LogBufferInfoForLine (int lineNum)
     {
         AcquireBufferListReaderLock();
@@ -753,9 +857,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
         ReleaseBufferListReaderLock();
     }
-#endif
 
-#if DEBUG
+    /// <summary>
+    /// Logs diagnostic information about the current state of the buffer and LRU cache for debugging purposes.
+    /// </summary>
+    /// <remarks>This method is intended for use in debug builds to assist with troubleshooting and analyzing
+    /// buffer management. It outputs details such as the number of LRU cache entries, buffer counts, and dispose
+    /// statistics to the logger. This method does not modify the state of the buffers or cache.</remarks>
     public void LogBufferDiagnostic ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "-------- Buffer diagnostics -------");
@@ -798,6 +906,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #region Private Methods
 
+    /// <summary>
+    /// Adds a log file to the collection and returns information about the added file.
+    /// </summary>
+    /// <param name="fileName">The path of the log file to add. Cannot be null or empty.</param>
+    /// <returns>An object that provides information about the added log file.</returns>
     private ILogFileInfo AddFile (string fileName)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Adding file to ILogFileInfoList: " + fileName);
@@ -806,6 +919,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return info;
     }
 
+    /// <summary>
+    /// Retrieves the log line at the specified line number, or returns null if the file has been deleted or the line
+    /// cannot be found.
+    /// </summary>
+    /// <param name="lineNum">The zero-based line number of the log entry to retrieve.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the log line at the specified line
+    /// number, or null if the file is deleted or the line does not exist.</returns>
     private Task<ILogLine> GetLogLineInternal (int lineNum)
     {
         if (_isDeleted)
@@ -845,6 +965,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return Task.FromResult(line);
     }
 
+    /// <summary>
+    /// Initializes the internal data structures used for least recently used (LRU) buffer management.
+    /// </summary>
+    /// <remarks>Call this method to reset or prepare the LRU buffer cache before use. This method clears any
+    /// existing buffer state and sets up the cache to track buffer usage according to the configured maximum buffer
+    /// count.</remarks>
     private void InitLruBuffers ()
     {
         _bufferList = [];
@@ -853,6 +979,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(_max_buffers + 1);
     }
 
+    /// <summary>
+    /// Starts the background task responsible for performing garbage collection operations.
+    /// </summary>
+    /// <remarks>This method initiates the garbage collection process on a separate thread or task. It is
+    /// intended for internal use to manage resource cleanup asynchronously. Calling this method multiple times without
+    /// proper synchronization may result in multiple concurrent garbage collection tasks.</remarks>
     private void StartGCThread ()
     {
         _garbageCollectorTask = Task.Run(GarbageCollectorThreadProc, _cts.Token);
@@ -861,6 +993,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         //_garbageCollectorThread.Start();
     }
 
+    /// <summary>
+    /// Resets the internal buffer cache, clearing any stored file size and line count information.
+    /// </summary>
+    /// <remarks>Call this method to reinitialize the buffer cache state, typically before reloading or
+    /// reprocessing file data. After calling this method, any previously cached file size or line count values will be
+    /// lost.</remarks>
     private void ResetBufferCache ()
     {
         FileSize = 0;
@@ -870,6 +1008,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         //this.lastReturnedLineNumForBuffer = -1;
     }
 
+    /// <summary>
+    /// Releases resources associated with open log files and resets related state information.
+    /// </summary>
     private void CloseFiles ()
     {
         //foreach (ILogFileInfo info in this.ILogFileInfoList)
@@ -883,6 +1024,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         //this.lastReturnedLineNumForBuffer = -1;
     }
 
+    /// <summary>
+    /// Retrieves information about a log file specified by its file name or URI.
+    /// </summary>
+    /// <param name="fileNameOrUri">The file name or URI identifying the log file for which to retrieve information. Cannot be null or empty.</param>
+    /// <returns>An object containing information about the specified log file.</returns>
+    /// <exception cref="LogFileException">Thrown if no file system plugin is found for the specified file name or URI, or if the log file cannot be found.</exception>
     private ILogFileInfo GetLogFileInfo (string fileNameOrUri) //TODO: I changed to static
     {
         //TODO this must be fixed and should be given to the logfilereader not just called (https://github.com/LogExperts/LogExpert/issues/402)
@@ -892,10 +1039,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     /// <summary>
-    ///
+    /// Replaces references to an existing log file information object with a new one in all managed buffers.
     /// </summary>
-    /// <param name="oldLogFileInfo"></param>
-    /// <param name="newLogFileInfo"></param>
+    /// <remarks>This method updates all buffer entries that reference the specified old log file information object,
+    /// assigning them the new log file information object instead. Use this method when a log file has been renamed or its
+    /// metadata has changed, and all associated buffers need to reference the updated information.</remarks>
+    /// <param name="oldLogFileInfo">The log file information object to be replaced. Cannot be null.</param>
+    /// <param name="newLogFileInfo">The new log file information object to use as a replacement. Cannot be null.</param>
     private void ReplaceBufferInfos (ILogFileInfo oldLogFileInfo, ILogFileInfo newLogFileInfo)
     {
         _logger.Debug(CultureInfo.InvariantCulture, "ReplaceBufferInfos() " + oldLogFileInfo.FullName + " -> " + newLogFileInfo.FullName);
@@ -909,6 +1059,15 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Deletes all log buffers associated with the specified log file information and returns the last buffer that was
+    /// removed.
+    /// </summary>
+    /// <remarks>If multiple buffers match the specified criteria, all are removed and the last one found is
+    /// returned. If no buffers match, the method returns null.</remarks>
+    /// <param name="iLogFileInfo">The log file information used to identify which buffers to delete. Cannot be null.</param>
+    /// <param name="matchNamesOnly">true to match buffers by file name only; false to require an exact object match for the log file information.</param>
+    /// <returns>The last LogBuffer instance that was removed; or null if no matching buffers were found.</returns>
     private LogBuffer DeleteBuffersForInfo (ILogFileInfo iLogFileInfo, bool matchNamesOnly)
     {
         _logger.Info($"Deleting buffers for file {iLogFileInfo.FullName}");
@@ -956,9 +1115,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     /// <summary>
+    /// Removes the specified log buffer from the internal buffer list and associated cache.
     /// The caller must have _writer locks for lruCache and buffer list!
     /// </summary>
-    /// <param name="buffer"></param>
+    /// <remarks>This method must be called only when the appropriate write locks for both the LRU cache and
+    /// buffer list are held. Removing a buffer that is not present has no effect.</remarks>
+    /// <param name="buffer">The log buffer to remove from the buffer list and cache. Must not be null.</param>
     private void RemoveFromBufferList (LogBuffer buffer)
     {
         Util.AssertTrue(_lruCacheDictLock.IsWriteLockHeld, "No _writer lock for lru cache");
@@ -967,9 +1129,18 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _ = _bufferList.Remove(buffer);
     }
 
-    private DateTime _lastProgressUpdate = DateTime.MinValue;
-    private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
-
+    /// <summary>
+    /// Reads log lines from the specified log file starting at the given file position and line number, and populates
+    /// the internal buffer list with the read data.
+    /// </summary>
+    /// <remarks>If the buffer list is empty or the log file changes, a new buffer is created. The method
+    /// updates internal state such as file size, encoding, and line count, and may trigger events to notify about file
+    /// loading progress or file not found conditions. This method is not thread-safe and should be called with
+    /// appropriate synchronization if accessed concurrently.</remarks>
+    /// <param name="logFileInfo">The log file information used to open and read the file. Must not be null.</param>
+    /// <param name="filePos">The byte position in the file at which to begin reading.</param>
+    /// <param name="startLine">The line number corresponding to the starting position in the file. Used to assign line numbers to buffered log
+    /// lines.</param>
     private void ReadToBufferList (ILogFileInfo logFileInfo, long filePos, int startLine)
     {
         try
@@ -1153,6 +1324,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Adds the specified log buffer to the internal buffer list and updates its position in the least recently used
+    /// (LRU) cache.
+    /// </summary>
+    /// <param name="logBuffer">The log buffer to add to the buffer list. Cannot be null.</param>
     private void AddBufferToList (LogBuffer logBuffer)
     {
 #if DEBUG
@@ -1163,6 +1339,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         UpdateLruCache(logBuffer);
     }
 
+    /// <summary>
+    /// Updates the least recently used (LRU) cache with the specified log buffer, adding it if it does not already
+    /// exist or marking it as recently used if it does.
+    /// </summary>
+    /// <remarks>If the specified log buffer is not already present in the cache, it is added. If it is
+    /// present, its usage is updated to reflect recent access. This method is thread-safe and manages cache locks
+    /// internally.</remarks>
+    /// <param name="logBuffer">The log buffer to add to or update in the LRU cache. Cannot be null.</param>
     private void UpdateLruCache (LogBuffer logBuffer)
     {
         AcquireLRUCacheDictUpgradeableReadLock();
@@ -1246,6 +1430,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Removes least recently used entries from the LRU cache to maintain the cache size within the configured limit.
+    /// </summary>
+    /// <remarks>This method is intended to be called when the LRU cache exceeds its maximum allowed size. It
+    /// removes the least recently used entries to free up resources and ensure optimal cache performance. The method is
+    /// not thread-safe and should be called only when appropriate locks are held to prevent concurrent
+    /// modifications.</remarks>
     private void GarbageCollectLruCache ()
     {
 #if DEBUG
@@ -1302,6 +1493,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 #endif
     }
 
+    /// <summary>
+    /// Executes the background thread procedure responsible for periodically triggering garbage collection of the least
+    /// recently used (LRU) cache while the thread is active.
+    /// </summary>
+    /// <remarks>This method is intended to run on a dedicated background thread. It repeatedly waits for a
+    /// fixed interval and then invokes cache cleanup, continuing until a stop signal is received. Exceptions during the
+    /// sleep interval are caught and ignored to ensure the thread remains active.</remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Garbage collector Thread Process")]
     private void GarbageCollectorThreadProc ()
     {
@@ -1319,93 +1517,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
-    //    private void UpdateLru(LogBuffer logBuffer)
-    //    {
-    //      lock (this.monitor)
-    //      {
-    //        int index;
-    //        if (this.lruDict.TryGetValue(logBuffer.StartLine, out index))
-    //        {
-    //          RemoveBufferFromLru(logBuffer, index);
-    //          AddBufferToLru(logBuffer);
-    //        }
-    //        else
-    //        {
-    //          if (this.bufferLru.Count > MAX_BUFFERS - 1)
-    //          {
-    //            LogBuffer looser = this.bufferLru[0];
-    //            if (looser != null)
-    //            {
-    //#if DEBUG
-    //              _logger.logDebug("Disposing buffer: " + looser.StartLine + "/" + looser.LineCount + "/" + looser.FileInfo.FileName);
-    //#endif
-    //              looser.DisposeContent();
-    //              RemoveBufferFromLru(looser);
-    //            }
-    //          }
-    //          AddBufferToLru(logBuffer);
-    //        }
-    //      }
-    //    }
-
-    ///// <summary>
-    ///// Removes a LogBuffer from the LRU. Note that the LogBuffer is searched in the lruDict
-    ///// via StartLine. So this property must have a consistent value.
-    ///// </summary>
-    ///// <param name="buffer"></param>
-    //private void RemoveBufferFromLru(LogBuffer buffer)
-    //{
-    //  int index;
-    //  lock (this.monitor)
-    //  {
-    //    if (this.lruDict.TryGetValue(buffer.StartLine, out index))
-    //    {
-    //      RemoveBufferFromLru(buffer, index);
-    //    }
-    //  }
-    //}
-
-    ///// <summary>
-    ///// Removes a LogBuffer from the LRU with known index. Note that the LogBuffer is searched in the lruDict
-    ///// via StartLine. So this property must have a consistent value.
-    ///// </summary>
-    ///// <param name="buffer"></param>
-    ///// <param name="index"></param>
-    //private void RemoveBufferFromLru(LogBuffer buffer, int index)
-    //{
-    //  lock (this.monitor)
-    //  {
-    //    this.bufferLru.RemoveAt(index);
-    //    this.lruDict.Remove(buffer.StartLine);
-    //    // adjust indizes, they have changed because of the remove
-    //    for (int i = index; i < this.bufferLru.Count; ++i)
-    //    {
-    //      this.lruDict[this.bufferLru[i].StartLine] = this.lruDict[this.bufferLru[i].StartLine] - 1;
-    //    }
-    //  }
-    //}
-
-    //private void AddBufferToLru(LogBuffer logBuffer)
-    //{
-    //  lock (this.monitor)
-    //  {
-    //    this.bufferLru.Add(logBuffer);
-    //    int newIndex = this.bufferLru.Count - 1;
-    //    this.lruDict[logBuffer.StartLine] = newIndex;
-    //  }
-    //}
-
+    /// <summary>
+    /// Clears all entries from the least recently used (LRU) cache and releases associated resources.
+    /// </summary>
+    /// <remarks>Call this method to remove all items from the LRU cache and dispose of their contents. This
+    /// operation is typically used to free memory or reset the cache state. The method is not thread-safe and should be
+    /// called only when appropriate synchronization is ensured.</remarks>
     private void ClearLru ()
     {
-        //lock (this.monitor)
-        //{
-        //  foreach (LogBuffer buffer in this.bufferLru)
-        //  {
-        //    buffer.DisposeContent();
-        //  }
-        //  this.bufferLru.Clear();
-        //  this.lruDict.Clear();
-        //}
         _logger.Info(CultureInfo.InvariantCulture, "Clearing LRU cache.");
         AcquireLruCacheDictWriterLock();
         AcquireDisposeWriterLock();
@@ -1420,6 +1539,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _logger.Info(CultureInfo.InvariantCulture, "Clearing done.");
     }
 
+    /// <summary>
+    /// Re-reads the contents of the specified log buffer from its associated file, updating its lines and dropped line
+    /// count as necessary.
+    /// </summary>
+    /// <remarks>This method acquires a lock on the provided log buffer during the operation to ensure thread
+    /// safety. If an I/O error occurs while accessing the file, the method logs a warning and returns without updating
+    /// the buffer.</remarks>
+    /// <param name="logBuffer">The log buffer to refresh with the latest data from its underlying file. Cannot be null.</param>
     private void ReReadBuffer (LogBuffer logBuffer)
     {
 #if DEBUG
@@ -1503,10 +1630,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     /// <summary>
-    ///
+    /// Retrieves the log buffer that contains the specified line number.
     /// </summary>
-    /// <param name="lineNum"></param>
-    /// <returns></returns>
+    /// <param name="lineNum">The zero-based line number for which to retrieve the corresponding log buffer. Must be greater than or equal to
+    /// zero.</param>
+    /// <returns>The <see cref="LogBuffer"/> instance that contains the specified line number, or <see langword="null"/> if no
+    /// such buffer exists.</returns>
     private LogBuffer GetBufferForLine (int lineNum)
     {
 #if DEBUG
@@ -1514,12 +1643,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 #endif
         LogBuffer logBuffer = null;
         AcquireBufferListReaderLock();
-        //if (lineNum == this.lastReturnedLineNumForBuffer)
-        //{
-        //  return this.lastReturnedBuffer;
-        //}
 
-        //int startIndex = lineNum / LogBuffer.MAX_LINES;  // doesn't work anymore since XML buffer may contain more lines than MAX_LINES
         var startIndex = 0;
         var count = _bufferList.Count;
         for (var i = startIndex; i < count; ++i)
@@ -1527,10 +1651,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             logBuffer = _bufferList[i];
             if (lineNum >= logBuffer.StartLine && lineNum < logBuffer.StartLine + logBuffer.LineCount)
             {
-                //UpdateLru(logBuffer);
                 UpdateLruCache(logBuffer);
-                //this.lastReturnedLineNumForBuffer = lineNum;
-                //this.lastReturnedBuffer = logBuffer;
                 break;
             }
         }
@@ -1543,8 +1664,9 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     }
 
     /// <summary>
-    /// Async callback used to check if the GetLogLine() call is succeeding again after a detected timeout.
+    /// Handles the completion of a log line retrieval operation and updates internal state flags accordingly.
     /// </summary>
+    /// <param name="line">The log line that was retrieved. Can be null if the operation did not return a line.</param>
     private void GetLineFinishedCallback (ILogLine line)
     {
         _isFailModeCheckCallPending = false;
@@ -1557,6 +1679,15 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _logger.Debug(CultureInfo.InvariantCulture, "'isLogLineCallPending' flag was reset.");
     }
 
+    /// <summary>
+    /// Finds the first buffer in the buffer list that is associated with the same file as the specified log buffer,
+    /// searching backwards from the given buffer.
+    /// </summary>
+    /// <remarks>This method searches backwards from the specified buffer in the buffer list to locate the
+    /// earliest buffer associated with the same file. The search is inclusive of the starting buffer.</remarks>
+    /// <param name="logBuffer">The log buffer from which to begin the search. Must not be null.</param>
+    /// <returns>The first LogBuffer in the buffer list that is associated with the same file as the specified buffer, searching
+    /// in reverse order from the given buffer. Returns null if the specified buffer is not found in the buffer list.</returns>
     private LogBuffer GetFirstBufferForFileByLogBuffer (LogBuffer logBuffer)
     {
         var info = logBuffer.FileInfo;
@@ -1584,6 +1715,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return resultBuffer;
     }
 
+    /// <summary>
+    /// Monitors the specified log file for changes and processes updates in a background thread.
+    /// </summary>
+    /// <remarks>This method is intended to be used as the entry point for a monitoring thread. It
+    /// periodically checks the watched log file for changes, handles file not found scenarios, and triggers appropriate
+    /// events when the file is updated or deleted. The method runs until a stop signal is received. Exceptions
+    /// encountered during monitoring are logged but do not terminate the monitoring loop.</remarks>
     private void MonitorThreadProc ()
     {
         Thread.CurrentThread.Name = "MonitorThread";
@@ -1652,6 +1790,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Handles the scenario when the monitored file is not found and updates the internal state to reflect that the
+    /// file has been deleted.
+    /// </summary>
+    /// <remarks>This method should be called when a monitored file is determined to be missing, such as after
+    /// a FileNotFoundException. It transitions the monitoring logic into a 'deleted' state and notifies any listeners
+    /// of the file's absence. Subsequent calls have no effect if the file is already marked as deleted.</remarks>
     private void MonitoredFileNotFound ()
     {
         long oldSize;
@@ -1671,6 +1816,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 #endif
     }
 
+    /// <summary>
+    /// Handles updates when the underlying file has changed, such as when it is modified or restored after deletion.
+    /// </summary>
+    /// <remarks>This method should be called when the file being monitored is detected to have changed. If
+    /// the file was previously deleted and has been restored, the method triggers a respawn event and resets the file
+    /// size. It also logs the change and notifies listeners of the update.</remarks>
     private void FileChanged ()
     {
         if (_isDeleted)
@@ -1688,6 +1839,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Raises a change event to notify listeners of updates to the monitored file, such as changes in file size, line
+    /// count, or file rollover events.
+    /// </summary>
+    /// <remarks>This method should be called whenever the state of the monitored file may have changed,
+    /// including when the file is recreated, deleted, or rolled over. It updates relevant event arguments and invokes
+    /// event handlers as appropriate. Listeners can use the event data to respond to file changes, such as updating UI
+    /// elements or processing new log entries.</remarks>
     private void FireChangeEvent ()
     {
         LogEventArgs args = new()
@@ -1753,6 +1912,18 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates an <see cref="ILogStreamReader"/> for reading log entries from the specified stream using the provided
+    /// encoding options.
+    /// </summary>
+    /// <remarks>If XML mode is enabled, the returned reader splits and parses XML log blocks according to the
+    /// current XML log configuration. The caller is responsible for disposing the returned reader when
+    /// finished.</remarks>
+    /// <param name="stream">The input stream containing the log data to be read. The stream must be readable and positioned at the start of
+    /// the log content.</param>
+    /// <param name="encodingOptions">The encoding options to use when interpreting the log data from the stream.</param>
+    /// <returns>An <see cref="ILogStreamReader"/> instance for reading log entries from the specified stream. If XML mode is
+    /// enabled, the reader parses XML log blocks; otherwise, it reads logs in the default format.</returns>
     private ILogStreamReader GetLogStreamReader (Stream stream, EncodingOptions encodingOptions)
     {
         var reader = CreateLogStreamReader(stream, encodingOptions);
@@ -1760,6 +1931,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return IsXmlMode ? new XmlBlockSplitter(new XmlLogReader(reader), XmlLogConfig) : reader;
     }
 
+    /// <summary>
+    /// Creates an instance of an ILogStreamReader for reading log data from the specified stream using the provided
+    /// encoding options.
+    /// </summary>
+    /// <param name="stream">The input stream containing the log data to be read. The stream must be readable and positioned at the start of
+    /// the log data.</param>
+    /// <param name="encodingOptions">The encoding options to use when interpreting the log data from the stream.</param>
+    /// <returns>An ILogStreamReader instance configured to read from the specified stream with the given encoding options.</returns>
     private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions)
     {
         return _readerType switch
@@ -1771,6 +1950,18 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         };
     }
 
+    /// <summary>
+    /// Attempts to read a single line from the specified log stream reader and applies optional preprocessing.
+    /// </summary>
+    /// <remarks>If an IOException or NotSupportedException occurs during reading, the method logs a warning
+    /// and treats the situation as end of stream. If a PreProcessColumnizer is set, the line is processed before being
+    /// returned.</remarks>
+    /// <param name="reader">The log stream reader from which to read the next line. Cannot be null.</param>
+    /// <param name="lineNum">The logical line number to associate with the line being read. Used for preprocessing.</param>
+    /// <param name="realLineNum">The actual line number in the underlying data source. Used for preprocessing.</param>
+    /// <param name="outLine">When this method returns, contains the line that was read and optionally preprocessed, or null if the end of the
+    /// stream is reached or an error occurs.</param>
+    /// <returns>true if a line was successfully read and assigned to outLine; otherwise, false.</returns>
     private bool ReadLine (ILogStreamReader reader, int lineNum, int realLineNum, out string outLine)
     {
         string line = null;
@@ -1806,6 +1997,19 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Attempts to read a single line from the specified log stream reader, returning both the line as a string and, if
+    /// available, as a memory buffer without additional allocations.
+    /// </summary>
+    /// <remarks>If the reader implements memory-based access, this method avoids unnecessary string
+    /// allocations by returning the line as a ReadOnlyMemory<char>. Otherwise, it falls back to reading the line as a
+    /// string only. The returned memory buffer is only valid until the next read operation on the reader.</remarks>
+    /// <param name="reader">The log stream reader from which to read the line. Must not be null.</param>
+    /// <param name="lineNum">The zero-based logical line number to associate with the read operation. Used for preprocessing or context.</param>
+    /// <param name="realLineNum">The zero-based physical line number in the underlying data source. Used for preprocessing or context.</param>
+    /// <returns>A tuple containing a boolean indicating success, a read-only memory buffer containing the line if available, and
+    /// the line as a string. If the reader supports memory-based access, the memory buffer is populated; otherwise, it
+    /// is null.</returns>
     private (bool Success, ReadOnlyMemory<char> LineMemory, string Line) ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum)
     {
         if (reader is ILogStreamReaderMemory memoryReader)
@@ -1828,6 +2032,14 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return (ReadLine(reader, lineNum, realLineNum, out var outLine), null, outLine);
     }
 
+    /// <summary>
+    /// Acquires an upgradeable read lock on the buffer list, waiting up to 10 seconds before blocking indefinitely if
+    /// the lock is not immediately available.
+    /// </summary>
+    /// <remarks>This method ensures that the calling thread holds an upgradeable read lock on the buffer
+    /// list. If the lock cannot be acquired within 10 seconds, a warning is logged and the method blocks until the lock
+    /// becomes available. Use this method when a read lock is needed with the potential to upgrade to a write
+    /// lock.</remarks>
     private void AcquireBufferListUpgradeableReadLock ()
     {
         if (!_bufferListLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
@@ -1837,6 +2049,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Acquires an upgradeable read lock on the dispose lock, waiting up to 10 seconds before blocking indefinitely if
+    /// the lock is not immediately available.
+    /// </summary>
+    /// <remarks>This method ensures that the current thread holds an upgradeable read lock on the dispose
+    /// lock, allowing for potential escalation to a write lock if needed. If the lock cannot be acquired within 10
+    /// seconds, a warning is logged and the method blocks until the lock becomes available.</remarks>
     private void AcquireDisposeLockUpgradableReadLock ()
     {
         if (!_disposeLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
@@ -1846,6 +2065,15 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Acquires an upgradeable read lock on the LRU cache dictionary, waiting up to 10 seconds before blocking
+    /// indefinitely if the lock is not immediately available.
+    /// </summary>
+    /// <remarks>This method ensures that the calling thread holds an upgradeable read lock on the LRU cache
+    /// dictionary, allowing for safe read access and the potential to upgrade to a write lock if necessary. If the lock
+    /// cannot be acquired within 10 seconds, a warning is logged and the method blocks until the lock becomes
+    /// available. This approach helps prevent deadlocks and provides diagnostic information in case of lock
+    /// contention.</remarks>
     private void AcquireLRUCacheDictUpgradeableReadLock ()
     {
         if (!_lruCacheDictLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
@@ -1855,6 +2083,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Acquires a read lock on the LRU cache dictionary to ensure thread-safe read access.
+    /// </summary>
+    /// <remarks>If the read lock cannot be acquired within 10 seconds, a warning is logged and the method
+    /// will block until the lock becomes available. Callers should ensure that this method is used in contexts where
+    /// blocking is acceptable to avoid potential deadlocks or performance issues.</remarks>
     private void AcquireLruCacheDictReaderLock ()
     {
         if (!_lruCacheDictLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
@@ -1864,6 +2098,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Acquires a read lock on the dispose lock, blocking the calling thread until the lock is obtained.
+    /// </summary>
+    /// <remarks>If the read lock cannot be acquired within 10 seconds, a warning is logged and the method
+    /// will block until the lock becomes available. This method is intended to ensure thread-safe access during
+    /// disposal operations.</remarks>
     private void AcquireDisposeReaderLock ()
     {
         if (!_disposeLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
@@ -1873,31 +2113,67 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases the writer lock held on the LRU cache dictionary, allowing other threads to acquire the lock.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that require exclusive access to the LRU cache
+    /// dictionary. Failing to release the writer lock may result in deadlocks or reduced concurrency.</remarks>
     private void ReleaseLRUCacheDictWriterLock ()
     {
         _lruCacheDictLock.ExitWriteLock();
     }
 
+    /// <summary>
+    /// Releases the writer lock held for disposing resources.
+    /// </summary>
+    /// <remarks>Call this method to exit the write lock acquired for resource disposal. This should be used
+    /// in conjunction with the corresponding method that acquires the writer lock to ensure proper synchronization
+    /// during disposal operations.</remarks>
     private void ReleaseDisposeWriterLock ()
     {
         _disposeLock.ExitWriteLock();
     }
 
+    /// <summary>
+    /// Releases the read lock on the LRU cache dictionary to allow write access by other threads.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that require read access to the LRU cache
+    /// dictionary. Failing to release the lock may result in deadlocks or prevent other threads from acquiring write
+    /// access.</remarks>
     private void ReleaseLRUCacheDictReaderLock ()
     {
         _lruCacheDictLock.ExitReadLock();
     }
 
+    /// <summary>
+    /// Releases a reader lock held for disposing resources, allowing other threads to acquire the lock as needed.
+    /// </summary>
+    /// <remarks>Call this method to release the read lock previously acquired for resource disposal
+    /// operations. Failing to release the lock may result in deadlocks or prevent other threads from accessing the
+    /// protected resource.</remarks>
     private void ReleaseDisposeReaderLock ()
     {
         _disposeLock.ExitReadLock();
     }
 
+    /// <summary>
+    /// Releases the upgradeable read lock held on the LRU cache dictionary.
+    /// </summary>
+    /// <remarks>Call this method to release the upgradeable read lock previously acquired on the LRU cache
+    /// dictionary. Failing to release the lock may result in deadlocks or reduced concurrency. This method should be
+    /// used in conjunction with the corresponding lock acquisition method to ensure proper synchronization.</remarks>
     private void ReleaseLRUCacheDictUpgradeableReadLock ()
     {
         _lruCacheDictLock.ExitUpgradeableReadLock();
     }
 
+    /// <summary>
+    /// Acquires the writer lock used to synchronize disposal operations, blocking the calling thread until the lock is
+    /// obtained.
+    /// </summary>
+    /// <remarks>If the writer lock cannot be acquired within 10 seconds, a warning is logged and the method
+    /// waits indefinitely until the lock becomes available. Callers should ensure that holding the lock for extended
+    /// periods does not cause deadlocks or performance issues.</remarks>
     private void AcquireDisposeWriterLock ()
     {
         if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -1907,6 +2183,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Acquires an exclusive writer lock on the LRU cache dictionary, blocking if the lock is not immediately
+    /// available.
+    /// </summary>
+    /// <remarks>If the writer lock cannot be acquired within 10 seconds, a warning is logged and the method
+    /// blocks until the lock becomes available. This method should be called before performing write operations on the
+    /// LRU cache dictionary to ensure thread safety.</remarks>
     private void AcquireLruCacheDictWriterLock ()
     {
         if (!_lruCacheDictLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -1916,11 +2199,24 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases the upgradeable read lock on the buffer list, allowing other threads to acquire exclusive or read
+    /// access.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that required an upgradeable read lock on the
+    /// buffer list. Failing to release the lock may result in deadlocks or reduced concurrency.</remarks>
     private void ReleaseBufferListUpgradeableReadLock ()
     {
         _bufferListLock.ExitUpgradeableReadLock();
     }
 
+    /// <summary>
+    /// Upgrades the buffer list lock from a reader lock to a writer lock, waiting up to 10 seconds before forcing the
+    /// upgrade if necessary.
+    /// </summary>
+    /// <remarks>If the writer lock cannot be acquired within 10 seconds, the method logs a warning and then
+    /// blocks until the writer lock is obtained. Call this method only when the current thread already holds a reader
+    /// lock on the buffer list.</remarks>
     private void UpgradeBufferlistLockToWriterLock ()
     {
         if (!_bufferListLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -1930,6 +2226,12 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Upgrades the current dispose lock to a writer lock, blocking if necessary until the upgrade is successful.
+    /// </summary>
+    /// <remarks>This method attempts to upgrade the dispose lock to a writer lock with a timeout. If the
+    /// upgrade cannot be completed within the timeout period, it logs a warning and blocks until the writer lock is
+    /// acquired. Call this method when exclusive access is required for disposal or resource modification.</remarks>
     private void UpgradeDisposeLockToWriterLock ()
     {
         if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -1939,6 +2241,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Upgrades the lock on the LRU cache dictionary from a reader lock to a writer lock, waiting up to 10 seconds
+    /// before forcing the upgrade.
+    /// </summary>
+    /// <remarks>If the writer lock cannot be acquired within 10 seconds, the method logs a warning and then
+    /// blocks until the writer lock is available. Call this method only when it is necessary to perform write
+    /// operations on the LRU cache dictionary after holding a reader lock.</remarks>
     private void UpgradeLRUCacheDicLockToWriterLock ()
     {
         if (!_lruCacheDictLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
@@ -1948,23 +2257,47 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Downgrades the buffer list lock from write mode to allow other threads to acquire read access.
+    /// </summary>
+    /// <remarks>Call this method after completing write operations to permit concurrent read access to the
+    /// buffer list. The calling thread must hold the write lock before invoking this method.</remarks>
     private void DowngradeBufferListLockFromWriterLock ()
     {
         _bufferListLock.ExitWriteLock();
     }
 
+    /// <summary>
+    /// Downgrades the LRU cache lock from a writer lock, allowing other threads to acquire read access.
+    /// </summary>
+    /// <remarks>Call this method after completing operations that require exclusive write access to the LRU
+    /// cache, to permit concurrent read operations. The caller must hold the writer lock before invoking this
+    /// method.</remarks>
     private void DowngradeLRUCacheLockFromWriterLock ()
     {
         _lruCacheDictLock.ExitWriteLock();
     }
 
+    /// <summary>
+    /// Releases the writer lock on the dispose lock, downgrading from write access.
+    /// </summary>
+    /// <remarks>Call this method to release write access to the dispose lock when a downgrade is required,
+    /// such as when transitioning from exclusive to shared access. This method should only be called when the current
+    /// thread holds the writer lock.</remarks>
     private void DowngradeDisposeLockFromWriterLock ()
     {
         _disposeLock.ExitWriteLock();
     }
 
 #if DEBUG
-    private void DumpBufferInfos (LogBuffer buffer)
+    /// <summary>
+    /// Outputs detailed information about the specified log buffer to the trace logger for debugging purposes.
+    /// </summary>
+    /// <remarks>This method is only available in debug builds. It writes buffer details such as start line,
+    /// line count, position, size, disposal state, and associated file to the trace log if trace logging is
+    /// enabled.</remarks>
+    /// <param name="buffer">The log buffer whose information will be written to the trace output. Cannot be null.</param>
+    private static void DumpBufferInfos (LogBuffer buffer)
     {
         if (_logger.IsTraceEnabled)
         {
@@ -1985,12 +2318,24 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #region IDisposable Support
 
+    /// <summary>
+    /// Releases all resources used by the current instance of the class.
+    /// </summary>
+    /// <remarks>Call this method when you are finished using the object to release unmanaged resources and
+    /// perform other cleanup operations. After calling Dispose, the object should not be used.</remarks>
     public void Dispose ()
     {
         Dispose(true);
         GC.SuppressFinalize(this); // Suppress finalization (not needed but best practice)
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the object and optionally releases the managed resources.
+    /// </summary>
+    /// <remarks>This method is called by public Dispose methods and can be overridden to release additional
+    /// resources in derived classes. When disposing is true, both managed and unmanaged resources should be released.
+    /// When disposing is false, only unmanaged resources should be released.</remarks>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected virtual void Dispose (bool disposing)
     {
         if (!_disposed)
@@ -2005,6 +2350,13 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
+    /// <summary>
+    /// Finalizes an instance of the LogfileReader class, releasing unmanaged resources before the object is reclaimed
+    /// by garbage collection.
+    /// </summary>
+    /// <remarks>This destructor is called automatically by the garbage collector when the object is no longer
+    /// accessible. It ensures that any unmanaged resources are properly released if Dispose was not called
+    /// explicitly.</remarks>
     //TODO: Seems that this can be deleted. Need to verify.
     ~LogfileReader ()
     {
@@ -2014,31 +2366,65 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     #endregion IDisposable Support
 
     #region Event Handlers
+
+    /// <summary>
+    /// Raises the FileSizeChanged event to notify subscribers when the size of the log file changes.
+    /// </summary>
+    /// <remarks>Derived classes can override this method to provide custom handling when the file size changes. This
+    /// method is typically called after the file size has been updated.</remarks>
+    /// <param name="e">An object that contains the event data associated with the file size change.</param>
     protected virtual void OnFileSizeChanged (LogEventArgs e)
     {
         FileSizeChanged?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Raises the LoadFile event to notify subscribers that a file load operation has occurred.
+    /// </summary>
+    /// <remarks>Override this method in a derived class to provide custom handling when a file is loaded.
+    /// Calling the base implementation ensures that registered event handlers are invoked.</remarks>
+    /// <param name="e">An object that contains the event data for the file load operation.</param>
     protected virtual void OnLoadFile (LoadFileEventArgs e)
     {
         LoadFile?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Raises the LoadingStarted event to signal that a file loading operation has begun.
+    /// </summary>
+    /// <remarks>Derived classes can override this method to provide custom handling when a loading operation
+    /// starts. This method is typically called to notify subscribers that loading has commenced.</remarks>
+    /// <param name="e">An object that contains the event data associated with the loading operation.</param>
     protected virtual void OnLoadingStarted (LoadFileEventArgs e)
     {
         LoadingStarted?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Raises the LoadingFinished event to signal that the loading process has completed.
+    /// </summary>
+    /// <remarks>Override this method in a derived class to provide custom logic when loading is finished.
+    /// This method is typically called after all loading operations are complete to notify subscribers.</remarks>
     protected virtual void OnLoadingFinished ()
     {
         LoadingFinished?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Raises the event that signals a file was not found.
+    /// </summary>
+    /// <remarks>Override this method in a derived class to provide custom handling when a file is not found.
+    /// This method invokes the associated event handlers, if any are subscribed.</remarks>
     protected virtual void OnFileNotFound ()
     {
         FileNotFound?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Raises the Respawned event to notify subscribers that the object has respawned.
+    /// </summary>
+    /// <remarks>Override this method in a derived class to provide custom logic when the object respawns.
+    /// Always call the base implementation to ensure that the Respawned event is raised.</remarks>
     protected virtual void OnRespawned ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "OnRespawned()");

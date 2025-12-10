@@ -2059,4 +2059,7 @@ Restart LogExpert to apply changes?</value>
   <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
     <value>Restart Recommended</value>
   </data>
+  <data name="LogfileReader_Error_Message_MustProvideAtLeastOneFile" xml:space="preserve">
+    <value>Must provide at least one file.</value>
+  </data>
 </root>
