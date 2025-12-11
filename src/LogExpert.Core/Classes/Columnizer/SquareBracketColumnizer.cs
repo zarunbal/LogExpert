@@ -150,7 +150,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
         return [.. columnNames];
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -213,7 +213,7 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
             }
         }
 
-        clogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
+        clogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
 
         return clogLine;
     }

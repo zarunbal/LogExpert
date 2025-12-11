@@ -27,13 +27,19 @@ internal interface ILogPaintContextUI : ILogPaintContext
 
     ILogLine GetLogLine (int lineNum);
 
-    IColumn GetCellValue (int rowIndex, int columnIndex);
+    ILogLineMemory GetLogLineMemory (int lineNum);
+
+    IColumnMemory GetCellValue (int rowIndex, int columnIndex);
 
     Bookmark GetBookmarkForLine (int lineNum);
 
     HighlightEntry FindHighlightEntry (ITextValue line, bool noWordMatches);
 
+    HighlightEntry FindHighlightEntry (ITextValueMemory line, bool noWordMatches);
+
     IList<HighlightMatchEntry> FindHighlightMatches (ITextValue line);
+
+    IList<HighlightMatchEntry> FindHighlightMatches (ITextValueMemory line);
 
     #endregion
 }

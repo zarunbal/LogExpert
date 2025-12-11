@@ -109,7 +109,7 @@ public class ClfColumnizer : ILogLineColumnizer
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -128,7 +128,7 @@ public class ClfColumnizer : ILogLineColumnizer
             new() {FullValue = "", Parent = cLogLine}
         };
 
-        cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+        cLogLine.ColumnValues = columns.Select(a => a as IColumnMemory).ToArray();
 
         var temp = line.FullLine;
         if (temp.Length > 1024)

@@ -59,7 +59,7 @@ public class FilterParams : ICloneable
     public Collection<int> ColumnList { get; } = [];
 
     [JsonConverter(typeof(ColumnizerJsonConverter))]
-    public ILogLineColumnizer CurrentColumnizer { get; set; }
+    public ILogLineMemoryColumnizer CurrentColumnizer { get; set; }
 
     /// <summary>
     /// false=looking for start

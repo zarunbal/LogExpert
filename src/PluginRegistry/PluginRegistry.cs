@@ -5,7 +5,6 @@ using System.Security;
 using ColumnizerLib;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
 using LogExpert.PluginRegistry.Events;
@@ -40,7 +39,7 @@ public class PluginRegistry : IPluginRegistry
     private readonly PluginEventBus _eventBus;
 
     // Lazy loaders for each plugin type - Type-Aware Lazy Loading
-    private readonly List<LazyPluginLoader<ILogLineColumnizer>> _lazyColumnizers = [];
+    private readonly List<LazyPluginLoader<ILogLineMemoryColumnizer>> _lazyColumnizers = [];
     private readonly List<LazyPluginLoader<IFileSystemPlugin>> _lazyFileSystemPlugins = [];
     private readonly List<LazyPluginLoader<IContextMenuEntry>> _lazyContextMenuPlugins = [];
     private readonly List<LazyPluginLoader<IKeywordAction>> _lazyKeywordActions = [];
@@ -122,7 +121,7 @@ public class PluginRegistry : IPluginRegistry
     /// Gets the list of registered columnizer plugins.
     /// Triggers lazy loading of columnizers if lazy loading is enabled.
     /// </summary>
-    public IList<ILogLineColumnizer> RegisteredColumnizers
+    public IList<ILogLineMemoryColumnizer> RegisteredColumnizers
     {
         get
         {
@@ -169,9 +168,9 @@ public class PluginRegistry : IPluginRegistry
         [
             //Default Columnizer if other Plugins can not be loaded
             new DefaultLogfileColumnizer(),
-            new TimestampColumnizer(),
-            new SquareBracketColumnizer(),
-            new ClfColumnizer(),
+            //new TimestampColumnizer() as ILogLineMemoryColumnizer,
+            //new SquareBracketColumnizer() as ILogLineMemoryColumnizer,
+            //new ClfColumnizer() as ILogLineMemoryColumnizer,
         ];
 
         //Default FileSystem if other FileSystem Plugins cannot be loaded
@@ -546,7 +545,7 @@ public class PluginRegistry : IPluginRegistry
 
         if (typeInfo.HasColumnizer)
         {
-            var loader = new LazyPluginLoader<ILogLineColumnizer>(dllName, manifest);
+            var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(dllName, manifest);
             _lazyColumnizers.Add(loader);
             _logger.Info("Registered lazy columnizer: {Plugin}", manifest?.Name ?? Path.GetFileName(dllName));
             registered = true;
@@ -772,9 +771,9 @@ public class PluginRegistry : IPluginRegistry
             _logger.Debug("Checking type {TypeName} in assembly {AssemblyName}", type.FullName, assembly.FullName);
 
             // Check for ILogLineColumnizer
-            if (type.GetInterfaces().Any(i => i.FullName == typeof(ILogLineColumnizer).FullName) &&
+            if (type.GetInterfaces().Any(i => i.FullName == typeof(ILogLineMemoryColumnizer).FullName) &&
                 TryInstantiatePluginSafe(type, out var instance) &&
-                instance is ILogLineColumnizer columnizer)
+                instance is ILogLineMemoryColumnizer columnizer)
             {
                 ProcessLoadedPlugin(columnizer, manifest, dllName);
                 pluginLoadedCount++;
@@ -852,7 +851,7 @@ public class PluginRegistry : IPluginRegistry
     /// </summary>
     private void ProcessLoadedPlugin (object plugin, PluginManifest? manifest, string dllPath)
     {
-        if (plugin is not ILogLineColumnizer columnizer)
+        if (plugin is not ILogLineMemoryColumnizer columnizer)
         {
             _logger.Warn("Loaded plugin is not ILogLineColumnizer: {Type}", plugin.GetType().Name);
             return;

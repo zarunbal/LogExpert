@@ -1,7 +1,8 @@
 namespace ColumnizerLib;
 
-public class Column : IColumn
+public class Column : IColumnMemory
 {
+    //TODO Memory Functions need implementation
     #region Fields
 
     private const string REPLACEMENT = "...";
@@ -49,9 +50,9 @@ public class Column : IColumn
 
     #region Properties
 
-    public static IColumn EmptyColumn { get; }
+    public static IColumnMemory EmptyColumn { get; }
 
-    public IColumnizedLogLine Parent { get; set; }
+    public IColumnizedLogLineMemory Parent { get; set; }
 
     public string FullValue
     {
@@ -74,6 +75,19 @@ public class Column : IColumn
     public string DisplayValue { get; private set; }
 
     public string Text => DisplayValue;
+
+    public IColumnizedLogLineMemory ParentMemory { get; }
+
+    public ReadOnlyMemory<char> FullValueMemory
+    {
+        get;
+        set; //implement
+    }
+
+    public ReadOnlyMemory<char> DisplayValueMemory { get; }
+
+    public ReadOnlyMemory<char> TextMemory { get; }
+    IColumnizedLogLine IColumn.Parent { get; }
 
     #endregion
 
@@ -99,12 +113,12 @@ public class Column : IColumn
     /// </summary>
     public static int GetMaxDisplayLength () => _maxDisplayLength;
 
-    public static Column[] CreateColumns (int count, IColumnizedLogLine parent)
+    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent)
     {
         return CreateColumns(count, parent, string.Empty);
     }
 
-    public static Column[] CreateColumns (int count, IColumnizedLogLine parent, string defaultValue)
+    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent, string defaultValue)
     {
         var output = new Column[count];
 

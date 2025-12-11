@@ -91,7 +91,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         return names;
     }
 
-    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public virtual IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         var json = ParseJson(line);
 
@@ -106,7 +106,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
         columns.Last().FullValue = line.FullLine;
 
-        cLogLine.ColumnValues = [.. columns.Select(a => (IColumn)a)];
+        cLogLine.ColumnValues = [.. columns.Select(a => (IColumnMemory)a)];
 
         return cLogLine;
     }
@@ -170,7 +170,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
     // {"time":"2019-02-13T02:55:35.5186240Z","message":"Hosting starting"}
     // {"time":"2019-02-13T02:55:35.5186240Z","level":"warning", "message":"invalid host."}
     //
-    protected virtual IColumnizedLogLine SplitJsonLine (ILogLine line, JObject json)
+    protected virtual IColumnizedLogLineMemory SplitJsonLine (ILogLine line, JObject json)
     {
         var cLogLine = new ColumnizedLogLine { LogLine = line };
 
@@ -195,7 +195,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         // Always rearrange the order of all json fields within a line to follow the sequence of columnNameList.
         // This will make sure the log line displayed correct even the order of json fields changed.
         //
-        List<IColumn> returnColumns = [];
+        List<IColumnMemory> returnColumns = [];
         foreach (var column in ColumnList)
         {
             var existingColumn = columns.Find(x => x.ColumnName == column.Name);

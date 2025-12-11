@@ -138,7 +138,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
         return names;
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         return _isValidCsv
             ? SplitCsvLine(line)
@@ -319,7 +319,7 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
                 columns.Add(new Column { FullValue = record, Parent = cLogLine });
             }
 
-            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
         }
 
         return cLogLine;

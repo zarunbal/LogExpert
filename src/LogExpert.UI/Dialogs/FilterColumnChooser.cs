@@ -11,7 +11,7 @@ internal partial class FilterColumnChooser : Form
 {
     #region Fields
 
-    private readonly ILogLineColumnizer _columnizer;
+    private readonly ILogLineMemoryColumnizer _columnizer;
     private readonly FilterParams _filterParams;
 
     #endregion

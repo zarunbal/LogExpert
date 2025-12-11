@@ -25,7 +25,7 @@ public class LazyPluginLoaderTests
         };
 
         // Act
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(dllPath, manifest);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(dllPath, manifest);
 
         // Assert
         Assert.That(loader, Is.Not.Null);
@@ -41,7 +41,7 @@ public class LazyPluginLoaderTests
         var dllPath = "test.dll";
 
         // Act
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(dllPath, null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(dllPath, null);
 
         // Assert
         Assert.That(loader, Is.Not.Null);
@@ -55,7 +55,7 @@ public class LazyPluginLoaderTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new LazyPluginLoader<ILogLineColumnizer>(null, null));
+            new LazyPluginLoader<ILogLineMemoryColumnizer>(null, null));
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class LazyPluginLoaderTests
     {
         // Arrange
         var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(nonExistentPath, null);
 
         // Act
         var instance = loader.GetInstance();
@@ -78,7 +78,7 @@ public class LazyPluginLoaderTests
     {
         // Arrange
         var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(nonExistentPath, null);
 
         // Act
         var instance1 = loader.GetInstance();
@@ -93,7 +93,7 @@ public class LazyPluginLoaderTests
     public void IsLoaded_BeforeGetInstance_ReturnsFalse ()
     {
         // Arrange
-        var loader = new LazyPluginLoader<ILogLineColumnizer>("test.dll", null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>("test.dll", null);
 
         // Assert
         Assert.That(loader.IsLoaded, Is.False);
@@ -104,7 +104,7 @@ public class LazyPluginLoaderTests
     {
         // Arrange
         var nonExistentPath = Path.Join(Path.GetTempPath(), "NonExistent_" + Guid.NewGuid() + ".dll");
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(nonExistentPath, null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(nonExistentPath, null);
 
         // Act
         _ = loader.GetInstance();
@@ -118,7 +118,7 @@ public class LazyPluginLoaderTests
     {
         // Arrange
         var dllPath = "C:\\plugins\\TestPlugin.dll";
-        var loader = new LazyPluginLoader<ILogLineColumnizer>(dllPath, null);
+        var loader = new LazyPluginLoader<ILogLineMemoryColumnizer>(dllPath, null);
 
         // Act
         var result = loader.ToString();

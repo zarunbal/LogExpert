@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace LogExpert.Tests;
 
-public class MockColumnizer : ILogLineColumnizer
+public class MockColumnizer : ILogLineMemoryColumnizer
 {
     [JsonColumnizerProperty]
     public int IntProperty { get; set; }
@@ -53,7 +53,7 @@ public class MockColumnizer : ILogLineColumnizer
 
     public string[] GetColumnNames () => throw new NotImplementedException();
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
 
     public void SetTimeOffset (int msecOffset) => throw new NotImplementedException();
 
@@ -62,9 +62,15 @@ public class MockColumnizer : ILogLineColumnizer
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
+
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line) => throw new NotImplementedException();
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line) => throw new NotImplementedException();
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 }
 
-public class MockColumnizerWithCustomName : ILogLineColumnizer
+public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
 {
     [JsonColumnizerProperty]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1721:Property names should not match get methods", Justification = "Unit Test")]
@@ -83,7 +89,7 @@ public class MockColumnizerWithCustomName : ILogLineColumnizer
 
     public string[] GetColumnNames () => ["Column1"];
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
 
     public bool IsTimeshiftImplemented () => false;
 
@@ -94,6 +100,21 @@ public class MockColumnizerWithCustomName : ILogLineColumnizer
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
+
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [TestFixture]
@@ -115,7 +136,7 @@ public class ColumnizerJsonConverterTests
         };
 
         var json = JsonConvert.SerializeObject(original, settings);
-        var deserialized = JsonConvert.DeserializeObject<ILogLineColumnizer>(json, settings);
+        var deserialized = JsonConvert.DeserializeObject<ILogLineMemoryColumnizer>(json, settings);
 
         Assert.That(deserialized, Is.Not.Null);
         Assert.That(original.GetName(), Is.EqualTo(deserialized.GetName()));
@@ -141,7 +162,7 @@ public class ColumnizerJsonConverterTests
 
         // Act: Serialize and deserialize
         var json = JsonConvert.SerializeObject(original, settings);
-        var deserialized = JsonConvert.DeserializeObject<ILogLineColumnizer>(json, settings) as MockColumnizerWithCustomName;
+        var deserialized = JsonConvert.DeserializeObject<ILogLineMemoryColumnizer>(json, settings) as MockColumnizerWithCustomName;
 
         // Assert: Verify the custom name and state are preserved
         Assert.That(deserialized, Is.Not.Null);
@@ -174,7 +195,7 @@ public class ColumnizerJsonConverterTests
         Assert.That(json, Does.Contain("MockColumnizerWithCustomName"));
 
         // Act: Deserialize
-        var deserialized = JsonConvert.DeserializeObject<ILogLineColumnizer>(json, settings) as MockColumnizerWithCustomName;
+        var deserialized = JsonConvert.DeserializeObject<ILogLineMemoryColumnizer>(json, settings) as MockColumnizerWithCustomName;
 
         // Assert: Should successfully deserialize even though GetName() returns different value
         Assert.That(deserialized, Is.Not.Null);
@@ -202,7 +223,7 @@ public class ColumnizerJsonConverterTests
         };
 
         // Act: Deserialize old format
-        var deserialized = JsonConvert.DeserializeObject<ILogLineColumnizer>(oldFormatJson, settings) as MockColumnizer;
+        var deserialized = JsonConvert.DeserializeObject<ILogLineMemoryColumnizer>(oldFormatJson, settings) as MockColumnizer;
 
         // Assert: Should successfully deserialize using fallback logic
         Assert.That(deserialized, Is.Not.Null);

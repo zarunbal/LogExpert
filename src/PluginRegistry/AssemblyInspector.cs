@@ -54,7 +54,7 @@ public static class AssemblyInspector
                 var interfaces = type.GetInterfaces();
 
                 // Check for each plugin interface type
-                if (interfaces.Any(i => i.FullName == typeof(ILogLineColumnizer).FullName))
+                if (interfaces.Any(i => i.FullName == typeof(ILogLineMemoryColumnizer).FullName))
                 {
                     info.HasColumnizer = true;
                     _logger.Debug("  Found ILogLineColumnizer: {TypeName}", type.Name);
@@ -111,7 +111,7 @@ public static class AssemblyInspector
                     try
                     {
                         var interfaces = type.GetInterfaces();
-                        if (interfaces.Any(i => i.FullName == typeof(ILogLineColumnizer).FullName))
+                        if (interfaces.Any(i => i.FullName == typeof(ILogLineMemoryColumnizer).FullName))
                         {
                             info.HasColumnizer = true;
                         }

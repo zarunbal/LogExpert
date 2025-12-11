@@ -84,15 +84,27 @@ public class LogBuffer
         IsDisposed = false;
     }
 
+    public void AddLine (ILogLineMemory lineMemory, long filePos)
+    {
+        _lineList.Add(lineMemory);
+#if DEBUG
+        _filePositions.Add(filePos);
+#endif
+        LineCount++;
+        IsDisposed = false;
+    }
+
     public void ClearLines ()
     {
         _logLines.Clear();
+        _lineList.Clear();
         LineCount = 0;
     }
 
     public void DisposeContent ()
     {
         _logLines.Clear();
+        _lineList.Clear();
         IsDisposed = true;
 #if DEBUG
         DisposeCount++;
@@ -101,12 +113,16 @@ public class LogBuffer
 
     public ILogLine GetLineOfBlock (int num)
     {
-        if (num < _logLines.Count && num >= 0)
-        {
-            return _logLines[num];
-        }
+        return num < _logLines.Count && num >= 0
+            ? _logLines[num]
+            : null;
+    }
 
-        return null;
+    public ILogLineMemory GetLineMemoryOfBlock (int num)
+    {
+        return num < _lineList.Count && num >= 0
+            ? _lineList[num]
+            : null;
     }
 
     #endregion

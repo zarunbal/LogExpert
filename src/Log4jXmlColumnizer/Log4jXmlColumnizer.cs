@@ -76,7 +76,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         return _config.ActiveColumnNames;
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ColumnizedLogLine clogLine = new()
         {
@@ -142,7 +142,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
         var filteredColumns = MapColumns(columns);
 
-        clogLine.ColumnValues = [.. filteredColumns.Select(a => a as IColumn)];
+        clogLine.ColumnValues = [.. filteredColumns.Select(a => a as IColumnMemory)];
 
         return clogLine;
     }

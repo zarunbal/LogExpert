@@ -30,7 +30,7 @@ public interface IKeywordAction
     /// retrieved from the callback. This is of course the line number of the line that has triggered
     /// the keyword match.
     /// </remarks>
-    void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
+    void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineMemoryColumnizer columnizer);
 
     /// <summary>
     /// Return the name of your plugin here. The returned name is used for displaying the plugin list 

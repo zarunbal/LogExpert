@@ -24,7 +24,7 @@ public interface ISharedToolWindow
     /// </summary>
     void FileChanged ();
 
-    void SetColumnizer (ILogLineColumnizer columnizer);
+    void SetColumnizer (ILogLineMemoryColumnizer columnizer);
 
     void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags);
 

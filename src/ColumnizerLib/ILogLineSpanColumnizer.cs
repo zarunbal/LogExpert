@@ -1,11 +1,11 @@
 namespace ColumnizerLib;
 
-public interface ILogLineSpanColumnizer : ILogLineColumnizer
+public interface ILogLineSpanColumnizer : ILogLineMemoryColumnizer
 {
     /// <summary>
     /// Span-based version of SplitLine that avoids string allocations
     /// </summary>
-    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ReadOnlySpan<char> lineSpan, int lineNumber);
+    IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ReadOnlySpan<char> lineSpan, int lineNumber);
 
     /// <summary>
     /// Span-based timestamp extraction

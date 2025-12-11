@@ -49,11 +49,11 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     public string[] GetColumnNames () => columns;
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         var logLine = new ColumnizedLogLine
         {
-            ColumnValues = new IColumn[columns.Length]
+            ColumnValues = new IColumnMemory[columns.Length]
         };
 
         if (Regex != null)
@@ -93,7 +93,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         }
         else
         {
-            IColumn colVal = new Column
+            IColumnMemory colVal = new Column
             {
                 Parent = logLine,
                 FullValue = line.FullLine

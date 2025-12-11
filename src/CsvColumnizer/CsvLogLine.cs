@@ -17,6 +17,8 @@ public class CsvLogLine (string fullLine, int lineNumber) : ILogLine, ILogLineMe
 
     public ReadOnlyMemory<char> TextMemory { get; }
 
+    public int LineNumber { get; }
+
     #endregion
 
     public CsvLogLine (ReadOnlyMemory<char> fullLine, int lineNumber) : this(fullLine.ToString(), lineNumber)

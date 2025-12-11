@@ -39,7 +39,7 @@ public class AutoColumnizer : ILogLineColumnizer
         throw new NotImplementedException();
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         throw new NotImplementedException();
     }

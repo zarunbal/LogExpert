@@ -1,11 +1,12 @@
-using System.Globalization;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.Versioning;
+
+using ColumnizerLib;
 
 using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
 using LogExpert.Dialogs;
-using ColumnizerLib;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -145,11 +146,11 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
         }
 
         _blockList.Add(singeList);
-        Invoke(new MethodInvoker(SetBlockListGuiStuff));
+        _ = Invoke(new MethodInvoker(SetBlockListGuiStuff));
     }
 
 
-    public void SetColumnizer (ILogLineColumnizer columnizer)
+    public void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         _logWindow.SetColumnizer(columnizer, patternHitsDataGridView);
         _logWindow.SetColumnizer(columnizer, contentDataGridView);

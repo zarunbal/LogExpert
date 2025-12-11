@@ -110,8 +110,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private int _filterPipeNameCounter;
     private List<int> _filterResultList = [];
 
-    private ILogLineColumnizer _forcedColumnizer;
-    private ILogLineColumnizer _forcedColumnizerForLoading;
+    private ILogLineMemoryColumnizer _forcedColumnizer;
+    private ILogLineMemoryColumnizer _forcedColumnizerForLoading;
     private bool _isDeadFile;
     private bool _isErrorShowing;
     private bool _isLoadError;
@@ -321,7 +321,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
 
-    public ILogLineColumnizer CurrentColumnizer
+    public ILogLineMemoryColumnizer CurrentColumnizer
     {
         get;
         private set
@@ -425,6 +425,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return _logFileReader.GetLogLine(lineNum);
     }
 
+    public ILogLineMemory GetLogLineMemory (int lineNum)
+    {
+        return _logFileReader.GetLogLineMemory(lineNum);
+    }
+
+    public ILogLineMemory GetLogLineMemoryWithWait (int lineNum)
+    {
+        return _logFileReader.GetLogLineMemoryWithWait(lineNum).Result;
+    }
+
     public ILogLine GetLogLineWithWait (int lineNum)
     {
         return _logFileReader.GetLogLineWithWait(lineNum).Result;
@@ -439,7 +449,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     #region Internals
 
-    internal IColumnizedLogLine GetColumnsForLine (int lineNumber)
+    internal IColumnizedLogLineMemory GetColumnsForLine (int lineNumber)
     {
         return _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
 
@@ -678,7 +688,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void UpdateProgressBarFx (int lineNum);
 
-    private delegate void SetColumnizerFx (ILogLineColumnizer columnizer);
+    private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
     private delegate void WriteFilterToTabFinishedFx (FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
 
@@ -688,7 +698,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void PatternStatisticFx (PatternArgs patternArgs);
 
-    private delegate void ActionPluginExecuteFx (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer);
+    private delegate void ActionPluginExecuteFx (string keyword, string param, ILogExpertCallback callback, ILogLineMemoryColumnizer columnizer);
 
     private delegate void PositionAfterReloadFx (ReloadMemento reloadMemento);
 
@@ -795,7 +805,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         BookmarkTextChanged?.Invoke(this, new BookmarkEventArgs(bookmark));
     }
 
-    protected void OnColumnizerChanged (ILogLineColumnizer columnizer)
+    protected void OnColumnizerChanged (ILogLineMemoryColumnizer columnizer)
     {
         ColumnizerChanged?.Invoke(this, new ColumnizerEventArgs(columnizer));
     }
@@ -2717,7 +2727,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ShowBookmarkBubbles = Preferences.ShowBubbles;
         //if (this.forcedColumnizer == null)
         {
-            ILogLineColumnizer columnizer;
+            ILogLineMemoryColumnizer columnizer;
             if (_forcedColumnizerForLoading != null)
             {
                 columnizer = _forcedColumnizerForLoading;
@@ -2733,7 +2743,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         //TODO this needs to be refactored
                         var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
-                        columnizer = ColumnizerPicker.CloneColumnizer(columnizer, directory);
+                        columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
                     }
                 }
                 else
@@ -2742,7 +2752,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
                     // Default Columnizers
-                    columnizer = ColumnizerPicker.CloneColumnizer(ColumnizerPicker.FindColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), directory);
+                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), directory);
                 }
             }
 
@@ -2780,7 +2790,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         locateLineInOriginalFileToolStripMenuItem.Enabled = FilterPipe != null;
     }
 
-    private ILogLineColumnizer FindColumnizer ()
+    private ILogLineMemoryColumnizer FindColumnizer ()
     {
         var columnizer = Preferences.MaskPrio
             ? _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName)) ?? _parentLogTabWin.GetColumnizerHistoryEntry(FileName)
@@ -3214,16 +3224,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    private void PreSelectColumnizer (ILogLineColumnizer columnizer)
+    private void PreSelectColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         CurrentColumnizer = columnizer != null
             ? (_forcedColumnizerForLoading = columnizer)
-            : (_forcedColumnizerForLoading = ColumnizerPicker.FindColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
+            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
     }
 
-    private void SetColumnizer (ILogLineColumnizer columnizer)
+    private void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
-        columnizer = ColumnizerPicker.FindReplacementForAutoColumnizer(FileName, _logFileReader, columnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        columnizer = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(FileName, _logFileReader, columnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         var timeDiff = 0;
         if (CurrentColumnizer != null && CurrentColumnizer.IsTimeshiftImplemented())
@@ -3239,7 +3249,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    private void SetColumnizerInternal (ILogLineColumnizer columnizer)
+    private void SetColumnizerInternal (ILogLineMemoryColumnizer columnizer)
     {
         //_logger.Info($"SetColumnizerInternal(): {columnizer.GetName()}");
 
@@ -3409,7 +3419,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void PaintHighlightedCell (DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
     {
-        var column = e.Value as IColumn;
+        var column = e.Value as IColumnMemory;
 
         column ??= Column.EmptyColumn;
 
@@ -3589,16 +3599,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>
     /// Returns the first HighlightEntry that matches the given line
     /// </summary>
+    //TODO Replace with ItextvalueMemory
     private HighlightEntry FindHighlightEntry (ITextValue line)
     {
         return FindHighlightEntry(line, false);
     }
 
+    //TODO Replace with ItextvalueMemory
     private HighlightEntry FindFirstNoWordMatchHighlightEntry (ITextValue line)
     {
         return FindHighlightEntry(line, true);
     }
 
+    //TODO Replace with ItextvalueMemory
     private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
     {
         if (entry.IsRegex)
@@ -3633,6 +3646,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>
     /// Returns all HilightEntry entries which matches the given line
     /// </summary>
+    //TODO Replace with ItextvalueMemory
     private IList<HighlightEntry> FindMatchingHilightEntries (ITextValue line)
     {
         IList<HighlightEntry> resultList = [];
@@ -3653,6 +3667,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return resultList;
     }
 
+    //TODO Replace with ItextvalueMemory
     private static void GetHighlightEntryMatches (ITextValue line, IList<HighlightEntry> hilightEntryList, IList<HighlightMatchEntry> resultList)
     {
         foreach (var entry in hilightEntryList)
@@ -5036,7 +5051,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (!_shouldCancel)
         {
             var title = name;
-            ILogLineColumnizer preProcessColumnizer = null;
+            ILogLineMemoryColumnizer preProcessColumnizer = null;
             if (CurrentColumnizer is not ILogLineXmlColumnizer)
             {
                 preProcessColumnizer = CurrentColumnizer;
@@ -5088,7 +5103,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private static void FilterRestore (LogWindow newWin, PersistenceData persistenceData)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         if (columnizer != null)
         {
@@ -6117,7 +6132,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                             //TODO this needs to be refactored
                             var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
-                            columnizer = ColumnizerPicker.CloneColumnizer(columnizer, directory);
+                            columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
                         }
                     }
                     else
@@ -6174,7 +6189,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (Preferences.AutoPick)
                 {
-                    var newColumnizer = ColumnizerPicker.FindBetterColumnizer(FileName, _logFileReader, CurrentColumnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+                    var newColumnizer = ColumnizerPicker.FindBetterMemoryColumnizer(FileName, _logFileReader, CurrentColumnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
                     if (newColumnizer != null)
                     {
@@ -6378,21 +6393,21 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _ = _externaLoadingFinishedEvent.WaitOne();
     }
 
-    public void ForceColumnizer (ILogLineColumnizer columnizer)
+    public void ForceColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         //TODO this needs to be refactored
         var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
-        _forcedColumnizer = ColumnizerPicker.CloneColumnizer(columnizer, directory);
+        _forcedColumnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
         SetColumnizer(_forcedColumnizer);
     }
 
-    public void ForceColumnizerForLoading (ILogLineColumnizer columnizer)
+    public void ForceColumnizerForLoading (ILogLineMemoryColumnizer columnizer)
     {
         //TODO this needs to be refactored
         var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
-        _forcedColumnizerForLoading = ColumnizerPicker.CloneColumnizer(columnizer, directory);
+        _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
     }
 
     public void PreselectColumnizer (string columnizerName)
@@ -6400,8 +6415,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //TODO this needs to be refactored
         var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
 
-        var columnizer = ColumnizerPicker.FindColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-        PreSelectColumnizer(ColumnizerPicker.CloneColumnizer(columnizer, directory));
+        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory));
     }
 
     public void ColumnizerConfigChanged ()
@@ -6409,7 +6424,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SetColumnizerInternal(CurrentColumnizer);
     }
 
-    public void SetColumnizer (ILogLineColumnizer columnizer, BufferedDataGridView gridView)
+    public void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
         PaintHelper.SetColumnizer(columnizer, gridView);
 
@@ -6418,7 +6433,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ApplyFrozenState(gridView);
     }
 
-    public IColumn GetCellValue (int rowIndex, int columnIndex)
+    public IColumnMemory GetCellValue (int rowIndex, int columnIndex)
     {
         if (columnIndex == 1)
         {
@@ -6438,9 +6453,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var cols = GetColumnsForLine(rowIndex);
             if (cols != null && cols.ColumnValues != null)
             {
-                if (columnIndex <= cols.ColumnValues.Length + 1)
+                if (columnIndex <= cols.ColumnMemoryValues.Length + 1)
                 {
-                    var value = cols.ColumnValues[columnIndex - 2];
+                    var value = cols.ColumnMemoryValues[columnIndex - 2];
 
                     return value != null && value.DisplayValue != null
                         ? value
@@ -6448,7 +6463,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
 
                 return columnIndex == 2
-                    ? cols.ColumnValues[^1]
+                    ? cols.ColumnMemoryValues[^1]
                     : Column.EmptyColumn;
             }
         }
@@ -6473,7 +6488,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             rowIndex = _filterResultList[rowIndex];
         }
 
-        var line = _logFileReader.GetLogLineWithWait(rowIndex).Result;
+        var line = _logFileReader.GetLogLineMemoryWithWait(rowIndex).Result;
 
         if (line != null)
         {
@@ -6587,7 +6602,64 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    public HighlightEntry FindHighlightEntry (ITextValueMemory line, bool noWordMatches)
+    {
+        // first check the temp entries
+        lock (_tempHighlightEntryListLock)
+        {
+            foreach (var entry in _tempHighlightEntryList)
+            {
+                if (noWordMatches && entry.IsWordMatch)
+                {
+                    continue;
+                }
+
+                if (CheckHighlightEntryMatch(entry, line))
+                {
+                    return entry;
+                }
+            }
+        }
+        lock (_currentHighlightGroupLock)
+        {
+            foreach (var entry in _currentHighlightGroup.HighlightEntryList)
+            {
+                if (noWordMatches && entry.IsWordMatch)
+                {
+                    continue;
+                }
+
+                if (CheckHighlightEntryMatch(entry, line))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+    }
+
     public IList<HighlightMatchEntry> FindHighlightMatches (ITextValue line)
+    {
+        IList<HighlightMatchEntry> resultList = [];
+
+        if (line != null)
+        {
+            lock (_currentHighlightGroupLock)
+            {
+                GetHighlightEntryMatches(line, _currentHighlightGroup.HighlightEntryList, resultList);
+            }
+
+            lock (_tempHighlightEntryList)
+            {
+                GetHighlightEntryMatches(line, _tempHighlightEntryList, resultList);
+            }
+        }
+
+        return resultList;
+    }
+
+    public IList<HighlightMatchEntry> FindHighlightMatches (ITextValueMemory line)
     {
         IList<HighlightMatchEntry> resultList = [];
 
@@ -6996,7 +7068,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         lock (_bookmarkLock)
         {
-            var line = _logFileReader.GetLogLine(lineNum);
+            var line = _logFileReader.GetLogLineMemory(lineNum);
 
             if (line == null)
             {
@@ -7558,7 +7630,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     }
 
                     lookBack = true;
-                    var logLine = _logFileReader.GetLogLine(lastLineNum);
+                    var logLine = _logFileReader.GetLogLineMemory(lastLineNum);
                     if (logLine == null)
                     {
                         return DateTime.MinValue;
@@ -7610,7 +7682,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < dataGridView.RowCount)
                 {
                     lookFwd = true;
-                    var logLine = _logFileReader.GetLogLine(lineNum);
+                    var logLine = _logFileReader.GetLogLineMemory(lineNum);
 
                     if (logLine == null)
                     {
@@ -7648,10 +7720,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         InvalidateCurrentRow(dataGridView);
     }
 
-    public ILogLine GetCurrentLine ()
+    public ILogLineMemory GetCurrentLine ()
     {
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
-            ? _logFileReader.GetLogLine(dataGridView.CurrentRow.Index)
+            ? _logFileReader.GetLogLineMemory(dataGridView.CurrentRow.Index)
             : null;
     }
 
@@ -7659,7 +7731,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         return lineNum < 0 || _logFileReader == null || lineNum >= _logFileReader.LineCount
             ? null
-            : _logFileReader.GetLogLine(lineNum);
+            : _logFileReader.GetLogLineMemory(lineNum);
+    }
+
+    public ILogLineMemory GetLineMemory (int lineNum)
+    {
+        return lineNum < 0 || _logFileReader == null || lineNum >= _logFileReader.LineCount
+            ? null
+            : _logFileReader.GetLogLineMemory(lineNum);
     }
 
     public int GetRealLineNum ()

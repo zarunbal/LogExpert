@@ -32,7 +32,7 @@ internal static class PaintHelper
             return;
         }
 
-        var line = logPaintCtx.GetLogLine(rowIndex);
+        var line = logPaintCtx.GetLogLineMemory(rowIndex);
 
         if (line != null)
         {
@@ -151,7 +151,7 @@ internal static class PaintHelper
     }
 
     [SupportedOSPlatform("windows")]
-    public static void SetColumnizer (ILogLineColumnizer columnizer, BufferedDataGridView gridView)
+    public static void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
         var rowCount = gridView.RowCount;
         var currLine = gridView.CurrentCellAddress.Y;

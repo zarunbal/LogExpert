@@ -72,7 +72,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         return ["Date/Time", "Message"];
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -82,7 +82,7 @@ internal class GlassfishColumnizer : ILogLineXmlColumnizer
         var temp = line.FullLine;
 
         var columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
-        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumn)];
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
 
         // delete '[#|' and '|#]'
         if (temp.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))

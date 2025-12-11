@@ -9,7 +9,7 @@ public interface ILogView
 {
     #region Properties
 
-    ILogLineColumnizer CurrentColumnizer { get; }
+    ILogLineMemoryColumnizer CurrentColumnizer { get; }
     string FileName { get; }
 
     #endregion

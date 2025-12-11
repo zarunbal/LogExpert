@@ -82,9 +82,9 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
         {"@mt", "Message Template"},
     };
 
-    protected override IColumnizedLogLine SplitJsonLine (ILogLine line, JObject json)
+    protected override IColumnizedLogLineMemory SplitJsonLine (ILogLine line, JObject json)
     {
-        List<IColumn> returnColumns = [];
+        List<IColumnMemory> returnColumns = [];
         var cLogLine = new ColumnizedLogLine { LogLine = line };
 
         var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString(), ColumnName = property.Name.ToString(), Parent = cLogLine }).ToList();

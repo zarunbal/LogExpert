@@ -408,7 +408,7 @@ internal partial class SettingsDialog : Form
 
             _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();

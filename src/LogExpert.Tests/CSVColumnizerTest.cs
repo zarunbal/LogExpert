@@ -24,7 +24,7 @@ public class CSVColumnizerTest
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
         var line = reader.GetLogLine(0);
-        IColumnizedLogLine logline = new ColumnizedLogLine();
+        IColumnizedLogLineMemory logline = new ColumnizedLogLine();
         if (line != null)
         {
             logline = csvColumnizer.SplitLine(null, line);

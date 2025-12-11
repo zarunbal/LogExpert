@@ -1443,6 +1443,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No column splitting. The whole line is displayed in a single column..
+        /// </summary>
+        public static string LogExpert_DefaultLogfileColumnicer_Description {
+            get {
+                return ResourceManager.GetString("LogExpert_DefaultLogfileColumnicer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (single line).
+        /// </summary>
+        public static string LogExpert_DefaultLogfileColumnicer_Name {
+            get {
+                return ResourceManager.GetString("LogExpert_DefaultLogfileColumnicer_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Must provide at least one file..
         /// </summary>
         public static string LogfileReader_Error_Message_MustProvideAtLeastOneFile {

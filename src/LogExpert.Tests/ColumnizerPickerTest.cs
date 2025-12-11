@@ -36,7 +36,7 @@ public class ColumnizerPickerTest
     {
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "test");
 
-        Mock<IAutoLogLineColumnizerCallback> autoLogLineColumnizerCallbackMock = new();
+        Mock<IAutoLogLineMemoryColumnizerCallback> autoLogLineColumnizerCallbackMock = new();
 
         _ = autoLogLineColumnizerCallbackMock.Setup(a => a.GetLogLine(0)).Returns(new TestLogLine()
         {
@@ -67,7 +67,7 @@ public class ColumnizerPickerTest
             LineNumber = 4
         });
 
-        var result = ColumnizerPicker.FindColumnizer(path, autoLogLineColumnizerCallbackMock.Object, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var result = ColumnizerPicker.FindMemoryColumnizer(path, autoLogLineColumnizerCallbackMock.Object, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(result.GetName(), Is.EqualTo(expectedColumnizerName));
     }
@@ -84,12 +84,12 @@ public class ColumnizerPickerTest
         LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, pluginRegistry, 500);
         reader.ReadFiles();
 
-        Mock<ILogLineColumnizer> autoColumnizer = new();
+        Mock<ILogLineMemoryColumnizer> autoColumnizer = new();
         _ = autoColumnizer.Setup(a => a.GetName()).Returns("Auto Columnizer");
 
         // TODO: When DI container is ready, we can mock this set up.
-        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer());
-        var result = ColumnizerPicker.FindReplacementForAutoColumnizer(fileName, reader, autoColumnizer.Object, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer() as ILogLineMemoryColumnizer);
+        var result = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(fileName, reader, autoColumnizer.Object, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(columnizerType, Is.EqualTo(result.GetType()));
     }
@@ -98,8 +98,8 @@ public class ColumnizerPickerTest
     public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
         // TODO: When DI container is ready, we can mock this set up.
-        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer());
-        var result = ColumnizerPicker.DecideColumnizerByName(fileName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonCompactColumnizer.JsonCompactColumnizer() as ILogLineMemoryColumnizer);
+        var result = ColumnizerPicker.DecideMemoryColumnizerByName(fileName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(columnizerType, Is.EqualTo(result.GetType()));
     }
@@ -109,9 +109,9 @@ public class ColumnizerPickerTest
     public void DecideColumnizerByName_ValidTextFile_ReturnCorrectColumnizer (string columnizerName, Type columnizerType)
     {
         // TODO: When DI container is ready, we can mock this set up.
-        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonColumnizer.JsonColumnizer());
+        PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers.Add(new JsonColumnizer.JsonColumnizer() as ILogLineMemoryColumnizer);
 
-        var result = ColumnizerPicker.DecideColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var result = ColumnizerPicker.DecideMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         Assert.That(columnizerType, Is.EqualTo(result.GetType()));
     }

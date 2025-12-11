@@ -13,7 +13,7 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 
-public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
+public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisposable
 {
     #region Fields
 
@@ -27,17 +27,19 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private readonly IPluginRegistry _pluginRegistry;
     private readonly CancellationTokenSource _cts = new();
     private readonly ReaderType _readerType;
-
-    private DateTime _lastProgressUpdate = DateTime.MinValue;
-    private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
-
-    private IList<LogBuffer> _bufferList;
-    private bool _contentDeleted;
     private readonly int _maximumLineLength;
 
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderWriterLockSlim _disposeLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderWriterLockSlim _lruCacheDictLock = new(LockRecursionPolicy.SupportsRecursion);
+
+    private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
+    private const int WAIT_TIME = 1000;
+
+    private IList<LogBuffer> _bufferList;
+
+    private bool _contentDeleted;
+    private DateTime _lastProgressUpdate = DateTime.MinValue;
 
     private long _fileLength;
     private Task _garbageCollectorTask;
@@ -529,6 +531,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return GetLogLineInternal(lineNum).Result;
     }
 
+    public ILogLineMemory GetLogLineMemory (int lineNum)
+    {
+        return GetLogLineMemoryInternal(lineNum).Result;
+    }
+
     /// <summary>
     /// Get the text content of the given line number.
     /// The actual work is done in an async thread. This method waits for thread completion for only 1 second. If the async
@@ -573,6 +580,38 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 _isFailModeCheckCallPending = true;
                 var logLine = await GetLogLineInternal(lineNum).ConfigureAwait(true);
                 GetLineFinishedCallback(logLine);
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ILogLineMemory> GetLogLineMemoryWithWait (int lineNum)
+    {
+        ILogLineMemory result = null;
+
+        if (!_isFastFailOnGetLogLine)
+        {
+            var task = Task.Run(() => GetLogLineMemoryInternal(lineNum));
+            if (task.Wait(WAIT_TIME))
+            {
+                result = await task.ConfigureAwait(false);
+                _isFastFailOnGetLogLine = false;
+            }
+            else
+            {
+                _isFastFailOnGetLogLine = true;
+                _logger.Debug(CultureInfo.InvariantCulture, "No result after {0}ms. Returning <null>.", WAIT_TIME);
+            }
+        }
+        else
+        {
+            _logger.Debug(CultureInfo.InvariantCulture, "Fast failing GetLogLine()");
+            if (!_isFailModeCheckCallPending)
+            {
+                _isFailModeCheckCallPending = true;
+                var logLine = await GetLogLineMemoryInternal(lineNum).ConfigureAwait(true);
+                GetLineMemoryFinishedCallback(logLine);
             }
         }
 
@@ -931,7 +970,6 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         if (_isDeleted)
         {
             _logger.Debug(CultureInfo.InvariantCulture, "Returning null for line {0} because file is deleted.", lineNum);
-
             // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
             return null;
         }
@@ -959,6 +997,44 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
 
         var line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+        ReleaseDisposeUpgradeableReadLock();
+        ReleaseBufferListReaderLock();
+
+        return Task.FromResult(line);
+    }
+
+    private Task<ILogLineMemory> GetLogLineMemoryInternal (int lineNum)
+    {
+        if (_isDeleted)
+        {
+            _logger.Debug(CultureInfo.InvariantCulture, "Returning null for line {0} because file is deleted.", lineNum);
+            // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
+            return null;
+        }
+
+        AcquireBufferListReaderLock();
+        var logBuffer = GetBufferForLine(lineNum);
+        if (logBuffer == null)
+        {
+            ReleaseBufferListReaderLock();
+            _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
+            return null;
+        }
+        // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
+        AcquireDisposeLockUpgradableReadLock();
+        if (logBuffer.IsDisposed)
+        {
+            UpgradeDisposeLockToWriterLock();
+
+            lock (logBuffer.FileInfo)
+            {
+                ReReadBuffer(logBuffer);
+            }
+
+            DowngradeDisposeLockFromWriterLock();
+        }
+
+        var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
         ReleaseDisposeUpgradeableReadLock();
         ReleaseBufferListReaderLock();
 
@@ -1670,6 +1746,18 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// </summary>
     /// <param name="line">The log line that was retrieved. Can be null if the operation did not return a line.</param>
     private void GetLineFinishedCallback (ILogLine line)
+    {
+        _isFailModeCheckCallPending = false;
+        if (line != null)
+        {
+            _logger.Debug(CultureInfo.InvariantCulture, "'isFastFailOnGetLogLine' flag was reset");
+            _isFastFailOnGetLogLine = false;
+        }
+
+        _logger.Debug(CultureInfo.InvariantCulture, "'isLogLineCallPending' flag was reset.");
+    }
+
+    private void GetLineMemoryFinishedCallback (ILogLineMemory line)
     {
         _isFailModeCheckCallPending = false;
         if (line != null)

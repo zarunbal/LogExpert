@@ -2062,4 +2062,10 @@ Restart LogExpert to apply changes?</value>
   <data name="LogfileReader_Error_Message_MustProvideAtLeastOneFile" xml:space="preserve">
     <value>Must provide at least one file.</value>
   </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Description" xml:space="preserve">
+    <value>No column splitting. The whole line is displayed in a single column.</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
+    <value>Default (single line)</value>
+  </data>
 </root>
