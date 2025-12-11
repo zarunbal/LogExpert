@@ -896,8 +896,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogWindowClosing (object sender, CancelEventArgs e)
     {
-        if (Preferences.AskForClose &&
-            MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+        if (Preferences.AskForClose && MessageBox.Show(Resources.LogWindow_UI_SureToClose, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
         {
             e.Cancel = true;
             return;
@@ -6359,6 +6358,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         FilterPipe?.CloseAndDisconnect();
         DisconnectFilterPipes();
+        ClearAndDisposeGrids();
+    }
+
+    /// <summary>
+    /// Dispose and clear the DataGridViews
+    /// </summary>
+    private void ClearAndDisposeGrids ()
+    {
+        dataGridView.Rows.Clear();
+        dataGridView.Dispose();
+
+        filterGridView.Rows.Clear();
+        filterGridView.Dispose();
     }
 
     public void WaitForLoadingFinished ()
