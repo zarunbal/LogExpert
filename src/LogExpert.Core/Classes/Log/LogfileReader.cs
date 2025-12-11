@@ -205,7 +205,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// <summary>
     /// Gets or sets the columnizer used to preprocess data before further processing.
     /// </summary>
-    public IPreProcessColumnizer PreProcessColumnizer { get; set; }
+    public IPreProcessColumnizerMemory PreProcessColumnizer { get; set; }
 
     /// <summary>
     /// Gets or sets the encoding options used for text processing operations.
@@ -1224,7 +1224,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
 
-                var (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+                var (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
 
                 while (success)
                 {
@@ -1233,10 +1233,11 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         return;
                     }
 
-                    if (line == null)
+                    if (wasDropped)
                     {
                         logBuffer.DroppedLinesCount += 1;
                         droppedLines++;
+                        (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                         continue;
                     }
 
@@ -1293,7 +1294,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                     filePos = reader.Position;
                     lineNum++;
 
-                    (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+                    (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                 }
 
                 logBuffer.Size = filePos - logBuffer.StartPos;
@@ -1577,7 +1578,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                 logBuffer.ClearLines();
 
-                var (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                var (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
 
                 while (success)
                 {
@@ -1586,9 +1587,10 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         break;
                     }
 
-                    if (line == null)
+                    if (wasDropped)
                     {
                         dropCount++;
+                        (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                         continue;
                     }
 
@@ -1598,7 +1600,7 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                     filePos = reader.Position;
                     lineCount++;
 
-                    (success, lineMemory, line) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                    (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                 }
 
                 if (maxLinesCount != logBuffer.LineCount)
@@ -2010,26 +2012,40 @@ public partial class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// <returns>A tuple containing a boolean indicating success, a read-only memory buffer containing the line if available, and
     /// the line as a string. If the reader supports memory-based access, the memory buffer is populated; otherwise, it
     /// is null.</returns>
-    private (bool Success, ReadOnlyMemory<char> LineMemory, string Line) ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum)
+    private (bool Success, ReadOnlyMemory<char> LineMemory, bool wasDropped) ReadLineMemory (ILogStreamReaderMemory reader, int lineNum, int realLineNum)
     {
-        if (reader is ILogStreamReaderMemory memoryReader)
+        if (reader is null)
         {
-            if (memoryReader.TryReadLine(out var lineMemory))
+            // Fallback to string-based reading if memory reader not available
+            if (ReadLine(reader, lineNum, realLineNum, out var outLine))
             {
-                var line = lineMemory.ToString(); // Still converts to string
-                                                  // ... preprocessing ...
+                return (true, outLine.AsMemory(), false);
+            }
 
-                if (PreProcessColumnizer != null)
-                {
-                    line = PreProcessColumnizer.PreProcessLine(line, lineNum, realLineNum);
-                }
+            return (false, ReadOnlyMemory<char>.Empty, false);
+        }
 
-                memoryReader.ReturnMemory(lineMemory);
-                return (true, lineMemory, line);
+        if (!reader.TryReadLine(out var lineMemory))
+        {
+            return (false, ReadOnlyMemory<char>.Empty, false);
+        }
+
+        var originalMemory = lineMemory;
+
+        if (PreProcessColumnizer != null)
+        {
+            lineMemory = PreProcessColumnizer.PreProcessLine(lineMemory, lineNum, realLineNum);
+
+            if (lineMemory.IsEmpty && !originalMemory.IsEmpty)
+            {
+                // Line was dropped by preprocessor
+                return (true, ReadOnlyMemory<char>.Empty, true);
             }
         }
 
-        return (ReadLine(reader, lineNum, realLineNum, out var outLine), null, outLine);
+        return (true, lineMemory, false);
+
+        //return (ReadLine(reader, lineNum, realLineNum, out var outLine), outLine.AsMemory());
     }
 
     /// <summary>

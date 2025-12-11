@@ -3290,7 +3290,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CurrentColumnizer = columnizer;
             _freezeStateMap.Clear();
 
-            _ = _logFileReader?.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer columnizer1
+            _ = _logFileReader?.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizerMemory columnizer1
                     ? columnizer1
                     : null;
 
@@ -6164,7 +6164,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 CurrentColumnizer = _forcedColumnizerForLoading;
             }
 
-            _logFileReader.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizer processColumnizer ? processColumnizer : null;
+            _logFileReader.PreProcessColumnizer = CurrentColumnizer is IPreProcessColumnizerMemory processColumnizer ? processColumnizer : null;
 
             RegisterLogFileReaderEvents();
             //_logger.Info($"Loading logfile: {fileName}");

@@ -17,7 +17,7 @@ namespace CsvColumnizer;
 /// The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
 /// the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
 /// </summary>
-public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizer, IColumnizerPriority
+public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerConfigurator, IPreProcessColumnizerMemory, IColumnizerPriority
 {
     #region Fields
 
@@ -63,6 +63,38 @@ public class CsvColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerCon
 
         return _config.CommentChar != ' ' &&
                logLine.StartsWith("" + _config.CommentChar, StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : logLine;
+    }
+
+    public ReadOnlyMemory<char> PreProcessLine (ReadOnlyMemory<char> logLine, int lineNum, int realLineNum)
+    {
+        if (realLineNum == 0)
+        {
+            // store for later field names and field count retrieval
+            _firstLine = new CsvLogLine(logLine, 0);
+
+            if (_config.MinColumns > 0)
+            {
+                using CsvReader csv = new(new StringReader(logLine.ToString()), _config.ReaderConfiguration);
+                if (csv.Parser.Count < _config.MinColumns)
+                {
+                    // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
+                    _isValidCsv = false;
+                    return logLine;
+                }
+            }
+
+            _isValidCsv = true;
+        }
+
+        if (_config.HasFieldNames && realLineNum == 0)
+        {
+            return null; // hide from LogExpert
+        }
+
+        return _config.CommentChar != ' ' &&
+               logLine.Span.StartsWith("" + _config.CommentChar, StringComparison.OrdinalIgnoreCase)
                     ? null
                     : logLine;
     }
