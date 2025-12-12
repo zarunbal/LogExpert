@@ -4,13 +4,15 @@ public class ColumnizedLogLine : IColumnizedLogLineMemory
 {
     #region Properties
 
-    public ILogLine LogLine { get; set; }
+    [Obsolete("Use the Property of IColumnizedLogLineMemory")]
+    ILogLine IColumnizedLogLine.LogLine { get; }
 
-    public IColumn[] ColumnValues { get; set; }
+    [Obsolete("Use the Property of IColumnizedLogLineMemory")]
+    IColumn[] IColumnizedLogLine.ColumnValues { get; }
 
-    public ILogLineMemory LogLineMemory { get; set; }
+    public ILogLineMemory LogLine { get; set; }
 
-    public IColumnMemory[] ColumnMemoryValues { get; set; }
+    public IColumnMemory[] ColumnValues { get; set; }
 
     #endregion
 }

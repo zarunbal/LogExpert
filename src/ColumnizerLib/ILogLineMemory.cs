@@ -11,5 +11,5 @@ public interface ILogLineMemory : ILogLine, ITextValueMemory
     /// <summary>
     /// Gets the full content of the line as a read-only region of memory.
     /// </summary>
-    ReadOnlyMemory<char> FullLineMemory { get; }
+    new ReadOnlyMemory<char> FullLine { get; }
 }

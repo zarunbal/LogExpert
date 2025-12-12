@@ -4,9 +4,9 @@ public interface IColumnizedLogLineMemory : IColumnizedLogLine
 {
     #region Properties
 
-    ILogLineMemory LogLineMemory { get; }
+    new ILogLineMemory LogLine { get; }
 
-    IColumnMemory[] ColumnMemoryValues { get; }
+    new IColumnMemory[] ColumnValues { get; }
 
     #endregion
 }

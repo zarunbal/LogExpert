@@ -4,7 +4,7 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
-public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
+public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory
 {
     #region ILogLineColumnizer implementation
 
@@ -316,6 +316,31 @@ public class SquareBracketColumnizer : ILogLineColumnizer, IColumnizerPriority
         }
 
         return result;
+    }
+
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
+    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    {
+        return SplitLine(callback, line);
+    }
+
+    public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

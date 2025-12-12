@@ -4,11 +4,11 @@ public interface IColumnMemory : IColumn, ITextValueMemory
 {
     #region Properties
 
-    IColumnizedLogLineMemory ParentMemory { get; }
+    new IColumnizedLogLineMemory Parent { get; }
 
-    ReadOnlyMemory<char> FullValueMemory { get; }
+    new ReadOnlyMemory<char> FullValue { get; }
 
-    ReadOnlyMemory<char> DisplayValueMemory { get; }
+    new ReadOnlyMemory<char> DisplayValue { get; }
 
     #endregion
 }

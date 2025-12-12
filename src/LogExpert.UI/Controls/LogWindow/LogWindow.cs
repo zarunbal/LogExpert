@@ -6453,9 +6453,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var cols = GetColumnsForLine(rowIndex);
             if (cols != null && cols.ColumnValues != null)
             {
-                if (columnIndex <= cols.ColumnMemoryValues.Length + 1)
+                if (columnIndex <= cols.ColumnValues.Length + 1)
                 {
-                    var value = cols.ColumnMemoryValues[columnIndex - 2];
+                    var value = cols.ColumnValues[columnIndex - 2];
 
                     return value != null && value.DisplayValue != null
                         ? value
@@ -6463,7 +6463,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
 
                 return columnIndex == 2
-                    ? cols.ColumnMemoryValues[^1]
+                    ? cols.ColumnValues[^1]
                     : Column.EmptyColumn;
             }
         }

@@ -29,29 +29,27 @@ namespace ColumnizerLib;
 /// </remarks>
 public class LogLine : ILogLineMemory
 {
-    public string FullLine { get; }
+    string ILogLine.FullLine { get; }
 
     public int LineNumber { get; }
 
-    public string Text { get; }
+    string ITextValue.Text { get; }
 
-    public ReadOnlyMemory<char> FullLineMemory { get; }
+    public ReadOnlyMemory<char> FullLine { get; }
 
-    public ReadOnlyMemory<char> TextMemory { get; }
+    public ReadOnlyMemory<char> Text { get; }
 
     public LogLine (string fullLine, int lineNumber)
     {
-        FullLine = fullLine;
         LineNumber = lineNumber;
-        FullLineMemory = fullLine.AsMemory();
-        TextMemory = fullLine.AsMemory();
+        FullLine = fullLine.AsMemory();
+        Text = fullLine.AsMemory();
     }
 
     public LogLine (ReadOnlyMemory<char> fullLine, int lineNumber)
     {
-        FullLine = fullLine.ToString();
         LineNumber = lineNumber;
-        FullLineMemory = fullLine;
-        TextMemory = fullLine;
+        FullLine = fullLine;
+        Text = fullLine;
     }
 }

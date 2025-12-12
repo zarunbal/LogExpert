@@ -5,13 +5,13 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
-public class ClfColumnizer : ILogLineColumnizer
+public partial class ClfColumnizer : ILogLineMemoryColumnizer
 {
     private const string DATE_TIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss zzz";
 
     #region Fields
 
-    private readonly Regex _lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
+    private readonly Regex _lineRegex = LineRegex();
 
     private readonly CultureInfo _cultureInfo = new("en-US");
     private int _timeOffset;
@@ -47,46 +47,12 @@ public class ClfColumnizer : ILogLineColumnizer
 
     public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        var cols = SplitLine(callback, line);
-        if (cols == null || cols.ColumnValues.Length < 8)
-        {
-            return DateTime.MinValue;
-        }
-
-        if (cols.ColumnValues[2].FullValue.Length == 0)
-        {
-            return DateTime.MinValue;
-        }
-
-        try
-        {
-            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, DATE_TIME_FORMAT, _cultureInfo);
-            return dateTime;
-        }
-        catch (Exception ex) when (ex is ArgumentException or
-                                         FormatException or
-                                         ArgumentOutOfRangeException)
-        {
-            return DateTime.MinValue;
-        }
+        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
     }
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
-        if (column == 2)
-        {
-            try
-            {
-                var newDateTime = DateTime.ParseExact(value, DATE_TIME_FORMAT, _cultureInfo);
-                var oldDateTime = DateTime.ParseExact(oldValue, DATE_TIME_FORMAT, _cultureInfo);
-                var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                _timeOffset = (int)(mSecsNew - mSecsOld);
-            }
-            catch (FormatException)
-            {
-            }
-        }
+        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
     }
 
     public string GetName ()
@@ -109,8 +75,45 @@ public class ClfColumnizer : ILogLineColumnizer
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
     }
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        // Use SplitLine to parse, then extract timestamp column
+        var cols = SplitLine(callback, line);
+
+        if (cols == null || cols.ColumnValues.Length < 8)
+        {
+            return DateTime.MinValue;
+        }
+
+        if (cols.ColumnValues[2] is not IColumnMemory dateColumn || dateColumn.FullValue.IsEmpty)
+        {
+            return DateTime.MinValue;
+        }
+
+        try
+        {
+            // Parse from Span
+            return DateTime.ParseExact(dateColumn.FullValue.Span, DATE_TIME_FORMAT, _cultureInfo);
+        }
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
+        {
+            return DateTime.MinValue;
+        }
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally Passed")]
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(callback, nameof(callback));
+
         ColumnizedLogLine cLogLine = new()
         {
             LogLine = line
@@ -118,87 +121,137 @@ public class ClfColumnizer : ILogLineColumnizer
 
         var columns = new Column[8]
         {
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine}
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
+            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine}
         };
 
-        cLogLine.ColumnValues = columns.Select(a => a as IColumnMemory).ToArray();
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
 
-        var temp = line.FullLine;
-        if (temp.Length > 1024)
+        var lineMemory = line.FullLine;
+
+        if (lineMemory.Length > 1024)
         {
-            // spam
-            temp = temp[..1024];
-            columns[3].FullValue = temp;
+            columns[3].FullValue = lineMemory[..1024];
             return cLogLine;
         }
+
+        var span = line.FullLine.Span;
+
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
-
-        if (_lineRegex.IsMatch(temp))
+        if (!_lineRegex.IsMatch(span))
         {
-            var match = _lineRegex.Match(temp);
-            var groups = match.Groups;
-            if (groups.Count == 10)
+            // Pattern didn't match - put entire line in request column
+            columns[3].FullValue = lineMemory;
+            return cLogLine;
+        }
+
+        var lineString = line.ToString();
+        var match = _lineRegex.Match(lineString);
+
+        if (match.Groups.Count == 10)
+        {
+            columns[0].FullValue = GetGroupMemory(lineMemory, match.Groups[1]);
+            columns[1].FullValue = GetGroupMemory(lineMemory, match.Groups[3]);
+            columns[3].FullValue = GetGroupMemory(lineMemory, match.Groups[5]);
+            columns[4].FullValue = GetGroupMemory(lineMemory, match.Groups[6]);
+            columns[5].FullValue = GetGroupMemory(lineMemory, match.Groups[7]);
+            columns[6].FullValue = GetGroupMemory(lineMemory, match.Groups[8]);
+            columns[7].FullValue = GetGroupMemory(lineMemory, match.Groups[9]);
+
+            var dateTimeMemory = GetGroupMemory(lineMemory, match.Groups[4]);
+
+            if (dateTimeMemory.Length > 2)
             {
-                columns[0].FullValue = groups[1].Value;
-                columns[1].FullValue = groups[3].Value;
-                columns[3].FullValue = groups[5].Value;
-                columns[4].FullValue = groups[6].Value;
-                columns[5].FullValue = groups[7].Value;
-                columns[6].FullValue = groups[8].Value;
-                columns[7].FullValue = groups[9].Value;
+                // Skip '[' at start and ']' at end
+                dateTimeMemory = dateTimeMemory[1..^1];
+            }
 
-                var dateTimeStr = groups[4].Value.Substring(1, 26);
+            var dateSpan = dateTimeMemory.Span;
 
-                // dirty probing of date/time format (much faster than DateTime.ParseExact()
-                if (dateTimeStr[2] == '/' && dateTimeStr[6] == '/' && dateTimeStr[11] == ':')
+            // dirty probing of date/time format (much faster than DateTime.ParseExact()
+            if (dateSpan.Length >= 12 && dateSpan[2] == '/' && dateSpan[6] == '/' && dateSpan[11] == ':')
+            {
+                if (_timeOffset != 0)
                 {
-                    if (_timeOffset != 0)
+                    try
                     {
-                        try
-                        {
-                            var dateTime = DateTime.ParseExact(dateTimeStr, DATE_TIME_FORMAT, _cultureInfo);
-                            dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
-                            var newDate = dateTime.ToString(DATE_TIME_FORMAT, _cultureInfo);
-                            columns[2].FullValue = newDate;
-                        }
-                        catch (Exception ex) when (ex is ArgumentException or
-                                                         FormatException or
-                                                         ArgumentOutOfRangeException)
-                        {
-                            columns[2].FullValue = "n/a";
-                        }
+                        var dateTime = DateTime.ParseExact(dateSpan, DATE_TIME_FORMAT, _cultureInfo);
+                        dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
+                        var newDate = dateTime.ToString(DATE_TIME_FORMAT, _cultureInfo);
+                        columns[2].FullValue = newDate.AsMemory();
                     }
-                    else
+                    catch (Exception ex) when (ex is ArgumentException or
+                                                     FormatException or
+                                                     ArgumentOutOfRangeException)
                     {
-                        columns[2].FullValue = dateTimeStr;
+                        columns[2].FullValue = "n/a".AsMemory();
                     }
                 }
                 else
                 {
-                    columns[2].FullValue = dateTimeStr;
+                    columns[2].FullValue = dateTimeMemory;
                 }
+            }
+            else
+            {
+                columns[2].FullValue = dateTimeMemory;
             }
         }
         else
         {
-            columns[3].FullValue = temp;
+            columns[3].FullValue = lineMemory;
         }
 
         return cLogLine;
+    }
+
+    /// <summary>
+    /// Converts a Regex Group capture to ReadOnlyMemory slice from original line
+    /// </summary>
+    private static ReadOnlyMemory<char> GetGroupMemory (ReadOnlyMemory<char> lineMemory, Group group)
+    {
+        if (!group.Success || group.Length == 0)
+        {
+            return ReadOnlyMemory<char>.Empty;
+        }
+
+        // Use group's Index and Length to slice original memory
+        // This avoids allocating a new string for the group value
+        return lineMemory.Slice(group.Index, group.Length);
     }
 
     public string GetCustomName ()
     {
         return GetName();
     }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        if (column == 2)
+        {
+            try
+            {
+                var newDateTime = DateTime.ParseExact(value, DATE_TIME_FORMAT, _cultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue, DATE_TIME_FORMAT, _cultureInfo);
+                var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                _timeOffset = (int)(mSecsNew - mSecsOld);
+            }
+            catch (FormatException)
+            {
+            }
+        }
+    }
+
+    [GeneratedRegex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")")]
+    private static partial Regex LineRegex ();
 
     #endregion
 }

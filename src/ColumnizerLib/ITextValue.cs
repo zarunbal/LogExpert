@@ -30,5 +30,5 @@ public static class TextValueExtensions
     public static string GetText (this ILogLine logLine) => logLine.FullLine;
 
     [Obsolete("Use DisplayValue property directly")]
-    public static string GetText (this IColumnMemory column) => column.DisplayValue;
+    public static string GetText (this IColumn column) => column.DisplayValue;
 }

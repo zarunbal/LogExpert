@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 [assembly: SupportedOSPlatform("windows")]
 namespace Log4jXmlColumnizer;
 
-public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator, IColumnizerPriority
+public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfiguratorMemory, IColumnizerPriorityMemory
 {
     #region Fields
 
@@ -45,13 +45,15 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
     {
-        Log4JLogLine line = new()
-        {
-            FullLine = logLine.FullLine.Replace(SEPARATOR_CHAR, '|'),
-            LineNumber = logLine.LineNumber
-        };
+        return GetLineTextForClipboard(logLine as ILogLineMemory, callback as ILogLineMemoryColumnizerCallback);
+    }
 
-        return line;
+    public ILogLineMemory GetLineTextForClipboard (ILogLineMemory logLine, ILogLineMemoryColumnizerCallback callback)
+    {
+        ArgumentNullException.ThrowIfNull(logLine);
+        ArgumentNullException.ThrowIfNull(callback);
+
+        return new Log4JLogLine(ReplaceInMemory(logLine.FullLine, SEPARATOR_CHAR, '|'), logLine.Text, logLine.LineNumber);
     }
 
     public string GetName ()
@@ -76,8 +78,17 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         return _config.ActiveColumnNames;
     }
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        ArgumentNullException.ThrowIfNull(line);
+        ArgumentNullException.ThrowIfNull(callback);
+
         ColumnizedLogLine clogLine = new()
         {
             LogLine = line
@@ -103,30 +114,30 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
                 }
 
                 var newDate = dateTime.ToString(DATETIME_FORMAT, CultureInfo.InvariantCulture);
-                columns[0].FullValue = newDate;
+                columns[0].FullValue = newDate.AsMemory();
             }
             catch (Exception ex) when (ex is ArgumentException or
                                              FormatException or
                                              ArgumentOutOfRangeException)
             {
-                columns[0].FullValue = "n/a";
+                columns[0].FullValue = "n/a".AsMemory();
             }
 
             var timestmp = columns[0];
 
-            string[] cols;
-            cols = line.FullLine.Split(trimChars, COLUMN_COUNT, StringSplitOptions.None);
+            ReadOnlyMemory<char>[] cols;
+            cols = SplitMemory(line.FullLine, trimChars[0], COLUMN_COUNT);
 
             if (cols.Length != COLUMN_COUNT)
             {
-                columns[0].FullValue = string.Empty;
-                columns[1].FullValue = string.Empty;
-                columns[2].FullValue = string.Empty;
-                columns[3].FullValue = string.Empty;
-                columns[4].FullValue = string.Empty;
-                columns[5].FullValue = string.Empty;
-                columns[6].FullValue = string.Empty;
-                columns[7].FullValue = string.Empty;
+                columns[0].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[1].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[2].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[3].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[4].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[5].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[6].FullValue = ReadOnlyMemory<char>.Empty;
+                columns[7].FullValue = ReadOnlyMemory<char>.Empty;
                 columns[8].FullValue = line.FullLine;
             }
             else
@@ -162,26 +173,36 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         return _timeOffset;
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        if (line.FullLine.Length < 15)
+        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        ArgumentNullException.ThrowIfNull(logLine);
+        ArgumentNullException.ThrowIfNull(callback);
+
+        if (logLine.FullLine.Length < 15)
         {
             return DateTime.MinValue;
         }
 
-        var endIndex = line.FullLine.IndexOf(SEPARATOR_CHAR, 1);
+        var span = logLine.FullLine.Span;
+
+        var endIndex = span.IndexOf(SEPARATOR_CHAR);
 
         if (endIndex is > 20 or < 0)
         {
             return DateTime.MinValue;
         }
 
-        var value = line.FullLine[..endIndex];
+        var value = logLine.FullLine[..endIndex];
 
         try
         {
             // convert log4j timestamp into a readable format:
-            if (long.TryParse(value, out var timestamp))
+            if (long.TryParse(value.ToString(), out var timestamp))
             {
                 // Add the time offset before returning
                 DateTime dateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -208,6 +229,11 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
+        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
         if (column == 0)
         {
             try
@@ -224,7 +250,7 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         }
     }
 
-    public void Configure (ILogLineColumnizerCallback callback, string configDir)
+    public void Configure (ILogLineMemoryColumnizerCallback callback, string configDir)
     {
         FileInfo fileInfo = new(configDir + Path.DirectorySeparatorChar + "log4jxmlcolumnizer.json");
 
@@ -236,6 +262,11 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
             JsonSerializer serializer = new();
             serializer.Serialize(sw, _config);
         }
+    }
+
+    public void Configure (ILogLineColumnizerCallback callback, string configDir)
+    {
+        Configure(callback as ILogLineMemoryColumnizerCallback, configDir);
     }
 
     public void LoadConfig (string configDir)
@@ -269,6 +300,14 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
+        return GetPriority(fileName, samples.Select(line => (ILogLineMemory)line));
+    }
+
+    public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
+    {
+        ArgumentNullException.ThrowIfNull(fileName);
+        ArgumentNullException.ThrowIfNull(samples);
+
         var result = Priority.NotSupport;
         if (fileName.EndsWith("xml", StringComparison.OrdinalIgnoreCase))
         {
@@ -281,6 +320,41 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Splits ReadOnlyMemory by separator character with max count limit
+    /// </summary>
+    /// <param name="input">The memory to split</param>
+    /// <param name="separator">The separator character (SEPARATOR_CHAR = '\xFFFD')</param>
+    /// <param name="maxCount">Maximum number of parts to return (9 in this case)</param>
+    /// <returns>Array of ReadOnlyMemory segments</returns>
+    private static ReadOnlyMemory<char>[] SplitMemory (ReadOnlyMemory<char> input, char separator, int maxCount)
+    {
+        var span = input.Span;
+        var result = new List<ReadOnlyMemory<char>>(maxCount);
+        var start = 0;
+
+        // Split until we have maxCount - 1 segments
+        // (last segment gets all remaining content)
+        for (var i = 0; i < span.Length && result.Count < maxCount - 1; i++)
+        {
+            if (span[i] == separator)
+            {
+                // Found separator - add segment before it
+                result.Add(input[start..i]);
+                start = i + 1;  // Skip the separator
+            }
+        }
+
+        // Add remaining content as last segment
+        // (or entire string if no separators found)
+        if (start <= input.Length)
+        {
+            result.Add(input[start..]);
+        }
+
+        return [.. result];
+    }
 
     private static string[] GetAllColumnNames () => ["Timestamp", "Level", "Logger", "Thread", "Class", "Method", "File", "Line", "Message"];
 
@@ -310,6 +384,27 @@ public class Log4jXmlColumnizer : ILogLineXmlColumnizer, IColumnizerConfigurator
         }
 
         return [.. output];
+    }
+
+    private static ReadOnlyMemory<char> ReplaceInMemory (ReadOnlyMemory<char> input, char oldChar, char newChar)
+    {
+        var span = input.Span;
+
+        // check is there anything to replace?
+        if (!span.Contains(oldChar))
+        {
+            return input;
+        }
+
+        // Allocate new buffer only when needed
+        var buffer = new char[input.Length];
+
+        for (var i = 0; i < span.Length; i++)
+        {
+            buffer[i] = span[i] == oldChar ? newChar : span[i];
+        }
+
+        return buffer.AsMemory();
     }
 
     #endregion

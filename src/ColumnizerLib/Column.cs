@@ -11,14 +11,14 @@ public class Column : IColumnMemory
     // Can be configured via SetMaxDisplayLength()
     private static int _maxDisplayLength = 20_000;
 
-    private static readonly List<Func<string, string>> _replacements = [
+    private static readonly List<Func<ReadOnlyMemory<char>, ReadOnlyMemory<char>>> _replacementsMemory = [
         //replace tab with 3 spaces, from old coding. Needed???
-                input => input.Replace("\t", "  ", StringComparison.Ordinal),
+        ReplaceTab,
 
-                //shorten string if it exceeds maxLength
-                input => input.Length > _maxDisplayLength
-                        ? string.Concat(input.AsSpan(0, _maxDisplayLength), REPLACEMENT)
-                        : input
+        //shorten string if it exceeds maxLength
+        input => input.Length > _maxDisplayLength
+                ? ShortenMemory(input, _maxDisplayLength)
+                : input
     ];
 
     #endregion
@@ -31,7 +31,7 @@ public class Column : IColumnMemory
         {
             //Win8 or newer support full UTF8 chars with the preinstalled fonts.
             //Replace null char with UTF8 Symbol U+2400 (␀)
-            _replacements.Add(input => input.Replace("\0", "␀", StringComparison.Ordinal));
+            _replacementsMemory.Add(input => ReplaceNullChar(input, '␀'));
         }
         else
         {
@@ -40,10 +40,10 @@ public class Column : IColumnMemory
             //.net 10 does no longer support windows lower then windows 10
             //TODO: remove if with one of the next releases
             //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
-            _replacements.Add(input => input.Replace("\0", " ", StringComparison.Ordinal));
+            _replacementsMemory.Add(input => ReplaceNullChar(input, ' '));
         }
 
-        EmptyColumn = new Column { FullValue = string.Empty };
+        EmptyColumn = new Column { FullValue = ReadOnlyMemory<char>.Empty };
     }
 
     #endregion
@@ -52,18 +52,49 @@ public class Column : IColumnMemory
 
     public static IColumnMemory EmptyColumn { get; }
 
-    public IColumnizedLogLineMemory Parent { get; set; }
+    [Obsolete]
+    IColumnizedLogLine IColumn.Parent { get; }
 
-    public string FullValue
+    [Obsolete]
+    string IColumn.FullValue
+    {
+        get;
+        //set
+        //{
+        //    field = value;
+
+        //    var temp = FullValue.ToString();
+
+        //    foreach (var replacement in _replacements)
+        //    {
+        //        temp = replacement(temp);
+        //    }
+
+        //    DisplayValue = temp.AsMemory();
+        //}
+    }
+
+    [Obsolete("Use the DisplayValue property of IColumnMemory")]
+    string IColumn.DisplayValue { get; }
+
+    [Obsolete("Use Text property of ITextValueMemory")]
+    string ITextValue.Text => DisplayValue.ToString();
+
+    public IColumnizedLogLineMemory Parent
+    {
+        get; set => field = value;
+    }
+
+    public ReadOnlyMemory<char> FullValue
     {
         get;
         set
         {
             field = value;
 
-            var temp = FullValue;
+            var temp = value;
 
-            foreach (var replacement in _replacements)
+            foreach (var replacement in _replacementsMemory)
             {
                 temp = replacement(temp);
             }
@@ -72,22 +103,9 @@ public class Column : IColumnMemory
         }
     }
 
-    public string DisplayValue { get; private set; }
+    public ReadOnlyMemory<char> DisplayValue { get; private set; }
 
-    public string Text => DisplayValue;
-
-    public IColumnizedLogLineMemory ParentMemory { get; }
-
-    public ReadOnlyMemory<char> FullValueMemory
-    {
-        get;
-        set; //implement
-    }
-
-    public ReadOnlyMemory<char> DisplayValueMemory { get; }
-
-    public ReadOnlyMemory<char> TextMemory { get; }
-    IColumnizedLogLine IColumn.Parent { get; }
+    public ReadOnlyMemory<char> Text => DisplayValue;
 
     #endregion
 
@@ -115,10 +133,10 @@ public class Column : IColumnMemory
 
     public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent)
     {
-        return CreateColumns(count, parent, string.Empty);
+        return CreateColumns(count, parent, ReadOnlyMemory<char>.Empty);
     }
 
-    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent, string defaultValue)
+    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent, ReadOnlyMemory<char> defaultValue)
     {
         var output = new Column[count];
 
@@ -132,7 +150,95 @@ public class Column : IColumnMemory
 
     public override string ToString ()
     {
-        return DisplayValue ?? string.Empty;
+        return DisplayValue.ToString() ?? ReadOnlyMemory<char>.Empty.ToString();
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>
+    /// Replaces tab characters with two spaces in the memory buffer.
+    /// </summary>
+    private static ReadOnlyMemory<char> ReplaceTab (ReadOnlyMemory<char> input)
+    {
+        var span = input.Span;
+        var tabIndex = span.IndexOf('\t');
+
+        if (tabIndex == -1)
+        {
+            return input;
+        }
+
+        // Count total tabs to calculate new length
+        var tabCount = 0;
+        foreach (var c in span)
+        {
+            if (c == '\t')
+            {
+                tabCount++;
+            }
+        }
+
+        // Allocate new buffer: original length + (tabCount * 1) since we replace 1 char with 2
+        var newLength = input.Length + tabCount;
+        var buffer = new char[newLength];
+        var bufferPos = 0;
+
+        for (var i = 0; i < span.Length; i++)
+        {
+            if (span[i] == '\t')
+            {
+                buffer[bufferPos++] = ' ';
+                buffer[bufferPos++] = ' ';
+            }
+            else
+            {
+                buffer[bufferPos++] = span[i];
+            }
+        }
+
+        return buffer;
+    }
+
+    /// <summary>
+    /// Shortens the memory buffer to the specified maximum length and appends "...".
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Non Localiced Parameter")]
+    private static ReadOnlyMemory<char> ShortenMemory (ReadOnlyMemory<char> input, int maxLength)
+    {
+        var buffer = new char[maxLength + REPLACEMENT.Length];
+        input.Span[..maxLength].CopyTo(buffer);
+        REPLACEMENT.AsSpan().CopyTo(buffer.AsSpan(maxLength));
+        return buffer;
+    }
+
+    /// <summary>
+    /// Replaces null characters with the specified replacement character.
+    /// </summary>
+    private static ReadOnlyMemory<char> ReplaceNullChar (ReadOnlyMemory<char> input, char replacement)
+    {
+        var span = input.Span;
+        var nullIndex = span.IndexOf('\0');
+
+        if (nullIndex == -1)
+        {
+            return input;
+        }
+
+        // Need to create a new buffer since we're modifying content
+        var buffer = new char[input.Length];
+        span.CopyTo(buffer);
+
+        for (var i = 0; i < buffer.Length; i++)
+        {
+            if (buffer[i] == '\0')
+            {
+                buffer[i] = replacement;
+            }
+        }
+
+        return buffer;
     }
 
     #endregion

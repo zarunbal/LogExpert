@@ -13,7 +13,7 @@ public interface ITextValueMemory : ITextValue
     /// <summary>
     /// Gets the text content as a read-only region of memory.
     /// </summary>
-    ReadOnlyMemory<char> TextMemory { get; }
+    new ReadOnlyMemory<char> Text { get; }
 
     #endregion
 }
@@ -28,12 +28,12 @@ public static class TextValueMemoryExtensions
     /// </summary>
     /// <param name="logLine">The log line from which to retrieve the text content. Cannot be null.</param>
     /// <returns>A read-only memory region containing the characters of the entire log line.</returns>
-    public static ReadOnlyMemory<char> GetText (this ILogLineMemory logLine) => logLine.FullLineMemory;
+    public static ReadOnlyMemory<char> GetText (this ILogLineMemory logLine) => logLine.FullLine;
 
     /// <summary>
     /// Gets the display text of the column as a read-only block of memory.
     /// </summary>
     /// <param name="column">The column from which to retrieve the display text. Cannot be null.</param>
     /// <returns>A read-only memory region containing the display text of the specified column.</returns>
-    public static ReadOnlyMemory<char> GetText (this IColumnMemory column) => column.DisplayValueMemory;
+    public static ReadOnlyMemory<char> GetText (this IColumnMemory column) => column.DisplayValue;
 }

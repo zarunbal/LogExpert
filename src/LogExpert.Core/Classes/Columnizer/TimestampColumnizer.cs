@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
-public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
+public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory
 {
     #region ILogLineColumnizer implementation
 
@@ -104,7 +104,7 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         return ["Date", "Time", "Message"];
     }
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -122,7 +122,7 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
             new() {FullValue = "", Parent = clogLine},
         };
 
-        clogLine.ColumnValues = columns.Select(a => a as IColumnMemory).ToArray();
+        clogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
 
         var temp = line.FullLine;
 
@@ -218,6 +218,26 @@ public class TimestampColumnizer : ILogLineColumnizer, IColumnizerPriority
         }
 
         return result;
+    }
+
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

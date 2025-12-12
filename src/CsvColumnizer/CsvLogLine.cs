@@ -3,29 +3,26 @@ using ColumnizerLib;
 
 namespace CsvColumnizer;
 
-public class CsvLogLine (string fullLine, int lineNumber) : ILogLine, ILogLineMemory
+public class CsvLogLine (string fullLine, int lineNumber) : ILogLineMemory
 {
     #region Properties
 
-    public string FullLine { get; set; } = fullLine;
+    string ILogLine.FullLine { get; }
 
-    public int LineNumberMemory { get; set; } = lineNumber;
+    string ITextValue.Text => FullLine.ToString();
 
-    string ITextValue.Text => FullLine;
+    public ReadOnlyMemory<char> FullLine { get; } = fullLine.AsMemory();
 
-    public ReadOnlyMemory<char> FullLineMemory { get; }
+    public ReadOnlyMemory<char> Text { get; }
 
-    public ReadOnlyMemory<char> TextMemory { get; }
-
-    public int LineNumber { get; }
+    public int LineNumber { get; } = lineNumber;
 
     #endregion
 
     public CsvLogLine (ReadOnlyMemory<char> fullLine, int lineNumber) : this(fullLine.ToString(), lineNumber)
     {
-        FullLine = fullLine.ToString();
-        LineNumberMemory = lineNumber;
-        FullLineMemory = fullLine;
-        TextMemory = fullLine;
+        FullLine = fullLine;
+        LineNumber = lineNumber;
+        Text = fullLine;
     }
 }

@@ -33,25 +33,11 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
     /// columnization process.</param>
     /// <param name="line">The log line to be split into columns. Cannot be null.</param>
     /// <returns>An object representing the columnized version of the specified log line.</returns>
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ArgumentNullException.ThrowIfNull(line);
 
-        ColumnizedLogLine cLogLine = new()
-        {
-            LogLine = line
-        };
-
-        cLogLine.ColumnValues =
-        [
-            new Column
-            {
-                FullValue = line.FullLine,
-                Parent = cLogLine
-            }
-        ];
-
-        return cLogLine;
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
     }
 
     /// <summary>
@@ -67,14 +53,14 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
 
         ColumnizedLogLine cLogLine = new()
         {
-            LogLineMemory = line
+            LogLine = line
         };
 
         cLogLine.ColumnValues =
         [
             new Column
             {
-                FullValueMemory = line.FullLineMemory,
+                FullValue = line.FullLine,
                 Parent = cLogLine
             }
         ];
@@ -97,6 +83,9 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
 
     public static Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
+
         return Priority.CanSupport;
     }
     #endregion
