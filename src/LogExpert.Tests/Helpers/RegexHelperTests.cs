@@ -140,7 +140,7 @@ public class RegexHelperTests
 
         // Assert
         Assert.That(isValid, Is.True);
-        Assert.That(error, Is.Null);
+        Assert.That(error, Is.Empty);
     }
 
     [Test]

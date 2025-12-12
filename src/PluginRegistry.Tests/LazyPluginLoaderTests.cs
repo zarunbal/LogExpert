@@ -1,7 +1,5 @@
 using ColumnizerLib;
 
-using LogExpert.PluginRegistry;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -126,7 +124,7 @@ public class LazyPluginLoaderTests
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("LazyPluginLoader"));
-        Assert.That(result, Does.Contain("ILogLineColumnizer"));
+        Assert.That(result, Does.Contain("ILogLineMemoryColumnizer"));
         Assert.That(result, Does.Contain("TestPlugin.dll"));
         Assert.That(result, Does.Contain("Loaded: False"));
     }

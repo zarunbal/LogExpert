@@ -23,7 +23,7 @@ public partial class RegexColumnizerBasicTests
         var columnizer = TestLogLine.CreateColumnizer(regex);
 
         TestLogLine testLogLine = new(4, lineToParse);
-        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         Assert.That(parsedLogLine.ColumnValues.Length, Is.EqualTo(expectedNumberOfColumns));
     }
@@ -39,9 +39,9 @@ public partial class RegexColumnizerBasicTests
         var columnizer = TestLogLine.CreateColumnizer(regex);
 
         TestLogLine testLogLine = new(3, lineToParse);
-        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
-        Assert.That(parsedLogLine.ColumnValues[columnIndexToTest].Text, Is.EqualTo(expectedColumnValue));
+        Assert.That(parsedLogLine.ColumnValues[columnIndexToTest].Text.ToString(), Is.EqualTo(expectedColumnValue));
     }
 
     [Test]
@@ -85,12 +85,12 @@ public partial class RegexColumnizerBasicTests
         var columnizer = TestLogLine.CreateColumnizer(@"^(?<digits>\d+)\s+(?<text>.*)$");
         TestLogLine testLogLine = new(1, "No digits at start");
 
-        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // First column should be empty
-        Assert.That(parsedLogLine.ColumnValues[0].Text, Is.Empty);
+        Assert.That(parsedLogLine.ColumnValues[0].Text.ToString(), Is.Empty);
         // Last column should contain the full line
-        Assert.That(parsedLogLine.ColumnValues[1].Text, Is.EqualTo("No digits at start"));
+        Assert.That(parsedLogLine.ColumnValues[1].Text.ToString(), Is.EqualTo("No digits at start"));
     }
 
     [Test]
@@ -99,9 +99,9 @@ public partial class RegexColumnizerBasicTests
         var columnizer = TestLogLine.CreateColumnizer(@"(?<text>.*)");
         TestLogLine testLogLine = new(1, "");
 
-        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var parsedLogLine = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         Assert.That(parsedLogLine.ColumnValues.Length, Is.EqualTo(1));
-        Assert.That(parsedLogLine.ColumnValues[0].Text, Is.Empty);
+        Assert.That(parsedLogLine.ColumnValues[0].Text.ToString(), Is.Empty);
     }
 }

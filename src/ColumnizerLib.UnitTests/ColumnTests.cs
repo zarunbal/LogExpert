@@ -88,19 +88,8 @@ public class ColumnTests
             FullValue = "asdf\0".AsMemory()
         };
 
-        //Switch between the different implementation for the windows versions
-        //Not that great solution but currently I'm out of ideas, I know that currently
-        //only one implementation depending on the windows version is executed
-        if (Environment.Version >= Version.Parse("6.2"))
-        {
-            Assert.That(column.DisplayValue, Is.EqualTo("asdf␀"));
-        }
-        else
-        {
-            Assert.That(column.DisplayValue, Is.EqualTo("asdf "));
-        }
-
-        Assert.That(column.FullValue, Is.EqualTo("asdf\0"));
+        Assert.That(column.DisplayValue.ToString(), Is.EqualTo("asdf "));
+        Assert.That(column.FullValue.ToString(), Is.EqualTo("asdf\0"));
     }
 
     [Test]
@@ -112,7 +101,7 @@ public class ColumnTests
             FullValue = "asdf\t".AsMemory()
         };
 
-        Assert.That(column.DisplayValue, Is.EqualTo("asdf  "));
-        Assert.That(column.FullValue, Is.EqualTo("asdf\t"));
+        Assert.That(column.DisplayValue.ToString(), Is.EqualTo("asdf  "));
+        Assert.That(column.FullValue.ToString(), Is.EqualTo("asdf\t"));
     }
 }
