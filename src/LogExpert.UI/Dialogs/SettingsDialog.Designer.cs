@@ -142,7 +142,7 @@ partial class SettingsDialog
         checkBoxSaveSessions = new CheckBox();
         tabPageMemory = new TabPage();
         groupBoxCPUAndStuff = new GroupBox();
-        checkBoxLegacyReader = new CheckBox();
+        comboBoxReaderType = new ComboBox();
         checkBoxMultiThread = new CheckBox();
         labelFilePollingInterval = new Label();
         upDownPollingInterval = new NumericUpDown();
@@ -254,7 +254,7 @@ partial class SettingsDialog
         upDownMaximumLineLength.Location = new Point(762, 121);
         upDownMaximumLineLength.Margin = new Padding(4, 5, 4, 5);
         upDownMaximumLineLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
-        upDownMaximumLineLength.Minimum = new decimal(new int[] { 20000, 0, 0, 0 });
+        upDownMaximumLineLength.Minimum = new decimal(new int[] { 1000, 0, 0, 0 });
         upDownMaximumLineLength.Name = "upDownMaximumLineLength";
         upDownMaximumLineLength.Size = new Size(106, 23);
         upDownMaximumLineLength.TabIndex = 15;
@@ -836,13 +836,13 @@ partial class SettingsDialog
         // 
         // listBoxTools
         // 
+        listBoxTools.DisplayMember = "Name";
         listBoxTools.FormattingEnabled = true;
         listBoxTools.Location = new Point(10, 14);
         listBoxTools.Margin = new Padding(4, 5, 4, 5);
         listBoxTools.Name = "listBoxTools";
         listBoxTools.Size = new Size(406, 148);
         listBoxTools.TabIndex = 0;
-        listBoxTools.DisplayMember = "Name";
         listBoxTools.SelectedIndexChanged += OnListBoxToolSelectedIndexChanged;
         // 
         // groupBoxToolSettings
@@ -1499,7 +1499,7 @@ partial class SettingsDialog
         // 
         // groupBoxCPUAndStuff
         // 
-        groupBoxCPUAndStuff.Controls.Add(checkBoxLegacyReader);
+        groupBoxCPUAndStuff.Controls.Add(comboBoxReaderType);
         groupBoxCPUAndStuff.Controls.Add(checkBoxMultiThread);
         groupBoxCPUAndStuff.Controls.Add(labelFilePollingInterval);
         groupBoxCPUAndStuff.Controls.Add(upDownPollingInterval);
@@ -1512,22 +1512,18 @@ partial class SettingsDialog
         groupBoxCPUAndStuff.TabStop = false;
         groupBoxCPUAndStuff.Text = "CPU and stuff";
         // 
-        // checkBoxLegacyReader
+        // comboBoxReaderType
         // 
-        checkBoxLegacyReader.AutoSize = true;
-        checkBoxLegacyReader.Location = new Point(14, 138);
-        checkBoxLegacyReader.Margin = new Padding(4, 5, 4, 5);
-        checkBoxLegacyReader.Name = "checkBoxLegacyReader";
-        checkBoxLegacyReader.Size = new Size(182, 19);
-        checkBoxLegacyReader.TabIndex = 9;
-        checkBoxLegacyReader.Text = "Use legacy file reader (slower)";
-        toolTip.SetToolTip(checkBoxLegacyReader, "Slower but more compatible with strange linefeeds and encodings");
-        checkBoxLegacyReader.UseVisualStyleBackColor = true;
+        comboBoxReaderType.FormattingEnabled = true;
+        comboBoxReaderType.Location = new Point(14, 76);
+        comboBoxReaderType.Name = "comboBoxReaderType";
+        comboBoxReaderType.Size = new Size(262, 23);
+        comboBoxReaderType.TabIndex = 10;
         // 
         // checkBoxMultiThread
         // 
         checkBoxMultiThread.AutoSize = true;
-        checkBoxMultiThread.Location = new Point(14, 103);
+        checkBoxMultiThread.Location = new Point(14, 49);
         checkBoxMultiThread.Margin = new Padding(4, 5, 4, 5);
         checkBoxMultiThread.Name = "checkBoxMultiThread";
         checkBoxMultiThread.Size = new Size(131, 19);
@@ -1538,7 +1534,7 @@ partial class SettingsDialog
         // labelFilePollingInterval
         // 
         labelFilePollingInterval.AutoSize = true;
-        labelFilePollingInterval.Location = new Point(9, 52);
+        labelFilePollingInterval.Location = new Point(14, 21);
         labelFilePollingInterval.Margin = new Padding(4, 0, 4, 0);
         labelFilePollingInterval.Name = "labelFilePollingInterval";
         labelFilePollingInterval.Size = new Size(137, 15);
@@ -1547,7 +1543,7 @@ partial class SettingsDialog
         // 
         // upDownPollingInterval
         // 
-        upDownPollingInterval.Location = new Point(190, 49);
+        upDownPollingInterval.Location = new Point(190, 19);
         upDownPollingInterval.Margin = new Padding(4, 5, 4, 5);
         upDownPollingInterval.Maximum = new decimal(new int[] { 5000, 0, 0, 0 });
         upDownPollingInterval.Minimum = new decimal(new int[] { 20, 0, 0, 0 });
@@ -1864,7 +1860,6 @@ partial class SettingsDialog
     private System.Windows.Forms.CheckBox checkBoxColumnFinder;
     private System.Windows.Forms.Button buttonExport;
     private System.Windows.Forms.Button buttonImport;
-    private System.Windows.Forms.CheckBox checkBoxLegacyReader;
     private System.Windows.Forms.Label labelMaximumFilterEntries;
     private System.Windows.Forms.NumericUpDown upDownMaximumFilterEntries;
     private System.Windows.Forms.NumericUpDown upDownMaximumFilterEntriesDisplayed;
@@ -1881,4 +1876,5 @@ partial class SettingsDialog
     private System.Windows.Forms.Label labelMaxDisplayLength;
     private Label labelLanguage;
     private ComboBox comboBoxLanguage;
+    private ComboBox comboBoxReaderType;
 }

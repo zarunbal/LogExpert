@@ -52,7 +52,7 @@ public class PerformanceTests
         };
 
         // Act
-        var proxy = new LazyPluginProxy<ILogLineColumnizer>(pluginPath, manifest);
+        var proxy = new LazyPluginProxy<ILogLineMemoryColumnizer>(pluginPath, manifest);
 
         // Assert
         Assert.That(proxy.IsLoaded, Is.False, "Plugin should not be loaded on proxy creation");
@@ -69,7 +69,7 @@ public class PerformanceTests
 
         // Arrange
         var pluginPath = "nonexistent.dll";
-        var proxy = new LazyPluginProxy<ILogLineColumnizer>(pluginPath, null);
+        var proxy = new LazyPluginProxy<ILogLineMemoryColumnizer>(pluginPath, null);
 
         // Act & Assert
         Assert.That(proxy.IsLoaded, Is.False);
@@ -94,7 +94,7 @@ public class PerformanceTests
             Main = "test.dll",
             ApiVersion = "1.0"
         };
-        var proxy = new LazyPluginProxy<ILogLineColumnizer>("test.dll", manifest);
+        var proxy = new LazyPluginProxy<ILogLineMemoryColumnizer>("test.dll", manifest);
 
         // Act
         var beforeLoad = proxy.ToString();
@@ -110,7 +110,7 @@ public class PerformanceTests
     public void LazyPluginProxy_TryPreload_ReturnsFalseForInvalidPlugin ()
     {
         // Arrange
-        var proxy = new LazyPluginProxy<ILogLineColumnizer>("nonexistent.dll", null);
+        var proxy = new LazyPluginProxy<ILogLineMemoryColumnizer>("nonexistent.dll", null);
 
         // Act
         var result = proxy.TryPreload();
@@ -255,7 +255,7 @@ public class PerformanceTests
     public void LazyPluginProxy_ThrowsArgumentNullException_ForNullPath ()
     {
         // Arrange, Act & Assert
-        _ = Assert.Throws<ArgumentNullException>(() => new LazyPluginProxy<ILogLineColumnizer>(null, null));
+        _ = Assert.Throws<ArgumentNullException>(() => new LazyPluginProxy<ILogLineMemoryColumnizer>(null, null));
     }
 
     [Test]

@@ -54,7 +54,12 @@ public class Preferences
 
     public bool DarkMode { get; set; }
 
+    [Obsolete("This setting is no longer used and will be removed in a future version. The 'UseLegacyReader' now works with ReaderType.Legacy")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool UseLegacyReader { get; set; }
+
+    public ReaderType ReaderType { get; set; } = ReaderType.Pipeline;
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 

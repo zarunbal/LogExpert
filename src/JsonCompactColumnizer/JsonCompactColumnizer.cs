@@ -9,7 +9,7 @@ namespace JsonCompactColumnizer;
 /// <summary>
 ///     This Columnizer can parse JSON files.
 /// </summary>
-public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerPriority
+public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerPriorityMemory
 {
     #region Public methods
 
@@ -25,6 +25,11 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
 
     public override void Selected (ILogLineColumnizerCallback callback)
     {
+        Selected(callback as ILogLineMemoryColumnizerCallback);
+    }
+
+    public override void Selected (ILogLineMemoryColumnizerCallback callback)
+    {
         ColumnList.Clear();
         // Create column header with cached column list.
 
@@ -34,9 +39,16 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Ignore errors when determine priority.")]
     public override Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
+        return GetPriority(fileName, samples.Select(line => (ILogLineMemory)line));
+    }
+
+    public override Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(fileName, nameof(fileName));
+        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
+
         var result = Priority.NotSupport;
         if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
         {
@@ -52,7 +64,7 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
                 if (json != null)
                 {
                     var columns = SplitJsonLine(samples.First(), json);
-                    if (columns.ColumnValues.Length > 0 && Array.Exists(columns.ColumnValues, x => !string.IsNullOrEmpty(x.FullValue)))
+                    if (columns.ColumnValues.Length > 0 && Array.Exists(columns.ColumnValues, x => !x.FullValue.IsEmpty))
                     {
                         result = Priority.PerfectlySupport;
                     }
@@ -82,12 +94,15 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
         {"@mt", "Message Template"},
     };
 
-    protected override IColumnizedLogLine SplitJsonLine (ILogLine line, JObject json)
+    protected override IColumnizedLogLineMemory SplitJsonLine (ILogLineMemory line, JObject json)
     {
-        List<IColumn> returnColumns = [];
+        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(json, nameof(json));
+
+        List<IColumnMemory> returnColumns = [];
         var cLogLine = new ColumnizedLogLine { LogLine = line };
 
-        var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString(), ColumnName = property.Name.ToString(), Parent = cLogLine }).ToList();
+        var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString().AsMemory(), ColumnName = property.Name.ToString(), Parent = cLogLine }).ToList();
 
         //
         // Always rearrage the order of all json fields within a line to follow the sequence of columnNameList.
@@ -106,7 +121,7 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
                 }
 
                 // Fields that is missing in current line should be shown as empty.
-                returnColumns.Add(new Column() { FullValue = "", Parent = cLogLine });
+                returnColumns.Add(new Column() { FullValue = "".AsMemory(), Parent = cLogLine });
             }
         }
 

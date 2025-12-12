@@ -21,17 +21,17 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("192.168.1.1"));
-        Assert.That(result.ColumnValues[1].Text, Is.EqualTo("frank"));
-        Assert.That(result.ColumnValues[2].Text, Is.EqualTo("10/Oct/2000:13:55:36 -0700"));
-        Assert.That(result.ColumnValues[3].Text, Is.EqualTo("GET"));
-        Assert.That(result.ColumnValues[4].Text, Is.EqualTo("/apache_pb.gif"));
-        Assert.That(result.ColumnValues[5].Text, Is.EqualTo("HTTP/1.0"));
-        Assert.That(result.ColumnValues[6].Text, Is.EqualTo("200"));
-        Assert.That(result.ColumnValues[7].Text, Is.EqualTo("2326"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("192.168.1.1"));
+        Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo("frank"));
+        Assert.That(result.ColumnValues[2].Text.ToString(), Is.EqualTo("10/Oct/2000:13:55:36 -0700"));
+        Assert.That(result.ColumnValues[3].Text.ToString(), Is.EqualTo("GET"));
+        Assert.That(result.ColumnValues[4].Text.ToString(), Is.EqualTo("/apache_pb.gif"));
+        Assert.That(result.ColumnValues[5].Text.ToString(), Is.EqualTo("HTTP/1.0"));
+        Assert.That(result.ColumnValues[6].Text.ToString(), Is.EqualTo("200"));
+        Assert.That(result.ColumnValues[7].Text.ToString(), Is.EqualTo("2326"));
     }
 
     [Test]
@@ -43,14 +43,14 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("2023-11-21 14:30:45,123"));
-        Assert.That(result.ColumnValues[1].Text, Is.EqualTo("ERROR"));
-        Assert.That(result.ColumnValues[2].Text, Is.EqualTo("main"));
-        Assert.That(result.ColumnValues[3].Text, Is.EqualTo("com.example.MyClass"));
-        Assert.That(result.ColumnValues[4].Text, Is.EqualTo("An error occurred"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("2023-11-21 14:30:45,123"));
+        Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo("ERROR"));
+        Assert.That(result.ColumnValues[2].Text.ToString(), Is.EqualTo("main"));
+        Assert.That(result.ColumnValues[3].Text.ToString(), Is.EqualTo("com.example.MyClass"));
+        Assert.That(result.ColumnValues[4].Text.ToString(), Is.EqualTo("An error occurred"));
     }
 
     [Test]
@@ -62,12 +62,12 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("value1"));
-        Assert.That(result.ColumnValues[1].Text, Is.EqualTo("value2"));
-        Assert.That(result.ColumnValues[2].Text, Is.EqualTo("value3"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("value1"));
+        Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo("value2"));
+        Assert.That(result.ColumnValues[2].Text.ToString(), Is.EqualTo("value3"));
     }
 
     [Test]
@@ -78,18 +78,18 @@ public class RegexColumnizerAdvancedParsingTests
 
         // Act & Assert - Line with optional part
         var line1 = new TestLogLine(1, "text 123");
-        var result1 = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), line1);
+        var result1 = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), line1);
         // Note: Regex groups are indexed from 1, group 0 is entire match, so groups appear in different order
-        Assert.That(result1.ColumnValues[0].Text, Is.EqualTo(" 123")); // Captures outer group
-        Assert.That(result1.ColumnValues[1].Text, Is.EqualTo("text")); // required group
-        Assert.That(result1.ColumnValues[2].Text, Is.EqualTo("123")); // Captures inner named group
+        Assert.That(result1.ColumnValues[0].Text.ToString(), Is.EqualTo(" 123")); // Captures outer group
+        Assert.That(result1.ColumnValues[1].Text.ToString(), Is.EqualTo("text")); // required group
+        Assert.That(result1.ColumnValues[2].Text.ToString(), Is.EqualTo("123")); // Captures inner named group
 
         // Line without optional part - still matches because optional group is... optional
         var line2 = new TestLogLine(2, "text");
-        var result2 = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), line2);
-        Assert.That(result2.ColumnValues[0].Text, Is.Empty); // Optional outer group not matched
-        Assert.That(result2.ColumnValues[1].Text, Is.EqualTo("text")); // required group matched
-        Assert.That(result2.ColumnValues[2].Text, Is.Empty); // optional inner group not matched
+        var result2 = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), line2);
+        Assert.That(result2.ColumnValues[0].Text.ToString(), Is.Empty); // Optional outer group not matched
+        Assert.That(result2.ColumnValues[1].Text.ToString(), Is.EqualTo("text")); // required group matched
+        Assert.That(result2.ColumnValues[2].Text.ToString(), Is.Empty); // optional inner group not matched
     }
 
     [Test]
@@ -101,10 +101,10 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("Single line of text"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("Single line of text"));
     }
 
     [Test]
@@ -116,12 +116,12 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("42"));
-        Assert.That(result.ColumnValues[1].Text, Is.EqualTo("3.14"));
-        Assert.That(result.ColumnValues[2].Text, Is.EqualTo("0xFF"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("42"));
+        Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo("3.14"));
+        Assert.That(result.ColumnValues[2].Text.ToString(), Is.EqualTo("0xFF"));
     }
 
     [Test]
@@ -133,10 +133,10 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert - First match
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("quoted value"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("quoted value"));
     }
 
     [Test]
@@ -148,10 +148,10 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert - Only captures first match
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("first"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("first"));
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert - Should parse first match
         Assert.That(result.ColumnValues.Length, Is.GreaterThan(0));
@@ -178,10 +178,10 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("INFO"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("INFO"));
     }
 
     [Test]
@@ -193,12 +193,12 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("text 123")); // outer
-        Assert.That(result.ColumnValues[1].Text, Is.EqualTo("text")); // inner1
-        Assert.That(result.ColumnValues[2].Text, Is.EqualTo("123")); // inner2
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("text 123")); // outer
+        Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo("text")); // inner1
+        Assert.That(result.ColumnValues[2].Text.ToString(), Is.EqualTo("123")); // inner2
     }
 
     [Test]
@@ -211,7 +211,7 @@ public class RegexColumnizerAdvancedParsingTests
 
         // Act
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
         stopwatch.Stop();
 
         // Assert - Main goal is performance, not exact match
@@ -228,10 +228,10 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("Hello 世界 🌍 Привет"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("Hello 世界 🌍 Привет"));
     }
 
     [Test]
@@ -243,9 +243,9 @@ public class RegexColumnizerAdvancedParsingTests
         var testLogLine = new TestLogLine(1, logLine);
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert
-        Assert.That(result.ColumnValues[0].Text, Is.EqualTo("[content in brackets]"));
+        Assert.That(result.ColumnValues[0].Text.ToString(), Is.EqualTo("[content in brackets]"));
     }
 }

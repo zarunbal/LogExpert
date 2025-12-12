@@ -55,7 +55,7 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
         tmpParam.SearchText = _filterParams.RangeSearchText;
 
         // search backward for starting keyword
-        var line = callback.GetLogLine(lineNum);
+        var line = callback.GetLogLineMemory(lineNum);
 
         while (lineNum >= 0)
         {
@@ -68,7 +68,7 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
             }
 
             lineNum--;
-            line = callback.GetLogLine(lineNum);
+            line = callback.GetLogLineMemory(lineNum);
 
             if (lineNum < 0 || Util.TestFilterCondition(tmpParam, line, callback)) // do not crash on Ctrl+R when there is not start line found
             {
@@ -90,7 +90,7 @@ internal class RangeFinder (FilterParams filterParams, ColumnizerCallback callba
 
         while (lineNum < lineCount)
         {
-            line = callback.GetLogLine(lineNum);
+            line = callback.GetLogLineMemory(lineNum);
             callback.LineNum = lineNum;
 
             if (!Util.TestFilterCondition(_filterParams, line, callback))

@@ -985,8 +985,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
         <value>If this mode is activated, the save file will be loaded from the Executable Location</value>
     </data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader" xml:space="preserve">
-        <value>Slower but more compatible with strange linefeeds and encodings</value>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp" xml:space="preserve">
+        <value>File Reader  algorithm</value>
     </data>
   <data name="SettingsDialog_Form_Text" xml:space="preserve">
         <value>Settings</value>
@@ -2064,5 +2064,14 @@ Restart LogExpert to apply changes?</value>
   </data>
   <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
     <value>Restart Recommended</value>
+  </data>
+  <data name="LogfileReader_Error_Message_MustProvideAtLeastOneFile" xml:space="preserve">
+    <value>Must provide at least one file.</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Description" xml:space="preserve">
+    <value>No column splitting. The whole line is displayed in a single column.</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
+    <value>Default (single line)</value>
   </data>
 </root>

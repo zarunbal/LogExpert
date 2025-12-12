@@ -5,6 +5,7 @@
     <NoWarn>$(NoWarn);NU1507</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="chocolatey" Version="2.4.3" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />

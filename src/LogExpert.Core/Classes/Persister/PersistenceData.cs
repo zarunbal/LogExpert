@@ -21,7 +21,7 @@ public class PersistenceData
     /// The columnizer to use for this session. This property stores the entire columnizer configuration including any custom names.
     /// </summary>
     [JsonConverter(typeof(ColumnizerJsonConverter))]
-    public ILogLineColumnizer Columnizer { get; set; }
+    public ILogLineMemoryColumnizer Columnizer { get; set; }
 
     /// <summary>
     /// Deprecated: Use Columnizer property instead. This is kept for backward compatibility with old session files.

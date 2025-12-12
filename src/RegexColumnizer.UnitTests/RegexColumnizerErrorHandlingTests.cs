@@ -112,12 +112,12 @@ public class RegexColumnizerErrorHandlingTests
 
         // Act - Regex is null after Init() failure, but Init() now creates fallback columns array
         // So this should work even though Regex is null
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert - Should have fallback column with the full line
         Assert.That(result.ColumnValues.Length, Is.GreaterThan(0));
         // When Regex is null but columns array exists, entire line should be placed
-        Assert.That(result.ColumnValues[0].FullValue, Is.EqualTo("Test line content"));
+        Assert.That(result.ColumnValues[0].FullValue.ToString(), Is.EqualTo("Test line content"));
     }
 
     [Test]
@@ -190,7 +190,7 @@ public class RegexColumnizerErrorHandlingTests
         var testLogLine = new TestLogLine(1, "   "); // Only whitespace
 
         // Act
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
 
         // Assert - Should handle gracefully
         Assert.That(result.ColumnValues, Is.Not.Null);
@@ -208,12 +208,11 @@ public class RegexColumnizerErrorHandlingTests
             @"(?<logger>[^\s]+)\s+" +
             @"(?<message>.*)$");
 
-        var testLogLine = new TestLogLine(1,
-            "2023-11-21 14:30:45,123 ERROR [main-thread-1] com.example.MyClass Error message here");
+        var testLogLine = new TestLogLine(1, "2023-11-21 14:30:45,123 ERROR [main-thread-1] com.example.MyClass Error message here");
 
         // Act
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), testLogLine);
+        var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), testLogLine);
         stopwatch.Stop();
 
         // Assert
@@ -279,8 +278,7 @@ public class RegexColumnizerErrorHandlingTests
 
         var columnizer = new Regex1Columnizer();
 
-        var configField = typeof(BaseRegexColumnizer).GetField("_config",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var configField = typeof(BaseRegexColumnizer).GetField("_config", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         configField?.SetValue(columnizer, config);
 
         // Act - Should not throw
@@ -308,11 +306,11 @@ public class RegexColumnizerErrorHandlingTests
         // Act & Assert - All should be handled the same way
         foreach (var line in lines)
         {
-            var result = columnizer.SplitLine(Mock.Of<ILogLineColumnizerCallback>(), line);
+            var result = columnizer.SplitLine(Mock.Of<ILogLineMemoryColumnizerCallback>(), line);
 
             Assert.That(result.ColumnValues.Length, Is.EqualTo(2));
-            Assert.That(result.ColumnValues[0].Text, Is.Empty); // First column empty
-            Assert.That(result.ColumnValues[1].Text, Is.EqualTo(line.FullLine)); // Full line in last column
+            Assert.That(result.ColumnValues[0].Text.ToString(), Is.Empty); // First column empty
+            Assert.That(result.ColumnValues[1].Text.ToString(), Is.EqualTo(line.FullLine.ToString())); // Full line in last column
         }
     }
 

@@ -18,7 +18,7 @@ public class ColumnizerJsonConverter : JsonConverter
 {
     public override bool CanConvert (Type objectType)
     {
-        return typeof(ILogLineColumnizer).IsAssignableFrom(objectType);
+        return typeof(ILogLineMemoryColumnizer).IsAssignableFrom(objectType);
     }
 
     public override void WriteJson (JsonWriter writer, object? value, JsonSerializer serializer)
@@ -26,7 +26,7 @@ public class ColumnizerJsonConverter : JsonConverter
         ArgumentNullException.ThrowIfNull(writer);
         ArgumentNullException.ThrowIfNull(value);
 
-        if (value is not ILogLineColumnizer columnizer)
+        if (value is not ILogLineMemoryColumnizer columnizer)
         {
             writer.WriteNull();
             return;
@@ -140,7 +140,7 @@ public class ColumnizerJsonConverter : JsonConverter
 
         foreach (var currentAssembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
+            foreach (var type in currentAssembly.GetTypes().Where(t => typeof(ILogLineMemoryColumnizer).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract))
             {
                 try
                 {
@@ -151,7 +151,7 @@ public class ColumnizerJsonConverter : JsonConverter
                     }
 
                     // Then check if the GetName() matches (e.g., "Regex1")
-                    if (Activator.CreateInstance(type) is ILogLineColumnizer instance && instance.GetName() == name)
+                    if (Activator.CreateInstance(type) is ILogLineMemoryColumnizer instance && instance.GetName() == name)
                     {
                         return type;
                     }
@@ -188,7 +188,7 @@ public class ColumnizerJsonConverter : JsonConverter
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == assemblyName))
         {
             var type = assembly.GetType(typeName);
-            if (type != null && typeof(ILogLineColumnizer).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            if (type != null && typeof(ILogLineMemoryColumnizer).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             {
                 return type;
             }
@@ -200,7 +200,7 @@ public class ColumnizerJsonConverter : JsonConverter
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             foreach (var type in assembly.GetTypes().Where(t =>
-                typeof(ILogLineColumnizer).IsAssignableFrom(t) &&
+                typeof(ILogLineMemoryColumnizer).IsAssignableFrom(t) &&
                 !t.IsInterface &&
                 !t.IsAbstract &&
                 t.Name.Equals(simpleTypeName, StringComparison.OrdinalIgnoreCase)))

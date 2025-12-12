@@ -134,7 +134,8 @@ internal partial class SearchDialog : Form
                 }
 
                 // Use RegexHelper for safer validation with timeout protection
-                if (!RegexHelper.IsValidPattern(comboBoxSearchFor.Text, out var error))
+                var (isValid, error) = RegexHelper.IsValidPattern(comboBoxSearchFor.Text);
+                if (!isValid)
                 {
                     throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.SearchDialog_UI_Error_InvalidRegexPattern, error));
                 }

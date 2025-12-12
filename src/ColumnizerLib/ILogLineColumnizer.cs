@@ -60,8 +60,8 @@ public interface ILogLineColumnizer
     /// add the offset and convert the timestamp back to string value(s).
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
-    /// <param name="line">The line content to be splitted</param>
-    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line);
+    /// <param name="logLine">The line content to be splitted</param>
+    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine);
 
     /// <summary>
     /// Returns true, if the columnizer supports timeshift handling.
@@ -101,8 +101,8 @@ public interface ILogLineColumnizer
     /// invalid input.
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
-    /// <param name="line">The line content which timestamp has to be returned.</param>
-    DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line);
+    /// <param name="logLine">The line content which timestamp has to be returned.</param>
+    DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine);
 
     /// <summary>
     /// This function is called if the user changes a value in a column (edit mode in the log view).

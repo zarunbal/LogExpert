@@ -88,7 +88,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     #region Public methods
 
-    public void SetColumnizer (ILogLineColumnizer columnizer)
+    public void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         PaintHelper.SetColumnizer(columnizer, bookmarkDataGridView);
 

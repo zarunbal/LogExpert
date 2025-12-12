@@ -18,7 +18,7 @@ internal class FlashIconPlugin : IKeywordAction
 
     #region IKeywordAction Member
 
-    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
+    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineMemoryColumnizer columnizer)
     {
         var openForms = Application.OpenForms;
         foreach (Form form in openForms)
