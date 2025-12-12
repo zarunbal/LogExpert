@@ -1440,13 +1440,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var refLineNum = lineNum;
+        var (timeStamp, lastLineNumber) = GetTimestampForLine(lineNum, false);
+        lineNum = lastLineNumber;
 
         copyToTabToolStripMenuItem.Enabled = dataGridView.SelectedCells.Count > 0;
         scrollAllTabsToTimestampToolStripMenuItem.Enabled = CurrentColumnizer.IsTimeshiftImplemented()
-                                                            &&
-                                                            GetTimestampForLine(ref refLineNum, false) !=
-                                                            DateTime.MinValue;
+                                                            && timeStamp != DateTime.MinValue;
 
         locateLineInOriginalFileToolStripMenuItem.Enabled = IsTempFile &&
                                                             FilterPipe != null &&
@@ -1581,8 +1580,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var currentLine = dataGridView.CurrentCellAddress.Y;
             if (currentLine > 0 && currentLine < dataGridView.RowCount)
             {
-                var lineNum = currentLine;
-                var timeStamp = GetTimestampForLine(ref lineNum, false);
+                var (timeStamp, _) = GetTimestampForLine(currentLine, false);
                 if (timeStamp.Equals(DateTime.MinValue)) // means: invalid
                 {
                     return;
@@ -3432,7 +3430,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var he = new HighlightEntry
         {
-            SearchText = column.DisplayValue,
+            SearchText = column.DisplayValue.ToString(),
             ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
             BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
             IsWordMatch = true
@@ -3495,8 +3493,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 ? new SolidBrush(matchEntry.HighlightEntry.BackgroundColor)
                 : null;
 
-            var matchWord = column.DisplayValue.Substring(matchEntry.StartPos, matchEntry.Length);
-            var wordSize = TextRenderer.MeasureText(e.Graphics, matchWord, font, proposedSize, flags);
+            var matchWord = column.DisplayValue.Slice(matchEntry.StartPos, matchEntry.Length);
+            var wordSize = TextRenderer.MeasureText(e.Graphics, matchWord.ToString(), font, proposedSize, flags);
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
@@ -3516,7 +3514,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect, foreColor, flags);
+            TextRenderer.DrawText(e.Graphics, matchWord.ToString(), font, wordRect, foreColor, flags);
             wordPos.Offset(wordSize.Width, 0);
         }
     }
@@ -3803,16 +3801,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var lineNum = _timeShiftSyncLine;
             if (lineNum >= 0 && lineNum < dataGridView.RowCount)
             {
-                var refLine = lineNum;
-                var timeStamp = GetTimestampForLine(ref refLine, true);
+                var (timeStamp, lineNumber) = GetTimestampForLine(lineNum, true);
+                lineNum = lineNumber;
                 if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)
                 {
                     _guiStateArgs.Timestamp = timeStamp;
                     SendGuiStateUpdate();
                     if (_shouldCallTimeSync)
                     {
-                        refLine = lineNum;
-                        var exactTimeStamp = GetTimestampForLine(ref refLine, false);
+                        var (exactTimeStamp, _) = GetTimestampForLine(lineNum, false);
                         SyncOtherWindows(exactTimeStamp);
                         _shouldCallTimeSync = false;
                     }
@@ -3829,10 +3826,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     (row2, row1) = (row1, row2);
                 }
 
-                var refLine = row1;
-                var timeStamp1 = GetTimestampForLine(ref refLine, false);
-                refLine = row2;
-                var timeStamp2 = GetTimestampForLine(ref refLine, false);
+                var (timeStamp1, _) = GetTimestampForLine(row1, false);
+                var (timeStamp2, _) = GetTimestampForLine(row2, false);
                 //TimeSpan span = TimeSpan.FromTicks(timeStamp2.Ticks - timeStamp1.Ticks);
                 var diff = timeStamp1.Ticks > timeStamp2.Ticks
                     ? new DateTime(timeStamp1.Ticks - timeStamp2.Ticks)
@@ -5291,7 +5286,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var line = 0;
         _guiStateArgs.MinTimestamp = GetTimestampForLineForward(ref line, true);
         line = dataGridView.RowCount - 1;
-        _guiStateArgs.MaxTimestamp = GetTimestampForLine(ref line, true);
+        (_guiStateArgs.MaxTimestamp, _) = GetTimestampForLine(line, true);
         SendGuiStateUpdate();
     }
 
@@ -5989,8 +5984,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
 
                 var currentLineNum = dataGridView.CurrentCellAddress.Y;
-                var refLine = currentLineNum;
-                var timeStamp = GetTimestampForLine(ref refLine, true);
+                var (timeStamp, _) = GetTimestampForLine(currentLineNum, true);
                 if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)
                 {
                     TimeSyncList.CurrentTimestamp = timeStamp;
@@ -6439,7 +6433,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             return new Column
             {
-                FullValue = $"{rowIndex + 1}" // line number
+                FullValue = $"{rowIndex + 1}".AsMemory() // line number
             };
         }
 
@@ -6457,7 +6451,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     var value = cols.ColumnValues[columnIndex - 2];
 
-                    return value != null && value.DisplayValue != null
+                    return value != null && !value.DisplayValue.IsEmpty
                         ? value
                         : value;
                 }
@@ -7533,12 +7527,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (foundLine >= 0)
         {
             // go backwards to the first occurence of the hit
-            var foundTimestamp = GetTimestampForLine(ref foundLine, roundToSeconds);
-
+            var (foundTimestamp, foundLine1) = GetTimestampForLine(foundLine, roundToSeconds);
+            foundLine = foundLine1;
             while (foundTimestamp.CompareTo(timestamp) == 0 && foundLine >= 0)
             {
                 foundLine--;
-                foundTimestamp = GetTimestampForLine(ref foundLine, roundToSeconds);
+                (foundTimestamp, foundLine1) = GetTimestampForLine(foundLine, roundToSeconds);
+                foundLine = foundLine1;
             }
 
             if (foundLine < 0)
@@ -7556,11 +7551,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public int FindTimestampLineInternal (int lineNum, int rangeStart, int rangeEnd, DateTime timestamp, bool roundToSeconds)
     {
-        var refLine = lineNum;
-        var currentTimestamp = GetTimestampForLine(ref refLine, roundToSeconds);
+        var (currentTimestamp, foundLine) = GetTimestampForLine(lineNum, roundToSeconds);
         if (currentTimestamp.CompareTo(timestamp) == 0)
         {
-            return lineNum;
+            //return lineNum;
+            return foundLine;
         }
 
         if (timestamp < currentTimestamp)
@@ -7583,13 +7578,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         // prevent endless loop
         if (rangeEnd - rangeStart < 2)
         {
-            currentTimestamp = GetTimestampForLine(ref rangeStart, roundToSeconds);
+            (currentTimestamp, rangeStart) = GetTimestampForLine(rangeStart, roundToSeconds);
             if (currentTimestamp.CompareTo(timestamp) == 0)
             {
                 return rangeStart;
             }
 
-            currentTimestamp = GetTimestampForLine(ref rangeEnd, roundToSeconds);
+            (currentTimestamp, rangeEnd) = GetTimestampForLine(rangeEnd, roundToSeconds);
 
             return currentTimestamp.CompareTo(timestamp) == 0
                 ? rangeEnd
@@ -7604,13 +7599,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
    * has no timestamp, the previous line will be checked until a
    * timestamp is found.
    */
-    public DateTime GetTimestampForLine (ref int lastLineNum, bool roundToSeconds)
+    public (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
     {
         lock (_currentColumnizerLock)
         {
             if (!CurrentColumnizer.IsTimeshiftImplemented())
             {
-                return DateTime.MinValue;
+                return (DateTime.MinValue, lastLineNum);
             }
 
             if (_logger.IsDebugEnabled)
@@ -7626,14 +7621,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_isTimestampDisplaySyncing && _shouldTimestampDisplaySyncingCancel)
                     {
-                        return DateTime.MinValue;
+                        return (DateTime.MinValue, lastLineNum);
                     }
 
                     lookBack = true;
                     var logLine = _logFileReader.GetLogLineMemory(lastLineNum);
                     if (logLine == null)
                     {
-                        return DateTime.MinValue;
+                        return (DateTime.MinValue, lastLineNum);
                     }
 
                     ColumnizerCallbackObject.LineNum = lastLineNum;
@@ -7657,7 +7652,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _logger.Debug($"### GetTimestampForLine: found timestamp={timeStamp}");
             }
 
-            return timeStamp;
+            return (timeStamp, lastLineNum);
         }
     }
 

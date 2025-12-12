@@ -39,34 +39,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     {
         ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
 
-        if (realLineNum == 0)
-        {
-            // store for later field names and field count retrieval
-            _firstLine = new CsvLogLine(logLine, 0);
-
-            if (_config.MinColumns > 0)
-            {
-                using CsvReader csv = new(new StringReader(logLine), _config.ReaderConfiguration);
-                if (csv.Parser.Count < _config.MinColumns)
-                {
-                    // on invalid CSV don't hide the first line from LogExpert, since the file will be displayed in plain mode
-                    _isValidCsv = false;
-                    return logLine;
-                }
-            }
-
-            _isValidCsv = true;
-        }
-
-        if (_config.HasFieldNames && realLineNum == 0)
-        {
-            return null; // hide from LogExpert
-        }
-
-        return _config.CommentChar != ' ' &&
-               logLine.StartsWith("" + _config.CommentChar, StringComparison.OrdinalIgnoreCase)
-                    ? null
-                    : logLine;
+        return PreProcessLine(logLine.AsMemory(), lineNum, realLineNum).ToString();
     }
 
     public ReadOnlyMemory<char> PreProcessLine (ReadOnlyMemory<char> logLine, int lineNum, int realLineNum)
@@ -140,18 +113,18 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         return names;
     }
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
-        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
 
         return _isValidCsv
-            ? SplitCsvLine(line)
-            : CreateColumnizedLogLine(line);
+            ? SplitCsvLine(logLine)
+            : CreateColumnizedLogLine(logLine);
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     private static ColumnizedLogLine CreateColumnizedLogLine (ILogLineMemory line)
@@ -180,12 +153,12 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }

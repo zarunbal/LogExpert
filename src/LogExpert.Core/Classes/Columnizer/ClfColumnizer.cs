@@ -21,7 +21,6 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
     #region cTor
 
     // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
-
     public ClfColumnizer ()
     {
     }
@@ -45,11 +44,24 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         return _timeOffset;
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Retrieves the timestamp associated with the specified log line.
+    /// </summary>
+    /// <param name="callback">An object that provides callback methods for columnizing log lines. Cannot be null.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
+    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
+    /// <summary>
+    /// Notifies the specified callback of a value change for a given column.
+    /// </summary>
+    /// <param name="callback">The callback to be notified of the value change. Cannot be null.</param>
+    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
+    /// <param name="value">The new value to assign to the specified column.</param>
+    /// <param name="oldValue">The previous value of the specified column before the update.</param>
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
         PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
@@ -75,15 +87,32 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Splits the specified log line into columns using the provided columnizer callback.
+    /// </summary>
+    /// <param name="callback">The callback interface used to receive columnization results and context during the split operation. Cannot be
+    /// null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the log line.</returns>
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    /// <summary>
+    /// Extracts the timestamp from the specified log line using the provided callback.
+    /// </summary>
+    /// <remarks>If the log line does not contain a valid timestamp in the expected column or format, the
+    /// method returns DateTime.MinValue. The expected timestamp format and column position are determined by the
+    /// implementation and may vary depending on the log source.</remarks>
+    /// <param name="callback">A callback interface used to assist in parsing the log line and retrieving column information.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp.</param>
+    /// <returns>A DateTime value representing the timestamp extracted from the log line. Returns DateTime.MinValue if the
+    /// timestamp cannot be parsed or is not present.</returns>
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         // Use SplitLine to parse, then extract timestamp column
-        var cols = SplitLine(callback, line);
+        var cols = SplitLine(callback, logLine);
 
         if (cols == null || cols.ColumnValues.Length < 8)
         {
@@ -97,7 +126,6 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
 
         try
         {
-            // Parse from Span
             return DateTime.ParseExact(dateColumn.FullValue.Span, DATE_TIME_FORMAT, _cultureInfo);
         }
         catch (Exception ex) when (ex is ArgumentException or
@@ -108,40 +136,40 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         }
     }
 
+    /// <summary>
+    /// Splits a log line into its constituent columns using the configured columnizer logic.
+    /// </summary>
+    /// <remarks>If the input line does not match the expected format, the entire line is placed in the
+    /// request column. For lines longer than 1024 characters, only the first 1024 characters are used for
+    /// columnization. The method does not localize column values.</remarks>
+    /// <param name="callback">A callback interface used to provide additional context or services required during columnization. Cannot be
+    /// null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized log line, with each column populated according to the parsed content of
+    /// the input line.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally Passed")]
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
-        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
         ArgumentNullException.ThrowIfNull(callback, nameof(callback));
 
         ColumnizedLogLine cLogLine = new()
         {
-            LogLine = line
+            LogLine = logLine
         };
 
-        var columns = new Column[8]
-        {
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine},
-            new() {FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine}
-        };
+        var columns = Column.CreateColumns(8, cLogLine);
 
-        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
-
-        var lineMemory = line.FullLine;
+        var lineMemory = logLine.FullLine;
 
         if (lineMemory.Length > 1024)
         {
             columns[3].FullValue = lineMemory[..1024];
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
             return cLogLine;
         }
 
-        var span = line.FullLine.Span;
+        var span = logLine.FullLine.Span;
 
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
@@ -149,10 +177,16 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         {
             // Pattern didn't match - put entire line in request column
             columns[3].FullValue = lineMemory;
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
             return cLogLine;
         }
 
-        var lineString = line.ToString();
+        // To extract regex group captures, we must convert to string.
+        // This is an unavoidable allocation - .NET Regex doesn't provide
+        // a way to get group capture positions from ReadOnlySpan<char>.
+        // However, GetGroupMemory() will slice the original ReadOnlyMemory,
+        // so we avoid allocating strings for each captured group.
+        var lineString = logLine.ToString();
         var match = _lineRegex.Match(lineString);
 
         if (match.Groups.Count == 10)
@@ -206,15 +240,18 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         }
         else
         {
+            // Regex matched but unexpected group count - put full line in request column
             columns[3].FullValue = lineMemory;
         }
 
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
         return cLogLine;
     }
 
     /// <summary>
     /// Converts a Regex Group capture to ReadOnlyMemory slice from original line
     /// </summary>
+    //TODO Extract to utility class
     private static ReadOnlyMemory<char> GetGroupMemory (ReadOnlyMemory<char> lineMemory, Group group)
     {
         if (!group.Success || group.Length == 0)
@@ -232,6 +269,15 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         return GetName();
     }
 
+    /// <summary>
+    /// Processes a value change for a specified column and notifies the callback of the update.
+    /// </summary>
+    /// <remarks>If the column index is 2, the method attempts to interpret the values as date and time
+    /// strings and calculates the time offset in milliseconds. No action is taken for other column indices.</remarks>
+    /// <param name="callback">The callback interface used to handle column value updates.</param>
+    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
+    /// <param name="value">The new value to be set for the specified column.</param>
+    /// <param name="oldValue">The previous value of the specified column before the update.</param>
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
         if (column == 2)
@@ -250,6 +296,14 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         }
     }
 
+    /// <summary>
+    /// Provides a compiled regular expression used to parse lines matching a specific log entry format.
+    /// </summary>
+    /// <remarks>The regular expression is precompiled for performance and is intended to extract fields from
+    /// log lines with a fixed format. The pattern captures multiple groups, including text fields and quoted values.
+    /// Use the returned <see cref="Regex"/> to match and extract data from log entries conforming to this
+    /// structure.</remarks>
+    /// <returns>A <see cref="Regex"/> instance that matches lines with the expected log entry structure.</returns>
     [GeneratedRegex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")")]
     private static partial Regex LineRegex ();
 

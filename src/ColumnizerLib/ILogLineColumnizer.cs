@@ -60,8 +60,8 @@ public interface ILogLineColumnizer
     /// add the offset and convert the timestamp back to string value(s).
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
-    /// <param name="line">The line content to be splitted</param>
-    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line);
+    /// <param name="logLine">The line content to be splitted</param>
+    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine);
 
     /// <summary>
     /// Returns true, if the columnizer supports timeshift handling.

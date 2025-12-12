@@ -44,7 +44,7 @@ public class ColumnTests
         Column.SetMaxDisplayLength(10_000);
 
         // Create a line longer than the display max length
-        var longValue = new StringBuilder().Append('X', 15_000).ToString();
+        var longValue = new StringBuilder().Append('X', 15_000).ToString().AsMemory();
 
         Column column = new()
         {
@@ -57,8 +57,8 @@ public class ColumnTests
 
         // DisplayValue should be truncated at 10,000 with "..." appended
         Assert.That(column.DisplayValue.Length, Is.EqualTo(10_003)); // 10000 + "..."
-        Assert.That(column.DisplayValue.EndsWith("...", StringComparison.OrdinalIgnoreCase), Is.True);
-        Assert.That(column.DisplayValue.StartsWith("XXX", StringComparison.OrdinalIgnoreCase), Is.True);
+        Assert.That(column.DisplayValue.ToString().EndsWith("...", StringComparison.OrdinalIgnoreCase), Is.True);
+        Assert.That(column.DisplayValue.ToString().StartsWith("XXX", StringComparison.OrdinalIgnoreCase), Is.True);
 
         // Reset for other tests
         Column.SetMaxDisplayLength(20_000);
@@ -69,7 +69,7 @@ public class ColumnTests
     {
         Column.SetMaxDisplayLength(20_000);
 
-        var normalValue = new StringBuilder().Append('Y', 5_000).ToString();
+        var normalValue = new StringBuilder().Append('Y', 5_000).ToString().AsMemory();
         Column column = new()
         {
             FullValue = normalValue
@@ -80,11 +80,12 @@ public class ColumnTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void Column_NullCharReplacement ()
     {
         Column column = new()
         {
-            FullValue = "asdf\0"
+            FullValue = "asdf\0".AsMemory()
         };
 
         //Switch between the different implementation for the windows versions
@@ -103,11 +104,12 @@ public class ColumnTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void Column_TabReplacement ()
     {
         Column column = new()
         {
-            FullValue = "asdf\t"
+            FullValue = "asdf\t".AsMemory()
         };
 
         Assert.That(column.DisplayValue, Is.EqualTo("asdf  "));

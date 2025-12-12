@@ -16,19 +16,19 @@ public interface ILogLineMemoryColumnizer : ILogLineColumnizer
     /// Splits a log line into columns using the specified callback for columnization.
     /// </summary>
     /// <param name="callback">The callback used to determine how the log line is split into columns. Cannot be null.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
     /// <returns>An object representing the columnized log line. The returned object contains the extracted columns from the
     /// input line.</returns>
-    IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line);
+    IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine);
 
     /// <summary>
     /// Retrieves the timestamp associated with the specified log line.
     /// </summary>
     /// <param name="callback">An object that provides access to columnizer services for the log line. Used to obtain additional context or
     /// data required for timestamp extraction.</param>
-    /// <param name="line">The log line from which to extract the timestamp.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp.</param>
     /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
-    DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line);
+    DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine);
 
     /// <summary>
     /// Notifies the callback of a new value for the specified column, providing both the current and previous values.

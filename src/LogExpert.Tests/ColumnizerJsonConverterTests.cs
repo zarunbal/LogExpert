@@ -59,15 +59,20 @@ public class MockColumnizer : ILogLineMemoryColumnizer
 
     public int GetTimeOffset () => throw new NotImplementedException();
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine) => throw new NotImplementedException();
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line) => throw new NotImplementedException();
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine) => throw new NotImplementedException();
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line) => throw new NotImplementedException();
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine) => throw new NotImplementedException();
 
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
+
+    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
+    {
+        return SplitLine(callback, logLine);
+    }
 }
 
 public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
@@ -97,16 +102,16 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
 
     public int GetTimeOffset () => throw new NotImplementedException();
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine) => throw new NotImplementedException();
 
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
@@ -114,6 +119,11 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
         throw new NotImplementedException();
+    }
+
+    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
+    {
+        return SplitLine(callback, logLine);
     }
 }
 

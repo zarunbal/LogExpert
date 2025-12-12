@@ -59,9 +59,9 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
         return names;
     }
 
-    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     public virtual bool IsTimeshiftImplemented ()
@@ -79,7 +79,7 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
         throw new NotImplementedException();
     }
 
-    public virtual DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    public virtual DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
         throw new NotImplementedException();
     }
@@ -175,27 +175,27 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
         return GetName();
     }
 
-    public virtual IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public virtual IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
-        var json = ParseJson(line);
+        var json = ParseJson(logLine);
 
         if (json != null)
         {
-            return SplitJsonLine(line, json);
+            return SplitJsonLine(logLine, json);
         }
 
-        var cLogLine = new ColumnizedLogLine { LogLine = line };
+        var cLogLine = new ColumnizedLogLine { LogLine = logLine };
 
         var columns = Column.CreateColumns(ColumnList.Count, cLogLine);
 
-        columns.Last().FullValue = line.FullLine;
+        columns.Last().FullValue = logLine.FullLine;
 
         cLogLine.ColumnValues = [.. columns.Select(a => (IColumnMemory)a)];
 
         return cLogLine;
     }
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
