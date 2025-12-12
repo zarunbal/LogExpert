@@ -712,7 +712,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \r\nSupports timeshift: {0}.
+        ///   Looks up a localized string similar to Supports timeshift: {0}.
         /// </summary>
         public static string FilterSelectorForm_UI_Text_SupportsTimeshift_Format {
             get {
@@ -966,7 +966,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error during save of entry.\r\n{0}.
+        ///   Looks up a localized string similar to Error during save of entry.
+        ///		{0}.
         /// </summary>
         public static string HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry {
             get {
@@ -3869,7 +3870,9 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This feature is pre-beta and does not work :)\r\nUsage: Select a range in the log window and press \&quot;Recalc\&quot;. \r\nThis will search for text ranges similar to the selected one..
+        ///   Looks up a localized string similar to This feature is pre-beta and does not work :)
+        ///		Usage: Select a range in the log window and press &quot;Recalc&quot;. 
+        ///		This will search for text ranges similar to the selected one..
         /// </summary>
         public static string PatternWindow_UI_Label_FeatureDescription {
             get {
@@ -3923,7 +3926,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start: {0}\nEnd: {1}.
+        ///   Looks up a localized string similar to Start: {0}
+        ///		End: {1}.
         /// </summary>
         public static string PatternWindow_UI_Label_RangeFormat {
             get {
@@ -4368,7 +4372,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0}).
+        ///   Looks up a localized string similar to Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.
+        ///		({0}).
         /// </summary>
         public static string Program_UI_Error_InsufficientRights {
             get {
@@ -4422,7 +4427,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Restoring layout requires an empty workbench.\n\n.
+        ///   Looks up a localized string similar to Restoring layout requires an empty workbench..
         /// </summary>
         public static string ProjectLoadDlg_UI_Label_Informational {
             get {
@@ -4550,7 +4555,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error during creation of search parameter\r\n{0}.
+        ///   Looks up a localized string similar to Error during creation of search parameter
+        ///		{0}.
         /// </summary>
         public static string SearchDialog_UI_Error_CreatingSearchParameter {
             get {
