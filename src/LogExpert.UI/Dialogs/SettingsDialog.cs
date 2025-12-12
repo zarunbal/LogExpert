@@ -5,7 +5,6 @@ using System.Text;
 
 using ColumnizerLib;
 
-using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -621,7 +620,7 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            _selectedTool.Name = Util.IsNullOrSpaces(textBoxToolName.Text) ? textBoxTool.Text : textBoxToolName.Text;
+            _selectedTool.Name = string.IsNullOrWhiteSpace(textBoxToolName.Text) ? textBoxTool.Text : textBoxToolName.Text;
             _selectedTool.Cmd = textBoxTool.Text;
             _selectedTool.Args = textBoxArguments.Text;
             _selectedTool.ColumnizerName = comboBoxColumnizer.Text;
@@ -1074,7 +1073,7 @@ internal partial class SettingsDialog : Form
         {
             var iconFile = _selectedTool.IconFile;
 
-            if (Util.IsNullOrSpaces(iconFile))
+            if (string.IsNullOrWhiteSpace(iconFile))
             {
                 iconFile = textBoxTool.Text;
             }

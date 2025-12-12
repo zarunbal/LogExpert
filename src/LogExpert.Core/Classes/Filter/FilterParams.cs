@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
@@ -12,6 +11,10 @@ using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Filter;
 
+// TODO: Convert LastLine to ReadOnlyMemory<char> as part of memory optimization effort
+// This will eliminate string allocations in TestFilterCondition and improve performance.
+// Will require updating all callers that currently expect string type.
+// Related to: ReadOnlyMemory migration in columnizers
 [Serializable]
 public class FilterParams : ICloneable
 {
@@ -75,7 +78,7 @@ public class FilterParams : ICloneable
 
     [JsonIgnore]
     [field: NonSerialized]
-    public Hashtable LastNonEmptyCols { get; set; } = [];
+    public Dictionary<int, ReadOnlyMemory<char>> LastNonEmptyCols { get; set; } = [];
 
     [JsonIgnore]
     [field: NonSerialized]

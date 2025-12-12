@@ -1,5 +1,4 @@
 using LogExpert.Core.Callback;
-using LogExpert.Core.Classes;
 
 using NLog;
 
@@ -69,7 +68,7 @@ internal class Filter
                     return count;
                 }
 
-                var line = _callback.GetLogLine(lineNum);
+                var line = _callback.GetLogLineMemory(lineNum);
 
                 if (line == null)
                 {

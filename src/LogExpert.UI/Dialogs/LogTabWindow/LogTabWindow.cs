@@ -1921,7 +1921,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         Process process = new();
         ProcessStartInfo startInfo = new(cmd, args);
-        if (!Util.IsNull(workingDir))
+        if (!string.IsNullOrEmpty(workingDir))
         {
             startInfo.WorkingDirectory = workingDir;
         }

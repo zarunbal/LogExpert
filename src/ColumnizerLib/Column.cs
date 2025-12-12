@@ -27,21 +27,10 @@ public class Column : IColumnMemory
 
     static Column ()
     {
-        if (Environment.Version >= Version.Parse("6.2"))
-        {
-            //Win8 or newer support full UTF8 chars with the preinstalled fonts.
-            //Replace null char with UTF8 Symbol U+2400 (␀)
-            _replacementsMemory.Add(input => ReplaceNullChar(input, '␀'));
-        }
-        else
-        {
-            //Everything below Win8 the installed fonts seems to not to support reliabel
-            //Replace null char with space
-            //.net 10 does no longer support windows lower then windows 10
-            //TODO: remove if with one of the next releases
-            //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
-            _replacementsMemory.Add(input => ReplaceNullChar(input, ' '));
-        }
+        //.net 10 only supports Windows10+ which has full UTF8-font support
+        // Replace null char with UTF-8 Symbol U+2400 (␀)
+        //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
+        _replacementsMemory.Add(input => ReplaceNullChar(input, ' '));
 
         EmptyColumn = new Column { FullValue = ReadOnlyMemory<char>.Empty };
     }

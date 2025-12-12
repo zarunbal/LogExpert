@@ -1921,7 +1921,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
         {
-            if (!Util.IsNull(ctl.SelectedText))
+            if (!string.IsNullOrEmpty(ctl.SelectedText))
             {
                 Clipboard.SetText(ctl.SelectedText);
             }
@@ -3097,7 +3097,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var filterLineAdded = false;
             for (var i = filterStart; i < e.LineCount; ++i)
             {
-                var line = _logFileReader.GetLogLine(i);
+                var line = _logFileReader.GetLogLineMemory(i);
                 if (line == null)
                 {
                     return;
@@ -4412,7 +4412,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             ColumnizerCallback callback = new(this);
             while (true)
             {
-                var line = _logFileReader.GetLogLine(lineNum);
+                var line = _logFileReader.GetLogLineMemory(lineNum);
                 if (line == null)
                 {
                     break;
@@ -4421,8 +4421,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 callback.LineNum = lineNum;
                 if (Util.TestFilterCondition(filterParams, line, callback))
                 {
-                    AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList,
-                        filterHitList);
+                    AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
                 }
 
                 lineNum++;
@@ -5116,7 +5115,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ProcessFilterPipes (int lineNum)
     {
-        var searchLine = _logFileReader.GetLogLine(lineNum);
+        var searchLine = _logFileReader.GetLogLineMemory(lineNum);
         if (searchLine == null)
         {
             return;
@@ -5140,9 +5139,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 //long startTime = Environment.TickCount;
                 if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
                 {
-                    var filterResult =
-                        GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
+                    var filterResult = GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
                     pipe.OpenFile();
+
                     foreach (var line in filterResult)
                     {
                         pipe.LastLinesHistoryList.Add(line);
