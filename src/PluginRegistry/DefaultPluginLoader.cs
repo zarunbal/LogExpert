@@ -45,7 +45,7 @@ public class DefaultPluginLoader : IPluginLoader
 
             // Find plugin types (ILogLineColumnizer implementations)
             var pluginTypes = assembly.GetTypes()
-                .Where(t => typeof(ILogLineColumnizer).IsAssignableFrom(t) &&
+                .Where(t => typeof(ILogLineMemoryColumnizer).IsAssignableFrom(t) &&
                            !t.IsAbstract &&
                            !t.IsInterface)
                 .ToList();

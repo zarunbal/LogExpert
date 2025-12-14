@@ -6,9 +6,8 @@ namespace LogExpert.Core.Classes.Log;
 
 public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 {
-    #region Fields
 
-    private static readonly Encoding[] _preambleEncodings = [Encoding.UTF8, Encoding.Unicode, Encoding.BigEndianUnicode, Encoding.UTF32];
+    #region Fields
 
     private readonly BufferedStream _stream;
     private readonly StreamReader _reader;
@@ -18,19 +17,39 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     private long _position;
 
+    private static readonly Encoding[] _preambleEncodings =
+    [
+        Encoding.UTF8,
+        Encoding.Unicode,
+        Encoding.BigEndianUnicode,
+        Encoding.UTF32
+    ];
+
     #endregion
 
     #region cTor
 
     protected PositionAwareStreamReaderBase (Stream stream, EncodingOptions encodingOptions, int maximumLineLength)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        if (!stream.CanRead)
+        {
+            throw new ArgumentException("Stream must support reading.", nameof(stream));
+        }
+
+        if (!stream.CanSeek)
+        {
+            throw new ArgumentException("Stream must support seeking.", nameof(stream));
+        }
+
         _stream = new BufferedStream(stream);
 
         MaximumLineLength = maximumLineLength;
 
         _preambleLength = DetectPreambleLengthAndEncoding(out var detectedEncoding);
 
-        var usedEncoding = GetUsedEncoding(encodingOptions, detectedEncoding);
+        var usedEncoding = DetermineEncoding(encodingOptions, detectedEncoding);
         _posIncPrecomputed = GetPosIncPrecomputed(usedEncoding);
 
         _reader = new StreamReader(_stream, usedEncoding, true);
@@ -59,8 +78,8 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
              *    always delivers a fixed length (does not mater what kind of data)
              */
             _position = value; //  +Encoding.GetPreamble().Length;      // 1
-            //stream.Seek(pos, SeekOrigin.Begin);     // 2
-            //stream.Seek(pos + Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
+                               //stream.Seek(pos, SeekOrigin.Begin);     // 2
+                               //stream.Seek(pos + Encoding.GetPreamble().Length, SeekOrigin.Begin);  // 3
             _ = _stream.Seek(_position + _preambleLength, SeekOrigin.Begin); // 4
 
             ResetReader();
@@ -124,6 +143,8 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         }
     }
 
+
+
     protected virtual void ResetReader ()
     {
         _reader.DiscardBufferedData();
@@ -158,19 +179,42 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         UTF-32-Little-Endian-Byteorder: FF FE 00 00
         */
 
-        var readPreamble = new byte[4];
+        var (length, encoding) = DetectPreambleLength(_stream);
+        // not found or less than 2 byte read
+        detectedEncoding = encoding;
 
-        var readLen = _stream.Read(readPreamble, 0, 4);
+        return length;
+    }
 
-        if (readLen >= 2)
+    public static Encoding DetermineEncoding (EncodingOptions options, Encoding detectedEncoding)
+    {
+        return options?.Encoding != null
+            ? options.Encoding
+            : detectedEncoding ?? options?.DefaultEncoding ?? Encoding.Default;
+    }
+
+    public static (int length, Encoding? detectedEncoding) DetectPreambleLength (Stream stream)
+    {
+        if (!stream.CanSeek)
+        {
+            return (0, null);
+        }
+
+        var originalPos = stream.Position;
+        var buffer = new byte[4];
+        _ = stream.Seek(0, SeekOrigin.Begin);
+        var readBytes = stream.Read(buffer, 0, buffer.Length);
+        _ = stream.Seek(originalPos, SeekOrigin.Begin);
+
+        if (readBytes >= 2)
         {
             foreach (var encoding in _preambleEncodings)
             {
                 var preamble = encoding.GetPreamble();
                 var fail = false;
-                for (var i = 0; i < readLen && i < preamble.Length; ++i)
+                for (var i = 0; i < readBytes && i < preamble.Length; ++i)
                 {
-                    if (readPreamble[i] != preamble[i])
+                    if (buffer[i] != preamble[i])
                     {
                         fail = true;
                         break;
@@ -179,26 +223,15 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
                 if (!fail)
                 {
-                    detectedEncoding = encoding;
-                    return preamble.Length;
+                    return (preamble.Length, encoding);
                 }
             }
         }
 
-        // not found or less than 2 byte read
-        detectedEncoding = null;
-
-        return 0;
+        return (0, null);
     }
 
-    private static Encoding GetUsedEncoding (EncodingOptions encodingOptions, Encoding detectedEncoding)
-    {
-        return encodingOptions.Encoding ??
-               detectedEncoding ??
-               encodingOptions.DefaultEncoding ??
-               Encoding.Default;
-    }
-    private static int GetPosIncPrecomputed (Encoding usedEncoding)
+    public static int GetPosIncPrecomputed (Encoding usedEncoding)
     {
         switch (usedEncoding)
         {

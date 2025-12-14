@@ -2,6 +2,8 @@ using System.ComponentModel;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
+using LogExpert.Core.Helpers;
+
 namespace LogExpert.UI.Dialogs;
 
 [SupportedOSPlatform("windows")]
@@ -79,17 +81,27 @@ internal partial class RegexHelperDialog : Form
     private void UpdateMatches ()
     {
         textBoxMatches.Text = string.Empty;
+
         try
         {
-            Regex rex = new(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            var matches = rex.Matches(comboBoxTestText.Text);
-
-            foreach (Match match in matches)
+            Regex rex = RegexHelper.CreateSafeRegex(comboBoxRegex.Text, _caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+            var (isValid, _) = RegexHelper.IsValidPattern(comboBoxRegex.Text);
+            if (isValid)
             {
-                textBoxMatches.Text += $"{match.Value}\r\n";
+                var matches = rex.Matches(comboBoxTestText.Text);
+
+                foreach (Match match in matches)
+                {
+                    textBoxMatches.Text += $"Match Value: \"{match.Value}\"\r\n";
+                }
+            }
+            else
+            {
+                textBoxMatches.Text = Resources.RegexHelperDialog_UI_TextBox_Matches_NoValidRegexPattern;
             }
         }
-        catch (ArgumentException)
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException)
         {
             textBoxMatches.Text = Resources.RegexHelperDialog_UI_TextBox_Matches_NoValidRegexPattern;
         }
@@ -122,12 +134,14 @@ internal partial class RegexHelperDialog : Form
     private void OnButtonOkClick (object sender, EventArgs e)
     {
         var text = comboBoxRegex.Text;
+        _ = ExpressionHistoryList.Remove(text);
+        ExpressionHistoryList.Insert(0, text);
         comboBoxRegex.Items.Remove(text);
         comboBoxRegex.Items.Insert(0, text);
 
         text = comboBoxTestText.Text;
-        comboBoxTestText.Items.Remove(text);
-        comboBoxTestText.Items.Insert(0, text);
+        _ = TesttextHistoryList.Remove(text);
+        TesttextHistoryList.Insert(0, text);
 
         if (comboBoxRegex.Items.Count > MAX_HISTORY)
         {

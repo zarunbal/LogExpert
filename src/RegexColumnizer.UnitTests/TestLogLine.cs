@@ -1,16 +1,21 @@
+
 using ColumnizerLib;
 
 using RegexColumnizer;
 
 namespace LogExpert.RegexColumnizer.Tests;
 
-internal class TestLogLine (int lineNumber, string fullLine) : ILogLine
+internal class TestLogLine (int lineNumber, string fullLine) : ILogLineMemory
 {
-    public string FullLine { get; set; } = fullLine;
+    string ILogLine.FullLine { get; }
 
     public int LineNumber { get; set; } = lineNumber;
 
-    public string Text { get; set; }
+    string ITextValue.Text { get; }
+
+    public ReadOnlyMemory<char> FullLine { get; } = fullLine.AsMemory();
+
+    public ReadOnlyMemory<char> Text { get; }
 
     public static Regex1Columnizer CreateColumnizer (string regex, string customName = "Test Columnizer")
     {

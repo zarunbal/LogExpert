@@ -1,0 +1,3 @@
+<Project>
+  <!-- Prevent parent Directory.Build.targets from being imported -->
+</Project>

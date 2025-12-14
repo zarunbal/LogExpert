@@ -2,6 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 using LogExpert.PluginRegistry.FileSystem;
 
 using NUnit.Framework;
@@ -24,7 +25,9 @@ internal class BufferShiftTest : RolloverHandlerTestBase
     }
 
     [Test]
-    public void TestShiftBuffers1 ()
+    [TestCase(ReaderType.System)]
+    //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
+    public void TestShiftBuffers1 (ReaderType readerType)
     {
         var linesPerFile = 10;
         MultiFileOptions options = new()
@@ -41,7 +44,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         };
 
         _ = PluginRegistry.PluginRegistry.Create(TestDirectory.FullName, 500);
-        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, false, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, readerType, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var lil = reader.GetLogFileInfoList();
@@ -60,11 +63,9 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         var oldCount = lil.Count;
 
         // Simulate rollover
-        //
         files = RolloverSimulation(files, "*$J(.)", false);
 
         // Simulate rollover detection
-        //
         _ = reader.ShiftBuffers();
 
         lil = reader.GetLogFileInfoList();
@@ -74,7 +75,6 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         Assert.That(reader.LineCount, Is.EqualTo(linesPerFile * lil.Count));
 
         // Check if rollover'd file names have been handled by LogfileReader
-        //
         Assert.That(lil.Count, Is.EqualTo(files.Count));
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
@@ -86,9 +86,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             _ = enumerator.MoveNext();
         }
 
-        // Check if file buffers have correct files. Assuming here that one buffer fits for a
-        // complete file
-        //
+        // Check if file buffers have correct files. Assuming here that one buffer fits for a complete file
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
 
@@ -104,7 +102,6 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         }
 
         // Checking file content
-        //
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
         _ = enumerator.MoveNext(); // move to 2nd entry. The first file now contains 2nd file's content (because rollover)
@@ -114,8 +111,8 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         for (i = 0; i < logBuffers.Count - 2; ++i)
         {
             var logBuffer = logBuffers[i];
-            var line = logBuffer.GetLineOfBlock(0);
-            Assert.That(line.FullLine.Contains(enumerator.Current, StringComparison.Ordinal));
+            var line = logBuffer.GetLineMemoryOfBlock(0);
+            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
             _ = enumerator.MoveNext();
         }
 
@@ -124,18 +121,16 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         for (; i < logBuffers.Count; ++i)
         {
             var logBuffer = logBuffers[i];
-            var line = logBuffer.GetLineOfBlock(0);
-            Assert.That(line.FullLine.Contains(enumerator.Current, StringComparison.Ordinal));
+            var line = logBuffer.GetLineMemoryOfBlock(0);
+            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
         }
 
         oldCount = lil.Count;
 
         // Simulate rollover again - now latest file will be deleted (simulates logger's rollover history limit)
-        //
         files = RolloverSimulation(files, "*$J(.)", true);
 
         // Simulate rollover detection
-        //
         _ = reader.ShiftBuffers();
         lil = reader.GetLogFileInfoList();
 
@@ -144,10 +139,9 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         Assert.That(reader.LineCount, Is.EqualTo(linesPerFile * lil.Count));
 
         // Check first line to see if buffers are correct
-        //
-        var firstLine = reader.GetLogLine(0);
+        var firstLine = reader.GetLogLineMemory(0);
         var names = new string[files.Count];
         files.CopyTo(names, 0);
-        Assert.That(firstLine.FullLine.Contains(names[2], StringComparison.Ordinal));
+        Assert.That(firstLine.FullLine.Span.Contains(names[2].AsSpan(), StringComparison.Ordinal));
     }
 }

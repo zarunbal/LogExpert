@@ -32,7 +32,7 @@ internal static class PaintHelper
             return;
         }
 
-        var line = logPaintCtx.GetLogLine(rowIndex);
+        var line = logPaintCtx.GetLogLineMemory(rowIndex);
 
         if (line != null)
         {
@@ -151,7 +151,7 @@ internal static class PaintHelper
     }
 
     [SupportedOSPlatform("windows")]
-    public static void SetColumnizer (ILogLineColumnizer columnizer, BufferedDataGridView gridView)
+    public static void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
         var rowCount = gridView.RowCount;
         var currLine = gridView.CurrentCellAddress.Y;
@@ -342,7 +342,7 @@ internal static class PaintHelper
 
         if (value is Column column)
         {
-            if (!string.IsNullOrEmpty(column.FullValue))
+            if (!column.FullValue.IsEmpty)
             {
                 HighlightMatchEntry hme = new()
                 {
@@ -352,7 +352,7 @@ internal static class PaintHelper
 
                 var he = new HighlightEntry
                 {
-                    SearchText = column.FullValue,
+                    SearchText = column.FullValue.ToString(),
                     //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
                     ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
@@ -416,9 +416,9 @@ internal static class PaintHelper
             var matchWord = string.Empty;
             if (value is Column again)
             {
-                if (!string.IsNullOrEmpty(again.FullValue))
+                if (!again.FullValue.IsEmpty)
                 {
-                    matchWord = again.FullValue.Substring(matchEntry.StartPos, matchEntry.Length);
+                    matchWord = again.FullValue.Slice(matchEntry.StartPos, matchEntry.Length).ToString();
                 }
             }
 

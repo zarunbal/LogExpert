@@ -2,11 +2,11 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.EventArguments;
 
-public class ColumnizerEventArgs(ILogLineColumnizer columnizer) : System.EventArgs
+public class ColumnizerEventArgs(ILogLineMemoryColumnizer columnizer) : System.EventArgs
 {
     #region Properties
 
-    public ILogLineColumnizer Columnizer { get; } = columnizer;
+    public ILogLineMemoryColumnizer Columnizer { get; } = columnizer;
 
     #endregion
 }

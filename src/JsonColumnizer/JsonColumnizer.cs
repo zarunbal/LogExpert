@@ -8,7 +8,7 @@ namespace JsonColumnizer;
 /// <summary>
 ///     This Columnizer can parse JSON files.
 /// </summary>
-public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPriority
+public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IColumnizerPriorityMemory
 {
     #region Properties
 
@@ -24,39 +24,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
     public virtual void Selected (ILogLineColumnizerCallback callback)
     {
-        ColumnList.Clear();
-        ColumnSet.Clear();
-
-        var line = callback.GetLogLine(0);
-
-        if (line != null)
-        {
-            var json = ParseJson(line);
-            if (json != null)
-            {
-                var fieldCount = json.Properties().Count();
-
-                for (var i = 0; i < fieldCount; ++i)
-                {
-                    var columeName = json.Properties().ToArray()[i].Name;
-                    if (ColumnSet.Add(columeName))
-                    {
-                        ColumnList.Add(new JsonColumn(columeName));
-                    }
-                }
-            }
-            else
-            {
-                _ = ColumnSet.Add("Text");
-                ColumnList.Add(InitialColumn);
-            }
-        }
-
-        if (ColumnList.Count == 0)
-        {
-            _ = ColumnSet.Add("Text");
-            ColumnList.Add(InitialColumn);
-        }
+        Selected(callback as ILogLineMemoryColumnizerCallback);
     }
 
     public virtual void DeSelected (ILogLineColumnizerCallback callback)
@@ -91,24 +59,9 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         return names;
     }
 
-    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        var json = ParseJson(line);
-
-        if (json != null)
-        {
-            return SplitJsonLine(line, json);
-        }
-
-        var cLogLine = new ColumnizedLogLine { LogLine = line };
-
-        var columns = Column.CreateColumns(ColumnList.Count, cLogLine);
-
-        columns.Last().FullValue = line.FullLine;
-
-        cLogLine.ColumnValues = [.. columns.Select(a => (IColumn)a)];
-
-        return cLogLine;
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     public virtual bool IsTimeshiftImplemented ()
@@ -126,7 +79,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         throw new NotImplementedException();
     }
 
-    public virtual DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    public virtual DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
         throw new NotImplementedException();
     }
@@ -138,6 +91,9 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
     public virtual Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
+
         var result = Priority.NotSupport;
         if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
         {
@@ -151,18 +107,15 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
 
     #region Private Methods
 
-    protected static JObject ParseJson (ILogLine line)
+    protected static JObject ParseJson (ILogLineMemory line)
     {
-        return JsonConvert.DeserializeObject<JObject>(line.FullLine, new JsonSerializerSettings()
+        ArgumentNullException.ThrowIfNull(line, nameof(line));
+
+        return JsonConvert.DeserializeObject<JObject>(line.FullLine.ToString(), new JsonSerializerSettings()
         {
             //We ignore the error and handle the null value
             Error = (sender, args) => args.ErrorContext.Handled = true
         });
-    }
-
-    public class ColumnWithName : Column
-    {
-        public string ColumnName { get; set; }
     }
 
     //
@@ -170,11 +123,14 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
     // {"time":"2019-02-13T02:55:35.5186240Z","message":"Hosting starting"}
     // {"time":"2019-02-13T02:55:35.5186240Z","level":"warning", "message":"invalid host."}
     //
-    protected virtual IColumnizedLogLine SplitJsonLine (ILogLine line, JObject json)
+    protected virtual IColumnizedLogLineMemory SplitJsonLine (ILogLineMemory line, JObject json)
     {
+        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(json, nameof(json));
+
         var cLogLine = new ColumnizedLogLine { LogLine = line };
 
-        var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString(), ColumnName = property.Name.ToString(), Parent = cLogLine }).ToList();
+        var columns = json.Properties().Select(property => new ColumnWithName { FullValue = property.Value.ToString().AsMemory(), ColumnName = property.Name.ToString(), Parent = cLogLine }).ToList();
 
         foreach (var jsonColumn in columns)
         {
@@ -195,7 +151,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
         // Always rearrange the order of all json fields within a line to follow the sequence of columnNameList.
         // This will make sure the log line displayed correct even the order of json fields changed.
         //
-        List<IColumn> returnColumns = [];
+        List<IColumnMemory> returnColumns = [];
         foreach (var column in ColumnList)
         {
             var existingColumn = columns.Find(x => x.ColumnName == column.Name);
@@ -206,7 +162,7 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
             }
 
             // Fields that is missing in current line should be shown as empty.
-            returnColumns.Add(new Column() { FullValue = "", Parent = cLogLine });
+            returnColumns.Add(new Column() { FullValue = ReadOnlyMemory<char>.Empty, Parent = cLogLine });
         }
 
         cLogLine.ColumnValues = [.. returnColumns];
@@ -217,6 +173,94 @@ public class JsonColumnizer : ILogLineColumnizer, IInitColumnizer, IColumnizerPr
     public string GetCustomName ()
     {
         return GetName();
+    }
+
+    public virtual IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        var json = ParseJson(logLine);
+
+        if (json != null)
+        {
+            return SplitJsonLine(logLine, json);
+        }
+
+        var cLogLine = new ColumnizedLogLine { LogLine = logLine };
+
+        var columns = Column.CreateColumns(ColumnList.Count, cLogLine);
+
+        columns.Last().FullValue = logLine.FullLine;
+
+        cLogLine.ColumnValues = [.. columns.Select(a => (IColumnMemory)a)];
+
+        return cLogLine;
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void Selected (ILogLineMemoryColumnizerCallback callback)
+    {
+        ArgumentNullException.ThrowIfNull(callback, nameof(callback));
+
+        ColumnList.Clear();
+        ColumnSet.Clear();
+
+        var line = callback.GetLogLineMemory(0);
+
+        if (line != null)
+        {
+            var json = ParseJson(line);
+            if (json != null)
+            {
+                var fieldCount = json.Properties().Count();
+
+                for (var i = 0; i < fieldCount; ++i)
+                {
+                    var columeName = json.Properties().ToArray()[i].Name;
+                    if (ColumnSet.Add(columeName))
+                    {
+                        ColumnList.Add(new JsonColumn(columeName));
+                    }
+                }
+            }
+            else
+            {
+                _ = ColumnSet.Add("Text");
+                ColumnList.Add(InitialColumn);
+            }
+        }
+
+        if (ColumnList.Count == 0)
+        {
+            _ = ColumnSet.Add("Text");
+            ColumnList.Add(InitialColumn);
+        }
+    }
+
+    public virtual void DeSelected (ILogLineMemoryColumnizerCallback callback)
+    {
+        // nothing to do
+    }
+
+    public virtual Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
+    {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
+
+        var result = Priority.NotSupport;
+        if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
+        {
+            result = Priority.WellSupport;
+        }
+
+        return result;
     }
 
     #endregion

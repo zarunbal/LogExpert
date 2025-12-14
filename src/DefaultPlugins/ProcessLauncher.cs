@@ -17,7 +17,7 @@ internal class ProcessLauncher : IKeywordAction
 
     private readonly object _callbackLock = new();
 
-    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
+    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineMemoryColumnizer columnizer)
     {
         var start = 0;
         int end;

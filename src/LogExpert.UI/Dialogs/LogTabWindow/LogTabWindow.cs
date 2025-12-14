@@ -193,7 +193,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private delegate void LoadMultiFilesDelegate (string[] fileName, EncodingOptions encodingOptions);
 
-    private delegate void SetColumnizerFx (ILogLineColumnizer columnizer);
+    private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
     private delegate void SetTabIconDelegate (LogWindow.LogWindow logWindow, Icon icon);
 
@@ -517,7 +517,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
+    public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer preProcessColumnizer)
     {
         var logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
         if (pipe.FilterParams.SearchText.Length > 0)
@@ -538,13 +538,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFileTabDeferred (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer)
+    public LogWindow.LogWindow AddFileTabDeferred (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer)
     {
         return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, true);
     }
 
     [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
+    public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
     {
         var logFileName = FindFilenameForSettings(givenFileName);
         var win = FindWindowForFile(logFileName);
@@ -662,7 +662,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    public ILogLineColumnizer GetColumnizerHistoryEntry (string fileName)
+    public ILogLineMemoryColumnizer GetColumnizerHistoryEntry (string fileName)
     {
         var entry = FindColumnizerHistoryEntry(fileName);
         if (entry != null)
@@ -729,7 +729,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    public ILogLineColumnizer FindColumnizerByFileMask (string fileName)
+    public ILogLineMemoryColumnizer FindColumnizerByFileMask (string fileName)
     {
         foreach (var entry in ConfigManager.Settings.Preferences.ColumnizerMaskList)
         {
@@ -739,7 +739,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 {
                     if (Regex.IsMatch(fileName, entry.Mask))
                     {
-                        var columnizer = ColumnizerPicker.FindColumnizerByName(entry.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+                        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(entry.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
                         return columnizer;
                     }
                 }
@@ -1310,7 +1310,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    private void SetColumnizerHistoryEntry (string fileName, ILogLineColumnizer columnizer)
+    private void SetColumnizerHistoryEntry (string fileName, ILogLineMemoryColumnizer columnizer)
     {
         var entry = FindColumnizerHistoryEntry(fileName);
         if (entry != null)
@@ -1921,7 +1921,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         Process process = new();
         ProcessStartInfo startInfo = new(cmd, args);
-        if (!Util.IsNull(workingDir))
+        if (!string.IsNullOrEmpty(workingDir))
         {
             startInfo.WorkingDirectory = workingDir;
         }
@@ -1931,7 +1931,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (sysoutPipe)
         {
-            var columnizer = ColumnizerPicker.DecideColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             //_logger.Info($"Starting external tool with sysout redirection: {cmd} {args}"));
             startInfo.UseShellExecute = false;

@@ -64,30 +64,26 @@ public static class RegexHelper
     /// <param name="pattern">The pattern to validate.</param>
     /// <param name="error">Output parameter containing error message if validation fails.</param>
     /// <returns>True if the pattern is valid, false otherwise.</returns>
-    public static bool IsValidPattern (string pattern, out string? error)
+    public static (bool isValid, string error) IsValidPattern (string pattern)
     {
         if (string.IsNullOrEmpty(pattern))
         {
-            error = "Pattern cannot be null or empty.";
-            return false;
+            return (false, "Pattern cannot be null or empty.");
         }
 
         try
         {
             _ = new Regex(pattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
-            error = null;
-            return true;
+            return (true, string.Empty);
         }
         catch (ArgumentException ex)
         {
-            error = ex.Message;
-            return false;
+            return (false, ex.Message);
         }
         catch (RegexMatchTimeoutException)
         {
             // Pattern is valid syntactically, but may be complex
-            error = null;
-            return true;
+            return (true, string.Empty);
         }
     }
 

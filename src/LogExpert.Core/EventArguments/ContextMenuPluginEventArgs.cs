@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.EventArguments;
 
-public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineColumnizer columnizer,
+public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineMemoryColumnizer columnizer,
     ILogExpertCallback callback) : System.EventArgs
 {
 
@@ -12,7 +12,7 @@ public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logL
 
     public IList<int> LogLines { get; } = logLines;
 
-    public ILogLineColumnizer Columnizer { get; } = columnizer;
+    public ILogLineMemoryColumnizer Columnizer { get; } = columnizer;
 
     public ILogExpertCallback Callback { get; } = callback;
 

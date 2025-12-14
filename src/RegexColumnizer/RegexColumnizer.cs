@@ -12,12 +12,21 @@ using Newtonsoft.Json;
 [assembly: SupportedOSPlatform("windows")]
 namespace RegexColumnizer;
 
-public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfigurator
+/// <summary>
+/// Provides a base class for columnizing log lines using regular expressions, supporting configurable column
+/// definitions and integration with log line memory interfaces.
+/// </summary>
+/// <remarks>This abstract class implements core logic for splitting log lines into columns based on regular
+/// expression group matches. It supports configuration loading and saving, and is intended to be extended by concrete
+/// columnizer implementations. The class ensures that columnized output always matches the expected column count, and
+/// provides mechanisms for both memory-efficient and string-based log line processing. Thread safety is not guaranteed;
+/// instances should not be shared across threads without external synchronization.</remarks>
+public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnizerConfiguratorMemory
 {
     #region Fields
 
     private readonly XmlSerializer _xml = new(typeof(RegexColumnizerConfig));
-    private string[] columns;
+    private string[] _columns;
     private RegexColumnizerConfig _config;
     #endregion
 
@@ -29,6 +38,10 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
 
     #region Public methods
 
+    /// <summary>
+    /// Gets the configured name, or a default name if no configuration is set.
+    /// </summary>
+    /// <returns>A string containing the configured name if available; otherwise, a default name.</returns>
     public string GetName ()
     {
         return string.IsNullOrWhiteSpace(_config?.Name)
@@ -36,6 +49,10 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             : _config.Name;
     }
 
+    /// <summary>
+    /// Gets the custom name if specified; otherwise, returns the default name.
+    /// </summary>
+    /// <returns>A string containing the custom name if it is set and not empty; otherwise, the default name.</returns>
     public string GetCustomName ()
     {
         return string.IsNullOrWhiteSpace(_config?.CustomName)
@@ -43,82 +60,162 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             : _config.CustomName;
     }
 
+    /// <summary>
+    /// Gets a localized description of the regular expression columnizer.
+    /// </summary>
+    /// <returns>A string containing the localized description text for the regular expression columnizer.</returns>
     public string GetDescription () => Resources.RegexColumnizer_Description;
 
-    public int GetColumnCount () => columns.Length;
+    /// <summary>
+    /// Gets the number of columns in the collection.
+    /// </summary>
+    /// <returns>The total number of columns contained in the collection.</returns>
+    public int GetColumnCount () => _columns.Length;
 
-    public string[] GetColumnNames () => columns;
+    /// <summary>
+    /// Returns the names of all columns in the current schema.
+    /// </summary>
+    /// <returns>An array of strings containing the names of the columns. The array will be empty if no columns are defined.</returns>
+    public string[] GetColumnNames () => _columns;
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Returns a slice of the specified memory corresponding to the matched group, or an empty memory if the group was
+    /// not successful or has zero length.
+    /// </summary>
+    /// <remarks>This method avoids allocating a new string by returning a memory slice over the original
+    /// input. The returned memory is valid as long as the underlying memory of <paramref name="lineMemory"/> remains
+    /// valid.</remarks>
+    /// <param name="lineMemory">The memory region containing the original input text from which the group was matched.</param>
+    /// <param name="group">The regular expression group whose matched value is to be extracted from the memory. The group must have been
+    /// matched against the input represented by <paramref name="lineMemory"/>.</param>
+    /// <returns>A <see cref="ReadOnlyMemory{Char}"/> representing the portion of <paramref name="lineMemory"/> matched by
+    /// <paramref name="group"/>. Returns <see cref="ReadOnlyMemory{Char}.Empty"/> if the group was not successful or
+    /// has zero length.</returns>
+    private static ReadOnlyMemory<char> GetGroupMemory (ReadOnlyMemory<char> lineMemory, Group group)
     {
-        var logLine = new ColumnizedLogLine
+        if (!group.Success || group.Length == 0)
         {
-            ColumnValues = new IColumn[columns.Length]
+            return ReadOnlyMemory<char>.Empty;
+        }
+
+        // Use group's Index and Length to slice original memory
+        // This avoids allocating a new string for the group value
+        return lineMemory.Slice(group.Index, group.Length);
+    }
+
+    /// <summary>
+    /// Splits the specified log line into columns according to the configured columnization logic.
+    /// </summary>
+    /// <remarks>If the log line does not match the configured regular expression, the entire line is placed
+    /// in the last column and other columns are set to empty. The method ensures that the returned object always
+    /// contains the expected number of columns, avoiding null values in the column array.</remarks>
+    /// <param name="callback">A callback interface used to provide additional context or services during columnization. Cannot be null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the input log line, with each column containing its
+    /// corresponding value.</returns>
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
+        ArgumentNullException.ThrowIfNull(callback, nameof(callback));
+
+        var columnizedLogLine = new ColumnizedLogLine
+        {
+            LogLine = logLine
         };
 
         if (Regex != null)
         {
-            var m = Regex.Match(line.FullLine);
-
-            if (m.Success)
+            if (Regex.IsMatch(logLine.FullLine.Span))
             {
-                for (var i = m.Groups.Count - 1; i > 0; i--)
+                // To extract regex group captures, we must convert to string.
+                // This is an unavoidable allocation - .NET Regex doesn't provide
+                // a way to get group capture positions from ReadOnlySpan<char>.
+                // However, GetGroupMemory() will slice the original ReadOnlyMemory,
+                // so we avoid allocating strings for each captured group.
+                var lineString = logLine.FullLine.ToString();
+                var match = Regex.Match(lineString);
+
+                var groupCount = Math.Min(match.Groups.Count - 1, _columns.Length);
+
+                var cols = Column.CreateColumns(_columns.Length, columnizedLogLine);
+
+                for (var i = 0; i < groupCount; i++)
                 {
-                    logLine.ColumnValues[i - 1] = new Column
-                    {
-                        Parent = logLine,
-                        FullValue = m.Groups[i].Value
-                    };
+                    cols[i].FullValue = GetGroupMemory(logLine.FullLine, match.Groups[i + 1]);
                 }
+
+                columnizedLogLine.ColumnValues = [.. cols.Select(c => c as IColumnMemory)];
             }
             else
             {
-                //Move non matching lines in the last column
-                logLine.ColumnValues[columns.Length - 1] = new Column
-                {
-                    Parent = logLine,
-                    FullValue = line.FullLine
-                };
-
                 //Fill other columns with empty string to avoid null pointer exceptions in unexpected places
-                for (var i = 0; i < columns.Length - 1; i++)
-                {
-                    logLine.ColumnValues[i] = new Column
-                    {
-                        Parent = logLine,
-                        FullValue = string.Empty
-                    };
-                }
+                var columns = Column.CreateColumns(_columns.Length, columnizedLogLine);
+
+                // Set last column to full line
+                columns[^1].FullValue = logLine.FullLine;
+
+                //Move non matching lines in the last column
+                columnizedLogLine.ColumnValues = [.. columns.Select(c => c as IColumnMemory)];
             }
         }
-        else
+        else //Regex is null, just put the full line in the first column
         {
-            IColumn colVal = new Column
-            {
-                Parent = logLine,
-                FullValue = line.FullLine
-            };
+            var cols = Column.CreateColumns(_columns.Length, columnizedLogLine);
+            cols[0].FullValue = logLine.FullLine;
 
-            logLine.ColumnValues[0] = colVal;
+            columnizedLogLine.ColumnValues = [.. cols.Select(c => c as IColumnMemory)];
         }
 
-        logLine.LogLine = line;
-        return logLine;
+        return columnizedLogLine;
     }
 
+    /// <summary>
+    /// Splits the specified log line into columns using the provided callback.
+    /// </summary>
+    /// <param name="callback">An object that receives columnization callbacks during the split operation. Cannot be null.</param>
+    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the log line.</returns>
+    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    {
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+    }
+
+    /// <summary>
+    /// Determines whether timeshift functionality is implemented.
+    /// </summary>
+    /// <returns><see langword="true"/> if timeshift is implemented; otherwise, <see langword="false"/>.</returns>
     public bool IsTimeshiftImplemented () => false;
 
+    /// <summary>
+    /// Sets the time offset, in milliseconds, to be applied to time calculations or operations.
+    /// </summary>
+    /// <param name="msecOffset">The time offset, in milliseconds. Positive values indicate a forward offset; negative values indicate a backward
+    /// offset.</param>
+    /// <exception cref="NotImplementedException">The method is not implemented.</exception>
     public void SetTimeOffset (int msecOffset)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Gets the time offset, in seconds, between the local system time and Coordinated Universal Time (UTC).
+    /// </summary>
+    /// <returns>The number of seconds that the local time is offset from UTC. A positive value indicates the local time is ahead
+    /// of UTC; a negative value indicates it is behind.</returns>
+    /// <exception cref="NotImplementedException">Thrown in all cases. This method is not implemented.</exception>
     public int GetTimeOffset ()
     {
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Extracts the timestamp from the specified log line using the provided callback.
+    /// </summary>
+    /// <param name="callback">The callback interface used to assist in extracting column data from the log line. Cannot be null.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
+    /// <returns>A DateTime value representing the timestamp found in the log line.</returns>
+    /// <exception cref="NotImplementedException">The method is not implemented.</exception>
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
         throw new NotImplementedException();
     }
@@ -128,6 +225,12 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Configures the columnizer using the specified callback and configuration directory.
+    /// </summary>
+    /// <param name="callback">The callback interface used to interact with the columnizer during configuration. Cannot be null.</param>
+    /// <param name="configDir">The path to the directory containing configuration files. Must be a valid directory path.</param>
+    /// <exception cref="ArgumentException">Thrown if configDir is null, empty, or consists only of white-space characters.</exception>
     public void Configure (ILogLineColumnizerCallback callback, string configDir)
     {
         // Validate inputs
@@ -136,66 +239,16 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             throw new ArgumentException(Resources.RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty, nameof(configDir));
         }
 
-        string name = GetName();
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty);
-        }
-
-        // Ensure directory exists
-        if (!Directory.Exists(configDir))
-        {
-            try
-            {
-                _ = Directory.CreateDirectory(configDir);
-            }
-            catch (Exception ex) when (ex is IOException or
-                                             UnauthorizedAccessException)
-            {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory, ex.Message),
-                                    Resources.RegexColumnizer_UI_Title_Error,
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-                return;
-            }
-        }
-
-        string filePath = Path.Join(configDir, $"{name}Columnizer.json");
-
-        RegexColumnizerConfigDialog dlg = new(_config);
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            try
-            {
-                // Only validate regex if expression is provided (empty is allowed and uses default)
-                if (!string.IsNullOrWhiteSpace(dlg.Config.Expression))
-                {
-                    // Test regex compilation to catch errors early
-                    _ = RegexHelper.CreateSafeRegex(dlg.Config.Expression);
-                }
-
-                // Save configuration
-                string json = JsonConvert.SerializeObject(dlg.Config, Formatting.Indented);
-                File.WriteAllText(filePath, json);
-
-                _config = dlg.Config;
-                Init();
-            }
-            catch (RegexMatchTimeoutException ex)
-            {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_RegexTimeout, ex.Message), Resources.RegexColumnizer_UI_Title_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (ArgumentException ex)
-            {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_InvalidRegexPattern, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToSaveConfiguration, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        Configure(callback as ILogLineMemoryColumnizerCallback, configDir);
     }
 
+    /// <summary>
+    /// Loads the configuration for the columnizer from the specified directory, using either a JSON or XML
+    /// configuration file if available.
+    /// </summary>
+    /// <remarks>If both JSON and XML configuration files are missing or invalid, a default configuration is
+    /// created. The method displays an error message if deserialization fails.</remarks>
+    /// <param name="configDir">The path to the directory containing the configuration files. Must not be null or empty.</param>
     public void LoadConfig (string configDir)
     {
         var configFile = GetConfigFileJSON(configDir);
@@ -239,8 +292,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
             {
                 string jsonContent = File.ReadAllText(configFile);
 
-                _config = JsonConvert.DeserializeObject<RegexColumnizerConfig>(jsonContent)
-                    ?? new RegexColumnizerConfig { Name = GetName() };
+                _config = JsonConvert.DeserializeObject<RegexColumnizerConfig>(jsonContent) ?? new RegexColumnizerConfig { Name = GetName() };
 
             }
             catch (JsonException ex)
@@ -335,7 +387,7 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
                 ? 0
                 : 1;
 
-            columns = [.. Regex.GetGroupNames().Skip(skip)];
+            _columns = [.. Regex.GetGroupNames().Skip(skip)];
         }
         catch (Exception ex) when (ex is ArgumentException or
                                          ArgumentNullException or
@@ -343,7 +395,127 @@ public abstract class BaseRegexColumnizer : ILogLineColumnizer, IColumnizerConfi
                                          RegexParseException)
         {
             Regex = null;
-            columns = ["text"];
+            _columns = ["text"];
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the timestamp associated with the specified log line.
+    /// </summary>
+    /// <param name="callback">An object that provides callback methods for columnizer operations. Used to access additional context or
+    /// services required during timestamp extraction.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
+    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
+    /// <exception cref="NotImplementedException">The method is not implemented.</exception>
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Notifies the callback of a value change for a specific column.
+    /// </summary>
+    /// <param name="callback">The callback interface to receive the value change notification. Cannot be null.</param>
+    /// <param name="column">The zero-based index of the column whose value has changed.</param>
+    /// <param name="value">The new value to be associated with the specified column.</param>
+    /// <param name="oldValue">The previous value of the specified column before the change.</param>
+    /// <exception cref="NotImplementedException">The method is not implemented.</exception>
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Splits the specified log line into columns using the provided callback.
+    /// </summary>
+    /// <param name="callback">An object that provides callback methods for columnization. Cannot be null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized form of the log line.</returns>
+    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
+    {
+        return SplitLine(callback, logLine);
+    }
+
+    /// <summary>
+    /// Displays a configuration dialog for the columnizer and saves the updated settings to the specified configuration
+    /// directory.
+    /// </summary>
+    /// <remarks>If the specified configuration directory does not exist, the method attempts to create it. If
+    /// the user cancels the configuration dialog, no changes are made. Any errors encountered during directory creation
+    /// or file saving are displayed to the user via a message box. The callback parameter is not used in the current
+    /// implementation.</remarks>
+    /// <param name="callback">A callback interface for columnizer memory operations. This parameter is reserved for future use and can be
+    /// null.</param>
+    /// <param name="configDir">The path to the directory where the configuration file will be stored. Cannot be null, empty, or consist only of
+    /// white-space characters.</param>
+    /// <exception cref="ArgumentException">Thrown if configDir is null, empty, or consists only of white-space characters.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the columnizer name is null or empty.</exception>
+    public void Configure (ILogLineMemoryColumnizerCallback callback, string configDir)
+    {
+        // Validate inputs
+        if (string.IsNullOrWhiteSpace(configDir))
+        {
+            throw new ArgumentException(Resources.RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty, nameof(configDir));
+        }
+
+        string name = GetName();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException(Resources.RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty);
+        }
+
+        // Ensure directory exists
+        if (!Directory.Exists(configDir))
+        {
+            try
+            {
+                _ = Directory.CreateDirectory(configDir);
+            }
+            catch (Exception ex) when (ex is IOException or
+                                             UnauthorizedAccessException)
+            {
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory, ex.Message),
+                                    Resources.RegexColumnizer_UI_Title_Error,
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        string filePath = Path.Join(configDir, $"{name}Columnizer.json");
+
+        RegexColumnizerConfigDialog dlg = new(_config);
+        if (dlg.ShowDialog() == DialogResult.OK)
+        {
+            try
+            {
+                // Only validate regex if expression is provided (empty is allowed and uses default)
+                if (!string.IsNullOrWhiteSpace(dlg.Config.Expression))
+                {
+                    // Test regex compilation to catch errors early
+                    _ = RegexHelper.CreateSafeRegex(dlg.Config.Expression);
+                }
+
+                // Save configuration
+                string json = JsonConvert.SerializeObject(dlg.Config, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+
+                _config = dlg.Config;
+                Init();
+            }
+            catch (RegexMatchTimeoutException ex)
+            {
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_RegexTimeout, ex.Message), Resources.RegexColumnizer_UI_Title_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (ArgumentException ex)
+            {
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_InvalidRegexPattern, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToSaveConfiguration, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 

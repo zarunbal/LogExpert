@@ -136,11 +136,11 @@ public class RegexHelperTests
         var pattern = @"\d{4}-\d{2}-\d{2}";
 
         // Act
-        var result = RegexHelper.IsValidPattern(pattern, out var error);
+        var (isValid, error) = RegexHelper.IsValidPattern(pattern);
 
         // Assert
-        Assert.That(result, Is.True);
-        Assert.That(error, Is.Null);
+        Assert.That(isValid, Is.True);
+        Assert.That(error, Is.Empty);
     }
 
     [Test]
@@ -150,10 +150,10 @@ public class RegexHelperTests
         var pattern = "[invalid";
 
         // Act
-        var result = RegexHelper.IsValidPattern(pattern, out var error);
+        var (isValid, error) = RegexHelper.IsValidPattern(pattern);
 
         // Assert
-        Assert.That(result, Is.False);
+        Assert.That(isValid, Is.False);
         Assert.That(error, Is.Not.Null);
         Assert.That(error, Does.Contain("Invalid pattern").Or.Contain("parsing").Or.Contain("Unterminated"));
     }
@@ -162,10 +162,10 @@ public class RegexHelperTests
     public void IsValidPattern_WithNullPattern_ShouldReturnFalse ()
     {
         // Act
-        var result = RegexHelper.IsValidPattern(null!, out var error);
+        var (isValid, error) = RegexHelper.IsValidPattern(null!);
 
         // Assert
-        Assert.That(result, Is.False);
+        Assert.That(isValid, Is.False);
         Assert.That(error, Is.Not.Null);
     }
 
@@ -173,10 +173,10 @@ public class RegexHelperTests
     public void IsValidPattern_WithEmptyPattern_ShouldReturnFalse ()
     {
         // Act
-        var result = RegexHelper.IsValidPattern(string.Empty, out var error);
+        var (isValid, error) = RegexHelper.IsValidPattern(string.Empty);
 
         // Assert
-        Assert.That(result, Is.False);
+        Assert.That(isValid, Is.False);
         Assert.That(error, Is.Not.Null);
     }
 

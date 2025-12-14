@@ -1,0 +1,16 @@
+<Project>
+  <!-- This file prevents the parent Directory.Build.props from affecting BenchmarkDotNet's generated projects -->
+  <PropertyGroup>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <!-- Do NOT include the shared AssemblyInfo.cs -->
+  <ItemGroup>
+    <Compile Remove="$(MSBuildThisFileDirectory)..\Solution Items\AssemblyInfo.cs" />
+    <Compile Remove="..\Solution Items\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <!-- Prevent parent Directory.Build.props from being applied -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="false" />
+</Project>

@@ -2,8 +2,6 @@ using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Interface;
 
-using NLog;
-
 namespace LogExpert.UI.Controls.LogWindow;
 
 internal class TimeSpreadCalculator
@@ -13,12 +11,11 @@ internal class TimeSpreadCalculator
     private const int INACTIVITY_TIME = 2000;
 
     private const int MAX_CONTRAST = 1300;
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly EventWaitHandle _calcEvent = new ManualResetEvent(false);
     private readonly ColumnizerCallback _callback;
 
-    private readonly object _diffListLock = new();
+    private readonly Lock _diffListLock = new();
     private readonly EventWaitHandle _lineCountEvent = new ManualResetEvent(false);
 
     //TODO Refactor that it does not need LogWindow
@@ -211,7 +208,7 @@ internal class TimeSpreadCalculator
         var lineNum = 0;
         var lastLineNum = _callback.GetLineCount() - 1;
         _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
-        _endTimestamp = _logWindow.GetTimestampForLine(ref lastLineNum, false);
+        (_endTimestamp, lastLineNum) = _logWindow.GetTimestampForLine(lastLineNum, false);
 
         var timePerLineSum = 0;
 
@@ -275,7 +272,7 @@ internal class TimeSpreadCalculator
         var lineNum = 0;
         var lastLineNum = _callback.GetLineCount() - 1;
         _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
-        _endTimestamp = _logWindow.GetTimestampForLine(ref lastLineNum, false);
+        (_endTimestamp, lastLineNum) = _logWindow.GetTimestampForLine(lastLineNum, false);
 
         if (_startTimestamp != DateTime.MinValue && _endTimestamp != DateTime.MinValue)
         {

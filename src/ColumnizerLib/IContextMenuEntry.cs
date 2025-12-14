@@ -32,9 +32,9 @@ public interface IContextMenuEntry
     ///   <li>null: No menu entry is displayed.</li>
     ///   </ul>
     /// </returns>
-    string GetMenuText (IList<int> loglines, ILogLineColumnizer columnizer, ILogExpertCallback callback);
+    string GetMenuText (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback);
 
-    string GetMenuText (int linesCount, ILogLineColumnizer columnizer, ILogLine logline);
+    string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline);
 
 
     /// <summary>
@@ -46,9 +46,9 @@ public interface IContextMenuEntry
     ///     if necessary.</param>
     /// <param name="callback">The callback interface implemented by LogExpert. You can use the functions
     ///     for retrieving log lines or pass it along to functions of the Columnizer if needed.</param>
-    void MenuSelected (IList<int> loglines, ILogLineColumnizer columnizer, ILogExpertCallback callback);
+    void MenuSelected (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback);
 
-    void MenuSelected (int linesCount, ILogLineColumnizer columnizer, ILogLine logline);
+    void MenuSelected (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline);
 
     #endregion
 }

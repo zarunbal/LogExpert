@@ -67,6 +67,22 @@ public interface ILogWindow
     ILogLine GetLogLineWithWait (int lineNum);
 
     /// <summary>
+    /// Retrieves the memory representation of a log line at the specified line number.
+    /// </summary>
+    /// <param name="lineNum">The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
+    /// number of lines.</param>
+    /// <returns>An object that provides access to the memory of the specified log line.</returns>
+    ILogLineMemory GetLineMemory (int lineNum);
+
+    /// <summary>
+    /// Retrieves the log line memory for the specified line number, waiting if the data is not immediately available.
+    /// </summary>
+    /// <param name="lineNum">The zero-based index of the log line to retrieve. Must be greater than or equal to 0.</param>
+    /// <returns>An object representing the memory for the specified log line. The returned object provides access to the log
+    /// line's content and associated metadata.</returns>
+    ILogLineMemory GetLogLineMemoryWithWait (int lineNum);
+
+    /// <summary>
     /// Gets the timestamp for the line at or after the specified line number,
     /// searching forward through the file.
     /// </summary>
@@ -93,26 +109,18 @@ public interface ILogWindow
     /// <summary>
     /// Gets the timestamp for the line at or before the specified line number,
     /// searching backward through the file.
+    /// second.
     /// </summary>
-    /// <param name="lastLineNum">
-    /// A reference to the line number to start searching from.
-    /// This value is updated to the line number where the timestamp was found.
-    /// </param>
-    /// <param name="roundToSeconds">
-    /// If <c>true</c>, the returned timestamp is rounded to the nearest second.
-    /// </param>
-    /// <returns>
-    /// The timestamp of the line at or before the specified line number,
-    /// or <see cref="DateTime.MinValue"/> if no valid timestamp is found.
-    /// </returns>
+    /// <param name="lastLineNum">A reference to the line number to start searching from. This value is updated to the line number where the timestamp was found.</param>
+    /// <param name="roundToSeconds">true to round the timestamp to the nearest second; otherwise, false to return the precise timestamp.</param>
+    /// <returns>A tuple containing the timestamp for the specified line and the last line number for which a timestamp is
+    /// available.</returns>
     /// <remarks>
     /// Not all log lines may contain timestamps. This method searches backward
     /// from the given line number until it finds a line with a valid timestamp.
-    /// The <paramref name="lastLineNum"/> parameter is updated to reflect the line
-    /// where the timestamp was found.
+    /// the returned tuple contains the lastLineNumber
     /// </remarks>
-    //TODO Find a way to not use a referenced int (https://github.com/LogExperts/LogExpert/issues/404)
-    DateTime GetTimestampForLine (ref int lastLineNum, bool roundToSeconds);
+    (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds);
 
     /// <summary>
     /// Finds the line number that corresponds to the specified timestamp within

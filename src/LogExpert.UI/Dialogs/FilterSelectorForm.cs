@@ -12,13 +12,13 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
     #region Fields
 
     private readonly ILogLineColumnizerCallback _callback;
-    private readonly IList<ILogLineColumnizer> _columnizerList;
+    private readonly IList<ILogLineMemoryColumnizer> _columnizerList;
 
     #endregion
 
     #region cTor
 
-    public FilterSelectorForm (IList<ILogLineColumnizer> existingColumnizerList, ILogLineColumnizer currentColumnizer, ILogLineColumnizerCallback callback, IConfigManager configManager)
+    public FilterSelectorForm (IList<ILogLineMemoryColumnizer> existingColumnizerList, ILogLineMemoryColumnizer currentColumnizer, ILogLineColumnizerCallback callback, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -77,7 +77,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     #region Properties
 
-    public ILogLineColumnizer SelectedColumnizer { get; private set; }
+    public ILogLineMemoryColumnizer SelectedColumnizer { get; private set; }
 
     public bool ApplyToAll => applyToAllCheckBox.Checked;
 
@@ -90,7 +90,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 
     private void OnFilterComboBoxFormat (object sender, ListControlConvertEventArgs e)
     {
-        if (e.ListItem is ILogLineColumnizer columnizer)
+        if (e.ListItem is ILogLineMemoryColumnizer columnizer)
         {
             e.Value = columnizer.GetName();
         }

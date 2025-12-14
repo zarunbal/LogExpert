@@ -5,7 +5,6 @@ using System.Text;
 
 using ColumnizerLib;
 
-using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -208,11 +207,11 @@ internal partial class SettingsDialog : Form
             radioButtonSessionApplicationStartupDir.Checked = true;
         }
 
+        //Keep Order or, exception is thrown with upDownMaxDisplayLength.Value because its bigger then maximum
         upDownMaximumLineLength.Value = Preferences.MaxLineLength;
-        upDownMaxDisplayLength.Value = Preferences.MaxDisplayLength;
 
-        // Ensure MaxDisplayLength doesn't exceed MaxLineLength
         upDownMaxDisplayLength.Maximum = Math.Min(upDownMaxDisplayLength.Maximum, upDownMaximumLineLength.Value);
+        upDownMaxDisplayLength.Value = Math.Min(Preferences.MaxDisplayLength, (int)upDownMaxDisplayLength.Maximum);
 
         upDownMaximumFilterEntriesDisplayed.Value = Preferences.MaximumFilterEntriesDisplayed;
         upDownMaximumFilterEntries.Value = Preferences.MaximumFilterEntries;
@@ -234,6 +233,7 @@ internal partial class SettingsDialog : Form
         FillMultifileSettings();
         FillEncodingList();
         FillLanguageList();
+        FillReaderTypeList();
 
         comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
         comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
@@ -242,8 +242,18 @@ internal partial class SettingsDialog : Form
         checkBoxAutoPick.Checked = Preferences.AutoPick;
         checkBoxAskCloseTabs.Checked = Preferences.AskForClose;
         checkBoxColumnFinder.Checked = Preferences.ShowColumnFinder;
-        checkBoxLegacyReader.Checked = Preferences.UseLegacyReader;
+
         checkBoxShowErrorMessageOnlyOneInstance.Checked = Preferences.ShowErrorMessageAllowOnlyOneInstances;
+    }
+
+    private void FillReaderTypeList ()
+    {
+        foreach (var readerType in Enum.GetValues<ReaderType>())
+        {
+            _ = comboBoxReaderType.Items.Add(readerType);
+        }
+
+        comboBoxReaderType.SelectedItem = Preferences.ReaderType;
     }
 
     private void FillPortableMode ()
@@ -397,7 +407,7 @@ internal partial class SettingsDialog : Form
 
             _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
@@ -610,7 +620,7 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            _selectedTool.Name = Util.IsNullOrSpaces(textBoxToolName.Text) ? textBoxTool.Text : textBoxToolName.Text;
+            _selectedTool.Name = string.IsNullOrWhiteSpace(textBoxToolName.Text) ? textBoxTool.Text : textBoxToolName.Text;
             _selectedTool.Cmd = textBoxTool.Text;
             _selectedTool.Args = textBoxArguments.Text;
             _selectedTool.ColumnizerName = comboBoxColumnizer.Text;
@@ -759,7 +769,7 @@ internal partial class SettingsDialog : Form
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
-        Preferences.UseLegacyReader = checkBoxLegacyReader.Checked;
+        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.Pipeline;
 
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
@@ -1063,7 +1073,7 @@ internal partial class SettingsDialog : Form
         {
             var iconFile = _selectedTool.IconFile;
 
-            if (Util.IsNullOrSpaces(iconFile))
+            if (string.IsNullOrWhiteSpace(iconFile))
             {
                 iconFile = textBoxTool.Text;
             }
@@ -1231,7 +1241,7 @@ internal partial class SettingsDialog : Form
             { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
             { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
             { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
-            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
+            { comboBoxReaderType, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp }
         };
     }
 
