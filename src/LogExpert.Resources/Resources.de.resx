@@ -1689,22 +1689,22 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Start: {0}
 		Ende: {1}</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
 		<value>Sitzung laden</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_Informational" xml:space="preserve">
 		<value>Das Wiederherstellen des Layouts erfordert eine leere Arbeitsfläche.</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_ChooseHowToProceed" xml:space="preserve">
 		<value>Bitte wählen Sie, wie Sie fortfahren möchten:</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_CloseTabs" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_CloseTabs" xml:space="preserve">
 		<value>Vorhandene Tabs schließen</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_NewWindow" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_NewWindow" xml:space="preserve">
 		<value>Neues Fenster öffnen</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_Ignore" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_Ignore" xml:space="preserve">
 		<value>Layoutdaten ignorieren</value>
 	</data>
   <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">

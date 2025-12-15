@@ -2015,6 +2015,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     //}
 
     [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("windows")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
         try
@@ -2038,13 +2039,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var projectData = loadResult.ProjectData;
             var hasLayoutData = projectData.TabLayoutXml != null;
 
-            // Handle missing files
+            // Handle missing files or layout options
             if (loadResult.RequiresUserIntervention)
             {
-                _logger.Warn($"Project has {loadResult.ValidationResult.MissingFiles.Count} missing files");
-
                 // If NO valid files AND NO alternatives, always cancel
-                if (!loadResult.HasValidFiles && loadResult.ValidationResult.PossibleAlternatives.Count == 0)
+                if (loadResult.RequiresUserIntervention && !loadResult.HasValidFiles && loadResult.ValidationResult.PossibleAlternatives.Count == 0)
                 {
                     _ = MessageBox.Show(
                         Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
@@ -2054,15 +2053,29 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     return;
                 }
 
-                // Show enhanced dialog with browsing capability
-                // This handles cases where:
-                // - Some files are valid and some are missing
-                // - All files are missing BUT alternatives are available
-                var dialogResult = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, out var selectedAlternatives);
+                // Show enhanced dialog with browsing capability and layout options
+                var dialogResult = MissingFilesDialog.ShowDialog(
+                    loadResult.ValidationResult,
+                    hasLayoutData,
+                    out var selectedAlternatives);
 
                 if (dialogResult == MissingFilesDialogResult.Cancel)
                 {
                     return;
+                }
+
+                // Handle layout-related results
+                switch (dialogResult)
+                {
+                    case MissingFilesDialogResult.CloseTabsAndRestoreLayout:
+                        CloseAllTabs();
+                        break;
+                    case MissingFilesDialogResult.OpenInNewWindow:
+                        LogExpertProxy.NewWindow([.. projectData.FileNames]);
+                        return;
+                    case MissingFilesDialogResult.IgnoreLayout:
+                        hasLayoutData = false;
+                        break;
                 }
 
                 // Apply selected alternatives
@@ -2091,70 +2104,51 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                             Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
-
                     }
                 }
 
                 // Load only valid files (original or replaced with alternatives)
-                _logger.Info($"Loading {loadResult.ValidationResult.ValidFiles.Count} valid files");
-
-                // Filter project data to only include valid files (considering alternatives)
-                var filesToLoad = new List<string>();
-                foreach (var fileName in projectData.FileNames)
+                if (loadResult.RequiresUserIntervention)
                 {
-                    // Check if this file exists (either original or alternative)
-                    try
+                    _logger.Info($"Loading {loadResult.ValidationResult.ValidFiles.Count} valid files");
+
+                    // Filter project data to only include valid files (considering alternatives)
+                    var filesToLoad = new List<string>();
+                    foreach (var fileName in projectData.FileNames)
                     {
-                        var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(fileName);
-                        if (fs != null)
+                        // Check if this file exists (either original or alternative)
+                        try
                         {
-                            var fileInfo = fs.GetLogfileInfo(fileName);
-                            if (fileInfo != null)
+                            var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(fileName);
+                            if (fs != null)
                             {
-                                filesToLoad.Add(fileName);
+                                var fileInfo = fs.GetLogfileInfo(fileName);
+                                if (fileInfo != null)
+                                {
+                                    filesToLoad.Add(fileName);
+                                }
                             }
                         }
+                        catch (Exception ex) when (ex is FileNotFoundException or
+                                                         DirectoryNotFoundException or
+                                                         UnauthorizedAccessException or
+                                                         IOException or
+                                                         UriFormatException or
+                                                         ArgumentException or
+                                                         ArgumentNullException)
+                        {
+                            // File doesn't exist or can't be accessed, skip it
+                            _logger.Warn($"Skipping inaccessible file: {fileName}");
+                        }
                     }
-                    catch (Exception ex) when (ex is FileNotFoundException or
-                                                     DirectoryNotFoundException or
-                                                     UnauthorizedAccessException or
-                                                     IOException or
-                                                     UriFormatException or
-                                                     ArgumentException or
-                                                     ArgumentNullException)
-                    {
-                        // File doesn't exist or can't be accessed, skip it
-                        _logger.Warn($"Skipping inaccessible file: {fileName}");
-                    }
-                }
 
-                projectData.FileNames = filesToLoad;
+                    projectData.FileNames = filesToLoad;
+                }
             }
             else
             {
                 // All files valid - proceed normally
                 _logger.Info($"All {projectData.FileNames.Count} files found, loading project");
-            }
-
-            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
-            {
-                //TODO Project load dialog needs to be replaced with the new dialog
-                ProjectLoadDlg dlg = new();
-                if (DialogResult.Cancel != dlg.ShowDialog())
-                {
-                    switch (dlg.ProjectLoadResult)
-                    {
-                        case ProjectLoadDlgResult.IgnoreLayout:
-                            hasLayoutData = false;
-                            break;
-                        case ProjectLoadDlgResult.CloseTabs:
-                            CloseAllTabs();
-                            break;
-                        case ProjectLoadDlgResult.NewWindow:
-                            LogExpertProxy.NewWindow([projectFileName]);
-                            return;
-                    }
-                }
             }
 
             foreach (var fileName in projectData.FileNames)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Classes.Persister;
@@ -6,6 +7,7 @@ namespace LogExpert.UI.Dialogs;
 
 /// <summary>
 /// Enhanced dialog for handling missing files with browsing and alternative selection.
+/// Also handles layout restoration options when loading a project with existing tabs.
 /// Phase 2 implementation of the Project File Validator.
 /// </summary>
 [SupportedOSPlatform("windows")]
@@ -15,6 +17,7 @@ public partial class MissingFilesDialog : Form
 
     private readonly ProjectValidationResult _validationResult;
     private readonly Dictionary<string, MissingFileItem> _fileItems;
+    private readonly bool _hasLayoutData;
 
     #endregion
 
@@ -39,7 +42,9 @@ public partial class MissingFilesDialog : Form
     /// Constructor for MissingFilesDialog.
     /// </summary>
     /// <param name="validationResult">Validation result containing file information</param>
-    public MissingFilesDialog (ProjectValidationResult validationResult)
+    /// <param name="showLayoutOptions">Whether to show layout restoration options</param>
+    /// <param name="hasLayoutData">Whether the project has layout data to restore</param>
+    public MissingFilesDialog (ProjectValidationResult validationResult, bool hasLayoutData = false)
     {
         ArgumentNullException.ThrowIfNull(validationResult);
 
@@ -47,11 +52,13 @@ public partial class MissingFilesDialog : Form
         _fileItems = [];
         SelectedAlternatives = [];
         Result = MissingFilesDialogResult.Cancel;
+        _hasLayoutData = hasLayoutData;
 
         InitializeComponent();
         InitializeFileItems();
         PopulateListView();
         UpdateSummary();
+        ConfigureLayoutOptions();
     }
 
     #endregion
@@ -84,9 +91,42 @@ public partial class MissingFilesDialog : Form
         return dialog.Result;
     }
 
+    /// <summary>
+    /// Shows the dialog with layout options and returns alternatives if selected.
+    /// </summary>
+    /// <param name="validationResult">Validation result</param>
+    /// <param name="showLayoutOptions">Whether to show layout restoration options</param>
+    /// <param name="hasLayoutData">Whether the project has layout data</param>
+    /// <param name="selectedAlternatives">Dictionary of selected alternatives</param>
+    /// <returns>Dialog result</returns>
+    public static MissingFilesDialogResult ShowDialog (ProjectValidationResult validationResult, bool hasLayoutData, out Dictionary<string, string> selectedAlternatives)
+    {
+        using var dialog = new MissingFilesDialog(validationResult, hasLayoutData);
+        _ = dialog.ShowDialog();
+        selectedAlternatives = dialog.SelectedAlternatives;
+        return dialog.Result;
+    }
+
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Configures visibility and state of layout options panel.
+    /// </summary>
+    private void ConfigureLayoutOptions ()
+    {
+        Text = Resources.MissingFilesDialog_UI_Title;
+
+        panelLayoutOptions.Visible = true;
+        labelLayoutInfo.Text = Resources.MissingFilesDialog_UI_Label_Informational;
+        radioButtonCloseTabs.Text = Resources.MissingFilesDialog_UI_Button_CloseTabs;
+        radioButtonNewWindow.Text = Resources.MissingFilesDialog_UI_Button_NewWindow;
+        radioButtonIgnoreLayout.Text = Resources.MissingFilesDialog_UI_Button_Ignore;
+        radioButtonCloseTabs.Checked = true;
+        panelLayoutOptions.BringToFront();
+        Height += panelLayoutOptions.Height;
+    }
 
     /// <summary>
     /// Creates status icons for the ImageList.
@@ -187,10 +227,11 @@ public partial class MissingFilesDialog : Form
                 Tag = fileItem,
                 ImageKey = fileItem.Status switch
                 {
-                    FileStatus.Valid => "Valid",
-                    FileStatus.MissingWithAlternatives => "Alternative",
-                    FileStatus.AlternativeSelected => "Selected",
-                    _ => "Missing"
+                    FileStatus.Valid => Resources.MissingFilesDialog_UI_FileStatus_Valid,
+                    FileStatus.MissingWithAlternatives => Resources.MissingFilesDialog_UI_FileStatus_Alternative,
+                    FileStatus.AlternativeSelected => Resources.MissingFilesDialog_UI_FileStatus_Selected,
+                    FileStatus.Missing => Resources.MissingFilesDialog_UI_FileStatus_Missing,
+                    _ => Resources.MissingFilesDialog_UI_FileStatus_Missing
                 }
             };
 
@@ -226,7 +267,7 @@ public partial class MissingFilesDialog : Form
         var totalCount = _fileItems.Count;
         var missingCount = totalCount - validCount;
 
-        labelSummary.Text = $"Found: {validCount} of {totalCount} files ({missingCount} missing)";
+        labelSummary.Text = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Label_Summary, validCount, totalCount, missingCount);
 
         // Enable "Load and Update Session" only if user has selected alternatives
         var hasSelectedAlternatives = _fileItems.Values.Any(f => f.Status == FileStatus.AlternativeSelected);
@@ -236,11 +277,11 @@ public partial class MissingFilesDialog : Form
         if (hasSelectedAlternatives)
         {
             var alternativeCount = _fileItems.Values.Count(f => f.Status == FileStatus.AlternativeSelected);
-            buttonLoadAndUpdate.Text = $"Load && Update Session ({alternativeCount})";
+            buttonLoadAndUpdate.Text = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount, alternativeCount);
         }
         else
         {
-            buttonLoadAndUpdate.Text = "Load && Update Session";
+            buttonLoadAndUpdate.Text = Resources.MissingFilesDialog_UI_Button_LoadUpdateSession;
         }
     }
 
@@ -248,12 +289,13 @@ public partial class MissingFilesDialog : Form
     /// Opens a file browser dialog for the specified missing file.
     /// </summary>
     /// <param name="fileItem">The file item to browse for</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally Left Blank")]
     private void BrowseForFile (MissingFileItem fileItem)
     {
         using var openFileDialog = new OpenFileDialog
         {
-            Title = $"Locate: {fileItem.DisplayName}",
-            Filter = "Log Files (*.log;*.txt)|*.log;*.txt|All Files (*.*)|*.*",
+            Title = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Filter_Title, fileItem.DisplayName),
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Filter_Logfiles, "(*.lxp)", "(*.*)|*.*"),
             FileName = fileItem.DisplayName,
             CheckFileExists = true,
             Multiselect = false
@@ -286,6 +328,37 @@ public partial class MissingFilesDialog : Form
             PopulateListView();
             UpdateSummary();
         }
+    }
+
+    /// <summary>
+    /// Determines the appropriate result based on layout selection and button clicked.
+    /// </summary>
+    /// <param name="baseResult">The base result from the button click (LoadValidFiles or LoadAndUpdateSession)</param>
+    /// <returns>The final result considering layout options</returns>
+    private MissingFilesDialogResult DetermineResult (MissingFilesDialogResult baseResult)
+    {
+        // If layout options are not shown or there's no layout data, return the base result
+        if (!_hasLayoutData || !panelLayoutOptions.Visible)
+        {
+            return baseResult;
+        }
+
+        // Determine layout-related result
+        if (radioButtonCloseTabs.Checked)
+        {
+            return MissingFilesDialogResult.CloseTabsAndRestoreLayout;
+        }
+        else if (radioButtonNewWindow.Checked)
+        {
+            return MissingFilesDialogResult.OpenInNewWindow;
+        }
+        else if (radioButtonIgnoreLayout.Checked)
+        {
+            return MissingFilesDialogResult.IgnoreLayout;
+        }
+
+        // Default to base result
+        return baseResult;
     }
 
     #endregion
@@ -344,14 +417,14 @@ public partial class MissingFilesDialog : Form
 
     private void OnButtonLoadClick (object sender, EventArgs e)
     {
-        Result = MissingFilesDialogResult.LoadValidFiles;
+        Result = DetermineResult(MissingFilesDialogResult.LoadValidFiles);
         DialogResult = DialogResult.OK;
         Close();
     }
 
     private void OnButtonLoadAndUpdateClick (object sender, EventArgs e)
     {
-        Result = MissingFilesDialogResult.LoadAndUpdateSession;
+        Result = DetermineResult(MissingFilesDialogResult.LoadAndUpdateSession);
         DialogResult = DialogResult.OK;
         Close();
     }

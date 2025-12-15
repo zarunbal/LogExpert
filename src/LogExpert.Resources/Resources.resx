@@ -1692,22 +1692,22 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Start: {0}
 		End: {1}</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
         <value>Loading Session</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_Informational" xml:space="preserve">
         <value>Restoring layout requires an empty workbench.</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_ChooseHowToProceed" xml:space="preserve">
         <value>Please choose how to proceed:</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Button_CloseTabs" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_CloseTabs" xml:space="preserve">
         <value>Close existing tabs</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Button_NewWindow" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_NewWindow" xml:space="preserve">
         <value>Open new window</value>
     </data>
-  <data name="ProjectLoadDlg_UI_Button_Ignore" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_Ignore" xml:space="preserve">
         <value>Ignore layout data</value>
     </data>
   <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">
@@ -2097,5 +2097,32 @@ Restart LogExpert to apply changes?</value>
   </data>
   <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Session Update Failed</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Alternative" xml:space="preserve">
+    <value>Alternative</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Selected" xml:space="preserve">
+    <value>Selected</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Label_Summary" xml:space="preserve">
+    <value>Found: {0} of {1} files ({2} missing)</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount" xml:space="preserve">
+    <value>Load &amp;&amp; Update Session ({0})</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_LoadUpdateSession" xml:space="preserve">
+    <value>Load &amp;&amp; Update Session</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Logfiles" xml:space="preserve">
+    <value>Log Files {0}|All Files {2}</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Title" xml:space="preserve">
+    <value>Locate: {0}</value>
   </data>
 </root>

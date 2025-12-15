@@ -3768,6 +3768,141 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close existing tabs.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Button_CloseTabs {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Button_CloseTabs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore layout data.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Button_Ignore {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Button_Ignore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load &amp;&amp; Update Session.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Button_LoadUpdateSession {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Button_LoadUpdateSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open new window.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Button_NewWindow {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Button_NewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load &amp;&amp; Update Session ({0}).
+        /// </summary>
+        public static string MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alternative.
+        /// </summary>
+        public static string MissingFilesDialog_UI_FileStatus_Alternative {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_FileStatus_Alternative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing.
+        /// </summary>
+        public static string MissingFilesDialog_UI_FileStatus_Missing {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_FileStatus_Missing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected.
+        /// </summary>
+        public static string MissingFilesDialog_UI_FileStatus_Selected {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_FileStatus_Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Valid.
+        /// </summary>
+        public static string MissingFilesDialog_UI_FileStatus_Valid {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_FileStatus_Valid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log Files {0}|All Files {2}.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Filter_Logfiles {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Filter_Logfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locate: {0}.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Filter_Title {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Filter_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please choose how to proceed:.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Label_ChooseHowToProceed {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Label_ChooseHowToProceed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restoring layout requires an empty workbench..
+        /// </summary>
+        public static string MissingFilesDialog_UI_Label_Informational {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Label_Informational", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found: {0} of {1} files ({2} missing).
+        /// </summary>
+        public static string MissingFilesDialog_UI_Label_Summary {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Label_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Session.
+        /// </summary>
+        public static string MissingFilesDialog_UI_Title {
+            get {
+                return ResourceManager.GetString("MissingFilesDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File name pattern:.
         /// </summary>
         public static string MultiFileMaskDialog_UI_Label_FileNamePattern {
@@ -4459,60 +4594,6 @@ namespace LogExpert {
         public static string Program_UI_Error_Pipe_CannotConnectToFirstInstance {
             get {
                 return ResourceManager.GetString("Program_UI_Error_Pipe_CannotConnectToFirstInstance", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Close existing tabs.
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Button_CloseTabs {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Button_CloseTabs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ignore layout data.
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Button_Ignore {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Button_Ignore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open new window.
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Button_NewWindow {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Button_NewWindow", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please choose how to proceed:.
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Label_ChooseHowToProceed {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Label_ChooseHowToProceed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restoring layout requires an empty workbench..
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Label_Informational {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Label_Informational", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loading Session.
-        /// </summary>
-        public static string ProjectLoadDlg_UI_Title {
-            get {
-                return ResourceManager.GetString("ProjectLoadDlg_UI_Title", resourceCulture);
             }
         }
         

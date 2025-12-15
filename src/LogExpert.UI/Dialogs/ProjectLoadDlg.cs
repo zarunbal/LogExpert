@@ -30,12 +30,12 @@ internal partial class ProjectLoadDlg : Form
 
     private void ApplyResources ()
     {
-        Text = Resources.ProjectLoadDlg_UI_Title;
-        labelInformational.Text = Resources.ProjectLoadDlg_UI_Label_Informational;
-        labelChooseHowToProceed.Text = Resources.ProjectLoadDlg_UI_Label_ChooseHowToProceed;
-        buttonCloseTabs.Text = Resources.ProjectLoadDlg_UI_Button_CloseTabs;
-        buttonNewWindow.Text = Resources.ProjectLoadDlg_UI_Button_NewWindow;
-        buttonIgnore.Text = Resources.ProjectLoadDlg_UI_Button_Ignore;
+        Text = Resources.MissingFilesDialog_UI_Title;
+        labelInformational.Text = Resources.MissingFilesDialog_UI_Label_Informational;
+        labelChooseHowToProceed.Text = Resources.MissingFilesDialog_UI_Label_ChooseHowToProceed;
+        buttonCloseTabs.Text = Resources.MissingFilesDialog_UI_Button_CloseTabs;
+        buttonNewWindow.Text = Resources.MissingFilesDialog_UI_Button_NewWindow;
+        buttonIgnore.Text = Resources.MissingFilesDialog_UI_Button_Ignore;
     }
 
     #endregion

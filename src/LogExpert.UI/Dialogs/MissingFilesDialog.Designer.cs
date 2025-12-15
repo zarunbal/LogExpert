@@ -47,9 +47,17 @@ partial class MissingFilesDialog
         imageListStatus = new ImageList(components);
         panelButtons = new Panel();
         panelTop = new Panel();
-        var buttonLayoutPanel = new FlowLayoutPanel();
+        panelLayoutOptions = new Panel();
+        labelLayoutInfo = new Label();
+        radioButtonCloseTabs = new RadioButton();
+        radioButtonNewWindow = new RadioButton();
+        radioButtonIgnoreLayout = new RadioButton();
+        buttonLayoutPanel = new FlowLayoutPanel();
         
         SuspendLayout();
+        panelLayoutOptions.SuspendLayout();
+        panelTop.SuspendLayout();
+        panelButtons.SuspendLayout();
         
         // 
         // imageListStatus
@@ -89,12 +97,66 @@ partial class MissingFilesDialog
         labelSummary.TabIndex = 1;
         
         // 
+        // labelLayoutInfo
+        // 
+        labelLayoutInfo.AutoSize = false;
+        labelLayoutInfo.Location = new Point(10, 5);
+        labelLayoutInfo.Size = new Size(400, 25);
+        labelLayoutInfo.Text = "This session contains layout data. How would you like to proceed?";
+        labelLayoutInfo.TextAlign = ContentAlignment.MiddleLeft;
+        labelLayoutInfo.TabIndex = 0;
+        
+        // 
+        // radioButtonCloseTabs
+        // 
+        radioButtonCloseTabs.AutoSize = true;
+        radioButtonCloseTabs.Checked = true;
+        radioButtonCloseTabs.Location = new Point(10, 35);
+        radioButtonCloseTabs.Name = "radioButtonCloseTabs";
+        radioButtonCloseTabs.Size = new Size(200, 24);
+        radioButtonCloseTabs.TabIndex = 1;
+        radioButtonCloseTabs.TabStop = true;
+        radioButtonCloseTabs.Text = "Close existing tabs and restore layout";
+        radioButtonCloseTabs.UseVisualStyleBackColor = true;
+        
+        // 
+        // radioButtonNewWindow
+        // 
+        radioButtonNewWindow.AutoSize = true;
+        radioButtonNewWindow.Location = new Point(10, 60);
+        radioButtonNewWindow.Name = "radioButtonNewWindow";
+        radioButtonNewWindow.Size = new Size(200, 24);
+        radioButtonNewWindow.TabIndex = 2;
+        radioButtonNewWindow.Text = "Open in a new window";
+        radioButtonNewWindow.UseVisualStyleBackColor = true;
+        
+        // 
+        // radioButtonIgnoreLayout
+        // 
+        radioButtonIgnoreLayout.AutoSize = true;
+        radioButtonIgnoreLayout.Location = new Point(10, 85);
+        radioButtonIgnoreLayout.Name = "radioButtonIgnoreLayout";
+        radioButtonIgnoreLayout.Size = new Size(200, 24);
+        radioButtonIgnoreLayout.TabIndex = 3;
+        radioButtonIgnoreLayout.Text = "Ignore layout data";
+        radioButtonIgnoreLayout.UseVisualStyleBackColor = true;
+        
+        // 
+        // panelLayoutOptions
+        // 
+        panelLayoutOptions.Controls.Add(radioButtonIgnoreLayout);
+        panelLayoutOptions.Controls.Add(radioButtonNewWindow);
+        panelLayoutOptions.Controls.Add(radioButtonCloseTabs);
+        panelLayoutOptions.Controls.Add(labelLayoutInfo);
+        panelLayoutOptions.Dock = DockStyle.Bottom;
+        panelLayoutOptions.Height = 115;
+        panelLayoutOptions.TabIndex = 3;
+        panelLayoutOptions.Visible = false;
+        
+        // 
         // listViewFiles
         // 
-        listViewFiles.Columns.AddRange([
-            columnFileName,
-            columnStatus,
-            columnPath]);
+        listViewFiles.Columns.AddRange(columnFileName, columnStatus, columnPath);
         listViewFiles.Dock = DockStyle.Fill;
         listViewFiles.FullRowSelect = true;
         listViewFiles.GridLines = true;
@@ -206,9 +268,10 @@ partial class MissingFilesDialog
         AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = buttonCancel;
         ClientSize = new Size(840, 500);
-        Controls.Add(listViewFiles);
-        Controls.Add(panelButtons);
-        Controls.Add(panelTop);
+        Controls.Add(listViewFiles);       
+        Controls.Add(panelLayoutOptions);  
+        Controls.Add(panelButtons);        
+        Controls.Add(panelTop);            
         FormBorderStyle = FormBorderStyle.Sizable;
         MinimumSize = new Size(600, 400);
         ShowIcon = false;
@@ -216,6 +279,11 @@ partial class MissingFilesDialog
         StartPosition = FormStartPosition.CenterParent;
         Text = "Missing Files";
         
+        panelLayoutOptions.ResumeLayout(false);
+        panelLayoutOptions.PerformLayout();
+        panelTop.ResumeLayout(false);
+        panelButtons.ResumeLayout(false);
+        panelButtons.PerformLayout();
         ResumeLayout(false);
     }
 
@@ -234,4 +302,10 @@ partial class MissingFilesDialog
     private ImageList imageListStatus;
     private Panel panelButtons;
     private Panel panelTop;
+    private Panel panelLayoutOptions;
+    private Label labelLayoutInfo;
+    private RadioButton radioButtonCloseTabs;
+    private RadioButton radioButtonNewWindow;
+    private RadioButton radioButtonIgnoreLayout;
+    private FlowLayoutPanel buttonLayoutPanel;
 }
