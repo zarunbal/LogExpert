@@ -585,20 +585,21 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var data = logWindow.Tag as LogWindowData;
         data.Color = _defaultTabColor;
-        SetTabColor(logWindow, _defaultTabColor);
+        //TODO SetTabColor and the Coloring must be reimplemented with a different UI Framework
+        //SetTabColor(logWindow, _defaultTabColor);
         //data.tabPage.BorderColor = this.defaultTabBorderColor;
-        if (!isTempFile)
-        {
-            foreach (var colorEntry in ConfigManager.Settings.FileColors)
-            {
-                if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
-                {
-                    data.Color = colorEntry.Color;
-                    SetTabColor(logWindow, colorEntry.Color);
-                    break;
-                }
-            }
-        }
+        //if (!isTempFile)
+        //{
+        //    foreach (var colorEntry in ConfigManager.Settings.FileColors)
+        //    {
+        //        if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
+        //        {
+        //            data.Color = colorEntry.Color;
+        //            //SetTabColor(logWindow, colorEntry.Color);
+        //            break;
+        //        }
+        //    }
+        //}
 
         if (!isTempFile)
         {
@@ -1045,9 +1046,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void AddToFileHistory (string fileName)
     {
-        bool FindName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
+        bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
 
-        var index = ConfigManager.Settings.FileHistoryList.FindIndex(FindName);
+        var index = ConfigManager.Settings.FileHistoryList.FindIndex(findName);
 
         if (index != -1)
         {
@@ -1372,7 +1373,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             oldLogWindow.BookmarkAdded -= OnBookmarkAdded;
             oldLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
             oldLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
-            DisconnectToolWindows(oldLogWindow);
+            DisconnectToolWindows();
         }
 
         if (newLogWindow != null)
@@ -1434,13 +1435,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _bookmarkWindow.SetCurrentFile(ctx);
     }
 
-    private void DisconnectToolWindows (LogWindow.LogWindow logWindow)
+    private void DisconnectToolWindows ()
     {
-        DisconnectBookmarkWindow(logWindow);
+        DisconnectBookmarkWindow();
     }
 
-    //TODO Find out if logwindow is necessary here
-    private void DisconnectBookmarkWindow (LogWindow.LogWindow logWindow)
+    private void DisconnectBookmarkWindow ()
     {
         _bookmarkWindow.SetBookmarkData(null);
         _bookmarkWindow.SetCurrentFile(null);
@@ -1460,6 +1460,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
         multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
         cellSelectModeToolStripMenuItem.Checked = e.CellSelectMode;
+
         RefreshEncodingMenuBar(e.CurrentEncoding);
 
         if (e.TimeshiftPossible && ConfigManager.Settings.Preferences.TimestampControl)
@@ -1679,6 +1680,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
+    //TODO Task based
     private void LedThreadProc ()
     {
         Thread.CurrentThread.Name = "LED Thread";
@@ -2002,44 +2004,159 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     //TODO Reimplementation needs a new UI Framework since, DockpanelSuite has no easy way to change TabColor
-    private static void SetTabColor (LogWindow.LogWindow logWindow, Color color)
-    {
-        //tabPage.BackLowColor = color;
-        //tabPage.BackLowColorDisabled = Color.FromArgb(255,
-        //  Math.Max(0, color.R - 50),
-        //  Math.Max(0, color.G - 50),
-        //  Math.Max(0, color.B - 50)
-        //  );
-    }
+    //private static void SetTabColor (LogWindow.LogWindow logWindow, Color color)
+    //{
+    //    //tabPage.BackLowColor = color;
+    //    //tabPage.BackLowColorDisabled = Color.FromArgb(255,
+    //    //  Math.Max(0, color.R - 50),
+    //    //  Math.Max(0, color.G - 50),
+    //    //  Math.Max(0, color.B - 50)
+    //    //  );
+    //}
 
     [SupportedOSPlatform("windows")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
-        var projectData = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
-        var hasLayoutData = projectData.TabLayoutXml != null;
-
-        if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
+        try
         {
-            ProjectLoadDlg dlg = new();
-            if (DialogResult.Cancel != dlg.ShowDialog())
+            _logger.Info($"Loading project from {projectFileName}");
+
+            // Load project with validation
+            var loadResult = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
+
+            // Check if project data was loaded
+            if (loadResult?.ProjectData == null)
             {
-                switch (dlg.ProjectLoadResult)
+                _ = MessageBox.Show(
+                    Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible,
+                    Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            var projectData = loadResult.ProjectData;
+            var hasLayoutData = projectData.TabLayoutXml != null;
+
+            // Handle missing files
+            if (loadResult.RequiresUserIntervention)
+            {
+                _logger.Warn($"Project has {loadResult.ValidationResult.MissingFiles.Count} missing files");
+
+                // If NO valid files AND NO alternatives, always cancel
+                if (!loadResult.HasValidFiles && loadResult.ValidationResult.PossibleAlternatives.Count == 0)
                 {
-                    case ProjectLoadDlgResult.IgnoreLayout:
-                        hasLayoutData = false;
-                        break;
-                    case ProjectLoadDlgResult.CloseTabs:
-                        CloseAllTabs();
-                        break;
-                    case ProjectLoadDlgResult.NewWindow:
-                        LogExpertProxy.NewWindow([projectFileName]);
-                        return;
+                    _ = MessageBox.Show(
+                        Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                        Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Show enhanced dialog with browsing capability
+                // This handles cases where:
+                // - Some files are valid and some are missing
+                // - All files are missing BUT alternatives are available
+                var dialogResult = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, out var selectedAlternatives);
+
+                if (dialogResult == MissingFilesDialogResult.Cancel)
+                {
+                    return;
+                }
+
+                // Apply selected alternatives
+                if (selectedAlternatives.Count > 0)
+                {
+                    _logger.Info($"User selected {selectedAlternatives.Count} alternative paths");
+
+                    // Replace original paths with selected alternatives in project data
+                    for (int i = 0; i < projectData.FileNames.Count; i++)
+                    {
+                        var originalPath = projectData.FileNames[i];
+                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
+                        {
+                            projectData.FileNames[i] = value;
+                            _logger.Info($"Replaced {Path.GetFileName(originalPath)} with {Path.GetFileName(value)}");
+                        }
+                    }
+
+                    // Update session file if user requested
+                    if (dialogResult == MissingFilesDialogResult.LoadAndUpdateSession)
+                    {
+                        ProjectPersister.SaveProjectData(projectFileName, projectData);
+
+                        _ = MessageBox.Show(
+                            Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
+                            Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
+                    }
+                }
+
+                // Load only valid files (original or replaced with alternatives)
+                _logger.Info($"Loading {loadResult.ValidationResult.ValidFiles.Count} valid files");
+
+                // Filter project data to only include valid files (considering alternatives)
+                var filesToLoad = new List<string>();
+                foreach (var fileName in projectData.FileNames)
+                {
+                    // Check if this file exists (either original or alternative)
+                    try
+                    {
+                        var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(fileName);
+                        if (fs != null)
+                        {
+                            var fileInfo = fs.GetLogfileInfo(fileName);
+                            if (fileInfo != null)
+                            {
+                                filesToLoad.Add(fileName);
+                            }
+                        }
+                    }
+                    catch (Exception ex) when (ex is FileNotFoundException or
+                                                     DirectoryNotFoundException or
+                                                     UnauthorizedAccessException or
+                                                     IOException or
+                                                     UriFormatException or
+                                                     ArgumentException or
+                                                     ArgumentNullException)
+                    {
+                        // File doesn't exist or can't be accessed, skip it
+                        _logger.Warn($"Skipping inaccessible file: {fileName}");
+                    }
+                }
+
+                projectData.FileNames = filesToLoad;
+            }
+            else
+            {
+                // All files valid - proceed normally
+                _logger.Info($"All {projectData.FileNames.Count} files found, loading project");
+            }
+
+            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
+            {
+                //TODO Project load dialog needs to be replaced with the new dialog
+                ProjectLoadDlg dlg = new();
+                if (DialogResult.Cancel != dlg.ShowDialog())
+                {
+                    switch (dlg.ProjectLoadResult)
+                    {
+                        case ProjectLoadDlgResult.IgnoreLayout:
+                            hasLayoutData = false;
+                            break;
+                        case ProjectLoadDlgResult.CloseTabs:
+                            CloseAllTabs();
+                            break;
+                        case ProjectLoadDlgResult.NewWindow:
+                            LogExpertProxy.NewWindow([projectFileName]);
+                            return;
+                    }
                 }
             }
-        }
 
-        if (projectData != null)
-        {
             foreach (var fileName in projectData.FileNames)
             {
                 _ = hasLayoutData
@@ -2047,13 +2164,27 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     : AddFileTab(fileName, false, null, true, null);
             }
 
-            if (hasLayoutData && restoreLayout)
+            // Restore layout only if we loaded at least one file
+            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
             {
+                _logger.Info("Restoring layout");
                 // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
                 DestroyToolWindows();
                 InitToolWindows();
                 RestoreLayout(projectData.TabLayoutXml);
             }
+            else if (_logWindowList.Count == 0)
+            {
+                _logger.Warn("No files loaded, skipping layout restoration");
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = MessageBox.Show(
+                $"Error loading project: {ex.Message}",
+                Resources.LogExpert_Common_UI_Title_Error,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
     }
 
@@ -2623,8 +2754,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 //if (this.dockPanel.ActiveContent != null &&
                 //    this.dockPanel.ActiveContent != sender || data.tailState != 0)
-                if ((CurrentLogWindow != null &&
-                    CurrentLogWindow != sender) || data.TailState != 0)
+                if (CurrentLogWindow != null && CurrentLogWindow != sender || data.TailState != 0)
                 {
                     data.Dirty = true;
                 }
@@ -2928,45 +3058,46 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnTabColorToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
+        //Todo TabColoring must be reimplemented with a different UI Framework
+        //var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
 
-        if (logWindow.Tag is not LogWindowData data)
-        {
-            return;
-        }
+        //if (logWindow.Tag is not LogWindowData data)
+        //{
+        //    return;
+        //}
 
-        ColorDialog dlg = new()
-        {
-            Color = data.Color
-        };
+        //ColorDialog dlg = new()
+        //{
+        //    Color = data.Color
+        //};
 
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            data.Color = dlg.Color;
-            SetTabColor(logWindow, data.Color);
-        }
+        //if (dlg.ShowDialog() == DialogResult.OK)
+        //{
+        //    data.Color = dlg.Color;
+        //    //SetTabColor(logWindow, data.Color);
+        //}
 
-        List<ColorEntry> delList = [];
+        //List<ColorEntry> delList = [];
 
-        foreach (var entry in ConfigManager.Settings.FileColors)
-        {
-            if (entry.FileName.Equals(logWindow.FileName, StringComparison.Ordinal))
-            {
-                delList.Add(entry);
-            }
-        }
+        //foreach (var entry in ConfigManager.Settings.FileColors)
+        //{
+        //    if (entry.FileName.Equals(logWindow.FileName, StringComparison.Ordinal))
+        //    {
+        //        delList.Add(entry);
+        //    }
+        //}
 
-        foreach (var entry in delList)
-        {
-            _ = ConfigManager.Settings.FileColors.Remove(entry);
-        }
+        //foreach (var entry in delList)
+        //{
+        //    _ = ConfigManager.Settings.FileColors.Remove(entry);
+        //}
 
-        ConfigManager.Settings.FileColors.Add(new ColorEntry(logWindow.FileName, dlg.Color));
+        //ConfigManager.Settings.FileColors.Add(new ColorEntry(logWindow.FileName, dlg.Color));
 
-        while (ConfigManager.Settings.FileColors.Count > MAX_COLOR_HISTORY)
-        {
-            ConfigManager.Settings.FileColors.RemoveAt(0);
-        }
+        //while (ConfigManager.Settings.FileColors.Count > MAX_COLOR_HISTORY)
+        //{
+        //    ConfigManager.Settings.FileColors.RemoveAt(0);
+        //}
     }
 
     [SupportedOSPlatform("windows")]

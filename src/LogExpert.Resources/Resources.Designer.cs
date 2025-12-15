@@ -1246,6 +1246,78 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error loading project file. The file may be corrupted or inaccessible..
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to update session file: {0}.
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session file has been updated with the new file paths..
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Message_UpdateSessionFile {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Message_UpdateSessionFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session Update Failed.
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project Load Failed.
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Title_ProjectLoadFailed {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Title_ProjectLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session Load Failed.
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Title_SessionLoadFailed {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Title_SessionLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session Updated.
+        /// </summary>
+        public static string LoadProject_UI_Message_Error_Title_UpdateSessionFile {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Error_Title_UpdateSessionFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None of the files in this session could be found. The session cannot be loaded..
+        /// </summary>
+        public static string LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound {
+            get {
+                return ResourceManager.GetString("LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not begin restart session. Unable to determine file locker..
         /// </summary>
         public static string Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker {

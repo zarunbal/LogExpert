@@ -15,11 +15,12 @@ public static class ProjectPersister
     #region Public methods
 
     /// <summary>
-    /// Loads the project session data from a specified file.
+    /// Loads the project session data from a specified file, including validation of referenced files.
     /// </summary>
-    /// <param name="projectFileName"></param>
-    /// <returns></returns>
-    public static ProjectData LoadProjectData (string projectFileName, IPluginRegistry pluginRegistry)
+    /// <param name="projectFileName">The path to the project file (.lxj)</param>
+    /// <param name="pluginRegistry">The plugin registry for file system validation</param>
+    /// <returns>A <see cref="ProjectLoadResult"/> containing the project data and validation results</returns>
+    public static ProjectLoadResult LoadProjectData (string projectFileName, IPluginRegistry pluginRegistry)
     {
         try
         {
@@ -31,18 +32,37 @@ public static class ProjectPersister
             var json = File.ReadAllText(projectFileName, Encoding.UTF8);
             var projectData = JsonConvert.DeserializeObject<ProjectData>(json, settings);
 
-            var hasLayout = projectData.TabLayoutXml != null;
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Validate all files referenced in the project
             var validationResult = ProjectFileValidator.ValidateProject(projectData, pluginRegistry);
 
-            return projectData;
+            return new ProjectLoadResult
+            {
+                ProjectData = projectData,
+                ValidationResult = validationResult
+            };
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or
                                          IOException or
                                          JsonSerializationException)
         {
-
             _logger.Warn($"Error loading persistence data from {projectFileName}, trying old xml version");
-            return ProjectPersisterXML.LoadProjectData(projectFileName);
+
+            var projectData = ProjectPersisterXML.LoadProjectData(projectFileName);
+
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Validate files from XML fallback as well
+            var validationResult = ProjectFileValidator.ValidateProject(projectData, pluginRegistry);
+
+            return new ProjectLoadResult
+            {
+                ProjectData = projectData,
+                ValidationResult = validationResult
+            };
         }
     }
 
