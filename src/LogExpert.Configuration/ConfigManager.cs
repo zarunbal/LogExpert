@@ -281,6 +281,14 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
+    public void ClearLastOpenFilesList ()
+    {
+        lock (_loadSaveLock)
+        {
+            Instance.Settings.LastOpenFilesList.Clear();
+        }
+    }
+
     #endregion
 
     #region Private Methods

@@ -909,8 +909,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void SaveLastOpenFilesList ()
     {
-        ConfigManager.Settings.LastOpenFilesList.Clear();
-        foreach (DockContent content in dockPanel.Contents)
+        foreach (DockContent content in dockPanel.Contents.Cast<DockContent>())
         {
             if (content is LogWindow.LogWindow logWin)
             {
@@ -2246,6 +2245,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     AddFileTab(name, false, null, false, null);
                 }
             }
+
+            ConfigManager.ClearLastOpenFilesList();
         }
 
         if (_startupFileNames != null)

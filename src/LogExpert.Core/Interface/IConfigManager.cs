@@ -151,4 +151,13 @@ public interface IConfigManager
     /// This method is supported only on Windows platforms.</remarks>
     /// <param name="fileName">The name of the file to add to the file history list. Comparison is case-insensitive.</param>
     void AddToFileHistory (string fileName);
+
+    /// <summary>
+    /// Clears the list of recently opened files.
+    /// </summary>
+    /// <remarks>Call this method to remove all entries from the recent files list, typically to reset user
+    /// history or in response to a privacy-related action. After calling this method, the list of last open files will
+    /// be empty until new files are opened.</remarks>
+
+    void ClearLastOpenFilesList ();
 }
