@@ -966,8 +966,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error during save of entry.
-        ///		{0}.
+        ///   Looks up a localized string similar to Error during save of entry. {0}.
         /// </summary>
         public static string HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry {
             get {
@@ -3849,7 +3848,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Log Files {0}|All Files {2}.
+        ///   Looks up a localized string similar to Log Files (*.lxp)|*.lxp|All Files (*.*)|*.*.
         /// </summary>
         public static string MissingFilesDialog_UI_Filter_Logfiles {
             get {

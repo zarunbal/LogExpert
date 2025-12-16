@@ -16,6 +16,7 @@ public static class ProjectPersister
 
     /// <summary>
     /// Loads the project session data from a specified file, including validation of referenced files.
+    /// Resolves .lxp persistence files to actual .log files before validation.
     /// </summary>
     /// <param name="projectFileName">The path to the project file (.lxj)</param>
     /// <param name="pluginRegistry">The plugin registry for file system validation</param>
@@ -35,13 +36,32 @@ public static class ProjectPersister
             // Set project file path for alternative file search
             projectData.ProjectFilePath = projectFileName;
 
-            // Validate all files referenced in the project
-            var validationResult = ProjectFileValidator.ValidateProject(projectData, pluginRegistry);
+            // Resolve .lxp files to actual .log files
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            // Create mapping: logFile → originalFile
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            // Create new ProjectData with resolved log file paths
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            // Validate the actual log files (not .lxp files)
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
 
             return new ProjectLoadResult
             {
-                ProjectData = projectData,
-                ValidationResult = validationResult
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
             };
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or
@@ -55,13 +75,29 @@ public static class ProjectPersister
             // Set project file path for alternative file search
             projectData.ProjectFilePath = projectFileName;
 
-            // Validate files from XML fallback as well
-            var validationResult = ProjectFileValidator.ValidateProject(projectData, pluginRegistry);
+            // Resolve .lxp files for XML fallback as well
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
 
             return new ProjectLoadResult
             {
-                ProjectData = projectData,
-                ValidationResult = validationResult
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
             };
         }
     }

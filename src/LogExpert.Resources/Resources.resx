@@ -255,8 +255,7 @@
         <value>[Default]</value>
     </data>
   <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
-        <value>Error during save of entry.
-		{0}</value>
+        <value>Error during save of entry. {0}</value>
     </data>
   <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
         <value>No processes are locking the path specified</value>
@@ -2120,7 +2119,7 @@ Restart LogExpert to apply changes?</value>
     <value>Load &amp;&amp; Update Session</value>
   </data>
   <data name="MissingFilesDialog_UI_Filter_Logfiles" xml:space="preserve">
-    <value>Log Files {0}|All Files {2}</value>
+    <value>Log Files (*.lxp)|*.lxp|All Files (*.*)|*.*</value>
   </data>
   <data name="MissingFilesDialog_UI_Filter_Title" xml:space="preserve">
     <value>Locate: {0}</value>

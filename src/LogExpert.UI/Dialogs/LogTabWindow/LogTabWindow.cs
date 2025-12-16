@@ -19,7 +19,6 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interface;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
-using LogExpert.PluginRegistry.FileSystem;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -41,7 +40,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private const int MAX_COLUMNIZER_HISTORY = 40;
     private const int MAX_COLOR_HISTORY = 40;
     private const int DIFF_MAX = 100;
-    private const int MAX_FILE_HISTORY = 10;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly Icon _deadIcon;
 
@@ -546,7 +544,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
     {
-        var logFileName = FindFilenameForSettings(givenFileName);
+        var logFileName = PersisterHelpers.FindFilenameForSettings(givenFileName, PluginRegistry.PluginRegistry.Instance);
         var win = FindWindowForFile(logFileName);
         if (win != null)
         {
@@ -1046,24 +1044,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void AddToFileHistory (string fileName)
     {
-        bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
-
-        var index = ConfigManager.Settings.FileHistoryList.FindIndex(findName);
-
-        if (index != -1)
-        {
-            ConfigManager.Settings.FileHistoryList.RemoveAt(index);
-        }
-
-        ConfigManager.Settings.FileHistoryList.Insert(0, fileName);
-
-        while (ConfigManager.Settings.FileHistoryList.Count > MAX_FILE_HISTORY)
-        {
-            ConfigManager.Settings.FileHistoryList.RemoveAt(ConfigManager.Settings.FileHistoryList.Count - 1);
-        }
-
-        ConfigManager.Save(SettingsFlags.FileHistory);
-
+        ConfigManager.AddToFileHistory(fileName);
         FillHistoryMenu();
     }
 
@@ -1082,46 +1063,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Checks if the file name is a settings file. If so, the contained logfile name
-    /// is returned. If not, the given file name is returned unchanged.
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
-    private static string FindFilenameForSettings (string fileName)
-    {
-        if (fileName.EndsWith(".lxp", StringComparison.OrdinalIgnoreCase))
-        {
-            var persistenceData = Persister.Load(fileName);
-            if (persistenceData == null)
-            {
-                return fileName;
-            }
-
-            if (!string.IsNullOrEmpty(persistenceData.FileName))
-            {
-                var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(persistenceData.FileName);
-                if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
-                {
-                    return persistenceData.FileName;
-                }
-
-                // On relative paths the URI check (and therefore the file system plugin check) will fail.
-                // So fs == null and fs == LocalFileSystem are handled here like normal files.
-                if (Path.IsPathRooted(persistenceData.FileName))
-                {
-                    return persistenceData.FileName;
-                }
-
-                // handle relative paths in .lxp files
-                var dir = Path.GetDirectoryName(fileName);
-                return Path.Join(dir, persistenceData.FileName);
-            }
-        }
-
-        return fileName;
     }
 
     [SupportedOSPlatform("windows")]
@@ -2015,53 +1956,65 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     //}
 
     [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
         try
         {
-            _logger.Info($"Loading project from {projectFileName}");
-
             // Load project with validation
             var loadResult = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
 
-            // Check if project data was loaded
             if (loadResult?.ProjectData == null)
             {
-                _ = MessageBox.Show(
+                ShowOkMessage(
                     Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible,
                     Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
-                    MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+
                 return;
             }
 
             var projectData = loadResult.ProjectData;
             var hasLayoutData = projectData.TabLayoutXml != null;
 
+            if (projectData.FileNames.Count == 0)
+            {
+                ShowOkMessage(
+                    Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
+                    Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
             // Handle missing files or layout options
             if (loadResult.RequiresUserIntervention)
             {
-                // If NO valid files AND NO alternatives, always cancel
-                if (loadResult.RequiresUserIntervention && !loadResult.HasValidFiles && loadResult.ValidationResult.PossibleAlternatives.Count == 0)
-                {
-                    _ = MessageBox.Show(
-                        Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
-                        Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-
                 // Show enhanced dialog with browsing capability and layout options
-                var dialogResult = MissingFilesDialog.ShowDialog(
-                    loadResult.ValidationResult,
-                    hasLayoutData,
-                    out var selectedAlternatives);
+                var (dialogResult, updateSessionFile, selectedAlternatives) = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, hasLayoutData);
 
                 if (dialogResult == MissingFilesDialogResult.Cancel)
                 {
                     return;
+                }
+
+                if (updateSessionFile)
+                {
+                    // Replace original paths with selected alternatives in project data
+                    for (int i = 0; i < projectData.FileNames.Count; i++)
+                    {
+                        var originalPath = projectData.FileNames[i];
+                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
+                        {
+                            projectData.FileNames[i] = value;
+                        }
+                    }
+
+                    ProjectPersister.SaveProjectData(projectFileName, projectData);
+
+                    ShowOkMessage(
+                        Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
+                        Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
+                        MessageBoxIcon.Information);
                 }
 
                 // Handle layout-related results
@@ -2071,84 +2024,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         CloseAllTabs();
                         break;
                     case MissingFilesDialogResult.OpenInNewWindow:
-                        LogExpertProxy.NewWindow([.. projectData.FileNames]);
-                        return;
+                        {
+                            var logFileNames = PersisterHelpers.FindFilenameForSettings(projectData.FileNames.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
+                            LogExpertProxy.NewWindow([.. logFileNames]);
+                            return;
+                        }
                     case MissingFilesDialogResult.IgnoreLayout:
                         hasLayoutData = false;
                         break;
                 }
-
-                // Apply selected alternatives
-                if (selectedAlternatives.Count > 0)
-                {
-                    _logger.Info($"User selected {selectedAlternatives.Count} alternative paths");
-
-                    // Replace original paths with selected alternatives in project data
-                    for (int i = 0; i < projectData.FileNames.Count; i++)
-                    {
-                        var originalPath = projectData.FileNames[i];
-                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
-                        {
-                            projectData.FileNames[i] = value;
-                            _logger.Info($"Replaced {Path.GetFileName(originalPath)} with {Path.GetFileName(value)}");
-                        }
-                    }
-
-                    // Update session file if user requested
-                    if (dialogResult == MissingFilesDialogResult.LoadAndUpdateSession)
-                    {
-                        ProjectPersister.SaveProjectData(projectFileName, projectData);
-
-                        _ = MessageBox.Show(
-                            Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
-                            Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
-                    }
-                }
-
-                // Load only valid files (original or replaced with alternatives)
-                if (loadResult.RequiresUserIntervention)
-                {
-                    _logger.Info($"Loading {loadResult.ValidationResult.ValidFiles.Count} valid files");
-
-                    // Filter project data to only include valid files (considering alternatives)
-                    var filesToLoad = new List<string>();
-                    foreach (var fileName in projectData.FileNames)
-                    {
-                        // Check if this file exists (either original or alternative)
-                        try
-                        {
-                            var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(fileName);
-                            if (fs != null)
-                            {
-                                var fileInfo = fs.GetLogfileInfo(fileName);
-                                if (fileInfo != null)
-                                {
-                                    filesToLoad.Add(fileName);
-                                }
-                            }
-                        }
-                        catch (Exception ex) when (ex is FileNotFoundException or
-                                                         DirectoryNotFoundException or
-                                                         UnauthorizedAccessException or
-                                                         IOException or
-                                                         UriFormatException or
-                                                         ArgumentException or
-                                                         ArgumentNullException)
-                        {
-                            // File doesn't exist or can't be accessed, skip it
-                            _logger.Warn($"Skipping inaccessible file: {fileName}");
-                        }
-                    }
-
-                    projectData.FileNames = filesToLoad;
-                }
-            }
-            else
-            {
-                // All files valid - proceed normally
-                _logger.Info($"All {projectData.FileNames.Count} files found, loading project");
             }
 
             foreach (var fileName in projectData.FileNames)
@@ -2174,12 +2058,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         catch (Exception ex)
         {
-            _ = MessageBox.Show(
+            ShowOkMessage(
                 $"Error loading project: {ex.Message}",
                 Resources.LogExpert_Common_UI_Title_Error,
-                MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
+    }
+
+    private static void ShowOkMessage (string title, string message, MessageBoxIcon icon)
+    {
+        _ = MessageBox.Show(
+            message,
+            title,
+            MessageBoxButtons.OK,
+            icon);
     }
 
     [SupportedOSPlatform("windows")]

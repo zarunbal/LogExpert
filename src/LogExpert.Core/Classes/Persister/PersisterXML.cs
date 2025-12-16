@@ -601,7 +601,8 @@ public static class PersisterXML
         }
         catch (Exception xmlParsingException) when (xmlParsingException is XmlException or
                                                                            UnauthorizedAccessException or
-                                                                           IOException)
+                                                                           IOException or
+                                                                           FileNotFoundException)
         {
             _logger.Error(xmlParsingException, $"Error loading persistence data from {fileName}, unknown format, parsing xml or json was not possible");
             return null;

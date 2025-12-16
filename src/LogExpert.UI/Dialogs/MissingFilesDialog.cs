@@ -29,6 +29,11 @@ public partial class MissingFilesDialog : Form
     public MissingFilesDialogResult Result { get; private set; }
 
     /// <summary>
+    /// Gets whether the user wants to update the session file.
+    /// </summary>
+    public bool UpdateSessionFile { get; private set; }
+
+    /// <summary>
     /// Gets the dictionary of selected alternative paths for missing files.
     /// Key: original path, Value: selected alternative path
     /// </summary>
@@ -52,6 +57,7 @@ public partial class MissingFilesDialog : Form
         _fileItems = [];
         SelectedAlternatives = [];
         Result = MissingFilesDialogResult.Cancel;
+        UpdateSessionFile = false;
         _hasLayoutData = hasLayoutData;
 
         InitializeComponent();
@@ -66,45 +72,16 @@ public partial class MissingFilesDialog : Form
     #region Public Methods
 
     /// <summary>
-    /// Shows the dialog and returns the user's choice.
-    /// </summary>
-    /// <param name="validationResult">Validation result</param>
-    /// <returns>Dialog result</returns>
-    public static MissingFilesDialogResult ShowDialog (ProjectValidationResult validationResult)
-    {
-        using var dialog = new MissingFilesDialog(validationResult);
-        _ = dialog.ShowDialog();
-        return dialog.Result;
-    }
-
-    /// <summary>
-    /// Shows the dialog and returns alternatives if selected.
-    /// </summary>
-    /// <param name="validationResult">Validation result</param>
-    /// <param name="selectedAlternatives">Dictionary of selected alternatives</param>
-    /// <returns>Dialog result</returns>
-    public static MissingFilesDialogResult ShowDialog (ProjectValidationResult validationResult, out Dictionary<string, string> selectedAlternatives)
-    {
-        using var dialog = new MissingFilesDialog(validationResult);
-        _ = dialog.ShowDialog();
-        selectedAlternatives = dialog.SelectedAlternatives;
-        return dialog.Result;
-    }
-
-    /// <summary>
     /// Shows the dialog with layout options and returns alternatives if selected.
     /// </summary>
     /// <param name="validationResult">Validation result</param>
-    /// <param name="showLayoutOptions">Whether to show layout restoration options</param>
     /// <param name="hasLayoutData">Whether the project has layout data</param>
-    /// <param name="selectedAlternatives">Dictionary of selected alternatives</param>
-    /// <returns>Dialog result</returns>
-    public static MissingFilesDialogResult ShowDialog (ProjectValidationResult validationResult, bool hasLayoutData, out Dictionary<string, string> selectedAlternatives)
+    /// <returns>Tuple containing the dialog result, whether to update session file, and selected alternatives</returns>
+    public static (MissingFilesDialogResult Result, bool UpdateSessionFile, Dictionary<string, string> SelectedAlternatives) ShowDialog (ProjectValidationResult validationResult, bool hasLayoutData)
     {
         using var dialog = new MissingFilesDialog(validationResult, hasLayoutData);
         _ = dialog.ShowDialog();
-        selectedAlternatives = dialog.SelectedAlternatives;
-        return dialog.Result;
+        return (dialog.Result, dialog.UpdateSessionFile, dialog.SelectedAlternatives);
     }
 
     #endregion
@@ -295,7 +272,7 @@ public partial class MissingFilesDialog : Form
         using var openFileDialog = new OpenFileDialog
         {
             Title = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Filter_Title, fileItem.DisplayName),
-            Filter = string.Format(CultureInfo.InvariantCulture, Resources.MissingFilesDialog_UI_Filter_Logfiles, "(*.lxp)", "(*.*)|*.*"),
+            Filter = Resources.MissingFilesDialog_UI_Filter_Logfiles,
             FileName = fileItem.DisplayName,
             CheckFileExists = true,
             Multiselect = false
@@ -331,16 +308,15 @@ public partial class MissingFilesDialog : Form
     }
 
     /// <summary>
-    /// Determines the appropriate result based on layout selection and button clicked.
+    /// Determines the appropriate layout result based on radio button selection.
     /// </summary>
-    /// <param name="baseResult">The base result from the button click (LoadValidFiles or LoadAndUpdateSession)</param>
-    /// <returns>The final result considering layout options</returns>
-    private MissingFilesDialogResult DetermineResult (MissingFilesDialogResult baseResult)
+    /// <returns>The layout-related result</returns>
+    private MissingFilesDialogResult DetermineLayoutResult ()
     {
-        // If layout options are not shown or there's no layout data, return the base result
+        // If layout options are not shown or there's no layout data, return LoadValidFiles
         if (!_hasLayoutData || !panelLayoutOptions.Visible)
         {
-            return baseResult;
+            return MissingFilesDialogResult.LoadValidFiles;
         }
 
         // Determine layout-related result
@@ -357,8 +333,8 @@ public partial class MissingFilesDialog : Form
             return MissingFilesDialogResult.IgnoreLayout;
         }
 
-        // Default to base result
-        return baseResult;
+        // Default to LoadValidFiles
+        return MissingFilesDialogResult.LoadValidFiles;
     }
 
     #endregion
@@ -417,14 +393,16 @@ public partial class MissingFilesDialog : Form
 
     private void OnButtonLoadClick (object sender, EventArgs e)
     {
-        Result = DetermineResult(MissingFilesDialogResult.LoadValidFiles);
+        Result = DetermineLayoutResult();
+        UpdateSessionFile = false;
         DialogResult = DialogResult.OK;
         Close();
     }
 
     private void OnButtonLoadAndUpdateClick (object sender, EventArgs e)
     {
-        Result = DetermineResult(MissingFilesDialogResult.LoadAndUpdateSession);
+        Result = DetermineLayoutResult();
+        UpdateSessionFile = true;
         DialogResult = DialogResult.OK;
         Close();
     }
@@ -432,6 +410,7 @@ public partial class MissingFilesDialog : Form
     private void OnButtonCancelClick (object sender, EventArgs e)
     {
         Result = MissingFilesDialogResult.Cancel;
+        UpdateSessionFile = false;
         DialogResult = DialogResult.Cancel;
         Close();
     }

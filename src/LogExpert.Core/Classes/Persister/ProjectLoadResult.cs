@@ -6,7 +6,7 @@ namespace LogExpert.Core.Classes.Persister;
 public class ProjectLoadResult
 {
     /// <summary>
-    /// The loaded project data.
+    /// The loaded project data (contains resolved log file paths).
     /// </summary>
     public ProjectData ProjectData { get; set; }
 
@@ -14,6 +14,14 @@ public class ProjectLoadResult
     /// Validation result containing valid, missing, and alternative file paths.
     /// </summary>
     public ProjectValidationResult ValidationResult { get; set; }
+
+    /// <summary>
+    /// Mapping of original file references to resolved log files.
+    /// Key: resolved log file path (.log)
+    /// Value: original file reference (.lxp or .log)
+    /// Used to update persistence files when user selects alternatives.
+    /// </summary>
+    public Dictionary<string, string> LogToOriginalFileMapping { get; set; } = [];
 
     /// <summary>
     /// Indicates whether the project has at least one valid file to load.

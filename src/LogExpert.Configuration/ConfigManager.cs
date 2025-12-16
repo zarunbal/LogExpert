@@ -46,6 +46,7 @@ public class ConfigManager : IConfigManager
     };
 
     private const string SETTINGS_FILE_NAME = "settings.json";
+    private const int MAX_FILE_HISTORY = 10;
 
     #endregion
 
@@ -249,6 +250,35 @@ public class ConfigManager : IConfigManager
 
         Instance.Settings.Preferences.HighlightGroupList = Import(Instance.Settings.Preferences.HighlightGroupList, fileInfo, importFlags);
         Save(SettingsFlags.All);
+    }
+
+    /// <summary>
+    /// Adds the specified file name to the file history list, moving it to the top if it already exists.
+    /// </summary>
+    /// <remarks>If the file name already exists in the history, it is moved to the top of the list. The file
+    /// history list is limited to a maximum number of entries; the oldest entries are removed if the limit is exceeded.
+    /// This method is supported only on Windows platforms.</remarks>
+    /// <param name="fileName">The name of the file to add to the file history list. Comparison is case-insensitive.</param>
+    [SupportedOSPlatform("windows")]
+    public void AddToFileHistory (string fileName)
+    {
+        bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
+
+        var index = Instance.Settings.FileHistoryList.FindIndex(findName);
+
+        if (index != -1)
+        {
+            Instance.Settings.FileHistoryList.RemoveAt(index);
+        }
+
+        Instance.Settings.FileHistoryList.Insert(0, fileName);
+
+        while (Instance.Settings.FileHistoryList.Count > MAX_FILE_HISTORY)
+        {
+            Instance.Settings.FileHistoryList.RemoveAt(Instance.Settings.FileHistoryList.Count - 1);
+        }
+
+        Save(SettingsFlags.FileHistory);
     }
 
     #endregion
@@ -1061,6 +1091,7 @@ public class ConfigManager : IConfigManager
 
         return true;
     }
+
     #endregion
 
     /// <summary>

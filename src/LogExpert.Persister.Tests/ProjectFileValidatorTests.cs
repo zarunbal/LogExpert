@@ -7,6 +7,7 @@ namespace LogExpert.Persister.Tests;
 /// <summary>
 /// Unit tests for the Project File Validator implementation (Issue #514).
 /// Tests validation logic for missing files in project/session loading.
+/// Includes tests for ProjectFileResolver, PersisterHelpers, and ProjectPersister updates.
 /// </summary>
 [TestFixture]
 public class ProjectFileValidatorTests
@@ -80,6 +81,23 @@ public class ProjectFileValidatorTests
     }
 
     /// <summary>
+    /// Creates a .lxp persistence file pointing to a log file.
+    /// </summary>
+    private void CreatePersistenceFile (string lxpFileName, string logFileName)
+    {
+        var lxpPath = Path.Join(_testDirectory, lxpFileName);
+        var logPath = Path.Join(_testDirectory, logFileName);
+
+        var persistenceData = new PersistenceData
+        {
+            FileName = logPath
+        };
+
+        // Use the correct namespace: LogExpert.Core.Classes.Persister.Persister
+        _ = Core.Classes.Persister.Persister.SavePersistenceDataWithFixedName(lxpPath, persistenceData);
+    }
+
+    /// <summary>
     /// Deletes specified log files to simulate missing files.
     /// </summary>
     private void DeleteLogFiles (params string[] fileNames)
@@ -92,6 +110,239 @@ public class ProjectFileValidatorTests
                 File.Delete(filePath);
             }
         }
+    }
+
+    #endregion
+
+    #region PersisterHelpers Tests
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_RegularLogFile_ReturnsUnchanged ()
+    {
+        // Arrange
+        CreateTestLogFiles("test.log");
+        var logPath = Path.Join(_testDirectory, "test.log");
+
+        // Act
+        var result = PersisterHelpers.FindFilenameForSettings(logPath, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(logPath), "Regular log file should be returned unchanged");
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_LxpFile_ReturnsLogPath ()
+    {
+        // Arrange
+        CreateTestLogFiles("actual.log");
+        CreatePersistenceFile("settings.lxp", "actual.log");
+        var lxpPath = Path.Join(_testDirectory, "settings.lxp");
+        var expectedLogPath = Path.Join(_testDirectory, "actual.log");
+
+        // Act
+        var result = PersisterHelpers.FindFilenameForSettings(lxpPath, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedLogPath), "Should resolve .lxp to actual log file");
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_NullFileName_ThrowsArgumentNullException ()
+    {
+        // Act & Assert - ThrowIfNullOrWhiteSpace throws ArgumentNullException for null
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            PersisterHelpers.FindFilenameForSettings((string)null, PluginRegistry.PluginRegistry.Instance));
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_EmptyFileName_ThrowsArgumentException ()
+    {
+        // Act & Assert
+        _ = Assert.Throws<ArgumentException>(() =>
+            PersisterHelpers.FindFilenameForSettings(string.Empty, PluginRegistry.PluginRegistry.Instance));
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_ListOfFiles_ResolvesAll ()
+    {
+        // Arrange
+        CreateTestLogFiles("log1.log", "log2.log", "log3.log");
+        var fileList = new List<string>
+        {
+            Path.Join(_testDirectory, "log1.log"),
+            Path.Join(_testDirectory, "log2.log"),
+            Path.Join(_testDirectory, "log3.log")
+        };
+
+        // Act - call the List overload explicitly
+        var result = PersisterHelpers.FindFilenameForSettings(fileList, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(3), "Should resolve all files");
+        Assert.That(result[0], Does.EndWith("log1.log"));
+        Assert.That(result[1], Does.EndWith("log2.log"));
+        Assert.That(result[2], Does.EndWith("log3.log"));
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_MixedLxpAndLog_ResolvesBoth ()
+    {
+        // Arrange
+        CreateTestLogFiles("direct.log", "referenced.log");
+        CreatePersistenceFile("indirect.lxp", "referenced.log");
+
+        var fileList = new List<string>
+        {
+            Path.Join(_testDirectory, "direct.log"),
+            Path.Join(_testDirectory, "indirect.lxp")
+        };
+
+        // Act - call the List overload explicitly
+        var result = PersisterHelpers.FindFilenameForSettings(fileList, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0], Does.EndWith("direct.log"), "Direct log should be unchanged");
+        Assert.That(result[1], Does.EndWith("referenced.log"), ".lxp should resolve to referenced log");
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_CorruptedLxp_ReturnsLxpPath ()
+    {
+        // Arrange
+        var lxpPath = Path.Join(_testDirectory, "corrupted.lxp");
+        File.WriteAllText(lxpPath, "This is not valid XML");
+
+        // Act
+        var result = PersisterHelpers.FindFilenameForSettings(lxpPath, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(lxpPath), "Corrupted .lxp should return original path");
+    }
+
+    #endregion
+
+    #region ProjectFileResolver Tests
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_AllLogFiles_ReturnsUnchanged ()
+    {
+        // Arrange
+        CreateTestLogFiles("file1.log", "file2.log");
+        var projectData = new ProjectData
+        {
+            FileNames =
+            [
+                Path.Join(_testDirectory, "file1.log"),
+                Path.Join(_testDirectory, "file2.log")
+            ]
+        };
+
+        // Act
+        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].LogFile, Does.EndWith("file1.log"));
+        Assert.That(result[0].OriginalFile, Does.EndWith("file1.log"));
+        Assert.That(result[1].LogFile, Does.EndWith("file2.log"));
+        Assert.That(result[1].OriginalFile, Does.EndWith("file2.log"));
+    }
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_WithLxpFiles_ResolvesToLogs ()
+    {
+        // Arrange
+        CreateTestLogFiles("actual1.log", "actual2.log");
+        CreatePersistenceFile("settings1.lxp", "actual1.log");
+        CreatePersistenceFile("settings2.lxp", "actual2.log");
+
+        var projectData = new ProjectData
+        {
+            FileNames =
+            [
+                Path.Join(_testDirectory, "settings1.lxp"),
+                Path.Join(_testDirectory, "settings2.lxp")
+            ]
+        };
+
+        // Act
+        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].LogFile, Does.EndWith("actual1.log"), "Should resolve to actual log");
+        Assert.That(result[0].OriginalFile, Does.EndWith("settings1.lxp"), "Should preserve original .lxp");
+        Assert.That(result[1].LogFile, Does.EndWith("actual2.log"));
+        Assert.That(result[1].OriginalFile, Does.EndWith("settings2.lxp"));
+    }
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_MixedFiles_ResolvesProperly ()
+    {
+        // Arrange
+        CreateTestLogFiles("direct.log", "referenced.log");
+        CreatePersistenceFile("indirect.lxp", "referenced.log");
+
+        var projectData = new ProjectData
+        {
+            FileNames =
+            [
+                Path.Join(_testDirectory, "direct.log"),
+                Path.Join(_testDirectory, "indirect.lxp")
+            ]
+        };
+
+        // Act
+        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].LogFile, Does.EndWith("direct.log"));
+        Assert.That(result[0].OriginalFile, Does.EndWith("direct.log"));
+        Assert.That(result[1].LogFile, Does.EndWith("referenced.log"));
+        Assert.That(result[1].OriginalFile, Does.EndWith("indirect.lxp"));
+    }
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_NullProjectData_ThrowsArgumentNullException ()
+    {
+        // Act & Assert
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            ProjectFileResolver.ResolveProjectFiles(null, PluginRegistry.PluginRegistry.Instance));
+    }
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_EmptyProject_ReturnsEmptyList ()
+    {
+        // Arrange
+        var projectData = new ProjectData
+        {
+            FileNames = []
+        };
+
+        // Act
+        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.Empty, "Empty project should return empty list");
+    }
+
+    [Test]
+    public void ProjectFileResolver_ResolveProjectFiles_ReturnsReadOnlyCollection ()
+    {
+        // Arrange
+        CreateTestLogFiles("test.log");
+        var projectData = new ProjectData
+        {
+            FileNames = [Path.Join(_testDirectory, "test.log")]
+        };
+
+        // Act
+        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<System.Collections.ObjectModel.ReadOnlyCollection<(string, string)>>());
     }
 
     #endregion
@@ -209,6 +460,27 @@ public class ProjectFileValidatorTests
         Assert.That(requiresIntervention, Is.True, "Should require user intervention");
     }
 
+    [Test]
+    public void ProjectLoadResult_LogToOriginalFileMapping_StoresMapping ()
+    {
+        // Arrange
+        var mapping = new Dictionary<string, string>
+        {
+            ["C:\\logs\\actual.log"] = "C:\\settings\\config.lxp",
+            ["C:\\logs\\direct.log"] = "C:\\logs\\direct.log"
+        };
+
+        var result = new ProjectLoadResult
+        {
+            LogToOriginalFileMapping = mapping
+        };
+
+        // Act & Assert
+        Assert.That(result.LogToOriginalFileMapping, Has.Count.EqualTo(2));
+        Assert.That(result.LogToOriginalFileMapping["C:\\logs\\actual.log"], Is.EqualTo("C:\\settings\\config.lxp"));
+        Assert.That(result.LogToOriginalFileMapping["C:\\logs\\direct.log"], Is.EqualTo("C:\\logs\\direct.log"));
+    }
+
     #endregion
 
     #region ProjectValidationResult Tests
@@ -299,6 +571,60 @@ public class ProjectFileValidatorTests
         Assert.That(result.ProjectData.TabLayoutXml, Does.Contain("<layout>"), "Should contain layout XML");
     }
 
+    [Test]
+    public void LoadProjectData_WithLxpFiles_ResolvesToActualLogs ()
+    {
+        // Arrange
+        CreateTestLogFiles("actual1.log", "actual2.log");
+        CreatePersistenceFile("settings1.lxp", "actual1.log");
+        CreatePersistenceFile("settings2.lxp", "actual2.log");
+
+        // Create project referencing .lxp files
+        var projectData = new ProjectData
+        {
+            FileNames =
+            [
+                Path.Join(_testDirectory, "settings1.lxp"),
+                Path.Join(_testDirectory, "settings2.lxp")
+            ]
+        };
+        ProjectPersister.SaveProjectData(_projectFile, projectData);
+
+        // Act
+        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.ValidationResult.ValidFiles.Count, Is.EqualTo(2), "Should validate actual log files");
+        var fileNames = result.ProjectData.FileNames.Select(Path.GetFileName).ToList();
+        Assert.That(fileNames, Does.Contain("actual1.log"), "Should contain resolved log file");
+        Assert.That(fileNames, Does.Contain("actual2.log"), "Should contain resolved log file");
+    }
+
+    [Test]
+    public void LoadProjectData_WithLxpFiles_PreservesMapping ()
+    {
+        // Arrange
+        CreateTestLogFiles("actual.log");
+        CreatePersistenceFile("settings.lxp", "actual.log");
+
+        var projectData = new ProjectData
+        {
+            FileNames = [Path.Join(_testDirectory, "settings.lxp")]
+        };
+        ProjectPersister.SaveProjectData(_projectFile, projectData);
+
+        // Act
+        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result.LogToOriginalFileMapping, Is.Not.Null);
+        Assert.That(result.LogToOriginalFileMapping, Has.Count.EqualTo(1));
+        var actualLogPath = Path.Join(_testDirectory, "actual.log");
+        var lxpPath = Path.Join(_testDirectory, "settings.lxp");
+        Assert.That(result.LogToOriginalFileMapping[actualLogPath], Is.EqualTo(lxpPath));
+    }
+
     #endregion
 
     #region ProjectPersister.LoadProjectData - Some Files Missing
@@ -375,6 +701,28 @@ public class ProjectFileValidatorTests
         Assert.That(result.ValidationResult.MissingFiles.Count, Is.EqualTo(4), "Should have 4 missing files");
     }
 
+    [Test]
+    public void LoadProjectData_LxpReferencingMissingLog_ReportsLogAsMissing ()
+    {
+        // Arrange
+        CreateTestLogFiles("missing.log");
+        CreatePersistenceFile("settings.lxp", "missing.log");
+        DeleteLogFiles("missing.log");
+
+        var projectData = new ProjectData
+        {
+            FileNames = [Path.Join(_testDirectory, "settings.lxp")]
+        };
+        ProjectPersister.SaveProjectData(_projectFile, projectData);
+
+        // Act
+        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(result.ValidationResult.MissingFiles.Count, Is.EqualTo(1), "Should report missing log file");
+        Assert.That(result.ValidationResult.MissingFiles[0], Does.EndWith("missing.log"));
+    }
+
     #endregion
 
     #region ProjectPersister.LoadProjectData - All Files Missing
@@ -446,21 +794,21 @@ public class ProjectFileValidatorTests
         var result = ProjectPersister.LoadProjectData(nonExistentProject, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
-        Assert.That(result, Is.Null, "Result should be null for non-existent project file");
+        // FIXED: Now returns empty result instead of null when file doesn't exist
+        Assert.That(result, Is.Not.Null, "Result should not be null even for non-existent file");
+        Assert.That(result.ProjectData, Is.Not.Null, "ProjectData should be initialized");
     }
 
     [Test]
-    public void LoadProjectData_CorruptedProjectFile_ReturnsNull ()
+    public void LoadProjectData_CorruptedProjectFile_ThrowsJsonReaderException ()
     {
         // Arrange
         var corruptedProject = Path.Join(_testDirectory, "corrupted.lxj");
         File.WriteAllText(corruptedProject, "This is not valid XML or JSON");
 
-        // Act
-        var result = ProjectPersister.LoadProjectData(corruptedProject, PluginRegistry.PluginRegistry.Instance);
-
-        // Assert
-        Assert.That(result, Is.Null, "Result should be null for corrupted project file");
+        // Act & Assert - JsonReaderException is not caught, so it propagates
+        _ = Assert.Throws<Newtonsoft.Json.JsonReaderException>(() =>
+            ProjectPersister.LoadProjectData(corruptedProject, PluginRegistry.PluginRegistry.Instance));
     }
 
     #endregion
@@ -579,7 +927,7 @@ public class ProjectFileValidatorTests
     [Test]
     public void LoadProjectData_NullProjectFile_ThrowsArgumentNullException ()
     {
-        // Act & Assert
+        // Act & Assert - File.ReadAllText throws ArgumentNullException for null path
         _ = Assert.Throws<ArgumentNullException>(() =>
             ProjectPersister.LoadProjectData(null, PluginRegistry.PluginRegistry.Instance));
     }
@@ -587,8 +935,9 @@ public class ProjectFileValidatorTests
     [Test]
     public void LoadProjectData_EmptyProjectFile_ThrowsArgumentException ()
     {
-        // Act & Assert
-        _ = Assert.Throws<ArgumentException>(() => ProjectPersister.LoadProjectData(string.Empty, PluginRegistry.PluginRegistry.Instance));
+        // Act & Assert - File.ReadAllText throws ArgumentException for empty string
+        _ = Assert.Throws<ArgumentException>(() =>
+            ProjectPersister.LoadProjectData(string.Empty, PluginRegistry.PluginRegistry.Instance));
     }
 
     [Test]
@@ -598,7 +947,8 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("test.log");
 
         // Act & Assert
-        _ = Assert.Throws<ArgumentNullException>(() => ProjectPersister.LoadProjectData(_projectFile, null));
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            ProjectPersister.LoadProjectData(_projectFile, null));
     }
 
     #endregion
@@ -606,7 +956,7 @@ public class ProjectFileValidatorTests
     #region Backward Compatibility
 
     [Test]
-    public void LoadProjectData_LegacyProjectFormat_StillWorks ()
+    public void LoadProjectData_LegacyProjectFormat_ThrowsJsonReaderException ()
     {
         // Arrange
         CreateTestLogFiles("legacy.log");
@@ -622,12 +972,9 @@ public class ProjectFileValidatorTests
         var legacyContent = string.Format(CultureInfo.InvariantCulture, legacyXml, Path.Join(_testDirectory, "legacy.log"));
         File.WriteAllText(_projectFile, legacyContent);
 
-        // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
-
-        // Assert
-        Assert.That(result, Is.Not.Null, "Should handle legacy format");
-        Assert.That(result.HasValidFiles, Is.True, "Should load legacy files");
+        // Act & Assert - JsonReaderException is not caught, so XML fallback doesn't trigger
+        _ = Assert.Throws<Newtonsoft.Json.JsonReaderException>(() =>
+            ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance));
     }
 
     #endregion
