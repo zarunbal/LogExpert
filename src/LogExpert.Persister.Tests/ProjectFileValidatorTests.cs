@@ -102,9 +102,8 @@ public class ProjectFileValidatorTests
     /// </summary>
     private void DeleteLogFiles (params string[] fileNames)
     {
-        foreach (var fileName in fileNames)
+        foreach (var filePath in fileNames.Select(fileName => Path.Join(_testDirectory, fileName)))
         {
-            var filePath = Path.Join(_testDirectory, fileName);
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);

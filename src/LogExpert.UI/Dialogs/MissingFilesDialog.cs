@@ -266,7 +266,6 @@ public partial class MissingFilesDialog : Form
     /// Opens a file browser dialog for the specified missing file.
     /// </summary>
     /// <param name="fileItem">The file item to browse for</param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally Left Blank")]
     private void BrowseForFile (MissingFileItem fileItem)
     {
         using var openFileDialog = new OpenFileDialog
@@ -287,7 +286,10 @@ public partial class MissingFilesDialog : Form
                 openFileDialog.InitialDirectory = directory;
             }
         }
-        catch
+        catch (Exception ex) when (ex is ArgumentException or
+                                         PathTooLongException or
+                                         NotSupportedException or
+                                         UnauthorizedAccessException)
         {
             // Ignore if path is invalid
         }

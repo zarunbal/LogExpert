@@ -146,14 +146,10 @@ public static class ProjectFileValidator
 
                     // Also check subdirectories (one level deep)
                     var subdirs = Directory.GetDirectories(projectDir);
-                    foreach (var subdir in subdirs)
-                    {
-                        var subdirCandidate = Path.Join(subdir, baseName);
-                        if (File.Exists(subdirCandidate))
-                        {
-                            alternatives.Add(subdirCandidate);
-                        }
-                    }
+                    alternatives.AddRange(
+                        subdirs
+                            .Select(subdir => Path.Join(subdir, baseName))
+                            .Where(File.Exists));
                 }
             }
             catch (Exception ex) when (ex is ArgumentException or
@@ -181,10 +177,10 @@ public static class ProjectFileValidator
             }
         }
         catch (Exception ex) when (ex is ArgumentException or
-                                        ArgumentNullException or
-                                        PathTooLongException or
-                                        UnauthorizedAccessException or
-                                        IOException)
+                                         ArgumentNullException or
+                                         PathTooLongException or
+                                         UnauthorizedAccessException or
+                                         IOException)
         {
             // Ignore errors when searching in Documents folder
         }
@@ -203,23 +199,20 @@ public static class ProjectFileValidator
                 var originalDrive = Path.GetPathRoot(fileName)?[0];
                 var pathWithoutDrive = fileName.Length > 3 ? fileName[3..] : string.Empty;
 
-                foreach (var drive in driveLetters)
+                foreach (var drive in driveLetters.Where(drive => drive != originalDrive && !string.IsNullOrEmpty(pathWithoutDrive)))
                 {
-                    if (drive != originalDrive && !string.IsNullOrEmpty(pathWithoutDrive))
+                    var alternatePath = $"{drive}:\\{pathWithoutDrive}";
+                    if (File.Exists(alternatePath) && !alternatives.Contains(alternatePath))
                     {
-                        var alternatePath = $"{drive}:\\{pathWithoutDrive}";
-                        if (File.Exists(alternatePath) && !alternatives.Contains(alternatePath))
-                        {
-                            alternatives.Add(alternatePath);
-                        }
+                        alternatives.Add(alternatePath);
                     }
                 }
             }
             catch (Exception ex) when (ex is ArgumentException or
-                                            ArgumentNullException or
-                                            PathTooLongException or
-                                            UnauthorizedAccessException or
-                                            IOException)
+                                             ArgumentNullException or
+                                             PathTooLongException or
+                                             UnauthorizedAccessException or
+                                             IOException)
             {
                 // Ignore errors when searching on different drives
             }
