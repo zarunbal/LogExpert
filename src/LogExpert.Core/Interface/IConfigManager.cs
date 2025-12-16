@@ -142,4 +142,22 @@ public interface IConfigManager
     /// <exception cref="InvalidOperationException">Thrown if settings validation fails.</exception>
     /// <exception cref="IOException">Thrown if the file cannot be written.</exception>
     void Save (SettingsFlags flags);
+
+    /// <summary>
+    /// Adds the specified file name to the file history list, moving it to the top if it already exists.
+    /// </summary>
+    /// <remarks>If the file name already exists in the history, it is moved to the top of the list. The file
+    /// history list is limited to a maximum number of entries; the oldest entries are removed if the limit is exceeded.
+    /// This method is supported only on Windows platforms.</remarks>
+    /// <param name="fileName">The name of the file to add to the file history list. Comparison is case-insensitive.</param>
+    void AddToFileHistory (string fileName);
+
+    /// <summary>
+    /// Clears the list of recently opened files.
+    /// </summary>
+    /// <remarks>Call this method to remove all entries from the recent files list, typically to reset user
+    /// history or in response to a privacy-related action. After calling this method, the list of last open files will
+    /// be empty until new files are opened.</remarks>
+
+    void ClearLastOpenFilesList ();
 }

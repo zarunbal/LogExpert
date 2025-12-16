@@ -21,6 +21,12 @@ public class LocalFileSystem : IFileSystemPlugin
         }
     }
 
+    /// <summary>
+    /// Retrieves information about a log file specified by a file URI.
+    /// </summary>
+    /// <param name="uriString">The URI string that identifies the log file. Must be a valid file URI.</param>
+    /// <returns>An object that provides information about the specified log file.</returns>
+    /// <exception cref="UriFormatException">Thrown if the provided URI string does not represent a file URI.</exception>
     public ILogFileInfo GetLogfileInfo (string uriString)
     {
         Uri uri = new(uriString);

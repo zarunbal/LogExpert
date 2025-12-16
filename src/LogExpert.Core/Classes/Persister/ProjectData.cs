@@ -15,5 +15,10 @@ public class ProjectData
     /// </summary>
     public string TabLayoutXml { get; set; }
 
+    /// <summary>
+    /// Gets or sets the full file path to the project file.
+    /// </summary>
+    public string ProjectFilePath { get; set; }
+
     #endregion
 }

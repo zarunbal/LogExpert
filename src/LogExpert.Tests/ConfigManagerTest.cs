@@ -675,8 +675,7 @@ public class ConfigManagerTest
 
         // Verify settings were actually imported
         Settings currentSettings = _configManager.Settings;
-        Assert.That(currentSettings.FilterList.Any(f => f.SearchText == "IMPORT_TEST_FILTER"), Is.True,
-            "Imported filter should be present");
+        Assert.That(currentSettings.FilterList.Any(f => f.SearchText == "IMPORT_TEST_FILTER"), Is.True, "Imported filter should be present");
     }
 
     [Test]

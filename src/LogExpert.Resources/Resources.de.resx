@@ -1689,22 +1689,22 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Start: {0}
 		Ende: {1}</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Title" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
 		<value>Sitzung laden</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Label_Informational" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_Informational" xml:space="preserve">
 		<value>Das Wiederherstellen des Layouts erfordert eine leere Arbeitsfläche.</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Label_ChooseHowToProceed" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Label_ChooseHowToProceed" xml:space="preserve">
 		<value>Bitte wählen Sie, wie Sie fortfahren möchten:</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_CloseTabs" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_CloseTabs" xml:space="preserve">
 		<value>Vorhandene Tabs schließen</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_NewWindow" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_NewWindow" xml:space="preserve">
 		<value>Neues Fenster öffnen</value>
 	</data>
-  <data name="ProjectLoadDlg_UI_Button_Ignore" xml:space="preserve">
+  <data name="MissingFilesDialog_UI_Button_Ignore" xml:space="preserve">
 		<value>Layoutdaten ignorieren</value>
 	</data>
   <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">
@@ -1988,7 +1988,13 @@ Regex-Suche/Ersetzen in der aktuell ausgewählten Zeile</value>
     <value>Vertrauen bestätigen</value>
   </data>
   <data name="PluginTrustDialog_UI_Message_ConfirmRemove" xml:space="preserve">
-    <value>Vertrauen für Plugin entfernen:`n`n{0}`n`nDas Plugin wird nicht geladen, bis es erneut zur Vertrauensliste hinzugefügt wird.`n`nFortfahren?</value>
+    <value>Vertrauen für Plugin entfernen:
+
+{0}
+
+Das Plugin wird nicht geladen, bis es erneut zur Vertrauensliste hinzugefügt wird.
+
+Fortfahren?</value>
   </data>
   <data name="PluginTrustDialog_UI_Message_ConfirmRemoveTitle" xml:space="preserve">
     <value>Entfernung bestätigen</value>
@@ -2037,5 +2043,76 @@ Regex-Suche/Ersetzen in der aktuell ausgewählten Zeile</value>
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement" xml:space="preserve">
     <value>Plugin &amp;Trust Management...</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Missing" xml:space="preserve">
+    <value>Fehlen</value>
+  </data>
+  <data name="SearchDialog_UI_Error_InvalidRegexPattern" xml:space="preserve">
+    <value>Ungültiges Regex-Muster: {0}</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Title" xml:space="preserve">
+    <value>Suchen: {0}</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Logfiles" xml:space="preserve">
+    <value>Protokolldateien (*.lxp)|*.lxp|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_LoadUpdateSession" xml:space="preserve">
+    <value>&amp;&amp; Aktualisierungssitzung laden</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount" xml:space="preserve">
+    <value>&amp;&amp; Aktualisierungssitzung laden ({0})</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Label_Summary" xml:space="preserve">
+    <value>Gefunden: {0} von {1} Dateien ({2} fehlen)</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Selected" xml:space="preserve">
+    <value>Ausgewählt</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Alternative" xml:space="preserve">
+    <value>Alternative</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
+    <value>Gültig</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+    <value>Sitzungsaktualisierung fehlgeschlagen</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+    <value>Sitzungsdatei konnte nicht aktualisiert werden: {0}</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+    <value>Sitzung aktualisiert</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+    <value>Die Sitzungsdatei wurde mit den neuen Dateipfaden aktualisiert.</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+    <value>Das Laden der Sitzung ist fehlgeschlagen</value>
+  </data>
+  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+    <value>Keine der Dateien in dieser Sitzung konnte gefunden werden. Die Sitzung kann nicht geladen werden.</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
+    <value>Das Laden des Projekts ist fehlgeschlagen</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>Fehler beim Laden der Projektdatei. Die Datei ist möglicherweise beschädigt oder nicht zugänglich.</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
+    <value>Standard (einzelne Zeile)</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Description" xml:space="preserve">
+    <value>Keine Spaltenaufteilung. Die gesamte Zeile wird in einer einzigen Spalte angezeigt.</value>
+  </data>
+  <data name="LogfileReader_Error_Message_MustProvideAtLeastOneFile" xml:space="preserve">
+    <value>Es muss mindestens eine Datei bereitgestellt werden.</value>
+  </data>
+  <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
+    <value>Neustart empfohlen</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_PluginTrustConfigurationUpdate" xml:space="preserve">
+    <value>Plugin-Vertrauenskonfiguration aktualisiert.
+
+LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
 </root>

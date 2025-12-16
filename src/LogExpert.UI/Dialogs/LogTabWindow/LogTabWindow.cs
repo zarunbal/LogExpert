@@ -19,7 +19,6 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interface;
 using LogExpert.Dialogs;
 using LogExpert.Entities;
-using LogExpert.PluginRegistry.FileSystem;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -41,7 +40,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private const int MAX_COLUMNIZER_HISTORY = 40;
     private const int MAX_COLOR_HISTORY = 40;
     private const int DIFF_MAX = 100;
-    private const int MAX_FILE_HISTORY = 10;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly Icon _deadIcon;
 
@@ -546,7 +544,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
     {
-        var logFileName = FindFilenameForSettings(givenFileName);
+        var logFileName = PersisterHelpers.FindFilenameForSettings(givenFileName, PluginRegistry.PluginRegistry.Instance);
         var win = FindWindowForFile(logFileName);
         if (win != null)
         {
@@ -585,20 +583,21 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var data = logWindow.Tag as LogWindowData;
         data.Color = _defaultTabColor;
-        SetTabColor(logWindow, _defaultTabColor);
+        //TODO SetTabColor and the Coloring must be reimplemented with a different UI Framework
+        //SetTabColor(logWindow, _defaultTabColor);
         //data.tabPage.BorderColor = this.defaultTabBorderColor;
-        if (!isTempFile)
-        {
-            foreach (var colorEntry in ConfigManager.Settings.FileColors)
-            {
-                if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
-                {
-                    data.Color = colorEntry.Color;
-                    SetTabColor(logWindow, colorEntry.Color);
-                    break;
-                }
-            }
-        }
+        //if (!isTempFile)
+        //{
+        //    foreach (var colorEntry in ConfigManager.Settings.FileColors)
+        //    {
+        //        if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
+        //        {
+        //            data.Color = colorEntry.Color;
+        //            //SetTabColor(logWindow, colorEntry.Color);
+        //            break;
+        //        }
+        //    }
+        //}
 
         if (!isTempFile)
         {
@@ -910,8 +909,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void SaveLastOpenFilesList ()
     {
-        ConfigManager.Settings.LastOpenFilesList.Clear();
-        foreach (DockContent content in dockPanel.Contents)
+        foreach (DockContent content in dockPanel.Contents.Cast<DockContent>())
         {
             if (content is LogWindow.LogWindow logWin)
             {
@@ -1045,24 +1043,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void AddToFileHistory (string fileName)
     {
-        bool FindName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
-
-        var index = ConfigManager.Settings.FileHistoryList.FindIndex(FindName);
-
-        if (index != -1)
-        {
-            ConfigManager.Settings.FileHistoryList.RemoveAt(index);
-        }
-
-        ConfigManager.Settings.FileHistoryList.Insert(0, fileName);
-
-        while (ConfigManager.Settings.FileHistoryList.Count > MAX_FILE_HISTORY)
-        {
-            ConfigManager.Settings.FileHistoryList.RemoveAt(ConfigManager.Settings.FileHistoryList.Count - 1);
-        }
-
-        ConfigManager.Save(SettingsFlags.FileHistory);
-
+        ConfigManager.AddToFileHistory(fileName);
         FillHistoryMenu();
     }
 
@@ -1081,46 +1062,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Checks if the file name is a settings file. If so, the contained logfile name
-    /// is returned. If not, the given file name is returned unchanged.
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
-    private static string FindFilenameForSettings (string fileName)
-    {
-        if (fileName.EndsWith(".lxp", StringComparison.OrdinalIgnoreCase))
-        {
-            var persistenceData = Persister.Load(fileName);
-            if (persistenceData == null)
-            {
-                return fileName;
-            }
-
-            if (!string.IsNullOrEmpty(persistenceData.FileName))
-            {
-                var fs = PluginRegistry.PluginRegistry.Instance.FindFileSystemForUri(persistenceData.FileName);
-                if (fs != null && !fs.GetType().Equals(typeof(LocalFileSystem)))
-                {
-                    return persistenceData.FileName;
-                }
-
-                // On relative paths the URI check (and therefore the file system plugin check) will fail.
-                // So fs == null and fs == LocalFileSystem are handled here like normal files.
-                if (Path.IsPathRooted(persistenceData.FileName))
-                {
-                    return persistenceData.FileName;
-                }
-
-                // handle relative paths in .lxp files
-                var dir = Path.GetDirectoryName(fileName);
-                return Path.Join(dir, persistenceData.FileName);
-            }
-        }
-
-        return fileName;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1372,7 +1313,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             oldLogWindow.BookmarkAdded -= OnBookmarkAdded;
             oldLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
             oldLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
-            DisconnectToolWindows(oldLogWindow);
+            DisconnectToolWindows();
         }
 
         if (newLogWindow != null)
@@ -1434,13 +1375,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _bookmarkWindow.SetCurrentFile(ctx);
     }
 
-    private void DisconnectToolWindows (LogWindow.LogWindow logWindow)
+    private void DisconnectToolWindows ()
     {
-        DisconnectBookmarkWindow(logWindow);
+        DisconnectBookmarkWindow();
     }
 
-    //TODO Find out if logwindow is necessary here
-    private void DisconnectBookmarkWindow (LogWindow.LogWindow logWindow)
+    private void DisconnectBookmarkWindow ()
     {
         _bookmarkWindow.SetBookmarkData(null);
         _bookmarkWindow.SetCurrentFile(null);
@@ -1460,6 +1400,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
         multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
         cellSelectModeToolStripMenuItem.Checked = e.CellSelectMode;
+
         RefreshEncodingMenuBar(e.CurrentEncoding);
 
         if (e.TimeshiftPossible && ConfigManager.Settings.Preferences.TimestampControl)
@@ -1679,6 +1620,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
+    //TODO Task based
     private void LedThreadProc ()
     {
         Thread.CurrentThread.Name = "LED Thread";
@@ -2002,44 +1944,96 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     //TODO Reimplementation needs a new UI Framework since, DockpanelSuite has no easy way to change TabColor
-    private static void SetTabColor (LogWindow.LogWindow logWindow, Color color)
-    {
-        //tabPage.BackLowColor = color;
-        //tabPage.BackLowColorDisabled = Color.FromArgb(255,
-        //  Math.Max(0, color.R - 50),
-        //  Math.Max(0, color.G - 50),
-        //  Math.Max(0, color.B - 50)
-        //  );
-    }
+    //private static void SetTabColor (LogWindow.LogWindow logWindow, Color color)
+    //{
+    //    //tabPage.BackLowColor = color;
+    //    //tabPage.BackLowColorDisabled = Color.FromArgb(255,
+    //    //  Math.Max(0, color.R - 50),
+    //    //  Math.Max(0, color.G - 50),
+    //    //  Math.Max(0, color.B - 50)
+    //    //  );
+    //}
 
     [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
-        var projectData = ProjectPersister.LoadProjectData(projectFileName);
-        var hasLayoutData = projectData.TabLayoutXml != null;
-
-        if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
+        try
         {
-            ProjectLoadDlg dlg = new();
-            if (DialogResult.Cancel != dlg.ShowDialog())
+            // Load project with validation
+            var loadResult = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
+
+            if (loadResult?.ProjectData == null)
             {
-                switch (dlg.ProjectLoadResult)
+                ShowOkMessage(
+                    Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible,
+                    Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
+                    MessageBoxIcon.Error);
+
+                return;
+            }
+
+            var projectData = loadResult.ProjectData;
+            var hasLayoutData = projectData.TabLayoutXml != null;
+
+            if (projectData.FileNames.Count == 0)
+            {
+                ShowOkMessage(
+                    Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
+                    Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            // Handle missing files or layout options
+            if (loadResult.RequiresUserIntervention)
+            {
+                // Show enhanced dialog with browsing capability and layout options
+                var (dialogResult, updateSessionFile, selectedAlternatives) = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, hasLayoutData);
+
+                if (dialogResult == MissingFilesDialogResult.Cancel)
                 {
-                    case ProjectLoadDlgResult.IgnoreLayout:
-                        hasLayoutData = false;
-                        break;
-                    case ProjectLoadDlgResult.CloseTabs:
+                    return;
+                }
+
+                if (updateSessionFile)
+                {
+                    // Replace original paths with selected alternatives in project data
+                    for (int i = 0; i < projectData.FileNames.Count; i++)
+                    {
+                        var originalPath = projectData.FileNames[i];
+                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
+                        {
+                            projectData.FileNames[i] = value;
+                        }
+                    }
+
+                    ProjectPersister.SaveProjectData(projectFileName, projectData);
+
+                    ShowOkMessage(
+                        Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
+                        Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
+                        MessageBoxIcon.Information);
+                }
+
+                // Handle layout-related results
+                switch (dialogResult)
+                {
+                    case MissingFilesDialogResult.CloseTabsAndRestoreLayout:
                         CloseAllTabs();
                         break;
-                    case ProjectLoadDlgResult.NewWindow:
-                        LogExpertProxy.NewWindow([projectFileName]);
-                        return;
+                    case MissingFilesDialogResult.OpenInNewWindow:
+                        {
+                            var logFileNames = PersisterHelpers.FindFilenameForSettings(projectData.FileNames.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
+                            LogExpertProxy.NewWindow([.. logFileNames]);
+                            return;
+                        }
+                    case MissingFilesDialogResult.IgnoreLayout:
+                        hasLayoutData = false;
+                        break;
                 }
             }
-        }
 
-        if (projectData != null)
-        {
             foreach (var fileName in projectData.FileNames)
             {
                 _ = hasLayoutData
@@ -2047,14 +2041,36 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     : AddFileTab(fileName, false, null, true, null);
             }
 
-            if (hasLayoutData && restoreLayout)
+            // Restore layout only if we loaded at least one file
+            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
             {
+                _logger.Info("Restoring layout");
                 // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
                 DestroyToolWindows();
                 InitToolWindows();
                 RestoreLayout(projectData.TabLayoutXml);
             }
+            else if (_logWindowList.Count == 0)
+            {
+                _logger.Warn("No files loaded, skipping layout restoration");
+            }
         }
+        catch (Exception ex)
+        {
+            ShowOkMessage(
+                $"Error loading project: {ex.Message}",
+                Resources.LogExpert_Common_UI_Title_Error,
+                MessageBoxIcon.Error);
+        }
+    }
+
+    private static void ShowOkMessage (string title, string message, MessageBoxIcon icon)
+    {
+        _ = MessageBox.Show(
+            message,
+            title,
+            MessageBoxButtons.OK,
+            icon);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2229,6 +2245,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     AddFileTab(name, false, null, false, null);
                 }
             }
+
+            ConfigManager.ClearLastOpenFilesList();
         }
 
         if (_startupFileNames != null)
@@ -2623,8 +2641,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 //if (this.dockPanel.ActiveContent != null &&
                 //    this.dockPanel.ActiveContent != sender || data.tailState != 0)
-                if ((CurrentLogWindow != null &&
-                    CurrentLogWindow != sender) || data.TailState != 0)
+                if (CurrentLogWindow != null && CurrentLogWindow != sender || data.TailState != 0)
                 {
                     data.Dirty = true;
                 }
@@ -2928,45 +2945,46 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnTabColorToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
+        //Todo TabColoring must be reimplemented with a different UI Framework
+        //var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
 
-        if (logWindow.Tag is not LogWindowData data)
-        {
-            return;
-        }
+        //if (logWindow.Tag is not LogWindowData data)
+        //{
+        //    return;
+        //}
 
-        ColorDialog dlg = new()
-        {
-            Color = data.Color
-        };
+        //ColorDialog dlg = new()
+        //{
+        //    Color = data.Color
+        //};
 
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            data.Color = dlg.Color;
-            SetTabColor(logWindow, data.Color);
-        }
+        //if (dlg.ShowDialog() == DialogResult.OK)
+        //{
+        //    data.Color = dlg.Color;
+        //    //SetTabColor(logWindow, data.Color);
+        //}
 
-        List<ColorEntry> delList = [];
+        //List<ColorEntry> delList = [];
 
-        foreach (var entry in ConfigManager.Settings.FileColors)
-        {
-            if (entry.FileName.Equals(logWindow.FileName, StringComparison.Ordinal))
-            {
-                delList.Add(entry);
-            }
-        }
+        //foreach (var entry in ConfigManager.Settings.FileColors)
+        //{
+        //    if (entry.FileName.Equals(logWindow.FileName, StringComparison.Ordinal))
+        //    {
+        //        delList.Add(entry);
+        //    }
+        //}
 
-        foreach (var entry in delList)
-        {
-            _ = ConfigManager.Settings.FileColors.Remove(entry);
-        }
+        //foreach (var entry in delList)
+        //{
+        //    _ = ConfigManager.Settings.FileColors.Remove(entry);
+        //}
 
-        ConfigManager.Settings.FileColors.Add(new ColorEntry(logWindow.FileName, dlg.Color));
+        //ConfigManager.Settings.FileColors.Add(new ColorEntry(logWindow.FileName, dlg.Color));
 
-        while (ConfigManager.Settings.FileColors.Count > MAX_COLOR_HISTORY)
-        {
-            ConfigManager.Settings.FileColors.RemoveAt(0);
-        }
+        //while (ConfigManager.Settings.FileColors.Count > MAX_COLOR_HISTORY)
+        //{
+        //    ConfigManager.Settings.FileColors.RemoveAt(0);
+        //}
     }
 
     [SupportedOSPlatform("windows")]

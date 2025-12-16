@@ -1,5 +1,7 @@
 using System.Text;
 
+using LogExpert.Core.Interface;
+
 using Newtonsoft.Json;
 
 using NLog;
@@ -13,11 +15,13 @@ public static class ProjectPersister
     #region Public methods
 
     /// <summary>
-    /// Loads the project session data from a specified file.
+    /// Loads the project session data from a specified file, including validation of referenced files.
+    /// Resolves .lxp persistence files to actual .log files before validation.
     /// </summary>
-    /// <param name="projectFileName"></param>
-    /// <returns></returns>
-    public static ProjectData LoadProjectData (string projectFileName)
+    /// <param name="projectFileName">The path to the project file (.lxj)</param>
+    /// <param name="pluginRegistry">The plugin registry for file system validation</param>
+    /// <returns>A <see cref="ProjectLoadResult"/> containing the project data and validation results</returns>
+    public static ProjectLoadResult LoadProjectData (string projectFileName, IPluginRegistry pluginRegistry)
     {
         try
         {
@@ -27,15 +31,74 @@ public static class ProjectPersister
             };
 
             var json = File.ReadAllText(projectFileName, Encoding.UTF8);
-            return JsonConvert.DeserializeObject<ProjectData>(json, settings);
+            var projectData = JsonConvert.DeserializeObject<ProjectData>(json, settings);
+
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Resolve .lxp files to actual .log files
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            // Create mapping: logFile → originalFile
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            // Create new ProjectData with resolved log file paths
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            // Validate the actual log files (not .lxp files)
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
+
+            return new ProjectLoadResult
+            {
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
+            };
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or
                                          IOException or
                                          JsonSerializationException)
         {
-
             _logger.Warn($"Error loading persistence data from {projectFileName}, trying old xml version");
-            return ProjectPersisterXML.LoadProjectData(projectFileName);
+
+            var projectData = ProjectPersisterXML.LoadProjectData(projectFileName);
+
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Resolve .lxp files for XML fallback as well
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
+
+            return new ProjectLoadResult
+            {
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
+            };
         }
     }
 
