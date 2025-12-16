@@ -175,7 +175,7 @@ public class ProjectFileValidatorTests
         };
 
         // Act - call the List overload explicitly
-        var result = PersisterHelpers.FindFilenameForSettings(fileList, PluginRegistry.PluginRegistry.Instance);
+        var result = PersisterHelpers.FindFilenameForSettings(fileList.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3), "Should resolve all files");
@@ -198,7 +198,7 @@ public class ProjectFileValidatorTests
         };
 
         // Act - call the List overload explicitly
-        var result = PersisterHelpers.FindFilenameForSettings(fileList, PluginRegistry.PluginRegistry.Instance);
+        var result = PersisterHelpers.FindFilenameForSettings(fileList.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
