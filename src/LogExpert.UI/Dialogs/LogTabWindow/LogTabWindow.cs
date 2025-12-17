@@ -43,6 +43,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly Icon _deadIcon;
 
+    private bool _disposed = false;
+
     private readonly Color _defaultTabColor = Color.FromArgb(255, 192, 192, 192);
     private readonly Brush _dirtyLedBrush;
 
@@ -250,37 +252,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     #endregion
-
-    private class LogWindowData
-    {
-        #region Fields
-
-        // public MdiTabControl.TabPage tabPage;
-
-        public Color Color { get; set; } = Color.FromKnownColor(KnownColor.Gray);
-
-        public int DiffSum { get; set; }
-
-        public bool Dirty { get; set; }
-
-        // tailState:
-        /// <summary>
-        /// 0 = on<br></br>
-        /// 1 = off<br></br>
-        /// 2 = off by Trigger<br></br>
-        /// </summary>
-        public int TailState { get; set; }
-
-        public ToolTip ToolTip { get; set; }
-
-        /// <summary>
-        /// 0 = off<br></br>
-        /// 1 = timeSynced
-        /// </summary>
-        public int SyncMode { get; set; }
-
-        #endregion
-    }
 
     #region Public methods
 
@@ -841,6 +812,124 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose (bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing && (components != null))
+        {
+            components.Dispose();
+
+            // Stop LED thread first to prevent access to disposed resources
+            StopLedThread();
+
+            // Dispose icons
+            DisposeIcons();
+
+            // Dispose brushes
+            DisposeBrushes();
+
+            _tabStringFormat?.Dispose();
+
+            _statusLineEventHandle?.Dispose();
+            _statusLineEventWakeupHandle?.Dispose();
+        }
+
+        _disposed = true;
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Stops the LED animation thread safely
+    /// </summary>
+    private void StopLedThread ()
+    {
+        if (_ledThread?.IsAlive == true)
+        {
+            _shouldStop = true;
+
+            // Give thread time to exit gracefully
+            if (!_ledThread.Join(TimeSpan.FromSeconds(1)))
+            {
+                _logger.Warn("LED thread did not stop gracefully within 1 second");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Disposes all LED icons in the 4D array
+    /// </summary>
+    private void DisposeIcons ()
+    {
+        if (_ledIcons == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _ledIcons.GetLength(0); i++)
+        {
+            for (int j = 0; j < _ledIcons.GetLength(1); j++)
+            {
+                for (int k = 0; k < _ledIcons.GetLength(2); k++)
+                {
+                    for (int l = 0; l < _ledIcons.GetLength(3); l++)
+                    {
+                        _ledIcons[i, j, k, l]?.Dispose();
+                        _ledIcons[i, j, k, l] = null;
+                    }
+                }
+            }
+        }
+
+        _deadIcon?.Dispose();
+
+        _logger.Debug("Disposed {Count} LED icons", 97); // 96 + 1 dead icon
+    }
+
+    /// <summary>
+    /// Disposes all brush resources
+    /// </summary>
+    private void DisposeBrushes ()
+    {
+        // Dispose LED brushes array
+        if (_ledBrushes != null)
+        {
+            foreach (var brush in _ledBrushes.Where(b => b != null))
+            {
+                brush.Dispose();
+            }
+
+            Array.Clear(_ledBrushes, 0, _ledBrushes.Length);
+        }
+
+        // Dispose tail LED brushes array
+        if (_tailLedBrush != null)
+        {
+            foreach (var brush in _tailLedBrush.Where(b => b != null))
+            {
+                brush.Dispose();
+            }
+
+            Array.Clear(_tailLedBrush, 0, _tailLedBrush.Length);
+        }
+
+        // Dispose individual brushes
+        _offLedBrush?.Dispose();
+
+        _dirtyLedBrush?.Dispose();
+
+        _syncLedBrush?.Dispose();
+
+        _logger.Debug("Disposed all brush resources");
+    }
 
     /// <summary>
     /// Creates a temp file with the text content of the clipboard and opens the temp file in a new tab.
@@ -2274,8 +2363,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         try
         {
             _shouldStop = true;
-            _ = _statusLineEventHandle.Set();
-            _ = _statusLineEventWakeupHandle.Set();
+            //_ = _statusLineEventHandle.Set();
+            //_ = _statusLineEventWakeupHandle.Set();
             _ledThread.Join();
 
             IList<LogWindow.LogWindow> deleteLogWindowList = [];
@@ -3309,4 +3398,35 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     #endregion
+
+    private class LogWindowData
+    {
+        #region Fields
+
+        // public MdiTabControl.TabPage tabPage;
+
+        public Color Color { get; set; } = Color.FromKnownColor(KnownColor.Gray);
+
+        public int DiffSum { get; set; }
+
+        public bool Dirty { get; set; }
+
+        // tailState:
+        /// <summary>
+        /// 0 = on<br></br>
+        /// 1 = off<br></br>
+        /// 2 = off by Trigger<br></br>
+        /// </summary>
+        public int TailState { get; set; }
+
+        public ToolTip ToolTip { get; set; }
+
+        /// <summary>
+        /// 0 = off<br></br>
+        /// 1 = timeSynced
+        /// </summary>
+        public int SyncMode { get; set; }
+
+        #endregion
+    }
 }
