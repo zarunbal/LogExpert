@@ -214,7 +214,7 @@ internal partial class BufferedDataGridView : DataGridView
     {
         var currentContext = BufferedGraphicsManager.Current;
 
-        using var myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle);
+        using var myBuffer = currentContext.Allocate(e.Graphics, ClientRectangle);
         lock (_overlayList)
         {
             _overlayList.Clear();

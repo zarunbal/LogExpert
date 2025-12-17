@@ -2115,4 +2115,10 @@ Fortfahren?</value>
 
 LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
+  <data name="LogExpert_Common_Error_Message_ServiceNotInitialized" xml:space="preserve">
+    <value>{0} nicht initialisiert</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized" xml:space="preserve">
+    <value>{0} ist bereits initialisiert</value>
+  </data>
 </root>

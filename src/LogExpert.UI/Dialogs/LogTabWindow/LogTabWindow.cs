@@ -23,6 +23,7 @@ using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
+using LogExpert.UI.Services;
 
 using NLog;
 
@@ -38,47 +39,32 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region Fields
 
     private const int MAX_COLUMNIZER_HISTORY = 40;
-    private const int MAX_COLOR_HISTORY = 40;
+    //private const int MAX_COLOR_HISTORY = 40;
     private const int DIFF_MAX = 100;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private readonly Icon _deadIcon;
 
-    private bool _disposed = false;
+    private readonly Icon _deadIcon;
+    private readonly ILedIndicatorService _ledService;
+    private readonly Lock _windowListLock = new();
+
+    private bool _disposed;
 
     private readonly Color _defaultTabColor = Color.FromArgb(255, 192, 192, 192);
-    private readonly Brush _dirtyLedBrush;
 
     private readonly int _instanceNumber;
-    private readonly Brush[] _ledBrushes = new Brush[5];
-    private readonly Icon[,,,] _ledIcons = new Icon[6, 2, 4, 2];
-
-    private readonly Rectangle[] _leds = new Rectangle[5];
 
     private readonly IList<LogWindow.LogWindow> _logWindowList = [];
-    private readonly Brush _offLedBrush;
     private readonly bool _showInstanceNumbers;
 
     private readonly string[] _startupFileNames;
 
-    private readonly EventWaitHandle _statusLineEventHandle = new AutoResetEvent(false);
-    private readonly EventWaitHandle _statusLineEventWakeupHandle = new ManualResetEvent(false);
-    private readonly Brush _syncLedBrush;
-
     [SupportedOSPlatform("windows")]
     private readonly StringFormat _tabStringFormat = new();
-
-    private readonly Brush[] _tailLedBrush = new Brush[3];
 
     private BookmarkWindow _bookmarkWindow;
 
     private LogWindow.LogWindow _currentLogWindow;
     private bool _firstBookmarkWindowShow = true;
-
-    private Thread _ledThread;
-
-    //Settings settings;
-
-    private bool _shouldStop;
 
     private bool _skipEvents;
 
@@ -117,31 +103,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         Rectangle led = new(0, 0, 8, 2);
 
-        for (var i = 0; i < _leds.Length; ++i)
-        {
-            _leds[i] = led;
-            led.Offset(0, led.Height + 0);
-        }
+        _ledService = new LedIndicatorService();
+        _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
+        _ledService.IconChanged += OnLedIconChanged;
+        _ledService.Start();
 
-        var grayAlpha = 50;
-
-        _ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 220, 0, 0));
-        _ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 220, 220, 0));
-        _ledBrushes[2] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-        _ledBrushes[3] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-        _ledBrushes[4] = new SolidBrush(Color.FromArgb(255, 0, 220, 0));
-
-        _offLedBrush = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160));
-
-        _dirtyLedBrush = new SolidBrush(Color.FromArgb(255, 220, 0, 00));
-
-        _tailLedBrush[0] = new SolidBrush(Color.FromArgb(255, 50, 100, 250)); // Follow tail: blue-ish
-        _tailLedBrush[1] = new SolidBrush(Color.FromArgb(grayAlpha, 160, 160, 160)); // Don't follow tail: gray
-        _tailLedBrush[2] = new SolidBrush(Color.FromArgb(255, 220, 220, 0)); // Stop follow tail (trigger): yellow-ish
-
-        _syncLedBrush = new SolidBrush(Color.FromArgb(255, 250, 145, 30));
-
-        CreateIcons();
+        _deadIcon = _ledService.GetDeadIcon();
 
         _tabStringFormat.LineAlignment = StringAlignment.Center;
         _tabStringFormat.Alignment = StringAlignment.Near;
@@ -168,9 +135,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         dragControlDateTime.Visible = false;
         loadProgessBar.Visible = false;
-
-        using var bmp = Resources.Deceased;
-        _deadIcon = Icon.FromHandle(bmp.GetHicon());
 
         FormClosing += OnLogTabWindowFormClosing;
 
@@ -692,7 +656,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 {
                     if (logWindow.ScrollToTimestamp(timestamp, false, false))
                     {
-                        ShowLedPeak(logWindow);
+                        _ledService.UpdateWindowActivity(logWindow, DIFF_MAX);
                     }
                 }
             }
@@ -773,15 +737,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        data.TailState = isEnabled
-            ? 0
+        data.LedState.TailState = isEnabled
+            ? TailFollowState.On
             : offByTrigger
-                ? 2
-                : 1;
+                ? TailFollowState.Paused
+                : TailFollowState.Off;
 
         if (Preferences.ShowTailState)
         {
-            var icon = GetLedIcon(data.DiffSum, data);
+            var icon = GetLedIcon(data.LedState.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
         }
     }
@@ -826,109 +790,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (disposing && (components != null))
         {
+            _ledService?.Stop();
+            _ledService?.Dispose();
             components.Dispose();
-
-            // Stop LED thread first to prevent access to disposed resources
-            StopLedThread();
-
-            // Dispose icons
-            DisposeIcons();
-
-            // Dispose brushes
-            DisposeBrushes();
-
             _tabStringFormat?.Dispose();
-
-            _statusLineEventHandle?.Dispose();
-            _statusLineEventWakeupHandle?.Dispose();
         }
 
         _disposed = true;
         base.Dispose(disposing);
-    }
-
-    /// <summary>
-    /// Stops the LED animation thread safely
-    /// </summary>
-    private void StopLedThread ()
-    {
-        if (_ledThread?.IsAlive == true)
-        {
-            _shouldStop = true;
-
-            // Give thread time to exit gracefully
-            if (!_ledThread.Join(TimeSpan.FromSeconds(1)))
-            {
-                _logger.Warn("LED thread did not stop gracefully within 1 second");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Disposes all LED icons in the 4D array
-    /// </summary>
-    private void DisposeIcons ()
-    {
-        if (_ledIcons == null)
-        {
-            return;
-        }
-
-        for (int i = 0; i < _ledIcons.GetLength(0); i++)
-        {
-            for (int j = 0; j < _ledIcons.GetLength(1); j++)
-            {
-                for (int k = 0; k < _ledIcons.GetLength(2); k++)
-                {
-                    for (int l = 0; l < _ledIcons.GetLength(3); l++)
-                    {
-                        _ledIcons[i, j, k, l]?.Dispose();
-                        _ledIcons[i, j, k, l] = null;
-                    }
-                }
-            }
-        }
-
-        _deadIcon?.Dispose();
-
-        _logger.Debug("Disposed {Count} LED icons", 97); // 96 + 1 dead icon
-    }
-
-    /// <summary>
-    /// Disposes all brush resources
-    /// </summary>
-    private void DisposeBrushes ()
-    {
-        // Dispose LED brushes array
-        if (_ledBrushes != null)
-        {
-            foreach (var brush in _ledBrushes.Where(b => b != null))
-            {
-                brush.Dispose();
-            }
-
-            Array.Clear(_ledBrushes, 0, _ledBrushes.Length);
-        }
-
-        // Dispose tail LED brushes array
-        if (_tailLedBrush != null)
-        {
-            foreach (var brush in _tailLedBrush.Where(b => b != null))
-            {
-                brush.Dispose();
-            }
-
-            Array.Clear(_tailLedBrush, 0, _tailLedBrush.Length);
-        }
-
-        // Dispose individual brushes
-        _offLedBrush?.Dispose();
-
-        _dirtyLedBrush?.Dispose();
-
-        _syncLedBrush?.Dispose();
-
-        _logger.Debug("Disposed all brush resources");
     }
 
     /// <summary>
@@ -1088,12 +957,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         LogWindowData data = new()
         {
-            DiffSum = 0
+            LedState = new LedState()
         };
 
         logWindow.Tag = data;
 
-        lock (_logWindowList)
+        lock (_windowListLock)
         {
             _logWindowList.Add(logWindow);
         }
@@ -1108,6 +977,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.SyncModeChanged += OnLogWindowSyncModeChanged;
 
         logWindow.Visible = true;
+
+        _ledService.RegisterWindow(logWindow);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1173,9 +1044,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void RemoveLogWindow (LogWindow.LogWindow logWindow)
     {
-        lock (_logWindowList)
+        lock (_windowListLock)
         {
             _ = _logWindowList.Remove(logWindow);
+            _ledService.UnregisterWindow(logWindow);
         }
 
         DisconnectEventHandlers(logWindow);
@@ -1562,103 +1434,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    // tailState: 0,1,2 = on/off/off by Trigger
-    // syncMode: 0 = normal (no), 1 = time synced
-    [SupportedOSPlatform("windows")]
-    private Icon CreateLedIcon (int level, bool dirty, int tailState, int syncMode)
-    {
-        var iconRect = _leds[0];
-        iconRect.Height = 16; // (DockPanel's damn hardcoded height) // this.leds[this.leds.Length - 1].Bottom;
-        iconRect.Width = iconRect.Right + 6;
-        Bitmap bmp = new(iconRect.Width, iconRect.Height);
-        var gfx = Graphics.FromImage(bmp);
-
-        var offsetFromTop = 4;
-
-        for (var i = 0; i < _leds.Length; ++i)
-        {
-            var ledRect = _leds[i];
-            ledRect.Offset(0, offsetFromTop);
-
-            if (level >= _leds.Length - i)
-            {
-                gfx.FillRectangle(_ledBrushes[i], ledRect);
-            }
-            else
-            {
-                gfx.FillRectangle(_offLedBrush, ledRect);
-            }
-        }
-
-        var ledSize = 3;
-        var ledGap = 1;
-        var lastLed = _leds[^1];
-        Rectangle dirtyLed = new(lastLed.Right + 2, lastLed.Bottom - ledSize, ledSize, ledSize);
-        Rectangle tailLed = new(dirtyLed.Location, dirtyLed.Size);
-        tailLed.Offset(0, -(ledSize + ledGap));
-        Rectangle syncLed = new(tailLed.Location, dirtyLed.Size);
-        syncLed.Offset(0, -(ledSize + ledGap));
-
-        syncLed.Offset(0, offsetFromTop);
-        tailLed.Offset(0, offsetFromTop);
-        dirtyLed.Offset(0, offsetFromTop);
-
-        if (dirty)
-        {
-            gfx.FillRectangle(_dirtyLedBrush, dirtyLed);
-        }
-        else
-        {
-            gfx.FillRectangle(_offLedBrush, dirtyLed);
-        }
-
-        // tailMode 4 means: don't show
-        if (tailState < 3)
-        {
-            gfx.FillRectangle(_tailLedBrush[tailState], tailLed);
-        }
-
-        if (syncMode == 1)
-        {
-            gfx.FillRectangle(_syncLedBrush, syncLed);
-        }
-        //else
-        //{
-        //  gfx.FillRectangle(this.offLedBrush, syncLed);
-        //}
-
-        // see http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=345656
-        // GetHicon() creates an unmanaged handle which must be destroyed. The Clone() workaround creates
-        // a managed copy of icon. then the unmanaged win32 handle is destroyed
-        var iconHandle = bmp.GetHicon();
-        var icon = Icon.FromHandle(iconHandle).Clone() as Icon;
-        _ = Vanara.PInvoke.User32.DestroyIcon(iconHandle);
-
-        gfx.Dispose();
-        bmp.Dispose();
-        return icon;
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void CreateIcons ()
-    {
-        for (var syncMode = 0; syncMode <= 1; syncMode++) // LED indicating time synced tabs
-        {
-            for (var tailMode = 0; tailMode < 4; tailMode++)
-            {
-                for (var i = 0; i < 6; ++i)
-                {
-                    _ledIcons[i, 0, tailMode, syncMode] = CreateLedIcon(i, false, tailMode, syncMode);
-                }
-
-                for (var i = 0; i < 6; ++i)
-                {
-                    _ledIcons[i, 1, tailMode, syncMode] = CreateLedIcon(i, true, tailMode, syncMode);
-                }
-            }
-        }
-    }
-
     [SupportedOSPlatform("windows")]
     private void FileNotFound (LogWindow.LogWindow logWin)
     {
@@ -1671,78 +1446,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void FileRespawned (LogWindow.LogWindow logWin)
     {
         var data = logWin.Tag as LogWindowData;
+        data.LedState.DiffSum = 0;
         var icon = GetLedIcon(0, data);
         _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void ShowLedPeak (LogWindow.LogWindow logWin)
-    {
-        var data = logWin.Tag as LogWindowData;
-        lock (data)
-        {
-            data.DiffSum = DIFF_MAX;
-        }
-
-        var icon = GetLedIcon(data.DiffSum, data);
-        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
-    }
-
-    private static int GetLevelFromDiff (int diff)
-    {
-        if (diff > 60)
-        {
-            diff = 60;
-        }
-
-        var level = diff / 10;
-        if (diff > 0 && level == 0)
-        {
-            level = 2;
-        }
-        else if (level == 0)
-        {
-            level = 1;
-        }
-
-        return level - 1;
-    }
-
-    [SupportedOSPlatform("windows")]
-    //TODO Task based
-    private void LedThreadProc ()
-    {
-        Thread.CurrentThread.Name = "LED Thread";
-        while (!_shouldStop)
-        {
-            try
-            {
-                Thread.Sleep(200);
-            }
-            catch
-            {
-                return;
-            }
-
-            lock (_logWindowList)
-            {
-                foreach (var logWindow in _logWindowList)
-                {
-                    var data = logWindow.Tag as LogWindowData;
-                    if (data.DiffSum > 0)
-                    {
-                        data.DiffSum -= 10;
-                        if (data.DiffSum < 0)
-                        {
-                            data.DiffSum = 0;
-                        }
-
-                        var icon = GetLedIcon(data.DiffSum, data);
-                        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
-                    }
-                }
-            }
-        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -1755,14 +1461,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    private Icon GetLedIcon (int diff, LogWindowData data)
+    /// <summary>
+    /// Gets the appropriate LED icon based on the difference sum and LED state.
+    /// </summary>
+    /// <param name="diffSum">The difference sum value used to determine the icon state.</param>
+    /// <param name="data">The log window data containing the LED state information.</param>
+    /// <returns>An <see cref="Icon"/> representing the current LED state.</returns>
+    private Icon GetLedIcon (int diffSum, LogWindowData data)
     {
-        var icon =
-            _ledIcons[
-                GetLevelFromDiff(diff), data.Dirty ? 1 : 0, Preferences.ShowTailState ? data.TailState : 3,
-                data.SyncMode
-            ];
-        return icon;
+        return _ledService.GetIcon(diffSum, data.LedState);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1880,14 +1587,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void SetTabIcons (Preferences preferences)
     {
-        _tailLedBrush[0] = new SolidBrush(preferences.ShowTailColor);
-        CreateIcons();
+        _ledService.RegenerateIcons(preferences.ShowTailColor);
         lock (_logWindowList)
         {
             foreach (var logWindow in _logWindowList)
             {
                 var data = logWindow.Tag as LogWindowData;
-                var icon = GetLedIcon(data.DiffSum, data);
+                var icon = GetLedIcon(data.LedState.DiffSum, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
             }
         }
@@ -2343,12 +2049,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             LoadFiles(_startupFileNames, false);
         }
 
-        _ledThread = new Thread(LedThreadProc)
-        {
-            IsBackground = true
-        };
-        _ledThread.Start();
-
         FillHighlightComboBox();
         FillToolLauncherBar();
 
@@ -2362,11 +2062,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         try
         {
-            _shouldStop = true;
-            //_ = _statusLineEventHandle.Set();
-            //_ = _statusLineEventWakeupHandle.Set();
-            _ledThread.Join();
-
             IList<LogWindow.LogWindow> deleteLogWindowList = [];
             ConfigManager.Settings.AlwaysOnTop = TopMost && ConfigManager.Settings.Preferences.AllowOnlyOneInstance;
             SaveLastOpenFilesList();
@@ -2709,36 +2404,23 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnFileSizeChanged (object sender, LogEventArgs e)
     {
-        if (sender.GetType().IsAssignableFrom(typeof(LogWindow.LogWindow)))
+        if (sender is not LogWindow.LogWindow logWindow)
         {
-            var diff = e.LineCount - e.PrevLineCount;
-            if (diff < 0)
-            {
-                return;
-            }
-
-            if (((LogWindow.LogWindow)sender).Tag is LogWindowData data)
-            {
-                lock (data)
-                {
-                    data.DiffSum += diff;
-                    if (data.DiffSum > DIFF_MAX)
-                    {
-                        data.DiffSum = DIFF_MAX;
-                    }
-                }
-
-                //if (this.dockPanel.ActiveContent != null &&
-                //    this.dockPanel.ActiveContent != sender || data.tailState != 0)
-                if (CurrentLogWindow != null && CurrentLogWindow != sender || data.TailState != 0)
-                {
-                    data.Dirty = true;
-                }
-
-                var icon = GetLedIcon(diff, data);
-                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
-            }
+            return;
         }
+
+        if (logWindow.Tag is not LogWindowData data)
+        {
+            return;
+        }
+
+        var diff = e.LineCount - e.PrevLineCount;
+        if (diff < 0)
+        {
+            return;
+        }
+
+        _ledService.UpdateWindowActivity(logWindow, diff);
     }
 
     private void OnLogWindowFileNotFound (object sender, EventArgs e)
@@ -2786,8 +2468,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             if (dockPanel.ActiveContent == sender)
             {
                 var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
-                data.Dirty = false;
-                var icon = GetLedIcon(data.DiffSum, data);
+                data.LedState.IsDirty = false;
+                var icon = GetLedIcon(data.LedState.DiffSum, data);
                 _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
             }
         }
@@ -2799,14 +2481,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (!Disposing)
         {
             var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
-            data.SyncMode = e.IsTimeSynced ? 1 : 0;
-            var icon = GetLedIcon(data.DiffSum, data);
+            data.LedState.SyncState = e.IsTimeSynced
+                ? TimeSyncState.Synced
+                : TimeSyncState.NotSynced;
+
+            var icon = GetLedIcon(data.LedState.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
         }
-        //else
-        //{
-        //    _logger.Warn("Received SyncModeChanged event while disposing. Event ignored.");
-        //}
     }
 
     [SupportedOSPlatform("windows")]
@@ -3269,6 +2950,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         thread.Start();
     }
 
+    private void OnLedIconChanged (object sender, IconChangedEventArgs e)
+    {
+        SetTabIcon(e.Window, e.NewIcon);
+    }
+
     private void OnWarnToolStripMenuItemClick (object sender, EventArgs e)
     {
         //_logger.GetLogger().LogLevel = _logger.Level.WARN;
@@ -3405,27 +3091,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         // public MdiTabControl.TabPage tabPage;
 
+        public LedState LedState { get; set; } = new();
+
         public Color Color { get; set; } = Color.FromKnownColor(KnownColor.Gray);
 
-        public int DiffSum { get; set; }
-
-        public bool Dirty { get; set; }
-
-        // tailState:
-        /// <summary>
-        /// 0 = on<br></br>
-        /// 1 = off<br></br>
-        /// 2 = off by Trigger<br></br>
-        /// </summary>
-        public int TailState { get; set; }
-
         public ToolTip ToolTip { get; set; }
-
-        /// <summary>
-        /// 0 = off<br></br>
-        /// 1 = timeSynced
-        /// </summary>
-        public int SyncMode { get; set; }
 
         #endregion
     }
