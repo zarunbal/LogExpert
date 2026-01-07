@@ -33,11 +33,7 @@ internal interface ILogPaintContextUI : ILogPaintContext
 
     Bookmark GetBookmarkForLine (int lineNum);
 
-    HighlightEntry FindHighlightEntry (ITextValue line, bool noWordMatches);
-
     HighlightEntry FindHighlightEntry (ITextValueMemory line, bool noWordMatches);
-
-    IList<HighlightMatchEntry> FindHighlightMatches (ITextValue line);
 
     IList<HighlightMatchEntry> FindHighlightMatches (ITextValueMemory line);
 

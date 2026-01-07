@@ -3164,7 +3164,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             for (var i = startLine; i < e.LineCount; ++i)
             {
-                var line = _logFileReader.GetLogLine(i);
+                var line = _logFileReader.GetLogLineMemory(i);
                 if (line != null)
                 {
                     var matchingList = FindMatchingHilightEntries(line);
@@ -3597,25 +3597,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>
     /// Returns the first HighlightEntry that matches the given line
     /// </summary>
-    //TODO Replace with ItextvalueMemory
-    private HighlightEntry FindHighlightEntry (ITextValue line)
+    private HighlightEntry FindHighlightEntry (ITextValueMemory line)
     {
         return FindHighlightEntry(line, false);
     }
 
-    //TODO Replace with ItextvalueMemory
-    private HighlightEntry FindFirstNoWordMatchHighlightEntry (ITextValue line)
+    private HighlightEntry FindFirstNoWordMatchHighlightEntry (ITextValueMemory line)
     {
         return FindHighlightEntry(line, true);
     }
 
-    //TODO Replace with ItextvalueMemory
-    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValue column)
+    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValueMemory column)
     {
         if (entry.IsRegex)
         {
             //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            if (entry.Regex.IsMatch(column.Text))
+            if (entry.Regex.IsMatch(column.Text.ToString()))
             {
                 return true;
             }
@@ -3624,14 +3621,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (entry.IsCaseSensitive)
             {
-                if (column.Text.Contains(entry.SearchText, StringComparison.Ordinal))
+                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.Ordinal))
                 {
                     return true;
                 }
             }
             else
             {
-                if (column.Text.ToUpperInvariant().Contains(entry.SearchText.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
+                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -3644,8 +3641,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>
     /// Returns all HilightEntry entries which matches the given line
     /// </summary>
-    //TODO Replace with ItextvalueMemory
-    private IList<HighlightEntry> FindMatchingHilightEntries (ITextValue line)
+    private IList<HighlightEntry> FindMatchingHilightEntries (ITextValueMemory line)
     {
         IList<HighlightEntry> resultList = [];
         if (line != null)
@@ -3665,14 +3661,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return resultList;
     }
 
-    //TODO Replace with ItextvalueMemory
-    private static void GetHighlightEntryMatches (ITextValue line, IList<HighlightEntry> hilightEntryList, IList<HighlightMatchEntry> resultList)
+    private static void GetHighlightEntryMatches (ITextValueMemory line, IList<HighlightEntry> hilightEntryList, IList<HighlightMatchEntry> resultList)
     {
         foreach (var entry in hilightEntryList)
         {
             if (entry.IsWordMatch)
             {
-                var matches = entry.Regex.Matches(line.Text);
+                var matches = entry.Regex.Matches(line.Text.ToString());
                 foreach (Match match in matches)
                 {
                     HighlightMatchEntry me = new()
@@ -4095,7 +4090,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         while (lineNum > 0)
         {
             lineNum--;
-            var line = _logFileReader.GetLogLine(lineNum);
+            var line = _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -4115,7 +4110,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         while (lineNum < _logFileReader.LineCount)
         {
             lineNum++;
-            var line = _logFileReader.GetLogLine(lineNum);
+            var line = _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -6557,44 +6552,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <param name="line"></param>
     /// <param name="noWordMatches"></param>
     /// <returns></returns>
-    public HighlightEntry FindHighlightEntry (ITextValue line, bool noWordMatches)
-    {
-        // first check the temp entries
-        lock (_tempHighlightEntryListLock)
-        {
-            foreach (var entry in _tempHighlightEntryList)
-            {
-                if (noWordMatches && entry.IsWordMatch)
-                {
-                    continue;
-                }
-
-                if (CheckHighlightEntryMatch(entry, line))
-                {
-                    return entry;
-                }
-            }
-        }
-
-        lock (_currentHighlightGroupLock)
-        {
-            foreach (var entry in _currentHighlightGroup.HighlightEntryList)
-            {
-                if (noWordMatches && entry.IsWordMatch)
-                {
-                    continue;
-                }
-
-                if (CheckHighlightEntryMatch(entry, line))
-                {
-                    return entry;
-                }
-            }
-
-            return null;
-        }
-    }
-
     public HighlightEntry FindHighlightEntry (ITextValueMemory line, bool noWordMatches)
     {
         // first check the temp entries
@@ -6613,6 +6570,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
         }
+
         lock (_currentHighlightGroupLock)
         {
             foreach (var entry in _currentHighlightGroup.HighlightEntryList)
@@ -6630,26 +6588,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             return null;
         }
-    }
-
-    public IList<HighlightMatchEntry> FindHighlightMatches (ITextValue line)
-    {
-        IList<HighlightMatchEntry> resultList = [];
-
-        if (line != null)
-        {
-            lock (_currentHighlightGroupLock)
-            {
-                GetHighlightEntryMatches(line, _currentHighlightGroup.HighlightEntryList, resultList);
-            }
-
-            lock (_tempHighlightEntryList)
-            {
-                GetHighlightEntryMatches(line, _tempHighlightEntryList, resultList);
-            }
-        }
-
-        return resultList;
     }
 
     public IList<HighlightMatchEntry> FindHighlightMatches (ITextValueMemory line)
