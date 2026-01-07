@@ -1277,7 +1277,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                         }
                     }
 
-                    AcquireDisposeReaderLock();
+                    AcquireDisposeLockUpgradableReadLock();
                     if (logBuffer.IsDisposed)
                     {
                         UpgradeDisposeLockToWriterLock();
@@ -1285,7 +1285,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                         DowngradeDisposeLockFromWriterLock();
                     }
 
-                    ReleaseDisposeReaderLock();
+                    ReleaseDisposeUpgradeableReadLock();
                 }
             }
             finally

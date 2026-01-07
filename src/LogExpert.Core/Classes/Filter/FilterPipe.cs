@@ -4,6 +4,7 @@ using System.Text;
 using ColumnizerLib;
 
 using LogExpert.Core.Interface;
+
 using NLog;
 
 namespace LogExpert.Core.Classes.Filter;
@@ -23,7 +24,7 @@ public class FilterPipe : IDisposable
 
     #region cTor
 
-    public FilterPipe(FilterParams filterParams, ILogWindow logWindow)
+    public FilterPipe (FilterParams filterParams, ILogWindow logWindow)
     {
         FilterParams = filterParams;
         LogWindow = logWindow;
@@ -68,15 +69,12 @@ public class FilterPipe : IDisposable
 
     public void CloseFile ()
     {
-        if (_writer != null)
-        {
-            _writer.Close();
-            _writer = null;
-        }
+        _writer?.Close();
+        _writer = null;
     }
 
     //TOOD: check if the callers are checking for null before calling
-    public bool WriteToPipe (ILogLine textLine, int orgLineNum)
+    public bool WriteToPipe (ILogLineMemory textLine, int orgLineNum)
     {
         ArgumentNullException.ThrowIfNull(textLine, nameof(textLine));
 
@@ -88,7 +86,7 @@ public class FilterPipe : IDisposable
                 {
                     try
                     {
-                        _writer.WriteLine(textLine.FullLine);
+                        _writer.WriteLine(textLine.FullLine.ToString());
                         _lineMappingList.Add(orgLineNum);
                         return true;
                     }

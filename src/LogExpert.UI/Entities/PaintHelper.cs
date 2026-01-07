@@ -330,10 +330,9 @@ internal static class PaintHelper
     [SupportedOSPlatform("windows")]
     private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
     {
-        //TODO Refactor if possible since Column is ITextValue
         var value = e.Value ?? string.Empty;
 
-        var matchList = logPaintCtx.FindHighlightMatches(value as ITextValue);
+        var matchList = logPaintCtx.FindHighlightMatches(value as ITextValueMemory);
         // too many entries per line seem to cause problems with the GDI
         while (matchList.Count > 50)
         {

@@ -1389,6 +1389,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is already initialized.
+        /// </summary>
+        public static string LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} must be created on UI thread.
+        /// </summary>
+        public static string LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} not initialized.
+        /// </summary>
+        public static string LogExpert_Common_Error_Message_ServiceNotInitialized {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_Error_Message_ServiceNotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Add.
         /// </summary>
         public static string LogExpert_Common_UI_Button_Add {
