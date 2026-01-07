@@ -453,7 +453,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer preProcessColumnizer)
     {
         var logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
-        if (pipe.FilterParams.SearchText.Length > 0)
+        if (pipe.FilterParams.SearchText?.Length > 0)
         {
             ToolTip tip = new(components);
 
