@@ -5198,8 +5198,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             foreach (var lineNum in lineNumList)
             {
-                var line = _logFileReader.GetLogLine(lineNum);
-                if (CurrentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
+                var line = _logFileReader.GetLogLineMemory(lineNum);
+                if (CurrentColumnizer is ILogLineMemoryXmlColumnizer xmlColumnizer)
                 {
                     callback.LineNum = lineNum;
                     line = xmlColumnizer.GetLineTextForClipboard(line, callback);

@@ -8,4 +8,9 @@ public static class LogLineExtensions
     {
         return logLine == null ? string.Empty : $"\t{logLine.LineNumber + 1}\t{logLine.FullLine}";
     }
+
+    public static string ToClipBoardText (this ILogLineMemory logLine)
+    {
+        return logLine == null ? string.Empty : $"\t{logLine.LineNumber + 1}\t{logLine.FullLine}";
+    }
 }
