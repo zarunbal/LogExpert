@@ -10,7 +10,7 @@ using NLog;
 namespace LogExpert.UI.Services;
 
 [SupportedOSPlatform("windows")]
-internal sealed class LedIndicatorService : ILedIndicatorService
+internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

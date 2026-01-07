@@ -7,7 +7,13 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyTitle>FlashIconHighlighter</AssemblyTitle>
+    <RootNamespace>FlashIconHighlighter</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Vanara.PInvoke.User32" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />

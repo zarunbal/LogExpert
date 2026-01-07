@@ -13,6 +13,7 @@ public class LedIndicatorServiceTests
 {
     private LedIndicatorService? _service;
     private ApplicationContext? _appContext;
+    private WindowsFormsSynchronizationContext? _syncContext;
 
     [SetUp]
     public void Setup ()
@@ -20,7 +21,8 @@ public class LedIndicatorServiceTests
         // Ensure we have a WindowsFormsSynchronizationContext for the UI thread
         if (SynchronizationContext.Current == null)
         {
-            SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+            _syncContext = new WindowsFormsSynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(_syncContext);
         }
 
         // Create an application context to ensure we have a proper UI context
@@ -35,6 +37,7 @@ public class LedIndicatorServiceTests
     {
         _service?.Dispose();
         _appContext?.Dispose();
+        _syncContext?.Dispose();
     }
 
     [Test]
