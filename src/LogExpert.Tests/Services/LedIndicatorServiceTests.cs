@@ -282,7 +282,7 @@ public class LedIndicatorServiceTests
         _service.Dispose();
 
         // Act & Assert
-        Assert.Throws<ObjectDisposedException>(() => _ = _service.CurrentTailColor);
+        _ = Assert.Throws<ObjectDisposedException>(() => _ = _service.CurrentTailColor);
     }
 
     [Test]

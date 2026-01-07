@@ -200,6 +200,21 @@ public interface ILogWindow
     void WritePipeTab (IList<LineEntry> lineEntryList, string title);
 
     /// <summary>
+    /// Creates a new tab containing the specified list of log line entries.
+    /// </summary>
+    /// <param name="lineEntryList">
+    /// A list of <see cref="LineEntryMemory"/> objects containing the lines and their
+    /// original line numbers to display in the new tab.
+    /// </param>
+    /// <param name="title">The title to display on the tab.</param>
+    /// <remarks>
+    /// This method is used to pipe filtered or selected content into a new tab
+    /// without creating a physical file. The new tab maintains references to the
+    /// original line numbers for context.
+    /// </remarks>
+    void WritePipeTab (IList<LineEntryMemory> lineEntryList, string title);
+
+    /// <summary>
     /// Activates this log window and brings it to the foreground.
     /// </summary>
     /// <remarks>

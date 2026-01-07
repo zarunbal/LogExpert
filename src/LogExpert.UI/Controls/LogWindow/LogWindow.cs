@@ -698,7 +698,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void PatternStatisticFx (PatternArgs patternArgs);
 
-    private delegate void ActionPluginExecuteFx (string keyword, string param, ILogExpertCallback callback, ILogLineMemoryColumnizer columnizer);
+    private delegate void ActionPluginExecuteFx (string keyword, string param, ILogExpertCallbackMemory callback, ILogLineMemoryColumnizer columnizer);
 
     private delegate void PositionAfterReloadFx (ReloadMemento reloadMemento);
 
@@ -735,9 +735,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
-    void ILogWindow.WritePipeTab (IList<LineEntry> lineEntryList, string title)
+    void ILogWindow.WritePipeTab (IList<LineEntryMemory> lineEntryList, string title)
     {
         WritePipeTab(lineEntryList, title);
+    }
+
+    [SupportedOSPlatform("windows")]
+    void ILogWindow.WritePipeTab (IList<LineEntry> lineEntryList, string title)
+    {
+        //WritePipeTab(lineEntryList, title);
     }
 
     #region Event Handlers
@@ -1472,7 +1478,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
             {
                 LogExpertCallback callback = new(this);
-                var menuText = entry.GetMenuText(lines.Count, CurrentColumnizer, callback.GetLogLine(lines[0]));
+                var menuText = entry.GetMenuText(lines.Count, CurrentColumnizer, callback.GetLogLineMemory(lines[0]));
 
                 if (menuText != null)
                 {
@@ -5014,11 +5020,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 break;
             }
 
-            var line = _logFileReader.GetLogLine(i);
-            if (CurrentColumnizer is ILogLineXmlColumnizer)
+            var line = _logFileReader.GetLogLineMemory(i);
+            if (CurrentColumnizer is ILogLineMemoryXmlColumnizer)
             {
                 callback.LineNum = i;
-                line = (CurrentColumnizer as ILogLineXmlColumnizer).GetLineTextForClipboard(line, callback);
+                line = (CurrentColumnizer as ILogLineMemoryXmlColumnizer).GetLineTextForClipboard(line, callback);
             }
 
             _ = pipe.WriteToPipe(line, i);
@@ -5041,7 +5047,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var title = name;
             ILogLineMemoryColumnizer preProcessColumnizer = null;
-            if (CurrentColumnizer is not ILogLineXmlColumnizer)
+            if (CurrentColumnizer is not ILogLineMemoryXmlColumnizer)
             {
                 preProcessColumnizer = CurrentColumnizer;
             }
@@ -5070,7 +5076,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <param name="lineEntryList"></param>
     /// <param name="title"></param>
     [SupportedOSPlatform("windows")]
-    internal void WritePipeTab (IList<LineEntry> lineEntryList, string title)
+    internal void WritePipeTab (IList<LineEntryMemory> lineEntryList, string title)
     {
         FilterPipe pipe = new(new FilterParams(), this)
         {
@@ -5145,7 +5151,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                             pipe.LastLinesHistoryList.RemoveAt(0);
                         }
 
-                        var textLine = _logFileReader.GetLogLine(line);
+                        var textLine = _logFileReader.GetLogLineMemory(line);
                         var fileOk = pipe.WriteToPipe(textLine, line);
                         if (!fileOk)
                         {

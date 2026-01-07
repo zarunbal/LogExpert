@@ -187,7 +187,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
             _columnList.Clear();
             var line = _config.HasFieldNames
                 ? _firstLine
-                : callback.GetLogLine(0);
+                : callback.GetLogLineMemory(0);
 
             if (line != null)
             {
