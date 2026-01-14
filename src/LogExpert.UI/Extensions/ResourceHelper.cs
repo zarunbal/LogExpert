@@ -1,9 +1,7 @@
 using System.Reflection;
 using System.Runtime.Versioning;
 
-using LogExpert.UI.Extensions;
-
-namespace LogExpert.Extensions;
+namespace LogExpert.UI.Extensions;
 
 internal static class ResourceHelper
 {

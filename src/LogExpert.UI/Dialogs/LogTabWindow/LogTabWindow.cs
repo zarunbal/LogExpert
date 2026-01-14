@@ -32,7 +32,6 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace LogExpert.UI.Controls.LogTabWindow;
 
 // Data shared over all LogTabWindow instances
-//TODO: Can we get rid of this class?
 [SupportedOSPlatform("windows")]
 internal partial class LogTabWindow : Form, ILogTabWindow
 {
@@ -44,7 +43,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly Icon _deadIcon;
-    private readonly ILedIndicatorService _ledService;
+    private readonly LedIndicatorService _ledService;
     private readonly Lock _windowListLock = new();
 
     private bool _disposed;
