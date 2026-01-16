@@ -112,12 +112,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private ILogLineMemoryColumnizer _forcedColumnizer;
     private ILogLineMemoryColumnizer _forcedColumnizerForLoading;
+
     private bool _isDeadFile;
     private bool _isErrorShowing;
     private bool _isLoadError;
     private bool _isLoading;
     private bool _isSearching;
     private bool _isTimestampDisplaySyncing;
+
     private List<int> _lastFilterLinesList = [];
 
     private int _lineHeight;

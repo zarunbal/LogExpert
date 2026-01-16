@@ -44,6 +44,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private readonly Icon _deadIcon;
     private readonly LedIndicatorService _ledService;
+
+    private ITabController _tabController;
+
     private readonly Lock _windowListLock = new();
 
     private bool _disposed;
@@ -82,6 +85,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         InitializeComponent();
 
         ConfigureDockPanel();
+
+        _tabController = new TabController(dockPanel);
+        _tabController.WindowAdded += OnTabControllerWindowAdded;
+        _tabController.WindowRemoved += OnTabControllerWindowRemoved;
+        _tabController.WindowActivated += OnTabControllerWindowActivated;
+        _tabController.WindowClosing += OnTabControllerWindowClosing;
 
         ApplyTextResources();
 
@@ -616,49 +625,146 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     public void SwitchTab (bool shiftPressed)
     {
-        var index = dockPanel.Contents.IndexOf(dockPanel.ActiveContent);
         if (shiftPressed)
         {
-            index--;
-            if (index < 0)
-            {
-                index = dockPanel.Contents.Count - 1;
-            }
-
-            if (index < 0)
-            {
-                return;
-            }
+            _tabController.SwitchToPreviousWindow();
         }
         else
         {
-            index++;
-            if (index >= dockPanel.Contents.Count)
-            {
-                index = 0;
-            }
-        }
-
-        if (index < dockPanel.Contents.Count)
-        {
-            (dockPanel.Contents[index] as DockContent).Activate();
+            _tabController.SwitchToNextWindow();
         }
     }
 
     public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow.LogWindow senderWindow)
     {
-        lock (_logWindowList)
+        foreach (var logWindow in _tabController.GetAllWindows())
         {
-            foreach (var logWindow in _logWindowList)
+            if (logWindow != senderWindow)
             {
-                if (logWindow != senderWindow)
+                if (logWindow.ScrollToTimestamp(timestamp, false, false))
                 {
-                    if (logWindow.ScrollToTimestamp(timestamp, false, false))
-                    {
-                        _ledService.UpdateWindowActivity(logWindow, DIFF_MAX);
-                    }
+                    _ledService.UpdateWindowActivity(logWindow, DIFF_MAX);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Handles the WindowActivated event from TabController.
+    /// Updates CurrentLogWindow and connects tool windows to the newly activated window.
+    /// </summary>
+    /// <param name="sender">The TabController that raised the event</param>
+    /// <param name="e">Event args containing the activated window and previous window</param>
+    [SupportedOSPlatform("windows")]
+    private void OnTabControllerWindowActivated (object sender, WindowActivatedEventArgs e)
+    {
+        var newWindow = e.Window;
+        var previousWindow = e.PreviousWindow;
+
+        if (newWindow == _currentLogWindow)
+        {
+            return;
+        }
+
+        // Update CurrentLogWindow - this triggers ChangeCurrentLogWindow internally
+        // which handles disconnecting from previous window and connecting to new window
+        CurrentLogWindow = newWindow;
+
+        // Clear dirty state for the newly activated window
+        if (newWindow?.Tag is LogWindowData data)
+        {
+            data.LedState.IsDirty = false;
+
+            // Update the tab icon to reflect cleared dirty state
+            var icon = GetLedIcon(data.LedState.DiffSum, data);
+            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), newWindow, icon);
+        }
+
+        // Notify the window it has been activated
+        newWindow?.LogWindowActivated();
+
+        // Connect tool windows (bookmark window, etc.) to new window
+        if (newWindow != null)
+        {
+            ConnectToolWindows(newWindow);
+        }
+    }
+
+    /// <summary>
+    /// Handles the WindowAdded event from TabController.
+    /// Performs additional setup for newly added windows that LogTabWindow needs.
+    /// </summary>
+    /// <param name="sender">The TabController that raised the event</param>
+    /// <param name="e">Event args containing the added window and title</param>
+    [SupportedOSPlatform("windows")]
+    private void OnTabControllerWindowAdded (object sender, WindowAddedEventArgs e)
+    {
+        var logWindow = e.Window;
+        var title = e.Title;
+
+        if (logWindow.Tag is not LogWindowData)
+        {
+            LogWindowData data = new()
+            {
+                LedState = new LedState(),
+                Color = _defaultTabColor
+            };
+
+            logWindow.Tag = data;
+        }
+
+        _ledService.RegisterWindow(logWindow);
+
+        ConnectEventHandlers(logWindow);
+    }
+
+    /// <summary>
+    /// Handles the WindowClosing event from TabController.
+    /// Performs pre-close validation and cleanup. Can cancel the close operation.
+    /// </summary>
+    /// <param name="sender">The TabController that raised the event</param>
+    /// <param name="e">Event args containing the window being closed and cancellation support</param>
+    [SupportedOSPlatform("windows")]
+    private void OnTabControllerWindowClosing (object sender, WindowClosingEventArgs e)
+    {
+        var logWindow = e.Window;
+        var skipConfirmation = e.SkipConfirmation;
+
+        if (_tabController.GetWindowCount() == 1 && !skipConfirmation)
+        {
+            //TODO Add logic to confirm closing the last tab if desired
+        }
+
+        if (logWindow.Tag is LogWindowData data)
+        {
+            data.ToolTip?.Hide(logWindow);
+        }
+    }
+
+    /// <summary>
+    /// Handles the WindowRemoved event from TabController.
+    /// Cleans up resources and event subscriptions for the removed window.
+    /// </summary>
+    /// <param name="sender">The TabController that raised the event</param>
+    /// <param name="e">Event args containing the removed window</param>
+    [SupportedOSPlatform("windows")]
+    private void OnTabControllerWindowRemoved (object sender, WindowRemovedEventArgs e)
+    {
+        var logWindow = e.Window;
+
+        _ledService.UnregisterWindow(logWindow);
+
+        DisconnectEventHandlers(logWindow);
+
+        if (logWindow.Tag is LogWindowData data)
+        {
+            data.ToolTip?.Dispose();
+            logWindow.Tag = null;
+        }
+
+        if (CurrentLogWindow == logWindow)
+        {
+            ChangeCurrentLogWindow(null);
         }
     }
 
@@ -712,7 +818,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     public void SelectTab (ILogWindow logWindow)
     {
-        logWindow.Activate();
+        _tabController.ActivateWindow(logWindow as LogWindow.LogWindow);
     }
 
     [SupportedOSPlatform("windows")]
@@ -761,12 +867,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public IList<WindowFileEntry> GetListOfOpenFiles ()
     {
         IList<WindowFileEntry> list = [];
-        lock (_logWindowList)
+
+        foreach (var logWindow in _tabController.GetAllWindows())
         {
-            foreach (var logWindow in _logWindowList)
-            {
-                list.Add(new WindowFileEntry(logWindow));
-            }
+            list.Add(new WindowFileEntry(logWindow));
         }
 
         return list;
@@ -866,14 +970,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void SaveLastOpenFilesList ()
     {
-        foreach (DockContent content in dockPanel.Contents.Cast<DockContent>())
+        foreach (var logWin in _tabController.GetAllWindowsFromDockPanel())
         {
-            if (content is LogWindow.LogWindow logWin)
+            if (!logWin.IsTempFile)
             {
-                if (!logWin.IsTempFile)
-                {
-                    ConfigManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
-                }
+                ConfigManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
             }
         }
     }
@@ -941,6 +1042,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         Activate();
     }
 
+    /// <summary>
+    /// Adds a LogWindow to the tab system.
+    /// Sets up window properties, delegates to TabController, and performs additional setup.
+    /// </summary>
+    /// <param name="logWindow">The window to add</param>
+    /// <param name="title">Tab title</param>
+    /// <param name="doNotAddToPanel">Skip adding to DockPanel (for deferred loading)</param>
     [SupportedOSPlatform("windows")]
     private void AddLogWindow (LogWindow.LogWindow logWindow, string title, bool doNotAddToPanel)
     {
@@ -949,23 +1057,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         SetTooltipText(logWindow, title);
         logWindow.DockAreas = DockAreas.Document | DockAreas.Float;
 
-        if (!doNotAddToPanel)
-        {
-            logWindow.Show(dockPanel);
-        }
+        _tabController.AddWindow(logWindow, title, doNotAddToPanel);
 
-        LogWindowData data = new()
-        {
-            LedState = new LedState()
-        };
+        logWindow.Visible = true;
+    }
 
-        logWindow.Tag = data;
-
-        lock (_windowListLock)
-        {
-            _logWindowList.Add(logWindow);
-        }
-
+    private void ConnectEventHandlers (LogWindow.LogWindow logWindow)
+    {
         logWindow.FileSizeChanged += OnFileSizeChanged;
         logWindow.TailFollowed += OnTailFollowed;
         logWindow.Disposed += OnLogWindowDisposed;
@@ -974,10 +1072,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.FilterListChanged += OnLogWindowFilterListChanged;
         logWindow.CurrentHighlightGroupChanged += OnLogWindowCurrentHighlightGroupChanged;
         logWindow.SyncModeChanged += OnLogWindowSyncModeChanged;
-
-        logWindow.Visible = true;
-
-        _ledService.RegisterWindow(logWindow);
     }
 
     [SupportedOSPlatform("windows")]
@@ -992,7 +1086,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.CurrentHighlightGroupChanged -= OnLogWindowCurrentHighlightGroupChanged;
         logWindow.SyncModeChanged -= OnLogWindowSyncModeChanged;
 
-        var data = logWindow.Tag as LogWindowData;
+        //var data = logWindow.Tag as LogWindowData;
         //data.tabPage.MouseClick -= tabPage_MouseClick;
         //data.tabPage.TabDoubleClick -= tabPage_TabDoubleClick;
         //data.tabPage.ContextMenuStrip = null;
@@ -1006,21 +1100,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         FillHistoryMenu();
     }
 
+    /// <summary>
+    /// Finds an existing window for a file.
+    /// </summary>
+    /// <param name="fileName">File name to search for</param>
+    /// <returns>The LogWindow for the file, or null if not found</returns>
     [SupportedOSPlatform("windows")]
     private LogWindow.LogWindow FindWindowForFile (string fileName)
     {
-        lock (_logWindowList)
-        {
-            foreach (var logWindow in _logWindowList)
-            {
-                if (logWindow.FileName.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal))
-                {
-                    return logWindow;
-                }
-            }
-        }
-
-        return null;
+        return _tabController.FindWindowByFileName(fileName);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1040,30 +1128,21 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         lastUsedToolStripMenuItem.DropDown = strip;
     }
 
+    /// <summary>
+    /// Removes a LogWindow from the tab system.
+    /// Delegates to TabController for removal and cleanup.
+    /// </summary>
+    /// <param name="logWindow">The window to remove</param>
     [SupportedOSPlatform("windows")]
     private void RemoveLogWindow (LogWindow.LogWindow logWindow)
     {
-        lock (_windowListLock)
-        {
-            _ = _logWindowList.Remove(logWindow);
-            _ledService.UnregisterWindow(logWindow);
-        }
-
-        DisconnectEventHandlers(logWindow);
+        _tabController.RemoveWindow(logWindow);
     }
 
     [SupportedOSPlatform("windows")]
     private void RemoveAndDisposeLogWindow (LogWindow.LogWindow logWindow, bool dontAsk)
     {
-        if (CurrentLogWindow == logWindow)
-        {
-            ChangeCurrentLogWindow(null);
-        }
-
-        lock (_logWindowList)
-        {
-            _ = _logWindowList.Remove(logWindow);
-        }
+        _tabController.RemoveWindow(logWindow);
 
         logWindow.Close(dontAsk);
     }
@@ -1535,13 +1614,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var fontName = ConfigManager.Settings.Preferences.FontName;
         var fontSize = ConfigManager.Settings.Preferences.FontSize;
 
-        lock (_logWindowList)
+        //lock (_logWindowList)
+        //{
+        foreach (var logWindow in _tabController.GetAllWindows())
         {
-            foreach (var logWindow in _logWindowList)
-            {
-                logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
-            }
+            logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
         }
+        //}
 
         _bookmarkWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
 
@@ -1587,15 +1666,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void SetTabIcons (Preferences preferences)
     {
         _ledService.RegenerateIcons(preferences.ShowTailColor);
-        lock (_logWindowList)
+        //lock (_logWindowList)
+        //{
+        foreach (var logWindow in _tabController.GetAllWindows())
         {
-            foreach (var logWindow in _logWindowList)
-            {
-                var data = logWindow.Tag as LogWindowData;
-                var icon = GetLedIcon(data.LedState.DiffSum, data);
-                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
-            }
+            var data = logWindow.Tag as LogWindowData;
+            var icon = GetLedIcon(data.LedState.DiffSum, data);
+            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
         }
+        //}
     }
 
     [SupportedOSPlatform("windows")]
@@ -1719,22 +1798,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void CloseAllTabs ()
     {
-        IList<Form> closeList = [];
-        lock (_logWindowList)
-        {
-            foreach (var content in dockPanel.Contents.Cast<DockContent>())
-            {
-                if (content is LogWindow.LogWindow window)
-                {
-                    closeList.Add(window);
-                }
-            }
-        }
-
-        foreach (var form in closeList)
-        {
-            form.Close();
-        }
+        _tabController.CloseAllWindows();
     }
 
     //TODO Reimplementation needs a new UI Framework since, DockpanelSuite has no easy way to change TabColor
@@ -1836,7 +1900,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
 
             // Restore layout only if we loaded at least one file
-            if (hasLayoutData && restoreLayout && _logWindowList.Count > 0)
+            if (hasLayoutData && restoreLayout && _tabController.GetWindowCount() > 0)
             {
                 _logger.Info("Restoring layout");
                 // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
@@ -1844,7 +1908,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 InitToolWindows();
                 RestoreLayout(projectData.TabLayoutXml);
             }
-            else if (_logWindowList.Count == 0)
+            else if (_tabController.GetWindowCount() == 0)
             {
                 _logger.Warn("No files loaded, skipping layout restoration");
             }
@@ -2065,7 +2129,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             ConfigManager.Settings.AlwaysOnTop = TopMost && ConfigManager.Settings.Preferences.AllowOnlyOneInstance;
             SaveLastOpenFilesList();
 
-            foreach (var logWindow in _logWindowList.ToArray())
+            foreach (var logWindow in _tabController.GetAllWindows())
             {
                 RemoveAndDisposeLogWindow(logWindow, true);
             }
@@ -2142,23 +2206,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             if (form.ApplyToAll)
             {
-                lock (_logWindowList)
+                foreach (var logWindow in _tabController.GetAllWindows())
                 {
-                    foreach (var logWindow in _logWindowList)
+                    if (logWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
                     {
-                        if (logWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
+                        //logWindow.SetColumnizer(form.SelectedColumnizer);
+                        SetColumnizerFx fx = logWindow.ForceColumnizer;
+                        _ = logWindow.Invoke(fx, form.SelectedColumnizer);
+                        SetColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
+                    }
+                    else
+                    {
+                        if (form.IsConfigPressed)
                         {
-                            //logWindow.SetColumnizer(form.SelectedColumnizer);
-                            SetColumnizerFx fx = logWindow.ForceColumnizer;
-                            _ = logWindow.Invoke(fx, form.SelectedColumnizer);
-                            SetColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
-                        }
-                        else
-                        {
-                            if (form.IsConfigPressed)
-                            {
-                                logWindow.ColumnizerConfigChanged();
-                            }
+                            logWindow.ColumnizerConfigChanged();
                         }
                     }
                 }
@@ -2174,16 +2235,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
                 if (form.IsConfigPressed)
                 {
-                    lock (_logWindowList)
+                    foreach (var logWindow in _tabController.GetAllWindows())
                     {
-                        foreach (var logWindow in _logWindowList)
+                        if (logWindow.CurrentColumnizer.GetType() == form.SelectedColumnizer.GetType())
                         {
-                            if (logWindow.CurrentColumnizer.GetType() == form.SelectedColumnizer.GetType())
-                            {
-                                logWindow.ColumnizerConfigChanged();
-                            }
+                            logWindow.ColumnizerConfigChanged();
                         }
                     }
+
                 }
             }
         }
@@ -2434,14 +2493,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogWindowFilterListChanged (object sender, FilterListChangedEventArgs e)
     {
-        lock (_logWindowList)
+        foreach (var logWindow in _tabController.GetAllWindows())
         {
-            foreach (var logWindow in _logWindowList)
+            if (logWindow != e.LogWindow)
             {
-                if (logWindow != e.LogWindow)
-                {
-                    logWindow.HandleChangedFilterList();
-                }
+                logWindow.HandleChangedFilterList();
             }
         }
 
@@ -2670,12 +2726,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         ConfigManager.Settings.HideLineColumn = hideLineColumnToolStripMenuItem.Checked;
 
-        lock (_logWindowList)
+        foreach (var logWin in _tabController.GetAllWindows())
         {
-            foreach (var logWin in _logWindowList)
-            {
-                logWin.ShowLineColumn(!ConfigManager.Settings.HideLineColumn);
-            }
+            logWin.ShowLineColumn(!ConfigManager.Settings.HideLineColumn);
         }
 
         _bookmarkWindow.LineColumnVisible = ConfigManager.Settings.HideLineColumn;
@@ -2694,9 +2747,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnCloseOtherTabsToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var closeList = dockPanel.Contents
-                .OfType<LogWindow.LogWindow>()
-                .Where(content => content != dockPanel.ActiveContent)
+        var activeWindow = _tabController.GetActiveWindow();
+        var closeList = _tabController.GetAllWindowsFromDockPanel()
+                .Where(window => window != activeWindow)
                 .ToList();
 
         foreach (var logWindow in closeList)
@@ -2779,15 +2832,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var fileName = dlg.FileName;
             List<string> fileNames = [];
 
-            lock (_logWindowList)
+            foreach (var logWin in _tabController.GetAllWindowsFromDockPanel())
             {
-                foreach (var logWindow in dockPanel.Contents.OfType<LogWindow.LogWindow>())
+                var persistenceFileName = logWin?.SavePersistenceDataAndReturnFileName(true);
+                if (persistenceFileName != null)
                 {
-                    var persistenceFileName = logWindow?.SavePersistenceDataAndReturnFileName(true);
-                    if (persistenceFileName != null)
-                    {
-                        fileNames.Add(persistenceFileName);
-                    }
+                    fileNames.Add(persistenceFileName);
                 }
             }
 
