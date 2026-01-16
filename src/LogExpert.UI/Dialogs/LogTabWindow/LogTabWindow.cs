@@ -45,9 +45,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly Icon _deadIcon;
     private readonly LedIndicatorService _ledService;
 
-    private ITabController _tabController;
-
-    private readonly Lock _windowListLock = new();
+    private readonly TabController _tabController;
 
     private bool _disposed;
 

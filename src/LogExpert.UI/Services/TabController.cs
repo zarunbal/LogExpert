@@ -61,7 +61,7 @@ internal class TabController : ITabController
 
         if (_initialized)
         {
-            throw new InvalidOperationException("TabController is already initialized with a DockPanel");
+            throw new InvalidOperationException(Resources.TabController_Error_Message_AlreadInitialized);
         }
 
         _dockPanel = dockPanel;
@@ -98,14 +98,14 @@ internal class TabController : ITabController
 
         if (!_initialized)
         {
-            throw new InvalidOperationException("TabController is not initialized. Call InitializeDockPanel first.");
+            throw new InvalidOperationException(Resources.TabController_Error_Message_NotInitialized);
         }
 
         lock (_windowsLock)
         {
             if (_windows.ContainsKey(window))
             {
-                throw new InvalidOperationException("Window already tracked");
+                throw new InvalidOperationException(Resources.TabController_Error_Message_WindowAlreadyTracked);
             }
 
             var metadata = new LogWindowMetadata
