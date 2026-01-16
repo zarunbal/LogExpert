@@ -55,7 +55,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private readonly int _instanceNumber;
 
-    private readonly IList<LogWindow.LogWindow> _logWindowList = [];
     private readonly bool _showInstanceNumbers;
 
     private readonly string[] _startupFileNames;
