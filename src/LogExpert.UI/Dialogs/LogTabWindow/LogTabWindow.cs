@@ -1529,9 +1529,41 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void SetTabIcon (LogWindow.LogWindow logWindow, Icon icon)
     {
+        if (logWindow == null | logWindow.IsDisposed)
+        {
+            return;
+        }
+
+        if (icon == null)
+        {
+            logWindow.Icon = null;
+            return;
+        }
+
         if (logWindow != null)
         {
-            logWindow.Icon = icon;
+
+            try
+            {
+                var handle = icon.Handle;
+                logWindow.Icon = (Icon)icon.Clone();
+            }
+            catch (ObjectDisposedException)
+            {
+                //Icon Disposed
+                return;
+            }
+
+            if (logWindow.Tag is LogWindowData data && data.OwnedIcon != null)
+            {
+                data.OwnedIcon.Dispose();
+            }
+
+            if (logWindow.Tag is LogWindowData logWindowData)
+            {
+                logWindowData.OwnedIcon = logWindow.Icon;
+            }
+
             logWindow.DockHandler.Pane?.TabStripControl.Invalidate(false);
         }
     }
@@ -3142,6 +3174,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         public Color Color { get; set; } = Color.FromKnownColor(KnownColor.Gray);
 
         public ToolTip ToolTip { get; set; }
+
+        public Icon OwnedIcon { get; set; }
 
         #endregion
     }

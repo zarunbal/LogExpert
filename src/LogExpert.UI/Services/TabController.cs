@@ -183,6 +183,11 @@ internal class TabController : ITabController
             return;
         }
 
+        if (!window.IsDisposed && window.IsHandleCreated)
+        {
+            window.Icon = null;
+        }
+
         window.Close(skipConfirmation);
         // Note: RemoveWindow will be called by OnWindowDisposed event handler
     }
@@ -432,6 +437,11 @@ internal class TabController : ITabController
             {
                 foreach (var window in _windows.Keys)
                 {
+                    if (!window.IsDisposed && window.IsHandleCreated)
+                    {
+                        window.Icon = null;
+                    }
+
                     window.Disposed -= OnWindowDisposed;
                     window.Activated -= OnWindowActivated;
                 }
