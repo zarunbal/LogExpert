@@ -8,7 +8,31 @@ namespace LogExpert.Core.Config;
 [Serializable]
 public class Preferences
 {
+
+    /// <summary>
+    /// List of highlight groups for syntax highlighting and text coloring.
+    /// </summary>
+    /// <remarks>
+    /// Supports legacy property name "hilightGroupList" (with typo) for backward compatibility.
+    /// Old settings files using the incorrect spelling will be automatically imported.
+    /// </remarks>
+    [Newtonsoft.Json.JsonProperty("HighlightGroupList")]
+    [System.Text.Json.Serialization.JsonPropertyName("HighlightGroupList")]
     public List<HighlightGroup> HighlightGroupList { get; set; } = [];
+
+    /// <summary>
+    /// Legacy property for backward compatibility with old settings files that used the typo "hilightGroupList".
+    /// This setter redirects data to the correct <see cref="HighlightGroupList"/> property.
+    /// Will be removed in a future version once migration period is complete.
+    /// </summary>
+    [Obsolete("This property exists only for backward compatibility with old settings files. Use HighlightGroupList instead.")]
+    [Newtonsoft.Json.JsonProperty("hilightGroupList")]
+    [System.Text.Json.Serialization.JsonPropertyName("hilightGroupList")]
+    public List<HighlightGroup> HilightGroupList
+    {
+        get => HighlightGroupList;
+        set => HighlightGroupList = value ?? [];
+    }
 
     public bool PortableMode { get; set; }
 
