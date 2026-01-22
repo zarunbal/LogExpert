@@ -73,4 +73,16 @@
   <data name="CsvColumnizerConfigDlg_UI_Button_Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="CsvColumnizer_UI_Title_Error" xml:space="preserve">
+    <value>Fehler</value>
+  </data>
+  <data name="CsvColumnizer_UI_Message_ErrorWhileDeserializing" xml:space="preserve">
+    <value>Fehler beim Deserialisieren der Konfigurationsdaten: {0}</value>
+  </data>
+  <data name="CsvColumnizer_Description" xml:space="preserve">
+    <value>Teilt die CSV-Dateien in Spalten auf.
+
+Credits:
+Dieser Columnizer verwendet den CsvHelper. https://github.com/JoshClose/CsvHelper.</value>
+  </data>
 </root>

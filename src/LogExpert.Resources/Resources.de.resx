@@ -2121,4 +2121,16 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized" xml:space="preserve">
     <value>{0} ist bereits initialisiert</value>
   </data>
+  <data name="LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread" xml:space="preserve">
+    <value>{0} muss im UI-Thread erstellt werden</value>
+  </data>
+  <data name="TabController_Error_Message_NotInitialized" xml:space="preserve">
+    <value>TabController ist nicht initialisiert. Rufen Sie zuerst InitializeDockPanel auf.</value>
+  </data>
+  <data name="TabController_Error_Message_WindowAlreadyTracked" xml:space="preserve">
+    <value>Fenster bereits verfolgt</value>
+  </data>
+  <data name="TabController_Error_Message_AlreadInitialized" xml:space="preserve">
+    <value>TabController ist bereits mit einem DockPanel initialisiert</value>
+  </data>
 </root>

@@ -2133,4 +2133,13 @@ Restart LogExpert to apply changes?</value>
   <data name="LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread" xml:space="preserve">
     <value>{0} must be created on UI thread</value>
   </data>
+  <data name="TabController_Error_Message_NotInitialized" xml:space="preserve">
+    <value>TabController is not initialized. Call InitializeDockPanel first.</value>
+  </data>
+  <data name="TabController_Error_Message_WindowAlreadyTracked" xml:space="preserve">
+    <value>Window already tracked</value>
+  </data>
+  <data name="TabController_Error_Message_AlreadInitialized" xml:space="preserve">
+    <value>TabController is already initialized with a DockPanel</value>
+  </data>
 </root>

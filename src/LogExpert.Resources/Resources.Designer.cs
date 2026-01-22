@@ -5917,6 +5917,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TabController is already initialized with a DockPanel.
+        /// </summary>
+        public static string TabController_Error_Message_AlreadInitialized {
+            get {
+                return ResourceManager.GetString("TabController_Error_Message_AlreadInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TabController is not initialized. Call InitializeDockPanel first..
+        /// </summary>
+        public static string TabController_Error_Message_NotInitialized {
+            get {
+                return ResourceManager.GetString("TabController_Error_Message_NotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Window already tracked.
+        /// </summary>
+        public static string TabController_Error_Message_WindowAlreadyTracked {
+            get {
+                return ResourceManager.GetString("TabController_Error_Message_WindowAlreadyTracked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name:.
         /// </summary>
         public static string TabRenameDialog_UI_Label_Name {

@@ -531,6 +531,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         return GetLogLineInternal(lineNum).Result;
     }
 
+    //TODO Make Task Based
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
         return GetLogLineMemoryInternal(lineNum).Result;

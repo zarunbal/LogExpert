@@ -95,14 +95,17 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
             return;
         }
 
-        _logger.Info("Disposing LedIndicatorService");
-
+        _disposed = true;
         Stop();
+
+        Thread.Sleep(ANIMATION_INTERVAL_MS * 2);
+
+        _logger.Info("Disposing LedIndicatorService");
 
         lock (_stateLock)
         {
             DisposeBrushes();
-            DisposeIcons();
+            //DisposeIcons();
             _windowStates.Clear();
         }
 
@@ -197,7 +200,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
 
         return !_isInitialized
             ? throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_Message_ServiceNotInitialized, nameof(LedIndicatorService)))
-            : _deadIcon;
+            : (Icon)_deadIcon.Clone();
     }
 
     /// <summary>
@@ -418,11 +421,20 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     {
         _logger.Info("Regenerating icons with new tail color: {Color}", tailColor);
 
+        bool wasRunning = _animationTimer != null && _animationTimer.Enabled;
+
+        if (wasRunning)
+        {
+            Stop();
+            Thread.Sleep(ANIMATION_INTERVAL_MS * 2);  // Wait for pending ticks
+        }
+
         lock (_stateLock)
         {
             // Dispose old resources
             DisposeBrushes();
-            DisposeIcons();
+            //DisposeIcons();
+            _iconCache = null;
 
             // Create new ones
             CurrentTailColor = tailColor;
@@ -443,6 +455,11 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
             {
                 OnIconChanged(window, icon);
             }
+        }
+
+        if (wasRunning)
+        {
+            Start();
         }
     }
 
