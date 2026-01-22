@@ -130,7 +130,7 @@ internal class TabController : ITabController
         window.Disposed += OnWindowDisposed;
         window.Activated += OnWindowActivated;
 
-        WindowAdded?.Invoke(this, new WindowAddedEventArgs(window, title));
+        WindowAdded?.Invoke(this, new WindowAddedEventArgs(window));
     }
 
     /// <summary>
