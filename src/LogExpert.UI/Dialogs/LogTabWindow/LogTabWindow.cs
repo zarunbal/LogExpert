@@ -656,7 +656,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnTabControllerWindowActivated (object sender, WindowActivatedEventArgs e)
     {
         var newWindow = e.Window;
-        var previousWindow = e.PreviousWindow;
 
         if (newWindow == _currentLogWindow)
         {
@@ -697,7 +696,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnTabControllerWindowAdded (object sender, WindowAddedEventArgs e)
     {
         var logWindow = e.Window;
-        var title = e.Title;
 
         if (logWindow.Tag is not LogWindowData)
         {
@@ -1529,7 +1527,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void SetTabIcon (LogWindow.LogWindow logWindow, Icon icon)
     {
-        if (logWindow == null | logWindow.IsDisposed)
+        if (logWindow == null || logWindow.IsDisposed)
         {
             return;
         }
@@ -1540,32 +1538,31 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        if (logWindow != null)
+        try
         {
-
-            try
-            {
-                var handle = icon.Handle;
-                logWindow.Icon = (Icon)icon.Clone();
-            }
-            catch (ObjectDisposedException)
-            {
-                //Icon Disposed
-                return;
-            }
-
-            if (logWindow.Tag is LogWindowData data && data.OwnedIcon != null)
-            {
-                data.OwnedIcon.Dispose();
-            }
-
-            if (logWindow.Tag is LogWindowData logWindowData)
-            {
-                logWindowData.OwnedIcon = logWindow.Icon;
-            }
-
-            logWindow.DockHandler.Pane?.TabStripControl.Invalidate(false);
+            //Accessing Handle makes sure it is not disposed,
+            //if it is, the ObjectDisposedException is thrown
+            _ = icon.Handle;
+            logWindow.Icon = (Icon)icon.Clone();
         }
+        catch (ObjectDisposedException)
+        {
+            //Icon Disposed
+            return;
+        }
+
+        if (logWindow.Tag is LogWindowData data && data.OwnedIcon != null)
+        {
+            data.OwnedIcon.Dispose();
+        }
+
+        if (logWindow.Tag is LogWindowData logWindowData)
+        {
+            logWindowData.OwnedIcon = logWindow.Icon;
+        }
+
+        logWindow.DockHandler.Pane?.TabStripControl.Invalidate(false);
+
     }
 
     /// <summary>
@@ -1695,15 +1692,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void SetTabIcons (Preferences preferences)
     {
         _ledService.RegenerateIcons(preferences.ShowTailColor);
-        //lock (_logWindowList)
-        //{
+
         foreach (var logWindow in _tabController.GetAllWindows())
         {
             var data = logWindow.Tag as LogWindowData;
             var icon = GetLedIcon(data.LedState.DiffSum, data);
             _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
         }
-        //}
     }
 
     [SupportedOSPlatform("windows")]

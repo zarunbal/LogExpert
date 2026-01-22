@@ -692,6 +692,7 @@ internal partial class SettingsDialog : Form
 
         _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("en-US").Name); // Add English as default
         _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("de-DE").Name);
+        _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("zh-CN").Name);
     }
 
     #endregion
