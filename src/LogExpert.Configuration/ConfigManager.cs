@@ -817,9 +817,8 @@ public class ConfigManager : IConfigManager
 
     private static void SaveHighlightGroupsAsJSON (FileInfo fileInfo, List<HighlightGroup> groups)
     {
-        using StreamWriter sw = new(fileInfo.Create());
-        JsonSerializer serializer = new();
-        serializer.Serialize(sw, groups);
+        string json = JsonConvert.SerializeObject(groups, Formatting.Indented);
+        File.WriteAllText(fileInfo.FullName, json, System.Text.Encoding.UTF8);
     }
 
     /// <summary>
