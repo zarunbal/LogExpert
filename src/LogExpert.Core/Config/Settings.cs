@@ -42,9 +42,8 @@ public class Settings
     /// Will be removed in a future version once migration period is complete.
     /// </summary>
     [Obsolete("This property exists only for backward compatibility with old settings files. Data is stored in Preferences.HighlightGroupList.")]
-    [Newtonsoft.Json.JsonProperty("hilightEntryList")]
-    [System.Text.Json.Serialization.JsonPropertyName("hilightEntryList")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("hilightEntryList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<HighlightEntry> HilightEntryList
     {
         get => null; // Never serialize this
@@ -61,9 +60,8 @@ public class Settings
     /// Will be removed in a future version once migration period is complete.
     /// </summary>
     [Obsolete("This property exists only for backward compatibility with old settings files. Data is stored in Preferences.HighlightGroupList.")]
-    [Newtonsoft.Json.JsonProperty("hilightGroupList")]
-    [System.Text.Json.Serialization.JsonPropertyName("hilightGroupList")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("hilightGroupList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<HighlightGroup> HilightGroupList
     {
         get => null; // Never serialize this

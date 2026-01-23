@@ -975,4 +975,105 @@ public class ConfigManagerTest
     }
 
     #endregion
+
+    #region Backward Compatibility Tests
+
+    [Test]
+    [Category("BackwardCompatibility")]
+    [Description("LoadOrCreateNew should successfully load old JSON with 'hilightGroupList' typo")]
+    public void LoadOrCreateNew_LegacyHilightGroupList_LoadsSuccessfully ()
+    {
+        // Arrange - Create JSON with old "hilightGroupList" property name (with typo)
+        string legacyJson = @"{
+  ""Preferences"": {
+    ""hilightGroupList"": [
+      {
+        ""GroupName"": ""LegacyGroup"",
+        ""hilightEntryList"": []
+      }
+    ],
+    ""FontName"": ""Courier New"",
+    ""FontSize"": 9
+  },
+  ""FilterList"": [],
+  ""SearchHistoryList"": []
+}";
+        File.WriteAllText(_testSettingsFile.FullName, legacyJson);
+
+        // Act
+        LoadResult loadResult = InvokePrivateInstanceMethod<LoadResult>("LoadOrCreateNew", _testSettingsFile);
+
+        // Assert
+        Assert.That(loadResult, Is.Not.Null);
+        Assert.That(loadResult.Settings, Is.Not.Null);
+        Assert.That(loadResult.Settings.Preferences.HighlightGroupList.Count, Is.EqualTo(1), "Should load legacy 'hilightGroupList' into HighlightGroupList");
+        Assert.That(loadResult.Settings.Preferences.HighlightGroupList[0].GroupName, Is.EqualTo("LegacyGroup"));
+    }
+
+    [Test]
+    [Category("BackwardCompatibility")]
+    [Description("SaveAsJSON should not write the obsolete 'hilightGroupList' property")]
+    public void SaveAsJSON_DoesNotWriteLegacyProperty ()
+    {
+        // Arrange
+        Settings settings = CreateTestSettings();
+        settings.Preferences.HighlightGroupList.Add(new HighlightGroup { GroupName = "TestGroup" });
+
+        // Act
+        InvokePrivateInstanceMethod("SaveAsJSON", _testSettingsFile, settings);
+
+        // Assert
+        string json = File.ReadAllText(_testSettingsFile.FullName);
+
+        // Should contain the new property name
+        Assert.That(json, Does.Contain("HighlightGroupList"),
+            "Should write 'HighlightGroupList' property");
+
+        // Should NOT contain the legacy property name
+        Assert.That(json, Does.Not.Contain("hilightGroupList"),
+            "Should NOT write obsolete 'hilightGroupList' property");
+
+        // Verify the content is correct
+        Assert.That(json, Does.Contain("TestGroup"));
+    }
+
+    [Test]
+    [Category("BackwardCompatibility")]
+    [Description("Old JSON with both properties should not create duplicates")]
+    public void LoadOrCreateNew_BothPropertiesInJSON_NoDuplicates ()
+    {
+        // Arrange - Create JSON with BOTH property names (simulating a corrupted file)
+        string jsonWithBoth = @"{
+  ""Preferences"": {
+    ""HighlightGroupList"": [
+      {
+        ""GroupName"": ""Group1"",
+        ""HighlightEntryList"": []
+      }
+    ],
+    ""hilightGroupList"": [
+      {
+        ""GroupName"": ""Group1"",
+        ""hilightEntryList"": []
+      }
+    ],
+    ""FontName"": ""Courier New"",
+    ""FontSize"": 9
+  },
+  ""FilterList"": [],
+  ""SearchHistoryList"": []
+}";
+        File.WriteAllText(_testSettingsFile.FullName, jsonWithBoth);
+
+        // Act
+        LoadResult loadResult = InvokePrivateInstanceMethod<LoadResult>("LoadOrCreateNew", _testSettingsFile);
+
+        // Assert
+        Assert.That(loadResult, Is.Not.Null);
+        Assert.That(loadResult.Settings, Is.Not.Null);
+        Assert.That(loadResult.Settings.Preferences.HighlightGroupList.Count, Is.EqualTo(1), "Should have exactly 1 group, not duplicates");
+        Assert.That(loadResult.Settings.Preferences.HighlightGroupList[0].GroupName, Is.EqualTo("Group1"));
+    }
+
+    #endregion
 }
