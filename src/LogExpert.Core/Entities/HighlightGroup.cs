@@ -26,11 +26,11 @@ public class HighlightGroup : ICloneable
     /// Will be removed in a future version once migration period is complete.
     /// </summary>
     [Obsolete("This property exists only for backward compatibility with old settings files. Use HighlightEntryList instead.")]
-    [Newtonsoft.Json.JsonProperty("hilightEntryList")]
-    [System.Text.Json.Serialization.JsonPropertyName("hilightEntryList")]
+    [Newtonsoft.Json.JsonProperty("hilightEntryList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<HighlightEntry> HilightEntryList
     {
-        get => HighlightEntryList;
+        get => null; // Always return null so Newtonsoft.Json won't serialize this property
         set => HighlightEntryList = value ?? [];
     }
 
