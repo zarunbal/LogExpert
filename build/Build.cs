@@ -60,6 +60,10 @@ partial class Build : NukeBuild
 
     AbsolutePath SftpFileSystemPackagex64 => BinDirectory / "SftpFileSystemx64/";
 
+    AbsolutePath StandaloneDirectory => BinDirectory / "Standalone";
+
+    AbsolutePath StandalonePublishDirectory => BinDirectory / "StandalonePublish";
+
     AbsolutePath SetupDirectory => BinDirectory / "SetupFiles";
 
     AbsolutePath LicenseDirectory => RootDirectory / "Licenses";
@@ -114,6 +118,7 @@ partial class Build : NukeBuild
         (BinDirectory / $"LogExpert-Setup-{VersionString}.exe"),
         BinDirectory / $"LogExpert-CI-{VersionString}.zip",
         BinDirectory / $"LogExpert.{VersionString}.zip",
+        BinDirectory / $"LogExpert-Standalone.{VersionString}.zip",
         BinDirectory / $"LogExpert.ColumnizerLib.{VersionString}.nupkg",
         BinDirectory / $"SftpFileSystem.x64.{VersionString}.zip",
         BinDirectory / $"SftpFileSystem.x86.{VersionString}.zip",
@@ -292,6 +297,53 @@ partial class Build : NukeBuild
             CompressionExtensions.ZipTo(PackageDirectory, BinDirectory / $"LogExpert.{VersionString}.zip");
         });
 
+    Target CreateStandalonePackage => _ => _
+        .DependsOn(Compile, Test)
+        .Executes(() =>
+        {
+            Log.Information("Creating standalone (self-contained) package...");
+
+            // Publish the main project as self-contained
+            DotNetPublish(s => s
+                .SetProject(SourceDirectory / "LogExpert" / "LogExpert.csproj")
+                .SetConfiguration(Configuration)
+                .SetOutput(StandalonePublishDirectory)
+                .SetSelfContained(true)
+                .SetRuntime("win-x64")
+                .SetProperty("PublishSingleFile", "false")
+                .SetProperty("IncludeNativeLibrariesForSelfExtract", "true"));
+
+            // Copy the self-contained publish output to the standalone directory
+            StandalonePublishDirectory.Copy(StandaloneDirectory, ExistsPolicy.MergeAndOverwriteIfNewer);
+
+            // Copy plugins from the regular build output
+            var pluginsDir = OutputDirectory / "plugins";
+            if (pluginsDir.DirectoryExists())
+            {
+                pluginsDir.Copy(StandaloneDirectory / "plugins", ExistsPolicy.MergeAndOverwriteIfNewer);
+            }
+
+            // Clean up excluded files
+            StandaloneDirectory.GlobFiles(ExcludeFileGlob).ForEach(file => file.DeleteFile());
+            StandaloneDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
+
+            // Create portable mode directory and configuration file
+            var portableDir = StandaloneDirectory / "portable";
+            portableDir.CreateDirectory();
+            (portableDir / "portableMode.json").WriteAllText("{}");
+
+            // Copy licenses
+            if (LicenseDirectory.DirectoryExists())
+            {
+                LicenseDirectory.Copy(StandaloneDirectory / "Licenses", ExistsPolicy.MergeAndOverwriteIfNewer);
+            }
+
+            // Create the standalone ZIP package
+            CompressionExtensions.ZipTo(StandaloneDirectory, BinDirectory / $"LogExpert-Standalone.{VersionString}.zip");
+
+            Log.Information($"Standalone package created: LogExpert-Standalone.{VersionString}.zip");
+        });
+
     Target ChangeVersionNumber => _ => _
         .Before(Compile)
         .Executes(() =>
@@ -361,7 +413,7 @@ partial class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, GeneratePluginHashes, CreateSetup);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, CreateStandalonePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, GeneratePluginHashes, CreateSetup);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
