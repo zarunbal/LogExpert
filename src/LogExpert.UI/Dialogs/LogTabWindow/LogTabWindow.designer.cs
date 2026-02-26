@@ -965,7 +965,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
             highlightGroupsToolStripComboBox.Size = new Size(150, 23);
             highlightGroupsToolStripComboBox.ToolTipText = "Select the current highlight settings for the log file (right-click to open highlight settings)";
             highlightGroupsToolStripComboBox.DropDownClosed += OnHighlightGroupsComboBoxDropDownClosed;
-            highlightGroupsToolStripComboBox.SelectedIndexChanged += OnHighlightGroupsComboBoxSelectedIndexChanged;
             highlightGroupsToolStripComboBox.MouseUp += OnHighlightGroupsComboBoxMouseUp;
             // 
             // checkBoxFollowTail

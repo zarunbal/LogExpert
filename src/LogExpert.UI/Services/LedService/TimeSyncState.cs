@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.LedService;
 
 /// <summary>
 /// Represents the time synchronization state for a log window

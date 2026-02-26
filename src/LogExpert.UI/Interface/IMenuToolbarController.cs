@@ -6,8 +6,9 @@ using System.Runtime.Versioning;
 
 using LogExpert.Core.EventArguments;
 using LogExpert.Dialogs;
+using LogExpert.UI.Services.MenuToolbarService;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Interface;
 
 /// <summary>
 /// Controls menu and toolbar state based on application state.
@@ -22,11 +23,6 @@ internal interface IMenuToolbarController : IDisposable
     /// </summary>
     void InitializeMenus (MenuStrip mainMenu, ToolStrip buttonToolbar, ToolStrip externalToolsToolStrip,
         DateTimeDragControl dragControlDateTime, CheckBox checkBoxFollowTail);
-
-    /// <summary>
-    /// Applies localized resource strings and ToolTips to all menu/toolbar items.
-    /// </summary>
-    void ApplyLocalization ();
 
     /// <summary>
     /// Updates all menus, toolbars, encoding, highlight group, and timestamp control

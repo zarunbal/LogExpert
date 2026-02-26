@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.MenuToolbarService;
 
 /// <summary>Event args for highlight group combo box selection.</summary>
 internal class HighlightGroupSelectedEventArgs (string groupName) : EventArgs

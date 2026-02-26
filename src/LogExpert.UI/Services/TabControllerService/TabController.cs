@@ -2,10 +2,12 @@ using System.Runtime.Versioning;
 
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Entities;
+using LogExpert.UI.Interface;
+using LogExpert.UI.Interface.Services;
 
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.TabControllerService;
 
 [SupportedOSPlatform("windows")]
 internal class TabController : ITabController

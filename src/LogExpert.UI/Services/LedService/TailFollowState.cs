@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.LedService;
 
 /// <summary>
 /// Represents the tail follow state for a log window

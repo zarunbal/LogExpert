@@ -151,6 +151,12 @@ public interface IConfigManager
     /// This method is supported only on Windows platforms.</remarks>
     /// <param name="fileName">The name of the file to add to the file history list. Comparison is case-insensitive.</param>
     void AddToFileHistory (string fileName);
+    
+    /// <summary>
+    /// Removes the specified file name from the file history list.
+    /// </summary>
+    /// <param name="fileName">The name of the file to remove from the file history list. Comparison is case-insensitive.</param>
+    void RemoveFromFileHistory (string fileName);
 
     /// <summary>
     /// Clears the list of recently opened files.

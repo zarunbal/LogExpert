@@ -1,6 +1,6 @@
 using LogExpert.UI.Controls.LogWindow;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.LedService;
 
 /// <summary>
 /// Event arguments for icon change notifications

@@ -5,12 +5,11 @@ using System.Text;
 
 using LogExpert.Core.EventArguments;
 using LogExpert.Dialogs;
+using LogExpert.UI.Interface;
 
 using NLog;
 
-using static Vanara.PInvoke.UxTheme;
-
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.MenuToolbarService;
 
 [SupportedOSPlatform("windows")]
 internal sealed class MenuToolbarController : IMenuToolbarController
@@ -105,8 +104,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         _bubblesButton = FindToolStripItem<ToolStripButton>(_buttonToolbar, "toolStripButtonBubbles");
 
         // Highlight group combo (may be on buttonToolbar or externalToolsToolStrip)
-        _highlightGroupCombo = FindToolStripItem<ToolStripComboBox>(_buttonToolbar, "highlightGroupsToolStripComboBox")
-            ?? FindToolStripItem<ToolStripComboBox>(_externalToolsToolStrip, "highlightGroupsToolStripComboBox");
+        _highlightGroupCombo = FindToolStripItem<ToolStripComboBox>(_buttonToolbar, "highlightGroupsToolStripComboBox") ?? FindToolStripItem<ToolStripComboBox>(_externalToolsToolStrip, "highlightGroupsToolStripComboBox");
 
         _highlightGroupCombo?.SelectedIndexChanged += OnHighlightGroupComboSelectedIndexChanged;
 
@@ -303,15 +301,6 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         _lastUsedMenuItem.DropDown = strip;
     }
 
-    public void ApplyLocalization ()
-    {
-        ApplyMenuResources();
-        ApplyTabContextMenuResources();
-        ApplyToolStripResources();
-        ApplyStatusStripResources();
-        ApplyToolTips();
-    }
-
     #region Private Helpers
 
     private static void SetCheckedSafe (ToolStripMenuItem item, bool value)
@@ -431,81 +420,6 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         {
             _logger.Warn("MenuToolbarController: menu item '{0}' not found during initialization", name);
         }
-    }
-
-    #endregion
-
-    #region Localization Methods
-
-    // These methods move the ~160 lines of ApplyTextResources / ApplyContextMenuResources /
-    // ApplyToolStripResources / ApplyStatusStripResources / ApplyToolTips from LogTabWindow.
-    //
-    // Use the actual resource keys: Resources.LogTabWindow_UI_ToolStripMenuItem_*
-    // See LogTabWindow.cs lines 300-455 for the complete listing.
-    //
-    // Implementation note: Copy the method bodies verbatim from LogTabWindow, replacing
-    // direct field access with the cached _xxxMenuItem fields. For controls still owned
-    // by LogTabWindow (e.g., labelStatus), pass them via initialization or leave those
-    // specific lines in LogTabWindow.
-
-    private void ApplyMenuResources ()
-    {
-        // Move body of ApplyContextMenuResources() from LogTabWindow (lines 343-414)
-    }
-
-    private void ApplyTabContextMenuResources ()
-    {
-        // Move body of ApplyTabContextMenuResources() from LogTabWindow (lines 315-325)
-        // Note: tab context menu items may still be owned by LogTabWindow. Evaluate
-        // whether to pass them in or leave in LogTabWindow.
-    }
-
-    private void ApplyToolStripResources ()
-    {
-        // Move body of ApplyToolStripResources() from LogTabWindow (lines 327-341)
-    }
-
-    private void ApplyStatusStripResources ()
-    {
-        //labelLines.Text = Resources.LogTabWindow_UI_Label_labelLines;
-        //labelSize.Text = Resources.LogTabWindow_UI_Label_labelSize;
-        //labelCurrentLine.Text = Resources.LogTabWindow_UI_Label_labelCurrentLine;
-        //labelStatus.Text = Resources.LogTabWindow_UI_Label_labelStatus;
-        // Move body of ApplyStatusStripResources() from LogTabWindow (lines 417-423)
-        // Note: status strip labels (labelLines, labelSize, etc.) are owned by LogTabWindow.
-        // Consider leaving this in LogTabWindow or passing references during initialization.
-    }
-
-    private void ApplyToolTips ()
-    {
-        // Move body of ApplyToolTips() from LogTabWindow (lines 425-455)
-        pluginTrustManagementToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement;
-        timeshiftToolStripTextBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox;
-        openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
-        newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
-        multiFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem;
-        loadProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
-        saveProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
-        timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
-        copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
-        columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
-        cellSelectModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem;
-        lockInstanceToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem;
-        toolsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_toolsToolStripMenuItem;
-        toolStripButtonSearch.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonSearch;
-        toolStripButtonOpen.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonOpen;
-        toolStripButtonDown.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonDown;
-        toolStripButtonUp.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonUp;
-        toolStripButtonBookmark.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonBookmark;
-        toolStripButtonFilter.ToolTipText = Resources.LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonFilter;
-        highlightGroupsToolStripComboBox.ToolTipText = Resources.LogTabWindow_UI_ToolStripComboBox_ToolTip_highlightGroupsToolStripComboBox;
-        tabRenameToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabRenameToolStripMenuItem;
-        closeAllTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeAllTabsToolStripMenuItem;
-        closeOtherTabsToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeOtherTabsToolStripMenuItem;
-        tabColorToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabColorToolStripMenuItem;
-        findInExplorerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_findInExplorerToolStripMenuItem;
-        copyPathToClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem;
-        truncateFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem;
     }
 
     #endregion

@@ -1,6 +1,7 @@
 using System.Runtime.Versioning;
 
-using LogExpert.UI.Services;
+using LogExpert.UI.Interface.Services;
+using LogExpert.UI.Services.LedService;
 
 using NUnit.Framework;
 
@@ -9,11 +10,12 @@ namespace LogExpert.Tests.Services;
 [TestFixture]
 [Apartment(ApartmentState.STA)] // Required for UI components
 [SupportedOSPlatform("windows")]
-public class LedIndicatorServiceTests
+public class LedIndicatorServiceTests : IDisposable
 {
     private LedIndicatorService? _service;
     private ApplicationContext? _appContext;
     private WindowsFormsSynchronizationContext? _syncContext;
+    private bool _disposed;
 
     [SetUp]
     public void Setup ()
@@ -140,9 +142,9 @@ public class LedIndicatorServiceTests
         _service!.Initialize(Color.Blue);
 
         // Act
-        _service.Start();
+        _service.StartService();
         Thread.Sleep(500); // Let timer tick a few times
-        _service.Stop();
+        _service.StopService();
 
         // Assert - no exception
         Assert.That(true, Is.True, "Service started and stopped without exceptions");
@@ -192,7 +194,7 @@ public class LedIndicatorServiceTests
     {
         // Arrange
         _service!.Initialize(Color.Blue);
-        _service.Start();
+        _service.StartService();
 
         // Act
         _service.Dispose();
@@ -217,7 +219,7 @@ public class LedIndicatorServiceTests
         // Arrange - don't initialize
 
         // Act & Assert
-        _ = Assert.Throws<InvalidOperationException>(() => _service!.Start());
+        _ = Assert.Throws<InvalidOperationException>(() => _service!.StartService());
     }
 
     [Test]
@@ -315,5 +317,26 @@ public class LedIndicatorServiceTests
         Assert.That(iconNotSynced, Is.Not.Null);
         // The icons should be different (synced has blue indicator on left side)
         Assert.That(iconSynced, Is.Not.EqualTo(iconNotSynced));
+    }
+
+    public void Dispose ()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose (bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _service?.Dispose();
+        }
+
+        _disposed = true;
     }
 }
