@@ -186,6 +186,7 @@ internal class MenuToolbarControllerTests : IDisposable
         _controller.UpdateHighlightGroups(groups, "Errors");
 
         var combo = _toolbar.Items["highlightGroupsToolStripComboBox"] as ToolStripComboBox;
+        Assert.That(combo, Is.Not.Null);
         Assert.That(combo.Items, Has.Count.EqualTo(3));
         Assert.That(combo.Text, Is.EqualTo("Errors"));
     }
@@ -229,6 +230,7 @@ internal class MenuToolbarControllerTests : IDisposable
 
         // Simulate user selecting "Errors"
         var combo = _toolbar.Items["highlightGroupsToolStripComboBox"] as ToolStripComboBox;
+        Assert.That(combo, Is.Not.Null, "Expected highlightGroupsToolStripComboBox to be a ToolStripComboBox.");
         combo.SelectedIndex = 1; // This triggers SelectedIndexChanged
 
         Assert.That(selectedGroup, Is.EqualTo("Errors"));
@@ -247,6 +249,7 @@ internal class MenuToolbarControllerTests : IDisposable
 
         // Changing selection after dispose should not raise HighlightGroupSelected
         var combo = _toolbar.Items["highlightGroupsToolStripComboBox"] as ToolStripComboBox;
+        Assert.That(combo, Is.Not.Null, "Expected highlightGroupsToolStripComboBox to be a ToolStripComboBox.");
         combo.SelectedIndex = 0;
 
         Assert.That(selectedGroup, Is.Null);
@@ -325,6 +328,7 @@ internal class MenuToolbarControllerTests : IDisposable
         _controller.UpdateGuiState(state, false);
 
         var bubblesButton = _toolbar.Items["toolStripButtonBubbles"] as ToolStripButton;
+        Assert.That(bubblesButton, Is.Not.Null, "Expected toolStripButtonBubbles to be a ToolStripButton.");
         Assert.That(bubblesButton.Checked, Is.True);
     }
 
