@@ -23,7 +23,10 @@ using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
-using LogExpert.UI.Services;
+using LogExpert.UI.Interface.Services;
+using LogExpert.UI.Services.LedService;
+using LogExpert.UI.Services.MenuToolbarService;
+using LogExpert.UI.Services.TabControllerService;
 
 using NLog;
 
@@ -46,6 +49,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly LedIndicatorService _ledService;
 
     private readonly TabController _tabController;
+    private readonly MenuToolbarController _menuToolbarController;
 
     private bool _disposed;
 
@@ -84,11 +88,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ConfigureDockPanel();
 
         _tabController = new TabController(dockPanel);
-        _tabController.WindowAdded += OnTabControllerWindowAdded;
-        _tabController.WindowRemoved += OnTabControllerWindowRemoved;
-        _tabController.WindowActivated += OnTabControllerWindowActivated;
-        _tabController.WindowClosing += OnTabControllerWindowClosing;
+        InitializeTabControllerEvents();
 
+        _menuToolbarController = new MenuToolbarController();
+        _menuToolbarController.InitializeMenus(mainMenuStrip, buttonToolStrip, externalToolsToolStrip, dragControlDateTime, checkBoxFollowTail);
+        InitializeMenuToolbarControllerEvents();
+        
         ApplyTextResources();
 
         ConfigManager = configManager;
@@ -111,7 +116,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _ledService = new LedIndicatorService();
         _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
         _ledService.IconChanged += OnLedIconChanged;
-        _ledService.Start();
+        _ledService.StartService();
 
         _deadIcon = _ledService.GetDeadIcon();
 
@@ -144,6 +149,37 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
+    }
+
+    private void InitializeMenuToolbarControllerEvents ()
+    {
+        _menuToolbarController.HistoryItemClicked += OnMenuControllerHistoryItemClicked;
+        _menuToolbarController.HistoryItemRemoveRequested += OnMenuControllerHistoryItemRemoveRequested;
+        _menuToolbarController.HighlightGroupSelected += OnMenuControllerHighlightGroupSelected;
+    }
+
+    private void OnMenuControllerHighlightGroupSelected (object? sender, HighlightGroupSelectedEventArgs e)
+    {
+        CurrentLogWindow?.SetCurrentHighlightGroup(e.GroupName);
+    }
+
+    private void OnMenuControllerHistoryItemRemoveRequested (object? sender, HistoryItemClickedEventArgs e)
+    {
+        ConfigManager.RemoveFromFileHistory(e.FileName);
+        FillHistoryMenu();
+    }
+
+    private void OnMenuControllerHistoryItemClicked (object? sender, HistoryItemClickedEventArgs e)
+    {
+        _ = AddFileTab(e.FileName, false, null, false, null);
+    }
+
+    private void InitializeTabControllerEvents ()
+    {
+        _tabController.WindowAdded += OnTabControllerWindowAdded;
+        _tabController.WindowRemoved += OnTabControllerWindowRemoved;
+        _tabController.WindowActivated += OnTabControllerWindowActivated;
+        _tabController.WindowClosing += OnTabControllerWindowClosing;
     }
 
     #endregion
@@ -189,11 +225,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public Preferences Preferences => ConfigManager.Settings.Preferences;
 
     public List<HighlightGroup> HighlightGroupList { get; private set; } = [];
-
-    //public Settings Settings
-    //{
-    //  get { return ConfigManager.Settings; }
-    //}
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ILogExpertProxy LogExpertProxy { get; set; }
@@ -299,7 +330,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ApplyTextResources ()
     {
-
         mainMenuStrip.Text = Resources.LogTabWindow_UI_MenuStrip_MainMenu;
         Text = Resources.LogExpert_Common_UI_Title_LogExpert;
         checkBoxHost.AccessibleName = Resources.LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost;
@@ -888,10 +918,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (disposing && (components != null))
         {
-            _ledService?.Stop();
+            _ledService?.StopService();
             _ledService?.Dispose();
             components.Dispose();
             _tabStringFormat?.Dispose();
+            _menuToolbarController?.Dispose();
         }
 
         _disposed = true;
@@ -1080,12 +1111,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.FilterListChanged -= OnLogWindowFilterListChanged;
         logWindow.CurrentHighlightGroupChanged -= OnLogWindowCurrentHighlightGroupChanged;
         logWindow.SyncModeChanged -= OnLogWindowSyncModeChanged;
-
-        //var data = logWindow.Tag as LogWindowData;
-        //data.tabPage.MouseClick -= tabPage_MouseClick;
-        //data.tabPage.TabDoubleClick -= tabPage_TabDoubleClick;
-        //data.tabPage.ContextMenuStrip = null;
-        //data.tabPage = null;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1109,18 +1134,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void FillHistoryMenu ()
     {
-        ToolStripDropDown strip = new ToolStripDropDownMenu();
-
-        foreach (var file in ConfigManager.Settings.FileHistoryList)
-        {
-            ToolStripItem item = new ToolStripMenuItem(file);
-            _ = strip.Items.Add(item);
-
-        }
-
-        strip.ItemClicked += OnHistoryItemClicked;
-        strip.MouseUp += OnStripMouseUp;
-        lastUsedToolStripMenuItem.DropDown = strip;
+        _menuToolbarController.PopulateFileHistory(ConfigManager.Settings.FileHistoryList);
     }
 
     /// <summary>
@@ -1169,16 +1183,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void FillHighlightComboBox ()
     {
-        var currentGroupName = highlightGroupsToolStripComboBox.Text;
-        highlightGroupsToolStripComboBox.Items.Clear();
-        foreach (var group in HighlightGroupList)
-        {
-            _ = highlightGroupsToolStripComboBox.Items.Add(group.GroupName);
-            if (group.GroupName.Equals(currentGroupName, StringComparison.Ordinal))
-            {
-                highlightGroupsToolStripComboBox.Text = group.GroupName;
-            }
-        }
+        var groups = HighlightGroupList.Select(g => g.GroupName);
+        var selected = highlightGroupsToolStripComboBox.Text;
+        _menuToolbarController.UpdateHighlightGroups(groups, selected);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1424,38 +1431,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void GuiStateUpdateWorker (GuiStateEventArgs e)
     {
         _skipEvents = true;
-        checkBoxFollowTail.Checked = e.FollowTail;
-        mainMenuStrip.Enabled = e.MenuEnabled;
-        timeshiftToolStripMenuItem.Enabled = e.TimeshiftPossible;
-        timeshiftToolStripMenuItem.Checked = e.TimeshiftEnabled;
-        timeshiftToolStripTextBox.Text = e.TimeshiftText;
-        timeshiftToolStripTextBox.Enabled = e.TimeshiftEnabled;
-        multiFileToolStripMenuItem.Enabled = e.MultiFileEnabled; // disabled for temp files
-        multiFileToolStripMenuItem.Checked = e.IsMultiFileActive;
-        multiFileEnabledStripMenuItem.Checked = e.IsMultiFileActive;
-        cellSelectModeToolStripMenuItem.Checked = e.CellSelectMode;
-
-        RefreshEncodingMenuBar(e.CurrentEncoding);
-
-        if (e.TimeshiftPossible && ConfigManager.Settings.Preferences.TimestampControl)
-        {
-            dragControlDateTime.MinDateTime = e.MinTimestamp;
-            dragControlDateTime.MaxDateTime = e.MaxTimestamp;
-            dragControlDateTime.DateTime = e.Timestamp;
-            dragControlDateTime.Visible = true;
-            dragControlDateTime.Enabled = true;
-            dragControlDateTime.Refresh();
-        }
-        else
-        {
-            dragControlDateTime.Visible = false;
-            dragControlDateTime.Enabled = false;
-        }
-
-        toolStripButtonBubbles.Checked = e.ShowBookmarkBubbles;
-        highlightGroupsToolStripComboBox.Text = e.HighlightGroupName;
-        columnFinderToolStripMenuItem.Checked = e.ColumnFinderVisible;
-
+        _menuToolbarController.UpdateGuiState(e, ConfigManager.Settings.Preferences.TimestampControl);
         _skipEvents = false;
     }
 
@@ -1579,39 +1555,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void RefreshEncodingMenuBar (Encoding encoding)
     {
-        encodingASCIIToolStripMenuItem.Checked = false;
-        encodingANSIToolStripMenuItem.Checked = false;
-        encodingUTF8toolStripMenuItem.Checked = false;
-        encodingUTF16toolStripMenuItem.Checked = false;
-        encodingISO88591toolStripMenuItem.Checked = false;
-
-        if (encoding == null)
-        {
-            return;
-        }
-
-        if (encoding is ASCIIEncoding)
-        {
-            encodingASCIIToolStripMenuItem.Checked = true;
-        }
-        else if (encoding.Equals(Encoding.Default))
-        {
-            encodingANSIToolStripMenuItem.Checked = true;
-        }
-        else if (encoding is UTF8Encoding)
-        {
-            encodingUTF8toolStripMenuItem.Checked = true;
-        }
-        else if (encoding is UnicodeEncoding)
-        {
-            encodingUTF16toolStripMenuItem.Checked = true;
-        }
-        else if (encoding.Equals(Encoding.GetEncoding("iso-8859-1")))
-        {
-            encodingISO88591toolStripMenuItem.Checked = true;
-        }
-
-        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
+        _menuToolbarController.UpdateEncodingMenu(encoding);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2176,22 +2120,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    private void OnStripMouseUp (object sender, MouseEventArgs e)
-    {
-        if (sender is ToolStripDropDown dropDown)
-        {
-            _ = AddFileTab(dropDown.Text, false, null, false, null);
-        }
-    }
-
-    private void OnHistoryItemClicked (object sender, ToolStripItemClickedEventArgs e)
-    {
-        if (!string.IsNullOrEmpty(e.ClickedItem.Text))
-        {
-            _ = AddFileTab(e.ClickedItem.Text, false, null, false, null);
-        }
-    }
-
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
         var logWindow = sender as LogWindow.LogWindow;
@@ -2266,7 +2194,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                             logWindow.ColumnizerConfigChanged();
                         }
                     }
-
                 }
             }
         }
@@ -2491,7 +2418,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        if (logWindow.Tag is not LogWindowData data)
+        if (logWindow.Tag is not LogWindowData)
         {
             return;
         }
@@ -2927,12 +2854,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     [SupportedOSPlatform("windows")]
     private void OnHighlightGroupsComboBoxDropDownClosed (object sender, EventArgs e)
-    {
-        ApplySelectedHighlightGroup();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnHighlightGroupsComboBoxSelectedIndexChanged (object sender, EventArgs e)
     {
         ApplySelectedHighlightGroup();
     }

@@ -2,7 +2,7 @@ using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 using LogExpert.UI.Controls.LogWindow;
-using LogExpert.UI.Services;
+using LogExpert.UI.Services.TabControllerService;
 
 using NUnit.Framework;
 
@@ -93,7 +93,7 @@ internal class TabControllerTests : IDisposable
     public void Constructor_WithNullDockPanel_ThrowsArgumentNullException()
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new TabController(null));
+        _ = Assert.Throws<ArgumentNullException>(() => new TabController(null));
     }
 
     [Test]
@@ -131,7 +131,7 @@ internal class TabControllerTests : IDisposable
         using var controller = new TabController();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => controller.InitializeDockPanel(null));
+        _ = Assert.Throws<ArgumentNullException>(() => controller.InitializeDockPanel(null));
     }
 
     [Test]
@@ -146,7 +146,7 @@ internal class TabControllerTests : IDisposable
         form2.Controls.Add(dockPanel2);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => controller.InitializeDockPanel(dockPanel2));
+        _ = Assert.Throws<InvalidOperationException>(() => controller.InitializeDockPanel(dockPanel2));
     }
 
     #endregion
@@ -305,7 +305,7 @@ internal class TabControllerTests : IDisposable
         // Arrange - already done in Setup
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _tabController.AddWindow(null, "Test Window"));
+        _ = Assert.Throws<ArgumentNullException>(() => _tabController.AddWindow(null, "Test Window"));
     }
 
     [Test]
@@ -358,7 +358,7 @@ internal class TabControllerTests : IDisposable
         // Arrange - already done in Setup
 
         // Act & Assert - should not throw
-        Assert.DoesNotThrow(() => _tabController.CloseAllWindows());
+        Assert.DoesNotThrow(_tabController.CloseAllWindows);
     }
 
     #endregion
@@ -397,7 +397,7 @@ internal class TabControllerTests : IDisposable
         // Arrange - already done in Setup
 
         // Act & Assert - should not throw
-        Assert.DoesNotThrow(() => _tabController.SwitchToNextWindow());
+        Assert.DoesNotThrow(_tabController.SwitchToNextWindow);
     }
 
     #endregion
@@ -410,7 +410,7 @@ internal class TabControllerTests : IDisposable
         // Arrange - already done in Setup
 
         // Act & Assert - should not throw
-        Assert.DoesNotThrow(() => _tabController.SwitchToPreviousWindow());
+        Assert.DoesNotThrow(_tabController.SwitchToPreviousWindow);
     }
 
     #endregion

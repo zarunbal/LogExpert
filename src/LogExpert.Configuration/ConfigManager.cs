@@ -281,6 +281,22 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
+    [SupportedOSPlatform("windows")]
+    public void RemoveFromFileHistory (string fileName)
+    {
+        bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
+
+        var index = Instance.Settings.FileHistoryList.FindIndex(findName);
+
+        if (index != -1)
+        {
+            Instance.Settings.FileHistoryList.RemoveAt(index);
+        }
+
+        Save(SettingsFlags.FileHistory);
+    }
+
+
     public void ClearLastOpenFilesList ()
     {
         lock (_loadSaveLock)

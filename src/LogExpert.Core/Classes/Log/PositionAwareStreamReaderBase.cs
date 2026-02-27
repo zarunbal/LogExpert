@@ -47,7 +47,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
         MaximumLineLength = maximumLineLength;
 
-        _preambleLength = DetectPreambleLengthAndEncoding(out var detectedEncoding);
+        (_preambleLength, Encoding? detectedEncoding) = DetectPreambleLength(_stream);
 
         var usedEncoding = DetermineEncoding(encodingOptions, detectedEncoding);
         _posIncPrecomputed = GetPosIncPrecomputed(usedEncoding);
@@ -165,11 +165,19 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     #region Private Methods
 
+    public static Encoding DetermineEncoding (EncodingOptions options, Encoding detectedEncoding)
+    {
+        return options?.Encoding != null
+            ? options.Encoding
+            : detectedEncoding ?? options?.DefaultEncoding ?? Encoding.Default;
+    }
+
     /// <summary>
-    /// Determines the actual number of preamble bytes in the file.
+    /// Determines the actual number of preamble bytes in the file and the Encoding.
     /// </summary>
-    /// <returns>Number of preamble bytes in the file</returns>
-    private int DetectPreambleLengthAndEncoding (out Encoding detectedEncoding)
+    /// <param name="stream"></param>
+    /// <returns>Number of preamble bytes in the file and the Encoding if there is one</returns>
+    public static (int length, Encoding? detectedEncoding) DetectPreambleLength (Stream stream)
     {
         /*
         UTF-8:                          EF BB BF
@@ -179,31 +187,15 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         UTF-32-Little-Endian-Byteorder: FF FE 00 00
         */
 
-        var (length, encoding) = DetectPreambleLength(_stream);
-        // not found or less than 2 byte read
-        detectedEncoding = encoding;
-
-        return length;
-    }
-
-    public static Encoding DetermineEncoding (EncodingOptions options, Encoding detectedEncoding)
-    {
-        return options?.Encoding != null
-            ? options.Encoding
-            : detectedEncoding ?? options?.DefaultEncoding ?? Encoding.Default;
-    }
-
-    public static (int length, Encoding? detectedEncoding) DetectPreambleLength (Stream stream)
-    {
         if (!stream.CanSeek)
         {
             return (0, null);
         }
 
         var originalPos = stream.Position;
-        var buffer = new byte[4];
+        Span<byte> buffer = stackalloc byte[4];
         _ = stream.Seek(0, SeekOrigin.Begin);
-        var readBytes = stream.Read(buffer, 0, buffer.Length);
+        var readBytes = stream.Read(buffer);
         _ = stream.Seek(originalPos, SeekOrigin.Begin);
 
         if (readBytes >= 2)

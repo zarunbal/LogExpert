@@ -1,6 +1,6 @@
 using LogExpert.UI.Controls.LogWindow;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.TabControllerService;
 
 internal class WindowRemovedEventArgs (LogWindow window) : EventArgs
 {

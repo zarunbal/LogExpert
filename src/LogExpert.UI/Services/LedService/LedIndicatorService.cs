@@ -4,10 +4,11 @@ using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Interface;
 
 using NLog;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.LedService;
 
 [SupportedOSPlatform("windows")]
 internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
@@ -96,7 +97,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
         }
 
         _disposed = true;
-        Stop();
+        StopService();
 
         Thread.Sleep(ANIMATION_INTERVAL_MS * 2);
 
@@ -425,7 +426,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
 
         if (wasRunning)
         {
-            Stop();
+            StopService();
             Thread.Sleep(ANIMATION_INTERVAL_MS * 2);  // Wait for pending ticks
         }
 
@@ -459,7 +460,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
 
         if (wasRunning)
         {
-            Start();
+            StartService();
         }
     }
 
@@ -483,7 +484,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     /// <summary>
     /// Starts the LED animation timer
     /// </summary>
-    public void Start ()
+    public void StartService ()
     {
         if (!_isInitialized)
         {
@@ -510,7 +511,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     /// <summary>
     /// Stops the LED animation timer
     /// </summary>
-    public void Stop ()
+    public void StopService ()
     {
         if (_animationTimer == null)
         {

@@ -125,11 +125,15 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
                     var secondChar = reader.Read();
                     if (secondChar == CHAR_LF) // check \n
                     {
-                        return Encoding.GetByteCount("\r\n");
+                        // Use stackalloc or SpanOwner instead of string
+                        Span<char> newline = ['\r', '\n'];
+                        return Encoding.GetByteCount(newline);
+                        //return Encoding.GetByteCount("\r\n");
                     }
                 }
 
-                return Encoding.GetByteCount(((char)firstChar).ToString());
+                Span<char> singleChar = [(char)firstChar];
+                return Encoding.GetByteCount(singleChar);
             }
 
             return 0;

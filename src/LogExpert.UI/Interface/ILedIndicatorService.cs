@@ -1,6 +1,7 @@
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Services.LedService;
 
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Interface;
 
 /// <summary>
 /// Service for managing LED indicator icons on log window tabs
@@ -35,12 +36,12 @@ internal interface ILedIndicatorService : IDisposable
     /// <summary>
     /// Starts the LED animation thread
     /// </summary>
-    void Start ();
+    void StartService ();
 
     /// <summary>
     /// Stops the LED animation thread
     /// </summary>
-    void Stop ();
+    void StopService ();
 
     /// <summary>
     /// Registers a window for LED state tracking

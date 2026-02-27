@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Services;
+namespace LogExpert.UI.Services.LedService;
 
 /// <summary>
 /// LED state information
