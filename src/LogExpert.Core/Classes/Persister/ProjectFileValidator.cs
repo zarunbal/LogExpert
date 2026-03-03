@@ -1,3 +1,5 @@
+using System.Security;
+
 using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.Classes.Persister;
@@ -106,7 +108,6 @@ public static class ProjectFileValidator
     /// Gets the list of fixed drive letters that are ready.
     /// Extracted to avoid repeated expensive DriveInfo.GetDrives() calls.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Drive enumeration can fail for various reasons")]
     private static List<char> GetFixedDriveLetters ()
     {
         try
@@ -115,7 +116,12 @@ public static class ProjectFileValidator
                 .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
                 .Select(d => d.Name[0])];
         }
-        catch
+        catch(Exception ex) when (
+             ex is IOException
+             or UnauthorizedAccessException
+             or SecurityException
+             or DriveNotFoundException
+             or ArgumentNullException)
         {
             return [];
         }
