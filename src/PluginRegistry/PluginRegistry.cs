@@ -5,6 +5,7 @@ using System.Security;
 using ColumnizerLib;
 
 using LogExpert.Core.Classes;
+using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
 using LogExpert.PluginRegistry.Events;
@@ -168,9 +169,9 @@ public class PluginRegistry : IPluginRegistry
         [
             //Default Columnizer if other Plugins can not be loaded
             new DefaultLogfileColumnizer(),
-            //new TimestampColumnizer() as ILogLineMemoryColumnizer,
-            //new SquareBracketColumnizer() as ILogLineMemoryColumnizer,
-            //new ClfColumnizer() as ILogLineMemoryColumnizer,
+            new TimestampColumnizer(),
+            new SquareBracketColumnizer(),
+            new ClfColumnizer(),
         ];
 
         //Default FileSystem if other FileSystem Plugins cannot be loaded

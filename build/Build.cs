@@ -68,30 +68,14 @@ partial class Build : NukeBuild
 
     string SetupCommandLineParameter => $"/dAppVersion=\"{VersionString}\" /O\"{BinDirectory}\" /F\"LogExpert-Setup-{VersionString}\"";
 
-    Version Version
-    {
-        get
-        {
-            int patch = 0;
-
-            if (AppVeyor.Instance != null)
-            {
-                patch = AppVeyor.Instance.BuildNumber;
-            }
-
-            return new Version(1, 21, 0, patch);
-        }
-    }
-
     [Parameter("Version string")]
-    string VersionString => $"{Version.Major}.{Version.Minor}.{Version.Build}";
+    string VersionString => $"{GitVersion.Major}.{GitVersion.Minor}.{GitVersion.Patch}";
 
     [Parameter("Version Information string")]
-    //.Branch.{GitVersion.BranchName}.{GitVersion.Sha} removed for testing purpose
     string VersionInformationString => $"{VersionString} {Configuration}";
 
     [Parameter("Version file string")]
-    string VersionFileString => $"{Version.Major}.{Version.Minor}.{Version.Build}";
+    string VersionFileString => $"{GitVersion.Major}.{GitVersion.Minor}.{GitVersion.Patch}";
 
     [Parameter("Exclude file globs")]
     string[] ExcludeFileGlob => ["**/*.xml", "**/*.XML", "**/*.pdb"];
