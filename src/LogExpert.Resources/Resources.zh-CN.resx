@@ -1978,4 +1978,91 @@ YY[YY] = 年
   <data name="MissingFilesDialog_UI_Filter_Title" xml:space="preserve">
     <value>定位：{0}</value>
   </data>
+  <data name="Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle" xml:space="preserve">
+    <value>RmEndSession：{0}</value>
+  </data>
+  <data name="LogWindow_UI_Common_ZeroValue" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName" xml:space="preserve">
+    <value>标头名称</value>
+  </data>
+  <data name="LogTabWindow_UI_StatusStrip_StatusStrip" xml:space="preserve">
+    <value>状态条1</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelSize" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelLines" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelCurrentLine" xml:space="preserve">
+    <value>长：</value>
+  </data>
+  <data name="LogTabWindow_UI_MenuStrip_mainMenuStrip" xml:space="preserve">
+    <value>菜单条1</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
+    <value>ASCII码</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
+    <value>美国国家标准协会</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
+    <value>ISO-8859-1</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
+    <value>UTF8</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
+    <value>统一码</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
+    <value>+00:00:00.000</value>
+  </data>
+  <data name="LogTabWindow_HelpFile" xml:space="preserve">
+    <value>日志专家.chm</value>
+  </data>
+  <data name="AboutBox_UI_LinkLabel_URL" xml:space="preserve">
+    <value>https://github.com/LogExperts/LogExpert</value>
+  </data>
+  <data name="RegexHelperDialog_Help_Chapter" xml:space="preserve">
+    <value>正则表达式.htm</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripContainer_toolStripContainer" xml:space="preserve">
+    <value>工具条容器1</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceNotInitialized" xml:space="preserve">
+    <value>{0} 未初始化</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized" xml:space="preserve">
+    <value>{0} 已初始化</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread" xml:space="preserve">
+    <value>必须在 UI 线程上创建 {0}</value>
+  </data>
+  <data name="TabController_Error_Message_NotInitialized" xml:space="preserve">
+    <value>TabController 未初始化。首先调用InitializeDockPanel。</value>
+  </data>
+  <data name="TabController_Error_Message_WindowAlreadyTracked" xml:space="preserve">
+    <value>窗口已被跟踪</value>
+  </data>
+  <data name="TabController_Error_Message_AlreadInitialized" xml:space="preserve">
+    <value>TabController 已使用 DockPanel 进行初始化</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_Title" xml:space="preserve">
+    <value>便携模式</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_CopySettingsQuestion" xml:space="preserve">
+    <value>无法激活便携模式：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
+    <value>您想将当前设置复制到便携式配置文件夹吗？</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_ActivationError" xml:space="preserve">
+    <value>某些文件无法迁移：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
+    <value>您想要将可移植设置移回默认配置文件夹 (%APPDATA%\LogExpert) 吗？</value>
+  </data>
 </root>

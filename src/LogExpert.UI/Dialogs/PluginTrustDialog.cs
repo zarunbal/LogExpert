@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
 
+using LogExpert.Core.Interface;
 using LogExpert.PluginRegistry;
 
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ internal partial class PluginTrustDialog : Form
 
     #region cTor
 
-    public PluginTrustDialog (Form parent)
+    public PluginTrustDialog (Form parent, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -33,7 +34,7 @@ internal partial class PluginTrustDialog : Form
 
         Owner = parent;
 
-        _configPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert", "trusted-plugins.json");
+        _configPath = Path.Join(configManager.ActiveConfigDir, "trusted-plugins.json");
 
         LoadConfiguration();
         PopulatePluginList();

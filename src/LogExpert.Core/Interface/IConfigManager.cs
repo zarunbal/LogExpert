@@ -34,7 +34,17 @@ public interface IConfigManager
     /// Returns the application startup path combined with "portable" subdirectory.
     /// When a portableMode.json file exists in this directory, the application runs in portable mode.
     /// </remarks>
+    [Obsolete("Use PortableConfigDir instead. This property is misnamed and may cause confusion. It will be removed in a future version.")]
     string PortableModeDir { get; }
+
+    /// <summary>
+    /// Gets the directory path for portable mode settings.
+    /// </summary>
+    /// <remarks>
+    /// Returns the application startup path combined with "portable" subdirectory.
+    /// When a portableMode.json file exists in this directory, the application runs in portable mode.
+    /// </remarks>
+    string PortableConfigDir { get; }
 
     /// <summary>
     /// Gets the standard configuration directory path.
@@ -50,6 +60,20 @@ public interface IConfigManager
     /// </summary>
     /// <value>Returns "portableMode.json"</value>
     string PortableModeSettingsFileName { get; }
+
+    /// <summary>
+    /// {ApplicationStartupPath}/configuration/sessions/<br></br>
+    /// Used for session file storage in portable mode.
+    /// </summary>
+    string PortableSessionDir { get; }
+
+    /// <summary>
+    /// Gets the directory path where the current session's data is stored.
+    /// </summary>
+    /// <remarks>This property is useful for accessing files or configurations that are specific to the active
+    /// session. The returned path may vary between sessions and should not be assumed to be persistent across
+    /// application restarts.</remarks>
+    string ActiveSessionDir { get; }
 
     /// <summary>
     /// Initializes the ConfigManager with application-specific paths and screen information.
@@ -164,6 +188,26 @@ public interface IConfigManager
     /// <remarks>Call this method to remove all entries from the recent files list, typically to reset user
     /// history or in response to a privacy-related action. After calling this method, the list of last open files will
     /// be empty until new files are opened.</remarks>
-
     void ClearLastOpenFilesList ();
+
+    /// <summary>
+    /// Returns the active configuration directory based on the current mode.
+    /// In portable mode: {AppDir}/configuration/
+    /// In normal mode: %APPDATA%/LogExpert/
+    /// </summary>
+    string ActiveConfigDir { get; }
+
+    /// <summary>
+    /// Copies configuration files from normal mode location (%APPDATA%/LogExpert/)
+    /// to the portable configuration directory ({AppDir}/configuration/).
+    /// Called when portable mode is activated and user confirms copy.
+    /// </summary>
+    void CopyConfigToPortable ();
+
+    /// <summary>
+    /// Moves configuration files from the portable directory ({AppDir}/configuration/)
+    /// back to normal mode locations (%APPDATA%/LogExpert/).
+    /// Called when portable mode is deactivated and user confirms migration.
+    /// </summary>
+    void MoveConfigFromPortable ();
 }

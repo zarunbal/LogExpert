@@ -1332,8 +1332,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (IsMultiFile)
                 {
-                    MethodInvoker invoker = DisplayCurrentFileOnStatusline;
-                    _ = invoker.BeginInvoke(null, null);
+                    //MethodInvoker invoker = DisplayCurrentFileOnStatusline;
+                    _ = Task.Run(DisplayCurrentFileOnStatusline);   
+                    //_ = invoker.BeginInvoke(null, null);
                 }
                 else
                 {
@@ -2420,7 +2421,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, Application.StartupPath)
+                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -2518,7 +2519,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceData(FileName, Preferences, Application.StartupPath)
+                ? Persister.LoadPersistenceData(FileName, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -2746,19 +2747,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_reloadMemento == null)
                     {
-                        //TODO this needs to be refactored
-                        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-                        columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+                        columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
                     }
                 }
                 else
                 {
-                    //TODO this needs to be refactored
-                    var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
                     // Default Columnizers
-                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), directory);
+                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), ConfigManager.ActiveConfigDir);
                 }
             }
 
@@ -2936,12 +2931,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void LogEventWorker ()
     {
         Thread.CurrentThread.Name = "LogEventWorker";
-        while (true)
+        while (!cts.Token.IsCancellationRequested)
         {
             //_logger.Debug($"Waiting for signal");
             _ = _logEventArgsEvent.WaitOne();
             //_logger.Debug($"Wakeup signal received.");
-            while (true)
+            while (!cts.Token.IsCancellationRequested)
             {
                 LogEventArgs e;
                 //var lastLineCount = 0;
@@ -2973,9 +2968,24 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 //    }
                 //}
 
-                _ = Invoke(UpdateGrid, [e]);
-                CheckFilterAndHighlight(e);
-                _timeSpreadCalc.SetLineCount(e.LineCount);
+                if (IsDisposed || Disposing || _waitingForClose)
+                {
+                    return;
+                }
+                else
+                {
+                    try
+                    {
+                        _ = Invoke(UpdateGrid, [e]);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    
+                    CheckFilterAndHighlight(e);
+                    _timeSpreadCalc.SetLineCount(e.LineCount);
+                }
             }
         }
     }
@@ -3132,8 +3142,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                 if (setBookmark)
                 {
-                    SetBookmarkFx fx = SetBookmarkFromTrigger;
-                    _ = fx.BeginInvoke(i, bookmarkComment, null, null);
+                    _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
                 }
 
                 if (stopTail && _guiStateArgs.FollowTail)
@@ -3142,7 +3151,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     FollowTailChanged(false, true);
                     if (firstStopTail && wasFollow)
                     {
-                        _ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                        //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                        _ = Task.Run(() => SelectAndEnsureVisible(i, false));
                         firstStopTail = false;
                     }
                 }
@@ -3180,8 +3190,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                     if (setBookmark)
                     {
-                        SetBookmarkFx fx = SetBookmarkFromTrigger;
-                        _ = fx.BeginInvoke(i, bookmarkComment, null, null);
+                        //SetBookmarkFx fx = SetBookmarkFromTrigger;
+                        _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
+                        //_ = fx.BeginInvoke(i, bookmarkComment, null, null);
                     }
 
                     if (stopTail && _guiStateArgs.FollowTail)
@@ -3190,7 +3201,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         FollowTailChanged(false, true);
                         if (firstStopTail && wasFollow)
                         {
-                            _ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                            //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
+                            _ = Task.Run(() => SelectAndEnsureVisible(i, false));
                             firstStopTail = false;
                         }
                     }
@@ -3223,8 +3235,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var plugin = PluginRegistry.PluginRegistry.Instance.FindKeywordActionPluginByName(entry.ActionEntry.PluginName);
                 if (plugin != null)
                 {
-                    ActionPluginExecuteFx fx = plugin.Execute;
-                    _ = fx.BeginInvoke(entry.SearchText, entry.ActionEntry.ActionParam, callback, CurrentColumnizer, null, null);
+                    //ActionPluginExecuteFx fx = plugin.Execute;
+                    _ = Task.Run(() => plugin.Execute(entry.SearchText, entry.ActionEntry.ActionParam, callback, CurrentColumnizer));
+                    //_ = fx.BeginInvoke(entry.SearchText, entry.ActionEntry.ActionParam, callback, CurrentColumnizer, null, null);
                 }
             }
         }
@@ -4359,11 +4372,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var settings = ConfigManager.Settings;
 
-        //FilterFx fx = settings.preferences.multiThreadFilter ? MultiThreadedFilter : new FilterFx(Filter);
         FilterFxAction = settings.Preferences.MultiThreadFilter ? MultiThreadedFilter : Filter;
-
-        //Task.Run(() => fx.Invoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList));
-        var filterFxActionTask = Task.Run(() => Filter(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList)).ConfigureAwait(false);
+        var filterFxActionTask = Task.Run(() => FilterFxAction(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList)).ConfigureAwait(false);
 
         await filterFxActionTask;
         FilterComplete();
@@ -4388,7 +4398,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         OnRegisterCancelHandler(cancelHandler);
         long startTime = Environment.TickCount;
 
-        fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback);
+        fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback).GetAwaiter().GetResult();
 
         long endTime = Environment.TickCount;
 
@@ -6125,10 +6135,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         if (_reloadMemento == null)
                         {
-                            //TODO this needs to be refactored
-                            var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-                            columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+                            columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
                         }
                     }
                     else
@@ -6250,7 +6257,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var persistenceData = GetPersistenceData();
 
             return ForcedPersistenceFileName == null
-                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, Application.StartupPath)
+                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.SavePersistenceDataWithFixedName(ForcedPersistenceFileName, persistenceData);
         }
         catch (IOException e)
@@ -6391,28 +6398,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void ForceColumnizer (ILogLineMemoryColumnizer columnizer)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-        _forcedColumnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+        _forcedColumnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
         SetColumnizer(_forcedColumnizer);
     }
 
     public void ForceColumnizerForLoading (ILogLineMemoryColumnizer columnizer)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-        _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+        _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
     }
 
     public void PreselectColumnizer (string columnizerName)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
         var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-        PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory));
+        PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
     }
 
     public void ColumnizerConfigChanged ()
@@ -6609,7 +6607,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 GetHighlightEntryMatches(line, _currentHighlightGroup.HighlightEntryList, resultList);
             }
 
-            lock (_tempHighlightEntryList)
+            lock (_tempHighlightEntryListLock)
             {
                 GetHighlightEntryMatches(line, _tempHighlightEntryList, resultList);
             }
@@ -7751,8 +7749,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void PatternStatistic (PatternArgs patternArgs)
     {
-        var fx = new PatternStatisticFx(TestStatistic);
-        _ = fx.BeginInvoke(patternArgs, null, null);
+        //var fx = new PatternStatisticFx(TestStatistic);
+        _ = Task.Run(() => TestStatistic(patternArgs));
+        //_ = fx.BeginInvoke(patternArgs, null, null);
     }
 
     public void ExportBookmarkList ()

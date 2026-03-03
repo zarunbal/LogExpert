@@ -17,6 +17,7 @@ public class LogTabWindowThreadingTests
     [Test]
     [Category("Threading")]
     [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void LedThread_WithConcurrentUpdates_NoRaceCondition ()
     {
         // Arrange
@@ -113,6 +114,7 @@ public class LogTabWindowThreadingTests
     [Test]
     [Category("Threading")]
     [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void LedThread_StartsAndStopsCleanly ()
     {
         // Arrange
@@ -157,6 +159,7 @@ public class LogTabWindowThreadingTests
     [Test]
     [Category("Threading")]
     [SupportedOSPlatform("windows")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void MultipleWindows_LedThreadsDoNotInterfere ()
     {
         // Arrange
