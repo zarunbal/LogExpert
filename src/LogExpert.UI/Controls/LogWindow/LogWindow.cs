@@ -2421,7 +2421,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, Application.StartupPath)
+                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -2519,7 +2519,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceData(FileName, Preferences, Application.StartupPath)
+                ? Persister.LoadPersistenceData(FileName, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
 
             if (persistenceData == null)
@@ -2747,19 +2747,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_reloadMemento == null)
                     {
-                        //TODO this needs to be refactored
-                        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-                        columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+                        columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
                     }
                 }
                 else
                 {
-                    //TODO this needs to be refactored
-                    var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
                     // Default Columnizers
-                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), directory);
+                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), ConfigManager.ActiveConfigDir);
                 }
             }
 
@@ -6141,10 +6135,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         if (_reloadMemento == null)
                         {
-                            //TODO this needs to be refactored
-                            var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-                            columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+                            columnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
                         }
                     }
                     else
@@ -6266,7 +6257,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var persistenceData = GetPersistenceData();
 
             return ForcedPersistenceFileName == null
-                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, Application.StartupPath)
+                ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, ConfigManager.ActiveSessionDir)
                 : Persister.SavePersistenceDataWithFixedName(ForcedPersistenceFileName, persistenceData);
         }
         catch (IOException e)
@@ -6407,28 +6398,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void ForceColumnizer (ILogLineMemoryColumnizer columnizer)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-        _forcedColumnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+        _forcedColumnizer = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
         SetColumnizer(_forcedColumnizer);
     }
 
     public void ForceColumnizerForLoading (ILogLineMemoryColumnizer columnizer)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
-        _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory);
+        _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
     }
 
     public void PreselectColumnizer (string columnizerName)
     {
-        //TODO this needs to be refactored
-        var directory = ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir;
-
         var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-        PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, directory));
+        PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
     }
 
     public void ColumnizerConfigChanged ()

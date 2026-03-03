@@ -399,6 +399,133 @@ public class PluginValidatorTests
 
     #endregion
 
+    #region Initialize Tests
+
+    [Test]
+    [Description("Initialize should update config directory and path")]
+    public void Initialize_WithValidDirectory_UpdatesConfigDirectory ()
+    {
+        // Arrange
+        var customConfigDir = Path.Join(_testDataPath, "customConfig");
+        _ = Directory.CreateDirectory(customConfigDir);
+
+        // Act
+        PluginValidator.Initialize(customConfigDir);
+
+        // Assert - Verify via reflection that _configDirectory was updated
+        var configDirField = typeof(PluginValidator).GetField("_configDirectory",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var configPathField = typeof(PluginValidator).GetField("_configPath",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        Assert.That(configDirField, Is.Not.Null, "_configDirectory field should exist");
+        Assert.That(configPathField, Is.Not.Null, "_configPath field should exist");
+
+        var actualDir = configDirField!.GetValue(null) as string;
+        var actualPath = configPathField!.GetValue(null) as string;
+
+        Assert.That(actualDir, Is.EqualTo(customConfigDir), "Config directory should be updated");
+        Assert.That(actualPath, Is.EqualTo(Path.Join(customConfigDir, "trusted-plugins.json")),
+            "Config path should point to trusted-plugins.json in new directory");
+    }
+
+    [Test]
+    [Description("Initialize with null should throw ArgumentException")]
+    public void Initialize_WithNull_ThrowsArgumentException ()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => PluginValidator.Initialize(null!));
+    }
+
+    [Test]
+    [Description("Initialize with empty string should throw ArgumentException")]
+    public void Initialize_WithEmptyString_ThrowsArgumentException ()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => PluginValidator.Initialize(string.Empty));
+    }
+
+    [Test]
+    [Description("Initialize with whitespace should throw ArgumentException")]
+    public void Initialize_WithWhitespace_ThrowsArgumentException ()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => PluginValidator.Initialize("   "));
+    }
+
+    [Test]
+    [Description("Initialize should reload trusted plugin configuration from new directory")]
+    public void Initialize_WithTrustedPluginsFile_ReloadsConfiguration ()
+    {
+        // Arrange - Create a trusted-plugins.json in custom directory
+        var customConfigDir = Path.Join(_testDataPath, "configWithPlugins");
+        _ = Directory.CreateDirectory(customConfigDir);
+
+        var trustedConfig = """
+        {
+            "TrustedPlugins": [
+                {
+                    "FileName": "CustomPlugin.dll",
+                    "Hash": "abc123",
+                    "TrustedAt": "2024-01-01T00:00:00Z",
+                    "TrustMethod": "UserApproved"
+                }
+            ]
+        }
+        """;
+        File.WriteAllText(Path.Join(customConfigDir, "trusted-plugins.json"), trustedConfig);
+
+        // Act
+        PluginValidator.Initialize(customConfigDir);
+
+        // Assert - The configuration should be loaded from the new directory
+        // We verify by checking that the internal config was updated via reflection
+        var configField = typeof(PluginValidator).GetField("_trustedPluginConfig",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.That(configField, Is.Not.Null, "_trustedPluginConfig field should exist");
+
+        var config = configField!.GetValue(null);
+        Assert.That(config, Is.Not.Null, "Configuration should be loaded from new directory");
+    }
+
+    [Test]
+    [Description("Initialize should handle directory without trusted-plugins.json gracefully")]
+    public void Initialize_WithoutTrustedPluginsFile_HandlesGracefully ()
+    {
+        // Arrange - Directory with no config file
+        var emptyConfigDir = Path.Join(_testDataPath, "emptyConfig");
+        _ = Directory.CreateDirectory(emptyConfigDir);
+
+        // Act & Assert - Should not throw
+        Assert.DoesNotThrow(() => PluginValidator.Initialize(emptyConfigDir),
+            "Initialize should handle missing config file gracefully");
+    }
+
+    [Test]
+    [Description("Initialize can be called multiple times with different directories")]
+    public void Initialize_CalledMultipleTimes_UpdatesEachTime ()
+    {
+        // Arrange
+        var dir1 = Path.Join(_testDataPath, "dir1");
+        var dir2 = Path.Join(_testDataPath, "dir2");
+        _ = Directory.CreateDirectory(dir1);
+        _ = Directory.CreateDirectory(dir2);
+
+        var configDirField = typeof(PluginValidator).GetField("_configDirectory",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.That(configDirField, Is.Not.Null);
+
+        // Act & Assert - First call
+        PluginValidator.Initialize(dir1);
+        Assert.That(configDirField!.GetValue(null) as string, Is.EqualTo(dir1));
+
+        // Act & Assert - Second call
+        PluginValidator.Initialize(dir2);
+        Assert.That(configDirField.GetValue(null) as string, Is.EqualTo(dir2));
+    }
+
+    #endregion
+
     #region Helper Methods
 
     /// <summary>

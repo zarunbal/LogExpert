@@ -116,14 +116,7 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
     {
         if (SelectedColumnizer is IColumnizerConfigurator configurator)
         {
-            var configDir = ConfigManager.ConfigDir;
-
-            if (ConfigManager.Settings.Preferences.PortableMode)
-            {
-                configDir = ConfigManager.PortableModeDir;
-            }
-
-            configurator.Configure(_callback, configDir);
+            configurator.Configure(_callback, ConfigManager.ActiveConfigDir);
             IsConfigPressed = true;
         }
     }

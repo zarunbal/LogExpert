@@ -2142,4 +2142,19 @@ Restart LogExpert to apply changes?</value>
   <data name="TabController_Error_Message_AlreadInitialized" xml:space="preserve">
     <value>TabController is already initialized with a DockPanel</value>
   </data>
+  <data name="SettingsDialog_UI_PortableMode_Title" xml:space="preserve">
+    <value>Portable Mode</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_CopySettingsQuestion" xml:space="preserve">
+    <value>Failed to activate portable mode: {0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
+    <value>Do you want to copy your current settings to the portable configuration folder?</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_ActivationError" xml:space="preserve">
+    <value>Some files could not be migrated: {0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
+    <value>Do you want to move the portable settings back to the default configuration folder (%APPDATA%\LogExpert)?</value>
+  </data>
 </root>

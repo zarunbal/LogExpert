@@ -1,3 +1,5 @@
+using System.Runtime.Versioning;
+
 using LogExpert.Configuration;
 using LogExpert.Core.Config;
 
@@ -8,6 +10,7 @@ using NUnit.Framework;
 namespace LogExpert.Tests;
 
 [TestFixture]
+[SupportedOSPlatform("windows")]
 public class JSONSaveTest
 {
     [Test(Author = "Hirogen", Description = "Save Options as JSON and Check if the written file can be cast again into the settings object")]
@@ -20,7 +23,7 @@ public class JSONSaveTest
 
         Settings settings = null;
 
-        Assert.DoesNotThrow(CastSettings);
+        Assert.DoesNotThrow(castSettings);
         Assert.That(settings, Is.Not.Null);
         Assert.That(settings.AlwaysOnTop, Is.True);
 
@@ -28,15 +31,11 @@ public class JSONSaveTest
         ConfigManager.Instance.Save(SettingsFlags.All);
 
         settings = null;
-        Assert.DoesNotThrow(CastSettings);
+        Assert.DoesNotThrow(castSettings);
 
-        Assert.That(settings, !Is.Null);
+        Assert.That(settings, Is.Not.Null);
         Assert.That(settings.AlwaysOnTop, Is.False);
 
-
-        void CastSettings ()
-        {
-            settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsFile));
-        }
+        void castSettings () => settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsFile));
     }
 }

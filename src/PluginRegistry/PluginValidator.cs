@@ -18,8 +18,8 @@ public static partial class PluginValidator
 
     private static TrustedPluginConfig _trustedPluginConfig;
     private static readonly Lock _configLock = new();
-    private static readonly string _configDirectory = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
-    private static readonly string _configPath = Path.Join(_configDirectory, "trusted-plugins.json");
+    private static string _configDirectory = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
+    private static string _configPath = Path.Join(_configDirectory, "trusted-plugins.json");
 
     // Whitelist of trusted plugin file names (shipped with LogExpert) - used as defaults
     private static readonly HashSet<string> _trustedPluginNames = new(StringComparer.OrdinalIgnoreCase)
@@ -59,12 +59,32 @@ public static partial class PluginValidator
 
     static PluginValidator ()
     {
+        // Load with default path; will be reloaded when Initialize() is called
         LoadTrustedPluginConfiguration();
     }
 
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Initializes the PluginValidator with the appropriate configuration directory.
+    /// Must be called during application startup after ConfigManager is initialized.
+    /// If not called, falls back to %APPDATA%/LogExpert/ for backward compatibility.
+    /// </summary>
+    /// <param name="configDirectory">The active configuration directory</param>
+    public static void Initialize (string configDirectory)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(configDirectory);
+
+        lock (_configLock)
+        {
+            _configDirectory = configDirectory;
+            _configPath = Path.Join(_configDirectory, "trusted-plugins.json");
+            _logger.Info("PluginValidator initialized with config directory: {Dir}", configDirectory);
+            LoadTrustedPluginConfiguration();
+        }
+    }
 
     /// <summary>
     /// Loads trusted plugin configuration from disk.

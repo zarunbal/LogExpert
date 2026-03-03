@@ -30,6 +30,9 @@ public static class ProjectFileValidator
 
         var result = new ProjectValidationResult();
 
+        // Cache drive letters once to avoid repeated expensive DriveInfo.GetDrives() calls
+        var cachedDriveLetters = GetFixedDriveLetters();
+
         foreach (var fileName in projectData.FileNames)
         {
             var normalizedPath = NormalizeFilePath(fileName);
@@ -55,7 +58,7 @@ public static class ProjectFileValidator
             {
                 result.MissingFiles.Add(fileName);
 
-                var alternativePaths = FindAlternativePaths(fileName, projectData.ProjectFilePath);
+                var alternativePaths = FindAlternativePaths(fileName, projectData.ProjectFilePath, cachedDriveLetters);
                 result.PossibleAlternatives[fileName] = alternativePaths;
             }
         }
@@ -100,6 +103,25 @@ public static class ProjectFileValidator
     }
 
     /// <summary>
+    /// Gets the list of fixed drive letters that are ready.
+    /// Extracted to avoid repeated expensive DriveInfo.GetDrives() calls.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Drive enumeration can fail for various reasons")]
+    private static List<char> GetFixedDriveLetters ()
+    {
+        try
+        {
+            return [.. DriveInfo.GetDrives()
+                .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
+                .Select(d => d.Name[0])];
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    /// <summary>
     /// Searches for alternative file paths that may correspond to the specified file name, considering common locations
     /// such as the project directory, its subdirectories, the user's Documents/LogExpert folder, alternate drive
     /// letters, and relative paths from the project directory.
@@ -112,9 +134,10 @@ public static class ProjectFileValidator
     /// whitespace.</param>
     /// <param name="projectFilePath">The full path to the project file used as a reference for searching related directories. Can be null or empty if
     /// project context is not available.</param>
+    /// <param name="cachedDriveLetters">Pre-computed list of fixed drive letters to avoid repeated DriveInfo.GetDrives() calls.</param>
     /// <returns>A list of strings containing the full paths of files found that match the specified file name in alternative
     /// locations. The list will be empty if no matching files are found.</returns>
-    private static List<string> FindAlternativePaths (string fileName, string projectFilePath)
+    private static List<string> FindAlternativePaths (string fileName, string projectFilePath, List<char> cachedDriveLetters)
     {
         var alternatives = new List<string>();
 
@@ -191,15 +214,10 @@ public static class ProjectFileValidator
         {
             try
             {
-                var driveLetters = DriveInfo.GetDrives()
-                    .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
-                    .Select(d => d.Name[0])
-                    .ToList();
-
                 var originalDrive = Path.GetPathRoot(fileName)?[0];
                 var pathWithoutDrive = fileName.Length > 3 ? fileName[3..] : string.Empty;
 
-                foreach (var drive in driveLetters.Where(drive => drive != originalDrive && !string.IsNullOrEmpty(pathWithoutDrive)))
+                foreach (var drive in cachedDriveLetters.Where(drive => drive != originalDrive && !string.IsNullOrEmpty(pathWithoutDrive)))
                 {
                     var alternatePath = $"{drive}:\\{pathWithoutDrive}";
                     if (File.Exists(alternatePath) && !alternatives.Contains(alternatePath))

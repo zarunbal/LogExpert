@@ -13,6 +13,7 @@ using LogExpert.Classes.CommandLine;
 using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
+using LogExpert.PluginRegistry;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions.LogWindow;
 
@@ -55,6 +56,7 @@ internal static class Program
 
         // Initialize ConfigManager with application-specific paths and screen information
         ConfigManager.Instance.Initialize(Application.StartupPath, SystemInformation.VirtualScreen);
+        PluginValidator.Initialize(ConfigManager.Instance.ActiveConfigDir);
 
         _logger.Info(CultureInfo.InvariantCulture, $"\r\n============================================================================\r\nLogExpert {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} started.\r\n============================================================================");
 
@@ -96,7 +98,7 @@ internal static class Program
                 }
             }
 
-            _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+            _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ActiveConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             SetCulture();
             SetDarkMode();

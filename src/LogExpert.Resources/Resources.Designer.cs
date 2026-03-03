@@ -5691,6 +5691,51 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some files could not be migrated: {0}.
+        /// </summary>
+        public static string SettingsDialog_UI_PortableMode_ActivationError {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_PortableMode_ActivationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to activate portable mode: {0}.
+        /// </summary>
+        public static string SettingsDialog_UI_PortableMode_CopySettingsQuestion {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_PortableMode_CopySettingsQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to move the portable settings back to the default configuration folder (%APPDATA%\LogExpert)?.
+        /// </summary>
+        public static string SettingsDialog_UI_PortableMode_MigrationError {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_PortableMode_MigrationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to copy your current settings to the portable configuration folder?.
+        /// </summary>
+        public static string SettingsDialog_UI_PortableMode_MoveSettingsQuestion {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_PortableMode_MoveSettingsQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Portable Mode.
+        /// </summary>
+        public static string SettingsDialog_UI_PortableMode_Title {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_PortableMode_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ask what to do.
         /// </summary>
         public static string SettingsDialog_UI_RadioButton_radioButtonAskWhatToDo {

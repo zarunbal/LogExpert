@@ -8,6 +8,7 @@ public class PersisterTests
 {
     private string _testDirectory;
     private string _applicationStartupPath;
+    private string _sessionDirectory;
     private string _logFileName;
 
     [SetUp]
@@ -20,6 +21,11 @@ public class PersisterTests
         // Create a subdirectory to simulate application startup path
         _applicationStartupPath = Path.Join(_testDirectory, "ApplicationPath");
         _ = Directory.CreateDirectory(_applicationStartupPath);
+
+        // Session directory: simulates the resolved session base directory
+        // In portable mode this would be {AppDir}/configuration/sessions/
+        // In normal mode this would be {AppDir}/sessionFiles/
+        _sessionDirectory = Path.Join(_applicationStartupPath, "sessionFiles");
 
         // Create a test log file
         _logFileName = Path.Join(_testDirectory, "test.log");
@@ -47,7 +53,7 @@ public class PersisterTests
     #region SavePersistenceData Tests - ApplicationStartupDir Location
 
     [Test]
-    public void SavePersistenceData_WithApplicationStartupDir_CreatesSessionFilesDirectory ()
+    public void SavePersistenceData_WithApplicationStartupDir_CreatesSessionDirectory ()
     {
         // Arrange
         var preferences = new Preferences
@@ -61,12 +67,11 @@ public class PersisterTests
         };
 
         // Act
-        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _applicationStartupPath);
+        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _sessionDirectory);
 
         // Assert
-        var expectedDirectory = Path.Join(_applicationStartupPath, "sessionFiles");
-        Assert.That(Directory.Exists(expectedDirectory), Is.True, "sessionFiles directory should be created");
-        Assert.That(savedFileName, Does.StartWith(expectedDirectory), "Saved file should be in sessionFiles directory");
+        Assert.That(Directory.Exists(_sessionDirectory), Is.True, "Session directory should be created");
+        Assert.That(savedFileName, Does.StartWith(_sessionDirectory), "Saved file should be in session directory");
     }
 
     [Test]
@@ -86,7 +91,7 @@ public class PersisterTests
         };
 
         // Act
-        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _applicationStartupPath);
+        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _sessionDirectory);
 
         // Assert
         Assert.That(File.Exists(savedFileName), Is.True, "Persistence file should exist");
@@ -111,7 +116,7 @@ public class PersisterTests
         };
 
         // Act
-        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _applicationStartupPath);
+        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, _sessionDirectory);
 
         // Assert
         var savedContent = File.ReadAllText(savedFileName);
@@ -236,10 +241,10 @@ public class PersisterTests
         };
 
         // Save data first
-        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _applicationStartupPath);
+        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _sessionDirectory);
 
         // Act
-        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, preferences, _applicationStartupPath);
+        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, preferences, _sessionDirectory);
 
         // Assert
         Assert.That(loadedData, Is.Not.Null, "Should load persistence data");
@@ -260,7 +265,7 @@ public class PersisterTests
         var nonExistentFile = Path.Join(_testDirectory, "nonexistent.log");
 
         // Act
-        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(nonExistentFile, preferences, _applicationStartupPath);
+        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(nonExistentFile, preferences, _sessionDirectory);
 
         // Assert
         Assert.That(loadedData, Is.Null, "Should return null when file doesn't exist");
@@ -301,10 +306,10 @@ public class PersisterTests
         };
 
         // Save data first
-        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _applicationStartupPath);
+        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _sessionDirectory);
 
         // Act
-        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceDataOptionsOnly(_logFileName, preferences, _applicationStartupPath);
+        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceDataOptionsOnly(_logFileName, preferences, _sessionDirectory);
 
         // Assert
         Assert.That(loadedData, Is.Not.Null, "Should load persistence data");
@@ -356,8 +361,8 @@ public class PersisterTests
         };
 
         // Act
-        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _applicationStartupPath);
-        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, preferences, _applicationStartupPath);
+        _ = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, originalData, preferences, _sessionDirectory);
+        var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, preferences, _sessionDirectory);
 
         // Assert
         Assert.That(loadedData, Is.Not.Null, "Should load data");
@@ -395,16 +400,16 @@ public class PersisterTests
         };
 
         // Act - Save to ApplicationStartupDir
-        var appDirFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, testData, appDirPreferences, _applicationStartupPath);
+        var appDirFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, testData, appDirPreferences, _sessionDirectory);
 
         // Save to SameDir
-        var sameDirFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, testData, sameDirPreferences, _applicationStartupPath);
+        var sameDirFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, testData, sameDirPreferences, _sessionDirectory);
 
         // Load from ApplicationStartupDir
-        var loadedFromAppDir = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, appDirPreferences, _applicationStartupPath);
+        var loadedFromAppDir = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, appDirPreferences, _sessionDirectory);
 
         // Load from SameDir
-        var loadedFromSameDir = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, sameDirPreferences, _applicationStartupPath);
+        var loadedFromSameDir = Core.Classes.Persister.Persister.LoadPersistenceData(_logFileName, sameDirPreferences, _sessionDirectory);
 
         // Assert
         Assert.That(appDirFileName, Is.Not.EqualTo(sameDirFileName), "Files should be in different locations");
@@ -606,7 +611,7 @@ public class PersisterTests
                     FileName = logFile,
                     CurrentLine = index * 100
                 };
-                return Core.Classes.Persister.Persister.SavePersistenceData(logFile, data, preferences, _applicationStartupPath);
+                return Core.Classes.Persister.Persister.SavePersistenceData(logFile, data, preferences, _sessionDirectory);
             }));
         }
 
@@ -615,7 +620,7 @@ public class PersisterTests
         // Assert - Verify all files were saved correctly
         for (int i = 0; i < logFiles.Count; i++)
         {
-            var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(logFiles[i], preferences, _applicationStartupPath);
+            var loadedData = Core.Classes.Persister.Persister.LoadPersistenceData(logFiles[i], preferences, _sessionDirectory);
             Assert.That(loadedData, Is.Not.Null, $"Should load data for file {i}");
             Assert.That(loadedData.CurrentLine, Is.EqualTo(i * 100), $"Data should match for file {i}");
         }
@@ -626,10 +631,10 @@ public class PersisterTests
     #region Directory Creation Tests
 
     [Test]
-    public void SavePersistenceData_ApplicationStartupDirNotExists_CreatesDirectory ()
+    public void SavePersistenceData_SessionBaseDirectoryNotExists_CreatesDirectory ()
     {
         // Arrange
-        var nonExistentAppPath = Path.Join(_testDirectory, "NonExistentAppPath");
+        var nonExistentSessionDir = Path.Join(_testDirectory, "NonExistentSessionDir");
         // Don't create the directory - let Persister create it
 
         var preferences = new Preferences
@@ -644,11 +649,10 @@ public class PersisterTests
         };
 
         // Act
-        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, nonExistentAppPath);
+        var savedFileName = Core.Classes.Persister.Persister.SavePersistenceData(_logFileName, persistenceData, preferences, nonExistentSessionDir);
 
         // Assert
-        var expectedDirectory = Path.Join(nonExistentAppPath, "sessionFiles");
-        Assert.That(Directory.Exists(expectedDirectory), Is.True, "Should create sessionFiles directory");
+        Assert.That(Directory.Exists(nonExistentSessionDir), Is.True, "Should create session base directory");
         Assert.That(File.Exists(savedFileName), Is.True, "Should create persistence file");
     }
 

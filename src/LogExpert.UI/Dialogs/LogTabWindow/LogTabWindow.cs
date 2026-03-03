@@ -2565,7 +2565,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnPluginTrustToolStripMenuItemClick (object sender, EventArgs e)
     {
-        using var dialog = new PluginTrustDialog(this);
+        using var dialog = new PluginTrustDialog(this, ConfigManager);
         var result = dialog.ShowDialog();
 
         if (result == DialogResult.OK)

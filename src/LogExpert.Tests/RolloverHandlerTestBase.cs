@@ -43,7 +43,7 @@ internal class RolloverHandlerTestBase
         return createdFiles;
     }
 
-    protected LinkedList<string> RolloverSimulation (LinkedList<string> files, string formatPattern,
+    protected static LinkedList<string> RolloverSimulation (LinkedList<string> files, string formatPattern,
         bool deleteLatestFile)
     {
         var fileList = files;
@@ -51,19 +51,19 @@ internal class RolloverHandlerTestBase
         fnb.SetFileName(fileList.Last.Value);
         fnb.Index += fileList.Count;
         var newFileName = fnb.BuildFileName();
-        fileList.AddFirst(newFileName);
+        _ = fileList.AddFirst(newFileName);
         var enumerator = fileList.GetEnumerator();
         var nextEnumerator = fileList.GetEnumerator();
-        nextEnumerator.MoveNext(); // move on 2nd entry
-        enumerator.MoveNext();
+        _ = nextEnumerator.MoveNext(); // move on 2nd entry
+        _ = enumerator.MoveNext();
 
         while (nextEnumerator.MoveNext())
         {
             File.Move(nextEnumerator.Current, enumerator.Current);
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
-        CreateFile(null, nextEnumerator.Current);
+        _ = CreateFile(null, nextEnumerator.Current);
 
         if (deleteLatestFile)
         {
@@ -74,8 +74,8 @@ internal class RolloverHandlerTestBase
         return fileList;
     }
 
-
-    protected void Cleanup ()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
+    protected static void Cleanup ()
     {
         try
         {
@@ -86,7 +86,7 @@ internal class RolloverHandlerTestBase
         }
     }
 
-    protected string CreateFile (DirectoryInfo dInfo, string fileName)
+    protected static string CreateFile (DirectoryInfo dInfo, string fileName)
     {
         var lineCount = 10;
         var fullName = dInfo == null ? fileName : dInfo.FullName + Path.DirectorySeparatorChar + fileName;

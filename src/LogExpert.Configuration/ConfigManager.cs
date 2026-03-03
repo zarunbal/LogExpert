@@ -18,6 +18,7 @@ using NLog;
 
 namespace LogExpert.Configuration;
 
+[SupportedOSPlatform("windows")]
 public class ConfigManager : IConfigManager
 {
     #region Fields
@@ -89,17 +90,45 @@ public class ConfigManager : IConfigManager
         }
     }
 
+    /// <summary>
+    /// {ApplicationStartupPath}/configuration/<br></br>
+    /// Used as the unified configuration directory in portable mode.
+    /// </summary>
+    public string PortableConfigDir => Path.Join(_applicationStartupPath, "configuration");
+
+    /// <summary>
+    /// {ApplicationStartupPath}/configuration/sessions/<br></br>
+    /// Used for session file storage in portable mode.
+    /// </summary>
+    public string PortableSessionDir => Path.Join(PortableConfigDir, "sessions");
+
     public string ConfigDir => Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
 
     /// <summary>
     /// Application.StartUpPath + portable
     /// </summary>
+    [Obsolete("Use PortableConfigDir instead. Kept only for old-layout migration detection.")]
     public string PortableModeDir => Path.Join(_applicationStartupPath, "portable");
 
     /// <summary>
     /// portableMode.json
     /// </summary>
     public string PortableModeSettingsFileName => "portableMode.json";
+
+    /// <summary>
+    /// Gets the directory path where the current session's data is stored.
+    /// </summary>
+    /// <remarks>This property is useful for accessing files or configurations that are specific to the active
+    /// session. The returned path may vary between sessions and should not be assumed to be persistent across
+    /// application restarts.</remarks>
+    public string ActiveSessionDir => Settings.Preferences.PortableMode ? PortableSessionDir : Path.Join(_applicationStartupPath, "sessionFiles");
+
+    /// <summary>
+    /// Returns the effective configuration directory.
+    /// Portable mode: PortableConfigDir ({AppDir}/configuration/)
+    /// Normal mode: ConfigDir (%APPDATA%/LogExpert/)
+    /// </summary>
+    public string ActiveConfigDir => Settings.Preferences.PortableMode ? PortableConfigDir : ConfigDir;
 
     #endregion
 
@@ -281,7 +310,6 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
-    [SupportedOSPlatform("windows")]
     public void RemoveFromFileHistory (string fileName)
     {
         bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
@@ -331,15 +359,26 @@ public class ConfigManager : IConfigManager
 
         string dir;
 
-        if (!File.Exists(Path.Join(PortableModeDir, PortableModeSettingsFileName)))
+        // 1. Check new portable layout first
+        if (File.Exists(Path.Join(PortableConfigDir, PortableModeSettingsFileName)))
         {
-            _logger.Info($"### {nameof(Load)}: Load settings standard mode");
-            dir = ConfigDir;
+            _logger.Info("Load: New portable layout detected — loading from {Dir}", PortableConfigDir);
+            dir = PortableConfigDir;
         }
+        // 2. Check old portable layout (migration candidate)
+#pragma warning disable CS0618 // Obsolete PortableModeDir — needed for migration
+        else if (File.Exists(Path.Join(PortableModeDir, PortableModeSettingsFileName)))
+        {
+            _logger.Info("Load: Old portable layout detected — triggering migration");
+            MigrateOldPortableLayout();
+            dir = PortableConfigDir;
+        }
+#pragma warning restore CS0618
+        // 3. Normal mode
         else
         {
-            _logger.Info($"### {nameof(Load)}: Load settings portable mode");
-            dir = _applicationStartupPath;
+            _logger.Info("Load: Standard mode — loading from {Dir}", ConfigDir);
+            dir = ConfigDir;
         }
 
         if (!Directory.Exists(dir))
@@ -428,12 +467,7 @@ public class ConfigManager : IConfigManager
                         throw new InvalidDataException(Resources.ConfigManager_Error_Messages_InvalidData_SettingsFileIsEmpty);
                     }
 
-                    settings = JsonConvert.DeserializeObject<Settings>(json, _jsonSettings);
-
-                    if (settings == null)
-                    {
-                        throw new JsonSerializationException(Resources.ConfigManager_Error_Messages_JSONSerialization_DeserializationReturnedNull);
-                    }
+                    settings = JsonConvert.DeserializeObject<Settings>(json, _jsonSettings) ?? throw new JsonSerializationException(Resources.ConfigManager_Error_Messages_JSONSerialization_DeserializationReturnedNull);
 
                     _logger.Info("Settings loaded successfully");
                 }
@@ -656,7 +690,7 @@ public class ConfigManager : IConfigManager
     {
         lock (_loadSaveLock)
         {
-            string dir = Settings.Preferences.PortableMode ? _applicationStartupPath : ConfigDir;
+            string dir = ActiveConfigDir;
 
             if (!Directory.Exists(dir))
             {
@@ -679,6 +713,241 @@ public class ConfigManager : IConfigManager
     {
         //Currently only fileFormat, maybe add some other formats later (YAML or XML?)
         SaveAsJSON(fileInfo, settings);
+    }
+
+    /// <summary>
+    /// Migrates configuration files from the old portable layout ({AppDir}/portable/ + {AppDir}/settings.json)
+    /// to the new unified layout ({AppDir}/configuration/).
+    /// </summary>
+    private void MigrateOldPortableLayout ()
+    {
+        _logger.Info("Starting migration from old portable layout to new layout");
+
+        try
+        {
+            // Ensure new directory exists
+            _ = Directory.CreateDirectory(PortableConfigDir);
+
+            // Move settings.json from app root to configuration/
+            MoveFileIfExists(
+                Path.Join(_applicationStartupPath, SETTINGS_FILE_NAME),
+                Path.Join(PortableConfigDir, SETTINGS_FILE_NAME));
+
+            MoveFileIfExists(
+                Path.Join(_applicationStartupPath, SETTINGS_FILE_NAME + ".bak"),
+                Path.Join(PortableConfigDir, SETTINGS_FILE_NAME + ".bak"));
+
+            // Move all files from old portable/ directory to configuration/
+#pragma warning disable CS0618
+            if (Directory.Exists(PortableModeDir))
+            {
+                foreach (var file in Directory.GetFiles(PortableModeDir))
+                {
+                    var fileName = Path.GetFileName(file);
+                    if (fileName.Equals(PortableModeSettingsFileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Move marker file too
+                        MoveFileIfExists(file, Path.Join(PortableConfigDir, fileName));
+                        continue;
+                    }
+
+                    MoveFileIfExists(file, Path.Join(PortableConfigDir, fileName));
+                }
+
+                // Move subdirectories (e.g., Plugins/)
+                foreach (var subDir in Directory.GetDirectories(PortableModeDir))
+                {
+                    var dirName = Path.GetFileName(subDir);
+                    var targetDir = Path.Join(PortableConfigDir, dirName);
+                    if (!Directory.Exists(targetDir))
+                    {
+                        Directory.Move(subDir, targetDir);
+                        _logger.Info("Moved directory: {Source} -> {Target}", subDir, targetDir);
+                    }
+                }
+
+                // Clean up old directory if empty
+                if (!Directory.EnumerateFileSystemEntries(PortableModeDir).Any())
+                {
+                    Directory.Delete(PortableModeDir);
+                    _logger.Info("Deleted empty old portable directory: {Dir}", PortableModeDir);
+                }
+            }
+#pragma warning restore CS0618
+
+            // Move session files if they exist in old location
+            var oldSessionDir = Path.Join(_applicationStartupPath, "sessionFiles");
+            if (Directory.Exists(oldSessionDir))
+            {
+                _ = Directory.CreateDirectory(PortableSessionDir);
+                foreach (var file in Directory.GetFiles(oldSessionDir, "*.lxp"))
+                {
+                    MoveFileIfExists(file, Path.Join(PortableSessionDir, Path.GetFileName(file)));
+                }
+
+                if (!Directory.EnumerateFileSystemEntries(oldSessionDir).Any())
+                {
+                    Directory.Delete(oldSessionDir);
+                }
+            }
+
+            // Copy plugin trust/permissions from %APPDATA% (don't move — user may have normal install too)
+            CopyFileIfNotExists(
+                Path.Join(ConfigDir, "trusted-plugins.json"),
+                Path.Join(PortableConfigDir, "trusted-plugins.json"));
+
+            CopyFileIfNotExists(
+                Path.Join(ConfigDir, "plugin-permissions.json"),
+                Path.Join(PortableConfigDir, "plugin-permissions.json"));
+
+            _logger.Info("Migration from old portable layout completed successfully");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.Error(ex, "Error during old portable layout migration");
+        }
+    }
+
+    /// <summary>
+    /// Copies configuration files from normal mode location (%APPDATA%/LogExpert/)
+    /// to the portable configuration directory ({AppDir}/configuration/).
+    /// Called when portable mode is activated and user confirms copy.
+    /// </summary>
+    public void CopyConfigToPortable ()
+    {
+        _logger.Info("Copying configuration to portable directory: {Dir}", PortableConfigDir);
+
+        try
+        {
+            _ = Directory.CreateDirectory(PortableConfigDir);
+
+            // Main configuration files
+            string[] filesToCopy =
+            [
+                SETTINGS_FILE_NAME,
+            SETTINGS_FILE_NAME + ".bak",
+            "trusted-plugins.json",
+            "plugin-permissions.json",
+        ];
+
+            foreach (var fileName in filesToCopy)
+            {
+                CopyFileIfExists(
+                    Path.Join(ConfigDir, fileName),
+                    Path.Join(PortableConfigDir, fileName));
+            }
+
+            // Columnizer config files (various extensions)
+            foreach (var file in Directory.GetFiles(ConfigDir))
+            {
+                var ext = Path.GetExtension(file).ToUpperInvariant();
+                var name = Path.GetFileName(file);
+
+                // Skip files we already copied and non-config files
+                if (filesToCopy.Contains(name, StringComparer.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (ext is ".DAT" or ".CFG" or ".JSON" && !name.Equals(SETTINGS_FILE_NAME, StringComparison.OrdinalIgnoreCase))
+                {
+                    CopyFileIfExists(file, Path.Join(PortableConfigDir, name));
+                }
+            }
+
+            // Copy Plugins directory recursively
+            var pluginsDir = Path.Join(ConfigDir, "Plugins");
+            if (Directory.Exists(pluginsDir))
+            {
+                CopyDirectoryRecursive(pluginsDir, Path.Join(PortableConfigDir, "Plugins"));
+            }
+
+            _logger.Info("Configuration copy to portable directory completed");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.Error(ex, "Error copying configuration to portable directory");
+            throw; // Re-throw so UI can show error
+        }
+    }
+
+    /// <summary>
+    /// Moves configuration files from the portable directory ({AppDir}/configuration/)
+    /// back to normal mode locations (%APPDATA%/LogExpert/).
+    /// Called when portable mode is deactivated and user confirms migration.
+    /// </summary>
+    public void MoveConfigFromPortable ()
+    {
+        _logger.Info("Moving configuration from portable directory to: {Dir}", ConfigDir);
+
+        try
+        {
+            _ = Directory.CreateDirectory(ConfigDir);
+
+            // Move all config files
+            foreach (var file in Directory.GetFiles(PortableConfigDir))
+            {
+                var fileName = Path.GetFileName(file);
+
+                // Skip marker file — it will be deleted separately
+                if (fileName.Equals(PortableModeSettingsFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var target = Path.Join(ConfigDir, fileName);
+                if (File.Exists(target))
+                {
+                    File.Delete(target);
+                }
+
+                File.Move(file, target);
+                _logger.Info("Moved: {Source} -> {Target}", file, target);
+            }
+
+            // Move Plugins directory
+            var portablePluginsDir = Path.Join(PortableConfigDir, "Plugins");
+            var normalPluginsDir = Path.Join(ConfigDir, "Plugins");
+            if (Directory.Exists(portablePluginsDir))
+            {
+                CopyDirectoryRecursive(portablePluginsDir, normalPluginsDir);
+                Directory.Delete(portablePluginsDir, recursive: true);
+            }
+
+            // Move session files to Documents
+            var portableSessionsDir = PortableSessionDir;
+            if (Directory.Exists(portableSessionsDir))
+            {
+                var docsSessionDir = Path.Join(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "LogExpert");
+                _ = Directory.CreateDirectory(docsSessionDir);
+
+                foreach (var file in Directory.GetFiles(portableSessionsDir, "*.lxp"))
+                {
+                    MoveFileIfExists(file, Path.Join(docsSessionDir, Path.GetFileName(file)));
+                }
+
+                if (!Directory.EnumerateFileSystemEntries(portableSessionsDir).Any())
+                {
+                    Directory.Delete(portableSessionsDir);
+                }
+            }
+
+            // Clean up portable directory
+            if (Directory.Exists(PortableConfigDir) &&
+                !Directory.EnumerateFileSystemEntries(PortableConfigDir).Any())
+            {
+                Directory.Delete(PortableConfigDir);
+                _logger.Info("Deleted empty portable configuration directory");
+            }
+
+            _logger.Info("Configuration migration from portable directory completed");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.Error(ex, "Error moving configuration from portable directory");
+            throw;
+        }
     }
 
     private void Save (FileInfo fileInfo, Settings settings, SettingsFlags flags)
@@ -1113,6 +1382,59 @@ public class ConfigManager : IConfigManager
         }
 
         return true;
+    }
+
+    private static void MoveFileIfExists (string source, string target)
+    {
+        if (!File.Exists(source))
+        {
+            return;
+        }
+
+        if (File.Exists(target))
+        {
+            File.Delete(target);
+        }
+
+        File.Move(source, target);
+        _logger.Info("Moved file: {Source} -> {Target}", source, target);
+    }
+
+    private static void CopyFileIfExists (string source, string target)
+    {
+        if (!File.Exists(source))
+        {
+            return;
+        }
+
+        File.Copy(source, target, overwrite: true);
+        _logger.Info("Copied file: {Source} -> {Target}", source, target);
+    }
+
+    private static void CopyFileIfNotExists (string source, string target)
+    {
+        if (!File.Exists(source) || File.Exists(target))
+        {
+            return;
+        }
+
+        File.Copy(source, target);
+        _logger.Info("Copied file (new): {Source} -> {Target}", source, target);
+    }
+
+    private static void CopyDirectoryRecursive (string sourceDir, string targetDir)
+    {
+        _ = Directory.CreateDirectory(targetDir);
+
+        foreach (var file in Directory.GetFiles(sourceDir))
+        {
+            File.Copy(file, Path.Join(targetDir, Path.GetFileName(file)), overwrite: true);
+        }
+
+        foreach (var dir in Directory.GetDirectories(sourceDir))
+        {
+            CopyDirectoryRecursive(dir, Path.Join(targetDir, Path.GetFileName(dir)));
+        }
     }
 
     #endregion

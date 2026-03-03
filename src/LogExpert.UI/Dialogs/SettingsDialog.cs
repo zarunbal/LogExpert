@@ -547,7 +547,7 @@ internal partial class SettingsDialog : Form
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
-                configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
+                configurator.SaveConfig(ConfigManager.ActiveConfigDir);
             }
         }
 
@@ -555,7 +555,7 @@ internal partial class SettingsDialog : Form
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
-                configurator.SaveConfig(checkBoxPortableMode.Checked ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
+                configurator.SaveConfig(ConfigManager.ActiveConfigDir);
             }
         }
     }
@@ -912,50 +912,86 @@ internal partial class SettingsDialog : Form
         {
             switch (checkBoxPortableMode.CheckState)
             {
-                case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
+                case CheckState.Checked:
                     {
-                        if (!Directory.Exists(ConfigManager.PortableModeDir))
+                        try
                         {
-                            _ = Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            // Create new portable configuration directory
+                            _ = Directory.CreateDirectory(ConfigManager.PortableConfigDir);
+
+                            // Create marker file
+                            var markerPath = Path.Join(ConfigManager.PortableConfigDir, ConfigManager.PortableModeSettingsFileName);
+                            if (!File.Exists(markerPath))
+                            {
+                                using (File.Create(markerPath)) { }
+                            }
+
+                            Preferences.PortableMode = true;
+                            checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
+
+                            // Ask user if they want to copy existing settings
+                            var result = MessageBox.Show(
+                                Resources.SettingsDialog_UI_PortableMode_CopySettingsQuestion,
+                                Resources.SettingsDialog_UI_PortableMode_Title,
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question);
+
+                            if (result == DialogResult.Yes)
+                            {
+                                ConfigManager.CopyConfigToPortable();
+                            }
+                        }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                        {
+                            _ = MessageBox.Show(
+                                string.Format(CultureInfo.CurrentCulture,
+                                    Resources.SettingsDialog_UI_PortableMode_ActivationError, ex.Message),
+                                Resources.LogExpert_Common_UI_Title_LogExpert,
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+
+                            checkBoxPortableMode.Checked = false;
+                            Preferences.PortableMode = false;
                         }
 
-                        using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
-                        {
-                            break;
-                        }
-                    }
-                case CheckState.Unchecked when File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
-                    {
-                        File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
                         break;
                     }
-
-                case CheckState.Unchecked:
-                    //intentionally left blank
-                    break;
-                case CheckState.Checked:
-                    //intentionally left blank
-                    break;
-                case CheckState.Indeterminate:
-                    //intentionally left blank
-                    break;
-                default:
-                    //intentionally left blank
-                    break;
-            }
-
-            switch (checkBoxPortableMode.CheckState)
-            {
                 case CheckState.Unchecked:
                     {
-                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_ActivatePortableMode;
                         Preferences.PortableMode = false;
-                        break;
-                    }
-                case CheckState.Checked:
-                    {
-                        Preferences.PortableMode = true;
-                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
+                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_ActivatePortableMode;
+
+                        // Ask user if they want to move settings back
+                        var result = MessageBox.Show(
+                            Resources.SettingsDialog_UI_PortableMode_MoveSettingsQuestion,
+                            Resources.SettingsDialog_UI_PortableMode_Title,
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                ConfigManager.MoveConfigFromPortable();
+                            }
+                            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                            {
+                                _ = MessageBox.Show(
+                                    string.Format(CultureInfo.CurrentCulture,
+                                        Resources.SettingsDialog_UI_PortableMode_MigrationError, ex.Message),
+                                    Resources.LogExpert_Common_UI_Title_LogExpert,
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
+                            }
+                        }
+
+                        // Delete marker file
+                        var markerPath = Path.Join(ConfigManager.PortableConfigDir, ConfigManager.PortableModeSettingsFileName);
+                        if (File.Exists(markerPath))
+                        {
+                            File.Delete(markerPath);
+                        }
+
                         break;
                     }
                 case CheckState.Indeterminate:
