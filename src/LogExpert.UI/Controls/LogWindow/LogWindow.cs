@@ -2462,7 +2462,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             AdjustHighlightSplitterWidth();
             SetCurrentHighlightGroup(persistenceData.HighlightGroupName);
 
-            SetCellSelectionMode(persistenceData.CellSelectMode);
+            SetCellSelectionMode(persistenceData.CellSelectMode, true);
 
             if (persistenceData.MultiFileNames.Count > 0)
             {
