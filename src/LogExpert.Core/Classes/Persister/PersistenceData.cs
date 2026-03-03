@@ -46,6 +46,12 @@ public class PersistenceData
 
     public List<FilterTabData> FilterTabDataList { get; set; } = [];
 
+    /// <summary>
+    /// Selection mode for Cells
+    /// Default: false (FullRowSelect mode)
+    /// </summary>
+    public bool CellSelectMode { get; set; }
+
     public int FirstDisplayedLine { get; set; } = -1;
 
     public bool FollowTail { get; set; } = true;
