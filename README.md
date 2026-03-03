@@ -46,7 +46,7 @@ This is a continous integration build. So always the latest and greates changes.
 ## How to Build
 
 * Clone / Fork / Download the source code
-* Open the Solution (src/LogExpert.sln) with Visual Studio 2017 (e.g. Community Edition)
+* Open the Solution (src/LogExpert.sln) with Visual Studio 2026 (e.g. Community Edition)
 * Restore Nuget Packages on Solution
 * Build
 * The output is under bin/(Debug/Release)/
