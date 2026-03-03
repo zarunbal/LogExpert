@@ -93,7 +93,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _menuToolbarController = new MenuToolbarController();
         _menuToolbarController.InitializeMenus(mainMenuStrip, buttonToolStrip, externalToolsToolStrip, dragControlDateTime, checkBoxFollowTail);
         InitializeMenuToolbarControllerEvents();
-        
+
         ApplyTextResources();
 
         ConfigManager = configManager;
@@ -184,29 +184,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     #endregion
 
-    #region Delegates
-
-    private delegate void AddFileTabsDelegate (string[] fileNames);
-
-    private delegate void ExceptionFx ();
-
-    private delegate void FileNotFoundDelegate (LogWindow.LogWindow logWin);
-
-    private delegate void FileRespawnedDelegate (LogWindow.LogWindow logWin);
-
-    public delegate void HighlightSettingsChangedEventHandler (object sender, EventArgs e);
-
-    private delegate void LoadMultiFilesDelegate (string[] fileName, EncodingOptions encodingOptions);
-
-    private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
-
-    private delegate void SetTabIconDelegate (LogWindow.LogWindow logWindow, Icon icon);
-
-    #endregion
-
     #region Events
 
-    public event HighlightSettingsChangedEventHandler HighlightSettingsChanged;
+    public event EventHandler HighlightSettingsChanged;
 
     #endregion
 
@@ -598,7 +578,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileEnabledStripMenuItem.Checked = true;
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
-        _ = BeginInvoke(new LoadMultiFilesDelegate(logWindow.LoadFilesAsMulti), fileNames, encodingOptions);
+        _ = BeginInvoke(logWindow.LoadFilesAsMulti, fileNames, encodingOptions);
         AddToFileHistory(fileNames[0]);
         return logWindow;
     }
@@ -606,7 +586,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public void LoadFiles (string[] fileNames)
     {
-        _ = Invoke(new AddFileTabsDelegate(AddFileTabs), [fileNames]);
+        _ = Invoke(AddFileTabs, [fileNames]);
     }
 
     [SupportedOSPlatform("windows")]
@@ -703,7 +683,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             // Update the tab icon to reflect cleared dirty state
             var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), newWindow, icon);
+            _ = BeginInvoke(SetTabIcon, newWindow, icon);
         }
 
         // Notify the window it has been activated
@@ -876,7 +856,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (Preferences.ShowTailState)
         {
             var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+            _ = BeginInvoke(SetTabIcon, logWindow, icon);
         }
     }
 
@@ -1487,7 +1467,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void FileNotFound (LogWindow.LogWindow logWin)
     {
         var data = logWin.Tag as LogWindowData;
-        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, _deadIcon);
+        _ = BeginInvoke(SetTabIcon, logWin, _deadIcon);
         dragControlDateTime.Visible = false;
     }
 
@@ -1497,7 +1477,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var data = logWin.Tag as LogWindowData;
         data.LedState.DiffSum = 0;
         var icon = GetLedIcon(0, data);
-        _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWin, icon);
+        _ = BeginInvoke(SetTabIcon, logWin, icon);
     }
 
     [SupportedOSPlatform("windows")]
@@ -1641,7 +1621,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var data = logWindow.Tag as LogWindowData;
             var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), logWindow, icon);
+            _ = BeginInvoke(SetTabIcon, logWindow, icon);
         }
     }
 
@@ -2163,8 +2143,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     if (logWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
                     {
                         //logWindow.SetColumnizer(form.SelectedColumnizer);
-                        SetColumnizerFx fx = logWindow.ForceColumnizer;
-                        _ = logWindow.Invoke(fx, form.SelectedColumnizer);
+                        _ = logWindow.Invoke(logWindow.ForceColumnizer, form.SelectedColumnizer);
                         SetColumnizerHistoryEntry(logWindow.FileName, form.SelectedColumnizer);
                     }
                     else
@@ -2180,8 +2159,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 if (CurrentLogWindow.CurrentColumnizer.GetType() != form.SelectedColumnizer.GetType())
                 {
-                    SetColumnizerFx fx = CurrentLogWindow.ForceColumnizer;
-                    _ = CurrentLogWindow.Invoke(fx, form.SelectedColumnizer);
+                    _ = CurrentLogWindow.Invoke(CurrentLogWindow.ForceColumnizer, form.SelectedColumnizer);
                     SetColumnizerHistoryEntry(CurrentLogWindow.FileName, form.SelectedColumnizer);
                 }
 
@@ -2434,12 +2412,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogWindowFileNotFound (object sender, EventArgs e)
     {
-        _ = Invoke(new FileNotFoundDelegate(FileNotFound), sender);
+        _ = Invoke(FileNotFound, sender);
     }
 
     private void OnLogWindowFileRespawned (object sender, EventArgs e)
     {
-        _ = Invoke(new FileRespawnedDelegate(FileRespawned), sender);
+        _ = Invoke(FileRespawned, sender);
     }
 
     private void OnLogWindowFilterListChanged (object sender, FilterListChangedEventArgs e)
@@ -2476,7 +2454,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
                 data.LedState.IsDirty = false;
                 var icon = GetLedIcon(data.LedState.DiffSum, data);
-                _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
+                _ = BeginInvoke(SetTabIcon, (LogWindow.LogWindow)sender, icon);
             }
         }
     }
@@ -2492,7 +2470,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 : TimeSyncState.NotSynced;
 
             var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), (LogWindow.LogWindow)sender, icon);
+            _ = BeginInvoke(SetTabIcon, (LogWindow.LogWindow)sender, icon);
         }
     }
 
@@ -2551,7 +2529,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             var data = CurrentLogWindow.Tag as LogWindowData;
             var icon = GetLedIcon(0, data);
-            _ = BeginInvoke(new SetTabIconDelegate(SetTabIcon), CurrentLogWindow, icon);
+            _ = BeginInvoke(SetTabIcon, CurrentLogWindow, icon);
             CurrentLogWindow.Reload();
         }
     }
@@ -2930,8 +2908,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnThrowExceptionBackgroundThToolStripMenuItemClick (object sender, EventArgs e)
     {
-        ExceptionFx fx = ThrowExceptionFx;
-        _ = fx.BeginInvoke(null, null);
+        _ = Task.Run(ThrowExceptionFx);
     }
 
     private void OnThrowExceptionBackgroundThreadToolStripMenuItemClick (object sender, EventArgs e)

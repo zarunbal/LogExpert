@@ -581,6 +581,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ApplyToolTipsResources ()
     {
+        helpToolTip.AutoPopDelay = 5000; //this is in ms, 5000ms =  5 seconds
         helpToolTip.SetToolTip(btnColumn, Resources.LogWindow_UI_Button_ToolTip_Column);
         helpToolTip.SetToolTip(columnRestrictCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_ColumnRestrict);
         helpToolTip.SetToolTip(knobControlFuzzy, Resources.LogWindow_UI_KnobControl_Fuzzy);
@@ -1333,7 +1334,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (IsMultiFile)
                 {
                     //MethodInvoker invoker = DisplayCurrentFileOnStatusline;
-                    _ = Task.Run(DisplayCurrentFileOnStatusline);   
+                    _ = Task.Run(DisplayCurrentFileOnStatusline);
                     //_ = invoker.BeginInvoke(null, null);
                 }
                 else
@@ -2982,7 +2983,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         return;
                     }
-                    
+
                     CheckFilterAndHighlight(e);
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }

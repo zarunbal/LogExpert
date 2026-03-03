@@ -37,7 +37,7 @@ internal partial class TimeSpreadingControl : UserControl
         Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
         _toolTip.InitialDelay = 0;
         _toolTip.ReshowDelay = 0;
-        _toolTip.ShowAlways = true;
+        _toolTip.AutoPopDelay = 5000;
         DoubleBuffered = false;
 
         ResumeLayout();
