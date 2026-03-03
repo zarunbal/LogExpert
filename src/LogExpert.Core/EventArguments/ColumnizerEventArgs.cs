@@ -1,10 +1,12 @@
-﻿namespace LogExpert.Core.EventArguments;
+using ColumnizerLib;
 
-public class ColumnizerEventArgs(ILogLineColumnizer columnizer) : System.EventArgs
+namespace LogExpert.Core.EventArguments;
+
+public class ColumnizerEventArgs(ILogLineMemoryColumnizer columnizer) : System.EventArgs
 {
     #region Properties
 
-    public ILogLineColumnizer Columnizer { get; } = columnizer;
+    public ILogLineMemoryColumnizer Columnizer { get; } = columnizer;
 
     #endregion
 }

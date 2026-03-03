@@ -13,7 +13,7 @@ internal class LogTabControl : TabControl
 
     #region cTor
 
-    public LogTabControl() : base()
+    public LogTabControl () : base()
     {
         //SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         //SetStyle(ControlStyles.UserPaint, true);
@@ -24,7 +24,7 @@ internal class LogTabControl : TabControl
 
     #region Overrides
 
-    protected override void OnPaint(PaintEventArgs e)
+    protected override void OnPaint (PaintEventArgs e)
     {
         BufferedGraphicsContext currentContext;
         currentContext = BufferedGraphicsManager.Current;

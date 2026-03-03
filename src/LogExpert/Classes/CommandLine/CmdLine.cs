@@ -63,10 +63,11 @@ public class CmdLine
     {
         get
         {
-            if (parameters.TryGetValue(name, out CmdLineParameter value) == false)
+            if (parameters.TryGetValue(name, out var value) == false)
             {
                 throw new CmdLineException(name, "Not a registered parameter.");
             }
+
             return value;
         }
     }
@@ -85,6 +86,7 @@ public class CmdLine
         {
             throw new CmdLineException(parameter.Name, "Parameter is already registered.");
         }
+
         parameters.Add(parameter.Name, parameter);
     }
 
@@ -94,7 +96,7 @@ public class CmdLine
     /// <param name="parameters">The parameter to add.</param>
     public void RegisterParameter(CmdLineParameter[] parameters)
     {
-        foreach (CmdLineParameter p in parameters)
+        foreach (var p in parameters)
         {
             RegisterParameter(p);
         }
@@ -133,7 +135,8 @@ public class CmdLine
                         i++;
                     }
                 }
-                if (parameters.TryGetValue(key, out CmdLineParameter cmdLineParameter) == false)
+
+                if (parameters.TryGetValue(key, out var cmdLineParameter) == false)
                 {
                     throw new CmdLineException(key, "Parameter is not allowed.");
                 }
@@ -184,9 +187,11 @@ public class CmdLine
             {
                 s += " ";
             }
+
             s += parameters[key].Help + "\n";
             help += s;
         }
+
         return help;
     }
 

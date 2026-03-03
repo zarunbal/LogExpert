@@ -1,12 +1,9 @@
-﻿using LogExpert.Core.Classes.DateTimeParser;
+using System.Globalization;
+using System.Text;
+
+using LogExpert.Core.Classes.DateTimeParser;
 
 using NUnit.Framework;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 
 namespace LogExpert.Tests;
 
@@ -14,7 +11,10 @@ namespace LogExpert.Tests;
 public class DateFormatParserTest
 {
     [Test]
-    public void CanParseAllCultures()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit tests")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1310:Specify StringComparison for correctness", Justification = "Unit tests")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "Unit tests")]
+    public void CanParseAllCultures ()
     {
         var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
 
@@ -58,7 +58,8 @@ public class DateFormatParserTest
     [TestCase("ar-TN", "dd", "MM", "yyyy", "hh", "mm", "ss", "tt")]
     [TestCase("as", "dd", "MM", "yyyy", "tt", "hh", "mm", "ss")]
     [TestCase("bg", "dd", "MM", "yyyy", "HH", "mm", "ss")]
-    public void TestDateFormatParserFromCulture(string cultureInfoName, params string[] expectedDateParts)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Unit tests")]
+    public void TestDateFormatParserFromCulture (string cultureInfoName, params string[] expectedDateParts)
     {
         var culture = CultureInfo.GetCultureInfo(cultureInfoName);
 
@@ -76,7 +77,7 @@ public class DateFormatParserTest
         var dateParts = dateSection
             .GeneralTextDateDurationParts
             .Where(Token.IsDatePart)
-            .Select(p => DateFormatPartAdjuster.AdjustDateTimeFormatPart(p))
+            .Select(DateFormatPartAdjuster.AdjustDateTimeFormatPart)
             .ToArray();
 
         Assert.That(dateParts.Length, Is.EqualTo(expectedDateParts.Length), message);
@@ -89,26 +90,26 @@ public class DateFormatParserTest
         }
     }
 
-    static string RemoveCharacters(string input, string charsToRemove)
+    private static string RemoveCharacters (string input, string charsToRemove)
     {
-        HashSet<char> charsToRemoveSet = new(charsToRemove);
+        HashSet<char> charsToRemoveSet = [.. charsToRemove];
         StringBuilder result = new();
 
         foreach (var c in input)
         {
             if (!charsToRemoveSet.Contains(c))
             {
-                result.Append(c);
+                _ = result.Append(c);
             }
         }
 
         return result.ToString();
     }
 
-    private string GetDateAndTimeFormat(CultureInfo culture)
+    private static string GetDateAndTimeFormat (CultureInfo culture)
     {
 
-        var InvisibleUNICODEmarkers =
+        var invisibleUNICODEmarkers =
                   "\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5" +
                             "\u180B\u180C\u180D\u180E\u200B\u200C\u200D\u200E\u200F" +
                             "\u202A\u202B\u202C\u202D\u202E\u202F\u205F\u2060\u2062" +
@@ -117,11 +118,9 @@ public class DateFormatParserTest
                             "\uFE0A\uFE0B\uFE0C\uFE0D\uFE0E\uFE0F";
 
 
-        var dateTime = string.Concat(culture.DateTimeFormat.ShortDatePattern.ToString(),
-            " ",
-            culture.DateTimeFormat.LongTimePattern.ToString());
+        var dateTime = string.Concat(culture.DateTimeFormat.ShortDatePattern.ToString(), " ", culture.DateTimeFormat.LongTimePattern.ToString());
 
-        return RemoveCharacters(dateTime, InvisibleUNICODEmarkers);
+        return RemoveCharacters(dateTime, invisibleUNICODEmarkers);
 
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace CsvColumnizer;
+namespace CsvColumnizer;
 
-internal class CsvColumn(string name)
+internal class CsvColumn (string name)
 {
     #region Properties
 

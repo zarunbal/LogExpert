@@ -1,0 +1,72 @@
+name: .NET Core Desktop
+
+on:
+  # push:
+    # branches: [ "Development" ]
+
+  pull_request:
+    branches: [ "Development" ]
+    types: [opened, synchronize]
+
+env:
+  Solution: src/LogExpert.sln
+  Test_Project_LogExpert: src/LogExpert.Tests/LogExpert.Tests.csproj
+  Test_Project_ColumnizerLib: src/ColumnizerLib.UnitTests/ColumnizerLib.UnitTests.csproj
+  Test_Project_PluginRegistry: src/PluginRegistry.Tests/PluginRegistry.Tests.csproj
+  Test_Project_RegexColumnizer: src/RegexColumnizer.UnitTests/RegexColumnizer.UnitTests.csproj
+
+jobs:
+  build:
+    permissions:
+      contents: write  # Changed to 'write' for committing
+      pull-requests: write  # Added for PR operations
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+
+    runs-on: windows-latest
+    name: Build Application - ${{ matrix.configuration }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}  # Checkout the PR branch
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build application
+        run: |
+          dotnet build ${{ env.Solution }} --nologo -v quiet -c ${{ matrix.configuration }}
+
+      - name: Generate Plugin Hashes
+        if: matrix.configuration == 'Release'
+        run: dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
+
+      - name: Commit Updated Hashes
+        if: matrix.configuration == 'Release'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/PluginRegistry/PluginHashGenerator.Generated.cs
+          git diff --staged --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "chore: update plugin hashes [skip ci]"
+            git push
+          } else {
+            Write-Host "No changes to commit"
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Snapshot-${{ matrix.configuration }}
+          path: bin/${{ matrix.configuration }}
+          retention-days: 7

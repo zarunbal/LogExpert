@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 
@@ -5,25 +6,19 @@ using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
 using LogExpert.UI.Extensions;
 
-using NLog;
-
 namespace LogExpert.UI.Controls.LogWindow;
 
 [SupportedOSPlatform("windows")]
 internal partial class TimeSpreadingControl : UserControl
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
     #region Fields
 
     private Bitmap _bitmap = new(1, 1);
     private int _displayHeight = 1;
-    private readonly int _edgeOffset = (int)NativeMethods.GetSystemMetricsForDpi(NativeMethods.SM_CYVSCROLL);
+    private readonly int _edgeOffset = Vanara.PInvoke.User32.GetSystemMetricsForDpi(Vanara.PInvoke.User32.SystemMetric.SM_CYVSCROLL, NativeMethods.SM_CYVSCROLL);
     private int _lastMouseY;
-    private readonly object _monitor = new();
+    private readonly Lock _monitor = new();
     private int _rectHeight = 1;
-
-    private TimeSpreadCalculator _timeSpreadCalc;
     private readonly ToolTip _toolTip;
 
     #endregion
@@ -32,13 +27,20 @@ internal partial class TimeSpreadingControl : UserControl
 
     public TimeSpreadingControl ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
         _toolTip = new ToolTip();
         Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
         _toolTip.InitialDelay = 0;
         _toolTip.ReshowDelay = 0;
-        _toolTip.ShowAlways = true;
+        _toolTip.AutoPopDelay = 5000;
         DoubleBuffered = false;
+
+        ResumeLayout();
     }
 
     #endregion
@@ -55,17 +57,19 @@ internal partial class TimeSpreadingControl : UserControl
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ReverseAlpha { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     internal TimeSpreadCalculator TimeSpreadCalc
     {
-        get => _timeSpreadCalc;
+        get;
         set
         {
             //timeSpreadCalc.CalcDone -= timeSpreadCalc_CalcDone;
-            _timeSpreadCalc = value;
-            _timeSpreadCalc.CalcDone += OnTimeSpreadCalcCalcDone;
-            _timeSpreadCalc.StartCalc += OnTimeSpreadCalcStartCalc;
+            field = value;
+            field.CalcDone += OnTimeSpreadCalcCalcDone;
+            field.StartCalc += OnTimeSpreadCalcStartCalc;
         }
     }
 
@@ -129,7 +133,7 @@ internal partial class TimeSpreadingControl : UserControl
             return;
         }
 
-        _timeSpreadCalc.Contrast += (_lastMouseY - e.Y) * 5;
+        TimeSpreadCalc.Contrast += (_lastMouseY - e.Y) * 5;
         _lastMouseY = e.Y;
     }
 
@@ -144,8 +148,6 @@ internal partial class TimeSpreadingControl : UserControl
 
     private void OnTimeSpreadCalcCalcDone (object sender, EventArgs e)
     {
-        _logger.Debug(CultureInfo.InvariantCulture, "timeSpreadCalc_CalcDone()");
-
         lock (_monitor)
         {
             Invalidate();
@@ -202,7 +204,7 @@ internal partial class TimeSpreadingControl : UserControl
             }
         }
 
-        BeginInvoke(new MethodInvoker(Refresh));
+        _ = BeginInvoke(new MethodInvoker(Refresh));
     }
 
     private void OnTimeSpreadCalcStartCalc (object sender, EventArgs e)
@@ -233,10 +235,10 @@ internal partial class TimeSpreadingControl : UserControl
 
             RectangleF rectf = new(rect.Left, rect.Top, rect.Width, rect.Height);
 
-            gfx.DrawString("Calculating time spread view...", Font, fgBrush, rectf, format);
+            gfx.DrawString(Resources.TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView, Font, fgBrush, rectf, format);
         }
 
-        BeginInvoke(new MethodInvoker(Refresh));
+        _ = BeginInvoke(new MethodInvoker(Refresh));
     }
 
     private void OnTimeSpreadingControlSizeChanged (object sender, EventArgs e)
@@ -298,7 +300,7 @@ internal partial class TimeSpreadingControl : UserControl
 
         _lastMouseY = e.Y;
         var dts = $"{entry.Timestamp:dd.MM.yyyy HH:mm:ss}";
-        _toolTip.SetToolTip(this, "Line " + (entry.LineNum + 1) + "\n" + dts);
+        _toolTip.SetToolTip(this, string.Format(CultureInfo.InvariantCulture, Resources.TimeSpreadingControl_UI_ToolTip, entry.LineNum, dts));
     }
 
     #endregion

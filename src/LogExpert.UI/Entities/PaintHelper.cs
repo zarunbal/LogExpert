@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
 using LogExpert.Dialogs;
@@ -30,7 +32,7 @@ internal static class PaintHelper
             return;
         }
 
-        var line = logPaintCtx.GetLogLine(rowIndex);
+        var line = logPaintCtx.GetLogLineMemory(rowIndex);
 
         if (line != null)
         {
@@ -76,7 +78,7 @@ internal static class PaintHelper
                             Alignment = StringAlignment.Center
                         };
 
-                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
+                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
                         using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
                     }
@@ -122,7 +124,7 @@ internal static class PaintHelper
     {
         DataGridViewTextBoxColumn lineNumberColumn = new()
         {
-            HeaderText = "Line",
+            HeaderText = Resources.PaintHelper_HeaderText_LineNumberColumn,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet,
             Resizable = DataGridViewTriState.NotSet,
             DividerWidth = 1,
@@ -149,7 +151,7 @@ internal static class PaintHelper
     }
 
     [SupportedOSPlatform("windows")]
-    public static void SetColumnizer (ILogLineColumnizer columnizer, BufferedDataGridView gridView)
+    public static void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
         var rowCount = gridView.RowCount;
         var currLine = gridView.CurrentCellAddress.Y;
@@ -306,7 +308,12 @@ internal static class PaintHelper
         {
             DataGridViewAdvancedCellBorderStyle.None => 0,
             DataGridViewAdvancedCellBorderStyle.InsetDouble or DataGridViewAdvancedCellBorderStyle.OutsetDouble => 2,
-            _ => 1
+            DataGridViewAdvancedCellBorderStyle.NotSet => 0, // Default border size for NotSet
+            DataGridViewAdvancedCellBorderStyle.Single => 0, // Default border size for Single
+            DataGridViewAdvancedCellBorderStyle.Inset => 0, // Default border size for Inset
+            DataGridViewAdvancedCellBorderStyle.Outset => 0, // Default border size for Outset
+            DataGridViewAdvancedCellBorderStyle.OutsetPartial => 0, // Default border size for OutsetPartial
+            _ => 0
         };
     }
 
@@ -323,10 +330,9 @@ internal static class PaintHelper
     [SupportedOSPlatform("windows")]
     private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
     {
-        //TODO Refactor if possible since Column is ITextValue
         var value = e.Value ?? string.Empty;
 
-        var matchList = logPaintCtx.FindHighlightMatches(value as ITextValue);
+        var matchList = logPaintCtx.FindHighlightMatches(value as ITextValueMemory);
         // too many entries per line seem to cause problems with the GDI
         while (matchList.Count > 50)
         {
@@ -335,7 +341,7 @@ internal static class PaintHelper
 
         if (value is Column column)
         {
-            if (!string.IsNullOrEmpty(column.FullValue))
+            if (!column.FullValue.IsEmpty)
             {
                 HighlightMatchEntry hme = new()
                 {
@@ -345,11 +351,11 @@ internal static class PaintHelper
 
                 var he = new HighlightEntry
                 {
-                    SearchText = column.FullValue,
+                    SearchText = column.FullValue.ToString(),
                     //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
                     ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
-                    IsRegEx = false,
+                    IsRegex = false,
                     IsCaseSensitive = false,
                     IsLedSwitch = false,
                     IsStopTail = false,
@@ -376,7 +382,6 @@ internal static class PaintHelper
             valBounds.Width -= e.CellStyle.Padding.Horizontal;
             valBounds.Height -= e.CellStyle.Padding.Vertical;
         }
-
 
         var flags =
                 TextFormatFlags.Left
@@ -410,9 +415,9 @@ internal static class PaintHelper
             var matchWord = string.Empty;
             if (value is Column again)
             {
-                if (!string.IsNullOrEmpty(again.FullValue))
+                if (!again.FullValue.IsEmpty)
                 {
-                    matchWord = again.FullValue.Substring(matchEntry.StartPos, matchEntry.Length);
+                    matchWord = again.FullValue.Slice(matchEntry.StartPos, matchEntry.Length).ToString();
                 }
             }
 
@@ -434,7 +439,6 @@ internal static class PaintHelper
                 {
                     e.Graphics.FillRectangle(bgBrush, wordRect);
                 }
-
             }
 
             TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect, foreColor, flags);

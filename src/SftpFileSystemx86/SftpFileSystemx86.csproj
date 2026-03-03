@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <RootNamespace>SftpFileSystem</RootNamespace>
@@ -42,6 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\SftpFileSystemx64\SftpFileSystem.manifest.json" Link="SftpFileSystem.manifest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx" Link="ConfigDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx" Link="FailedKeyDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx" Link="LoginDialog.resx" />
@@ -55,5 +59,13 @@
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
+    <ProjectReference Include="..\SftpFileSystem.Resources\SftpFileSystem.Resources.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.de.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

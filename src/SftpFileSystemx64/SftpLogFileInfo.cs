@@ -1,6 +1,7 @@
-using LogExpert;
+using ColumnizerLib;
 
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
 
 namespace SftpFileSystem;
@@ -61,16 +62,16 @@ public class SftpLogFileInfo : ILogFileInfo
                     }
                     else
                     {
-                        MessageBox.Show("Loading key file failed");
+                        _ = MessageBox.Show("Loading key file failed");
                     }
                 }
             }
 
-            if (cancelled == false)
+            if (!cancelled)
             {
                 success = false;
                 var credentials = sftFileSystem.GetCredentials(Uri, true, true);
-                while (success == false)
+                while (!success)
                 {
                     //Add ConnectionInfo object
                     _sftp = new SftpClient(Uri.Host, credentials.UserName, sftFileSystem.PrivateKeyFile);
@@ -81,7 +82,7 @@ public class SftpLogFileInfo : ILogFileInfo
                         success = true;
                     }
 
-                    if (success == false)
+                    if (!success)
                     {
                         FailedKeyDialog dlg = new();
                         var res = dlg.ShowDialog();
@@ -103,7 +104,7 @@ public class SftpLogFileInfo : ILogFileInfo
             }
         }
 
-        if (success == false)
+        if (!success)
         {
             // username/password auth
             var credentials = sftFileSystem.GetCredentials(Uri, true, false);
@@ -118,7 +119,7 @@ public class SftpLogFileInfo : ILogFileInfo
                 if (_sftp == null)
                 {
                     // 2nd fail -> abort
-                    MessageBox.Show("Authentication failed!");
+                    _ = MessageBox.Show("Authentication failed!");
                     //MessageBox.Show(sftp.LastErrorText);
                     return;
                 }
@@ -129,9 +130,9 @@ public class SftpLogFileInfo : ILogFileInfo
             }
         }
 
-        if (_sftp.IsConnected == false)
+        if (!_sftp.IsConnected)
         {
-            MessageBox.Show("Sftp is not connected");
+            _ = MessageBox.Show("Sftp is not connected");
             return;
         }
 
@@ -166,7 +167,10 @@ public class SftpLogFileInfo : ILogFileInfo
                 var len = file.Attributes.Size;
                 return len != -1;
             }
-            catch (Exception e)
+            catch (Exception e) when (e is SshException or
+                                           SftpPathNotFoundException or
+                                           SftpPermissionDeniedException or
+                                           ArgumentNullException)
             {
                 _logger.LogError(e.Message);
                 return false;

@@ -1,7 +1,9 @@
-﻿namespace LogExpert.Core.EventArguments;
+using ColumnizerLib;
 
-public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logLines, ILogLineColumnizer columnizer,
-    ILogExpertCallback callback) : System.EventArgs
+namespace LogExpert.Core.EventArguments;
+
+public class ContextMenuPluginEventArgs (IContextMenuEntry entry, IList<int> logLines, ILogLineMemoryColumnizer columnizer,
+    ILogExpertCallbackMemory callback) : EventArgs
 {
 
     #region Properties
@@ -10,9 +12,9 @@ public class ContextMenuPluginEventArgs(IContextMenuEntry entry, IList<int> logL
 
     public IList<int> LogLines { get; } = logLines;
 
-    public ILogLineColumnizer Columnizer { get; } = columnizer;
+    public ILogLineMemoryColumnizer Columnizer { get; } = columnizer;
 
-    public ILogExpertCallback Callback { get; } = callback;
+    public ILogExpertCallbackMemory Callback { get; } = callback;
 
     #endregion
 }

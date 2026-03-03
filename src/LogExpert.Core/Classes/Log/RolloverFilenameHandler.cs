@@ -1,4 +1,6 @@
-﻿using LogExpert.Core.Entities;
+using ColumnizerLib;
+
+using LogExpert.Core.Entities;
 using LogExpert.Core.Interface;
 using System.Collections.Generic;
 
@@ -91,6 +93,7 @@ public class RolloverFilenameHandler
                 }
             }
         }
+
         return fileList;
     }
 
@@ -100,8 +103,8 @@ public class RolloverFilenameHandler
 
     private bool FileExists(string filePath, IPluginRegistry pluginRegistry)
     {
-        IFileSystemPlugin fs = pluginRegistry.FindFileSystemForUri(filePath);
-        ILogFileInfo info = fs.GetLogfileInfo(filePath);
+        var fs = pluginRegistry.FindFileSystemForUri(filePath);
+        var info = fs.GetLogfileInfo(filePath);
         return info.FileExists;
     }
 

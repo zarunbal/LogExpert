@@ -1,5 +1,3 @@
-using LogExpert.Core.Classes;
-
 namespace LogExpert.Core.Config;
 
 [Serializable]
@@ -27,7 +25,7 @@ public class ToolEntry
 
     public override string ToString ()
     {
-        return Util.IsNull(Name) ? Cmd : Name;
+        return Name ?? Cmd ?? "<unnamed>";
     }
 
     public ToolEntry Clone ()

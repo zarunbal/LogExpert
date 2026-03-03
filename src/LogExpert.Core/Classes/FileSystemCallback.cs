@@ -1,5 +1,7 @@
 using System.Globalization;
 
+using ColumnizerLib;
+
 using NLog;
 
 namespace LogExpert.Core.Classes;

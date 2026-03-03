@@ -15,7 +15,7 @@ internal class RolloverHandlerTestBase
     protected LinkedList<string> CreateTestFilesWithDate ()
     {
         LinkedList<string> createdFiles = new();
-        DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         TestDirectory = dInfo;
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_1.log"));
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine_2010-06-08_0.log"));
@@ -31,7 +31,7 @@ internal class RolloverHandlerTestBase
     protected LinkedList<string> CreateTestFilesWithoutDate ()
     {
         LinkedList<string> createdFiles = new();
-        DirectoryInfo dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         TestDirectory = dInfo;
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine.log.6"));
         _ = createdFiles.AddLast(CreateFile(dInfo, "engine.log.5"));
@@ -43,27 +43,27 @@ internal class RolloverHandlerTestBase
         return createdFiles;
     }
 
-    protected LinkedList<string> RolloverSimulation (LinkedList<string> files, string formatPattern,
+    protected static LinkedList<string> RolloverSimulation (LinkedList<string> files, string formatPattern,
         bool deleteLatestFile)
     {
-        LinkedList<string> fileList = files;
+        var fileList = files;
         RolloverFilenameBuilder fnb = new(formatPattern);
         fnb.SetFileName(fileList.Last.Value);
         fnb.Index += fileList.Count;
         var newFileName = fnb.BuildFileName();
-        fileList.AddFirst(newFileName);
-        LinkedList<string>.Enumerator enumerator = fileList.GetEnumerator();
-        LinkedList<string>.Enumerator nextEnumerator = fileList.GetEnumerator();
-        nextEnumerator.MoveNext(); // move on 2nd entry
-        enumerator.MoveNext();
+        _ = fileList.AddFirst(newFileName);
+        var enumerator = fileList.GetEnumerator();
+        var nextEnumerator = fileList.GetEnumerator();
+        _ = nextEnumerator.MoveNext(); // move on 2nd entry
+        _ = enumerator.MoveNext();
 
         while (nextEnumerator.MoveNext())
         {
             File.Move(nextEnumerator.Current, enumerator.Current);
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
         }
 
-        CreateFile(null, nextEnumerator.Current);
+        _ = CreateFile(null, nextEnumerator.Current);
 
         if (deleteLatestFile)
         {
@@ -74,8 +74,8 @@ internal class RolloverHandlerTestBase
         return fileList;
     }
 
-
-    protected void Cleanup ()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
+    protected static void Cleanup ()
     {
         try
         {
@@ -86,7 +86,7 @@ internal class RolloverHandlerTestBase
         }
     }
 
-    protected string CreateFile (DirectoryInfo dInfo, string fileName)
+    protected static string CreateFile (DirectoryInfo dInfo, string fileName)
     {
         var lineCount = 10;
         var fullName = dInfo == null ? fileName : dInfo.FullName + Path.DirectorySeparatorChar + fileName;

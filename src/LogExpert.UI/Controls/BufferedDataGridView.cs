@@ -1,5 +1,5 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
-using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Entities;
@@ -62,8 +62,10 @@ internal partial class BufferedDataGridView : DataGridView
   }
    */
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ContextMenuStrip EditModeMenuStrip { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool PaintWithOverlays { get; set; }
 
     #endregion
@@ -212,7 +214,7 @@ internal partial class BufferedDataGridView : DataGridView
     {
         var currentContext = BufferedGraphicsManager.Current;
 
-        using var myBuffer = currentContext.Allocate(CreateGraphics(), ClientRectangle);
+        using var myBuffer = currentContext.Allocate(e.Graphics, ClientRectangle);
         lock (_overlayList)
         {
             _overlayList.Clear();
@@ -244,6 +246,7 @@ internal partial class BufferedDataGridView : DataGridView
             foreach (var overlay in _overlayList.Values)
             {
                 var textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
+
                 Rectangle rectBubble = new(overlay.Position, new Size((int)textSize.Width, (int)textSize.Height));
                 rectBubble.Offset(60, -(rectBubble.Height + 40));
                 rectBubble.Inflate(3, 3);
@@ -252,6 +255,7 @@ internal partial class BufferedDataGridView : DataGridView
                 myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
                 myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
                 e.Graphics.SetClip(rectBubble, CombineMode.Union);
+
                 RectangleF textRect = new(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
                 myBuffer.Graphics.FillRectangle(_brush, rectBubble);
                 //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
@@ -260,7 +264,7 @@ internal partial class BufferedDataGridView : DataGridView
 
                 if (_logger.IsDebugEnabled)
                 {
-                    _logger.Debug(CultureInfo.InvariantCulture, $"ClipRgn: {myBuffer.Graphics.ClipBounds.Left},{myBuffer.Graphics.ClipBounds.Top},{myBuffer.Graphics.ClipBounds.Width},{myBuffer.Graphics.ClipBounds.Height}");
+                    _logger.Debug($"### PaintOverlays: {myBuffer.Graphics.ClipBounds.Left},{myBuffer.Graphics.ClipBounds.Top},{myBuffer.Graphics.ClipBounds.Width},{myBuffer.Graphics.ClipBounds.Height}");
                 }
             }
         }
@@ -319,10 +323,10 @@ internal partial class BufferedDataGridView : DataGridView
                     editControl.EditingControlDataGridView.HorizontalScrollingOffset = scrollIndex;
                     e.Handled = true;
                 }
-                else
-                {
-                    _logger.Warn(CultureInfo.InvariantCulture, "Edit control was null, to be checked");
-                }
+                //else
+                //{
+                //    _logger.Warn($"Edit control was null, to be checked");
+                //}
             }
         }
     }

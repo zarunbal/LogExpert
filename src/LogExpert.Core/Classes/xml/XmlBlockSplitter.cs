@@ -1,4 +1,6 @@
-﻿using LogExpert.Core.Classes.Log;
+using ColumnizerLib;
+
+using LogExpert.Core.Classes.Log;
 
 using System.Text;
 using System.Xml;
@@ -125,6 +127,7 @@ public class XmlBlockSplitter : LogStreamReaderBase
                 line = line.Substring(MAX_LEN);
                 _lineList.Enqueue(part);
             }
+
             _lineList.Enqueue(line);
         }
     }
@@ -166,6 +169,7 @@ public class XmlBlockSplitter : LogStreamReaderBase
                 _lineList.Enqueue("[XML Parser error] " + block);
             }
         }
+
         return _lineList.Dequeue();
     }
 

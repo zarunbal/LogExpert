@@ -1,14 +1,17 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 namespace LogExpert.Core.Classes.Columnizer;
 
-public class ClfColumnizer : ILogLineColumnizer
+public partial class ClfColumnizer : ILogLineMemoryColumnizer
 {
-    private const string DateTimeFormat = "dd/MMM/yyyy:HH:mm:ss zzz";
+    private const string DATE_TIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss zzz";
+
     #region Fields
 
-    private readonly Regex _lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
+    private readonly Regex _lineRegex = LineRegex();
 
     private readonly CultureInfo _cultureInfo = new("en-US");
     private int _timeOffset;
@@ -18,7 +21,6 @@ public class ClfColumnizer : ILogLineColumnizer
     #region cTor
 
     // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
-
     public ClfColumnizer ()
     {
     }
@@ -42,48 +44,27 @@ public class ClfColumnizer : ILogLineColumnizer
         return _timeOffset;
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Retrieves the timestamp associated with the specified log line.
+    /// </summary>
+    /// <param name="callback">An object that provides callback methods for columnizing log lines. Cannot be null.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
+    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
-        IColumnizedLogLine cols = SplitLine(callback, line);
-        if (cols == null || cols.ColumnValues.Length < 8)
-        {
-            return DateTime.MinValue;
-        }
-
-        if (cols.ColumnValues[2].FullValue.Length == 0)
-        {
-            return DateTime.MinValue;
-        }
-
-        try
-        {
-            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, DateTimeFormat, _cultureInfo);
-            return dateTime;
-        }
-        catch (Exception)
-        {
-            return DateTime.MinValue;
-        }
+        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
+    /// <summary>
+    /// Notifies the specified callback of a value change for a given column.
+    /// </summary>
+    /// <param name="callback">The callback to be notified of the value change. Cannot be null.</param>
+    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
+    /// <param name="value">The new value to assign to the specified column.</param>
+    /// <param name="oldValue">The previous value of the specified column before the update.</param>
     public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
-        if (column == 2)
-        {
-            try
-            {
-                var newDateTime =
-                    DateTime.ParseExact(value, DateTimeFormat, _cultureInfo);
-                var oldDateTime =
-                    DateTime.ParseExact(oldValue, DateTimeFormat, _cultureInfo);
-                var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                _timeOffset = (int)(mSecsNew - mSecsOld);
-            }
-            catch (FormatException)
-            {
-            }
-        }
+        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
     }
 
     public string GetName ()
@@ -106,89 +87,225 @@ public class ClfColumnizer : ILogLineColumnizer
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Splits the specified log line into columns using the provided columnizer callback.
+    /// </summary>
+    /// <param name="callback">The callback interface used to receive columnization results and context during the split operation. Cannot be
+    /// null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the log line.</returns>
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
     {
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
+    }
+
+    /// <summary>
+    /// Extracts the timestamp from the specified log line using the provided callback.
+    /// </summary>
+    /// <remarks>If the log line does not contain a valid timestamp in the expected column or format, the
+    /// method returns DateTime.MinValue. The expected timestamp format and column position are determined by the
+    /// implementation and may vary depending on the log source.</remarks>
+    /// <param name="callback">A callback interface used to assist in parsing the log line and retrieving column information.</param>
+    /// <param name="logLine">The log line from which to extract the timestamp.</param>
+    /// <returns>A DateTime value representing the timestamp extracted from the log line. Returns DateTime.MinValue if the
+    /// timestamp cannot be parsed or is not present.</returns>
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        // Use SplitLine to parse, then extract timestamp column
+        var cols = SplitLine(callback, logLine);
+
+        if (cols == null || cols.ColumnValues.Length < 8)
+        {
+            return DateTime.MinValue;
+        }
+
+        if (cols.ColumnValues[2] is not IColumnMemory dateColumn || dateColumn.FullValue.IsEmpty)
+        {
+            return DateTime.MinValue;
+        }
+
+        try
+        {
+            return DateTime.ParseExact(dateColumn.FullValue.Span, DATE_TIME_FORMAT, _cultureInfo);
+        }
+        catch (Exception ex) when (ex is ArgumentException or
+                                         FormatException or
+                                         ArgumentOutOfRangeException)
+        {
+            return DateTime.MinValue;
+        }
+    }
+
+    /// <summary>
+    /// Splits a log line into its constituent columns using the configured columnizer logic.
+    /// </summary>
+    /// <remarks>If the input line does not match the expected format, the entire line is placed in the
+    /// request column. For lines longer than 1024 characters, only the first 1024 characters are used for
+    /// columnization. The method does not localize column values.</remarks>
+    /// <param name="callback">A callback interface used to provide additional context or services required during columnization. Cannot be
+    /// null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized log line, with each column populated according to the parsed content of
+    /// the input line.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally Passed")]
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
+    {
+        ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
+        ArgumentNullException.ThrowIfNull(callback, nameof(callback));
+
         ColumnizedLogLine cLogLine = new()
         {
-            LogLine = line
+            LogLine = logLine
         };
 
-        var columns = new Column[8]
-        {
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine},
-            new() {FullValue = "", Parent = cLogLine}
-        };
+        var columns = Column.CreateColumns(8, cLogLine);
 
-        cLogLine.ColumnValues = columns.Select(a => a as IColumn).ToArray();
+        var lineMemory = logLine.FullLine;
 
-        var temp = line.FullLine;
-        if (temp.Length > 1024)
+        if (lineMemory.Length > 1024)
         {
-            // spam
-            temp = temp[..1024];
-            columns[3].FullValue = temp;
+            columns[3].FullValue = lineMemory[..1024];
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
             return cLogLine;
         }
+
+        var span = logLine.FullLine.Span;
+
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
-
-        if (_lineRegex.IsMatch(temp))
+        if (!_lineRegex.IsMatch(span))
         {
-            Match match = _lineRegex.Match(temp);
-            GroupCollection groups = match.Groups;
-            if (groups.Count == 10)
+            // Pattern didn't match - put entire line in request column
+            columns[3].FullValue = lineMemory;
+            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
+            return cLogLine;
+        }
+
+        // To extract regex group captures, we must convert to string.
+        // This is an unavoidable allocation - .NET Regex doesn't provide
+        // a way to get group capture positions from ReadOnlySpan<char>.
+        // However, GetGroupMemory() will slice the original ReadOnlyMemory,
+        // so we avoid allocating strings for each captured group.
+        var lineString = logLine.ToString();
+        var match = _lineRegex.Match(lineString);
+
+        if (match.Groups.Count == 10)
+        {
+            columns[0].FullValue = GetGroupMemory(lineMemory, match.Groups[1]);
+            columns[1].FullValue = GetGroupMemory(lineMemory, match.Groups[3]);
+            columns[3].FullValue = GetGroupMemory(lineMemory, match.Groups[5]);
+            columns[4].FullValue = GetGroupMemory(lineMemory, match.Groups[6]);
+            columns[5].FullValue = GetGroupMemory(lineMemory, match.Groups[7]);
+            columns[6].FullValue = GetGroupMemory(lineMemory, match.Groups[8]);
+            columns[7].FullValue = GetGroupMemory(lineMemory, match.Groups[9]);
+
+            var dateTimeMemory = GetGroupMemory(lineMemory, match.Groups[4]);
+
+            if (dateTimeMemory.Length > 2)
             {
-                columns[0].FullValue = groups[1].Value;
-                columns[1].FullValue = groups[3].Value;
-                columns[3].FullValue = groups[5].Value;
-                columns[4].FullValue = groups[6].Value;
-                columns[5].FullValue = groups[7].Value;
-                columns[6].FullValue = groups[8].Value;
-                columns[7].FullValue = groups[9].Value;
+                // Skip '[' at start and ']' at end
+                dateTimeMemory = dateTimeMemory[1..^1];
+            }
 
-                var dateTimeStr = groups[4].Value.Substring(1, 26);
+            var dateSpan = dateTimeMemory.Span;
 
-                // dirty probing of date/time format (much faster than DateTime.ParseExact()
-                if (dateTimeStr[2] == '/' && dateTimeStr[6] == '/' && dateTimeStr[11] == ':')
+            // dirty probing of date/time format (much faster than DateTime.ParseExact()
+            if (dateSpan.Length >= 12 && dateSpan[2] == '/' && dateSpan[6] == '/' && dateSpan[11] == ':')
+            {
+                if (_timeOffset != 0)
                 {
-                    if (_timeOffset != 0)
+                    try
                     {
-                        try
-                        {
-                            var dateTime = DateTime.ParseExact(dateTimeStr, DateTimeFormat, _cultureInfo);
-                            dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
-                            var newDate = dateTime.ToString(DateTimeFormat, _cultureInfo);
-                            columns[2].FullValue = newDate;
-                        }
-                        catch (Exception)
-                        {
-                            columns[2].FullValue = "n/a";
-                        }
+                        var dateTime = DateTime.ParseExact(dateSpan, DATE_TIME_FORMAT, _cultureInfo);
+                        dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
+                        var newDate = dateTime.ToString(DATE_TIME_FORMAT, _cultureInfo);
+                        columns[2].FullValue = newDate.AsMemory();
                     }
-                    else
+                    catch (Exception ex) when (ex is ArgumentException or
+                                                     FormatException or
+                                                     ArgumentOutOfRangeException)
                     {
-                        columns[2].FullValue = dateTimeStr;
+                        columns[2].FullValue = "n/a".AsMemory();
                     }
                 }
                 else
                 {
-                    columns[2].FullValue = dateTimeStr;
+                    columns[2].FullValue = dateTimeMemory;
                 }
+            }
+            else
+            {
+                columns[2].FullValue = dateTimeMemory;
             }
         }
         else
         {
-            columns[3].FullValue = temp;
+            // Regex matched but unexpected group count - put full line in request column
+            columns[3].FullValue = lineMemory;
         }
 
+        cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
         return cLogLine;
     }
+
+    /// <summary>
+    /// Converts a Regex Group capture to ReadOnlyMemory slice from original line
+    /// </summary>
+    //TODO Extract to utility class
+    private static ReadOnlyMemory<char> GetGroupMemory (ReadOnlyMemory<char> lineMemory, Group group)
+    {
+        if (!group.Success || group.Length == 0)
+        {
+            return ReadOnlyMemory<char>.Empty;
+        }
+
+        // Use group's Index and Length to slice original memory
+        // This avoids allocating a new string for the group value
+        return lineMemory.Slice(group.Index, group.Length);
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
+    /// <summary>
+    /// Processes a value change for a specified column and notifies the callback of the update.
+    /// </summary>
+    /// <remarks>If the column index is 2, the method attempts to interpret the values as date and time
+    /// strings and calculates the time offset in milliseconds. No action is taken for other column indices.</remarks>
+    /// <param name="callback">The callback interface used to handle column value updates.</param>
+    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
+    /// <param name="value">The new value to be set for the specified column.</param>
+    /// <param name="oldValue">The previous value of the specified column before the update.</param>
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        if (column == 2)
+        {
+            try
+            {
+                var newDateTime = DateTime.ParseExact(value, DATE_TIME_FORMAT, _cultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue, DATE_TIME_FORMAT, _cultureInfo);
+                var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
+                _timeOffset = (int)(mSecsNew - mSecsOld);
+            }
+            catch (FormatException)
+            {
+            }
+        }
+    }
+
+    /// <summary>
+    /// Provides a compiled regular expression used to parse lines matching a specific log entry format.
+    /// </summary>
+    /// <remarks>The regular expression is precompiled for performance and is intended to extract fields from
+    /// log lines with a fixed format. The pattern captures multiple groups, including text fields and quoted values.
+    /// Use the returned <see cref="Regex"/> to match and extract data from log entries conforming to this
+    /// structure.</remarks>
+    /// <returns>A <see cref="Regex"/> instance that matches lines with the expected log entry structure.</returns>
+    [GeneratedRegex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")")]
+    private static partial Regex LineRegex ();
 
     #endregion
 }

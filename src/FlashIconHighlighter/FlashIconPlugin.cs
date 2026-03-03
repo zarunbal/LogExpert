@@ -1,9 +1,9 @@
-using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
 
-using LogExpert;
+using ColumnizerLib;
+
+using static Vanara.PInvoke.User32;
 
 [assembly: SupportedOSPlatform("windows")]
 namespace FlashIconHighlighter;
@@ -18,29 +18,33 @@ internal class FlashIconPlugin : IKeywordAction
 
     #region IKeywordAction Member
 
-    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
+    public void Execute (string keyword, string param, ILogExpertCallbackMemory callback, ILogLineMemoryColumnizer columnizer)
     {
-        FormCollection openForms = Application.OpenForms;
+        var openForms = Application.OpenForms;
         foreach (Form form in openForms)
         {
             if (form.TopLevel && form.Name.Equals("LogTabWindow", StringComparison.OrdinalIgnoreCase) && form.Text.Contains(callback.GetFileName(), StringComparison.Ordinal))
             {
-                form.BeginInvoke(FlashWindow, [form]);
+                _ = form.BeginInvoke(FlashWindow, [form]);
             }
         }
     }
 
+    /// <summary>
+    /// Flash Window http://blogs.x2line.com/al/archive/2008/04/19/3392.aspx
+    /// </summary>
+    /// <param name="form"></param>
     private void FlashWindow (Form form)
     {
         FLASHWINFO fw = new()
         {
-            cbSize = Convert.ToUInt32(Marshal.SizeOf(typeof(FLASHWINFO))),
+            cbSize = Convert.ToUInt32(Marshal.SizeOf<FLASHWINFO>()),
             hwnd = form.Handle,
-            dwFlags = 14,
+            dwFlags = FLASHW.FLASHW_TRAY | FLASHW.FLASHW_CAPTION | FLASHW.FLASHW_TIMER,
             uCount = 0
         };
 
-        Win32Stuff.FlashWindowEx(ref fw);
+        _ = FlashWindowEx(fw);
     }
 
     public string GetDescription ()

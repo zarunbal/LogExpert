@@ -1,7 +1,8 @@
-﻿using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.Filter;
 
 namespace LogExpert.Core.Classes.Persister;
 
+[Serializable]
 public class FilterTabData
 {
     public FilterParams FilterParams { get; set; } = new();

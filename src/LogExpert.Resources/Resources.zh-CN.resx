@@ -1,0 +1,2068 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
+    <value>LogExpert</value>
+    <comment>LogExpert</comment>
+  </data>
+  <data name="Program_UI_Error_ConfigFileNotFound" xml:space="preserve">
+    <value>未找到配置文件</value>
+  </data>
+  <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
+    <value>LogExpert 权限不足。可能您是从网络驱动器启动的。请从本地驱动器启动 LogExpert。
+		({0})</value>
+  </data>
+  <data name="LogExpert_Common_UI_Title_Error" xml:space="preserve">
+    <value>LogExpert 错误</value>
+    <comment>LogExpert 错误标题</comment>
+  </data>
+  <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+    <value>无法打开与第一个实例的连接 ({0})</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
+    <value>设置已导入</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>设置无法导入: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>导出设置到文件</value>
+  </data>
+  <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
+    <value>设置文件 (*.json)|*.json|所有文件 (*.*)</value>
+  </data>
+  <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
+    <value>复制为</value>
+  </data>
+  <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
+    <value>新建分组</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>添加条目时出错。
+{0}</value>
+  </data>
+  <data name="HighlightDialog_RegexError" xml:space="preserve">
+    <value>正则表达式值为空或仅包含空白字符</value>
+  </data>
+  <data name="HighlightDialog_UI_DefaultGroupName" xml:space="preserve">
+    <value>[默认]</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>保存条目时出错。 {0}</value>
+  </data>
+  <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
+    <value>没有进程锁定指定的路径</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker" xml:space="preserve">
+    <value>无法开始重启会话。无法确定文件锁定者。</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotRegisterResource" xml:space="preserve">
+    <value>无法注册资源。</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResource" xml:space="preserve">
+    <value>无法列出锁定资源的进程</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult" xml:space="preserve">
+    <value>无法列出锁定资源的进程。获取结果大小失败。</value>
+  </data>
+  <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
+    <value>行</value>
+  </data>
+  <data name="LogWindow_UI_SureToClose" xml:space="preserve">
+    <value>确定关闭吗?</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SelCountSelectedLines" xml:space="preserve">
+    <value>已选中 {0} 行</value>
+  </data>
+  <data name="LogWindow_UI_Text_Frozen" xml:space="preserve">
+    <value>冻结</value>
+  </data>
+  <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
+    <value>在此处冻结左侧列 ({0})</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
+    <value>无效的正则表达式</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingFile" xml:space="preserve">
+    <value>正在加载文件...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FileNotFound" xml:space="preserve">
+    <value>文件未找到</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingWithParameter" xml:space="preserve">
+    <value>正在加载 {0}</value>
+  </data>
+  <data name="Logger_Error_In_Function" xml:space="preserve">
+    <value>{0} 中的错误: {1}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
+    <value>时间差为 {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
+    <value>未找到: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromBeginningOfFile" xml:space="preserve">
+    <value>从文件开头开始</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromEndOfFile" xml:space="preserve">
+    <value>从文件末尾开始</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SearchingPressESCToCancel" xml:space="preserve">
+    <value>正在搜索... 按 ESC 取消。</value>
+  </data>
+  <data name="LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks" xml:space="preserve">
+    <value>书签中包含一些注释。真的要移除书签吗?</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
+    <value>导入书签列表时出错: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ImportBookmarkList" xml:space="preserve">
+    <value>选择用于加载书签的文件</value>
+  </data>
+  <data name="LogWindow_UI_ImportExportBookmarkList_Filter" xml:space="preserve">
+    <value>CSV 文件 (*.csv)|*.csv|书签文件 (*.bmk)|*.bmk</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileExportingBookmarkList" xml:space="preserve">
+    <value>导出书签列表时出错: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
+    <value>选择用于保存书签的文件</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Clip" xml:space="preserve">
+    <value>{0}-&gt;剪贴板</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Copy" xml:space="preserve">
+    <value>{0}-&gt;C</value>
+  </data>
+  <data name="LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt" xml:space="preserve">
+    <value>该书签附带注释。真的要移除该书签吗?</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile" xml:space="preserve">
+    <value>截断文件时出现意外问题</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
+    <value>截断失败: 文件被 {0} 锁定</value>
+  </data>
+  <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
+    <value>保存持久化数据时出现意外错误: {0}</value>
+  </data>
+  <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
+    <value>无法加载文件
+{0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile" xml:space="preserve">
+    <value>正在写入临时文件... 按 ESC 取消。</value>
+  </data>
+  <data name="LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter" xml:space="preserve">
+    <value>-&gt;F</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced" xml:space="preserve">
+    <value>隐藏高级选项...</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced" xml:space="preserve">
+    <value>显示高级选项...</value>
+  </data>
+  <data name="LogWindow_UI_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
+    <value>清除筛选列表时出错: {0}</value>
+  </data>
+  <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
+    <value>未找到搜索结果</value>
+  </data>
+  <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
+    <value>"筛选时发生异常。请向开发者报告:
+{0}
+{1}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
+    <value>筛选耗时: {0} 毫秒。</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
+    <value>正在筛选... 按 ESC 取消。</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>   {0}</value>
+  </data>
+  <data name="LogWindow_UI_ColumnComboBox_ToolTip" xml:space="preserve">
+    <value>选择要滚动到的列</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnName" xml:space="preserve">
+    <value>列名:</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToClipboard" xml:space="preserve">
+    <value>复制到剪贴板</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToNewTab" xml:space="preserve">
+    <value>复制到新标签页</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab" xml:space="preserve">
+    <value>将标记的行复制到新的标签页窗口</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>将所有标签页滚动到当前时间戳</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>将所有打开的标签页滚动到选定的时间戳（如有可能）</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
+    <value>时间同步文件</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync" xml:space="preserve">
+    <value>解除此窗口的时间同步</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile" xml:space="preserve">
+    <value>在原始文件中定位筛选出的行</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToggleBoomark" xml:space="preserve">
+    <value>切换书签</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_BookmarkComment" xml:space="preserve">
+    <value>书签注释...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkEditMode" xml:space="preserve">
+    <value>标记/编辑模式</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
+    <value>临时高亮</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RemoveAll" xml:space="preserve">
+    <value>全部移除</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MakeAllPermanent" xml:space="preserve">
+    <value>全部设为永久</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange" xml:space="preserve">
+    <value>标记当前筛选范围</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Color" xml:space="preserve">
+    <value>颜色...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveToLastColumn" xml:space="preserve">
+    <value>移动到最后一列</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere" xml:space="preserve">
+    <value>在此处冻结左侧列</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveLeft" xml:space="preserve">
+    <value>左移</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveRight" xml:space="preserve">
+    <value>右移</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HideColumn" xml:space="preserve">
+    <value>隐藏列</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RestoreColumns" xml:space="preserve">
+    <value>恢复列</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollToColumn" xml:space="preserve">
+    <value>滚动到列...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Copy" xml:space="preserve">
+    <value>复制</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine" xml:space="preserve">
+    <value>在日志文件中高亮选中内容（整行）</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode" xml:space="preserve">
+    <value>在日志文件中高亮选中内容（单词模式）</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterForSelection" xml:space="preserve">
+    <value>对选中内容进行筛选</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment" xml:space="preserve">
+    <value>将选中文本设为书签注释</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView" xml:space="preserve">
+    <value>在日志视图中标记筛选命中项</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines" xml:space="preserve">
+    <value>在选中行上设置书签</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn" xml:space="preserve">
+    <value>隐藏此列</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn" xml:space="preserve">
+    <value>将此列移至最后位置</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment" xml:space="preserve">
+    <value>编辑书签的注释</value>
+  </data>
+  <data name="LogWindow_UI_Button_Column" xml:space="preserve">
+    <value>列...</value>
+  </data>
+  <data name="LogWindow_UI_Button_SaveFilter" xml:space="preserve">
+    <value>保存筛选</value>
+  </data>
+  <data name="LogWindow_UI_Button_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="LogWindow_UI_Button_ShowAdvanced" xml:space="preserve">
+    <value>显示高级选项...</value>
+  </data>
+  <data name="LogWindow_UI_Button_Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Search" xml:space="preserve">
+    <value>启动筛选搜索</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ShowAdvanced" xml:space="preserve">
+    <value>切换高级筛选选项面板</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Column" xml:space="preserve">
+    <value>为“列限制”选择列</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterDown" xml:space="preserve">
+    <value>将所选条目在列表中向下移动</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterUp" xml:space="preserve">
+    <value>将所选条目在列表中向上移动</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ColumnRestrict" xml:space="preserve">
+    <value>列限制</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_RangeSearch" xml:space="preserve">
+    <value>范围搜索</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_InvertMatch" xml:space="preserve">
+    <value>反转匹配</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_AutoHide" xml:space="preserve">
+    <value>自动隐藏</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterOnLoad" xml:space="preserve">
+    <value>自动启动</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterSync" xml:space="preserve">
+    <value>同步</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterTail" xml:space="preserve">
+    <value>筛选尾部</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterRegex" xml:space="preserve">
+    <value>正则表达式</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterCaseSensitive" xml:space="preserve">
+    <value>区分大小写</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_ColumnRestrict" xml:space="preserve">
+    <value>将搜索限制在列内</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_RangeSearch" xml:space="preserve">
+    <value>启用一种特殊的搜索模式，该模式会筛选出两个给定搜索词之间的所有内容。</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_InvertMatch" xml:space="preserve">
+    <value>反转搜索结果</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_AutoHide" xml:space="preserve">
+    <value>加载筛选后隐藏筛选列表</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterOnLoad" xml:space="preserve">
+    <value>加载已保存的筛选后立即开始筛选</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterSync" xml:space="preserve">
+    <value>将筛选视图中当前选中的行同步到日志文件视图中的选中位置</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterTail" xml:space="preserve">
+    <value>筛选尾部文件内容（在文件更改时保持筛选视图更新）</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterRegex" xml:space="preserve">
+    <value>使用正则表达式。（右键单击可调出正则表达式帮助窗口）</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive" xml:space="preserve">
+    <value>使筛选区分大小写</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_FilterRange" xml:space="preserve">
+    <value>使用范围搜索时的第二个搜索字符串（“结束字符串”）</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnNames" xml:space="preserve">
+    <value>列名</value>
+  </data>
+  <data name="LogWindow_UI_Label_TextFilter" xml:space="preserve">
+    <value>文本与筛选：</value>
+  </data>
+  <data name="LogWindow_UI_Label_Fuzzyness" xml:space="preserve">
+    <value>模糊度</value>
+  </data>
+  <data name="LogWindow_UI_Label_BackSpread" xml:space="preserve">
+    <value>向后扩展</value>
+  </data>
+  <data name="LogWindow_UI_Label_ForeSpread" xml:space="preserve">
+    <value>向前扩展</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_Fuzzy" xml:space="preserve">
+    <value>模糊搜索级别（0 = 关闭模糊）</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterBackSpread" xml:space="preserve">
+    <value>将前面的行添加到搜索结果（上下拖动，按住 Shift 可微调间距）</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterForeSpread" xml:space="preserve">
+    <value>将后面的行添加到搜索结果（上下拖动，按住 Shift 可微调间距）</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterToNewTab" xml:space="preserve">
+    <value>筛选到新标签页</value>
+  </data>
+  <data name="LogWindow_UI_Button_FilterToTab" xml:space="preserve">
+    <value>筛选到标签页</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterToTab" xml:space="preserve">
+    <value>在新标签页中打开筛选后的内容</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ToggleHighlightPanel" xml:space="preserve">
+    <value>打开或关闭已保存筛选列表</value>
+  </data>
+  <data name="LogWindow_UI_ListBox_ToolTip_Filter" xml:space="preserve">
+    <value>双击以加载已保存的筛选</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_Filter" xml:space="preserve">
+    <value>筛选的搜索字符串</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_InvertMatch" xml:space="preserve">
+    <value>（反转匹配）</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
+    <value>列限制</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
+    <value>筛选：{0} {1}{2}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard" xml:space="preserve">
+    <value>剪贴板</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn" xml:space="preserve">
+    <value>粘贴于 {0}</value>
+  </data>
+  <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
+    <value>权限不足 {0}：{1}</value>
+  </data>
+  <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
+    <value>在 {0} 值 {1}，最小值 {2}，最大值 {3}，可见值 {4} 期间发生错误：{5}</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
+    <value>行</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
+    <value>行：</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
+    <value>-&gt;E</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate" xml:space="preserve">
+    <value>这是由异步委托抛出的测试异常</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
+    <value>这是由后台线程抛出的测试异常</value>
+  </data>
+  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+    <value>LogExpert 会话 {0}</value>
+  </data>
+  <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
+    <value>这是由 GUI 线程抛出的测试异常</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelWarningMaximumLineLength" xml:space="preserve">
+    <value>! 更改最大行长度可能会影响性能，不建议这样做 !</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumLineLength" xml:space="preserve">
+    <value>最大行长度（需重启生效）</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntriesDisplayed" xml:space="preserve">
+    <value>最大显示的筛选条目数</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntries" xml:space="preserve">
+    <value>最大筛选条目数</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelDefaultEncoding" xml:space="preserve">
+    <value>默认编码</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelFont" xml:space="preserve">
+    <value>字体</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolsDescription" xml:space="preserve">
+    <value>您可以配置任意数量的工具。勾选的工具会出现在图标栏中。所有其他工具可在工具菜单中找到。</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelWorkingDir" xml:space="preserve">
+    <value>工作目录：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolName" xml:space="preserve">
+    <value>名称：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolColumnizerForOutput" xml:space="preserve">
+    <value>输出列分隔器：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelTool" xml:space="preserve">
+    <value>程序：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelArguments" xml:space="preserve">
+    <value>参数：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaxDays" xml:space="preserve">
+    <value>最大天数：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelPattern" xml:space="preserve">
+    <value>模式：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelHintMultiFile" xml:space="preserve">
+    <value>提示：将文件拖放到 LogExpert 上时按住 Shift 键，将在单文件和多文件模式之间切换。</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelNoteMultiFile" xml:space="preserve">
+    <value>注意：如果文件名遵循多文件命名规则（&lt;文件名&gt;, &lt;文件名&gt;.1, &lt;文件名&gt;.2, ...），您可以在加载第一个文件后直接从文件菜单中选择“多文件”，即可自动将日志文件作为多文件加载。</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelSessionSaveOwnDir" xml:space="preserve">
+    <value>占位符文本，将由程序自动替换</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelFilePollingInterval" xml:space="preserve">
+    <value>文件轮询间隔（毫秒）：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelInfo" xml:space="preserve">
+    <value>更改将在下次加载文件时生效</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelNumberOfBlocks" xml:space="preserve">
+    <value>块数量</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelLinesPerBlock" xml:space="preserve">
+    <value>每块行数</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTailColor" xml:space="preserve">
+    <value>颜色...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonChangeFont" xml:space="preserve">
+    <value>更改...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTimespreadColor" xml:space="preserve">
+    <value>颜色...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolDelete" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolAdd" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolDown" xml:space="preserve">
+    <value>下移</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolUp" xml:space="preserve">
+    <value>上移</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonWorkingDir" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonIcon" xml:space="preserve">
+    <value>   图标...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonArguments" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTool" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonDelete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonConfigPlugin" xml:space="preserve">
+    <value>配置...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonSessionSaveDir" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Cancel" xml:space="preserve">
+    <value>取消(&amp;C)</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_OK" xml:space="preserve">
+    <value>确定(&amp;O)</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Export" xml:space="preserve">
+    <value>导出...</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Import" xml:space="preserve">
+    <value>导入(&amp;I)...</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMisc" xml:space="preserve">
+    <value>杂项</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaults" xml:space="preserve">
+    <value>默认值</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxFont" xml:space="preserve">
+    <value>字体</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeSpreadDisplay" xml:space="preserve">
+    <value>时间扩展显示</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDisplayMode" xml:space="preserve">
+    <value>显示模式</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeStampNavigationControl" xml:space="preserve">
+    <value>时间戳导航控件</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMouseDragDefaults" xml:space="preserve">
+    <value>鼠标拖动默认</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxToolSettings" xml:space="preserve">
+    <value>工具设置</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaultFileNamePattern" xml:space="preserve">
+    <value>默认文件名模式</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxWhenOpeningMultiFile" xml:space="preserve">
+    <value>当打开多个文件时...</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPlugins" xml:space="preserve">
+    <value>插件</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxSettings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPersistantFileLocation" xml:space="preserve">
+    <value>持久化文件位置</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxCPUAndStuff" xml:space="preserve">
+    <value>CPU 及其他</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxLineBufferUsage" xml:space="preserve">
+    <value>行缓冲区使用情况</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowErrorMessageOnlyOneInstance" xml:space="preserve">
+    <value>显示错误消息？</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnSize" xml:space="preserve">
+    <value>设置最后一列宽度</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTailState" xml:space="preserve">
+    <value>在标签页上显示尾部状态</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxOpenLastFiles" xml:space="preserve">
+    <value>重新打开上次使用的文件</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSingleInstance" xml:space="preserve">
+    <value>仅允许一个实例</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
+    <value>关闭标签页前询问</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
+    <value>深色模式（需重启生效）</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
+    <value>启用跟随尾部</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnFinder" xml:space="preserve">
+    <value>显示列查找器</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSyncFilter" xml:space="preserve">
+    <value>启用同步筛选列表</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFilterTail" xml:space="preserve">
+    <value>启用筛选尾部</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxReverseAlpha" xml:space="preserve">
+    <value>反字母顺序</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimeSpread" xml:space="preserve">
+    <value>显示时间扩展</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimestamp" xml:space="preserve">
+    <value>如果列分隔器支持，则显示时间戳控件</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSysout" xml:space="preserve">
+    <value>将标准输出通过管道传输到标签页</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAutoPick" xml:space="preserve">
+    <value>对新文件自动选择</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMaskPrio" xml:space="preserve">
+    <value>掩码优先于历史记录</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxPortableMode" xml:space="preserve">
+    <value>激活便携模式</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveFilter" xml:space="preserve">
+    <value>保存并恢复筛选及筛选标签页</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveSessions" xml:space="preserve">
+    <value>自动保存持久化文件 (.lxp)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxLegacyReader" xml:space="preserve">
+    <value>使用旧版文件读取器（较慢）</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMultiThread" xml:space="preserve">
+    <value>多线程筛选</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageViewSettings" xml:space="preserve">
+    <value>视图设置</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageTimeStampFeatures" xml:space="preserve">
+    <value>时间戳功能</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageExternalTools" xml:space="preserve">
+    <value>外部工具</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageColumnizers" xml:space="preserve">
+    <value>列分隔器</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageHighlightMask" xml:space="preserve">
+    <value>高亮</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMultiFile" xml:space="preserve">
+    <value>多文件</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPagePlugins" xml:space="preserve">
+    <value>插件</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageSessions" xml:space="preserve">
+    <value>持久化</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMemory" xml:space="preserve">
+    <value>内存/CPU</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLineView" xml:space="preserve">
+    <value>行视图</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTimeView" xml:space="preserve">
+    <value>时间视图</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDragInverted" xml:space="preserve">
+    <value>垂直倒置</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonHorizMouseDrag" xml:space="preserve">
+    <value>水平</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDrag" xml:space="preserve">
+    <value>垂直</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonAskWhatToDo" xml:space="preserve">
+    <value>询问操作方式</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTreatAllFilesAsOneMultifile" xml:space="preserve">
+    <value>将所有文件视为一个多文件</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLoadEveryFileIntoSeperatedTab" xml:space="preserve">
+    <value>将每个文件加载到单独的标签页</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSaveOwn" xml:space="preserve">
+    <value>独立目录</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonsessionSaveDocuments" xml:space="preserve">
+    <value>我的文档/LogExpert</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSameDir" xml:space="preserve">
+    <value>与日志文件同一目录</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionApplicationStartupDir" xml:space="preserve">
+    <value>应用程序启动目录</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir" xml:space="preserve">
+    <value>此路径基于可执行文件及其启动位置。</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask" xml:space="preserve">
+    <value>文件名掩码 (正则)</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileName" xml:space="preserve">
+    <value>文件名掩码 (正则)</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer" xml:space="preserve">
+    <value>列分隔器</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup" xml:space="preserve">
+    <value>高亮组</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding" xml:space="preserve">
+    <value>在没有 BOM 头且持久化数据不可用的情况下使用的编码。</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
+    <value>如果启用此模式，保存文件将从可执行文件所在位置加载</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp" xml:space="preserve">
+    <value>文件读取算法</value>
+  </data>
+  <data name="SettingsDialog_Form_Text" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir" xml:space="preserve">
+    <value>选择工作目录</value>
+  </data>
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir" xml:space="preserve">
+    <value>为 LogExpert 的会话文件选择文件夹</value>
+  </data>
+  <data name="SettingsDialog_UI_ActivatePortableMode" xml:space="preserve">
+    <value>激活便携模式</value>
+  </data>
+  <data name="SettingsDialog_UI_DeActivatePortableMode" xml:space="preserve">
+    <value>取消激活便携模式</value>
+  </data>
+  <data name="SettingsDialog_UI_CouldNotCreatePortableMode" xml:space="preserve">
+    <value>无法创建/删除便携模式标记：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>导出设置到文件</value>
+  </data>
+  <data name="SettingsDialog_UI_Filter_ExportSettings" xml:space="preserve">
+    <value>设置 {0}|所有文件 {1}</value>
+  </data>
+  <data name="SettingsDialog_UI_Error_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>设置无法导入：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_SettingsImported" xml:space="preserve">
+    <value>设置已导入</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelLanguage" xml:space="preserve">
+    <value>语言（需要重启）：</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage" xml:space="preserve">
+    <value>用户界面语言</value>
+  </data>
+  <data name="Eminus_UI_CannotParseJavaStackTraceLine" xml:space="preserve">
+    <value>无法解析 Java 堆栈跟踪行</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_LoadClassInEclipse" xml:space="preserve">
+    <value>在 Eclipse 中加载类</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
+    <value>{0}在 Eclipse 中加载类</value>
+  </data>
+  <data name="LogExpert_Common_UI_Title_Deserialize" xml:space="preserve">
+    <value>反序列化</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
+    <value>Eclipse 远程导航</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Host" xml:space="preserve">
+    <value>主机</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Port" xml:space="preserve">
+    <value>端口</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Description" xml:space="preserve">
+    <value>输入 Eclipse 插件监听的主机和端口。如果配置了密码，请输入密码。</value>
+  </data>
+  <data name="AboutBox_UI_Label_Copyright" xml:space="preserve">
+    <value>版权</value>
+  </data>
+  <data name="AboutBox_UI_Label_Version" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="AboutBox_UI_Label_ProductName" xml:space="preserve">
+    <value>产品名称</value>
+  </data>
+  <data name="AboutBox_UI_Text" xml:space="preserve">
+    <value>关于框</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag" xml:space="preserve">
+    <value>水平拖动</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag" xml:space="preserve">
+    <value>垂直拖动</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemInvertedDrag" xml:space="preserve">
+    <value>垂直倒置拖动</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector" xml:space="preserve">
+    <value>时间戳选择器</value>
+  </data>
+  <data name="TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView" xml:space="preserve">
+    <value>正在计算时间扩展视图...</value>
+  </data>
+  <data name="TimeSpreadingControl_UI_ToolTip" xml:space="preserve">
+    <value>行 {0}
+{1}</value>
+  </data>
+  <data name="ColorComboBox_UI_ColorComboBox_Text_Custom" xml:space="preserve">
+    <value>自定义</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelStatus" xml:space="preserve">
+    <value>就绪</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_fileToolStripMenuItem" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_openToolStripMenuItem" xml:space="preserve">
+    <value>打开...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_openURIToolStripMenuItem" xml:space="preserve">
+    <value>打开 URL...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_closeFileToolStripMenuItem" xml:space="preserve">
+    <value>关闭文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem" xml:space="preserve">
+    <value>重新加载</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_newFromClipboardToolStripMenuItem" xml:space="preserve">
+    <value>从剪贴板新建标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem" xml:space="preserve">
+    <value>多文件</value>
+  </data>
+  <data name="LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem" xml:space="preserve">
+    <value>启用多文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem" xml:space="preserve">
+    <value>文件名掩码...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem" xml:space="preserve">
+    <value>加载会话...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem" xml:space="preserve">
+    <value>保存会话...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem" xml:space="preserve">
+    <value>最近使用</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_viewNavigateToolStripMenuItem" xml:space="preserve">
+    <value>查看/导航</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem" xml:space="preserve">
+    <value>转到行...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem" xml:space="preserve">
+    <value>搜索...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem" xml:space="preserve">
+    <value>书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem" xml:space="preserve">
+    <value>切换书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem" xml:space="preserve">
+    <value>跳至下一个</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem" xml:space="preserve">
+    <value>跳至上一个</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem" xml:space="preserve">
+    <value>书签列表</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem" xml:space="preserve">
+    <value>列查找器</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem" xml:space="preserve">
+    <value>时间偏移</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
+    <value>复制到标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_columnizerToolStripMenuItem" xml:space="preserve">
+    <value>列分隔器...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_hilightingToolStripMenuItem" xml:space="preserve">
+    <value>高亮与触发器...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_settingsToolStripMenuItem" xml:space="preserve">
+    <value>设置...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_cellSelectModeToolStripMenuItem" xml:space="preserve">
+    <value>单元格选择模式</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_alwaysOnTopToolStripMenuItem" xml:space="preserve">
+    <value>始终置顶</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_hideLineColumnToolStripMenuItem" xml:space="preserve">
+    <value>隐藏行号列</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_lockInstanceToolStripMenuItem" xml:space="preserve">
+    <value>锁定实例</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_toolsToolStripMenuItem" xml:space="preserve">
+    <value>工具</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem" xml:space="preserve">
+    <value>配置...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_helpToolStripMenuItem" xml:space="preserve">
+    <value>帮助</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_showHelpToolStripMenuItem" xml:space="preserve">
+    <value>显示帮助</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_aboutToolStripMenuItem" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_debugToolStripMenuItem" xml:space="preserve">
+    <value>调试</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_dumpLogBufferInfoToolStripMenuItem" xml:space="preserve">
+    <value>转储 LogBuffer 信息</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_dumpBufferDiagnosticToolStripMenuItem" xml:space="preserve">
+    <value>转储缓冲区诊断</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_runGCToolStripMenuItem" xml:space="preserve">
+    <value>运行垃圾回收</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_gCInfoToolStripMenuItem" xml:space="preserve">
+    <value>转储垃圾回收信息</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionGUIThreadToolStripMenuItem" xml:space="preserve">
+    <value>抛出异常（GUI 线程）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionbackgroundThToolStripMenuItem" xml:space="preserve">
+    <value>抛出异常（异步委托）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_throwExceptionBackgroundThreadToolStripMenuItem" xml:space="preserve">
+    <value>抛出异常（后台线程）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_loglevelToolStripMenuItem" xml:space="preserve">
+    <value>日志级别</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_warnToolStripMenuItem" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_infoToolStripMenuItem" xml:space="preserve">
+    <value>信息</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_debugLogLevelToolStripMenuItem" xml:space="preserve">
+    <value>调试</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem" xml:space="preserve">
+    <value>禁用单词高亮模式</value>
+  </data>
+  <data name="LogTabWindow_UI_CheckBox_Host" xml:space="preserve">
+    <value>跟随尾部</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonOpen" xml:space="preserve">
+    <value>打开文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonSearch" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonFilter" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonBookmark" xml:space="preserve">
+    <value>切换书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonUp" xml:space="preserve">
+    <value>上一个书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonDown" xml:space="preserve">
+    <value>下一个书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonBubbles" xml:space="preserve">
+    <value>显示书签气泡</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_toolStripButtonTail" xml:space="preserve">
+    <value>尾部</value>
+  </data>
+  <data name="LogTabWindow_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
+    <value>跟随尾部</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_closeThisTabToolStripMenuItem" xml:space="preserve">
+    <value>关闭此标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_closeOtherTabsToolStripMenuItem" xml:space="preserve">
+    <value>关闭其他标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_closeAllTabsToolStripMenuItem" xml:space="preserve">
+    <value>关闭所有标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_tabColorToolStripMenuItem" xml:space="preserve">
+    <value>标签页颜色...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_tabRenameToolStripMenuItem" xml:space="preserve">
+    <value>标签页重命名...</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_copyPathToClipboardToolStripMenuItem" xml:space="preserve">
+    <value>复制路径到剪贴板</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_findInExplorerToolStripMenuItem" xml:space="preserve">
+    <value>在资源管理器中查找</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_truncateFileToolStripMenuItem" xml:space="preserve">
+    <value>截断文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem" xml:space="preserve">
+    <value>编码</value>
+  </data>
+  <data name="LogTabWindow_UI_CheckBox_ToolTip_checkBoxHost" xml:space="preserve">
+    <value>主机</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripTextBox" xml:space="preserve">
+    <value>时间偏移 (hh:mm:ss.fff)</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem" xml:space="preserve">
+    <value>通过输入文件系统插件支持的 URL 打开文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem" xml:space="preserve">
+    <value>用剪贴板内容创建新标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem" xml:space="preserve">
+    <value>将多个文件视为一个大文件（例如 data.log, data.log.1, data.log.2,...）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem" xml:space="preserve">
+    <value>加载已保存的会话（日志文件列表）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem" xml:space="preserve">
+    <value>保存会话（所有打开的标签页）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem" xml:space="preserve">
+    <value>如果列分隔器支持，可为显示日志时间设置偏移</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
+    <value>将所有选中行复制到新标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem" xml:space="preserve">
+    <value>将各类日志文件拆分为固定列</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem" xml:space="preserve">
+    <value>在逐行选择与单元格选择模式之间切换</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem" xml:space="preserve">
+    <value>启用后，所有新启动的 LogExpert 实例将重定向到此窗口</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_toolsToolStripMenuItem" xml:space="preserve">
+    <value>启动外部工具（在设置中配置）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonSearch" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonOpen" xml:space="preserve">
+    <value>打开文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonDown" xml:space="preserve">
+    <value>转到下一个书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonUp" xml:space="preserve">
+    <value>转到上一个书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonBookmark" xml:space="preserve">
+    <value>切换书签</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripButton_ToolTip_toolStripButtonFilter" xml:space="preserve">
+    <value>筛选窗口</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripComboBox_ToolTip_highlightGroupsToolStripComboBox" xml:space="preserve">
+    <value>选择当前日志文件的高亮设置（右键打开高亮设置）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabRenameToolStripMenuItem" xml:space="preserve">
+    <value>设置标签页上显示的文本</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeAllTabsToolStripMenuItem" xml:space="preserve">
+    <value>关闭所有标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_closeOtherTabsToolStripMenuItem" xml:space="preserve">
+    <value>关闭除本页外的所有标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_tabColorToolStripMenuItem" xml:space="preserve">
+    <value>设置标签页颜色</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_findInExplorerToolStripMenuItem" xml:space="preserve">
+    <value>打开资源管理器窗口并选中日志文件</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem" xml:space="preserve">
+    <value>完整文件名（含路径）复制到剪贴板</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem" xml:space="preserve">
+    <value>尝试截断标签页中打开的文件</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText" xml:space="preserve">
+    <value>只允许一个实例，取消勾选“视图设置 =&gt; 仅允许 1 个实例”才能启动多个实例！</value>
+  </data>
+  <data name="AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage" xml:space="preserve">
+    <value>仅显示此消息一次？</value>
+  </data>
+  <data name="BookmarkCommentDlg_UI_Title" xml:space="preserve">
+    <value>书签注释</value>
+  </data>
+  <data name="BookmarkWindow_UI_ToolStripMenuItem_RemoveComments" xml:space="preserve">
+    <value>移除注释</value>
+  </data>
+  <data name="BookmarkWindow_UI_CheckBox_ShowCommentColumn" xml:space="preserve">
+    <value>显示注释列</value>
+  </data>
+  <data name="BookmarkWindow_UI_Title" xml:space="preserve">
+    <value>书签</value>
+  </data>
+  <data name="BookmarkWindow_UI_Label_Comment" xml:space="preserve">
+    <value>书签注释：</value>
+  </data>
+  <data name="BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines" xml:space="preserve">
+    <value>真的要移除选中行的书签注释吗？</value>
+  </data>
+  <data name="BookmarkWindow_UI_NoBookmarksInCurrentFile" xml:space="preserve">
+    <value>当前文件中没有书签</value>
+  </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderText" xml:space="preserve">
+    <value>书签注释</value>
+  </data>
+  <data name="ChooseIconDialog_UI_Button_ChooseIconFile" xml:space="preserve">
+    <value>图标文件...</value>
+  </data>
+  <data name="ChooseIconDialog_UI_Text" xml:space="preserve">
+    <value>选择图标</value>
+  </data>
+  <data name="OpenUriDialog_UI_Dialog_Text" xml:space="preserve">
+    <value>打开 URL</value>
+  </data>
+  <data name="OpenUriDialog_UI_Label_URL" xml:space="preserve">
+    <value>URL：</value>
+  </data>
+  <data name="OpenUriDialog_UI_Label_Explaination" xml:space="preserve">
+    <value>输入由已安装的文件系统插件支持的 URL（例如 file:// 或 sftp://）</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Help" xml:space="preserve">
+    <value>帮助(&amp;H)</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_Regex" xml:space="preserve">
+    <value>正则表达式：</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_TestText" xml:space="preserve">
+    <value>测试文本：</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Label_Matches" xml:space="preserve">
+    <value>匹配项：</value>
+  </data>
+  <data name="RegexHelperDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>区分大小写</value>
+  </data>
+  <data name="RegexHelperDialog_UI_TextBox_Matches_NoValidRegexPattern" xml:space="preserve">
+    <value>无效的正则表达式模式</value>
+  </data>
+  <data name="RegexHelperDialog_UI_Title" xml:space="preserve">
+    <value>正则表达式助手</value>
+  </data>
+  <data name="SearchDialog_UI_Label_SearchFor" xml:space="preserve">
+    <value>搜索：(&amp;S)</value>
+  </data>
+  <data name="SearchDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>区分大小写(&amp;C)</value>
+  </data>
+  <data name="SearchDialog_UI_CheckBox_RegularExpression" xml:space="preserve">
+    <value>正则表达式(&amp;R)</value>
+  </data>
+  <data name="SearchDialog_UI_Button_RegexHelper" xml:space="preserve">
+    <value>正则表达式助手(&amp;H)</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_FromTop" xml:space="preserve">
+    <value>从顶部</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_FromSelectedLine" xml:space="preserve">
+    <value>从选中行</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_SearchStart" xml:space="preserve">
+    <value>搜索起始位置</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_Options" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="SearchDialog_UI_GroupBox_Direction" xml:space="preserve">
+    <value>方向</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_Backward" xml:space="preserve">
+    <value>向后</value>
+  </data>
+  <data name="SearchDialog_UI_RadioButton_Forward" xml:space="preserve">
+    <value>向前</value>
+  </data>
+  <data name="SearchDialog_UI_Title" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="SearchDialog_UI_Error_CreatingSearchParameter" xml:space="preserve">
+    <value>"创建搜索参数时出错
+		{0}</value>
+  </data>
+  <data name="SearchDialog_UI_Error_SearchTextEmpty" xml:space="preserve">
+    <value>搜索文本为空</value>
+  </data>
+  <data name="HighlightDialog_UI_Title" xml:space="preserve">
+    <value>高亮与动作触发器</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Add" xml:space="preserve">
+    <value>添加(&amp;A)</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Delete" xml:space="preserve">
+    <value>删除(&amp;D)</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_MoveUp" xml:space="preserve">
+    <value>上移</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_MoveDown" xml:space="preserve">
+    <value>下移</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Apply" xml:space="preserve">
+    <value>应用(&amp;A)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_CustomForeColor" xml:space="preserve">
+    <value>前景色</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_CustomBackColor" xml:space="preserve">
+    <value>背景色</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BookmarkComment" xml:space="preserve">
+    <value>书签注释</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_SelectPlugin" xml:space="preserve">
+    <value>选择...</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_GroupDown" xml:space="preserve">
+    <value>下移</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_GroupUp" xml:space="preserve">
+    <value>上移</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
+    <value>复制(&amp;C)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
+    <value>删除分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_NewGroup" xml:space="preserve">
+    <value>新建分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_ForegroundColor" xml:space="preserve">
+    <value>前景色</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_BackgroundColor" xml:space="preserve">
+    <value>背景色</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SearchString" xml:space="preserve">
+    <value>搜索字符串：</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_AssignNamesToGroups" xml:space="preserve">
+    <value>您可以在设置中为文件名分配分组。</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_RegEx" xml:space="preserve">
+    <value>正则表达式</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
+    <value>区分大小写</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_DontDirtyLed" xml:space="preserve">
+    <value>不要点亮脏指示灯</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Bookmark" xml:space="preserve">
+    <value>设置书签</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_StopTail" xml:space="preserve">
+    <value>停止跟随尾部</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Plugin" xml:space="preserve">
+    <value>插件</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_WordMatch" xml:space="preserve">
+    <value>单词模式</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_Bold" xml:space="preserve">
+    <value>粗体</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_NoBackground" xml:space="preserve">
+    <value>无背景</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_LineMatchCriteria" xml:space="preserve">
+    <value>行匹配条件</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Coloring" xml:space="preserve">
+    <value>着色</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Actions" xml:space="preserve">
+    <value>动作</value>
+  </data>
+  <data name="HighlightDialog_UI_GroupBox_Groups" xml:space="preserve">
+    <value>分组</value>
+  </data>
+  <data name="BookmarkWindow_UI_MenuItem_DeleteBookmarks" xml:space="preserve">
+    <value>删除书签</value>
+  </data>
+  <data name="GotoLineDialog_UI_Title" xml:space="preserve">
+    <value>转到行</value>
+  </data>
+  <data name="GotoLineDialog_UI_Label_LineNumber" xml:space="preserve">
+    <value>行号：</value>
+  </data>
+  <data name="TabRenameDialog_UI_Title" xml:space="preserve">
+    <value>重命名标签页</value>
+  </data>
+  <data name="TabRenameDialog_UI_Label_Name" xml:space="preserve">
+    <value>名称：</value>
+  </data>
+  <data name="ExceptionWindow_UI_Title" xml:space="preserve">
+    <value>LogExpert 错误</value>
+  </data>
+  <data name="ExceptionWindow_UI_Label_ErrorMessage" xml:space="preserve">
+    <value>发生未处理的错误。请向开发者报告。</value>
+  </data>
+  <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
+    <value>复制到剪贴板</value>
+  </data>
+  <data name="PatternWindow_UI_Title" xml:space="preserve">
+    <value>模式</value>
+  </data>
+  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
+    <value>块数量（模式变体）：</value>
+  </data>
+  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
+    <value>块行数：</value>
+  </data>
+  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
+    <value>此功能处于预 Beta 阶段，尚不可用 :)
+用法：在日志窗口中选择一个范围并按“重新计算”。 
+这将会搜索与所选范围相似的文本范围。"</value>
+  </data>
+  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
+    <value>模糊</value>
+  </data>
+  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
+    <value>最大差异</value>
+  </data>
+  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
+    <value>最大缺失</value>
+  </data>
+  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
+    <value>权重</value>
+  </data>
+  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
+    <value>（未设定范围）</value>
+  </data>
+  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
+    <value>重新计算</value>
+  </data>
+  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
+    <value>设定范围</value>
+  </data>
+  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
+    <value>起始: {0}
+		结束: {1}</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
+    <value>正在加载会话</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Label_Informational" xml:space="preserve">
+    <value>恢复布局需要一个空的工作区。</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Label_ChooseHowToProceed" xml:space="preserve">
+    <value>请选择如何继续：</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_CloseTabs" xml:space="preserve">
+    <value>关闭现有标签页</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_NewWindow" xml:space="preserve">
+    <value>打开新窗口</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_Ignore" xml:space="preserve">
+    <value>忽略布局数据</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Title" xml:space="preserve">
+    <value>多文件设置</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SettingsFor" xml:space="preserve">
+    <value>多文件设置针对：</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_FileNamePattern" xml:space="preserve">
+    <value>文件名模式：</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
+    <value>最大天数：</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
+    <value>模式语法：
+
+* = 任意字符（通配符）
+$D(&lt;日期&gt;) = 日期模式
+$I = 文件索引编号
+$J = 文件索引编号，为零时隐藏
+$J(&lt;前缀&gt;) = 类似 $J，但在非零时添加 &lt;前缀&gt;
+
+&lt;日期&gt;：
+DD = 日
+MM = 月
+YY[YY] = 年
+其它字符将按原样使用</value>
+  </data>
+  <data name="FilterColumnChooser_UI_Title" xml:space="preserve">
+    <value>列</value>
+  </data>
+  <data name="FilterColumnChooser_UI_GroupBox_OnEmptyColumns" xml:space="preserve">
+    <value>空列时</value>
+  </data>
+  <data name="FilterColumnChooser_UI_CheckBox_ExactMatch" xml:space="preserve">
+    <value>精确匹配</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_NoHit" xml:space="preserve">
+    <value>无匹配</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_SearchHit" xml:space="preserve">
+    <value>搜索命中</value>
+  </data>
+  <data name="FilterColumnChooser_UI_RadioButton_UsePrevContent" xml:space="preserve">
+    <value>使用先前内容</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_Title_Columns" xml:space="preserve">
+    <value>列</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ColumnListBox" xml:space="preserve">
+    <value>选择一个或多个列以将搜索操作限制到所选列。</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_NoHit" xml:space="preserve">
+    <value>空列无搜索命中</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_SearchHit" xml:space="preserve">
+    <value>空列始终为搜索命中</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_UsePrevContent" xml:space="preserve">
+    <value>若前一个非空列为搜索命中，则空列为搜索命中</value>
+  </data>
+  <data name="FilterColumnChooser_UI_ToolTip_ExactMatch" xml:space="preserve">
+    <value>若选中，搜索字符串必须完全匹配（非子串搜索）</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Title" xml:space="preserve">
+    <value>列分隔器</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Label_ChooseColumnizer" xml:space="preserve">
+    <value>选择列分隔器：</value>
+  </data>
+  <data name="FilterSelectorForm_UI_CheckBox_ApplyToAll" xml:space="preserve">
+    <value>应用到所有打开的文件</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Button_Config" xml:space="preserve">
+    <value>配置...</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Format" xml:space="preserve">
+    <value>支持时间偏移：{0}</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="FilterSelectorForm_UI_Text_SupportsTimeshift_No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_Title" xml:space="preserve">
+    <value>导入设置</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_Label_SettingsFileToImport" xml:space="preserve">
+    <value>要导入的设置文件：</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_Button_ChooseFile" xml:space="preserve">
+    <value>选择文件...</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_GroupBox_ImportOptions" xml:space="preserve">
+    <value>导入选项</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_HighlightSettings" xml:space="preserve">
+    <value>高亮设置</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_HighlightFileMasks" xml:space="preserve">
+    <value>高亮文件掩码</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_ColumnizerFileMasks" xml:space="preserve">
+    <value>列分隔器文件掩码</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_ExternalTools" xml:space="preserve">
+    <value>外部工具</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_Other" xml:space="preserve">
+    <value>其它</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_CheckBox_KeepExistingSettings" xml:space="preserve">
+    <value>保留现有设置</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_OpenFileDialog_Title" xml:space="preserve">
+    <value>从文件加载设置</value>
+  </data>
+  <data name="ImportSettingsDialog_UI_OpenFileDialog_Filter" xml:space="preserve">
+    <value>设置文件 (*.json)|*.json|所有文件 (*.*)|*.*</value>
+    <comment>文件筛选器格式：描述|模式|描述|模式</comment>
+  </data>
+  <data name="KeywordActionDlg_UI_Title" xml:space="preserve">
+    <value>关键字动作</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_KeywordActionPlugin" xml:space="preserve">
+    <value>关键字动作插件：</value>
+  </data>
+  <data name="KeywordActionDlg_UI_Label_Parameter" xml:space="preserve">
+    <value>参数</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Title" xml:space="preserve">
+    <value>正在加载多个文件</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Label_ChooseLoadingMode" xml:space="preserve">
+    <value>选择加载模式：</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Button_SingleFiles" xml:space="preserve">
+    <value>单文件</value>
+  </data>
+  <data name="MultiLoadRequestDialog_UI_Button_MultiFile" xml:space="preserve">
+    <value>多文件</value>
+  </data>
+  <data name="SearchProgressDialog_UI_Title" xml:space="preserve">
+    <value>正在搜索...</value>
+  </data>
+  <data name="SearchProgressDialog_UI_Label_SearchingInProgress" xml:space="preserve">
+    <value>搜索进行中...</value>
+  </data>
+  <data name="SearchProgressDialog_UI_Button_CancelSearch" xml:space="preserve">
+    <value>取消搜索</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Title" xml:space="preserve">
+    <value>工具参数帮助</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Label_EnterCommandLine" xml:space="preserve">
+    <value>输入命令行：</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_Test" xml:space="preserve">
+    <value>测试</value>
+  </data>
+  <data name="ToolArgsDialog_UI_Button_RegexHelp" xml:space="preserve">
+    <value>正则表达式帮助</value>
+  </data>
+  <data name="ToolArgsDialog_UI_HelpText" xml:space="preserve">
+    <value>%L = 当前行号
+%N = 当前日志文件名（不含路径）
+%P = 当前日志文件路径（目录）
+%F = 日志文件全名（含路径）
+%E = 日志文件扩展名（例如 'txt'）
+%M = 日志文件名（不含扩展名）
+%S = 用户（来自 URI）
+%R = 路径（来自 URI）
+%H = 主机（来自 URI）
+%T = 端口（来自 URI）
+?""&lt;name&gt;"" = 变量参数 'name'
+?""&lt;name&gt;""(def1,def2,...) = 带预定义值的变量参数
+{&lt;regex&gt;}{&lt;replace&gt;}：
+对当前选中行执行正则搜索/替换</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Title" xml:space="preserve">
+    <value>工具参数</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameter" xml:space="preserve">
+    <value>参数的值：</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem" xml:space="preserve">
+    <value>导出书签...</value>
+  </data>
+  <data name="LogTabWindow_UI_MenuStrip_MainMenu" xml:space="preserve">
+    <value>主菜单</value>
+  </data>
+  <data name="PluginHashDialog_UI_Title" xml:space="preserve">
+    <value>插件哈希</value>
+  </data>
+  <data name="PluginHashDialog_UI_Label_PluginName" xml:space="preserve">
+    <value>插件：{0}</value>
+  </data>
+  <data name="PluginHashDialog_UI_Label_Hash" xml:space="preserve">
+    <value>SHA256 哈希：</value>
+  </data>
+  <data name="PluginHashDialog_UI_Button_Copy" xml:space="preserve">
+    <value>复制(&amp;C)</value>
+  </data>
+  <data name="PluginHashDialog_UI_Button_Close" xml:space="preserve">
+    <value>关闭(&amp;C)</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_CopySuccess" xml:space="preserve">
+    <value>哈希已复制到剪贴板。</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_SuccessTitle" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_CopyError" xml:space="preserve">
+    <value>复制哈希失败：{0}</value>
+  </data>
+  <data name="PluginHashDialog_UI_Message_ErrorTitle" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Title" xml:space="preserve">
+    <value>插件信任管理</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Label_TotalPlugins" xml:space="preserve">
+    <value>插件总数：{0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_GroupBox_TrustedPlugins" xml:space="preserve">
+    <value>受信任插件</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_AddPlugin" xml:space="preserve">
+    <value>添加插件...(&amp;A)</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_Remove" xml:space="preserve">
+    <value>移除(&amp;R)</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Button_ViewHash" xml:space="preserve">
+    <value>查看哈希...(&amp;V)</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_PluginName" xml:space="preserve">
+    <value>插件名称</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_HashVerified" xml:space="preserve">
+    <value>哈希已验证</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_HashPartial" xml:space="preserve">
+    <value>哈希（部分）</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Column_Status" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Value_Trusted" xml:space="preserve">
+    <value>受信任</value>
+  </data>
+  <data name="PluginTrustDialog_UI_FileDialog_Filter" xml:space="preserve">
+    <value>插件文件 (*.dll)|*.dll|所有文件 (*.*)|*.*</value>
+  </data>
+  <data name="PluginTrustDialog_UI_FileDialog_Title" xml:space="preserve">
+    <value>选择要信任的插件</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_LoadError" xml:space="preserve">
+    <value>加载配置时出错：{0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ErrorTitle" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_AlreadyTrusted" xml:space="preserve">
+    <value>插件 ''{0}'' 已在受信任列表中。</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_AlreadyTrustedTitle" xml:space="preserve">
+    <value>已受信任</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmTrust" xml:space="preserve">
+    <value>信任插件：
+
+名称：{0}
+路径：{1}
+哈希：{2}
+
+您要信任此插件吗？</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmTrustTitle" xml:space="preserve">
+    <value>确认信任</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmRemove" xml:space="preserve">
+    <value>移除插件信任：
+
+{0}
+
+在重新加入受信任列表之前，该插件将不会被加载。
+
+继续？</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_ConfirmRemoveTitle" xml:space="preserve">
+    <value>确认移除</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_NoHash" xml:space="preserve">
+    <value>未找到插件哈希：{0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_NoHashTitle" xml:space="preserve">
+    <value>无哈希</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SaveSuccess" xml:space="preserve">
+    <value>插件信任配置保存成功。</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SuccessTitle" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_SaveError" xml:space="preserve">
+    <value>保存配置失败：`n`n{0}</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_UnsavedChanges" xml:space="preserve">
+    <value>配置已被修改。放弃更改？</value>
+  </data>
+  <data name="PluginTrustDialog_UI_Message_UnsavedChangesTitle" xml:space="preserve">
+    <value>未保存的更改</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Save" xml:space="preserve">
+    <value>保存(&amp;S)</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_ValidatingPluginSecurityAndManifest" xml:space="preserve">
+    <value>正在验证插件安全性和清单</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedValidationNotTrustedOrInvalidManifest" xml:space="preserve">
+    <value>验证失败（不受信任或清单无效）</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_LoadingPluginAssembly" xml:space="preserve">
+    <value>正在加载插件程序集</value>
+  </data>
+  <data name="PluginRegistry_PluginLoadingProgress_FailedToLoadPluginAssemblyTimeoutOrError" xml:space="preserve">
+    <value>加载插件程序集失败（超时或错误）</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_PluginTrustManagement" xml:space="preserve">
+    <value>管理受信任插件并查看插件哈希</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement" xml:space="preserve">
+    <value>插件信任管理...(&amp;T)</value>
+  </data>
+  <data name="SearchDialog_UI_Error_InvalidRegexPattern" xml:space="preserve">
+    <value>无效的正则表达式模式：{0}</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_PluginTrustConfigurationUpdate" xml:space="preserve">
+    <value>插件信任配置已更新。
+
+是否重启 LogExpert 以应用更改？</value>
+  </data>
+  <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
+    <value>建议重启</value>
+  </data>
+  <data name="LogfileReader_Error_Message_MustProvideAtLeastOneFile" xml:space="preserve">
+    <value>必须至少提供一个文件。</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Description" xml:space="preserve">
+    <value>无列拆分。整行显示在单列中。</value>
+  </data>
+  <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
+    <value>默认（单行）</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>加载项目文件出错。文件可能已损坏或无法访问。</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
+    <value>项目加载失败</value>
+  </data>
+  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+    <value>此会话中的文件均未找到。无法加载会话。</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+    <value>会话加载失败</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+    <value>会话文件已使用新文件路径更新。</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+    <value>会话已更新</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+    <value>更新会话文件失败：{0}</value>
+  </data>
+  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+    <value>会话更新失败</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
+    <value>有效</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Alternative" xml:space="preserve">
+    <value>备选</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Selected" xml:space="preserve">
+    <value>已选</value>
+  </data>
+  <data name="MissingFilesDialog_UI_FileStatus_Missing" xml:space="preserve">
+    <value>缺失</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Label_Summary" xml:space="preserve">
+    <value>找到：{0} / {1} 个文件（{2} 个缺失）</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_UpdateSessionAlternativeCount" xml:space="preserve">
+    <value>加载并更新会话 ({0})</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Button_LoadUpdateSession" xml:space="preserve">
+    <value>加载并更新会话</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Logfiles" xml:space="preserve">
+    <value>日志文件 (*.lxp)|*.lxp|所有文件 (*.*)|*.*</value>
+  </data>
+  <data name="MissingFilesDialog_UI_Filter_Title" xml:space="preserve">
+    <value>定位：{0}</value>
+  </data>
+  <data name="Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle" xml:space="preserve">
+    <value>RmEndSession：{0}</value>
+  </data>
+  <data name="LogWindow_UI_Common_ZeroValue" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName" xml:space="preserve">
+    <value>标头名称</value>
+  </data>
+  <data name="LogTabWindow_UI_StatusStrip_StatusStrip" xml:space="preserve">
+    <value>状态条1</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelSize" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelLines" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogTabWindow_UI_Label_labelCurrentLine" xml:space="preserve">
+    <value>长：</value>
+  </data>
+  <data name="LogTabWindow_UI_MenuStrip_mainMenuStrip" xml:space="preserve">
+    <value>菜单条1</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
+    <value>ASCII码</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
+    <value>美国国家标准协会</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
+    <value>ISO-8859-1</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
+    <value>UTF8</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
+    <value>统一码</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
+    <value>+00:00:00.000</value>
+  </data>
+  <data name="LogTabWindow_HelpFile" xml:space="preserve">
+    <value>日志专家.chm</value>
+  </data>
+  <data name="AboutBox_UI_LinkLabel_URL" xml:space="preserve">
+    <value>https://github.com/LogExperts/LogExpert</value>
+  </data>
+  <data name="RegexHelperDialog_Help_Chapter" xml:space="preserve">
+    <value>正则表达式.htm</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripContainer_toolStripContainer" xml:space="preserve">
+    <value>工具条容器1</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceNotInitialized" xml:space="preserve">
+    <value>{0} 未初始化</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceIsAlreadyInitialized" xml:space="preserve">
+    <value>{0} 已初始化</value>
+  </data>
+  <data name="LogExpert_Common_Error_Message_ServiceMustBeCreatedOnUIThread" xml:space="preserve">
+    <value>必须在 UI 线程上创建 {0}</value>
+  </data>
+  <data name="TabController_Error_Message_NotInitialized" xml:space="preserve">
+    <value>TabController 未初始化。首先调用InitializeDockPanel。</value>
+  </data>
+  <data name="TabController_Error_Message_WindowAlreadyTracked" xml:space="preserve">
+    <value>窗口已被跟踪</value>
+  </data>
+  <data name="TabController_Error_Message_AlreadInitialized" xml:space="preserve">
+    <value>TabController 已使用 DockPanel 进行初始化</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_Title" xml:space="preserve">
+    <value>便携模式</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_CopySettingsQuestion" xml:space="preserve">
+    <value>无法激活便携模式：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
+    <value>您想将当前设置复制到便携式配置文件夹吗？</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_ActivationError" xml:space="preserve">
+    <value>某些文件无法迁移：{0}</value>
+  </data>
+  <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
+    <value>您想要将可移植设置移回默认配置文件夹 (%APPDATA%\LogExpert) 吗？</value>
+  </data>
+</root>

@@ -1,14 +1,11 @@
-using LogExpert.Config;
+using System.Runtime.Versioning;
+using System.Windows.Forms;
+
+using LogExpert.Configuration;
 using LogExpert.Core.Interface;
-using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Extensions.LogWindow;
 
 using NLog;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Windows.Forms;
 
 namespace LogExpert.Classes;
 
@@ -22,13 +19,15 @@ internal class LogExpertProxy : ILogExpertProxy
 
     [NonSerialized] private ILogTabWindow _firstLogTabWindow;
 
+    [NonSerialized] private ILogTabWindow _mostRecentActiveWindow; // ⭐ PHASE 2: Track most recently activated window
+
     [NonSerialized] private int _logWindowIndex = 1;
 
     #endregion
 
     #region cTor
 
-    public LogExpertProxy(ILogTabWindow logTabWindow)
+    public LogExpertProxy (ILogTabWindow logTabWindow)
     {
         AddWindow(logTabWindow);
         logTabWindow.LogExpertProxy = this;
@@ -60,25 +59,38 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region Public methods
 
-    public void LoadFiles(string[] fileNames)
+    public void LoadFiles (string[] fileNames)
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Loading files into existing LogTabWindow");
-        ILogTabWindow logWin = _windowList[^1];
+        // Use most recently ACTIVATED window, fallback to most recently created
+        var logWin = _mostRecentActiveWindow ?? _windowList[^1];
+        _logger.Info($"Loading files in {(_mostRecentActiveWindow != null ? "most recently activated" : "most recently created")} window");
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
         logWin.LoadFiles(fileNames);
     }
 
-    public void NewWindow(string[] fileNames)
+    /// <summary>
+    /// Notifies the proxy that a window has been activated by the user.
+    /// This is used to track which window should receive new files when "Allow Only One Instance" is enabled.
+    /// </summary>
+    /// <param name="window">The window that was activated</param>
+    public void NotifyWindowActivated (ILogTabWindow window)
+    {
+        _mostRecentActiveWindow = window;
+        _logger.Debug($"Most recent active window updated: {window}");
+    }
+
+    [SupportedOSPlatform("windows")]
+    public void NewWindow (string[] fileNames)
     {
         if (_firstLogTabWindow.IsDisposed)
         {
-            _logger.Warn(CultureInfo.InvariantCulture, "first GUI thread window is disposed. Setting a new one.");
+            _logger.Warn("### NewWindow: first GUI thread window is disposed. Setting a new one.");
             // may occur if a window is closed because of unhandled exception.
             // Determine a new 'firstWindow'. If no window is left, start a new one.
             RemoveWindow(_firstLogTabWindow);
             if (_windowList.Count == 0)
             {
-                _logger.Info(CultureInfo.InvariantCulture, "No windows left. New created window will be the new 'first' GUI window");
+                _logger.Info("### NewWindow: No windows left. New created window will be the new 'first' GUI window");
                 LoadFiles(fileNames);
             }
             else
@@ -93,40 +105,49 @@ internal class LogExpertProxy : ILogExpertProxy
         }
     }
 
-    public void NewWindowOrLockedWindow(string[] fileNames)
+    [SupportedOSPlatform("windows")]
+    public void NewWindowOrLockedWindow (string[] fileNames)
     {
+        // Lock Instance has priority
+        // Check for locked window first
         foreach (var logWin in _windowList)
         {
             if (AbstractLogTabWindow.StaticData.CurrentLockedMainWindow == logWin)
             {
+                _logger.Info("Loading files in locked window");
                 _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
                 logWin.LoadFiles(fileNames);
                 return;
             }
         }
-        // No locked window was found --> create a new one
-        NewWindow(fileNames);
+
+        // No locked window found
+        // Load in most recent window (not new window)
+        _logger.Info("No locked window, loading files in most recent window");
+        LoadFiles(fileNames); // Uses most recent window
     }
 
-
-    public void NewWindowWorker(string[] fileNames)
+    [SupportedOSPlatform("windows")]
+    public void NewWindowWorker (string[] fileNames)
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Creating new LogTabWindow");
         IConfigManager configManager = ConfigManager.Instance;
-        ILogTabWindow logWin = AbstractLogTabWindow.Create(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true, configManager);
+        var logWin = AbstractLogTabWindow.Create(fileNames.Length > 0
+                                                    ? fileNames
+                                                    : null,
+                                                    _logWindowIndex++,
+                                                    true,
+                                                    configManager);
         logWin.LogExpertProxy = this;
         AddWindow(logWin);
         logWin.Show();
         logWin.Activate();
     }
 
-
-    public void WindowClosed(ILogTabWindow logWin)
+    public void WindowClosed (ILogTabWindow logWin)
     {
         RemoveWindow(logWin);
         if (_windowList.Count == 0)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Last LogTabWindow was closed");
             PluginRegistry.PluginRegistry.Instance.CleanupPlugins();
             OnLastWindowClosed();
         }
@@ -140,7 +161,7 @@ internal class LogExpertProxy : ILogExpertProxy
         }
     }
 
-    public int GetLogWindowCount()
+    public int GetLogWindowCount ()
     {
         return _windowList.Count;
     }
@@ -154,24 +175,22 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region Private Methods
 
-    private void AddWindow(ILogTabWindow window)
+    private void AddWindow (ILogTabWindow window)
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Adding window to list");
         _windowList.Add(window);
     }
 
-    private void RemoveWindow(ILogTabWindow window)
+    private void RemoveWindow (ILogTabWindow window)
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Removing window from list");
         _ = _windowList.Remove(window);
     }
 
     #endregion
 
-    protected void OnLastWindowClosed()
+    protected void OnLastWindowClosed ()
     {
         LastWindowClosed?.Invoke(this, new EventArgs());
     }
 
-    private delegate void NewWindowFx(string[] fileNames);
+    private delegate void NewWindowFx (string[] fileNames);
 }

@@ -1,4 +1,7 @@
-﻿using LogExpert.Core.Entities;
+using System.Text;
+
+using LogExpert.Core.Entities;
+using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.Classes.Log;
 
@@ -8,7 +11,7 @@ namespace LogExpert.Core.Classes.Log;
 /// UTF-8 handling is a bit slower, because after reading a character the byte length of the character must be determined.
 /// Lines are read char-by-char. StreamReader.ReadLine() is not used because StreamReader cannot tell a file position.
 /// </summary>
-public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
+public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, ILogStreamReaderMemory
 {
     #region Fields
 
@@ -17,24 +20,25 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
 
     private int _newLineSequenceLength;
 
+    private string _currentLine; // Store current line for Memory<char> access
+
     public override bool IsDisposed { get; protected set; }
 
     #endregion
 
     #region cTor
 
-    public PositionAwareStreamReaderSystem(Stream stream, EncodingOptions encodingOptions) : base(stream, encodingOptions)
+    public PositionAwareStreamReaderSystem (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : base(stream, encodingOptions, maximumLineLength)
     {
-
     }
 
     #endregion
 
     #region Public methods
 
-    public override string ReadLine()
+    public override string ReadLine ()
     {
-        StreamReader reader = GetStreamReader();
+        var reader = GetStreamReader();
 
         if (_newLineSequenceLength == 0)
         {
@@ -47,20 +51,63 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
         {
             MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
 
-            if (line.Length > MaxLineLen)
+            if (line.Length > MaximumLineLength)
             {
-                line = line.Remove(MaxLineLen);
+                line = line[..MaximumLineLength];
             }
         }
 
         return line;
     }
 
+    /// <summary>
+    /// Attempts to read the next line from the stream without allocating a new string.
+    /// The returned Memory&lt;char&gt; is valid until the next call to TryReadLine or ReturnMemory.
+    /// </summary>
+    public bool TryReadLine (out ReadOnlyMemory<char> lineMemory)
+    {
+        var reader = GetStreamReader();
+
+        if (_newLineSequenceLength == 0)
+        {
+            _newLineSequenceLength = GuessNewLineSequenceLength(reader);
+        }
+
+        var line = reader.ReadLine();
+
+        if (line != null)
+        {
+            MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
+
+            if (line.Length > MaximumLineLength)
+            {
+                line = line[..MaximumLineLength];
+            }
+
+            // Store line for Memory access
+            _currentLine = line;
+            lineMemory = line.AsMemory();
+            return true;
+        }
+
+        lineMemory = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Returns the memory buffer. For System reader, this is a no-op since we use string-backed Memory.
+    /// </summary>
+    public void ReturnMemory (ReadOnlyMemory<char> memory)
+    {
+        // No-op for System reader - string is already managed by GC
+        _currentLine = null;
+    }
+
     #endregion
 
     #region Private Methods
 
-    private int GuessNewLineSequenceLength(StreamReader reader)
+    private int GuessNewLineSequenceLength (StreamReader reader)
     {
         var currentPos = Position;
 
@@ -78,10 +125,15 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase
                     var secondChar = reader.Read();
                     if (secondChar == CHAR_LF) // check \n
                     {
-                        return Encoding.GetByteCount("\r\n");
+                        // Use stackalloc or SpanOwner instead of string
+                        Span<char> newline = ['\r', '\n'];
+                        return Encoding.GetByteCount(newline);
+                        //return Encoding.GetByteCount("\r\n");
                     }
                 }
-                return Encoding.GetByteCount(((char)firstChar).ToString());
+
+                Span<char> singleChar = [(char)firstChar];
+                return Encoding.GetByteCount(singleChar);
             }
 
             return 0;

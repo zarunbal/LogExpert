@@ -1,31 +1,56 @@
-﻿namespace LogExpert.Core.Entities;
+using ColumnizerLib;
 
-public class DefaultLogfileColumnizer : ILogLineColumnizer
+namespace LogExpert.Core.Entities;
+
+public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
 {
     #region ILogLineColumnizer Members
 
-    public string GetName()
+    public string GetName ()
     {
-        return "Default (single line)";
+        return Resources.LogExpert_DefaultLogfileColumnicer_Name;
     }
 
-    public string GetDescription()
+    public string GetDescription ()
     {
-        return "No column splitting. The whole line is displayed in a single column.";
+        return Resources.LogExpert_DefaultLogfileColumnicer_Description;
     }
 
-    public int GetColumnCount()
+    public int GetColumnCount ()
     {
         return 1;
     }
 
-    public string[] GetColumnNames()
+    public string[] GetColumnNames ()
     {
         return ["Text"];
     }
 
-    public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+    /// <summary>
+    /// Splits the specified log line into columns using the provided callback.
+    /// </summary>
+    /// <param name="callback">An object that provides callback methods for columnizing the log line. May be used to customize or influence the
+    /// columnization process.</param>
+    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the specified log line.</returns>
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
+        ArgumentNullException.ThrowIfNull(line);
+
+        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
+    }
+
+    /// <summary>
+    /// Splits the specified log line into columns using the provided callback.
+    /// </summary>
+    /// <param name="callback">A callback interface that can be used to customize or influence the columnization process. May be null if no
+    /// callback behavior is required.</param>
+    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
+    /// <returns>An object representing the columnized version of the specified log line.</returns>
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        ArgumentNullException.ThrowIfNull(line);
+
         ColumnizedLogLine cLogLine = new()
         {
             LogLine = line
@@ -40,42 +65,63 @@ public class DefaultLogfileColumnizer : ILogLineColumnizer
             }
         ];
 
-
         return cLogLine;
+    }
+
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    {
+        // No special handling needed for default columnizer
+        return DateTime.MinValue;
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        // No special handling needed for default columnizer
     }
 
     public string Text => GetName();
 
-    public Priority GetPriority(string fileName, IEnumerable<ILogLine> samples)
+    public static Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
+
         return Priority.CanSupport;
     }
     #endregion
 
     #region ILogLineColumnizer Not implemented Members
 
-    public bool IsTimeshiftImplemented()
+    public bool IsTimeshiftImplemented ()
     {
         return false;
     }
 
-    public void SetTimeOffset(int msecOffset)
+    public void SetTimeOffset (int msecOffset)
     {
-        throw new NotImplementedException();
+        // No special handling needed for default columnizer
     }
 
-    public int GetTimeOffset()
+    public int GetTimeOffset ()
     {
-        throw new NotImplementedException();
+        // No special handling needed for default columnizer
+        return int.MinValue;
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
-        throw new NotImplementedException();
+        // No special handling needed for default columnizer
+        return DateTime.MinValue;
     }
 
-    public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
+        // No special handling needed for default columnizer
+    }
+
+    public string GetCustomName ()
+    {
+        return GetName();
     }
 
     #endregion
