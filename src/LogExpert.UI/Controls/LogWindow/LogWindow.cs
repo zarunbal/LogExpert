@@ -2462,6 +2462,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             AdjustHighlightSplitterWidth();
             SetCurrentHighlightGroup(persistenceData.HighlightGroupName);
 
+            SetCellSelectionMode(persistenceData.CellSelectMode, true);
+
             if (persistenceData.MultiFileNames.Count > 0)
             {
                 //_logger.Info($"Detected MultiFile name list in persistence options");
@@ -2570,6 +2572,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 // FirstDisplayedScrollingRowIndex calculates sometimes the wrong scrolling ranges???
             }
+
+            SetCellSelectionMode(persistenceData.CellSelectMode, true);
 
             if (Preferences.SaveFilters)
             {
@@ -6293,11 +6297,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             FilterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed,
             FilterPosition = splitContainerLogWindow.SplitterDistance,
             FollowTail = _guiStateArgs.FollowTail,
+            CellSelectMode = _guiStateArgs.CellSelectMode,
             FileName = FileName,
             TabName = Text,
             SessionFileName = SessionFileName,
             Columnizer = CurrentColumnizer,
             LineCount = _logFileReader.LineCount
+
+
         };
 
         _filterParams.IsFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
@@ -7247,7 +7254,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
     }
 
-    public void SetCellSelectionMode (bool isCellMode)
+    public void SetCellSelectionMode (bool isCellMode, bool updateGUI = false)
     {
         if (isCellMode)
         {
@@ -7260,6 +7267,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         _guiStateArgs.CellSelectMode = isCellMode;
+
+        if (updateGUI)
+        {
+            SendGuiStateUpdate();
+        }
     }
 
     public void TimeshiftEnabled (bool isEnabled, string shiftValue)

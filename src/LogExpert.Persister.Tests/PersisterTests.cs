@@ -357,7 +357,8 @@ public class PersisterTests
             MultiFile = true,
             MultiFilePattern = "test*.log",
             MultiFileMaxDays = 7,
-            LineCount = 1000
+            LineCount = 1000,
+            CellSelectMode = true
         };
 
         // Act
@@ -377,6 +378,7 @@ public class PersisterTests
         Assert.That(loadedData.MultiFilePattern, Is.EqualTo(originalData.MultiFilePattern), "MultiFilePattern should match");
         Assert.That(loadedData.MultiFileMaxDays, Is.EqualTo(originalData.MultiFileMaxDays), "MultiFileMaxDays should match");
         Assert.That(loadedData.LineCount, Is.EqualTo(originalData.LineCount), "LineCount should match");
+        Assert.That(loadedData.CellSelectMode, Is.EqualTo(originalData.CellSelectMode), "CellSelectMode should match");
     }
 
     [Test]
