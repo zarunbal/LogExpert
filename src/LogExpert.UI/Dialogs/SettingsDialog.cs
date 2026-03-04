@@ -923,7 +923,8 @@ internal partial class SettingsDialog : Form
                             var markerPath = Path.Join(ConfigManager.PortableConfigDir, ConfigManager.PortableModeSettingsFileName);
                             if (!File.Exists(markerPath))
                             {
-                                using (File.Create(markerPath)) { }
+                                using (File.Create(markerPath)) 
+                                { }   
                             }
 
                             Preferences.PortableMode = true;

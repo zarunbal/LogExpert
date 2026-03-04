@@ -2054,15 +2054,15 @@ YY[YY] = 年
     <value>便携模式</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_CopySettingsQuestion" xml:space="preserve">
-    <value>无法激活便携模式：{0}</value>
-  </data>
-  <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
     <value>您想将当前设置复制到便携式配置文件夹吗？</value>
   </data>
+  <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
+    <value>您想要将可移植设置移回默认配置文件夹 (%APPDATA%\LogExpert) 吗？</value>
+  </data>
   <data name="SettingsDialog_UI_PortableMode_ActivationError" xml:space="preserve">
-    <value>某些文件无法迁移：{0}</value>
+    <value>无法激活便携模式：{0}</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
-    <value>您想要将可移植设置移回默认配置文件夹 (%APPDATA%\LogExpert) 吗？</value>
+    <value>某些文件无法迁移：{0}</value>
   </data>
 </root>
