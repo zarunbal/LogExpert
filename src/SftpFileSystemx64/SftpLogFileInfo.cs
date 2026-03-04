@@ -136,7 +136,17 @@ public class SftpLogFileInfo : ILogFileInfo
             return;
         }
 
-        OriginalLength = _lastLength = Length;
+        try
+        {
+            OriginalLength = _lastLength = Length;
+        }
+        catch (Exception e) when (e is SftpPathNotFoundException or
+                                       SftpPermissionDeniedException)
+        {
+            _logger.LogError(e.Message);
+            OriginalLength = _lastLength = -1;
+        }
+
     }
 
     #endregion
@@ -194,8 +204,17 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            var file = (SftpFile)_sftp.Get(_remoteFileName);
-            return file.Attributes.Size;
+            try
+            {
+                var file = (SftpFile)_sftp.Get(_remoteFileName);
+                return file.Attributes.Size;
+            }
+            catch (Exception e) when (e is SftpPathNotFoundException or
+                                           SftpPermissionDeniedException)
+            {
+                _logger.LogError(e.Message);
+                return -1;
+            }
         }
     }
 
