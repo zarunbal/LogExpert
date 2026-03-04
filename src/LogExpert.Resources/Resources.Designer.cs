@@ -5691,7 +5691,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some files could not be migrated: {0}.
+        ///   Looks up a localized string similar to Failed to activate portable mode: {0}.
         /// </summary>
         public static string SettingsDialog_UI_PortableMode_ActivationError {
             get {
@@ -5700,7 +5700,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to activate portable mode: {0}.
+        ///   Looks up a localized string similar to Do you want to copy your current settings to the portable configuration folder?.
         /// </summary>
         public static string SettingsDialog_UI_PortableMode_CopySettingsQuestion {
             get {
@@ -5709,7 +5709,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to move the portable settings back to the default configuration folder (%APPDATA%\LogExpert)?.
+        ///   Looks up a localized string similar to Some files could not be migrated: {0}.
         /// </summary>
         public static string SettingsDialog_UI_PortableMode_MigrationError {
             get {
@@ -5718,7 +5718,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to copy your current settings to the portable configuration folder?.
+        ///   Looks up a localized string similar to Do you want to move the portable settings back to the default configuration folder (%APPDATA%\LogExpert)?.
         /// </summary>
         public static string SettingsDialog_UI_PortableMode_MoveSettingsQuestion {
             get {
