@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
@@ -31,6 +32,8 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     private EminusConfigDlg dlg;
     private EminusConfig tmpConfig = new();
 
+    private static readonly SearchValues<char> _delimiters = SearchValues.Create(['(', '$', '<']);
+
     #endregion
 
     #region Properties
@@ -42,14 +45,14 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     #region Private Methods
 
     [SupportedOSPlatform("windows")]
-    private XmlDocument BuildParam (ILogLine line)
+    private XmlDocument BuildParam (ILogLineMemory line)
     {
         var fullLogLine = line.FullLine;
         // no Java stacktrace but some special logging of our applications at work:
-        if (fullLogLine.Contains(EXCEPTION_OF_TYPE, StringComparison.CurrentCulture) ||
-            fullLogLine.Contains(NESTED, StringComparison.CurrentCulture))
+        if (fullLogLine.Span.Contains(EXCEPTION_OF_TYPE, StringComparison.CurrentCulture) ||
+            fullLogLine.Span.Contains(NESTED, StringComparison.CurrentCulture))
         {
-            var pos = fullLogLine.IndexOf(CREATED_IN, StringComparison.OrdinalIgnoreCase);
+            var pos = fullLogLine.Span.IndexOf(CREATED_IN, StringComparison.OrdinalIgnoreCase);
 
             if (pos == -1)
             {
@@ -57,68 +60,74 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
             }
 
             pos += CREATED_IN.Length;
-            var endPos = fullLogLine.IndexOf(DOT, pos, StringComparison.OrdinalIgnoreCase);
+            var endPos = fullLogLine.Span[pos..].IndexOf(DOT, StringComparison.OrdinalIgnoreCase);
 
             if (endPos == -1)
             {
                 return null;
             }
 
-            var className = fullLogLine[pos..endPos];
-            pos = fullLogLine.IndexOf(DOUBLE_DOT, pos, StringComparison.OrdinalIgnoreCase);
+            var className = fullLogLine[pos..(pos + endPos)].Span;
+
+            var doubleDotPos = fullLogLine.Span[pos..].IndexOf(DOUBLE_DOT, StringComparison.OrdinalIgnoreCase);
+            if (doubleDotPos == -1)
+            {
+                return null;
+            }
+
+            pos += doubleDotPos;
+
+            var lineNum = fullLogLine[(pos + 1)..].Span;
+            var doc = BuildXmlDocument(className, lineNum);
+            return doc;
+        }
+
+        if (fullLogLine.Span.Contains(AT, StringComparison.OrdinalIgnoreCase))
+        {
+            var str = fullLogLine.Span.Trim();
+
+            ReadOnlySpan<char> className;
+
+            var pos = str.IndexOf(AT, StringComparison.OrdinalIgnoreCase) + 3;
+            str = str[pos..]; // remove 'at '
+            var idx = str.IndexOfAny(_delimiters);
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            if (str[idx] == '$')
+            {
+                className = str[..idx];
+            }
+            else
+            {
+                pos = str[..idx].LastIndexOf(DOT, StringComparison.OrdinalIgnoreCase);
+                if (pos == -1)
+                {
+                    return null;
+                }
+
+                className = str[..pos];
+            }
+
+            idx = str.LastIndexOf(DOUBLE_DOT, StringComparison.OrdinalIgnoreCase);
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            pos = str[idx..].IndexOf(')');
 
             if (pos == -1)
             {
                 return null;
             }
 
-            var lineNum = fullLogLine[(pos + 1)..];
-            var doc = BuildXmlDocument(className, lineNum);
-            return doc;
-        }
+            var lineNum = str.Slice(idx + 1, pos - 1);
 
-        if (fullLogLine.Contains(AT, StringComparison.OrdinalIgnoreCase))
-        {
-            var str = fullLogLine.Trim();
-            string className = null;
-            string lineNum = null;
-            var pos = str.IndexOf(AT, StringComparison.OrdinalIgnoreCase) + 3;
-            str = str[pos..]; // remove 'at '
-            var idx = str.IndexOfAny(['(', '$', '<']);
-
-            if (idx != -1)
-            {
-                if (str[idx] == '$')
-                {
-                    className = str[..idx];
-                }
-                else
-                {
-                    pos = str.LastIndexOf(DOT, idx, StringComparison.OrdinalIgnoreCase);
-                    if (pos == -1)
-                    {
-                        return null;
-                    }
-
-                    className = str[..pos];
-                }
-
-                idx = str.LastIndexOf(DOUBLE_DOT, StringComparison.OrdinalIgnoreCase);
-
-                if (idx == -1)
-                {
-                    return null;
-                }
-
-                pos = str.IndexOf(')', idx);
-
-                if (pos == -1)
-                {
-                    return null;
-                }
-
-                lineNum = str.Substring(idx + 1, pos - idx - 1);
-            }
             /*
              * <?xml version="1.0" encoding="UTF-8"?>
                 <loadclass>
@@ -137,7 +146,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     }
 
     [SupportedOSPlatform("windows")]
-    private XmlDocument BuildXmlDocument (string className, string lineNum)
+    private XmlDocument BuildXmlDocument (ReadOnlySpan<char> className, ReadOnlySpan<char> lineNum)
     {
         XmlDocument xmlDoc = new();
         _ = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
@@ -151,8 +160,8 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
 
         var elemClassName = xmlDoc.CreateElement("classname");
         var elemLineNum = xmlDoc.CreateElement("linenumber");
-        elemClassName.InnerText = className;
-        elemLineNum.InnerText = lineNum;
+        elemClassName.InnerText = className.ToString();
+        elemLineNum.InnerText = lineNum.ToString();
         _ = loadElement.AppendChild(elemClassName);
         _ = loadElement.AppendChild(elemLineNum);
         return xmlDoc;
@@ -169,7 +178,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     }
 
     [SupportedOSPlatform("windows")]
-    public string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline)
+    public string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLineMemory logline)
     {
         return linesCount == 1 && BuildParam(logline) != null
             ? Resources.Eminus_UI_GetMenuText_LoadClassInEclipse
@@ -182,7 +191,7 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
     }
 
     [SupportedOSPlatform("windows")]
-    public void MenuSelected (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline)
+    public void MenuSelected (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLineMemory logline)
     {
         if (linesCount != 1)
         {

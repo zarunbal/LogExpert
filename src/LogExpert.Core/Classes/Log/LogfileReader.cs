@@ -518,19 +518,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
     }
 
-    /// <summary>
-    /// Retrieves the log line at the specified zero-based line number.
-    /// </summary>
-    /// <remarks>This method blocks until the log line is available. If the specified line number is out of
-    /// range, an exception may be thrown.</remarks>
-    /// <param name="lineNum">The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
-    /// number of log lines.</param>
-    /// <returns>An object representing the log line at the specified index.</returns>
-    public ILogLine GetLogLine (int lineNum)
-    {
-        return GetLogLineInternal(lineNum).Result;
-    }
-
     //TODO Make Task Based
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
@@ -966,7 +953,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="lineNum">The zero-based line number of the log entry to retrieve.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the log line at the specified line
     /// number, or null if the file is deleted or the line does not exist.</returns>
-    private Task<ILogLine> GetLogLineInternal (int lineNum)
+    private Task<ILogLineMemory> GetLogLineInternal (int lineNum)
     {
         if (_isDeleted)
         {
@@ -997,7 +984,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             DowngradeDisposeLockFromWriterLock();
         }
 
-        var line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+        var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
         ReleaseDisposeUpgradeableReadLock();
         ReleaseBufferListReaderLock();
 

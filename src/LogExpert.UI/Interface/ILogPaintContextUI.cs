@@ -25,8 +25,6 @@ internal interface ILogPaintContextUI : ILogPaintContext
 
     #region Public methods
 
-    ILogLine GetLogLine (int lineNum);
-
     ILogLineMemory GetLogLineMemory (int lineNum);
 
     IColumnMemory GetCellValue (int rowIndex, int columnIndex);

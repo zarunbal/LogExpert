@@ -181,6 +181,15 @@ public class Util
         }
     }
 
+    public static unsafe int YetiLevenshtein (ReadOnlySpan<char> s1, ReadOnlySpan<char> s2)
+    {
+        fixed (char* p1 = s1)
+        fixed (char* p2 = s2)
+        {
+            return YetiLevenshtein(p1, s1.Length, p2, s2.Length, 0);
+        }
+    }
+
     public static unsafe int YetiLevenshtein (string s1, string s2, int substitutionCost)
     {
         var xc = substitutionCost - 1;

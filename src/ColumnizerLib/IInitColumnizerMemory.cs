@@ -16,7 +16,7 @@ namespace ColumnizerLib;
 /// retrieve specific lines.
 /// </para>
 /// </remarks>
-public interface IInitColumnizerMemory : IInitColumnizer
+public interface IInitColumnizerMemory
 {
     #region Public methods
 

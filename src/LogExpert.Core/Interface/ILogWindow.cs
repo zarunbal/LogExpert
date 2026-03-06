@@ -29,19 +29,6 @@ public interface ILogWindow
     /// </remarks>
     string GetCurrentFileName (int lineNum);
 
-    /// <summary>
-    /// Gets the log line at the specified line number.
-    /// </summary>
-    /// <param name="lineNum">The zero-based line number to retrieve.</param>
-    /// <returns>
-    /// An <see cref="ILogLine"/> object containing the line content and metadata,
-    /// or <c>null</c> if the line number is out of range or the line cannot be retrieved.
-    /// </returns>
-    /// <remarks>
-    /// This method retrieves lines from the internal buffer cache and may trigger
-    /// disk reads if the line is not currently cached.
-    /// </remarks>
-    ILogLine GetLine (int lineNum);
 
     /// <summary>
     /// Gets the log line at the specified line number asynchronously, with a timeout.

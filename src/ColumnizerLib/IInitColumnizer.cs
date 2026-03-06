@@ -16,6 +16,7 @@ namespace ColumnizerLib;
 /// retrieve specific lines.
 /// </para>
 /// </remarks>
+[Obsolete("This interface is deprecated. Use IInitColumnizerMemory instead and implement the Selected and DeSelected methods there.")]
 public interface IInitColumnizer
 {
     #region Public methods

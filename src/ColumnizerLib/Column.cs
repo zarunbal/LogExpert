@@ -41,10 +41,10 @@ public class Column : IColumnMemory
 
     public static IColumnMemory EmptyColumn { get; }
 
-    [Obsolete]
+    [Obsolete("Use IColumnizedLogLineMemory Parent Property")]
     IColumnizedLogLine IColumn.Parent { get; }
 
-    [Obsolete]
+    [Obsolete("Use ReadOnlyMemory<char> FullValue")]
     string IColumn.FullValue
     {
         get;

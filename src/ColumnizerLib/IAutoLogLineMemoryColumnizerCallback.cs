@@ -1,6 +1,6 @@
 namespace ColumnizerLib;
 
-public interface IAutoLogLineMemoryColumnizerCallback : IAutoLogLineColumnizerCallback
+public interface IAutoLogLineMemoryColumnizerCallback
 {
     /// <summary>
     /// Returns the log line with the given index (zero-based).

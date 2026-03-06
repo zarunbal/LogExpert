@@ -4,11 +4,29 @@ namespace ColumnizerLib;
 /// Defines a callback interface for retrieving memory-based representations of individual log lines by line number.
 /// </summary>
 /// <remarks>Implementations of this interface enable columnizers to access log line data in a memory-efficient
-/// format, which may improve performance when processing large log files. This interface extends <see
-/// cref="ILogLineColumnizerCallback"/> to provide additional capabilities for memory-based log line access.</remarks>
-public interface ILogLineMemoryColumnizerCallback : ILogLineColumnizerCallback
+/// format, which may improve performance when processing large log files.</remarks>
+public interface ILogLineMemoryColumnizerCallback
 {
     #region Public methods
+
+    /// <summary>
+    /// This property returns the current line number. That is the line number of the log line
+    /// a ILogLineColumnizer function is called for (e.g. the line that has to be painted).
+    /// </summary>
+    /// <returns>The current line number starting at 0</returns>
+    int LineNum { get; }
+
+    /// <summary>
+    /// Returns the full file name (path + name) of the current log file.
+    /// </summary>
+    /// <returns>File name of current log file</returns>
+    string GetFileName ();
+
+    /// <summary>
+    /// Returns the number of lines of the logfile.
+    /// </summary>
+    /// <returns>Number of lines.</returns>
+    int GetLineCount ();
 
     /// <summary>
     /// Retrieves the memory representation of the log line at the specified line number.

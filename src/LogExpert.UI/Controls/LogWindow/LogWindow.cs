@@ -28,6 +28,8 @@ using LogExpert.UI.Interface;
 
 using NLog;
 
+using Vanara.Extensions;
+
 using WeifenLuo.WinFormsUI.Docking;
 //using static LogExpert.PluginRegistry.PluginRegistry; //TODO: Adjust the instance name so using static can be used.
 
@@ -421,11 +423,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #endregion
 
     #region Public methods
-
-    public ILogLine GetLogLine (int lineNum)
-    {
-        return _logFileReader.GetLogLine(lineNum);
-    }
 
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
@@ -1007,7 +1004,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var line = _logFileReader.GetLogLine(e.RowIndex);
+        var line = _logFileReader.GetLogLineMemory(e.RowIndex);
         var offset = CurrentColumnizer.GetTimeOffset();
         CurrentColumnizer.SetTimeOffset(0);
         ColumnizerCallbackObject.SetLineNum(e.RowIndex);
@@ -1021,7 +1018,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var oldValue = cols.ColumnValues[e.ColumnIndex - 2].FullValue;
         var newValue = (string)e.Value;
         //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
+        //TODO OLD VALUE needs to be ReadOnlySpan<char>
+        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue.ToString());
         dataGridView.Refresh();
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
         var span = timeSpan.ToString();
@@ -1548,7 +1546,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var menuArgs = item.Tag as ContextMenuPluginEventArgs;
             var logLines = menuArgs.LogLines;
-            menuArgs.Entry.MenuSelected(logLines.Count, menuArgs.Columnizer, menuArgs.Callback.GetLogLine(logLines[0]));
+            menuArgs.Entry.MenuSelected(logLines.Count, menuArgs.Columnizer, menuArgs.Callback.GetLogLineMemory(logLines[0]));
         }
     }
 
@@ -3357,9 +3355,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CurrentColumnizer = columnizer;
         }
 
-        (oldColumnizer as IInitColumnizer)?.DeSelected(new ColumnizerCallback(this));
+        (oldColumnizer as IInitColumnizerMemory)?.DeSelected(new ColumnizerCallbackMemory(this));
 
-        (columnizer as IInitColumnizer)?.Selected(new ColumnizerCallback(this));
+        (columnizer as IInitColumnizerMemory)?.Selected(new ColumnizerCallbackMemory(this));
 
         SetColumnizer(columnizer, dataGridView);
         SetColumnizer(columnizer, filterGridView);
@@ -3951,7 +3949,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            var line = _logFileReader.GetLogLine(lineNum);
+            var line = _logFileReader.GetLogLineMemory(lineNum);
             if (line == null)
             {
                 return -1;
@@ -3962,7 +3960,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 Regex rex = new(searchParams.SearchText, searchParams.IsCaseSensitive
                                                     ? RegexOptions.None
                                                     : RegexOptions.IgnoreCase);
-                if (rex.IsMatch(line.FullLine))
+                if (rex.IsMatch(line.FullLine.ToString()))
                 {
                     return lineNum;
                 }
@@ -3971,14 +3969,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (searchParams.IsCaseSensitive)
                 {
-                    if (line.FullLine.Contains(searchParams.SearchText, StringComparison.Ordinal))
+                    if (line.FullLine.Span.Contains(searchParams.SearchText, StringComparison.Ordinal))
                     {
                         return lineNum;
                     }
                 }
                 else
                 {
-                    if (line.FullLine.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
+                    if (line.FullLine.Span.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
                     {
                         return lineNum;
                     }
@@ -5636,43 +5634,43 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PrepareDict ()
     {
         _lineHashList.Clear();
-        Regex regex = new("\\d");
-        Regex regex2 = new("\\S");
 
         var num = _logFileReader.LineCount;
         for (var i = 0; i < num; ++i)
         {
-            var msg = GetMsgForLine(i);
-            if (msg != null)
+            var msgMemory = GetMsgForLine(i);
+            if (!msgMemory.IsEmpty)
             {
-                msg = msg.ToLowerInvariant();
-                msg = regex.Replace(msg, "0");
-                msg = regex2.Replace(msg, " ");
-                var chars = msg.ToCharArray();
+                var span = msgMemory.Span;
                 var value = 0;
                 var numOfE = 0;
                 var numOfA = 0;
                 var numOfI = 0;
-                foreach (var t in chars)
+
+                foreach (var c in span)
                 {
-                    value += t;
-                    switch (t)
+                    var lower = char.ToLowerInvariant(c);
+
+                    // TODO: verify that the normalization semantics are correct and intended:
+                    // Normalize: \d → '0', then \S (non-whitespace) → ' '
+                    // Note: original applies \d first, then \S. Since '0' is non-whitespace,
+                    // digits also become ' '. Effectively ALL non-whitespace → ' '.
+                    // Verification is need that this is the intended behavior.
+                    // If \S was meant to be \s (whitespace → space) or \D (non-digit → space),
+                    // the hash semantics would differ significantly.
+                    var normalized = char.IsWhiteSpace(lower) ? lower : ' ';
+
+                    value += normalized;
+
+                    switch (lower)
                     {
-                        case 'e':
-                            numOfE++;
-                            break;
-                        case 'a':
-                            numOfA++;
-                            break;
-                        case 'i':
-                            numOfI++;
-                            break;
+                        case 'e': numOfE++; break;
+                        case 'a': numOfA++; break;
+                        case 'i': numOfI++; break;
                     }
                 }
 
-                value += numOfE * 30;
-                value += numOfA * 20;
-                value += numOfI * 10;
+                value += numOfE * 30 + numOfA * 20 + numOfI * 10;
                 _lineHashList.Add(value);
             }
         }
@@ -5714,10 +5712,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var threshold = _patternArgs.Fuzzy;
 
         var prepared = false;
-        Regex regex = null;
-        Regex regex2 = null;
         string msgToFind = null;
         var culture = CultureInfo.CurrentCulture;
+
+        char[] normalizedBuffer = null;
 
         var num = _logFileReader.LineCount;
         for (var i = startLine; i < num; ++i)
@@ -5738,30 +5736,50 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (!prepared)
                 {
-                    msgToFind = GetMsgForLine(srcLine);
-                    regex = ReplaceDigit();
-                    regex2 = ReplaceNonWordCharacters();
-                    msgToFind = msgToFind.ToLower(culture);
-                    msgToFind = regex.Replace(msgToFind, "0");
-                    msgToFind = regex2.Replace(msgToFind, " ");
+                    var srcMemory = GetMsgForLine(srcLine);
+                    msgToFind = string.Create(srcMemory.Length, srcMemory, static (dest, src) =>
+                    {
+                        var source = src.Span;
+                        for (var j = 0; j < source.Length; ++j)
+                        {
+                            var c = char.ToLowerInvariant(source[j]);
+                            dest[j] = char.IsDigit(c) ? '0'              // \d -> '0',
+                            : !char.IsLetterOrDigit(c) && c != '_' ? ' ' // \W -> ' '
+                                : c;
+                        }
+                    });
+
                     prepared = true;
                 }
 
-                var msg = GetMsgForLine(i);
-                if (msg != null)
+                var msgMemory = GetMsgForLine(i);
+                if (!msgMemory.IsEmpty)
                 {
-                    msg = regex.Replace(msg, "0");
-                    msg = regex2.Replace(msg, " ");
-                    var lenDiff = Math.Abs(msg.Length - msgToFind.Length);
+                    // Early length check — normalization preserves length, so check on span directly.
+                    // Both \d→'0' and \W→' ' are 1:1 char replacements, length is unchanged.
+                    var lenDiff = Math.Abs(msgMemory.Length - msgToFind.Length);
                     if (lenDiff > threshold)
                     {
-                        //this.similarCache[srcLine, i] = lenDiff;
                         continue;
                     }
 
-                    msg = msg.ToLower(culture);
-                    var distance = Util.YetiLevenshtein(msgToFind, msg);
-                    //this.similarCache[srcLine, i] = distance;
+                    if (normalizedBuffer == null || normalizedBuffer.Length < msgMemory.Length)
+                    {
+                        normalizedBuffer = new char[msgMemory.Length];
+                    }
+
+                    var normalized = normalizedBuffer.AsSpan(0, msgMemory.Length);
+
+                    var source = msgMemory.Span;
+                    for (var j = 0; j < source.Length; j++)
+                    {
+                        var c = char.ToLowerInvariant(source[j]);
+                        normalized[j] = char.IsDigit(c) ? '0'
+                                       : !char.IsLetterOrDigit(c) && c != '_' ? ' '
+                                       : c;
+                    }
+
+                    var distance = Util.YetiLevenshtein(msgToFind.AsSpan(), normalized);
                     if (distance < threshold)
                     {
                         return i;
@@ -5773,9 +5791,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return -1;
     }
 
-    private string GetMsgForLine (int i)
+    private ReadOnlyMemory<char> GetMsgForLine (int i)
     {
-        var line = _logFileReader.GetLogLine(i);
+        var line = _logFileReader.GetLogLineMemory(i);
         var columnizer = CurrentColumnizer;
         ColumnizerCallback callback = new(this);
         var cols = columnizer.SplitLine(callback, line);

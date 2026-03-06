@@ -34,7 +34,7 @@ public interface IContextMenuEntry
     /// </returns>
     string GetMenuText (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback);
 
-    string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline);
+    string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLineMemory logline);
 
 
     /// <summary>
@@ -48,7 +48,7 @@ public interface IContextMenuEntry
     ///     for retrieving log lines or pass it along to functions of the Columnizer if needed.</param>
     void MenuSelected (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback);
 
-    void MenuSelected (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLine logline);
+    void MenuSelected (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLineMemory logline);
 
     #endregion
 }

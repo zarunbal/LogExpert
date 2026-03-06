@@ -24,9 +24,9 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     private const string CONFIGFILENAME = "csvcolumnizer.json";
 
     private readonly IList<CsvColumn> _columnList = [];
-    private CsvColumnizerConfig _config;
+    private CsvColumnizerConfig _config = CreateDefaultConfig();
 
-    private ILogLine _firstLine;
+    private ILogLineMemory _firstLine;
 
     // if CSV is detected to be 'invalid' the columnizer will behave like a default columnizer
     private bool _isValidCsv;
@@ -41,6 +41,12 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
         return PreProcessLine(logLine.AsMemory(), lineNum, realLineNum).ToString();
     }
+    private static CsvColumnizerConfig CreateDefaultConfig ()
+    {
+        var config = new CsvColumnizerConfig();
+        config.InitDefaults();
+        return config;
+    }
 
     public ReadOnlyMemory<char> PreProcessLine (ReadOnlyMemory<char> logLine, int lineNum, int realLineNum)
     {
@@ -49,7 +55,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
             // store for later field names and field count retrieval
             _firstLine = new CsvLogLine(logLine, 0);
 
-            if (_config.MinColumns > 0)
+            if (_config != null && _config.MinColumns > 0)
             {
                 using CsvReader csv = new(new StringReader(logLine.ToString()), _config.ReaderConfiguration);
                 if (csv.Parser.Count < _config.MinColumns)
@@ -191,7 +197,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
             if (line != null)
             {
-                using CsvReader csv = new(new StringReader(line.FullLine), _config.ReaderConfiguration);
+                using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
                 _ = csv.Read();
                 _ = csv.ReadHeader();
 
