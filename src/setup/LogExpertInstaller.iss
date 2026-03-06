@@ -146,6 +146,7 @@ Source: "{#ReleaseFolder}\files\json\usedComponents.json"; DestDir: "{app}\files
 Source: "{#ReleaseFolder}\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\LogExpert.deps.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\de\LogExpert.Configuration.resources.dll"; DestDir: "{app}\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.Configuration.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
