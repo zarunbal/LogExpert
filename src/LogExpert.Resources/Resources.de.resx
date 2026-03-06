@@ -2134,18 +2134,18 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
     <value>TabController ist bereits mit einem DockPanel initialisiert</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_Title" xml:space="preserve">
-    <value>Tragbarer Modus</value>
+    <value>Portable Modus</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_CopySettingsQuestion" xml:space="preserve">
-    <value>Der tragbare Modus konnte nicht aktiviert werden: {0}</value>
+    <value>Möchten Sie Ihre aktuellen Einstellungen in den Portable-Modus Konfigurationsordner kopieren?</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_MoveSettingsQuestion" xml:space="preserve">
-    <value>Möchten Sie Ihre aktuellen Einstellungen in den tragbaren Konfigurationsordner kopieren?</value>
+    <value>Möchten Sie die tragbaren Einstellungen zurück in den Standardkonfigurationsordner (%APPDATA%\LogExpert) verschieben?</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_ActivationError" xml:space="preserve">
-    <value>Einige Dateien konnten nicht migriert werden: {0}</value>
+    <value>Der Portable Modus konnte nicht aktiviert werden: {0}</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
-    <value>Möchten Sie die tragbaren Einstellungen zurück in den Standardkonfigurationsordner (%APPDATA%\LogExpert) verschieben?</value>
+    <value>Einige Dateien konnten nicht migriert werden: {0}</value>
   </data>
 </root>
