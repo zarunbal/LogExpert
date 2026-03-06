@@ -4,7 +4,6 @@
 #include "CodeDependencies.iss"
 
 #define AppName "LogExpert"
-#define AppVersion "1.21.0"
 #define AppURL "https://github.com/LogExperts/LogExpert"
 #define AppExeName "LogExpert.exe"
 
@@ -12,6 +11,13 @@
 #define AppPath SourcePath
 #define SetupName "LogExpert.Installer"
 #define ReleaseFolder = "..\..\bin\Release"
+
+; AppVersion can be passed via command line (e.g., iscc /dAppVersion="1.21.0").
+; The Nuke build system does this automatically using GitVersion.
+; If not provided, it is read from the built executable's file version.
+#ifndef AppVersion
+  #define AppVersion GetFileVersion(AddBackslash(SourcePath) + ReleaseFolder + "\" + AppExeName)
+#endif
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -186,6 +192,12 @@ Source: "{#ReleaseFolder}\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll"; DestDir
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+
+[InstallDelete]
+;DELETE ALL DLLs and PDBs and EXEs
+Type: files; Name: "{app}\*.dll"
+Type: files; Name: "{app}\*.pdb"
+Type: files; Name: "{app}\*.exe"
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

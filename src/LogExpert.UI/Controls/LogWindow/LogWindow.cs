@@ -6302,7 +6302,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             TabName = Text,
             SessionFileName = SessionFileName,
             Columnizer = CurrentColumnizer,
-            LineCount = _logFileReader.LineCount
+            LineCount = _logFileReader != null ? _logFileReader.LineCount : 0
 
 
         };

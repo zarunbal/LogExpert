@@ -26,11 +26,13 @@ Summary of (most) features:
 
 ## Download
 
-Follow the [Link](https://github.com/LogExperts/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
-
-Or Install via chocolatey
-
-```choco install logexpert```
+* Follow the [Link](https://github.com/LogExperts/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
+* Install via chocolatey
+  ```choco install logexpert```
+* get the Nuget package [Link](https://www.nuget.org/packages/logexpert)
+  ```dotnet add package logexpert --version 1.30.0```
+* the ColumnizerLib can also be downloaded via nuget [Link](https://www.nuget.org/packages/ColumnizerLib)
+  ```dotnet add package ColumnizerLib --version 1.21.0```
 
 Requirements
 
