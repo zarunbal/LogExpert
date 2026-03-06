@@ -192,13 +192,7 @@ Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(
 
 [Code]
 function InitializeSetup(): Boolean;
-var ErrCode: integer;
 begin
-    if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 0) then begin
-      if MsgBox('.net 10 64Bit is missing do you want to download it from https://dotnet.microsoft.com/download/dotnet/10.0 ?', mbConfirmation, MB_YESNO) = IDYES then
-      begin
-        ShellExecAsOriginalUser('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOW, ewNoWait, ErrCode);
-      end;
-    end;
+    Dependency_AddDotNet100Desktop;
     Result := True;
 end;
