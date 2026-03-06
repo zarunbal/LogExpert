@@ -152,6 +152,7 @@ Source: "{#ReleaseFolder}\files\json\usedComponents.json"; DestDir: "{app}\files
 Source: "{#ReleaseFolder}\LogExpert.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\LogExpert.deps.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\de\LogExpert.Configuration.resources.dll"; DestDir: "{app}\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.Configuration.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -203,13 +204,7 @@ Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(
 
 [Code]
 function InitializeSetup(): Boolean;
-var ErrCode: integer;
 begin
-    if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 0) then begin
-      if MsgBox('.net 10 64Bit is missing do you want to download it from https://dotnet.microsoft.com/download/dotnet/10.0 ?', mbConfirmation, MB_YESNO) = IDYES then
-      begin
-        ShellExecAsOriginalUser('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOW, ewNoWait, ErrCode);
-      end;
-    end;
+    Dependency_AddDotNet100Desktop;
     Result := True;
 end;
