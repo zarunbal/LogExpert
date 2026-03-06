@@ -12,9 +12,5 @@ internal class Log4JLogLine (ReadOnlyMemory<char> fullLine, ReadOnlyMemory<char>
 
     public ReadOnlyMemory<char> Text { get; } = text;
 
-    string ITextValue.Text => FullLine.ToString();
-
-    string ILogLine.FullLine { get; }
-
     #endregion
 }

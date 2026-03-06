@@ -29,15 +29,7 @@ public class MockColumnizer : ILogLineMemoryColumnizer
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
     public string GetColumnName (int column) => "Col";
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
-    public string GetColumnValue (ILogLine line, int column) => "";
-
     public bool IsTimeshiftImplemented () => false;
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
-    public void PushValue (ILogLine line, int column, string value) { }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit Test")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Unit Test")]
@@ -53,26 +45,15 @@ public class MockColumnizer : ILogLineMemoryColumnizer
 
     public string[] GetColumnNames () => throw new NotImplementedException();
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
-
     public void SetTimeOffset (int msecOffset) => throw new NotImplementedException();
 
     public int GetTimeOffset () => throw new NotImplementedException();
-
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine) => throw new NotImplementedException();
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 
     public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine) => throw new NotImplementedException();
 
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine) => throw new NotImplementedException();
 
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
-
-    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback, logLine);
-    }
 }
 
 public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
@@ -94,17 +75,11 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
 
     public string[] GetColumnNames () => ["Column1"];
 
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line) => throw new NotImplementedException();
-
     public bool IsTimeshiftImplemented () => false;
 
     public void SetTimeOffset (int msecOffset) => throw new NotImplementedException();
 
     public int GetTimeOffset () => throw new NotImplementedException();
-
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine) => throw new NotImplementedException();
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
 
     public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
@@ -119,11 +94,6 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
         throw new NotImplementedException();
-    }
-
-    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback, logLine);
     }
 }
 

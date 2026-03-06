@@ -128,11 +128,6 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
             : CreateColumnizedLogLine(logLine);
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
     private static ColumnizedLogLine CreateColumnizedLogLine (ILogLineMemory line)
     {
         ColumnizedLogLine cLogLine = new()
@@ -159,17 +154,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        throw new NotImplementedException();
-    }
-
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
         throw new NotImplementedException();
     }
@@ -177,11 +162,6 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
         throw new NotImplementedException();
-    }
-
-    public void Selected (ILogLineColumnizerCallback callback)
-    {
-        Selected(callback as ILogLineMemoryColumnizerCallback);
     }
 
     public void Selected (ILogLineMemoryColumnizerCallback callback)
@@ -226,16 +206,6 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     public void DeSelected (ILogLineMemoryColumnizerCallback callback)
     {
         // nothing to do
-    }
-
-    public void DeSelected (ILogLineColumnizerCallback callback)
-    {
-        // nothing to do
-    }
-
-    public void Configure (ILogLineColumnizerCallback callback, string configDir)
-    {
-        Configure(callback as ILogLineMemoryColumnizerCallback, configDir);
     }
 
     public void Configure (ILogLineMemoryColumnizerCallback callback, string configDir)
@@ -293,20 +263,6 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                 _config.InitDefaults();
             }
         }
-    }
-
-    public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
-
-        var result = Priority.NotSupport;
-
-        if (fileName.EndsWith("csv", StringComparison.OrdinalIgnoreCase))
-        {
-            result = Priority.CanSupport;
-        }
-
-        return result;
     }
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)

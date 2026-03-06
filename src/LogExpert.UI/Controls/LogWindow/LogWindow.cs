@@ -18,9 +18,8 @@ using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
-using LogExpert.Entities;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -432,11 +431,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogLineMemory GetLogLineMemoryWithWait (int lineNum)
     {
         return _logFileReader.GetLogLineMemoryWithWait(lineNum).Result;
-    }
-
-    public ILogLine GetLogLineWithWait (int lineNum)
-    {
-        return _logFileReader.GetLogLineWithWait(lineNum).Result;
     }
 
     public Bookmark GetBookmarkForLine (int lineNum)
@@ -7694,13 +7688,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
             ? _logFileReader.GetLogLineMemory(dataGridView.CurrentRow.Index)
             : null;
-    }
-
-    public ILogLine GetLine (int lineNum)
-    {
-        return lineNum < 0 || _logFileReader == null || lineNum >= _logFileReader.LineCount
-            ? null
-            : _logFileReader.GetLogLineMemory(lineNum);
     }
 
     public ILogLineMemory GetLineMemory (int lineNum)

@@ -24,16 +24,6 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
         return _timeOffset;
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
-    }
-
     public string GetName ()
     {
         return "Timestamp Columnizer";
@@ -54,11 +44,6 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     public string[] GetColumnNames ()
     {
         return ["Date", "Time", "Message"];
-    }
-
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     /// <summary>

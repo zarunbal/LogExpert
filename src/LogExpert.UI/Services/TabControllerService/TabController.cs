@@ -3,7 +3,6 @@ using System.Runtime.Versioning;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Interface;
-using LogExpert.UI.Interface.Services;
 
 using WeifenLuo.WinFormsUI.Docking;
 

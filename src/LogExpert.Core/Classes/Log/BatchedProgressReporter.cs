@@ -8,10 +8,11 @@ namespace LogExpert.Core.Classes.Log;
 /// Batches progress updates to reduce UI thread marshalling overhead.
 /// Collects updates in a thread-safe queue and processes them on a timer.
 /// </summary>
+//TODO Refactor
 public sealed class BatchedProgressReporter : IDisposable
 {
     private readonly ConcurrentQueue<LoadFileEventArgs> _progressQueue = new();
-    private readonly System.Threading.Timer _timer;
+    private readonly Timer _timer;
     private readonly Action<LoadFileEventArgs> _progressCallback;
     private readonly int _updateIntervalMs;
     private bool _disposed;

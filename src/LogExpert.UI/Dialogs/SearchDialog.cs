@@ -2,8 +2,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 
+using LogExpert.Core.Entities;
 using LogExpert.Core.Helpers;
-using LogExpert.Entities;
 using LogExpert.UI.Dialogs;
 
 namespace LogExpert.Dialogs;

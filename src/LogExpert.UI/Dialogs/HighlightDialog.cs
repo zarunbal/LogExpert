@@ -9,7 +9,7 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Helpers;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;

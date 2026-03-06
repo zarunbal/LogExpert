@@ -7,7 +7,7 @@ using LogExpert.Core.Classes.xml;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using NLog;
 
@@ -539,41 +539,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     /// <param name="lineNum">line to retrieve</param>
     /// <returns></returns>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Constants always UpperCase")]
-    public async Task<ILogLine> GetLogLineWithWait (int lineNum)
-    {
-        const int WAIT_TIME = 1000;
-
-        ILogLine result = null;
-
-        if (!_isFastFailOnGetLogLine)
-        {
-            var task = Task.Run(() => GetLogLineInternal(lineNum));
-            if (task.Wait(WAIT_TIME))
-            {
-                result = task.Result;
-                _isFastFailOnGetLogLine = false;
-            }
-            else
-            {
-                _isFastFailOnGetLogLine = true;
-                _logger.Debug(CultureInfo.InvariantCulture, "No result after {0}ms. Returning <null>.", WAIT_TIME);
-            }
-        }
-        else
-        {
-            _logger.Debug(CultureInfo.InvariantCulture, "Fast failing GetLogLine()");
-            if (!_isFailModeCheckCallPending)
-            {
-                _isFailModeCheckCallPending = true;
-                var logLine = await GetLogLineInternal(lineNum).ConfigureAwait(true);
-                GetLineFinishedCallback(logLine);
-            }
-        }
-
-        return result;
-    }
-
     public async Task<ILogLineMemory> GetLogLineMemoryWithWait (int lineNum)
     {
         ILogLineMemory result = null;
@@ -953,44 +918,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="lineNum">The zero-based line number of the log entry to retrieve.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the log line at the specified line
     /// number, or null if the file is deleted or the line does not exist.</returns>
-    private Task<ILogLineMemory> GetLogLineInternal (int lineNum)
-    {
-        if (_isDeleted)
-        {
-            _logger.Debug(CultureInfo.InvariantCulture, "Returning null for line {0} because file is deleted.", lineNum);
-            // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
-            return null;
-        }
-
-        AcquireBufferListReaderLock();
-        var logBuffer = GetBufferForLine(lineNum);
-        if (logBuffer == null)
-        {
-            ReleaseBufferListReaderLock();
-            _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
-            return null;
-        }
-
-        // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-        AcquireDisposeLockUpgradableReadLock();
-        if (logBuffer.IsDisposed)
-        {
-            UpgradeDisposeLockToWriterLock();
-            lock (logBuffer.FileInfo)
-            {
-                ReReadBuffer(logBuffer);
-            }
-
-            DowngradeDisposeLockFromWriterLock();
-        }
-
-        var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
-        ReleaseDisposeUpgradeableReadLock();
-        ReleaseBufferListReaderLock();
-
-        return Task.FromResult(line);
-    }
-
     private Task<ILogLineMemory> GetLogLineMemoryInternal (int lineNum)
     {
         if (_isDeleted)
@@ -1727,22 +1654,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 #endif
         ReleaseBufferListReaderLock();
         return logBuffer;
-    }
-
-    /// <summary>
-    /// Handles the completion of a log line retrieval operation and updates internal state flags accordingly.
-    /// </summary>
-    /// <param name="line">The log line that was retrieved. Can be null if the operation did not return a line.</param>
-    private void GetLineFinishedCallback (ILogLine line)
-    {
-        _isFailModeCheckCallPending = false;
-        if (line != null)
-        {
-            _logger.Debug(CultureInfo.InvariantCulture, "'isFastFailOnGetLogLine' flag was reset");
-            _isFastFailOnGetLogLine = false;
-        }
-
-        _logger.Debug(CultureInfo.InvariantCulture, "'isLogLineCallPending' flag was reset.");
     }
 
     private void GetLineMemoryFinishedCallback (ILogLineMemory line)

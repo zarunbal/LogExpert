@@ -645,7 +645,7 @@
         <value>Pasted on {0}</value>
     </data>
   <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
-        <value>Insufficient rights {0}: {1} </value>
+        <value>Insufficient rights {0}: {1}</value>
     </data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
         <value>Error during {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>

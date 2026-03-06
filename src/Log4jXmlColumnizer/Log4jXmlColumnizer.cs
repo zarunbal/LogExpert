@@ -43,11 +43,6 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
         return _xmlConfig;
     }
 
-    public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
-    {
-        return GetLineTextForClipboard(logLine as ILogLineMemory, callback as ILogLineMemoryColumnizerCallback);
-    }
-
     public ILogLineMemory GetLineTextForClipboard (ILogLineMemory logLine, ILogLineMemoryColumnizerCallback callback)
     {
         ArgumentNullException.ThrowIfNull(logLine);
@@ -78,39 +73,34 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
         return _config.ActiveColumnNames;
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
-    }
-
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
-        ArgumentNullException.ThrowIfNull(line);
+        ArgumentNullException.ThrowIfNull(logLine);
         ArgumentNullException.ThrowIfNull(callback);
 
         ColumnizedLogLine clogLine = new()
         {
-            LogLine = line
+            LogLine = logLine
         };
 
         var columns = Column.CreateColumns(COLUMN_COUNT, clogLine);
 
         // If the line is too short (i.e. does not follow the format for this columnizer) return the whole line content
         // in colum 8 (the log message column). Date and time column will be left blank.
-        if (line.FullLine.Length < 15)
+        if (logLine.FullLine.Length < 15)
         {
-            columns[8].FullValue = line.FullLine;
+            columns[8].FullValue = logLine.FullLine;
         }
         else
         {
             try
             {
-                var dateTime = GetTimestamp(callback, line);
+                var dateTime = GetTimestamp(callback, logLine);
 
                 if (dateTime == DateTime.MinValue)
                 {
-                    columns[8].FullValue = line.FullLine;
+                    columns[8].FullValue = logLine.FullLine;
                 }
 
                 var newDate = dateTime.ToString(DATETIME_FORMAT, CultureInfo.InvariantCulture);
@@ -126,7 +116,7 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
             var timestmp = columns[0];
 
             ReadOnlyMemory<char>[] cols;
-            cols = SplitMemory(line.FullLine, trimChars[0], COLUMN_COUNT);
+            cols = SplitMemory(logLine.FullLine, trimChars[0], COLUMN_COUNT);
 
             if (cols.Length != COLUMN_COUNT)
             {
@@ -138,7 +128,7 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
                 columns[5].FullValue = ReadOnlyMemory<char>.Empty;
                 columns[6].FullValue = ReadOnlyMemory<char>.Empty;
                 columns[7].FullValue = ReadOnlyMemory<char>.Empty;
-                columns[8].FullValue = line.FullLine;
+                columns[8].FullValue = logLine.FullLine;
             }
             else
             {
@@ -171,11 +161,6 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
     public int GetTimeOffset ()
     {
         return _timeOffset;
-    }
-
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
@@ -227,11 +212,6 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
         }
     }
 
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
-    }
-
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
         if (column == 0)
@@ -264,11 +244,6 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
         }
     }
 
-    public void Configure (ILogLineColumnizerCallback callback, string configDir)
-    {
-        Configure(callback as ILogLineMemoryColumnizerCallback, configDir);
-    }
-
     public void LoadConfig (string configDir)
     {
         var configPath = Path.Join(configDir, "log4jxmlcolumnizer.json");
@@ -296,11 +271,6 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
                 _config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
             }
         }
-    }
-
-    public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        return GetPriority(fileName, samples.Select(line => (ILogLineMemory)line));
     }
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)

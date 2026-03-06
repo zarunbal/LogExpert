@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.UI.Interface;
 

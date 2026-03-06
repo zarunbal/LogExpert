@@ -16,7 +16,6 @@ public class LogBuffer
 
     private readonly List<ILogLineMemory> _lineList = [];
 
-    private readonly IList<ILogLine> _logLines = [];
     private int MAX_LINES = 500;
     private long _size;
 
@@ -86,14 +85,12 @@ public class LogBuffer
 
     public void ClearLines ()
     {
-        _logLines.Clear();
         _lineList.Clear();
         LineCount = 0;
     }
 
     public void DisposeContent ()
     {
-        _logLines.Clear();
         _lineList.Clear();
         IsDisposed = true;
 #if DEBUG

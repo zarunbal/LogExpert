@@ -1,9 +1,9 @@
-﻿using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Entities;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.EventArguments;
 
-public class CurrentHighlightGroupChangedEventArgs(ILogWindow logWindow, HighlightGroup currentGroup)
+public class CurrentHighlightGroupChangedEventArgs (ILogWindow logWindow, HighlightGroup currentGroup) : EventArgs
 {
     #region Properties
 

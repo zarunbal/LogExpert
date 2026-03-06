@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using Moq;
 

@@ -1,6 +1,6 @@
 using LogExpert.Core.Entities;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// To be implemented by the bookmark window. Will be informed from LogWindow about changes in bookmarks.

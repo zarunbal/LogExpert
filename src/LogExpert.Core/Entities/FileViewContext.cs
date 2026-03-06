@@ -1,4 +1,4 @@
-﻿using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Entities;
 

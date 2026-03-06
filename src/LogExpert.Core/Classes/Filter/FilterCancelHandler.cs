@@ -1,6 +1,6 @@
 using System.Globalization;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using NLog;
 

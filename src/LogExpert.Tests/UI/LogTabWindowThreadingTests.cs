@@ -1,7 +1,7 @@
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Config;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Extensions.LogWindow;
 
 using Moq;

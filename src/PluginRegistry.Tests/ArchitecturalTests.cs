@@ -1,4 +1,3 @@
-using LogExpert.PluginRegistry;
 using LogExpert.PluginRegistry.Events;
 using LogExpert.PluginRegistry.Interfaces;
 
@@ -164,6 +163,7 @@ public class ArchitecturalTests
     }
 
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "Unit Tests")]
     public void PluginLogger_LogsMessages_WithoutException ()
     {
         // Arrange

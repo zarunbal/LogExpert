@@ -87,7 +87,7 @@ public class PluginValidatorTests
         CreateValidManifest(manifestPath, "TestPlugin");
 
         // Act
-        var result = PluginValidator.ValidatePlugin(pluginPath, out var manifest);
+        var result = PluginValidator.ValidatePlugin(pluginPath, out var _);
 
         // Assert
         Assert.That(result, Is.True.Or.False); // Depends on actual validation logic
@@ -434,7 +434,7 @@ public class PluginValidatorTests
     public void Initialize_WithNull_ThrowsArgumentException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PluginValidator.Initialize(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => PluginValidator.Initialize(null!));
     }
 
     [Test]
@@ -442,7 +442,7 @@ public class PluginValidatorTests
     public void Initialize_WithEmptyString_ThrowsArgumentException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PluginValidator.Initialize(string.Empty));
+        _ = Assert.Throws<ArgumentException>(() => PluginValidator.Initialize(string.Empty));
     }
 
     [Test]
@@ -450,7 +450,7 @@ public class PluginValidatorTests
     public void Initialize_WithWhitespace_ThrowsArgumentException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PluginValidator.Initialize("   "));
+        _ = Assert.Throws<ArgumentException>(() => PluginValidator.Initialize("   "));
     }
 
     [Test]
@@ -490,6 +490,7 @@ public class PluginValidatorTests
 
     [Test]
     [Description("Initialize should handle directory without trusted-plugins.json gracefully")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void Initialize_WithoutTrustedPluginsFile_HandlesGracefully ()
     {
         // Arrange - Directory with no config file

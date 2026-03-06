@@ -5,7 +5,7 @@ using BenchmarkDotNet.Running;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Benchmarks;
 

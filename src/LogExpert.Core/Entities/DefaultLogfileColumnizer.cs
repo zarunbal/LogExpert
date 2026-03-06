@@ -29,38 +29,24 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
     /// <summary>
     /// Splits the specified log line into columns using the provided callback.
     /// </summary>
-    /// <param name="callback">An object that provides callback methods for columnizing the log line. May be used to customize or influence the
-    /// columnization process.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized version of the specified log line.</returns>
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        ArgumentNullException.ThrowIfNull(line);
-
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
-    }
-
-    /// <summary>
-    /// Splits the specified log line into columns using the provided callback.
-    /// </summary>
     /// <param name="callback">A callback interface that can be used to customize or influence the columnization process. May be null if no
     /// callback behavior is required.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
+    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
     /// <returns>An object representing the columnized version of the specified log line.</returns>
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
-        ArgumentNullException.ThrowIfNull(line);
+        ArgumentNullException.ThrowIfNull(logLine);
 
         ColumnizedLogLine cLogLine = new()
         {
-            LogLine = line
+            LogLine = logLine
         };
 
         cLogLine.ColumnValues =
         [
             new Column
             {
-                FullValue = line.FullLine,
+                FullValue = logLine.FullLine,
                 Parent = cLogLine
             }
         ];
@@ -68,7 +54,7 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
         return cLogLine;
     }
 
-    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         // No special handling needed for default columnizer
         return DateTime.MinValue;
@@ -81,7 +67,7 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
 
     public string Text => GetName();
 
-    public static Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
+    public static Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
         ArgumentNullException.ThrowIfNull(samples, nameof(samples));
@@ -106,17 +92,6 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
     {
         // No special handling needed for default columnizer
         return int.MinValue;
-    }
-
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        // No special handling needed for default columnizer
-        return DateTime.MinValue;
-    }
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        // No special handling needed for default columnizer
     }
 
     public string GetCustomName ()

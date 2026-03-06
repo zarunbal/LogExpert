@@ -10,7 +10,7 @@ using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using Newtonsoft.Json;
 

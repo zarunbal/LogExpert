@@ -1,7 +1,5 @@
 using ColumnizerLib;
 
-using LogExpert.PluginRegistry;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -19,6 +17,7 @@ public class PerformanceTests
     }
 
     [TearDown]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void Teardown ()
     {
         if (Directory.Exists(_testPluginDirectory))
@@ -223,7 +222,7 @@ public class PerformanceTests
         var pluginPath = "nonexistent.dll";
 
         // Act
-        var result = await cache.LoadPluginWithCacheAsync(pluginPath);
+        var result = await cache.LoadPluginWithCacheAsync(pluginPath).ConfigureAwait(false);
 
         // Assert
         Assert.That(result.Success, Is.False);

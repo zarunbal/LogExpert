@@ -66,6 +66,8 @@ public class Log4jXmlColumnizerConfig
 
     public void FillDefaults (string[] columnNames)
     {
+        ArgumentNullException.ThrowIfNull(columnNames, nameof(columnNames));
+
         ColumnList.Clear();
         for (var i = 0; i < columnNames.Length; ++i)
         {

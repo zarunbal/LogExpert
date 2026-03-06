@@ -1,4 +1,4 @@
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Represents a log tab window that can display and manage log files.

@@ -1,14 +1,14 @@
 namespace ColumnizerLib;
 
-public interface IColumnMemory : IColumn, ITextValueMemory
+public interface IColumnMemory : ITextValueMemory
 {
     #region Properties
 
-    new IColumnizedLogLineMemory Parent { get; }
+    IColumnizedLogLineMemory Parent { get; }
 
-    new ReadOnlyMemory<char> FullValue { get; }
+    ReadOnlyMemory<char> FullValue { get; }
 
-    new ReadOnlyMemory<char> DisplayValue { get; }
+    ReadOnlyMemory<char> DisplayValue { get; }
 
     #endregion
 }

@@ -3,7 +3,6 @@ using System.Drawing;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Entities;
 
 namespace LogExpert.Core.Config;
 
