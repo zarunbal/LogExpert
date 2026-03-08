@@ -4,7 +4,7 @@ using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Callback;
 
-public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback, ICloneable
+public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback
 {
     #region Fields
     private readonly ILogWindow _logWindow = logWindow;
@@ -28,7 +28,7 @@ public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnize
 
     #region Public methods
 
-    public object Clone ()
+    public ColumnizerCallback Clone ()
     {
         return new ColumnizerCallback(this);
     }
