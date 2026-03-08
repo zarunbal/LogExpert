@@ -1,7 +1,6 @@
 using System.Reflection;
 
 using LogExpert.Configuration;
-using LogExpert.Core.Config;
 
 using NUnit.Framework;
 
@@ -19,7 +18,6 @@ public class ConfigManagerPortableModeTests
     private ConfigManager _configManager;
 
     [SetUp]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void SetUp ()
     {
         // Create isolated test directory for each test
@@ -71,7 +69,6 @@ public class ConfigManagerPortableModeTests
     /// <summary>
     /// Resets ConfigManager singleton initialization state via reflection.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     private void ResetConfigManagerInitialization ()
     {
         var isInitializedField = typeof(ConfigManager).GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -121,7 +118,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("PortableConfigDir should return {AppDir}/configuration/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void PortableConfigDir_ReturnsConfigurationSubdirectory ()
     {
         // Act
@@ -139,7 +135,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("PortableSessionDir should return {AppDir}/configuration/sessions/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void PortableSessionDir_ReturnsSessionsSubdirectory ()
     {
         // Act
@@ -157,7 +152,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveConfigDir should return ConfigDir when portable mode is off")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveConfigDir_NormalMode_ReturnsConfigDir ()
     {
         // Arrange
@@ -173,7 +167,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveConfigDir should return PortableConfigDir when portable mode is on")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveConfigDir_PortableMode_ReturnsPortableConfigDir ()
     {
         // Arrange
@@ -189,7 +182,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveConfigDir should toggle when PortableMode changes")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveConfigDir_TogglesWithPortableMode ()
     {
         // Arrange & Act - Start in normal mode
@@ -218,7 +210,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveSessionDir should return {AppDir}/sessionFiles when portable mode is off")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveSessionDir_NormalMode_ReturnsSessionFilesSubdirectory ()
     {
         // Arrange
@@ -235,7 +226,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveSessionDir should return PortableSessionDir when portable mode is on")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveSessionDir_PortableMode_ReturnsPortableSessionDir ()
     {
         // Arrange
@@ -251,7 +241,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("ActiveSessionDir should toggle when PortableMode changes")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void ActiveSessionDir_TogglesWithPortableMode ()
     {
         // Arrange & Act - Start in normal mode
@@ -281,7 +270,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should move settings.json from app root to configuration/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_MovesSettingsFromAppRoot ()
     {
         // Arrange - Create settings.json in app root (old location)
@@ -300,7 +288,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should move files from old portable/ directory")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_MovesFilesFromOldPortableDir ()
     {
         // Arrange - Create old portable directory with marker and config file
@@ -324,7 +311,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should move sessionFiles to configuration/sessions/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_MovesSessionFiles ()
     {
         // Arrange - Create old sessionFiles directory
@@ -346,7 +332,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should delete empty old portable directory")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_DeletesEmptyOldDir ()
     {
         // Arrange
@@ -367,7 +352,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should move subdirectories from old portable/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_MovesSubdirectories ()
     {
         // Arrange - Create old portable/Plugins/ directory
@@ -392,7 +376,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MigrateOldPortableLayout should move settings.json backup (.bak)")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MigrateOldPortableLayout_MovesSettingsBackup ()
     {
         // Arrange
@@ -413,7 +396,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable should create the portable configuration directory")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyConfigToPortable_CreatesPortableConfigDir ()
     {
         // Arrange - Ensure settings.json exists in normal location
@@ -431,7 +413,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable should copy settings.json")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyConfigToPortable_CopiesSettingsFile ()
     {
         // Arrange
@@ -451,7 +432,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable should copy trusted-plugins.json")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyConfigToPortable_CopiesTrustedPluginsFile ()
     {
         // Arrange
@@ -471,7 +451,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable should copy Plugins subdirectory recursively")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyConfigToPortable_CopiesPluginsDirectory ()
     {
         // Arrange
@@ -497,7 +476,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable should copy .dat/.cfg config files")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyConfigToPortable_CopiesColumnizerConfigFiles ()
     {
         // Arrange
@@ -518,15 +496,14 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyConfigToPortable with no source files should not throw")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void CopyConfigToPortable_NoSourceFiles_DoesNotThrow ()
     {
         // Arrange - ConfigDir might not exist or be empty
         // (don't create any files)
 
         // Act & Assert
-        Assert.DoesNotThrow(() => _configManager.CopyConfigToPortable(),
-            "Should not throw when no source files exist");
+        Assert.DoesNotThrow(_configManager.CopyConfigToPortable, "Should not throw when no source files exist");
     }
 
     #endregion
@@ -536,7 +513,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should move config files back to ConfigDir")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveConfigFromPortable_MovesConfigFilesToNormalLocation ()
     {
         // Arrange - Create files in portable config dir
@@ -560,7 +536,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should skip the portableMode.json marker file")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveConfigFromPortable_SkipsMarkerFile ()
     {
         // Arrange
@@ -581,7 +556,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should move Plugins directory")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveConfigFromPortable_MovesPluginsDirectory ()
     {
         // Arrange
@@ -601,7 +575,7 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should move session files to Documents/LogExpert")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void MoveConfigFromPortable_MovesSessionFiles ()
     {
         // Arrange
@@ -631,7 +605,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should overwrite existing files in ConfigDir")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveConfigFromPortable_OverwritesExistingFiles ()
     {
         // Arrange
@@ -652,7 +625,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveConfigFromPortable should clean up empty portable config directory")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveConfigFromPortable_CleansUpEmptyPortableDir ()
     {
         // Arrange - Create portable dir with only one file to move
@@ -674,7 +646,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveFileIfExists should move a file and delete source")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveFileIfExists_MovesFile ()
     {
         // Arrange
@@ -684,7 +655,7 @@ public class ConfigManagerPortableModeTests
 
         // Act
         var method = typeof(ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
-        method?.Invoke(null, [source, target]);
+        _ = (method?.Invoke(null, [source, target]));
 
         // Assert
         Assert.That(File.Exists(target), Is.True, "Target file should exist");
@@ -695,7 +666,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("MoveFileIfExists with non-existent source should do nothing")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void MoveFileIfExists_NonExistentSource_DoesNothing ()
     {
         // Arrange
@@ -704,7 +674,7 @@ public class ConfigManagerPortableModeTests
 
         // Act
         var method = typeof(ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
-        method?.Invoke(null, [source, target]);
+        _ = (method?.Invoke(null, [source, target]));
 
         // Assert
         Assert.That(File.Exists(target), Is.False, "Target should not be created");
@@ -713,7 +683,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyFileIfExists should copy file preserving source")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyFileIfExists_CopiesFile ()
     {
         // Arrange
@@ -723,7 +692,7 @@ public class ConfigManagerPortableModeTests
 
         // Act
         var method = typeof(ConfigManager).GetMethod("CopyFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
-        method?.Invoke(null, [source, target]);
+        _ = (method?.Invoke(null, [source, target]));
 
         // Assert
         Assert.That(File.Exists(source), Is.True, "Source should still exist");
@@ -734,7 +703,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyFileIfNotExists should not overwrite existing target")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyFileIfNotExists_DoesNotOverwrite ()
     {
         // Arrange
@@ -745,7 +713,7 @@ public class ConfigManagerPortableModeTests
 
         // Act
         var method = typeof(ConfigManager).GetMethod("CopyFileIfNotExists", BindingFlags.NonPublic | BindingFlags.Static);
-        method?.Invoke(null, [source, target]);
+        _ = (method?.Invoke(null, [source, target]));
 
         //Assert
         Assert.That(File.ReadAllText(target), Is.EqualTo("existing content"),
@@ -755,7 +723,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("CopyDirectoryRecursive should copy all files and subdirectories")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void CopyDirectoryRecursive_CopiesEverything ()
     {
         // Arrange
@@ -770,7 +737,7 @@ public class ConfigManagerPortableModeTests
 
         // Act
         var method = typeof(ConfigManager).GetMethod("CopyDirectoryRecursive", BindingFlags.NonPublic | BindingFlags.Static);
-        method?.Invoke(null, [sourceDir, targetDir]);
+        _ = (method?.Invoke(null, [sourceDir, targetDir]));
 
         // Assert
         Assert.That(File.Exists(Path.Join(targetDir, "file1.txt")), Is.True);
@@ -786,7 +753,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("Load should detect new portable layout when portableMode.json exists in configuration/")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Load_NewPortableLayout_DetectedCorrectly ()
     {
         // Arrange - Create new portable layout
@@ -807,7 +773,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("Load should detect old portable layout and trigger migration")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Load_OldPortableLayout_TriggersMigration ()
     {
         // Arrange - Create old portable layout
@@ -840,7 +805,6 @@ public class ConfigManagerPortableModeTests
     [Test]
     [Category("PortableMode")]
     [Description("Full cycle: activate portable mode, copy config, verify, deactivate")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void PortableMode_FullToggleCycle_WorksCorrectly ()
     {
         // Arrange - Create some config in normal location

@@ -1,6 +1,6 @@
 using LogExpert.Core.Entities;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 public interface IBookmarkData
 {

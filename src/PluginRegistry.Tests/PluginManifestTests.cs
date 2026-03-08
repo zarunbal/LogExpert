@@ -1,5 +1,3 @@
-using LogExpert.PluginRegistry;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -17,10 +15,11 @@ public class PluginManifestTests
     public void SetUp ()
     {
         _testDataPath = Path.Join(Path.GetTempPath(), "LogExpertManifestTests", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_testDataPath);
+        _ = Directory.CreateDirectory(_testDataPath);
     }
 
     [TearDown]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void TearDown ()
     {
         if (Directory.Exists(_testDataPath))
@@ -123,7 +122,7 @@ public class PluginManifestTests
 
         // Assert
         Assert.That(isValid, Is.False);
-        Assert.That(errors.Any(e => e.Contains("Invalid version format")), Is.True);
+        Assert.That(errors.Any(e => e.Contains("Invalid version format", StringComparison.InvariantCultureIgnoreCase)), Is.True);
     }
 
     [Test]
@@ -285,7 +284,7 @@ public class PluginManifestTests
 
         // Assert
         Assert.That(isValid, Is.False);
-        Assert.That(errors.Any(e => e.Contains("Invalid LogExpert version requirement")), Is.True);
+        Assert.That(errors.Any(e => e.Contains("Invalid LogExpert version requirement", StringComparison.InvariantCultureIgnoreCase)), Is.True);
     }
 
     [Test]
@@ -308,7 +307,7 @@ public class PluginManifestTests
 
         // Assert
         Assert.That(isValid, Is.False);
-        Assert.That(errors.Any(e => e.Contains("Invalid .NET version requirement")), Is.True);
+        Assert.That(errors.Any(e => e.Contains("Invalid .NET version requirement", StringComparison.InvariantCultureIgnoreCase)), Is.True);
     }
 
     [Test]
@@ -350,7 +349,7 @@ public class PluginManifestTests
             Description = "Test plugin",
             ApiVersion = "1.0",
             Main = "TestPlugin.dll",
-            Permissions = new List<string> { "filesystem:read", "filesystem:write", "network:connect" }
+            Permissions = ["filesystem:read", "filesystem:write", "network:connect"]
         };
 
         // Act
@@ -373,7 +372,7 @@ public class PluginManifestTests
             Description = "Test plugin",
             ApiVersion = "1.0",
             Main = "TestPlugin.dll",
-            Permissions = new List<string> { "invalid:permission" }
+            Permissions = ["invalid:permission"]
         };
 
         // Act
@@ -381,7 +380,7 @@ public class PluginManifestTests
 
         // Assert
         Assert.That(isValid, Is.False);
-        Assert.That(errors.Any(e => e.Contains("Invalid permission")), Is.True);
+        Assert.That(errors.Any(e => e.Contains("Invalid permission", StringComparison.InvariantCultureIgnoreCase)), Is.True);
     }
 
     [Test]
@@ -396,7 +395,7 @@ public class PluginManifestTests
             Description = "Test plugin",
             ApiVersion = "1.0",
             Main = "TestPlugin.dll",
-            Permissions = new List<string> { "filesystem:read", "invalid:permission", "network:connect" }
+            Permissions = ["filesystem:read", "invalid:permission", "network:connect"]
         };
 
         // Act
@@ -420,15 +419,15 @@ public class PluginManifestTests
             Description = "Test plugin",
             ApiVersion = "1.0",
             Main = "TestPlugin.dll",
-            Permissions = new List<string>
-            {
+            Permissions =
+            [
                 "filesystem:read",
                 "filesystem:write",
                 "network:connect",
                 "config:read",
                 "config:write",
                 "registry:read"
-            }
+            ]
         };
 
         // Act

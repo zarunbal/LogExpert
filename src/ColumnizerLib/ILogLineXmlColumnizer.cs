@@ -37,6 +37,7 @@ namespace ColumnizerLib;
 /// </ol>
 /// </para>
 /// </remarks>
+[Obsolete("This interface is deprecated. Please use ILogLineMemoryXmlColumnizer for a memory based implementation instead.")]
 public interface ILogLineXmlColumnizer : ILogLineColumnizer
 {
     #region Public methods

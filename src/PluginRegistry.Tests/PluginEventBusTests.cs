@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-using LogExpert.PluginRegistry;
 using LogExpert.PluginRegistry.Interfaces;
 
 using NUnit.Framework;
@@ -20,7 +14,7 @@ public class PluginEventBusTests
     private PluginEventBus _eventBus = null!;
 
     [SetUp]
-    public void SetUp()
+    public void SetUp ()
     {
         _eventBus = new PluginEventBus();
     }
@@ -46,80 +40,89 @@ public class PluginEventBusTests
     #region Subscription Tests
 
     [Test]
-    public void Subscribe_WithValidPluginAndHandler_ShouldNotThrow()
+    public void Subscribe_WithValidPluginAndHandler_ShouldNotThrow ()
     {
         // Arrange
         var pluginName = "TestPlugin";
-        Action<TestEvent> handler = e => { };
+        static void handler (TestEvent e)
+        { }
 
         // Act & Assert
-        Assert.DoesNotThrow(() => _eventBus.Subscribe(pluginName, handler));
+        Assert.DoesNotThrow(() => _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler));
     }
 
     [Test]
-    public void Subscribe_WithNullPluginName_ShouldThrowArgumentNullException()
+    public void Subscribe_WithNullPluginName_ShouldThrowArgumentNullException ()
     {
         // Arrange
-        Action<TestEvent> handler = e => { };
+        static void handler (TestEvent e)
+        { }
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _eventBus.Subscribe<TestEvent>(null!, handler));
+        _ = Assert.Throws<ArgumentNullException>(() => _eventBus.Subscribe<TestEvent>(null!, handler));
     }
 
     [Test]
-    public void Subscribe_WithNullHandler_ShouldThrowArgumentNullException()
+    public void Subscribe_WithNullHandler_ShouldThrowArgumentNullException ()
     {
         // Arrange
         var pluginName = "TestPlugin";
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _eventBus.Subscribe<TestEvent>(pluginName, null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _eventBus.Subscribe<TestEvent>(pluginName, null!));
     }
 
     [Test]
-    public void Subscribe_MultiplePluginsToSameEvent_ShouldAllowBoth()
+    public void Subscribe_MultiplePluginsToSameEvent_ShouldAllowBoth ()
     {
         // Arrange
         var plugin1 = "Plugin1";
         var plugin2 = "Plugin2";
-        Action<TestEvent> handler1 = e => { };
-        Action<TestEvent> handler2 = e => { };
+        static void handler1 (TestEvent e)
+        { }
+
+        static void handler2 (TestEvent e)
+        { }
 
         // Act & Assert
         Assert.DoesNotThrow(() =>
         {
-            _eventBus.Subscribe(plugin1, handler1);
-            _eventBus.Subscribe(plugin2, handler2);
+            _eventBus.Subscribe(plugin1, (Action<TestEvent>)handler1);
+            _eventBus.Subscribe(plugin2, (Action<TestEvent>)handler2);
         });
     }
 
     [Test]
-    public void Subscribe_SamePluginToDifferentEvents_ShouldAllowBoth()
+    public void Subscribe_SamePluginToDifferentEvents_ShouldAllowBoth ()
     {
         // Arrange
         var pluginName = "TestPlugin";
-        Action<TestEvent> handler1 = e => { };
-        Action<AnotherTestEvent> handler2 = e => { };
+        static void handler1 (TestEvent e)
+        { }
+
+        static void handler2 (AnotherTestEvent e)
+        { }
 
         // Act & Assert
         Assert.DoesNotThrow(() =>
         {
-            _eventBus.Subscribe(pluginName, handler1);
-            _eventBus.Subscribe(pluginName, handler2);
+            _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler1);
+            _eventBus.Subscribe(pluginName, (Action<AnotherTestEvent>)handler2);
         });
     }
 
     [Test]
-    public void Subscribe_SamePluginAndEventMultipleTimes_ShouldAllowMultipleSubscriptions()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Subscribe_SamePluginAndEventMultipleTimes_ShouldAllowMultipleSubscriptions ()
     {
         // Arrange
         var pluginName = "TestPlugin";
         var callCount = 0;
-        Action<TestEvent> handler = e => callCount++;
+        void handler (TestEvent e) => callCount++;
 
         // Act
-        _eventBus.Subscribe(pluginName, handler);
-        _eventBus.Subscribe(pluginName, handler);
+        _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler);
+        _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler);
         _eventBus.Publish(new TestEvent { Message = "Test" });
 
         // Assert
@@ -131,7 +134,8 @@ public class PluginEventBusTests
     #region Publishing Tests
 
     [Test]
-    public void Publish_WithSubscriber_ShouldNotifySubscriber()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_WithSubscriber_ShouldNotifySubscriber ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -150,7 +154,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_WithNoSubscribers_ShouldNotThrow()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_WithNoSubscribers_ShouldNotThrow ()
     {
         // Arrange
         var testEvent = new TestEvent { Message = "Test" };
@@ -160,14 +165,15 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_WithNullEvent_ShouldThrowArgumentNullException()
+    public void Publish_WithNullEvent_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _eventBus.Publish<TestEvent>(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _eventBus.Publish<TestEvent>(null!));
     }
 
     [Test]
-    public void Publish_WithMultipleSubscribers_ShouldNotifyAll()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_WithMultipleSubscribers_ShouldNotifyAll ()
     {
         // Arrange
         var receivedCount = 0;
@@ -185,7 +191,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_OnlyNotifiesSubscribersOfMatchingEventType()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_OnlyNotifiesSubscribersOfMatchingEventType ()
     {
         // Arrange
         var testEventCount = 0;
@@ -203,7 +210,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_WhenHandlerThrows_ShouldNotifyOtherSubscribers()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_WhenHandlerThrows_ShouldNotifyOtherSubscribers ()
     {
         // Arrange
         var callCount = 0;
@@ -221,7 +229,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_PreservesEventData()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Publish_PreservesEventData ()
     {
         // Arrange
         TestEvent? receivedEvent = null;
@@ -249,14 +258,15 @@ public class PluginEventBusTests
     #region Unsubscription Tests
 
     [Test]
-    public void Unsubscribe_WithNullPluginName_ShouldThrowArgumentNullException()
+    public void Unsubscribe_WithNullPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _eventBus.Unsubscribe<TestEvent>(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _eventBus.Unsubscribe<TestEvent>(null!));
     }
 
     [Test]
-    public void Unsubscribe_AfterSubscribing_ShouldStopReceivingEvents()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Unsubscribe_AfterSubscribing_ShouldStopReceivingEvents ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -273,7 +283,7 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Unsubscribe_WhenNotSubscribed_ShouldNotThrow()
+    public void Unsubscribe_WhenNotSubscribed_ShouldNotThrow ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -283,7 +293,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Unsubscribe_OnlyUnsubscribesSpecifiedEventType()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Unsubscribe_OnlyUnsubscribesSpecifiedEventType ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -304,7 +315,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Unsubscribe_OnlyUnsubscribesSpecifiedPlugin()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Unsubscribe_OnlyUnsubscribesSpecifiedPlugin ()
     {
         // Arrange
         var plugin1Count = 0;
@@ -327,14 +339,15 @@ public class PluginEventBusTests
     #region UnsubscribeAll Tests
 
     [Test]
-    public void UnsubscribeAll_WithNullPluginName_ShouldThrowArgumentNullException()
+    public void UnsubscribeAll_WithNullPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _eventBus.UnsubscribeAll(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _eventBus.UnsubscribeAll(null!));
     }
 
     [Test]
-    public void UnsubscribeAll_ShouldUnsubscribeFromAllEvents()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void UnsubscribeAll_ShouldUnsubscribeFromAllEvents ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -355,7 +368,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void UnsubscribeAll_OnlyAffectsSpecifiedPlugin()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void UnsubscribeAll_OnlyAffectsSpecifiedPlugin ()
     {
         // Arrange
         var plugin1Count = 0;
@@ -374,7 +388,7 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void UnsubscribeAll_WhenNotSubscribed_ShouldNotThrow()
+    public void UnsubscribeAll_WhenNotSubscribed_ShouldNotThrow ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -384,7 +398,8 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void UnsubscribeAll_WithMultipleSubscriptions_ShouldRemoveAll()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void UnsubscribeAll_WithMultipleSubscriptions_ShouldRemoveAll ()
     {
         // Arrange
         var pluginName = "TestPlugin";
@@ -408,7 +423,7 @@ public class PluginEventBusTests
     #region Thread Safety Tests
 
     [Test]
-    public void Publish_ConcurrentPublishes_ShouldBeSafe()
+    public void Publish_ConcurrentPublishes_ShouldBeSafe ()
     {
         // Arrange
         var callCount = 0;
@@ -428,14 +443,14 @@ public class PluginEventBusTests
             tasks.Add(Task.Run(() => _eventBus.Publish(new TestEvent { Message = "Test" })));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll([.. tasks]);
 
         // Assert
         Assert.That(callCount, Is.EqualTo(10), "All events should be received");
     }
 
     [Test]
-    public void Subscribe_ConcurrentSubscriptions_ShouldBeSafe()
+    public void Subscribe_ConcurrentSubscriptions_ShouldBeSafe ()
     {
         // Arrange
         var tasks = new List<Task>();
@@ -448,11 +463,11 @@ public class PluginEventBusTests
         }
 
         // Assert
-        Assert.DoesNotThrow(() => Task.WaitAll(tasks.ToArray()));
+        Assert.DoesNotThrow(() => Task.WaitAll([.. tasks]));
     }
 
     [Test]
-    public void SubscribeAndPublish_Concurrent_ShouldBeSafe()
+    public void SubscribeAndPublish_Concurrent_ShouldBeSafe ()
     {
         // Arrange
         var callCount = 0;
@@ -460,21 +475,18 @@ public class PluginEventBusTests
 
         // Act
         var tasks = new List<Task>();
-        
+
         // Subscribe tasks
         for (var i = 0; i < 5; i++)
         {
             var pluginName = $"Plugin{i}";
-            tasks.Add(Task.Run(() =>
-            {
-                _eventBus.Subscribe<TestEvent>(pluginName, e =>
+            tasks.Add(Task.Run(() => _eventBus.Subscribe<TestEvent>(pluginName, e =>
                 {
                     lock (lockObj)
                     {
                         callCount++;
                     }
-                });
-            }));
+                })));
         }
 
         // Give subscriptions time to register
@@ -486,14 +498,14 @@ public class PluginEventBusTests
             tasks.Add(Task.Run(() => _eventBus.Publish(new TestEvent { Message = "Test" })));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll([.. tasks]);
 
         // Assert
         Assert.That(callCount, Is.GreaterThan(0), "Some events should be received");
     }
 
     [Test]
-    public void UnsubscribeDuringPublish_ShouldBeSafe()
+    public void UnsubscribeDuringPublish_ShouldBeSafe ()
     {
         // Arrange
         var publishCount = 0;
@@ -512,17 +524,18 @@ public class PluginEventBusTests
         }
 
         // Act
-        var tasks = new List<Task>();
-
-        // Publish task
-        tasks.Add(Task.Run(() =>
+        var tasks = new List<Task>
         {
-            for (var i = 0; i < 100; i++)
+            // Publish task
+            Task.Run(() =>
             {
-                _eventBus.Publish(new TestEvent { Message = "Test" });
-                Thread.Sleep(1);
-            }
-        }));
+                for (var i = 0; i < 100; i++)
+                {
+                    _eventBus.Publish(new TestEvent { Message = "Test" });
+                    Thread.Sleep(1);
+                }
+            })
+        };
 
         // Unsubscribe tasks
         for (var i = 0; i < 10; i++)
@@ -536,7 +549,7 @@ public class PluginEventBusTests
         }
 
         // Assert
-        Assert.DoesNotThrow(() => Task.WaitAll(tasks.ToArray()));
+        Assert.DoesNotThrow(() => Task.WaitAll([.. tasks]));
         Assert.That(publishCount, Is.GreaterThan(0), "Some events should be received before unsubscribe");
     }
 
@@ -545,21 +558,22 @@ public class PluginEventBusTests
     #region Edge Case Tests
 
     [Test]
-    public void Subscribe_AfterUnsubscribe_ShouldAllowResubscription()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Subscribe_AfterUnsubscribe_ShouldAllowResubscription ()
     {
         // Arrange
         var pluginName = "TestPlugin";
         var callCount = 0;
-        Action<TestEvent> handler = e => callCount++;
+        void handler (TestEvent e) => callCount++;
 
         // Act
-        _eventBus.Subscribe(pluginName, handler);
+        _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler);
         _eventBus.Publish(new TestEvent { Message = "Test 1" });
-        
+
         _eventBus.Unsubscribe<TestEvent>(pluginName);
         _eventBus.Publish(new TestEvent { Message = "Test 2" });
-        
-        _eventBus.Subscribe(pluginName, handler);
+
+        _eventBus.Subscribe(pluginName, (Action<TestEvent>)handler);
         _eventBus.Publish(new TestEvent { Message = "Test 3" });
 
         // Assert
@@ -567,7 +581,7 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_WithVeryLongEventData_ShouldWork()
+    public void Publish_WithVeryLongEventData_ShouldWork ()
     {
         // Arrange
         var receivedMessage = "";
@@ -582,7 +596,7 @@ public class PluginEventBusTests
     }
 
     [Test]
-    public void Publish_ManyEventsQuickly_ShouldHandleAll()
+    public void Publish_ManyEventsQuickly_ShouldHandleAll ()
     {
         // Arrange
         var callCount = 0;

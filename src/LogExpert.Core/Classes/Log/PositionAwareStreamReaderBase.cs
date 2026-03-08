@@ -143,8 +143,6 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         }
     }
 
-
-
     protected virtual void ResetReader ()
     {
         _reader.DiscardBufferedData();

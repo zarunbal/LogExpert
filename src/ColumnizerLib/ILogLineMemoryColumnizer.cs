@@ -8,9 +8,64 @@ namespace ColumnizerLib;
 /// allowing consumers to process log data efficiently in memory. The interface is designed for use with log sources
 /// that provide direct memory access to log lines, supporting custom column extraction and value notification
 /// workflows. Thread safety and performance characteristics depend on the specific implementation.</remarks>
-public interface ILogLineMemoryColumnizer : ILogLineColumnizer
+public interface ILogLineMemoryColumnizer
 {
     #region Public methods
+
+    /// <summary>
+    /// Returns the name for the columnizer. This name is used for the columnizer selection dialog.
+    /// </summary>
+    string GetName ();
+
+    /// <summary>
+    /// Returns the name that is given by the user for this columnizer.
+    /// </summary>
+    string GetCustomName ();
+
+    /// <summary>
+    /// Returns the description of the columnizer. This text is used in the columnizer selection dialog.
+    /// </summary>
+    string GetDescription ();
+
+    /// <summary>
+    /// Returns the number of columns the columnizer will split lines into.
+    /// </summary>
+    /// <remarks>
+    /// This value does not include the column for displaying the line number. The line number column
+    /// is added by LogExpert and is not handled by columnizers.
+    /// </remarks>
+    int GetColumnCount ();
+
+    /// <summary>
+    /// Returns the names of the columns. The returned names are used by LogExpert for the column headers in the data grid view.
+    /// The names are expected in order from left to right.
+    /// </summary>
+    string[] GetColumnNames ();
+
+    /// <summary>
+    /// Returns true, if the columnizer supports timeshift handling.
+    /// </summary>
+    /// <remarks>
+    /// If you return true, you also have to implement the function SetTimeOffset(), GetTimeOffset() and GetTimestamp().
+    /// You also must handle PushValue() for the column(s) that displays the timestamp.
+    /// </remarks>
+    bool IsTimeshiftImplemented ();
+
+    /// <summary>
+    /// Sets an offset to be used for displaying timestamp values. You have to implement this function, if
+    /// your IsTimeshiftImplemented() function return true.
+    /// </summary>
+    /// <remarks>
+    /// You have to store the given value in the Columnizer instance and add this offset to the timestamp column(s) returned by SplitLine()
+    /// (e.g. in the date and time columns).
+    /// </remarks>
+    /// <param name="msecOffset">The timestamp offset in milliseconds.</param>
+    void SetTimeOffset (int msecOffset);
+
+    /// <summary>
+    /// Returns the current stored timestamp offset (set by SetTimeOffset()).
+    /// </summary>
+    int GetTimeOffset ();
 
     /// <summary>
     /// Splits a log line into columns using the specified callback for columnization.

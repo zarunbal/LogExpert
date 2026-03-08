@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 namespace AutoColumnizer;
 
-public class AutoColumnizer : ILogLineColumnizer
+public class AutoColumnizer : ILogLineMemoryColumnizer
 {
     #region ILogLineColumnizer implementation
 
@@ -28,7 +28,6 @@ public class AutoColumnizer : ILogLineColumnizer
         return "Automatically find the right columnizer for any file";
     }
 
-
     public int GetColumnCount ()
     {
         throw new NotImplementedException();
@@ -39,7 +38,7 @@ public class AutoColumnizer : ILogLineColumnizer
         throw new NotImplementedException();
     }
 
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
@@ -54,12 +53,12 @@ public class AutoColumnizer : ILogLineColumnizer
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
 
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
     }
 

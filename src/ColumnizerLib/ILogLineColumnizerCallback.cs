@@ -12,6 +12,7 @@ namespace ColumnizerLib;
 ///An example would be when the log lines contains only the time of day but the date is coded in the file name. In this situation
 ///you can use the GetFileName() function to retrieve the name of the current file to build a complete timestamp.
 ///</remarks>
+[Obsolete("This interface is deprecated and will be removed in a future version. Please use ILogLineMemoryColumnizerCallback for a memory based implementation instead.")]
 public interface ILogLineColumnizerCallback
 {
     #region Public methods

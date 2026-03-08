@@ -44,29 +44,6 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         return _timeOffset;
     }
 
-    /// <summary>
-    /// Retrieves the timestamp associated with the specified log line.
-    /// </summary>
-    /// <param name="callback">An object that provides callback methods for columnizing log lines. Cannot be null.</param>
-    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
-    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    /// <summary>
-    /// Notifies the specified callback of a value change for a given column.
-    /// </summary>
-    /// <param name="callback">The callback to be notified of the value change. Cannot be null.</param>
-    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
-    /// <param name="value">The new value to assign to the specified column.</param>
-    /// <param name="oldValue">The previous value of the specified column before the update.</param>
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
-    }
-
     public string GetName ()
     {
         return "Webserver CLF Columnizer";
@@ -85,18 +62,6 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
     public string[] GetColumnNames ()
     {
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
-    }
-
-    /// <summary>
-    /// Splits the specified log line into columns using the provided columnizer callback.
-    /// </summary>
-    /// <param name="callback">The callback interface used to receive columnization results and context during the split operation. Cannot be
-    /// null.</param>
-    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized version of the log line.</returns>
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
     }
 
     /// <summary>

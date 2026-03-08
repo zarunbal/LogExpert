@@ -1380,7 +1380,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Insufficient rights {0}: {1} .
+        ///   Looks up a localized string similar to Insufficient rights {0}: {1}.
         /// </summary>
         public static string LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage {
             get {

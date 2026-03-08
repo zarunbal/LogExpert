@@ -1,5 +1,3 @@
-using LogExpert.PluginRegistry;
-
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -21,6 +19,7 @@ public class PluginPermissionManagerTests
     }
 
     [TearDown]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unit Tests")]
     public void TearDown ()
     {
         try
@@ -406,7 +405,7 @@ public class PluginPermissionManagerTests
     public void SetPermissions_WithNullPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
+        _ = Assert.Throws<ArgumentNullException>(() =>
             PluginPermissionManager.SetPermissions(null!, PluginPermission.FileSystemRead));
     }
 
@@ -414,7 +413,7 @@ public class PluginPermissionManagerTests
     public void SetPermissions_WithEmptyPluginName_ShouldThrowArgumentNullException ()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
+        _ = Assert.Throws<ArgumentNullException>(() =>
             PluginPermissionManager.SetPermissions("", PluginPermission.FileSystemRead));
     }
 

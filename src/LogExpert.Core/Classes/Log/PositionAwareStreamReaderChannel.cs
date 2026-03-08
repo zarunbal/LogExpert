@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Channels;
 
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Log;
 

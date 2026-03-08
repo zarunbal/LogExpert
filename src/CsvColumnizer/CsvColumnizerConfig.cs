@@ -1,9 +1,8 @@
-﻿using CsvHelper.Configuration;
+using System.Globalization;
+
+using CsvHelper.Configuration;
 
 using Newtonsoft.Json;
-
-using System;
-using System.Globalization;
 
 namespace CsvColumnizer;
 
@@ -33,7 +32,7 @@ public class CsvColumnizerConfig
 
     #region Public methods
 
-    public void InitDefaults()
+    public void InitDefaults ()
     {
         ReaderConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -53,7 +52,7 @@ public class CsvColumnizerConfig
         MinColumns = 0;
     }
 
-    public void ConfigureReaderConfiguration()
+    public void ConfigureReaderConfiguration ()
     {
         ReaderConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {

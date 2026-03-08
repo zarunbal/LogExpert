@@ -7,10 +7,6 @@ public class CsvLogLine (string fullLine, int lineNumber) : ILogLineMemory
 {
     #region Properties
 
-    string ILogLine.FullLine { get; }
-
-    string ITextValue.Text => FullLine.ToString();
-
     public ReadOnlyMemory<char> FullLine { get; } = fullLine.AsMemory();
 
     public ReadOnlyMemory<char> Text { get; }

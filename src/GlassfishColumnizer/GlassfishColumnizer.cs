@@ -43,11 +43,6 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
         return _xmlConfig;
     }
 
-    public ILogLine GetLineTextForClipboard (ILogLine logLine, ILogLineColumnizerCallback callback)
-    {
-        return GetLineTextForClipboard(logLine as ILogLineMemory, callback as ILogLineMemoryColumnizerCallback);
-    }
-
     public string GetName ()
     {
         return "Glassfish";
@@ -88,28 +83,17 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     }
 
     /// <summary>
-    /// Splits the specified log line into columns using the provided columnizer callback.
-    /// </summary>
-    /// <param name="callback">The callback interface used to provide columnization logic for the log line. Cannot be null.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized version of the log line.</returns>
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
-    }
-
-    /// <summary>
     /// Parses a log line into its constituent columns according to the columnizer's format.
     /// </summary>
     /// <remarks>If the input line does not conform to the expected format or is too short, only the log
     /// message column is populated and date/time columns are left blank. The method is tolerant of malformed input and
     /// will not throw for common formatting issues.</remarks>
     /// <param name="callback">A callback interface used to provide context or services required during columnization.</param>
-    /// <param name="line">The log line to be split into columns.</param>
+    /// <param name="logLine">The log line to be split into columns.</param>
     /// <returns>An object representing the columnized log line, with each column populated based on the input line. If the line
     /// does not match the expected format, the entire line is placed in the log message column.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
-    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         //[#|2025-03-14T10:36:37.159846Z|INFO|glassfish|javax.enterprise.system.core.server|_ThreadID=14;_ThreadName=main;| GlassFish Server Open Source Edition 5.1.0 (5.1.0) startup time : milliseconds 987 |#]
         //[#|2008-08-24T08:58:38.325+0200|INFO|sun-appserver9.1|STC.eWay.batch.com.stc.connector.batchadapter.system.BatchInboundWork|_ThreadID=43;_ThreadName=p: thread-pool-1; w: 7;|BATCH-MSG-M0992: Another Work item already checking for files... |#]
@@ -118,12 +102,12 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
 
         ColumnizedLogLine cLogLine = new()
         {
-            LogLine = line
+            LogLine = logLine
         };
 
         var columns = Column.CreateColumns(COLUMN_COUNT, cLogLine);
 
-        var temp = line.FullLine;
+        var temp = logLine.FullLine;
 
         // delete '[#|' and '|#]'
         if (temp.Span.StartsWith("[#|", StringComparison.OrdinalIgnoreCase))
@@ -147,7 +131,7 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
 
         try
         {
-            var dateTime = GetTimestamp(callback, line);
+            var dateTime = GetTimestamp(callback, logLine);
             if (dateTime == DateTime.MinValue)
             {
                 columns[1].FullValue = temp;
@@ -223,29 +207,6 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     public int GetTimeOffset ()
     {
         return _timeOffset;
-    }
-
-    /// <summary>
-    /// Retrieves the timestamp associated with the specified log line.
-    /// </summary>
-    /// <param name="callback">An object that provides callback methods for columnizing log lines. Cannot be null.</param>
-    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
-    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    /// <summary>
-    /// Pushes a new value for a specified column using the provided callback interface.
-    /// </summary>
-    /// <param name="callback">The callback interface used to handle the value push operation. Cannot be null.</param>
-    /// <param name="column">The zero-based index of the column to which the value is pushed.</param>
-    /// <param name="value">The new value to be pushed for the specified column. Can be null.</param>
-    /// <param name="oldValue">The previous value of the specified column. Can be null.</param>
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
     }
 
     /// <summary>

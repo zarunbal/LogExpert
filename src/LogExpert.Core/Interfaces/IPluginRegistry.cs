@@ -1,6 +1,6 @@
 using ColumnizerLib;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 //TODO: Add documentation
 public interface IPluginRegistry

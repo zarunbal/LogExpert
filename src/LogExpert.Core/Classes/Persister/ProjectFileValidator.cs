@@ -1,6 +1,6 @@
 using System.Security;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Persister;
 

@@ -23,11 +23,6 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
         return Resources.JsonCompactColumnizer_Description;
     }
 
-    public override void Selected (ILogLineColumnizerCallback callback)
-    {
-        Selected(callback as ILogLineMemoryColumnizerCallback);
-    }
-
     public override void Selected (ILogLineMemoryColumnizerCallback callback)
     {
         ColumnList.Clear();
@@ -39,11 +34,7 @@ public class JsonCompactColumnizer : JsonColumnizer.JsonColumnizer, IColumnizerP
         }
     }
 
-    public override Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        return GetPriority(fileName, samples.Select(line => (ILogLineMemory)line));
-    }
-
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Intentionally Ignored")]
     public override Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentException.ThrowIfNullOrEmpty(fileName, nameof(fileName));

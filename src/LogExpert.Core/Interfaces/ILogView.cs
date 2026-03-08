@@ -1,6 +1,6 @@
 using ColumnizerLib;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Methods to control the LogWindow from other views.

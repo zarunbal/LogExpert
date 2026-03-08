@@ -3,7 +3,7 @@ using System.Drawing;
 using LogExpert.Core.Config;
 using LogExpert.Core.EventArguments;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Manages application configuration settings including loading, saving, importing, and exporting.

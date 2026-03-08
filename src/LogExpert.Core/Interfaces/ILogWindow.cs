@@ -3,7 +3,7 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Represents a log window that displays and manages a log file in LogExpert.
@@ -28,43 +28,6 @@ public interface ILogWindow
     /// are viewed together as one virtual file.
     /// </remarks>
     string GetCurrentFileName (int lineNum);
-
-    /// <summary>
-    /// Gets the log line at the specified line number.
-    /// </summary>
-    /// <param name="lineNum">The zero-based line number to retrieve.</param>
-    /// <returns>
-    /// An <see cref="ILogLine"/> object containing the line content and metadata,
-    /// or <c>null</c> if the line number is out of range or the line cannot be retrieved.
-    /// </returns>
-    /// <remarks>
-    /// This method retrieves lines from the internal buffer cache and may trigger
-    /// disk reads if the line is not currently cached.
-    /// </remarks>
-    ILogLine GetLine (int lineNum);
-
-    /// <summary>
-    /// Gets the log line at the specified line number asynchronously, with a timeout.
-    /// </summary>
-    /// <param name="lineNum">The zero-based line number to retrieve.</param>
-    /// <returns>
-    /// An <see cref="ILogLine"/> object containing the line content and metadata,
-    /// or <c>null</c> if the operation times out or the line cannot be retrieved.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    /// This method waits for up to 1 second for the line to be loaded. If the line
-    /// is not available within that time, it returns <c>null</c>. This prevents
-    /// the GUI thread from freezing when files are slow to load (e.g., from network shares
-    /// or when files have been deleted).
-    /// </para>
-    /// <para>
-    /// After detecting a timeout, the method enters a 'fast fail mode' where subsequent
-    /// calls return <c>null</c> immediately. A background operation checks if the issue
-    /// is resolved and exits fast fail mode when the file becomes accessible again.
-    /// </para>
-    /// </remarks>
-    ILogLine GetLogLineWithWait (int lineNum);
 
     /// <summary>
     /// Retrieves the memory representation of a log line at the specified line number.

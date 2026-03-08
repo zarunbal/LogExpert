@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.PluginRegistry;
 
 using Newtonsoft.Json;

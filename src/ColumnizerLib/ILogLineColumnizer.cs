@@ -11,6 +11,7 @@ namespace ColumnizerLib;
 /// <br></br><br></br>
 /// You can implement your own columnizers for your logfile format, if needed.
 ///</summary>
+[Obsolete("This interface is deprecated. Use ILogLineMemoryColumnizer for a memory-based implementation instead.")]
 public interface ILogLineColumnizer
 {
     #region Public methods

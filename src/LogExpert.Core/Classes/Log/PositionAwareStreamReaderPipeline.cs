@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 using System.Text;
 
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Log;
 

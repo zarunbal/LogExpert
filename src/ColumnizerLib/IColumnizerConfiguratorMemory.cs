@@ -5,7 +5,7 @@ namespace ColumnizerLib;
 /// The Config button in LogExpert's columnizer dialog is enabled if a Columnizer implements this interface.
 /// If you don't need a config dialog you don't have to implement this interface.
 /// </summary>
-public interface IColumnizerConfiguratorMemory : IColumnizerConfigurator
+public interface IColumnizerConfiguratorMemory
 {
     #region Public methods
 
@@ -28,6 +28,17 @@ public interface IColumnizerConfiguratorMemory : IColumnizerConfigurator
     /// functions in the Columnizer.
     /// </remarks>
     void Configure (ILogLineMemoryColumnizerCallback callback, string configDir);
+
+    /// <summary>
+    /// This function will be called right after LogExpert has loaded your Columnizer class. Use this
+    /// to load the configuration which was saved in the Configure() function.
+    /// You have to hold the loaded config data in your Columnizer object.
+    /// </summary>
+    /// <param name="configDir">The complete path to the directory where LogExpert stores its settings.
+    /// You can use this directory, if you want to. Please don't use the file name "settings.dat", because this
+    /// name is used by LogExpert.
+    /// </param>
+    void LoadConfig (string configDir);
 
     #endregion
 }

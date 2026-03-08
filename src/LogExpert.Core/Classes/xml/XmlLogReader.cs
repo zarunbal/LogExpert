@@ -1,7 +1,7 @@
 using System.Text;
 
 using LogExpert.Core.Classes.Log;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.xml;
 

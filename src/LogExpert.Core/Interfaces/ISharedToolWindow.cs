@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 using LogExpert.Core.Config;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Interface to be implemented by tools windows that are shared across multiple log files.

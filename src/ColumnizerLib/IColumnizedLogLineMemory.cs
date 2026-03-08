@@ -1,12 +1,12 @@
 namespace ColumnizerLib;
 
-public interface IColumnizedLogLineMemory : IColumnizedLogLine
+public interface IColumnizedLogLineMemory
 {
     #region Properties
 
-    new ILogLineMemory LogLine { get; }
+    ILogLineMemory LogLine { get; }
 
-    new IColumnMemory[] ColumnValues { get; }
+    IColumnMemory[] ColumnValues { get; }
 
     #endregion
 }

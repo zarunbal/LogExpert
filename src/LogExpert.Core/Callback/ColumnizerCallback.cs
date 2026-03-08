@@ -1,10 +1,10 @@
 using ColumnizerLib;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Callback;
 
-public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineColumnizerCallback, ICloneable
+public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback
 {
     #region Fields
     private readonly ILogWindow _logWindow = logWindow;
@@ -28,7 +28,7 @@ public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnize
 
     #region Public methods
 
-    public object Clone ()
+    public ColumnizerCallback Clone ()
     {
         return new ColumnizerCallback(this);
     }
@@ -36,11 +36,6 @@ public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnize
     public string GetFileName ()
     {
         return _logWindow.GetCurrentFileName(LineNum);
-    }
-
-    public ILogLine GetLogLine (int lineNum)
-    {
-        return _logWindow.GetLine(lineNum);
     }
 
     public int GetLineCount ()

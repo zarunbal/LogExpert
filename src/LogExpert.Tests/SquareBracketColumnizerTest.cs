@@ -58,7 +58,7 @@ public class SquareBracketColumnizerTest
 
         LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
         logFileReader.ReadFiles();
-        List<ILogLine> loglines =
+        List<ILogLineMemory> loglines =
         [
             // Sampling a few lines to select the correct columnizer
             logFileReader.GetLogLineMemory(0),

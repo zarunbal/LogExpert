@@ -3,7 +3,7 @@ using System.Text;
 
 using ColumnizerLib;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using NLog;
 

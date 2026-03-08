@@ -14,7 +14,7 @@ internal class ArgParser (string argTemplate)
     #region Public methods
 
     [SupportedOSPlatform("windows")]
-    public string BuildArgs (ILogLine logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
+    public string BuildArgs (ILogLineMemory logLine, int lineNum, ILogFileInfo logFileInfo, Form parent)
     {
         StringBuilder builder = new(argTemplate);
 
@@ -47,7 +47,7 @@ internal class ArgParser (string argTemplate)
             replace = GetNextGroup(builder, ref sPos);
             if (reg != null && replace != null)
             {
-                var result = Regex.Replace(logLine.FullLine, reg, replace);
+                var result = Regex.Replace(logLine.FullLine.ToString(), reg, replace);
                 _ = builder.Insert(sPos, result);
             }
         } while (replace != null);

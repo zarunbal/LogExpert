@@ -11,12 +11,12 @@ namespace ColumnizerLib;
 /// </para>
 /// <para>
 /// <b>Usage:</b> <br/>
-/// This struct implements the <see cref="ILogLine"/> interface, allowing it to be used wherever an <c>ILogLine</c>
+/// This struct implements the <see cref="ILogLineMemory"/> interface, allowing it to be used wherever an <c>ILogLineMemory</c>
 /// is expected. It provides value semantics and is intended to be lightweight and efficiently passed by value.
 /// </para>
 /// <para>
-/// <b>Relationship to ILogLine:</b> <br/>
-/// <c>LogLine</c> is a concrete, immutable implementation of the <see cref="ILogLine"/> interface, providing
+/// <b>Relationship to ILogLineMemory:</b> <br/>
+/// <c>LogLine</c> is a concrete, immutable implementation of the <see cref="ILogLineMemory"/> interface, providing
 /// properties for the full line text and its line number.
 /// </para>
 /// <para>
@@ -29,11 +29,7 @@ namespace ColumnizerLib;
 /// </remarks>
 public class LogLine : ILogLineMemory
 {
-    string ILogLine.FullLine { get; }
-
     public int LineNumber { get; }
-
-    string ITextValue.Text { get; }
 
     public ReadOnlyMemory<char> FullLine { get; }
 
