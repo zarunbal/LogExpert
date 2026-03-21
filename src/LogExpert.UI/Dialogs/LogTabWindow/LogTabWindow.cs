@@ -1427,7 +1427,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible, ex));
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible), ex);
             }
 
             _ = Invoke(new MethodInvoker(statusStrip.Refresh));
