@@ -63,7 +63,7 @@ public static class ColumnizerPicker
     /// Creates a new instance of the specified columnizer type and loads its configuration from the given directory.
     /// </summary>
     /// <remarks>The method requires that the columnizer type has a public parameterless constructor. If the
-    /// type implements IColumnizerConfigurator, its configuration is loaded from the specified directory. If these
+    /// type implements IColumnizerConfiguratorMemory, its configuration is loaded from the specified directory. If these
     /// conditions are not met, the method returns null.</remarks>
     /// <param name="columnizer">The columnizer instance whose type will be cloned. If null, the method returns null.</param>
     /// <param name="directory">The directory path from which to load the configuration for the new columnizer instance.</param>
@@ -82,7 +82,7 @@ public static class ColumnizerPicker
         {
             var o = cti.Invoke([]);
 
-            if (o is IColumnizerConfigurator configurator)
+            if (o is IColumnizerConfiguratorMemory configurator)
             {
                 configurator.LoadConfig(directory);
             }
