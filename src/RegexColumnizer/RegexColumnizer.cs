@@ -429,6 +429,11 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
 
         string filePath = Path.Join(configDir, $"{name}Columnizer.json");
 
+        _config ??= new RegexColumnizerConfig
+        {
+            Name = GetName()
+        };
+
         RegexColumnizerConfigDialog dlg = new(_config);
         if (dlg.ShowDialog() == DialogResult.OK)
         {
