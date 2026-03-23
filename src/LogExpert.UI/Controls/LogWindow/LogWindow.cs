@@ -283,8 +283,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public delegate bool ScrollToTimestampFx (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall);
 
-    public delegate void TailFollowedEventHandler (object sender, EventArgs e);
-
     #endregion
 
     #region Events
@@ -297,7 +295,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public event EventHandler<GuiStateEventArgs> GuiStateUpdate;
 
-    public event TailFollowedEventHandler TailFollowed;
+    public event EventHandler<EventArgs> TailFollowed;
 
     public event EventHandler<EventArgs> FileNotFound;
 
@@ -732,12 +730,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     void ILogWindow.WritePipeTab (IList<LineEntryMemory> lineEntryList, string title)
     {
         WritePipeTab(lineEntryList, title);
-    }
-
-    [SupportedOSPlatform("windows")]
-    void ILogWindow.WritePipeTab (IList<LineEntry> lineEntryList, string title)
-    {
-        //WritePipeTab(lineEntryList, title);
     }
 
     #region Event Handlers
@@ -2442,7 +2434,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (_reloadMemento == null)
             {
-                PreselectColumnizer(persistenceData.Columnizer?.GetName());
+                PreSelectColumnizerByName(persistenceData.Columnizer?.GetName());
             }
 
             FollowTailChanged(persistenceData.FollowTail, false);
@@ -3240,13 +3232,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    private void PreSelectColumnizer (ILogLineMemoryColumnizer columnizer)
-    {
-        CurrentColumnizer = columnizer != null
-            ? (_forcedColumnizerForLoading = columnizer)
-            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
-    }
-
     private void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         columnizer = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(FileName, _logFileReader, columnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
@@ -3270,8 +3255,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //_logger.Info($"SetColumnizerInternal(): {columnizer.GetName()}");
 
         var oldColumnizer = CurrentColumnizer;
-        var oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;
-        var oldColumnizerIsPreProcess = CurrentColumnizer is IPreProcessColumnizer;
+        var oldColumnizerIsXmlType = CurrentColumnizer is ILogLineMemoryXmlColumnizer;
+        var oldColumnizerIsPreProcess = CurrentColumnizer is IPreProcessColumnizerMemory;
         var mustReload = false;
 
         // Check if the filtered columns disappeared, if so must refresh the UI
@@ -3321,14 +3306,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     : null;
 
             // always reload when choosing XML columnizers
-            if (_logFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
+            if (_logFileReader != null && CurrentColumnizer is ILogLineMemoryXmlColumnizer)
             {
                 //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
                 mustReload = true;
             }
 
             // Reload when choosing no XML columnizer but previous columnizer was XML
-            if (_logFileReader != null && CurrentColumnizer is not ILogLineXmlColumnizer && oldColumnizerIsXmlType)
+            if (_logFileReader != null && CurrentColumnizer is not ILogLineMemoryXmlColumnizer && oldColumnizerIsXmlType)
             {
                 _logFileReader.IsXmlMode = false;
                 //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -5422,7 +5407,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
 
         PrepareDict();
-        ResetCache(num);
+        //ResetCache(num); TODO REIPMLEMENT
 
         Dictionary<int, int> processedLinesDict = [];
         List<PatternBlock> blockList = [];
@@ -5512,22 +5497,23 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     //Well keep this for the moment because there is some other commented code which calls this one
-    private static PatternBlock FindExistingBlock (PatternBlock block, List<PatternBlock> blockList)
-    {
-        foreach (var searchBlock in blockList)
-        {
-            if (((block.StartLine > searchBlock.StartLine && block.StartLine < searchBlock.EndLine) ||
-                 (block.EndLine > searchBlock.StartLine && block.EndLine < searchBlock.EndLine)) &&
-                  block.StartLine != searchBlock.StartLine &&
-                  block.EndLine != searchBlock.EndLine
-            )
-            {
-                return searchBlock;
-            }
-        }
+    //TODO REIMPLEMENT if needed, otherwise remove
+    //private static PatternBlock FindExistingBlock (PatternBlock block, List<PatternBlock> blockList)
+    //{
+    //    foreach (var searchBlock in blockList)
+    //    {
+    //        if (((block.StartLine > searchBlock.StartLine && block.StartLine < searchBlock.EndLine) ||
+    //             (block.EndLine > searchBlock.StartLine && block.EndLine < searchBlock.EndLine)) &&
+    //              block.StartLine != searchBlock.StartLine &&
+    //              block.EndLine != searchBlock.EndLine
+    //        )
+    //        {
+    //            return searchBlock;
+    //        }
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 
     private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict)
     {
@@ -5671,35 +5657,35 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     //TODO Reimplement
-    private int FindSimilarLine (int srcLine, int startLine)
-    {
-        var value = _lineHashList[srcLine];
+    //private int FindSimilarLine (int srcLine, int startLine)
+    //{
+    //    var value = _lineHashList[srcLine];
 
-        var num = _lineHashList.Count;
-        for (var i = startLine; i < num; ++i)
-        {
-            if (Math.Abs(_lineHashList[i] - value) < 3)
-            {
-                return i;
-            }
-        }
+    //    var num = _lineHashList.Count;
+    //    for (var i = startLine; i < num; ++i)
+    //    {
+    //        if (Math.Abs(_lineHashList[i] - value) < 3)
+    //        {
+    //            return i;
+    //        }
+    //    }
 
-        return -1;
-    }
+    //    return -1;
+    //}
 
     //TODO Reimplement this cache to speed up the similar line search
     // int[,] similarCache;
-    private static void ResetCache (int num)
-    {
-        //this.similarCache = new int[num, num];
-        //for (int i = 0; i < num; ++i)
-        //{
-        //  for (int j = 0; j < num; j++)
-        //  {
-        //    this.similarCache[i, j] = -1;
-        //  }
-        //}
-    }
+    //private static void ResetCache (int num)
+    //{
+    //    //this.similarCache = new int[num, num];
+    //    //for (int i = 0; i < num; ++i)
+    //    //{
+    //    //  for (int j = 0; j < num; j++)
+    //    //  {
+    //    //    this.similarCache[i, j] = -1;
+    //    //  }
+    //    //}
+    //}
 
     private int FindSimilarLine (int srcLine, int startLine, Dictionary<int, int> processedLinesDict)
     {
@@ -6188,7 +6174,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
 
-            if (CurrentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
+            if (CurrentColumnizer is ILogLineMemoryXmlColumnizer xmlColumnizer)
             {
                 _logFileReader.IsXmlMode = true;
                 _logFileReader.XmlLogConfig = xmlColumnizer.GetXmlLogConfiguration();
@@ -6315,8 +6301,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SessionFileName = SessionFileName,
             Columnizer = CurrentColumnizer,
             LineCount = _logFileReader != null ? _logFileReader.LineCount : 0
-
-
         };
 
         _filterParams.IsFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
@@ -6427,7 +6411,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
     }
 
-    public void PreselectColumnizer (string columnizerName)
+    private void PreSelectColumnizer (ILogLineMemoryColumnizer columnizer)
+    {
+        CurrentColumnizer = columnizer != null
+            ? (_forcedColumnizerForLoading = columnizer)
+            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
+    }
+
+    public void PreSelectColumnizerByName (string columnizerName)
     {
         var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
         PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
@@ -7981,14 +7972,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         RefreshAllGrids();
     }
-
-    //Replace any digit, to normalize numbers.
-    [GeneratedRegex("\\d")]
-    private static partial Regex ReplaceDigit ();
-
-    //Replace any non-word character, anything that is not a letter, digit or underscore
-    [GeneratedRegex("\\W")]
-    private static partial Regex ReplaceNonWordCharacters ();
 
     #endregion
 }

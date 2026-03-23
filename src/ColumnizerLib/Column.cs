@@ -2,7 +2,6 @@ namespace ColumnizerLib;
 
 public class Column : IColumnMemory
 {
-    //TODO Memory Functions need implementation
     #region Fields
 
     private const string REPLACEMENT = "...";

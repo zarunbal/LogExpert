@@ -2327,6 +2327,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnStatusLineEvent (object sender, StatusLineEventArgs e)
     {
+        if (InvokeRequired)
+        {
+            _ = BeginInvoke(() => StatusLineEventWorker(e));
+            return;
+        }
+
         StatusLineEventWorker(e);
     }
 
