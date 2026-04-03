@@ -10,10 +10,10 @@ internal interface ILogWindowCoordinator
 {
     /// <summary>
     /// Resolves the appropriate highlight group using a 4-tier fallback chain:
-    /// 1. File-mask regex match (if fileName is provided)
-    /// 2. Name match (if groupName is provided)
-    /// 3. First group in the list
-    /// 4. New empty group
+    /// 1. File-mask regex match (if fileName is provided)<br></br>
+    /// 2. Name match (if groupName is provided)<br></br>
+    /// 3. First group in the list<br></br>
+    /// 4. New empty group<br></br>
     /// Never returns null.
     /// </summary>
     HighlightGroup ResolveHighlightGroup (string? groupName, string? fileName);

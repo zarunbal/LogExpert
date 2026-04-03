@@ -79,6 +79,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly Image _panelOpenButtonImage;
     private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
+    private readonly ILogWindowCoordinator _logWindowCoordinator;
 
     private readonly ProgressEventArgs _progressEventArgs = new();
     private readonly Lock _reloadLock = new();
@@ -149,7 +150,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogWindow (LogTabWindow.LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
+    public LogWindow (ILogWindowCoordinator logWindowCoordinator, LogTabWindow.LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -166,6 +167,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         columnNamesLabel.Text = string.Empty; // no filtering on columns by default
 
         _parentLogTabWin = parent;
+        _logWindowCoordinator = logWindowCoordinator;
         IsTempFile = isTempFile;
         ConfigManager = configManager; //TODO: This should be changed to DI
         //Thread.CurrentThread.Name = "LogWindowThread";
@@ -194,7 +196,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
         tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
-        _parentLogTabWin.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
+        _logWindowCoordinator.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
         SetColumnizer(PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers[0]);
 
         _patternArgs.MaxMisses = 5;
@@ -833,7 +835,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
         _waitingForClose = true;
-        _parentLogTabWin.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
+        _logWindowCoordinator.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
         _logFileReader?.DeleteAllContent();
 
         FreeFromTimeSync();
@@ -3523,14 +3525,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
-    /// background colors.
-    /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
-    /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the
+    /// same foreground and background colors. All regions which don't match a word-mode entry will be painted with the
+    /// colors of a default entry (groundEntry). This is either the first matching non-word-mode highlight entry or a
+    /// black-on-white default (if no matching entry was found).
     /// </summary>
     /// <param name="matchList">List of all highlight matches for the current cell</param>
     /// <param name="groundEntry">The entry that is used as the default.</param>
-    /// <returns>List of HighlightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
+    /// <returns>
+    /// List of HighlightMatchEntry objects. The list spans over the whole cell and contains color infos for every
+    /// substring.
+    /// </returns>
     private static IList<HighlightMatchEntry> MergeHighlightMatchEntries (IList<HighlightMatchEntry> matchList, HighlightMatchEntry groundEntry)
     {
         // Fill an area with lenth of whole text with a default hilight entry
@@ -4444,9 +4449,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    ///  Returns a list with 'additional filter results'. This is the given line number
-    ///  and (if back spread and/or fore spread is enabled) some additional lines.
-    ///  This function doesn't check the filter condition!
+    /// Returns a list with 'additional filter results'. This is the given line number and (if back spread and/or fore
+    /// spread is enabled) some additional lines. This function doesn't check the filter condition!
     /// </summary>
     /// <param name="filterParams"></param>
     /// <param name="lineNum"></param>
@@ -5942,16 +5946,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void SetDefaultHighlightGroup ()
     {
-        var group = _parentLogTabWin.FindHighlightGroupByFileMask(FileName);
-
-        if (group != null)
-        {
-            SetCurrentHighlightGroup(group.GroupName);
-        }
-        else
-        {
-            SetCurrentHighlightGroup(Resources.HighlightDialog_UI_DefaultGroupName);
-        }
+        var group = _logWindowCoordinator.ResolveHighlightGroup(null, FileName);
+        //Resources.HighlightDialog_UI_DefaultGroupName
+        SetCurrentHighlightGroup(group.GroupName);
     }
 
     [SupportedOSPlatform("windows")]
@@ -7325,7 +7322,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Change the file encoding. May force a reload if byte count ot preamble lenght differs from previous used encoding.
+    /// Change the file encoding. May force a reload if byte count ot preamble lenght differs from previous used
+    /// encoding.
     /// </summary>
     /// <param name="encoding"></param>
     public void ChangeEncoding (Encoding encoding)
@@ -7884,14 +7882,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public void SetCurrentHighlightGroup (string groupName)
     {
         _guiStateArgs.HighlightGroupName = groupName;
+
         lock (_currentHighlightGroupLock)
         {
-            _currentHighlightGroup = _parentLogTabWin.FindHighlightGroup(groupName);
-
-            _currentHighlightGroup ??= _parentLogTabWin.HighlightGroupList.Count > 0
-                ? _parentLogTabWin.HighlightGroupList[0]
-                : new HighlightGroup();
-
+            _currentHighlightGroup = _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
             _guiStateArgs.HighlightGroupName = _currentHighlightGroup.GroupName;
         }
 

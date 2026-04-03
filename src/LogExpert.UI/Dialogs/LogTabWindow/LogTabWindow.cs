@@ -23,6 +23,7 @@ using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
 using LogExpert.UI.Services.LedService;
+using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
 using LogExpert.UI.Services.TabControllerService;
 
@@ -48,6 +49,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private readonly TabController _tabController;
     private readonly MenuToolbarController _menuToolbarController;
+    private readonly LogWindowCoordinator _logWindowCoordinator;
 
     private bool _disposed;
 
@@ -95,6 +97,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ApplyTextResources();
 
         ConfigManager = configManager;
+        _logWindowCoordinator = new LogWindowCoordinator(configManager);
 
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
@@ -179,12 +182,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _tabController.WindowActivated += OnTabControllerWindowActivated;
         _tabController.WindowClosing += OnTabControllerWindowClosing;
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler HighlightSettingsChanged;
 
     #endregion
 
@@ -507,7 +504,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
-        LogWindow.LogWindow logWindow = new(this, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, this, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
         {
             GivenFileName = givenFileName
         };
@@ -570,7 +567,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return null;
         }
 
-        LogWindow.LogWindow logWindow = new(this, fileNames[^1], false, false, ConfigManager);
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, this, fileNames[^1], false, false, ConfigManager);
         AddLogWindow(logWindow, fileNames[^1], false);
         multiFileToolStripMenuItem.Checked = true;
         multiFileEnabledStripMenuItem.Checked = true;
@@ -655,8 +652,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowActivated event from TabController.
-    /// Updates CurrentLogWindow and connects tool windows to the newly activated window.
+    /// Handles the WindowActivated event from TabController. Updates CurrentLogWindow and connects tool windows to the
+    /// newly activated window.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the activated window and previous window</param>
@@ -695,8 +692,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowAdded event from TabController.
-    /// Performs additional setup for newly added windows that LogTabWindow needs.
+    /// Handles the WindowAdded event from TabController. Performs additional setup for newly added windows that
+    /// LogTabWindow needs.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the added window and title</param>
@@ -722,8 +719,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowClosing event from TabController.
-    /// Performs pre-close validation and cleanup. Can cancel the close operation.
+    /// Handles the WindowClosing event from TabController. Performs pre-close validation and cleanup. Can cancel the
+    /// close operation.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the window being closed and cancellation support</param>
@@ -745,8 +742,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowRemoved event from TabController.
-    /// Cleans up resources and event subscriptions for the removed window.
+    /// Handles the WindowRemoved event from TabController. Cleans up resources and event subscriptions for the removed
+    /// window.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the removed window</param>
@@ -1047,8 +1044,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Adds a LogWindow to the tab system.
-    /// Sets up window properties, delegates to TabController, and performs additional setup.
+    /// Adds a LogWindow to the tab system. Sets up window properties, delegates to TabController, and performs
+    /// additional setup.
     /// </summary>
     /// <param name="logWindow">The window to add</param>
     /// <param name="title">Tab title</param>
@@ -1116,8 +1113,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Removes a LogWindow from the tab system.
-    /// Delegates to TabController for removal and cleanup.
+    /// Removes a LogWindow from the tab system. Delegates to TabController for removal and cleanup.
     /// </summary>
     /// <param name="logWindow">The window to remove</param>
     [SupportedOSPlatform("windows")]
@@ -2009,7 +2005,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnHighlightSettingsChanged ()
     {
-        HighlightSettingsChanged?.Invoke(this, EventArgs.Empty);
+        _logWindowCoordinator.OnHighlightSettingsChanged();
     }
 
     #endregion

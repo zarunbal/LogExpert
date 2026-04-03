@@ -37,7 +37,7 @@ public class LogWindowCoordinatorTests
     {
         // Arrange
         var group = new HighlightGroup { GroupName = "MyGroup" };
-        _coordinator.UpdateHighlightGroups([group]);
+        _preferences.HighlightGroupList = [group];
 
         // Act
         var result = _coordinator.ResolveHighlightGroup("MyGroup", null);
@@ -51,7 +51,7 @@ public class LogWindowCoordinatorTests
     {
         // Arrange
         var group = new HighlightGroup { GroupName = "LogGroup" };
-        _coordinator.UpdateHighlightGroups([group]);
+        _preferences.HighlightGroupList = [group];
         _preferences.HighlightMaskList.Add(new HighlightMaskEntry { Mask = @"\.log$", HighlightGroupName = "LogGroup" });
 
         // Act
@@ -67,7 +67,7 @@ public class LogWindowCoordinatorTests
         // Arrange
         var maskGroup = new HighlightGroup { GroupName = "MaskGroup" };
         var nameGroup = new HighlightGroup { GroupName = "NameGroup" };
-        _coordinator.UpdateHighlightGroups([maskGroup, nameGroup]);
+        _preferences.HighlightGroupList = [maskGroup, nameGroup];
         _preferences.HighlightMaskList.Add(new HighlightMaskEntry { Mask = @"\.log$", HighlightGroupName = "MaskGroup" });
 
         // Act
@@ -82,7 +82,7 @@ public class LogWindowCoordinatorTests
     {
         // Arrange
         var group = new HighlightGroup { GroupName = "NameGroup" };
-        _coordinator.UpdateHighlightGroups([group]);
+        _preferences.HighlightGroupList = [group];
         _preferences.HighlightMaskList.Add(new HighlightMaskEntry { Mask = @"\.xml$", HighlightGroupName = "OtherGroup" });
 
         // Act
@@ -98,7 +98,7 @@ public class LogWindowCoordinatorTests
         // Arrange
         var firstGroup = new HighlightGroup { GroupName = "First" };
         var secondGroup = new HighlightGroup { GroupName = "Second" };
-        _coordinator.UpdateHighlightGroups([firstGroup, secondGroup]);
+        _preferences.HighlightGroupList = [firstGroup, secondGroup];
 
         // Act
         var result = _coordinator.ResolveHighlightGroup("NonExistent", null);
@@ -111,7 +111,7 @@ public class LogWindowCoordinatorTests
     public void ResolveHighlightGroup_EmptyList_ReturnsNewEmptyGroup ()
     {
         // Arrange
-        _coordinator.UpdateHighlightGroups([]);
+        _preferences.HighlightGroupList = [];
 
         // Act
         var result = _coordinator.ResolveHighlightGroup("NonExistent", null);
@@ -125,7 +125,7 @@ public class LogWindowCoordinatorTests
     public void ResolveHighlightGroup_NeverReturnsNull ()
     {
         // Arrange
-        _coordinator.UpdateHighlightGroups([]);
+        _preferences.HighlightGroupList = [];
 
         // Act
         var result = _coordinator.ResolveHighlightGroup(null, null);
@@ -139,7 +139,7 @@ public class LogWindowCoordinatorTests
     {
         // Arrange
         var group = new HighlightGroup { GroupName = "GoodGroup" };
-        _coordinator.UpdateHighlightGroups([group]);
+        _preferences.HighlightGroupList = [group];
         _preferences.HighlightMaskList.Add(new HighlightMaskEntry { Mask = @"[invalid", HighlightGroupName = "BadGroup" });
         _preferences.HighlightMaskList.Add(new HighlightMaskEntry { Mask = @"\.log$", HighlightGroupName = "GoodGroup" });
 

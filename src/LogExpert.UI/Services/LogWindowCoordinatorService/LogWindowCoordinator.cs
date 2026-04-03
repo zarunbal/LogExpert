@@ -20,24 +20,9 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager) : ILog
     private readonly IConfigManager _configManager = configManager;
     private readonly Lock _highlightGroupLock = new();
 
-    /// <summary>
-    /// The current list of highlight groups. This is owned by Preferences and
-    /// updated via <see cref="UpdateHighlightGroups"/>.
-    /// </summary>
-    private List<HighlightGroup> HighlightGroupList { get; set; } = [];
-
     public event EventHandler HighlightSettingsChanged;
 
-    /// <summary>
-    /// Updates the highlight group list (called after settings change).
-    /// </summary>
-    public void UpdateHighlightGroups (List<HighlightGroup> groups)
-    {
-        lock (_highlightGroupLock)
-        {
-            HighlightGroupList = groups;
-        }
-    }
+    private List<HighlightGroup> HighlightGroups => _configManager.Settings.Preferences.HighlightGroupList;
 
     /// <summary>
     /// Raises the HighlightSettingsChanged event.
@@ -72,9 +57,9 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager) : ILog
             }
 
             // Tier 3: First group in the list
-            if (HighlightGroupList.Count > 0)
+            if (HighlightGroups.Count > 0)
             {
-                return HighlightGroupList[0];
+                return HighlightGroups[0];
             }
 
             // Tier 4: New empty group (never returns null)
@@ -84,7 +69,7 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager) : ILog
 
     private HighlightGroup? FindHighlightGroupByName (string groupName)
     {
-        foreach (var group in HighlightGroupList)
+        foreach (var group in HighlightGroups)
         {
             if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
             {
