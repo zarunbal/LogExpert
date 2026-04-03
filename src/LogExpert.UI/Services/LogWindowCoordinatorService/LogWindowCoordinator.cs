@@ -1,6 +1,11 @@
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
+using LogExpert.Core.Classes;
+using LogExpert.Core.Classes.Columnizer;
+using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Interface;
@@ -13,16 +18,19 @@ namespace LogExpert.UI.Services.LogWindowCoordinatorService;
 /// Coordinates workspace-level operations for LogWindow instances.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class LogWindowCoordinator (IConfigManager configManager) : ILogWindowCoordinator
+internal sealed class LogWindowCoordinator (IConfigManager configManager, IPluginRegistry pluginRegistry) : ILogWindowCoordinator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly IConfigManager _configManager = configManager;
+    private readonly IPluginRegistry _pluginRegistry = pluginRegistry;
     private readonly Lock _highlightGroupLock = new();
 
     public event EventHandler HighlightSettingsChanged;
 
     private List<HighlightGroup> HighlightGroups => _configManager.Settings.Preferences.HighlightGroupList;
+
+    public SearchParams SearchParams { get; } = new SearchParams();
 
     /// <summary>
     /// Raises the HighlightSettingsChanged event.
@@ -97,6 +105,74 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager) : ILog
                 {
                     _logger.Error($"RegEx-error while matching highlight mask: {e}");
                 }
+            }
+        }
+
+        return null;
+    }
+
+    public ILogLineMemoryColumnizer? ResolveColumnizer (string fileName)
+    {
+        var preferences = _configManager.Settings.Preferences;
+        var shortName = Util.GetNameFromPath(fileName);
+
+        return preferences.MaskPrio
+            ? FindColumnizerByFileMask(shortName) ?? GetColumnizerHistoryEntry(fileName)
+            : GetColumnizerHistoryEntry(fileName) ?? FindColumnizerByFileMask(shortName);
+    }
+
+    private ILogLineMemoryColumnizer? FindColumnizerByFileMask (string fileName)
+    {
+        foreach (var entry in _configManager.Settings.Preferences.ColumnizerMaskList)
+        {
+            if (entry.Mask != null)
+            {
+                try
+                {
+                    if (Regex.IsMatch(fileName, entry.Mask))
+                    {
+                        return ColumnizerPicker.FindMemorColumnizerByName(
+                            entry.ColumnizerName,
+                            _pluginRegistry.RegisteredColumnizers);
+                    }
+                }
+                catch (ArgumentException e)
+                {
+                    _logger.Error($"RegEx-error while finding columnizer: {e}");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private ILogLineMemoryColumnizer? GetColumnizerHistoryEntry (string fileName)
+    {
+        var historyEntry = FindColumnizerHistoryEntry(fileName);
+        if (historyEntry != null)
+        {
+            foreach (var columnizer in _pluginRegistry.RegisteredColumnizers)
+            {
+                if (columnizer.GetName().Equals(historyEntry.ColumnizerName, StringComparison.Ordinal))
+                {
+                    return columnizer;
+                }
+            }
+
+            // Stale entry — columnizer name no longer registered. Remove it.
+            _ = _configManager.Settings.ColumnizerHistoryList.Remove(historyEntry);
+        }
+
+        return null;
+    }
+
+    public ColumnizerHistoryEntry? FindColumnizerHistoryEntry (string fileName)
+    {
+        foreach (var entry in _configManager.Settings.ColumnizerHistoryList)
+        {
+            if (entry.FileName.Equals(fileName, StringComparison.Ordinal))
+            {
+                return entry;
             }
         }
 

@@ -2784,11 +2784,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private ILogLineMemoryColumnizer FindColumnizer ()
     {
-        var columnizer = Preferences.MaskPrio
-            ? _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName)) ?? _parentLogTabWin.GetColumnizerHistoryEntry(FileName)
-            : _parentLogTabWin.GetColumnizerHistoryEntry(FileName) ?? _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName));
-
-        return columnizer;
+        return _logWindowCoordinator.ResolveColumnizer(FileName);
     }
 
     private void ReloadNewFile ()
@@ -6685,7 +6681,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         _guiStateArgs.MenuEnabled = false;
         GuiStateUpdate(this, _guiStateArgs);
-        var searchParams = _parentLogTabWin.SearchParams;
+        var searchParams = _logWindowCoordinator.SearchParams;
 
         searchParams.CurrentLine = (searchParams.IsForward || searchParams.IsFindNext) && !searchParams.IsShiftF3Pressed
             ? dataGridView.CurrentCellAddress.Y + 1
@@ -6781,14 +6777,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         switch (e.KeyCode)
         {
-            case Keys.F3 when _parentLogTabWin.SearchParams?.SearchText == null || _parentLogTabWin.SearchParams.SearchText.Length == 0:
+            case Keys.F3 when _logWindowCoordinator.SearchParams?.SearchText == null || _logWindowCoordinator.SearchParams.SearchText.Length == 0:
                 {
                     return;
                 }
             case Keys.F3:
                 {
-                    _parentLogTabWin.SearchParams.IsFindNext = true;
-                    _parentLogTabWin.SearchParams.IsShiftF3Pressed = (e.Modifiers & Keys.Shift) == Keys.Shift;
+                    _logWindowCoordinator.SearchParams.IsFindNext = true;
+                    _logWindowCoordinator.SearchParams.IsShiftF3Pressed = (e.Modifiers & Keys.Shift) == Keys.Shift;
                     StartSearch();
                     break;
                 }

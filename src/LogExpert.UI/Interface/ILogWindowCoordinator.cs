@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Entities;
 
 namespace LogExpert.UI.Interface;
@@ -23,4 +25,18 @@ internal interface ILogWindowCoordinator
     /// Subscribers should re-resolve their highlight groups.
     /// </summary>
     event EventHandler HighlightSettingsChanged;
+
+    /// <summary>
+    /// Resolves the appropriate columnizer for the given file name.
+    /// Respects MaskPrio preference (mask-first vs history-first).
+    /// Cleans up stale history entries.
+    /// Returns null when no match found.
+    /// </summary>
+    ILogLineMemoryColumnizer? ResolveColumnizer (string fileName);
+
+    /// <summary>
+    /// Shared search parameters across all tabs.
+    /// All tabs read/write from the same instance.
+    /// </summary>
+    SearchParams SearchParams { get; }
 }

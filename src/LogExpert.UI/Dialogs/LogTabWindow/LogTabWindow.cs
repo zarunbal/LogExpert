@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using ColumnizerLib;
 
@@ -97,7 +96,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ApplyTextResources();
 
         ConfigManager = configManager;
-        _logWindowCoordinator = new LogWindowCoordinator(configManager);
+        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance);
 
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
@@ -195,7 +194,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         set => ChangeCurrentLogWindow(value);
     }
 
-    public SearchParams SearchParams { get; private set; } = new SearchParams();
+    public SearchParams SearchParams => _logWindowCoordinator.SearchParams;
 
     public Preferences Preferences => ConfigManager.Settings.Preferences;
 
@@ -600,29 +599,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var res = dlg.ShowDialog();
         if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.SearchText))
         {
-            SearchParams = dlg.SearchParams;
+            SearchParams.CopyFrom(dlg.SearchParams);
             SearchParams.IsFindNext = false;
             CurrentLogWindow.StartSearch();
         }
-    }
-
-    public ILogLineMemoryColumnizer GetColumnizerHistoryEntry (string fileName)
-    {
-        var entry = FindColumnizerHistoryEntry(fileName);
-        if (entry != null)
-        {
-            foreach (var columnizer in PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers)
-            {
-                if (columnizer.GetName().Equals(entry.ColumnizerName, StringComparison.Ordinal))
-                {
-                    return columnizer;
-                }
-            }
-
-            _ = ConfigManager.Settings.ColumnizerHistoryList.Remove(entry); // no valid name -> remove entry
-        }
-
-        return null;
     }
 
     public void SwitchTab (bool shiftPressed)
@@ -766,54 +746,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ChangeCurrentLogWindow(null);
         }
-    }
-
-    public ILogLineMemoryColumnizer FindColumnizerByFileMask (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.Preferences.ColumnizerMaskList)
-        {
-            if (entry.Mask != null)
-            {
-                try
-                {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(entry.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-                        return columnizer;
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while finding columnizer: {e}");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public HighlightGroup FindHighlightGroupByFileMask (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.Preferences.HighlightMaskList)
-        {
-            if (entry.Mask != null)
-            {
-                try
-                {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        var group = FindHighlightGroup(entry.HighlightGroupName);
-                        return group;
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while finding columnizer: {e}");
-                }
-            }
-        }
-
-        return null;
     }
 
     public void SelectTab (ILogWindow logWindow)
@@ -1268,7 +1200,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void SetColumnizerHistoryEntry (string fileName, ILogLineMemoryColumnizer columnizer)
     {
-        var entry = FindColumnizerHistoryEntry(fileName);
+        var entry = _logWindowCoordinator.FindColumnizerHistoryEntry(fileName);
         if (entry != null)
         {
             _ = ConfigManager.Settings.ColumnizerHistoryList.Remove(entry);
@@ -1281,19 +1213,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ConfigManager.Settings.ColumnizerHistoryList.RemoveAt(0);
         }
-    }
-
-    private ColumnizerHistoryEntry FindColumnizerHistoryEntry (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.ColumnizerHistoryList)
-        {
-            if (entry.FileName.Equals(fileName, StringComparison.Ordinal))
-            {
-                return entry;
-            }
-        }
-
-        return null;
     }
 
     [SupportedOSPlatform("windows")]
