@@ -5,9 +5,11 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
+using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
+using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
 
 using NLog;
@@ -18,12 +20,13 @@ namespace LogExpert.UI.Services.LogWindowCoordinatorService;
 /// Coordinates workspace-level operations for LogWindow instances.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class LogWindowCoordinator (IConfigManager configManager, IPluginRegistry pluginRegistry) : ILogWindowCoordinator
+internal sealed class LogWindowCoordinator (IConfigManager configManager, IPluginRegistry pluginRegistry, Controls.LogTabWindow.LogTabWindow logTabWindow) : ILogWindowCoordinator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly IConfigManager _configManager = configManager;
     private readonly IPluginRegistry _pluginRegistry = pluginRegistry;
+    private readonly Controls.LogTabWindow.LogTabWindow _logTabWindow = logTabWindow;
     private readonly Lock _highlightGroupLock = new();
 
     public event EventHandler HighlightSettingsChanged;
@@ -177,5 +180,15 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager, IPlugi
         }
 
         return null;
+    }
+
+    public LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer? preProcessColumnizer)
+    {
+        return _logTabWindow.AddFilterTab(pipe, title, preProcessColumnizer);
+    }
+
+    public LogWindow AddTempFileTab (string fileName, string title)
+    {
+        return _logTabWindow.AddTempFileTab(fileName, title);
     }
 }

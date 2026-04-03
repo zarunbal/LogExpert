@@ -32,7 +32,10 @@ public class LogWindowCoordinatorTests
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
         _ = _pluginRegistryMock.Setup(pr => pr.RegisteredColumnizers).Returns([]);
 
-        _coordinator = new LogWindowCoordinator(_configManagerMock.Object, _pluginRegistryMock.Object);
+        // Tab creation methods (AddFilterTab, AddTempFileTab) are pure delegation
+        // to LogTabWindow and are verified via smoke tests rather than unit tests,
+        // as they require a full WinForms context.
+        _coordinator = new LogWindowCoordinator(_configManagerMock.Object, _pluginRegistryMock.Object, null);
     }
 
     [Test]

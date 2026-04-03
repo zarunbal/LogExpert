@@ -96,7 +96,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ApplyTextResources();
 
         ConfigManager = configManager;
-        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance);
+        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this);
 
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);

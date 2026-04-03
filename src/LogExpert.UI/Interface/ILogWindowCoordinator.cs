@@ -1,6 +1,8 @@
 using ColumnizerLib;
 
+using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
+using LogExpert.UI.Controls.LogWindow;
 
 namespace LogExpert.UI.Interface;
 
@@ -39,4 +41,14 @@ internal interface ILogWindowCoordinator
     /// All tabs read/write from the same instance.
     /// </summary>
     SearchParams SearchParams { get; }
+
+    /// <summary>
+    /// Creates a new filter result tab. Transitionally delegates to the main form.
+    /// </summary>
+    LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer? preProcessColumnizer);
+
+    /// <summary>
+    /// Creates a new temporary file tab. Transitionally delegates to the main form.
+    /// </summary>
+    LogWindow AddTempFileTab (string fileName, string title);
 }

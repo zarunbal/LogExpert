@@ -5046,7 +5046,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 preProcessColumnizer = CurrentColumnizer;
             }
 
-            var newWin = _parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
+            var newWin = _logWindowCoordinator.AddFilterTab(pipe, title, preProcessColumnizer);
             newWin.FilterPipe = pipe;
             pipe.OwnLogWindow = newWin;
             if (persistenceData != null)
@@ -5373,7 +5373,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     protected internal void AddTempFileTab (string fileName, string title)
     {
-        _ = _parentLogTabWin.AddTempFileTab(fileName, title);
+        _ = _logWindowCoordinator.AddTempFileTab(fileName, title);
     }
 
     private void InitPatternWindow ()
@@ -7313,7 +7313,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             writer.Close();
             var title = string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_CopyMarkedLinesToTab_Clip, Util.GetNameFromPath(FileName));
-            _ = _parentLogTabWin.AddTempFileTab(fileName, title);
+            _ = _logWindowCoordinator.AddTempFileTab(fileName, title);
         }
     }
 
