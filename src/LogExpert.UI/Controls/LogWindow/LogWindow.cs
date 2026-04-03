@@ -384,7 +384,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ForcedPersistenceFileName { get; set; }
 
-    public Preferences Preferences => _parentLogTabWin.Preferences;
+    public Preferences Preferences => ConfigManager.Settings.Preferences;
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string GivenFileName { get; set; }
@@ -821,10 +821,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogWindowLoad (object sender, EventArgs e)
     {
-        var setLastColumnWidth = _parentLogTabWin.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = _parentLogTabWin.Preferences.LastColumnWidth;
-        var fontName = _parentLogTabWin.Preferences.FontName;
-        var fontSize = _parentLogTabWin.Preferences.FontSize;
+        var setLastColumnWidth = Preferences.SetLastColumnWidth;
+        var lastColumnWidth = Preferences.LastColumnWidth;
+        var fontName = Preferences.FontName;
+        var fontSize = Preferences.FontSize;
 
         PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
     }
@@ -2908,10 +2908,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _statusEventArgs.FileSize = _logFileReader.FileSize;
         SendStatusLineUpdate();
 
-        var setLastColumnWidth = _parentLogTabWin.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = _parentLogTabWin.Preferences.LastColumnWidth;
-        var fontName = _parentLogTabWin.Preferences.FontName;
-        var fontSize = _parentLogTabWin.Preferences.FontSize;
+        var setLastColumnWidth = Preferences.SetLastColumnWidth;
+        var lastColumnWidth = Preferences.LastColumnWidth;
+        var fontName = Preferences.FontName;
+        var fontSize = Preferences.FontSize;
 
         PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
         //LoadPersistenceData();
@@ -2966,13 +2966,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     try
                     {
                         _ = Invoke(UpdateGrid, [e]);
+                        CheckFilterAndHighlight(e);
                     }
                     catch (ObjectDisposedException)
                     {
                         return;
                     }
 
-                    CheckFilterAndHighlight(e);
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }
             }
@@ -5957,8 +5957,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void HandleChangedFilterOnLoadSetting ()
     {
-        _parentLogTabWin.Preferences.IsFilterOnLoad = filterOnLoadCheckBox.Checked;
-        _parentLogTabWin.Preferences.IsAutoHideFilterList = hideFilterListOnLoadCheckBox.Checked;
+        Preferences.IsFilterOnLoad = filterOnLoadCheckBox.Checked;
+        Preferences.IsAutoHideFilterList = hideFilterListOnLoadCheckBox.Checked;
         OnFilterListChanged(this);
     }
 

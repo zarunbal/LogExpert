@@ -924,7 +924,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             _logger.Debug(CultureInfo.InvariantCulture, "Returning null for line {0} because file is deleted.", lineNum);
             // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
-            return null;
+            return Task.FromResult<ILogLineMemory>(null);
         }
 
         AcquireBufferListReaderLock();
@@ -933,7 +933,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             ReleaseBufferListReaderLock();
             _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
-            return null;
+            return Task.FromResult<ILogLineMemory>(null);
         }
         // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
         AcquireDisposeLockUpgradableReadLock();
