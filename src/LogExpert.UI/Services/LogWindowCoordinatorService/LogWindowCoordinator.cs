@@ -10,6 +10,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Entities;
 using LogExpert.UI.Interface;
 
 using NLog;
@@ -20,14 +21,23 @@ namespace LogExpert.UI.Services.LogWindowCoordinatorService;
 /// Coordinates workspace-level operations for LogWindow instances.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal sealed class LogWindowCoordinator (IConfigManager configManager, IPluginRegistry pluginRegistry, Controls.LogTabWindow.LogTabWindow logTabWindow) : ILogWindowCoordinator
+internal sealed class LogWindowCoordinator (
+    IConfigManager configManager,
+    IPluginRegistry pluginRegistry,
+    Controls.LogTabWindow.LogTabWindow logTabWindow,
+    ITabController tabController,
+    ILedIndicatorService ledIndicatorService) : ILogWindowCoordinator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly IConfigManager _configManager = configManager;
     private readonly IPluginRegistry _pluginRegistry = pluginRegistry;
     private readonly Controls.LogTabWindow.LogTabWindow _logTabWindow = logTabWindow;
+    private readonly ITabController _tabController = tabController;
+    private readonly ILedIndicatorService _ledIndicatorService = ledIndicatorService;
     private readonly Lock _highlightGroupLock = new();
+
+    private const int DIFF_MAX = 100;
 
     public event EventHandler HighlightSettingsChanged;
 
@@ -190,5 +200,41 @@ internal sealed class LogWindowCoordinator (IConfigManager configManager, IPlugi
     public LogWindow AddTempFileTab (string fileName, string title)
     {
         return _logTabWindow.AddTempFileTab(fileName, title);
+    }
+
+    public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender)
+    {
+        foreach (var logWindow in _tabController.GetAllWindows())
+        {
+            if (logWindow != sender)
+            {
+                if (logWindow.ScrollToTimestamp(timestamp, false, false))
+                {
+                    _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
+                }
+            }
+        }
+    }
+
+    public IList<WindowFileEntry> GetOpenFiles ()
+    {
+        IList<WindowFileEntry> list = [];
+
+        foreach (var logWindow in _tabController.GetAllWindows())
+        {
+            list.Add(new WindowFileEntry(logWindow));
+        }
+
+        return list;
+    }
+
+    public void SelectTab (LogWindow logWindow)
+    {
+        _tabController.ActivateWindow(logWindow);
+    }
+
+    public void NotifyFollowTailChanged (LogWindow logWindow, bool isEnabled, bool offByTrigger)
+    {
+        _logTabWindow.FollowTailChanged(logWindow, isEnabled, offByTrigger);
     }
 }

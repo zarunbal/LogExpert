@@ -3,6 +3,7 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Entities;
 
 namespace LogExpert.UI.Interface;
 
@@ -51,4 +52,24 @@ internal interface ILogWindowCoordinator
     /// Creates a new temporary file tab. Transitionally delegates to the main form.
     /// </summary>
     LogWindow AddTempFileTab (string fileName, string title);
+
+    /// <summary>
+    /// Scrolls all tabs (except sender) to the given timestamp and updates LED activity.
+    /// </summary>
+    void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender);
+
+    /// <summary>
+    /// Returns the list of all currently open log files.
+    /// </summary>
+    IList<WindowFileEntry> GetOpenFiles ();
+
+    /// <summary>
+    /// Activates the tab containing the specified LogWindow.
+    /// </summary>
+    void SelectTab (LogWindow logWindow);
+
+    /// <summary>
+    /// Notifies the LED indicator service about follow-tail state changes.
+    /// </summary>
+    void NotifyFollowTailChanged (LogWindow logWindow, bool isEnabled, bool offByTrigger);
 }

@@ -78,7 +78,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Image _panelCloseButtonImage;
 
     private readonly Image _panelOpenButtonImage;
-    private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
     private readonly ILogWindowCoordinator _logWindowCoordinator;
 
     private readonly ProgressEventArgs _progressEventArgs = new();
@@ -150,7 +149,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogWindow (ILogWindowCoordinator logWindowCoordinator, LogTabWindow.LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
+    public LogWindow (ILogWindowCoordinator logWindowCoordinator, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -166,7 +165,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         columnNamesLabel.Text = string.Empty; // no filtering on columns by default
 
-        _parentLogTabWin = parent;
         _logWindowCoordinator = logWindowCoordinator;
         IsTempFile = isTempFile;
         ConfigManager = configManager; //TODO: This should be changed to DI
@@ -1495,7 +1493,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (CurrentColumnizer.IsTimeshiftImplemented())
         {
-            var list = _parentLogTabWin.GetListOfOpenFiles();
+            var list = _logWindowCoordinator.GetOpenFiles();
             syncTimestampsToToolStripMenuItem.Enabled = true;
             syncTimestampsToToolStripMenuItem.DropDownItems.Clear();
             EventHandler ev = OnHandleSyncContextMenu;
@@ -1582,7 +1580,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     return;
                 }
 
-                _parentLogTabWin.ScrollAllTabsToTimestamp(timeStamp, this);
+                _logWindowCoordinator.ScrollAllTabsToTimestamp(timeStamp, this);
             }
         }
     }
@@ -1596,7 +1594,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (lineNum != -1)
             {
                 FilterPipe.LogWindow.SelectLine(lineNum, false, true);
-                _parentLogTabWin.SelectTab(FilterPipe.LogWindow);
+                _logWindowCoordinator.SelectTab(FilterPipe.LogWindow as LogWindow);
             }
         }
     }
@@ -6634,7 +6632,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _ = BeginInvoke(new MethodInvoker(dataGridView.Refresh));
         //this.dataGridView.Refresh();
-        _parentLogTabWin.FollowTailChanged(this, isChecked, byTrigger);
+        _logWindowCoordinator.NotifyFollowTailChanged(this, isChecked, byTrigger);
         SendGuiStateUpdate();
     }
 
@@ -7886,7 +7884,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         SendGuiStateUpdate();
-        _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
+
+        if (IsHandleCreated)
+        {
+            _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
+        }
     }
 
     public void SwitchMultiFile (bool enabled)

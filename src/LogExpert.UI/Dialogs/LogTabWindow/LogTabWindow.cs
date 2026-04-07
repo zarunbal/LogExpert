@@ -40,7 +40,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private const int MAX_COLUMNIZER_HISTORY = 40;
     //private const int MAX_COLOR_HISTORY = 40;
-    private const int DIFF_MAX = 100;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly Icon _deadIcon;
@@ -95,8 +94,18 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ApplyTextResources();
 
+        Rectangle led = new(0, 0, 8, 2);
+
         ConfigManager = configManager;
-        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this);
+
+        _ledService = new LedIndicatorService();
+        _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
+        _ledService.IconChanged += OnLedIconChanged;
+        _ledService.StartService();
+
+        _deadIcon = _ledService.GetDeadIcon();
+
+        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService);
 
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
@@ -110,15 +119,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ConfigManager.ConfigChanged += OnConfigChanged;
         HighlightGroupList = configManager.Settings.Preferences.HighlightGroupList;
-
-        Rectangle led = new(0, 0, 8, 2);
-
-        _ledService = new LedIndicatorService();
-        _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
-        _ledService.IconChanged += OnLedIconChanged;
-        _ledService.StartService();
-
-        _deadIcon = _ledService.GetDeadIcon();
 
         _tabStringFormat.LineAlignment = StringAlignment.Center;
         _tabStringFormat.Alignment = StringAlignment.Near;
@@ -198,6 +198,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     public Preferences Preferences => ConfigManager.Settings.Preferences;
 
+    //TODO: This needs to be changed, since its only using _configManager.Settings.Preferences.HighlightGroupList,
+    //like the logwindowCoordinator, but its also used in the settingsDialog, this needs to be refactored
     public List<HighlightGroup> HighlightGroupList { get; private set; } = [];
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -211,18 +213,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     internal HighlightGroup FindHighlightGroup (string groupName)
     {
-        lock (HighlightGroupList)
-        {
-            foreach (var group in HighlightGroupList)
-            {
-                if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
-                {
-                    return group;
-                }
-            }
+        return _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
 
-            return null;
-        }
+        //lock (HighlightGroupList)
+        //{
+        //    foreach (var group in HighlightGroupList)
+        //    {
+        //        if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
+        //        {
+        //            return group;
+        //        }
+        //    }
+
+        //    return null;
+        //}
     }
 
     #endregion
@@ -497,13 +501,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 AddToFileHistory(givenFileName);
             }
 
-            SelectTab(win);
+            _logWindowCoordinator.SelectTab(win);
             return win;
         }
 
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
-        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, this, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
         {
             GivenFileName = givenFileName
         };
@@ -566,7 +570,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return null;
         }
 
-        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, this, fileNames[^1], false, false, ConfigManager);
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, fileNames[^1], false, false, ConfigManager);
         AddLogWindow(logWindow, fileNames[^1], false);
         multiFileToolStripMenuItem.Checked = true;
         multiFileEnabledStripMenuItem.Checked = true;
@@ -614,20 +618,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         else
         {
             _tabController.SwitchToNextWindow();
-        }
-    }
-
-    public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow.LogWindow senderWindow)
-    {
-        foreach (var logWindow in _tabController.GetAllWindows())
-        {
-            if (logWindow != senderWindow)
-            {
-                if (logWindow.ScrollToTimestamp(timestamp, false, false))
-                {
-                    _ledService.UpdateWindowActivity(logWindow, DIFF_MAX);
-                }
-            }
         }
     }
 
@@ -748,11 +738,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    public void SelectTab (ILogWindow logWindow)
-    {
-        _tabController.ActivateWindow(logWindow as LogWindow.LogWindow);
-    }
-
     [SupportedOSPlatform("windows")]
     public void SetForeground ()
     {
@@ -794,18 +779,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             NotifyWindowsForChangedPrefs(flags);
         }
-    }
-
-    public IList<WindowFileEntry> GetListOfOpenFiles ()
-    {
-        IList<WindowFileEntry> list = [];
-
-        foreach (var logWindow in _tabController.GetAllWindows())
-        {
-            list.Add(new WindowFileEntry(logWindow));
-        }
-
-        return list;
     }
 
     #endregion
