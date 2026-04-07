@@ -25,6 +25,7 @@ using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
 using LogExpert.UI.Services.TabControllerService;
+using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
 using NLog;
 
@@ -48,6 +49,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly TabController _tabController;
     private readonly MenuToolbarController _menuToolbarController;
     private readonly LogWindowCoordinator _logWindowCoordinator;
+    private readonly ToolWindowCoordinator _toolWindowCoordinator;
 
     private bool _disposed;
 
@@ -62,10 +64,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private readonly StringFormat _tabStringFormat = new();
 
-    private BookmarkWindow _bookmarkWindow;
-
     private LogWindow.LogWindow _currentLogWindow;
-    private bool _firstBookmarkWindowShow = true;
 
     private bool _skipEvents;
 
@@ -97,6 +96,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         Rectangle led = new(0, 0, 8, 2);
 
         ConfigManager = configManager;
+
+        _toolWindowCoordinator = new ToolWindowCoordinator(configManager);
 
         _ledService = new LedIndicatorService();
         _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
@@ -839,39 +840,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void InitToolWindows ()
     {
-        InitBookmarkWindow();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void DestroyToolWindows ()
-    {
-        DestroyBookmarkWindow();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void InitBookmarkWindow ()
-    {
-        _bookmarkWindow = new BookmarkWindow
-        {
-            HideOnClose = true,
-            ShowHint = DockState.DockBottom
-        };
-
-        var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = ConfigManager.Settings.Preferences.LastColumnWidth;
-        var fontName = ConfigManager.Settings.Preferences.FontName;
-        var fontSize = ConfigManager.Settings.Preferences.FontSize;
-
-        _bookmarkWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, SettingsFlags.All);
-        _bookmarkWindow.VisibleChanged += OnBookmarkWindowVisibleChanged;
-        _firstBookmarkWindowShow = true;
+        _toolWindowCoordinator.Initialize();
     }
 
     [SupportedOSPlatform("windows")]
     private void DestroyBookmarkWindow ()
     {
-        _bookmarkWindow.HideOnClose = false;
-        _bookmarkWindow.Close();
+        _toolWindowCoordinator.Destroy();
     }
 
     private void SaveLastOpenFilesList ()
@@ -1216,10 +1191,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             oldLogWindow.StatusLineEvent -= OnStatusLineEvent;
             oldLogWindow.ProgressBarUpdate -= OnProgressBarUpdate;
             oldLogWindow.GuiStateUpdate -= OnGuiStateUpdate;
-            oldLogWindow.ColumnizerChanged -= OnColumnizerChanged;
-            oldLogWindow.BookmarkAdded -= OnBookmarkAdded;
-            oldLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
-            oldLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
             DisconnectToolWindows();
         }
 
@@ -1228,10 +1199,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             newLogWindow.StatusLineEvent += OnStatusLineEvent;
             newLogWindow.ProgressBarUpdate += OnProgressBarUpdate;
             newLogWindow.GuiStateUpdate += OnGuiStateUpdate;
-            newLogWindow.ColumnizerChanged += OnColumnizerChanged;
-            newLogWindow.BookmarkAdded += OnBookmarkAdded;
-            newLogWindow.BookmarkRemoved += OnBookmarkRemoved;
-            newLogWindow.BookmarkTextChanged += OnBookmarkTextChanged;
 
             Text = newLogWindow.IsTempFile
                 ? titleName + @" - " + newLogWindow.TempTitleName
@@ -1246,7 +1213,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             searchToolStripMenuItem.Enabled = true;
             filterToolStripMenuItem.Enabled = true;
             goToLineToolStripMenuItem.Enabled = true;
-            //ConnectToolWindows(newLogWindow);
+            ConnectToolWindows(newLogWindow);
         }
         else
         {
@@ -1272,25 +1239,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ConnectToolWindows (LogWindow.LogWindow logWindow)
     {
-        ConnectBookmarkWindow(logWindow);
-    }
-
-    private void ConnectBookmarkWindow (LogWindow.LogWindow logWindow)
-    {
-        FileViewContext ctx = new(logWindow, logWindow);
-        _bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
-        _bookmarkWindow.SetCurrentFile(ctx);
+        _toolWindowCoordinator.Connect(logWindow);
     }
 
     private void DisconnectToolWindows ()
     {
-        DisconnectBookmarkWindow();
-    }
-
-    private void DisconnectBookmarkWindow ()
-    {
-        _bookmarkWindow.SetBookmarkData(null);
-        _bookmarkWindow.SetCurrentFile(null);
+        _toolWindowCoordinator.Disconnect();
     }
 
     [SupportedOSPlatform("windows")]
@@ -1458,7 +1412,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         //}
 
-        _bookmarkWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
 
         HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
         if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
@@ -1738,7 +1692,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 _logger.Info("Restoring layout");
                 // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
-                DestroyToolWindows();
+                DestroyBookmarkWindow();
                 InitToolWindows();
                 RestoreLayout(projectData.TabLayoutXml);
             }
@@ -1875,9 +1829,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private IDockContent DeserializeDockContent (string persistString)
     {
-        if (persistString.Equals(WindowTypes.BookmarkWindow.ToString(), StringComparison.Ordinal))
+        var toolContent = _toolWindowCoordinator.GetDockContent(persistString);
+        if (toolContent != null)
         {
-            return _bookmarkWindow;
+            return toolContent;
         }
 
         if (persistString.StartsWith(WindowTypes.LogWindow.ToString(), StringComparison.OrdinalIgnoreCase))
@@ -1888,8 +1843,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 return win;
             }
-
-            //_logger.Warn("Layout data contains non-existing LogWindow for {fileName}"));
         }
 
         return null;
@@ -1903,11 +1856,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #endregion
 
     #region Events handler
-
-    private void OnBookmarkWindowVisibleChanged (object sender, EventArgs e)
-    {
-        _firstBookmarkWindowShow = false;
-    }
 
     private void OnLogTabWindowLoad (object sender, EventArgs e)
     {
@@ -2188,26 +2136,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _ = BeginInvoke(GuiStateUpdateWorker, e);
     }
 
-    private void OnColumnizerChanged (object sender, ColumnizerEventArgs e)
-    {
-        _bookmarkWindow?.SetColumnizer(e.Columnizer);
-    }
-
-    private void OnBookmarkAdded (object sender, EventArgs e)
-    {
-        _bookmarkWindow.UpdateView();
-    }
-
-    private void OnBookmarkTextChanged (object sender, BookmarkEventArgs e)
-    {
-        _bookmarkWindow.BookmarkTextChanged(e.Bookmark);
-    }
-
-    private void OnBookmarkRemoved (object sender, EventArgs e)
-    {
-        _bookmarkWindow.UpdateView();
-    }
-
     private void OnProgressBarUpdate (object sender, ProgressEventArgs e)
     {
         _ = Invoke(ProgressBarUpdateWorker, e);
@@ -2484,21 +2412,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnShowBookmarkListToolStripMenuItemClick (object sender, EventArgs e)
     {
-        if (_bookmarkWindow.Visible)
-        {
-            _bookmarkWindow.Hide();
-        }
-        else
-        {
-            // strange: on very first Show() now bookmarks are displayed. after a hide it will work.
-            if (_firstBookmarkWindowShow)
-            {
-                _bookmarkWindow.Show(dockPanel);
-                _bookmarkWindow.Hide();
-            }
-
-            _bookmarkWindow.Show(dockPanel);
-        }
+        _toolWindowCoordinator.ToggleBookmarkVisibility(dockPanel);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2552,7 +2466,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             logWin.ShowLineColumn(!ConfigManager.Settings.HideLineColumn);
         }
 
-        _bookmarkWindow.LineColumnVisible = ConfigManager.Settings.HideLineColumn;
+        _toolWindowCoordinator.SetLineColumnVisible(!ConfigManager.Settings.HideLineColumn);
     }
 
     // ==================================================================
