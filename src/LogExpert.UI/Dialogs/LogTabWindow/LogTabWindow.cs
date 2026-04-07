@@ -804,6 +804,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             components.Dispose();
             _tabStringFormat?.Dispose();
             _menuToolbarController?.Dispose();
+            _toolWindowCoordinator?.Dispose();
         }
 
         _disposed = true;
