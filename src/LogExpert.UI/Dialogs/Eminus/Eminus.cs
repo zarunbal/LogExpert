@@ -171,23 +171,12 @@ internal class Eminus : IContextMenuEntry, ILogExpertPluginConfigurator
 
     #region IContextMenuEntry Member
 
-    public string GetMenuText (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback)
-    {
-        //not used
-        return string.Empty;
-    }
-
     [SupportedOSPlatform("windows")]
     public string GetMenuText (int linesCount, ILogLineMemoryColumnizer columnizer, ILogLineMemory logline)
     {
         return linesCount == 1 && BuildParam(logline) != null
             ? Resources.Eminus_UI_GetMenuText_LoadClassInEclipse
             : string.Format(CultureInfo.InvariantCulture, Resources.Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse, DISABLED);
-    }
-
-    public void MenuSelected (IList<int> loglines, ILogLineMemoryColumnizer columnizer, ILogExpertCallback callback)
-    {
-        //Not used
     }
 
     [SupportedOSPlatform("windows")]

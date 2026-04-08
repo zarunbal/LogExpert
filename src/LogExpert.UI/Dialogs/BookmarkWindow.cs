@@ -70,7 +70,13 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool LineColumnVisible
     {
-        set => bookmarkDataGridView.Columns[2].Visible = value;
+        set
+        {
+            if (bookmarkDataGridView.Columns.Count > 2)
+            {
+                bookmarkDataGridView.Columns[2].Visible = value;
+            }
+        }
     }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
