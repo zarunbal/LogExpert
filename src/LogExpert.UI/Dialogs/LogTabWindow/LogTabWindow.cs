@@ -93,8 +93,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ApplyTextResources();
 
-        Rectangle led = new(0, 0, 8, 2);
-
         ConfigManager = configManager;
 
         _toolWindowCoordinator = new ToolWindowCoordinator(configManager);

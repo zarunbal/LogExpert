@@ -90,34 +90,23 @@ internal sealed class LogWindowCoordinator (
 
     private HighlightGroup? FindHighlightGroupByName (string groupName)
     {
-        foreach (var group in HighlightGroups)
-        {
-            if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
-            {
-                return group;
-            }
-        }
-
-        return null;
+        return HighlightGroups.FirstOrDefault(g => g.GroupName.Equals(groupName, StringComparison.Ordinal));
     }
 
     private HighlightGroup? FindHighlightGroupByFileMask (string fileName)
     {
-        foreach (var entry in _configManager.Settings.Preferences.HighlightMaskList)
+        foreach (var entry in _configManager.Settings.Preferences.HighlightMaskList.Where(entry => entry.Mask != null))
         {
-            if (entry.Mask != null)
+            try
             {
-                try
+                if (Regex.IsMatch(fileName, entry.Mask))
                 {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        return FindHighlightGroupByName(entry.HighlightGroupName);
-                    }
+                    return FindHighlightGroupByName(entry.HighlightGroupName);
                 }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while matching highlight mask: {e}");
-                }
+            }
+            catch (ArgumentException e)
+            {
+                _logger.Error($"RegEx-error while matching highlight mask: {e}");
             }
         }
 
@@ -136,23 +125,20 @@ internal sealed class LogWindowCoordinator (
 
     private ILogLineMemoryColumnizer? FindColumnizerByFileMask (string fileName)
     {
-        foreach (var entry in _configManager.Settings.Preferences.ColumnizerMaskList)
+        foreach (var entry in _configManager.Settings.Preferences.ColumnizerMaskList.Where(entry => entry.Mask != null))
         {
-            if (entry.Mask != null)
+            try
             {
-                try
+                if (Regex.IsMatch(fileName, entry.Mask))
                 {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        return ColumnizerPicker.FindMemorColumnizerByName(
-                            entry.ColumnizerName,
-                            _pluginRegistry.RegisteredColumnizers);
-                    }
+                    return ColumnizerPicker.FindMemorColumnizerByName(
+                        entry.ColumnizerName,
+                        _pluginRegistry.RegisteredColumnizers);
                 }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while finding columnizer: {e}");
-                }
+            }
+            catch (ArgumentException e)
+            {
+                _logger.Error($"RegEx-error while finding columnizer: {e}");
             }
         }
 
@@ -164,12 +150,11 @@ internal sealed class LogWindowCoordinator (
         var historyEntry = FindColumnizerHistoryEntry(fileName);
         if (historyEntry != null)
         {
-            foreach (var columnizer in _pluginRegistry.RegisteredColumnizers)
+            var foundColumnizer = _pluginRegistry.RegisteredColumnizers.FirstOrDefault(c => c.GetName().Equals(historyEntry.ColumnizerName, StringComparison.Ordinal));
+
+            if (foundColumnizer != null)
             {
-                if (columnizer.GetName().Equals(historyEntry.ColumnizerName, StringComparison.Ordinal))
-                {
-                    return columnizer;
-                }
+                return foundColumnizer;
             }
 
             // Stale entry — columnizer name no longer registered. Remove it.
@@ -181,15 +166,7 @@ internal sealed class LogWindowCoordinator (
 
     public ColumnizerHistoryEntry? FindColumnizerHistoryEntry (string fileName)
     {
-        foreach (var entry in _configManager.Settings.ColumnizerHistoryList)
-        {
-            if (entry.FileName.Equals(fileName, StringComparison.Ordinal))
-            {
-                return entry;
-            }
-        }
-
-        return null;
+        return _configManager.Settings.ColumnizerHistoryList.FirstOrDefault(entry => entry.FileName.Equals(fileName, StringComparison.Ordinal));
     }
 
     public LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer? preProcessColumnizer)
@@ -204,14 +181,11 @@ internal sealed class LogWindowCoordinator (
 
     public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender)
     {
-        foreach (var logWindow in _tabController.GetAllWindows())
+        foreach (var logWindow in _tabController.GetAllWindows().Where(logWindow => logWindow != sender))
         {
-            if (logWindow != sender)
+            if (logWindow.ScrollToTimestamp(timestamp, false, false))
             {
-                if (logWindow.ScrollToTimestamp(timestamp, false, false))
-                {
-                    _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
-                }
+                _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
             }
         }
     }
