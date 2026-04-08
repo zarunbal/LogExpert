@@ -39,8 +39,6 @@ internal partial class BufferedDataGridView : DataGridView
         Alignment = StringAlignment.Near
     };
 
-    private readonly SortedList<int, BookmarkOverlay> _overlayList = [];
-
     private readonly Lock _overlayLock = new();
     private readonly List<BookmarkOverlay> _overlayStaging = [];
     private BookmarkOverlay[] _overlaySnapshot = [];
@@ -70,13 +68,6 @@ internal partial class BufferedDataGridView : DataGridView
     #endregion
 
     #region Properties
-
-    /*
-  public Graphics Buffer
-  {
-    get { return this.myBuffer.Graphics; }
-  }
-   */
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ContextMenuStrip EditModeMenuStrip { get; set; }
@@ -164,7 +155,7 @@ internal partial class BufferedDataGridView : DataGridView
         {
             if (PaintWithOverlays)
             {
-                NewPaintOverlays(e);
+                PaintOverlays(e);
             }
             else
             {
@@ -186,7 +177,7 @@ internal partial class BufferedDataGridView : DataGridView
         }
     }
 
-    private void NewPaintOverlays (PaintEventArgs e)
+    private void PaintOverlays (PaintEventArgs e)
     {
         EnsureDrawingResources();
 
@@ -370,62 +361,6 @@ internal partial class BufferedDataGridView : DataGridView
         }
 
         return null;
-    }
-
-    private void PaintOverlays (PaintEventArgs e)
-    {
-        var currentContext = BufferedGraphicsManager.Current;
-
-        using var myBuffer = currentContext.Allocate(e.Graphics, ClientRectangle);
-        lock (_overlayList)
-        {
-            _overlayList.Clear();
-        }
-
-        myBuffer.Graphics.SetClip(ClientRectangle, CombineMode.Union);
-        e.Graphics.SetClip(ClientRectangle, CombineMode.Union);
-
-        PaintEventArgs args = new(myBuffer.Graphics, e.ClipRectangle);
-
-        base.OnPaint(args);
-
-        myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
-
-        // Remove Columnheader from Clippingarea
-        Rectangle rectTableHeader = new(DisplayRectangle.X, DisplayRectangle.Y, DisplayRectangle.Width, ColumnHeadersHeight);
-        myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
-
-        //e.Graphics.SetClip(rect, CombineMode.Union);
-
-        lock (_overlayList)
-        {
-            foreach (var overlay in _overlayList.Values)
-            {
-                var textSize = myBuffer.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
-
-                Rectangle rectBubble = new(overlay.Position, new Size((int)textSize.Width, (int)textSize.Height));
-                rectBubble.Offset(60, -(rectBubble.Height + 40));
-                rectBubble.Inflate(3, 3);
-                rectBubble.Location += overlay.Bookmark.OverlayOffset;
-                overlay.BubbleRect = rectBubble;
-                myBuffer.Graphics.SetClip(rectBubble, CombineMode.Union); // Bubble to clip
-                myBuffer.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
-                e.Graphics.SetClip(rectBubble, CombineMode.Union);
-
-                RectangleF textRect = new(rectBubble.X, rectBubble.Y, rectBubble.Width, rectBubble.Height);
-                myBuffer.Graphics.FillRectangle(_brush, rectBubble);
-                //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
-                myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
-                myBuffer.Graphics.DrawString(overlay.Bookmark.Text, _font, _textBrush, textRect, _format);
-
-                if (_logger.IsDebugEnabled)
-                {
-                    _logger.Debug($"### PaintOverlays: {myBuffer.Graphics.ClipBounds.Left},{myBuffer.Graphics.ClipBounds.Top},{myBuffer.Graphics.ClipBounds.Width},{myBuffer.Graphics.ClipBounds.Height}");
-                }
-            }
-        }
-
-        myBuffer.Render(e.Graphics);
     }
 
     #endregion
