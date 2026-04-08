@@ -86,11 +86,11 @@ public class FilterParams : ICloneable
 
     ///Returns RangeSearchText.ToUpperInvariant
     [JsonIgnore]
-    internal string NormalizedRangeSearchText => RangeSearchText.ToUpperInvariant();
+    internal string NormalizedRangeSearchText => RangeSearchText?.ToUpperInvariant();
 
     ///Returns SearchText.ToUpperInvariant
     [JsonIgnore]
-    internal string NormalizedSearchText => SearchText.ToUpperInvariant();
+    internal string NormalizedSearchText => SearchText?.ToUpperInvariant();
 
     [JsonIgnore]
     [field: NonSerialized]

@@ -51,7 +51,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly Image _advancedButtonImage;
 
-    private readonly Lock _bookmarkLock = new();
     private readonly BookmarkDataProvider _bookmarkProvider = new();
 
     private readonly IList<IBackgroundProcessCancelHandler> _cancelHandlerList = [];
@@ -70,7 +69,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 
-    private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
+    private readonly EventWaitHandle _logEventArgsEvent = new AutoResetEvent(false);
 
     private readonly List<LogEventArgs> _logEventArgsList = [];
     private readonly Task _logEventHandlerTask;
@@ -223,11 +222,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         splitContainerLogWindow.Panel2Collapsed = true;
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
-        _timeShiftSyncTask = new Task(SyncTimestampDisplayWorker, cts.Token);
-        _timeShiftSyncTask.Start();
+        _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-        _logEventHandlerTask = new Task(LogEventWorker, cts.Token);
-        _logEventHandlerTask.Start();
+        _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
         //this.filterUpdateThread.Start();
@@ -782,6 +779,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
     }
 
+    //TODO Double Check why the bookmark Providers have the Event and the LogWindow, and if it still necessary
     protected void OnBookmarkAdded ()
     {
         BookmarkAdded?.Invoke(this, EventArgs.Empty);
@@ -2930,7 +2928,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     //_logger.Info($"{_logEventArgsList.Count} events in queue");
                     if (_logEventArgsList.Count == 0)
                     {
-                        _ = _logEventArgsEvent.Reset();
                         break;
                     }
 
@@ -2961,7 +2958,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     try
                     {
-                        _ = Invoke(UpdateGrid, [e]);
+                        _ = BeginInvoke(UpdateGrid, [e]);
                         CheckFilterAndHighlight(e);
                     }
                     catch (ObjectDisposedException)
@@ -3127,7 +3124,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                 if (setBookmark)
                 {
-                    _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
+                    var capturedLineNum = i;
+                    var capturedComment = bookmarkComment;
+                    _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
                 }
 
                 if (stopTail && _guiStateArgs.FollowTail)
@@ -3137,7 +3136,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     if (firstStopTail && wasFollow)
                     {
                         //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                        _ = Task.Run(() => SelectAndEnsureVisible(i, false));
+                        var capturedLineNum = i;
+                        _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
                         firstStopTail = false;
                     }
                 }
@@ -3175,8 +3175,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                     if (setBookmark)
                     {
-                        //SetBookmarkFx fx = SetBookmarkFromTrigger;
-                        _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
+                        var capturedLineNum = i;
+                        var capturedComment = bookmarkComment;
+                        _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
                         //_ = fx.BeginInvoke(i, bookmarkComment, null, null);
                     }
 
@@ -3187,7 +3188,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         if (firstStopTail && wasFollow)
                         {
                             //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                            _ = Task.Run(() => SelectAndEnsureVisible(i, false));
+                            var capturedLineNum = i;
+                            _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
                             firstStopTail = false;
                         }
                     }
@@ -7005,34 +7007,34 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void SetBookmarkFromTrigger (int lineNum, string comment)
     {
-        lock (_bookmarkLock)
+        var line = _logFileReader.GetLogLineMemory(lineNum);
+
+        if (line == null)
         {
-            var line = _logFileReader.GetLogLineMemory(lineNum);
-
-            if (line == null)
-            {
-                return;
-            }
-
-            var paramParser = new ParamParser(comment);
-
-            try
-            {
-                comment = paramParser.ReplaceParams(line, lineNum, FileName);
-            }
-            catch (ArgumentException)
-            {
-                // occurs on invalid regex
-            }
-
-            if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
-            {
-                _bookmarkProvider.RemoveBookmarkForLine(lineNum);
-            }
-
-            _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
-            OnBookmarkAdded();
+#if DEBUG
+            _logger.Warn($"SetBookmarkFromTrigger: line {lineNum} returned null, bookmark not set");
+#endif
+            return;
         }
+
+        var paramParser = new ParamParser(comment);
+
+        try
+        {
+            comment = paramParser.ReplaceParams(line, lineNum, FileName);
+        }
+        catch (ArgumentException)
+        {
+            // occurs on invalid regex
+        }
+
+        if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
+        {
+            _bookmarkProvider.RemoveBookmarkForLine(lineNum);
+        }
+
+        _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
+        OnBookmarkAdded();
     }
 
     public void JumpNextBookmark ()
