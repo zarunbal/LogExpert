@@ -13,6 +13,8 @@ public class BookmarkDataProvider : IBookmarkData
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    private readonly Lock _bookmarkListLock = new();
+
     #endregion
 
     #region cTor
@@ -49,7 +51,10 @@ public class BookmarkDataProvider : IBookmarkData
 
     public void SetBookmarks (SortedList<int, Entities.Bookmark> bookmarkList)
     {
-        BookmarkList = bookmarkList;
+        lock (_bookmarkListLock)
+        {
+            BookmarkList = bookmarkList;
+        }
     }
 
     public void ToggleBookmark (int lineNum)
@@ -66,17 +71,26 @@ public class BookmarkDataProvider : IBookmarkData
 
     public bool IsBookmarkAtLine (int lineNum)
     {
-        return BookmarkList.ContainsKey(lineNum);
+        lock (_bookmarkListLock)
+        {
+            return BookmarkList.ContainsKey(lineNum);
+        }
     }
 
     public int GetBookmarkIndexForLine (int lineNum)
     {
-        return BookmarkList.IndexOfKey(lineNum);
+        lock (_bookmarkListLock)
+        {
+            return BookmarkList.IndexOfKey(lineNum);
+        }
     }
 
     public Entities.Bookmark GetBookmarkForLine (int lineNum)
     {
-        return BookmarkList[lineNum];
+        lock (_bookmarkListLock)
+        {
+            return BookmarkList[lineNum];
+        }
     }
 
     #endregion
@@ -116,6 +130,7 @@ public class BookmarkDataProvider : IBookmarkData
 
     public int FindNextBookmarkIndex (int lineNum)
     {
+
         var values = BookmarkList.Values;
         for (var i = 0; i < BookmarkList.Count; ++i)
         {
@@ -130,7 +145,11 @@ public class BookmarkDataProvider : IBookmarkData
 
     public void RemoveBookmarkForLine (int lineNum)
     {
-        _ = BookmarkList.Remove(lineNum);
+        lock (_bookmarkListLock)
+        {
+            _ = BookmarkList.Remove(lineNum);
+        }
+
         OnBookmarkRemoved();
     }
 
@@ -138,11 +157,13 @@ public class BookmarkDataProvider : IBookmarkData
     public void RemoveBookmarksForLines (IEnumerable<int> lineNumList)
     {
         ArgumentNullException.ThrowIfNull(lineNumList, nameof(lineNumList));
-
-        foreach (var lineNum in lineNumList)
+        lock (_bookmarkListLock)
         {
-            _ = BookmarkList.Remove(lineNum);
+            foreach (var lineNum in lineNumList)
+            {
+                _ = BookmarkList.Remove(lineNum);
 
+            }
         }
 
         OnBookmarkRemoved();
@@ -152,19 +173,30 @@ public class BookmarkDataProvider : IBookmarkData
     public void AddBookmark (Entities.Bookmark bookmark)
     {
         ArgumentNullException.ThrowIfNull(bookmark, nameof(bookmark));
+        lock (_bookmarkListLock)
+        {
+            BookmarkList.Add(bookmark.LineNum, bookmark);
+        }
 
-        BookmarkList.Add(bookmark.LineNum, bookmark);
         OnBookmarkAdded();
     }
 
     public void ClearAllBookmarks ()
     {
+#if DEBUG
         _logger.Debug(CultureInfo.InvariantCulture, "Removing all bookmarks");
-        BookmarkList.Clear();
+#endif
+        lock (_bookmarkListLock)
+        {
+            BookmarkList.Clear();
+        }
+
         OnAllBookmarksRemoved();
     }
 
     #endregion
+
+    #region Event invokers
 
     protected void OnBookmarkAdded ()
     {
@@ -180,4 +212,7 @@ public class BookmarkDataProvider : IBookmarkData
     {
         AllBookmarksRemoved?.Invoke(this, EventArgs.Empty);
     }
+
+    #endregion
+
 }
