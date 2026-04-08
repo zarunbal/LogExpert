@@ -6,7 +6,6 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes;
 using LogExpert.Core.EventArguments;
-using LogExpert.Dialogs;
 
 namespace LogExpert.UI.Controls.LogWindow;
 

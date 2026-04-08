@@ -30,7 +30,7 @@ private void InitializeComponent() {
   this.removeCommentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
   this.bookmarkTextBox = new System.Windows.Forms.TextBox();
   this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-  this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
+  this.bookmarkDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
   this.checkBoxCommentColumn = new System.Windows.Forms.CheckBox();
   this.labelComment = new System.Windows.Forms.Label();
   this.contextMenuStrip1.SuspendLayout();
@@ -184,7 +184,7 @@ private void InitializeComponent() {
 
 #endregion
 
-private BufferedDataGridView bookmarkDataGridView;
+private LogExpert.UI.Controls.BufferedDataGridView bookmarkDataGridView;
 private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
 private System.Windows.Forms.ToolStripMenuItem deleteBookmarkssToolStripMenuItem;
 private System.Windows.Forms.TextBox bookmarkTextBox;

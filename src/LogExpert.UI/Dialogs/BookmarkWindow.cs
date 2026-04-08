@@ -7,6 +7,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
+using LogExpert.UI.Controls;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Interface;
 

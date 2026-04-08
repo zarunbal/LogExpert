@@ -4,7 +4,6 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Interface;
 

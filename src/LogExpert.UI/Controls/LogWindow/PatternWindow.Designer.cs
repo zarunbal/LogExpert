@@ -51,8 +51,8 @@ namespace LogExpert.UI.Controls.LogWindow
       this.maxMissesKnobControl = new KnobControl();
       this.maxDiffKnobControl = new KnobControl();
       this.fuzzyKnobControl = new KnobControl();
-      this.patternHitsDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
-      this.contentDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
+      this.patternHitsDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
+      this.contentDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
       this.splitContainer1.Panel1.SuspendLayout();
       this.splitContainer1.Panel2.SuspendLayout();
       this.splitContainer1.SuspendLayout();
@@ -402,10 +402,10 @@ namespace LogExpert.UI.Controls.LogWindow
 
     #endregion
 
-    private LogExpert.Dialogs.BufferedDataGridView patternHitsDataGridView;
+    private LogExpert.UI.Controls.BufferedDataGridView patternHitsDataGridView;
     private System.Windows.Forms.SplitContainer splitContainer1;
     private System.Windows.Forms.SplitContainer splitContainer2;
-    private LogExpert.Dialogs.BufferedDataGridView contentDataGridView;
+    private LogExpert.UI.Controls.BufferedDataGridView contentDataGridView;
     private System.Windows.Forms.Panel panel1;
     private System.Windows.Forms.Label labelBlockLines;
     private System.Windows.Forms.Label blockLinesLabel;

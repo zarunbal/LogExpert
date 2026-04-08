@@ -4,11 +4,10 @@ using System.Runtime.Versioning;
 
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
-using LogExpert.UI.Controls;
 
 using NLog;
 
-namespace LogExpert.Dialogs;
+namespace LogExpert.UI.Controls;
 
 [SupportedOSPlatform("windows")]
 internal partial class BufferedDataGridView : DataGridView
@@ -16,17 +15,37 @@ internal partial class BufferedDataGridView : DataGridView
     #region Fields
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private readonly Brush _brush;
 
-    private readonly Color _bubbleColor = Color.FromArgb(160, 250, 250, 0); //yellow
-    private readonly Font _font = new("Arial", 10);
+    private static Color BubbleColor =>
+        Application.IsDarkModeEnabled
+            ? Color.FromArgb(160, 80, 80, 0) // muted yellow on dark
+            : Color.FromArgb(160, 250, 250, 0); // bright yellow on light
+
+    private static Color TextColor =>
+        Application.IsDarkModeEnabled
+            ? Color.FromArgb(200, 180, 200, 255) // light blue on dark
+            : Color.FromArgb(200, 0, 0, 90); // dark blue on light
+
+    private readonly Font _font = new("Segoe UI", 9.75f);
+    private Pen? _pen;
+    private Brush? _brush;
+    private Brush? _textBrush;
+    private Color _currentBubbleColor;
+    private Color _currentTextColor;
+
+    private readonly StringFormat _format = new()
+    {
+        LineAlignment = StringAlignment.Center,
+        Alignment = StringAlignment.Near
+    };
 
     private readonly SortedList<int, BookmarkOverlay> _overlayList = [];
 
-    private readonly Pen _pen;
-    private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(200, 0, 0, 90)); //dark blue
+    private readonly Lock _overlayLock = new();
+    private readonly List<BookmarkOverlay> _overlayStaging = [];
+    private BookmarkOverlay[] _overlaySnapshot = [];
 
-    private BookmarkOverlay _draggedOverlay;
+    private BookmarkOverlay? _draggedOverlay;
     private Point _dragStartPoint;
     private bool _isDrag;
     private Size _oldOverlayOffset;
@@ -37,9 +56,6 @@ internal partial class BufferedDataGridView : DataGridView
 
     public BufferedDataGridView ()
     {
-        _pen = new Pen(_bubbleColor, (float)3.0);
-        _brush = new SolidBrush(_bubbleColor);
-
         InitializeComponent();
         DoubleBuffered = true;
         VirtualMode = true;
@@ -74,15 +90,73 @@ internal partial class BufferedDataGridView : DataGridView
 
     public void AddOverlay (BookmarkOverlay overlay)
     {
-        lock (_overlayList)
+        lock (_overlayLock)
         {
-            _overlayList.Add(overlay.Position.Y, overlay);
+            _overlayStaging.Add(overlay);
         }
+    }
+
+    /// <summary>
+    /// Atomically captures all staged overlays and clears the staging list. Call this once per paint cycle before
+    /// drawing.
+    /// </summary>
+    private BookmarkOverlay[] SwapOverlaySnapshot ()
+    {
+        lock (_overlayLock)
+        {
+            _overlaySnapshot = [.. _overlayStaging];
+            _overlayStaging.Clear();
+
+            return _overlaySnapshot;
+        }
+    }
+
+    /// <summary>
+    /// Ensures GDI+ drawing resources match the current color mode.
+    /// Called at the start of each paint cycle.
+    /// </summary>
+    private void EnsureDrawingResources ()
+    {
+        var bubbleColor = BubbleColor;
+        var textColor = TextColor;
+
+        if (bubbleColor == _currentBubbleColor
+            && textColor == _currentTextColor
+            && _pen is not null)
+        {
+            return;
+        }
+
+        _pen?.Dispose();
+        _brush?.Dispose();
+        _textBrush?.Dispose();
+
+        _currentBubbleColor = bubbleColor;
+        _currentTextColor = textColor;
+
+        _pen = new Pen(_currentBubbleColor, 3.0f);
+        _brush = new SolidBrush(_currentBubbleColor);
+        _textBrush = new SolidBrush(_currentTextColor);
     }
 
     #endregion
 
     #region Overrides
+
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            components?.Dispose();
+            _brush?.Dispose();
+            _pen?.Dispose();
+            _textBrush?.Dispose();
+            _font?.Dispose();
+            _format?.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
 
     protected override void OnPaint (PaintEventArgs e)
     {
@@ -90,7 +164,7 @@ internal partial class BufferedDataGridView : DataGridView
         {
             if (PaintWithOverlays)
             {
-                PaintOverlays(e);
+                NewPaintOverlays(e);
             }
             else
             {
@@ -99,8 +173,87 @@ internal partial class BufferedDataGridView : DataGridView
         }
         catch (Exception ex)
         {
-            _logger.Error(ex);
+            _logger.Error($"Overlay painting failed, falling back to base paint. {ex}");
+
+            try
+            {
+                base.OnPaint(e);
+            }
+            catch (Exception innerEx)
+            {
+                _logger.Error($"Base paint also failed. {innerEx}");
+            }
         }
+    }
+
+    private void NewPaintOverlays (PaintEventArgs e)
+    {
+        EnsureDrawingResources();
+
+        // Let the base DataGridView paint into its own double buffer first.
+        base.OnPaint(e);
+
+        // Atomically capture and clear staged overlays. No lock held after this.
+        var overlays = SwapOverlaySnapshot();
+
+        if (overlays.Length == 0)
+        {
+            return;
+        }
+
+        // Save the original clip and set up overlay clipping area.
+        var originalClip = e.Graphics.Clip;
+
+        e.Graphics.SetClip(DisplayRectangle, CombineMode.Replace);
+
+        // Exclude column headers from overlay drawing area.
+        Rectangle rectTableHeader = new(
+            DisplayRectangle.X,
+            DisplayRectangle.Y,
+            DisplayRectangle.Width,
+            ColumnHeadersHeight);
+
+        e.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
+
+        foreach (var overlay in overlays)
+        {
+            var textSize = e.Graphics.MeasureString(overlay.Bookmark.Text, _font, 300);
+
+            Rectangle rectBubble = new(
+                overlay.Position,
+                new Size((int)textSize.Width,
+                (int)textSize.Height));
+
+            rectBubble.Offset(60, -(rectBubble.Height + 40));
+            rectBubble.Inflate(3, 3);
+            rectBubble.Location += overlay.Bookmark.OverlayOffset;
+            overlay.BubbleRect = rectBubble;
+
+            // Temporarily extend clip to include the bubble area.
+            e.Graphics.SetClip(rectBubble, CombineMode.Union);
+            e.Graphics.SetClip(rectTableHeader, CombineMode.Exclude);
+
+            RectangleF textRect = new(
+                rectBubble.X,
+                rectBubble.Y,
+                rectBubble.Width,
+                rectBubble.Height);
+
+            e.Graphics.FillRectangle(_brush, rectBubble);
+            e.Graphics.DrawLine(
+                _pen,
+                overlay.Position,
+                new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
+            e.Graphics.DrawString(overlay.Bookmark.Text, _font, _textBrush, textRect, _format);
+
+            if (_logger.IsDebugEnabled)
+            {
+                _logger.Debug($"### PaintOverlays: {e.Graphics.ClipBounds.Left}, {e.Graphics.ClipBounds.Top}, {e.Graphics.ClipBounds.Width}, {e.Graphics.ClipBounds.Height}");
+            }
+        }
+
+        // Restore original clip region.
+        e.Graphics.Clip = originalClip;
     }
 
     protected override void OnEditingControlShowing (DataGridViewEditingControlShowingEventArgs e)
@@ -159,7 +312,7 @@ internal partial class BufferedDataGridView : DataGridView
 
     protected override void OnMouseMove (MouseEventArgs e)
     {
-        if (_isDrag)
+        if (_isDrag && _draggedOverlay is not null)
         {
             Cursor = Cursors.Hand;
             Size offset = new(e.X - _dragStartPoint.X, e.Y - _dragStartPoint.Y);
@@ -190,20 +343,29 @@ internal partial class BufferedDataGridView : DataGridView
         }
     }
 
+    protected override void OnMouseLeave (EventArgs e)
+    {
+        if (!_isDrag)
+        {
+            Cursor = Cursors.Default;
+        }
+
+        base.OnMouseLeave(e);
+    }
+
     #endregion
 
     #region Private Methods
 
     private BookmarkOverlay GetOverlayForPosition (Point pos)
     {
-        lock (_overlayList)
+        var overlays = _overlaySnapshot;
+
+        foreach (var overlay in overlays)
         {
-            foreach (var overlay in _overlayList.Values)
+            if (overlay.BubbleRect.Contains(pos))
             {
-                if (overlay.BubbleRect.Contains(pos))
-                {
-                    return overlay;
-                }
+                return overlay;
             }
         }
 
@@ -226,12 +388,6 @@ internal partial class BufferedDataGridView : DataGridView
         PaintEventArgs args = new(myBuffer.Graphics, e.ClipRectangle);
 
         base.OnPaint(args);
-
-        StringFormat format = new()
-        {
-            LineAlignment = StringAlignment.Center,
-            Alignment = StringAlignment.Near
-        };
 
         myBuffer.Graphics.SetClip(DisplayRectangle, CombineMode.Intersect);
 
@@ -260,7 +416,7 @@ internal partial class BufferedDataGridView : DataGridView
                 myBuffer.Graphics.FillRectangle(_brush, rectBubble);
                 //myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rect.X, rect.Y + rect.Height / 2));
                 myBuffer.Graphics.DrawLine(_pen, overlay.Position, new Point(rectBubble.X, rectBubble.Y + rectBubble.Height));
-                myBuffer.Graphics.DrawString(overlay.Bookmark.Text, _font, _textBrush, textRect, format);
+                myBuffer.Graphics.DrawString(overlay.Bookmark.Text, _font, _textBrush, textRect, _format);
 
                 if (_logger.IsDebugEnabled)
                 {
