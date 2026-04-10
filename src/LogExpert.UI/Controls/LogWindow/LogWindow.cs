@@ -72,8 +72,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly EventWaitHandle _logEventArgsEvent = new AutoResetEvent(false);
 
     private readonly List<LogEventArgs> _logEventArgsList = [];
+
     private readonly Task _logEventHandlerTask;
+
     //private readonly Thread _logEventHandlerThread;
+
     private readonly Image _panelCloseButtonImage;
 
     private readonly Image _panelOpenButtonImage;
@@ -87,7 +90,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Lock _tempHighlightEntryListLock = new();
 
     private readonly Task _timeShiftSyncTask;
-    private readonly CancellationTokenSource cts = new();
+
+    private readonly CancellationTokenSource _cts = new();
+    private CancellationTokenSource _highlightBookmarkScanCts;
 
     //private readonly Thread _timeShiftSyncThread;
     private readonly EventWaitHandle _timeShiftSyncTimerEvent = new ManualResetEvent(false);
@@ -98,6 +103,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Lock _timeSyncListLock = new();
 
     private ColumnCache _columnCache = new();
+
+    private readonly StringFormat _format = new()
+    {
+        LineAlignment = StringAlignment.Center,
+        Alignment = StringAlignment.Center
+    };
 
     //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
     private HighlightGroup _currentHighlightGroup = new();
@@ -222,9 +233,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         splitContainerLogWindow.Panel2Collapsed = true;
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
-        _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-        _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
         //this.filterUpdateThread.Start();
@@ -674,8 +685,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;
     //private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
-
-    private delegate void UpdateProgressBarFx (int lineNum);
 
     private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
@@ -2914,12 +2923,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void LogEventWorker ()
     {
         Thread.CurrentThread.Name = "LogEventWorker";
-        while (!cts.Token.IsCancellationRequested)
+        while (!_cts.Token.IsCancellationRequested)
         {
             //_logger.Debug($"Waiting for signal");
             _ = _logEventArgsEvent.WaitOne();
             //_logger.Debug($"Wakeup signal received.");
-            while (!cts.Token.IsCancellationRequested)
+            while (!_cts.Token.IsCancellationRequested)
             {
                 LogEventArgs e;
                 //var lastLineCount = 0;
@@ -2975,7 +2984,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void StopLogEventWorkerThread ()
     {
         _ = _logEventArgsEvent.Set();
-        cts.Cancel();
+        _cts.Cancel();
         //_logEventHandlerThread.Abort();
         //_logEventHandlerThread.Join();
     }
@@ -3521,7 +3530,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the
+    /// Builds a list of HighlightMatchEntry objects. A HighlightMatchEntry spans over a region that is painted with the
     /// same foreground and background colors. All regions which don't match a word-mode entry will be painted with the
     /// colors of a default entry (groundEntry). This is either the first matching non-word-mode highlight entry or a
     /// black-on-white default (if no matching entry was found).
@@ -3746,7 +3755,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //_timeShiftSyncWakeupEvent.Set();
         //_timeShiftSyncThread.Abort();
         //_timeShiftSyncThread.Join();
-        cts.Cancel();
+        _cts.Cancel();
     }
 
     [SupportedOSPlatform("windows")]
@@ -6340,6 +6349,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void CloseLogWindow ()
     {
+        CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();
         StopLogEventWorkerThread();
@@ -6528,19 +6538,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     if (bookmark.Text.Length > 0)
                     {
-                        StringFormat format = new()
-                        {
-                            LineAlignment = StringAlignment.Center,
-                            Alignment = StringAlignment.Center
-                        };
-
                         //Todo Add this as a Settings Option
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
                         using var font = new Font(fontName, Preferences.FontSize, FontStyle.Bold);
-                        e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), format);
+                        e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }
                 }
             }
@@ -6795,8 +6799,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         _shouldCancel = true;
                     }
 
+                    CancelHighlightBookmarkScan();
                     FireCancelHandlers();
                     RemoveAllSearchHighlightEntries();
+
+
                     break;
                 }
             case Keys.E when (e.Modifiers & Keys.Control) == Keys.Control:
@@ -7000,8 +7007,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum));
         }
 
-        dataGridView.Refresh();
-        filterGridView.Refresh();
+        RefreshAllGrids();
         OnBookmarkAdded();
     }
 
@@ -7035,6 +7041,136 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
         OnBookmarkAdded();
+    }
+
+    /// <summary>
+    /// Cancels any in-progress highlight bookmark scan, removes existing auto-generated bookmarks, and starts a new
+    /// background scan based on the current highlight group.
+    /// </summary>
+    private void RunHighlightBookmarkScan ()
+    {
+        // Guard: don't scan during loading or if reader is not available
+        if (_isLoading || _logFileReader == null)
+        {
+            return;
+        }
+
+        // Cancel any in-progress scan
+        CancelHighlightBookmarkScan();
+
+        // Step 1: Remove previous auto-generated bookmarks
+        _bookmarkProvider.RemoveAutoGeneratedBookmarks();
+        RefreshAllGrids();
+
+        // Step 2: Get current highlight entries (snapshot under lock)
+        List<HighlightEntry> entries;
+        lock (_currentHighlightGroupLock)
+        {
+            entries = [.. _currentHighlightGroup.HighlightEntryList];
+        }
+
+        // Step 3: Early exit if no entries have IsSetBookmark
+        if (!entries.Any(e => e.IsSetBookmark))
+        {
+            return;
+        }
+
+        // Step 4: Start background scan
+        var cts = new CancellationTokenSource();
+        _highlightBookmarkScanCts = cts;
+        var lineCount = _logFileReader.LineCount;
+        var fileName = FileName;
+
+        StatusLineText("Scanning bookmarks...");
+        _progressEventArgs.MinValue = 0;
+        _progressEventArgs.MaxValue = lineCount;
+        _progressEventArgs.Value = 0;
+        _progressEventArgs.Visible = true;
+        SendProgressBarUpdate();
+
+        var progress = new Progress<int>(currentLine =>
+        {
+            // Marshal progress update to UI thread
+            if (IsHandleCreated && !IsDisposed)
+            {
+                _ = BeginInvoke(() =>
+                {
+                    _progressEventArgs.Value = currentLine;
+                    SendProgressBarUpdate();
+
+                    if (lineCount > 0)
+                    {
+                        var pct = (int)((long)currentLine * 100 / lineCount);
+                        StatusLineText($"Scanning bookmarks... {pct}%");
+                    }
+                });
+            }
+        });
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                var bookmarks = HighlightBookmarkScanner.Scan(lineCount, i => _logFileReader.GetLogLineMemory(i), entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
+
+                // Marshal bookmark additions to UI thread
+                if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
+                {
+                    _ = BeginInvoke(() =>
+                    {
+                        _ = _bookmarkProvider.AddBookmarks(bookmarks);
+
+                        RefreshAllGrids();
+
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Scan was cancelled — clean up on UI thread
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    _ = BeginInvoke(() =>
+                    {
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
+            }
+            finally
+            {
+                // Only dispose if this is still the active CTS
+                if (_highlightBookmarkScanCts == cts)
+                {
+                    _highlightBookmarkScanCts = null;
+                }
+
+                cts.Dispose();
+            }
+        });
+    }
+
+    /// <summary>
+    /// Cancels any currently running highlight bookmark scan.
+    /// </summary>
+    private void CancelHighlightBookmarkScan ()
+    {
+        var cts = _highlightBookmarkScanCts;
+        if (cts != null)
+        {
+            try
+            {
+                cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed — ignore
+            }
+        }
     }
 
     public void JumpNextBookmark ()
@@ -7809,17 +7945,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var bookmarkAdded = false;
                 foreach (var b in newBookmarks.Values)
                 {
-                    if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
+                    if (_bookmarkProvider.BookmarkList.TryGetValue(b.LineNum, out Bookmark? existingBookmark))
                     {
-                        _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
-                        bookmarkAdded = true; // refresh the list only once at the end
-                    }
-                    else
-                    {
-                        var existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
                         // replace existing bookmark for that line, preserving the overlay
                         existingBookmark.Text = b.Text;
                         OnBookmarkTextChanged(b);
+                    }
+                    else
+                    {
+                        _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
+                        bookmarkAdded = true; // refresh the list only once at the end
                     }
                 }
 
@@ -7829,8 +7964,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     OnBookmarkAdded();
                 }
 
-                dataGridView.Refresh();
-                filterGridView.Refresh();
+                RefreshAllGrids();
             }
             catch (IOException e)
             {
@@ -7889,7 +8023,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (IsHandleCreated)
         {
+            //NOTE: Possible double refresh of AllGrids, maybe not necessary if only will be called once
             _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
+            _ = BeginInvoke(new MethodInvoker(RunHighlightBookmarkScan));
         }
     }
 
