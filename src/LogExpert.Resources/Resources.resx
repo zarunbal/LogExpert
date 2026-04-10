@@ -2157,4 +2157,13 @@ Restart LogExpert to apply changes?</value>
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
     <value>Some files could not be migrated: {0}</value>
   </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderTextSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
 </root>

@@ -281,6 +281,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        public static string BookmarkWindow_UI_DataGridColumn_HeaderTextSource {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_DataGridColumn_HeaderTextSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bookmark comment:.
         /// </summary>
         public static string BookmarkWindow_UI_Label_Comment {
@@ -313,6 +322,24 @@ namespace LogExpert {
         public static string BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines {
             get {
                 return ResourceManager.GetString("BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto.
+        /// </summary>
+        public static string BookmarkWindow_UI_SourceHighlightText_Auto {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_SourceHighlightText_Auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string BookmarkWindow_UI_SourceHighlightText_Manual {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_SourceHighlightText_Manual", resourceCulture);
             }
         }
         
