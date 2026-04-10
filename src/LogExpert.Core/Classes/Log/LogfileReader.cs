@@ -54,7 +54,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private bool _disposed;
     private ILogFileInfo _watchedILogFileInfo;
 
-    private volatile LogBuffer _lastBuffer;
     private volatile int _lastBufferIndex = -1;
 
     #endregion
@@ -1769,7 +1768,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             if (lastIdx >= 0 && lastIdx < count)
             {
                 var buf = list[lastIdx];
-                if (lineNum >= buf.StartLine && lineNum < buf.StartLine + buf.LineCount)
+                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
+                //if (lineNum >= buf.StartLine && lineNum < buf.EndLine)
                 {
                     UpdateLruCache(buf);
                     return buf;
@@ -1779,7 +1779,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 if (lastIdx + 1 < count)
                 {
                     var next = list[lastIdx + 1];
-                    if (lineNum >= next.StartLine && lineNum < next.StartLine + next.LineCount)
+                    if ((uint)(lineNum - next.StartLine) < (uint)next.LineCount)
+                    //if (lineNum >= next.StartLine && lineNum < next.EndLine)
                     {
                         _lastBuffer = next;
                         _lastBufferIndex = lastIdx + 1;
@@ -1791,7 +1792,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 if (lastIdx - 1 >= 0)
                 {
                     var prev = list[lastIdx - 1];
-                    if (lineNum >= prev.StartLine && lineNum < prev.StartLine + prev.LineCount)
+                    if ((uint)(lineNum - prev.StartLine) < (uint)prev.LineCount)
+                    //if (lineNum >= prev.StartLine && lineNum < prev.EndLine)
                     {
                         _lastBuffer = prev;
                         _lastBufferIndex = lastIdx - 1;
@@ -1806,7 +1808,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             if (guess >= 0 && guess < count)
             {
                 var buf = list[guess];
-                if (lineNum >= buf.StartLine && lineNum < buf.StartLine + buf.LineCount)
+                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
+                //if (lineNum >= buf.StartLine && lineNum < buf.EndLine)
                 {
                     _lastBuffer = buf;
                     _lastBufferIndex = guess;
@@ -1815,25 +1818,27 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
             }
 
-            // Layer 3: Binary search fallback — O(log n) guaranteed
-            int lo = 0, hi = count - 1;
-            while (lo <= hi)
-            {
-                int mid = (lo + hi) >> 1;
-                var buf = list[mid];
+            // Layer 3: Branchless binary search with power-of-two strides
+            var step = HighestPowerOfTwo(count);
+            var idx = (list[step - 1].StartLine <= lineNum) ? count - step : 0;
 
-                if (lineNum < buf.StartLine)
+            for (step >>= 1; step > 0; step >>= 1)
+            {
+                var probe = idx + step;
+                if (probe < count && list[probe - 1].StartLine <= lineNum)
                 {
-                    hi = mid - 1;
+                    idx = probe;
                 }
-                else if (lineNum >= buf.StartLine + buf.LineCount)
-                {
-                    lo = mid + 1;
-                }
-                else
+            }
+
+            // idx is now the buffer index — verify bounds
+            if (idx < count)
+            {
+                var buf = list[idx];
+                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
                 {
                     _lastBuffer = buf;
-                    _lastBufferIndex = mid;
+                    _lastBufferIndex = idx;
                     UpdateLruCache(buf);
                     return buf;
                 }
@@ -1850,6 +1855,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             ReleaseBufferListReaderLock();
         }
     }
+
+    private static int HighestPowerOfTwo (int n) => 1 << (31 - int.LeadingZeroCount(n));
 
     private void GetLineMemoryFinishedCallback (ILogLineMemory line)
     {
