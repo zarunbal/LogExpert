@@ -3343,6 +3343,24 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks....
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarks {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks... {0}%.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarksPct {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarksPct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Searching... Press ESC to cancel..
         /// </summary>
         public static string LogWindow_UI_StatusLineText_SearchingPressESCToCancel {

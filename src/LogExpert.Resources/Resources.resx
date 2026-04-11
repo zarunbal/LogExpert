@@ -2166,4 +2166,10 @@ Restart LogExpert to apply changes?</value>
   <data name="BookmarkWindow_UI_SourceHighlightText_Manual" xml:space="preserve">
     <value>Manual</value>
   </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarks" xml:space="preserve">
+    <value>Scanning bookmarks...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksPct" xml:space="preserve">
+    <value>Scanning bookmarks... {0}%</value>
+  </data>
 </root>
