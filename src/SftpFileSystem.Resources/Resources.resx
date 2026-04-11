@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- ConfigDialog Resources -->
+  <data name="ConfigDialog_UI_Title" xml:space="preserve">
+    <value>SFTP Configuration</value>
+  </data>
+  <data name="ConfigDialog_UI_CheckBox_UseKeyfile" xml:space="preserve">
+    <value>Use keyfile</value>
+  </data>
+  <data name="ConfigDialog_UI_Button_SelectFile" xml:space="preserve">
+    <value>Select file...</value>
+  </data>
+  <data name="ConfigDialog_UI_GroupBox_KeyType" xml:space="preserve">
+    <value>Key type</value>
+  </data>
+  <data name="ConfigDialog_UI_RadioButton_PuttyKey" xml:space="preserve">
+    <value>Putty private key</value>
+  </data>
+  <data name="ConfigDialog_UI_RadioButton_SSHKey" xml:space="preserve">
+    <value>Open SSH private key</value>
+  </data>
+  <data name="ConfigDialog_UI_Label_KeyInfo" xml:space="preserve">
+    <value>Key will be loaded once on first usage. Password will be asked then.</value>
+  </data>
+  
+  <!-- LoginDialog Resources -->
+  <data name="LoginDialog_UI_Title" xml:space="preserve">
+    <value>LogExpert SFTP Plugin</value>
+  </data>
+  <data name="LoginDialog_UI_Label_Server" xml:space="preserve">
+    <value>Server:</value>
+  </data>
+  <data name="LoginDialog_UI_Label_Username" xml:space="preserve">
+    <value>User name:</value>
+  </data>
+  <data name="LoginDialog_UI_Label_Password" xml:space="preserve">
+    <value>Password:</value>
+  </data>
+  <data name="LoginDialog_UI_Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="LoginDialog_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  
+  <!-- FailedKeyDialog Resources -->
+  <data name="FailedKeyDialog_UI_Title" xml:space="preserve">
+    <value>Key Authentication Failed</value>
+  </data>
+  <data name="FailedKeyDialog_UI_Label_Message" xml:space="preserve">
+    <value>Key authentication failed. What would you like to do?</value>
+  </data>
+  <data name="FailedKeyDialog_UI_Button_Retry" xml:space="preserve">
+    <value>Retry with key</value>
+  </data>
+  <data name="FailedKeyDialog_UI_Button_UsePassword" xml:space="preserve">
+    <value>Use password authentication</value>
+  </data>
+  <data name="FailedKeyDialog_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  
+  <!-- PrivateKeyPasswordDialog Resources -->
+  <data name="PrivateKeyPasswordDialog_UI_Title" xml:space="preserve">
+    <value>Private Key Password</value>
+  </data>
+  <data name="PrivateKeyPasswordDialog_UI_Label_Password" xml:space="preserve">
+    <value>Enter private key password:</value>
+  </data>
+  <data name="PrivateKeyPasswordDialog_UI_Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="PrivateKeyPasswordDialog_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+</root>

@@ -1,3 +1,5 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes.Log;
 
@@ -7,21 +9,21 @@ internal class ColumnCache
 {
     #region Fields
 
-    private IColumnizedLogLine _cachedColumns;
-    private ILogLineColumnizer _lastColumnizer;
+    private IColumnizedLogLineMemory _cachedColumns;
+    private ILogLineMemoryColumnizer _lastColumnizer;
     private int _lastLineNumber = -1;
 
     #endregion
 
     #region Internals
 
-    internal IColumnizedLogLine GetColumnsForLine (LogfileReader logFileReader, int lineNumber, ILogLineColumnizer columnizer, ColumnizerCallback columnizerCallback)
+    internal IColumnizedLogLineMemory GetColumnsForLine (LogfileReader logFileReader, int lineNumber, ILogLineMemoryColumnizer columnizer, ColumnizerCallback columnizerCallback)
     {
         if (_lastColumnizer != columnizer || (_lastLineNumber != lineNumber && _cachedColumns != null) || columnizerCallback.LineNum != lineNumber)
         {
             _lastColumnizer = columnizer;
             _lastLineNumber = lineNumber;
-            ILogLine line = logFileReader.GetLogLineWithWait(lineNumber).Result;
+            var line = logFileReader.GetLogLineMemoryWithWait(lineNumber).Result;
 
             if (line != null)
             {

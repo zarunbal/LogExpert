@@ -1,4 +1,4 @@
-﻿namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs;
 
 partial class ChooseIconDlg
 {
@@ -32,8 +32,8 @@ private void InitializeComponent()
         this.iconListView = new System.Windows.Forms.ListView();
         this.iconFileLabel = new System.Windows.Forms.Label();
         this.buttonChooseIconFile = new System.Windows.Forms.Button();
-        this.okButton = new System.Windows.Forms.Button();
-        this.cancelButton = new System.Windows.Forms.Button();
+        this.buttonOk = new System.Windows.Forms.Button();
+        this.buttonCancel = new System.Windows.Forms.Button();
         this.SuspendLayout();
         // 
         // iconListView
@@ -58,7 +58,7 @@ private void InitializeComponent()
         this.iconFileLabel.Name = "iconFileLabel";
         this.iconFileLabel.Size = new System.Drawing.Size(411, 35);
         this.iconFileLabel.TabIndex = 1;
-        this.iconFileLabel.Text = "label1";
+        this.iconFileLabel.Text = "IconFileLabel";
         // 
         // buttonChooseIconFile
         // 
@@ -73,32 +73,32 @@ private void InitializeComponent()
         // 
         // okButton
         // 
-        this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-        this.okButton.Location = new System.Drawing.Point(316, 226);
-        this.okButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-        this.okButton.Name = "okButton";
-        this.okButton.Size = new System.Drawing.Size(112, 35);
-        this.okButton.TabIndex = 3;
-        this.okButton.Text = "OK";
-        this.okButton.UseVisualStyleBackColor = true;
-        this.okButton.Click += new System.EventHandler(this.OnOkButtonClick);
+        this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+        this.buttonOk.Location = new System.Drawing.Point(316, 226);
+        this.buttonOk.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        this.buttonOk.Name = "okButton";
+        this.buttonOk.Size = new System.Drawing.Size(112, 35);
+        this.buttonOk.TabIndex = 3;
+        this.buttonOk.Text = "OK";
+        this.buttonOk.UseVisualStyleBackColor = true;
+        this.buttonOk.Click += new System.EventHandler(this.OnOkButtonClick);
         // 
         // cancelButton
         // 
-        this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        this.cancelButton.Location = new System.Drawing.Point(440, 226);
-        this.cancelButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-        this.cancelButton.Name = "cancelButton";
-        this.cancelButton.Size = new System.Drawing.Size(112, 35);
-        this.cancelButton.TabIndex = 4;
-        this.cancelButton.Text = "Cancel";
-        this.cancelButton.UseVisualStyleBackColor = true;
+        this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+        this.buttonCancel.Location = new System.Drawing.Point(440, 226);
+        this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        this.buttonCancel.Name = "cancelButton";
+        this.buttonCancel.Size = new System.Drawing.Size(112, 35);
+        this.buttonCancel.TabIndex = 4;
+        this.buttonCancel.Text = "Cancel";
+        this.buttonCancel.UseVisualStyleBackColor = true;
         // 
         // ChooseIconDlg
         // 
         this.ClientSize = new System.Drawing.Size(568, 278);
-        this.Controls.Add(this.cancelButton);
-        this.Controls.Add(this.okButton);
+        this.Controls.Add(this.buttonCancel);
+        this.Controls.Add(this.buttonOk);
         this.Controls.Add(this.buttonChooseIconFile);
         this.Controls.Add(this.iconFileLabel);
         this.Controls.Add(this.iconListView);
@@ -119,6 +119,6 @@ private void InitializeComponent()
 private System.Windows.Forms.ListView iconListView;
 private System.Windows.Forms.Label iconFileLabel;
 private System.Windows.Forms.Button buttonChooseIconFile;
-private System.Windows.Forms.Button okButton;
-private System.Windows.Forms.Button cancelButton;
+private System.Windows.Forms.Button buttonOk;
+private System.Windows.Forms.Button buttonCancel;
 }

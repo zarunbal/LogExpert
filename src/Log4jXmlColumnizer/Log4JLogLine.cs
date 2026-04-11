@@ -1,16 +1,16 @@
-﻿using LogExpert;
+using ColumnizerLib;
 
 namespace Log4jXmlColumnizer;
 
-internal class Log4JLogLine : ILogLine
+internal class Log4JLogLine (ReadOnlyMemory<char> fullLine, ReadOnlyMemory<char> text, int lineNumber) : ILogLineMemory
 {
     #region Properties
 
-    public string FullLine { get; set; }
+    public ReadOnlyMemory<char> FullLine { get; set; } = fullLine;
 
-    public int LineNumber { get; set; }
+    public int LineNumber { get; set; } = lineNumber;
 
-    string ITextValue.Text => FullLine;
+    public ReadOnlyMemory<char> Text { get; } = text;
 
     #endregion
 }

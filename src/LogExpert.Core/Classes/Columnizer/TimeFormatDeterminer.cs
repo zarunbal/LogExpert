@@ -48,34 +48,53 @@ internal class TimeFormatDeterminer
     private readonly FormatInfo formatInfo20 = new("yyyy-MM-dd", "HH:mm:ss.ffff", new CultureInfo("en-US"));
     private readonly FormatInfo formatInfo21 = new("yyyy-MM-dd", "HH:mm:ss,ffff", new CultureInfo("en-US"));
 
-
+    /// <summary>
+    /// Determines the date and time format information for the specified input line.
+    /// </summary>
+    /// <param name="line">The input string containing date and time data to analyze. Cannot be null.</param>
+    /// <returns>A FormatInfo object that describes the detected date and time format of the input line.</returns>
+    [Obsolete("Use DetermineDateTimeFormatInfo(ReadOnlySpan<char>) for better performance.")]
     public FormatInfo DetermineDateTimeFormatInfo (string line)
     {
-        if (line.Length < 21)
+        return DetermineDateTimeFormatInfo(line.AsSpan());
+    }
+
+    /// <summary>
+    /// Determines the date and time format information for the specified character span.
+    /// </summary>
+    /// <remarks>This method inspects the structure of the input span to identify common date and time
+    /// formats. It does not perform full parsing or validation of the date and time value. The method is optimized for
+    /// performance and is suitable for scenarios where rapid format detection is required.</remarks>
+    /// <param name="span">A read-only span of characters containing the date and time string to analyze. The span must be at least 21
+    /// characters long.</param>
+    /// <returns>A FormatInfo instance describing the detected date and time format, or null if the format could not be
+    /// determined.</returns>
+    public FormatInfo DetermineDateTimeFormatInfo (ReadOnlySpan<char> span)
+    {
+        if (span.Length < 21)
         {
             return null;
         }
 
-        var temp = line;
         var ignoreFirst = false;
 
         // determine if string starts with bracket and remove it
-        if (temp[0] is '[' or '(' or '{')
+        if (span[0] is '[' or '(' or '{')
         {
-            temp = temp[1..];
+            span = span[1..];
             ignoreFirst = true;
 
         }
 
         // dirty hardcoded probing of date/time format (much faster than DateTime.ParseExact()
-        if (temp[2] == '.' && temp[5] == '.' && temp[13] == ':' && temp[16] == ':')
+        if (span[2] == '.' && span[5] == '.' && span[13] == ':' && span[16] == ':')
         {
-            if (temp[19] == '.')
+            if (span[19] == '.')
             {
                 formatInfo1.IgnoreFirstChar = ignoreFirst;
                 return formatInfo1;
             }
-            else if (temp[19] == ',')
+            else if (span[19] == ',')
             {
                 formatInfo7.IgnoreFirstChar = ignoreFirst;
                 return formatInfo7;
@@ -86,27 +105,27 @@ internal class TimeFormatDeterminer
                 return formatInfo2;
             }
         }
-        else if (temp[2] == '/' && temp[5] == '/' && temp[13] == ':' && temp[16] == ':')
+        else if (span[2] == '/' && span[5] == '/' && span[13] == ':' && span[16] == ':')
         {
-            if (temp[19] == '.')
+            if (span[19] == '.')
             {
                 formatInfo18.IgnoreFirstChar = ignoreFirst;
                 return formatInfo18;
             }
-            else if (temp[19] == ':')
+            else if (span[19] == ':')
             {
                 formatInfo19.IgnoreFirstChar = ignoreFirst;
                 return formatInfo19;
             }
         }
-        else if (temp[4] == '/' && temp[7] == '/' && temp[13] == ':' && temp[16] == ':')
+        else if (span[4] == '/' && span[7] == '/' && span[13] == ':' && span[16] == ':')
         {
-            if (temp[19] == '.')
+            if (span[19] == '.')
             {
                 formatInfo3.IgnoreFirstChar = ignoreFirst;
                 return formatInfo3;
             }
-            else if (temp[19] == ',')
+            else if (span[19] == ',')
             {
                 formatInfo8.IgnoreFirstChar = ignoreFirst;
                 return formatInfo8;
@@ -117,14 +136,14 @@ internal class TimeFormatDeterminer
                 return formatInfo4;
             }
         }
-        else if (temp[4] == '.' && temp[7] == '.' && temp[13] == ':' && temp[16] == ':')
+        else if (span[4] == '.' && span[7] == '.' && span[13] == ':' && span[16] == ':')
         {
-            if (temp[19] == '.')
+            if (span[19] == '.')
             {
                 formatInfo5.IgnoreFirstChar = ignoreFirst;
                 return formatInfo5;
             }
-            else if (temp[19] == ',')
+            else if (span[19] == ',')
             {
                 formatInfo9.IgnoreFirstChar = ignoreFirst;
                 return formatInfo9;
@@ -135,11 +154,11 @@ internal class TimeFormatDeterminer
                 return formatInfo6;
             }
         }
-        else if (temp[4] == '-' && temp[7] == '-' && temp[13] == ':' && temp[16] == ':')
+        else if (span[4] == '-' && span[7] == '-' && span[13] == ':' && span[16] == ':')
         {
-            if (temp[19] == '.')
+            if (span[19] == '.')
             {
-                if (temp.Length > 23 && char.IsDigit(temp[23]))
+                if (span.Length > 23 && char.IsDigit(span[23]))
                 {
                     formatInfo20.IgnoreFirstChar = ignoreFirst;
                     return formatInfo20;
@@ -150,9 +169,9 @@ internal class TimeFormatDeterminer
                     return formatInfo10;
                 }
             }
-            else if (temp[19] == ',')
+            else if (span[19] == ',')
             {
-                if (temp.Length > 23 && char.IsDigit(temp[23]))
+                if (span.Length > 23 && char.IsDigit(span[23]))
                 {
                     formatInfo21.IgnoreFirstChar = ignoreFirst;
                     return formatInfo21;
@@ -163,7 +182,7 @@ internal class TimeFormatDeterminer
                     return formatInfo11;
                 }
             }
-            else if (temp[19] == ':')
+            else if (span[19] == ':')
             {
                 formatInfo17.IgnoreFirstChar = ignoreFirst;
                 return formatInfo17;
@@ -174,14 +193,14 @@ internal class TimeFormatDeterminer
                 return formatInfo12;
             }
         }
-        else if (temp[2] == ' ' && temp[6] == ' ' && temp[14] == ':' && temp[17] == ':')
+        else if (span[2] == ' ' && span[6] == ' ' && span[14] == ':' && span[17] == ':')
         {
-            if (temp[20] == ',')
+            if (span[20] == ',')
             {
                 formatInfo13.IgnoreFirstChar = ignoreFirst;
                 return formatInfo13;
             }
-            else if (temp[20] == '.')
+            else if (span[20] == '.')
             {
                 formatInfo14.IgnoreFirstChar = ignoreFirst;
                 return formatInfo14;
@@ -193,7 +212,7 @@ internal class TimeFormatDeterminer
             }
         }
         //dd.MM.yy HH:mm:ss.fff
-        else if (temp[2] == '.' && temp[5] == '.' && temp[11] == ':' && temp[14] == ':' && temp[17] == '.')
+        else if (span[2] == '.' && span[5] == '.' && span[11] == ':' && span[14] == ':' && span[17] == '.')
         {
             formatInfo16.IgnoreFirstChar = ignoreFirst;
             return formatInfo16;
@@ -202,18 +221,38 @@ internal class TimeFormatDeterminer
         return null;
     }
 
+    /// <summary>
+    /// Determines the time format information for the specified field name.
+    /// </summary>
+    /// <param name="field">The name of the field for which to retrieve time format information. Cannot be null.</param>
+    /// <returns>A FormatInfo object containing details about the time format for the specified field.</returns>
+    [Obsolete("Use DetermineTimeFormatInfo(ReadOnlySpan<char>) for better performance.")]
     public FormatInfo DetermineTimeFormatInfo (string field)
     {
+        return DetermineTimeFormatInfo(field.AsSpan());
+    }
+
+    /// <summary>
+    /// Determines the appropriate time format information for the specified character span representing a time value.
+    /// </summary>
+    /// <remarks>This method performs a fast, heuristic analysis of the input span to identify common time
+    /// formats. It does not perform full validation or parsing of the time value. For unsupported or unrecognized
+    /// formats, the method returns null.</remarks>
+    /// <param name="span">A read-only span of characters containing the time value to analyze. The span is expected to be in a supported
+    /// time format.</param>
+    /// <returns>A FormatInfo instance describing the detected time format, or null if the format is not recognized.</returns>
+    public FormatInfo DetermineTimeFormatInfo (ReadOnlySpan<char> span)
+    {
         // dirty hardcoded probing of time format (much faster than DateTime.ParseExact()
-        if (field[2] == ':' && field[5] == ':')
+        if (span[2] == ':' && span[5] == ':')
         {
-            if (field.Length > 8)
+            if (span.Length > 8)
             {
-                if (field[8] == '.')
+                if (span[8] == '.')
                 {
                     return formatInfo1;
                 }
-                else if (field[8] == ',')
+                else if (span[8] == ',')
                 {
                     return formatInfo7;
                 }

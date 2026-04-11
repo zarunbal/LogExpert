@@ -322,6 +322,10 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
+# Nuke Build System
+.nuke/*
+!.nuke/parameters.json
+
 # CodeRush personal settings
 .cr/personal
 

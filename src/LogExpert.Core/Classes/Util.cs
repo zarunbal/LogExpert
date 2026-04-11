@@ -3,6 +3,8 @@ using System.Drawing;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Filter;
 
 namespace LogExpert.Core.Classes;
@@ -51,29 +53,31 @@ public class Util
             : fileName[(i + 1)..];
     }
 
-
     public static string GetFileSizeAsText (long size)
     {
         return size < 1024
-            ? string.Empty + size + " bytes"
+            ? $"{size} bytes"
             : size < 1024 * 1024
-                ? string.Empty + (size / 1024) + " KB"
-                : string.Empty + $"{size / 1048576.0:0.00}" + " MB";
+                ? $"{size / 1024} KB"
+                : $"{size / 1048576.0:0.00} MB";
     }
 
-    //TOOD: check if the callers are checking for null before calling
-    public static bool TestFilterCondition (FilterParams filterParams, ILogLine line, ILogLineColumnizerCallback columnizerCallback)
+    public static bool TestFilterCondition (FilterParams filterParams, ILogLineMemory logLine, ILogLineMemoryColumnizerCallback columnizerCallback)
     {
         ArgumentNullException.ThrowIfNull(filterParams, nameof(filterParams));
-        ArgumentNullException.ThrowIfNull(line, nameof(line));
+        ArgumentNullException.ThrowIfNull(logLine, nameof(logLine));
 
-        if (filterParams.LastLine.Equals(line.FullLine, StringComparison.OrdinalIgnoreCase))
+        // TODO: Once FilterParams.LastLine is converted to ReadOnlyMemory<char>, this can be simplified to:
+        // if (MemoryExtensions.Equals(filterParams.LastLine.Span, logLine.FullLine.Span, StringComparison.OrdinalIgnoreCase))
+        if (MemoryExtensions.Equals(filterParams.LastLine.AsSpan(), logLine.FullLine.Span, StringComparison.OrdinalIgnoreCase))
         {
             return filterParams.LastResult;
         }
 
-        var match = TestFilterMatch(filterParams, line, columnizerCallback);
-        filterParams.LastLine = line.FullLine;
+        var match = TestFilterMatch(filterParams, logLine, columnizerCallback);
+
+        // TODO: This ToString() allocation will be eliminated when LastLine becomes ReadOnlyMemory<char>
+        filterParams.LastLine = logLine.FullLine.ToString();
 
         if (filterParams.IsRangeSearch)
         {
@@ -106,47 +110,68 @@ public class Util
         return match;
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
-    public static int DamerauLevenshteinDistance (string src, string dest)
+    public static int DamerauLevenshteinDistance (ReadOnlySpan<char> source, ReadOnlySpan<char> destination, bool ignoreCase = false)
     {
-        var d = new int[src.Length + 1, dest.Length + 1];
-        int i, j, cost;
-        var str1 = src.ToCharArray();
-        var str2 = dest.ToCharArray();
+        var d = new int[source.Length + 1, destination.Length + 1];
 
-        for (i = 0; i <= str1.Length; i++)
+        for (var i = 0; i <= source.Length; i++)
         {
             d[i, 0] = i;
         }
 
-        for (j = 0; j <= str2.Length; j++)
+        for (var j = 0; j <= destination.Length; j++)
         {
             d[0, j] = j;
         }
 
-        for (i = 1; i <= str1.Length; i++)
+        for (var i = 1; i <= source.Length; i++)
         {
-            for (j = 1; j <= str2.Length; j++)
+            for (var j = 1; j <= destination.Length; j++)
             {
-                cost = str1[i - 1] == str2[j - 1]
+                var char1 = ignoreCase
+                    ? char.ToUpperInvariant(source[i - 1])
+                    : source[i - 1];
+
+                var char2 = ignoreCase
+                    ? char.ToUpperInvariant(destination[j - 1])
+                    : destination[j - 1];
+
+                var cost = char1 == char2
                     ? 0
                     : 1;
 
-                d[i, j] =
-                    Math.Min(d[i - 1, j] + 1, // Deletion
-                        Math.Min(d[i, j - 1] + 1, // Insertion
-                            d[i - 1, j - 1] + cost)); // Substitution
+                d[i, j] = Math.Min
+                    (
+                        d[i - 1, j] + 1,        // Deletion
+                        Math.Min
+                        (
+                            d[i, j - 1] + 1,    // Insertion
+                            d[i - 1, j - 1] + cost // Substitution
+                        )
+                    );
 
-                if (i > 1 && j > 1 && str1[i - 1] == str2[j - 2] && str1[i - 2] == str2[j - 1])
+                // Transposition
+                if (i > 1 && j > 1)
                 {
-                    d[i, j] = Math.Min(d[i, j], d[i - 2, j - 2] + cost);
+                    var prevChar1 = ignoreCase
+                        ? char.ToUpperInvariant(source[i - 2])
+                        : source[i - 2];
+
+                    var prevChar2 = ignoreCase
+                        ? char.ToUpperInvariant(destination[j - 2])
+                        : destination[j - 2];
+
+                    if (char1 == prevChar2 && prevChar1 == char2)
+                    {
+                        d[i, j] = Math.Min(d[i, j], d[i - 2, j - 2] + cost);
+                    }
                 }
             }
         }
-        return d[str1.Length, str2.Length];
+
+        return d[source.Length, destination.Length];
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
         fixed (char* p1 = s1)
@@ -156,13 +181,22 @@ public class Util
         }
     }
 
-    public static unsafe int YetiLevenshtein (string s1, string s2, int substitionCost)
+    public static unsafe int YetiLevenshtein (ReadOnlySpan<char> s1, ReadOnlySpan<char> s2)
     {
-        var xc = substitionCost - 1;
+        fixed (char* p1 = s1)
+        fixed (char* p2 = s2)
+        {
+            return YetiLevenshtein(p1, s1.Length, p2, s2.Length, 0);
+        }
+    }
+
+    public static unsafe int YetiLevenshtein (string s1, string s2, int substitutionCost)
+    {
+        var xc = substitutionCost - 1;
 
         if (xc is < 0 or > 1)
         {
-            throw new ArgumentException("", nameof(substitionCost));
+            throw new ArgumentException("", nameof(substitutionCost));
         }
 
         fixed (char* p1 = s1)
@@ -382,26 +416,6 @@ public class Util
         return i;
     }
 
-    /// <summary>
-    /// Returns true, if the given string is null or empty
-    /// </summary>
-    /// <param name="toTest"></param>
-    /// <returns></returns>
-    public static bool IsNull (string toTest)
-    {
-        return toTest == null || toTest.Length == 0;
-    }
-
-    /// <summary>
-    /// Returns true, if the given string is null or empty or contains only spaces
-    /// </summary>
-    /// <param name="toTest"></param>
-    /// <returns></returns>
-    public static bool IsNullOrSpaces (string toTest)
-    {
-        return toTest == null || toTest.Trim().Length == 0;
-    }
-
     [Conditional("DEBUG")]
     public static void AssertTrue (bool condition, string msg)
     {
@@ -415,7 +429,7 @@ public class Util
 
     //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
     [SupportedOSPlatform("windows")]
-    public string? GetWordFromPos (int xPos, string text, Graphics g, Font font)
+    public static string? GetWordFromPos (int xPos, string text, Graphics g, Font font)
     {
         var words = text.Split([' ', '.', ':', ';']);
 
@@ -440,13 +454,13 @@ public class Util
         stringFormat.SetMeasurableCharacterRanges(crArray);
 
         RectangleF rect = new(0, 0, 3000, 20);
-        Region[] stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
+        var stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
 
         var found = false;
 
         var y = 0;
 
-        foreach (Region regio in stringRegions)
+        foreach (var regio in stringRegions)
         {
             if (regio.IsVisible(xPos, 3, g))
             {
@@ -466,7 +480,7 @@ public class Util
 
     #region Private Methods
 
-    private static bool TestFilterMatch (FilterParams filterParams, ILogLine line, ILogLineColumnizerCallback columnizerCallback)
+    private static bool TestFilterMatch (FilterParams filterParams, ILogLineMemory logLine, ILogLineMemoryColumnizerCallback columnizerCallback)
     {
         string normalizedSearchText;
         string searchText;
@@ -482,7 +496,7 @@ public class Util
         {
             normalizedSearchText = filterParams.NormalizedSearchText;
             searchText = filterParams.SearchText;
-            rex = filterParams.Rex;
+            rex = filterParams.Regex;
         }
 
         if (string.IsNullOrEmpty(searchText))
@@ -492,22 +506,19 @@ public class Util
 
         if (filterParams.ColumnRestrict)
         {
-            IColumnizedLogLine columns = filterParams.CurrentColumnizer.SplitLine(columnizerCallback, line);
+            var columns = filterParams.CurrentColumnizer.SplitLine(columnizerCallback, logLine);
             var found = false;
             foreach (var colIndex in filterParams.ColumnList)
             {
-                if (colIndex < columns.ColumnValues.Length
-                ) // just to be sure, maybe the columnizer has changed anyhow
+                if (colIndex < columns.ColumnValues.Length) // just to be sure, maybe the columnizer has changed anyhow
                 {
                     if (columns.ColumnValues[colIndex].FullValue.Trim().Length == 0)
                     {
                         if (filterParams.EmptyColumnUsePrev)
                         {
-                            var prevValue = (string)filterParams.LastNonEmptyCols[colIndex];
-                            if (prevValue != null)
+                            if (filterParams.LastNonEmptyCols.TryGetValue(colIndex, out var prevValue))
                             {
-                                if (TestMatchSub(filterParams, prevValue, normalizedSearchText, searchText, rex,
-                                    filterParams.ExactColumnMatch))
+                                if (TestMatchSub(filterParams, prevValue, normalizedSearchText.AsSpan(), searchText.AsSpan(), rex, filterParams.ExactColumnMatch))
                                 {
                                     found = true;
                                 }
@@ -521,9 +532,7 @@ public class Util
                     else
                     {
                         filterParams.LastNonEmptyCols[colIndex] = columns.ColumnValues[colIndex].FullValue;
-                        if (TestMatchSub(filterParams, columns.ColumnValues[colIndex].FullValue, normalizedSearchText,
-                            searchText, rex,
-                            filterParams.ExactColumnMatch))
+                        if (TestMatchSub(filterParams, columns.ColumnValues[colIndex].FullValue, normalizedSearchText.AsSpan(), searchText.AsSpan(), rex, filterParams.ExactColumnMatch))
                         {
                             found = true;
                         }
@@ -535,11 +544,17 @@ public class Util
         }
         else
         {
-            return TestMatchSub(filterParams, line.FullLine, normalizedSearchText, searchText, rex, false);
+            return TestMatchSub(filterParams, logLine.FullLine, normalizedSearchText.AsSpan(), searchText.AsSpan(), rex, false);
         }
     }
 
-    private static bool TestMatchSub (FilterParams filterParams, string line, string lowerSearchText, string searchText, Regex rex, bool exactMatch)
+    private static bool TestMatchSub (
+            FilterParams filterParams,
+            ReadOnlySpan<char> line,
+            ReadOnlySpan<char> normalizedSearchText,  // Pre-normalized (uppercase) // lowerSearchText
+            ReadOnlySpan<char> searchText,
+            Regex rex,
+            bool exactMatch)
     {
         if (filterParams.IsRegex)
         {
@@ -554,14 +569,15 @@ public class Util
             {
                 if (exactMatch)
                 {
-                    if (line.ToUpperInvariant().Trim().Equals(lowerSearchText, StringComparison.Ordinal))
+                    var trimmedLine = line.Trim();
+                    if (MemoryExtensions.Equals(trimmedLine, normalizedSearchText, StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if (line.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
+                    if (line.Contains(normalizedSearchText, StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
@@ -578,7 +594,7 @@ public class Util
                 }
                 else
                 {
-                    if (line.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                    if (line.Contains(searchText, StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -590,16 +606,11 @@ public class Util
                 var range = line.Length - searchText.Length;
                 if (range > 0)
                 {
-                    for (var i = 0; i < range; ++i)
+                    for (var i = 0; i <= range; ++i)
                     {
-                        var src = line.Substring(i, searchText.Length);
+                        var src = line.Slice(i, searchText.Length);
 
-                        if (!filterParams.IsCaseSensitive)
-                        {
-                            src = src.ToLowerInvariant();
-                        }
-
-                        var dist = DamerauLevenshteinDistance(src, searchText);
+                        var dist = DamerauLevenshteinDistance(src, searchText, !filterParams.IsCaseSensitive);
 
                         if ((searchText.Length + 1) / (float)(dist + 1) >= 11F / (float)(filterParams.FuzzyValue + 1F))
                         {
@@ -613,6 +624,22 @@ public class Util
         }
 
         return false;
+    }
+
+    private static bool TestMatchSub (
+            FilterParams filterParams,
+            ReadOnlyMemory<char> line,  // From ILogLineMemory.FullLine
+            ReadOnlySpan<char> normalizedSearchText,
+            ReadOnlySpan<char> searchText,
+            Regex rex,
+            bool exactMatch)
+    {
+        return TestMatchSub(filterParams, line.Span, normalizedSearchText, searchText, rex, exactMatch);
+    }
+
+    private static bool TestMatchSub (FilterParams filterParams, string line, string lowerSearchText, string searchText, Regex rex, bool exactMatch)
+    {
+        return TestMatchSub(filterParams, line.AsSpan(), lowerSearchText.AsSpan(), searchText.AsSpan(), rex, exactMatch);
     }
 
     private static unsafe int MemchrRPLC (char* buffer, char c, int count)

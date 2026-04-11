@@ -1,14 +1,14 @@
 <Project>
   <PropertyGroup>
-    <Version>1.20.0.0</Version>
-    <AssemblyVersion>1.20.0.0</AssemblyVersion>
-    <FileVersion>1.20.0.0</FileVersion>
-    <InformationalVersion>1.20.0.0</InformationalVersion>
+    <Version>1.31.0.0</Version>
+    <AssemblyVersion>1.31.0.0</AssemblyVersion>
+    <FileVersion>1.31.0.0</FileVersion>
+    <InformationalVersion>1.31.0.0</InformationalVersion>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
-    <Company>Log Expert</Company>
+    <Company>LogExperts</Company>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
     <PublishAot>false</PublishAot>
@@ -17,9 +17,17 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!--<OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>--><!--TODO: Normalize this across solution-->
     <SignAssembly>true</SignAssembly>
+    <PackageProjectUrl>https://github.com/LogExperts/LogExpert</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LogExperts/LogExpert</RepositoryUrl>
+    <PackageTags>LogExpert, Columnizer, Logging, Windows, Winforms</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v.1.31.0</PackageReleaseNotes>
+    <PackageVersion>1.31.0.0</PackageVersion>
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
     <Product>LogExpert</Product>
     <Copyright>Copyright © LogExpert 2025</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsTestProject>false</IsTestProject>
     <UseWindowsForms>false</UseWindowsForms>
     <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
@@ -49,6 +57,7 @@
   <ItemGroup Label="Links">
     <Compile Include="..\Solution Items\AssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
     <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+    <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

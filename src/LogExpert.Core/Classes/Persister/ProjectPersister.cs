@@ -1,65 +1,131 @@
-﻿using System.Collections.Generic;
-using System.Xml;
+using System.Text;
+
+using LogExpert.Core.Interfaces;
+
+using Newtonsoft.Json;
+
+using NLog;
 
 namespace LogExpert.Core.Classes.Persister;
 
 public static class ProjectPersister
 {
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
     #region Public methods
 
-    public static ProjectData LoadProjectData(string projectFileName)
+    /// <summary>
+    /// Loads the project session data from a specified file, including validation of referenced files.
+    /// Resolves .lxp persistence files to actual .log files before validation.
+    /// </summary>
+    /// <param name="projectFileName">The path to the project file (.lxj)</param>
+    /// <param name="pluginRegistry">The plugin registry for file system validation</param>
+    /// <returns>A <see cref="ProjectLoadResult"/> containing the project data and validation results</returns>
+    public static ProjectLoadResult LoadProjectData (string projectFileName, IPluginRegistry pluginRegistry)
     {
-        ProjectData projectData = new();
-        XmlDocument xmlDoc = new();
-        xmlDoc.Load(projectFileName);
-        XmlNodeList fileList = xmlDoc.GetElementsByTagName("member");
-        foreach (XmlNode fileNode in fileList)
+        try
         {
-            var fileElement = fileNode as XmlElement;
-            var fileName = fileElement.GetAttribute("fileName");
-            projectData.MemberList.Add(fileName);
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+            };
+
+            var json = File.ReadAllText(projectFileName, Encoding.UTF8);
+            var projectData = JsonConvert.DeserializeObject<ProjectData>(json, settings);
+
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Resolve .lxp files to actual .log files
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            // Create mapping: logFile → originalFile
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            // Create new ProjectData with resolved log file paths
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            // Validate the actual log files (not .lxp files)
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
+
+            return new ProjectLoadResult
+            {
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
+            };
         }
-        XmlNodeList layoutElements = xmlDoc.GetElementsByTagName("layout");
-        if (layoutElements.Count > 0)
+        catch (Exception ex) when (ex is UnauthorizedAccessException or
+                                         IOException or
+                                         JsonSerializationException)
         {
-            projectData.TabLayoutXml = layoutElements[0].InnerXml;
+            _logger.Warn($"Error loading persistence data from {projectFileName}, trying old xml version");
+
+            var projectData = ProjectPersisterXML.LoadProjectData(projectFileName);
+
+            // Set project file path for alternative file search
+            projectData.ProjectFilePath = projectFileName;
+
+            // Resolve .lxp files for XML fallback as well
+            var resolvedFiles = ProjectFileResolver.ResolveProjectFiles(projectData, pluginRegistry);
+
+            var logToOriginalMapping = new Dictionary<string, string>();
+            foreach (var (logFile, originalFile) in resolvedFiles)
+            {
+                logToOriginalMapping[logFile] = originalFile;
+            }
+
+            var resolvedProjectData = new ProjectData
+            {
+                FileNames = [.. resolvedFiles.Select(r => r.LogFile)],
+                TabLayoutXml = projectData.TabLayoutXml,
+                ProjectFilePath = projectData.ProjectFilePath
+            };
+
+            var validationResult = ProjectFileValidator.ValidateProject(resolvedProjectData, pluginRegistry);
+
+            return new ProjectLoadResult
+            {
+                ProjectData = resolvedProjectData,
+                ValidationResult = validationResult,
+                LogToOriginalFileMapping = logToOriginalMapping
+            };
         }
-        return projectData;
     }
 
-
-    public static void SaveProjectData(string projectFileName, ProjectData projectData)
+    /// <summary>
+    /// Saves the specified project data to a file in JSON format.
+    /// </summary>
+    /// <remarks>The method serializes the <paramref name="projectData"/> into a JSON string with indented
+    /// formatting and writes it to the specified <paramref name="projectFileName"/> using UTF-8 encoding.</remarks>
+    /// <param name="projectFileName">The path to the file where the project data will be saved. Cannot be null or empty.</param>
+    /// <param name="projectData">The project data to be serialized and saved. Cannot be null.</param>
+    public static void SaveProjectData (string projectFileName, ProjectData projectData)
     {
-        XmlDocument xmlDoc = new();
-        XmlElement rootElement = xmlDoc.CreateElement("logexpert");
-        xmlDoc.AppendChild(rootElement);
-        XmlElement projectElement = xmlDoc.CreateElement("project");
-        rootElement.AppendChild(projectElement);
-        XmlElement membersElement = xmlDoc.CreateElement("members");
-        projectElement.AppendChild(membersElement);
-        SaveProjectMembers(xmlDoc, membersElement, projectData.MemberList);
-
-        if (projectData.TabLayoutXml != null)
+        var settings = new JsonSerializerSettings
         {
-            XmlElement layoutElement = xmlDoc.CreateElement("layout");
-            layoutElement.InnerXml = projectData.TabLayoutXml;
-            rootElement.AppendChild(layoutElement);
+            Formatting = Formatting.Indented,
+        };
+
+        try
+        {
+            var json = JsonConvert.SerializeObject(projectData, settings);
+            File.WriteAllText(projectFileName, json, Encoding.UTF8);
         }
-
-        xmlDoc.Save(projectFileName);
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private static void SaveProjectMembers(XmlDocument xmlDoc, XmlNode membersNode, List<string> memberList)
-    {
-        foreach (var fileName in memberList)
+        catch (Exception ex) when (ex is JsonSerializationException or
+                                         UnauthorizedAccessException or
+                                         IOException)
         {
-            XmlElement memberElement = xmlDoc.CreateElement("member");
-            membersNode.AppendChild(memberElement);
-            memberElement.SetAttribute("fileName", fileName);
+            _logger.Error(ex, $"Error saving persistence data to {projectFileName}");
         }
     }
 

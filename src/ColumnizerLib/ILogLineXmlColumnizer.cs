@@ -1,4 +1,4 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This is the interface for a Columnizer which supports XML log files. This interface extends
@@ -37,6 +37,7 @@ namespace LogExpert;
 /// </ol>
 /// </para>
 /// </remarks>
+[Obsolete("This interface is deprecated. Please use ILogLineMemoryXmlColumnizer for a memory based implementation instead.")]
 public interface ILogLineXmlColumnizer : ILogLineColumnizer
 {
     #region Public methods

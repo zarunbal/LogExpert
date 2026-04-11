@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-
 namespace LogExpert.Core.Classes.DateTimeParser;
 
 //TODO: This should be moved into LogExpert.UI and changed to internal
@@ -17,22 +14,12 @@ public static class DateFormatPartAdjuster
         ["s"] = "ss"
     };
 
-    public static string AdjustDateTimeFormatPart(string part)
+    public static string AdjustDateTimeFormatPart (string part)
     {
         ArgumentNullException.ThrowIfNull(part, nameof(part));
 
-        if (!_dateTimePartReplacements.TryGetValue(part, out var adjustedPart))
-        {
-            return part;
-        }
-
-        if (char.IsUpper(part[0]))
-        {
-            return adjustedPart.ToUpper();
-        }
-        else
-        {
-            return adjustedPart.ToLower();
-        }
+        return !_dateTimePartReplacements.TryGetValue(part, out var adjustedPart)
+            ? part
+            : char.IsUpper(part[0]) ? adjustedPart.ToUpperInvariant() : adjustedPart.ToLowerInvariant();
     }
 }

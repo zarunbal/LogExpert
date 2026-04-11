@@ -1,9 +1,13 @@
+using System.ComponentModel;
 using System.Runtime.Versioning;
+
+using ColumnizerLib;
 
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
+using LogExpert.UI.Controls;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Interface;
 
@@ -13,7 +17,6 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.Dialogs;
 
-//TODO can be moved to Logexpert.UI if the PaintHelper has been refactored
 [SupportedOSPlatform("windows")]
 internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmarkView
 {
@@ -32,29 +35,58 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     public BookmarkWindow ()
     {
-        InitializeComponent();
+        SuspendLayout();
+
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
+        InitializeComponent();
+        contextMenuStrip1.Opening += OnContextMenuStripOpening;
+
         bookmarkDataGridView.CellValueNeeded += OnBoomarkDataGridViewCellValueNeeded;
         bookmarkDataGridView.CellPainting += OnBoomarkDataGridViewCellPainting;
+
+        ApplyResources();
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        // Dialog title
+        Text = Resources.BookmarkWindow_UI_Title;
+
+        labelComment.Text = Resources.BookmarkWindow_UI_Label_Comment;
+
+        checkBoxCommentColumn.Text = Resources.BookmarkWindow_UI_CheckBox_ShowCommentColumn;
+
+        deleteBookmarkssToolStripMenuItem.Text = Resources.BookmarkWindow_UI_MenuItem_DeleteBookmarks;
+        removeCommentsToolStripMenuItem.Text = Resources.BookmarkWindow_UI_ToolStripMenuItem_RemoveComments;
     }
 
     #endregion
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool LineColumnVisible
     {
-        set => bookmarkDataGridView.Columns[2].Visible = value;
-    }
-
-    public bool ShowBookmarkCommentColumn
-    {
-        get => commentColumnCheckBox.Checked;
         set
         {
-            commentColumnCheckBox.Checked = value;
+            if (bookmarkDataGridView.Columns.Count > 3)
+            {
+                bookmarkDataGridView.Columns[3].Visible = value;
+            }
+        }
+    }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+    public bool ShowBookmarkCommentColumn
+    {
+        get => checkBoxCommentColumn.Checked;
+        set
+        {
+            checkBoxCommentColumn.Checked = value;
             ShowCommentColumn(value);
         }
     }
@@ -63,7 +95,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     #region Public methods
 
-    public void SetColumnizer (ILogLineColumnizer columnizer)
+    public void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         PaintHelper.SetColumnizer(columnizer, bookmarkDataGridView);
 
@@ -74,7 +106,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
         DataGridViewTextBoxColumn commentColumn = new()
         {
-            HeaderText = "Bookmark Comment",
+            HeaderText = Resources.BookmarkWindow_UI_DataGridColumn_HeaderText,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
             Resizable = DataGridViewTriState.NotSet,
             DividerWidth = 1,
@@ -84,7 +116,20 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         };
 
         bookmarkDataGridView.Columns.Insert(1, commentColumn);
-        ShowCommentColumn(commentColumnCheckBox.Checked);
+
+        DataGridViewTextBoxColumn sourceColumn = new()
+        {
+            HeaderText = Resources.BookmarkWindow_UI_DataGridColumn_HeaderTextSource,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+            Resizable = DataGridViewTriState.NotSet,
+            DividerWidth = 1,
+            ReadOnly = true,
+            Width = 120,
+            MinimumWidth = 60
+        };
+
+        bookmarkDataGridView.Columns.Insert(2, sourceColumn);
+        ShowCommentColumn(checkBoxCommentColumn.Checked);
         ResizeColumns();
     }
 
@@ -212,7 +257,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
                 LineAlignment = StringAlignment.Center
             };
 
-            e.Graphics.DrawString("No bookmarks in current file", SystemFonts.DialogFont, SystemBrushes.WindowText, ClientRectangle, sf);
+            e.Graphics.DrawString(Resources.BookmarkWindow_UI_NoBookmarksInCurrentFile, SystemFonts.DialogFont, SystemBrushes.WindowText, ClientRectangle, sf);
         }
         else
         {
@@ -232,20 +277,39 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         bookmarkDataGridView.Refresh();
     }
 
-    private void CommentPainting (BufferedDataGridView gridView, DataGridViewCellPaintingEventArgs e)
+    private void OnConvertToManualToolStripMenuItemClick (object sender, EventArgs e)
     {
-        if (e.State.HasFlag(DataGridViewElementStates.Selected))
+        foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
         {
-            using var brush = PaintHelper.GetBrushForFocusedControl(gridView.Focused, e.CellStyle.SelectionBackColor);
-            e.Graphics.FillRectangle(brush, e.CellBounds);
-        }
-        else
-        {
-            e.CellStyle.BackColor = Color.White;
-            e.PaintBackground(e.CellBounds, false);
+            if (row.Index >= 0 && row.Index < _bookmarkData.Bookmarks.Count)
+            {
+                var bookmark = _bookmarkData.Bookmarks[row.Index];
+                if (bookmark.IsAutoGenerated)
+                {
+                    bookmark.IsAutoGenerated = false;
+                    bookmark.SourceHighlightText = null;
+                }
+            }
         }
 
-        e.PaintContent(e.CellBounds);
+        bookmarkDataGridView.Refresh();
+        _logView?.RefreshLogView();
+    }
+
+    private void OnContextMenuStripOpening (object sender, CancelEventArgs e)
+    {
+        var hasAutoGenerated = false;
+        foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
+        {
+            if (row.Index >= 0 && row.Index < _bookmarkData.Bookmarks.Count
+                && _bookmarkData.Bookmarks[row.Index].IsAutoGenerated)
+            {
+                hasAutoGenerated = true;
+                break;
+            }
+        }
+
+        convertToManualToolStripMenuItem.Enabled = hasAutoGenerated;
     }
 
     private void DeleteSelectedBookmarks ()
@@ -320,14 +384,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
                 var lineNum = _bookmarkData.Bookmarks[e.RowIndex].LineNum;
 
-                // if (e.ColumnIndex == 1)
-                // {
-                // CommentPainting(this.bookmarkDataGridView, lineNum, e);
-                // }
-                //{
-                // else
                 PaintHelper.CellPainting(_logPaintContext, bookmarkDataGridView.Focused, lineNum, e.ColumnIndex, e);
-                //}
             }
             catch (Exception ex)
             {
@@ -353,15 +410,23 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         var lineNum = bookmarkForLine.LineNum;
         if (e.ColumnIndex == 1)
         {
-            e.Value = bookmarkForLine.Text?.Replace('\n', ' ').Replace('\r', ' ');
+            e.Value = new Column { FullValue = (bookmarkForLine.Text?.Replace('\n', ' ').Replace('\r', ' ') ?? string.Empty).AsMemory() };
+        }
+
+        else if (e.ColumnIndex == 2)
+        {
+            var sourceText = bookmarkForLine.IsAutoGenerated
+                    ? bookmarkForLine.SourceHighlightText ?? Resources.BookmarkWindow_UI_SourceHighlightText_Auto
+                    : Resources.BookmarkWindow_UI_SourceHighlightText_Manual;
+            e.Value = new Column { FullValue = sourceText.AsMemory() };
         }
         else
         {
-            var columnIndex = e.ColumnIndex > 1 ? e.ColumnIndex - 1 : e.ColumnIndex;
+            // Columns 0, 3+ map to log columns. Offset by 2 (comment + source columns) for indices > 2.
+            var columnIndex = e.ColumnIndex > 2 ? e.ColumnIndex - 2 : e.ColumnIndex;
             e.Value = _logPaintContext.GetCellValue(lineNum, columnIndex);
         }
     }
-
 
     private void OnBoomarkDataGridViewMouseDoubleClick (object sender, MouseEventArgs e)
     {
@@ -402,7 +467,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         {
             if (bookmarkDataGridView.Focused)
             {
-                bookmarkTextBox.Focus();
+                _ = bookmarkTextBox.Focus();
                 e.Handled = true;
             }
         }
@@ -537,7 +602,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     private void OnRemoveCommentsToolStripMenuItemClick (object sender, EventArgs e)
     {
-        if (MessageBox.Show("Really remove bookmark comments for selected lines?", "LogExpert", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        if (MessageBox.Show(Resources.BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.Yes)
         {
             foreach (DataGridViewRow row in bookmarkDataGridView.SelectedRows)
             {
@@ -555,7 +620,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     private void OnCommentColumnCheckBoxCheckedChanged (object sender, EventArgs e)
     {
-        ShowCommentColumn(commentColumnCheckBox.Checked);
+        ShowCommentColumn(checkBoxCommentColumn.Checked);
     }
 
     private void BookmarkWindow_ClientSizeChanged (object sender, EventArgs e)

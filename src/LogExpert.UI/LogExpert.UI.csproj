@@ -4,8 +4,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>LogExpert.UI</RootNamespace>
+    <AssemblyTitle>LogExpert.UI</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,12 +18,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <PackageReference Include="DockPanelSuite.ThemeVS2015" />
+    <PackageReference Include="Vanara.Library" />
+    <PackageReference Include="Vanara.PInvoke.RstrtMgr" />
+    <PackageReference Include="Vanara.PInvoke.Shell32" />
+    <PackageReference Include="Vanara.PInvoke.User32" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs" />
   </ItemGroup>
 
 </Project>

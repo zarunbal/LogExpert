@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Log4jXmlColumnizerConfigDlg Resources -->
+  <data name="Log4jXmlColumnizerConfigDlg_UI_Title" xml:space="preserve">
+    <value>Log4j XML Columnizer</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_Label_ChooseColumns" xml:space="preserve">
+    <value>Choose columns to show:</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_CheckBox_LocalTime" xml:space="preserve">
+    <value>Convert timestamps to local time zone</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_Visible" xml:space="preserve">
+    <value></value>
+    <comment>Empty string for checkbox column header</comment>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_Column" xml:space="preserve">
+    <value>Column</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_MaxLen" xml:space="preserve">
+    <value>Max len</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Log4jXmlColumnizer_UI_Title_Deserialize" xml:space="preserve">
+    <value>Deserialize</value>
+  </data>
+</root>

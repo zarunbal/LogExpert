@@ -1,8 +1,8 @@
-using NLog;
-
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+
+using NLog;
 
 namespace LogExpert.Core.Classes;
 
@@ -20,10 +20,10 @@ public class SysoutPipe : IDisposable
 
     #region cTor
 
-    public SysoutPipe(StreamReader sysout)
+    public SysoutPipe (StreamReader sysout)
     {
         _disposed = false;
-        this._sysout = sysout;
+        _sysout = sysout;
         FileName = Path.GetTempFileName();
         _logger.Info(CultureInfo.InvariantCulture, "sysoutPipe created temp file: {0}", FileName);
 
@@ -47,19 +47,19 @@ public class SysoutPipe : IDisposable
 
     #region Public methods
 
-    public void ClosePipe()
+    public void ClosePipe ()
     {
         _writer.Close();
         _writer = null;
     }
 
 
-    public void DataReceivedEventHandler(object sender, DataReceivedEventArgs e)
+    public void DataReceivedEventHandler (object sender, DataReceivedEventArgs e)
     {
         _writer.WriteLine(e.Data);
     }
 
-    public void ProcessExitedEventHandler(object sender, System.EventArgs e)
+    public void ProcessExitedEventHandler (object sender, EventArgs e)
     {
         //ClosePipe();
         if (sender.GetType() == typeof(Process))
@@ -71,7 +71,7 @@ public class SysoutPipe : IDisposable
 
     #endregion
 
-    protected void ReaderThread()
+    protected void ReaderThread ()
     {
         var buff = new char[256];
 
@@ -84,6 +84,7 @@ public class SysoutPipe : IDisposable
                 {
                     break;
                 }
+
                 _writer.Write(buff, 0, read);
             }
             catch (IOException e)
@@ -96,13 +97,13 @@ public class SysoutPipe : IDisposable
         ClosePipe();
     }
 
-    public void Dispose()
+    public void Dispose ()
     {
         Dispose(true);
         GC.SuppressFinalize(this); // Suppress finalization (not needed but best practice)
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose (bool disposing)
     {
         if (!_disposed)
         {

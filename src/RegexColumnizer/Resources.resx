@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- RegexColumnizerConfigDialog Resources -->
+  <data name="RegexColumnizerConfigDialog_UI_Title" xml:space="preserve">
+    <value>Regex Columnizer</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Label_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Label_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_GroupBox_TestZone" xml:space="preserve">
+    <value>Test Zone</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Label_Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Button_Check" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Button_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="RegexColumnizer_Description" xml:space="preserve">
+    <value>Columns are filled by regular expression named capture groups</value>
+  </data>
+  <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Configuration directory cannot be null or empty</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Columnizer name cannot be null or empty</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Error" xml:space="preserve">
+    <value>Configuration Error</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Warning" xml:space="preserve">
+    <value>Configuration Warning</value>
+  </data>
+  <data name="RegexColumnizer_UI_Title_Deserialize" xml:space="preserve">
+    <value>Deserialize</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_RegexTimeout" xml:space="preserve">
+    <value>Regex pattern may cause performance issues: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_InvalidRegexPattern" xml:space="preserve">
+    <value>Invalid regex pattern: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_FailedToSaveConfiguration" xml:space="preserve">
+    <value>Failed to save configuration: {0}</value>
+  </data>
+  <data name="RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory" xml:space="preserve">
+    <value>Failed to create configuration directory: {0}</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNotAllowed" xml:space="preserve">
+    <value>Columnizer name '{0}' contains path separators which are not allowed</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters" xml:space="preserve">
+    <value>Columnizer name '{0}' contains invalid filename characters</value>
+  </data>
+  <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhichAreNotAllowed" xml:space="preserve">
+    <value>Columnizer name '{0}' contains path traversal patterns which are not allowed</value>
+  </data>
+  <data name="RegexColumnizerConfigDialog_UI_Error_Title" xml:space="preserve">
+    <value>Regex Columnizer Configuration</value>
+  </data>
+  <data name="RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex" xml:space="preserve">
+    <value>Invalid Regex !{0}{1}</value>
+  </data>
+</root>

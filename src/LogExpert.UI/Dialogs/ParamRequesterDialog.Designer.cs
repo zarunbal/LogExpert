@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Dialogs;
+namespace LogExpert.Dialogs;
 
 partial class ParamRequesterDialog
 {
@@ -89,7 +89,7 @@ private void InitializeComponent()
         this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
         this.Text = "Tool parameter";
-        this.Shown += new System.EventHandler(this.ParamRequesterDialog_Shown);
+        this.Shown += new System.EventHandler(this.OnParamRequesterDialogShown);
         this.ResumeLayout(false);
         this.PerformLayout();
 

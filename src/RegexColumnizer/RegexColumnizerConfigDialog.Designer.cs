@@ -1,4 +1,4 @@
-﻿namespace RegexColumnizer
+namespace RegexColumnizer
 {
 	partial class RegexColumnizerConfigDialog
 	{

@@ -1,4 +1,4 @@
-﻿namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// Interface for file system plugins. A file system plugin is responsible for feeding file data to LogExpert.
@@ -31,7 +31,7 @@ public interface IFileSystemPlugin
     /// </summary>
     /// <param name="uriString">The URI of the file to be loaded.</param>
     /// <returns>Return <code>true</code> if the file system plugin can handle the URI.</returns>
-    bool CanHandleUri(string uriString);
+    bool CanHandleUri (string uriString);
 
     /// <summary>
     /// Return a file system specific implementation of <see cref="ILogFileInfo"/> here.
@@ -39,7 +39,7 @@ public interface IFileSystemPlugin
     /// </summary>
     /// <param name="uriString"></param>
     /// <returns></returns>
-    ILogFileInfo GetLogfileInfo(string uriString);
+    ILogFileInfo GetLogfileInfo (string uriString);
 
     #endregion
 }

@@ -1,8 +1,10 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Callback;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
-internal class LogExpertCallback (LogWindow logWindow) : ColumnizerCallback(logWindow), ILogExpertCallback
+internal class LogExpertCallback (LogWindow logWindow) : ColumnizerCallback(logWindow), ILogExpertCallbackMemory
 {
     #region Public methods
 
@@ -11,7 +13,7 @@ internal class LogExpertCallback (LogWindow logWindow) : ColumnizerCallback(logW
         logWindow.AddTempFileTab(fileName, title);
     }
 
-    public void AddPipedTab (IList<LineEntry> lineEntryList, string title)
+    public void AddPipedTab (IList<LineEntryMemory> lineEntryList, string title)
     {
         logWindow.WritePipeTab(lineEntryList, title);
     }
