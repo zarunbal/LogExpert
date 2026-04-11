@@ -7079,8 +7079,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Returns the SearchText of the first matching highlight entry with IsSetBookmark for the given line.
-    /// Used to set SourceHighlightText on trigger-created bookmarks.
+    /// Returns the SearchText of the first matching highlight entry with IsSetBookmark for the given line. Used to set
+    /// SourceHighlightText on trigger-created bookmarks.
     /// </summary>
     private string GetSourceHighlightTextForLine (int lineNum)
     {
@@ -7149,70 +7149,92 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        var progress = new Progress<int>(currentLine =>
+        var progress = new Progress<int>(OnHighlightBookmarkScanProgress);
+        _ = Task.Run(() => ExecuteHighlightBookmarkScan(lineCount, entries, fileName, progress, cts));
+    }
+
+    private void ExecuteHighlightBookmarkScan (int lineCount, List<HighlightEntry> entries, string fileName, IProgress<int> progress, CancellationTokenSource cts)
+    {
+        try
         {
-            // Marshal progress update to UI thread
+            var bookmarks = HighlightBookmarkScanner.Scan(lineCount, _logFileReader.GetLogLineMemory, entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
+
+            // Marshal bookmark additions to UI thread
+            if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
+            {
+                _ = BeginInvoke(() =>
+                {
+                    _ = _bookmarkProvider.AddBookmarks(bookmarks);
+
+                    RefreshAllGrids();
+
+                    _progressEventArgs.Visible = false;
+                    SendProgressBarUpdate();
+                    StatusLineText(string.Empty);
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Scan was cancelled — clean up on UI thread
             if (IsHandleCreated && !IsDisposed)
             {
                 _ = BeginInvoke(() =>
                 {
-                    _progressEventArgs.Value = currentLine;
+                    _progressEventArgs.Visible = false;
                     SendProgressBarUpdate();
-
-                    if (lineCount > 0)
-                    {
-                        var pct = (int)((long)currentLine * 100 / lineCount);
-                        StatusLineText(string.Format(LogExpert.Resources.LogWindow_UI_StatusLineText_ScanningBookmarksPct, pct));
-                    }
+                    StatusLineText(string.Empty);
                 });
             }
-        });
-
-        _ = Task.Run(() =>
+        }
+        finally
         {
-            try
+            // Only dispose if this is still the active CTS
+            if (_highlightBookmarkScanCts == cts)
             {
-                var bookmarks = HighlightBookmarkScanner.Scan(lineCount, i => _logFileReader.GetLogLineMemory(i), entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
-
-                // Marshal bookmark additions to UI thread
-                if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
-                {
-                    _ = BeginInvoke(() =>
-                    {
-                        _ = _bookmarkProvider.AddBookmarks(bookmarks);
-
-                        RefreshAllGrids();
-
-                        _progressEventArgs.Visible = false;
-                        SendProgressBarUpdate();
-                        StatusLineText(string.Empty);
-                    });
-                }
+                _highlightBookmarkScanCts = null;
             }
-            catch (OperationCanceledException)
+
+            cts.Dispose();
+        }
+    }
+
+    private void OnHighlightBookmarkScanProgress (int currentLine)
+    {
+        try
+        {
+            if (_highlightBookmarkScanCts is not { } cts)
             {
-                // Scan was cancelled — clean up on UI thread
-                if (IsHandleCreated && !IsDisposed)
-                {
-                    _ = BeginInvoke(() =>
-                    {
-                        _progressEventArgs.Visible = false;
-                        SendProgressBarUpdate();
-                        StatusLineText(string.Empty);
-                    });
-                }
+                return;
             }
-            finally
-            {
-                // Only dispose if this is still the active CTS
-                if (_highlightBookmarkScanCts == cts)
-                {
-                    _highlightBookmarkScanCts = null;
-                }
 
-                cts.Dispose();
+            if (cts.Token.IsCancellationRequested)
+            {
+                StatusLineText(Resources.LogWindow_UI_StatusLineText_ScanningBookmarksEnded);
+                return;
             }
-        });
+        }
+        catch (ObjectDisposedException)
+        {
+            // CTS was disposed after task completed — progress callback is stale
+            return;
+        }
+
+        if (IsHandleCreated && !IsDisposed)
+        {
+            _ = BeginInvoke(() =>
+            {
+                _progressEventArgs.Value = currentLine;
+                SendProgressBarUpdate();
+
+                var lineCount = _logFileReader?.LineCount ?? 0;
+                if (lineCount > 0)
+                {
+                    var pct = (int)((long)currentLine * 100 / lineCount);
+                    StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_ScanningBookmarksPct, pct));
+                }
+            });
+        }
     }
 
     /// <summary>

@@ -2065,4 +2065,22 @@ YY[YY] = 年
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
     <value>某些文件无法迁移：{0}</value>
   </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderTextSource" xml:space="preserve">
+    <value>源高亮触发</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Auto" xml:space="preserve">
+    <value>汽车</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Manual" xml:space="preserve">
+    <value>手动的</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarks" xml:space="preserve">
+    <value>正在扫描书签...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksPct" xml:space="preserve">
+    <value>正在扫描书签...{0}%</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
+    <value>扫描书签已完成/取消！</value>
+  </data>
 </root>

@@ -281,7 +281,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source.
+        ///   Looks up a localized string similar to Source Highlight Trigger.
         /// </summary>
         public static string BookmarkWindow_UI_DataGridColumn_HeaderTextSource {
             get {
@@ -3348,6 +3348,15 @@ namespace LogExpert {
         public static string LogWindow_UI_StatusLineText_ScanningBookmarks {
             get {
                 return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks finished / canceled!.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarksEnded {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarksEnded", resourceCulture);
             }
         }
         
