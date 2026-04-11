@@ -57,6 +57,8 @@ public class LogBuffer
         get => _size;
     }
 
+    public int EndLine => StartLine + LineCount;
+
     public int StartLine { set; get; }
 
     public int LineCount { get; private set; }

@@ -19,8 +19,7 @@ protected override void Dispose(bool disposing) {
 #region Windows Form Designer generated code
 
 /// <summary>
-/// Required method for Designer support - do not modify
-/// the contents of this method with the code editor.
+/// Required method for Designer support - do not modify the contents of this method with the code editor.
 /// </summary>
 private void InitializeComponent() {
   this.components = new System.ComponentModel.Container();
@@ -30,8 +29,9 @@ private void InitializeComponent() {
   this.removeCommentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
   this.bookmarkTextBox = new System.Windows.Forms.TextBox();
   this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-  this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
+  this.bookmarkDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
   this.checkBoxCommentColumn = new System.Windows.Forms.CheckBox();
+  this.convertToManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
   this.labelComment = new System.Windows.Forms.Label();
   this.contextMenuStrip1.SuspendLayout();
   this.splitContainer1.Panel1.SuspendLayout();
@@ -44,7 +44,8 @@ private void InitializeComponent() {
   // 
   this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
         this.deleteBookmarkssToolStripMenuItem,
-        this.removeCommentsToolStripMenuItem});
+        this.removeCommentsToolStripMenuItem,
+        this.convertToManualToolStripMenuItem});
   this.contextMenuStrip1.Name = "contextMenuStrip1";
   this.contextMenuStrip1.Size = new System.Drawing.Size(186, 48);
   // 
@@ -80,6 +81,13 @@ private void InitializeComponent() {
   this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
   this.splitContainer1.Location = new System.Drawing.Point(0, 0);
   this.splitContainer1.Name = "splitContainer1";
+  // 
+  // convertToManualToolStripMenuItem
+  // 
+  this.convertToManualToolStripMenuItem.Name = "convertToManualToolStripMenuItem";
+  this.convertToManualToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+  this.convertToManualToolStripMenuItem.Text = "Convert to manual";
+  this.convertToManualToolStripMenuItem.Click += new System.EventHandler(this.OnConvertToManualToolStripMenuItemClick);
   // 
   // splitContainer1.Panel1
   // 
@@ -184,7 +192,7 @@ private void InitializeComponent() {
 
 #endregion
 
-private BufferedDataGridView bookmarkDataGridView;
+private LogExpert.UI.Controls.BufferedDataGridView bookmarkDataGridView;
 private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
 private System.Windows.Forms.ToolStripMenuItem deleteBookmarkssToolStripMenuItem;
 private System.Windows.Forms.TextBox bookmarkTextBox;
@@ -192,4 +200,5 @@ private System.Windows.Forms.SplitContainer splitContainer1;
 private System.Windows.Forms.Label labelComment;
 private System.Windows.Forms.ToolStripMenuItem removeCommentsToolStripMenuItem;
 private System.Windows.Forms.CheckBox checkBoxCommentColumn;
+private System.Windows.Forms.ToolStripMenuItem convertToManualToolStripMenuItem;
 }

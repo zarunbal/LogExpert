@@ -47,19 +47,6 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     }
 
     /// <summary>
-    /// Determines the priority level for processing a log file based on the presence of recognizable timestamp formats
-    /// in the provided log lines.
-    /// </summary>
-    /// <param name="fileName">The name of the log file to evaluate. Cannot be null.</param>
-    /// <param name="samples">A collection of log lines to analyze for timestamp patterns. Cannot be null.</param>
-    /// <returns>A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
-    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.</returns>
-    public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        return GetPriority(fileName, samples.Cast<ILogLineMemory>());
-    }
-
-    /// <summary>
     /// Splits a log line into its constituent columns, typically separating date, time, and the remainder of the line.
     /// </summary>
     /// <remarks>If the log line does not match a recognized date/time format, the entire line is returned as
@@ -228,6 +215,14 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
         }
     }
 
+    /// <summary>
+    /// Determines the priority level for processing a log file based on the presence of recognizable timestamp formats
+    /// in the provided log lines.
+    /// </summary>
+    /// <param name="fileName">The name of the log file to evaluate. Cannot be null.</param>
+    /// <param name="samples">A collection of log lines to analyze for timestamp patterns. Cannot be null.</param>
+    /// <returns>A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
+    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.</returns>
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentNullException.ThrowIfNull(samples, nameof(samples));
