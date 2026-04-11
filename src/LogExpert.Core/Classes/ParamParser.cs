@@ -11,7 +11,7 @@ public class ParamParser (string argTemplate)
 {
     #region Public methods
 
-    public string ReplaceParams (ILogLine logLine, int lineNum, string fileName)
+    public string ReplaceParams (ILogLineMemory logLine, int lineNum, string fileName)
     {
         FileInfo fileInfo = new(fileName);
         StringBuilder builder = new(argTemplate);
@@ -46,13 +46,13 @@ public class ParamParser (string argTemplate)
                 try
                 {
                     var regex = RegexHelper.GetOrCreateCached(reg);
-                    var result = regex.Replace(logLine.FullLine, replace);
-                    builder.Insert(sPos, result);
+                    var result = regex.Replace(logLine.FullLine.ToString(), replace);
+                    _ = builder.Insert(sPos, result);
                 }
                 catch (RegexMatchTimeoutException)
                 {
                     // If regex times out, insert the original pattern as fallback
-                    builder.Insert(sPos, $"{{timeout: {reg}}}");
+                    _ = builder.Insert(sPos, $"{{timeout: {reg}}}");
                 }
             }
         } while (replace != null);

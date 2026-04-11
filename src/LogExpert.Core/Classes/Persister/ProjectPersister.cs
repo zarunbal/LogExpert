@@ -1,6 +1,6 @@
 using System.Text;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using Newtonsoft.Json;
 

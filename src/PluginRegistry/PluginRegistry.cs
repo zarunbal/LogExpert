@@ -7,7 +7,7 @@ using ColumnizerLib;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.PluginRegistry.Events;
 using LogExpert.PluginRegistry.FileSystem;
 using LogExpert.PluginRegistry.Interfaces;

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 public interface IPipeline<TInput, TOutput>
 {

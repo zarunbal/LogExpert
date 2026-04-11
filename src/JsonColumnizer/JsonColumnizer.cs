@@ -22,16 +22,6 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
 
     #region Public methods
 
-    public virtual void Selected (ILogLineColumnizerCallback callback)
-    {
-        Selected(callback as ILogLineMemoryColumnizerCallback);
-    }
-
-    public virtual void DeSelected (ILogLineColumnizerCallback callback)
-    {
-        // nothing to do
-    }
-
     public virtual string GetName ()
     {
         return "JSON Columnizer";
@@ -59,11 +49,6 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
         return names;
     }
 
-    public virtual IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
     public virtual bool IsTimeshiftImplemented ()
     {
         return false;
@@ -77,30 +62,6 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
     public virtual int GetTimeOffset ()
     {
         throw new NotImplementedException();
-    }
-
-    public virtual DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
-        ArgumentNullException.ThrowIfNull(samples, nameof(samples));
-
-        var result = Priority.NotSupport;
-        if (fileName.EndsWith("json", StringComparison.OrdinalIgnoreCase))
-        {
-            result = Priority.WellSupport;
-        }
-
-        return result;
     }
 
     #endregion

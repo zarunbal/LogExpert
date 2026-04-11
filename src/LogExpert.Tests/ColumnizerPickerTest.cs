@@ -156,12 +156,6 @@ public class ColumnizerPickerTest
 
         public int LineNumber { get; set; }
 
-        // Explicit implementation for ILogLine.FullLine (string version)
-        string ILogLine.FullLine => FullLine.ToString();
-
-        // Explicit implementation for ITextValue.Text
-        string ITextValue.Text => FullLine.ToString();
-
         // Explicit implementation for ITextValueMemory.Text (ReadOnlyMemory<char> version)
         ReadOnlyMemory<char> ITextValueMemory.Text => FullLine;
     }

@@ -6,6 +6,7 @@ namespace ColumnizerLib;
 /// <remarks>Implementations use the provided file name and sample log lines to assess how suitable the columnizer
 /// is for processing the file. Higher priority values indicate a better fit. This interface is typically used to select
 /// the most appropriate columnizer when multiple options are available.</remarks>
+[Obsolete("This interface is deprecated. Use IColumnizerPriorityMemory instead for a memory based implementation.")]
 public interface IColumnizerPriority
 {
     /// <summary>

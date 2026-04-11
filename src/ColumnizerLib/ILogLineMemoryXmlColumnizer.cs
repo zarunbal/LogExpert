@@ -1,8 +1,7 @@
 namespace ColumnizerLib;
 
 /// <summary>
-/// This is the interface for a Columnizer which supports XML log files. This interface extends
-/// the <see cref="ILogLineXmlColumnizer"/> interface.
+/// This is the interface for a Columnizer which supports XML log files.
 /// LogExpert will automatically load a log file in XML mode if the current Columnizer implements
 /// this interface.
 /// </summary>
@@ -19,14 +18,14 @@ namespace ColumnizerLib;
 /// <para>
 /// If you implement a XML Columnizer you have to provide the start tag and end tag and a
 /// XSLT. Also you have to provide a namespace declaration, if your logfile uses name spaces.
-/// All this stuff must be provided by returning a IXmlLogConfiguration in the <see cref="ILogLineXmlColumnizer.GetXmlLogConfiguration"/> method.
+/// All this stuff must be provided by returning a IXmlLogConfiguration in the <see cref="GetXmlLogConfiguration"/> method.
 /// </para>
 /// <para>
 /// The processing of XML log files is done in the following steps:
 /// <ol>
 /// <li>LogExpert reads the file and separates it into fragments of XML content using the given
-///     start/end tags (<see cref="ILogLineXmlColumnizer.GetXmlLogConfiguration"/>)</li>
-/// <li>The fragments will be translated using the given XSLT (<see cref="ILogLineXmlColumnizer.GetXmlLogConfiguration"/>)
+///     start/end tags (<see cref="GetXmlLogConfiguration"/>)</li>
+/// <li>The fragments will be translated using the given XSLT (<see cref="GetXmlLogConfiguration"/>)
 ///     The result is one or more lines of text content. These lines will be the lines LogExpert will 'see'
 ///     in its internal buffer and line management. They will be handled like normal text lines in other
 ///     (non-XML) log files.
@@ -37,9 +36,15 @@ namespace ColumnizerLib;
 /// </ol>
 /// </para>
 /// </remarks>
-public interface ILogLineMemoryXmlColumnizer : ILogLineXmlColumnizer, ILogLineMemoryColumnizer
+public interface ILogLineMemoryXmlColumnizer : ILogLineMemoryColumnizer
 {
     #region Public methods
+
+    /// <summary>
+    /// You have to implement this function to provide a configuration for LogExpert's XML reader.
+    /// </summary>
+    /// <returns></returns>
+    IXmlLogConfiguration GetXmlLogConfiguration ();
 
     /// <summary>
     /// Returns the text which should be copied into the clipboard when the user want to copy selected

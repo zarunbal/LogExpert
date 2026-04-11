@@ -1,5 +1,4 @@
 using LogExpert.UI.Controls.LogWindow;
-using LogExpert.UI.Interface.Services;
 using LogExpert.UI.Services.TabControllerService;
 
 using WeifenLuo.WinFormsUI.Docking;

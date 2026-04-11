@@ -109,29 +109,6 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
         }
     }
 
-    /// <summary>
-    /// Retrieves the timestamp associated with the specified log line.
-    /// </summary>
-    /// <param name="callback">An object that provides callback methods for columnizing log lines. Cannot be null.</param>
-    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
-    /// <returns>A DateTime value representing the timestamp of the specified log line.</returns>
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    /// <summary>
-    /// Pushes a new value for a specified column using the provided callback interface.
-    /// </summary>
-    /// <param name="callback">The callback interface used to handle the value push operation. Cannot be null.</param>
-    /// <param name="column">The zero-based index of the column for which the value is being pushed.</param>
-    /// <param name="value">The new value to assign to the specified column. Can be null.</param>
-    /// <param name="oldValue">The previous value of the specified column. Can be null.</param>
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
-    }
-
     public string GetName ()
     {
         return "Square Bracket Columnizer";
@@ -276,17 +253,6 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
         clogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
 
         return clogLine;
-    }
-
-    /// <summary>
-    /// Splits the specified log line into columns using the provided columnizer callback.
-    /// </summary>
-    /// <param name="callback">The callback interface used to process and retrieve column data from the log line. Cannot be null.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized log line, containing the extracted columns from the input line.</returns>
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
     }
 
     /// <summary>

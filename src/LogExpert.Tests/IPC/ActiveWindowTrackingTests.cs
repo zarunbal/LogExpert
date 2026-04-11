@@ -1,5 +1,5 @@
 using LogExpert.Classes;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using Moq;
 

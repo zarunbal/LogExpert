@@ -18,15 +18,16 @@ using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
-using LogExpert.Entities;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Interface;
 
 using NLog;
+
+using Vanara.Extensions;
 
 using WeifenLuo.WinFormsUI.Docking;
 //using static LogExpert.PluginRegistry.PluginRegistry; //TODO: Adjust the instance name so using static can be used.
@@ -50,7 +51,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly Image _advancedButtonImage;
 
-    private readonly Lock _bookmarkLock = new();
     private readonly BookmarkDataProvider _bookmarkProvider = new();
 
     private readonly IList<IBackgroundProcessCancelHandler> _cancelHandlerList = [];
@@ -69,15 +69,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 
-    private readonly EventWaitHandle _logEventArgsEvent = new ManualResetEvent(false);
+    private readonly EventWaitHandle _logEventArgsEvent = new AutoResetEvent(false);
 
     private readonly List<LogEventArgs> _logEventArgsList = [];
+
     private readonly Task _logEventHandlerTask;
+
     //private readonly Thread _logEventHandlerThread;
+
     private readonly Image _panelCloseButtonImage;
 
     private readonly Image _panelOpenButtonImage;
-    private readonly LogTabWindow.LogTabWindow _parentLogTabWin;
+    private readonly ILogWindowCoordinator _logWindowCoordinator;
 
     private readonly ProgressEventArgs _progressEventArgs = new();
     private readonly Lock _reloadLock = new();
@@ -87,7 +90,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Lock _tempHighlightEntryListLock = new();
 
     private readonly Task _timeShiftSyncTask;
-    private readonly CancellationTokenSource cts = new();
+
+    private readonly CancellationTokenSource _cts = new();
+    private CancellationTokenSource _highlightBookmarkScanCts;
 
     //private readonly Thread _timeShiftSyncThread;
     private readonly EventWaitHandle _timeShiftSyncTimerEvent = new ManualResetEvent(false);
@@ -98,6 +103,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Lock _timeSyncListLock = new();
 
     private ColumnCache _columnCache = new();
+
+    private readonly StringFormat _format = new()
+    {
+        LineAlignment = StringAlignment.Center,
+        Alignment = StringAlignment.Center
+    };
 
     //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
     private HighlightGroup _currentHighlightGroup = new();
@@ -148,7 +159,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogWindow (LogTabWindow.LogTabWindow parent, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
+    public LogWindow (ILogWindowCoordinator logWindowCoordinator, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -164,7 +175,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         columnNamesLabel.Text = string.Empty; // no filtering on columns by default
 
-        _parentLogTabWin = parent;
+        _logWindowCoordinator = logWindowCoordinator;
         IsTempFile = isTempFile;
         ConfigManager = configManager; //TODO: This should be changed to DI
         //Thread.CurrentThread.Name = "LogWindowThread";
@@ -193,7 +204,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
         tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
-        _parentLogTabWin.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
+        _logWindowCoordinator.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
         SetColumnizer(PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers[0]);
 
         _patternArgs.MaxMisses = 5;
@@ -222,11 +233,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         splitContainerLogWindow.Panel2Collapsed = true;
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
-        _timeShiftSyncTask = new Task(SyncTimestampDisplayWorker, cts.Token);
-        _timeShiftSyncTask.Start();
+        _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-        _logEventHandlerTask = new Task(LogEventWorker, cts.Token);
-        _logEventHandlerTask.Start();
+        _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
         //this.filterUpdateThread.Start();
@@ -282,8 +291,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public delegate bool ScrollToTimestampFx (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall);
 
-    public delegate void TailFollowedEventHandler (object sender, EventArgs e);
-
     #endregion
 
     #region Events
@@ -296,7 +303,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public event EventHandler<GuiStateEventArgs> GuiStateUpdate;
 
-    public event TailFollowedEventHandler TailFollowed;
+    public event EventHandler<EventArgs> TailFollowed;
 
     public event EventHandler<EventArgs> FileNotFound;
 
@@ -322,6 +329,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
+
+    /// <summary>
+    /// Color used to paint the bookmark marker in column 0 for auto-generated (highlight-triggered) bookmarks. Uses a
+    /// lighter/more desaturated shade to distinguish from manual bookmarks.
+    /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+    public Color AutoBookmarkColor { get; set; } = Color.FromArgb(180, 210, 180);
 
     public ILogLineMemoryColumnizer CurrentColumnizer
     {
@@ -385,7 +399,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string ForcedPersistenceFileName { get; set; }
 
-    public Preferences Preferences => _parentLogTabWin.Preferences;
+    public Preferences Preferences => ConfigManager.Settings.Preferences;
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string GivenFileName { get; set; }
@@ -422,11 +436,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     #region Public methods
 
-    public ILogLine GetLogLine (int lineNum)
-    {
-        return _logFileReader.GetLogLine(lineNum);
-    }
-
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
         return _logFileReader.GetLogLineMemory(lineNum);
@@ -435,11 +444,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogLineMemory GetLogLineMemoryWithWait (int lineNum)
     {
         return _logFileReader.GetLogLineMemoryWithWait(lineNum).Result;
-    }
-
-    public ILogLine GetLogLineWithWait (int lineNum)
-    {
-        return _logFileReader.GetLogLineWithWait(lineNum).Result;
     }
 
     public Bookmark GetBookmarkForLine (int lineNum)
@@ -689,8 +693,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;
     //private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
-    private delegate void UpdateProgressBarFx (int lineNum);
-
     private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
     private delegate void WriteFilterToTabFinishedFx (FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
@@ -743,12 +745,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         WritePipeTab(lineEntryList, title);
     }
 
-    [SupportedOSPlatform("windows")]
-    void ILogWindow.WritePipeTab (IList<LineEntry> lineEntryList, string title)
-    {
-        //WritePipeTab(lineEntryList, title);
-    }
-
     #region Event Handlers
 
     [SupportedOSPlatform("windows")]
@@ -799,6 +795,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
     }
 
+    //TODO Double Check why the bookmark Providers have the Event and the LogWindow, and if it still necessary
     protected void OnBookmarkAdded ()
     {
         BookmarkAdded?.Invoke(this, EventArgs.Empty);
@@ -838,10 +835,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogWindowLoad (object sender, EventArgs e)
     {
-        var setLastColumnWidth = _parentLogTabWin.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = _parentLogTabWin.Preferences.LastColumnWidth;
-        var fontName = _parentLogTabWin.Preferences.FontName;
-        var fontSize = _parentLogTabWin.Preferences.FontSize;
+        var setLastColumnWidth = Preferences.SetLastColumnWidth;
+        var lastColumnWidth = Preferences.LastColumnWidth;
+        var fontName = Preferences.FontName;
+        var fontSize = Preferences.FontSize;
 
         PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
     }
@@ -850,7 +847,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
         _waitingForClose = true;
-        _parentLogTabWin.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
+        _logWindowCoordinator.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
         _logFileReader?.DeleteAllContent();
 
         FreeFromTimeSync();
@@ -890,6 +887,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
 
             HandleChangedFilterList();
+
+            _ = Invoke(new MethodInvoker(RunHighlightBookmarkScan));
         }
 
         _reloadMemento = null;
@@ -1007,7 +1006,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var line = _logFileReader.GetLogLine(e.RowIndex);
+        var line = _logFileReader.GetLogLineMemory(e.RowIndex);
         var offset = CurrentColumnizer.GetTimeOffset();
         CurrentColumnizer.SetTimeOffset(0);
         ColumnizerCallbackObject.SetLineNum(e.RowIndex);
@@ -1021,7 +1020,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var oldValue = cols.ColumnValues[e.ColumnIndex - 2].FullValue;
         var newValue = (string)e.Value;
         //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
+        //TODO OLD VALUE needs to be ReadOnlySpan<char>
+        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue.ToString());
         dataGridView.Refresh();
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
         var span = timeSpan.ToString();
@@ -1509,7 +1509,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (CurrentColumnizer.IsTimeshiftImplemented())
         {
-            var list = _parentLogTabWin.GetListOfOpenFiles();
+            var list = _logWindowCoordinator.GetOpenFiles();
             syncTimestampsToToolStripMenuItem.Enabled = true;
             syncTimestampsToToolStripMenuItem.DropDownItems.Clear();
             EventHandler ev = OnHandleSyncContextMenu;
@@ -1548,7 +1548,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var menuArgs = item.Tag as ContextMenuPluginEventArgs;
             var logLines = menuArgs.LogLines;
-            menuArgs.Entry.MenuSelected(logLines.Count, menuArgs.Columnizer, menuArgs.Callback.GetLogLine(logLines[0]));
+            menuArgs.Entry.MenuSelected(logLines.Count, menuArgs.Columnizer, menuArgs.Callback.GetLogLineMemory(logLines[0]));
         }
     }
 
@@ -1596,7 +1596,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     return;
                 }
 
-                _parentLogTabWin.ScrollAllTabsToTimestamp(timeStamp, this);
+                _logWindowCoordinator.ScrollAllTabsToTimestamp(timeStamp, this);
             }
         }
     }
@@ -1610,7 +1610,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (lineNum != -1)
             {
                 FilterPipe.LogWindow.SelectLine(lineNum, false, true);
-                _parentLogTabWin.SelectTab(FilterPipe.LogWindow);
+                _logWindowCoordinator.SelectTab(FilterPipe.LogWindow as LogWindow);
             }
         }
     }
@@ -2450,7 +2450,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (_reloadMemento == null)
             {
-                PreselectColumnizer(persistenceData.Columnizer?.GetName());
+                PreSelectColumnizerByName(persistenceData.Columnizer?.GetName());
             }
 
             FollowTailChanged(persistenceData.FollowTail, false);
@@ -2798,11 +2798,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private ILogLineMemoryColumnizer FindColumnizer ()
     {
-        var columnizer = Preferences.MaskPrio
-            ? _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName)) ?? _parentLogTabWin.GetColumnizerHistoryEntry(FileName)
-            : _parentLogTabWin.GetColumnizerHistoryEntry(FileName) ?? _parentLogTabWin.FindColumnizerByFileMask(Util.GetNameFromPath(FileName));
-
-        return columnizer;
+        return _logWindowCoordinator.ResolveColumnizer(FileName);
     }
 
     private void ReloadNewFile ()
@@ -2924,10 +2920,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _statusEventArgs.FileSize = _logFileReader.FileSize;
         SendStatusLineUpdate();
 
-        var setLastColumnWidth = _parentLogTabWin.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = _parentLogTabWin.Preferences.LastColumnWidth;
-        var fontName = _parentLogTabWin.Preferences.FontName;
-        var fontSize = _parentLogTabWin.Preferences.FontSize;
+        var setLastColumnWidth = Preferences.SetLastColumnWidth;
+        var lastColumnWidth = Preferences.LastColumnWidth;
+        var fontName = Preferences.FontName;
+        var fontSize = Preferences.FontSize;
 
         PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
         //LoadPersistenceData();
@@ -2936,12 +2932,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void LogEventWorker ()
     {
         Thread.CurrentThread.Name = "LogEventWorker";
-        while (!cts.Token.IsCancellationRequested)
+        while (!_cts.Token.IsCancellationRequested)
         {
             //_logger.Debug($"Waiting for signal");
             _ = _logEventArgsEvent.WaitOne();
             //_logger.Debug($"Wakeup signal received.");
-            while (!cts.Token.IsCancellationRequested)
+            while (!_cts.Token.IsCancellationRequested)
             {
                 LogEventArgs e;
                 //var lastLineCount = 0;
@@ -2950,7 +2946,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     //_logger.Info($"{_logEventArgsList.Count} events in queue");
                     if (_logEventArgsList.Count == 0)
                     {
-                        _ = _logEventArgsEvent.Reset();
                         break;
                     }
 
@@ -2981,14 +2976,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     try
                     {
-                        _ = Invoke(UpdateGrid, [e]);
+                        _ = BeginInvoke(UpdateGrid, [e]);
+                        CheckFilterAndHighlight(e);
                     }
                     catch (ObjectDisposedException)
                     {
                         return;
                     }
 
-                    CheckFilterAndHighlight(e);
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }
             }
@@ -2998,7 +2993,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void StopLogEventWorkerThread ()
     {
         _ = _logEventArgsEvent.Set();
-        cts.Cancel();
+        _cts.Cancel();
         //_logEventHandlerThread.Abort();
         //_logEventHandlerThread.Join();
     }
@@ -3142,12 +3137,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 //pipeFx.BeginInvoke(i, null, null);
                 ProcessFilterPipes(i);
 
-                var matchingList = FindMatchingHilightEntries(line);
+                var matchingList = FindMatchingHighlightEntries(line);
                 LaunchHighlightPlugins(matchingList, i);
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                 if (setBookmark)
                 {
-                    _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
+                    var capturedLineNum = i;
+                    var capturedComment = bookmarkComment;
+                    _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
                 }
 
                 if (stopTail && _guiStateArgs.FollowTail)
@@ -3157,7 +3154,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     if (firstStopTail && wasFollow)
                     {
                         //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                        _ = Task.Run(() => SelectAndEnsureVisible(i, false));
+                        var capturedLineNum = i;
+                        _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
                         firstStopTail = false;
                     }
                 }
@@ -3190,13 +3188,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var line = _logFileReader.GetLogLineMemory(i);
                 if (line != null)
                 {
-                    var matchingList = FindMatchingHilightEntries(line);
+                    var matchingList = FindMatchingHighlightEntries(line);
                     LaunchHighlightPlugins(matchingList, i);
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
                     if (setBookmark)
                     {
-                        //SetBookmarkFx fx = SetBookmarkFromTrigger;
-                        _ = Task.Run(() => SetBookmarkFromTrigger(i, bookmarkComment));
+                        var capturedLineNum = i;
+                        var capturedComment = bookmarkComment;
+                        _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
                         //_ = fx.BeginInvoke(i, bookmarkComment, null, null);
                     }
 
@@ -3207,7 +3206,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         if (firstStopTail && wasFollow)
                         {
                             //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                            _ = Task.Run(() => SelectAndEnsureVisible(i, false));
+                            var capturedLineNum = i;
+                            _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
                             firstStopTail = false;
                         }
                     }
@@ -3248,13 +3248,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    private void PreSelectColumnizer (ILogLineMemoryColumnizer columnizer)
-    {
-        CurrentColumnizer = columnizer != null
-            ? (_forcedColumnizerForLoading = columnizer)
-            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
-    }
-
     private void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
         columnizer = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(FileName, _logFileReader, columnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
@@ -3278,8 +3271,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //_logger.Info($"SetColumnizerInternal(): {columnizer.GetName()}");
 
         var oldColumnizer = CurrentColumnizer;
-        var oldColumnizerIsXmlType = CurrentColumnizer is ILogLineXmlColumnizer;
-        var oldColumnizerIsPreProcess = CurrentColumnizer is IPreProcessColumnizer;
+        var oldColumnizerIsXmlType = CurrentColumnizer is ILogLineMemoryXmlColumnizer;
+        var oldColumnizerIsPreProcess = CurrentColumnizer is IPreProcessColumnizerMemory;
         var mustReload = false;
 
         // Check if the filtered columns disappeared, if so must refresh the UI
@@ -3329,14 +3322,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     : null;
 
             // always reload when choosing XML columnizers
-            if (_logFileReader != null && CurrentColumnizer is ILogLineXmlColumnizer)
+            if (_logFileReader != null && CurrentColumnizer is ILogLineMemoryXmlColumnizer)
             {
                 //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
                 mustReload = true;
             }
 
             // Reload when choosing no XML columnizer but previous columnizer was XML
-            if (_logFileReader != null && CurrentColumnizer is not ILogLineXmlColumnizer && oldColumnizerIsXmlType)
+            if (_logFileReader != null && CurrentColumnizer is not ILogLineMemoryXmlColumnizer && oldColumnizerIsXmlType)
             {
                 _logFileReader.IsXmlMode = false;
                 //forcedColumnizer = currentColumnizer; // prevent Columnizer selection on SetGuiAfterReload()
@@ -3357,9 +3350,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CurrentColumnizer = columnizer;
         }
 
-        (oldColumnizer as IInitColumnizer)?.DeSelected(new ColumnizerCallback(this));
+        (oldColumnizer as IInitColumnizerMemory)?.DeSelected(new ColumnizerCallbackMemory(this));
 
-        (columnizer as IInitColumnizer)?.Selected(new ColumnizerCallback(this));
+        (columnizer as IInitColumnizerMemory)?.Selected(new ColumnizerCallbackMemory(this));
 
         SetColumnizer(columnizer, dataGridView);
         SetColumnizer(columnizer, filterGridView);
@@ -3546,14 +3539,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
-    /// background colors.
-    /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
-    /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+    /// Builds a list of HighlightMatchEntry objects. A HighlightMatchEntry spans over a region that is painted with the
+    /// same foreground and background colors. All regions which don't match a word-mode entry will be painted with the
+    /// colors of a default entry (groundEntry). This is either the first matching non-word-mode highlight entry or a
+    /// black-on-white default (if no matching entry was found).
     /// </summary>
     /// <param name="matchList">List of all highlight matches for the current cell</param>
     /// <param name="groundEntry">The entry that is used as the default.</param>
-    /// <returns>List of HighlightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
+    /// <returns>
+    /// List of HighlightMatchEntry objects. The list spans over the whole cell and contains color infos for every
+    /// substring.
+    /// </returns>
     private static IList<HighlightMatchEntry> MergeHighlightMatchEntries (IList<HighlightMatchEntry> matchList, HighlightMatchEntry groundEntry)
     {
         // Fill an area with lenth of whole text with a default hilight entry
@@ -3665,9 +3661,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    /// Returns all HilightEntry entries which matches the given line
+    /// Returns all HighlightEntry entries which matches the given line
     /// </summary>
-    private IList<HighlightEntry> FindMatchingHilightEntries (ITextValueMemory line)
+    private IList<HighlightEntry> FindMatchingHighlightEntries (ITextValueMemory line)
     {
         IList<HighlightEntry> resultList = [];
         if (line != null)
@@ -3768,7 +3764,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //_timeShiftSyncWakeupEvent.Set();
         //_timeShiftSyncThread.Abort();
         //_timeShiftSyncThread.Join();
-        cts.Cancel();
+        _cts.Cancel();
     }
 
     [SupportedOSPlatform("windows")]
@@ -3951,7 +3947,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            var line = _logFileReader.GetLogLine(lineNum);
+            var line = _logFileReader.GetLogLineMemory(lineNum);
             if (line == null)
             {
                 return -1;
@@ -3962,7 +3958,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 Regex rex = new(searchParams.SearchText, searchParams.IsCaseSensitive
                                                     ? RegexOptions.None
                                                     : RegexOptions.IgnoreCase);
-                if (rex.IsMatch(line.FullLine))
+                if (rex.IsMatch(line.FullLine.ToString()))
                 {
                     return lineNum;
                 }
@@ -3971,14 +3967,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (searchParams.IsCaseSensitive)
                 {
-                    if (line.FullLine.Contains(searchParams.SearchText, StringComparison.Ordinal))
+                    if (line.FullLine.Span.Contains(searchParams.SearchText, StringComparison.Ordinal))
                     {
                         return lineNum;
                     }
                 }
                 else
                 {
-                    if (line.FullLine.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
+                    if (line.FullLine.Span.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
                     {
                         return lineNum;
                     }
@@ -4467,9 +4463,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>
-    ///  Returns a list with 'additional filter results'. This is the given line number
-    ///  and (if back spread and/or fore spread is enabled) some additional lines.
-    ///  This function doesn't check the filter condition!
+    /// Returns a list with 'additional filter results'. This is the given line number and (if back spread and/or fore
+    /// spread is enabled) some additional lines. This function doesn't check the filter condition!
     /// </summary>
     /// <param name="filterParams"></param>
     /// <param name="lineNum"></param>
@@ -5069,7 +5064,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 preProcessColumnizer = CurrentColumnizer;
             }
 
-            var newWin = _parentLogTabWin.AddFilterTab(pipe, title, preProcessColumnizer);
+            var newWin = _logWindowCoordinator.AddFilterTab(pipe, title, preProcessColumnizer);
             newWin.FilterPipe = pipe;
             pipe.OwnLogWindow = newWin;
             if (persistenceData != null)
@@ -5396,7 +5391,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     protected internal void AddTempFileTab (string fileName, string title)
     {
-        _ = _parentLogTabWin.AddTempFileTab(fileName, title);
+        _ = _logWindowCoordinator.AddTempFileTab(fileName, title);
     }
 
     private void InitPatternWindow ()
@@ -5430,7 +5425,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
 
         PrepareDict();
-        ResetCache(num);
+        //ResetCache(num); TODO REIPMLEMENT
 
         Dictionary<int, int> processedLinesDict = [];
         List<PatternBlock> blockList = [];
@@ -5520,22 +5515,23 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     //Well keep this for the moment because there is some other commented code which calls this one
-    private static PatternBlock FindExistingBlock (PatternBlock block, List<PatternBlock> blockList)
-    {
-        foreach (var searchBlock in blockList)
-        {
-            if (((block.StartLine > searchBlock.StartLine && block.StartLine < searchBlock.EndLine) ||
-                 (block.EndLine > searchBlock.StartLine && block.EndLine < searchBlock.EndLine)) &&
-                  block.StartLine != searchBlock.StartLine &&
-                  block.EndLine != searchBlock.EndLine
-            )
-            {
-                return searchBlock;
-            }
-        }
+    //TODO REIMPLEMENT if needed, otherwise remove
+    //private static PatternBlock FindExistingBlock (PatternBlock block, List<PatternBlock> blockList)
+    //{
+    //    foreach (var searchBlock in blockList)
+    //    {
+    //        if (((block.StartLine > searchBlock.StartLine && block.StartLine < searchBlock.EndLine) ||
+    //             (block.EndLine > searchBlock.StartLine && block.EndLine < searchBlock.EndLine)) &&
+    //              block.StartLine != searchBlock.StartLine &&
+    //              block.EndLine != searchBlock.EndLine
+    //        )
+    //        {
+    //            return searchBlock;
+    //        }
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 
     private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict)
     {
@@ -5636,88 +5632,88 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PrepareDict ()
     {
         _lineHashList.Clear();
-        Regex regex = new("\\d");
-        Regex regex2 = new("\\S");
 
         var num = _logFileReader.LineCount;
         for (var i = 0; i < num; ++i)
         {
-            var msg = GetMsgForLine(i);
-            if (msg != null)
+            var msgMemory = GetMsgForLine(i);
+            if (!msgMemory.IsEmpty)
             {
-                msg = msg.ToLowerInvariant();
-                msg = regex.Replace(msg, "0");
-                msg = regex2.Replace(msg, " ");
-                var chars = msg.ToCharArray();
+                var span = msgMemory.Span;
                 var value = 0;
                 var numOfE = 0;
                 var numOfA = 0;
                 var numOfI = 0;
-                foreach (var t in chars)
+
+                foreach (var c in span)
                 {
-                    value += t;
-                    switch (t)
+                    var lower = char.ToLowerInvariant(c);
+
+                    // TODO: verify that the normalization semantics are correct and intended:
+                    // Normalize: \d → '0', then \S (non-whitespace) → ' '
+                    // Note: original applies \d first, then \S. Since '0' is non-whitespace,
+                    // digits also become ' '. Effectively ALL non-whitespace → ' '.
+                    // Verification is need that this is the intended behavior.
+                    // If \S was meant to be \s (whitespace → space) or \D (non-digit → space),
+                    // the hash semantics would differ significantly.
+                    var normalized = char.IsWhiteSpace(lower) ? lower : ' ';
+
+                    value += normalized;
+
+                    switch (lower)
                     {
-                        case 'e':
-                            numOfE++;
-                            break;
-                        case 'a':
-                            numOfA++;
-                            break;
-                        case 'i':
-                            numOfI++;
-                            break;
+                        case 'e': numOfE++; break;
+                        case 'a': numOfA++; break;
+                        case 'i': numOfI++; break;
                     }
                 }
 
-                value += numOfE * 30;
-                value += numOfA * 20;
-                value += numOfI * 10;
+                value += numOfE * 30 + numOfA * 20 + numOfI * 10;
                 _lineHashList.Add(value);
             }
         }
     }
 
     //TODO Reimplement
-    private int FindSimilarLine (int srcLine, int startLine)
-    {
-        var value = _lineHashList[srcLine];
+    //private int FindSimilarLine (int srcLine, int startLine)
+    //{
+    //    var value = _lineHashList[srcLine];
 
-        var num = _lineHashList.Count;
-        for (var i = startLine; i < num; ++i)
-        {
-            if (Math.Abs(_lineHashList[i] - value) < 3)
-            {
-                return i;
-            }
-        }
+    //    var num = _lineHashList.Count;
+    //    for (var i = startLine; i < num; ++i)
+    //    {
+    //        if (Math.Abs(_lineHashList[i] - value) < 3)
+    //        {
+    //            return i;
+    //        }
+    //    }
 
-        return -1;
-    }
+    //    return -1;
+    //}
 
     //TODO Reimplement this cache to speed up the similar line search
     // int[,] similarCache;
-    private static void ResetCache (int num)
-    {
-        //this.similarCache = new int[num, num];
-        //for (int i = 0; i < num; ++i)
-        //{
-        //  for (int j = 0; j < num; j++)
-        //  {
-        //    this.similarCache[i, j] = -1;
-        //  }
-        //}
-    }
+    //private static void ResetCache (int num)
+    //{
+    //    //this.similarCache = new int[num, num];
+    //    //for (int i = 0; i < num; ++i)
+    //    //{
+    //    //  for (int j = 0; j < num; j++)
+    //    //  {
+    //    //    this.similarCache[i, j] = -1;
+    //    //  }
+    //    //}
+    //}
 
     private int FindSimilarLine (int srcLine, int startLine, Dictionary<int, int> processedLinesDict)
     {
         var threshold = _patternArgs.Fuzzy;
 
         var prepared = false;
-        Regex regex = null;
-        Regex regex2 = null;
         string msgToFind = null;
         var culture = CultureInfo.CurrentCulture;
+
+        char[] normalizedBuffer = null;
 
         var num = _logFileReader.LineCount;
         for (var i = startLine; i < num; ++i)
@@ -5738,30 +5734,50 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (!prepared)
                 {
-                    msgToFind = GetMsgForLine(srcLine);
-                    regex = ReplaceDigit();
-                    regex2 = ReplaceNonWordCharacters();
-                    msgToFind = msgToFind.ToLower(culture);
-                    msgToFind = regex.Replace(msgToFind, "0");
-                    msgToFind = regex2.Replace(msgToFind, " ");
+                    var srcMemory = GetMsgForLine(srcLine);
+                    msgToFind = string.Create(srcMemory.Length, srcMemory, static (dest, src) =>
+                    {
+                        var source = src.Span;
+                        for (var j = 0; j < source.Length; ++j)
+                        {
+                            var c = char.ToLowerInvariant(source[j]);
+                            dest[j] = char.IsDigit(c) ? '0'              // \d -> '0',
+                            : !char.IsLetterOrDigit(c) && c != '_' ? ' ' // \W -> ' '
+                                : c;
+                        }
+                    });
+
                     prepared = true;
                 }
 
-                var msg = GetMsgForLine(i);
-                if (msg != null)
+                var msgMemory = GetMsgForLine(i);
+                if (!msgMemory.IsEmpty)
                 {
-                    msg = regex.Replace(msg, "0");
-                    msg = regex2.Replace(msg, " ");
-                    var lenDiff = Math.Abs(msg.Length - msgToFind.Length);
+                    // Early length check — normalization preserves length, so check on span directly.
+                    // Both \d→'0' and \W→' ' are 1:1 char replacements, length is unchanged.
+                    var lenDiff = Math.Abs(msgMemory.Length - msgToFind.Length);
                     if (lenDiff > threshold)
                     {
-                        //this.similarCache[srcLine, i] = lenDiff;
                         continue;
                     }
 
-                    msg = msg.ToLower(culture);
-                    var distance = Util.YetiLevenshtein(msgToFind, msg);
-                    //this.similarCache[srcLine, i] = distance;
+                    if (normalizedBuffer == null || normalizedBuffer.Length < msgMemory.Length)
+                    {
+                        normalizedBuffer = new char[msgMemory.Length];
+                    }
+
+                    var normalized = normalizedBuffer.AsSpan(0, msgMemory.Length);
+
+                    var source = msgMemory.Span;
+                    for (var j = 0; j < source.Length; j++)
+                    {
+                        var c = char.ToLowerInvariant(source[j]);
+                        normalized[j] = char.IsDigit(c) ? '0'
+                                       : !char.IsLetterOrDigit(c) && c != '_' ? ' '
+                                       : c;
+                    }
+
+                    var distance = Util.YetiLevenshtein(msgToFind.AsSpan(), normalized);
                     if (distance < threshold)
                     {
                         return i;
@@ -5773,9 +5789,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return -1;
     }
 
-    private string GetMsgForLine (int i)
+    private ReadOnlyMemory<char> GetMsgForLine (int i)
     {
-        var line = _logFileReader.GetLogLine(i);
+        var line = _logFileReader.GetLogLineMemory(i);
         var columnizer = CurrentColumnizer;
         ColumnizerCallback callback = new(this);
         var cols = columnizer.SplitLine(callback, line);
@@ -5944,23 +5960,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void SetDefaultHighlightGroup ()
     {
-        var group = _parentLogTabWin.FindHighlightGroupByFileMask(FileName);
-
-        if (group != null)
-        {
-            SetCurrentHighlightGroup(group.GroupName);
-        }
-        else
-        {
-            SetCurrentHighlightGroup(Resources.HighlightDialog_UI_DefaultGroupName);
-        }
+        var group = _logWindowCoordinator.ResolveHighlightGroup(null, FileName);
+        //Resources.HighlightDialog_UI_DefaultGroupName
+        SetCurrentHighlightGroup(group.GroupName);
     }
 
     [SupportedOSPlatform("windows")]
     private void HandleChangedFilterOnLoadSetting ()
     {
-        _parentLogTabWin.Preferences.IsFilterOnLoad = filterOnLoadCheckBox.Checked;
-        _parentLogTabWin.Preferences.IsAutoHideFilterList = hideFilterListOnLoadCheckBox.Checked;
+        Preferences.IsFilterOnLoad = filterOnLoadCheckBox.Checked;
+        Preferences.IsAutoHideFilterList = hideFilterListOnLoadCheckBox.Checked;
         OnFilterListChanged(this);
     }
 
@@ -6176,7 +6185,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
 
-            if (CurrentColumnizer is ILogLineXmlColumnizer xmlColumnizer)
+            if (CurrentColumnizer is ILogLineMemoryXmlColumnizer xmlColumnizer)
             {
                 _logFileReader.IsXmlMode = true;
                 _logFileReader.XmlLogConfig = xmlColumnizer.GetXmlLogConfiguration();
@@ -6284,9 +6293,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public PersistenceData GetPersistenceData ()
     {
+        // Filter out auto-generated bookmarks — they are transient and will be re-generated on load
+        SortedList<int, Bookmark> manualBookmarks = [];
+        foreach (var kvp in _bookmarkProvider.BookmarkList)
+        {
+            if (!kvp.Value.IsAutoGenerated)
+            {
+                manualBookmarks.Add(kvp.Key, kvp.Value);
+            }
+        }
+
         PersistenceData persistenceData = new()
         {
-            BookmarkList = _bookmarkProvider.BookmarkList,
+            BookmarkList = manualBookmarks,
             RowHeightList = _rowHeightList,
             MultiFile = IsMultiFile,
             MultiFilePattern = _multiFileOptions.FormatPattern,
@@ -6303,8 +6322,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             SessionFileName = SessionFileName,
             Columnizer = CurrentColumnizer,
             LineCount = _logFileReader != null ? _logFileReader.LineCount : 0
-
-
         };
 
         _filterParams.IsFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
@@ -6351,6 +6368,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void CloseLogWindow ()
     {
+        CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();
         StopLogEventWorkerThread();
@@ -6415,7 +6433,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _forcedColumnizerForLoading = ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir);
     }
 
-    public void PreselectColumnizer (string columnizerName)
+    private void PreSelectColumnizer (ILogLineMemoryColumnizer columnizer)
+    {
+        CurrentColumnizer = columnizer != null
+            ? (_forcedColumnizerForLoading = columnizer)
+            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
+    }
+
+    public void PreSelectColumnizerByName (string columnizerName)
     {
         var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
         PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
@@ -6525,26 +6550,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     // = new Rectangle(e.CellBounds.Left + 2, e.CellBounds.Top + 2, 6, 6);
                     var rect = e.CellBounds;
                     rect.Inflate(-2, -2);
-                    using var brush = new SolidBrush(BookmarkColor);
-                    e.Graphics.FillRectangle(brush, rect);
-
                     var bookmark = _bookmarkProvider.GetBookmarkForLine(rowIndex);
+                    var bookmarkColor = bookmark.IsAutoGenerated ? AutoBookmarkColor : BookmarkColor;
+                    using var brush = new SolidBrush(bookmarkColor);
+                    e.Graphics.FillRectangle(brush, rect);
 
                     if (bookmark.Text.Length > 0)
                     {
-                        StringFormat format = new()
-                        {
-                            LineAlignment = StringAlignment.Center,
-                            Alignment = StringAlignment.Center
-                        };
-
                         //Todo Add this as a Settings Option
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
                         using var font = new Font(fontName, Preferences.FontSize, FontStyle.Bold);
-                        e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), format);
+                        e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }
                 }
             }
@@ -6638,7 +6657,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _ = BeginInvoke(new MethodInvoker(dataGridView.Refresh));
         //this.dataGridView.Refresh();
-        _parentLogTabWin.FollowTailChanged(this, isChecked, byTrigger);
+        _logWindowCoordinator.NotifyFollowTailChanged(this, isChecked, byTrigger);
         SendGuiStateUpdate();
     }
 
@@ -6685,7 +6704,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         _guiStateArgs.MenuEnabled = false;
         GuiStateUpdate(this, _guiStateArgs);
-        var searchParams = _parentLogTabWin.SearchParams;
+        var searchParams = _logWindowCoordinator.SearchParams;
 
         searchParams.CurrentLine = (searchParams.IsForward || searchParams.IsFindNext) && !searchParams.IsShiftF3Pressed
             ? dataGridView.CurrentCellAddress.Y + 1
@@ -6781,14 +6800,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         switch (e.KeyCode)
         {
-            case Keys.F3 when _parentLogTabWin.SearchParams?.SearchText == null || _parentLogTabWin.SearchParams.SearchText.Length == 0:
+            case Keys.F3 when _logWindowCoordinator.SearchParams?.SearchText == null || _logWindowCoordinator.SearchParams.SearchText.Length == 0:
                 {
                     return;
                 }
             case Keys.F3:
                 {
-                    _parentLogTabWin.SearchParams.IsFindNext = true;
-                    _parentLogTabWin.SearchParams.IsShiftF3Pressed = (e.Modifiers & Keys.Shift) == Keys.Shift;
+                    _logWindowCoordinator.SearchParams.IsFindNext = true;
+                    _logWindowCoordinator.SearchParams.IsShiftF3Pressed = (e.Modifiers & Keys.Shift) == Keys.Shift;
                     StartSearch();
                     break;
                 }
@@ -6799,8 +6818,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         _shouldCancel = true;
                     }
 
+                    CancelHighlightBookmarkScan();
                     FireCancelHandlers();
                     RemoveAllSearchHighlightEntries();
+
+
                     break;
                 }
             case Keys.E when (e.Modifiers & Keys.Control) == Keys.Control:
@@ -6989,55 +7011,249 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
 
-            if (!string.IsNullOrEmpty(bookmark.Text))
+            // If it's an auto-generated bookmark, convert to manual instead of removing
+            if (bookmark.IsAutoGenerated)
             {
-                if (MessageBox.Show(Resources.LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.No)
-                {
-                    return;
-                }
+                _ = _bookmarkProvider.ConvertToManualBookmark(lineNum);
             }
+            else
+            {
+                if (!string.IsNullOrEmpty(bookmark.Text))
+                {
+                    if (MessageBox.Show(Resources.LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
 
-            _bookmarkProvider.RemoveBookmarkForLine(lineNum);
+                _bookmarkProvider.RemoveBookmarkForLine(lineNum);
+            }
         }
         else
         {
             _bookmarkProvider.AddBookmark(new Bookmark(lineNum));
         }
 
-        dataGridView.Refresh();
-        filterGridView.Refresh();
+        RefreshAllGrids();
         OnBookmarkAdded();
     }
 
     public void SetBookmarkFromTrigger (int lineNum, string comment)
     {
-        lock (_bookmarkLock)
-        {
-            var line = _logFileReader.GetLogLineMemory(lineNum);
+        var line = _logFileReader.GetLogLineMemory(lineNum);
 
-            if (line == null)
+        if (line == null)
+        {
+#if DEBUG
+            _logger.Warn($"SetBookmarkFromTrigger: line {lineNum} returned null, bookmark not set");
+#endif
+            return;
+        }
+
+        var paramParser = new ParamParser(comment);
+
+        try
+        {
+            comment = paramParser.ReplaceParams(line, lineNum, FileName);
+        }
+        catch (ArgumentException)
+        {
+            // occurs on invalid regex
+        }
+
+        if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
+        {
+            var existing = _bookmarkProvider.GetBookmarkForLine(lineNum);
+
+            // Don't overwrite manual bookmarks with auto-generated ones
+            if (!existing.IsAutoGenerated)
             {
                 return;
             }
 
-            var paramParser = new ParamParser(comment);
+            _bookmarkProvider.RemoveBookmarkForLine(lineNum);
+        }
 
+        _bookmarkProvider.AddBookmark(Bookmark.CreateAutoGenerated(lineNum, comment, GetSourceHighlightTextForLine(lineNum)));
+        OnBookmarkAdded();
+    }
+
+    /// <summary>
+    /// Returns the SearchText of the first matching highlight entry with IsSetBookmark for the given line. Used to set
+    /// SourceHighlightText on trigger-created bookmarks.
+    /// </summary>
+    private string GetSourceHighlightTextForLine (int lineNum)
+    {
+        var line = _logFileReader.GetLogLineMemory(lineNum);
+
+        if (line == null)
+        {
+            return string.Empty;
+        }
+
+        var matchingList = FindMatchingHighlightEntries(line);
+
+        foreach (var entry in matchingList)
+        {
+            if (entry.IsSetBookmark)
+            {
+                return entry.SearchText;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Cancels any in-progress highlight bookmark scan, removes existing auto-generated bookmarks, and starts a new
+    /// background scan based on the current highlight group.
+    /// </summary>
+    private void RunHighlightBookmarkScan ()
+    {
+        // Guard: don't scan during loading or if reader is not available
+        if (_isLoading || _logFileReader == null)
+        {
+            return;
+        }
+
+        // Cancel any in-progress scan
+        CancelHighlightBookmarkScan();
+
+        // Step 1: Remove previous auto-generated bookmarks
+        _bookmarkProvider.RemoveAutoGeneratedBookmarks();
+        RefreshAllGrids();
+
+        // Step 2: Get current highlight entries (snapshot under lock)
+        List<HighlightEntry> entries;
+        lock (_currentHighlightGroupLock)
+        {
+            entries = [.. _currentHighlightGroup.HighlightEntryList];
+        }
+
+        // Step 3: Early exit if no entries have IsSetBookmark
+        if (!entries.Any(e => e.IsSetBookmark))
+        {
+            return;
+        }
+
+        // Step 4: Start background scan
+        var cts = new CancellationTokenSource();
+        _highlightBookmarkScanCts = cts;
+        var lineCount = _logFileReader.LineCount;
+        var fileName = FileName;
+
+        StatusLineText(Resources.LogWindow_UI_StatusLineText_ScanningBookmarks);
+        _progressEventArgs.MinValue = 0;
+        _progressEventArgs.MaxValue = lineCount;
+        _progressEventArgs.Value = 0;
+        _progressEventArgs.Visible = true;
+        SendProgressBarUpdate();
+
+        var progress = new Progress<int>(OnHighlightBookmarkScanProgress);
+        _ = Task.Run(() => ExecuteHighlightBookmarkScan(lineCount, entries, fileName, progress, cts));
+    }
+
+    private void ExecuteHighlightBookmarkScan (int lineCount, List<HighlightEntry> entries, string fileName, IProgress<int> progress, CancellationTokenSource cts)
+    {
+        using (cts)
+        {
             try
             {
-                comment = paramParser.ReplaceParams(line, lineNum, FileName);
+                var bookmarks = HighlightBookmarkScanner.Scan(lineCount, _logFileReader.GetLogLineMemory, entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
+
+                // Marshal bookmark additions to UI thread
+                if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
+                {
+                    _ = BeginInvoke(() =>
+                    {
+                        _ = _bookmarkProvider.AddBookmarks(bookmarks);
+
+                        RefreshAllGrids();
+
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
             }
-            catch (ArgumentException)
+            catch (OperationCanceledException)
             {
-                // occurs on invalid regex
+                // Scan was cancelled — clean up on UI thread
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    _ = BeginInvoke(() =>
+                    {
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
+            }
+            finally
+            {
+                // Only dispose if this is still the active CTS
+                if (_highlightBookmarkScanCts == cts)
+                {
+                    _highlightBookmarkScanCts = null;
+                }
+            }
+        }
+    }
+
+    private void OnHighlightBookmarkScanProgress (int currentLine)
+    {
+        try
+        {
+            if (_highlightBookmarkScanCts is not { } cts)
+            {
+                return;
             }
 
-            if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
+            if (cts.Token.IsCancellationRequested)
             {
-                _bookmarkProvider.RemoveBookmarkForLine(lineNum);
+                StatusLineText(Resources.LogWindow_UI_StatusLineText_ScanningBookmarksEnded);
+                return;
             }
+        }
+        catch (ObjectDisposedException)
+        {
+            // CTS was disposed after task completed — progress callback is stale
+            return;
+        }
 
-            _bookmarkProvider.AddBookmark(new Bookmark(lineNum, comment));
-            OnBookmarkAdded();
+        if (IsHandleCreated && !IsDisposed)
+        {
+            _ = BeginInvoke(() =>
+            {
+                _progressEventArgs.Value = currentLine;
+                SendProgressBarUpdate();
+
+                var lineCount = _logFileReader?.LineCount ?? 0;
+                if (lineCount > 0)
+                {
+                    var pct = (int)((long)currentLine * 100 / lineCount);
+                    StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_ScanningBookmarksPct, pct));
+                }
+            });
+        }
+    }
+
+    /// <summary>
+    /// Cancels any currently running highlight bookmark scan.
+    /// </summary>
+    private void CancelHighlightBookmarkScan ()
+    {
+        var cts = _highlightBookmarkScanCts;
+        if (cts != null)
+        {
+            try
+            {
+                cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed — ignore
+            }
         }
     }
 
@@ -7317,12 +7533,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             writer.Close();
             var title = string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_CopyMarkedLinesToTab_Clip, Util.GetNameFromPath(FileName));
-            _ = _parentLogTabWin.AddTempFileTab(fileName, title);
+            _ = _logWindowCoordinator.AddTempFileTab(fileName, title);
         }
     }
 
     /// <summary>
-    /// Change the file encoding. May force a reload if byte count ot preamble lenght differs from previous used encoding.
+    /// Change the file encoding. May force a reload if byte count ot preamble lenght differs from previous used
+    /// encoding.
     /// </summary>
     /// <param name="encoding"></param>
     public void ChangeEncoding (Encoding encoding)
@@ -7678,13 +7895,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             : null;
     }
 
-    public ILogLine GetLine (int lineNum)
-    {
-        return lineNum < 0 || _logFileReader == null || lineNum >= _logFileReader.LineCount
-            ? null
-            : _logFileReader.GetLogLineMemory(lineNum);
-    }
-
     public ILogLineMemory GetLineMemory (int lineNum)
     {
         return lineNum < 0 || _logFileReader == null || lineNum >= _logFileReader.LineCount
@@ -7819,17 +8029,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var bookmarkAdded = false;
                 foreach (var b in newBookmarks.Values)
                 {
-                    if (!_bookmarkProvider.BookmarkList.ContainsKey(b.LineNum))
+                    if (_bookmarkProvider.BookmarkList.TryGetValue(b.LineNum, out Bookmark? existingBookmark))
                     {
-                        _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
-                        bookmarkAdded = true; // refresh the list only once at the end
-                    }
-                    else
-                    {
-                        var existingBookmark = _bookmarkProvider.BookmarkList[b.LineNum];
                         // replace existing bookmark for that line, preserving the overlay
                         existingBookmark.Text = b.Text;
                         OnBookmarkTextChanged(b);
+                    }
+                    else
+                    {
+                        _bookmarkProvider.BookmarkList.Add(b.LineNum, b);
+                        bookmarkAdded = true; // refresh the list only once at the end
                     }
                 }
 
@@ -7839,8 +8048,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     OnBookmarkAdded();
                 }
 
-                dataGridView.Refresh();
-                filterGridView.Refresh();
+                RefreshAllGrids();
             }
             catch (IOException e)
             {
@@ -7888,19 +8096,21 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public void SetCurrentHighlightGroup (string groupName)
     {
         _guiStateArgs.HighlightGroupName = groupName;
+
         lock (_currentHighlightGroupLock)
         {
-            _currentHighlightGroup = _parentLogTabWin.FindHighlightGroup(groupName);
-
-            _currentHighlightGroup ??= _parentLogTabWin.HighlightGroupList.Count > 0
-                ? _parentLogTabWin.HighlightGroupList[0]
-                : new HighlightGroup();
-
+            _currentHighlightGroup = _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
             _guiStateArgs.HighlightGroupName = _currentHighlightGroup.GroupName;
         }
 
         SendGuiStateUpdate();
-        _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
+
+        if (IsHandleCreated)
+        {
+            //NOTE: Possible double refresh of AllGrids, maybe not necessary if only will be called once
+            _ = BeginInvoke(new MethodInvoker(RefreshAllGrids));
+            _ = BeginInvoke(new MethodInvoker(RunHighlightBookmarkScan));
+        }
     }
 
     public void SwitchMultiFile (bool enabled)
@@ -7976,14 +8186,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         RefreshAllGrids();
     }
-
-    //Replace any digit, to normalize numbers.
-    [GeneratedRegex("\\d")]
-    private static partial Regex ReplaceDigit ();
-
-    //Replace any non-word character, anything that is not a letter, digit or underscore
-    [GeneratedRegex("\\W")]
-    private static partial Regex ReplaceNonWordCharacters ();
 
     #endregion
 }

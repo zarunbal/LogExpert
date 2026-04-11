@@ -14,9 +14,8 @@ public class LogBuffer
     private readonly IList<long> _filePositions = []; // file position for every line
 #endif
 
-    private readonly List<ILogLineMemory> _lineList = new();
+    private readonly List<ILogLineMemory> _lineList = [];
 
-    private readonly IList<ILogLine> _logLines = [];
     private int MAX_LINES = 500;
     private long _size;
 
@@ -58,6 +57,8 @@ public class LogBuffer
         get => _size;
     }
 
+    public int EndLine => StartLine + LineCount;
+
     public int StartLine { set; get; }
 
     public int LineCount { get; private set; }
@@ -74,16 +75,6 @@ public class LogBuffer
 
     #region Public methods
 
-    public void AddLine (ILogLine line, long filePos)
-    {
-        _logLines.Add(line);
-#if DEBUG
-        _filePositions.Add(filePos);
-#endif
-        LineCount++;
-        IsDisposed = false;
-    }
-
     public void AddLine (ILogLineMemory lineMemory, long filePos)
     {
         _lineList.Add(lineMemory);
@@ -96,26 +87,17 @@ public class LogBuffer
 
     public void ClearLines ()
     {
-        _logLines.Clear();
         _lineList.Clear();
         LineCount = 0;
     }
 
     public void DisposeContent ()
     {
-        _logLines.Clear();
         _lineList.Clear();
         IsDisposed = true;
 #if DEBUG
         DisposeCount++;
 #endif
-    }
-
-    public ILogLine GetLineOfBlock (int num)
-    {
-        return num < _logLines.Count && num >= 0
-            ? _logLines[num]
-            : null;
     }
 
     public ILogLineMemory GetLineMemoryOfBlock (int num)

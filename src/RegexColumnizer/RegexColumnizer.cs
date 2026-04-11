@@ -170,17 +170,6 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
     }
 
     /// <summary>
-    /// Splits the specified log line into columns using the provided callback.
-    /// </summary>
-    /// <param name="callback">An object that receives columnization callbacks during the split operation. Cannot be null.</param>
-    /// <param name="line">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized version of the log line.</returns>
-    public IColumnizedLogLineMemory SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, line as ILogLineMemory);
-    }
-
-    /// <summary>
     /// Determines whether timeshift functionality is implemented.
     /// </summary>
     /// <returns><see langword="true"/> if timeshift is implemented; otherwise, <see langword="false"/>.</returns>
@@ -206,40 +195,6 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
     public int GetTimeOffset ()
     {
         throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Extracts the timestamp from the specified log line using the provided callback.
-    /// </summary>
-    /// <param name="callback">The callback interface used to assist in extracting column data from the log line. Cannot be null.</param>
-    /// <param name="logLine">The log line from which to extract the timestamp. Cannot be null.</param>
-    /// <returns>A DateTime value representing the timestamp found in the log line.</returns>
-    /// <exception cref="NotImplementedException">The method is not implemented.</exception>
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Configures the columnizer using the specified callback and configuration directory.
-    /// </summary>
-    /// <param name="callback">The callback interface used to interact with the columnizer during configuration. Cannot be null.</param>
-    /// <param name="configDir">The path to the directory containing configuration files. Must be a valid directory path.</param>
-    /// <exception cref="ArgumentException">Thrown if configDir is null, empty, or consists only of white-space characters.</exception>
-    public void Configure (ILogLineColumnizerCallback callback, string configDir)
-    {
-        // Validate inputs
-        if (string.IsNullOrWhiteSpace(configDir))
-        {
-            throw new ArgumentException(Resources.RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty, nameof(configDir));
-        }
-
-        Configure(callback as ILogLineMemoryColumnizerCallback, configDir);
     }
 
     /// <summary>
@@ -426,17 +381,6 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
     }
 
     /// <summary>
-    /// Splits the specified log line into columns using the provided callback.
-    /// </summary>
-    /// <param name="callback">An object that provides callback methods for columnization. Cannot be null.</param>
-    /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized form of the log line.</returns>
-    IColumnizedLogLine ILogLineColumnizer.SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback, logLine);
-    }
-
-    /// <summary>
     /// Displays a configuration dialog for the columnizer and saves the updated settings to the specified configuration
     /// directory.
     /// </summary>
@@ -484,6 +428,11 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
         }
 
         string filePath = Path.Join(configDir, $"{name}Columnizer.json");
+
+        _config ??= new RegexColumnizerConfig
+        {
+            Name = GetName()
+        };
 
         RegexColumnizerConfigDialog dlg = new(_config);
         if (dlg.ShowDialog() == DialogResult.OK)

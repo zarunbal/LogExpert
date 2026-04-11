@@ -2,7 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 using NUnit.Framework;
 
@@ -21,6 +21,7 @@ internal class ReaderTest
     {
     }
 
+    //TODO reimplement
     private void CompareReaderImplementationsInternal (string fileName, Encoding enc, int maxPosition)
     {
         var path = Environment.CurrentDirectory + "\\data\\";

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using ColumnizerLib;
 
@@ -16,17 +15,17 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
-using LogExpert.Entities;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
-using LogExpert.UI.Interface.Services;
 using LogExpert.UI.Services.LedService;
+using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
 using LogExpert.UI.Services.TabControllerService;
+using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
 using NLog;
 
@@ -42,7 +41,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private const int MAX_COLUMNIZER_HISTORY = 40;
     //private const int MAX_COLOR_HISTORY = 40;
-    private const int DIFF_MAX = 100;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly Icon _deadIcon;
@@ -50,6 +48,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private readonly TabController _tabController;
     private readonly MenuToolbarController _menuToolbarController;
+    private readonly LogWindowCoordinator _logWindowCoordinator;
+    private readonly ToolWindowCoordinator _toolWindowCoordinator;
 
     private bool _disposed;
 
@@ -64,10 +64,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private readonly StringFormat _tabStringFormat = new();
 
-    private BookmarkWindow _bookmarkWindow;
-
     private LogWindow.LogWindow _currentLogWindow;
-    private bool _firstBookmarkWindowShow = true;
 
     private bool _skipEvents;
 
@@ -98,6 +95,17 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ConfigManager = configManager;
 
+        _toolWindowCoordinator = new ToolWindowCoordinator(configManager);
+
+        _ledService = new LedIndicatorService();
+        _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
+        _ledService.IconChanged += OnLedIconChanged;
+        _ledService.StartService();
+
+        _deadIcon = _ledService.GetDeadIcon();
+
+        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService);
+
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
@@ -110,15 +118,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         ConfigManager.ConfigChanged += OnConfigChanged;
         HighlightGroupList = configManager.Settings.Preferences.HighlightGroupList;
-
-        Rectangle led = new(0, 0, 8, 2);
-
-        _ledService = new LedIndicatorService();
-        _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
-        _ledService.IconChanged += OnLedIconChanged;
-        _ledService.StartService();
-
-        _deadIcon = _ledService.GetDeadIcon();
 
         _tabStringFormat.LineAlignment = StringAlignment.Center;
         _tabStringFormat.Alignment = StringAlignment.Near;
@@ -184,12 +183,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     #endregion
 
-    #region Events
-
-    public event EventHandler HighlightSettingsChanged;
-
-    #endregion
-
     #region Properties
 
     [SupportedOSPlatform("windows")]
@@ -200,10 +193,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         set => ChangeCurrentLogWindow(value);
     }
 
-    public SearchParams SearchParams { get; private set; } = new SearchParams();
+    public SearchParams SearchParams => _logWindowCoordinator.SearchParams;
 
     public Preferences Preferences => ConfigManager.Settings.Preferences;
 
+    //TODO: This needs to be changed, since its only using _configManager.Settings.Preferences.HighlightGroupList,
+    //like the logwindowCoordinator, but its also used in the settingsDialog, this needs to be refactored
     public List<HighlightGroup> HighlightGroupList { get; private set; } = [];
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -217,18 +212,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     internal HighlightGroup FindHighlightGroup (string groupName)
     {
-        lock (HighlightGroupList)
-        {
-            foreach (var group in HighlightGroupList)
-            {
-                if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
-                {
-                    return group;
-                }
-            }
+        return _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
 
-            return null;
-        }
+        //lock (HighlightGroupList)
+        //{
+        //    foreach (var group in HighlightGroupList)
+        //    {
+        //        if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
+        //        {
+        //            return group;
+        //        }
+        //    }
+
+        //    return null;
+        //}
     }
 
     #endregion
@@ -503,13 +500,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 AddToFileHistory(givenFileName);
             }
 
-            SelectTab(win);
+            _logWindowCoordinator.SelectTab(win);
             return win;
         }
 
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
-        LogWindow.LogWindow logWindow = new(this, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
         {
             GivenFileName = givenFileName
         };
@@ -572,7 +569,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return null;
         }
 
-        LogWindow.LogWindow logWindow = new(this, fileNames[^1], false, false, ConfigManager);
+        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, fileNames[^1], false, false, ConfigManager);
         AddLogWindow(logWindow, fileNames[^1], false);
         multiFileToolStripMenuItem.Checked = true;
         multiFileEnabledStripMenuItem.Checked = true;
@@ -605,29 +602,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var res = dlg.ShowDialog();
         if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.SearchText))
         {
-            SearchParams = dlg.SearchParams;
+            SearchParams.CopyFrom(dlg.SearchParams);
             SearchParams.IsFindNext = false;
             CurrentLogWindow.StartSearch();
         }
-    }
-
-    public ILogLineMemoryColumnizer GetColumnizerHistoryEntry (string fileName)
-    {
-        var entry = FindColumnizerHistoryEntry(fileName);
-        if (entry != null)
-        {
-            foreach (var columnizer in PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers)
-            {
-                if (columnizer.GetName().Equals(entry.ColumnizerName, StringComparison.Ordinal))
-                {
-                    return columnizer;
-                }
-            }
-
-            _ = ConfigManager.Settings.ColumnizerHistoryList.Remove(entry); // no valid name -> remove entry
-        }
-
-        return null;
     }
 
     public void SwitchTab (bool shiftPressed)
@@ -642,23 +620,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow.LogWindow senderWindow)
-    {
-        foreach (var logWindow in _tabController.GetAllWindows())
-        {
-            if (logWindow != senderWindow)
-            {
-                if (logWindow.ScrollToTimestamp(timestamp, false, false))
-                {
-                    _ledService.UpdateWindowActivity(logWindow, DIFF_MAX);
-                }
-            }
-        }
-    }
-
     /// <summary>
-    /// Handles the WindowActivated event from TabController.
-    /// Updates CurrentLogWindow and connects tool windows to the newly activated window.
+    /// Handles the WindowActivated event from TabController. Updates CurrentLogWindow and connects tool windows to the
+    /// newly activated window.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the activated window and previous window</param>
@@ -697,8 +661,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowAdded event from TabController.
-    /// Performs additional setup for newly added windows that LogTabWindow needs.
+    /// Handles the WindowAdded event from TabController. Performs additional setup for newly added windows that
+    /// LogTabWindow needs.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the added window and title</param>
@@ -724,8 +688,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowClosing event from TabController.
-    /// Performs pre-close validation and cleanup. Can cancel the close operation.
+    /// Handles the WindowClosing event from TabController. Performs pre-close validation and cleanup. Can cancel the
+    /// close operation.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the window being closed and cancellation support</param>
@@ -747,8 +711,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Handles the WindowRemoved event from TabController.
-    /// Cleans up resources and event subscriptions for the removed window.
+    /// Handles the WindowRemoved event from TabController. Cleans up resources and event subscriptions for the removed
+    /// window.
     /// </summary>
     /// <param name="sender">The TabController that raised the event</param>
     /// <param name="e">Event args containing the removed window</param>
@@ -771,59 +735,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ChangeCurrentLogWindow(null);
         }
-    }
-
-    public ILogLineMemoryColumnizer FindColumnizerByFileMask (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.Preferences.ColumnizerMaskList)
-        {
-            if (entry.Mask != null)
-            {
-                try
-                {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(entry.ColumnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-                        return columnizer;
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while finding columnizer: {e}");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public HighlightGroup FindHighlightGroupByFileMask (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.Preferences.HighlightMaskList)
-        {
-            if (entry.Mask != null)
-            {
-                try
-                {
-                    if (Regex.IsMatch(fileName, entry.Mask))
-                    {
-                        var group = FindHighlightGroup(entry.HighlightGroupName);
-                        return group;
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    _logger.Error($"RegEx-error while finding columnizer: {e}");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public void SelectTab (ILogWindow logWindow)
-    {
-        _tabController.ActivateWindow(logWindow as LogWindow.LogWindow);
     }
 
     [SupportedOSPlatform("windows")]
@@ -869,18 +780,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
     }
 
-    public IList<WindowFileEntry> GetListOfOpenFiles ()
-    {
-        IList<WindowFileEntry> list = [];
-
-        foreach (var logWindow in _tabController.GetAllWindows())
-        {
-            list.Add(new WindowFileEntry(logWindow));
-        }
-
-        return list;
-    }
-
     #endregion
 
     #region Private Methods
@@ -903,6 +802,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             components.Dispose();
             _tabStringFormat?.Dispose();
             _menuToolbarController?.Dispose();
+            _toolWindowCoordinator?.Dispose();
         }
 
         _disposed = true;
@@ -939,39 +839,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void InitToolWindows ()
     {
-        InitBookmarkWindow();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void DestroyToolWindows ()
-    {
-        DestroyBookmarkWindow();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void InitBookmarkWindow ()
-    {
-        _bookmarkWindow = new BookmarkWindow
-        {
-            HideOnClose = true,
-            ShowHint = DockState.DockBottom
-        };
-
-        var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
-        var lastColumnWidth = ConfigManager.Settings.Preferences.LastColumnWidth;
-        var fontName = ConfigManager.Settings.Preferences.FontName;
-        var fontSize = ConfigManager.Settings.Preferences.FontSize;
-
-        _bookmarkWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, SettingsFlags.All);
-        _bookmarkWindow.VisibleChanged += OnBookmarkWindowVisibleChanged;
-        _firstBookmarkWindowShow = true;
+        _toolWindowCoordinator.Initialize();
     }
 
     [SupportedOSPlatform("windows")]
     private void DestroyBookmarkWindow ()
     {
-        _bookmarkWindow.HideOnClose = false;
-        _bookmarkWindow.Close();
+        _toolWindowCoordinator.Destroy();
     }
 
     private void SaveLastOpenFilesList ()
@@ -1049,8 +923,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Adds a LogWindow to the tab system.
-    /// Sets up window properties, delegates to TabController, and performs additional setup.
+    /// Adds a LogWindow to the tab system. Sets up window properties, delegates to TabController, and performs
+    /// additional setup.
     /// </summary>
     /// <param name="logWindow">The window to add</param>
     /// <param name="title">Tab title</param>
@@ -1118,8 +992,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Removes a LogWindow from the tab system.
-    /// Delegates to TabController for removal and cleanup.
+    /// Removes a LogWindow from the tab system. Delegates to TabController for removal and cleanup.
     /// </summary>
     /// <param name="logWindow">The window to remove</param>
     [SupportedOSPlatform("windows")]
@@ -1274,7 +1147,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void SetColumnizerHistoryEntry (string fileName, ILogLineMemoryColumnizer columnizer)
     {
-        var entry = FindColumnizerHistoryEntry(fileName);
+        var entry = _logWindowCoordinator.FindColumnizerHistoryEntry(fileName);
         if (entry != null)
         {
             _ = ConfigManager.Settings.ColumnizerHistoryList.Remove(entry);
@@ -1287,19 +1160,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             ConfigManager.Settings.ColumnizerHistoryList.RemoveAt(0);
         }
-    }
-
-    private ColumnizerHistoryEntry FindColumnizerHistoryEntry (string fileName)
-    {
-        foreach (var entry in ConfigManager.Settings.ColumnizerHistoryList)
-        {
-            if (entry.FileName.Equals(fileName, StringComparison.Ordinal))
-            {
-                return entry;
-            }
-        }
-
-        return null;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1330,10 +1190,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             oldLogWindow.StatusLineEvent -= OnStatusLineEvent;
             oldLogWindow.ProgressBarUpdate -= OnProgressBarUpdate;
             oldLogWindow.GuiStateUpdate -= OnGuiStateUpdate;
-            oldLogWindow.ColumnizerChanged -= OnColumnizerChanged;
-            oldLogWindow.BookmarkAdded -= OnBookmarkAdded;
-            oldLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
-            oldLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
             DisconnectToolWindows();
         }
 
@@ -1342,10 +1198,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             newLogWindow.StatusLineEvent += OnStatusLineEvent;
             newLogWindow.ProgressBarUpdate += OnProgressBarUpdate;
             newLogWindow.GuiStateUpdate += OnGuiStateUpdate;
-            newLogWindow.ColumnizerChanged += OnColumnizerChanged;
-            newLogWindow.BookmarkAdded += OnBookmarkAdded;
-            newLogWindow.BookmarkRemoved += OnBookmarkRemoved;
-            newLogWindow.BookmarkTextChanged += OnBookmarkTextChanged;
 
             Text = newLogWindow.IsTempFile
                 ? titleName + @" - " + newLogWindow.TempTitleName
@@ -1360,7 +1212,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             searchToolStripMenuItem.Enabled = true;
             filterToolStripMenuItem.Enabled = true;
             goToLineToolStripMenuItem.Enabled = true;
-            //ConnectToolWindows(newLogWindow);
+            ConnectToolWindows(newLogWindow);
         }
         else
         {
@@ -1386,25 +1238,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ConnectToolWindows (LogWindow.LogWindow logWindow)
     {
-        ConnectBookmarkWindow(logWindow);
-    }
-
-    private void ConnectBookmarkWindow (LogWindow.LogWindow logWindow)
-    {
-        FileViewContext ctx = new(logWindow, logWindow);
-        _bookmarkWindow.SetBookmarkData(logWindow.BookmarkData);
-        _bookmarkWindow.SetCurrentFile(ctx);
+        _toolWindowCoordinator.Connect(logWindow);
     }
 
     private void DisconnectToolWindows ()
     {
-        DisconnectBookmarkWindow();
-    }
-
-    private void DisconnectBookmarkWindow ()
-    {
-        _bookmarkWindow.SetBookmarkData(null);
-        _bookmarkWindow.SetCurrentFile(null);
+        _toolWindowCoordinator.Disconnect();
     }
 
     [SupportedOSPlatform("windows")]
@@ -1429,7 +1268,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible, ex));
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible), ex);
             }
 
             _ = Invoke(new MethodInvoker(statusStrip.Refresh));
@@ -1572,7 +1411,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         //}
 
-        _bookmarkWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
 
         HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
         if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
@@ -1852,7 +1691,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 _logger.Info("Restoring layout");
                 // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
-                DestroyToolWindows();
+                DestroyBookmarkWindow();
                 InitToolWindows();
                 RestoreLayout(projectData.TabLayoutXml);
             }
@@ -1989,9 +1828,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private IDockContent DeserializeDockContent (string persistString)
     {
-        if (persistString.Equals(WindowTypes.BookmarkWindow.ToString(), StringComparison.Ordinal))
+        var toolContent = _toolWindowCoordinator.GetDockContent(persistString);
+        if (toolContent != null)
         {
-            return _bookmarkWindow;
+            return toolContent;
         }
 
         if (persistString.StartsWith(WindowTypes.LogWindow.ToString(), StringComparison.OrdinalIgnoreCase))
@@ -2002,8 +1842,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 return win;
             }
-
-            //_logger.Warn("Layout data contains non-existing LogWindow for {fileName}"));
         }
 
         return null;
@@ -2011,17 +1849,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnHighlightSettingsChanged ()
     {
-        HighlightSettingsChanged?.Invoke(this, EventArgs.Empty);
+        _logWindowCoordinator.OnHighlightSettingsChanged();
     }
 
     #endregion
 
     #region Events handler
-
-    private void OnBookmarkWindowVisibleChanged (object sender, EventArgs e)
-    {
-        _firstBookmarkWindowShow = false;
-    }
 
     private void OnLogTabWindowLoad (object sender, EventArgs e)
     {
@@ -2302,26 +2135,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _ = BeginInvoke(GuiStateUpdateWorker, e);
     }
 
-    private void OnColumnizerChanged (object sender, ColumnizerEventArgs e)
-    {
-        _bookmarkWindow?.SetColumnizer(e.Columnizer);
-    }
-
-    private void OnBookmarkAdded (object sender, EventArgs e)
-    {
-        _bookmarkWindow.UpdateView();
-    }
-
-    private void OnBookmarkTextChanged (object sender, BookmarkEventArgs e)
-    {
-        _bookmarkWindow.BookmarkTextChanged(e.Bookmark);
-    }
-
-    private void OnBookmarkRemoved (object sender, EventArgs e)
-    {
-        _bookmarkWindow.UpdateView();
-    }
-
     private void OnProgressBarUpdate (object sender, ProgressEventArgs e)
     {
         _ = Invoke(ProgressBarUpdateWorker, e);
@@ -2329,6 +2142,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnStatusLineEvent (object sender, StatusLineEventArgs e)
     {
+        if (InvokeRequired)
+        {
+            _ = BeginInvoke(() => StatusLineEventWorker(e));
+            return;
+        }
+
         StatusLineEventWorker(e);
     }
 
@@ -2592,21 +2411,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnShowBookmarkListToolStripMenuItemClick (object sender, EventArgs e)
     {
-        if (_bookmarkWindow.Visible)
-        {
-            _bookmarkWindow.Hide();
-        }
-        else
-        {
-            // strange: on very first Show() now bookmarks are displayed. after a hide it will work.
-            if (_firstBookmarkWindowShow)
-            {
-                _bookmarkWindow.Show(dockPanel);
-                _bookmarkWindow.Hide();
-            }
-
-            _bookmarkWindow.Show(dockPanel);
-        }
+        _toolWindowCoordinator.ToggleBookmarkVisibility(dockPanel);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2660,7 +2465,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             logWin.ShowLineColumn(!ConfigManager.Settings.HideLineColumn);
         }
 
-        _bookmarkWindow.LineColumnVisible = ConfigManager.Settings.HideLineColumn;
+        _toolWindowCoordinator.SetLineColumnVisible(!ConfigManager.Settings.HideLineColumn);
     }
 
     // ==================================================================

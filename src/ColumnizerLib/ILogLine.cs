@@ -6,6 +6,7 @@ namespace ColumnizerLib;
 /// <remarks>Implementations of this interface provide access to both the full text of the log line and its
 /// position within the source log. This can be used to correlate log entries with their original context or for
 /// processing log files line by line.</remarks>
+[Obsolete("This interface is deprecated. Use ILogLineMemory for a memory-based implementation instead.")]
 public interface ILogLine : ITextValue
 {
     #region Properties

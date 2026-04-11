@@ -2,7 +2,7 @@ using System.Runtime.Versioning;
 
 using ColumnizerLib;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Dialogs;
 
@@ -11,14 +11,14 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
 {
     #region Fields
 
-    private readonly ILogLineColumnizerCallback _callback;
+    private readonly ILogLineMemoryColumnizerCallback _callback;
     private readonly IList<ILogLineMemoryColumnizer> _columnizerList;
 
     #endregion
 
     #region cTor
 
-    public FilterSelectorForm (IList<ILogLineMemoryColumnizer> existingColumnizerList, ILogLineMemoryColumnizer currentColumnizer, ILogLineColumnizerCallback callback, IConfigManager configManager)
+    public FilterSelectorForm (IList<ILogLineMemoryColumnizer> existingColumnizerList, ILogLineMemoryColumnizer currentColumnizer, ILogLineMemoryColumnizerCallback callback, IConfigManager configManager)
     {
         SuspendLayout();
 
@@ -108,13 +108,13 @@ internal partial class FilterSelectorForm : Form //TODO: Can this be changed to 
             Resources.FilterSelectorForm_UI_Text_SupportsTimeshift_Format,
             timeshiftSupported);
         commentTextBox.Text = description;
-        configButton.Enabled = SelectedColumnizer is IColumnizerConfigurator;
+        configButton.Enabled = SelectedColumnizer is IColumnizerConfiguratorMemory;
     }
 
     //TODO: Check if this logic can be removed from this class and remove all the config manager instances from here.
     private void OnConfigButtonClick (object sender, EventArgs e)
     {
-        if (SelectedColumnizer is IColumnizerConfigurator configurator)
+        if (SelectedColumnizer is IColumnizerConfiguratorMemory configurator)
         {
             configurator.Configure(_callback, ConfigManager.ActiveConfigDir);
             IsConfigPressed = true;

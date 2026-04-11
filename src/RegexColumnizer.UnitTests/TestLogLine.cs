@@ -7,11 +7,7 @@ namespace LogExpert.RegexColumnizer.Tests;
 
 internal class TestLogLine (int lineNumber, string fullLine) : ILogLineMemory
 {
-    string ILogLine.FullLine { get; }
-
     public int LineNumber { get; set; } = lineNumber;
-
-    string ITextValue.Text { get; }
 
     public ReadOnlyMemory<char> FullLine { get; } = fullLine.AsMemory();
 

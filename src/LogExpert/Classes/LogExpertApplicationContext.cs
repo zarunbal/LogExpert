@@ -1,7 +1,7 @@
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Classes;
 

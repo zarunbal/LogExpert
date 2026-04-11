@@ -3,7 +3,7 @@ using System.Text;
 
 using LogExpert.PluginRegistry;
 
-namespace PluginHashGenerator.Tool;
+namespace LogExpert;
 
 /// <summary>
 /// Console tool to generate plugin hashes and update the GetBuiltInPluginHashes() method.

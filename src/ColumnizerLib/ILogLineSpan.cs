@@ -1,3 +1,5 @@
+namespace ColumnizerLib;
+
 public interface ILogLineSpan
 {
     ReadOnlySpan<char> GetFullLineSpan ();
@@ -5,19 +7,13 @@ public interface ILogLineSpan
     int LineNumber { get; }
 }
 
-public readonly ref struct LogLineSpan : ILogLineSpan
+public readonly ref struct LogLineSpan (ReadOnlyMemory<char> lineMemory, int lineNumber) : ILogLineSpan
 {
-    private readonly ReadOnlyMemory<char> _lineMemory;
+    private readonly ReadOnlyMemory<char> _lineMemory = lineMemory;
 
-    public LogLineSpan (ReadOnlyMemory<char> lineMemory, int lineNumber)
-    {
-        _lineMemory = lineMemory;
-        LineNumber = lineNumber;
-    }
-
-    public static LogLineSpan Create (ReadOnlyMemory<char> lineMemory, int lineNumber) => new LogLineSpan(lineMemory, lineNumber);
+    public static LogLineSpan Create (ReadOnlyMemory<char> lineMemory, int lineNumber) => new(lineMemory, lineNumber);
 
     public ReadOnlySpan<char> GetFullLineSpan () => _lineMemory.Span;
 
-    public int LineNumber { get; }
+    public int LineNumber { get; } = lineNumber;
 }

@@ -11,11 +11,7 @@ internal class GlassFishLogLine (ReadOnlyMemory<char> fullLine, ReadOnlyMemory<c
 
     public ReadOnlyMemory<char> Text { get; } = text;
 
-    string ILogLine.FullLine { get; }
-
     public int LineNumber { get; set; } = lineNumber;
-
-    string ITextValue.Text => FullLine.ToString();
 
     #endregion
 }

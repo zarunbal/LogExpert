@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Provides a position-aware stream reader interface for reading log files with support for character encoding

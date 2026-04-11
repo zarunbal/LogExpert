@@ -1,6 +1,6 @@
 using ColumnizerLib;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Callback;
 
@@ -36,11 +36,6 @@ public class ColumnizerCallbackMemory (ILogWindow logWindow) : ILogLineMemoryCol
     public string GetFileName ()
     {
         return _logWindow.GetCurrentFileName(LineNum);
-    }
-
-    public ILogLine GetLogLine (int lineNum)
-    {
-        return _logWindow.GetLine(lineNum);
     }
 
     public int GetLineCount ()

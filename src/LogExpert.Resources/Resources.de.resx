@@ -639,7 +639,7 @@
 		<value>Eingfügt am {0}</value>
 	</data>
   <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
-		<value>Unzureichende Rechte {0}: {1} </value>
+		<value>Unzureichende Rechte {0}: {1}</value>
 	</data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
 		<value>Fehler während {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
@@ -2147,5 +2147,23 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
     <value>Einige Dateien konnten nicht migriert werden: {0}</value>
+  </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderTextSource" xml:space="preserve">
+    <value>Highlight-Trigger Quelle</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarks" xml:space="preserve">
+    <value>Scanne Lesezeichen...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksPct" xml:space="preserve">
+    <value>Scanne Lesezeichen... {0}%</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
+    <value>Scanne Lesezeichen beendet / abgebrochen!</value>
   </data>
 </root>

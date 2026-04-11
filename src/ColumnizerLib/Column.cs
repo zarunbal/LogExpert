@@ -2,7 +2,6 @@ namespace ColumnizerLib;
 
 public class Column : IColumnMemory
 {
-    //TODO Memory Functions need implementation
     #region Fields
 
     private const string REPLACEMENT = "...";
@@ -40,34 +39,6 @@ public class Column : IColumnMemory
     #region Properties
 
     public static IColumnMemory EmptyColumn { get; }
-
-    [Obsolete]
-    IColumnizedLogLine IColumn.Parent { get; }
-
-    [Obsolete]
-    string IColumn.FullValue
-    {
-        get;
-        //set
-        //{
-        //    field = value;
-
-        //    var temp = FullValue.ToString();
-
-        //    foreach (var replacement in _replacements)
-        //    {
-        //        temp = replacement(temp);
-        //    }
-
-        //    DisplayValue = temp.AsMemory();
-        //}
-    }
-
-    [Obsolete("Use the DisplayValue property of IColumnMemory")]
-    string IColumn.DisplayValue { get; }
-
-    [Obsolete("Use Text property of ITextValueMemory")]
-    string ITextValue.Text => DisplayValue.ToString();
 
     public IColumnizedLogLineMemory Parent
     {

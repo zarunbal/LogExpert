@@ -576,11 +576,11 @@ end;
 procedure Dependency_AddDotNet100Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/10.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 0) then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 3) then begin
     Dependency_Add('dotnet100desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 10.0.0' + Dependency_ArchTitle,
-      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x64.exe'),
+      '.NET Desktop Runtime 10.0.3' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.3-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.3/windowsdesktop-runtime-10.0.3-win-x64.exe'),
       '', False, False);
   end;
 end;

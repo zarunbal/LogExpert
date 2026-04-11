@@ -5,6 +5,7 @@ namespace ColumnizerLib;
 /// The Config button in LogExpert's columnizer dialog is enabled if a Columnizer implements this interface.
 /// If you don't need a config dialog you don't have to implement this interface.
 /// </summary>
+[Obsolete("This interface is deprecated. Please implement IColumnizerConfiguratorMemory instead.")]
 public interface IColumnizerConfigurator
 {
     #region Public methods

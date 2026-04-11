@@ -1,6 +1,6 @@
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.UI.Controls.LogWindow;
 

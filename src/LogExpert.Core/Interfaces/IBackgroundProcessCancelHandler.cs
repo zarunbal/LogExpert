@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Core.Interface;
+namespace LogExpert.Core.Interfaces;
 
 /// <summary>
 /// Interface which can register at the LogWindow to be informed of pressing ESC.
@@ -11,7 +11,7 @@ public interface IBackgroundProcessCancelHandler
     /// <summary>
     /// Called when ESC was pressed.
     /// </summary>
-    void EscapePressed();
+    void EscapePressed ();
 
     #endregion
 }

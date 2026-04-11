@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using LogExpert.PluginRegistry;
 
 namespace LogExpert.PluginRegistry.Tests;
 
@@ -7,7 +6,8 @@ namespace LogExpert.PluginRegistry.Tests;
 public class PluginLoadProgressTests
 {
     [Test]
-    public void PluginLoadProgressEventArgs_Constructor_SetsPropertiesCorrectly()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void PluginLoadProgressEventArgs_Constructor_SetsPropertiesCorrectly ()
     {
         // Arrange
         var pluginPath = @"C:\Plugins\TestPlugin.dll";
@@ -37,7 +37,7 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgressEventArgs_PercentComplete_CalculatesCorrectly()
+    public void PluginLoadProgressEventArgs_PercentComplete_CalculatesCorrectly ()
     {
         // Arrange & Act
         var args1 = new PluginLoadProgressEventArgs("path", "name", 0, 10, PluginLoadStatus.Started);
@@ -51,7 +51,7 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgressEventArgs_PercentComplete_ZeroTotalReturnsZero()
+    public void PluginLoadProgressEventArgs_PercentComplete_ZeroTotalReturnsZero ()
     {
         // Arrange & Act
         var args = new PluginLoadProgressEventArgs("path", "name", 0, 0, PluginLoadStatus.Started);
@@ -61,7 +61,8 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgressEventArgs_ToString_ReturnsFormattedString()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void PluginLoadProgressEventArgs_ToString_ReturnsFormattedString ()
     {
         // Arrange
         var args = new PluginLoadProgressEventArgs(
@@ -83,7 +84,7 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgressEventArgs_NullMessage_HandledGracefully()
+    public void PluginLoadProgressEventArgs_NullMessage_HandledGracefully ()
     {
         // Arrange & Act
         var args = new PluginLoadProgressEventArgs(
@@ -101,21 +102,21 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadStatus_AllValuesAreDefined()
+    public void PluginLoadStatus_AllValuesAreDefined ()
     {
         // Assert
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Started), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Validating), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Validated), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Loading), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Loaded), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Skipped), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Failed), Is.True);
-        Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), PluginLoadStatus.Completed), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Started), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Validating), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Validated), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Loading), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Loaded), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Skipped), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Failed), Is.True);
+        Assert.That(Enum.IsDefined(PluginLoadStatus.Completed), Is.True);
     }
 
     [Test]
-    public void PluginLoadProgress_MultiplePlugins_CalculatesProgressCorrectly()
+    public void PluginLoadProgress_MultiplePlugins_CalculatesProgressCorrectly ()
     {
         // Arrange
         var totalPlugins = 20;
@@ -136,7 +137,7 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgress_EventArgs_TimestampIsRecent()
+    public void PluginLoadProgress_EventArgs_TimestampIsRecent ()
     {
         // Arrange
         var before = DateTime.UtcNow;
@@ -157,7 +158,7 @@ public class PluginLoadProgressTests
     }
 
     [Test]
-    public void PluginLoadProgress_StatusFlow_IsLogical()
+    public void PluginLoadProgress_StatusFlow_IsLogical ()
     {
         // This test documents the expected status flow
         var expectedFlow = new[]
@@ -173,12 +174,12 @@ public class PluginLoadProgressTests
         // Assert all statuses are in the enum
         foreach (var status in expectedFlow)
         {
-            Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), status), Is.True);
+            Assert.That(Enum.IsDefined(status), Is.True);
         }
     }
 
     [Test]
-    public void PluginLoadProgress_AlternateStatusFlow_SkippedScenario()
+    public void PluginLoadProgress_AlternateStatusFlow_SkippedScenario ()
     {
         // Document alternate flow when plugin is skipped
         var skippedFlow = new[]
@@ -190,12 +191,12 @@ public class PluginLoadProgressTests
 
         foreach (var status in skippedFlow)
         {
-            Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), status), Is.True);
+            Assert.That(Enum.IsDefined(status), Is.True);
         }
     }
 
     [Test]
-    public void PluginLoadProgress_AlternateStatusFlow_FailedScenario()
+    public void PluginLoadProgress_AlternateStatusFlow_FailedScenario ()
     {
         // Document alternate flow when plugin fails to load
         var failedFlow = new[]
@@ -209,7 +210,7 @@ public class PluginLoadProgressTests
 
         foreach (var status in failedFlow)
         {
-            Assert.That(Enum.IsDefined(typeof(PluginLoadStatus), status), Is.True);
+            Assert.That(Enum.IsDefined(status), Is.True);
         }
     }
 }

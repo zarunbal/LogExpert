@@ -1,8 +1,4 @@
-using LogExpert.Classes;
 using LogExpert.Core.Classes.IPC;
-using LogExpert.Core.Interface;
-
-using Moq;
 
 using Newtonsoft.Json;
 
@@ -31,14 +27,14 @@ public class OneInstanceIpcTests
         // through the public API. This test verifies the expected behavior.
         // For unit testing, we'd need to make SerializeCommandIntoNonFormattedJSON internal
         // or use InternalsVisibleTo attribute.
-        
+
         // For now, we test the IpcMessage structure directly
         var message = new IpcMessage
         {
             Type = allowOnlyOne ? IpcMessageType.NewWindowOrLockedWindow : IpcMessageType.NewWindow,
             Payload = Newtonsoft.Json.Linq.JObject.FromObject(new LoadPayload { Files = [.. files] })
         };
-        
+
         var json = JsonConvert.SerializeObject(message, Formatting.None);
         var deserialized = JsonConvert.DeserializeObject<IpcMessage>(json);
 
@@ -63,7 +59,7 @@ public class OneInstanceIpcTests
             Type = allowOnlyOne ? IpcMessageType.NewWindowOrLockedWindow : IpcMessageType.NewWindow,
             Payload = Newtonsoft.Json.Linq.JObject.FromObject(new LoadPayload { Files = [.. files] })
         };
-        
+
         var json = JsonConvert.SerializeObject(message, Formatting.None);
         var deserialized = JsonConvert.DeserializeObject<IpcMessage>(json);
 
@@ -78,9 +74,9 @@ public class OneInstanceIpcTests
         var originalMessage = new IpcMessage
         {
             Type = IpcMessageType.Load,
-            Payload = Newtonsoft.Json.Linq.JObject.FromObject(new LoadPayload 
-            { 
-                Files = ["file1.log", "file2.log", "file3.log"] 
+            Payload = Newtonsoft.Json.Linq.JObject.FromObject(new LoadPayload
+            {
+                Files = ["file1.log", "file2.log", "file3.log"]
             })
         };
 
@@ -91,10 +87,10 @@ public class OneInstanceIpcTests
         // Assert
         Assert.That(deserializedMessage, Is.Not.Null);
         Assert.That(deserializedMessage.Type, Is.EqualTo(originalMessage.Type));
-        
+
         var originalPayload = originalMessage.Payload.ToObject<LoadPayload>();
         var deserializedPayload = deserializedMessage.Payload.ToObject<LoadPayload>();
-        
+
         Assert.That(deserializedPayload.Files.Count, Is.EqualTo(originalPayload.Files.Count));
         for (int i = 0; i < originalPayload.Files.Count; i++)
         {

@@ -9,14 +9,15 @@ using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions;
 
 namespace LogExpert.Dialogs;
 
-//TODO: This class should not know ConfigManager?
+//TODO: This class should not know ConfigManager, this needs to be refactored?
+//TODO: This class should not be aware of LogTabWindow, only use HighlightGroupList. Refactor to pass IList instead of LogTabWindow?
 [SupportedOSPlatform("windows")]
 internal partial class SettingsDialog : Form
 {
@@ -453,7 +454,7 @@ internal partial class SettingsDialog : Form
 
             var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
-            currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
+            currentGroup = highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
             _ = dataGridViewHighlightMask.Rows.Add(row);
@@ -664,9 +665,11 @@ internal partial class SettingsDialog : Form
     /// <summary>
     /// Populates the encoding list in the combo box with a predefined set of character encodings.
     /// </summary>
-    /// <remarks>This method clears any existing items in the combo box and adds a selection of common
-    /// encodings, including ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, and Windows-1252. The value member of the combo
-    /// box is set to a specific header name defined in the resources.</remarks>
+    /// <remarks>
+    /// This method clears any existing items in the combo box and adds a selection of common encodings, including
+    /// ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, and Windows-1252. The value member of the combo box is set
+    /// to a specific header name defined in the resources.
+    /// </remarks>
     private void FillEncodingList ()
     {
         comboBoxEncoding.Items.Clear();
@@ -684,8 +687,10 @@ internal partial class SettingsDialog : Form
     /// <summary>
     /// Populates the language selection list with available language options.
     /// </summary>
-    /// <remarks>Clears any existing items in the language selection list and adds predefined language
-    /// options. Currently, it includes English (United States) and German (Germany).</remarks>
+    /// <remarks>
+    /// Clears any existing items in the language selection list and adds predefined language options. Currently, it
+    /// includes English (United States) and German (Germany).
+    /// </remarks>
     private void FillLanguageList ()
     {
         comboBoxLanguage.Items.Clear();
@@ -923,8 +928,8 @@ internal partial class SettingsDialog : Form
                             var markerPath = Path.Join(ConfigManager.PortableConfigDir, ConfigManager.PortableModeSettingsFileName);
                             if (!File.Exists(markerPath))
                             {
-                                using (File.Create(markerPath)) 
-                                { }   
+                                using (File.Create(markerPath))
+                                { }
                             }
 
                             Preferences.PortableMode = true;
@@ -1266,10 +1271,14 @@ internal partial class SettingsDialog : Form
     /// <summary>
     /// Creates a mapping of UI controls to their corresponding tooltip text.
     /// </summary>
-    /// <remarks>This method initializes a dictionary with predefined tooltips for specific UI controls.
-    /// Additional tooltips can be added to the dictionary as needed.</remarks>
-    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
-    /// strings representing the tooltip text for each control.</returns>
+    /// <remarks>
+    /// This method initializes a dictionary with predefined tooltips for specific UI controls. Additional tooltips can
+    /// be added to the dictionary as needed.
+    /// </remarks>
+    /// <returns>
+    /// A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
+    /// strings representing the tooltip text for each control.
+    /// </returns>
     private Dictionary<Control, string> GetToolTipMap ()
     {
         return new Dictionary<Control, string>

@@ -2,7 +2,7 @@ using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 using LogExpert.Configuration;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Extensions.LogWindow;
 
 using NLog;
@@ -19,7 +19,7 @@ internal class LogExpertProxy : ILogExpertProxy
 
     [NonSerialized] private ILogTabWindow _firstLogTabWindow;
 
-    [NonSerialized] private ILogTabWindow _mostRecentActiveWindow; // ⭐ PHASE 2: Track most recently activated window
+    [NonSerialized] private ILogTabWindow _mostRecentActiveWindow; // Track most recently activated window
 
     [NonSerialized] private int _logWindowIndex = 1;
 

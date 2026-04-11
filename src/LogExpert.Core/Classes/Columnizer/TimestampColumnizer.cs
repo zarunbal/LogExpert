@@ -24,16 +24,6 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
         return _timeOffset;
     }
 
-    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return GetTimestamp(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
-    {
-        PushValue(callback as ILogLineMemoryColumnizerCallback, column, value, oldValue);
-    }
-
     public string GetName ()
     {
         return "Timestamp Columnizer";
@@ -54,24 +44,6 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     public string[] GetColumnNames ()
     {
         return ["Date", "Time", "Message"];
-    }
-
-    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine logLine)
-    {
-        return SplitLine(callback as ILogLineMemoryColumnizerCallback, logLine as ILogLineMemory);
-    }
-
-    /// <summary>
-    /// Determines the priority level for processing a log file based on the presence of recognizable timestamp formats
-    /// in the provided log lines.
-    /// </summary>
-    /// <param name="fileName">The name of the log file to evaluate. Cannot be null.</param>
-    /// <param name="samples">A collection of log lines to analyze for timestamp patterns. Cannot be null.</param>
-    /// <returns>A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
-    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.</returns>
-    public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
-    {
-        return GetPriority(fileName, samples.Cast<ILogLineMemory>());
     }
 
     /// <summary>
@@ -243,6 +215,14 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
         }
     }
 
+    /// <summary>
+    /// Determines the priority level for processing a log file based on the presence of recognizable timestamp formats
+    /// in the provided log lines.
+    /// </summary>
+    /// <param name="fileName">The name of the log file to evaluate. Cannot be null.</param>
+    /// <param name="samples">A collection of log lines to analyze for timestamp patterns. Cannot be null.</param>
+    /// <returns>A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
+    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.</returns>
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentNullException.ThrowIfNull(samples, nameof(samples));
