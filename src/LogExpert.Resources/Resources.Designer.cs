@@ -281,6 +281,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source Highlight Trigger.
+        /// </summary>
+        public static string BookmarkWindow_UI_DataGridColumn_HeaderTextSource {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_DataGridColumn_HeaderTextSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bookmark comment:.
         /// </summary>
         public static string BookmarkWindow_UI_Label_Comment {
@@ -313,6 +322,24 @@ namespace LogExpert {
         public static string BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines {
             get {
                 return ResourceManager.GetString("BookmarkWindow_UI_ReallyRemoveBookmarkCommentsForSelectedLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto.
+        /// </summary>
+        public static string BookmarkWindow_UI_SourceHighlightText_Auto {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_SourceHighlightText_Auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string BookmarkWindow_UI_SourceHighlightText_Manual {
+            get {
+                return ResourceManager.GetString("BookmarkWindow_UI_SourceHighlightText_Manual", resourceCulture);
             }
         }
         
@@ -3312,6 +3339,33 @@ namespace LogExpert {
         public static string LogWindow_UI_StatusLineText_FilterSearch_Filtering {
             get {
                 return ResourceManager.GetString("LogWindow_UI_StatusLineText_FilterSearch_Filtering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks....
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarks {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks finished / canceled!.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarksEnded {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarksEnded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scanning bookmarks... {0}%.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_ScanningBookmarksPct {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_ScanningBookmarksPct", resourceCulture);
             }
         }
         

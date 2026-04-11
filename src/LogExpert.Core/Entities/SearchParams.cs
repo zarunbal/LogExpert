@@ -21,4 +21,19 @@ public class SearchParams
 
     [field: NonSerialized]
     public bool IsShiftF3Pressed { get; set; }
+
+    public void CopyFrom (SearchParams other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        CurrentLine = other.CurrentLine;
+        HistoryList = other.HistoryList;
+        IsCaseSensitive = other.IsCaseSensitive;
+        IsFindNext = other.IsFindNext;
+        IsForward = other.IsForward;
+        IsFromTop = other.IsFromTop;
+        IsRegex = other.IsRegex;
+        SearchText = other.SearchText;
+        IsShiftF3Pressed = other.IsShiftF3Pressed;
+    }
 }

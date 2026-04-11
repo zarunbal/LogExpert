@@ -54,8 +54,17 @@ public class SftpLogFileInfo : ILogFileInfo
                         break;
                     }
 
-                    PrivateKeyFile privateKeyFile = new(sftFileSystem.ConfigData.KeyFile, dlg.Password);
-
+                    PrivateKeyFile privateKeyFile = null;
+                    
+                    try
+                    {
+                        privateKeyFile = new(sftFileSystem.ConfigData.KeyFile, dlg.Password);
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        _logger.LogError(ex.Message);
+                    }
+                    
                     if (privateKeyFile != null)
                     {
                         sftFileSystem.PrivateKeyFile = privateKeyFile;
@@ -74,7 +83,16 @@ public class SftpLogFileInfo : ILogFileInfo
                 while (!success)
                 {
                     //Add ConnectionInfo object
-                    _sftp = new SftpClient(Uri.Host, credentials.UserName, sftFileSystem.PrivateKeyFile);
+                    try
+                    { 
+                        _sftp = new SftpClient(Uri.Host, credentials.UserName, sftFileSystem.PrivateKeyFile);
+                    }
+                    catch (Exception ex) when(ex is ArgumentException or
+                                       ArgumentNullException or
+                                       ArgumentOutOfRangeException)
+                    {
+                        _logger.LogError(ex.Message);
+                    }
 
                     if (_sftp != null)
                     {
@@ -108,13 +126,31 @@ public class SftpLogFileInfo : ILogFileInfo
         {
             // username/password auth
             var credentials = sftFileSystem.GetCredentials(Uri, true, false);
-            _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
-
+            try
+            {
+                _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
+            }
+            catch (Exception ex) when (ex is ArgumentException or
+                                       ArgumentNullException or
+                                       ArgumentOutOfRangeException)
+            {
+               _logger.LogError(ex.Message);
+            }
+            
             if (_sftp == null)
             {
-                // first fail -> try again with disabled cache
-                credentials = sftFileSystem.GetCredentials(Uri, false, false);
-                _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
+                try
+                {
+                    // first fail -> try again with disabled cache
+                    credentials = sftFileSystem.GetCredentials(Uri, false, false);
+                    _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
+                }
+                catch (Exception ex) when (ex is ArgumentException or
+                                           ArgumentNullException or
+                                           ArgumentOutOfRangeException)
+                {
+                    _logger.LogError(ex.Message);
+                }
 
                 if (_sftp == null)
                 {
@@ -146,7 +182,6 @@ public class SftpLogFileInfo : ILogFileInfo
             _logger.LogError(e.Message);
             OriginalLength = _lastLength = -1;
         }
-
     }
 
     #endregion
