@@ -9,16 +9,26 @@ public partial class AllowOnlyOneInstanceErrorDialog : Form
 
     public AllowOnlyOneInstanceErrorDialog ()
     {
+        SuspendLayout();
+
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         InitializeComponent();
-        SetText();
+
+        ApplyResources();
+
+        ResumeLayout();
     }
 
-    private void SetText ()
+    private void ApplyResources ()
     {
-        labelErrorText.Text = @"Only one instance allowed, uncheck ""View Settings => Allow only 1 Instances"" to start multiple instances!";
+        labelErrorText.Text = Resources.AllowOnlyOneInstanceErrorDialog_UI_Label_labelErrorText;
+        checkBoxIgnoreMessage.Text = Resources.AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
     }
 
-    private void OnButtonOkClick (object sender, System.EventArgs e)
+    private void OnButtonOkClick (object sender, EventArgs e)
     {
         DoNotShowThisMessageAgain = checkBoxIgnoreMessage.Checked;
     }

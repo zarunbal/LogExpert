@@ -1,6 +1,6 @@
-﻿namespace LogExpert.Core.Entities;
+namespace LogExpert.Core.Entities;
 
-public class LogEventArgs : System.EventArgs
+public class LogEventArgs : EventArgs
 {
     #region Fields
 

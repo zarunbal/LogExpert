@@ -69,7 +69,7 @@ public class RolloverFilenameBuilder
     public void SetFileName (string fileName)
     {
         _currentFileName = fileName;
-        Match match = _regex.Match(fileName);
+        var match = _regex.Match(fileName);
         if (match.Success)
         {
             _dateGroup = match.Groups["date"];

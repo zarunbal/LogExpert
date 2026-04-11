@@ -1,4 +1,4 @@
-﻿namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This interface declares the configuration data which is needed for XML log file parsing.

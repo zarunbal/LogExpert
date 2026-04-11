@@ -1,4 +1,4 @@
-﻿namespace RegexColumnizer;
+namespace RegexColumnizer;
 
 public class RegexColumnizerConfig
 {
@@ -7,6 +7,8 @@ public class RegexColumnizerConfig
     public string Expression { get; set; } = "(?<text>.*)";
 
     public string Name { get; set; }
+
+    public string CustomName { get; set; }
 
     #endregion
 }

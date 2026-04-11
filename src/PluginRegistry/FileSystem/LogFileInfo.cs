@@ -1,4 +1,6 @@
-﻿using NLog;
+using ColumnizerLib;
+
+using NLog;
 
 namespace LogExpert.PluginRegistry.FileSystem;
 
@@ -8,7 +10,7 @@ public class LogFileInfo : ILogFileInfo
 
     private const int RETRY_COUNT = 5;
     private const int RETRY_SLEEP = 250;
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     //FileStream fStream;
     private readonly FileInfo fInfo;
@@ -19,7 +21,7 @@ public class LogFileInfo : ILogFileInfo
 
     #region cTor
 
-    public LogFileInfo(Uri fileUri)
+    public LogFileInfo (Uri fileUri)
     {
         fInfo = new FileInfo(fileUri.LocalPath);
         Uri = fileUri;
@@ -34,7 +36,6 @@ public class LogFileInfo : ILogFileInfo
     public string FullName => fInfo.FullName;
 
     public string FileName => fInfo.Name;
-
 
     public string DirectoryName => fInfo.DirectoryName;
 
@@ -67,6 +68,7 @@ public class LogFileInfo : ILogFileInfo
                         _logger.Warn(e, "LogFileInfo.Length");
                         return -1;
                     }
+
                     Thread.Sleep(RETRY_SLEEP);
                 }
             }
@@ -97,6 +99,7 @@ public class LogFileInfo : ILogFileInfo
             {
                 return -1;
             }
+
             try
             {
                 fInfo.Refresh();
@@ -120,7 +123,7 @@ public class LogFileInfo : ILogFileInfo
     /// rollover situations.
     /// </summary>
     /// <returns></returns>
-    public Stream OpenStream()
+    public Stream OpenStream ()
     {
         var retry = RETRY_COUNT;
 
@@ -137,6 +140,7 @@ public class LogFileInfo : ILogFileInfo
                 {
                     throw;
                 }
+
                 Thread.Sleep(RETRY_SLEEP);
             }
             catch (UnauthorizedAccessException uae)
@@ -146,23 +150,25 @@ public class LogFileInfo : ILogFileInfo
                 {
                     throw new IOException("Error opening file", uae);
                 }
+
                 Thread.Sleep(RETRY_SLEEP);
             }
         }
     }
 
     //TODO Replace with Event from FileSystemWatcher
-    public bool FileHasChanged()
+    public bool FileHasChanged ()
     {
         if (LengthWithoutRetry != lastLength)
         {
             lastLength = LengthWithoutRetry;
             return true;
         }
+
         return false;
     }
 
-    public override string ToString()
+    public override string ToString ()
     {
         return fInfo.FullName + ", OldLen: " + OriginalLength + ", Len: " + Length;
     }

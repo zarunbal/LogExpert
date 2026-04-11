@@ -1,16 +1,17 @@
-﻿using LogExpert;
+
+using ColumnizerLib;
 
 namespace GlassfishColumnizer;
 
-internal class GlassFishLogLine : ILogLine
+internal class GlassFishLogLine (ReadOnlyMemory<char> fullLine, ReadOnlyMemory<char> text, int lineNumber) : ILogLineMemory
 {
     #region Properties
 
-    public string FullLine { get; set; }
+    public ReadOnlyMemory<char> FullLine { get; } = fullLine;
 
-    public int LineNumber { get; set; }
+    public ReadOnlyMemory<char> Text { get; } = text;
 
-    string ITextValue.Text => FullLine;
+    public int LineNumber { get; set; } = lineNumber;
 
     #endregion
 }

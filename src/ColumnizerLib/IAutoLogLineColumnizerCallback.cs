@@ -1,5 +1,6 @@
-namespace LogExpert;
+namespace ColumnizerLib;
 
+[Obsolete("This interface is deprecated. Use IAutoLogLineMemoryColumnizerCallback for a memory-based implementation instead.")]
 public interface IAutoLogLineColumnizerCallback
 {
     /// <summary>

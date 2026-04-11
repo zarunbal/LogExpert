@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Xml.Serialization;
 
-using LogExpert;
+using ColumnizerLib;
 
 using Renci.SshNet;
 
@@ -32,7 +32,9 @@ public class SftpFileSystem (IFileSystemCallback callback) : IFileSystemPlugin, 
             Uri uri = new(uriString);
             return uri.Scheme.Equals("sftp", StringComparison.OrdinalIgnoreCase);
         }
-        catch (Exception e)
+        catch (Exception e) when (e is UriFormatException or
+                                       ArgumentNullException or
+                                       ArgumentException)
         {
             _logger.LogError(e.Message);
             return false;

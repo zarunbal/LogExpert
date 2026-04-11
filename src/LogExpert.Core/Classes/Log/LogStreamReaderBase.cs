@@ -1,7 +1,6 @@
-﻿using System;
 using System.Text;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Log;
 
@@ -9,12 +8,12 @@ public abstract class LogStreamReaderBase : ILogStreamReader
 {
     #region cTor
 
-    protected LogStreamReaderBase()
+    protected LogStreamReaderBase ()
     {
 
     }
 
-    ~LogStreamReaderBase()
+    ~LogStreamReaderBase ()
     {
         Dispose(false);
     }
@@ -44,7 +43,7 @@ public abstract class LogStreamReaderBase : ILogStreamReader
     /// <summary>
     /// Destroy and release the current stream reader.
     /// </summary>
-    public void Dispose()
+    public void Dispose ()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
@@ -53,11 +52,11 @@ public abstract class LogStreamReaderBase : ILogStreamReader
     /// Destroy and release the current stream reader.
     /// </summary>
     /// <param name="disposing">Specifies whether or not the managed objects should be released.</param>
-    protected abstract void Dispose(bool disposing);
+    protected abstract void Dispose (bool disposing);
 
-    public abstract int ReadChar();
+    public abstract int ReadChar ();
 
-    public abstract string ReadLine();
+    public abstract string ReadLine ();
 
     #endregion
 }

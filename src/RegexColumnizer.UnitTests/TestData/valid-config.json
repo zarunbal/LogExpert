@@ -1,0 +1,4 @@
+{
+  "Name": "Test Columnizer",
+  "Expression": "^(?<time>\\d+)\\s+(?<level>\\w+)\\s+(?<message>.*)$"
+}

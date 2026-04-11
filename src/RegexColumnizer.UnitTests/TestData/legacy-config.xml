@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<RegexColumnizerConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Expression>^(?&lt;text&gt;.*)$</Expression>
+  <Name>Legacy XML Config</Name>
+</RegexColumnizerConfig>

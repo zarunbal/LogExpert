@@ -1,0 +1,21 @@
+{
+  "name": "DefaultPlugins",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Collection of default plugins including Search, Highlight, and Action keyword handlers",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "filesystem:write",
+    "config:read",
+    "network:connect"
+  ],
+  "dependencies": {},
+  "main": "DefaultPlugins.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Log4jXmlColumnizer;
 
 [Serializable]
@@ -26,7 +23,7 @@ public class Log4jXmlColumnizerConfig
         get
         {
             var count = 0;
-            foreach (Log4jColumnEntry entry in ColumnList)
+            foreach (var entry in ColumnList)
             {
                 if (entry.Visible)
                 {
@@ -47,7 +44,7 @@ public class Log4jXmlColumnizerConfig
         {
             var names = new string[ActiveColumnCount];
             var index = 0;
-            foreach (Log4jColumnEntry entry in ColumnList)
+            foreach (var entry in ColumnList)
             {
                 if (entry.Visible)
                 {
@@ -69,6 +66,8 @@ public class Log4jXmlColumnizerConfig
 
     public void FillDefaults (string[] columnNames)
     {
+        ArgumentNullException.ThrowIfNull(columnNames, nameof(columnNames));
+
         ColumnList.Clear();
         for (var i = 0; i < columnNames.Length; ++i)
         {

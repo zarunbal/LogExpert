@@ -1,26 +1,24 @@
-using System;
-using System.Collections.Generic;
+namespace ColumnizerLib;
 
-namespace LogExpert;
-
-public class Column : IColumn
+public class Column : IColumnMemory
 {
     #region Fields
 
-    private const int MAXLENGTH = 4678 - 3;
     private const string REPLACEMENT = "...";
 
-    private static readonly List<Func<string, string>> _replacements = [
+    // Display-level maximum line length (separate from reader-level limit)
+    // Can be configured via SetMaxDisplayLength()
+    private static int _maxDisplayLength = 20_000;
+
+    private static readonly List<Func<ReadOnlyMemory<char>, ReadOnlyMemory<char>>> _replacementsMemory = [
         //replace tab with 3 spaces, from old coding. Needed???
-                input => input.Replace("\t", "  ", StringComparison.Ordinal),
+        ReplaceTab,
 
-                //shorten string if it exceeds maxLength
-                input => input.Length > MAXLENGTH
-                        ? string.Concat(input.AsSpan(0, MAXLENGTH), REPLACEMENT)
-                        : input
+        //shorten string if it exceeds maxLength
+        input => input.Length > _maxDisplayLength
+                ? ShortenMemory(input, _maxDisplayLength)
+                : input
     ];
-
-    private string _fullValue;
 
     #endregion
 
@@ -28,40 +26,35 @@ public class Column : IColumn
 
     static Column ()
     {
-        if (Environment.Version >= Version.Parse("6.2"))
-        {
-            //Win8 or newer support full UTF8 chars with the preinstalled fonts.
-            //Replace null char with UTF8 Symbol U+2400 (␀)
-            _replacements.Add(input => input.Replace("\0", "␀", StringComparison.Ordinal));
-        }
-        else
-        {
-            //Everything below Win8 the installed fonts seems to not to support reliabel
-            //Replace null char with space
-            _replacements.Add(input => input.Replace("\0", " ", StringComparison.Ordinal));
-        }
+        //.net 10 only supports Windows10+ which has full UTF8-font support
+        // Replace null char with UTF-8 Symbol U+2400 (␀)
+        //https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md
+        _replacementsMemory.Add(input => ReplaceNullChar(input, ' '));
 
-        EmptyColumn = new Column { FullValue = string.Empty };
+        EmptyColumn = new Column { FullValue = ReadOnlyMemory<char>.Empty };
     }
 
     #endregion
 
     #region Properties
 
-    public static IColumn EmptyColumn { get; }
+    public static IColumnMemory EmptyColumn { get; }
 
-    public IColumnizedLogLine Parent { get; set; }
-
-    public string FullValue
+    public IColumnizedLogLineMemory Parent
     {
-        get => _fullValue;
+        get; set => field = value;
+    }
+
+    public ReadOnlyMemory<char> FullValue
+    {
+        get;
         set
         {
-            _fullValue = value;
+            field = value;
 
-            var temp = FullValue;
+            var temp = value;
 
-            foreach (var replacement in _replacements)
+            foreach (var replacement in _replacementsMemory)
             {
                 temp = replacement(temp);
             }
@@ -70,20 +63,40 @@ public class Column : IColumn
         }
     }
 
-    public string DisplayValue { get; private set; }
+    public ReadOnlyMemory<char> DisplayValue { get; private set; }
 
-    public string Text => DisplayValue;
+    public ReadOnlyMemory<char> Text => DisplayValue;
 
     #endregion
 
     #region Public methods
 
-    public static Column[] CreateColumns (int count, IColumnizedLogLine parent)
+    /// <summary>
+    /// Configures the maximum display length for all Column instances.
+    /// This is separate from the reader-level MaxLineLength.
+    /// </summary>
+    /// <param name="maxLength">Maximum length for displayed content. Must be at least 1000.</param>
+    public static void SetMaxDisplayLength (int maxLength)
     {
-        return CreateColumns(count, parent, string.Empty);
+        if (maxLength < 1000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxLength), Resources.Column_Error_Messages_MaximumDisplayLengthMustBeAtLeast1000Characters);
+        }
+
+        _maxDisplayLength = maxLength;
     }
 
-    public static Column[] CreateColumns (int count, IColumnizedLogLine parent, string defaultValue)
+    /// <summary>
+    /// Gets the current maximum display length setting.
+    /// </summary>
+    public static int GetMaxDisplayLength () => _maxDisplayLength;
+
+    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent)
+    {
+        return CreateColumns(count, parent, ReadOnlyMemory<char>.Empty);
+    }
+
+    public static Column[] CreateColumns (int count, IColumnizedLogLineMemory parent, ReadOnlyMemory<char> defaultValue)
     {
         var output = new Column[count];
 
@@ -97,7 +110,95 @@ public class Column : IColumn
 
     public override string ToString ()
     {
-        return DisplayValue ?? string.Empty;
+        return DisplayValue.ToString() ?? ReadOnlyMemory<char>.Empty.ToString();
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>
+    /// Replaces tab characters with two spaces in the memory buffer.
+    /// </summary>
+    private static ReadOnlyMemory<char> ReplaceTab (ReadOnlyMemory<char> input)
+    {
+        var span = input.Span;
+        var tabIndex = span.IndexOf('\t');
+
+        if (tabIndex == -1)
+        {
+            return input;
+        }
+
+        // Count total tabs to calculate new length
+        var tabCount = 0;
+        foreach (var c in span)
+        {
+            if (c == '\t')
+            {
+                tabCount++;
+            }
+        }
+
+        // Allocate new buffer: original length + (tabCount * 1) since we replace 1 char with 2
+        var newLength = input.Length + tabCount;
+        var buffer = new char[newLength];
+        var bufferPos = 0;
+
+        for (var i = 0; i < span.Length; i++)
+        {
+            if (span[i] == '\t')
+            {
+                buffer[bufferPos++] = ' ';
+                buffer[bufferPos++] = ' ';
+            }
+            else
+            {
+                buffer[bufferPos++] = span[i];
+            }
+        }
+
+        return buffer;
+    }
+
+    /// <summary>
+    /// Shortens the memory buffer to the specified maximum length and appends "...".
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Non Localiced Parameter")]
+    private static ReadOnlyMemory<char> ShortenMemory (ReadOnlyMemory<char> input, int maxLength)
+    {
+        var buffer = new char[maxLength + REPLACEMENT.Length];
+        input.Span[..maxLength].CopyTo(buffer);
+        REPLACEMENT.AsSpan().CopyTo(buffer.AsSpan(maxLength));
+        return buffer;
+    }
+
+    /// <summary>
+    /// Replaces null characters with the specified replacement character.
+    /// </summary>
+    private static ReadOnlyMemory<char> ReplaceNullChar (ReadOnlyMemory<char> input, char replacement)
+    {
+        var span = input.Span;
+        var nullIndex = span.IndexOf('\0');
+
+        if (nullIndex == -1)
+        {
+            return input;
+        }
+
+        // Need to create a new buffer since we're modifying content
+        var buffer = new char[input.Length];
+        span.CopyTo(buffer);
+
+        for (var i = 0; i < buffer.Length; i++)
+        {
+            if (buffer[i] == '\0')
+            {
+                buffer[i] = replacement;
+            }
+        }
+
+        return buffer;
     }
 
     #endregion

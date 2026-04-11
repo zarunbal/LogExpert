@@ -1,5 +1,6 @@
-using System;
 using System.Diagnostics;
+
+using ColumnizerLib;
 
 namespace LogExpert;
 
@@ -13,9 +14,9 @@ internal class ProcessLauncher : IKeywordAction
 
     #region IKeywordAction Member
 
-    private readonly object _callbackLock = new();
+    private readonly Lock _callbackLock = new();
 
-    public void Execute (string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
+    public void Execute (string keyword, string param, ILogExpertCallbackMemory callback, ILogLineMemoryColumnizer columnizer)
     {
         var start = 0;
         int end;
@@ -44,16 +45,16 @@ internal class ProcessLauncher : IKeywordAction
             parameters = parameters.Replace("%K", keyword, StringComparison.Ordinal);
 
             var lineNumber = callback.LineNum; //Line Numbers start at 0, but are displayed (+1)
-            var logline = callback.GetLogLine(lineNumber).FullLine;
-            parameters = parameters.Replace("%L", string.Empty + lineNumber, System.StringComparison.Ordinal);
+            var logline = callback.GetLogLineMemory(lineNumber).FullLine;
+            parameters = parameters.Replace("%L", string.Empty + lineNumber, StringComparison.Ordinal);
             parameters = parameters.Replace("%T", callback.GetTabTitle(), StringComparison.Ordinal);
-            parameters = parameters.Replace("%C", logline, StringComparison.Ordinal);
+            parameters = parameters.Replace("%C", logline.ToString(), StringComparison.Ordinal);
 
             Process explorer = new();
             explorer.StartInfo.FileName = procName;
             explorer.StartInfo.Arguments = parameters;
             explorer.StartInfo.UseShellExecute = false;
-            explorer.Start();
+            _ = explorer.Start();
         }
     }
 

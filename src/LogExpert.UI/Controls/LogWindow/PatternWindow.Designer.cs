@@ -1,4 +1,4 @@
-﻿namespace LogExpert.UI.Controls.LogWindow
+namespace LogExpert.UI.Controls.LogWindow
 {
   partial class PatternWindow
   {
@@ -34,25 +34,25 @@
       this.splitContainer2 = new System.Windows.Forms.SplitContainer();
       this.panel2 = new System.Windows.Forms.Panel();
       this.blockCountLabel = new System.Windows.Forms.Label();
-      this.label1 = new System.Windows.Forms.Label();
+      this.labelNumberOfBlocks = new System.Windows.Forms.Label();
       this.panel1 = new System.Windows.Forms.Panel();
-      this.label2 = new System.Windows.Forms.Label();
+      this.labelBlockLines = new System.Windows.Forms.Label();
       this.blockLinesLabel = new System.Windows.Forms.Label();
       this.panel4 = new System.Windows.Forms.Panel();
-      this.setRangeButton = new System.Windows.Forms.Button();
-      this.label7 = new System.Windows.Forms.Label();
-      this.recalcButton = new System.Windows.Forms.Button();
-      this.label6 = new System.Windows.Forms.Label();
-      this.label5 = new System.Windows.Forms.Label();
-      this.label4 = new System.Windows.Forms.Label();
-      this.label3 = new System.Windows.Forms.Label();
-      this.rangeLabel = new System.Windows.Forms.Label();
+      this.buttonSetRange = new System.Windows.Forms.Button();
+      this.labelWeight = new System.Windows.Forms.Label();
+      this.buttonRecalculate = new System.Windows.Forms.Button();
+      this.labelMaxMisses = new System.Windows.Forms.Label();
+      this.labelMaxDiff = new System.Windows.Forms.Label();
+      this.labelFuzzy = new System.Windows.Forms.Label();
+      this.labelFeatureDescription = new System.Windows.Forms.Label();
+      this.labelNoRangeSet = new System.Windows.Forms.Label();
       this.weigthKnobControl = new KnobControl();
       this.maxMissesKnobControl = new KnobControl();
       this.maxDiffKnobControl = new KnobControl();
       this.fuzzyKnobControl = new KnobControl();
-      this.patternHitsDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
-      this.contentDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
+      this.patternHitsDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
+      this.contentDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
       this.splitContainer1.Panel1.SuspendLayout();
       this.splitContainer1.Panel2.SuspendLayout();
       this.splitContainer1.SuspendLayout();
@@ -119,7 +119,7 @@
       // panel2
       // 
       this.panel2.Controls.Add(this.blockCountLabel);
-      this.panel2.Controls.Add(this.label1);
+      this.panel2.Controls.Add(this.labelNumberOfBlocks);
       this.panel2.Controls.Add(this.patternHitsDataGridView);
       this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panel2.Location = new System.Drawing.Point(0, 0);
@@ -139,17 +139,17 @@
       // 
       // label1
       // 
-      this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(0, 89);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(175, 13);
-      this.label1.TabIndex = 2;
-      this.label1.Text = "Number of blocks (pattern variants):";
+      this.labelNumberOfBlocks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.labelNumberOfBlocks.AutoSize = true;
+      this.labelNumberOfBlocks.Location = new System.Drawing.Point(0, 89);
+      this.labelNumberOfBlocks.Name = "label1";
+      this.labelNumberOfBlocks.Size = new System.Drawing.Size(175, 13);
+      this.labelNumberOfBlocks.TabIndex = 2;
+      this.labelNumberOfBlocks.Text = "Number of blocks (pattern variants):";
       // 
       // panel1
       // 
-      this.panel1.Controls.Add(this.label2);
+      this.panel1.Controls.Add(this.labelBlockLines);
       this.panel1.Controls.Add(this.blockLinesLabel);
       this.panel1.Controls.Add(this.contentDataGridView);
       this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -160,13 +160,13 @@
       // 
       // label2
       // 
-      this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(3, 89);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(61, 13);
-      this.label2.TabIndex = 2;
-      this.label2.Text = "Block lines:";
+      this.labelBlockLines.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.labelBlockLines.AutoSize = true;
+      this.labelBlockLines.Location = new System.Drawing.Point(3, 89);
+      this.labelBlockLines.Name = "label2";
+      this.labelBlockLines.Size = new System.Drawing.Size(61, 13);
+      this.labelBlockLines.TabIndex = 2;
+      this.labelBlockLines.Text = "Block lines:";
       // 
       // blockLinesLabel
       // 
@@ -180,15 +180,15 @@
       // panel4
       // 
       this.panel4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.panel4.Controls.Add(this.setRangeButton);
-      this.panel4.Controls.Add(this.label7);
-      this.panel4.Controls.Add(this.recalcButton);
+      this.panel4.Controls.Add(this.buttonSetRange);
+      this.panel4.Controls.Add(this.labelWeight);
+      this.panel4.Controls.Add(this.buttonRecalculate);
       this.panel4.Controls.Add(this.weigthKnobControl);
-      this.panel4.Controls.Add(this.label6);
+      this.panel4.Controls.Add(this.labelMaxMisses);
       this.panel4.Controls.Add(this.maxMissesKnobControl);
-      this.panel4.Controls.Add(this.label5);
+      this.panel4.Controls.Add(this.labelMaxDiff);
       this.panel4.Controls.Add(this.maxDiffKnobControl);
-      this.panel4.Controls.Add(this.label4);
+      this.panel4.Controls.Add(this.labelFuzzy);
       this.panel4.Controls.Add(this.fuzzyKnobControl);
       this.panel4.Location = new System.Drawing.Point(3, 106);
       this.panel4.Name = "panel4";
@@ -197,81 +197,81 @@
       // 
       // setRangeButton
       // 
-      this.setRangeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.setRangeButton.Location = new System.Drawing.Point(267, 5);
-      this.setRangeButton.Name = "setRangeButton";
-      this.setRangeButton.Size = new System.Drawing.Size(75, 23);
-      this.setRangeButton.TabIndex = 12;
-      this.setRangeButton.Text = "Set range";
-      this.setRangeButton.UseVisualStyleBackColor = true;
-      this.setRangeButton.Click += new System.EventHandler(this.OnSetRangeButtonClick);
+      this.buttonSetRange.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.buttonSetRange.Location = new System.Drawing.Point(267, 5);
+      this.buttonSetRange.Name = "setRangeButton";
+      this.buttonSetRange.Size = new System.Drawing.Size(75, 23);
+      this.buttonSetRange.TabIndex = 12;
+      this.buttonSetRange.Text = "Set range";
+      this.buttonSetRange.UseVisualStyleBackColor = true;
+      this.buttonSetRange.Click += new System.EventHandler(this.OnSetRangeButtonClick);
       // 
       // label7
       // 
-      this.label7.AutoSize = true;
-      this.label7.Location = new System.Drawing.Point(192, 41);
-      this.label7.Name = "label7";
-      this.label7.Size = new System.Drawing.Size(41, 13);
-      this.label7.TabIndex = 11;
-      this.label7.Text = "Weigth";
+      this.labelWeight.AutoSize = true;
+      this.labelWeight.Location = new System.Drawing.Point(192, 41);
+      this.labelWeight.Name = "label7";
+      this.labelWeight.Size = new System.Drawing.Size(41, 13);
+      this.labelWeight.TabIndex = 11;
+      this.labelWeight.Text = "Weigth";
       // 
       // recalcButton
       // 
-      this.recalcButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.recalcButton.Location = new System.Drawing.Point(267, 30);
-      this.recalcButton.Name = "recalcButton";
-      this.recalcButton.Size = new System.Drawing.Size(75, 23);
-      this.recalcButton.TabIndex = 6;
-      this.recalcButton.Text = "Recalc";
-      this.recalcButton.UseVisualStyleBackColor = true;
-      this.recalcButton.Click += new System.EventHandler(this.OnRecalcButtonClick);
+      this.buttonRecalculate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.buttonRecalculate.Location = new System.Drawing.Point(267, 30);
+      this.buttonRecalculate.Name = "recalcButton";
+      this.buttonRecalculate.Size = new System.Drawing.Size(75, 23);
+      this.buttonRecalculate.TabIndex = 6;
+      this.buttonRecalculate.Text = "Recalc";
+      this.buttonRecalculate.UseVisualStyleBackColor = true;
+      this.buttonRecalculate.Click += new System.EventHandler(this.OnRecalcButtonClick);
       // 
       // label6
       // 
-      this.label6.AutoSize = true;
-      this.label6.Location = new System.Drawing.Point(113, 41);
-      this.label6.Name = "label6";
-      this.label6.Size = new System.Drawing.Size(61, 13);
-      this.label6.TabIndex = 9;
-      this.label6.Text = "Max misses";
+      this.labelMaxMisses.AutoSize = true;
+      this.labelMaxMisses.Location = new System.Drawing.Point(113, 41);
+      this.labelMaxMisses.Name = "label6";
+      this.labelMaxMisses.Size = new System.Drawing.Size(61, 13);
+      this.labelMaxMisses.TabIndex = 9;
+      this.labelMaxMisses.Text = "Max misses";
       // 
       // label5
       // 
-      this.label5.AutoSize = true;
-      this.label5.Location = new System.Drawing.Point(57, 41);
-      this.label5.Name = "label5";
-      this.label5.Size = new System.Drawing.Size(44, 13);
-      this.label5.TabIndex = 7;
-      this.label5.Text = "Max diff";
+      this.labelMaxDiff.AutoSize = true;
+      this.labelMaxDiff.Location = new System.Drawing.Point(57, 41);
+      this.labelMaxDiff.Name = "label5";
+      this.labelMaxDiff.Size = new System.Drawing.Size(44, 13);
+      this.labelMaxDiff.TabIndex = 7;
+      this.labelMaxDiff.Text = "Max diff";
       // 
       // label4
       // 
-      this.label4.AutoSize = true;
-      this.label4.Location = new System.Drawing.Point(6, 41);
-      this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(34, 13);
-      this.label4.TabIndex = 5;
-      this.label4.Text = "Fuzzy";
+      this.labelFuzzy.AutoSize = true;
+      this.labelFuzzy.Location = new System.Drawing.Point(6, 41);
+      this.labelFuzzy.Name = "label4";
+      this.labelFuzzy.Size = new System.Drawing.Size(34, 13);
+      this.labelFuzzy.TabIndex = 5;
+      this.labelFuzzy.Text = "Fuzzy";
       // 
       // label3
       // 
-      this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.label3.Location = new System.Drawing.Point(483, 110);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(303, 49);
-      this.label3.TabIndex = 12;
-      this.label3.Text = "This feature is pre-beta and does not work :)\r\nUsage: Select a range in the log w" +
+      this.labelFeatureDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.labelFeatureDescription.Location = new System.Drawing.Point(483, 110);
+      this.labelFeatureDescription.Name = "label3";
+      this.labelFeatureDescription.Size = new System.Drawing.Size(303, 49);
+      this.labelFeatureDescription.TabIndex = 12;
+      this.labelFeatureDescription.Text = "This feature is pre-beta and does not work :)\r\nUsage: Select a range in the log w" +
           "indow and press \"Recalc\". \r\nThis will search for text ranges similar to the sele" +
           "cted one.";
       // 
       // rangeLabel
       // 
-      this.rangeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.rangeLabel.Location = new System.Drawing.Point(352, 114);
-      this.rangeLabel.Name = "rangeLabel";
-      this.rangeLabel.Size = new System.Drawing.Size(125, 42);
-      this.rangeLabel.TabIndex = 13;
-      this.rangeLabel.Text = "(no range set)";
+      this.labelNoRangeSet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.labelNoRangeSet.Location = new System.Drawing.Point(352, 114);
+      this.labelNoRangeSet.Name = "rangeLabel";
+      this.labelNoRangeSet.Size = new System.Drawing.Size(125, 42);
+      this.labelNoRangeSet.TabIndex = 13;
+      this.labelNoRangeSet.Text = "(no range set)";
       // 
       // weigthKnobControl
       // 
@@ -373,8 +373,8 @@
       // PatternWindow
       // 
       this.ClientSize = new System.Drawing.Size(798, 165);
-      this.Controls.Add(this.rangeLabel);
-      this.Controls.Add(this.label3);
+      this.Controls.Add(this.labelNoRangeSet);
+      this.Controls.Add(this.labelFeatureDescription);
       this.Controls.Add(this.panel4);
       this.Controls.Add(this.splitContainer1);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -402,29 +402,29 @@
 
     #endregion
 
-    private LogExpert.Dialogs.BufferedDataGridView patternHitsDataGridView;
+    private LogExpert.UI.Controls.BufferedDataGridView patternHitsDataGridView;
     private System.Windows.Forms.SplitContainer splitContainer1;
     private System.Windows.Forms.SplitContainer splitContainer2;
-    private LogExpert.Dialogs.BufferedDataGridView contentDataGridView;
+    private LogExpert.UI.Controls.BufferedDataGridView contentDataGridView;
     private System.Windows.Forms.Panel panel1;
-    private System.Windows.Forms.Label label2;
+    private System.Windows.Forms.Label labelBlockLines;
     private System.Windows.Forms.Label blockLinesLabel;
     private System.Windows.Forms.Panel panel2;
-    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Label labelNumberOfBlocks;
     private System.Windows.Forms.Label blockCountLabel;
     private System.Windows.Forms.Panel panel3;
     private KnobControl fuzzyKnobControl;
     private System.Windows.Forms.Panel panel4;
-    private System.Windows.Forms.Label label4;
-    private System.Windows.Forms.Label label5;
+    private System.Windows.Forms.Label labelFuzzy;
+    private System.Windows.Forms.Label labelMaxDiff;
     private KnobControl maxDiffKnobControl;
-    private System.Windows.Forms.Label label6;
+    private System.Windows.Forms.Label labelMaxMisses;
     private KnobControl maxMissesKnobControl;
-    private System.Windows.Forms.Label label7;
+    private System.Windows.Forms.Label labelWeight;
     private KnobControl weigthKnobControl;
-    private System.Windows.Forms.Button recalcButton;
-    private System.Windows.Forms.Label label3;
-    private System.Windows.Forms.Button setRangeButton;
-    private System.Windows.Forms.Label rangeLabel;
+    private System.Windows.Forms.Button buttonRecalculate;
+    private System.Windows.Forms.Label labelFeatureDescription;
+    private System.Windows.Forms.Button buttonSetRange;
+    private System.Windows.Forms.Label labelNoRangeSet;
   }
 }

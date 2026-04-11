@@ -1,13 +1,17 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
+using ColumnizerLib;
+
+using LogExpert.Core.Helpers;
+
 namespace LogExpert.Core.Classes;
 
 public class ParamParser (string argTemplate)
 {
     #region Public methods
 
-    public string ReplaceParams (ILogLine logLine, int lineNum, string fileName)
+    public string ReplaceParams (ILogLineMemory logLine, int lineNum, string fileName)
     {
         FileInfo fileInfo = new(fileName);
         StringBuilder builder = new(argTemplate);
@@ -38,8 +42,18 @@ public class ParamParser (string argTemplate)
             replace = GetNextGroup(builder, ref sPos);
             if (reg != null && replace != null)
             {
-                var result = Regex.Replace(logLine.FullLine, reg, replace);
-                builder.Insert(sPos, result);
+                // Use RegexHelper for safe regex operations with timeout protection
+                try
+                {
+                    var regex = RegexHelper.GetOrCreateCached(reg);
+                    var result = regex.Replace(logLine.FullLine.ToString(), replace);
+                    _ = builder.Insert(sPos, result);
+                }
+                catch (RegexMatchTimeoutException)
+                {
+                    // If regex times out, insert the original pattern as fallback
+                    _ = builder.Insert(sPos, $"{{timeout: {reg}}}");
+                }
             }
         } while (replace != null);
         return builder.ToString();

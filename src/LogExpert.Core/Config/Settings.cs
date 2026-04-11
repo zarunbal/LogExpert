@@ -1,7 +1,8 @@
 using System.Drawing;
 
 using LogExpert.Core.Classes.Filter;
-using LogExpert.Entities;
+using LogExpert.Core.Classes.Highlight;
+using LogExpert.Core.Entities;
 
 namespace LogExpert.Core.Config;
 
@@ -33,6 +34,45 @@ public class Settings
     public List<string> FilterRangeHistoryList { get; set; } = [];
 
     public bool HideLineColumn { get; set; }
+
+    /// <summary>
+    /// Legacy property for backward compatibility with old settings files that had hilightEntryList at root level.
+    /// This property redirects data to Preferences.HighlightGroupList during import.
+    /// Will be removed in a future version once migration period is complete.
+    /// </summary>
+    [Obsolete("This property exists only for backward compatibility with old settings files. Data is stored in Preferences.HighlightGroupList.")]
+    [Newtonsoft.Json.JsonProperty("hilightEntryList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public List<HighlightEntry> HilightEntryList
+    {
+        get => null; // Never serialize this
+        set
+        {
+            // This was likely empty in old files as entries were in groups
+            // Keep for compatibility but likely unused
+        }
+    }
+
+    /// <summary>
+    /// Legacy property for backward compatibility with old settings files that had hilightGroupList at root level.
+    /// This property redirects data to Preferences.HighlightGroupList during import.
+    /// Will be removed in a future version once migration period is complete.
+    /// </summary>
+    [Obsolete("This property exists only for backward compatibility with old settings files. Data is stored in Preferences.HighlightGroupList.")]
+    [Newtonsoft.Json.JsonProperty("hilightGroupList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public List<HighlightGroup> HilightGroupList
+    {
+        get => null; // Never serialize this
+        set
+        {
+            if (value != null && value.Count > 0)
+            {
+                Preferences ??= new Preferences();
+                Preferences.HighlightGroupList = value;
+            }
+        }
+    }
 
     public bool IsMaximized { get; set; }
 

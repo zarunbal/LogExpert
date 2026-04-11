@@ -1,4 +1,4 @@
-﻿using LogExpert.PluginRegistry.FileSystem;
+using LogExpert.PluginRegistry.FileSystem;
 
 using NUnit.Framework;
 
@@ -36,14 +36,14 @@ internal class LocalFileSystemTest : RolloverHandlerTestBase
     [Test]
     public void TestUriToFileStream()
     {
-        DirectoryInfo dInfo = Directory.CreateDirectory(RolloverHandlerTest.TEST_DIR_NAME);
+        var dInfo = Directory.CreateDirectory(TEST_DIR_NAME);
         var fullName = CreateFile(dInfo, "test.log");
 
         LocalFileSystem fs = new();
-        ILogFileInfo info = fs.GetLogfileInfo(fullName);
+        var info = fs.GetLogfileInfo(fullName);
         Assert.That(info.Length > 0, Is.True);
         Assert.That(info.OriginalLength == info.Length, Is.True);
-        Stream stream = info.OpenStream();
+        var stream = info.OpenStream();
         Assert.That(stream.CanSeek, Is.True);
         StreamReader reader = new(stream);
         var line = reader.ReadLine();

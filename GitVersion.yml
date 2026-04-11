@@ -1,6 +1,11 @@
 assembly-versioning-scheme: MajorMinorPatchTag
 mode: ContinuousDelivery
-branches: {}
+tag-prefix: 'v\.?'
+branches:
+  develop:
+    increment: None
+  main:
+    increment: None
 ignore:
   sha: []
 merge-message-formats: {}

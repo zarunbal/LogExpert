@@ -1,4 +1,6 @@
-﻿using NLog;
+using ColumnizerLib;
+
+using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 
@@ -6,13 +8,14 @@ public class LogBuffer
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
 #if DEBUG
-    private readonly IList<long> _filePositions = new List<long>(); // file position for every line
+    private readonly IList<long> _filePositions = []; // file position for every line
 #endif
 
-    private readonly IList<ILogLine> _logLines = new List<ILogLine>();
+    private readonly List<ILogLineMemory> _lineList = [];
+
     private int MAX_LINES = 500;
     private long _size;
 
@@ -22,7 +25,9 @@ public class LogBuffer
 
     //public LogBuffer() { }
 
-    public LogBuffer(ILogFileInfo fileInfo, int maxLines)
+    // Don't use a primary constructor here: field initializers (like MAX_LINES) run before primary constructor parameters are assigned,
+    // so MAX_LINES would always be set to its default value before the constructor body can assign it. Use a regular constructor instead.
+    public LogBuffer (ILogFileInfo fileInfo, int maxLines)
     {
         FileInfo = fileInfo;
         MAX_LINES = maxLines;
@@ -52,6 +57,8 @@ public class LogBuffer
         get => _size;
     }
 
+    public int EndLine => StartLine + LineCount;
+
     public int StartLine { set; get; }
 
     public int LineCount { get; private set; }
@@ -68,9 +75,9 @@ public class LogBuffer
 
     #region Public methods
 
-    public void AddLine(ILogLine line, long filePos)
+    public void AddLine (ILogLineMemory lineMemory, long filePos)
     {
-        _logLines.Add(line);
+        _lineList.Add(lineMemory);
 #if DEBUG
         _filePositions.Add(filePos);
 #endif
@@ -78,29 +85,26 @@ public class LogBuffer
         IsDisposed = false;
     }
 
-    public void ClearLines()
+    public void ClearLines ()
     {
-        _logLines.Clear();
+        _lineList.Clear();
         LineCount = 0;
     }
 
-    public void DisposeContent()
+    public void DisposeContent ()
     {
-        _logLines.Clear();
+        _lineList.Clear();
         IsDisposed = true;
 #if DEBUG
         DisposeCount++;
 #endif
     }
 
-    public ILogLine GetLineOfBlock(int num)
+    public ILogLineMemory GetLineMemoryOfBlock (int num)
     {
-        if (num < _logLines.Count && num >= 0)
-        {
-            return _logLines[num];
-        }
-
-        return null;
+        return num < _lineList.Count && num >= 0
+            ? _lineList[num]
+            : null;
     }
 
     #endregion
@@ -108,15 +112,11 @@ public class LogBuffer
 #if DEBUG
     public long DisposeCount { get; private set; }
 
-
-    public long GetFilePosForLineOfBlock(int line)
+    public long GetFilePosForLineOfBlock (int line)
     {
-        if (line >= 0 && line < _filePositions.Count)
-        {
-            return _filePositions[line];
-        }
-
-        return -1;
+        return line >= 0 && line < _filePositions.Count
+            ? _filePositions[line]
+            : -1;
     }
 
 #endif
