@@ -1,0 +1,12 @@
+using LogExpert.Core.Interfaces;
+
+namespace LogExpert.UI.Extensions.LogWindow;
+
+public class StaticLogTabWindowData
+{
+    #region Properties
+
+    public ILogTabWindow CurrentLockedMainWindow { get; set; }
+
+    #endregion
+}

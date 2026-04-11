@@ -1,37 +1,38 @@
-﻿using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
-using LogExpert.Controls.LogTabWindow;
+using LogExpert.Core.Interfaces;
 
-namespace LogExpert.Classes
+namespace LogExpert.Classes;
+
+internal class LogExpertApplicationContext : ApplicationContext
 {
-    internal class LogExpertApplicationContext : ApplicationContext
+    #region Fields
+
+    private readonly LogExpertProxy _proxy;
+
+    #endregion
+
+    #region cTor
+
+    [SupportedOSPlatform("windows")]
+    public LogExpertApplicationContext (LogExpertProxy proxy, ILogTabWindow firstLogWin)
     {
-        #region Fields
-
-        private readonly LogExpertProxy _proxy;
-
-        #endregion
-
-        #region cTor
-
-        public LogExpertApplicationContext(LogExpertProxy proxy, LogTabWindow firstLogWin)
-        {
-            _proxy = proxy;
-            _proxy.LastWindowClosed += new LogExpertProxy.LastWindowClosedEventHandler(OnProxyLastWindowClosed);
-            firstLogWin.Show();
-        }
-
-        #endregion
-
-        #region Events handler
-
-        private void OnProxyLastWindowClosed(object sender, EventArgs e)
-        {
-            ExitThread();
-            Application.Exit();
-        }
-
-        #endregion
+        _proxy = proxy;
+        _proxy.LastWindowClosed += OnProxyLastWindowClosed;
+        firstLogWin.Show();
     }
+
+    #endregion
+
+    #region Events handler
+
+    [SupportedOSPlatform("windows")]
+    private void OnProxyLastWindowClosed (object sender, EventArgs e)
+    {
+        ExitThread();
+        Application.Exit();
+    }
+
+    #endregion
 }

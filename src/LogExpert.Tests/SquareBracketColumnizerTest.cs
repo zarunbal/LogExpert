@@ -1,47 +1,79 @@
-﻿using LogExpert.Classes.Log;
+using System.Reflection;
+
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Columnizer;
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
+namespace LogExpert.Tests;
 
-namespace LogExpert.Tests
+[TestFixture]
+public class SquareBracketColumnizerTest
 {
-    [TestFixture]
-    public class SquareBracketColumnizerTest
+    [SetUp]
+    public void Setup ()
     {
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_01.txt", 5)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6)]
-        [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3)]
-        public void GetPriority_HappyFile_ColumnCountMatches(string fileName, int count)
-        {
-            SquareBracketColumnizer squareBracketColumnizer = new();
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        // Reset singleton for testing (same pattern as PluginRegistryTests)
+        ResetPluginRegistrySingleton();
 
-            LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions());
-            logFileReader.ReadFiles();
-            List<ILogLine> loglines = new()
-            {
-                // Sampling a few lines to select the correct columnizer
-                logFileReader.GetLogLine(0),
-                logFileReader.GetLogLine(1),
-                logFileReader.GetLogLine(2),
-                logFileReader.GetLogLine(3),
-                logFileReader.GetLogLine(4),
-                logFileReader.GetLogLine(5),
-                logFileReader.GetLogLine(25),
-                logFileReader.GetLogLine(100),
-                logFileReader.GetLogLine(200),
-                logFileReader.GetLogLine(400)
-            };
+        // Initialize plugin registry with proper test directory
+        var testDataPath = Path.Join(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(testDataPath);
 
-            squareBracketColumnizer.GetPriority(path, loglines);
-            Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
-        }
+        var pluginRegistry = PluginRegistry.PluginRegistry.Create(testDataPath, 250);
 
+        // Verify the local file system plugin is registered
+        var localPlugin = pluginRegistry.FindFileSystemForUri(@"C:\test.txt");
+        Assert.That(localPlugin, Is.Not.Null, "Local file system plugin not registered!");
+    }
+
+    [TearDown]
+    public void TearDown ()
+    {
+        ResetPluginRegistrySingleton();
+    }
+
+    /// <summary>
+    /// Uses reflection to reset the singleton instance for testing.
+    /// This ensures each test starts with a fresh PluginRegistry state.
+    /// </summary>
+    private static void ResetPluginRegistrySingleton ()
+    {
+        var instanceField = typeof(PluginRegistry.PluginRegistry).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic);
+        instanceField?.SetValue(null, null);
+    }
+
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_01.txt", 5, ReaderType.System)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5, ReaderType.System)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6, ReaderType.System)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3, ReaderType.System)]
+    public void GetPriority_HappyFile_ColumnCountMatches (string fileName, int count, ReaderType readerType)
+    {
+        SquareBracketColumnizer squareBracketColumnizer = new();
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
+
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
+        logFileReader.ReadFiles();
+        List<ILogLineMemory> loglines =
+        [
+            // Sampling a few lines to select the correct columnizer
+            logFileReader.GetLogLineMemory(0),
+            logFileReader.GetLogLineMemory(1),
+            logFileReader.GetLogLineMemory(2),
+            logFileReader.GetLogLineMemory(3),
+            logFileReader.GetLogLineMemory(4),
+            logFileReader.GetLogLineMemory(5),
+            logFileReader.GetLogLineMemory(25),
+            logFileReader.GetLogLineMemory(100),
+            logFileReader.GetLogLineMemory(200),
+            logFileReader.GetLogLineMemory(400)
+        ];
+
+        _ = squareBracketColumnizer.GetPriority(path, loglines);
+        Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
     }
 }

@@ -1,82 +1,103 @@
-﻿using System;
 using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
-namespace RegexColumnizer
+using LogExpert.Core.Helpers;
+
+namespace RegexColumnizer;
+
+public partial class RegexColumnizerConfigDialog : Form
 {
-    public partial class RegexColumnizerConfigDialog : Form
+    public RegexColumnizerConfigDialog (RegexColumnizerConfig config)
     {
-        public RegexColumnizerConfigDialog()
-        {
-            SuspendLayout();
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
+        SuspendLayout();
 
-            InitializeComponent();
-            ResumeLayout();
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
+        Config = config;
+
+        ApplyResources();
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.RegexColumnizerConfigDialog_UI_Title + Config.Name;
+        lblRegEx.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Regex;
+        label2.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Name;
+        gbTestZone.Text = Resources.RegexColumnizerConfigDialog_UI_GroupBox_TestZone;
+        label1.Text = Resources.RegexColumnizerConfigDialog_UI_Label_Line;
+        tbCheck.Text = Resources.RegexColumnizerConfigDialog_UI_Button_Check;
+        btnOk.Text = Resources.RegexColumnizerConfigDialog_UI_Button_OK;
+        btnCancel.Text = Resources.RegexColumnizerConfigDialog_UI_Button_Cancel;
+    }
+
+    private void OnBtnOkClick (object sender, EventArgs e)
+    {
+        if (Check())
+        {
+            Config.Expression = tbExpression.Text;
+            Config.CustomName = tbName.Text;
         }
+    }
 
-        public RegexColumnizerConfig Config { get; set; }
+    private void RegexColumnizerConfigDialog_Load (object sender, EventArgs e)
+    {
+        tbExpression.Text = Config.Expression;
+        tbName.Text = Config.CustomName;
+    }
 
-        private void OnBtnOkClick(object sender, EventArgs e)
+    private void OnButtonCheckClick (object sender, EventArgs e)
+    {
+        _ = Check();
+    }
+
+    public RegexColumnizerConfig Config { get; }
+
+    private bool Check ()
+    {
+        DataTable table = new();
+
+        try
         {
-            if (Check())
+            // Use RegexHelper for safe regex creation with timeout protection
+            Regex regex = RegexHelper.CreateSafeRegex(tbExpression.Text);
+            var groupNames = regex.GetGroupNames();
+            var offset = groupNames.Length > 1 ? 1 : 0;
+
+            for (var i = offset; i < groupNames.Length; i++)
             {
-                Config.Expression = tbExpression.Text;
-                Config.Name = tbName.Text;
+                _ = table.Columns.Add(groupNames[i]);
             }
 
-        }
-
-        private void RegexColumnizerConfigDialog_Load(object sender, EventArgs e)
-        {
-            tbExpression.Text = Config.Expression;
-            tbName.Text = Config.Name;
-        }
-
-        private void OnButtonCheckClick(object sender, EventArgs e)
-        {
-            Check();
-        }
-
-        private bool Check()
-        {
-            DataTable table = new();
-
-            try
+            if (!string.IsNullOrEmpty(tbTestLine.Text))
             {
-                Regex regex = new(tbExpression.Text);
-                var groupNames = regex.GetGroupNames();
-                int offset = groupNames.Length > 1 ? 1 : 0;
-
-                for (int i = offset; i < groupNames.Length; i++)
-                {
-                    table.Columns.Add(groupNames[i]);
-                }
-
-                if (!string.IsNullOrEmpty(tbTestLine.Text))
-                {
-                    Match match = regex.Match(tbTestLine.Text);
-                    var row = table.NewRow();
-                    var values = match.Groups.OfType<Group>().Skip(offset).Select(group => group.Value).Cast<object>().ToArray();
-                    row.ItemArray = values;
-                    table.Rows.Add(row);
-                }
-
-                return true;
+                var match = regex.Match(tbTestLine.Text);
+                var row = table.NewRow();
+                var values = match.Groups.OfType<Group>().Skip(offset).Select(group => group.Value).Cast<object>().ToArray();
+                row.ItemArray = values;
+                table.Rows.Add(row);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($@"Invalid Regex !{Environment.NewLine}{ex.Message}", @"Regex Columnizer Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            finally
-            {
-                dataGridView1.DataSource = table;
-            }
+
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException or
+                                         ArgumentNullException or
+                                         RegexMatchTimeoutException or
+                                         InvalidCastException or
+                                         ConstraintException or
+                                         NoNullAllowedException)
+        {
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex, Environment.NewLine, ex.Message), Resources.RegexColumnizerConfigDialog_UI_Error_Title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+        finally
+        {
+            dataGridView1.DataSource = table;
         }
     }
 }

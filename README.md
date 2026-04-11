@@ -1,9 +1,10 @@
-# LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml)
+# LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml)
 
-This is a clone from (no longer exists) https://logexpert.codeplex.com/
+This is a clone from (no longer exists) <https://logexpert.codeplex.com/>
 
-# Overview
-LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
+## Overview
+
+LogExpert is a Windows feature rich tail program (a GUI replacement for the Unix tail command) with support for plugins, highlighting, filtering, bookmarking, columnizing and more.
 
 Summary of (most) features:
 
@@ -23,56 +24,73 @@ Summary of (most) features:
 * Serilog.Formatting.Compact format support (Experimental)
 * Portable (all options / settings saved in application startup directory)
 
-# Download
-Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
+## Download
 
-Or Install via chocolatey
-
-```choco install logexpert```
+* Follow the [Link](https://github.com/LogExperts/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
+* Install via chocolatey
+  ```choco install logexpert```
+* get the Nuget package [Link](https://www.nuget.org/packages/logexpert)
+  ```dotnet add package logexpert --version 1.30.0```
+* the ColumnizerLib can also be downloaded via nuget [Link](https://www.nuget.org/packages/ColumnizerLib)
+  ```dotnet add package ColumnizerLib --version 1.21.0```
 
 Requirements
-- https://dotnet.microsoft.com/en-us/download/dotnet/8.0
-- .NET 8 (https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer or https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.13-windows-x86-installer) 
-- ASP.NET Core Runtime (https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-x64-installer, https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-x86-installer or https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-hosting-bundle-installer)
+
+* <https://dotnet.microsoft.com/en-us/download>
+* .NET 10 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.0-windows-x64-installer>)
 
 ## CI
+
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.
 
 [CI Download](https://ci.appveyor.com/project/Zarunbal/logexpert)
 
-# How to Build
+## How to Build
 
-- Clone / Fork / Download the source code
-- Open the Solution (src/LogExpert.sln) with Visual Studio 2017 (e.g. Community Edition)
-- Restore Nuget Packages on Solution
-- Build
-- The output is under bin/(Debug/Release)/
+* Clone / Fork / Download the source code
+* Open the Solution (src/LogExpert.sln) with Visual Studio 2026 (e.g. Community Edition)
+* Restore Nuget Packages on Solution
+* Build
+* The output is under bin/(Debug/Release)/
 
 Nuke.build Requirements
-- Chocolatey must be installed
-- Optional for Setup Inno Script 5 or 6
 
-# Pull Request
-- Use Development branch as target
+* Chocolatey must be installed
+* Optional for Setup Inno Script 6.6.1
 
-# FAQ / HELP / Informations / Examples
+## Resources / Translations
+If you want to contribute translations or add new languages please use the ResXResourceManager Extension to add new or missing
+translations for either German / English. With this extension its easy to add a new language as well:
+[ResXResourceManager](https://github.com/dotnet/ResXResourceManager/tree/master)
+
+After creating a new language resource please create a new pull request.
+
+## Pull Request
+
+* Use Development branch as target
+
+## FAQ / HELP / Informations / Examples
+
 Please checkout the wiki for FAQ / HELP / Informations / Examples
 
-# High DPI
-- dont use AutoScaleMode for single GUI controls like Buttons etc.
-- dont use AutoScaleDimensions for single GUI controls like Buttons etc.
+## High DPI
 
-https://github.com/zarunbal/LogExpert/wiki
+* dont use AutoScaleMode for single GUI controls like Buttons etc.
+* dont use AutoScaleDimensions for single GUI controls like Buttons etc.
 
-# Discord Server
-https://discord.gg/SjxkuckRe9
+<https://github.com/LogExperts/LogExpert/wiki>
 
-## Credits
-### Contributors
+## Discord Server
+
+<https://discord.gg/SjxkuckRe9>
+
+### Credits
+
+#### Contributors
 
 This project exists thanks to all the people who contribute.
-<a href="https://github.com/zarunbal/LogExpert/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=zarunbal/LogExpert" />
+<a href="https://github.com/LogExperts/LogExpert/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=LogExperts/LogExpert" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).

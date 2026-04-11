@@ -1,61 +1,61 @@
-﻿using LogExpert;
-
-using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
+
+using ColumnizerLib;
+
+using static Vanara.PInvoke.User32;
 
 [assembly: SupportedOSPlatform("windows")]
-namespace FlashIconHighlighter
+namespace FlashIconHighlighter;
+
+internal class FlashIconPlugin : IKeywordAction
 {
-    internal class FlashIconPlugin : IKeywordAction
+    #region Properties
+
+    public string Text => GetName();
+
+    #endregion
+
+    #region IKeywordAction Member
+
+    public void Execute (string keyword, string param, ILogExpertCallbackMemory callback, ILogLineMemoryColumnizer columnizer)
     {
-        #region Properties
-
-        public string Text
+        var openForms = Application.OpenForms;
+        foreach (Form form in openForms)
         {
-            get { return GetName(); }
-        }
-
-        #endregion
-
-        #region IKeywordAction Member
-
-        public void Execute(string keyword, string param, ILogExpertCallback callback, ILogLineColumnizer columnizer)
-        {
-            FormCollection openForms = Application.OpenForms;
-            foreach (Form form in openForms)
+            if (form.TopLevel && form.Name.Equals("LogTabWindow", StringComparison.OrdinalIgnoreCase) && form.Text.Contains(callback.GetFileName(), StringComparison.Ordinal))
             {
-                if (form.TopLevel && form.Name.Equals("LogTabWindow") && form.Text.Contains(callback.GetFileName()))
-                {
-                    form.BeginInvoke(FlashWindow, [form]);
-                }
+                _ = form.BeginInvoke(FlashWindow, [form]);
             }
         }
-
-        private void FlashWindow(Form form)
-        {
-            FLASHWINFO fw = new()
-            {
-                cbSize = Convert.ToUInt32(Marshal.SizeOf(typeof(FLASHWINFO))),
-                hwnd = form.Handle,
-                dwFlags = 14,
-                uCount = 0
-            };
-
-            Win32Stuff.FlashWindowEx(ref fw);
-        }
-
-        public string GetDescription()
-        {
-            return "Let the taskbar icon flash ";
-        }
-
-        public string GetName()
-        {
-            return "Flash Icon";
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Flash Window http://blogs.x2line.com/al/archive/2008/04/19/3392.aspx
+    /// </summary>
+    /// <param name="form"></param>
+    private void FlashWindow (Form form)
+    {
+        FLASHWINFO fw = new()
+        {
+            cbSize = Convert.ToUInt32(Marshal.SizeOf<FLASHWINFO>()),
+            hwnd = form.Handle,
+            dwFlags = FLASHW.FLASHW_TRAY | FLASHW.FLASHW_CAPTION | FLASHW.FLASHW_TIMER,
+            uCount = 0
+        };
+
+        _ = FlashWindowEx(fw);
+    }
+
+    public string GetDescription ()
+    {
+        return "Let the taskbar icon flash ";
+    }
+
+    public string GetName ()
+    {
+        return "Flash Icon";
+    }
+
+    #endregion
 }

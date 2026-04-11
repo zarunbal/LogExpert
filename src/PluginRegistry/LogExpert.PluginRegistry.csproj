@@ -1,28 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Nullable>enable</Nullable>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LogExpert.PluginRegistry</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePluginHashesEnabled>true</GeneratePluginHashesEnabled>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs" Link="AssemblyVersion.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NLog" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Logexpert.Core\LogExpert.Core.csproj" />
-  </ItemGroup>
+  <!-- Import the PluginHashGenerator targets -->
+  <Import Project="PluginHashGenerator.targets" />
 
 </Project>

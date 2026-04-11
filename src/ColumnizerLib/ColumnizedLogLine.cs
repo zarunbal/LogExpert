@@ -1,13 +1,12 @@
-﻿namespace LogExpert
+namespace ColumnizerLib;
+
+public class ColumnizedLogLine : IColumnizedLogLineMemory
 {
-    public class ColumnizedLogLine : IColumnizedLogLine
-    {
-        #region Properties
+    #region Properties
 
-        public ILogLine LogLine { get; set; }
+    public ILogLineMemory LogLine { get; set; }
 
-        public IColumn[] ColumnValues { get; set; }
+    public IColumnMemory[] ColumnValues { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

@@ -1,0 +1,20 @@
+{
+  "name": "RegexColumnizer",
+  "version": "1.0.0",
+  "author": "LogExpert Team",
+  "description": "Highly configurable columnizer using regular expressions to parse log lines into columns",
+  "apiVersion": "1.0",
+  "requires": {
+    "logExpert": ">=1.10.0",
+    "dotnet": ">=8.0"
+  },
+  "permissions": [
+    "filesystem:read",
+    "config:read",
+    "config:write"
+  ],
+  "dependencies": {},
+  "main": "RegexColumnizer.dll",
+  "url": "https://github.com/LogExperts/LogExpert",
+  "license": "MIT"
+}

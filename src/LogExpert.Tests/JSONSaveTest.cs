@@ -1,45 +1,41 @@
-﻿using LogExpert.Config;
+using System.Runtime.Versioning;
+
+using LogExpert.Configuration;
 using LogExpert.Core.Config;
 
 using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-using System.IO;
+namespace LogExpert.Tests;
 
-namespace LogExpert.Tests
+[TestFixture]
+[SupportedOSPlatform("windows")]
+public class JSONSaveTest
 {
-    [TestFixture]
-    public class JSONSaveTest
+    [Test(Author = "Hirogen", Description = "Save Options as JSON and Check if the written file can be cast again into the settings object")]
+    public void SaveOptionsAsJSON ()
     {
-        [Test(Author = "Hirogen", Description = "Save Options as JSON and Check if the written file can be cast again into the settings object")]
-        public void SaveOptionsAsJSON()
-        {
-            ConfigManager.Settings.alwaysOnTop = true;
-            ConfigManager.Save(SettingsFlags.All);
-            string configDir = ConfigManager.ConfigDir;
-            string settingsFile = configDir + "\\settings.json";
+        ConfigManager.Instance.Settings.AlwaysOnTop = true;
+        ConfigManager.Instance.Save(SettingsFlags.All);
+        var configDir = ConfigManager.Instance.ConfigDir;
+        var settingsFile = configDir + "\\settings.json";
 
-            Settings settings = null;
-            
-            Assert.DoesNotThrow(CastSettings);
-            Assert.That(settings, Is.Not.Null);
-            Assert.That(settings.alwaysOnTop, Is.True);
+        Settings settings = null;
 
-            ConfigManager.Settings.alwaysOnTop = false;
-            ConfigManager.Save(SettingsFlags.All);
-            
-            settings = null;
-            Assert.DoesNotThrow(CastSettings);
+        Assert.DoesNotThrow(castSettings);
+        Assert.That(settings, Is.Not.Null);
+        Assert.That(settings.AlwaysOnTop, Is.True);
 
-            Assert.That(settings, !Is.Null);
-            Assert.That(settings.alwaysOnTop, Is.False);
+        ConfigManager.Instance.Settings.AlwaysOnTop = false;
+        ConfigManager.Instance.Save(SettingsFlags.All);
 
+        settings = null;
+        Assert.DoesNotThrow(castSettings);
 
-            void CastSettings()
-            {
-                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsFile));
-            }
-        }
+        Assert.That(settings, Is.Not.Null);
+        Assert.That(settings.AlwaysOnTop, Is.False);
+
+        void castSettings () => settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsFile));
     }
 }
