@@ -147,7 +147,7 @@ public class FilterStarter
 
         // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
         var threadFilterParams = filterParams.CloneWithCurrentColumnizer();
-        Filter filter = new((ColumnizerCallback)_callback.Clone());
+        Filter filter = new(_callback.Clone());
         lock (_filterWorkerList)
         {
             _filterWorkerList.Add(filter);

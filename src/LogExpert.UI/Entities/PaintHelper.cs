@@ -4,7 +4,6 @@ using ColumnizerLib;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Interface;
 
@@ -16,6 +15,12 @@ namespace LogExpert.UI.Entities;
 internal static class PaintHelper
 {
     #region Fields
+
+    private static readonly StringFormat _format = new()
+    {
+        LineAlignment = StringAlignment.Center,
+        Alignment = StringAlignment.Center
+    };
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -72,15 +77,9 @@ internal static class PaintHelper
 
                     if (bookmark.Text.Length > 0)
                     {
-                        StringFormat format = new()
-                        {
-                            LineAlignment = StringAlignment.Center,
-                            Alignment = StringAlignment.Center
-                        };
-
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
                         using var font = logPaintCtx.MonospacedFont;
-                        e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
+                        e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
                 }
             }

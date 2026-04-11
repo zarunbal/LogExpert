@@ -2148,4 +2148,22 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="SettingsDialog_UI_PortableMode_MigrationError" xml:space="preserve">
     <value>Einige Dateien konnten nicht migriert werden: {0}</value>
   </data>
+  <data name="BookmarkWindow_UI_DataGridColumn_HeaderTextSource" xml:space="preserve">
+    <value>Highlight-Trigger Quelle</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="BookmarkWindow_UI_SourceHighlightText_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarks" xml:space="preserve">
+    <value>Scanne Lesezeichen...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksPct" xml:space="preserve">
+    <value>Scanne Lesezeichen... {0}%</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
+    <value>Scanne Lesezeichen beendet / abgebrochen!</value>
+  </data>
 </root>
