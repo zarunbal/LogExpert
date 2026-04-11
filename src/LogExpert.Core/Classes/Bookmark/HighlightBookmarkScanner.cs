@@ -1,3 +1,5 @@
+using System.Text;
+
 using ColumnizerLib;
 
 using LogExpert.Core.Classes.Highlight;
@@ -79,26 +81,21 @@ public static class HighlightBookmarkScanner
     private static (bool SetBookmark, string BookmarkComment, string SourceHighlightText) GetBookmarkAction (ITextValueMemory line, List<HighlightEntry> bookmarkEntries)
     {
         var setBookmark = false;
-        var bookmarkComment = string.Empty;
+        var bookmarkCommentBuilder = new StringBuilder();
         var sourceHighlightText = string.Empty;
 
-        foreach (var entry in bookmarkEntries)
+        foreach (var entry in bookmarkEntries.Where(entry => CheckHighlightEntryMatch(entry, line)))
         {
-            if (CheckHighlightEntryMatch(entry, line))
-            {
-                setBookmark = true;
-                sourceHighlightText = entry.SearchText;
+            setBookmark = true;
+            sourceHighlightText = entry.SearchText;
 
-                if (!string.IsNullOrEmpty(entry.BookmarkComment))
-                {
-                    bookmarkComment += entry.BookmarkComment + "\r\n";
-                }
+            if (!string.IsNullOrEmpty(entry.BookmarkComment))
+            {
+                _ = bookmarkCommentBuilder.Append(entry.BookmarkComment).Append("\r\n");
             }
         }
 
-        bookmarkComment = bookmarkComment.TrimEnd('\r', '\n');
-
-        return (setBookmark, bookmarkComment, sourceHighlightText);
+        return (setBookmark, bookmarkCommentBuilder.ToString().TrimEnd('\r', '\n'), sourceHighlightText);
     }
 
     /// <summary>

@@ -170,7 +170,7 @@ internal partial class BufferedDataGridView : DataGridView
             {
                 base.OnPaint(e);
             }
-            catch (Exception innerEx)
+            catch (InvalidOperationException innerEx)
             {
                 _logger.Error($"Base paint also failed. {innerEx}");
             }

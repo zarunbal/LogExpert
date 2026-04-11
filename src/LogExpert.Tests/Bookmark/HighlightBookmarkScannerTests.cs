@@ -213,7 +213,8 @@ public class HighlightBookmarkScannerTests
         {
             new() { SearchText = "ERROR", IsSetBookmark = true }
         };
-        var cts = new CancellationTokenSource();
+
+        using var cts = new CancellationTokenSource();
         cts.Cancel();
 
         // Act & Assert

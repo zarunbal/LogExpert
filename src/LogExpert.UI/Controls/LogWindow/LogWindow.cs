@@ -7155,47 +7155,48 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ExecuteHighlightBookmarkScan (int lineCount, List<HighlightEntry> entries, string fileName, IProgress<int> progress, CancellationTokenSource cts)
     {
-        try
+        using (cts)
         {
-            var bookmarks = HighlightBookmarkScanner.Scan(lineCount, _logFileReader.GetLogLineMemory, entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
-
-            // Marshal bookmark additions to UI thread
-            if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
+            try
             {
-                _ = BeginInvoke(() =>
+                var bookmarks = HighlightBookmarkScanner.Scan(lineCount, _logFileReader.GetLogLineMemory, entries, fileName, PROGRESS_BAR_MODULO, progress, cts.Token);
+
+                // Marshal bookmark additions to UI thread
+                if (!cts.Token.IsCancellationRequested && IsHandleCreated && !IsDisposed)
                 {
-                    _ = _bookmarkProvider.AddBookmarks(bookmarks);
+                    _ = BeginInvoke(() =>
+                    {
+                        _ = _bookmarkProvider.AddBookmarks(bookmarks);
 
-                    RefreshAllGrids();
+                        RefreshAllGrids();
 
-                    _progressEventArgs.Visible = false;
-                    SendProgressBarUpdate();
-                    StatusLineText(string.Empty);
-                });
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
             }
-        }
-        catch (OperationCanceledException)
-        {
-            // Scan was cancelled — clean up on UI thread
-            if (IsHandleCreated && !IsDisposed)
+            catch (OperationCanceledException)
             {
-                _ = BeginInvoke(() =>
+                // Scan was cancelled — clean up on UI thread
+                if (IsHandleCreated && !IsDisposed)
                 {
-                    _progressEventArgs.Visible = false;
-                    SendProgressBarUpdate();
-                    StatusLineText(string.Empty);
-                });
+                    _ = BeginInvoke(() =>
+                    {
+                        _progressEventArgs.Visible = false;
+                        SendProgressBarUpdate();
+                        StatusLineText(string.Empty);
+                    });
+                }
             }
-        }
-        finally
-        {
-            // Only dispose if this is still the active CTS
-            if (_highlightBookmarkScanCts == cts)
+            finally
             {
-                _highlightBookmarkScanCts = null;
+                // Only dispose if this is still the active CTS
+                if (_highlightBookmarkScanCts == cts)
+                {
+                    _highlightBookmarkScanCts = null;
+                }
             }
-
-            cts.Dispose();
         }
     }
 
