@@ -30,6 +30,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private readonly ReaderType _readerType;
     private readonly int _maximumLineLength;
 
+    private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderWriterLockSlim _disposeLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderWriterLockSlim _lruCacheDictLock = new(LockRecursionPolicy.SupportsRecursion);
@@ -1203,7 +1204,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         try
         {
             using var fileStream = logFileInfo.OpenStream();
-            using var reader = GetLogStreamReader(fileStream, EncodingOptions);
+            using var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
 
             reader.Position = filePos;
             _fileLength = logFileInfo.Length;
@@ -1236,7 +1237,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
                 else
                 {
-                    logBuffer = _bufferList[_bufferList.Count - 1];
+                    logBuffer = _bufferList[^1];
 
                     if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName, StringComparison.Ordinal))
                     {
@@ -1281,7 +1282,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 var droppedLines = logBuffer.PrevBuffersDroppedLinesSum;
                 filePos = reader.Position;
 
-                var (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+                var (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
 
                 while (success)
                 {
@@ -1294,7 +1295,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     {
                         logBuffer.DroppedLinesCount += 1;
                         droppedLines++;
-                        (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+                        (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                         continue;
                     }
 
@@ -1351,7 +1352,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     filePos = reader.Position;
                     lineNum++;
 
-                    (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
+                    (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                 }
 
                 logBuffer.Size = filePos - logBuffer.StartPos;
@@ -1619,9 +1620,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 #if DEBUG
         _logger.Info(CultureInfo.InvariantCulture, "re-reading buffer: {0}/{1}/{2}", logBuffer.StartLine, logBuffer.LineCount, logBuffer.FileInfo.FullName);
 #endif
-        try
+        lock (_logBufferLock)
         {
-            Monitor.Enter(logBuffer);
             Stream fileStream = null;
             try
             {
@@ -1635,7 +1635,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
             try
             {
-                var reader = GetLogStreamReader(fileStream, EncodingOptions);
+                //TODO LogStream Reader has to be changed to ILogStreamReaderMemory
+                var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
 
                 var filePos = logBuffer.StartPos;
                 reader.Position = logBuffer.StartPos;
@@ -1644,7 +1645,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
                 logBuffer.ClearLines();
 
-                var (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                var (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
 
                 while (success)
                 {
@@ -1656,7 +1657,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     if (wasDropped)
                     {
                         dropCount++;
-                        (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                        (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                         continue;
                     }
 
@@ -1666,7 +1667,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     filePos = reader.Position;
                     lineCount++;
 
-                    (success, lineMemory, wasDropped) = ReadLineMemory(reader as ILogStreamReaderMemory, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                    (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                 }
 
                 if (maxLinesCount != logBuffer.LineCount)
@@ -1691,49 +1692,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 fileStream.Close();
             }
         }
-        finally
-        {
-            Monitor.Exit(logBuffer);
-        }
     }
-
-    /// <summary>
-    /// Retrieves the log buffer that contains the specified line number.
-    /// </summary>
-    /// <param name="lineNum">
-    /// The zero-based line number for which to retrieve the corresponding log buffer. Must be greater than or equal to
-    /// zero.
-    /// </param>
-    /// <returns>
-    /// The <see cref="LogBuffer"/> instance that contains the specified line number, or <see langword="null"/> if no
-    /// such buffer exists.
-    /// </returns>
-    //    private LogBuffer GetBufferForLine (int lineNum)
-    //    {
-    //#if DEBUG
-    //        long startTime = Environment.TickCount;
-    //#endif
-    //        LogBuffer logBuffer = null;
-    //        AcquireBufferListReaderLock();
-
-    //        var startIndex = 0;
-    //        var count = _bufferList.Count;
-    //        for (var i = startIndex; i < count; ++i)
-    //        {
-    //            logBuffer = _bufferList[i];
-    //            if (lineNum >= logBuffer.StartLine && lineNum < logBuffer.StartLine + logBuffer.LineCount)
-    //            {
-    //                UpdateLruCache(logBuffer);
-    //                break;
-    //            }
-    //        }
-    //#if DEBUG
-    //        long endTime = Environment.TickCount;
-    //        //_logger.logDebug("getBufferForLine(" + lineNum + ") duration: " + ((endTime - startTime)) + " ms. Buffer start line: " + logBuffer.StartLine);
-    //#endif
-    //        ReleaseBufferListReaderLock();
-    //        return logBuffer;
-    //    }
 
     /// <summary>
     /// Retrieves the log buffer that contains the specified line number.
