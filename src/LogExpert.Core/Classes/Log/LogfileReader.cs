@@ -789,7 +789,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             return;
         }
 
-        _logger.Info(CultureInfo.InvariantCulture, "Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
+        _logger.Info(CultureInfo.InvariantCulture, "Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(false));
         AcquireBufferListWriterLock();
         ClearBufferState();
         AcquireLruCacheDictWriterLock();
@@ -809,9 +809,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         ReleaseDisposeWriterLock();
         ReleaseLRUCacheDictWriterLock();
         ReleaseBufferListWriterLock();
-        GC.Collect();
         _contentDeleted = true;
-        _logger.Info(CultureInfo.InvariantCulture, "Deleting complete. Used mem: {0:N0}", GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
+        _logger.Info(CultureInfo.InvariantCulture, "Deleting complete. Used mem: {0:N0}", GC.GetTotalMemory(false));
     }
 
     /// <summary>
