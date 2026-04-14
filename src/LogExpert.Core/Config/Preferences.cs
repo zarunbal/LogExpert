@@ -164,7 +164,7 @@ public class Preferences
 
     public string FontName { get; set; } = "Courier New";
 
-    public float FontSize { get; set; } = 9;
+    public int FontSize { get; set; } = 9;
 
     public List<HighlightMaskEntry> HighlightMaskList { get; set; } = [];
 }
