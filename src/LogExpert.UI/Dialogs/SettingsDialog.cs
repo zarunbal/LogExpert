@@ -721,7 +721,7 @@ internal partial class SettingsDialog : Form
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            Preferences.FontSize = dlg.Font.Size;
+            Preferences.FontSize = (int)dlg.Font.Size;
             Preferences.FontName = dlg.Font.FontFamily.Name;
         }
 

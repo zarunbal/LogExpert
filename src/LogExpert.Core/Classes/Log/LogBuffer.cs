@@ -11,13 +11,12 @@ public class LogBuffer
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
 #if DEBUG
-    private readonly IList<long> _filePositions = []; // file position for every line
+    private readonly List<long> _filePositions; // file position for every line
 #endif
 
-    private readonly List<ILogLineMemory> _lineList = [];
+    private readonly List<ILogLineMemory> _lineList;
 
     private int MAX_LINES = 500;
-    private long _size;
 
     #endregion
 
@@ -31,6 +30,10 @@ public class LogBuffer
     {
         FileInfo = fileInfo;
         MAX_LINES = maxLines;
+        _lineList = new(MAX_LINES);
+#if DEBUG
+        _filePositions = new(MAX_LINES);
+#endif
     }
 
     #endregion
@@ -43,18 +46,18 @@ public class LogBuffer
     {
         set
         {
-            _size = value;
+            field = value;
 #if DEBUG
             if (_filePositions.Count > 0)
             {
-                if (_size < _filePositions[_filePositions.Count - 1] - StartPos)
+                if (field < _filePositions[^1] - StartPos)
                 {
                     _logger.Error("LogBuffer overall Size must be greater than last line file position!");
                 }
             }
 #endif
         }
-        get => _size;
+        get;
     }
 
     public int EndLine => StartLine + LineCount;
