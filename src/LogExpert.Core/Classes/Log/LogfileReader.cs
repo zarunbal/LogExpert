@@ -33,7 +33,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
     private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
-    private readonly ReaderWriterLockSlim _disposeLock = new(LockRecursionPolicy.SupportsRecursion);
 
     private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
     private const int WAIT_TIME = 1000;
@@ -500,7 +499,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void ReleaseDisposeUpgradeableReadLock ()
     {
-        _disposeLock.ExitUpgradeableReadLock();
+        //_disposeLock.ExitUpgradeableReadLock();
     }
 
     /// <summary>
@@ -778,7 +777,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _logger.Info(CultureInfo.InvariantCulture, "Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(false));
         AcquireBufferListWriterLock();
         ClearBufferState();
-        AcquireDisposeWriterLock();
+        //AcquireDisposeWriterLock();
 
         foreach (var logBuffer in _bufferList)
         {
@@ -791,7 +790,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _lruCacheDict.Clear();
         _bufferList.Clear();
 
-        ReleaseDisposeWriterLock();
+        //ReleaseDisposeWriterLock();
         ReleaseBufferListWriterLock();
         _contentDeleted = true;
         _logger.Info(CultureInfo.InvariantCulture, "Deleting complete. Used mem: {0:N0}", GC.GetTotalMemory(false));
@@ -861,11 +860,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
-        AcquireDisposeReaderLock();
+        //AcquireDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "Buffer info for line {0}", lineNum);
         DumpBufferInfos(buffer);
         _logger.Info(CultureInfo.InvariantCulture, "File pos for current line: {0}", buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
-        ReleaseDisposeReaderLock();
+        //ReleaseDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
         ReleaseBufferListReaderLock();
     }
@@ -893,7 +892,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         for (var i = 0; i < _bufferList.Count; ++i)
         {
             var buffer = _bufferList[i];
-            AcquireDisposeReaderLock();
+            //AcquireDisposeReaderLock();
             if (buffer.StartLine != lineNum)
             {
                 _logger.Error("Start line of buffer is: {0}, expected: {1}", buffer.StartLine, lineNum);
@@ -905,7 +904,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             disposeSum += buffer.DisposeCount;
             maxDispose = Math.Max(maxDispose, buffer.DisposeCount);
             minDispose = Math.Min(minDispose, buffer.DisposeCount);
-            ReleaseDisposeReaderLock();
+            //ReleaseDisposeReaderLock();
         }
 
         ReleaseBufferListReaderLock();
@@ -957,27 +956,58 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
             return default;
         }
-        // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-        AcquireDisposeLockUpgradableReadLock();
-        if (logBuffer.IsDisposed)
-        {
-            UpgradeDisposeLockToWriterLock();
 
-            lock (logBuffer.FileInfo)
+        var lockTaken = false;
+        try
+        {
+            logBuffer.AcquireContentLock(ref lockTaken);
+
+            if (logBuffer.IsDisposed)
             {
-                ReReadBuffer(logBuffer);
+                UpgradeDisposeLockToWriterLock();
+
+                lock (logBuffer.FileInfo)
+                {
+                    ReReadBuffer(logBuffer);
+                }
             }
 
-            DowngradeDisposeLockFromWriterLock();
-        }
-
-        var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
-        ReleaseDisposeUpgradeableReadLock();
-        ReleaseBufferListReaderLock();
-
-        return line.HasValue
+            var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
+            return line.HasValue
             ? new ValueTask<ILogLineMemory>(line.Value)
             : default;
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                logBuffer.ReleaseContentLock();
+            }
+
+            ReleaseBufferListReaderLock();
+        }
+
+        //// disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
+        //AcquireDisposeLockUpgradableReadLock();
+        //if (logBuffer.IsDisposed)
+        //{
+        //    UpgradeDisposeLockToWriterLock();
+
+        //    lock (logBuffer.FileInfo)
+        //    {
+        //        ReReadBuffer(logBuffer);
+        //    }
+
+        //    DowngradeDisposeLockFromWriterLock();
+        //}
+
+        //var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
+        //ReleaseDisposeUpgradeableReadLock();
+        //ReleaseBufferListReaderLock();
+
+        //return line.HasValue
+        //    ? new ValueTask<ILogLineMemory>(line.Value)
+        //    : default;
     }
 
     /// <summary>
@@ -1226,15 +1256,33 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                         }
                     }
 
-                    AcquireDisposeLockUpgradableReadLock();
-                    if (logBuffer.IsDisposed)
+                    var lockTaken = false;
+
+                    try
                     {
-                        UpgradeDisposeLockToWriterLock();
-                        ReReadBuffer(logBuffer);
-                        DowngradeDisposeLockFromWriterLock();
+                        logBuffer.AcquireContentLock(ref lockTaken);
+                        if (logBuffer.IsDisposed)
+                        {
+                            ReReadBuffer(logBuffer);
+                        }
+                    }
+                    finally
+                    {
+                        if (lockTaken)
+                        {
+                            logBuffer.ReleaseContentLock();
+                        }
                     }
 
-                    ReleaseDisposeUpgradeableReadLock();
+                    //AcquireDisposeLockUpgradableReadLock();
+                    //if (logBuffer.IsDisposed)
+                    //{
+                    //    UpgradeDisposeLockToWriterLock();
+                    //    ReReadBuffer(logBuffer);
+                    //    DowngradeDisposeLockFromWriterLock();
+                    //}
+
+                    //ReleaseDisposeUpgradeableReadLock();
                 }
             }
             finally
@@ -1431,17 +1479,29 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             var entries = _lruCacheDict.ToArray();
             Array.Sort(entries, static (a, b) => a.Value.LastUseTimeStamp.CompareTo(b.Value.LastUseTimeStamp));
 
-            AcquireDisposeWriterLock();
+            //AcquireDisposeWriterLock();
             for (var i = 0; i < diff && i < entries.Length; ++i)
             {
                 var kvp = entries[i];
                 if (_lruCacheDict.TryRemove(kvp.Key, out var removed))
                 {
-                    removed.LogBuffer.DisposeContent();
+                    var lockTaken = false;
+                    try
+                    {
+                        removed.LogBuffer.AcquireContentLock(ref lockTaken);
+                        removed.LogBuffer.DisposeContent();
+                    }
+                    finally
+                    {
+                        if (lockTaken)
+                        {
+                            removed.LogBuffer.ReleaseContentLock();
+                        }
+                    }
                 }
             }
 
-            ReleaseDisposeWriterLock();
+            //ReleaseDisposeWriterLock();
         }
 
 #if DEBUG
@@ -1493,7 +1553,19 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         AcquireDisposeWriterLock();
         foreach (var entry in _lruCacheDict.Values)
         {
-            entry.LogBuffer.DisposeContent();
+            var lockTaken = false;
+            try
+            {
+                entry.LogBuffer.AcquireContentLock(ref lockTaken);
+                entry.LogBuffer.DisposeContent();
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    entry.LogBuffer.ReleaseContentLock();
+                }
+            }
         }
 
         _lruCacheDict.Clear();
@@ -2248,11 +2320,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void AcquireDisposeLockUpgradableReadLock ()
     {
-        if (!_disposeLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Upgradeable read lock timed out");
-            _disposeLock.EnterUpgradeableReadLock();
-        }
+        //if (!_disposeLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
+        //{
+        //    _logger.Warn("Upgradeable read lock timed out");
+        //    _disposeLock.EnterUpgradeableReadLock();
+        //}
     }
 
     /// <summary>
@@ -2264,11 +2336,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void AcquireDisposeReaderLock ()
     {
-        if (!_disposeLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Dispose reader lock timed out");
-            _disposeLock.EnterReadLock();
-        }
+        //if (!_disposeLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
+        //{
+        //    _logger.Warn("Dispose reader lock timed out");
+        //    _disposeLock.EnterReadLock();
+        //}
     }
 
     /// <summary>
@@ -2281,7 +2353,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void ReleaseDisposeWriterLock ()
     {
-        _disposeLock.ExitWriteLock();
+        //_disposeLock.ExitWriteLock();
     }
 
     /// <summary>
@@ -2293,7 +2365,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void ReleaseDisposeReaderLock ()
     {
-        _disposeLock.ExitReadLock();
+        //_disposeLock.ExitReadLock();
     }
 
     /// <summary>
@@ -2307,11 +2379,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void AcquireDisposeWriterLock ()
     {
-        if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Dispose writer lock timed out");
-            _disposeLock.EnterWriteLock();
-        }
+        //if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        //{
+        //    _logger.Warn("Dispose writer lock timed out");
+        //    _disposeLock.EnterWriteLock();
+        //}
     }
 
     /// <summary>
@@ -2355,11 +2427,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void UpgradeDisposeLockToWriterLock ()
     {
-        if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Writer lock upgrade timed out");
-            _disposeLock.EnterWriteLock();
-        }
+        //if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
+        //{
+        //    _logger.Warn("Writer lock upgrade timed out");
+        //    _disposeLock.EnterWriteLock();
+        //}
     }
 
     /// <summary>
@@ -2384,7 +2456,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     private void DowngradeDisposeLockFromWriterLock ()
     {
-        _disposeLock.ExitWriteLock();
+        //_disposeLock.ExitWriteLock();
     }
 
 #if DEBUG

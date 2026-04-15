@@ -124,9 +124,9 @@ internal partial class SettingsDialog : Form
             Preferences.FontName = DEFAULT_FONT_NAME;
         }
 
-        if (Preferences.FontSize <= 0)
+        if (Math.Abs(Preferences.FontSize) <= 0.1)
         {
-            Preferences.FontSize = 9;
+            Preferences.FontSize = 9.0f;
         }
 
         FillPortableMode();
@@ -721,7 +721,7 @@ internal partial class SettingsDialog : Form
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            Preferences.FontSize = (int)dlg.Font.Size;
+            Preferences.FontSize = dlg.Font.Size;
             Preferences.FontName = dlg.Font.FontFamily.Name;
         }
 

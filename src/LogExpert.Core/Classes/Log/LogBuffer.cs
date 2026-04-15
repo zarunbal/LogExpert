@@ -8,6 +8,7 @@ public class LogBuffer
 {
     #region Fields
 
+    private SpinLock _contentLock = new(enableThreadOwnerTracking: false);
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
 #if DEBUG
@@ -108,6 +109,22 @@ public class LogBuffer
         return num < _lineList.Count && num >= 0
             ? _lineList[num]
             : null;
+    }
+
+    /// <summary>
+    /// Acquires the content lock. The caller MUST call <see cref="ReleaseContentLock"/> in a finally block.
+    /// </summary>
+    public void AcquireContentLock (ref bool lockTaken)
+    {
+        _contentLock.Enter(ref lockTaken);
+    }
+
+    /// <summary>
+    /// Releases the content lock previously acquired via <see cref="AcquireContentLock"/>.
+    /// </summary>
+    public void ReleaseContentLock ()
+    {
+        _contentLock.Exit(useMemoryBarrier: false);
     }
 
     #endregion

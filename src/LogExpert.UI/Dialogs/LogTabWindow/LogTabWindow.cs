@@ -1403,13 +1403,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         var fontName = ConfigManager.Settings.Preferences.FontName;
         var fontSize = ConfigManager.Settings.Preferences.FontSize;
 
-        //lock (_logWindowList)
-        //{
         foreach (var logWindow in _tabController.GetAllWindows())
         {
             logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
         }
-        //}
 
         _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
 
