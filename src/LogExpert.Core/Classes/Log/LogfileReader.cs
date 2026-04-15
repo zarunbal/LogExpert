@@ -34,6 +34,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
 
+    private MemoryMappedFileReader _mmfReader;
+
     private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
     private const int WAIT_TIME = 1000;
 
@@ -46,7 +48,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private Task _garbageCollectorTask;
     private Task _monitorTask;
     private bool _isDeleted;
-
 
     private IList<ILogFileInfo> _logFileInfoList = [];
     private ConcurrentDictionary<int, LogBufferCacheEntry> _lruCacheDict;
@@ -125,6 +126,18 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         _watchedILogFileInfo = fileInfo;
+
+        if (!IsMultiFile && _watchedILogFileInfo.Uri?.Scheme is null or "file")
+        {
+            try
+            {
+                _mmfReader = new MemoryMappedFileReader(_watchedILogFileInfo.FullName, EncodingOptions.Encoding ?? Encoding.Default);
+            }
+            catch (IOException)
+            {
+                _mmfReader = null; // fallback to buffer path
+            }
+        }
 
         StartGCThread();
     }
@@ -1016,6 +1029,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             return default;
         }
 
+        if (_mmfReader != null && lineNum < _mmfReader.LineCount)
+        {
+            var line = _mmfReader.GetLine(lineNum);
+            return new ValueTask<ILogLineMemory>(line);
+        }
+
         AcquireBufferListReaderLock();
         var logBuffer = GetBufferForLineCore(lineNum);
         if (logBuffer == null)
@@ -1902,12 +1921,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             }
         }
 
-        return null;
-
 #if DEBUG
         long endTime = Environment.TickCount;
         _logger.Debug($"getBufferForLine({lineNum}) duration: {endTime - startTime} ms.");
 #endif
+
+        return null;
     }
 
     private static int HighestPowerOfTwo (int n) => 1 << (31 - int.LeadingZeroCount(n));
@@ -2086,6 +2105,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             _logger.Info(CultureInfo.InvariantCulture, "file size changed. new size={0}, file: {1}", newSize, _fileName);
             FireChangeEvent();
         }
+
+        _mmfReader?.ExtendIndex();
     }
 
     /// <summary>
@@ -2446,6 +2467,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 DeleteAllContent();
                 _cts.Dispose();
                 _lastBufferIndex.Dispose();
+                _mmfReader?.Dispose();
             }
 
             _disposed = true;
