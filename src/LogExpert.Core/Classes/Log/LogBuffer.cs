@@ -14,7 +14,7 @@ public class LogBuffer
     private readonly List<long> _filePositions; // file position for every line
 #endif
 
-    private readonly List<ILogLineMemory> _lineList;
+    private readonly List<LogLine> _lineList;
 
     private int MAX_LINES = 500;
 
@@ -78,7 +78,7 @@ public class LogBuffer
 
     #region Public methods
 
-    public void AddLine (ILogLineMemory lineMemory, long filePos)
+    public void AddLine (LogLine lineMemory, long filePos)
     {
         _lineList.Add(lineMemory);
 #if DEBUG
@@ -103,7 +103,7 @@ public class LogBuffer
 #endif
     }
 
-    public ILogLineMemory GetLineMemoryOfBlock (int num)
+    public LogLine? GetLineMemoryOfBlock (int num)
     {
         return num < _lineList.Count && num >= 0
             ? _lineList[num]

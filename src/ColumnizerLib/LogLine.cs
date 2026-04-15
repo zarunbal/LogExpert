@@ -27,7 +27,7 @@ namespace ColumnizerLib;
 /// was replaced to better align with these performance and semantic requirements.
 /// </para>
 /// </remarks>
-public class LogLine : ILogLineMemory
+public readonly record struct LogLine : ILogLineMemory
 {
     public int LineNumber { get; }
 
