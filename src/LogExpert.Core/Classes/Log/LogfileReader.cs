@@ -491,18 +491,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Releases an upgradeable read lock held by the current thread on the associated lock object.
-    /// </summary>
-    /// <remarks>
-    /// Call this method to exit an upgradeable read lock previously acquired on the underlying lock. Failing to release
-    /// the lock may result in deadlocks or resource contention.
-    /// </remarks>
-    private void ReleaseDisposeUpgradeableReadLock ()
-    {
-        //_disposeLock.ExitUpgradeableReadLock();
-    }
-
-    /// <summary>
     /// Acquires the writer lock for the buffer list, blocking the calling thread until the lock is obtained.
     /// </summary>
     /// <remarks>
@@ -860,11 +848,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
-        //AcquireDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "Buffer info for line {0}", lineNum);
         DumpBufferInfos(buffer);
         _logger.Info(CultureInfo.InvariantCulture, "File pos for current line: {0}", buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
-        //ReleaseDisposeReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
         ReleaseBufferListReaderLock();
     }
@@ -889,10 +875,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         long disposeSum = 0;
         long maxDispose = 0;
         long minDispose = int.MaxValue;
+
         for (var i = 0; i < _bufferList.Count; ++i)
         {
             var buffer = _bufferList[i];
-            //AcquireDisposeReaderLock();
             if (buffer.StartLine != lineNum)
             {
                 _logger.Error("Start line of buffer is: {0}, expected: {1}", buffer.StartLine, lineNum);
@@ -904,7 +890,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             disposeSum += buffer.DisposeCount;
             maxDispose = Math.Max(maxDispose, buffer.DisposeCount);
             minDispose = Math.Min(minDispose, buffer.DisposeCount);
-            //ReleaseDisposeReaderLock();
         }
 
         ReleaseBufferListReaderLock();
@@ -964,8 +949,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
             if (logBuffer.IsDisposed)
             {
-                UpgradeDisposeLockToWriterLock();
-
                 lock (logBuffer.FileInfo)
                 {
                     ReReadBuffer(logBuffer);
@@ -986,28 +969,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
             ReleaseBufferListReaderLock();
         }
-
-        //// disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-        //AcquireDisposeLockUpgradableReadLock();
-        //if (logBuffer.IsDisposed)
-        //{
-        //    UpgradeDisposeLockToWriterLock();
-
-        //    lock (logBuffer.FileInfo)
-        //    {
-        //        ReReadBuffer(logBuffer);
-        //    }
-
-        //    DowngradeDisposeLockFromWriterLock();
-        //}
-
-        //var line = logBuffer.GetLineMemoryOfBlock(lineNum - logBuffer.StartLine);
-        //ReleaseDisposeUpgradeableReadLock();
-        //ReleaseBufferListReaderLock();
-
-        //return line.HasValue
-        //    ? new ValueTask<ILogLineMemory>(line.Value)
-        //    : default;
     }
 
     /// <summary>
@@ -1273,16 +1234,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                             logBuffer.ReleaseContentLock();
                         }
                     }
-
-                    //AcquireDisposeLockUpgradableReadLock();
-                    //if (logBuffer.IsDisposed)
-                    //{
-                    //    UpgradeDisposeLockToWriterLock();
-                    //    ReReadBuffer(logBuffer);
-                    //    DowngradeDisposeLockFromWriterLock();
-                    //}
-
-                    //ReleaseDisposeUpgradeableReadLock();
                 }
             }
             finally
@@ -1479,7 +1430,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             var entries = _lruCacheDict.ToArray();
             Array.Sort(entries, static (a, b) => a.Value.LastUseTimeStamp.CompareTo(b.Value.LastUseTimeStamp));
 
-            //AcquireDisposeWriterLock();
             for (var i = 0; i < diff && i < entries.Length; ++i)
             {
                 var kvp = entries[i];
@@ -1500,8 +1450,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     }
                 }
             }
-
-            //ReleaseDisposeWriterLock();
         }
 
 #if DEBUG
@@ -1550,7 +1498,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void ClearLru ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "Clearing LRU cache.");
-        AcquireDisposeWriterLock();
         foreach (var entry in _lruCacheDict.Values)
         {
             var lockTaken = false;
@@ -1569,7 +1516,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         _lruCacheDict.Clear();
-        ReleaseDisposeWriterLock();
         _logger.Info(CultureInfo.InvariantCulture, "Clearing done.");
     }
 
@@ -2310,83 +2256,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Acquires an upgradeable read lock on the dispose lock, waiting up to 10 seconds before blocking indefinitely if
-    /// the lock is not immediately available.
-    /// </summary>
-    /// <remarks>
-    /// This method ensures that the current thread holds an upgradeable read lock on the dispose lock, allowing for
-    /// potential escalation to a write lock if needed. If the lock cannot be acquired within 10 seconds, a warning is
-    /// logged and the method blocks until the lock becomes available.
-    /// </remarks>
-    private void AcquireDisposeLockUpgradableReadLock ()
-    {
-        //if (!_disposeLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
-        //{
-        //    _logger.Warn("Upgradeable read lock timed out");
-        //    _disposeLock.EnterUpgradeableReadLock();
-        //}
-    }
-
-    /// <summary>
-    /// Acquires a read lock on the dispose lock, blocking the calling thread until the lock is obtained.
-    /// </summary>
-    /// <remarks>
-    /// If the read lock cannot be acquired within 10 seconds, a warning is logged and the method will block until the
-    /// lock becomes available. This method is intended to ensure thread-safe access during disposal operations.
-    /// </remarks>
-    private void AcquireDisposeReaderLock ()
-    {
-        //if (!_disposeLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
-        //{
-        //    _logger.Warn("Dispose reader lock timed out");
-        //    _disposeLock.EnterReadLock();
-        //}
-    }
-
-    /// <summary>
-    /// Releases the writer lock held for disposing resources.
-    /// </summary>
-    /// <remarks>
-    /// Call this method to exit the write lock acquired for resource disposal. This should be used in conjunction with
-    /// the corresponding method that acquires the writer lock to ensure proper synchronization during disposal
-    /// operations.
-    /// </remarks>
-    private void ReleaseDisposeWriterLock ()
-    {
-        //_disposeLock.ExitWriteLock();
-    }
-
-    /// <summary>
-    /// Releases a reader lock held for disposing resources, allowing other threads to acquire the lock as needed.
-    /// </summary>
-    /// <remarks>
-    /// Call this method to release the read lock previously acquired for resource disposal operations. Failing to
-    /// release the lock may result in deadlocks or prevent other threads from accessing the protected resource.
-    /// </remarks>
-    private void ReleaseDisposeReaderLock ()
-    {
-        //_disposeLock.ExitReadLock();
-    }
-
-    /// <summary>
-    /// Acquires the writer lock used to synchronize disposal operations, blocking the calling thread until the lock is
-    /// obtained.
-    /// </summary>
-    /// <remarks>
-    /// If the writer lock cannot be acquired within 10 seconds, a warning is logged and the method waits indefinitely
-    /// until the lock becomes available. Callers should ensure that holding the lock for extended periods does not
-    /// cause deadlocks or performance issues.
-    /// </remarks>
-    private void AcquireDisposeWriterLock ()
-    {
-        //if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        //{
-        //    _logger.Warn("Dispose writer lock timed out");
-        //    _disposeLock.EnterWriteLock();
-        //}
-    }
-
-    /// <summary>
     /// Releases the upgradeable read lock on the buffer list, allowing other threads to acquire exclusive or read
     /// access.
     /// </summary>
@@ -2418,23 +2287,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Upgrades the current dispose lock to a writer lock, blocking if necessary until the upgrade is successful.
-    /// </summary>
-    /// <remarks>
-    /// This method attempts to upgrade the dispose lock to a writer lock with a timeout. If the upgrade cannot be
-    /// completed within the timeout period, it logs a warning and blocks until the writer lock is acquired. Call this
-    /// method when exclusive access is required for disposal or resource modification.
-    /// </remarks>
-    private void UpgradeDisposeLockToWriterLock ()
-    {
-        //if (!_disposeLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        //{
-        //    _logger.Warn("Writer lock upgrade timed out");
-        //    _disposeLock.EnterWriteLock();
-        //}
-    }
-
-    /// <summary>
     /// Downgrades the buffer list lock from write mode to allow other threads to acquire read access.
     /// </summary>
     /// <remarks>
@@ -2444,19 +2296,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void DowngradeBufferListLockFromWriterLock ()
     {
         _bufferListLock.ExitWriteLock();
-    }
-
-    /// <summary>
-    /// Releases the writer lock on the dispose lock, downgrading from write access.
-    /// </summary>
-    /// <remarks>
-    /// Call this method to release write access to the dispose lock when a downgrade is required, such as when
-    /// transitioning from exclusive to shared access. This method should only be called when the current thread holds
-    /// the writer lock.
-    /// </remarks>
-    private void DowngradeDisposeLockFromWriterLock ()
-    {
-        //_disposeLock.ExitWriteLock();
     }
 
 #if DEBUG
