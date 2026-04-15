@@ -1,4 +1,4 @@
-using System.Buffers;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -34,7 +34,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly ReaderWriterLockSlim _disposeLock = new(LockRecursionPolicy.SupportsRecursion);
-    private readonly ReaderWriterLockSlim _lruCacheDictLock = new(LockRecursionPolicy.SupportsRecursion);
 
     private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
     private const int WAIT_TIME = 1000;
@@ -51,7 +50,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
 
     private IList<ILogFileInfo> _logFileInfoList = [];
-    private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
+    private ConcurrentDictionary<int, LogBufferCacheEntry> _lruCacheDict;
     private bool _shouldStop;
     private bool _disposed;
     private ILogFileInfo _watchedILogFileInfo;
@@ -202,13 +201,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </summary>
     public long FileSize { get; private set; }
 
-    //TODO: Change to private field. No need for a property.
     /// <summary>
     /// Gets or sets a value indicating whether XML mode is enabled.
     /// </summary>
     public bool IsXmlMode { get; set; }
 
-    //TODO: Change to private field. No need for a property.
     /// <summary>
     /// Gets or sets the XML log configuration used to control logging behavior and settings.
     /// </summary>
@@ -257,9 +254,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _lastProgressUpdate = 0;
         FileSize = 0;
         LineCount = 0;
-        //this.lastReturnedLine = "";
-        //this.lastReturnedLineNum = -1;
-        //this.lastReturnedLineNumForBuffer = -1;
+
         _isDeleted = false;
         ClearLru();
         AcquireBufferListWriterLock();
@@ -269,7 +264,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             foreach (var info in _logFileInfoList)
             {
-                //info.OpenFile();
                 ReadToBufferList(info, 0, LineCount);
             }
 
@@ -391,10 +385,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 {
                     _logger.Info(CultureInfo.InvariantCulture, "{0} does not exist", fileName);
                     lostILogFileInfoList.Add(logFileInfo);
-#if DEBUG // for better overview in logfile:
-                    //ILogFileInfo newILogFileInfo = new ILogFileInfo(fileName);
-                    //ReplaceBufferInfos(ILogFileInfo, newILogFileInfo);
-#endif
                 }
             }
 
@@ -402,11 +392,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             {
                 _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for lost files");
 
-                AcquireLruCacheDictWriterLock();
-
                 foreach (var logFileInfo in lostILogFileInfoList)
                 {
-                    //this.ILogFileInfoList.Remove(logFileInfo);
                     var lastBuffer = DeleteBuffersForInfo(logFileInfo, false);
                     if (lastBuffer != null)
                     {
@@ -420,7 +407,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
                 }
 
-                ReleaseLRUCacheDictWriterLock();
 #if DEBUG
                 if (_bufferList.Count > 0)
                 {
@@ -432,30 +418,23 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             // Read anew all buffers following a buffer info that couldn't be matched with the corresponding existing file
             _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for files that must be re-read");
 
-            AcquireLruCacheDictWriterLock();
-
             foreach (var iLogFileInfo in readNewILogFileInfoList)
             {
                 DeleteBuffersForInfo(iLogFileInfo, true);
-                //this.ILogFileInfoList.Remove(logFileInfo);
             }
 
             _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for the watched file");
 
             DeleteBuffersForInfo(_watchedILogFileInfo, true);
-            ReleaseLRUCacheDictWriterLock();
 
             _logger.Info(CultureInfo.InvariantCulture, "Re-Reading files");
 
             foreach (var iLogFileInfo in readNewILogFileInfoList)
             {
-                //logFileInfo.OpenFile();
                 ReadToBufferList(iLogFileInfo, 0, LineCount);
-                //this.ILogFileInfoList.Add(logFileInfo);
                 newFileInfoList.Add(iLogFileInfo);
             }
 
-            //this.watchedILogFileInfo = this.ILogFileInfoList[this.ILogFileInfoList.Count - 1];
             _logFileInfoList = newFileInfoList;
             _watchedILogFileInfo = GetLogFileInfo(_watchedILogFileInfo.FullName);
             _logFileInfoList.Add(_watchedILogFileInfo);
@@ -756,28 +735,23 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         _logger.Info(CultureInfo.InvariantCulture, "stopMonitoring()");
         _shouldStop = true;
+        _cts.Cancel();
 
-        Thread.Sleep(_watchedILogFileInfo.PollInterval); // leave time for the threads to stop by themselves
-
-        if (_monitorTask != null)
+        try
         {
-            if (_monitorTask.Status == TaskStatus.Running) // if thread has not finished, abort it
-            {
-                _cts.Cancel();
-            }
+            var timeout = TimeSpan.FromSeconds(5);
+            _ = _monitorTask?.Wait(timeout);
+            _ = _garbageCollectorTask?.Wait(timeout);
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is OperationCanceledException))
+        {
+            //Expected exceptions due to task cancellation, can be safely ignored.
+        }
+        catch (AggregateException ex)
+        {
+            _logger.Warn(ex, "Exception while waiting for monitor or GC task to complete");
         }
 
-        if (!_garbageCollectorTask.IsCanceled)
-        {
-            if (_garbageCollectorTask.Status == TaskStatus.Running) // if thread has not finished, abort it
-            {
-                _cts.Cancel();
-            }
-        }
-
-        //this.loadThread = null;
-        //_monitorThread = null;
-        //_garbageCollectorThread = null; // preventive call
         CloseFiles();
     }
 
@@ -788,12 +762,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     public void StopMonitoringAsync ()
     {
         var task = Task.Run(StopMonitoring);
-
-        //Thread stopperThread = new(new ThreadStart(StopMonitoring))
-        //{
-        //    IsBackground = true
-        //};
-        //stopperThread.Start();
     }
 
     /// <summary>
@@ -810,7 +778,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _logger.Info(CultureInfo.InvariantCulture, "Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(false));
         AcquireBufferListWriterLock();
         ClearBufferState();
-        AcquireLruCacheDictWriterLock();
         AcquireDisposeWriterLock();
 
         foreach (var logBuffer in _bufferList)
@@ -825,7 +792,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _bufferList.Clear();
 
         ReleaseDisposeWriterLock();
-        ReleaseLRUCacheDictWriterLock();
         ReleaseBufferListWriterLock();
         _contentDeleted = true;
         _logger.Info(CultureInfo.InvariantCulture, "Deleting complete. Used mem: {0:N0}", GC.GetTotalMemory(false));
@@ -915,10 +881,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     public void LogBufferDiagnostic ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "-------- Buffer diagnostics -------");
-        AcquireLruCacheDictReaderLock();
         var cacheCount = _lruCacheDict.Count;
         _logger.Info(CultureInfo.InvariantCulture, "LRU entries: {0}", cacheCount);
-        ReleaseLRUCacheDictReaderLock();
 
         AcquireBufferListReaderLock();
         _logger.Info(CultureInfo.InvariantCulture, "File: {0}\r\nBuffer count: {1}\r\nDisposed buffers: {2}", _fileName, _bufferList.Count, _bufferList.Count - cacheCount);
@@ -1027,9 +991,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         ClearBufferState();
         _bufferList = [];
-        //_bufferLru = new List<LogBuffer>(_max_buffers + 1);
-        //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
-        _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(_max_buffers + 1);
+        _lruCacheDict = new ConcurrentDictionary<int, LogBufferCacheEntry>(concurrencyLevel: Environment.ProcessorCount, capacity: _max_buffers + 1);
     }
 
     /// <summary>
@@ -1043,9 +1005,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void StartGCThread ()
     {
         _garbageCollectorTask = Task.Run(GarbageCollectorThreadProc, _cts.Token);
-        //_garbageCollectorThread = new Thread(new ThreadStart(GarbageCollectorThreadProc));
-        //_garbageCollectorThread.IsBackground = true;
-        //_garbageCollectorThread.Start();
     }
 
     /// <summary>
@@ -1059,9 +1018,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         FileSize = 0;
         LineCount = 0;
-        //this.lastReturnedLine = "";
-        //this.lastReturnedLineNum = -1;
-        //this.lastReturnedLineNumForBuffer = -1;
     }
 
     /// <summary>
@@ -1069,15 +1025,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </summary>
     private void CloseFiles ()
     {
-        //foreach (ILogFileInfo info in this.ILogFileInfoList)
-        //{
-        //  info.CloseFile();
-        //}
         FileSize = 0;
         LineCount = 0;
-        //this.lastReturnedLine = "";
-        //this.lastReturnedLineNum = -1;
-        //this.lastReturnedLineNumForBuffer = -1;
     }
 
     /// <summary>
@@ -1196,9 +1145,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="buffer">The log buffer to remove from the buffer list and cache. Must not be null.</param>
     private void RemoveFromBufferList (LogBuffer buffer)
     {
-        Util.AssertTrue(_lruCacheDictLock.IsWriteLockHeld, "No _writer lock for lru cache");
         Util.AssertTrue(_bufferListLock.IsWriteLockHeld, "No _writer lock for buffer list");
-        _ = _lruCacheDict.Remove(buffer.StartLine);
+        _ = _lruCacheDict.TryRemove(buffer.StartLine, out _);
         _ = _bufferList.Remove(buffer);
     }
 
@@ -1413,7 +1361,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _logger.Debug(CultureInfo.InvariantCulture, "AddBufferToList(): {0}/{1}/{2}", logBuffer.StartLine, logBuffer.LineCount, logBuffer.FileInfo.FullName);
 #endif
         _bufferList.Add(logBuffer);
-        //UpdateLru(logBuffer);
         UpdateLruCache(logBuffer);
     }
 
@@ -1428,60 +1375,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="logBuffer">The log buffer to add to or update in the LRU cache. Cannot be null.</param>
     private void UpdateLruCache (LogBuffer logBuffer)
     {
-        AcquireLRUCacheDictUpgradeableReadLock();
-        try
-        {
-            if (_lruCacheDict.TryGetValue(logBuffer.StartLine, out var cacheEntry))
-            {
-                cacheEntry.Touch();
-            }
-            else
-            {
-                UpgradeLRUCacheDicLockToWriterLock();
-                try
-                {
-                    if (!_lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry))
-                    {
-                        cacheEntry = new LogBufferCacheEntry
-                        {
-                            LogBuffer = logBuffer
-                        };
+        var cacheEntry = _lruCacheDict.GetOrAdd(
+        logBuffer.StartLine,
+        static (_, buf) => new LogBufferCacheEntry { LogBuffer = buf },
+        logBuffer);
 
-                        try
-                        {
-                            _lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
-                        }
-                        catch (ArgumentException e)
-                        {
-                            _logger.Error(e, "Error in LRU cache: " + e.Message);
-#if DEBUG // there seems to be a bug with double added key
-
-                            _logger.Info(CultureInfo.InvariantCulture, "Added buffer:");
-                            DumpBufferInfos(logBuffer);
-                            if (_lruCacheDict.TryGetValue(logBuffer.StartLine, out var existingEntry))
-                            {
-                                _logger.Info(CultureInfo.InvariantCulture, "Existing buffer: ");
-                                DumpBufferInfos(existingEntry.LogBuffer);
-                            }
-                            else
-                            {
-                                _logger.Warn(CultureInfo.InvariantCulture, "Ooops? Cannot find the already existing entry in LRU.");
-                            }
-#endif
-                            throw;
-                        }
-                    }
-                }
-                finally
-                {
-                    DowngradeLRUCacheLockFromWriterLock();
-                }
-            }
-        }
-        finally
-        {
-            ReleaseLRUCacheDictUpgradeableReadLock();
-        }
+        cacheEntry.Touch();
     }
 
     /// <summary>
@@ -1492,16 +1391,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="newLineNum"></param>
     private void SetNewStartLineForBuffer (LogBuffer logBuffer, int newLineNum)
     {
-        Util.AssertTrue(_lruCacheDictLock.IsWriteLockHeld, "No _writer lock for lru cache");
-        if (_lruCacheDict.ContainsKey(logBuffer.StartLine))
+        if (_lruCacheDict.TryRemove(logBuffer.StartLine, out var cacheEntry))
         {
-            _ = _lruCacheDict.Remove(logBuffer.StartLine);
             logBuffer.StartLine = newLineNum;
-            LogBufferCacheEntry cacheEntry = new()
-            {
-                LogBuffer = logBuffer
-            };
-            _lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
+            _ = _lruCacheDict.TryAdd(logBuffer.StartLine, cacheEntry);
         }
         else
         {
@@ -1524,7 +1417,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 #endif
         _logger.Debug(CultureInfo.InvariantCulture, "Starting garbage collection");
         var threshold = 10;
-        AcquireLruCacheDictWriterLock();
         var diff = 0;
         if (_lruCacheDict.Count - (_max_buffers + threshold) > 0)
         {
@@ -1535,44 +1427,23 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 _logger.Info(CultureInfo.InvariantCulture, "Removing {0} entries from LRU cache for {1}", diff, Util.GetNameFromPath(_fileName));
             }
 #endif
-            var count = _lruCacheDict.Count;
-            var sortArray = ArrayPool<(long Timestamp, int StartLine)>.Shared.Rent(count);
-            try
+            // Snapshot values and sort by timestamp (ascending = least recently used first)
+            var entries = _lruCacheDict.ToArray();
+            Array.Sort(entries, static (a, b) => a.Value.LastUseTimeStamp.CompareTo(b.Value.LastUseTimeStamp));
+
+            AcquireDisposeWriterLock();
+            for (var i = 0; i < diff && i < entries.Length; ++i)
             {
-                var idx = 0;
-                foreach (var entry in _lruCacheDict.Values)
+                var kvp = entries[i];
+                if (_lruCacheDict.TryRemove(kvp.Key, out var removed))
                 {
-                    sortArray[idx++] = (entry.LastUseTimeStamp, entry.LogBuffer.StartLine);
+                    removed.LogBuffer.DisposeContent();
                 }
-
-                Array.Sort(sortArray, 0, count);
-
-                // remove first <diff> entries (least recently used)
-                AcquireDisposeWriterLock();
-                for (var i = 0; i < diff; ++i)
-                {
-                    if (i >= count)
-                    {
-                        break;
-                    }
-
-                    var startLine = sortArray[i].StartLine;
-                    if (_lruCacheDict.TryGetValue(startLine, out var entry))
-                    {
-                        _lruCacheDict.Remove(startLine);
-                        entry.LogBuffer.DisposeContent();
-                    }
-                }
-
-                ReleaseDisposeWriterLock();
             }
-            finally
-            {
-                ArrayPool<(long Timestamp, int StartLine)>.Shared.Return(sortArray);
-            }
+
+            ReleaseDisposeWriterLock();
         }
 
-        ReleaseLRUCacheDictWriterLock();
 #if DEBUG
         if (diff > 0)
         {
@@ -1591,17 +1462,17 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// then invokes cache cleanup, continuing until a stop signal is received. Exceptions during the sleep interval are
     /// caught and ignored to ensure the thread remains active.
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Garbage collector Thread Process")]
-    private void GarbageCollectorThreadProc ()
+    private async Task GarbageCollectorThreadProc ()
     {
         while (!_shouldStop)
         {
             try
             {
-                Thread.Sleep(10000);
+                await Task.Delay(10000, _cts.Token).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch (OperationCanceledException)
             {
+                break;
             }
 
             GarbageCollectLruCache();
@@ -1619,7 +1490,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void ClearLru ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "Clearing LRU cache.");
-        AcquireLruCacheDictWriterLock();
         AcquireDisposeWriterLock();
         foreach (var entry in _lruCacheDict.Values)
         {
@@ -1628,7 +1498,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
         _lruCacheDict.Clear();
         ReleaseDisposeWriterLock();
-        ReleaseLRUCacheDictWriterLock();
         _logger.Info(CultureInfo.InvariantCulture, "Clearing done.");
     }
 
@@ -1839,8 +1708,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Core buffer lookup without acquiring <c>_bufferListLock</c>.
-    /// The caller MUST already hold a read or write lock on <c>_bufferListLock</c>.
+    /// Core buffer lookup without acquiring <c> _bufferListLock</c>. The caller MUST already hold a read or write lock
+    /// on <c> _bufferListLock</c>.
     /// </summary>
     private LogBuffer GetBufferForLineCore (int lineNum)
     {
@@ -2003,7 +1872,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// updated or deleted. The method runs until a stop signal is received. Exceptions encountered during monitoring
     /// are logged but do not terminate the monitoring loop.
     /// </remarks>
-    private void MonitorThreadProc ()
+    private async Task MonitorThreadProc ()
     {
         Thread.CurrentThread.Name = "MonitorThread";
         //IFileSystemPlugin fs = PluginRegistry.GetInstance().FindFileSystemForUri(this.watchedILogFileInfo.FullName);
@@ -2030,15 +1899,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             try
             {
                 var pollInterval = _watchedILogFileInfo.PollInterval;
-                //#if DEBUG
-                //          if (_logger.IsDebug)
-                //          {
-                //            _logger.logDebug("Poll interval for " + this.fileName + ": " + pollInterval);
-                //          }
-                //#endif
-                Thread.Sleep(pollInterval);
+                await Task.Delay(pollInterval, _cts.Token).ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch (OperationCanceledException e)
             {
                 _logger.Error(e);
             }
@@ -2166,7 +2029,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
                 else
                 {
-                    // ReloadBufferList();  // removed because reloading is triggered by owning LogWindow
                     // Trigger "new file" handling (reload)
                     OnLoadFile(new LoadFileEventArgs(_fileName, 0, true, _fileLength, true));
 
@@ -2355,8 +2217,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         return (true, lineMemory, false);
-
-        //return (ReadLine(reader, lineNum, realLineNum, out var outLine), outLine.AsMemory());
     }
 
     /// <summary>
@@ -2396,42 +2256,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Acquires an upgradeable read lock on the LRU cache dictionary, waiting up to 10 seconds before blocking
-    /// indefinitely if the lock is not immediately available.
-    /// </summary>
-    /// <remarks>
-    /// This method ensures that the calling thread holds an upgradeable read lock on the LRU cache dictionary, allowing
-    /// for safe read access and the potential to upgrade to a write lock if necessary. If the lock cannot be acquired
-    /// within 10 seconds, a warning is logged and the method blocks until the lock becomes available. This approach
-    /// helps prevent deadlocks and provides diagnostic information in case of lock contention.
-    /// </remarks>
-    private void AcquireLRUCacheDictUpgradeableReadLock ()
-    {
-        if (!_lruCacheDictLock.TryEnterUpgradeableReadLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Upgradeable read lock timed out");
-            _lruCacheDictLock.EnterUpgradeableReadLock();
-        }
-    }
-
-    /// <summary>
-    /// Acquires a read lock on the LRU cache dictionary to ensure thread-safe read access.
-    /// </summary>
-    /// <remarks>
-    /// If the read lock cannot be acquired within 10 seconds, a warning is logged and the method will block until the
-    /// lock becomes available. Callers should ensure that this method is used in contexts where blocking is acceptable
-    /// to avoid potential deadlocks or performance issues.
-    /// </remarks>
-    private void AcquireLruCacheDictReaderLock ()
-    {
-        if (!_lruCacheDictLock.TryEnterReadLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("LRU cache dict reader lock timed out");
-            _lruCacheDictLock.EnterReadLock();
-        }
-    }
-
-    /// <summary>
     /// Acquires a read lock on the dispose lock, blocking the calling thread until the lock is obtained.
     /// </summary>
     /// <remarks>
@@ -2448,18 +2272,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Releases the writer lock held on the LRU cache dictionary, allowing other threads to acquire the lock.
-    /// </summary>
-    /// <remarks>
-    /// Call this method after completing operations that require exclusive access to the LRU cache dictionary. Failing
-    /// to release the writer lock may result in deadlocks or reduced concurrency.
-    /// </remarks>
-    private void ReleaseLRUCacheDictWriterLock ()
-    {
-        _lruCacheDictLock.ExitWriteLock();
-    }
-
-    /// <summary>
     /// Releases the writer lock held for disposing resources.
     /// </summary>
     /// <remarks>
@@ -2473,18 +2285,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Releases the read lock on the LRU cache dictionary to allow write access by other threads.
-    /// </summary>
-    /// <remarks>
-    /// Call this method after completing operations that require read access to the LRU cache dictionary. Failing to
-    /// release the lock may result in deadlocks or prevent other threads from acquiring write access.
-    /// </remarks>
-    private void ReleaseLRUCacheDictReaderLock ()
-    {
-        _lruCacheDictLock.ExitReadLock();
-    }
-
-    /// <summary>
     /// Releases a reader lock held for disposing resources, allowing other threads to acquire the lock as needed.
     /// </summary>
     /// <remarks>
@@ -2494,19 +2294,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void ReleaseDisposeReaderLock ()
     {
         _disposeLock.ExitReadLock();
-    }
-
-    /// <summary>
-    /// Releases the upgradeable read lock held on the LRU cache dictionary.
-    /// </summary>
-    /// <remarks>
-    /// Call this method to release the upgradeable read lock previously acquired on the LRU cache dictionary. Failing
-    /// to release the lock may result in deadlocks or reduced concurrency. This method should be used in conjunction
-    /// with the corresponding lock acquisition method to ensure proper synchronization.
-    /// </remarks>
-    private void ReleaseLRUCacheDictUpgradeableReadLock ()
-    {
-        _lruCacheDictLock.ExitUpgradeableReadLock();
     }
 
     /// <summary>
@@ -2524,24 +2311,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             _logger.Warn("Dispose writer lock timed out");
             _disposeLock.EnterWriteLock();
-        }
-    }
-
-    /// <summary>
-    /// Acquires an exclusive writer lock on the LRU cache dictionary, blocking if the lock is not immediately
-    /// available.
-    /// </summary>
-    /// <remarks>
-    /// If the writer lock cannot be acquired within 10 seconds, a warning is logged and the method blocks until the
-    /// lock becomes available. This method should be called before performing write operations on the LRU cache
-    /// dictionary to ensure thread safety.
-    /// </remarks>
-    private void AcquireLruCacheDictWriterLock ()
-    {
-        if (!_lruCacheDictLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("LRU cache dict writer lock timed out");
-            _lruCacheDictLock.EnterWriteLock();
         }
     }
 
@@ -2594,24 +2363,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Upgrades the lock on the LRU cache dictionary from a reader lock to a writer lock, waiting up to 10 seconds
-    /// before forcing the upgrade.
-    /// </summary>
-    /// <remarks>
-    /// If the writer lock cannot be acquired within 10 seconds, the method logs a warning and then blocks until the
-    /// writer lock is available. Call this method only when it is necessary to perform write operations on the LRU
-    /// cache dictionary after holding a reader lock.
-    /// </remarks>
-    private void UpgradeLRUCacheDicLockToWriterLock ()
-    {
-        if (!_lruCacheDictLock.TryEnterWriteLock(TimeSpan.FromSeconds(10)))
-        {
-            _logger.Warn("Writer lock upgrade timed out");
-            _lruCacheDictLock.EnterWriteLock();
-        }
-    }
-
-    /// <summary>
     /// Downgrades the buffer list lock from write mode to allow other threads to acquire read access.
     /// </summary>
     /// <remarks>
@@ -2621,18 +2372,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void DowngradeBufferListLockFromWriterLock ()
     {
         _bufferListLock.ExitWriteLock();
-    }
-
-    /// <summary>
-    /// Downgrades the LRU cache lock from a writer lock, allowing other threads to acquire read access.
-    /// </summary>
-    /// <remarks>
-    /// Call this method after completing operations that require exclusive write access to the LRU cache, to permit
-    /// concurrent read operations. The caller must hold the writer lock before invoking this method.
-    /// </remarks>
-    private void DowngradeLRUCacheLockFromWriterLock ()
-    {
-        _lruCacheDictLock.ExitWriteLock();
     }
 
     /// <summary>
