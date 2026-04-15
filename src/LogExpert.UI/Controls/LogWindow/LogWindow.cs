@@ -939,17 +939,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (e.NewFile)
         {
-            //_logger.Info("OnLogFileReaderLoadFile: New File created.");
-
             // File was new created (e.g. rollover)
             _isDeadFile = false;
             UnRegisterLogFileReaderEvents();
             dataGridView.CurrentCellChanged -= OnDataGridViewCurrentCellChanged;
             MethodInvoker invoker = ReloadNewFile;
             _ = BeginInvoke(invoker);
-            //Thread loadThread = new Thread(new ThreadStart(ReloadNewFile));
-            //loadThread.Start();
-            //_logger.Debug("OnLogFileReaderLoadFile: Reloading invoked.");
         }
         else if (_isLoading)
         {
@@ -959,18 +954,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void OnFileSizeChanged (object sender, LogEventArgs e)
     {
-        //OnFileSizeChanged(e);  // now done in UpdateGrid()
-        //_logger.Info($"Got FileSizeChanged event. prevLines:{e.PrevLineCount}, curr lines: {e.LineCount}");
-
-        // - now done in the thread that works on the event args list
-        //if (e.IsRollover)
-        //{
-        //  ShiftBookmarks(e.RolloverOffset);
-        //  ShiftFilterPipes(e.RolloverOffset);
-        //}
-
-        //UpdateGridCallback callback = new UpdateGridCallback(UpdateGrid);
-        //this.BeginInvoke(callback, new object[] { e });
         lock (_logEventArgsList)
         {
             _logEventArgsList.Add(e);
@@ -981,8 +964,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnDataGridViewCellValueNeeded (object sender, DataGridViewCellValueEventArgs e)
     {
-        var startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
+        PrefetchVisibleLines();
 
+        var startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
         e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
 
         // The new column could be find dynamically.
@@ -995,6 +979,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var colName = CurrentColumnizer.GetColumnNames()[i];
                 _ = dataGridView.Columns.Add(PaintHelper.CreateTitleColumn(colName));
             }
+        }
+    }
+
+    private void PrefetchVisibleLines ()
+    {
+        if (_logFileReader == null)
+        {
+            return;
+        }
+
+        var firstVisible = dataGridView.FirstDisplayedScrollingRowIndex;
+        var visibleCount = dataGridView.DisplayedRowCount(includePartialRow: true);
+
+        if (firstVisible >= 0 && visibleCount > 0)
+        {
+            _columnCache.Prefetch(_logFileReader, firstVisible, visibleCount);
         }
     }
 

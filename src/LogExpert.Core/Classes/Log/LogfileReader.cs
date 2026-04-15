@@ -916,6 +916,89 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
+    /// Retrieves a contiguous range of log lines starting at the specified line number.
+    /// Acquires locks once for the entire batch, amortising synchronisation overhead.
+    /// </summary>
+    /// <param name="startLine">The zero-based line number of the first line to retrieve.</param>
+    /// <param name="count">The number of lines to retrieve. May be clamped to available lines.</param>
+    /// <returns>
+    /// An array of <see cref="ILogLineMemory"/> instances. The array length may be less than
+    /// <paramref name="count"/> if the end of file is reached. Entries may be null if a buffer
+    /// is unavailable.
+    /// </returns>
+    public ILogLineMemory[] GetLogLineMemories (int startLine, int count)
+    {
+        if (_isDeleted || count <= 0)
+        {
+            return [];
+        }
+
+        var result = new ILogLineMemory[count];
+        var filled = 0;
+
+        AcquireBufferListReaderLock();
+        try
+        {
+            var lineNum = startLine;
+            while (filled < count)
+            {
+                var logBuffer = GetBufferForLineCore(lineNum);
+                if (logBuffer == null)
+                {
+                    break;
+                }
+
+                // Protect against concurrent disposal
+                var lockTaken = false;
+                try
+                {
+                    logBuffer.AcquireContentLock(ref lockTaken);
+
+                    if (logBuffer.IsDisposed)
+                    {
+                        lock (logBuffer.FileInfo)
+                        {
+                            ReReadBuffer(logBuffer);
+                        }
+                    }
+
+                    // Copy lines from this buffer
+                    var bufferOffset = lineNum - logBuffer.StartLine;
+                    var availableInBuffer = logBuffer.LineCount - bufferOffset;
+                    var toCopy = Math.Min(count - filled, availableInBuffer);
+
+                    for (var i = 0; i < toCopy; i++)
+                    {
+                        result[filled + i] = logBuffer.GetLineMemoryOfBlock(bufferOffset + i);
+                    }
+
+                    filled += toCopy;
+                    lineNum += toCopy;
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        logBuffer.ReleaseContentLock();
+                    }
+                }
+            }
+        }
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
+
+        // Trim if we got fewer lines than requested
+        if (filled < count)
+        {
+            Array.Resize(ref result, filled);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Retrieves the log line at the specified line number, or returns null if the file has been deleted or the line
     /// cannot be found.
     /// </summary>
