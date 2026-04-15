@@ -49,12 +49,14 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private Task _monitorTask;
     private bool _isDeleted;
 
-    private int _totalLineCount;
+
     private IList<ILogFileInfo> _logFileInfoList = [];
     private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
     private bool _shouldStop;
     private bool _disposed;
     private ILogFileInfo _watchedILogFileInfo;
+
+    private bool _isLineCountDirty = true;
 
     private volatile bool _isFailModeCheckCallPending;
     private volatile bool _isFastFailOnGetLogLine;
@@ -153,8 +155,36 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// </remarks>
     public int LineCount
     {
-        get => Volatile.Read(ref _totalLineCount);
-        private set => Interlocked.Exchange(ref _totalLineCount, value);
+        get
+        {
+            if (_isLineCountDirty)
+            {
+                field = 0;
+                if (_bufferListLock.IsReadLockHeld || _bufferListLock.IsWriteLockHeld)
+                {
+                    foreach (var buffer in _bufferList)
+                    {
+                        field += buffer.LineCount;
+                    }
+                }
+                else
+                {
+                    AcquireBufferListReaderLock();
+                    foreach (var buffer in _bufferList)
+                    {
+                        field += buffer.LineCount;
+                    }
+
+                    ReleaseBufferListReaderLock();
+                }
+
+                _isLineCountDirty = false;
+            }
+
+            return field;
+        }
+
+        private set;
     }
 
     /// <summary>
@@ -291,6 +321,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         ClearBufferState();
 
         var offset = 0;
+        _isLineCountDirty = true;
 
         lock (_monitor)
         {
@@ -434,14 +465,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() end. offset={0}", offset);
-
-        var newTotal = 0;
-        foreach (var buf in _bufferList)
-        {
-            newTotal += buf.LineCount;
-        }
-
-        _ = Interlocked.Exchange(ref _totalLineCount, newTotal);
 
         ReleaseBufferListWriterLock();
 
@@ -803,8 +826,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
         _lruCacheDict.Clear();
         _bufferList.Clear();
-
-        _ = Interlocked.Exchange(ref _totalLineCount, 0);
 
         ReleaseDisposeWriterLock();
         ReleaseLRUCacheDictWriterLock();
@@ -1180,7 +1201,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         Util.AssertTrue(_bufferListLock.IsWriteLockHeld, "No _writer lock for buffer list");
         _ = _lruCacheDict.Remove(buffer.StartLine);
         _ = _bufferList.Remove(buffer);
-        _ = Interlocked.Add(ref _totalLineCount, -buffer.LineCount);
     }
 
     /// <summary>
@@ -1362,16 +1382,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 Monitor.Exit(logBuffer);
             }
 
-            var newTotal = 0;
-            AcquireBufferListReaderLock();
-
-            foreach (var buf in _bufferList)
-            {
-                newTotal += buf.LineCount;
-            }
-
-            ReleaseBufferListReaderLock();
-            _ = Interlocked.Exchange(ref _totalLineCount, newTotal);
+            _isLineCountDirty = true;
             FileSize = reader.Position;
 
             // Reader may have detected another encoding
