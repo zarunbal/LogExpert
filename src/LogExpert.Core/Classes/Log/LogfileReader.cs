@@ -30,6 +30,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private readonly ReaderType _readerType;
     private readonly int _maximumLineLength;
 
+    private readonly LogBufferPool _bufferPool;
     private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
 
@@ -100,6 +101,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _multiFileOptions = multiFileOptions;
         _pluginRegistry = pluginRegistry;
         _disposed = false;
+
+        _bufferPool = new LogBufferPool(_max_buffers * 2);
 
         InitLruBuffers();
 
@@ -1300,11 +1303,15 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             {
                 if (_bufferList.Count == 0)
                 {
-                    logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
-                    {
-                        StartLine = startLine,
-                        StartPos = filePos
-                    };
+                    logBuffer = _bufferPool.Rent(logFileInfo, _maxLinesPerBuffer);
+                    logBuffer.StartLine = startLine;
+                    logBuffer.StartPos = filePos;
+                    // logBuffer.PrevBuffersDroppedLinesSum = droppedLines;
+                    // logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
+                    // {
+                    //     StartLine = startLine,
+                    //     StartPos = filePos
+                    // };
 
                     UpgradeBufferlistLockToWriterLock();
 
@@ -1323,11 +1330,15 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
                     if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName, StringComparison.Ordinal))
                     {
-                        logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
-                        {
-                            StartLine = startLine,
-                            StartPos = filePos
-                        };
+                        logBuffer = _bufferPool.Rent(logFileInfo, _maxLinesPerBuffer);
+                        logBuffer.StartLine = startLine;
+                        logBuffer.StartPos = filePos;
+                        // logBuffer.PrevBuffersDroppedLinesSum = droppedLines;
+                        // logBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
+                        // {
+                        //     StartLine = startLine,
+                        //     StartPos = filePos
+                        // };
 
                         UpgradeBufferlistLockToWriterLock();
 
@@ -1408,12 +1419,17 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                         Monitor.Exit(logBuffer);
                         try
                         {
-                            var newBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
-                            {
-                                StartLine = lineNum,
-                                StartPos = filePos,
-                                PrevBuffersDroppedLinesSum = droppedLines
-                            };
+                            var newBuffer = _bufferPool.Rent(logFileInfo, _maxLinesPerBuffer);
+                            newBuffer.StartLine = lineNum;
+                            newBuffer.StartPos = filePos;
+                            newBuffer.PrevBuffersDroppedLinesSum = droppedLines;
+
+                            //var newBuffer = new LogBuffer(logFileInfo, _maxLinesPerBuffer)
+                            //{
+                            //    StartLine = lineNum,
+                            //    StartPos = filePos,
+                            //    PrevBuffersDroppedLinesSum = droppedLines
+                            //};
 
                             AcquireBufferListWriterLock();
 
@@ -1564,7 +1580,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     try
                     {
                         removed.LogBuffer.AcquireContentLock(ref lockTaken);
-                        removed.LogBuffer.DisposeContent();
+                        //removed.LogBuffer.DisposeContent();
+                        _bufferPool.Return(removed.LogBuffer);
                     }
                     finally
                     {
