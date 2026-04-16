@@ -119,6 +119,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             if (!line.HasValue)
             {
                 Assert.Fail("Expected first block line to be present.");
+                continue;
             }
 
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
@@ -134,6 +135,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             if (!line.HasValue)
             {
                 Assert.Fail("Expected first block line to be present.");
+                continue;
             }
 
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
