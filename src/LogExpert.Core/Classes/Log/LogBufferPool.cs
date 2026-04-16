@@ -20,6 +20,13 @@ public sealed class LogBufferPool (int maxSize)
         return new LogBuffer(fileInfo, maxLines);
     }
 
+    /// <summary>
+    /// Returns a <see cref="LogBuffer"/> to the pool for reuse.
+    /// </summary>
+    /// <remarks>
+    /// Disposing the buffer's content is handled by this method, so callers should not dispose the buffer themselves.
+    /// </remarks>
+    /// <param name="buffer">The buffer to return.</param>
     public void Return (LogBuffer buffer)
     {
         ArgumentNullException.ThrowIfNull(buffer);

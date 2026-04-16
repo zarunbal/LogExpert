@@ -20,15 +20,11 @@ public class LogBuffer
     private LogLine[] _lineArray;
     private int _lineArrayLength; // capacity of the rented array
 
-    //private readonly List<LogLine> _lineList;
-
     private int MAX_LINES = 500;
 
     #endregion
 
     #region cTor
-
-    //public LogBuffer() { }
 
     // Don't use a primary constructor here: field initializers (like MAX_LINES) run before primary constructor parameters are assigned,
     // so MAX_LINES would always be set to its default value before the constructor body can assign it. Use a regular constructor instead.
@@ -36,8 +32,6 @@ public class LogBuffer
     {
         FileInfo = fileInfo;
         MAX_LINES = maxLines;
-        //_lineList = new(MAX_LINES);
-
         _lineArray = ArrayPool<LogLine>.Shared.Rent(maxLines);
         _lineArrayLength = _lineArray.Length;
 #if DEBUG
@@ -89,8 +83,6 @@ public class LogBuffer
 
     public void AddLine (LogLine lineMemory, long filePos)
     {
-        //_lineList.Add(lineMemory);
-
         if (LineCount < _lineArrayLength)
         {
             _lineArray[LineCount] = lineMemory;
@@ -112,7 +104,6 @@ public class LogBuffer
     public void ClearLines ()
     {
         Array.Clear(_lineArray, 0, LineCount);
-        //_lineList.Clear();
         LineCount = 0;
     }
 
@@ -140,8 +131,6 @@ public class LogBuffer
 
     public void DisposeContent ()
     {
-        //_lineList.Clear();
-
         if (_lineArray != null)
         {
             Array.Clear(_lineArray, 0, LineCount);
@@ -161,9 +150,6 @@ public class LogBuffer
         return num < LineCount && num >= 0
         ? _lineArray[num]
         : null;
-        //return num < _lineList.Count && num >= 0
-        //    ? _lineList[num]
-        //    : null;
     }
 
     /// <summary>
