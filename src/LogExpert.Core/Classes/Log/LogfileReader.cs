@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 
 using ColumnizerLib;
@@ -34,12 +33,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private readonly Lock _logBufferLock = new();
     private readonly ReaderWriterLockSlim _bufferListLock = new(LockRecursionPolicy.SupportsRecursion);
 
-    private MemoryMappedFileReader _mmfReader;
+    private readonly MemoryMappedFileReader _mmfReader;
 
     private const int PROGRESS_UPDATE_INTERVAL_MS = 100;
     private const int WAIT_TIME = 1000;
 
-    private List<LogBuffer> _bufferList;
+    private SortedList<int, LogBuffer> _bufferList;
 
     private bool _contentDeleted;
     private long _lastProgressUpdate;
@@ -173,7 +172,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 field = 0;
                 if (_bufferListLock.IsReadLockHeld || _bufferListLock.IsWriteLockHeld)
                 {
-                    foreach (var buffer in _bufferList)
+                    foreach (var buffer in _bufferList.Values)
                     {
                         field += buffer.LineCount;
                     }
@@ -181,7 +180,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 else
                 {
                     AcquireBufferListReaderLock();
-                    foreach (var buffer in _bufferList)
+                    foreach (var buffer in _bufferList.Values)
                     {
                         field += buffer.LineCount;
                     }
@@ -347,7 +346,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 var logFileInfo = enumerator.Current;
                 var fileName = logFileInfo.FullName;
                 _logger.Debug(CultureInfo.InvariantCulture, "Testing file {0}", fileName);
+
                 var node = fileNameList.Find(fileName);
+
                 if (node == null)
                 {
                     _logger.Warn(CultureInfo.InvariantCulture, "File {0} not found", fileName);
@@ -414,15 +415,15 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
 
                 _logger.Info(CultureInfo.InvariantCulture, "Adjusting StartLine values in {0} buffers by offset {1}", _bufferList.Count, offset);
-                foreach (var buffer in _bufferList)
+                foreach (var buffer in _bufferList.Values)
                 {
                     SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
                 }
 
 #if DEBUG
-                if (_bufferList.Count > 0)
+                if (_bufferList.Values.Count > 0)
                 {
-                    _logger.Debug(CultureInfo.InvariantCulture, "First buffer now has StartLine {0}", _bufferList[0].StartLine);
+                    _logger.Debug(CultureInfo.InvariantCulture, "First buffer now has StartLine {0}", _bufferList.Values[0].StartLine);
                 }
 #endif
             }
@@ -634,11 +635,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
         if (logBuffer != null && index != -1)
         {
-            for (var i = index; i < _bufferList.Count; ++i)
+            for (var i = index; i < _bufferList.Values.Count; ++i)
             {
-                if (_bufferList[i].FileInfo != logBuffer.FileInfo)
+                if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
                 {
-                    result = _bufferList[i].StartLine;
+                    result = _bufferList.Values[i].StartLine;
                     break;
                 }
             }
@@ -670,9 +671,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             for (var i = index; i >= 0; --i)
             {
-                if (_bufferList[i].FileInfo != logBuffer.FileInfo)
+                if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
                 {
-                    result = _bufferList[i].StartLine + _bufferList[i].LineCount;
+                    result = _bufferList.Values[i].StartLine + _bufferList.Values[i].LineCount;
                     break;
                 }
             }
@@ -780,7 +781,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         ClearBufferState();
         //AcquireDisposeWriterLock();
 
-        foreach (var logBuffer in _bufferList)
+        foreach (var logBuffer in _bufferList.Values)
         {
             if (!logBuffer.IsDisposed)
             {
@@ -832,7 +833,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <returns></returns>
     public IList<LogBuffer> GetBufferList ()
     {
-        return _bufferList;
+        return _bufferList.Values;
     }
 
     #endregion
@@ -889,9 +890,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         long maxDispose = 0;
         long minDispose = int.MaxValue;
 
-        for (var i = 0; i < _bufferList.Count; ++i)
+        for (var i = 0; i < _bufferList.Values.Count; ++i)
         {
-            var buffer = _bufferList[i];
+            var buffer = _bufferList.Values[i];
             if (buffer.StartLine != lineNum)
             {
                 _logger.Error("Start line of buffer is: {0}, expected: {1}", buffer.StartLine, lineNum);
@@ -1155,7 +1156,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     private void ReplaceBufferInfos (ILogFileInfo oldLogFileInfo, ILogFileInfo newLogFileInfo)
     {
         _logger.Debug(CultureInfo.InvariantCulture, "ReplaceBufferInfos() " + oldLogFileInfo.FullName + " -> " + newLogFileInfo.FullName);
-        foreach (var buffer in _bufferList)
+        foreach (var buffer in _bufferList.Values)
         {
             if (buffer.FileInfo == oldLogFileInfo)
             {
@@ -1189,7 +1190,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
         if (matchNamesOnly)
         {
-            foreach (var buffer in _bufferList)
+            foreach (var buffer in _bufferList.Values)
             {
                 if (buffer.FileInfo.FullName.Equals(iLogFileInfo.FullName, StringComparison.Ordinal))
                 {
@@ -1200,7 +1201,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
         else
         {
-            foreach (var buffer in _bufferList)
+            foreach (var buffer in _bufferList.Values)
             {
                 if (buffer.FileInfo == iLogFileInfo)
                 {
@@ -1240,7 +1241,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         Util.AssertTrue(_bufferListLock.IsWriteLockHeld, "No _writer lock for buffer list");
         _ = _lruCacheDict.TryRemove(buffer.StartLine, out _);
-        _ = _bufferList.Remove(buffer);
+        _ = _bufferList.Remove(buffer.StartLine);
     }
 
     /// <summary>
@@ -1297,7 +1298,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
                 else
                 {
-                    logBuffer = _bufferList[^1];
+                    logBuffer = _bufferList.Values[_bufferList.Count - 1];
 
                     if (!logBuffer.FileInfo.FullName.Equals(logFileInfo.FullName, StringComparison.Ordinal))
                     {
@@ -1461,7 +1462,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 #if DEBUG
         _logger.Debug(CultureInfo.InvariantCulture, "AddBufferToList(): {0}/{1}/{2}", logBuffer.StartLine, logBuffer.LineCount, logBuffer.FileInfo.FullName);
 #endif
-        _bufferList.Add(logBuffer);
+        _bufferList[logBuffer.StartLine] = logBuffer;
         UpdateLruCache(logBuffer);
     }
 
@@ -1492,14 +1493,15 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <param name="newLineNum"></param>
     private void SetNewStartLineForBuffer (LogBuffer logBuffer, int newLineNum)
     {
-        if (_lruCacheDict.TryRemove(logBuffer.StartLine, out var cacheEntry))
+        var hadCache = _lruCacheDict.TryRemove(logBuffer.StartLine, out var cacheEntry);
+
+        _ = _bufferList.Remove(logBuffer.StartLine);
+        logBuffer.StartLine = newLineNum;
+        _bufferList[newLineNum] = logBuffer;
+
+        if (hadCache)
         {
-            logBuffer.StartLine = newLineNum;
             _ = _lruCacheDict.TryAdd(logBuffer.StartLine, cacheEntry);
-        }
-        else
-        {
-            logBuffer.StartLine = newLineNum;
         }
     }
 
@@ -1716,8 +1718,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         AcquireBufferListReaderLock();
         try
         {
-            var arr = CollectionsMarshal.AsSpan(_bufferList);
-            var count = arr.Length;
+            var arr = _bufferList.Values;
+            var count = arr.Count;
 
             if (count == 0)
             {
@@ -1840,8 +1842,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         long startTime = Environment.TickCount;
 #endif
 
-        var arr = CollectionsMarshal.AsSpan(_bufferList);
-        var count = arr.Length;
+        var arr = _bufferList.Values;
+        var count = arr.Count;
 
         if (count == 0)
         {
@@ -1971,12 +1973,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         while (true)
         {
             index--;
-            if (index < 0 || _bufferList[index].FileInfo != info)
+            if (index < 0 || _bufferList.Values[index].FileInfo != info)
             {
                 break;
             }
 
-            resultBuffer = _bufferList[index];
+            resultBuffer = _bufferList.Values[index];
         }
 
         ReleaseBufferListReaderLock();
