@@ -554,7 +554,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             AcquireBufferListReaderLock();
             try
             {
-                var logBuffer = GetBufferForLineCore(lineNum);
+                var (logBuffer, _) = GetBufferForLineWithIndex(lineNum);
                 canFastPath = logBuffer is { IsDisposed: false };
             }
             finally
@@ -605,8 +605,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     public string GetLogFileNameForLine (int lineNum)
     {
         var logBuffer = GetBufferForLine(lineNum);
-        var fileName = logBuffer?.FileInfo.FullName;
-        return fileName;
+        return logBuffer?.FileInfo.FullName;
     }
 
     /// <summary>
@@ -616,11 +615,8 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <returns></returns>
     public ILogFileInfo GetLogFileInfoForLine (int lineNum)
     {
-        AcquireBufferListReaderLock();
-        var logBuffer = GetBufferForLineCore(lineNum);
-        var info = logBuffer?.FileInfo;
-        ReleaseBufferListReaderLock();
-        return info;
+        var logBuffer = GetBufferForLine(lineNum);
+        return logBuffer?.FileInfo;
     }
 
     /// <summary>
@@ -632,20 +628,27 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         var result = -1;
         AcquireBufferListReaderLock();
-        var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
-        if (logBuffer != null && index != -1)
+
+        try
         {
-            for (var i = index; i < _bufferList.Values.Count; ++i)
+            var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
+            if (logBuffer != null && index != -1)
             {
-                if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
+                for (var i = index; i < _bufferList.Values.Count; ++i)
                 {
-                    result = _bufferList.Values[i].StartLine;
-                    break;
+                    if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
+                    {
+                        result = _bufferList.Values[i].StartLine;
+                        break;
+                    }
                 }
             }
         }
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
 
-        ReleaseBufferListReaderLock();
         return result;
     }
 
@@ -666,20 +669,27 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     {
         var result = -1;
         AcquireBufferListReaderLock();
-        var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
-        if (logBuffer != null && index != -1)
+
+        try
         {
-            for (var i = index; i >= 0; --i)
+            var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
+            if (logBuffer != null && index != -1)
             {
-                if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
+                for (var i = index; i >= 0; --i)
                 {
-                    result = _bufferList.Values[i].StartLine + _bufferList.Values[i].LineCount;
-                    break;
+                    if (_bufferList.Values[i].FileInfo != logBuffer.FileInfo)
+                    {
+                        result = _bufferList.Values[i].StartLine + _bufferList.Values[i].LineCount;
+                        break;
+                    }
                 }
             }
         }
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
 
-        ReleaseBufferListReaderLock();
         return result;
     }
 
@@ -694,19 +704,25 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     /// <returns></returns>
     public int GetRealLineNumForVirtualLineNum (int lineNum)
     {
-        AcquireBufferListReaderLock();
-        var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
         var result = -1;
-        if (logBuffer != null)
+        AcquireBufferListReaderLock();
+        try
         {
-            logBuffer = GetFirstBufferForFileByLogBuffer(logBuffer, index);
+            var (logBuffer, index) = GetBufferForLineWithIndex(lineNum);
             if (logBuffer != null)
             {
-                result = lineNum - logBuffer.StartLine;
+                logBuffer = GetFirstBufferForFileByLogBuffer(logBuffer, index);
+                if (logBuffer != null)
+                {
+                    result = lineNum - logBuffer.StartLine;
+                }
             }
         }
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
 
-        ReleaseBufferListReaderLock();
         return result;
     }
 
@@ -853,20 +869,26 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     public void LogBufferInfoForLine (int lineNum)
     {
         AcquireBufferListReaderLock();
-        var buffer = GetBufferForLineCore(lineNum);
-        if (buffer == null)
+
+        try
+        {
+            var (buffer, _) = GetBufferForLineWithIndex(lineNum);
+            if (buffer == null)
+            {
+                _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
+                return;
+            }
+
+            _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
+            _logger.Info(CultureInfo.InvariantCulture, "Buffer info for line {0}", lineNum);
+            DumpBufferInfos(buffer);
+            _logger.Info(CultureInfo.InvariantCulture, "File pos for current line: {0}", buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
+            _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
+        }
+        finally
         {
             ReleaseBufferListReaderLock();
-            _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
-            return;
         }
-
-        _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
-        _logger.Info(CultureInfo.InvariantCulture, "Buffer info for line {0}", lineNum);
-        DumpBufferInfos(buffer);
-        _logger.Info(CultureInfo.InvariantCulture, "File pos for current line: {0}", buffer.GetFilePosForLineOfBlock(lineNum - buffer.StartLine));
-        _logger.Info(CultureInfo.InvariantCulture, "-----------------------------------");
-        ReleaseBufferListReaderLock();
     }
 
     /// <summary>
@@ -930,15 +952,14 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     /// <summary>
-    /// Retrieves a contiguous range of log lines starting at the specified line number.
-    /// Acquires locks once for the entire batch, amortising synchronisation overhead.
+    /// Retrieves a contiguous range of log lines starting at the specified line number. Acquires locks once for the
+    /// entire batch, amortising synchronisation overhead.
     /// </summary>
     /// <param name="startLine">The zero-based line number of the first line to retrieve.</param>
     /// <param name="count">The number of lines to retrieve. May be clamped to available lines.</param>
     /// <returns>
-    /// An array of <see cref="ILogLineMemory"/> instances. The array length may be less than
-    /// <paramref name="count"/> if the end of file is reached. Entries may be null if a buffer
-    /// is unavailable.
+    /// An array of <see cref="ILogLineMemory"/> instances. The array length may be less than <paramref name="count"/>
+    /// if the end of file is reached. Entries may be null if a buffer is unavailable.
     /// </returns>
     public ILogLineMemory[] GetLogLineMemories (int startLine, int count)
     {
@@ -956,7 +977,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             var lineNum = startLine;
             while (filled < count)
             {
-                var logBuffer = GetBufferForLineCore(lineNum);
+                var (logBuffer, _) = GetBufferForLineWithIndex(lineNum);
                 if (logBuffer == null)
                 {
                     break;
@@ -1037,7 +1058,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
 
         AcquireBufferListReaderLock();
-        var logBuffer = GetBufferForLineCore(lineNum);
+        var (logBuffer, _) = GetBufferForLineWithIndex(lineNum);
         if (logBuffer == null)
         {
             ReleaseBufferListReaderLock();
@@ -1713,127 +1734,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         }
     }
 
-    private (LogBuffer? Buffer, int Index) GetBufferForLineWithIndex (int lineNum)
-    {
-        AcquireBufferListReaderLock();
-        try
-        {
-            var arr = _bufferList.Values;
-            var count = arr.Count;
-
-            if (count == 0)
-            {
-                return (null, -1);
-            }
-
-            // Layer 0: Last buffer cache
-            var lastIdx = _lastBufferIndex.Value;
-            if (lastIdx >= 0 && lastIdx < count)
-            {
-                var buf = arr[lastIdx];
-                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
-                {
-                    return (buf, lastIdx);
-                }
-
-                // Layer 1: Adjacent buffer prediction
-                if (lastIdx + 1 < count)
-                {
-                    var next = arr[lastIdx + 1];
-                    if ((uint)(lineNum - next.StartLine) < (uint)next.LineCount)
-                    {
-                        _lastBufferIndex.Value = lastIdx + 1;
-                        UpdateLruCache(next);
-                        return (next, lastIdx + 1);
-                    }
-                }
-
-                if (lastIdx - 1 >= 0)
-                {
-                    var prev = arr[lastIdx - 1];
-                    if ((uint)(lineNum - prev.StartLine) < (uint)prev.LineCount)
-                    {
-                        _lastBufferIndex.Value = lastIdx - 1;
-                        UpdateLruCache(prev);
-                        return (prev, lastIdx - 1);
-                    }
-                }
-            }
-
-            // Layer 2: Direct mapping guess
-            var guess = lineNum / _maxLinesPerBuffer;
-            if ((uint)guess < (uint)count)
-            {
-                var buf = arr[guess];
-                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
-                {
-                    _lastBufferIndex.Value = guess;
-                    UpdateLruCache(buf);
-                    return (buf, guess);
-                }
-            }
-
-            // Layer 3: Branchless binary search with power-of-two strides
-            var step = HighestPowerOfTwo(count);
-            var idx = (arr[step - 1].StartLine <= lineNum) ? count - step : 0;
-
-            for (step >>= 1; step > 0; step >>= 1)
-            {
-                var probe = idx + step;
-                if (probe < count && arr[probe - 1].StartLine <= lineNum)
-                {
-                    idx = probe;
-                }
-            }
-
-            if (idx < count)
-            {
-                var buf = arr[idx];
-                if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
-                {
-                    _lastBufferIndex.Value = idx;
-                    UpdateLruCache(buf);
-                    return (buf, idx);
-                }
-            }
-
-            return (null, -1);
-        }
-        finally
-        {
-            ReleaseBufferListReaderLock();
-        }
-    }
-
-    /// <summary>
-    /// Retrieves the log buffer that contains the specified line number.
-    /// </summary>
-    /// <param name="lineNum">
-    /// The zero-based line number for which to retrieve the corresponding log buffer. Must be greater than or equal to
-    /// zero.
-    /// </param>
-    /// <returns>
-    /// The <see cref="LogBuffer"/> instance that contains the specified line number, or <see langword="null"/> if no
-    /// such buffer exists.
-    /// </returns>
-    private LogBuffer GetBufferForLine (int lineNum)
-    {
-        AcquireBufferListReaderLock();
-        try
-        {
-            return GetBufferForLineCore(lineNum);
-        }
-        finally
-        {
-            ReleaseBufferListReaderLock();
-        }
-    }
-
     /// <summary>
     /// Core buffer lookup without acquiring <c> _bufferListLock</c>. The caller MUST already hold a read or write lock
     /// on <c> _bufferListLock</c>.
     /// </summary>
-    private LogBuffer GetBufferForLineCore (int lineNum)
+    private (LogBuffer? Buffer, int Index) GetBufferForLineWithIndex (int lineNum)
     {
 #if DEBUG
         Util.AssertTrue(
@@ -1841,13 +1746,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             "No lock held for buffer list in GetBufferForLineCore");
         long startTime = Environment.TickCount;
 #endif
-
         var arr = _bufferList.Values;
         var count = arr.Count;
 
         if (count == 0)
         {
-            return null;
+            return (null, -1);
         }
 
         // Layer 0: Last buffer cache — O(1) for sequential access
@@ -1858,7 +1762,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
             {
                 //dont UpdateLRUCache, the cache has not changed in layer 0
-                return buf;
+                return (buf, lastIdx);
             }
 
             // Layer 1: Adjacent buffer prediction — O(1) for buffer boundary crossings
@@ -1869,7 +1773,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 {
                     _lastBufferIndex.Value = lastIdx + 1;
                     UpdateLruCache(next);
-                    return next;
+                    return (next, lastIdx + 1);
                 }
             }
 
@@ -1880,7 +1784,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 {
                     _lastBufferIndex.Value = lastIdx - 1;
                     UpdateLruCache(prev);
-                    return prev;
+                    return (prev, lastIdx - 1);
                 }
             }
         }
@@ -1894,7 +1798,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             {
                 _lastBufferIndex.Value = guess;
                 UpdateLruCache(buf);
-                return buf;
+                return (buf, guess);
             }
         }
 
@@ -1919,16 +1823,39 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             {
                 _lastBufferIndex.Value = idx;
                 UpdateLruCache(buf);
-                return buf;
+                return (buf, idx);
             }
         }
-
 #if DEBUG
         long endTime = Environment.TickCount;
         _logger.Debug($"getBufferForLine({lineNum}) duration: {endTime - startTime} ms.");
 #endif
+        return (null, -1);
+    }
 
-        return null;
+    /// <summary>
+    /// Retrieves the log buffer that contains the specified line number.
+    /// </summary>
+    /// <param name="lineNum">
+    /// The zero-based line number for which to retrieve the corresponding log buffer. Must be greater than or equal to
+    /// zero.
+    /// </param>
+    /// <returns>
+    /// The <see cref="LogBuffer"/> instance that contains the specified line number, or <see langword="null"/> if no
+    /// such buffer exists.
+    /// </returns>
+    private LogBuffer GetBufferForLine (int lineNum)
+    {
+        AcquireBufferListReaderLock();
+        try
+        {
+            var (buffer, _) = GetBufferForLineWithIndex(lineNum);
+            return buffer;
+        }
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
     }
 
     private static int HighestPowerOfTwo (int n) => 1 << (31 - int.LeadingZeroCount(n));
