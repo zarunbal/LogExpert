@@ -331,144 +331,150 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() begin for {0}{1}", _fileName, IsMultiFile ? " (MultiFile)" : "");
 
         AcquireBufferListWriterLock();
-        ClearBufferState();
 
-        var offset = 0;
-        _isLineCountDirty = true;
-
-        lock (_monitor)
+        try
         {
-            RolloverFilenameHandler rolloverHandler = new(_watchedILogFileInfo, _multiFileOptions);
-            var fileNameList = rolloverHandler.GetNameList(_pluginRegistry);
+            ClearBufferState();
 
-            ResetBufferCache();
+            var offset = 0;
+            _isLineCountDirty = true;
 
-            IList<ILogFileInfo> lostILogFileInfoList = [];
-            IList<ILogFileInfo> readNewILogFileInfoList = [];
-            IList<ILogFileInfo> newFileInfoList = [];
-
-            var enumerator = _logFileInfoList.GetEnumerator();
-
-            while (enumerator.MoveNext())
+            lock (_monitor)
             {
-                var logFileInfo = enumerator.Current;
-                var fileName = logFileInfo.FullName;
-                _logger.Debug(CultureInfo.InvariantCulture, "Testing file {0}", fileName);
+                RolloverFilenameHandler rolloverHandler = new(_watchedILogFileInfo, _multiFileOptions);
+                var fileNameList = rolloverHandler.GetNameList(_pluginRegistry);
 
-                var node = fileNameList.Find(fileName);
+                ResetBufferCache();
 
-                if (node == null)
+                IList<ILogFileInfo> lostILogFileInfoList = [];
+                IList<ILogFileInfo> readNewILogFileInfoList = [];
+                IList<ILogFileInfo> newFileInfoList = [];
+
+                var enumerator = _logFileInfoList.GetEnumerator();
+
+                while (enumerator.MoveNext())
                 {
-                    _logger.Warn(CultureInfo.InvariantCulture, "File {0} not found", fileName);
-                    continue;
-                }
+                    var logFileInfo = enumerator.Current;
+                    var fileName = logFileInfo.FullName;
+                    _logger.Debug(CultureInfo.InvariantCulture, "Testing file {0}", fileName);
 
-                if (node.Previous != null)
-                {
-                    fileName = node.Previous.Value;
-                    var newILogFileInfo = GetLogFileInfo(fileName);
-                    _logger.Debug(CultureInfo.InvariantCulture, "{0} exists\r\nOld size={1}, new size={2}", fileName, logFileInfo.OriginalLength, newILogFileInfo.Length);
-                    // is the new file the same as the old buffer info?
-                    if (newILogFileInfo.Length == logFileInfo.OriginalLength)
+                    var node = fileNameList.Find(fileName);
+
+                    if (node == null)
                     {
-                        ReplaceBufferInfos(logFileInfo, newILogFileInfo);
-                        newFileInfoList.Add(newILogFileInfo);
+                        _logger.Warn(CultureInfo.InvariantCulture, "File {0} not found", fileName);
+                        continue;
                     }
-                    else
-                    {
-                        _logger.Debug(CultureInfo.InvariantCulture, "Buffer for {0} must be re-read.", fileName);
-                        // not the same. so must read the rest of the list anew from the files
-                        readNewILogFileInfoList.Add(newILogFileInfo);
-                        while (enumerator.MoveNext())
-                        {
-                            fileName = enumerator.Current.FullName;
-                            node = fileNameList.Find(fileName);
-                            if (node == null)
-                            {
-                                _logger.Warn(CultureInfo.InvariantCulture, "File {0} not found", fileName);
-                                continue;
-                            }
 
-                            if (node.Previous != null)
+                    if (node.Previous != null)
+                    {
+                        fileName = node.Previous.Value;
+                        var newILogFileInfo = GetLogFileInfo(fileName);
+                        _logger.Debug(CultureInfo.InvariantCulture, "{0} exists\r\nOld size={1}, new size={2}", fileName, logFileInfo.OriginalLength, newILogFileInfo.Length);
+                        // is the new file the same as the old buffer info?
+                        if (newILogFileInfo.Length == logFileInfo.OriginalLength)
+                        {
+                            ReplaceBufferInfos(logFileInfo, newILogFileInfo);
+                            newFileInfoList.Add(newILogFileInfo);
+                        }
+                        else
+                        {
+                            _logger.Debug(CultureInfo.InvariantCulture, "Buffer for {0} must be re-read.", fileName);
+                            // not the same. so must read the rest of the list anew from the files
+                            readNewILogFileInfoList.Add(newILogFileInfo);
+                            while (enumerator.MoveNext())
                             {
-                                fileName = node.Previous.Value;
-                                _logger.Debug(CultureInfo.InvariantCulture, "New name is {0}", fileName);
-                                readNewILogFileInfoList.Add(GetLogFileInfo(fileName));
-                            }
-                            else
-                            {
-                                _logger.Warn(CultureInfo.InvariantCulture, "No previous file for {0} found", fileName);
+                                fileName = enumerator.Current.FullName;
+                                node = fileNameList.Find(fileName);
+                                if (node == null)
+                                {
+                                    _logger.Warn(CultureInfo.InvariantCulture, "File {0} not found", fileName);
+                                    continue;
+                                }
+
+                                if (node.Previous != null)
+                                {
+                                    fileName = node.Previous.Value;
+                                    _logger.Debug(CultureInfo.InvariantCulture, "New name is {0}", fileName);
+                                    readNewILogFileInfoList.Add(GetLogFileInfo(fileName));
+                                }
+                                else
+                                {
+                                    _logger.Warn(CultureInfo.InvariantCulture, "No previous file for {0} found", fileName);
+                                }
                             }
                         }
                     }
-                }
-                else
-                {
-                    _logger.Info(CultureInfo.InvariantCulture, "{0} does not exist", fileName);
-                    lostILogFileInfoList.Add(logFileInfo);
-                }
-            }
-
-            if (lostILogFileInfoList.Count > 0)
-            {
-                _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for lost files");
-
-                foreach (var logFileInfo in lostILogFileInfoList)
-                {
-                    var lastDeletedBufferInfo = DeleteBuffersForInfo(logFileInfo, false);
-                    if (lastDeletedBufferInfo != null)
+                    else
                     {
-                        offset += lastDeletedBufferInfo.Value.StartLine + lastDeletedBufferInfo.Value.LineCount;
+                        _logger.Info(CultureInfo.InvariantCulture, "{0} does not exist", fileName);
+                        lostILogFileInfoList.Add(logFileInfo);
                     }
                 }
 
-                _logger.Info(CultureInfo.InvariantCulture, "Adjusting StartLine values in {0} buffers by offset {1}", _bufferList.Count, offset);
-                foreach (var buffer in _bufferList.Values)
+                if (lostILogFileInfoList.Count > 0)
                 {
-                    SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
-                }
+                    _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for lost files");
+
+                    foreach (var logFileInfo in lostILogFileInfoList)
+                    {
+                        var lastDeletedBufferInfo = DeleteBuffersForInfo(logFileInfo, false);
+                        if (lastDeletedBufferInfo != null)
+                        {
+                            offset += lastDeletedBufferInfo.Value.StartLine + lastDeletedBufferInfo.Value.LineCount;
+                        }
+                    }
+
+                    _logger.Info(CultureInfo.InvariantCulture, "Adjusting StartLine values in {0} buffers by offset {1}", _bufferList.Count, offset);
+                    foreach (var buffer in _bufferList.Values.ToList())
+                    {
+                        SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
+                    }
 
 #if DEBUG
-                if (_bufferList.Values.Count > 0)
-                {
-                    _logger.Debug(CultureInfo.InvariantCulture, "First buffer now has StartLine {0}", _bufferList.Values[0].StartLine);
-                }
+                    if (_bufferList.Values.Count > 0)
+                    {
+                        _logger.Debug(CultureInfo.InvariantCulture, "First buffer now has StartLine {0}", _bufferList.Values[0].StartLine);
+                    }
 #endif
+                }
+
+                // Read anew all buffers following a buffer info that couldn't be matched with the corresponding existing file
+                _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for files that must be re-read");
+
+                foreach (var iLogFileInfo in readNewILogFileInfoList)
+                {
+                    DeleteBuffersForInfo(iLogFileInfo, true);
+                }
+
+                _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for the watched file");
+
+                DeleteBuffersForInfo(_watchedILogFileInfo, true);
+
+                _logger.Info(CultureInfo.InvariantCulture, "Re-Reading files");
+
+                foreach (var iLogFileInfo in readNewILogFileInfoList)
+                {
+                    ReadToBufferList(iLogFileInfo, 0, LineCount);
+                    newFileInfoList.Add(iLogFileInfo);
+                }
+
+                _logFileInfoList = newFileInfoList;
+                _watchedILogFileInfo = GetLogFileInfo(_watchedILogFileInfo.FullName);
+                _logFileInfoList.Add(_watchedILogFileInfo);
+                _logger.Info(CultureInfo.InvariantCulture, "Reading watched file");
+
+                ReadToBufferList(_watchedILogFileInfo, 0, LineCount);
             }
 
-            // Read anew all buffers following a buffer info that couldn't be matched with the corresponding existing file
-            _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for files that must be re-read");
+            _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() end. offset={0}", offset);
 
-            foreach (var iLogFileInfo in readNewILogFileInfoList)
-            {
-                DeleteBuffersForInfo(iLogFileInfo, true);
-            }
-
-            _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for the watched file");
-
-            DeleteBuffersForInfo(_watchedILogFileInfo, true);
-
-            _logger.Info(CultureInfo.InvariantCulture, "Re-Reading files");
-
-            foreach (var iLogFileInfo in readNewILogFileInfoList)
-            {
-                ReadToBufferList(iLogFileInfo, 0, LineCount);
-                newFileInfoList.Add(iLogFileInfo);
-            }
-
-            _logFileInfoList = newFileInfoList;
-            _watchedILogFileInfo = GetLogFileInfo(_watchedILogFileInfo.FullName);
-            _logFileInfoList.Add(_watchedILogFileInfo);
-            _logger.Info(CultureInfo.InvariantCulture, "Reading watched file");
-
-            ReadToBufferList(_watchedILogFileInfo, 0, LineCount);
+            return offset;
         }
-
-        _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() end. offset={0}", offset);
-
-        ReleaseBufferListWriterLock();
-
-        return offset;
+        finally
+        {
+            ReleaseBufferListWriterLock();
+        }
     }
 
     /// <summary>

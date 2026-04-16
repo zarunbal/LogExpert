@@ -27,6 +27,9 @@ internal class BufferShiftTest : RolloverHandlerTestBase
     [Test]
     [TestCase(ReaderType.System)]
     //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
+    //TO Test real life scenario, use the LogRotator tool, in the src/Tools/LogRotator directory,
+    //to create files and perform rollovers while watching the files in LogExpert with MultiFile enabled
+    //(pattern: *$J(.))
     public void TestShiftBuffers1 (ReaderType readerType)
     {
         var linesPerFile = 10;
@@ -118,7 +121,6 @@ internal class BufferShiftTest : RolloverHandlerTestBase
             _ = enumerator.MoveNext();
         }
 
-        _ = enumerator.MoveNext();
         // the last 2 files now contain the content of the previously watched file
         for (; i < logBuffers.Count; ++i)
         {
