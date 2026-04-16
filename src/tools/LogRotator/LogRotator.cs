@@ -2,6 +2,7 @@ using System.Text;
 
 const string baseDir = "logs";
 const string baseName = "engine.log";
+var safeBaseName = Path.GetFileName(baseName);
 const int maxBackups = 6;
 const int linesPerFile = 50;
 
@@ -9,11 +10,11 @@ Directory.CreateDirectory(baseDir);
 
 // Create initial set of files
 Console.WriteLine($"Creating initial files in '{Path.GetFullPath(baseDir)}'...");
-WriteLogFile(Path.Combine(baseDir, baseName), 0);
+WriteLogFile(Path.Join(baseDir, safeBaseName), 0);
 
 for (var i = 1; i <= maxBackups; i++)
 {
-    WriteLogFile(Path.Combine(baseDir, $"{baseName}.{i}"), i);
+    WriteLogFile(Path.Join(baseDir, $"{safeBaseName}.{i}"), i);
 }
 
 PrintFiles();
@@ -41,41 +42,41 @@ while (true)
     Console.WriteLine($"\n--- Rotation #{rotationCount} ---");
 
     // Delete the oldest file (simulates maxBackups limit)
-    var oldest = Path.Combine(baseDir, $"{baseName}.{maxBackups}");
+    var oldest = Path.Join(baseDir, $"{safeBaseName}.{maxBackups}");
 
     if (File.Exists(oldest))
     {
         File.Delete(oldest);
-        Console.WriteLine($"  Deleted: {baseName}.{maxBackups}");
+        Console.WriteLine($"  Deleted: {safeBaseName}.{maxBackups}");
     }
 
     // Shift all numbered files up by one
     for (var i = maxBackups - 1; i >= 1; i--)
     {
-        var src = Path.Combine(baseDir, $"{baseName}.{i}");
-        var dst = Path.Combine(baseDir, $"{baseName}.{i + 1}");
+        var src = Path.Join(baseDir, $"{safeBaseName}.{i}");
+        var dst = Path.Join(baseDir, $"{safeBaseName}.{i + 1}");
 
         if (File.Exists(src))
         {
             File.Move(src, dst);
-            Console.WriteLine($"  Renamed: {baseName}.{i} -> {baseName}.{i + 1}");
+            Console.WriteLine($"  Renamed: {safeBaseName}.{i} -> {safeBaseName}.{i + 1}");
         }
     }
 
     // Rename current log to .1
-    var current = Path.Combine(baseDir, baseName);
-    var first = Path.Combine(baseDir, $"{baseName}.1");
+    var current = Path.Join(baseDir, safeBaseName);
+    var first = Path.Join(baseDir, $"{safeBaseName}.1");
 
     if (File.Exists(current))
     {
         File.Move(current, first);
-        Console.WriteLine($"  Renamed: {baseName} -> {baseName}.1");
+        Console.WriteLine($"  Renamed: {safeBaseName} -> {safeBaseName}.1");
     }
 
     // Create empty file first (like real log frameworks do), so LogExpert detects
     // newSize < oldSize and triggers ShiftBuffers()
     File.Create(current).Dispose();
-    Console.WriteLine($"  Created: {baseName} (empty - triggers rollover detection)");
+    Console.WriteLine($"  Created: {safeBaseName} (empty - triggers rollover detection)");
 
     PrintFiles();
 
@@ -84,7 +85,7 @@ while (true)
     Thread.Sleep(2000);
 
     WriteLogFile(current, maxBackups + rotationCount);
-    Console.WriteLine($"  Wrote content to {baseName}");
+    Console.WriteLine($"  Wrote content to {safeBaseName}");
 
     PrintFiles();
     Console.WriteLine("\nPress ENTER for next rotation, Q to quit.");
@@ -104,7 +105,7 @@ static void PrintFiles()
 {
     Console.WriteLine("\nCurrent files on disk:");
 
-    foreach (var f in Directory.GetFiles(baseDir, $"{baseName}*").OrderBy(f => f))
+    foreach (var f in Directory.GetFiles(baseDir, $"{safeBaseName}*").OrderBy(f => f))
     {
         Console.WriteLine($"  {Path.GetFileName(f)} ({new FileInfo(f).Length} bytes)");
     }

@@ -26,6 +26,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
     [Test]
     [TestCase(ReaderType.System)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
     //TO Test real life scenario, use the LogRotator tool, in the src/Tools/LogRotator directory,
     //to create files and perform rollovers while watching the files in LogExpert with MultiFile enabled
@@ -115,7 +116,11 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-            Assert.That(line.HasValue, Is.True);
+            if (!line.HasValue)
+            {
+                Assert.Fail("Expected first block line to be present.");
+            }
+
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
             _ = enumerator.MoveNext();
         }
@@ -125,7 +130,12 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-            Assert.That(line.HasValue, Is.True);
+
+            if (!line.HasValue)
+            {
+                Assert.Fail("Expected first block line to be present.");
+            }
+
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
         }
 
