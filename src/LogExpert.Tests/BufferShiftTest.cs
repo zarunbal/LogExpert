@@ -115,9 +115,8 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-#pragma warning disable CS8629 // Nullable value type may be null.
+            Assert.That(line.HasValue, Is.True);
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
-#pragma warning restore CS8629 // Nullable value type may be null.
             _ = enumerator.MoveNext();
         }
 
@@ -126,9 +125,8 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-#pragma warning disable CS8629 // Nullable value type may be null.
+            Assert.That(line.HasValue, Is.True);
             Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
-#pragma warning restore CS8629 // Nullable value type may be null.
         }
 
         oldCount = lil.Count;
