@@ -124,7 +124,7 @@ internal partial class SettingsDialog : Form
             Preferences.FontName = DEFAULT_FONT_NAME;
         }
 
-        if (Math.Abs(Preferences.FontSize) < 0.1)
+        if (Math.Abs(Preferences.FontSize) <= 0.1)
         {
             Preferences.FontSize = 9.0f;
         }
@@ -263,7 +263,7 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = $"{Preferences.FontName} {(int)Preferences.FontSize}";
+        labelFont.Text = $"{Preferences.FontName} {Preferences.FontSize}";
         labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
     }
 

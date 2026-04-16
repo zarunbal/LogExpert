@@ -26,7 +26,11 @@ internal class BufferShiftTest : RolloverHandlerTestBase
 
     [Test]
     [TestCase(ReaderType.System)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
+    //TO Test real life scenario, use the LogRotator tool, in the src/Tools/LogRotator directory,
+    //to create files and perform rollovers while watching the files in LogExpert with MultiFile enabled
+    //(pattern: *$J(.))
     public void TestShiftBuffers1 (ReaderType readerType)
     {
         var linesPerFile = 10;
@@ -112,17 +116,29 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
+            if (!line.HasValue)
+            {
+                Assert.Fail("Expected first block line to be present.");
+                continue;
+            }
+
+            Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
             _ = enumerator.MoveNext();
         }
 
-        _ = enumerator.MoveNext();
         // the last 2 files now contain the content of the previously watched file
         for (; i < logBuffers.Count; ++i)
         {
             var logBuffer = logBuffers[i];
             var line = logBuffer.GetLineMemoryOfBlock(0);
-            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
+
+            if (!line.HasValue)
+            {
+                Assert.Fail("Expected first block line to be present.");
+                continue;
+            }
+
+            Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
         }
 
         oldCount = lil.Count;

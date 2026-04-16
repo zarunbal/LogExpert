@@ -1,14 +1,12 @@
-﻿namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log;
 
 public class LogBufferCacheEntry
 {
-    #region Fields
-
-    #endregion
+    private long _lastUseTimeStamp;
 
     #region cTor
 
-    public LogBufferCacheEntry()
+    public LogBufferCacheEntry ()
     {
         Touch();
     }
@@ -19,15 +17,15 @@ public class LogBufferCacheEntry
 
     public LogBuffer LogBuffer { get; set; }
 
-    public long LastUseTimeStamp { get; private set; }
+    public long LastUseTimeStamp => Interlocked.Read(ref _lastUseTimeStamp);
 
     #endregion
 
     #region Public methods
 
-    public void Touch()
+    public void Touch ()
     {
-        LastUseTimeStamp = Environment.TickCount & int.MaxValue;
+        _ = Interlocked.Exchange(ref _lastUseTimeStamp, Environment.TickCount64);
     }
 
     #endregion

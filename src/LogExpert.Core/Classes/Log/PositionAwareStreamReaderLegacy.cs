@@ -14,9 +14,6 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
     public override bool IsDisposed { get; protected set; }
 
     #endregion
-    #region cTor
-
-    #endregion
 
     #region Public methods
 
