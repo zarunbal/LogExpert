@@ -252,18 +252,15 @@ internal sealed class FileOperationService (
 
     public void AddFileTabs (string[] fileNames)
     {
-        foreach (var fileName in fileNames)
+        foreach (var fileName in fileNames.Where(filename => !string.IsNullOrEmpty(filename)))
         {
-            if (!string.IsNullOrEmpty(fileName))
+            if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
-                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
-                {
-                    _projectFileCallback(fileName, false);
-                }
-                else
-                {
-                    _ = AddFileTab(new FileTabRequest { FileName = fileName });
-                }
+                _projectFileCallback(fileName, false);
+            }
+            else
+            {
+                _ = AddFileTab(new FileTabRequest { FileName = fileName });
             }
         }
     }
@@ -314,12 +311,9 @@ internal sealed class FileOperationService (
 
     public void SaveLastOpenFilesList ()
     {
-        foreach (var logWin in _tabController.GetAllWindowsFromDockPanel())
+        foreach (var logWin in _tabController.GetAllWindowsFromDockPanel().Where(logwin => !logwin.IsTempFile))
         {
-            if (!logWin.IsTempFile)
-            {
-                _configManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
-            }
+            _configManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
         }
     }
 
@@ -333,15 +327,12 @@ internal sealed class FileOperationService (
 
         if (_configManager.Settings.Preferences.OpenLastFiles)
         {
-            foreach (var name in lastOpenFiles)
+            foreach (var name in lastOpenFiles.Where(filename => !string.IsNullOrEmpty(filename)))
             {
-                if (!string.IsNullOrEmpty(name))
-                {
-                    _ = AddFileTab(new FileTabRequest { FileName = name });
-                }
+                _ = AddFileTab(new FileTabRequest { FileName = name });
             }
-
-            _configManager.ClearLastOpenFilesList();
         }
+
+        _configManager.ClearLastOpenFilesList();
     }
 }
