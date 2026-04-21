@@ -593,13 +593,13 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 else
                 {
                     _isFastFailOnGetLogLine = true;
-                    _logger.Debug(CultureInfo.InvariantCulture, "No result after {0}ms. Returning <null>.", WAIT_TIME);
+                    _logger.Info(CultureInfo.InvariantCulture, "Entering fast-fail mode for line {0}. No result after {1}ms.", lineNum, WAIT_TIME);
                 }
             }
         }
         else
         {
-            _logger.Debug(CultureInfo.InvariantCulture, "Fast failing GetLogLine()");
+            _logger.Info(CultureInfo.InvariantCulture, "Fast-fail returning null for line {0}", lineNum);
             if (!_isFailModeCheckCallPending)
             {
                 _isFailModeCheckCallPending = true;
@@ -1590,7 +1590,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     try
                     {
                         removed.LogBuffer.AcquireContentLock(ref lockTaken);
-                        _bufferPool.Return(removed.LogBuffer);
+                        // Evict content but preserve metadata (LineCount, StartLine, etc.)
+                        // so the buffer remains findable in _bufferList lookups.
+                        // Do NOT return to pool — the buffer is still referenced by _bufferList.
+                        removed.LogBuffer.EvictContent();
                     }
                     finally
                     {

@@ -6517,7 +6517,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var line = _logFileReader.GetLogLineMemoryWithWait(rowIndex).Result;
 
-        if (line != null)
+        if (line == null)
+        {
+            _logger.Warn("CellPainting: null line for rowIndex={0}, isFilteredGridView={1}", rowIndex, isFilteredGridView);
+
+            // Paint an empty cell with proper colors to prevent white-on-white default rendering
+            e.Graphics.SetClip(e.CellBounds);
+            using (var brush = new SolidBrush(e.CellStyle.BackColor))
+            {
+                e.Graphics.FillRectangle(brush, e.CellBounds);
+            }
+
+            e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
+            e.Handled = true;
+            return;
+        }
+
         {
             var entry = FindFirstNoWordMatchHighlightEntry(line);
             e.Graphics.SetClip(e.CellBounds);

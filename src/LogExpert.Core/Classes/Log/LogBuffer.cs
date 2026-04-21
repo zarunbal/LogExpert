@@ -103,8 +103,20 @@ public class LogBuffer
 
     public void ClearLines ()
     {
-        Array.Clear(_lineArray, 0, LineCount);
+        if (_lineArray == null)
+        {
+            _lineArray = ArrayPool<LogLine>.Shared.Rent(MAX_LINES);
+            _lineArrayLength = _lineArray.Length;
+        }
+        else
+        {
+            Array.Clear(_lineArray, 0, LineCount);
+        }
+
         LineCount = 0;
+#if DEBUG
+        _filePositions.Clear();
+#endif
     }
 
     /// <summary>
@@ -129,6 +141,31 @@ public class LogBuffer
 #endif
     }
 
+    /// <summary>
+    /// Evicts the buffer content to free memory while preserving metadata (LineCount, StartLine, StartPos, Size).
+    /// The buffer remains findable in buffer list lookups and can be re-read from disk when accessed.
+    /// </summary>
+    public void EvictContent ()
+    {
+        if (_lineArray != null)
+        {
+            Array.Clear(_lineArray, 0, LineCount);
+            ArrayPool<LogLine>.Shared.Return(_lineArray);
+            _lineArray = null;
+        }
+
+        // Do NOT zero LineCount — it is needed for buffer lookup in GetBufferForLineWithIndex.
+        // Do NOT zero StartLine, StartPos, Size — they are needed for re-reading from disk.
+        IsDisposed = true;
+#if DEBUG
+        DisposeCount++;
+#endif
+    }
+
+    /// <summary>
+    /// Fully disposes the buffer content and resets all metadata. Used when the buffer is being returned to the pool
+    /// or completely removed from the buffer list.
+    /// </summary>
     public void DisposeContent ()
     {
         if (_lineArray != null)
