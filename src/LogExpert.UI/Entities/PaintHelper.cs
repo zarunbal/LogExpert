@@ -78,7 +78,9 @@ internal static class PaintHelper
                     if (bookmark.Text.Length > 0)
                     {
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
-                        using var font = logPaintCtx.MonospacedFont;
+
+                        //borrowing the monospaced font from logPaintCtx to avoid creating too many font objects which causes GDI problems
+                        var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
                 }
@@ -217,9 +219,9 @@ internal static class PaintHelper
     }
 
     /// <summary>
-    /// This returns Black or White based on the color that is given
-    /// If the color is smaller than 128 it means its a darker color and white should be the fore color,
-    /// if the color is bigger than 128 it means its a lighter color and black should be the fore color
+    /// This returns Black or White based on the color that is given If the color is smaller than 128 it means its a
+    /// darker color and white should be the fore color, if the color is bigger than 128 it means its a lighter color
+    /// and black should be the fore color
     /// </summary>
     /// <param name="backColor">lighter or darker back color</param>
     /// <returns>White or Black based on the given back color</returns>
@@ -403,7 +405,8 @@ internal static class PaintHelper
 
         foreach (var matchEntry in matchList)
         {
-            using var font = matchEntry != null && matchEntry.HighlightEntry.IsBold
+            //Borrow reference from logPaintCtx to avoid creating too many font objects which causes GDI problems
+            var font = matchEntry != null && matchEntry.HighlightEntry.IsBold
                 ? logPaintCtx.BoldFont
                 : logPaintCtx.NormalFont;
 
@@ -446,14 +449,17 @@ internal static class PaintHelper
     }
 
     /// <summary>
-    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
-    /// background colors.
-    /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
-    /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the
+    /// same foreground and background colors. All regions which don't match a word-mode entry will be painted with the
+    /// colors of a default entry (groundEntry). This is either the first matching non-word-mode highlight entry or a
+    /// black-on-white default (if no matching entry was found).
     /// </summary>
     /// <param name="matchList">List of all highlight matches for the current cell</param>
     /// <param name="groundEntry">The entry that is used as the default.</param>
-    /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
+    /// <returns>
+    /// List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every
+    /// substring.
+    /// </returns>
     private static IList<HighlightMatchEntry> MergeHighlightMatchEntries (IList<HighlightMatchEntry> matchList, HighlightMatchEntry groundEntry)
     {
         // Fill an area with lenth of whole text with a default hilight entry

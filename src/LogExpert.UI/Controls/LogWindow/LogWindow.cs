@@ -7580,23 +7580,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             LoadFilesAsMulti(_fileNames, EncodingOptions);
         }
-
-        //if (currentLine < this.dataGridView.RowCount && currentLine >= 0)
-        //  this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLine].Cells[0];
-        //if (firstDisplayedLine < this.dataGridView.RowCount && firstDisplayedLine >= 0)
-        //  this.dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
-
-        //if (this.filterTailCheckBox.Checked)
-        //{
-        //  _logger.logInfo("Refreshing filter view because of reload.");
-        //  FilterSearch();
-        //}
     }
 
     public void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
+            NormalFont?.Dispose();
+            BoldFont?.Dispose();
+            MonospacedFont?.Dispose();
+
             NormalFont = new Font(new FontFamily(fontName), fontSize);
             BoldFont = new Font(NormalFont, FontStyle.Bold);
             MonospacedFont = new Font(FONT_COURIER_NEW, Preferences.FontSize, FontStyle.Bold);
