@@ -7586,10 +7586,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
-            NormalFont?.Dispose();
-            BoldFont?.Dispose();
-            MonospacedFont?.Dispose();
-
             NormalFont = new Font(new FontFamily(fontName), fontSize);
             BoldFont = new Font(NormalFont, FontStyle.Bold);
             MonospacedFont = new Font(FONT_COURIER_NEW, Preferences.FontSize, FontStyle.Bold);

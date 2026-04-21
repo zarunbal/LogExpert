@@ -78,9 +78,7 @@ internal static class PaintHelper
                     if (bookmark.Text.Length > 0)
                     {
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
-
-                        //borrowing the monospaced font from logPaintCtx to avoid creating too many font objects which causes GDI problems
-                        var font = logPaintCtx.MonospacedFont;
+                        using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
                 }
@@ -405,8 +403,7 @@ internal static class PaintHelper
 
         foreach (var matchEntry in matchList)
         {
-            //Borrow reference from logPaintCtx to avoid creating too many font objects which causes GDI problems
-            var font = matchEntry != null && matchEntry.HighlightEntry.IsBold
+            using var font = matchEntry != null && matchEntry.HighlightEntry.IsBold
                 ? logPaintCtx.BoldFont
                 : logPaintCtx.NormalFont;
 
