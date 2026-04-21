@@ -26,7 +26,8 @@ internal sealed class LogWindowCoordinator (
     IPluginRegistry pluginRegistry,
     Controls.LogTabWindow.LogTabWindow logTabWindow,
     ITabController tabController,
-    ILedIndicatorService ledIndicatorService) : ILogWindowCoordinator
+    ILedIndicatorService ledIndicatorService,
+    IFileOperationService fileOperationService) : ILogWindowCoordinator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -35,6 +36,7 @@ internal sealed class LogWindowCoordinator (
     private readonly Controls.LogTabWindow.LogTabWindow _logTabWindow = logTabWindow;
     private readonly ITabController _tabController = tabController;
     private readonly ILedIndicatorService _ledIndicatorService = ledIndicatorService;
+    private readonly IFileOperationService _fileOperationService = fileOperationService;
     private readonly Lock _highlightGroupLock = new();
 
     private const int DIFF_MAX = 100;
@@ -171,12 +173,12 @@ internal sealed class LogWindowCoordinator (
 
     public LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer? preProcessColumnizer)
     {
-        return _logTabWindow.AddFilterTab(pipe, title, preProcessColumnizer);
+        return _fileOperationService.AddFilterTab(pipe, title, preProcessColumnizer);
     }
 
     public LogWindow AddTempFileTab (string fileName, string title)
     {
-        return _logTabWindow.AddTempFileTab(fileName, title);
+        return _fileOperationService.AddTempFileTab(fileName, title);
     }
 
     public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender)

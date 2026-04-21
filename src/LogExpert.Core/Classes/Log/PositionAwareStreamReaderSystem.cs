@@ -20,8 +20,6 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
 
     private int _newLineSequenceLength;
 
-    private string _currentLine; // Store current line for Memory<char> access
-
     public override bool IsDisposed { get; protected set; }
 
     #endregion
@@ -85,7 +83,6 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
             }
 
             // Store line for Memory access
-            _currentLine = line;
             lineMemory = line.AsMemory();
             return true;
         }
@@ -100,7 +97,6 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
     public void ReturnMemory (ReadOnlyMemory<char> memory)
     {
         // No-op for System reader - string is already managed by GC
-        _currentLine = null;
     }
 
     #endregion

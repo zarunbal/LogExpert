@@ -6517,7 +6517,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var line = _logFileReader.GetLogLineMemoryWithWait(rowIndex).Result;
 
-        if (line != null)
+        if (line == null)
+        {
+            _logger.Warn("CellPainting: null line for rowIndex={0}, isFilteredGridView={1}", rowIndex, isFilteredGridView);
+
+            // Paint an empty cell with proper colors to prevent white-on-white default rendering
+            e.Graphics.SetClip(e.CellBounds);
+            using (var brush = new SolidBrush(e.CellStyle.BackColor))
+            {
+                e.Graphics.FillRectangle(brush, e.CellBounds);
+            }
+
+            e.Paint(e.CellBounds, DataGridViewPaintParts.Border);
+            e.Handled = true;
+            return;
+        }
+
         {
             var entry = FindFirstNoWordMatchHighlightEntry(line);
             e.Graphics.SetClip(e.CellBounds);
@@ -7580,17 +7595,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             LoadFilesAsMulti(_fileNames, EncodingOptions);
         }
-
-        //if (currentLine < this.dataGridView.RowCount && currentLine >= 0)
-        //  this.dataGridView.CurrentCell = this.dataGridView.Rows[currentLine].Cells[0];
-        //if (firstDisplayedLine < this.dataGridView.RowCount && firstDisplayedLine >= 0)
-        //  this.dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
-
-        //if (this.filterTailCheckBox.Checked)
-        //{
-        //  _logger.logInfo("Refreshing filter view because of reload.");
-        //  FilterSearch();
-        //}
     }
 
     public void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
