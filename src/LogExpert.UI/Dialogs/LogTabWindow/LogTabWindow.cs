@@ -283,19 +283,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     internal HighlightGroup FindHighlightGroup (string groupName)
     {
         return _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
-
-        //lock (HighlightGroupList)
-        //{
-        //    foreach (var group in HighlightGroupList)
-        //    {
-        //        if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
-        //        {
-        //            return group;
-        //        }
-        //    }
-
-        //    return null;
-        //}
     }
 
     #endregion
@@ -530,79 +517,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         copyPathToClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem;
         truncateFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_truncateFileToolStripMenuItem;
     }
-
-    //[SupportedOSPlatform("windows")]
-    //public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
-    //{
-    //    var logFileName = PersisterHelpers.FindFilenameForSettings(givenFileName, PluginRegistry.PluginRegistry.Instance);
-    //    var win = FindWindowForFile(logFileName);
-    //    if (win != null)
-    //    {
-    //        if (!isTempFile)
-    //        {
-    //            AddToFileHistory(givenFileName);
-    //        }
-
-    //        _logWindowCoordinator.SelectTab(win);
-    //        return win;
-    //    }
-
-    //    EncodingOptions encodingOptions = new();
-    //    FillDefaultEncodingFromSettings(encodingOptions);
-    //    LogWindow.LogWindow logWindow = new(_logWindowCoordinator, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
-    //    {
-    //        GivenFileName = givenFileName
-    //    };
-
-    //    if (preProcessColumnizer != null)
-    //    {
-    //        logWindow.ForceColumnizerForLoading(preProcessColumnizer);
-    //    }
-
-    //    if (isTempFile)
-    //    {
-    //        logWindow.TempTitleName = title;
-    //        encodingOptions.Encoding = new UnicodeEncoding(false, false);
-    //    }
-
-    //    AddLogWindow(logWindow, title, doNotAddToDockPanel);
-    //    if (!isTempFile)
-    //    {
-    //        AddToFileHistory(givenFileName);
-    //    }
-
-    //    var data = logWindow.Tag as LogWindowData;
-    //    data.Color = _defaultTabColor;
-    //    //TODO SetTabColor and the Coloring must be reimplemented with a different UI Framework
-    //    //SetTabColor(logWindow, _defaultTabColor);
-    //    //data.tabPage.BorderColor = this.defaultTabBorderColor;
-    //    //if (!isTempFile)
-    //    //{
-    //    //    foreach (var colorEntry in ConfigManager.Settings.FileColors)
-    //    //    {
-    //    //        if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
-    //    //        {
-    //    //            data.Color = colorEntry.Color;
-    //    //            //SetTabColor(logWindow, colorEntry.Color);
-    //    //            break;
-    //    //        }
-    //    //    }
-    //    //}
-
-    //    if (!isTempFile)
-    //    {
-    //        SetTooltipText(logWindow, logFileName);
-    //    }
-
-    //    if (givenFileName.EndsWith(".lxp", StringComparison.Ordinal))
-    //    {
-    //        logWindow.ForcedPersistenceFileName = givenFileName;
-    //    }
-
-    //    // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
-    //    _ = Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
-    //    return logWindow;
-    //}
 
     [SupportedOSPlatform("windows")]
     public void LoadFiles (string[] fileNames)
@@ -1183,12 +1097,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    //TODO Crossthread Exception when a log file has been filtered to a new tab!
     private void StatusLineEventWorker (StatusLineEventArgs e)
     {
         if (e != null)
         {
-            //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
+#if DEBUG
+            _logger.Debug("StatusLineEvent: text = " + e.StatusText);
+#endif
             labelStatus.Text = e.StatusText;
             labelStatus.Size = TextRenderer.MeasureText(labelStatus.Text, labelStatus.Font);
             labelLines.Text = $"{e.LineCount} {Resources.LogTabWindow_StatusLineText_lowerCase_Lines}";

@@ -37,6 +37,26 @@ internal sealed class FileOperationService (
     public event EventHandler? FileHistoryChanged;
     public event EventHandler<FileOpenedEventArgs>? FileOpened;
 
+
+    // TODO TabColor was part of older Versions, this is a feature that should be readded, sooner or later, but it is not a priority right now.
+    //    var data = logWindow.Tag as LogWindowData;
+    //    data.Color = _defaultTabColor;
+    //    //TODO SetTabColor and the Coloring must be reimplemented with a different UI Framework
+    //    //SetTabColor(logWindow, _defaultTabColor);
+    //    //data.tabPage.BorderColor = this.defaultTabBorderColor;
+    //    //if (!isTempFile)
+    //    //{
+    //    //    foreach (var colorEntry in ConfigManager.Settings.FileColors)
+    //    //    {
+    //    //        if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
+    //    //        {
+    //    //            data.Color = colorEntry.Color;
+    //    //            //SetTabColor(logWindow, colorEntry.Color);
+    //    //            break;
+    //    //        }
+    //    //    }
+    //    //}
+
     public LogWindow AddFileTab (FileTabRequest request)
     {
         var logFileName = PersisterHelpers.FindFilenameForSettings(request.FileName, _pluginRegistry);
