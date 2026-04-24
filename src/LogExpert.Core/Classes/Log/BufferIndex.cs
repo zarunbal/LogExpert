@@ -6,6 +6,12 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 
+/*
+ * !IMPORTANT
+ * Before and after changes are made run the BufferIndexBenchmarks for a baseline, so no performance regression is introduced
+ * If changes are made to this class, please also review BufferIndexSnapshot and BufferShiftTest to ensure consistency and correctness.
+ */
+
 /// <summary>
 /// Thread-safe index that maps line numbers to <see cref="LogBuffer"/> instances with LRU eviction. This is the hot
 /// path — every GetLogLine call goes through here. Has zero file-I/O dependencies. Constructable with only integers for
