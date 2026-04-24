@@ -32,9 +32,7 @@ public sealed class BufferIndex : IDisposable
         _lruCacheDict = new(Environment.ProcessorCount, maxBuffers + 1);
     }
 
-    // ─────────────────────────────────────────────
-    //  Hot path — lookup
-    // ─────────────────────────────────────────────
+    #region Hot Path Lookup
 
     /// <summary>
     /// 4-layer lookup. Caller must hold at least a read lock. Returns false if lineNum is out of range or the index is
@@ -65,7 +63,7 @@ public sealed class BufferIndex : IDisposable
 
         if (count == 0)
         {
-            return new LogBufferEntry { Buffer = null, Index = -1, Found = false };
+            return new LogBufferEntry(null, -1, false);
         }
 
         // Layer 0: Last buffer cache — O(1) for sequential access
@@ -76,7 +74,7 @@ public sealed class BufferIndex : IDisposable
             if ((uint)(lineNum - buf.StartLine) < (uint)buf.LineCount)
             {
                 //dont UpdateLRUCache, the cache has not changed in layer 0
-                return new LogBufferEntry { Buffer = buf, Index = lastIdx, Found = true };
+                return new LogBufferEntry(buf, lastIdx, true);
             }
 
             // Layer 1: Adjacent buffer prediction — O(1) for buffer boundary crossings
@@ -87,7 +85,7 @@ public sealed class BufferIndex : IDisposable
                 {
                     _lastBufferIndex.Value = lastIdx + 1;
                     UpdateLru(next);
-                    return new LogBufferEntry { Buffer = next, Index = lastIdx + 1, Found = true };
+                    return new LogBufferEntry(next, lastIdx + 1, true);
                 }
             }
 
@@ -98,7 +96,7 @@ public sealed class BufferIndex : IDisposable
                 {
                     _lastBufferIndex.Value = lastIdx - 1;
                     UpdateLru(prev);
-                    return new LogBufferEntry { Buffer = prev, Index = lastIdx - 1, Found = true };
+                    return new LogBufferEntry(prev, lastIdx - 1, true);
                 }
             }
         }
@@ -112,7 +110,7 @@ public sealed class BufferIndex : IDisposable
             {
                 _lastBufferIndex.Value = guess;
                 UpdateLru(buf);
-                return new LogBufferEntry { Buffer = buf, Index = guess, Found = true };
+                return new LogBufferEntry(buf, guess, true);
             }
         }
 
@@ -137,17 +135,19 @@ public sealed class BufferIndex : IDisposable
             {
                 _lastBufferIndex.Value = idx;
                 UpdateLru(buf);
-                return new LogBufferEntry { Buffer = buf, Index = idx, Found = true };
+                return new LogBufferEntry(buf, idx, true);
             }
         }
 #if DEBUG
         long endTime = Environment.TickCount;
         _logger.Debug($"TryFindBufferWithIndex({lineNum}) duration: {endTime - startTime} ms.");
 #endif
-        return new LogBufferEntry { Buffer = null, Index = -1, Found = false };
+        return new LogBufferEntry(null, -1, false);
     }
 
-    // --- Navigation: multi-file traversal ---
+    #endregion
+
+    #region Navigation: multi-file traversal
 
     /// <summary>
     /// Finds the start line of the next file segment after <paramref name="lineNum"/>. Caller must hold at least a read
@@ -236,9 +236,9 @@ public sealed class BufferIndex : IDisposable
         return resultBuffer;
     }
 
-    // ─────────────────────────────────────────────
-    //  Mutation — called during reads and rollover
-    // ─────────────────────────────────────────────
+    #endregion
+
+    #region Mutation — called during reads and rollover
 
     /// <summary>
     /// Adds a buffer to the index and updates LRU tracking. Caller must hold a write lock.
@@ -297,9 +297,9 @@ public sealed class BufferIndex : IDisposable
         _isLineCountDirty = true;
     }
 
-    // ─────────────────────────────────────────────
-    //  LRU eviction
-    // ─────────────────────────────────────────────
+    #endregion
+
+    #region LRU eviction
 
     /// <summary>
     /// Removes least-recently-used entries when cache exceeds max size. Evicts content but preserves metadata so
@@ -404,7 +404,7 @@ public sealed class BufferIndex : IDisposable
         _logger.Info(CultureInfo.InvariantCulture, "Clearing done.");
     }
 
-    // --- Read access ---
+    #endregion
 
     /// <summary>
     /// Gets the number of buffers.
@@ -460,17 +460,17 @@ public sealed class BufferIndex : IDisposable
     /// </summary>
     public int LruCacheCount => _lruCacheDict.Count;
 
-    // ─────────────────────────────────────────────
-    //  Lock management — using-scoped only
-    // ─────────────────────────────────────────────
+    #region Lock management — using-scoped only
 
     public ReadLockScope AcquireReadLock () => new(_lock);
+
     public WriteLockScope AcquireWriteLock () => new(_lock);
+
     public UpgradeableReadLockScope AcquireUpgradeableReadLock () => new(_lock);
 
-    // ─────────────────────────────────────────────
-    //  Diagnostics
-    // ─────────────────────────────────────────────
+    #endregion
+
+    #region Diagnostics
 
     /// <summary>
     /// Creates an immutable point-in-time capture of the index state. Acquires its own read lock internally.
@@ -503,9 +503,9 @@ public sealed class BufferIndex : IDisposable
         };
     }
 
-    // ─────────────────────────────────────────────
-    //  Internal helpers
-    // ─────────────────────────────────────────────
+    #endregion
+
+    #region Internal Helpers
 
     public void ResetThreadLocalCache () => _lastBufferIndex.Value = -1;
 
@@ -526,11 +526,12 @@ public sealed class BufferIndex : IDisposable
         _lastBufferIndex.Dispose();
         _lock.Dispose();
     }
+
+    #endregion
 }
 
-// ─────────────────────────────────────────────
-//  Lock scope structs
-// ─────────────────────────────────────────────
+#region Lock scope structs
+
 public readonly ref struct ReadLockScope
 {
     private readonly ReaderWriterLockSlim _lock;
@@ -602,11 +603,13 @@ public readonly ref struct WriteLockUpgradeScope
     public void Dispose () => _lock.ExitWriteLock();
 }
 
-public sealed record LogBufferEntry
+#endregion
+
+public readonly struct LogBufferEntry (LogBuffer? buffer, int index, bool found)
 {
-    public LogBuffer Buffer { get; set; }
+    public LogBuffer? Buffer { get; } = buffer;
 
-    public int Index { get; set; }
+    public int Index { get; } = index;
 
-    public bool Found { get; set; }
+    public bool Found { get; } = found;
 }

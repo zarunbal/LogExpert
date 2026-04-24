@@ -98,7 +98,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
         _bufferPool = new LogBufferPool(_max_buffers * 2);
 
-        //InitLruBuffers();
         _bufferIndex = new BufferIndex(_max_buffers, _maxLinesPerBuffer);
 
         ILogFileInfo fileInfo = null;
@@ -154,7 +153,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
     #region Properties
 
-    /// <summary>For tests and diagnostics. Replaces GetBufferList().</summary>
+    /// <summary>For tests and diagnostics.</summary>
     internal BufferIndex BufferIndex => _bufferIndex;
 
     /// <summary>
