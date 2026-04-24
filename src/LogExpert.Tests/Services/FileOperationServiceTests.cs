@@ -37,6 +37,13 @@ internal class FileOperationServiceTests : IDisposable
 
     private bool _disposed;
 
+    [OneTimeSetUp]
+    public void OneTimeSetUp ()
+    {
+        var dir = Path.GetDirectoryName(typeof(FileOperationServiceTests).Assembly.Location)!;
+        _ = PluginRegistry.PluginRegistry.Create(dir, 500);
+    }
+
     [SetUp]
     public void Setup ()
     {
