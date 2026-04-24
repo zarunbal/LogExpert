@@ -7,7 +7,7 @@ using LogExpert.PluginRegistry.FileSystem;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.Buffers;
 
 [TestFixture]
 internal class BufferShiftTest : RolloverHandlerTestBase
@@ -94,12 +94,12 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
 
-        var logBuffers = reader.GetBufferList();
+        var snapshot = reader.BufferIndex.CreateSnapshot();
         var startLine = 0;
 
-        foreach (var logBuffer in logBuffers)
+        foreach (var logBuffer in snapshot.Buffers)
         {
-            Assert.That(enumerator.Current, Is.EqualTo(logBuffer.FileInfo.FullName));
+            Assert.That(enumerator.Current, Is.EqualTo(logBuffer.FileName));
             Assert.That(logBuffer.StartLine, Is.EqualTo(startLine));
             startLine += 10;
             _ = enumerator.MoveNext();
@@ -109,36 +109,37 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         enumerator = files.GetEnumerator();
         _ = enumerator.MoveNext();
         _ = enumerator.MoveNext(); // move to 2nd entry. The first file now contains 2nd file's content (because rollover)
-        logBuffers = reader.GetBufferList();
+
+        snapshot = reader.BufferIndex.CreateSnapshot();
         int i;
 
-        for (i = 0; i < logBuffers.Count - 2; ++i)
+        for (i = 0; i < snapshot.Buffers.Count - 2; ++i)
         {
-            var logBuffer = logBuffers[i];
-            var line = logBuffer.GetLineMemoryOfBlock(0);
-            if (!line.HasValue)
+            var logBuffer = snapshot.Buffers[i];
+            var line = reader.GetLogLineMemory(logBuffer.StartLine);
+            if (line == null)
             {
                 Assert.Fail("Expected first block line to be present.");
                 continue;
             }
 
-            Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
+            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
             _ = enumerator.MoveNext();
         }
 
         // the last 2 files now contain the content of the previously watched file
-        for (; i < logBuffers.Count; ++i)
+        for (; i < snapshot.Buffers.Count; ++i)
         {
-            var logBuffer = logBuffers[i];
-            var line = logBuffer.GetLineMemoryOfBlock(0);
+            var logBuffer = snapshot.Buffers[i];
+            var line = reader.GetLogLineMemory(logBuffer.StartLine);
 
-            if (!line.HasValue)
+            if (line == null)
             {
                 Assert.Fail("Expected first block line to be present.");
                 continue;
             }
 
-            Assert.That(line.Value.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
+            Assert.That(line.FullLine.Span.Contains(enumerator.Current.AsSpan(), StringComparison.Ordinal));
         }
 
         oldCount = lil.Count;
