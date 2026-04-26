@@ -4,7 +4,7 @@ using System.Globalization;
 
 using NLog;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Buffers;
 
 /*
  * !IMPORTANT

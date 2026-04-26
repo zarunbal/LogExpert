@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 using LogExpert.Core.EventArguments;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.ProgressReporters;
 
 /// <summary>
 /// Batches progress updates to reduce UI thread marshalling overhead.

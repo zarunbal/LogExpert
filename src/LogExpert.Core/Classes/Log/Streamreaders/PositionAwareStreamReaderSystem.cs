@@ -3,7 +3,7 @@ using System.Text;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Streamreaders;
 
 /// <summary>
 /// This class is responsible for reading line from the log file. It also decodes characters with the appropriate charset encoding.

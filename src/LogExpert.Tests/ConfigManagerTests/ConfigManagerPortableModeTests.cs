@@ -1,10 +1,8 @@
 using System.Reflection;
 
-using LogExpert.Configuration;
-
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.ConfigManagerTests;
 
 /// <summary>
 /// Unit tests for ConfigManager portable mode functionality.
@@ -15,7 +13,7 @@ namespace LogExpert.Tests;
 public class ConfigManagerPortableModeTests
 {
     private string _testDir;
-    private ConfigManager _configManager;
+    private Configuration.ConfigManager _configManager;
 
     [SetUp]
     public void SetUp ()
@@ -25,7 +23,7 @@ public class ConfigManagerPortableModeTests
         _ = Directory.CreateDirectory(_testDir);
 
         // Initialize ConfigManager for testing
-        _configManager = ConfigManager.Instance;
+        _configManager = Configuration.ConfigManager.Instance;
 
         // Reset the singleton's initialization state using reflection
         ResetConfigManagerInitialization();
@@ -71,11 +69,11 @@ public class ConfigManagerPortableModeTests
     /// </summary>
     private void ResetConfigManagerInitialization ()
     {
-        var isInitializedField = typeof(ConfigManager).GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
+        var isInitializedField = typeof(Configuration.ConfigManager).GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
         isInitializedField?.SetValue(_configManager, false);
 
         // Reset settings so they reload from the new path
-        var settingsField = typeof(ConfigManager).GetField("_settings", BindingFlags.NonPublic | BindingFlags.Instance);
+        var settingsField = typeof(Configuration.ConfigManager).GetField("_settings", BindingFlags.NonPublic | BindingFlags.Instance);
         settingsField?.SetValue(_configManager, null);
     }
 
@@ -85,7 +83,7 @@ public class ConfigManagerPortableModeTests
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private void InvokePrivateInstanceMethod (string methodName, params object[] parameters)
     {
-        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
+        MethodInfo? method = typeof(Configuration.ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new Exception($"Instance method {methodName} not found");
 
         _ = method.Invoke(_configManager, parameters);
@@ -654,7 +652,7 @@ public class ConfigManagerPortableModeTests
         File.WriteAllText(source, "test content");
 
         // Act
-        var method = typeof(ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(Configuration.ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
         _ = (method?.Invoke(null, [source, target]));
 
         // Assert
@@ -673,7 +671,7 @@ public class ConfigManagerPortableModeTests
         var target = Path.Join(_testDir, "target.txt");
 
         // Act
-        var method = typeof(ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(Configuration.ConfigManager).GetMethod("MoveFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
         _ = (method?.Invoke(null, [source, target]));
 
         // Assert
@@ -691,7 +689,7 @@ public class ConfigManagerPortableModeTests
         File.WriteAllText(source, "copy me");
 
         // Act
-        var method = typeof(ConfigManager).GetMethod("CopyFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(Configuration.ConfigManager).GetMethod("CopyFileIfExists", BindingFlags.NonPublic | BindingFlags.Static);
         _ = (method?.Invoke(null, [source, target]));
 
         // Assert
@@ -712,7 +710,7 @@ public class ConfigManagerPortableModeTests
         File.WriteAllText(target, "existing content");
 
         // Act
-        var method = typeof(ConfigManager).GetMethod("CopyFileIfNotExists", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(Configuration.ConfigManager).GetMethod("CopyFileIfNotExists", BindingFlags.NonPublic | BindingFlags.Static);
         _ = (method?.Invoke(null, [source, target]));
 
         //Assert
@@ -736,7 +734,7 @@ public class ConfigManagerPortableModeTests
         File.WriteAllText(Path.Join(subDir, "file2.txt"), "content2");
 
         // Act
-        var method = typeof(ConfigManager).GetMethod("CopyDirectoryRecursive", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = typeof(Configuration.ConfigManager).GetMethod("CopyDirectoryRecursive", BindingFlags.NonPublic | BindingFlags.Static);
         _ = (method?.Invoke(null, [sourceDir, targetDir]));
 
         // Assert

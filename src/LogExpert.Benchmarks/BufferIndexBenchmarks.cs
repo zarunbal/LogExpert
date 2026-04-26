@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using ColumnizerLib;
 
 using LogExpert.Benchmarks.Support;
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Buffers;
 
 namespace LogExpert.Benchmarks;
 

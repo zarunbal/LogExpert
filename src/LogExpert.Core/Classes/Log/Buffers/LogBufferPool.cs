@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 using ColumnizerLib;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Buffers;
 
 public sealed class LogBufferPool (int maxSize)
 {

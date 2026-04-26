@@ -1,6 +1,6 @@
 using LogExpert.Core.Entities;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Streamreaders;
 
 public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : PositionAwareStreamReaderBase(stream, encodingOptions, maximumLineLength)
 {

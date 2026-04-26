@@ -6,7 +6,7 @@ using System.Text;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Streamreaders;
 
 public class PositionAwareStreamReaderPipeline : LogStreamReaderBase, ILogStreamReaderMemory
 {

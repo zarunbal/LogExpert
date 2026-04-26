@@ -2,7 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Entities;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Streamreaders;
 
 public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 {

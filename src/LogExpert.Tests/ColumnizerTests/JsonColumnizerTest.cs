@@ -6,7 +6,7 @@ using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.ColumnizerTests;
 
 [TestFixture]
 public class JsonColumnizerTest

@@ -1,6 +1,5 @@
 using System.Reflection;
 
-using LogExpert.Configuration;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -9,7 +8,7 @@ using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.ConfigManagerTests;
 
 /// <summary>
 /// Unit tests for ConfigManager settings loss prevention fixes.
@@ -20,10 +19,9 @@ public class ConfigManagerTest
 {
     private string _testDir;
     private FileInfo _testSettingsFile;
-    private ConfigManager _configManager;
+    private Configuration.ConfigManager _configManager;
 
     [SetUp]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void SetUp ()
     {
         // Create isolated test directory for each test
@@ -32,7 +30,7 @@ public class ConfigManagerTest
         _testSettingsFile = new FileInfo(Path.Join(_testDir, "settings.json"));
 
         // Initialize ConfigManager for testing
-        _configManager = ConfigManager.Instance;
+        _configManager = Configuration.ConfigManager.Instance;
         _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
     }
 
@@ -65,7 +63,7 @@ public class ConfigManagerTest
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private static T InvokePrivateStaticMethod<T> (string methodName, params object[] parameters)
     {
-        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo? method = typeof(Configuration.ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
 
         return method == null
             ? throw new Exception($"Static method {methodName} not found")
@@ -78,7 +76,7 @@ public class ConfigManagerTest
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private T InvokePrivateInstanceMethod<T> (string methodName, params object[] parameters)
     {
-        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo? method = typeof(Configuration.ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
         return method == null
             ? throw new Exception($"Instance method {methodName} not found")
@@ -91,7 +89,7 @@ public class ConfigManagerTest
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Unit Tests")]
     private void InvokePrivateInstanceMethod (string methodName, params object[] parameters)
     {
-        MethodInfo? method = typeof(ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
+        MethodInfo? method = typeof(Configuration.ConfigManager).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new Exception($"Instance method {methodName} not found");
 
         _ = method.Invoke(_configManager, parameters);
@@ -553,7 +551,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should handle null _settings field by using Settings property")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void Import_WithUninitializedSettings_ShouldNotThrowNullReference ()
     {
@@ -578,7 +575,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should validate that import file exists")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithNonExistentFile_ShouldReturnFailure ()
     {
         // Arrange
@@ -596,7 +592,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should validate that import file is not null")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithNullFileInfo_ShouldReturnFailure ()
     {
         // Act
@@ -611,7 +606,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should detect corrupted import files")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithCorruptedFile_ShouldReturnFailure ()
     {
         // Arrange
@@ -631,7 +625,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should detect empty/default settings and require confirmation")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithEmptySettings_ShouldRequireConfirmation ()
     {
         // Arrange
@@ -652,7 +645,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should successfully import valid populated settings")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithValidPopulatedSettings_ShouldSucceed ()
     {
         // Arrange
@@ -681,7 +673,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import with Other flag should merge preferences correctly")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithOtherFlag_ShouldMergePreferences ()
     {
         // Arrange
@@ -713,7 +704,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import with ColumnizerMasks flag should import columnizer masks")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithColumnizerMasksFlag_ShouldImportMasks ()
     {
         // Arrange
@@ -739,7 +729,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import with KeepExisting flag should merge rather than replace")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_WithKeepExistingFlag_ShouldMergeSettings ()
     {
         // Arrange
@@ -771,7 +760,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should handle null Preferences in import file gracefully")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
     public void Import_WithNullPreferences_ShouldHandleGracefully ()
     {
@@ -797,7 +785,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Multiple imports should maintain consistency")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_MultipleImports_ShouldMaintainConsistency ()
     {
         // Arrange & Act - Multiple imports
@@ -823,7 +810,6 @@ public class ConfigManagerTest
     [Test]
     [Category("Import")]
     [Description("Import should save settings after successful import")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Unit Test")]
     public void Import_SuccessfulImport_ShouldSaveSettings ()
     {
         // Arrange

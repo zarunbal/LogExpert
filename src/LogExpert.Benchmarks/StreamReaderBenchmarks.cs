@@ -2,7 +2,7 @@ using System.Text;
 
 using BenchmarkDotNet.Attributes;
 
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 

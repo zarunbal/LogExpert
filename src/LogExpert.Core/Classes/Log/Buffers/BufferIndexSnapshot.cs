@@ -1,4 +1,4 @@
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Buffers;
 
 /// <summary>
 /// Immutable point-in-time capture of <see cref="BufferIndex"/> state.

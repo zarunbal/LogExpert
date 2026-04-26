@@ -1,6 +1,6 @@
 using System.Text;
 
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
 
 using NUnit.Framework;
@@ -106,7 +106,7 @@ public class LogStreamReaderTest
     [TestCase("Line 1\r\nLine 2\r\nLine 3\r\n", 3)]
     [TestCase("Line 1\rLine 2\rLine 3", 3)]
     [TestCase("Line 1\rLine 2\rLine 3\r", 3)]
-    public void ReadLinesWithPipelineNewLine(string text, int expectedLines)
+    public void ReadLinesWithPipelineNewLine (string text, int expectedLines)
     {
         using var stream = new MemoryStream(Encoding.ASCII.GetBytes(text));
         using var reader = new PositionAwareStreamReaderPipeline(stream, new EncodingOptions(), 500);
@@ -131,7 +131,7 @@ public class LogStreamReaderTest
     [TestCase("\n\n\n", 3)]
     [TestCase("\r\n\r\n\r\n", 3)]
     [TestCase("\r\r\r", 3)]
-    public void CountLinesWithPipelineNewLine(string text, int expectedLines)
+    public void CountLinesWithPipelineNewLine (string text, int expectedLines)
     {
         using var stream = new MemoryStream(Encoding.ASCII.GetBytes(text));
         using var reader = new PositionAwareStreamReaderPipeline(stream, new EncodingOptions(), 500);
@@ -145,7 +145,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void PipelineReaderShouldTrackPositionCorrectly()
+    public void PipelineReaderShouldTrackPositionCorrectly ()
     {
         var text = "Line 1\nLine 2\nLine 3\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -168,7 +168,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void PipelineReaderShouldSupportSeeking()
+    public void PipelineReaderShouldSupportSeeking ()
     {
         var text = "Line 1\nLine 2\nLine 3\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -194,7 +194,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void PipelineReaderShouldHandleMaximumLineLength()
+    public void PipelineReaderShouldHandleMaximumLineLength ()
     {
         var longLine = new string('X', 1000);
         var text = $"{longLine}\nShort line\n";
@@ -212,7 +212,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void PipelineReaderShouldHandleUnicode()
+    public void PipelineReaderShouldHandleUnicode ()
     {
         var text = "Hello 世界\nСпасибо\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -226,7 +226,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void PipelineReaderShouldHandleEmptyLines()
+    public void PipelineReaderShouldHandleEmptyLines ()
     {
         var text = "Line 1\n\nLine 3\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));

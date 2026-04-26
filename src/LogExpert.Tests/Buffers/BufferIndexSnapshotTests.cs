@@ -1,4 +1,4 @@
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Buffers;
 
 using NUnit.Framework;
 

@@ -4,7 +4,7 @@ using ColumnizerLib;
 
 using NLog;
 
-namespace LogExpert.Core.Classes.Log;
+namespace LogExpert.Core.Classes.Log.Buffers;
 
 public class LogBuffer
 {

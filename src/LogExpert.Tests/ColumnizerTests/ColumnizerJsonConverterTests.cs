@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.ColumnizerTests;
 
 public class MockColumnizer : ILogLineMemoryColumnizer
 {
