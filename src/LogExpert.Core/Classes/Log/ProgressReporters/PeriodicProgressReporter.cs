@@ -13,8 +13,8 @@ internal sealed class PeriodicProgressReporter : ILoadProgressReporter
     private readonly CancellationTokenSource _cts = new();
     private readonly TimeSpan _dispatchInterval;
 
-    public event EventHandler<LoadFileEventArgs> LoadFile;
-    public event EventHandler<LoadFileEventArgs> LoadingStarted;
+    public event EventHandler<LoadFileEventArgs>? LoadFile;
+    public event EventHandler<LoadFileEventArgs>? LoadingStarted;
     public event EventHandler<EventArgs>? LoadingFinished;
 
     // Volatile state: written by I/O thread, read by dispatch loop

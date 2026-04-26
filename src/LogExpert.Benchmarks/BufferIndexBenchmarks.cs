@@ -9,38 +9,38 @@ namespace LogExpert.Benchmarks;
 
 [MemoryDiagnoser]
 [RankColumn]
-public class BufferIndexBenchmarks
+public class BufferIndexBenchmarks : IDisposable
 {
     private BufferIndex _index = null!;
     private int _totalLines;
 
+    private bool _disposed;
+
     [Params(100, 1_000, 10_000)]
     public int BufferCount { get; set; }
 
-    private const int LinesPerBuffer = 500;
+    private const int LINES_PER_BUFFER = 500;
 
     [GlobalSetup]
     public void Setup ()
     {
-        _index = new BufferIndex(BufferCount, LinesPerBuffer);
-        _totalLines = BufferCount * LinesPerBuffer;
+        _index = new BufferIndex(BufferCount, LINES_PER_BUFFER);
+        _totalLines = BufferCount * LINES_PER_BUFFER;
 
         var fakeFileInfo = new FakeLogFileInfo();
 
-        using (var _ = _index.AcquireWriteLock())
+        using (var writeLock = _index.AcquireWriteLock())
         {
             for (int i = 0; i < BufferCount; i++)
             {
-                var buffer = new LogBuffer(fakeFileInfo, LinesPerBuffer)
+                var buffer = new LogBuffer(fakeFileInfo, LINES_PER_BUFFER)
                 {
-                    StartLine = i * LinesPerBuffer
+                    StartLine = i * LINES_PER_BUFFER
                 };
 
-                for (int j = 0; j < LinesPerBuffer; j++)
+                for (int j = 0; j < LINES_PER_BUFFER; j++)
                 {
-                    buffer.AddLine(
-                        new LogLine($"line {i * LinesPerBuffer + j}".AsMemory(), i * LinesPerBuffer + j),
-                        0);
+                    buffer.AddLine(new LogLine($"line {i * LINES_PER_BUFFER + j}".AsMemory(), i * LINES_PER_BUFFER + j), 0);
                 }
 
                 _index.Add(buffer);
@@ -65,7 +65,7 @@ public class BufferIndexBenchmarks
     [Benchmark(Baseline = true)]
     public LogBuffer? SequentialAccess ()
     {
-        using var _ = _index.AcquireReadLock();
+        using var readlock = _index.AcquireReadLock();
         LogBuffer? last = null;
         var start = Math.Max(0, _totalLines - 1000);
         for (int i = start; i < _totalLines; i++)
@@ -76,6 +76,7 @@ public class BufferIndexBenchmarks
                 last = logBufferEntry.Buffer;
             }
         }
+
         return last;
     }
 
@@ -87,7 +88,7 @@ public class BufferIndexBenchmarks
     [Benchmark]
     public LogBuffer? StrideAccess ()
     {
-        using var _ = _index.AcquireReadLock();
+        using var readLock = _index.AcquireReadLock();
         LogBuffer? last = null;
         var stride = _totalLines / 3 + 1;
         var lineNum = 0;
@@ -112,7 +113,7 @@ public class BufferIndexBenchmarks
     [Benchmark]
     public LogBuffer? BoundaryAccess ()
     {
-        using var _ = _index.AcquireReadLock();
+        using var readLock = _index.AcquireReadLock();
         LogBuffer? last = null;
 
         for (int i = 0; i < 1000; i++)
@@ -136,7 +137,7 @@ public class BufferIndexBenchmarks
     [Benchmark]
     public LogBuffer? ScrollAccess ()
     {
-        using var _ = _index.AcquireReadLock();
+        using var readLock = _index.AcquireReadLock();
         LogBuffer? last = null;
         const int pageSize = 50;
         const int pageJump = pageSize * 3;
@@ -167,5 +168,24 @@ public class BufferIndexBenchmarks
     public void EvictAndRepopulate ()
     {
         _index.EvictLeastRecentlyUsed();
+    }
+
+    public void Dispose ()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose (bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _index?.Dispose();
+            }
+
+            _disposed = true;
+        }
     }
 }

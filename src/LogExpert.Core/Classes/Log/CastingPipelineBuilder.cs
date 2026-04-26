@@ -23,7 +23,7 @@ public class CastingPipelineBuilder : IPipeline<object, object>
         first.Add(input);
     }
 
-    public void Complete()
+    public void Complete ()
     {
         if (_buffers.Length > 0)
         {
@@ -43,20 +43,18 @@ public class CastingPipelineBuilder : IPipeline<object, object>
             _ = Task.Run(() =>
             {
                 //GetConsuminEnumerable => is blocking when the collection is empty
-                foreach (object input in _buffers[bufferIndexLocal].GetConsumingEnumerable())
+                foreach (object input in _buffers[bufferIndexLocal].GetConsumingEnumerable().Select(pipelineStep))
                 {
-                    object output = pipelineStep.Invoke(input);
-
                     bool isLastStep = bufferIndexLocal == _pipelineSteps.Count - 1;
                     if (isLastStep)
                     {
                         //BeginInvoke would be better https://stackoverflow.com/questions/1916095/how-do-i-make-an-eventhandler-run-asynchronously/16336361#16336361
-                        Finished?.Invoke(output);
+                        Finished?.Invoke(input);
                     }
                     else
                     {
                         BlockingCollection<object> next = _buffers[bufferIndexLocal + 1];
-                        next.Add(output);
+                        next.Add(input);
                     }
                 }
             });

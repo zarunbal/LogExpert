@@ -5,7 +5,7 @@ namespace LogExpert.Core.Classes.Log.ProgressReporters;
 /// <summary>
 /// No-op reporter for benchmarks and unit tests. Zero allocation, zero overhead.
 /// </summary>
-internal sealed class NullProgressReporter : ILoadProgressReporter
+public sealed class NullProgressReporter : ILoadProgressReporter
 {
     public static readonly NullProgressReporter Instance = new();
 

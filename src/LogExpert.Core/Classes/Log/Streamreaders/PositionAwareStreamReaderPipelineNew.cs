@@ -270,7 +270,9 @@ public class PositionAwareStreamReaderPipelineNew : LogStreamReaderBase, ILogStr
 
             return segment;
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is IOException or
+                                         DecoderFallbackException or
+                                         ObjectDisposedException)
         {
             return null;
         }
@@ -332,9 +334,13 @@ public class PositionAwareStreamReaderPipelineNew : LogStreamReaderBase, ILogStr
             {
                 _pipeReader.Complete();
             }
-            catch (Exception)
+            catch (ObjectDisposedException)
             {
-                // Ignore
+                // Ignore: shutdown race
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore: already completed or invalid teardown state
             }
         }
     }
@@ -370,10 +376,13 @@ public class PositionAwareStreamReaderPipelineNew : LogStreamReaderBase, ILogStr
                     charsInBuffer = processResult.RemainingChars;
                     byteOffset = processResult.NewByteOffset;
 
+                    var pipeline = _pipeline ?? throw new InvalidOperationException("Pipeline is not initialized.");
+
                     // Feed each line to pipeline (which will enqueue them)
                     foreach (var segment in processResult.Lines)
                     {
-                        _pipeline.Execute(new BufferData(default, segment.Buffer, 0, null, segment.ByteOffset, false)
+
+                        pipeline.Execute(new BufferData(default, segment.Buffer, 0, null, segment.ByteOffset, false)
                         {
                             PreExtractedSegment = segment
                         });
@@ -400,9 +409,21 @@ public class PositionAwareStreamReaderPipelineNew : LogStreamReaderBase, ILogStr
         {
             // Expected
         }
-        catch (Exception ex)
+        catch (DecoderFallbackException ex)
         {
             Volatile.Write(ref _producerException, ex);
+        }
+        catch (ObjectDisposedException ex)
+        {
+            Volatile.Write(ref _producerException, ex);
+        }
+        catch (InvalidOperationException ex)
+        {
+            Volatile.Write(ref _producerException, ex);
+        }
+        catch
+        {
+            throw;
         }
         finally
         {
