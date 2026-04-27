@@ -242,16 +242,9 @@ public class LogBuffer
 
     private void ReturnCharBlocks ()
     {
-        if (_charBlocks is not { Count: > 0 })
-        {
-            return;
-        }
-
-        foreach (var block in _charBlocks)
-        {
-            ArrayPool<char>.Shared.Return(block);
-        }
-
+        // Just drop the reference — do NOT return to ArrayPool.
+        // The UI thread may still hold ReadOnlyMemory<char> slices into these blocks.
+        // GC will collect them once all references (LogLine, UI snapshots) are released.
         _charBlocks = null;
     }
 

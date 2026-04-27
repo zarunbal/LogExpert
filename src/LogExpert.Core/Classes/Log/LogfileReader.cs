@@ -1242,6 +1242,14 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
                     lineCount++;
 
+                    // Add the line to the CURRENT buffer BEFORE any buffer rotation.
+                    // The lineMemory slice is backed by the allocator's current char[] block,
+                    // so it must be added to the buffer that will own those blocks after DetachBlocks().
+                    var logLine = new LogLine(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
+                    logBuffer.AddLine(logLine, filePos);
+                    filePos = reader.Position;
+                    lineNum++;
+
                     if (lineCount > _maxLinesPerBuffer && reader.IsBufferComplete)
                     {
                         _progressReporter.ReportProgress(logFileInfo.FullName, filePos, logFileInfo.Length);
@@ -1278,11 +1286,6 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                             throw;
                         }
                     }
-
-                    var logLine = new LogLine(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
-                    logBuffer.AddLine(logLine, filePos);
-                    filePos = reader.Position;
-                    lineNum++;
 
                     (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines);
                 }

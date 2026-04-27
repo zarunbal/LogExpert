@@ -69,12 +69,6 @@ public class CharBlockAllocatorTests
 
         Assert.That(blocks, Has.Count.EqualTo(2));
         Assert.That(allocator.BlockCount, Is.EqualTo(1)); // fresh block created
-
-        // Return manually (in production, LogBuffer does this)
-        foreach (var block in blocks)
-        {
-            ArrayPool<char>.Shared.Return(block);
-        }
     }
 
     [Test]
@@ -90,14 +84,9 @@ public class CharBlockAllocatorTests
 
         var blocks = allocator.DetachBlocks();
 
-        // Only normal blocks are returned to caller
-        Assert.That(blocks, Has.Count.EqualTo(2)); // initial + second normal block
-        Assert.That(allocator.OversizedBlockCount, Is.EqualTo(0)); // returned to pool
-
-        foreach (var block in blocks)
-        {
-            ArrayPool<char>.Shared.Return(block);
-        }
+        // All blocks (normal + oversized) are transferred to caller
+        Assert.That(blocks, Has.Count.EqualTo(3)); // initial + second normal + oversized
+        Assert.That(allocator.OversizedBlockCount, Is.EqualTo(0)); // transferred to caller
     }
 
     [Test]

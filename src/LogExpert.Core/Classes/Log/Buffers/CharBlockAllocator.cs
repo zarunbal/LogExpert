@@ -1,15 +1,18 @@
-using System.Buffers;
-
 namespace LogExpert.Core.Classes.Log.Buffers;
 
 /// <summary>
-/// Allocates <see cref="ReadOnlyMemory{Char}"/> slices from large pooled char[] blocks.
+/// Allocates <see cref="ReadOnlyMemory{Char}"/> slices from large char[] blocks.
 /// Multiple lines are packed into each block to reduce per-line allocation overhead.
 /// </summary>
 /// <remarks>
-/// Each block is rented from <see cref="ArrayPool{Char}.Shared"/>. When the current block
-/// has insufficient space for a requested allocation, a new block is rented. All blocks
-/// are returned to the pool when <see cref="ReturnAll"/> is called.
+/// Blocks are plain arrays (not pooled) because their lifetime extends beyond the allocator:
+/// the UI thread may hold <see cref="ReadOnlyMemory{Char}"/> slices long after the backing
+/// <see cref="LogBuffer"/> is evicted. Using <see cref="System.Buffers.ArrayPool{T}"/> here would
+/// cause use-after-return corruption when evicted blocks are re-rented by new reads.
+///
+/// We still get the primary GC benefit: hundreds of short-lived strings from
+/// <see cref="System.IO.StreamReader.ReadLine"/> are copied into a few large blocks, keeping
+/// the strings Gen0-eligible and reducing Gen1/Gen2 promotions.
 ///
 /// This class is NOT thread-safe. Each reader/fill operation should use its own instance.
 /// </remarks>
@@ -27,7 +30,7 @@ public sealed class CharBlockAllocator : IDisposable
     public CharBlockAllocator (int blockSize = DEFAULT_BLOCK_SIZE)
     {
         _blockSize = blockSize;
-        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
+        _currentBlock = new char[_blockSize];
         _blocks.Add(_currentBlock);
         _currentOffset = 0;
     }
@@ -60,7 +63,7 @@ public sealed class CharBlockAllocator : IDisposable
         // Oversized line: give it its own array, tracked separately
         if (length > _blockSize)
         {
-            var oversized = ArrayPool<char>.Shared.Rent(length);
+            var oversized = new char[length];
             _oversizedBlocks.Add(oversized);
             return oversized.AsMemory(0, length);
         }
@@ -74,56 +77,42 @@ public sealed class CharBlockAllocator : IDisposable
         }
 
         // Need a new block
-        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
+        _currentBlock = new char[_blockSize];
         _blocks.Add(_currentBlock);
         _currentOffset = length;
         return _currentBlock.AsMemory(0, length);
     }
 
     /// <summary>
-    /// Detaches and returns the list of normal (fixed-size) blocks. After this call,
-    /// the allocator no longer owns those blocks — the caller (LogBuffer) is responsible
-    /// for returning them to <see cref="ArrayPool{Char}.Shared"/>.
-    ///
-    /// Oversized blocks are returned to the pool immediately during this call, since
-    /// each one backs exactly one line and has already been copied into the caller's
-    /// data structures.
+    /// Detaches and returns the list of all blocks (normal + oversized). After this call,
+    /// the allocator no longer owns those blocks — the caller (LogBuffer) holds them
+    /// until GC collects them after all <see cref="ReadOnlyMemory{Char}"/> slices are released.
     /// </summary>
     public List<char[]> DetachBlocks ()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        // Return oversized blocks immediately — they are one-off rentals
-        foreach (var oversized in _oversizedBlocks)
+        // Merge oversized blocks into the main list so the caller owns everything
+        if (_oversizedBlocks.Count > 0)
         {
-            ArrayPool<char>.Shared.Return(oversized);
+            _blocks.AddRange(_oversizedBlocks);
+            _oversizedBlocks.Clear();
         }
-
-        _oversizedBlocks.Clear();
 
         // Swap the list — O(1), no copy. Caller owns the old list.
         var blocks = _blocks;
-        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
+        _currentBlock = new char[_blockSize];
         _blocks = [_currentBlock];
         _currentOffset = 0;
         return blocks;
     }
 
     /// <summary>
-    /// Returns all rented blocks (both normal and oversized) to <see cref="ArrayPool{Char}.Shared"/>.
+    /// Releases all block references. The actual char[] memory is collected by GC
+    /// once all <see cref="ReadOnlyMemory{Char}"/> slices pointing into them are released.
     /// </summary>
     public void ReturnAll ()
     {
-        foreach (var block in _blocks)
-        {
-            ArrayPool<char>.Shared.Return(block);
-        }
-
-        foreach (var oversized in _oversizedBlocks)
-        {
-            ArrayPool<char>.Shared.Return(oversized);
-        }
-
         _blocks.Clear();
         _oversizedBlocks.Clear();
         _currentBlock = null!;

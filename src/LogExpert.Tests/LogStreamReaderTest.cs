@@ -353,12 +353,6 @@ public class LogStreamReaderTest
 
         // After detach, allocator should have a fresh block
         Assert.That(reader.BlockAllocator.BlockCount, Is.EqualTo(1));
-
-        // Clean up detached blocks
-        foreach (var block in blocks)
-        {
-            System.Buffers.ArrayPool<char>.Shared.Return(block);
-        }
     }
 
     [Test]
