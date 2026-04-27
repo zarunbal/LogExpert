@@ -76,6 +76,31 @@ public class ReadThroughputBenchmarks
         return reader.LineCount;
     }
 
+    /// <summary>
+    /// Post-change: read with block-based allocation (System reader uses CharBlockAllocator).
+    /// Compare Gen0/Gen1/Gen2 collections vs baseline to validate allocation reduction.
+    /// This method is identical to ReadWithNullReporter — it exists solely for explicit
+    /// before/after naming in benchmark reports.
+    /// </summary>
+    [Benchmark]
+    public int ReadWithBlockAllocation ()
+    {
+        using var reader = new LogfileReader(
+            _tempFile,
+            new EncodingOptions { Encoding = Encoding.UTF8 },
+            multiFile: false,
+            bufferCount: 500,
+            linesPerBuffer: 500,
+            new MultiFileOptions(),
+            ReaderType.System,
+            PluginRegistry.PluginRegistry.Instance,
+            maximumLineLength: 500,
+            progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
+
+        reader.ReadFiles();
+        return reader.LineCount;
+    }
+
     [GlobalCleanup]
     public void Cleanup ()
     {

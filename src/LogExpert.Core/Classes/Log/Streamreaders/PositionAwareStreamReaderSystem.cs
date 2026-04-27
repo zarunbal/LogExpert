@@ -1,5 +1,6 @@
 using System.Text;
 
+using LogExpert.Core.Classes.Log.Buffers;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
@@ -28,6 +29,20 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
 
     public PositionAwareStreamReaderSystem (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : base(stream, encodingOptions, maximumLineLength)
     {
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Gets or creates the block allocator used by this reader instance.
+    /// The caller can detach the blocks after reading a buffer's worth of lines.
+    /// </summary>
+    public CharBlockAllocator BlockAllocator
+    {
+        get => field ??= new CharBlockAllocator();
+        private set;
     }
 
     #endregion
@@ -73,30 +88,32 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
 
         var line = reader.ReadLine();
 
-        if (line != null)
+        if (line is null)
         {
-            MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
-
-            if (line.Length > MaximumLineLength)
-            {
-                line = line[..MaximumLineLength];
-            }
-
-            // Store line for Memory access
-            lineMemory = line.AsMemory();
-            return true;
+            lineMemory = default;
+            return false;
         }
 
-        lineMemory = default;
-        return false;
+        MovePosition(Encoding.GetByteCount(line) + _newLineSequenceLength);
+
+        var length = Math.Min(line.Length, MaximumLineLength);
+
+        // Allocate from block and copy
+        var allocator = BlockAllocator;
+        var target = allocator.Rent(length);
+        line.AsSpan(0, length).CopyTo(target.Span);
+        lineMemory = target;
+        return true;
     }
 
     /// <summary>
-    /// Returns the memory buffer. For System reader, this is a no-op since we use string-backed Memory.
+    /// Returns the memory buffer. For the block-based reader, individual returns are not tracked — blocks are returned
+    /// in bulk via the BlockAllocator when the LogBuffer is evicted or the reader is disposed.
     /// </summary>
     public void ReturnMemory (ReadOnlyMemory<char> memory)
     {
-        // No-op for System reader - string is already managed by GC
+        // Bulk return via BlockAllocator.DetachBlocks() or Dispose().
+        // Individual per-line return is not needed with block-based allocation.
     }
 
     #endregion
@@ -138,6 +155,17 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
         {
             Position = currentPos;
         }
+    }
+
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            BlockAllocator?.Dispose();
+            BlockAllocator = null;
+        }
+
+        base.Dispose(disposing);
     }
 
     #endregion

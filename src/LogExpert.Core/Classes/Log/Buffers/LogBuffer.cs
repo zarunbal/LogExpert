@@ -19,6 +19,7 @@ public class LogBuffer
 
     private LogLine[] _lineArray;
     private int _lineArrayLength; // capacity of the rented array
+    private List<char[]> _charBlocks;
 
     private int MAX_LINES = 500;
 
@@ -113,6 +114,8 @@ public class LogBuffer
             Array.Clear(_lineArray, 0, LineCount);
         }
 
+        ReturnCharBlocks();
+
         LineCount = 0;
 #if DEBUG
         _filePositions.Clear();
@@ -124,6 +127,8 @@ public class LogBuffer
     /// </summary>
     public void Reinitialise (ILogFileInfo fileInfo, int maxLines)
     {
+        ReturnCharBlocks();
+
         FileInfo = fileInfo;
         MAX_LINES = maxLines;
         StartLine = 0;
@@ -154,8 +159,10 @@ public class LogBuffer
             _lineArray = null;
         }
 
-        // Do NOT zero LineCount — it is needed for buffer lookup in GetBufferForLineWithIndex.
-        // Do NOT zero StartLine, StartPos, Size — they are needed for re-reading from disk.
+        ReturnCharBlocks();
+
+        //! Do NOT zero LineCount — it is needed for buffer lookup in GetBufferForLineWithIndex.
+        //! Do NOT zero StartLine, StartPos, Size — they are needed for re-reading from disk.
         IsDisposed = true;
 #if DEBUG
         DisposeCount++;
@@ -175,6 +182,8 @@ public class LogBuffer
             _lineArray = null;
             LineCount = 0;
         }
+
+        ReturnCharBlocks();
 
         IsDisposed = true;
 #if DEBUG
@@ -205,6 +214,16 @@ public class LogBuffer
         _contentLock.Exit(useMemoryBarrier: false);
     }
 
+    /// <summary>
+    /// Attaches pooled char[] blocks that back the ReadOnlyMemory in this buffer's LogLine entries.
+    /// These blocks will be returned to ArrayPool when the buffer is evicted or disposed.
+    /// </summary>
+    public void AttachCharBlocks (List<char[]> blocks)
+    {
+        ReturnCharBlocks(); // return any previously held blocks
+        _charBlocks = blocks;
+    }
+
     #endregion
 
 #if DEBUG
@@ -218,4 +237,23 @@ public class LogBuffer
     }
 
 #endif
+
+    #region Private Methods
+
+    private void ReturnCharBlocks ()
+    {
+        if (_charBlocks is not { Count: > 0 })
+        {
+            return;
+        }
+
+        foreach (var block in _charBlocks)
+        {
+            ArrayPool<char>.Shared.Return(block);
+        }
+
+        _charBlocks = null;
+    }
+
+    #endregion
 }

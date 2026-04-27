@@ -1248,6 +1248,13 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
 
                         logBuffer.Size = filePos - logBuffer.StartPos;
 
+                        // Detach char blocks from the reader's allocator and attach to the completed buffer.
+                        // Must happen before Monitor.Exit so the buffer is still exclusively owned.
+                        if (reader is PositionAwareStreamReaderSystem systemDetachBlockReader)
+                        {
+                            logBuffer.AttachCharBlocks(systemDetachBlockReader.BlockAllocator.DetachBlocks());
+                        }
+
                         Monitor.Exit(logBuffer);
                         try
                         {
@@ -1281,6 +1288,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 }
 
                 logBuffer.Size = filePos - logBuffer.StartPos;
+
+                // Attach remaining blocks to the final buffer
+                if (reader is PositionAwareStreamReaderSystem systemDetachBlockReader2)
+                {
+                    logBuffer.AttachCharBlocks(systemDetachBlockReader2.BlockAllocator.DetachBlocks());
+                }
             }
             finally
             {
@@ -1363,10 +1376,11 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 return;
             }
 
+            ILogStreamReaderMemory reader = null;
             try
             {
                 //TODO LogStream Reader has to be changed to ILogStreamReaderMemory
-                var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
+                reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
 
                 var filePos = logBuffer.StartPos;
                 reader.Position = logBuffer.StartPos;
@@ -1400,6 +1414,12 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                     (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
                 }
 
+                // Attach char blocks from the reader to the re-read buffer
+                if (reader is PositionAwareStreamReaderSystem systemReader)
+                {
+                    logBuffer.AttachCharBlocks(systemReader.BlockAllocator.DetachBlocks());
+                }
+
                 if (maxLinesCount != logBuffer.LineCount)
                 {
                     _logger.Warn(CultureInfo.InvariantCulture, "LineCount in buffer differs after re-reading. old={0}, new={1}", maxLinesCount, logBuffer.LineCount);
@@ -1419,6 +1439,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
             }
             finally
             {
+                (reader as IDisposable)?.Dispose();
                 fileStream.Close();
             }
         }
@@ -1859,9 +1880,9 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 DeleteAllContent();
                 _cts.Dispose();
                 BufferIndex.Dispose();
-                _progressReporter.Dispose(); 
+                _progressReporter.Dispose();
                 _mmfReader?.Dispose();
-                
+
             }
 
             _disposed = true;
