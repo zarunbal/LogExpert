@@ -24,6 +24,7 @@ using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
+using LogExpert.UI.Services.ProjectFileHandlerService;
 using LogExpert.UI.Services.TabControllerService;
 using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
@@ -51,6 +52,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly LogWindowCoordinator _logWindowCoordinator;
     private readonly ToolWindowCoordinator _toolWindowCoordinator;
     private readonly FileOperationService _fileOperationService;
+    private readonly ProjectFileHandler _projectFileHandler;
 
     private bool _disposed;
 
@@ -109,6 +111,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _fileOperationService.FileHistoryChanged += (_, _) => FillHistoryMenu();
         _fileOperationService.FileOpened += OnFileOperationServiceFileOpened;
+
+        _projectFileHandler = new ProjectFileHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request));
 
         _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService, _fileOperationService);
 
@@ -1422,109 +1426,88 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadProject (string projectFileName, bool restoreLayout)
     {
-        try
+        var outcome = _projectFileHandler.LoadProject(projectFileName);
+        bool openedTabs = false;
+
+        switch (outcome.Status)
         {
-            // Load project with validation
-            var loadResult = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
-
-            if (loadResult?.ProjectData == null)
-            {
-                ShowOkMessage(
-                    Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible,
-                    Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
-                    MessageBoxIcon.Error);
-
-                return;
-            }
-
-            var projectData = loadResult.ProjectData;
-            var hasLayoutData = projectData.TabLayoutXml != null;
-
-            if (projectData.FileNames.Count == 0)
-            {
-                ShowOkMessage(
-                    Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
-                    Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // Handle missing files or layout options
-            if (loadResult.RequiresUserIntervention)
-            {
-                // Show enhanced dialog with browsing capability and layout options
-                var (dialogResult, updateSessionFile, selectedAlternatives) = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, hasLayoutData);
-
-                if (dialogResult == MissingFilesDialogResult.Cancel)
+            case ProjectLoadOutcome.LoadStatus.Error:
                 {
+                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
+                                  Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
+                                  MessageBoxIcon.Error);
                     return;
                 }
-
-                if (updateSessionFile)
+            case ProjectLoadOutcome.LoadStatus.EmptyProject:
                 {
-                    // Replace original paths with selected alternatives in project data
-                    for (int i = 0; i < projectData.FileNames.Count; i++)
+                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
+                                  Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                                  MessageBoxIcon.Error);
+                    return;
+                }
+            case ProjectLoadOutcome.LoadStatus.NeedsIntervention:
+                {
+                    var (dialogResult, updateSessionFile, selectedAlternatives) =
+                    MissingFilesDialog.ShowDialog(outcome.ValidationResult!, outcome.HasLayoutData);
+
+                    if (dialogResult == MissingFilesDialogResult.Cancel)
                     {
-                        var originalPath = projectData.FileNames[i];
-                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
-                        {
-                            projectData.FileNames[i] = value;
-                        }
+                        return;
                     }
 
-                    ProjectPersister.SaveProjectData(projectFileName, projectData);
+                    if (dialogResult == MissingFilesDialogResult.IgnoreLayout)
+                    {
+                        restoreLayout = false;
+                    }
 
-                    ShowOkMessage(
-                        Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
-                        Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
-                        MessageBoxIcon.Information);
-                }
+                    var resolution = new MissingFilesResolution
+                    {
+                        CloseAllTabs = dialogResult == MissingFilesDialogResult.CloseTabsAndRestoreLayout,
+                        OpenInNewWindow = dialogResult == MissingFilesDialogResult.OpenInNewWindow,
+                        UpdateSessionFile = updateSessionFile,
+                        SelectedAlternatives = selectedAlternatives
+                    };
 
-                // Handle layout-related results
-                switch (dialogResult)
-                {
-                    case MissingFilesDialogResult.CloseTabsAndRestoreLayout:
+                    var interventionResult = _projectFileHandler.ContinueLoad(outcome, resolution, restoreLayout);
+
+                    if (updateSessionFile)
+                    {
+                        ShowOkMessage(Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
+                                      Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
+                                      MessageBoxIcon.Information);
+                    }
+
+                    if (interventionResult.CloseAllTabs)
+                    {
                         CloseAllTabs();
-                        break;
-                    case MissingFilesDialogResult.OpenInNewWindow:
-                        {
-                            var logFileNames = PersisterHelpers.FindFilenameForSettings(projectData.FileNames.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
-                            LogExpertProxy.NewWindow([.. logFileNames]);
-                            return;
-                        }
-                    case MissingFilesDialogResult.IgnoreLayout:
-                        hasLayoutData = false;
-                        break;
+                    }
+
+                    if (interventionResult.OpenInNewWindowFiles is not null)
+                    {
+                        LogExpertProxy.NewWindow([.. interventionResult.OpenInNewWindowFiles]);
+                        return;
+                    }
+
+                    openedTabs = interventionResult.OpenedTabs;
+                    break;
                 }
-            }
-
-            foreach (var fileName in projectData.FileNames)
-            {
-                _ = hasLayoutData
-                    ? _fileOperationService.AddFileTabDeferred(fileName, false, null, true, null)
-                    : _fileOperationService.AddFileTab(new FileTabRequest { FileName = fileName, ForcePersistenceLoading = true });
-            }
-
-            // Restore layout only if we loaded at least one file
-            if (hasLayoutData && restoreLayout && _tabController.GetWindowCount() > 0)
-            {
-                _logger.Info("Restoring layout");
-                // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
-                DestroyBookmarkWindow();
-                InitToolWindows();
-                RestoreLayout(projectData.TabLayoutXml);
-            }
-            else if (_tabController.GetWindowCount() == 0)
-            {
-                _logger.Warn("No files loaded, skipping layout restoration");
-            }
+            case ProjectLoadOutcome.LoadStatus.Success:
+                {
+                    openedTabs = _projectFileHandler.ContinueLoad(outcome, null, restoreLayout).OpenedTabs;
+                    break;
+                }
         }
-        catch (Exception ex)
+
+        if (restoreLayout && outcome.HasLayoutData && openedTabs)
         {
-            ShowOkMessage(
-                $"Error loading project: {ex.Message}",
-                Resources.LogExpert_Common_UI_Title_Error,
-                MessageBoxIcon.Error);
+            _logger.Info("Restoring layout");
+            DestroyBookmarkWindow();
+            InitToolWindows();
+            RestoreLayout(outcome.LayoutXml!);
+        }
+        else if (!openedTabs)
+        {
+            _logger.Warn("No files loaded, skipping layout restoration");
         }
     }
 
@@ -2396,7 +2379,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 TabLayoutXml = SaveLayout()
             };
 
-            ProjectPersister.SaveProjectData(fileName, projectData);
+            if (!_projectFileHandler.SaveProject(fileName, projectData, out var errorMessage))
+            {
+                ShowOkMessage(errorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
+                              Resources.LogExpert_Common_UI_Title_Error,
+                              MessageBoxIcon.Error);
+            }
         }
     }
 
