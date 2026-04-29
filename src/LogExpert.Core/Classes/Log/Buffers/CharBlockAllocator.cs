@@ -100,25 +100,23 @@ public sealed class CharBlockAllocator : IDisposable
     }
 
     /// <summary>
-    /// Releases all block references. The actual char[] memory is collected by GC
-    /// once all <see cref="ReadOnlyMemory{Char}"/> slices pointing into them are released.
+    /// Returns all blocks to <see cref="ArrayPool{T}.Shared"/>.
+    /// Safe to call only when no <see cref="ReadOnlyMemory{Char}"/> slices reference these blocks
+    /// (i.e., after DetachBlocks transferred ownership to LogBuffer, and the reader is being disposed).
     /// </summary>
     public void ReturnAll ()
     {
-        // Don't return to ArrayPool — LogLine ReadOnlyMemory<char> slices may still
-        // reference these blocks. Let GC collect when all consumers are done.
-
-        //foreach (var block in _blocks)
-        //{
-        //    ArrayPool<char>.Shared.Return(block);
-        //}
+        foreach (var block in _blocks)
+        {
+            ArrayPool<char>.Shared.Return(block);
+        }
 
         _blocks.Clear();
 
-        //foreach (var block in _oversizedBlocks)
-        //{
-        //    ArrayPool<char>.Shared.Return(block);
-        //}
+        foreach (var block in _oversizedBlocks)
+        {
+            ArrayPool<char>.Shared.Return(block);
+        }
 
         _oversizedBlocks.Clear();
         _currentBlock = null!;

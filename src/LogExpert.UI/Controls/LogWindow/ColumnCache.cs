@@ -27,6 +27,8 @@ internal class ColumnCache
     /// <summary>
     /// Prefetch a range of lines in a single batch call.
     /// Call this before a paint cycle with the visible row range.
+    /// Pin-before-read: pins are acquired BEFORE reading lines to prevent
+    /// the GC eviction thread from returning char blocks between read and pin.
     /// </summary>
     internal void Prefetch (LogfileReader logFileReader, int startLine, int count)
     {
@@ -35,16 +37,38 @@ internal class ColumnCache
             return; // already prefetched this exact range
         }
 
-        // Release pins from previous prefetch before acquiring new ones
-        _pinHandle?.Dispose();
+        //Pin BEFORE reading — this should prevent GC thread from evicting buffers
+        //between GetLogLineMemories() and PinRange().
+        PinHandle newHandle;
+        using (var readLock = logFileReader.BufferIndex.AcquireReadLock())
+        {
+            newHandle = logFileReader.BufferIndex.PinRange(startLine, startLine + count - 1);
+        }
 
-        _prefetchedLines = logFileReader.GetLogLineMemories(startLine, count);
+        var newLines = logFileReader.GetLogLineMemories(startLine, count);
+
+        //Atomic swap: old handle released AFTER new is in place
+        var oldHandle = _pinHandle;
+        _pinHandle = newHandle;
+        _prefetchedLines = newLines;
         _prefetchStartLine = startLine;
-        _prefetchCount = _prefetchedLines.Length;
+        _prefetchCount = newLines.Length;
 
-        // Pin the buffers backing the prefetched lines to prevent eviction during display
-        using var readLock = logFileReader.BufferIndex.AcquireReadLock();
-        _pinHandle = logFileReader.BufferIndex.PinRange(startLine, startLine + _prefetchCount - 1);
+        // Now safe to release old pins — new pins cover the new visible range
+        oldHandle?.Dispose();
+    }
+
+    /// <summary>
+    /// Returns the prefetched line for the given line number if it falls within the
+    /// currently pinned range. Returns null if not available.
+    /// </summary>
+    internal ILogLineMemory? GetPrefetchedLine (int lineNumber)
+    {
+        return _prefetchedLines != null
+            && lineNumber >= _prefetchStartLine
+            && lineNumber < _prefetchStartLine + _prefetchCount
+                ? _prefetchedLines[lineNumber - _prefetchStartLine]
+                : null;
     }
 
     /// <summary>
@@ -59,6 +83,19 @@ internal class ColumnCache
         _prefetchStartLine = -1;
         _prefetchCount = 0;
         _lastLineNumber = -1;
+    }
+
+    /// <summary>
+    /// Forces the next <see cref="Prefetch"/> call to re-fetch and re-pin, without releasing
+    /// current pins. Use this instead of <see cref="InvalidatePrefetch"/> when the visible data
+    /// may be stale but the underlying buffers must remain pinned until replacement pins are acquired.
+    /// </summary>
+    internal void MarkPrefetchStale ()
+    {
+        _prefetchStartLine = -1;
+        _prefetchCount = 0;
+        _lastLineNumber = -1;
+        _cachedColumns = null;
     }
 
     internal IColumnizedLogLineMemory GetColumnsForLine (LogfileReader logFileReader, int lineNumber, ILogLineMemoryColumnizer columnizer, ColumnizerCallback columnizerCallback)
@@ -77,6 +114,9 @@ internal class ColumnCache
                 line = _prefetchedLines[lineNumber - _prefetchStartLine];
             }
 
+            // Fallback: read directly. This is safe because the caller (CellValueNeeded)
+            // has already called Prefetch/PrefetchFilterVisibleLines which pins the relevant
+            // buffers. Pinned buffers won't have their char blocks returned to the pool.
             line ??= logFileReader.GetLogLineMemoryWithWait(lineNumber).Result;
 
             if (line != null)

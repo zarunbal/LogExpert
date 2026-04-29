@@ -267,11 +267,20 @@ public class LogBuffer
     /// <summary>
     /// Attaches pooled char[] blocks that back the ReadOnlyMemory in this buffer's LogLine entries. These blocks will
     /// be returned to ArrayPool when the buffer is evicted or disposed.
+    /// New blocks are MERGED with existing ones — never replace — because the buffer's existing
+    /// LogLine entries still reference the old blocks (e.g., during tail mode where multiple
+    /// read sessions append lines to the same buffer).
     /// </summary>
     public void AttachCharBlocks (List<char[]> blocks)
     {
-        ReturnCharBlocks(); // return any previously held blocks
-        _charBlocks = blocks;
+        if (_charBlocks is null)
+        {
+            _charBlocks = blocks;
+        }
+        else
+        {
+            _charBlocks.AddRange(blocks);
+        }
     }
 
     #endregion
@@ -314,13 +323,10 @@ public class LogBuffer
             return;
         }
 
-        // Don't return blocks to ArrayPool — external code (ColumnCache, DataGridView,
-        // filter grid) may still hold ReadOnlyMemory<char> slices into these blocks.
-        // Dropping the reference lets GC collect them when all consumers are done.
-        //foreach (var block in _charBlocks)
-        //{
-        //    ArrayPool<char>.Shared.Return(block);
-        //}
+        foreach (var block in _charBlocks)
+        {
+            ArrayPool<char>.Shared.Return(block);
+        }
 
         _charBlocks = null;
     }
