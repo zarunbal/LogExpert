@@ -5,7 +5,7 @@ using LogExpert.Core.Entities;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.StreamReaderTests;
 
 [TestFixture]
 public class LogStreamReaderTest

@@ -338,6 +338,14 @@ public sealed class BufferIndex : IDisposable
                 var kvp = entries[i];
                 if (_lruCacheDict.TryRemove(kvp.Key, out var removed))
                 {
+                    // Skip pinned buffers — the UI is actively displaying their content.
+                    // Re-add to LRU so they'll be reconsidered in a future eviction pass.
+                    if (removed.LogBuffer.IsPinned)
+                    {
+                        _lruCacheDict.TryAdd(kvp.Key, removed);
+                        continue;
+                    }
+
                     var lockTaken = false;
                     try
                     {
@@ -365,6 +373,33 @@ public sealed class BufferIndex : IDisposable
             _logger.Info(CultureInfo.InvariantCulture, "Garbage collector time: " + (endTime - startTime) + " ms.");
         }
 #endif
+    }
+
+    /// <summary>
+    /// Pins all buffers that cover the specified line range. Returns a <see cref="PinHandle"/>
+    /// that unpins them on dispose. Caller must hold at least a read lock.
+    /// </summary>
+    public PinHandle PinRange (int startLine, int endLine)
+    {
+        var pinned = new List<LogBuffer>();
+        var line = startLine;
+
+        while (line <= endLine)
+        {
+            var entry = TryFindBuffer(line);
+            if (!entry.Found || entry.Buffer is null)
+            {
+                break;
+            }
+
+            entry.Buffer.Pin();
+            pinned.Add(entry.Buffer);
+
+            // Jump to next buffer's start line to avoid redundant lookups
+            line = entry.Buffer.StartLine + entry.Buffer.LineCount;
+        }
+
+        return new PinHandle(pinned);
     }
 
     /// <summary>

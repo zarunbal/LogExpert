@@ -2,6 +2,7 @@ using ColumnizerLib;
 
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Buffers;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -17,6 +18,7 @@ internal class ColumnCache
     private ILogLineMemory[] _prefetchedLines;
     private int _prefetchStartLine = -1;
     private int _prefetchCount;
+    private PinHandle? _pinHandle;
 
     #endregion
 
@@ -33,9 +35,16 @@ internal class ColumnCache
             return; // already prefetched this exact range
         }
 
+        // Release pins from previous prefetch before acquiring new ones
+        _pinHandle?.Dispose();
+
         _prefetchedLines = logFileReader.GetLogLineMemories(startLine, count);
         _prefetchStartLine = startLine;
         _prefetchCount = _prefetchedLines.Length;
+
+        // Pin the buffers backing the prefetched lines to prevent eviction during display
+        using var readLock = logFileReader.BufferIndex.AcquireReadLock();
+        _pinHandle = logFileReader.BufferIndex.PinRange(startLine, startLine + _prefetchCount - 1);
     }
 
     /// <summary>
@@ -43,6 +52,9 @@ internal class ColumnCache
     /// </summary>
     internal void InvalidatePrefetch ()
     {
+        _pinHandle?.Dispose();
+        _pinHandle = null;
+
         _prefetchedLines = null;
         _prefetchStartLine = -1;
         _prefetchCount = 0;

@@ -5220,7 +5220,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = clipText.AppendLine(line.ToClipBoardText());
             }
 
-            Clipboard.SetText(clipText.ToString());
+            Clipboard.SetDataObject(clipText.ToString());
         }
     }
 

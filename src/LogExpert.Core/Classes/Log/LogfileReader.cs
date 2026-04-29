@@ -217,7 +217,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     #region Properties
 
     /// <summary>For tests and diagnostics.</summary>
-    internal BufferIndex BufferIndex { get; }
+    public BufferIndex BufferIndex { get; }
 
     /// <summary>
     /// Gets the total number of lines contained in all buffers.
@@ -1262,6 +1262,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                         {
                             logBuffer.AttachCharBlocks(systemDetachBlockReader.BlockAllocator.DetachBlocks());
                         }
+                        else if (reader is PositionAwareStreamReaderDirect directReader)
+                        {
+                            logBuffer.AttachCharBlocks(directReader.DetachBlocks());
+                        }
 
                         Monitor.Exit(logBuffer);
                         try
@@ -1296,6 +1300,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 if (reader is PositionAwareStreamReaderSystem systemDetachBlockReader2)
                 {
                     logBuffer.AttachCharBlocks(systemDetachBlockReader2.BlockAllocator.DetachBlocks());
+                }
+                else if (reader is PositionAwareStreamReaderDirect directReader)
+                {
+                    logBuffer.AttachCharBlocks(directReader.DetachBlocks());
                 }
             }
             finally
@@ -1421,6 +1429,10 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
                 if (reader is PositionAwareStreamReaderSystem systemReader)
                 {
                     logBuffer.AttachCharBlocks(systemReader.BlockAllocator.DetachBlocks());
+                }
+                else if (reader is PositionAwareStreamReaderDirect directReader)
+                {
+                    logBuffer.AttachCharBlocks(directReader.DetachBlocks());
                 }
 
                 if (maxLinesCount != logBuffer.LineCount)
@@ -1703,6 +1715,7 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
         {
             ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
             ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
+            ReaderType.SystemDirect => new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength),
             //Default will be System
             _ => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
         };

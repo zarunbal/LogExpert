@@ -6,7 +6,7 @@ using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.Tests.StreamReaderTests;
 
 [TestFixture]
 public class LogfileReaderBlockAllocationTests
@@ -46,6 +46,37 @@ public class LogfileReaderBlockAllocationTests
             linesPerBuffer: 500,
             new MultiFileOptions(),
             ReaderType.System,
+            PluginRegistry.PluginRegistry.Instance,
+            maximumLineLength: 500,
+            progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
+
+        reader.ReadFiles();
+
+        Assert.That(reader.LineCount, Is.EqualTo(lineCount));
+
+        // Verify first, middle, and last lines
+        VerifyLine(reader, 0, 0);
+        VerifyLine(reader, lineCount / 2, lineCount / 2);
+        VerifyLine(reader, lineCount - 1, lineCount - 1);
+    }
+
+    [Test]
+    [TestCase(10)]
+    [TestCase(100)]
+    [TestCase(1_000)]
+    [TestCase(10_000)]
+    public void ReadFiles_AllLinesCorrect_WithDirectRead (int lineCount)
+    {
+        GenerateLogFile(_tempFile, lineCount);
+
+        using var reader = new LogfileReader(
+            _tempFile,
+            new EncodingOptions { Encoding = Encoding.UTF8 },
+            multiFile: false,
+            bufferCount: 100,
+            linesPerBuffer: 500,
+            new MultiFileOptions(),
+            ReaderType.SystemDirect,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);

@@ -21,6 +21,8 @@ public class LogBuffer
     private int _lineArrayLength; // capacity of the rented array
     private List<char[]> _charBlocks;
 
+    private int _pinCount;
+
     private int MAX_LINES = 500;
 
     #endregion
@@ -44,6 +46,11 @@ public class LogBuffer
 
     #region Properties
 
+    /// <summary>
+    /// Returns true if any component has pinned this buffer to prevent eviction.
+    /// </summary>
+    public bool IsPinned => Volatile.Read(ref _pinCount) > 0;
+
     public long StartPos { set; get; }
 
     public long Size
@@ -56,7 +63,7 @@ public class LogBuffer
             {
                 if (field < _filePositions[^1] - StartPos)
                 {
-                    _logger.Error("LogBuffer overall Size must be greater than last line file position!");
+                    _logger.Error("### LogBuffer: LogBuffer overall Size must be greater than last line file position!");
                 }
             }
 #endif
@@ -82,6 +89,36 @@ public class LogBuffer
 
     #region Public methods
 
+    /// <summary>
+    /// Increments the pin count. While pinned, the buffer will not be evicted by the LRU garbage collector.
+    /// Each call to Pin() must be balanced by a call to Unpin().
+    /// </summary>
+    public void Pin ()
+    {
+        _ = Interlocked.Increment(ref _pinCount);
+    }
+
+    /// <summary>
+    /// Decrements the pin count. When the count reaches zero, the buffer becomes eligible for eviction.
+    /// </summary>
+    public void Unpin ()
+    {
+        var newCount = Interlocked.Decrement(ref _pinCount);
+#if DEBUG
+        if (newCount < 0)
+        {
+            _logger.Warn("Unpin underflow: _pinCount went to {0}. Unbalanced Pin/Unpin calls.", newCount);
+        }
+#endif
+    }
+
+    /// <summary>
+    /// Adds a log line to the internal collection at the specified file position.
+    /// </summary>
+    /// <remarks>If the internal collection has reached its maximum capacity, the log line is not added. In
+    /// debug builds, an error is logged when this occurs.</remarks>
+    /// <param name="lineMemory">The log line to add to the collection.</param>
+    /// <param name="filePos">The file position associated with the log line.</param>
     public void AddLine (LogLine lineMemory, long filePos)
     {
         if (LineCount < _lineArrayLength)
@@ -102,6 +139,12 @@ public class LogBuffer
         IsDisposed = false;
     }
 
+    /// <summary>
+    /// Removes all log lines from the current collection, resetting its state for reuse.
+    /// </summary>
+    /// <remarks>After calling this method, the collection will be empty and ready to accept new log lines.
+    /// Any resources associated with the previous log lines are released. This method is typically used to clear the
+    /// log data before loading new content or starting a new logging session.</remarks>
     public void ClearLines ()
     {
         if (_lineArray == null)
@@ -138,6 +181,7 @@ public class LogBuffer
         DroppedLinesCount = 0;
         PrevBuffersDroppedLinesSum = 0;
         IsDisposed = false;
+        _pinCount = 0;
         _lineArray = ArrayPool<LogLine>.Shared.Rent(maxLines);
         _lineArrayLength = _lineArray.Length;
 #if DEBUG
@@ -147,8 +191,8 @@ public class LogBuffer
     }
 
     /// <summary>
-    /// Evicts the buffer content to free memory while preserving metadata (LineCount, StartLine, StartPos, Size).
-    /// The buffer remains findable in buffer list lookups and can be re-read from disk when accessed.
+    /// Evicts the buffer content to free memory while preserving metadata (LineCount, StartLine, StartPos, Size). The
+    /// buffer remains findable in buffer list lookups and can be re-read from disk when accessed.
     /// </summary>
     public void EvictContent ()
     {
@@ -170,8 +214,8 @@ public class LogBuffer
     }
 
     /// <summary>
-    /// Fully disposes the buffer content and resets all metadata. Used when the buffer is being returned to the pool
-    /// or completely removed from the buffer list.
+    /// Fully disposes the buffer content and resets all metadata. Used when the buffer is being returned to the pool or
+    /// completely removed from the buffer list.
     /// </summary>
     public void DisposeContent ()
     {
@@ -191,6 +235,12 @@ public class LogBuffer
 #endif
     }
 
+    /// <summary>
+    /// Retrieves the log line at the specified index within the current memory block.
+    /// </summary>
+    /// <param name="num">The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
+    /// number of lines.</param>
+    /// <returns>The <see cref="LogLine"/> at the specified index if it exists; otherwise, <see langword="null"/>.</returns>
     public LogLine? GetLineMemoryOfBlock (int num)
     {
         return num < LineCount && num >= 0
@@ -215,8 +265,8 @@ public class LogBuffer
     }
 
     /// <summary>
-    /// Attaches pooled char[] blocks that back the ReadOnlyMemory in this buffer's LogLine entries.
-    /// These blocks will be returned to ArrayPool when the buffer is evicted or disposed.
+    /// Attaches pooled char[] blocks that back the ReadOnlyMemory in this buffer's LogLine entries. These blocks will
+    /// be returned to ArrayPool when the buffer is evicted or disposed.
     /// </summary>
     public void AttachCharBlocks (List<char[]> blocks)
     {
@@ -227,6 +277,7 @@ public class LogBuffer
     #endregion
 
 #if DEBUG
+
     public long DisposeCount { get; private set; }
 
     public long GetFilePosForLineOfBlock (int line)
@@ -240,11 +291,37 @@ public class LogBuffer
 
     #region Private Methods
 
+    /// <summary>
+    /// Releases references to the character block buffers used by this instance, allowing them to be garbage collected
+    /// when no longer in use.
+    /// </summary>
+    /// <remarks>If the buffer is pinned, this method only drops the reference without returning the blocks to
+    /// the array pool, as external consumers may still hold references. This helps prevent premature reuse of buffers
+    /// that may still be accessed elsewhere.</remarks>
     private void ReturnCharBlocks ()
     {
-        // Just drop the reference — do NOT return to ArrayPool.
-        // The UI thread may still hold ReadOnlyMemory<char> slices into these blocks.
-        // GC will collect them once all references (LogLine, UI snapshots) are released.
+        if (_charBlocks is null)
+        {
+            return;
+        }
+
+        if (IsPinned)
+        {
+            // Buffer is pinned — UI still holds ReadOnlyMemory<char> slices into these blocks.
+            // Don't return to ArrayPool; just drop the reference. GC will collect them
+            // once all UI references (ColumnCache, DataGridView) are released.
+            _charBlocks = null;
+            return;
+        }
+
+        // Don't return blocks to ArrayPool — external code (ColumnCache, DataGridView,
+        // filter grid) may still hold ReadOnlyMemory<char> slices into these blocks.
+        // Dropping the reference lets GC collect them when all consumers are done.
+        //foreach (var block in _charBlocks)
+        //{
+        //    ArrayPool<char>.Shared.Return(block);
+        //}
+
         _charBlocks = null;
     }
 

@@ -101,6 +101,29 @@ public class ReadThroughputBenchmarks
         return reader.LineCount;
     }
 
+    /// <summary>
+    /// Direct-read: reads decoded chars directly into pooled blocks without per-line string allocation.
+    /// Compare allocations and GC counts vs ReadWithBlockAllocation.
+    /// </summary>
+    [Benchmark]
+    public int ReadWithDirectRead ()
+    {
+        using var reader = new LogfileReader(
+            _tempFile,
+            new EncodingOptions { Encoding = Encoding.UTF8 },
+            multiFile: false,
+            bufferCount: 500,
+            linesPerBuffer: 500,
+            new MultiFileOptions(),
+            ReaderType.SystemDirect,
+            PluginRegistry.PluginRegistry.Instance,
+            maximumLineLength: 500,
+            progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
+
+        reader.ReadFiles();
+        return reader.LineCount;
+    }
+
     [GlobalCleanup]
     public void Cleanup ()
     {

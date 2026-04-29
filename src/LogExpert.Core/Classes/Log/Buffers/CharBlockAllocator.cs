@@ -1,24 +1,16 @@
+using System.Buffers;
+
 namespace LogExpert.Core.Classes.Log.Buffers;
 
-/// <summary>
-/// Allocates <see cref="ReadOnlyMemory{Char}"/> slices from large char[] blocks.
-/// Multiple lines are packed into each block to reduce per-line allocation overhead.
-/// </summary>
 /// <remarks>
-/// Blocks are plain arrays (not pooled) because their lifetime extends beyond the allocator:
-/// the UI thread may hold <see cref="ReadOnlyMemory{Char}"/> slices long after the backing
-/// <see cref="LogBuffer"/> is evicted. Using <see cref="System.Buffers.ArrayPool{T}"/> here would
-/// cause use-after-return corruption when evicted blocks are re-rented by new reads.
-///
-/// We still get the primary GC benefit: hundreds of short-lived strings from
-/// <see cref="System.IO.StreamReader.ReadLine"/> are copied into a few large blocks, keeping
-/// the strings Gen0-eligible and reducing Gen1/Gen2 promotions.
-///
+/// Blocks are rented from <see cref="ArrayPool{T}.Shared"/> and returned when the owning <see cref="LogBuffer"/> is
+/// evicted. The pinning mechanism (Phase 1/2) ensures that buffers whose content is still displayed by the UI are
+/// exempt from eviction, preventing use-after-return corruption.
 /// This class is NOT thread-safe. Each reader/fill operation should use its own instance.
 /// </remarks>
 public sealed class CharBlockAllocator : IDisposable
 {
-    private const int DEFAULT_BLOCK_SIZE = 65_536; // 128 KB in chars (64K chars × 2 bytes)
+    private const int DEFAULT_BLOCK_SIZE = 32_768; // 64 KB (32K chars × 2 bytes), stays under 85 KB LOH threshold
 
     private readonly int _blockSize;
     private List<char[]> _blocks = [];
@@ -30,7 +22,7 @@ public sealed class CharBlockAllocator : IDisposable
     public CharBlockAllocator (int blockSize = DEFAULT_BLOCK_SIZE)
     {
         _blockSize = blockSize;
-        _currentBlock = new char[_blockSize];
+        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
         _blocks.Add(_currentBlock);
         _currentOffset = 0;
     }
@@ -77,7 +69,7 @@ public sealed class CharBlockAllocator : IDisposable
         }
 
         // Need a new block
-        _currentBlock = new char[_blockSize];
+        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
         _blocks.Add(_currentBlock);
         _currentOffset = length;
         return _currentBlock.AsMemory(0, length);
@@ -101,7 +93,7 @@ public sealed class CharBlockAllocator : IDisposable
 
         // Swap the list — O(1), no copy. Caller owns the old list.
         var blocks = _blocks;
-        _currentBlock = new char[_blockSize];
+        _currentBlock = ArrayPool<char>.Shared.Rent(_blockSize);
         _blocks = [_currentBlock];
         _currentOffset = 0;
         return blocks;
@@ -113,7 +105,21 @@ public sealed class CharBlockAllocator : IDisposable
     /// </summary>
     public void ReturnAll ()
     {
+        // Don't return to ArrayPool — LogLine ReadOnlyMemory<char> slices may still
+        // reference these blocks. Let GC collect when all consumers are done.
+
+        //foreach (var block in _blocks)
+        //{
+        //    ArrayPool<char>.Shared.Return(block);
+        //}
+
         _blocks.Clear();
+
+        //foreach (var block in _oversizedBlocks)
+        //{
+        //    ArrayPool<char>.Shared.Return(block);
+        //}
+
         _oversizedBlocks.Clear();
         _currentBlock = null!;
         _currentOffset = 0;

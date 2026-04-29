@@ -79,7 +79,7 @@ public class Preferences
     [Newtonsoft.Json.JsonIgnore]
     public bool UseLegacyReader { get; set; }
 
-    public ReaderType ReaderType { get; set; } = ReaderType.Pipeline;
+    public ReaderType ReaderType { get; set; } = ReaderType.System;
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 
