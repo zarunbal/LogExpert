@@ -6,6 +6,7 @@ namespace LogExpert.Core.Interfaces;
 /// </summary>
 public interface ILogfileReaderDiagnostics
 {
+#if DEBUG
     /// <summary>
     /// Logs detailed buffer information for the given line to the diagnostic output.
     /// Only functional in debug builds; no-op in release.
@@ -17,4 +18,5 @@ public interface ILogfileReaderDiagnostics
     /// Only functional in debug builds; no-op in release.
     /// </summary>
     void LogBufferDiagnostic();
+#endif
 }
