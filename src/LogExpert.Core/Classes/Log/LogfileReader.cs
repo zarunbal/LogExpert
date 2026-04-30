@@ -16,7 +16,7 @@ using NLog;
 
 namespace LogExpert.Core.Classes.Log;
 
-public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisposable
+public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogfileReaderConfiguration, IBufferPinning, ILogfileReaderDiagnostics
 {
     #region Fields
 
@@ -2000,4 +2000,15 @@ public partial class LogfileReader : IAutoLogLineMemoryColumnizerCallback, IDisp
     }
 
     #endregion Event Handlers
+
+    #region IBufferPinning
+
+    /// <inheritdoc />
+    PinHandle IBufferPinning.PinRange(int startLine, int endLine)
+    {
+        using var readLock = BufferIndex.AcquireReadLock();
+        return BufferIndex.PinRange(startLine, endLine);
+    }
+
+    #endregion
 }

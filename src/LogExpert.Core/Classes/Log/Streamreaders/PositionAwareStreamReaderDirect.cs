@@ -147,6 +147,12 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     /// </summary>
     public List<char[]> DetachBlocks ()
     {
+        // Nothing to detach: no completed blocks and no lines were scanned from the current block.
+        if (_completedBlocks.Count == 0 && _scanOffset == 0)
+        {
+            return [];
+        }
+
         // The current _readBlock contains memory backing lines already added to the LogBuffer.
         // It must be transferred to the buffer along with any completed blocks.
         _completedBlocks.Add(_readBlock);

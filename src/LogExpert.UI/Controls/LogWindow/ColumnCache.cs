@@ -1,8 +1,8 @@
 using ColumnizerLib;
 
 using LogExpert.Core.Callback;
-using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Log.Buffers;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -30,7 +30,7 @@ internal class ColumnCache
     /// Pin-before-read: pins are acquired BEFORE reading lines to prevent
     /// the GC eviction thread from returning char blocks between read and pin.
     /// </summary>
-    internal void Prefetch (LogfileReader logFileReader, int startLine, int count)
+    internal void Prefetch (ILogfileReader logFileReader, int startLine, int count)
     {
         if (startLine == _prefetchStartLine && count == _prefetchCount)
         {
@@ -39,10 +39,10 @@ internal class ColumnCache
 
         //Pin BEFORE reading — this should prevent GC thread from evicting buffers
         //between GetLogLineMemories() and PinRange().
-        PinHandle newHandle;
-        using (var readLock = logFileReader.BufferIndex.AcquireReadLock())
+        PinHandle? newHandle = null;
+        if (logFileReader is IBufferPinning pinning)
         {
-            newHandle = logFileReader.BufferIndex.PinRange(startLine, startLine + count - 1);
+            newHandle = pinning.PinRange(startLine, startLine + count - 1);
         }
 
         var newLines = logFileReader.GetLogLineMemories(startLine, count);
@@ -98,7 +98,7 @@ internal class ColumnCache
         _cachedColumns = null;
     }
 
-    internal IColumnizedLogLineMemory GetColumnsForLine (LogfileReader logFileReader, int lineNumber, ILogLineMemoryColumnizer columnizer, ColumnizerCallback columnizerCallback)
+    internal IColumnizedLogLineMemory GetColumnsForLine (ILogfileReader logFileReader, int lineNumber, ILogLineMemoryColumnizer columnizer, ColumnizerCallback columnizerCallback)
     {
         if (_lastColumnizer != columnizer || (_lastLineNumber != lineNumber && _cachedColumns != null) || columnizerCallback.LineNum != lineNumber)
         {
