@@ -202,8 +202,24 @@ public class LogBufferCharBlockTests
         var retrieved2 = buffer.GetLineMemoryOfBlock(1);
         Assert.That(retrieved1.HasValue, Is.True);
         Assert.That(retrieved2.HasValue, Is.True);
-        Assert.That(retrieved1.Value.FullLine.Span.ToString(), Is.EqualTo("Hello World"));
-        Assert.That(retrieved2.Value.FullLine.Span.ToString(), Is.EqualTo("Second Line"));
+
+        if (retrieved1 is not { } retrievedLine1)
+        {
+            Assert.Fail("Expected first retrieved line to have a value.");
+        }
+        else
+        {
+            Assert.That(retrievedLine1.FullLine.Span.ToString(), Is.EqualTo("Hello World"));
+        }
+
+        if (retrieved2 is not { } retrievedLine2)
+        {
+            Assert.Fail("Expected second retrieved line to have a value.");
+        }
+        else
+        {
+            Assert.That(retrievedLine2.FullLine.Span.ToString(), Is.EqualTo("Second Line"));
+        }
 
         // After eviction, blocks are returned and lines are no longer accessible
         buffer.EvictContent();

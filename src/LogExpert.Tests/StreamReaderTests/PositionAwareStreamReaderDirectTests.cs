@@ -275,6 +275,7 @@ public class PositionAwareStreamReaderDirectTests
         // Read all lines
         while (reader.TryReadLine(out _))
         {
+            // Intentionally empty: consume all lines to advance reader state.
         }
 
         var blocks = reader.DetachBlocks();

@@ -331,6 +331,7 @@ public class LogStreamReaderTest
 
         while (reader.TryReadLine(out _))
         {
+            // Intentionally empty: consume all lines to advance reader state.
         }
 
         // The allocator should have at least 1 block
@@ -346,6 +347,7 @@ public class LogStreamReaderTest
 
         while (reader.TryReadLine(out _))
         {
+            // Intentionally empty: consume all lines to advance reader state.
         }
 
         var blocks = reader.BlockAllocator.DetachBlocks();

@@ -1376,10 +1376,10 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 #endif
         lock (_logBufferLock)
         {
-            Stream fileStream = null;
+            Stream openendFileStream;
             try
             {
-                fileStream = logBuffer.FileInfo.OpenStream();
+                openendFileStream = logBuffer.FileInfo.OpenStream();
             }
             catch (IOException e)
             {
@@ -1387,75 +1387,68 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                 return;
             }
 
-            ILogStreamReaderMemory reader = null;
-            try
+            using Stream fileStream = openendFileStream;
             {
                 //TODO LogStream Reader has to be changed to ILogStreamReaderMemory
-                reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
+                var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
 
-                var filePos = logBuffer.StartPos;
-                reader.Position = logBuffer.StartPos;
-                var maxLinesCount = logBuffer.LineCount;
-                var lineCount = 0;
-                var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
-                logBuffer.ClearLines();
-
-                var (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
-
-                while (success)
+                using var readerDisposabel = reader as IDisposable;
                 {
-                    if (lineCount >= maxLinesCount)
-                    {
-                        break;
-                    }
+                    var filePos = logBuffer.StartPos;
+                    reader.Position = logBuffer.StartPos;
+                    var maxLinesCount = logBuffer.LineCount;
+                    var lineCount = 0;
+                    var dropCount = logBuffer.PrevBuffersDroppedLinesSum;
+                    logBuffer.ClearLines();
 
-                    if (wasDropped)
+                    var (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+
+                    while (success)
                     {
-                        dropCount++;
+                        if (lineCount >= maxLinesCount)
+                        {
+                            break;
+                        }
+
+                        if (wasDropped)
+                        {
+                            dropCount++;
+                            (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
+                            continue;
+                        }
+
+                        LogLine logLine = new(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
+
+                        logBuffer.AddLine(logLine, filePos);
+                        filePos = reader.Position;
+                        lineCount++;
+
                         (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
-                        continue;
                     }
 
-                    LogLine logLine = new(lineMemory, logBuffer.StartLine + logBuffer.LineCount);
+                    // Attach char blocks from the reader to the re-read buffer
+                    if (reader is PositionAwareStreamReaderSystem systemReader)
+                    {
+                        logBuffer.AttachCharBlocks(systemReader.BlockAllocator.DetachBlocks());
+                    }
+                    else if (reader is PositionAwareStreamReaderDirect directReader)
+                    {
+                        logBuffer.AttachCharBlocks(directReader.DetachBlocks());
+                    }
 
-                    logBuffer.AddLine(logLine, filePos);
-                    filePos = reader.Position;
-                    lineCount++;
+                    if (maxLinesCount != logBuffer.LineCount)
+                    {
+                        _logger.Warn(CultureInfo.InvariantCulture, "LineCount in buffer differs after re-reading. old={0}, new={1}", maxLinesCount, logBuffer.LineCount);
+                    }
 
-                    (success, lineMemory, wasDropped) = ReadLineMemory(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + dropCount);
-                }
-
-                // Attach char blocks from the reader to the re-read buffer
-                if (reader is PositionAwareStreamReaderSystem systemReader)
-                {
-                    logBuffer.AttachCharBlocks(systemReader.BlockAllocator.DetachBlocks());
-                }
-                else if (reader is PositionAwareStreamReaderDirect directReader)
-                {
-                    logBuffer.AttachCharBlocks(directReader.DetachBlocks());
-                }
-
-                if (maxLinesCount != logBuffer.LineCount)
-                {
-                    _logger.Warn(CultureInfo.InvariantCulture, "LineCount in buffer differs after re-reading. old={0}, new={1}", maxLinesCount, logBuffer.LineCount);
-                }
-
-                if (dropCount - logBuffer.PrevBuffersDroppedLinesSum != logBuffer.DroppedLinesCount)
-                {
-                    _logger.Warn(CultureInfo.InvariantCulture, "DroppedLinesCount in buffer differs after re-reading. old={0}, new={1}", logBuffer.DroppedLinesCount, dropCount);
-                    logBuffer.DroppedLinesCount = dropCount - logBuffer.PrevBuffersDroppedLinesSum;
+                    if (dropCount - logBuffer.PrevBuffersDroppedLinesSum != logBuffer.DroppedLinesCount)
+                    {
+                        _logger.Warn(CultureInfo.InvariantCulture, "DroppedLinesCount in buffer differs after re-reading. old={0}, new={1}", logBuffer.DroppedLinesCount, dropCount);
+                        logBuffer.DroppedLinesCount = dropCount - logBuffer.PrevBuffersDroppedLinesSum;
+                    }
                 }
 
                 GC.KeepAlive(fileStream);
-            }
-            catch (IOException e)
-            {
-                _logger.Warn(e);
-            }
-            finally
-            {
-                (reader as IDisposable)?.Dispose();
-                fileStream.Close();
             }
         }
     }
@@ -2004,7 +1997,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     #region IBufferPinning
 
     /// <inheritdoc />
-    PinHandle IBufferPinning.PinRange(int startLine, int endLine)
+    PinHandle IBufferPinning.PinRange (int startLine, int endLine)
     {
         using var readLock = BufferIndex.AcquireReadLock();
         return BufferIndex.PinRange(startLine, endLine);

@@ -90,8 +90,8 @@ public class LogBuffer
     #region Public methods
 
     /// <summary>
-    /// Increments the pin count. While pinned, the buffer will not be evicted by the LRU garbage collector.
-    /// Each call to Pin() must be balanced by a call to Unpin().
+    /// Increments the pin count. While pinned, the buffer will not be evicted by the LRU garbage collector. Each call
+    /// to Pin() must be balanced by a call to Unpin().
     /// </summary>
     public void Pin ()
     {
@@ -103,20 +103,24 @@ public class LogBuffer
     /// </summary>
     public void Unpin ()
     {
-        var newCount = Interlocked.Decrement(ref _pinCount);
 #if DEBUG
+        var newCount = Interlocked.Decrement(ref _pinCount);
         if (newCount < 0)
         {
             _logger.Warn("Unpin underflow: _pinCount went to {0}. Unbalanced Pin/Unpin calls.", newCount);
         }
+#else
+        Interlocked.Decrement(ref _pinCount);
 #endif
     }
 
     /// <summary>
     /// Adds a log line to the internal collection at the specified file position.
     /// </summary>
-    /// <remarks>If the internal collection has reached its maximum capacity, the log line is not added. In
-    /// debug builds, an error is logged when this occurs.</remarks>
+    /// <remarks>
+    /// If the internal collection has reached its maximum capacity, the log line is not added. In debug builds, an
+    /// error is logged when this occurs.
+    /// </remarks>
     /// <param name="lineMemory">The log line to add to the collection.</param>
     /// <param name="filePos">The file position associated with the log line.</param>
     public void AddLine (LogLine lineMemory, long filePos)
@@ -142,9 +146,11 @@ public class LogBuffer
     /// <summary>
     /// Removes all log lines from the current collection, resetting its state for reuse.
     /// </summary>
-    /// <remarks>After calling this method, the collection will be empty and ready to accept new log lines.
-    /// Any resources associated with the previous log lines are released. This method is typically used to clear the
-    /// log data before loading new content or starting a new logging session.</remarks>
+    /// <remarks>
+    /// After calling this method, the collection will be empty and ready to accept new log lines. Any resources
+    /// associated with the previous log lines are released. This method is typically used to clear the log data before
+    /// loading new content or starting a new logging session.
+    /// </remarks>
     public void ClearLines ()
     {
         if (_lineArray == null)
@@ -238,9 +244,13 @@ public class LogBuffer
     /// <summary>
     /// Retrieves the log line at the specified index within the current memory block.
     /// </summary>
-    /// <param name="num">The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
-    /// number of lines.</param>
-    /// <returns>The <see cref="LogLine"/> at the specified index if it exists; otherwise, <see langword="null"/>.</returns>
+    /// <param name="num">
+    /// The zero-based index of the log line to retrieve. Must be greater than or equal to 0 and less than the total
+    /// number of lines.
+    /// </param>
+    /// <returns>
+    /// The <see cref="LogLine"/> at the specified index if it exists; otherwise, <see langword="null"/>.
+    /// </returns>
     public LogLine? GetLineMemoryOfBlock (int num)
     {
         return num < LineCount && num >= 0
@@ -266,10 +276,9 @@ public class LogBuffer
 
     /// <summary>
     /// Attaches pooled char[] blocks that back the ReadOnlyMemory in this buffer's LogLine entries. These blocks will
-    /// be returned to ArrayPool when the buffer is evicted or disposed.
-    /// New blocks are MERGED with existing ones — never replace — because the buffer's existing
-    /// LogLine entries still reference the old blocks (e.g., during tail mode where multiple
-    /// read sessions append lines to the same buffer).
+    /// be returned to ArrayPool when the buffer is evicted or disposed. New blocks are MERGED with existing ones —
+    /// never replace — because the buffer's existing LogLine entries still reference the old blocks (e.g., during tail
+    /// mode where multiple read sessions append lines to the same buffer).
     /// </summary>
     public void AttachCharBlocks (List<char[]> blocks)
     {
@@ -304,9 +313,11 @@ public class LogBuffer
     /// Releases references to the character block buffers used by this instance, allowing them to be garbage collected
     /// when no longer in use.
     /// </summary>
-    /// <remarks>If the buffer is pinned, this method only drops the reference without returning the blocks to
-    /// the array pool, as external consumers may still hold references. This helps prevent premature reuse of buffers
-    /// that may still be accessed elsewhere.</remarks>
+    /// <remarks>
+    /// If the buffer is pinned, this method only drops the reference without returning the blocks to the array pool, as
+    /// external consumers may still hold references. This helps prevent premature reuse of buffers that may still be
+    /// accessed elsewhere.
+    /// </remarks>
     private void ReturnCharBlocks ()
     {
         if (_charBlocks is null)
