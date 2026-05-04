@@ -214,12 +214,17 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
 
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
+        PushValue(callback, column, value, oldValue.AsMemory());
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
         if (column == 0)
         {
             try
             {
                 var newDateTime = DateTime.ParseExact(value, DATETIME_FORMAT, _cultureInfo);
-                var oldDateTime = DateTime.ParseExact(oldValue, DATETIME_FORMAT, _cultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue.ToString(), DATETIME_FORMAT, _cultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 _timeOffset = (int)(mSecsNew - mSecsOld);

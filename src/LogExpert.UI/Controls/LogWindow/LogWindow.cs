@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -103,6 +104,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly Lock _timeSyncListLock = new();
 
     private ColumnCache _columnCache = new();
+    private ColumnCache _filterColumnCache = new();
 
     private readonly StringFormat _format = new()
     {
@@ -418,7 +420,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public Font BoldFont { get; private set; }
 
-    LogfileReader ILogWindow.LogFileReader => _logFileReader;
+    ILogfileReader ILogWindow.LogFileReader => _logFileReader;
 
     //public event EventHandler<EventArgs> ILogWindow.FileSizeChanged
     //{
@@ -454,24 +456,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #endregion
 
     #region Internals
-
-    internal IColumnizedLogLineMemory GetColumnsForLine (int lineNumber)
-    {
-        return _columnCache.GetColumnsForLine(_logFileReader, lineNumber, CurrentColumnizer, ColumnizerCallbackObject);
-
-        //string line = this.logFileReader.GetLogLine(lineNumber);
-        //if (line != null)
-        //{
-        //  string[] cols;
-        //  this.columnizerCallback.LineNum = lineNumber;
-        //  cols = this.CurrentColumnizer.SplitLine(this.columnizerCallback, line);
-        //  return cols;
-        //}
-        //else
-        //{
-        //  return null;
-        //}
-    }
 
     #region Apply Resources
 
@@ -998,6 +982,49 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    private void PrefetchFilterVisibleLines ()
+    {
+        if (_logFileReader == null || _filterResultList == null || _filterResultList.Count == 0)
+        {
+            return;
+        }
+
+        var firstVisible = filterGridView.FirstDisplayedScrollingRowIndex;
+        var visibleCount = filterGridView.DisplayedRowCount(includePartialRow: true);
+
+        if (firstVisible < 0 || visibleCount <= 0)
+        {
+            return;
+        }
+
+        // The filter grid maps grid rows -> original line numbers.
+        // We need to pin the actual line buffers for the visible filter rows.
+        var endVisible = Math.Min(firstVisible + visibleCount, _filterResultList.Count);
+        var span = CollectionsMarshal.AsSpan(_filterResultList)[firstVisible..endVisible];
+
+        var minLine = span[0];
+        var maxLine = minLine;
+
+        for (int i = 0; i < span.Length; i++)
+        {
+            int lineNum = span[i];
+
+            if (lineNum < minLine)
+            {
+                minLine = lineNum;
+            }
+            else if (lineNum > maxLine)
+            {
+                maxLine = lineNum;
+            }
+        }
+
+        // Prefetch the tight range covering only the visible filter rows.
+        // For sorted filter results this is the same as before but
+        // bounded to actual visible rows, not the entire result set.
+        _filterColumnCache.Prefetch(_logFileReader, minLine, maxLine - minLine + 1);
+    }
+
     [SupportedOSPlatform("windows")]
     private void OnDataGridViewCellValuePushed (object sender, DataGridViewCellValueEventArgs e)
     {
@@ -1019,10 +1046,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var oldValue = cols.ColumnValues[e.ColumnIndex - 2].FullValue;
         var newValue = (string)e.Value;
-        //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-        //TODO OLD VALUE needs to be ReadOnlySpan<char>
-        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue.ToString());
+
+        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
         dataGridView.Refresh();
+
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
         var span = timeSpan.ToString();
         var index = span.LastIndexOf('.');
@@ -1057,9 +1084,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 SyncTimestampDisplay();
             }
-
-            //MethodInvoker invoker = new MethodInvoker(DisplayCurrentFileOnStatusline);
-            //invoker.BeginInvoke(null, null);
         }
     }
 
@@ -1127,8 +1151,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
+        PrefetchFilterVisibleLines();
+
         var lineNum = _filterResultList[e.RowIndex];
-        e.Value = GetCellValue(lineNum, e.ColumnIndex);
+        e.Value = GetFilterCellValue(lineNum, e.ColumnIndex);
     }
 
     [SupportedOSPlatform("windows")]
@@ -3079,6 +3105,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (_guiStateArgs.FollowTail && dataGridView.RowCount > 0)
             {
+                // Mark prefetch stale so the next paint re-fetches fresh data.
+                // Do NOT call InvalidatePrefetch() here — it unpins buffers, creating a
+                // window where the GC thread can evict and return blocks to the pool.
+                _columnCache.MarkPrefetchStale();
                 dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
                 OnTailFollowed(EventArgs.Empty);
             }
@@ -5220,7 +5250,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = clipText.AppendLine(line.ToClipBoardText());
             }
 
-            Clipboard.SetText(clipText.ToString());
+            Clipboard.SetDataObject(clipText.ToString());
         }
     }
 
@@ -6171,6 +6201,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
 
             _columnCache = new ColumnCache();
+            _filterColumnCache = new ColumnCache();
 
             try
             {
@@ -6236,6 +6267,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         EncodingOptions = encodingOptions;
         _columnCache = new ColumnCache();
+        _filterColumnCache = new ColumnCache();
 
         _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
 
@@ -6477,7 +6509,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            var cols = GetColumnsForLine(rowIndex);
+            var cols = _columnCache.GetColumnsForLine(_logFileReader, rowIndex, CurrentColumnizer, ColumnizerCallbackObject);
             if (cols != null && cols.ColumnValues != null)
             {
                 if (columnIndex <= cols.ColumnValues.Length + 1)
@@ -6494,10 +6526,125 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     : Column.EmptyColumn;
             }
         }
-        catch
+#if DEBUG
+        catch (IndexOutOfRangeException ex)
+        {
+
+            _logger.Warn(ex, "Failed to get cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (IndexOutOfRangeException)
+        {
+            return Column.EmptyColumn;
+
+        }
+#endif
+#if DEBUG
+        catch (ArgumentOutOfRangeException ex)
+        {
+
+            _logger.Warn(ex, "Failed to get cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (ArgumentOutOfRangeException)
         {
             return Column.EmptyColumn;
         }
+#endif
+#if DEBUG
+        catch (NullReferenceException ex)
+        {
+
+            _logger.Warn(ex, "Failed to get cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (NullReferenceException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
+        return Column.EmptyColumn;
+    }
+
+    /// <summary>
+    /// Filter grid variant of GetCellValue that uses _filterColumnCache (which pins
+    /// the filter's visible buffers) instead of _columnCache (which pins the main grid's range).
+    /// </summary>
+    private IColumnMemory GetFilterCellValue (int rowIndex, int columnIndex)
+    {
+        if (columnIndex == 1)
+        {
+            return new Column
+            {
+                FullValue = $"{rowIndex + 1}".AsMemory() // line number
+            };
+        }
+
+        if (columnIndex == 0)
+        {
+            return Column.EmptyColumn;
+        }
+
+        try
+        {
+            var cols = _filterColumnCache.GetColumnsForLine(_logFileReader, rowIndex, CurrentColumnizer, ColumnizerCallbackObject);
+            if (cols != null && cols.ColumnValues != null)
+            {
+                if (columnIndex <= cols.ColumnValues.Length + 1)
+                {
+                    var value = cols.ColumnValues[columnIndex - 2];
+
+                    return value != null && !value.DisplayValue.IsEmpty
+                        ? value
+                        : value;
+                }
+
+                return columnIndex == 2
+                    ? cols.ColumnValues[^1]
+                    : Column.EmptyColumn;
+            }
+        }
+#if DEBUG
+        catch (IndexOutOfRangeException ex)
+        {
+
+            _logger.Warn(ex, "Failed to get filter cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (IndexOutOfRangeException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
+#if DEBUG
+        catch (ArgumentOutOfRangeException ex)
+        {
+
+            _logger.Warn(ex, "Failed to get filter cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (ArgumentOutOfRangeException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
+#if DEBUG
+        catch (NullReferenceException ex)
+        {
+            _logger.Warn(ex, "Failed to get filter cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
+#else
+        catch (NullReferenceException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
 
         return Column.EmptyColumn;
     }
@@ -6515,7 +6662,23 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             rowIndex = _filterResultList[rowIndex];
         }
 
-        var line = _logFileReader.GetLogLineMemoryWithWait(rowIndex).Result;
+        // Ensure prefetch is current — CellPainting fires BEFORE CellValueNeeded on scroll jumps,
+        // so the prefetch may still be at the old range. Without this, GetPrefetchedLine returns null
+        // and the fallback (GetLogLineMemoryWithWait) fetches an unprotected line whose backing block
+        // can be returned to the shared ArrayPool and rented by another window's reader.
+        if (!isFilteredGridView)
+        {
+            PrefetchVisibleLines();
+        }
+        else
+        {
+            PrefetchFilterVisibleLines();
+        }
+
+        // Use only prefetched (pinned) data — no unprotected fallback
+        ILogLineMemory line = !isFilteredGridView
+            ? _columnCache.GetPrefetchedLine(rowIndex)
+            : _filterColumnCache.GetPrefetchedLine(rowIndex);
 
         if (line == null)
         {
@@ -6666,12 +6829,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (dataGridView.RowCount >= _logFileReader.LineCount && _logFileReader.LineCount > 0)
             {
+                // Mark stale instead of invalidating — keeps old buffers pinned until
+                // the next Prefetch atomically swaps in new pins.
+                _columnCache.MarkPrefetchStale();
                 dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
             }
         }
 
         _ = BeginInvoke(new MethodInvoker(dataGridView.Refresh));
-        //this.dataGridView.Refresh();
         _logWindowCoordinator.NotifyFollowTailChanged(this, isChecked, byTrigger);
         SendGuiStateUpdate();
     }
@@ -7772,10 +7937,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /**
-   * Get the timestamp for the given line number. If the line
-   * has no timestamp, the previous line will be checked until a
-   * timestamp is found.
-   */
+    * Get the timestamp for the given line number. If the line
+    * has no timestamp, the previous line will be checked until a
+    * timestamp is found.
+*/
     public (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
     {
         lock (_currentColumnizerLock)
@@ -7834,10 +7999,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /**
-   * Get the timestamp for the given line number. If the line
-   * has no timestamp, the next line will be checked until a
-   * timestamp is found.
-   */
+    * Get the timestamp for the given line number. If the line
+    * has no timestamp, the next line will be checked until a
+    * timestamp is found.
+*/
     public DateTime GetTimestampForLineForward (ref int lineNum, bool roundToSeconds)
     {
         lock (_currentColumnizerLock)

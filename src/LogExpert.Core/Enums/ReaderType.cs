@@ -18,5 +18,11 @@ public enum ReaderType
     /// <summary>
     /// System.IO.StreamReader based implementation.
     /// </summary>
-    System
+    System,
+
+    /// <summary>
+    /// Direct-read implementation: reads decoded chars directly into pooled blocks via
+    /// StreamReader.Read(char[], offset, count), eliminating per-line string allocation.
+    /// </summary>
+    SystemDirect
 }

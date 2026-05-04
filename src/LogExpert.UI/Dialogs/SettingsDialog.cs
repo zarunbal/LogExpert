@@ -250,7 +250,10 @@ internal partial class SettingsDialog : Form
     {
         foreach (var readerType in Enum.GetValues<ReaderType>())
         {
-            _ = comboBoxReaderType.Items.Add(readerType);
+            if (!comboBoxReaderType.Items.Contains(readerType))
+            {
+                _ = comboBoxReaderType.Items.Add(readerType);
+            }
         }
 
         comboBoxReaderType.SelectedItem = Preferences.ReaderType;

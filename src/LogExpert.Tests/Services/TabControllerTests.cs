@@ -1,5 +1,4 @@
 using System.Runtime.Versioning;
-using System.Windows.Forms;
 
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Services.TabControllerService;
@@ -12,13 +11,11 @@ namespace LogExpert.Tests.Services;
 
 /// <summary>
 /// Unit tests for TabController.
-/// 
-/// Note: Many tests are limited because LogWindow is a complex WinForms control
-/// that cannot be easily mocked or subclassed. Tests that require actual LogWindow
-/// instances would need to be run as integration tests with full UI infrastructure.
-/// 
-/// These tests focus on the core TabController functionality that can be tested
-/// without instantiating LogWindow objects.
+/// Note: Many tests are limited because LogWindow is a complex WinForms control that cannot be easily mocked or
+/// subclassed. Tests that require actual LogWindow instances would need to be run as integration tests with full UI
+/// infrastructure.
+/// These tests focus on the core TabController functionality that can be tested without instantiating LogWindow
+/// objects.
 /// </summary>
 [TestFixture]
 [SupportedOSPlatform("windows")]
@@ -31,7 +28,7 @@ internal class TabControllerTests : IDisposable
     private bool _disposed;
 
     [SetUp]
-    public void Setup()
+    public void Setup ()
     {
         // Create a real Form and DockPanel for testing
         // This is necessary because DockPanel requires WinForms infrastructure
@@ -48,20 +45,22 @@ internal class TabControllerTests : IDisposable
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
         _tabController?.Dispose();
         _testForm?.Close();
         _testForm?.Dispose();
     }
 
-    public void Dispose()
+    #region IDisposable Implementation
+
+    public void Dispose ()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose (bool disposing)
     {
         if (_disposed)
         {
@@ -77,10 +76,12 @@ internal class TabControllerTests : IDisposable
         _disposed = true;
     }
 
+    #endregion
+
     #region Constructor Tests
 
     [Test]
-    public void Constructor_WithDockPanel_InitializesSuccessfully()
+    public void Constructor_WithDockPanel_InitializesSuccessfully ()
     {
         // Arrange & Act - already done in Setup
 
@@ -90,14 +91,14 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void Constructor_WithNullDockPanel_ThrowsArgumentNullException()
+    public void Constructor_WithNullDockPanel_ThrowsArgumentNullException ()
     {
         // Arrange & Act & Assert
         _ = Assert.Throws<ArgumentNullException>(() => new TabController(null));
     }
 
     [Test]
-    public void Constructor_WithoutDockPanel_CreatesUninitializedController()
+    public void Constructor_WithoutDockPanel_CreatesUninitializedController ()
     {
         // Arrange & Act
         using var controller = new TabController();
@@ -112,7 +113,7 @@ internal class TabControllerTests : IDisposable
     #region InitializeDockPanel Tests
 
     [Test]
-    public void InitializeDockPanel_WithValidDockPanel_Succeeds()
+    public void InitializeDockPanel_WithValidDockPanel_Succeeds ()
     {
         // Arrange
         using var controller = new TabController();
@@ -125,7 +126,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void InitializeDockPanel_WithNullDockPanel_ThrowsArgumentNullException()
+    public void InitializeDockPanel_WithNullDockPanel_ThrowsArgumentNullException ()
     {
         // Arrange
         using var controller = new TabController();
@@ -135,7 +136,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void InitializeDockPanel_WhenAlreadyInitialized_ThrowsInvalidOperationException()
+    public void InitializeDockPanel_WhenAlreadyInitialized_ThrowsInvalidOperationException ()
     {
         // Arrange
         using var controller = new TabController(_dockPanel);
@@ -154,7 +155,7 @@ internal class TabControllerTests : IDisposable
     #region GetAllWindowsFromDockPanel Tests
 
     [Test]
-    public void GetAllWindowsFromDockPanel_WhenNotInitialized_ReturnsEmptyList()
+    public void GetAllWindowsFromDockPanel_WhenNotInitialized_ReturnsEmptyList ()
     {
         // Arrange
         using var controller = new TabController();
@@ -167,7 +168,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void GetAllWindowsFromDockPanel_WhenInitializedButEmpty_ReturnsEmptyList()
+    public void GetAllWindowsFromDockPanel_WhenInitializedButEmpty_ReturnsEmptyList ()
     {
         // Arrange - already done in Setup
 
@@ -179,7 +180,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void GetAllWindowsFromDockPanel_ReturnsReadOnlyList()
+    public void GetAllWindowsFromDockPanel_ReturnsReadOnlyList ()
     {
         // Arrange - already done in Setup
 
@@ -195,7 +196,7 @@ internal class TabControllerTests : IDisposable
     #region GetAllWindows Tests
 
     [Test]
-    public void GetAllWindows_WhenEmpty_ReturnsEmptyList()
+    public void GetAllWindows_WhenEmpty_ReturnsEmptyList ()
     {
         // Arrange - already done in Setup
 
@@ -212,7 +213,7 @@ internal class TabControllerTests : IDisposable
     #region GetWindowCount Tests
 
     [Test]
-    public void GetWindowCount_WhenEmpty_ReturnsZero()
+    public void GetWindowCount_WhenEmpty_ReturnsZero ()
     {
         // Arrange - already done in Setup
 
@@ -228,7 +229,7 @@ internal class TabControllerTests : IDisposable
     #region HasWindow Tests
 
     [Test]
-    public void HasWindow_WithNullWindow_ReturnsFalse()
+    public void HasWindow_WithNullWindow_ReturnsFalse ()
     {
         // Arrange - already done in Setup
 
@@ -244,7 +245,7 @@ internal class TabControllerTests : IDisposable
     #region GetActiveWindow Tests
 
     [Test]
-    public void GetActiveWindow_WhenNoWindowActive_ReturnsNull()
+    public void GetActiveWindow_WhenNoWindowActive_ReturnsNull ()
     {
         // Arrange - already done in Setup
 
@@ -260,7 +261,7 @@ internal class TabControllerTests : IDisposable
     #region FindWindowByFileName Tests
 
     [Test]
-    public void FindWindowByFileName_WithNullFileName_ReturnsNull()
+    public void FindWindowByFileName_WithNullFileName_ReturnsNull ()
     {
         // Arrange - already done in Setup
 
@@ -272,7 +273,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void FindWindowByFileName_WithEmptyFileName_ReturnsNull()
+    public void FindWindowByFileName_WithEmptyFileName_ReturnsNull ()
     {
         // Arrange - already done in Setup
 
@@ -284,7 +285,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void FindWindowByFileName_WhenNoWindowsExist_ReturnsNull()
+    public void FindWindowByFileName_WhenNoWindowsExist_ReturnsNull ()
     {
         // Arrange - already done in Setup
 
@@ -300,7 +301,7 @@ internal class TabControllerTests : IDisposable
     #region AddWindow Tests
 
     [Test]
-    public void AddWindow_WithNullWindow_ThrowsArgumentNullException()
+    public void AddWindow_WithNullWindow_ThrowsArgumentNullException ()
     {
         // Arrange - already done in Setup
 
@@ -309,7 +310,7 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
-    public void AddWindow_WhenNotInitialized_ThrowsInvalidOperationException()
+    public void AddWindow_WhenNotInitialized_ThrowsInvalidOperationException ()
     {
         // Arrange
         using var controller = new TabController();
@@ -327,7 +328,7 @@ internal class TabControllerTests : IDisposable
     #region RemoveWindow Tests
 
     [Test]
-    public void RemoveWindow_WithNullWindow_DoesNotThrow()
+    public void RemoveWindow_WithNullWindow_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -340,7 +341,7 @@ internal class TabControllerTests : IDisposable
     #region CloseWindow Tests
 
     [Test]
-    public void CloseWindow_WithNullWindow_DoesNotThrow()
+    public void CloseWindow_WithNullWindow_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -353,7 +354,7 @@ internal class TabControllerTests : IDisposable
     #region CloseAllWindows Tests
 
     [Test]
-    public void CloseAllWindows_WhenEmpty_DoesNotThrow()
+    public void CloseAllWindows_WhenEmpty_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -366,7 +367,7 @@ internal class TabControllerTests : IDisposable
     #region CloseAllExcept Tests
 
     [Test]
-    public void CloseAllExcept_WithNullWindow_DoesNotThrow()
+    public void CloseAllExcept_WithNullWindow_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -379,7 +380,7 @@ internal class TabControllerTests : IDisposable
     #region ActivateWindow Tests
 
     [Test]
-    public void ActivateWindow_WithNullWindow_DoesNotThrow()
+    public void ActivateWindow_WithNullWindow_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -392,7 +393,7 @@ internal class TabControllerTests : IDisposable
     #region SwitchToNextWindow Tests
 
     [Test]
-    public void SwitchToNextWindow_WhenEmpty_DoesNotThrow()
+    public void SwitchToNextWindow_WhenEmpty_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -405,7 +406,7 @@ internal class TabControllerTests : IDisposable
     #region SwitchToPreviousWindow Tests
 
     [Test]
-    public void SwitchToPreviousWindow_WhenEmpty_DoesNotThrow()
+    public void SwitchToPreviousWindow_WhenEmpty_DoesNotThrow ()
     {
         // Arrange - already done in Setup
 
@@ -418,7 +419,7 @@ internal class TabControllerTests : IDisposable
     #region Dispose Tests
 
     [Test]
-    public void Dispose_MultipleCallsDoNotThrow()
+    public void Dispose_MultipleCallsDoNotThrow ()
     {
         // Arrange
         using var controller = new TabController(_dockPanel);
