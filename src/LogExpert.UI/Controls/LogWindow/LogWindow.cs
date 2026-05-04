@@ -6589,27 +6589,38 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     : Column.EmptyColumn;
             }
         }
+#if DEBUG
         catch (IndexOutOfRangeException ex)
         {
-#if DEBUG
+
             _logger.Warn(ex, "Failed to get filter cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
+#else
+        catch (IndexOutOfRangeException)
+        {
             return Column.EmptyColumn;
         }
+#endif
+#if DEBUG
         catch (ArgumentOutOfRangeException ex)
         {
-#if DEBUG
+
             _logger.Warn(ex, "Failed to get filter cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
+#else
+        catch (ArgumentOutOfRangeException)
+        {
             return Column.EmptyColumn;
         }
+#endif
+#if DEBUG
         catch (NullReferenceException ex)
         {
-#if DEBUG
             _logger.Warn(ex, "Failed to get filter cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
+#else
+        catch (NullReferenceException)
+        {
             return Column.EmptyColumn;
         }
+#endif
 
         return Column.EmptyColumn;
     }
