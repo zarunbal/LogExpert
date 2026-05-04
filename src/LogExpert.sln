@@ -85,6 +85,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{39822C1B-E
 	ProjectSection(SolutionItems) = preProject
 		docs\PLUGIN_DEVELOPMENT_GUIDE.md = docs\PLUGIN_DEVELOPMENT_GUIDE.md
 		docs\PLUGIN_HASH_MANAGEMENT.md = docs\PLUGIN_HASH_MANAGEMENT.md
+		docs\UBIQUITOUS_LANGUAGE.md = docs\UBIQUITOUS_LANGUAGE.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginHashGenerator.Tool", "PluginHashGenerator.Tool\PluginHashGenerator.Tool.csproj", "{B2E6D6E0-C995-8F9D-4482-869C6A5A64C0}"
@@ -100,11 +101,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Persister.Tests", "LogExpert.Persister.Tests\LogExpert.Persister.Tests.csproj", "{CAD17410-CE8C-4FE5-91DE-1B3DE2945135}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Benchmarks", "LogExpert.Benchmarks\LogExpert.Benchmarks.csproj", "{1046779B-500D-8260-33BA-BC778C4B836F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{C83F15B6-F6E0-4526-A5C5-47806772E49A}"
-	ProjectSection(SolutionItems) = preProject
-		docs\performance\BENCHMARK_SUMMARY.md = docs\performance\BENCHMARK_SUMMARY.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "help", "help", "{9FC7BC64-CE77-45DF-B8AC-10F1D0336E76}"
 	ProjectSection(SolutionItems) = preProject
@@ -243,7 +239,6 @@ Global
 		{39822C1B-E4C6-40F3-86C4-74C68BDEF3D0} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 		{CAD17410-CE8C-4FE5-91DE-1B3DE2945135} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 		{1046779B-500D-8260-33BA-BC778C4B836F} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
-		{C83F15B6-F6E0-4526-A5C5-47806772E49A} = {39822C1B-E4C6-40F3-86C4-74C68BDEF3D0}
 		{9FC7BC64-CE77-45DF-B8AC-10F1D0336E76} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

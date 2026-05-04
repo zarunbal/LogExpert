@@ -1046,10 +1046,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var oldValue = cols.ColumnValues[e.ColumnIndex - 2].FullValue;
         var newValue = (string)e.Value;
-        //string oldValue = (string) this.dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-        //TODO OLD VALUE needs to be ReadOnlySpan<char>
-        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue.ToString());
+
+        CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
         dataGridView.Refresh();
+
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
         var span = timeSpan.ToString();
         var index = span.LastIndexOf('.');
@@ -6526,28 +6526,46 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     : Column.EmptyColumn;
             }
         }
+#if DEBUG
         catch (IndexOutOfRangeException ex)
         {
-#if DEBUG
+
             _logger.Warn(ex, "Failed to get cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
             return Column.EmptyColumn;
         }
+#else
+        catch (IndexOutOfRangeException)
+        {
+            return Column.EmptyColumn;
+
+        }
+#endif
+#if DEBUG
         catch (ArgumentOutOfRangeException ex)
         {
-#if DEBUG
+
             _logger.Warn(ex, "Failed to get cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
             return Column.EmptyColumn;
         }
+#else
+        catch (ArgumentOutOfRangeException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
+#if DEBUG
         catch (NullReferenceException ex)
         {
-#if DEBUG
+
             _logger.Warn(ex, "Failed to get cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
-#endif
             return Column.EmptyColumn;
         }
-
+#else
+        catch (NullReferenceException)
+        {
+            return Column.EmptyColumn;
+        }
+#endif
         return Column.EmptyColumn;
     }
 
@@ -6594,6 +6612,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
 
             _logger.Warn(ex, "Failed to get filter cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
 #else
         catch (IndexOutOfRangeException)
         {
@@ -6605,6 +6625,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
 
             _logger.Warn(ex, "Failed to get filter cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
 #else
         catch (ArgumentOutOfRangeException)
         {
@@ -6615,6 +6637,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         catch (NullReferenceException ex)
         {
             _logger.Warn(ex, "Failed to get filter cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            return Column.EmptyColumn;
+        }
 #else
         catch (NullReferenceException)
         {
@@ -7913,10 +7937,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /**
-   * Get the timestamp for the given line number. If the line
-   * has no timestamp, the previous line will be checked until a
-   * timestamp is found.
-   */
+    * Get the timestamp for the given line number. If the line
+    * has no timestamp, the previous line will be checked until a
+    * timestamp is found.
+*/
     public (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
     {
         lock (_currentColumnizerLock)
@@ -7975,10 +7999,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /**
-   * Get the timestamp for the given line number. If the line
-   * has no timestamp, the next line will be checked until a
-   * timestamp is found.
-   */
+    * Get the timestamp for the given line number. If the line
+    * has no timestamp, the next line will be checked until a
+    * timestamp is found.
+*/
     public DateTime GetTimestampForLineForward (ref int lineNum, bool roundToSeconds)
     {
         lock (_currentColumnizerLock)

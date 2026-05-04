@@ -380,6 +380,11 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
         throw new NotImplementedException();
     }
 
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Displays a configuration dialog for the columnizer and saves the updated settings to the specified configuration
     /// directory.

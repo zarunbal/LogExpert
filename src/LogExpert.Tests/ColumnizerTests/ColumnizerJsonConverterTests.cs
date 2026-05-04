@@ -54,6 +54,8 @@ public class MockColumnizer : ILogLineMemoryColumnizer
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine) => throw new NotImplementedException();
 
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue) => throw new NotImplementedException();
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue) => throw new NotImplementedException();
 }
 
 public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
@@ -95,6 +97,12 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
     {
         throw new NotImplementedException();
     }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
 }
 
 [TestFixture]
