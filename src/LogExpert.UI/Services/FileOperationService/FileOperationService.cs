@@ -331,8 +331,8 @@ internal sealed class FileOperationService (
             {
                 _ = AddFileTab(new FileTabRequest { FileName = name });
             }
-        }
 
-        _configManager.ClearLastOpenFilesList();
+            _configManager.ClearLastOpenFilesList();
+        }
     }
 }
