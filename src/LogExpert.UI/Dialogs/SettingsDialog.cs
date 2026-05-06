@@ -777,7 +777,7 @@ internal partial class SettingsDialog : Form
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
-        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.Pipeline;
+        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.SystemDirect;
 
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;

@@ -6,9 +6,10 @@ namespace LogExpert.Core.Enums;
 public enum ReaderType
 {
     /// <summary>
-    /// System.IO.Pipelines based reader implementation (high performance).
+    /// Direct-read implementation: reads decoded chars directly into pooled blocks via
+    /// StreamReader.Read(char[], offset, count), eliminating per-line string allocation.
     /// </summary>
-    Pipeline,
+    SystemDirect,
 
     /// <summary>
     /// Legacy reader implementation (original).
@@ -18,11 +19,5 @@ public enum ReaderType
     /// <summary>
     /// System.IO.StreamReader based implementation.
     /// </summary>
-    System,
-
-    /// <summary>
-    /// Direct-read implementation: reads decoded chars directly into pooled blocks via
-    /// StreamReader.Read(char[], offset, count), eliminating per-line string allocation.
-    /// </summary>
-    SystemDirect
+    System
 }
