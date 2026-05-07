@@ -1709,8 +1709,8 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
             ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
             ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
             ReaderType.SystemDirect => new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength),
-            //Default will be System
-            _ => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
+            //Default will be SystemDirect, because it is the best performing reader and should be used if not explicitly overridden by user.
+            _ => new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength),
         };
     }
 

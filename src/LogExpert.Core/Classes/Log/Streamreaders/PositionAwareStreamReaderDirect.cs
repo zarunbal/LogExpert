@@ -159,7 +159,15 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
 
         // Rent a fresh block and carry over any unscanned data (partial line in progress)
         var tailLength = _readBlockLength - _scanOffset;
-        var newBlock = ArrayPool<char>.Shared.Rent(BLOCK_SIZE);
+
+        // The tail may exceed BLOCK_SIZE after reading a long line (buffer was grown).
+        var newBlockSize = BLOCK_SIZE;
+        while (tailLength > newBlockSize)
+        {
+            newBlockSize *= 2;
+        }
+
+        var newBlock = ArrayPool<char>.Shared.Rent(newBlockSize);
 
         if (tailLength > 0)
         {
@@ -183,8 +191,17 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     {
         var tailLength = _readBlockLength - _scanOffset;
 
-        // Rent a new block
-        var newBlock = ArrayPool<char>.Shared.Rent(BLOCK_SIZE);
+        // Determine new block size: if the tail already fills a standard block,
+        // grow the buffer so there's room to read more data. This handles lines
+        // longer than BLOCK_SIZE (e.g. huge XML payloads).
+        var newBlockSize = BLOCK_SIZE;
+        while (tailLength >= newBlockSize)
+        {
+            newBlockSize *= 2;
+        }
+
+        // Rent a new block (may be larger than BLOCK_SIZE for very long lines)
+        var newBlock = ArrayPool<char>.Shared.Rent(newBlockSize);
 
         // Copy the tail (partial line) to the start of the new block
         if (tailLength > 0)
@@ -199,7 +216,8 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _scanOffset = 0;
 
         // Fill the rest of the block from the stream
-        var charsRead = reader.Read(newBlock, tailLength, BLOCK_SIZE - tailLength);
+        var available = newBlock.Length - tailLength;
+        var charsRead = reader.Read(newBlock, tailLength, available);
 
         _readBlockLength = tailLength + charsRead;
 
