@@ -124,7 +124,7 @@ internal partial class SettingsDialog : Form
             Preferences.FontName = DEFAULT_FONT_NAME;
         }
 
-        if (Math.Abs(Preferences.FontSize) < 0.1)
+        if (Math.Abs(Preferences.FontSize) <= 0.1)
         {
             Preferences.FontSize = 9.0f;
         }
@@ -250,7 +250,10 @@ internal partial class SettingsDialog : Form
     {
         foreach (var readerType in Enum.GetValues<ReaderType>())
         {
-            _ = comboBoxReaderType.Items.Add(readerType);
+            if (!comboBoxReaderType.Items.Contains(readerType))
+            {
+                _ = comboBoxReaderType.Items.Add(readerType);
+            }
         }
 
         comboBoxReaderType.SelectedItem = Preferences.ReaderType;
@@ -263,7 +266,7 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = $"{Preferences.FontName} {(int)Preferences.FontSize}";
+        labelFont.Text = $"{Preferences.FontName} {Preferences.FontSize}";
         labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
     }
 
@@ -774,7 +777,7 @@ internal partial class SettingsDialog : Form
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
-        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.Pipeline;
+        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.SystemDirect;
 
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;

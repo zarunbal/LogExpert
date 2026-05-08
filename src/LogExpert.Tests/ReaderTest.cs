@@ -1,6 +1,6 @@
 using System.Text;
 
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
