@@ -76,7 +76,10 @@ internal sealed class ProjectFileHandler (
                     LayoutXml = layoutXml
                 };
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         InvalidOperationException or
+                                         Newtonsoft.Json.JsonException)
         {
             _logger.Error(ex, "LoadProject: Exception loading {FileName}", projectFileName);
 
@@ -116,7 +119,10 @@ internal sealed class ProjectFileHandler (
                 ProjectPersister.SaveProjectData(projectData.ProjectFilePath, projectData);
                 _logger.Info("ContinueLoad: Updated session file {FileName}", projectData.ProjectFilePath);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException or
+                                             UnauthorizedAccessException or
+                                             InvalidOperationException or
+                                             ArgumentException)
             {
                 _logger.Error(ex, "ContinueLoad: Failed to update session file {FileName}", projectData.ProjectFilePath);
             }
@@ -154,7 +160,14 @@ internal sealed class ProjectFileHandler (
                 _ = addFileTab(request);
                 openedCount++;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OutOfMemoryException
+                                         and not StackOverflowException
+                                         and not AccessViolationException
+                                         and not AppDomainUnloadedException
+                                         and not BadImageFormatException
+                                         and not CannotUnloadAppDomainException
+                                         and not InvalidProgramException
+                                         and not ThreadAbortException)
             {
                 _logger.Error(ex, "ContinueLoad: Failed to open tab for {FileName}", fileName);
             }
@@ -176,7 +189,10 @@ internal sealed class ProjectFileHandler (
             errorMessage = null;
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         InvalidOperationException or
+                                         ArgumentException)
         {
             _logger.Error(ex, "SaveProject: Failed to save {FileName}", projectFileName);
             errorMessage = $"Error saving project: {ex.Message}";

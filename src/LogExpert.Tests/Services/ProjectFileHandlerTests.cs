@@ -75,8 +75,7 @@ internal class ProjectFileHandlerTests : IDisposable
     public void LoadProject_ValidProjectFile_ReturnsSuccess ()
     {
         // Arrange: create a real log file so validation passes
-        var logFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".log");
-        File.WriteAllText(logFile, "test log line");
+        var logFile = CreateTempLogFile();
         var tempFile = CreateTempProjectFile([logFile], layoutXml: null);
 
         try
@@ -93,8 +92,8 @@ internal class ProjectFileHandlerTests : IDisposable
         }
         finally
         {
-            File.Delete(tempFile);
             File.Delete(logFile);
+            File.Delete(tempFile);
         }
     }
 
@@ -102,8 +101,7 @@ internal class ProjectFileHandlerTests : IDisposable
     public void LoadProject_ValidProjectWithLayoutXml_HasLayoutDataIsTrue ()
     {
         // Arrange: create a real log file so validation passes
-        var logFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".log");
-        File.WriteAllText(logFile, "test log line");
+        var logFile = CreateTempLogFile();
         var tempFile = CreateTempProjectFile([logFile], layoutXml: "<DockPanel><Content/></DockPanel>");
 
         try
@@ -608,6 +606,16 @@ internal class ProjectFileHandlerTests : IDisposable
             },
             LayoutXml = layoutXml
         };
+    }
+
+    private static string CreateTempLogFile ()
+    {
+        var tempPathFile = Path.GetTempFileName();
+        var logFile = Path.ChangeExtension(tempPathFile, ".log")!;
+        File.WriteAllText(logFile, "test log line");
+        File.Delete(tempPathFile);
+
+        return logFile;
     }
 
     /// <summary>
