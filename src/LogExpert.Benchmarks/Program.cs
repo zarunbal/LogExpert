@@ -16,6 +16,7 @@ public static class Program
             _ = BenchmarkRunner.Run<BufferIndexBenchmarks>();
             _ = BenchmarkRunner.Run<ReadThroughputBenchmarks>();
             _ = BenchmarkRunner.Run<BufferIndexContentionBenchmarks>();
+            _ = BenchmarkRunner.Run<CsvColumnizerBenchmarks>();
         }
         else
         {
@@ -28,6 +29,7 @@ public static class Program
         Console.WriteLine("ReadThroughputBenchmarks: Benchmarks for read throughput");
         Console.WriteLine("BufferIndexBenchmarks: Benchmarks for buffer index");
         Console.WriteLine("BufferIndexContentionBenchmarks: Benchmarks for buffer index contention");
+        Console.WriteLine("CsvColumnizerBenchmarks: Benchmarks for CSV columnizer (SplitLine, PreProcess, Selected)");
         Console.WriteLine("Dry run:");
         Console.WriteLine("dotnet run -c Release -- --filter \"*<benchmarkname>*\" --job Dry --noOverwrite");
         Console.WriteLine("Short run:");
