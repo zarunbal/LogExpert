@@ -1,6 +1,6 @@
 # LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/build_dotnet.yml)
 
-This is a clone from (no longer exists) <https://logexpert.codeplex.com/>
+This is a clone from (no longer exists) https://logexpert.codeplex.com/
 
 ## Overview
 

@@ -3,7 +3,6 @@
  *
  */
 
-//TODO: Replace with https://github.com/commandlineparser/commandline
 //TODO: or with this https://github.com/natemcmaster/CommandLineUtils
 namespace LogExpert.Classes.CommandLine;
 

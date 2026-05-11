@@ -164,6 +164,11 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         throw new NotImplementedException();
     }
 
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Selected (ILogLineMemoryColumnizerCallback callback)
     {
         ArgumentNullException.ThrowIfNull(callback, nameof(callback));
