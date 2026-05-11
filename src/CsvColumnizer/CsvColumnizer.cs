@@ -177,7 +177,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         {
             _columnList.Clear();
             var line = _config.HasFieldNames
-                ? _firstLine
+                ? _firstLine ?? callback.GetLogLineMemory(0)
                 : callback.GetLogLineMemory(0);
 
             if (line != null)
@@ -204,6 +204,10 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                         _columnList.Add(new CsvColumn("Column " + i + 1));
                     }
                 }
+            }
+            else
+            {
+                _columnList.Add(new CsvColumn("Text"));
             }
         }
     }
@@ -290,28 +294,40 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
     private ColumnizedLogLine SplitCsvLine (ILogLineMemory line)
     {
+        if (line.FullLine.IsEmpty)
+        {
+            return CreateColumnizedLogLine(line);
+        }
+
         ColumnizedLogLine cLogLine = new()
         {
             LogLine = line
         };
 
-        using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-        _ = csv.Read();
-        _ = csv.ReadHeader();
-
-        //we only read line by line and not the whole file so it is always the header
-        var records = csv.HeaderRecord;
-
-        if (records != null)
+        try
         {
-            List<Column> columns = [];
+            using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
+            _ = csv.Read();
+            _ = csv.ReadHeader();
 
-            foreach (var record in records)
+            //we only read line by line and not the whole file so it is always the header
+            var records = csv.HeaderRecord;
+
+            if (records != null)
             {
-                columns.Add(new Column { FullValue = record.AsMemory(), Parent = cLogLine });
-            }
+                List<Column> columns = [];
 
-            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
+                foreach (var record in records)
+                {
+                    columns.Add(new Column { FullValue = record.AsMemory(), Parent = cLogLine });
+                }
+
+                cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
+            }
+        }
+        catch (CsvHelperException)
+        {
+            return CreateColumnizedLogLine(line);
         }
 
         return cLogLine;

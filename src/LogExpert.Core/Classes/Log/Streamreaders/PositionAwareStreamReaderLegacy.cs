@@ -1,8 +1,10 @@
+using LogExpert.Core.Classes.Log.Buffers;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Log.Streamreaders;
 
-public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : PositionAwareStreamReaderBase(stream, encodingOptions, maximumLineLength)
+public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions encodingOptions, int maximumLineLength) : PositionAwareStreamReaderBase(stream, encodingOptions, maximumLineLength), ILogStreamReaderMemory
 {
     #region Fields
 
@@ -15,7 +17,38 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
 
     #endregion
 
+    #region Properties
+
+    public CharBlockAllocator BlockAllocator
+    {
+        get => field ??= new CharBlockAllocator();
+        private set;
+    }
+
+    #endregion
+
     #region Public methods
+
+    public bool TryReadLine (out ReadOnlyMemory<char> lineMemory)
+    {
+        var line = ReadLine();
+
+        if (line is null)
+        {
+            lineMemory = default;
+            return false;
+        }
+
+        var target = BlockAllocator.Rent(line.Length);
+        line.AsSpan().CopyTo(target.Span);
+        lineMemory = target;
+        return true;
+    }
+
+    public void ReturnMemory (ReadOnlyMemory<char> memory)
+    {
+        // Bulk return via BlockAllocator.DetachBlocks() when the LogBuffer is evicted.
+    }
 
     public override string ReadLine ()
     {
