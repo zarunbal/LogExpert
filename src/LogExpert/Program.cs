@@ -54,6 +54,10 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+        // Register the plugin assembly resolver early so that settings deserialization
+        // can find plugin types (e.g., CsvColumnizer) before PluginRegistry.Create() runs.
+        PluginRegistry.PluginRegistry.RegisterAssemblyResolver();
+
         // Initialize ConfigManager with application-specific paths and screen information
         ConfigManager.Instance.Initialize(Application.StartupPath, SystemInformation.VirtualScreen);
         PluginValidator.Initialize(ConfigManager.Instance.ActiveConfigDir);

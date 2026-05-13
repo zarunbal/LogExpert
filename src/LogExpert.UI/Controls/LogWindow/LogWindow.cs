@@ -6521,7 +6521,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     return value != null && !value.DisplayValue.IsEmpty
                         ? value
-                        : value;
+                        : Column.EmptyColumn;
                 }
 
                 return columnIndex == 2
@@ -6602,7 +6602,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     return value != null && !value.DisplayValue.IsEmpty
                         ? value
-                        : value;
+                        : Column.EmptyColumn;
                 }
 
                 return columnIndex == 2
@@ -6682,6 +6682,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ILogLineMemory line = !isFilteredGridView
             ? _columnCache.GetPrefetchedLine(rowIndex)
             : _filterColumnCache.GetPrefetchedLine(rowIndex);
+
+        if (line == null)
+        {
+            // Fallback: prefetch a single-row range covering the requested row and retry.
+            // This handles the case where CellPainting runs before the grid's layout has
+            // populated FirstDisplayedScrollingRowIndex / DisplayedRowCount (common for
+            // very small files with only one visible row), and PrefetchVisibleLines
+            // therefore short-circuits without pinning anything.
+            var targetCache = !isFilteredGridView ? _columnCache : _filterColumnCache;
+            targetCache.Prefetch(_logFileReader, rowIndex, 1);
+            line = targetCache.GetPrefetchedLine(rowIndex);
+        }
 
         if (line == null)
         {

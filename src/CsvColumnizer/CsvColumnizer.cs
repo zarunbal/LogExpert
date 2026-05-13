@@ -52,6 +52,9 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     {
         if (realLineNum == 0)
         {
+            // Auto-detect delimiter from the first line
+            AutoDetectDelimiter(logLine);
+
             // store for later field names and field count retrieval
             _firstLine = new CsvLogLine(logLine, 0);
 
@@ -291,6 +294,42 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Auto-detects the delimiter using CsvHelper's built-in detection.
+    /// After parsing, the detected delimiter is extracted from csv.Parser.Delimiter.
+    /// </summary>
+    private void AutoDetectDelimiter (ReadOnlyMemory<char> lineContent)
+    {
+        if (lineContent.IsEmpty)
+        {
+            return;
+        }
+
+        try
+        {
+            var autoDetectedConfig = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                DetectDelimiter = true,
+                DetectDelimiterValues = [",", ";", "\t", "|"]
+            };
+
+            using CsvReader csv = new(new StringReader(lineContent.ToString()), autoDetectedConfig);
+            _ = csv.Read();
+
+            var detectedDelimiter = csv.Parser.Delimiter;
+
+            if (detectedDelimiter != _config.DelimiterChar)
+            {
+                _config.DelimiterChar = detectedDelimiter;
+                _config.ConfigureReaderConfiguration();
+            }
+        }
+        catch (CsvHelperException)
+        {
+            // If detection fails, keep the current config delimiter
+        }
+    }
 
     private ColumnizedLogLine SplitCsvLine (ILogLineMemory line)
     {
