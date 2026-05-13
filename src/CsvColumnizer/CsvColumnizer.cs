@@ -299,22 +299,22 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     /// Auto-detects the delimiter using CsvHelper's built-in detection.
     /// After parsing, the detected delimiter is extracted from csv.Parser.Delimiter.
     /// </summary>
-    private void AutoDetectDelimiter (ReadOnlyMemory<char> firstLine)
+    private void AutoDetectDelimiter (ReadOnlyMemory<char> lineContent)
     {
-        if (firstLine.IsEmpty)
+        if (lineContent.IsEmpty)
         {
             return;
         }
 
         try
         {
-            var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+            var autoDetectedConfig = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 DetectDelimiter = true,
                 DetectDelimiterValues = [",", ";", "\t", "|"]
             };
 
-            using CsvReader csv = new(new StringReader(firstLine.ToString()), config);
+            using CsvReader csv = new(new StringReader(lineContent.ToString()), autoDetectedConfig);
             _ = csv.Read();
 
             var detectedDelimiter = csv.Parser.Delimiter;
