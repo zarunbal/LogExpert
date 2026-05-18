@@ -1226,15 +1226,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
         var lastColumnWidth = ConfigManager.Settings.Preferences.LastColumnWidth;
-        var fontName = ConfigManager.Settings.Preferences.FontName;
-        var fontSize = ConfigManager.Settings.Preferences.FontSize;
 
         foreach (var logWindow in _tabController.GetAllWindows())
         {
-            logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
+            logWindow.PreferencesChanged(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, false, flags);
         }
 
-        _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _toolWindowCoordinator.ApplyPreferences(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, flags);
 
         HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
         if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)

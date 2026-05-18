@@ -158,8 +158,16 @@ public class Preferences
 
     public bool FollowTail { get; set; } = true;
 
+    [Obsolete("This setting is no longer used and will be removed in a future version. The 'FontString' will be used for Importing / Exporting the Font")]
     public string FontName { get; set; } = "Courier New";
 
+    public string FontString { get; set; } = "Courier New, 9pt, style=Regular";
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    public Font Font { get; set; }
+
+    [Obsolete("This setting is no longer used and will be removed in a future version. The 'FontString' will be used for Importing / Exporting the Font")]
     public float FontSize { get => field; set => field = MathF.Round(value, 1); } = 9.0f;
 
     public List<HighlightMaskEntry> HighlightMaskList { get; set; } = [];

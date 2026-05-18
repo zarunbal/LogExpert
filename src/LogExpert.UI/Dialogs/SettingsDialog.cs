@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
@@ -25,7 +26,7 @@ internal partial class SettingsDialog : Form
 
     private readonly Image _emptyImage = new Bitmap(16, 16);
     private readonly LogTabWindow _logTabWin;
-    private const string DEFAULT_FONT_NAME = "Courier New";
+    private const float DEFAULT_FONT_SIZE = 9.0f;
 
     private ILogExpertPluginConfigurator _selectedPlugin;
     private ToolEntry _selectedTool;
@@ -118,16 +119,6 @@ internal partial class SettingsDialog : Form
     private void FillDialog ()
     {
         Preferences ??= new Preferences();
-
-        if (Preferences.FontName == null)
-        {
-            Preferences.FontName = DEFAULT_FONT_NAME;
-        }
-
-        if (Math.Abs(Preferences.FontSize) <= 0.1)
-        {
-            Preferences.FontSize = 9.0f;
-        }
 
         FillPortableMode();
 
@@ -266,8 +257,10 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = $"{Preferences.FontName} {Preferences.FontSize}";
-        labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
+        var font = Preferences.Font ?? new Font(FontFamily.GenericMonospace, DEFAULT_FONT_SIZE);
+        var style = font.Style == FontStyle.Regular ? string.Empty : $" {font.Style}";
+        labelFont.Text = $"{font.Name} {font.Size}{style}";
+        labelFont.Font = font;
     }
 
     private void SaveMultifileData ()
@@ -714,18 +707,24 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnChangeFontClick (object sender, EventArgs e)
     {
-        FontDialog dlg = new()
+        var currentFont = Preferences.Font ?? new Font(FontFamily.GenericMonospace, DEFAULT_FONT_SIZE);
+
+        using FontDialog dlg = new()
         {
-            ShowEffects = false,
+            ShowEffects = true,
             AllowVerticalFonts = false,
             AllowScriptChange = false,
-            Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize)
+            Font = currentFont
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            Preferences.FontSize = dlg.Font.Size;
-            Preferences.FontName = dlg.Font.FontFamily.Name;
+            var converter = TypeDescriptor.GetConverter(typeof(Font));
+            var selected = (Font)dlg.Font.Clone();
+
+            Preferences.Font?.Dispose();
+            Preferences.Font = selected;
+            Preferences.FontString = converter.ConvertToInvariantString(selected);
         }
 
         DisplayFontName();

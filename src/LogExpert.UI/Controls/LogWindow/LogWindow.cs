@@ -821,10 +821,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         var setLastColumnWidth = Preferences.SetLastColumnWidth;
         var lastColumnWidth = Preferences.LastColumnWidth;
-        var fontName = Preferences.FontName;
-        var fontSize = Preferences.FontSize;
 
-        PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
+        PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2948,10 +2946,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var setLastColumnWidth = Preferences.SetLastColumnWidth;
         var lastColumnWidth = Preferences.LastColumnWidth;
-        var fontName = Preferences.FontName;
-        var fontSize = Preferences.FontSize;
 
-        PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
+        PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
         //LoadPersistenceData();
     }
 
@@ -5433,7 +5429,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _patternWindow = new PatternWindow(this);
         _patternWindow.SetColumnizer(CurrentColumnizer);
         //this.patternWindow.SetBlockList(blockList);
-        _patternWindow.SetFont(Preferences.FontName, Preferences.FontSize);
+        _patternWindow.SetFont(Preferences.Font);
         _patternWindow.Fuzzy = _patternArgs.Fuzzy;
         _patternWindow.MaxDiff = _patternArgs.MaxDiffInBlock;
         _patternWindow.MaxMisses = _patternArgs.MaxMisses;
@@ -6755,7 +6751,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
-                        using var font = new Font(fontName, Preferences.FontSize, FontStyle.Bold);
+                        using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }
                 }
@@ -7777,13 +7773,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    public void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
+    public void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
-            NormalFont = new Font(new FontFamily(fontName), fontSize);
+            font ??= Preferences.Font ?? new Font(FontFamily.GenericMonospace, 9f);
+
+            NormalFont = font;
             BoldFont = new Font(NormalFont, FontStyle.Bold);
-            MonospacedFont = new Font(FONT_COURIER_NEW, Preferences.FontSize, FontStyle.Bold);
+            MonospacedFont = new Font(FONT_COURIER_NEW, NormalFont.Size, FontStyle.Bold);
 
             var lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
             var lineSpacingPixel = NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);

@@ -136,8 +136,7 @@ public class ToolWindowCoordinatorTests : IDisposable
         _coordinator.Initialize();
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-            _coordinator.ApplyPreferences("Courier New", 10f, true, 500, SettingsFlags.All));
+        Assert.DoesNotThrow(() => _coordinator.ApplyPreferences(new Font("Courier New", 10f), true, 500, SettingsFlags.All));
     }
 
     [Test]
@@ -193,8 +192,7 @@ public class ToolWindowCoordinatorTests : IDisposable
     public void ApplyPreferences_BeforeInitialize_DoesNotThrow ()
     {
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-            _coordinator.ApplyPreferences("Courier New", 10f, true, 500, SettingsFlags.All));
+        Assert.DoesNotThrow(() => _coordinator.ApplyPreferences(new Font("Courier New", 10f), true, 500, SettingsFlags.All));
     }
 
     [Test]
