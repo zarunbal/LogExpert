@@ -678,12 +678,12 @@ public class ConfigManagerTest
         // Arrange
         // Set up current settings
         Settings currentSettings = _configManager.Settings;
-        currentSettings.Preferences.FontSize = 10;
+        currentSettings.Preferences.FontString = "Courier New, 9pt, style=Regular";
         currentSettings.Preferences.ColumnizerMaskList.Clear();
 
         // Create import settings with different preferences
         Settings importSettings = CreateTestSettings();
-        importSettings.Preferences.FontSize = 12;
+        importSettings.Preferences.FontString = "Arial, 12pt, style=Bold";
         importSettings.Preferences.ShowBubbles = true;
 
         string importFilePath = Path.Join(_testDir, "import_other.json");
@@ -698,7 +698,7 @@ public class ConfigManagerTest
         Assert.That(result.Success, Is.True);
 
         Settings updatedSettings = _configManager.Settings;
-        Assert.That(updatedSettings.Preferences.FontSize, Is.EqualTo(12), "Preferences should be merged from import file");
+        Assert.That(updatedSettings.Preferences.FontString, Is.EqualTo("Arial, 12pt, style=Bold"), "Preferences should be merged from import file");
     }
 
     [Test]
