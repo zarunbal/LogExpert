@@ -137,9 +137,9 @@ internal partial class HighlightDialog : Form
 
     private void OnBtnCopyGroupClick (object sender, EventArgs e)
     {
-        if (listBoxGroups.SelectedIndex >= 0 && listBoxGroups.SelectedIndex < HighlightGroupList.Count)
+        if (comboBoxGroups.SelectedIndex >= 0 && comboBoxGroups.SelectedIndex < HighlightGroupList.Count)
         {
-            var newGroup = (HighlightGroup)HighlightGroupList[listBoxGroups.SelectedIndex].Clone();
+            var newGroup = (HighlightGroup)HighlightGroupList[comboBoxGroups.SelectedIndex].Clone();
             newGroup.GroupName = $"{Resources.HighlightDialog_UI_Snippet_CopyOf} {newGroup.GroupName}";
 
             HighlightGroupList.Add(newGroup);
@@ -156,10 +156,10 @@ internal partial class HighlightDialog : Form
             return;
         }
 
-        if (listBoxGroups.SelectedIndex >= 0 && listBoxGroups.SelectedIndex < HighlightGroupList.Count)
+        if (comboBoxGroups.SelectedIndex >= 0 && comboBoxGroups.SelectedIndex < HighlightGroupList.Count)
         {
-            var index = listBoxGroups.SelectedIndex;
-            HighlightGroupList.RemoveAt(listBoxGroups.SelectedIndex);
+            var index = comboBoxGroups.SelectedIndex;
+            HighlightGroupList.RemoveAt(comboBoxGroups.SelectedIndex);
             FillGroupListBoxGroups();
             if (index < HighlightGroupList.Count)
             {
@@ -192,11 +192,11 @@ internal partial class HighlightDialog : Form
 
     private void OnBtnGroupDownClick (object sender, EventArgs e)
     {
-        var index = listBoxGroups.SelectedIndex;
+        var index = comboBoxGroups.SelectedIndex;
         if (index > -1 && index < _highlightGroupList.Count - 1)
         {
             _highlightGroupList.Reverse(index, 2);
-            listBoxGroups.Refresh();
+            comboBoxGroups.Refresh();
             FillGroupListBoxGroups();
             SelectGroup(index + 1);
         }
@@ -204,11 +204,11 @@ internal partial class HighlightDialog : Form
 
     private void OnBtnGroupUpClick (object sender, EventArgs e)
     {
-        var index = listBoxGroups.SelectedIndex;
+        var index = comboBoxGroups.SelectedIndex;
         if (index > 0)
         {
             _highlightGroupList.Reverse(index - 1, 2);
-            listBoxGroups.Refresh();
+            comboBoxGroups.Refresh();
             FillGroupListBoxGroups();
             SelectGroup(index - 1);
         }
@@ -339,14 +339,14 @@ internal partial class HighlightDialog : Form
         }
     }
 
-    private void OnListBoxGroupsSelectionChanged (object sender, EventArgs e)
+    private void OnCmbBoxGroupSelectionChangeCommitted (object sender, EventArgs e)
     {
-        SelectGroup(listBoxGroups.SelectedIndex);
+        SelectGroup(comboBoxGroups.SelectedIndex);
     }
 
     private void OnCmbBoxGroupTextUpdate (object sender, EventArgs e)
     {
-        _currentGroup.GroupName = listBoxGroups.Text;
+        _currentGroup.GroupName = comboBoxGroups.Text;
     }
 
     private void OnDeleteButtonClick (object sender, EventArgs e)
@@ -425,11 +425,11 @@ internal partial class HighlightDialog : Form
     private void FillGroupListBoxGroups ()
     {
         SelectGroup(-1);
-        listBoxGroups.Items.Clear();
+        comboBoxGroups.Items.Clear();
 
         foreach (var group in HighlightGroupList)
         {
-            _ = listBoxGroups.Items.Add(group);
+            _ = comboBoxGroups.Items.Add(group);
         }
 
         ReEvaluateGroupButtonStates();
@@ -476,8 +476,8 @@ internal partial class HighlightDialog : Form
             if (group.GroupName.Equals(groupToSelect, StringComparison.Ordinal))
             {
                 _currentGroup = group;
-                listBoxGroups.SelectedValue = group;
-                listBoxGroups.SelectedIndex = HighlightGroupList.IndexOf(group);
+                comboBoxGroups.SelectedValue = group;
+                comboBoxGroups.SelectedIndex = HighlightGroupList.IndexOf(group);
                 break;
             }
         }
@@ -490,10 +490,10 @@ internal partial class HighlightDialog : Form
     private void ReEvaluateGroupButtonStates ()
     {
         // Refresh button states based on the selection in the listBoxGroups
-        var atLeastOneSelected = listBoxGroups.SelectedItem != null;
-        var moreThanOne = listBoxGroups.Items.Count > 1;
-        var firstSelected = atLeastOneSelected && listBoxGroups.SelectedIndex == 0;
-        var lastSelected = atLeastOneSelected && listBoxGroups.SelectedIndex == listBoxGroups.Items.Count - 1;
+        var atLeastOneSelected = comboBoxGroups.SelectedItem != null;
+        var moreThanOne = comboBoxGroups.Items.Count > 1;
+        var firstSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == 0;
+        var lastSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == comboBoxGroups.Items.Count - 1;
 
         btnDeleteGroup.Enabled = atLeastOneSelected;
         btnCopyGroup.Enabled = atLeastOneSelected;
@@ -521,13 +521,13 @@ internal partial class HighlightDialog : Form
         {
             _currentGroup = HighlightGroupList[index];
             //listBoxGroups.Items[index] = _currentGroup;
-            listBoxGroups.SelectedIndex = index;
-            listBoxGroups.SelectedItem = _currentGroup;
+            comboBoxGroups.SelectedIndex = index;
+            comboBoxGroups.SelectedItem = _currentGroup;
             FillHighlightListBox();
         }
         else
         {
-            listBoxGroups.SelectedItem = null;
+            comboBoxGroups.SelectedItem = null;
             _currentGroup = null;
             listBoxHighlight.Items.Clear();
         }

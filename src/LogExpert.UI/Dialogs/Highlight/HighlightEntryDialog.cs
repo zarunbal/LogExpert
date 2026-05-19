@@ -159,7 +159,7 @@ public partial class HighlightEntryDialog : Form
             {
                 ShowError(Resources.HighlightDialog_RegexError);
                 _tabControl.SelectedTab = _tabLineMatch;
-                _textBoxSearchString.Focus();
+                _ = _textBoxSearchString.Focus();
                 return;
             }
 
@@ -168,7 +168,7 @@ public partial class HighlightEntryDialog : Form
             {
                 ShowError(error ?? Resources.HighlightDialog_RegexError);
                 _tabControl.SelectedTab = _tabLineMatch;
-                _textBoxSearchString.Focus();
+                _ = _textBoxSearchString.Focus();
                 return;
             }
         }
