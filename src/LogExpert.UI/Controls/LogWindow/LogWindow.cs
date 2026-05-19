@@ -3799,13 +3799,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        foreach (var entry in matchingList)
+        foreach (var entry in matchingList.Where(entry => entry.AlertOnHit))
         {
-            if (entry.AlertOnHit)
-            {
-                _ = AudioPlayer.PlayThrottled(entry.SoundFilePath, entry.CooldownSeconds);
-                break;
-            }
+            _ = AudioPlayer.PlayThrottled(entry.SoundFilePath, entry.CooldownSeconds);
+            break;
         }
     }
 

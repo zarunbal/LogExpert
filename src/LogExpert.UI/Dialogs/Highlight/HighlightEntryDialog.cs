@@ -102,6 +102,7 @@ public partial class HighlightEntryDialog : Form
         _checkBoxAlertOnHit.Checked = _entry.AlertOnHit;
         _textBoxSoundFile.Text = _entry.SoundFilePath ?? string.Empty;
         var cooldown = _entry.CooldownSeconds;
+
         if (cooldown < _numericCooldownSeconds.Minimum)
         {
             cooldown = (int)_numericCooldownSeconds.Minimum;
@@ -110,12 +111,14 @@ public partial class HighlightEntryDialog : Form
         {
             cooldown = (int)_numericCooldownSeconds.Maximum;
         }
+
         _numericCooldownSeconds.Value = cooldown;
     }
 
     private static void SelectComboColor (ColorComboBox combo, Color color)
     {
         combo.CustomColor = color;
+
         if (combo.Items.Contains(color))
         {
             combo.SelectedIndex = combo.Items.Cast<Color>().ToList().LastIndexOf(color);
@@ -391,14 +394,9 @@ public partial class HighlightEntryDialog : Form
 
         _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, Color.Black);
 
-        if (_checkBoxNoBackground != null && _checkBoxNoBackground.Checked)
-        {
-            _previewLabel.BackColor = SystemColors.Window;
-        }
-        else
-        {
-            _previewLabel.BackColor = GetSelectedColor(_colorBoxBackground, SystemColors.Window);
-        }
+        _previewLabel.BackColor = _checkBoxNoBackground != null && _checkBoxNoBackground.Checked
+            ? SystemColors.Window
+            : GetSelectedColor(_colorBoxBackground, SystemColors.Window);
 
         var bold = _checkBoxBold != null && _checkBoxBold.Checked;
         var baseFont = Font;
