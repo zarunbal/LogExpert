@@ -821,6 +821,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        public static string HighlightDialog_UI_Button_BrowseSoundFile {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_BrowseSoundFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Copy.
         /// </summary>
         public static string HighlightDialog_UI_Button_Copy {
@@ -889,6 +898,15 @@ namespace LogExpert {
         public static string HighlightDialog_UI_Button_SelectPlugin {
             get {
                 return ResourceManager.GetString("HighlightDialog_UI_Button_SelectPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alert on hit.
+        /// </summary>
+        public static string HighlightDialog_UI_CheckBox_AlertOnHit {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_CheckBox_AlertOnHit", resourceCulture);
             }
         }
         
@@ -1065,6 +1083,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cooldown:.
+        /// </summary>
+        public static string HighlightDialog_UI_Label_Cooldown {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Label_Cooldown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Foreground color.
         /// </summary>
         public static string HighlightDialog_UI_Label_ForegroundColor {
@@ -1083,11 +1110,38 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to seconds.
+        /// </summary>
+        public static string HighlightDialog_UI_Label_Seconds {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Label_Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sound file:.
+        /// </summary>
+        public static string HighlightDialog_UI_Label_SoundFile {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Label_SoundFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New group.
         /// </summary>
         public static string HighlightDialog_UI_NewGroup_BaseName {
             get {
                 return ResourceManager.GetString("HighlightDialog_UI_NewGroup_BaseName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audio files (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|All files (*.*)|*.*.
+        /// </summary>
+        public static string HighlightDialog_UI_OpenFileFilter_Audio {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_OpenFileFilter_Audio", resourceCulture);
             }
         }
         
@@ -1133,6 +1187,60 @@ namespace LogExpert {
         public static string HighlightDialog_UI_Title_ExportSettings {
             get {
                 return ResourceManager.GetString("HighlightDialog_UI_Title_ExportSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (preview).
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Preview_Placeholder {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Preview_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actions.
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Tab_Actions {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Tab_Actions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Coloring.
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Tab_Coloring {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Tab_Coloring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line Match Criteria.
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Tab_LineMatchCriteria {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Tab_LineMatchCriteria", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add Highlight.
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Title_Add {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Title_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Highlight — &quot;{0}&quot;.
+        /// </summary>
+        public static string HighlightEntryEditDialog_UI_Title_EditFormat {
+            get {
+                return ResourceManager.GetString("HighlightEntryEditDialog_UI_Title_EditFormat", resourceCulture);
             }
         }
         
@@ -1475,6 +1583,15 @@ namespace LogExpert {
         public static string LogExpert_Common_UI_Button_Delete {
             get {
                 return ResourceManager.GetString("LogExpert_Common_UI_Button_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Edit.
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_Edit {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_Edit", resourceCulture);
             }
         }
         
