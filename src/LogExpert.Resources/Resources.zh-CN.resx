@@ -2083,4 +2083,43 @@ YY[YY] = 年
   <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
     <value>扫描书签已完成/取消！</value>
   </data>
+  <data name="HighlightDialog_UI_CheckBox_AlertOnHit" xml:space="preserve">
+    <value>命中警报</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SoundFile" xml:space="preserve">
+    <value>声音文件：</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BrowseSoundFile" xml:space="preserve">
+    <value>浏览...</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Cooldown" xml:space="preserve">
+    <value>冷却：</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Seconds" xml:space="preserve">
+    <value>秒</value>
+  </data>
+  <data name="HighlightDialog_UI_OpenFileFilter_Audio" xml:space="preserve">
+    <value>音频文件 (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|所有文件 (*.*)|*.*</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_Add" xml:space="preserve">
+    <value>添加亮点</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_EditFormat" xml:space="preserve">
+    <value>编辑突出显示 —“{0}”</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_LineMatchCriteria" xml:space="preserve">
+    <value>线路匹配标准</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Coloring" xml:space="preserve">
+    <value>着色</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Actions" xml:space="preserve">
+    <value>动作</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
+    <value>（预览）</value>
+  </data>
 </root>

@@ -2166,4 +2166,43 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
     <value>Scanne Lesezeichen beendet / abgebrochen!</value>
   </data>
+  <data name="HighlightDialog_UI_CheckBox_AlertOnHit" xml:space="preserve">
+    <value>Alarm bei Treffer</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SoundFile" xml:space="preserve">
+    <value>Sounddatei:</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BrowseSoundFile" xml:space="preserve">
+    <value>Durchsuchen...</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Cooldown" xml:space="preserve">
+    <value>Abklingzeit:</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Seconds" xml:space="preserve">
+    <value>Sekunden</value>
+  </data>
+  <data name="HighlightDialog_UI_OpenFileFilter_Audio" xml:space="preserve">
+    <value>Audiodateien (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_Add" xml:space="preserve">
+    <value>Highlight hinzufügen</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_EditFormat" xml:space="preserve">
+    <value>Hervorhebung bearbeiten – „{0}“</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_LineMatchCriteria" xml:space="preserve">
+    <value>Kriterien für Linienübereinstimmung</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Coloring" xml:space="preserve">
+    <value>Farben</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Edit" xml:space="preserve">
+    <value>&amp;Bearbeiten</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
+    <value>(Vorschau)</value>
+  </data>
 </root>

@@ -1,17 +1,14 @@
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
-using System.Text.RegularExpressions;
 
 using ColumnizerLib;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
-using LogExpert.UI.Controls;
 using LogExpert.UI.Dialogs;
+using LogExpert.UI.Dialogs.Highlight;
 using LogExpert.UI.Entities;
 
 namespace LogExpert.Dialogs;
@@ -21,9 +18,6 @@ internal partial class HighlightDialog : Form
 {
     #region Private Fields
 
-    private readonly Image _applyButtonImage;
-    private string _bookmarkComment;
-    private ActionEntry _currentActionEntry = new();
     private HighlightGroup _currentGroup;
     private List<HighlightGroup> _highlightGroupList;
 
@@ -45,8 +39,6 @@ internal partial class HighlightDialog : Form
         ConfigManager = configManager;
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
-        _applyButtonImage = btnApply.Image;
-        btnApply.Image = null;
 
         ResumeLayout();
     }
@@ -59,14 +51,10 @@ internal partial class HighlightDialog : Form
         btnOk.Text = Resources.LogExpert_Common_UI_Button_OK;
         btnCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
         btnAdd.Text = Resources.LogExpert_Common_UI_Button_Add;
+        btnEdit.Text = Resources.LogExpert_Common_UI_Button_Edit;
         btnDelete.Text = Resources.LogExpert_Common_UI_Button_Delete;
         btnMoveUp.Text = Resources.LogExpert_Common_UI_Button_MoveUp;
         btnMoveDown.Text = Resources.LogExpert_Common_UI_Button_MoveDown;
-        btnApply.Text = Resources.LogExpert_Common_UI_Button_Apply;
-        btnCustomForeColor.Text = Resources.HighlightDialog_UI_Button_CustomForeColor;
-        btnCustomBackColor.Text = Resources.HighlightDialog_UI_Button_CustomBackColor;
-        btnBookmarkComment.Text = Resources.HighlightDialog_UI_Button_BookmarkComment;
-        btnSelectPlugin.Text = Resources.HighlightDialog_UI_Button_SelectPlugin;
         btnImportGroup.Text = Resources.LogExpert_Common_UI_Button_Import;
         btnExportGroup.Text = Resources.LogExpert_Common_UI_Button_Export;
         btnMoveGroupDown.Text = Resources.HighlightDialog_UI_Button_GroupDown;
@@ -75,24 +63,7 @@ internal partial class HighlightDialog : Form
         btnDeleteGroup.Text = Resources.HighlightDialog_UI_Button_DeleteGroup;
         btnNewGroup.Text = Resources.HighlightDialog_UI_Button_NewGroup;
 
-        labelForgroundColor.Text = Resources.HighlightDialog_UI_Label_ForegroundColor;
-        labelBackgroundColor.Text = Resources.HighlightDialog_UI_Label_BackgroundColor;
-        labelSearchString.Text = Resources.HighlightDialog_UI_Label_SearchString;
         labelAssignNamesToGroups.Text = Resources.HighlightDialog_UI_Label_AssignNamesToGroups;
-
-        checkBoxRegex.Text = Resources.HighlightDialog_UI_CheckBox_RegEx;
-        checkBoxCaseSensitive.Text = Resources.HighlightDialog_UI_CheckBox_CaseSensitive;
-        checkBoxDontDirtyLed.Text = Resources.HighlightDialog_UI_CheckBox_DontDirtyLed;
-        checkBoxBookmark.Text = Resources.HighlightDialog_UI_CheckBox_Bookmark;
-        checkBoxStopTail.Text = Resources.HighlightDialog_UI_CheckBox_StopTail;
-        checkBoxPlugin.Text = Resources.HighlightDialog_UI_CheckBox_Plugin;
-        checkBoxWordMatch.Text = Resources.HighlightDialog_UI_CheckBox_WordMatch;
-        checkBoxBold.Text = Resources.HighlightDialog_UI_CheckBox_Bold;
-        checkBoxNoBackground.Text = Resources.HighlightDialog_UI_CheckBox_NoBackground;
-
-        groupBoxLineMatchCriteria.Text = Resources.HighlightDialog_UI_GroupBox_LineMatchCriteria;
-        groupBoxColoring.Text = Resources.HighlightDialog_UI_GroupBox_Coloring;
-        groupBoxActions.Text = Resources.HighlightDialog_UI_GroupBox_Actions;
         groupBoxGroups.Text = Resources.HighlightDialog_UI_GroupBox_Groups;
     }
 
@@ -121,8 +92,6 @@ internal partial class HighlightDialog : Form
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string PreSelectedGroupName { get; set; }
 
-    private bool IsDirty => btnApply.Image == _applyButtonImage;
-
     private IConfigManager ConfigManager { get; }
 
     #endregion
@@ -131,52 +100,52 @@ internal partial class HighlightDialog : Form
 
     private void OnAddButtonClick (object sender, EventArgs e)
     {
-        AddNewEntry();
-        Dirty();
-    }
-
-    private void OnBtnApplyClick (object sender, EventArgs e)
-    {
-        SaveEntry();
-    }
-
-    private void OnBtnBookmarkCommentClick (object sender, EventArgs e)
-    {
-        BookmarkCommentDlg dlg = new()
+        if (_currentGroup == null)
         {
-            Comment = _bookmarkComment
+            return;
+        }
+
+        var entry = new HighlightEntry
+        {
+            ForegroundColor = Color.White,
+            BackgroundColor = Color.Gray,
         };
 
-        if (dlg.ShowDialog() == DialogResult.OK)
+        using var dlg = new HighlightEntryDialog(entry, KeywordActionList, isNew: true);
+        if (dlg.ShowDialog(this) == DialogResult.OK)
         {
-            _bookmarkComment = dlg.Comment;
-            Dirty();
+            _currentGroup.HighlightEntryList.Add(entry);
+            _ = listBoxHighlight.Items.Add(entry);
+            listBoxHighlight.SelectedItem = entry;
+            ReEvaluateHighlightButtonStates();
+        }
+    }
+
+    private void OnBtnEditClick (object sender, EventArgs e)
+    {
+        if (listBoxHighlight.SelectedItem is not HighlightEntry entry)
+        {
+            return;
+        }
+
+        using var dlg = new HighlightEntryDialog(entry, KeywordActionList, isNew: false);
+        if (dlg.ShowDialog(this) == DialogResult.OK)
+        {
+            listBoxHighlight.Refresh();
         }
     }
 
     private void OnBtnCopyGroupClick (object sender, EventArgs e)
     {
-        if (comboBoxGroups.SelectedIndex >= 0 && comboBoxGroups.SelectedIndex < HighlightGroupList.Count)
+        if (listBoxGroups.SelectedIndex >= 0 && listBoxGroups.SelectedIndex < HighlightGroupList.Count)
         {
-            var newGroup = (HighlightGroup)HighlightGroupList[comboBoxGroups.SelectedIndex].Clone();
+            var newGroup = (HighlightGroup)HighlightGroupList[listBoxGroups.SelectedIndex].Clone();
             newGroup.GroupName = $"{Resources.HighlightDialog_UI_Snippet_CopyOf} {newGroup.GroupName}";
 
             HighlightGroupList.Add(newGroup);
-            FillGroupComboBox();
+            FillGroupListBoxGroups();
             SelectGroup(HighlightGroupList.Count - 1);
         }
-    }
-
-    private void OnBtnCustomBackColorClick (object sender, EventArgs e)
-    {
-        ChooseColor(colorBoxBackground);
-        Dirty();
-    }
-
-    private void OnBtnCustomForeColorClick (object sender, EventArgs e)
-    {
-        ChooseColor(colorBoxForeground);
-        Dirty();
     }
 
     private void OnBtnDelGroupClick (object sender, EventArgs e)
@@ -187,11 +156,11 @@ internal partial class HighlightDialog : Form
             return;
         }
 
-        if (comboBoxGroups.SelectedIndex >= 0 && comboBoxGroups.SelectedIndex < HighlightGroupList.Count)
+        if (listBoxGroups.SelectedIndex >= 0 && listBoxGroups.SelectedIndex < HighlightGroupList.Count)
         {
-            var index = comboBoxGroups.SelectedIndex;
-            HighlightGroupList.RemoveAt(comboBoxGroups.SelectedIndex);
-            FillGroupComboBox();
+            var index = listBoxGroups.SelectedIndex;
+            HighlightGroupList.RemoveAt(listBoxGroups.SelectedIndex);
+            FillGroupListBoxGroups();
             if (index < HighlightGroupList.Count)
             {
                 SelectGroup(index);
@@ -223,24 +192,24 @@ internal partial class HighlightDialog : Form
 
     private void OnBtnGroupDownClick (object sender, EventArgs e)
     {
-        var index = comboBoxGroups.SelectedIndex;
+        var index = listBoxGroups.SelectedIndex;
         if (index > -1 && index < _highlightGroupList.Count - 1)
         {
             _highlightGroupList.Reverse(index, 2);
-            comboBoxGroups.Refresh();
-            FillGroupComboBox();
+            listBoxGroups.Refresh();
+            FillGroupListBoxGroups();
             SelectGroup(index + 1);
         }
     }
 
     private void OnBtnGroupUpClick (object sender, EventArgs e)
     {
-        var index = comboBoxGroups.SelectedIndex;
+        var index = listBoxGroups.SelectedIndex;
         if (index > 0)
         {
             _highlightGroupList.Reverse(index - 1, 2);
-            comboBoxGroups.Refresh();
-            FillGroupComboBox();
+            listBoxGroups.Refresh();
+            FillGroupListBoxGroups();
             SelectGroup(index - 1);
         }
     }
@@ -294,10 +263,9 @@ internal partial class HighlightDialog : Form
 
         _highlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
 
-        FillGroupComboBox();
+        FillGroupListBoxGroups();
 
         _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsImported, Resources.LogExpert_Common_UI_Title_LogExpert);
-
     }
 
     private void OnBtnMoveDownClick (object sender, EventArgs e)
@@ -347,61 +315,13 @@ internal partial class HighlightDialog : Form
 
         HighlightGroup newGroup = new() { GroupName = name };
         HighlightGroupList.Add(newGroup);
-        FillGroupComboBox();
+        FillGroupListBoxGroups();
         SelectGroup(HighlightGroupList.Count - 1);
     }
 
     private void OnBtnOkClick (object sender, EventArgs e)
     {
-        // Apply pending changes if closing the form.
-        if (IsDirty)
-        {
-            // cannot call 'this.applyButton.PerformClick();' because it prohibits the OK button to terminate the dialog
-            OnBtnApplyClick(btnApply, EventArgs.Empty);
-        }
-    }
-
-    private void OnChkBoxBoldCheckedChanged (object sender, EventArgs e)
-    {
-        Dirty();
-    }
-
-    private void OnChkBoxNoBackgroundCheckedChanged (object sender, EventArgs e)
-    {
-        colorBoxBackground.Enabled = !checkBoxNoBackground.Checked;
-        btnCustomBackColor.Enabled = !checkBoxNoBackground.Checked;
-        Dirty();
-    }
-
-    private void OnChkBoxPluginCheckedChanged (object sender, EventArgs e)
-    {
-        Dirty();
-        btnSelectPlugin.Enabled = checkBoxPlugin.Checked;
-    }
-
-    private void OnChkBoxRegexMouseUp (object sender, MouseEventArgs e)
-    {
-        if (e.Button == MouseButtons.Right)
-        {
-            RegexHelperDialog dlg = new()
-            {
-                Owner = this,
-                CaseSensitive = checkBoxCaseSensitive.Checked,
-                Pattern = textBoxSearchString.Text
-            };
-
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                checkBoxCaseSensitive.Checked = dlg.CaseSensitive;
-                textBoxSearchString.Text = dlg.Pattern;
-            }
-        }
-    }
-
-    private void OnChkBoxWordMatchCheckedChanged (object sender, EventArgs e)
-    {
-        Dirty();
-        checkBoxNoBackground.Enabled = checkBoxWordMatch.Checked;
+        // All edits are committed via the sub-dialog. Nothing to flush here.
     }
 
     private void OnCmbBoxGroupDrawItem (object sender, DrawItemEventArgs e)
@@ -419,14 +339,14 @@ internal partial class HighlightDialog : Form
         }
     }
 
-    private void OnCmbBoxGroupSelectionChangeCommitted (object sender, EventArgs e)
+    private void OnListBoxGroupsSelectionChanged (object sender, EventArgs e)
     {
-        SelectGroup(comboBoxGroups.SelectedIndex);
+        SelectGroup(listBoxGroups.SelectedIndex);
     }
 
     private void OnCmbBoxGroupTextUpdate (object sender, EventArgs e)
     {
-        _currentGroup.GroupName = comboBoxGroups.Text;
+        _currentGroup.GroupName = listBoxGroups.Text;
     }
 
     private void OnDeleteButtonClick (object sender, EventArgs e)
@@ -455,13 +375,6 @@ internal partial class HighlightDialog : Form
 
     private void OnHighlightDialogLoad (object sender, EventArgs e)
     {
-        colorBoxForeground.SelectedIndex = 1;
-        colorBoxBackground.SelectedIndex = 2;
-        btnApply.Enabled = false;
-        btnApply.Image = null;
-        btnBookmarkComment.Enabled = false;
-        btnSelectPlugin.Enabled = false;
-
         ReEvaluateHighlightButtonStates();
     }
 
@@ -502,130 +415,21 @@ internal partial class HighlightDialog : Form
 
     private void OnListBoxHighlightSelectedIndexChanged (object sender, EventArgs e)
     {
-        StartEditEntry();
-    }
-
-    private void OnPluginButtonClick (object sender, EventArgs e)
-    {
-        KeywordActionDlg dlg = new(_currentActionEntry, KeywordActionList);
-
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            _currentActionEntry = dlg.ActionEntry;
-            Dirty();
-        }
+        ReEvaluateHighlightButtonStates();
     }
 
     #endregion
 
     #region Private Methods
 
-    private void AddNewEntry ()
-    {
-        {
-            try
-            {
-                CheckRegex();
-
-                HighlightEntry entry = new()
-                {
-                    SearchText = textBoxSearchString.Text,
-                    ForegroundColor = colorBoxForeground.SelectedColor,
-                    BackgroundColor = colorBoxBackground.SelectedColor,
-                    IsRegex = checkBoxRegex.Checked,
-                    IsCaseSensitive = checkBoxCaseSensitive.Checked,
-                    IsLedSwitch = checkBoxDontDirtyLed.Checked,
-                    IsStopTail = checkBoxStopTail.Checked,
-                    IsSetBookmark = checkBoxBookmark.Checked,
-                    IsActionEntry = checkBoxPlugin.Checked,
-                    ActionEntry = _currentActionEntry,
-                    IsWordMatch = checkBoxWordMatch.Checked,
-                    IsBold = checkBoxBold.Checked,
-                    NoBackground = checkBoxNoBackground.Checked
-                };
-
-                _ = listBoxHighlight.Items.Add(entry);
-
-                // Select the newly created item
-                _currentGroup.HighlightEntryList.Add(entry);
-                listBoxHighlight.SelectedItem = entry;
-            }
-            catch (Exception ex) when (ex is ArgumentException
-                                            or RegexMatchTimeoutException
-                                            or ArgumentNullException
-                                            or InvalidOperationException
-                                            or SystemException)
-            {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message),
-                    Resources.LogExpert_Common_UI_Title_Error,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-            }
-        }
-    }
-
-    private void ChangeToDirty (object sender, EventArgs e)
-    {
-        Dirty();
-    }
-
-    private void CheckRegex ()
-    {
-        if (checkBoxRegex.Checked)
-        {
-            if (string.IsNullOrWhiteSpace(textBoxSearchString.Text))
-            {
-                throw new ArgumentException(Resources.HighlightDialog_RegexError);
-            }
-
-            // Use RegexHelper for safer validation with timeout protection
-            var (isValid, error) = RegexHelper.IsValidPattern(textBoxSearchString.Text);
-            if (!isValid)
-            {
-                throw new ArgumentException(error ?? Resources.HighlightDialog_RegexError);
-            }
-        }
-    }
-
-    private static void ChooseColor (ColorComboBox comboBox)
-    {
-        ColorDialog colorDialog = new()
-        {
-            AllowFullOpen = true,
-            ShowHelp = false,
-            Color = comboBox.CustomColor
-        };
-
-        if (colorDialog.ShowDialog() == DialogResult.OK)
-        {
-            comboBox.CustomColor = colorDialog.Color;
-            comboBox.SelectedIndex = 0;
-        }
-
-        colorDialog.Dispose();
-    }
-
-    private void Dirty ()
-    {
-        var index = listBoxHighlight.SelectedIndex;
-        if (index > -1)
-        {
-            btnApply.Enabled = true;
-            btnApply.Image = _applyButtonImage;
-        }
-
-        btnAdd.Enabled = textBoxSearchString.Text.Length > 0;
-    }
-
-    private void FillGroupComboBox ()
+    private void FillGroupListBoxGroups ()
     {
         SelectGroup(-1);
-
-        comboBoxGroups.Items.Clear();
+        listBoxGroups.Items.Clear();
 
         foreach (var group in HighlightGroupList)
         {
-            _ = comboBoxGroups.Items.Add(group);
+            _ = listBoxGroups.Items.Add(group);
         }
 
         ReEvaluateGroupButtonStates();
@@ -658,7 +462,7 @@ internal partial class HighlightDialog : Form
             HighlightGroupList.Add(highlightGroup);
         }
 
-        FillGroupComboBox();
+        FillGroupListBoxGroups();
 
         _currentGroup = null;
         var groupToSelect = PreSelectedGroupName;
@@ -672,8 +476,8 @@ internal partial class HighlightDialog : Form
             if (group.GroupName.Equals(groupToSelect, StringComparison.Ordinal))
             {
                 _currentGroup = group;
-                comboBoxGroups.SelectedValue = group;
-                comboBoxGroups.SelectedIndex = HighlightGroupList.IndexOf(group);
+                listBoxGroups.SelectedValue = group;
+                listBoxGroups.SelectedIndex = HighlightGroupList.IndexOf(group);
                 break;
             }
         }
@@ -685,11 +489,11 @@ internal partial class HighlightDialog : Form
 
     private void ReEvaluateGroupButtonStates ()
     {
-        // Refresh button states based on the selection in the combobox
-        var atLeastOneSelected = comboBoxGroups.SelectedItem != null;
-        var moreThanOne = comboBoxGroups.Items.Count > 1;
-        var firstSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == 0;
-        var lastSelected = atLeastOneSelected && comboBoxGroups.SelectedIndex == comboBoxGroups.Items.Count - 1;
+        // Refresh button states based on the selection in the listBoxGroups
+        var atLeastOneSelected = listBoxGroups.SelectedItem != null;
+        var moreThanOne = listBoxGroups.Items.Count > 1;
+        var firstSelected = atLeastOneSelected && listBoxGroups.SelectedIndex == 0;
+        var lastSelected = atLeastOneSelected && listBoxGroups.SelectedIndex == listBoxGroups.Items.Count - 1;
 
         btnDeleteGroup.Enabled = atLeastOneSelected;
         btnCopyGroup.Enabled = atLeastOneSelected;
@@ -699,51 +503,16 @@ internal partial class HighlightDialog : Form
 
     private void ReEvaluateHighlightButtonStates ()
     {
-        // Refresh button states based on the selection in the combobox
+        // Refresh button states based on the selection in the listbox
         var atLeastOneSelected = listBoxHighlight.SelectedItem != null;
         var moreThanOne = listBoxHighlight.Items.Count > 1;
         var firstSelected = atLeastOneSelected && listBoxHighlight.SelectedIndex == 0;
         var lastSelected = atLeastOneSelected && listBoxHighlight.SelectedIndex == listBoxHighlight.Items.Count - 1;
 
+        btnEdit.Enabled = atLeastOneSelected;
         btnDelete.Enabled = atLeastOneSelected;
         btnMoveUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
         btnMoveDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;
-    }
-
-    private void SaveEntry ()
-    {
-        try
-        {
-            CheckRegex();
-
-            var entry = (HighlightEntry)listBoxHighlight.SelectedItem;
-
-            entry.ForegroundColor = (Color)colorBoxForeground.SelectedItem;
-            entry.BackgroundColor = (Color)colorBoxBackground.SelectedItem;
-            entry.SearchText = textBoxSearchString.Text;
-            entry.IsRegex = checkBoxRegex.Checked;
-            entry.IsCaseSensitive = checkBoxCaseSensitive.Checked;
-            btnApply.Enabled = false;
-            btnApply.Image = null;
-            entry.IsLedSwitch = checkBoxDontDirtyLed.Checked;
-            entry.IsSetBookmark = checkBoxBookmark.Checked;
-            entry.IsStopTail = checkBoxStopTail.Checked;
-            entry.IsActionEntry = checkBoxPlugin.Checked;
-            entry.ActionEntry = (ActionEntry)_currentActionEntry.Clone();
-            entry.BookmarkComment = _bookmarkComment;
-            entry.IsWordMatch = checkBoxWordMatch.Checked;
-            entry.IsBold = checkBoxBold.Checked;
-            entry.NoBackground = checkBoxNoBackground.Checked;
-            listBoxHighlight.Refresh();
-        }
-        catch (Exception ex) when (ex is ArgumentException
-                                        or RegexMatchTimeoutException
-                                        or ArgumentNullException
-                                        or InvalidOperationException
-                                        or SystemException)
-        {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message), Resources.LogExpert_Common_UI_Title_Error);
-        }
     }
 
     private void SelectGroup (int index)
@@ -751,70 +520,20 @@ internal partial class HighlightDialog : Form
         if (index >= 0 && index < HighlightGroupList.Count)
         {
             _currentGroup = HighlightGroupList[index];
-            comboBoxGroups.Items[index] = _currentGroup;
-            comboBoxGroups.SelectedIndex = index;
-            comboBoxGroups.SelectedItem = _currentGroup;
+            //listBoxGroups.Items[index] = _currentGroup;
+            listBoxGroups.SelectedIndex = index;
+            listBoxGroups.SelectedItem = _currentGroup;
             FillHighlightListBox();
         }
         else
         {
-            comboBoxGroups.SelectedItem = null;
+            listBoxGroups.SelectedItem = null;
             _currentGroup = null;
             listBoxHighlight.Items.Clear();
         }
 
         ReEvaluateHighlightButtonStates();
         ReEvaluateGroupButtonStates();
-    }
-
-    private void StartEditEntry ()
-    {
-        var entry = (HighlightEntry)listBoxHighlight.SelectedItem;
-
-        if (entry != null)
-        {
-            textBoxSearchString.Text = entry.SearchText;
-
-            colorBoxForeground.CustomColor = entry.ForegroundColor;
-            colorBoxBackground.CustomColor = entry.BackgroundColor;
-
-            if (colorBoxForeground.Items.Contains(entry.ForegroundColor))
-            {
-                colorBoxForeground.SelectedIndex = colorBoxForeground.Items.Cast<Color>().ToList().LastIndexOf(entry.ForegroundColor);
-            }
-            else
-            {
-                colorBoxForeground.SelectedItem = entry.ForegroundColor;
-            }
-
-            if (colorBoxForeground.Items.Contains(entry.ForegroundColor))
-            {
-                colorBoxBackground.SelectedIndex = colorBoxBackground.Items.Cast<Color>().ToList().LastIndexOf(entry.BackgroundColor);
-            }
-            else
-            {
-                colorBoxBackground.SelectedItem = entry.BackgroundColor;
-            }
-
-            checkBoxRegex.Checked = entry.IsRegex;
-            checkBoxCaseSensitive.Checked = entry.IsCaseSensitive;
-            checkBoxDontDirtyLed.Checked = entry.IsLedSwitch;
-            checkBoxBookmark.Checked = entry.IsSetBookmark;
-            checkBoxStopTail.Checked = entry.IsStopTail;
-            checkBoxPlugin.Checked = entry.IsActionEntry;
-            btnSelectPlugin.Enabled = checkBoxPlugin.Checked;
-            btnBookmarkComment.Enabled = checkBoxBookmark.Checked;
-            _currentActionEntry = entry.ActionEntry != null ? (ActionEntry)entry.ActionEntry.Clone() : new ActionEntry();
-            _bookmarkComment = entry.BookmarkComment;
-            checkBoxWordMatch.Checked = entry.IsWordMatch;
-            checkBoxBold.Checked = entry.IsBold;
-            checkBoxNoBackground.Checked = entry.NoBackground;
-        }
-
-        btnApply.Enabled = false;
-        btnApply.Image = null;
-
-        ReEvaluateHighlightButtonStates();
     }
 
     #endregion

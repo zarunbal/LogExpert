@@ -21,6 +21,7 @@
     <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
     <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
     <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+    <ProjectReference Include="..\LogExpert.Audio\LogExpert.Audio.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
 
