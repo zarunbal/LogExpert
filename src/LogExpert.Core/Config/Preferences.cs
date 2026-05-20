@@ -36,6 +36,11 @@ public class Preferences
     public bool PortableMode { get; set; }
 
     /// <summary>
+    /// Settings controlling display substitution of ASCII control characters (C0 + DEL) in the log grid.
+    /// </summary>
+    public ControlCharSettings ControlCharSettings { get; set; } = new();
+
+    /// <summary>
     /// OBSOLETE: This setting is no longer used. It was originally intended to show an error dialog when "Allow Only
     /// One Instance" was enabled, but this behavior was incorrect (showed dialog on success instead of failure). The
     /// feature now works silently on success and only shows a warning on IPC failure. This property is kept for
