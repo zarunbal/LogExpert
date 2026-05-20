@@ -34,6 +34,11 @@ public class ToolWindowCoordinatorTests : IDisposable
 
         _configManagerMock = new Mock<IConfigManager>();
         _settings = new Settings();
+
+        // Materialize Font from FontString (mirrors ConfigManager.InitializeFont)
+        var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(Font));
+        _settings.Preferences.Font = (Font)converter.ConvertFromInvariantString(_settings.Preferences.FontString)!;
+
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
 
         _coordinator = new ToolWindowCoordinator(_configManagerMock.Object);
