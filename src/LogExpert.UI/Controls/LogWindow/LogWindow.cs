@@ -22,6 +22,7 @@ using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
+using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -3499,10 +3500,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             hme.HighlightEntry.IsBold = groundEntry.IsBold;
         }
 
-        matchList = MergeHighlightMatchEntries(matchList, hme);
-
-        //var leftPad = e.CellStyle.Padding.Left;
-        //RectangleF rect = new(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
+        // Build render segments (substitution-aware) and combine with the highlight match
+        // list to produce paint-ready segments. When ControlCharSettings.Substitute is
+        // false the renderer returns a single raw segment, so this path produces the same
+        // visual output as the legacy MergeHighlightMatchEntries-based loop.
+        var controlCharSettings = Preferences.ControlCharSettings ?? new Core.Config.ControlCharSettings();
+        var rawText = column.DisplayValue.ToString();
+        var renderSegments = ControlCharRenderer.Render(rawText, controlCharSettings);
+        var paintSegments = SubstitutedHighlightSegmenter.Combine(
+            renderSegments,
+            matchList,
+            hme.HighlightEntry,
+            controlCharSettings);
 
         var borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
         var valBounds = e.CellBounds;
@@ -3525,31 +3534,29 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 | TextFormatFlags.VerticalCenter
                 | TextFormatFlags.TextBoxControl;
 
-        //          | TextFormatFlags.VerticalCenter
-        //          | TextFormatFlags.TextBoxControl
-        //          TextFormatFlags.SingleLine
-
-        //TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-
         var wordPos = valBounds.Location;
         Size proposedSize = new(valBounds.Width, valBounds.Height);
 
         e.Graphics.SetClip(e.CellBounds);
 
-        foreach (var matchEntry in matchList)
+        foreach (var segment in paintSegments)
         {
-            var font = matchEntry != null && matchEntry.HighlightEntry.IsBold ? BoldFont : NormalFont;
+            var font = segment.IsBold ? BoldFont : NormalFont;
+            // Italic only applies to substituted glyphs; raw runs never set it.
+            if (segment.IsItalic)
+            {
+                font = new Font(font, font.Style | FontStyle.Italic);
+            }
 
-            using var bgBrush = matchEntry.HighlightEntry.BackgroundColor != Color.Empty
-                ? new SolidBrush(matchEntry.HighlightEntry.BackgroundColor)
+            using var bgBrush = segment.BackColor != Color.Empty
+                ? new SolidBrush(segment.BackColor)
                 : null;
 
-            var matchWord = column.DisplayValue.Slice(matchEntry.StartPos, matchEntry.Length);
-            var wordSize = TextRenderer.MeasureText(e.Graphics, matchWord.ToString(), font, proposedSize, flags);
+            var wordSize = TextRenderer.MeasureText(e.Graphics, segment.RenderedText, font, proposedSize, flags);
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
-            var foreColor = matchEntry.HighlightEntry.ForegroundColor;
+            var foreColor = segment.ForeColor;
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
             {
                 if (foreColor.Equals(Color.Black))
@@ -3559,14 +3566,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             else
             {
-                if (bgBrush != null && !matchEntry.HighlightEntry.NoBackground)
+                if (bgBrush != null && !segment.NoBackground)
                 {
                     e.Graphics.FillRectangle(bgBrush, wordRect);
                 }
             }
 
-            TextRenderer.DrawText(e.Graphics, matchWord.ToString(), font, wordRect, foreColor, flags);
+            TextRenderer.DrawText(e.Graphics, segment.RenderedText, font, wordRect, foreColor, flags);
             wordPos.Offset(wordSize.Width, 0);
+
+            if (segment.IsItalic)
+            {
+                font.Dispose();
+            }
         }
     }
 
