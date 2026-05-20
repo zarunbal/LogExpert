@@ -233,4 +233,25 @@ public class ControlCharRendererTests
         Assert.That(segments[2].RenderedText, Is.EqualTo("c"));
         Assert.That(segments[2].SourceStart, Is.EqualTo(4));
     }
+
+    [Test]
+    public void HasAnyEnabledCodepoint_NoMatch_ReturnsFalse ()
+    {
+        var enabled = new HashSet<int> { 0x01, 0x07 };
+        Assert.That(ControlCharRenderer.HasAnyEnabledCodepoint("plain text", enabled), Is.False);
+    }
+
+    [Test]
+    public void HasAnyEnabledCodepoint_OneMatch_ReturnsTrue ()
+    {
+        var enabled = new HashSet<int> { 0x01 };
+        Assert.That(ControlCharRenderer.HasAnyEnabledCodepoint("a\u0001b", enabled), Is.True);
+    }
+
+    [Test]
+    public void HasAnyEnabledCodepoint_EmptyOrNullSet_ReturnsFalse ()
+    {
+        Assert.That(ControlCharRenderer.HasAnyEnabledCodepoint("a\u0001b", []), Is.False);
+        Assert.That(ControlCharRenderer.HasAnyEnabledCodepoint("a\u0001b", null!), Is.False);
+    }
 }

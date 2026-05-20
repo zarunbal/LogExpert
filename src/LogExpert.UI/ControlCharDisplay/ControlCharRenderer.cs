@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using LogExpert.Core.Config;
@@ -53,5 +54,28 @@ internal static class ControlCharRenderer
         }
 
         return segments;
+    }
+
+    /// <summary>
+    /// Cheap pre-scan used by paint code to decide whether to take the substitution path.
+    /// Returns true when at least one character in <paramref name="text"/> is contained in
+    /// <paramref name="enabledCodepoints"/>.
+    /// </summary>
+    public static bool HasAnyEnabledCodepoint (ReadOnlySpan<char> text, HashSet<int> enabledCodepoints)
+    {
+        if (enabledCodepoints is null || enabledCodepoints.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (char c in text)
+        {
+            if (enabledCodepoints.Contains(c))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
