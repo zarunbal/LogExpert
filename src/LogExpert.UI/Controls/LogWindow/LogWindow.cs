@@ -5357,9 +5357,25 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void CopyMarkedLinesToClipboard ()
     {
+        var clipboardSettings = Preferences.ControlCharSettings ?? new ControlCharSettings();
+        bool transformDisplayedForm = clipboardSettings.Substitute && clipboardSettings.CopyDisplayedForm;
+
         if (_guiStateArgs.CellSelectMode)
         {
             var data = dataGridView.GetClipboardContent();
+            if (transformDisplayedForm && data is not null)
+            {
+                // Replace the UnicodeText payload with the substituted form. Default
+                // EnabledCodepoints exclude TAB/LF/CR so the grid's cell/line separators
+                // are preserved; users who opt in to those codepoints will see those
+                // separators substituted too.
+                if (data.TryGetData<string>(DataFormats.UnicodeText, out var unicodeText))
+                {
+                    var transformed = SubstitutedClipboardBuilder.Build(unicodeText.AsSpan(), 0, unicodeText.Length, clipboardSettings);
+                    data = new DataObject(DataFormats.UnicodeText, transformed);
+                }
+            }
+
             Clipboard.SetDataObject(data);
         }
         else
@@ -5386,7 +5402,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                 }
 
-                _ = clipText.AppendLine(line.ToClipBoardText());
+                if (transformDisplayedForm)
+                {
+                    var rawLine = line.FullLine;
+                    var substituted = SubstitutedClipboardBuilder.Build(
+                        rawLine.Span, 0, rawLine.Length, clipboardSettings);
+                    _ = clipText.Append('\t')
+                        .Append(line.LineNumber + 1)
+                        .Append('\t')
+                        .AppendLine(substituted);
+                }
+                else
+                {
+                    _ = clipText.AppendLine(line.ToClipBoardText());
+                }
             }
 
             Clipboard.SetDataObject(clipText.ToString());
