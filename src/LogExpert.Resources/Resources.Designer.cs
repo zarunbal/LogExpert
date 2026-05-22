@@ -1923,6 +1923,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sysout for the Tool was configured, but there is no active logfile the Tool will be started without the Sysout Pipe.
+        /// </summary>
+        public static string LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Plugin trust configuration updated.
         ///
         ///Restart LogExpert to apply changes?.

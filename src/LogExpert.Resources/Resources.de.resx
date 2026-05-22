@@ -2274,4 +2274,7 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
     <value>Angezeigte Form statt der Rohzeichen kopieren</value>
   </data>
+  <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
+    <value>Sysout für das Tool wurde konfiguriert, aber es gibt keine aktive Logdatei. Das Tool wird ohne die Sysout-Pipe gestartet</value>
+  </data>
 </root>

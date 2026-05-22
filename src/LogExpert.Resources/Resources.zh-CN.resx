@@ -2185,4 +2185,7 @@ YY[YY] = 年
   <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
     <value>复制显示的形式而不是原始字符</value>
   </data>
+  <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
+    <value>已配置该工具的 Sysout，但没有活动日志文件，该工具将在没有 Sysout 管道的情况下启动</value>
+  </data>
 </root>
