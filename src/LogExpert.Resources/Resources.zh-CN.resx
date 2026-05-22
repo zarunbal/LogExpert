@@ -2122,4 +2122,67 @@ YY[YY] = 年
   <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
     <value>（预览）</value>
   </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageControlCharacters" xml:space="preserve">
+    <value>控制字符</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable" xml:space="preserve">
+    <value>替换显示中的控制字符</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsWarning" xml:space="preserve">
+    <value>仅显示 — 不修改文件内容或影响搜索、过滤或复制到剪贴板（除非启用以下选项）。启用此功能可能会使某些日志文件看起来不寻常。</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsHint" xml:space="preserve">
+    <value>启用上面的替换以应用。</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle" xml:space="preserve">
+    <value>展示风格</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures" xml:space="preserve">
+    <value>Unicode 控制图片（默认）</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret" xml:space="preserve">
+    <value>插入符号 (^X)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape" xml:space="preserve">
+    <value>C 转义序列 (\x01)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation" xml:space="preserve">
+    <value>缩写 (&lt;SOH&gt;)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047" xml:space="preserve">
+    <value>ISO 2047 图形</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetAll" xml:space="preserve">
+    <value>全部启用</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNone" xml:space="preserve">
+    <value>全部禁用</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace" xml:space="preserve">
+    <value>非空白默认值</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance" xml:space="preserve">
+    <value>外貌</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsForeColor" xml:space="preserve">
+    <value>前景色：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsBackColor" xml:space="preserve">
+    <value>背景颜色：</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColorClear" xml:space="preserve">
+    <value>（无颜色）</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsBold" xml:space="preserve">
+    <value>粗体</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic" xml:space="preserve">
+    <value>斜体</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard" xml:space="preserve">
+    <value>剪贴板</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
+    <value>复制显示的形式而不是原始字符</value>
+  </data>
 </root>

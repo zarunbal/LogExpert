@@ -5096,6 +5096,60 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsBackColor {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsBackColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (no color).
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsBackColorClear {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsBackColorClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsForeColor {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsForeColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable all.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsPresetAll {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsPresetAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable all.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsPresetNone {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsPresetNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-whitespace defaults.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         public static string SettingsDialog_UI_Button_buttonDelete {
@@ -5227,6 +5281,42 @@ namespace LogExpert {
         public static string SettingsDialog_UI_CheckBox_checkBoxColumnSize {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxColumnSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bold.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxControlCharsBold {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxControlCharsBold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy displayed form instead of raw characters.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Substitute control characters in display.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italic.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic", resourceCulture);
             }
         }
         
@@ -5528,6 +5618,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Appearance.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clipboard.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display style.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CPU and stuff.
         /// </summary>
         public static string SettingsDialog_UI_GroupBox_groupBoxCPUAndStuff {
@@ -5668,6 +5785,42 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Label_labelArguments {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Label_labelArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background colour:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelControlCharsBackColor {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelControlCharsBackColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Foreground colour:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelControlCharsForeColor {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelControlCharsForeColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable substitution above to apply..
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelControlCharsHint {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelControlCharsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display only — does not modify file contents or affect search, filter, or copy-to-clipboard (unless the option below is enabled). Enabling this can make some log files look unusual..
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelControlCharsWarning {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelControlCharsWarning", resourceCulture);
             }
         }
         
@@ -5916,6 +6069,51 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Abbreviation (&lt;SOH&gt;).
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Caret notation (^X).
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to C escape sequence (\x01).
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unicode Control Pictures (default).
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ISO 2047 graphics.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047 {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horizontal.
         /// </summary>
         public static string SettingsDialog_UI_RadioButton_radioButtonHorizMouseDrag {
@@ -6038,6 +6236,15 @@ namespace LogExpert {
         public static string SettingsDialog_UI_TabPage_tabPageColumnizers {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_TabPage_tabPageColumnizers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Control characters.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_tabPageControlCharacters {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_tabPageControlCharacters", resourceCulture);
             }
         }
         
