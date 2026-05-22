@@ -1369,12 +1369,9 @@ internal partial class SettingsDialog : Form
         s.Style = GetSelectedStyle();
 
         var newSet = new HashSet<int>();
-        foreach (var kvp in _controlCharsEnabledByCp)
+        foreach (var kvp in _controlCharsEnabledByCp.Where(kvp => kvp.Value))
         {
-            if (kvp.Value)
-            {
-                _ = newSet.Add(kvp.Key);
-            }
+            _ = newSet.Add(kvp.Key);
         }
 
         s.EnabledCodepoints = newSet;

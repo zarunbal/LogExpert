@@ -5363,17 +5363,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (_guiStateArgs.CellSelectMode)
         {
             var data = dataGridView.GetClipboardContent();
-            if (transformDisplayedForm && data is not null)
+
+            // Replace the UnicodeText payload with the substituted form. Default
+            // EnabledCodepoints exclude TAB/LF/CR so the grid's cell/line separators
+            // are preserved; users who opt in to those codepoints will see those
+            // separators substituted too.
+            if (transformDisplayedForm && data is not null && data.TryGetData<string>(DataFormats.UnicodeText, out var unicodeText))
             {
-                // Replace the UnicodeText payload with the substituted form. Default
-                // EnabledCodepoints exclude TAB/LF/CR so the grid's cell/line separators
-                // are preserved; users who opt in to those codepoints will see those
-                // separators substituted too.
-                if (data.TryGetData<string>(DataFormats.UnicodeText, out var unicodeText))
-                {
-                    var transformed = SubstitutedClipboardBuilder.Build(unicodeText.AsSpan(), 0, unicodeText.Length, clipboardSettings);
-                    data = new DataObject(DataFormats.UnicodeText, transformed);
-                }
+                var transformed = SubstitutedClipboardBuilder.Build(unicodeText.AsSpan(), 0, unicodeText.Length, clipboardSettings);
+                data = new DataObject(DataFormats.UnicodeText, transformed);
             }
 
             Clipboard.SetDataObject(data);
