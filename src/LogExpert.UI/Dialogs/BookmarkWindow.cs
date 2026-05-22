@@ -195,11 +195,11 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
         HideIfNeeded();
     }
 
-    public void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)
+    public void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
-            SetFont(fontName, fontSize);
+            SetFont(font);
             if (bookmarkDataGridView.Columns.Count > 1 && setLastColumnWidth)
             {
                 bookmarkDataGridView.Columns[bookmarkDataGridView.Columns.Count - 1].MinimumWidth = lastColumnWidth;
@@ -269,9 +269,8 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     #region Private Methods
 
-    private void SetFont (string fontName, float fontSize)
+    private void SetFont (Font font)
     {
-        Font font = new(new FontFamily(fontName), fontSize);
         bookmarkDataGridView.DefaultCellStyle.Font = font;
         bookmarkDataGridView.RowTemplate.Height = font.Height + 4;
         bookmarkDataGridView.Refresh();

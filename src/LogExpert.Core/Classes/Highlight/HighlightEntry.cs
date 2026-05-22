@@ -59,7 +59,7 @@ public class HighlightEntry () : ICloneable
                     ? RegexHelper.GetOrCreateCached(SearchText, IsCaseSensitive
                         ? RegexOptions.None
                         : RegexOptions.IgnoreCase)
-                    : RegexHelper.GetOrCreateCached(System.Text.RegularExpressions.Regex.Escape(SearchText),
+                    : RegexHelper.GetOrCreateCached(Regex.Escape(SearchText),
                                 IsCaseSensitive
                                 ? RegexOptions.None
                                 : RegexOptions.IgnoreCase);
@@ -75,6 +75,25 @@ public class HighlightEntry () : ICloneable
     public bool IsSearchHit { get; set; }
 
     public bool IsBold { get; set; }
+
+    /// <summary>
+    /// When true, a sound is played whenever a newly tailed line matches this
+    /// entry. The sound is throttled globally across all log windows; see
+    /// <see cref="CooldownSeconds"/>.
+    /// </summary>
+    public bool AlertOnHit { get; set; }
+
+    /// <summary>
+    /// Absolute path to an audio file to play when <see cref="AlertOnHit"/> fires.
+    /// When empty or null, the Windows default beep is played instead.
+    /// </summary>
+    public string SoundFilePath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Minimum seconds between two alert plays (process-wide, across all
+    /// highlight entries and log windows). <c>0</c> disables throttling.
+    /// </summary>
+    public int CooldownSeconds { get; set; } = 2;
 
     public bool NoBackground { get; set; }
 
@@ -94,6 +113,9 @@ public class HighlightEntry () : ICloneable
             ActionEntry = ActionEntry != null ? (ActionEntry)ActionEntry.Clone() : null,
             IsWordMatch = IsWordMatch,
             IsBold = IsBold,
+            AlertOnHit = AlertOnHit,
+            SoundFilePath = SoundFilePath,
+            CooldownSeconds = CooldownSeconds,
             BookmarkComment = BookmarkComment,
             NoBackground = NoBackground,
             IsSearchHit = IsSearchHit

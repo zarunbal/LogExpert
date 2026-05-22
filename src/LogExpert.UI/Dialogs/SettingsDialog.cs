@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security;
@@ -10,6 +11,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
+using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions;
@@ -25,10 +27,36 @@ internal partial class SettingsDialog : Form
 
     private readonly Image _emptyImage = new Bitmap(16, 16);
     private readonly LogTabWindow _logTabWin;
-    private const string DEFAULT_FONT_NAME = "Courier New";
+    private const float DEFAULT_FONT_SIZE = 9.0f;
 
     private ILogExpertPluginConfigurator _selectedPlugin;
     private ToolEntry _selectedTool;
+
+    private Color _controlCharsForeColor;
+    private Color _controlCharsBackColor;
+    private readonly Dictionary<int, bool> _controlCharsEnabledByCp = new(33);
+
+    // Codepoint set displayed in the grid (C0 + DEL, 33 rows).
+    private static readonly int[] _allDisplayableControlCps = [.. Enumerable.Range(0, 32), 0x7F];
+
+    // Friendly metadata for the grid; tooltip uses the formal Unicode name.
+    private static readonly (string Abbr, string Name)[] _controlCharMeta =
+    [
+        ("NUL", "NULL"), ("SOH", "START OF HEADING"), ("STX", "START OF TEXT"),
+        ("ETX", "END OF TEXT"), ("EOT", "END OF TRANSMISSION"), ("ENQ", "ENQUIRY"),
+        ("ACK", "ACKNOWLEDGE"), ("BEL", "BELL"), ("BS", "BACKSPACE"),
+        ("HT", "HORIZONTAL TABULATION"), ("LF", "LINE FEED"), ("VT", "VERTICAL TABULATION"),
+        ("FF", "FORM FEED"), ("CR", "CARRIAGE RETURN"), ("SO", "SHIFT OUT"),
+        ("SI", "SHIFT IN"), ("DLE", "DATA LINK ESCAPE"), ("DC1", "DEVICE CONTROL ONE"),
+        ("DC2", "DEVICE CONTROL TWO"), ("DC3", "DEVICE CONTROL THREE"),
+        ("DC4", "DEVICE CONTROL FOUR"), ("NAK", "NEGATIVE ACKNOWLEDGE"),
+        ("SYN", "SYNCHRONOUS IDLE"), ("ETB", "END OF TRANSMISSION BLOCK"),
+        ("CAN", "CANCEL"), ("EM", "END OF MEDIUM"), ("SUB", "SUBSTITUTE"),
+        ("ESC", "ESCAPE"), ("FS", "FILE SEPARATOR"), ("GS", "GROUP SEPARATOR"),
+        ("RS", "RECORD SEPARATOR"), ("US", "UNIT SEPARATOR"),
+        // index 32 maps to 0x7F
+        ("DEL", "DELETE"),
+    ];
 
     #endregion
 
@@ -118,16 +146,6 @@ internal partial class SettingsDialog : Form
     private void FillDialog ()
     {
         Preferences ??= new Preferences();
-
-        if (Preferences.FontName == null)
-        {
-            Preferences.FontName = DEFAULT_FONT_NAME;
-        }
-
-        if (Math.Abs(Preferences.FontSize) < 0.1)
-        {
-            Preferences.FontSize = 9.0f;
-        }
 
         FillPortableMode();
 
@@ -244,13 +262,18 @@ internal partial class SettingsDialog : Form
         checkBoxColumnFinder.Checked = Preferences.ShowColumnFinder;
 
         checkBoxShowErrorMessageOnlyOneInstance.Checked = Preferences.ShowErrorMessageAllowOnlyOneInstances;
+
+        FillControlCharsTab();
     }
 
     private void FillReaderTypeList ()
     {
         foreach (var readerType in Enum.GetValues<ReaderType>())
         {
-            _ = comboBoxReaderType.Items.Add(readerType);
+            if (!comboBoxReaderType.Items.Contains(readerType))
+            {
+                _ = comboBoxReaderType.Items.Add(readerType);
+            }
         }
 
         comboBoxReaderType.SelectedItem = Preferences.ReaderType;
@@ -263,8 +286,10 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = $"{Preferences.FontName} {(int)Preferences.FontSize}";
-        labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
+        var font = Preferences.Font ?? new Font(FontFamily.GenericMonospace, DEFAULT_FONT_SIZE);
+        var style = font.Style == FontStyle.Regular ? string.Empty : $" {font.Style}";
+        labelFont.Text = $"{font.Name} {font.Size}{style}";
+        labelFont.Font = font;
     }
 
     private void SaveMultifileData ()
@@ -600,7 +625,7 @@ internal partial class SettingsDialog : Form
                 break;
         }
 
-        textBoxMultifilePattern.Text = Preferences.MultiFileOptions.FormatPattern; //TODO: Impport settings file throws an exception. Fix or I caused it?
+        textBoxMultifilePattern.Text = Preferences.MultiFileOptions.FormatPattern;
         upDownMultifileDays.Value = Preferences.MultiFileOptions.MaxDayTry;
     }
 
@@ -711,18 +736,24 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnChangeFontClick (object sender, EventArgs e)
     {
-        FontDialog dlg = new()
+        var currentFont = Preferences.Font ?? new Font(FontFamily.GenericMonospace, DEFAULT_FONT_SIZE);
+
+        using FontDialog dlg = new()
         {
-            ShowEffects = false,
+            ShowEffects = true,
             AllowVerticalFonts = false,
             AllowScriptChange = false,
-            Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize)
+            Font = currentFont
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            Preferences.FontSize = dlg.Font.Size;
-            Preferences.FontName = dlg.Font.FontFamily.Name;
+            var converter = TypeDescriptor.GetConverter(typeof(Font));
+            var selected = (Font)dlg.Font.Clone();
+
+            Preferences.Font?.Dispose();
+            Preferences.Font = selected;
+            Preferences.FontString = converter.ConvertToInvariantString(selected);
         }
 
         DisplayFontName();
@@ -774,7 +805,7 @@ internal partial class SettingsDialog : Form
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
-        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.Pipeline;
+        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.SystemDirect;
 
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
@@ -787,6 +818,7 @@ internal partial class SettingsDialog : Form
         SaveHighlightMaskList();
         GetToolListBoxData();
         SaveMultifileData();
+        SaveControlCharsTab();
     }
 
     private void OnBtnToolClick (object sender, EventArgs e)
@@ -1289,6 +1321,216 @@ internal partial class SettingsDialog : Form
             { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
             { comboBoxReaderType, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp }
         };
+    }
+
+    private void FillControlCharsTab ()
+    {
+        var s = Preferences.ControlCharSettings ??= new ControlCharSettings();
+
+        checkBoxControlCharsEnable.Checked = s.Substitute;
+        checkBoxControlCharsCopyDisplayedForm.Checked = s.CopyDisplayedForm;
+        checkBoxControlCharsBold.Checked = s.Bold;
+        checkBoxControlCharsItalic.Checked = s.Italic;
+        _controlCharsForeColor = s.ForeColor == Color.Empty ? Color.Gray : s.ForeColor;
+        _controlCharsBackColor = s.BackColor;
+
+        switch (s.Style)
+        {
+            case ControlCharStyle.Caret: radioButtonControlCharStyleCaret.Checked = true; break;
+            case ControlCharStyle.CEscape: radioButtonControlCharStyleCEscape.Checked = true; break;
+            case ControlCharStyle.Abbreviation: radioButtonControlCharStyleAbbreviation.Checked = true; break;
+            case ControlCharStyle.Iso2047: radioButtonControlCharStyleIso2047.Checked = true; break;
+            default: radioButtonControlCharStyleControlPictures.Checked = true; break;
+        }
+
+        _controlCharsEnabledByCp.Clear();
+        var enabled = s.EnabledCodepoints ?? [];
+        foreach (var cp in _allDisplayableControlCps)
+        {
+            _controlCharsEnabledByCp[cp] = enabled.Contains(cp);
+        }
+
+        PopulateControlCharsGrid();
+        UpdateColorButtons();
+        UpdateSampleAndPreview();
+        UpdateHintVisibility();
+    }
+
+    private void SaveControlCharsTab ()
+    {
+        var s = Preferences.ControlCharSettings ??= new ControlCharSettings();
+
+        s.Substitute = checkBoxControlCharsEnable.Checked;
+        s.CopyDisplayedForm = checkBoxControlCharsCopyDisplayedForm.Checked;
+        s.Bold = checkBoxControlCharsBold.Checked;
+        s.Italic = checkBoxControlCharsItalic.Checked;
+        s.ForeColor = _controlCharsForeColor;
+        s.BackColor = _controlCharsBackColor;
+        s.Style = GetSelectedStyle();
+
+        var newSet = new HashSet<int>();
+        foreach (var kvp in _controlCharsEnabledByCp.Where(kvp => kvp.Value))
+        {
+            _ = newSet.Add(kvp.Key);
+        }
+
+        s.EnabledCodepoints = newSet;
+    }
+
+    private void PopulateControlCharsGrid ()
+    {
+        var style = GetSelectedStyle();
+        dataGridViewControlChars.SuspendLayout();
+        dataGridViewControlChars.Rows.Clear();
+
+        for (var i = 0; i < _allDisplayableControlCps.Length; i++)
+        {
+            var cp = _allDisplayableControlCps[i];
+            var meta = _controlCharMeta[i];
+            var preview = ControlCharStyleFormatter.Format(cp, style);
+            var caret = cp == 0x7F ? "^?" : "^" + (char)(cp + 0x40);
+            var rowIndex = dataGridViewControlChars.Rows.Add(
+                _controlCharsEnabledByCp.TryGetValue(cp, out var on) && on,
+                "0x" + cp.ToString("X2", CultureInfo.InvariantCulture),
+                meta.Abbr,
+                caret,
+                preview);
+
+            dataGridViewControlChars.Rows[rowIndex].Tag = cp;
+            dataGridViewControlChars.Rows[rowIndex].Cells[columnControlCharAbbr.Index].ToolTipText = meta.Name;
+        }
+
+        dataGridViewControlChars.ResumeLayout();
+    }
+
+    private void OnControlCharsGridCellValueChanged (object sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0 || e.ColumnIndex != columnControlCharEnabled.Index)
+        {
+            return;
+        }
+
+        var row = dataGridViewControlChars.Rows[e.RowIndex];
+        if (row.Tag is int cp && row.Cells[columnControlCharEnabled.Index].Value is bool checkedValue)
+        {
+            _controlCharsEnabledByCp[cp] = checkedValue;
+        }
+    }
+
+    private void OnControlCharStyleChanged (object sender, EventArgs e)
+    {
+        if (sender is RadioButton rb && rb.Checked)
+        {
+            PopulateControlCharsGrid();
+            UpdateSampleAndPreview();
+        }
+    }
+
+    private void OnControlCharsEnableChanged (object sender, EventArgs e) => UpdateHintVisibility();
+
+    private void UpdateHintVisibility ()
+    {
+        labelControlCharsHint.Visible = !checkBoxControlCharsEnable.Checked;
+    }
+
+    private void ApplyPreset (IReadOnlySet<int> preset)
+    {
+        foreach (var cp in _allDisplayableControlCps)
+        {
+            _controlCharsEnabledByCp[cp] = preset.Contains(cp);
+        }
+
+        PopulateControlCharsGrid();
+    }
+
+    private ControlCharStyle GetSelectedStyle ()
+    {
+        return radioButtonControlCharStyleCaret.Checked
+            ? ControlCharStyle.Caret
+            : radioButtonControlCharStyleCEscape.Checked
+                ? ControlCharStyle.CEscape
+                : radioButtonControlCharStyleAbbreviation.Checked
+                    ? ControlCharStyle.Abbreviation
+                    : radioButtonControlCharStyleIso2047.Checked
+                        ? ControlCharStyle.Iso2047
+                        : ControlCharStyle.ControlPictures;
+    }
+
+    private void OnControlCharsPresetAllClick (object sender, EventArgs e) => ApplyPreset(ControlCharPresetProvider.All);
+
+    private void OnControlCharsPresetNoneClick (object sender, EventArgs e) => ApplyPreset(ControlCharPresetProvider.None);
+
+    private void OnControlCharsPresetNonWhitespaceClick (object sender, EventArgs e) => ApplyPreset(ControlCharPresetProvider.NonWhitespaceDefaults);
+
+    private void OnControlCharsGridCurrentCellDirtyStateChanged (object sender, EventArgs e)
+    {
+        if (dataGridViewControlChars.IsCurrentCellDirty)
+        {
+            _ = dataGridViewControlChars.CommitEdit(DataGridViewDataErrorContexts.Commit);
+        }
+    }
+
+    private void OnControlCharsBackColorClearClick (object sender, EventArgs e)
+    {
+        _controlCharsBackColor = Color.Empty;
+        UpdateColorButtons();
+        UpdateSampleAndPreview();
+    }
+
+    private void OnControlCharsBoldChanged (object sender, EventArgs e) => UpdateSampleAndPreview();
+
+    private void OnControlCharsItalicChanged (object sender, EventArgs e) => UpdateSampleAndPreview();
+
+    private void OnControlCharsForeColorClick (object sender, EventArgs e)
+    {
+        using var dlg = new ColorDialog { Color = _controlCharsForeColor == Color.Empty ? Color.Gray : _controlCharsForeColor };
+
+        if (dlg.ShowDialog(this) == DialogResult.OK)
+        {
+            _controlCharsForeColor = dlg.Color;
+            UpdateColorButtons();
+            UpdateSampleAndPreview();
+        }
+    }
+
+    private void OnControlCharsBackColorClick (object sender, EventArgs e)
+    {
+        using var dlg = new ColorDialog { Color = _controlCharsBackColor == Color.Empty ? Color.White : _controlCharsBackColor };
+        if (dlg.ShowDialog(this) == DialogResult.OK)
+        {
+            _controlCharsBackColor = dlg.Color;
+            UpdateColorButtons();
+            UpdateSampleAndPreview();
+        }
+    }
+
+    private void UpdateColorButtons ()
+    {
+        buttonControlCharsForeColor.BackColor = _controlCharsForeColor == Color.Empty ? Color.Gray : _controlCharsForeColor;
+        buttonControlCharsBackColor.BackColor = _controlCharsBackColor == Color.Empty ? SystemColors.Control : _controlCharsBackColor;
+    }
+
+    private void UpdateSampleAndPreview ()
+    {
+        var style = GetSelectedStyle();
+        // Sample renders 0x01 SOH so all styles look distinct.
+        var sample = ControlCharStyleFormatter.Format(0x01, style);
+        labelControlCharsSample.Text = "abc" + sample + "def";
+        labelControlCharsSample.ForeColor = _controlCharsForeColor == Color.Empty ? Color.Gray : _controlCharsForeColor;
+        labelControlCharsSample.BackColor = _controlCharsBackColor == Color.Empty ? SystemColors.Control : _controlCharsBackColor;
+
+        var fontStyle = FontStyle.Regular;
+        if (checkBoxControlCharsBold.Checked)
+        {
+            fontStyle |= FontStyle.Bold;
+        }
+
+        if (checkBoxControlCharsItalic.Checked)
+        {
+            fontStyle |= FontStyle.Italic;
+        }
+
+        labelControlCharsSample.Font = new Font(FontFamily.GenericMonospace, 12f, fontStyle);
     }
 
     #endregion

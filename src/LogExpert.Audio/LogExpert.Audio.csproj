@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>LogExpert.Audio</RootNamespace>
+    <AssemblyTitle>LogExpert.Audio</AssemblyTitle>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" />
+    <PackageReference Include="NLog" />
+  </ItemGroup>
+
+</Project>
