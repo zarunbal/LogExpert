@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using ColumnizerLib;
 using ColumnizerLib.Extensions;
 
+using LogExpert.Audio;
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Bookmark;
@@ -21,6 +22,7 @@ using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
+using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
@@ -821,10 +823,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         var setLastColumnWidth = Preferences.SetLastColumnWidth;
         var lastColumnWidth = Preferences.LastColumnWidth;
-        var fontName = Preferences.FontName;
-        var fontSize = Preferences.FontSize;
 
-        PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
+        PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2948,10 +2948,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         var setLastColumnWidth = Preferences.SetLastColumnWidth;
         var lastColumnWidth = Preferences.LastColumnWidth;
-        var fontName = Preferences.FontName;
-        var fontSize = Preferences.FontSize;
 
-        PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
+        PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
         //LoadPersistenceData();
     }
 
@@ -3170,6 +3168,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var matchingList = FindMatchingHighlightEntries(line);
                 LaunchHighlightPlugins(matchingList, i);
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
+                TriggerAudioAlert(matchingList);
                 if (setBookmark)
                 {
                     var capturedLineNum = i;
@@ -3221,6 +3220,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var matchingList = FindMatchingHighlightEntries(line);
                     LaunchHighlightPlugins(matchingList, i);
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
+                    TriggerAudioAlert(matchingList);
                     if (setBookmark)
                     {
                         var capturedLineNum = i;
@@ -3430,7 +3430,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _ = columnComboBox.Items.Add(columnName);
         }
 
-        columnComboBox.SelectedIndex = 0;
+        if (columnComboBox.Items.Count > 0)
+        {
+            columnComboBox.SelectedIndex = 0;
+        }
 
         OnColumnizerChanged(CurrentColumnizer);
     }
@@ -3440,6 +3443,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             gridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            AdjustColumnWidthsForControlCharSubstitution(gridView);
             if (gridView.Columns.Count > 1 && Preferences.SetLastColumnWidth &&
                 gridView.Columns[gridView.Columns.Count - 1].Width < Preferences.LastColumnWidth
             )
@@ -3456,6 +3460,76 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             // There are some rare situations with null ref exceptions when resizing columns and on filter finished
             // So catch them here. Better than crashing.
             _logger.Error($"Error while resizing columns: {e}");
+        }
+    }
+
+    /// <summary>
+    /// DataGridView's built-in auto-resize measures the cell <c>Value</c> (raw text). When
+    /// control-character substitution is enabled, substituted glyphs render wider than the
+    /// original 1-character control bytes, so columns under-measure and clip. This routine
+    /// walks the displayed rows, measures the rendered (post-substitution) string for each
+    /// cell, and grows the column width when needed.
+    /// </summary>
+    private void AdjustColumnWidthsForControlCharSubstitution (BufferedDataGridView gridView)
+    {
+        var settings = Preferences.ControlCharSettings;
+        if (settings is null || !settings.Substitute || settings.EnabledCodepoints is null || settings.EnabledCodepoints.Count == 0)
+        {
+            return;
+        }
+
+        int firstRow = gridView.FirstDisplayedScrollingRowIndex;
+        if (firstRow < 0)
+        {
+            return;
+        }
+
+        int displayed = gridView.DisplayedRowCount(true);
+        if (displayed <= 0)
+        {
+            return;
+        }
+
+        int lastRow = Math.Min(firstRow + displayed, gridView.RowCount) - 1;
+
+        for (int colIndex = 0; colIndex < gridView.ColumnCount; colIndex++)
+        {
+            var gridColumn = gridView.Columns[colIndex];
+            int requiredWidth = gridColumn.Width;
+
+            for (int rowIndex = firstRow; rowIndex <= lastRow; rowIndex++)
+            {
+                var cellValue = gridView.Rows[rowIndex].Cells[colIndex].Value;
+                if (cellValue is not IColumnMemory mem || mem.DisplayValue.IsEmpty)
+                {
+                    continue;
+                }
+
+                if (!ControlCharRenderer.HasAnyEnabledCodepoint(mem.DisplayValue.Span, settings.EnabledCodepoints))
+                {
+                    continue;
+                }
+
+                var rendered = ControlCharRenderer.Render(mem.DisplayValue.ToString(), settings);
+                var sb = new System.Text.StringBuilder(mem.DisplayValue.Length + 8);
+                foreach (var seg in rendered)
+                {
+                    _ = sb.Append(seg.RenderedText);
+                }
+
+                var size = TextRenderer.MeasureText(sb.ToString(), NormalFont);
+                // Match the padding DataGridView uses for DisplayedCells auto-size.
+                int candidate = size.Width + 9;
+                if (candidate > requiredWidth)
+                {
+                    requiredWidth = candidate;
+                }
+            }
+
+            if (requiredWidth > gridColumn.Width)
+            {
+                gridColumn.Width = requiredWidth;
+            }
         }
     }
 
@@ -3497,10 +3571,28 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             hme.HighlightEntry.IsBold = groundEntry.IsBold;
         }
 
-        matchList = MergeHighlightMatchEntries(matchList, hme);
+        // Decide path: take the cheap legacy merge when substitution is disabled or the cell
+        // contains no enabled control character (the dominant case). Otherwise build
+        // render segments and combine them with the highlight match list.
+        var controlCharSettings = Preferences.ControlCharSettings ?? new Core.Config.ControlCharSettings();
+        bool useSubstitutionPath = controlCharSettings.Substitute
+            && ControlCharRenderer.HasAnyEnabledCodepoint(column.DisplayValue.Span, controlCharSettings.EnabledCodepoints);
 
-        //var leftPad = e.CellStyle.Padding.Left;
-        //RectangleF rect = new(e.CellBounds.Left + leftPad, e.CellBounds.Top, e.CellBounds.Width, e.CellBounds.Height);
+        IReadOnlyList<PaintSegment> paintSegments;
+        if (useSubstitutionPath)
+        {
+            var rawText = column.DisplayValue.ToString();
+            var renderSegments = ControlCharRenderer.Render(rawText, controlCharSettings);
+            paintSegments = SubstitutedHighlightSegmenter.Combine(
+                renderSegments,
+                matchList,
+                hme.HighlightEntry,
+                controlCharSettings);
+        }
+        else
+        {
+            paintSegments = ToPaintSegments(MergeHighlightMatchEntries(matchList, hme), column.DisplayValue);
+        }
 
         var borderWidths = PaintHelper.BorderWidths(e.AdvancedBorderStyle);
         var valBounds = e.CellBounds;
@@ -3523,31 +3615,29 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 | TextFormatFlags.VerticalCenter
                 | TextFormatFlags.TextBoxControl;
 
-        //          | TextFormatFlags.VerticalCenter
-        //          | TextFormatFlags.TextBoxControl
-        //          TextFormatFlags.SingleLine
-
-        //TextRenderer.DrawText(e.Graphics, e.Value as String, e.CellStyle.Font, valBounds, Color.FromKnownColor(KnownColor.Black), flags);
-
         var wordPos = valBounds.Location;
         Size proposedSize = new(valBounds.Width, valBounds.Height);
 
         e.Graphics.SetClip(e.CellBounds);
 
-        foreach (var matchEntry in matchList)
+        foreach (var segment in paintSegments)
         {
-            var font = matchEntry != null && matchEntry.HighlightEntry.IsBold ? BoldFont : NormalFont;
+            var font = segment.IsBold ? BoldFont : NormalFont;
+            // Italic only applies to substituted glyphs; raw runs never set it.
+            if (segment.IsItalic)
+            {
+                font = new Font(font, font.Style | FontStyle.Italic);
+            }
 
-            using var bgBrush = matchEntry.HighlightEntry.BackgroundColor != Color.Empty
-                ? new SolidBrush(matchEntry.HighlightEntry.BackgroundColor)
+            using var bgBrush = segment.BackColor != Color.Empty
+                ? new SolidBrush(segment.BackColor)
                 : null;
 
-            var matchWord = column.DisplayValue.Slice(matchEntry.StartPos, matchEntry.Length);
-            var wordSize = TextRenderer.MeasureText(e.Graphics, matchWord.ToString(), font, proposedSize, flags);
+            var wordSize = TextRenderer.MeasureText(e.Graphics, segment.RenderedText, font, proposedSize, flags);
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
-            var foreColor = matchEntry.HighlightEntry.ForegroundColor;
+            var foreColor = segment.ForeColor;
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
             {
                 if (foreColor.Equals(Color.Black))
@@ -3557,15 +3647,43 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             else
             {
-                if (bgBrush != null && !matchEntry.HighlightEntry.NoBackground)
+                if (bgBrush != null && !segment.NoBackground)
                 {
                     e.Graphics.FillRectangle(bgBrush, wordRect);
                 }
             }
 
-            TextRenderer.DrawText(e.Graphics, matchWord.ToString(), font, wordRect, foreColor, flags);
+            TextRenderer.DrawText(e.Graphics, segment.RenderedText, font, wordRect, foreColor, flags);
             wordPos.Offset(wordSize.Width, 0);
+
+            if (segment.IsItalic)
+            {
+                font.Dispose();
+            }
         }
+    }
+
+    /// <summary>
+    /// Adapter that converts the legacy merged highlight-match list (produced by
+    /// <see cref="MergeHighlightMatchEntries"/>) into a <see cref="PaintSegment"/> list so
+    /// the unified paint loop can render it without a separate code path.
+    /// </summary>
+    private static IReadOnlyList<PaintSegment> ToPaintSegments (IList<HighlightMatchEntry> mergedMatches, ReadOnlyMemory<char> raw)
+    {
+        var result = new List<PaintSegment>(mergedMatches.Count);
+        foreach (var me in mergedMatches)
+        {
+            result.Add(new PaintSegment(
+                RenderedText: raw.Slice(me.StartPos, me.Length).ToString(),
+                ForeColor: me.HighlightEntry.ForegroundColor,
+                BackColor: me.HighlightEntry.BackgroundColor,
+                IsBold: me.HighlightEntry.IsBold,
+                IsItalic: false,
+                NoBackground: me.HighlightEntry.NoBackground,
+                IsSubstituted: false));
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -3781,6 +3899,27 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         bookmarkComment = bookmarkComment.TrimEnd(['\r', '\n']);
 
         return (noLed, stopTail, setBookmark, bookmarkComment);
+    }
+
+    /// <summary>
+    /// Fires an audio alert for the first matching highlight entry that has
+    /// <see cref="HighlightEntry.AlertOnHit"/> enabled. Iteration stops after the
+    /// first such entry; the process-wide cooldown maintained by
+    /// <see cref="AudioPlayer"/> would suppress subsequent plays anyway.
+    /// Called only from the tail trigger path.
+    /// </summary>
+    private static void TriggerAudioAlert (IList<HighlightEntry> matchingList)
+    {
+        if (matchingList == null || matchingList.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var entry in matchingList.Where(entry => entry.AlertOnHit))
+        {
+            _ = AudioPlayer.PlayThrottled(entry.SoundFilePath, entry.CooldownSeconds);
+            break;
+        }
     }
 
     private void StopTimespreadThread ()
@@ -5218,9 +5357,23 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void CopyMarkedLinesToClipboard ()
     {
+        var clipboardSettings = Preferences.ControlCharSettings ?? new ControlCharSettings();
+        bool transformDisplayedForm = clipboardSettings.Substitute && clipboardSettings.CopyDisplayedForm;
+
         if (_guiStateArgs.CellSelectMode)
         {
             var data = dataGridView.GetClipboardContent();
+
+            // Replace the UnicodeText payload with the substituted form. Default
+            // EnabledCodepoints exclude TAB/LF/CR so the grid's cell/line separators
+            // are preserved; users who opt in to those codepoints will see those
+            // separators substituted too.
+            if (transformDisplayedForm && data is not null && data.TryGetData<string>(DataFormats.UnicodeText, out var unicodeText))
+            {
+                var transformed = SubstitutedClipboardBuilder.Build(unicodeText.AsSpan(), 0, unicodeText.Length, clipboardSettings);
+                data = new DataObject(DataFormats.UnicodeText, transformed);
+            }
+
             Clipboard.SetDataObject(data);
         }
         else
@@ -5247,7 +5400,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     line = xmlColumnizer.GetLineTextForClipboard(line, callback);
                 }
 
-                _ = clipText.AppendLine(line.ToClipBoardText());
+                if (transformDisplayedForm)
+                {
+                    var rawLine = line.FullLine;
+                    var substituted = SubstitutedClipboardBuilder.Build(
+                        rawLine.Span, 0, rawLine.Length, clipboardSettings);
+                    _ = clipText.Append('\t')
+                        .Append(line.LineNumber + 1)
+                        .Append('\t')
+                        .AppendLine(substituted);
+                }
+                else
+                {
+                    _ = clipText.AppendLine(line.ToClipBoardText());
+                }
             }
 
             Clipboard.SetDataObject(clipText.ToString());
@@ -5430,7 +5596,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _patternWindow = new PatternWindow(this);
         _patternWindow.SetColumnizer(CurrentColumnizer);
         //this.patternWindow.SetBlockList(blockList);
-        _patternWindow.SetFont(Preferences.FontName, Preferences.FontSize);
+        _patternWindow.SetFont(Preferences.Font);
         _patternWindow.Fuzzy = _patternArgs.Fuzzy;
         _patternWindow.MaxDiff = _patternArgs.MaxDiffInBlock;
         _patternWindow.MaxMisses = _patternArgs.MaxMisses;
@@ -6518,7 +6684,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     return value != null && !value.DisplayValue.IsEmpty
                         ? value
-                        : value;
+                        : Column.EmptyColumn;
                 }
 
                 return columnIndex == 2
@@ -6599,7 +6765,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     return value != null && !value.DisplayValue.IsEmpty
                         ? value
-                        : value;
+                        : Column.EmptyColumn;
                 }
 
                 return columnIndex == 2
@@ -6682,6 +6848,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (line == null)
         {
+            // Fallback: prefetch a single-row range covering the requested row and retry.
+            // This handles the case where CellPainting runs before the grid's layout has
+            // populated FirstDisplayedScrollingRowIndex / DisplayedRowCount (common for
+            // very small files with only one visible row), and PrefetchVisibleLines
+            // therefore short-circuits without pinning anything.
+            var targetCache = !isFilteredGridView ? _columnCache : _filterColumnCache;
+            targetCache.Prefetch(_logFileReader, rowIndex, 1);
+            line = targetCache.GetPrefetchedLine(rowIndex);
+        }
+
+        if (line == null)
+        {
             _logger.Warn("CellPainting: null line for rowIndex={0}, isFilteredGridView={1}", rowIndex, isFilteredGridView);
 
             // Paint an empty cell with proper colors to prevent white-on-white default rendering
@@ -6740,7 +6918,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
                         using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
-                        using var font = new Font(fontName, Preferences.FontSize, FontStyle.Bold);
+                        using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }
                 }
@@ -7762,13 +7940,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    public void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
+    public void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
     {
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
-            NormalFont = new Font(new FontFamily(fontName), fontSize);
+            font ??= Preferences.Font ?? new Font(FontFamily.GenericMonospace, 9f);
+
+            NormalFont = font;
             BoldFont = new Font(NormalFont, FontStyle.Bold);
-            MonospacedFont = new Font(FONT_COURIER_NEW, Preferences.FontSize, FontStyle.Bold);
+            MonospacedFont = new Font(FONT_COURIER_NEW, NormalFont.Size, FontStyle.Bold);
 
             var lineSpacing = NormalFont.FontFamily.GetLineSpacing(FontStyle.Regular);
             var lineSpacingPixel = NormalFont.Size * lineSpacing / NormalFont.FontFamily.GetEmHeight(FontStyle.Regular);

@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LogExpert.Audio\LogExpert.Audio.csproj" />
     <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
     <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />

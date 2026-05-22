@@ -2,6 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Interfaces;
 
 using NUnit.Framework;
 
@@ -418,5 +419,27 @@ public class LogStreamReaderTest
 
         Assert.That(reader.TryReadLine(out var line2), Is.True);
         Assert.That(line2.Span.ToString(), Is.EqualTo("Line 2"));
+    }
+
+    [Test]
+    [TestCase("Line 1\nLine 2\nLine 3", 3)]
+    [TestCase("Line 1\r\nLine 2\r\nLine 3", 3)]
+    [TestCase("Line 1\rLine 2\rLine 3", 3)]
+    public void TryReadLine_LegacyReader_ReadsAllLines (string text, int expectedLines)
+    {
+        using var stream = new MemoryStream(Encoding.ASCII.GetBytes(text));
+        using var reader = new PositionAwareStreamReaderLegacy(stream, new EncodingOptions(), 500);
+
+        var memoryReader = reader as ILogStreamReaderMemory;
+        Assert.That(memoryReader, Is.Not.Null, "Legacy reader must implement ILogStreamReaderMemory");
+
+        var lineCount = 0;
+        while (memoryReader!.TryReadLine(out var lineMemory))
+        {
+            lineCount++;
+            Assert.That(lineMemory.Span.ToString(), Does.StartWith($"Line {lineCount}"));
+        }
+
+        Assert.That(lineCount, Is.EqualTo(expectedLines));
     }
 }

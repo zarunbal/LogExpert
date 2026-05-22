@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Resources", "LogE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.UI", "LogExpert.UI\LogExpert.UI.csproj", "{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Audio", "LogExpert.Audio\LogExpert.Audio.csproj", "{A8F4D2E1-7B5C-4F3A-9C2D-1E8B6A4F0D52}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.PluginRegistry", "PluginRegistry\LogExpert.PluginRegistry.csproj", "{E2D8E653-B7DF-4ACE-8314-8059B1E20751}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Columnizers", "Columnizers", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
@@ -191,6 +193,10 @@ Global
 		{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F4D2E1-7B5C-4F3A-9C2D-1E8B6A4F0D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F4D2E1-7B5C-4F3A-9C2D-1E8B6A4F0D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F4D2E1-7B5C-4F3A-9C2D-1E8B6A4F0D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F4D2E1-7B5C-4F3A-9C2D-1E8B6A4F0D52}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2D8E653-B7DF-4ACE-8314-8059B1E20751}.Release|Any CPU.ActiveCfg = Release|Any CPU

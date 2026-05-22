@@ -1226,15 +1226,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
         var lastColumnWidth = ConfigManager.Settings.Preferences.LastColumnWidth;
-        var fontName = ConfigManager.Settings.Preferences.FontName;
-        var fontSize = ConfigManager.Settings.Preferences.FontSize;
 
         foreach (var logWindow in _tabController.GetAllWindows())
         {
-            logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
+            logWindow.PreferencesChanged(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, false, flags);
         }
 
-        _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _toolWindowCoordinator.ApplyPreferences(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, flags);
 
         HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
         if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
@@ -1330,14 +1328,18 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 var argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
                 if (argLine != null)
                 {
-                    StartTool(toolEntry.Cmd, argLine, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir);
+                    StartTool(toolEntry.Cmd, argLine, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir, true);
                 }
             }
+        }
+        else
+        {
+            StartTool(toolEntry.Cmd, string.Empty, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir);
         }
     }
 
     [SupportedOSPlatform("windows")]
-    private void StartTool (string cmd, string args, bool sysoutPipe, string columnizerName, string workingDir)
+    private void StartTool (string cmd, string args, bool sysoutPipe, string columnizerName, string workingDir, bool startWithOpenLog = false)
     {
         if (string.IsNullOrEmpty(cmd))
         {
@@ -1354,7 +1356,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         process.StartInfo = startInfo;
         process.EnableRaisingEvents = true;
 
-        if (sysoutPipe)
+        if (sysoutPipe && !startWithOpenLog)
+        {
+            _ = MessageBox.Show(Resources.LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured, Resources.LogExpert_Common_UI_Title_LogExpert);
+        }
+
+        if (sysoutPipe && startWithOpenLog)
         {
             var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
@@ -1389,19 +1396,24 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
         else
         {
-            try
-            {
-                startInfo.UseShellExecute = false;
-                _ = process.Start();
-            }
-            catch (Exception e) when (e is Win32Exception or
-                                            InvalidOperationException or
-                                            ObjectDisposedException or
-                                            PlatformNotSupportedException)
-            {
-                _logger.Error(e);
-                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
-            }
+            StartExternalTool(process, startInfo);
+        }
+    }
+
+    private static void StartExternalTool (Process process, ProcessStartInfo startInfo)
+    {
+        try
+        {
+            startInfo.UseShellExecute = false;
+            _ = process.Start();
+        }
+        catch (Exception e) when (e is Win32Exception or
+                                        InvalidOperationException or
+                                        ObjectDisposedException or
+                                        PlatformNotSupportedException)
+        {
+            _logger.Error(e);
+            _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
         }
     }
 

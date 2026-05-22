@@ -100,7 +100,19 @@ internal class ColumnCache
 
     internal IColumnizedLogLineMemory GetColumnsForLine (ILogfileReader logFileReader, int lineNumber, ILogLineMemoryColumnizer columnizer, ColumnizerCallback columnizerCallback)
     {
-        if (_lastColumnizer != columnizer || (_lastLineNumber != lineNumber && _cachedColumns != null) || columnizerCallback.LineNum != lineNumber)
+        // Re-fetch when:
+        //   - the columnizer instance changed
+        //   - we are asked for a different line number
+        //   - the callback's line number is out of sync with the requested line
+        //   - the cache is empty (null) — without this, a single null fetch for a given
+        //     lineNumber poisons the cache and every subsequent call for that same line
+        //     returns null. This is visible as a permanently blank row when the grid
+        //     only displays a single row (e.g. CSV file with header + 1 data line and
+        //     header dropped by the CsvColumnizer's PreProcessLine).
+        if (_lastColumnizer != columnizer
+            || _lastLineNumber != lineNumber
+            || columnizerCallback.LineNum != lineNumber
+            || _cachedColumns == null)
         {
             _lastColumnizer = columnizer;
             _lastLineNumber = lineNumber;

@@ -112,6 +112,20 @@ public class PluginRegistry : IPluginRegistry
         return Instance;
     }
 
+    /// <summary>
+    /// Registers the assembly resolve handler so that plugin assemblies in the "plugins" subdirectory
+    /// can be found during type resolution (e.g., when deserializing settings that reference plugin types).
+    /// Must be called before any code that may trigger Type.GetType() for plugin types.
+    /// </summary>
+    public static void RegisterAssemblyResolver ()
+    {
+        AppDomain.CurrentDomain.AssemblyResolve -= ColumnizerResolveEventHandler;
+        AppDomain.CurrentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
+
+        //// Wire up the converter's assembly loader to go through validated loading
+        //LogExpert.Core.Classes.JsonConverters.ColumnizerJsonConverter.AssemblyLoader = LoadAndValidateAssembly;
+    }
+
     #endregion
 
     #region Properties

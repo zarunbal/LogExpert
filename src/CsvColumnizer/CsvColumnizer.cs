@@ -52,6 +52,9 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     {
         if (realLineNum == 0)
         {
+            // Auto-detect delimiter from the first line
+            AutoDetectDelimiter(logLine);
+
             // store for later field names and field count retrieval
             _firstLine = new CsvLogLine(logLine, 0);
 
@@ -177,7 +180,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         {
             _columnList.Clear();
             var line = _config.HasFieldNames
-                ? _firstLine
+                ? _firstLine ?? callback.GetLogLineMemory(0)
                 : callback.GetLogLineMemory(0);
 
             if (line != null)
@@ -204,6 +207,10 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                         _columnList.Add(new CsvColumn("Column " + i + 1));
                     }
                 }
+            }
+            else
+            {
+                _columnList.Add(new CsvColumn("Text"));
             }
         }
     }
@@ -288,30 +295,78 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
     #region Private Methods
 
+    /// <summary>
+    /// Auto-detects the delimiter using CsvHelper's built-in detection.
+    /// After parsing, the detected delimiter is extracted from csv.Parser.Delimiter.
+    /// </summary>
+    private void AutoDetectDelimiter (ReadOnlyMemory<char> lineContent)
+    {
+        if (lineContent.IsEmpty)
+        {
+            return;
+        }
+
+        try
+        {
+            var autoDetectedConfig = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                DetectDelimiter = true,
+                DetectDelimiterValues = [",", ";", "\t", "|"]
+            };
+
+            using CsvReader csv = new(new StringReader(lineContent.ToString()), autoDetectedConfig);
+            _ = csv.Read();
+
+            var detectedDelimiter = csv.Parser.Delimiter;
+
+            if (detectedDelimiter != _config.DelimiterChar)
+            {
+                _config.DelimiterChar = detectedDelimiter;
+                _config.ConfigureReaderConfiguration();
+            }
+        }
+        catch (CsvHelperException)
+        {
+            // If detection fails, keep the current config delimiter
+        }
+    }
+
     private ColumnizedLogLine SplitCsvLine (ILogLineMemory line)
     {
+        if (line.FullLine.IsEmpty)
+        {
+            return CreateColumnizedLogLine(line);
+        }
+
         ColumnizedLogLine cLogLine = new()
         {
             LogLine = line
         };
 
-        using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-        _ = csv.Read();
-        _ = csv.ReadHeader();
-
-        //we only read line by line and not the whole file so it is always the header
-        var records = csv.HeaderRecord;
-
-        if (records != null)
+        try
         {
-            List<Column> columns = [];
+            using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
+            _ = csv.Read();
+            _ = csv.ReadHeader();
 
-            foreach (var record in records)
+            //we only read line by line and not the whole file so it is always the header
+            var records = csv.HeaderRecord;
+
+            if (records != null)
             {
-                columns.Add(new Column { FullValue = record.AsMemory(), Parent = cLogLine });
-            }
+                List<Column> columns = [];
 
-            cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
+                foreach (var record in records)
+                {
+                    columns.Add(new Column { FullValue = record.AsMemory(), Parent = cLogLine });
+                }
+
+                cLogLine.ColumnValues = [.. columns.Select(a => a as IColumnMemory)];
+            }
+        }
+        catch (CsvHelperException)
+        {
+            return CreateColumnizedLogLine(line);
         }
 
         return cLogLine;

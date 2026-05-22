@@ -150,6 +150,7 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
 
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
         // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
+        // 192.168.1.10 - - [21/Oct/2024:12:34:56 +0000] "GET /api/v1/users HTTP/1.1" 200 1234 "https://example.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" "-"0.025 0.025
         if (!_lineRegex.IsMatch(span))
         {
             // Pattern didn't match - put entire line in request column
@@ -163,7 +164,7 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
         // a way to get group capture positions from ReadOnlySpan<char>.
         // However, GetGroupMemory() will slice the original ReadOnlyMemory,
         // so we avoid allocating strings for each captured group.
-        var lineString = logLine.ToString();
+        var lineString = logLine.FullLine.ToString();
         var match = _lineRegex.Match(lineString);
 
         if (match.Groups.Count == 10)
@@ -289,7 +290,7 @@ public partial class ClfColumnizer : ILogLineMemoryColumnizer
     /// <see cref="Regex"/> to match and extract data from log entries conforming to this structure.
     /// </remarks>
     /// <returns>A <see cref="Regex"/> instance that matches lines with the expected log entry structure.</returns>
-    [GeneratedRegex("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")")]
+    [GeneratedRegex(@"^(\S+) (\S+) (\S+) (\[[^\]]+\]) ("".*?"") (\S+) (\S+) ("".*?"") ("".*?"")")]
     private static partial Regex LineRegex ();
 
     #endregion
