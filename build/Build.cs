@@ -169,6 +169,7 @@ partial class Build : NukeBuild
                 .SetTargetPath(Solution)
                 .SetTargets("Rebuild")
                 .SetAssemblyVersion(VersionString)
+                .SetFileVersion(VersionFileString)
                 .SetInformationalVersion(VersionInformationString)
                 .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
                 .SetConfiguration(Configuration)
@@ -280,27 +281,6 @@ partial class Build : NukeBuild
         .Before(Compile)
         .Executes(() =>
         {
-            Log.Information($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
-
-            AbsolutePath assemblyInfo = SourceDirectory / "Solution Items" / "AssemblyInfo.cs";
-
-            string text = assemblyInfo.ReadAllText();
-            Regex configurationRegex = AssemblyConfiguration();
-            Regex assemblyVersionRegex = AssemblyVersion();
-            Regex assemblyFileVersionRegex = AssemblyFileVersion();
-            Regex assemblyInformationalVersionRegex = AssemblyInformationalVersion();
-
-            text = configurationRegex.Replace(text, (match) => ReplaceVersionMatch(match, $"\"{Configuration}\""));
-            text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
-            text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
-            text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
-
-            Log.Verbose("Content of AssemblyInfo.cs file");
-            Log.Verbose(text);
-            Log.Verbose("End of Content");
-
-            assemblyInfo.WriteAllText(text);
-
             SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
             {
                 if (string.IsNullOrWhiteSpace(MyVariable))
@@ -539,11 +519,6 @@ partial class Build : NukeBuild
         }
     }
 
-    private string ReplaceVersionMatch (Match match, string replacement)
-    {
-        return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
-    }
-
     private void TransformTemplateFile (AbsolutePath path, bool deleteTemplate)
     {
         string text = path.ReadAllText();
@@ -556,18 +531,6 @@ partial class Build : NukeBuild
             path.DeleteFile();
         }
     }
-
-    [GeneratedRegex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyInformationalVersion ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyVersion ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])")]
-    private static partial Regex AssemblyConfiguration ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyFileVersion ();
 
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex SFTPPlugin ();
