@@ -24,7 +24,7 @@ public class Preferences
     /// setter redirects data to the correct <see cref="HighlightGroupList"/> property. Will be removed in a future
     /// version once migration period is complete.
     /// </summary>
-    [Obsolete("This property exists only for backward compatibility with old settings files. Use HighlightGroupList instead.")]
+    [Obsolete("This property exists only for backward compatibility with old settings files. Use HighlightGroupList instead. This will be removed with version 1.50")]
     [Newtonsoft.Json.JsonProperty("hilightGroupList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore]
     public List<HighlightGroup> HilightGroupList
@@ -47,7 +47,7 @@ public class Preferences
     /// backward compatibility with old settings files but is no longer used or saved. Will be removed in a future
     /// version.
     /// </summary>
-    [Obsolete("This setting is no longer used and will be removed in a future version. The 'Allow Only One Instance' feature now works silently.")]
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'Allow Only One Instance' feature now works silently.")]
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
@@ -79,12 +79,12 @@ public class Preferences
 
     public bool DarkMode { get; set; }
 
-    [Obsolete("This setting is no longer used and will be removed in a future version. The 'UseLegacyReader' now works with ReaderType.Legacy")]
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'UseLegacyReader' now works with ReaderType.Legacy")]
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     public bool UseLegacyReader { get; set; }
 
-    public ReaderType ReaderType { get; set; } = ReaderType.System;
+    public ReaderType ReaderType { get; set; } = ReaderType.SystemDirect;
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 
@@ -163,7 +163,7 @@ public class Preferences
 
     public bool FollowTail { get; set; } = true;
 
-    [Obsolete("This setting is no longer used and will be removed in a future version. The 'FontString' will be used for Importing / Exporting the Font")]
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'FontString' will be used for Importing / Exporting the Font")]
     public string FontName { get; set; } = "Courier New";
 
     public string FontString { get; set; } = "Courier New, 9pt, style=Regular";
@@ -172,7 +172,7 @@ public class Preferences
     [Newtonsoft.Json.JsonIgnore]
     public Font Font { get; set; }
 
-    [Obsolete("This setting is no longer used and will be removed in a future version. The 'FontString' will be used for Importing / Exporting the Font")]
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'FontString' will be used for Importing / Exporting the Font")]
     public float FontSize { get => field; set => field = MathF.Round(value, 1); } = 9.0f;
 
     public List<HighlightMaskEntry> HighlightMaskList { get; set; } = [];
