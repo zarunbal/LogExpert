@@ -1,6 +1,6 @@
 using System.Runtime.Versioning;
 
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogTabWindow;
 
 namespace LogExpert.UI.Extensions.LogWindow;

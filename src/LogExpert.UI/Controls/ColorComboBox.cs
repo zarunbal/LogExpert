@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Runtime.Versioning;
 
@@ -6,12 +7,6 @@ namespace LogExpert.UI.Controls;
 [SupportedOSPlatform("windows")]
 internal class ColorComboBox : ComboBox
 {
-    #region Fields
-
-    private Color _customColor = Color.FromKnownColor(KnownColor.Black);
-
-    #endregion
-
     #region cTor
 
     public ColorComboBox ()
@@ -22,7 +17,7 @@ internal class ColorComboBox : ComboBox
         {
             Items.AddRange(
                 [
-                    _customColor,
+                    CustomColor,
                     Color.Black,
                     Color.White,
                     Color.Gray,
@@ -49,16 +44,17 @@ internal class ColorComboBox : ComboBox
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color CustomColor
     {
-        get => _customColor;
+        get;
         set
         {
-            _customColor = value;
+            field = value;
             Items.RemoveAt(0);
-            Items.Insert(0, _customColor);
+            Items.Insert(0, field);
         }
-    }
+    } = Color.FromKnownColor(KnownColor.Black);
 
     public Color SelectedColor => (Color)(SelectedIndex != -1 ? Items[SelectedIndex] : null);
 
@@ -78,13 +74,11 @@ internal class ColorComboBox : ComboBox
 
             if (e.Index == 0)
             {
-                e.Graphics.DrawString("Custom", e.Font, Brushes.Black,
-                    new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(Resources.ColorComboBox_UI_ColorComboBox_Text_Custom, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
             }
             else
             {
-                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, Brushes.Black,
-                    new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
             }
 
             if (!Enabled)
@@ -94,6 +88,7 @@ internal class ColorComboBox : ComboBox
                 e.Graphics.FillRectangle(brush, rectangle);
                 brush.Dispose();
             }
+
             e.DrawFocusRectangle();
         }
     }

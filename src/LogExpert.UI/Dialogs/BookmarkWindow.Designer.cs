@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Dialogs; 
+namespace LogExpert.Dialogs; 
 partial class BookmarkWindow {
 /// <summary>
 /// Required designer variable.
@@ -19,8 +19,7 @@ protected override void Dispose(bool disposing) {
 #region Windows Form Designer generated code
 
 /// <summary>
-/// Required method for Designer support - do not modify
-/// the contents of this method with the code editor.
+/// Required method for Designer support - do not modify the contents of this method with the code editor.
 /// </summary>
 private void InitializeComponent() {
   this.components = new System.ComponentModel.Container();
@@ -30,9 +29,10 @@ private void InitializeComponent() {
   this.removeCommentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
   this.bookmarkTextBox = new System.Windows.Forms.TextBox();
   this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-  this.bookmarkDataGridView = new LogExpert.Dialogs.BufferedDataGridView();
-  this.commentColumnCheckBox = new System.Windows.Forms.CheckBox();
-  this.label1 = new System.Windows.Forms.Label();
+  this.bookmarkDataGridView = new LogExpert.UI.Controls.BufferedDataGridView();
+  this.checkBoxCommentColumn = new System.Windows.Forms.CheckBox();
+  this.convertToManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+  this.labelComment = new System.Windows.Forms.Label();
   this.contextMenuStrip1.SuspendLayout();
   this.splitContainer1.Panel1.SuspendLayout();
   this.splitContainer1.Panel2.SuspendLayout();
@@ -44,7 +44,8 @@ private void InitializeComponent() {
   // 
   this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
         this.deleteBookmarkssToolStripMenuItem,
-        this.removeCommentsToolStripMenuItem});
+        this.removeCommentsToolStripMenuItem,
+        this.convertToManualToolStripMenuItem});
   this.contextMenuStrip1.Name = "contextMenuStrip1";
   this.contextMenuStrip1.Size = new System.Drawing.Size(186, 48);
   // 
@@ -81,6 +82,13 @@ private void InitializeComponent() {
   this.splitContainer1.Location = new System.Drawing.Point(0, 0);
   this.splitContainer1.Name = "splitContainer1";
   // 
+  // convertToManualToolStripMenuItem
+  // 
+  this.convertToManualToolStripMenuItem.Name = "convertToManualToolStripMenuItem";
+  this.convertToManualToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+  this.convertToManualToolStripMenuItem.Text = "Convert to manual";
+  this.convertToManualToolStripMenuItem.Click += new System.EventHandler(this.OnConvertToManualToolStripMenuItemClick);
+  // 
   // splitContainer1.Panel1
   // 
   this.splitContainer1.Panel1.Controls.Add(this.bookmarkDataGridView);
@@ -88,8 +96,8 @@ private void InitializeComponent() {
   // 
   // splitContainer1.Panel2
   // 
-  this.splitContainer1.Panel2.Controls.Add(this.commentColumnCheckBox);
-  this.splitContainer1.Panel2.Controls.Add(this.label1);
+  this.splitContainer1.Panel2.Controls.Add(this.checkBoxCommentColumn);
+  this.splitContainer1.Panel2.Controls.Add(this.labelComment);
   this.splitContainer1.Panel2.Controls.Add(this.bookmarkTextBox);
   this.splitContainer1.Size = new System.Drawing.Size(717, 158);
   this.splitContainer1.SplitterDistance = 517;
@@ -133,24 +141,24 @@ private void InitializeComponent() {
   // 
   // commentColumnCheckBox
   // 
-  this.commentColumnCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-  this.commentColumnCheckBox.AutoSize = true;
-  this.commentColumnCheckBox.Location = new System.Drawing.Point(7, 138);
-  this.commentColumnCheckBox.Name = "commentColumnCheckBox";
-  this.commentColumnCheckBox.Size = new System.Drawing.Size(136, 17);
-  this.commentColumnCheckBox.TabIndex = 8;
-  this.commentColumnCheckBox.Text = "Show comment column";
-  this.commentColumnCheckBox.UseVisualStyleBackColor = true;
-  this.commentColumnCheckBox.CheckedChanged += new System.EventHandler(this.OnCommentColumnCheckBoxCheckedChanged);
+  this.checkBoxCommentColumn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+  this.checkBoxCommentColumn.AutoSize = true;
+  this.checkBoxCommentColumn.Location = new System.Drawing.Point(7, 138);
+  this.checkBoxCommentColumn.Name = "checkBoxCommentColumn";
+  this.checkBoxCommentColumn.Size = new System.Drawing.Size(136, 17);
+  this.checkBoxCommentColumn.TabIndex = 8;
+  this.checkBoxCommentColumn.Text = "Show comment column";
+  this.checkBoxCommentColumn.UseVisualStyleBackColor = true;
+  this.checkBoxCommentColumn.CheckedChanged += new System.EventHandler(this.OnCommentColumnCheckBoxCheckedChanged);
   // 
   // label1
   // 
-  this.label1.AutoSize = true;
-  this.label1.Location = new System.Drawing.Point(4, 4);
-  this.label1.Name = "label1";
-  this.label1.Size = new System.Drawing.Size(104, 13);
-  this.label1.TabIndex = 7;
-  this.label1.Text = "Bookmark comment:";
+  this.labelComment.AutoSize = true;
+  this.labelComment.Location = new System.Drawing.Point(4, 4);
+  this.labelComment.Name = "labelComment";
+  this.labelComment.Size = new System.Drawing.Size(104, 13);
+  this.labelComment.TabIndex = 7;
+  this.labelComment.Text = "Bookmark comment:";
   // 
   // BookmarkWindow
   // 
@@ -184,12 +192,13 @@ private void InitializeComponent() {
 
 #endregion
 
-private BufferedDataGridView bookmarkDataGridView;
+private LogExpert.UI.Controls.BufferedDataGridView bookmarkDataGridView;
 private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
 private System.Windows.Forms.ToolStripMenuItem deleteBookmarkssToolStripMenuItem;
 private System.Windows.Forms.TextBox bookmarkTextBox;
 private System.Windows.Forms.SplitContainer splitContainer1;
-private System.Windows.Forms.Label label1;
+private System.Windows.Forms.Label labelComment;
 private System.Windows.Forms.ToolStripMenuItem removeCommentsToolStripMenuItem;
-private System.Windows.Forms.CheckBox commentColumnCheckBox;
+private System.Windows.Forms.CheckBox checkBoxCommentColumn;
+private System.Windows.Forms.ToolStripMenuItem convertToManualToolStripMenuItem;
 }

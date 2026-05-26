@@ -1,4 +1,6 @@
-﻿namespace LogExpert.Core.Structs;
+using ColumnizerLib;
+
+namespace LogExpert.Core.Structs;
 
 public struct ActEntry
 {

@@ -8,13 +8,70 @@ namespace LogExpert.Core.Config;
 [Serializable]
 public class Preferences
 {
+    /// <summary>
+    /// List of highlight groups for syntax highlighting and text coloring.
+    /// </summary>
+    /// <remarks>
+    /// Supports legacy property name "hilightGroupList" (with typo) for backward compatibility. Old settings files
+    /// using the incorrect spelling will be automatically imported.
+    /// </remarks>
+    [Newtonsoft.Json.JsonProperty("HighlightGroupList")]
+    [System.Text.Json.Serialization.JsonPropertyName("HighlightGroupList")]
     public List<HighlightGroup> HighlightGroupList { get; set; } = [];
+
+    /// <summary>
+    /// Legacy property for backward compatibility with old settings files that used the typo "hilightGroupList". This
+    /// setter redirects data to the correct <see cref="HighlightGroupList"/> property. Will be removed in a future
+    /// version once migration period is complete.
+    /// </summary>
+    [Obsolete("This property exists only for backward compatibility with old settings files. Use HighlightGroupList instead. This will be removed with version 1.50")]
+    [Newtonsoft.Json.JsonProperty("hilightGroupList", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public List<HighlightGroup> HilightGroupList
+    {
+        get => null; // Always return null so Newtonsoft.Json won't serialize this property
+        set => HighlightGroupList = value ?? [];
+    }
 
     public bool PortableMode { get; set; }
 
+    /// <summary>
+    /// Settings controlling display substitution of ASCII control characters (C0 + DEL) in the log grid.
+    /// </summary>
+    public ControlCharSettings ControlCharSettings { get; set; } = new();
+
+    /// <summary>
+    /// OBSOLETE: This setting is no longer used. It was originally intended to show an error dialog when "Allow Only
+    /// One Instance" was enabled, but this behavior was incorrect (showed dialog on success instead of failure). The
+    /// feature now works silently on success and only shows a warning on IPC failure. This property is kept for
+    /// backward compatibility with old settings files but is no longer used or saved. Will be removed in a future
+    /// version.
+    /// </summary>
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'Allow Only One Instance' feature now works silently.")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
 
+    /// <summary>
+    /// Maximum length of lines that can be read from log files at the reader level. Lines exceeding this length will be
+    /// truncated during file reading operations. This setting protects against memory issues and performance
+    /// degradation from extremely long lines.
+    /// </summary>
+    /// <remarks>
+    /// <para> This property controls line truncation at the I/O reader level before lines are processed by columnizers.
+    /// It is implemented in <see cref="Classes.Log.Streamreaders.PositionAwareStreamReaderSystem"/> and
+    /// <see cref="Classes.Log.Streamreaders.PositionAwareStreamReaderLegacy"/>. </para> <para> Related property:
+    /// <see cref="MaxDisplayLength"/> controls display-level truncation in UI columns, which must not exceed this
+    /// value. Default is 20000 characters. </para>
+    /// </remarks>
     public int MaxLineLength { get; set; } = 20000;
+
+    /// <summary>
+    /// Maximum length of text displayed in columns before truncation with "...". This is separate from
+    /// <see cref="MaxLineLength"/> which controls reader-level line reading. Must not exceed
+    /// <see cref="MaxLineLength"/>. Default is 20000 characters.
+    /// </summary>
+    public int MaxDisplayLength { get; set; } = 20000;
 
     public bool AllowOnlyOneInstance { get; set; }
 
@@ -22,11 +79,16 @@ public class Preferences
 
     public bool DarkMode { get; set; }
 
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'UseLegacyReader' now works with ReaderType.Legacy")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool UseLegacyReader { get; set; }
+
+    public ReaderType ReaderType { get; set; } = ReaderType.SystemDirect;
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 
-    public DragOrientationsEnum TimestampControlDragOrientation { get; set; } = DragOrientationsEnum.Horizontal;
+    public DragOrientations TimestampControlDragOrientation { get; set; } = DragOrientations.Horizontal;
 
     public bool TimestampControl { get; set; }
 
@@ -91,7 +153,9 @@ public class Preferences
 
     public List<ColumnizerMaskEntry> ColumnizerMaskList { get; set; } = [];
 
-    public string DefaultEncoding { get; set; }
+    public string DefaultEncoding { get; set; } = "utf-8";
+
+    public string DefaultLanguage { get; set; } = "en-US";
 
     public bool FilterSync { get; set; } = true;
 
@@ -99,9 +163,17 @@ public class Preferences
 
     public bool FollowTail { get; set; } = true;
 
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'FontString' will be used for Importing / Exporting the Font")]
     public string FontName { get; set; } = "Courier New";
 
-    public float FontSize { get; set; } = 9;
+    public string FontString { get; set; } = "Courier New, 9pt, style=Regular";
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    public Font Font { get; set; }
+
+    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'FontString' will be used for Importing / Exporting the Font")]
+    public float FontSize { get => field; set => field = MathF.Round(value, 1); } = 9.0f;
 
     public List<HighlightMaskEntry> HighlightMaskList { get; set; } = [];
 }

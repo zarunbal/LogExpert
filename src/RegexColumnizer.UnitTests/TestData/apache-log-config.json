@@ -1,0 +1,4 @@
+{
+  "Name": "Apache Access Log",
+  "Expression": "^(?<ip>\\S+)\\s+\\S+\\s+(?<user>\\S+)\\s+\\[(?<datetime>[^\\]]+)\\]\\s+\"(?<method>\\S+)\\s+(?<path>\\S+)\\s+(?<protocol>\\S+)\"\\s+(?<status>\\d+)\\s+(?<size>\\d+)"
+}

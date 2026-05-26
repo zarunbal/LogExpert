@@ -12,7 +12,7 @@ public class FilterStarter
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly ColumnizerCallback _callback;
     private readonly SortedDictionary<int, int> _filterHitDict;
@@ -45,7 +45,7 @@ public class FilterStarter
         ThreadCount = Environment.ProcessorCount * 4;
         ThreadCount = minThreads;
         ThreadPool.GetMinThreads(out _, out var completion);
-        ThreadPool.SetMinThreads(minThreads, completion);
+        _ = ThreadPool.SetMinThreads(minThreads, completion);
         ThreadPool.GetMaxThreads(out _, out _);
     }
 
@@ -65,7 +65,7 @@ public class FilterStarter
 
     #region Public methods
 
-    public async void DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
+    public async Task DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
     {
         FilterResultLines.Clear();
         LastFilterLinesList.Clear();
@@ -85,8 +85,11 @@ public class FilterStarter
         }
 
         var workStartLine = startLine;
+
         _progressLineCount = 0;
         _progressCallback = progressCallback;
+
+        var tasks = new List<Task>();
         while (workStartLine < startLine + maxCount)
         {
             if (workStartLine + interval > maxCount)
@@ -97,13 +100,17 @@ public class FilterStarter
                     break;
                 }
             }
+
             _logger.Info(CultureInfo.InvariantCulture, "FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
 
-            var filter = await Task.Run(() => DoWork(filterParams, workStartLine, interval, ThreadProgressCallback)).ConfigureAwait(false);
-            FilterDoneCallback(filter);
+            var capturedStartLine = workStartLine;
+            var capturedInterval = interval;
+
+            tasks.Add(Task.Run(() => DoWork(filterParams, capturedStartLine, capturedInterval, ThreadProgressCallback)));
             workStartLine += interval;
         }
 
+        await Task.WhenAll(tasks).ConfigureAwait(false);
         MergeResults();
     }
 
@@ -140,7 +147,7 @@ public class FilterStarter
 
         // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
         var threadFilterParams = filterParams.CloneWithCurrentColumnizer();
-        Filter filter = new((ColumnizerCallback)_callback.Clone());
+        Filter filter = new(_callback.Clone());
         lock (_filterWorkerList)
         {
             _filterWorkerList.Add(filter);
@@ -159,14 +166,6 @@ public class FilterStarter
         }
 
         return filter;
-    }
-
-    private void FilterDoneCallback (Filter filter)
-    {
-        lock (_filterReadyList)
-        {
-            _filterReadyList.Add(filter);
-        }
     }
 
     private void MergeResults ()

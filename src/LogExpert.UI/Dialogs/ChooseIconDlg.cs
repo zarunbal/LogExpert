@@ -1,5 +1,7 @@
-using LogExpert.UI.Extensions;
+using System.ComponentModel;
 using System.Runtime.Versioning;
+
+using LogExpert.UI.Extensions;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -12,7 +14,7 @@ internal partial class ChooseIconDlg : Form
 
     #region cTor
 
-    public ChooseIconDlg(string fileName)
+    public ChooseIconDlg (string fileName)
     {
         InitializeComponent();
 
@@ -20,25 +22,37 @@ internal partial class ChooseIconDlg : Form
         AutoScaleMode = AutoScaleMode.Dpi;
 
         FileName = fileName;
+
+        ApplyResources();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.ChooseIconDialog_UI_Text;
+        buttonChooseIconFile.Text = Resources.ChooseIconDialog_UI_Button_ChooseIconFile;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
     }
 
     #endregion
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string FileName { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public int IconIndex { get; set; }
 
     #endregion
 
     #region Private Methods
 
-    private void FillIconList()
+    private void FillIconList ()
     {
         iconListView.Items.Clear();
 
-        Icon[,] icons = NativeMethods.ExtractIcons(FileName);
+        var icons = NativeMethods.ExtractIcons(FileName);
 
         if (icons == null)
         {
@@ -47,26 +61,27 @@ internal partial class ChooseIconDlg : Form
 
         ImageList imageList = new();
 
-        if (icons.GetLength(0) > 0)
+        if (icons.Length > 0)
         {
-            imageList.ImageSize = icons[1, 0].Size;
+            imageList.ImageSize = icons[1][0].Size;
             iconListView.LargeImageList = imageList;
 
-            for (var i = 0; i < icons.GetLength(1); ++i)
+            for (var i = 0; i < icons[1].Length; ++i)
             {
-                imageList.Images.Add(icons[1, i]);
+                imageList.Images.Add(icons[1][i]);
                 ListViewItem item = new()
                 {
                     ImageIndex = i
                 };
-                iconListView.Items.Add(item);
+
+                _ = iconListView.Items.Add(item);
             }
         }
     }
 
-    private void DisposeIcons()
+    private void DisposeIcons ()
     {
-        ImageList imageList = iconListView.LargeImageList;
+        var imageList = iconListView.LargeImageList;
         iconListView.LargeImageList = null;
         foreach (Image image in imageList.Images)
         {
@@ -78,13 +93,13 @@ internal partial class ChooseIconDlg : Form
 
     #region Events handler
 
-    private void ChooseIconDlg_Load(object sender, EventArgs e)
+    private void ChooseIconDlg_Load (object sender, EventArgs e)
     {
         FillIconList();
         iconFileLabel.Text = FileName;
     }
 
-    private void OnButtonChooseIconFileClick(object sender, EventArgs e)
+    private void OnButtonChooseIconFileClick (object sender, EventArgs e)
     {
         OpenFileDialog dlg = new()
         {
@@ -108,7 +123,7 @@ internal partial class ChooseIconDlg : Form
         }
     }
 
-    private void OnOkButtonClick(object sender, EventArgs e)
+    private void OnOkButtonClick (object sender, EventArgs e)
     {
         IconIndex = iconListView.SelectedIndices.Count > 0 ? iconListView.SelectedIndices[0] : -1;
 

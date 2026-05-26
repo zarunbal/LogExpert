@@ -1,17 +1,19 @@
-﻿using Newtonsoft.Json;
-
 using System.Drawing;
 using System.Text.RegularExpressions;
+
+using LogExpert.Core.Helpers;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Highlight;
 
 [Serializable]
 [method: JsonConstructor]
-public class HighlightEntry() : ICloneable
+public class HighlightEntry () : ICloneable
 {
     #region Fields
 
-    [NonSerialized] private Regex regex = null;
+    [NonSerialized] private Regex _regex = null;
 
     private string _searchText = string.Empty;
 
@@ -23,7 +25,7 @@ public class HighlightEntry() : ICloneable
 
     public bool IsSetBookmark { get; set; }
 
-    public bool IsRegEx { get; set; }
+    public bool IsRegex { get; set; }
 
     public bool IsCaseSensitive { get; set; }
 
@@ -37,7 +39,7 @@ public class HighlightEntry() : ICloneable
         set
         {
             _searchText = value;
-            regex = null;
+            _regex = null;
         }
     }
 
@@ -53,39 +55,56 @@ public class HighlightEntry() : ICloneable
     {
         get
         {
-            if (regex == null)
-            {
-                if (IsRegEx)
-                {
-                    regex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                }
-                else
-                {
-                    regex = new Regex(Regex.Escape(SearchText), IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-                }
-            }
-            return regex;
+            _regex ??= IsRegex
+                    ? RegexHelper.GetOrCreateCached(SearchText, IsCaseSensitive
+                        ? RegexOptions.None
+                        : RegexOptions.IgnoreCase)
+                    : RegexHelper.GetOrCreateCached(Regex.Escape(SearchText),
+                                IsCaseSensitive
+                                ? RegexOptions.None
+                                : RegexOptions.IgnoreCase);
+
+            return _regex;
         }
     }
 
     public bool IsWordMatch { get; set; }
 
-    // highlightes search result
+    // Highlight search result
     [field: NonSerialized]
     public bool IsSearchHit { get; set; }
 
     public bool IsBold { get; set; }
 
+    /// <summary>
+    /// When true, a sound is played whenever a newly tailed line matches this
+    /// entry. The sound is throttled globally across all log windows; see
+    /// <see cref="CooldownSeconds"/>.
+    /// </summary>
+    public bool AlertOnHit { get; set; }
+
+    /// <summary>
+    /// Absolute path to an audio file to play when <see cref="AlertOnHit"/> fires.
+    /// When empty or null, the Windows default beep is played instead.
+    /// </summary>
+    public string SoundFilePath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Minimum seconds between two alert plays (process-wide, across all
+    /// highlight entries and log windows). <c>0</c> disables throttling.
+    /// </summary>
+    public int CooldownSeconds { get; set; } = 2;
+
     public bool NoBackground { get; set; }
 
-    public object Clone()
+    public object Clone ()
     {
         var highLightEntry = new HighlightEntry
         {
             SearchText = SearchText,
             ForegroundColor = ForegroundColor,
             BackgroundColor = BackgroundColor,
-            IsRegEx = IsRegEx,
+            IsRegex = IsRegex,
             IsCaseSensitive = IsCaseSensitive,
             IsLedSwitch = IsLedSwitch,
             IsStopTail = IsStopTail,
@@ -94,6 +113,9 @@ public class HighlightEntry() : ICloneable
             ActionEntry = ActionEntry != null ? (ActionEntry)ActionEntry.Clone() : null,
             IsWordMatch = IsWordMatch,
             IsBold = IsBold,
+            AlertOnHit = AlertOnHit,
+            SoundFilePath = SoundFilePath,
+            CooldownSeconds = CooldownSeconds,
             BookmarkComment = BookmarkComment,
             NoBackground = NoBackground,
             IsSearchHit = IsSearchHit

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace ColumnizerLib;
 
-namespace LogExpert;
-
+[Obsolete("This interface is deprecated. Use IColumnMemory for a memory-based implementation instead.")]
 public interface IColumn : ITextValue
 {
     #region Properties

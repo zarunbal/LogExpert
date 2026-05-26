@@ -1,62 +1,68 @@
-﻿using LogExpert;
-
-using System;
+using ColumnizerLib;
 
 namespace AutoColumnizer;
 
-public class AutoColumnizer : ILogLineColumnizer
+public class AutoColumnizer : ILogLineMemoryColumnizer
 {
     #region ILogLineColumnizer implementation
 
     public string Text => GetName();
 
-    public bool IsTimeshiftImplemented()
+    public bool IsTimeshiftImplemented ()
     {
         return true;
     }
 
-    public string GetName()
+    public string GetName ()
     {
         return "Auto Columnizer";
     }
 
-    public string GetDescription()
+    public string GetCustomName ()
+    {
+        return GetName();
+    }
+
+    public string GetDescription ()
     {
         return "Automatically find the right columnizer for any file";
     }
 
-
-    public int GetColumnCount()
+    public int GetColumnCount ()
     {
         throw new NotImplementedException();
     }
 
-    public string[] GetColumnNames()
+    public string[] GetColumnNames ()
     {
         throw new NotImplementedException();
     }
 
-    public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
 
-    public void SetTimeOffset(int msecOffset)
+    public void SetTimeOffset (int msecOffset)
     {
         throw new NotImplementedException();
     }
 
-    public int GetTimeOffset()
+    public int GetTimeOffset ()
     {
         throw new NotImplementedException();
     }
 
-    public DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         throw new NotImplementedException();
     }
 
-    public void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
     {
     }
 

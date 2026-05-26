@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace LogExpert;
+namespace ColumnizerLib;
 
 /// <summary>
 /// This callback interface is implemented by LogExpert. You can use it e.g. when implementing a
 /// context menu plugin.
 /// </summary>
+[Obsolete("This interface is deprecated. Please use ILogExpertCallbackMemory for a memory based implementation instead.")]
 public interface ILogExpertCallback : ILogLineColumnizerCallback
 {
     #region Public methods
@@ -27,7 +26,7 @@ public interface ILogExpertCallback : ILogLineColumnizerCallback
     ///   <li>The file will be deleted when closing the tab!</li>
     /// </ul>
     /// </remarks>
-    void AddTempFileTab(string fileName, string title);
+    void AddTempFileTab (string fileName, string title);
 
     /// <summary>
     /// With this function you can create a new tab and add a bunch of text lines to it.
@@ -53,13 +52,13 @@ public interface ILogExpertCallback : ILogLineColumnizerCallback
     /// will disable the "locate in original file" menu entry.
     /// </para>
     /// </remarks>
-    void AddPipedTab(IList<LineEntry> lineEntryList, string title);
+    void AddPipedTab (IList<LineEntry> lineEntryList, string title);
 
     /// <summary>
     /// Returns the title of the current tab (the tab for which the context menu plugin was called for).
     /// </summary>
     /// <returns></returns>
-    string GetTabTitle();
+    string GetTabTitle ();
 
     #endregion
 }

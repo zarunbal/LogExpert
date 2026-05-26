@@ -1,6 +1,8 @@
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.UI.Interface;
 
@@ -11,24 +13,27 @@ internal interface ILogPaintContextUI : ILogPaintContext
 {
     #region Properties
 
-    Font MonospacedFont { get; } // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+    Font MonospacedFont { get; }
+
     Font NormalFont { get; }
+
     Font BoldFont { get; }
+
     Color BookmarkColor { get; }
 
     #endregion
 
     #region Public methods
 
-    ILogLine GetLogLine(int lineNum);
+    ILogLineMemory GetLogLineMemory (int lineNum);
 
-    IColumn GetCellValue(int rowIndex, int columnIndex);
+    IColumnMemory GetCellValue (int rowIndex, int columnIndex);
 
-    Bookmark GetBookmarkForLine(int lineNum);
+    Bookmark GetBookmarkForLine (int lineNum);
 
-    HighlightEntry FindHighlightEntry(ITextValue line, bool noWordMatches);
+    HighlightEntry FindHighlightEntry (ITextValueMemory line, bool noWordMatches);
 
-    IList<HighlightMatchEntry> FindHighlightMatches(ITextValue line);
+    IList<HighlightMatchEntry> FindHighlightMatches (ITextValueMemory line);
 
     #endregion
 }

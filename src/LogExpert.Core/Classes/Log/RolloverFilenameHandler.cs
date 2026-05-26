@@ -1,5 +1,8 @@
-﻿using LogExpert.Core.Entities;
-using LogExpert.Core.Interface;
+using ColumnizerLib;
+
+using LogExpert.Core.Entities;
+using LogExpert.Core.Interfaces;
+
 using System.Collections.Generic;
 
 namespace LogExpert.Core.Classes.Log;
@@ -50,10 +53,13 @@ public class RolloverFilenameHandler
     public LinkedList<string> GetNameList(IPluginRegistry pluginRegistry)
     {
         LinkedList<string> fileList = new();
+        
         var fileName = _filenameBuilder.BuildFileName();
         var filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;
-        fileList.AddFirst(filePath);
+        _ = fileList.AddFirst(filePath);
+        
         var found = true;
+        
         while (found)
         {
             found = false;
@@ -65,11 +71,12 @@ public class RolloverFilenameHandler
                 filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
                 if (FileExists(filePath, pluginRegistry))
                 {
-                    fileList.AddFirst(filePath);
+                    _ = fileList.AddFirst(filePath);
                     found = true;
                     continue;
                 }
             }
+
             // if file with index isn't found or no index is in format pattern, decrement the current date
             if (_filenameBuilder.IsDatePattern)
             {
@@ -82,7 +89,7 @@ public class RolloverFilenameHandler
                     filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
                     if (FileExists(filePath, pluginRegistry))
                     {
-                        fileList.AddFirst(filePath);
+                        _ = fileList.AddFirst(filePath);
                         found = true;
                         break;
                     }
@@ -91,6 +98,7 @@ public class RolloverFilenameHandler
                 }
             }
         }
+
         return fileList;
     }
 
@@ -100,9 +108,15 @@ public class RolloverFilenameHandler
 
     private bool FileExists(string filePath, IPluginRegistry pluginRegistry)
     {
-        IFileSystemPlugin fs = pluginRegistry.FindFileSystemForUri(filePath);
-        ILogFileInfo info = fs.GetLogfileInfo(filePath);
-        return info.FileExists;
+        var fs = pluginRegistry.FindFileSystemForUri(filePath);
+
+        if(fs == null)
+        {
+            return false; 
+        }
+
+        var info = fs.GetLogfileInfo(filePath);
+        return info is not null && info.FileExists;
     }
 
     #endregion

@@ -1,24 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace></RootNamespace>
     <IsPackable>False</IsPackable>
-    <NoWarn>CS0649;CS0169</NoWarn>
+    <NoWarn>CS0649;CS0169;CS9107</NoWarn>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="chocolatey" Version="2.4.3" />
-    <PackageReference Include="GitVersion.Core" Version="6.3.0" />
-    <PackageReference Include="NuGet.CommandLine" Version="6.14.0">
+    <PackageReference Include="chocolatey" Version="2.7.1" />
+    <PackageReference Include="GitVersion.Core" Version="6.7.0" />
+    <PackageReference Include="Microsoft.Build" Version="18.4.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.4.0" />
+    <PackageReference Include="NuGet.CommandLine" Version="7.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Nuke.Common" Version="9.0.4" />
+    <PackageReference Include="NuGet.Packaging" Version="7.3.1" />
+    <PackageReference Include="NuGet.Versioning" Version="7.3.1" />
+    <PackageReference Include="Nuke.Common" Version="10.1.0" />
     <PackageReference Include="Nuke.GitHub" Version="7.0.0" />
-    <PackageReference Include="NUnit.ConsoleRunner" Version="3.20.1" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.22.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

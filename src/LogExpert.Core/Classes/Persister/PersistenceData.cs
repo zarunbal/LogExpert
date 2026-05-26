@@ -1,10 +1,14 @@
-using System.Text;
+using ColumnizerLib;
 
 using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Entities;
+
+using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.Persister;
 
+[Serializable]
 public class PersistenceData
 {
     public SortedList<int, Entities.Bookmark> BookmarkList { get; set; } = [];
@@ -13,11 +17,22 @@ public class PersistenceData
 
     public bool BookmarkListVisible { get; set; }
 
+    /// <summary>
+    /// The columnizer to use for this session. This property stores the entire columnizer configuration including any custom names.
+    /// </summary>
+    [JsonConverter(typeof(ColumnizerJsonConverter))]
+    public ILogLineMemoryColumnizer Columnizer { get; set; }
+
+    /// <summary>
+    /// Deprecated: Use Columnizer property instead. This is kept for backward compatibility with old session files.
+    /// </summary>
+    [Obsolete("Use Columnizer property instead. This property is kept for backward compatibility.")]
     public string ColumnizerName { get; set; }
 
     public int CurrentLine { get; set; } = -1;
 
-    public Encoding Encoding { get; set; }
+    [JsonConverter(typeof(EncodingJsonConverter))]
+    public System.Text.Encoding Encoding { get; set; }
 
     public string FileName { get; set; }
 
@@ -30,6 +45,12 @@ public class PersistenceData
     public bool FilterSaveListVisible { get; set; }
 
     public List<FilterTabData> FilterTabDataList { get; set; } = [];
+
+    /// <summary>
+    /// Selection mode for Cells
+    /// Default: false (FullRowSelect mode)
+    /// </summary>
+    public bool CellSelectMode { get; set; }
 
     public int FirstDisplayedLine { get; set; } = -1;
 

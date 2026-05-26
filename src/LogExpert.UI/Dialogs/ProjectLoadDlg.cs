@@ -1,6 +1,7 @@
-using LogExpert.Core.Enums;
-
+using System.ComponentModel;
 using System.Runtime.Versioning;
+
+using LogExpert.Core.Enums;
 
 namespace LogExpert.Dialogs;
 
@@ -13,37 +14,54 @@ internal partial class ProjectLoadDlg : Form
 
     #region cTor
 
-    public ProjectLoadDlg()
+    public ProjectLoadDlg ()
     {
-        InitializeComponent();
+        SuspendLayout();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
+
+        InitializeComponent();
+
+        ApplyResources();
+
+        ResumeLayout();
+    }
+
+    private void ApplyResources ()
+    {
+        Text = Resources.MissingFilesDialog_UI_Title;
+        labelInformational.Text = Resources.MissingFilesDialog_UI_Label_Informational;
+        labelChooseHowToProceed.Text = Resources.MissingFilesDialog_UI_Label_ChooseHowToProceed;
+        buttonCloseTabs.Text = Resources.MissingFilesDialog_UI_Button_CloseTabs;
+        buttonNewWindow.Text = Resources.MissingFilesDialog_UI_Button_NewWindow;
+        buttonIgnore.Text = Resources.MissingFilesDialog_UI_Button_Ignore;
     }
 
     #endregion
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public ProjectLoadDlgResult ProjectLoadResult { get; set; } = ProjectLoadDlgResult.Cancel;
 
     #endregion
 
     #region Events handler
 
-    private void OnButtonCloseTabsClick(object sender, EventArgs e)
+    private void OnButtonCloseTabsClick (object sender, EventArgs e)
     {
         ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
         Close();
     }
 
-    private void OnButtonNewWindowClick(object sender, EventArgs e)
+    private void OnButtonNewWindowClick (object sender, EventArgs e)
     {
         ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
         Close();
     }
 
-    private void OnButtonIgnoreClick(object sender, EventArgs e)
+    private void OnButtonIgnoreClick (object sender, EventArgs e)
     {
         ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
         Close();

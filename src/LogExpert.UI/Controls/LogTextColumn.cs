@@ -2,14 +2,8 @@ using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Controls;
 
-internal class LogTextColumn : DataGridViewColumn
+[method: SupportedOSPlatform("windows")]
+internal class LogTextColumn () : DataGridViewColumn(new LogGridCell())
 {
-    #region cTor
 
-    [SupportedOSPlatform("windows")]
-    public LogTextColumn () : base(new LogGridCell())
-    {
-    }
-
-    #endregion
 }
