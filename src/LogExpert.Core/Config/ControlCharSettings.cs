@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 using Newtonsoft.Json;
 
 namespace LogExpert.Core.Config;
 
+[Serializable]
 public sealed class ControlCharSettings
 {
     public bool Substitute { get; set; }
@@ -31,9 +30,10 @@ public sealed class ControlCharSettings
 
     internal static HashSet<int> BuildNonWhitespacePreset ()
     {
-        return Enumerable.Range(0x00, 0x20)
-            .Where(c => c is not 0x09 and not 0x0A and not 0x0D)
-            .Append(0x7F)
-            .ToHashSet();
+        return
+        [
+            .. Enumerable.Range(0x00, 0x20).Where(c => c is not 0x09 and not 0x0A and not 0x0D),
+            0x7F,
+        ];
     }
 }

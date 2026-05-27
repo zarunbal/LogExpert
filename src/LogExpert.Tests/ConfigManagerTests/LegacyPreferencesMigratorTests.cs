@@ -56,7 +56,7 @@ public class LegacyPreferencesMigratorTests
     [Test]
     public void CurrentSettings_IsNoOp ()
     {
-        var settings = new Settings { SettingsVersion = LegacyPreferencesMigrator.CurrentSettingsVersion };
+        var settings = new Settings { SettingsVersion = LegacyPreferencesMigrator.CURRENT_SETTINGS_VERSION };
         settings.Preferences.ColumnizerMaskList.Add(new ColumnizerMaskEntry
         {
             Mask = "*.log",

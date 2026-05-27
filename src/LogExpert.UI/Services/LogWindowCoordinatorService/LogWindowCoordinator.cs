@@ -124,7 +124,7 @@ internal sealed class LogWindowCoordinator (
         // GetColumnizerHistoryEntry rather than a pure name lookup inside ColumnizerResolver.
         var historyHit = GetColumnizerHistoryEntry(fileName);
 
-        var inputs = new ColumnizerResolver.ResolveInputs
+        var inputs = new ResolveInputs
         {
             Priority = preferences.ColumnizerSelectionPriority,
             FileName = fileName,

@@ -20,7 +20,7 @@ namespace LogExpert.Core.Classes.Columnizer;
 /// </remarks>
 public static class ColumnizerMaskMatcher
 {
-    private static readonly RegexOptions _options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+    private const RegexOptions OPTIONS = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
 
     public static bool Matches (ColumnizerMaskEntry entry, string fileName)
     {
@@ -35,7 +35,7 @@ public static class ColumnizerMaskMatcher
 
         try
         {
-            return Regex.IsMatch(fileName, pattern, _options);
+            return Regex.IsMatch(fileName, pattern, OPTIONS);
         }
         catch (ArgumentException)
         {
@@ -55,18 +55,12 @@ public static class ColumnizerMaskMatcher
 
         foreach (var ch in glob)
         {
-            switch (ch)
+            _ = ch switch
             {
-                case '*':
-                    _ = sb.Append(".*");
-                    break;
-                case '?':
-                    _ = sb.Append('.');
-                    break;
-                default:
-                    _ = sb.Append(Regex.Escape(ch.ToString()));
-                    break;
-            }
+                '*' => sb.Append(".*"),
+                '?' => sb.Append('.'),
+                _ => sb.Append(Regex.Escape(ch.ToString())),
+            };
         }
 
         _ = sb.Append('$');

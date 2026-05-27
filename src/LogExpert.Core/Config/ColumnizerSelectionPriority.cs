@@ -14,8 +14,8 @@ public enum ColumnizerSelectionPriority
     HistoryThenMask = 0,
 
     /// <summary>Persistence → Mask → History → AutoPick.</summary>
-    MaskThenHistory,
+    MaskThenHistory = 1,
 
     /// <summary>Mask → Persistence → History → AutoPick. A matching mask outranks the saved <c>.lxp</c> columnizer.</summary>
-    MaskOverridesPersistence,
+    MaskOverridesPersistence = 2,
 }

@@ -134,7 +134,7 @@ public class Preferences
     /// <summary>
     /// Obsolete: replaced by <see cref="ColumnizerSelectionPriority"/>. Will be removed in 1.50.
     /// During settings load, <see cref="LegacyPreferencesMigrator"/> migrates a <c>true</c> value here to
-    /// <see cref="Config.ColumnizerSelectionPriority.MaskThenHistory"/> on the new property.
+    /// <see cref="ColumnizerSelectionPriority.MaskThenHistory"/> on the new property.
     /// </summary>
     [Obsolete("Replaced by ColumnizerSelectionPriority; will be removed in 1.50.")]
     public bool MaskPrio { get; set; }

@@ -10,7 +10,7 @@ namespace LogExpert.Configuration;
 public static class LegacyPreferencesMigrator
 {
     /// <summary>Current schema version. Bumped whenever a new migration step is added.</summary>
-    public const int CurrentSettingsVersion = 1;
+    public const int CURRENT_SETTINGS_VERSION = 1;
 
     /// <summary>
     /// Migrates the given <see cref="Settings"/> in place. Returns <see langword="true"/> if any
@@ -38,12 +38,9 @@ public static class LegacyPreferencesMigrator
         // Their default-loaded value would be Glob, which would silently change behaviour. Rewrite to Regex.
         if (settings.Preferences?.ColumnizerMaskList != null)
         {
-            foreach (var entry in settings.Preferences.ColumnizerMaskList)
+            foreach (var entry in settings.Preferences.ColumnizerMaskList.Where(entry => entry != null))
             {
-                if (entry != null)
-                {
-                    entry.Type = MaskType.Regex;
-                }
+                entry.Type = MaskType.Regex;
             }
         }
 
