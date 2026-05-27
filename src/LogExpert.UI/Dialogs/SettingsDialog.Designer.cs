@@ -7,24 +7,10 @@ partial class SettingsDialog
     /// </summary>
     private System.ComponentModel.IContainer components = null;
 
-    /// <summary>
-    /// Clean up any resources being used.
-    /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && (components != null))
-        {
-            components.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-
     #region Windows Form Designer generated code
 
     /// <summary>
-    /// Required method for Designer support - do not modify
-    /// the contents of this method with the code editor.
+    /// Required method for Designer support - do not modify the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent ()
     {
@@ -101,12 +87,13 @@ partial class SettingsDialog
         labelArguments = new Label();
         textBoxArguments = new TextBox();
         tabPageColumnizers = new TabPage();
+        groupBoxColumnizerPriority = new GroupBox();
         checkBoxAutoPick = new CheckBox();
-        checkBoxMaskPrio = new CheckBox();
+        radioColumnizerPriorityHistoryThenMask = new RadioButton();
+        radioColumnizerPriorityMaskThenHistory = new RadioButton();
+        radioColumnizerPriorityMaskOverridesPersistence = new RadioButton();
         buttonDelete = new Button();
         dataGridViewColumnizer = new DataGridView();
-        dataGridViewTextBoxColumnFileMask = new DataGridViewTextBoxColumn();
-        dataGridViewComboBoxColumnColumnizer = new DataGridViewComboBoxColumn();
         tabPageHighlightMask = new TabPage();
         dataGridViewHighlightMask = new DataGridView();
         dataGridViewTextBoxColumnFileName = new DataGridViewTextBoxColumn();
@@ -188,6 +175,10 @@ partial class SettingsDialog
         toolTip = new ToolTip(components);
         buttonExport = new Button();
         buttonImport = new Button();
+        dataGridViewImageColumnColumnizerStale = new DataGridViewImageColumn();
+        dataGridViewTextBoxColumnFileMask = new DataGridViewTextBoxColumn();
+        dataGridViewComboBoxColumnColumnizerMaskType = new DataGridViewComboBoxColumn();
+        dataGridViewComboBoxColumnColumnizer = new DataGridViewComboBoxColumn();
         tabControlSettings.SuspendLayout();
         tabPageViewSettings.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).BeginInit();
@@ -206,6 +197,7 @@ partial class SettingsDialog
         tabPageExternalTools.SuspendLayout();
         groupBoxToolSettings.SuspendLayout();
         tabPageColumnizers.SuspendLayout();
+        groupBoxColumnizerPriority.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewColumnizer).BeginInit();
         tabPageHighlightMask.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewHighlightMask).BeginInit();
@@ -1058,8 +1050,7 @@ partial class SettingsDialog
         // 
         // tabPageColumnizers
         // 
-        tabPageColumnizers.Controls.Add(checkBoxAutoPick);
-        tabPageColumnizers.Controls.Add(checkBoxMaskPrio);
+        tabPageColumnizers.Controls.Add(groupBoxColumnizerPriority);
         tabPageColumnizers.Controls.Add(buttonDelete);
         tabPageColumnizers.Controls.Add(dataGridViewColumnizer);
         tabPageColumnizers.Location = new Point(4, 24);
@@ -1071,12 +1062,25 @@ partial class SettingsDialog
         tabPageColumnizers.Text = "Columnizers";
         tabPageColumnizers.UseVisualStyleBackColor = true;
         // 
+        // groupBoxColumnizerPriority
+        // 
+        groupBoxColumnizerPriority.Controls.Add(checkBoxAutoPick);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityHistoryThenMask);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityMaskThenHistory);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityMaskOverridesPersistence);
+        groupBoxColumnizerPriority.Location = new Point(4, 339);
+        groupBoxColumnizerPriority.Name = "groupBoxColumnizerPriority";
+        groupBoxColumnizerPriority.Size = new Size(500, 98);
+        groupBoxColumnizerPriority.TabIndex = 4;
+        groupBoxColumnizerPriority.TabStop = false;
+        groupBoxColumnizerPriority.Text = "Columnizer selection priority";
+        // 
         // checkBoxAutoPick
         // 
         checkBoxAutoPick.AutoSize = true;
         checkBoxAutoPick.Checked = true;
         checkBoxAutoPick.CheckState = CheckState.Checked;
-        checkBoxAutoPick.Location = new Point(530, 386);
+        checkBoxAutoPick.Location = new Point(301, 72);
         checkBoxAutoPick.Margin = new Padding(4, 5, 4, 5);
         checkBoxAutoPick.Name = "checkBoxAutoPick";
         checkBoxAutoPick.Size = new Size(192, 19);
@@ -1084,20 +1088,41 @@ partial class SettingsDialog
         checkBoxAutoPick.Text = "Automatically pick for new files";
         checkBoxAutoPick.UseVisualStyleBackColor = true;
         // 
-        // checkBoxMaskPrio
+        // radioColumnizerPriorityHistoryThenMask
         // 
-        checkBoxMaskPrio.AutoSize = true;
-        checkBoxMaskPrio.Location = new Point(213, 388);
-        checkBoxMaskPrio.Margin = new Padding(4, 5, 4, 5);
-        checkBoxMaskPrio.Name = "checkBoxMaskPrio";
-        checkBoxMaskPrio.Size = new Size(192, 19);
-        checkBoxMaskPrio.TabIndex = 4;
-        checkBoxMaskPrio.Text = "Mask has priority before history";
-        checkBoxMaskPrio.UseVisualStyleBackColor = true;
+        radioColumnizerPriorityHistoryThenMask.AutoSize = true;
+        radioColumnizerPriorityHistoryThenMask.Checked = true;
+        radioColumnizerPriorityHistoryThenMask.Location = new Point(6, 22);
+        radioColumnizerPriorityHistoryThenMask.Name = "radioColumnizerPriorityHistoryThenMask";
+        radioColumnizerPriorityHistoryThenMask.Size = new Size(189, 19);
+        radioColumnizerPriorityHistoryThenMask.TabIndex = 0;
+        radioColumnizerPriorityHistoryThenMask.TabStop = true;
+        radioColumnizerPriorityHistoryThenMask.Text = "Use history then mask (default)";
+        radioColumnizerPriorityHistoryThenMask.UseVisualStyleBackColor = true;
+        // 
+        // radioColumnizerPriorityMaskThenHistory
+        // 
+        radioColumnizerPriorityMaskThenHistory.AutoSize = true;
+        radioColumnizerPriorityMaskThenHistory.Location = new Point(6, 48);
+        radioColumnizerPriorityMaskThenHistory.Name = "radioColumnizerPriorityMaskThenHistory";
+        radioColumnizerPriorityMaskThenHistory.Size = new Size(144, 19);
+        radioColumnizerPriorityMaskThenHistory.TabIndex = 1;
+        radioColumnizerPriorityMaskThenHistory.Text = "Use mask, then history";
+        radioColumnizerPriorityMaskThenHistory.UseVisualStyleBackColor = true;
+        // 
+        // radioColumnizerPriorityMaskOverridesPersistence
+        // 
+        radioColumnizerPriorityMaskOverridesPersistence.AutoSize = true;
+        radioColumnizerPriorityMaskOverridesPersistence.Location = new Point(6, 73);
+        radioColumnizerPriorityMaskOverridesPersistence.Name = "radioColumnizerPriorityMaskOverridesPersistence";
+        radioColumnizerPriorityMaskOverridesPersistence.Size = new Size(227, 19);
+        radioColumnizerPriorityMaskOverridesPersistence.TabIndex = 2;
+        radioColumnizerPriorityMaskOverridesPersistence.Text = "Use mask, override per-file persistence";
+        radioColumnizerPriorityMaskOverridesPersistence.UseVisualStyleBackColor = true;
         // 
         // buttonDelete
         // 
-        buttonDelete.Location = new Point(12, 380);
+        buttonDelete.Location = new Point(812, 395);
         buttonDelete.Margin = new Padding(4, 5, 4, 5);
         buttonDelete.Name = "buttonDelete";
         buttonDelete.Size = new Size(112, 35);
@@ -1112,28 +1137,17 @@ partial class SettingsDialog
         dataGridViewColumnizer.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         dataGridViewColumnizer.BackgroundColor = SystemColors.ControlLight;
         dataGridViewColumnizer.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dataGridViewColumnizer.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumnFileMask, dataGridViewComboBoxColumnColumnizer });
+        dataGridViewColumnizer.Columns.AddRange(new DataGridViewColumn[] { dataGridViewImageColumnColumnizerStale, dataGridViewTextBoxColumnFileMask, dataGridViewComboBoxColumnColumnizerMaskType, dataGridViewComboBoxColumnColumnizer });
         dataGridViewColumnizer.Dock = DockStyle.Top;
         dataGridViewColumnizer.EditMode = DataGridViewEditMode.EditOnEnter;
         dataGridViewColumnizer.Location = new Point(4, 5);
         dataGridViewColumnizer.Margin = new Padding(4, 5, 4, 5);
         dataGridViewColumnizer.Name = "dataGridViewColumnizer";
         dataGridViewColumnizer.RowHeadersWidth = 62;
-        dataGridViewColumnizer.Size = new Size(934, 365);
+        dataGridViewColumnizer.Size = new Size(934, 326);
         dataGridViewColumnizer.TabIndex = 2;
-        dataGridViewColumnizer.RowsAdded += OnDataGridViewColumnizerRowsAdded;
-        // 
-        // dataGridViewTextBoxColumnFileMask
-        // 
-        dataGridViewTextBoxColumnFileMask.HeaderText = "File name mask (RegEx)";
-        dataGridViewTextBoxColumnFileMask.MinimumWidth = 40;
-        dataGridViewTextBoxColumnFileMask.Name = "dataGridViewTextBoxColumnFileMask";
-        // 
-        // dataGridViewComboBoxColumnColumnizer
-        // 
-        dataGridViewComboBoxColumnColumnizer.HeaderText = "Columnizer";
-        dataGridViewComboBoxColumnColumnizer.MinimumWidth = 230;
-        dataGridViewComboBoxColumnColumnizer.Name = "dataGridViewComboBoxColumnColumnizer";
+        dataGridViewColumnizer.DefaultValuesNeeded += OnDataGridViewColumnizerDefaultValuesNeeded;
+        dataGridViewColumnizer.CurrentCellDirtyStateChanged += OnDataGridViewColumnizerCurrentCellDirtyStateChanged;
         // 
         // tabPageHighlightMask
         // 
@@ -1348,6 +1362,7 @@ partial class SettingsDialog
         columnControlCharEnabled.MinimumWidth = 30;
         columnControlCharEnabled.Name = "columnControlCharEnabled";
         columnControlCharEnabled.Resizable = DataGridViewTriState.False;
+        columnControlCharEnabled.Width = 30;
         // 
         // columnControlCharHex
         // 
@@ -2026,6 +2041,37 @@ partial class SettingsDialog
         buttonImport.UseVisualStyleBackColor = true;
         buttonImport.Click += OnBtnImportClick;
         // 
+        // dataGridViewImageColumnColumnizerStale
+        // 
+        dataGridViewImageColumnColumnizerStale.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        dataGridViewImageColumnColumnizerStale.HeaderText = "";
+        dataGridViewImageColumnColumnizerStale.ImageLayout = DataGridViewImageCellLayout.Zoom;
+        dataGridViewImageColumnColumnizerStale.MinimumWidth = 24;
+        dataGridViewImageColumnColumnizerStale.Name = "dataGridViewImageColumnColumnizerStale";
+        dataGridViewImageColumnColumnizerStale.ReadOnly = true;
+        dataGridViewImageColumnColumnizerStale.Resizable = DataGridViewTriState.False;
+        dataGridViewImageColumnColumnizerStale.Width = 24;
+        // 
+        // dataGridViewTextBoxColumnFileMask
+        // 
+        dataGridViewTextBoxColumnFileMask.HeaderText = "File name mask";
+        dataGridViewTextBoxColumnFileMask.MinimumWidth = 40;
+        dataGridViewTextBoxColumnFileMask.Name = "dataGridViewTextBoxColumnFileMask";
+        // 
+        // dataGridViewComboBoxColumnColumnizerMaskType
+        // 
+        dataGridViewComboBoxColumnColumnizerMaskType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        dataGridViewComboBoxColumnColumnizerMaskType.HeaderText = "Type";
+        dataGridViewComboBoxColumnColumnizerMaskType.MinimumWidth = 80;
+        dataGridViewComboBoxColumnColumnizerMaskType.Name = "dataGridViewComboBoxColumnColumnizerMaskType";
+        dataGridViewComboBoxColumnColumnizerMaskType.Width = 80;
+        // 
+        // dataGridViewComboBoxColumnColumnizer
+        // 
+        dataGridViewComboBoxColumnColumnizer.HeaderText = "Columnizer";
+        dataGridViewComboBoxColumnColumnizer.MinimumWidth = 230;
+        dataGridViewComboBoxColumnColumnizer.Name = "dataGridViewComboBoxColumnColumnizer";
+        // 
         // SettingsDialog
         // 
         AcceptButton = buttonOk;
@@ -2073,7 +2119,8 @@ partial class SettingsDialog
         groupBoxToolSettings.ResumeLayout(false);
         groupBoxToolSettings.PerformLayout();
         tabPageColumnizers.ResumeLayout(false);
-        tabPageColumnizers.PerformLayout();
+        groupBoxColumnizerPriority.ResumeLayout(false);
+        groupBoxColumnizerPriority.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewColumnizer).EndInit();
         tabPageHighlightMask.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)dataGridViewHighlightMask).EndInit();
@@ -2141,10 +2188,11 @@ partial class SettingsDialog
     private System.Windows.Forms.TabPage tabPageColumnizers;
     private System.Windows.Forms.DataGridView dataGridViewColumnizer;
     private System.Windows.Forms.Button buttonDelete;
-    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileMask;
-    private System.Windows.Forms.DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizer;
     private System.Windows.Forms.CheckBox checkBoxSysout;
-    private System.Windows.Forms.CheckBox checkBoxMaskPrio;
+    private System.Windows.Forms.GroupBox groupBoxColumnizerPriority;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityHistoryThenMask;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityMaskThenHistory;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityMaskOverridesPersistence;
     private System.Windows.Forms.GroupBox groupBoxMisc;
     private System.Windows.Forms.CheckBox checkBoxAskCloseTabs;
     private System.Windows.Forms.TabPage tabPageMultiFile;
@@ -2271,4 +2319,8 @@ partial class SettingsDialog
     private DataGridViewTextBoxColumn columnControlCharAbbr;
     private DataGridViewTextBoxColumn columnControlCharCaret;
     private DataGridViewTextBoxColumn columnControlCharPreview;
+    private DataGridViewImageColumn dataGridViewImageColumnColumnizerStale;
+    private DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileMask;
+    private DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizerMaskType;
+    private DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizer;
 }

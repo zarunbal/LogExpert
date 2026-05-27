@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs.Helpers;
 
 /// <summary>
 /// Represents the result of the Missing Files Dialog interaction.

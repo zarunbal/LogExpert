@@ -6,7 +6,6 @@ using System.Text;
 
 using ColumnizerLib;
 
-using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
@@ -14,6 +13,7 @@ using LogExpert.Core.Interfaces;
 using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
+using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Extensions;
 
 namespace LogExpert.Dialogs;
@@ -26,6 +26,7 @@ internal partial class SettingsDialog : Form
     #region Fields
 
     private readonly Image _emptyImage = new Bitmap(16, 16);
+    private readonly Image _staleImage = SystemIcons.Exclamation.ToBitmap();
     private readonly LogTabWindow _logTabWin;
     private const float DEFAULT_FONT_SIZE = 9.0f;
 
@@ -74,11 +75,30 @@ internal partial class SettingsDialog : Form
 
         InitializeComponent();
 
+        dataGridViewImageColumnColumnizerStale.CellTemplate = new EmptyImageCell();
+
         LoadResources();
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         ResumeLayout();
+    }
+
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            components?.Dispose();
+            _staleImage?.Dispose();
+            _emptyImage?.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     public SettingsDialog (Preferences prefs, LogTabWindow logTabWin, int tabToOpen, IConfigManager configManager) : this(prefs, logTabWin)
@@ -139,6 +159,8 @@ internal partial class SettingsDialog : Form
 
         dataGridViewTextBoxColumnFileMask.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask;
         dataGridViewComboBoxColumnColumnizer.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer;
+        dataGridViewComboBoxColumnColumnizerMaskType.HeaderText = Resources.SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType;
+        dataGridViewComboBoxColumnColumnizerMaskType.ToolTipText = Resources.SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType;
         dataGridViewTextBoxColumnFileName.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileName;
         dataGridViewComboBoxColumnHighlightGroup.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup;
     }
@@ -212,8 +234,6 @@ internal partial class SettingsDialog : Form
                     break;
                 }
             case SessionSaveLocation.LoadedSessionFile:
-                // intentionally left blank
-                break;
             default:
                 // intentionally left blank
                 break;
@@ -252,18 +272,30 @@ internal partial class SettingsDialog : Form
         FillEncodingList();
         FillLanguageList();
         FillReaderTypeList();
+        FillControlCharsTab();
 
         comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
         comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
 
-        checkBoxMaskPrio.Checked = Preferences.MaskPrio;
+        switch (Preferences.ColumnizerSelectionPriority)
+        {
+            case ColumnizerSelectionPriority.MaskThenHistory:
+                radioColumnizerPriorityMaskThenHistory.Checked = true;
+                break;
+            case ColumnizerSelectionPriority.MaskOverridesPersistence:
+                radioColumnizerPriorityMaskOverridesPersistence.Checked = true;
+                break;
+            case ColumnizerSelectionPriority.HistoryThenMask:
+            default:
+                radioColumnizerPriorityHistoryThenMask.Checked = true;
+                break;
+        }
+
         checkBoxAutoPick.Checked = Preferences.AutoPick;
         checkBoxAskCloseTabs.Checked = Preferences.AskForClose;
         checkBoxColumnFinder.Checked = Preferences.ShowColumnFinder;
 
         checkBoxShowErrorMessageOnlyOneInstance.Checked = Preferences.ShowErrorMessageAllowOnlyOneInstances;
-
-        FillControlCharsTab();
     }
 
     private void FillReaderTypeList ()
@@ -313,65 +345,6 @@ internal partial class SettingsDialog : Form
         Preferences.MultiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
     }
 
-    private static void OnBtnToolClickInternal (TextBox textBox)
-    {
-        OpenFileDialog dlg = new()
-        {
-            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
-        };
-
-        if (!string.IsNullOrEmpty(textBox.Text))
-        {
-            FileInfo info = new(textBox.Text);
-            if (info.Directory != null && info.Directory.Exists)
-            {
-                dlg.InitialDirectory = info.DirectoryName;
-            }
-        }
-
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            textBox.Text = dlg.FileName;
-        }
-    }
-
-    //TODO: what is the purpose of this method?
-    private void OnBtnArgsClickInternal (TextBox textBox)
-    {
-        ToolArgsDialog dlg = new(_logTabWin, this)
-        {
-            Arg = textBox.Text
-        };
-
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            textBox.Text = dlg.Arg;
-        }
-    }
-
-    private static void OnBtnWorkingDirClick (TextBox textBox)
-    {
-        FolderBrowserDialog dlg = new()
-        {
-            RootFolder = Environment.SpecialFolder.MyComputer,
-            Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir
-        };
-
-        if (!string.IsNullOrEmpty(textBox.Text))
-        {
-            DirectoryInfo info = new(textBox.Text);
-            if (info.Exists)
-            {
-                dlg.SelectedPath = info.FullName;
-            }
-        }
-
-        if (dlg.ShowDialog() == DialogResult.OK)
-        {
-            textBox.Text = dlg.SelectedPath;
-        }
-    }
-
     private void FillColumnizerForToolsList ()
     {
         if (_selectedTool != null)
@@ -395,9 +368,6 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        //ILogLineColumnizer columnizer = Util.FindColumnizerByName(columnizerName, this.logTabWin.RegisteredColumnizers);
-        //if (columnizer == null)
-        //  columnizer = this.logTabWin.RegisteredColumnizers[0];
         comboBox.SelectedIndex = selIndex;
     }
 
@@ -405,46 +375,51 @@ internal partial class SettingsDialog : Form
     {
         dataGridViewColumnizer.Rows.Clear();
 
-        var comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[1];
+        var comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[3];
         comboColumn.Items.Clear();
 
-        //var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
+        var typeColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[2];
+        typeColumn.ValueType = typeof(MaskType);
+
+        if (typeColumn.Items.Count == 0)
+        {
+            _ = typeColumn.Items.Add(MaskType.Glob);
+            _ = typeColumn.Items.Add(MaskType.Regex);
+        }
 
         var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizerLookup = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var columnizer in columnizers)
         {
-            _ = comboColumn.Items.Add(columnizer.GetName());
+            var name = columnizer.GetName();
+            _ = comboColumn.Items.Add(name);
+            _ = columnizerLookup.Add(name);
         }
-        //comboColumn.DisplayMember = "Name";
-        //comboColumn.ValueMember = "Columnizer";
 
         foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
-            DataGridViewRow row = new();
-            _ = row.Cells.Add(new DataGridViewTextBoxCell());
-            DataGridViewComboBoxCell cell = new();
+            int rowIndex = dataGridViewColumnizer.Rows.Add();
+            var row = dataGridViewColumnizer.Rows[rowIndex];
 
-            foreach (var logColumnizer in columnizers)
+            row.Cells[1].Value = maskEntry.Mask;
+            row.Cells[2].Value = maskEntry.Type;
+
+            if (columnizerLookup.Contains(maskEntry.ColumnizerName))
             {
-                _ = cell.Items.Add(logColumnizer.GetName());
+                row.Cells[3].Value = maskEntry.ColumnizerName;
+                row.Cells[0].Value = _emptyImage;
             }
-
-            _ = row.Cells.Add(cell);
-            row.Cells[0].Value = maskEntry.Mask;
-            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(maskEntry.ColumnizerName,
-                PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-
-            row.Cells[1].Value = columnizer.GetName();
-            _ = dataGridViewColumnizer.Rows.Add(row);
-        }
-
-        var count = dataGridViewColumnizer.RowCount;
-
-        if (count > 0 && !dataGridViewColumnizer.Rows[count - 1].IsNewRow)
-        {
-            var comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[count - 1].Cells[1];
-            comboCell.Value = comboCell.Items[0];
+            else
+            {
+                // Stale entry — the columnizer is not registered. Mark the row but keep the original name
+                // (a future re-install of the plugin will resurrect the entry).
+                row.Cells[3].Value = maskEntry.ColumnizerName;
+                row.Cells[0].Value = _staleImage;
+                row.Cells[0].ToolTipText = string.Format(CultureInfo.CurrentCulture,
+                    Resources.SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale,
+                    maskEntry.ColumnizerName);
+            }
         }
     }
 
@@ -477,9 +452,9 @@ internal partial class SettingsDialog : Form
             _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
-            var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
+            //var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
-            currentGroup = highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
+            var currentGroup = highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
             _ = dataGridViewHighlightMask.Rows.Add(row);
@@ -489,8 +464,7 @@ internal partial class SettingsDialog : Form
 
         if (count > 0 && !dataGridViewHighlightMask.Rows[count - 1].IsNewRow)
         {
-            var comboCell =
-                (DataGridViewComboBoxCell)dataGridViewHighlightMask.Rows[count - 1].Cells[1];
+            var comboCell = (DataGridViewComboBoxCell)dataGridViewHighlightMask.Rows[count - 1].Cells[1];
             comboCell.Value = comboCell.Items[0];
         }
     }
@@ -503,11 +477,17 @@ internal partial class SettingsDialog : Form
         {
             if (!row.IsNewRow)
             {
+                var type = row.Cells[2].Value is MaskType maskType
+                    ? maskType
+                    : MaskType.Glob;
+
                 ColumnizerMaskEntry entry = new()
                 {
-                    Mask = (string)row.Cells[0].Value,
-                    ColumnizerName = (string)row.Cells[1].Value
+                    Mask = (string)row.Cells[1].Value,
+                    Type = type,
+                    ColumnizerName = (string)row.Cells[3].Value
                 };
+
                 Preferences.ColumnizerMaskList.Add(entry);
             }
         }
@@ -526,6 +506,7 @@ internal partial class SettingsDialog : Form
                     Mask = (string)row.Cells[0].Value,
                     HighlightGroupName = (string)row.Cells[1].Value
                 };
+
                 Preferences.HighlightMaskList.Add(entry);
             }
         }
@@ -774,7 +755,11 @@ internal partial class SettingsDialog : Form
 
         SaveColumnizerList();
 
-        Preferences.MaskPrio = checkBoxMaskPrio.Checked;
+        Preferences.ColumnizerSelectionPriority = radioColumnizerPriorityMaskOverridesPersistence.Checked
+            ? ColumnizerSelectionPriority.MaskOverridesPersistence
+            : radioColumnizerPriorityMaskThenHistory.Checked
+                ? ColumnizerSelectionPriority.MaskThenHistory
+                : ColumnizerSelectionPriority.HistoryThenMask;
         Preferences.AutoPick = checkBoxAutoPick.Checked;
         Preferences.AskForClose = checkBoxAskCloseTabs.Checked;
         Preferences.AllowOnlyOneInstance = checkBoxSingleInstance.Checked;
@@ -823,22 +808,54 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnToolClick (object sender, EventArgs e)
     {
-        OnBtnToolClickInternal(textBoxTool);
+        OpenFileDialog dlg = new()
+        {
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
+
+        if (!string.IsNullOrEmpty(textBoxTool.Text))
+        {
+            FileInfo info = new(textBoxTool.Text);
+            if (info.Directory != null && info.Directory.Exists)
+            {
+                dlg.InitialDirectory = info.DirectoryName;
+            }
+        }
+
+        if (dlg.ShowDialog() == DialogResult.OK)
+        {
+            textBoxTool.Text = dlg.FileName;
+        }
     }
 
-    //TODO: what is the purpose of this click?
     private void OnBtnArgClick (object sender, EventArgs e)
     {
-        OnBtnArgsClickInternal(textBoxArguments);
+        ToolArgsDialog dlg = new(_logTabWin, this)
+        {
+            Arg = textBoxArguments.Text
+        };
+
+        if (dlg.ShowDialog() == DialogResult.OK)
+        {
+            textBoxArguments.Text = dlg.Arg;
+        }
     }
 
-    //TODO Remove or refactor this function
-    private void OnDataGridViewColumnizerRowsAdded (object sender, DataGridViewRowsAddedEventArgs e)
+    /// <summary>
+    /// Adds default values to the Columnizer Grid when a new row is created. The default mask type is set to "Glob",
+    /// and if there are any registered columnizers, the first one in the list is selected as the default columnizer for
+    /// the new row.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnDataGridViewColumnizerDefaultValuesNeeded (object sender, DataGridViewRowEventArgs e)
     {
-        var comboCell = (DataGridViewComboBoxCell)dataGridViewColumnizer.Rows[e.RowIndex].Cells[1];
-        if (comboCell.Items.Count > 0)
+        e.Row.Cells[2].Value = MaskType.Glob;
+
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        if (columnizers.Count > 0)
         {
-            //comboCell.Value = comboCell.Items[0];
+            e.Row.Cells[3].Value = columnizers[0].GetName();
         }
     }
 
@@ -855,6 +872,14 @@ internal partial class SettingsDialog : Form
     private void OnDataGridViewColumnizerDataError (object sender, DataGridViewDataErrorEventArgs e)
     {
         e.Cancel = true;
+    }
+
+    private void OnDataGridViewColumnizerCurrentCellDirtyStateChanged (object sender, EventArgs e)
+    {
+        if (dataGridViewColumnizer.IsCurrentCellDirty)
+        {
+            _ = dataGridViewColumnizer.CommitEdit(DataGridViewDataErrorContexts.Commit);
+        }
     }
 
     private void OnChkBoxSysoutCheckedChanged (object sender, EventArgs e)
@@ -1170,7 +1195,25 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnWorkingDirClick (object sender, EventArgs e)
     {
-        OnBtnWorkingDirClick(textBoxWorkingDir);
+        FolderBrowserDialog dlg = new()
+        {
+            RootFolder = Environment.SpecialFolder.MyComputer,
+            Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir
+        };
+
+        if (!string.IsNullOrEmpty(textBoxWorkingDir.Text))
+        {
+            DirectoryInfo info = new(textBoxWorkingDir.Text);
+            if (info.Exists)
+            {
+                dlg.SelectedPath = info.FullName;
+            }
+        }
+
+        if (dlg.ShowDialog() == DialogResult.OK)
+        {
+            textBoxWorkingDir.Text = dlg.SelectedPath;
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -1323,6 +1366,10 @@ internal partial class SettingsDialog : Form
         };
     }
 
+    #endregion
+
+    #region Control Chars Tab
+
     private void FillControlCharsTab ()
     {
         var s = Preferences.ControlCharSettings ??= new ControlCharSettings();
@@ -1336,11 +1383,32 @@ internal partial class SettingsDialog : Form
 
         switch (s.Style)
         {
-            case ControlCharStyle.Caret: radioButtonControlCharStyleCaret.Checked = true; break;
-            case ControlCharStyle.CEscape: radioButtonControlCharStyleCEscape.Checked = true; break;
-            case ControlCharStyle.Abbreviation: radioButtonControlCharStyleAbbreviation.Checked = true; break;
-            case ControlCharStyle.Iso2047: radioButtonControlCharStyleIso2047.Checked = true; break;
-            default: radioButtonControlCharStyleControlPictures.Checked = true; break;
+            case ControlCharStyle.Caret:
+                {
+                    radioButtonControlCharStyleCaret.Checked = true;
+                    break;
+                }
+            case ControlCharStyle.CEscape:
+                {
+                    radioButtonControlCharStyleCEscape.Checked = true;
+                    break;
+                }
+            case ControlCharStyle.Abbreviation:
+                {
+                    radioButtonControlCharStyleAbbreviation.Checked = true;
+                    break;
+                }
+            case ControlCharStyle.Iso2047:
+                {
+                    radioButtonControlCharStyleIso2047.Checked = true;
+                    break;
+                }
+            case ControlCharStyle.ControlPictures:
+            default:
+                {
+                    radioButtonControlCharStyleControlPictures.Checked = true;
+                    break;
+                }
         }
 
         _controlCharsEnabledByCp.Clear();

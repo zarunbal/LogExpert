@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs.Helpers;
 
 /// <summary>
 /// Represents the status of a file in the missing files dialog.

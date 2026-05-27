@@ -131,7 +131,19 @@ public class Preferences
 
     public int MaximumFilterEntriesDisplayed { get; set; } = 20;
 
+    /// <summary>
+    /// Obsolete: replaced by <see cref="ColumnizerSelectionPriority"/>. Will be removed in 1.50.
+    /// During settings load, <see cref="LegacyPreferencesMigrator"/> migrates a <c>true</c> value here to
+    /// <see cref="Config.ColumnizerSelectionPriority.MaskThenHistory"/> on the new property.
+    /// </summary>
+    [Obsolete("Replaced by ColumnizerSelectionPriority; will be removed in 1.50.")]
     public bool MaskPrio { get; set; }
+
+    /// <summary>
+    /// Controls the precedence order used to resolve a columnizer for a newly opened file.
+    /// </summary>
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public ColumnizerSelectionPriority ColumnizerSelectionPriority { get; set; } = ColumnizerSelectionPriority.HistoryThenMask;
 
     public bool AutoPick { get; set; }
 

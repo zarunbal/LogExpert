@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Classes.Persister;
+using LogExpert.UI.Dialogs.Helpers;
 
 namespace LogExpert.UI.Dialogs;
 
