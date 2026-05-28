@@ -1195,7 +1195,7 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnWorkingDirClick (object sender, EventArgs e)
     {
-        FolderBrowserDialog dlg = new()
+        using FolderBrowserDialog dlg = new()
         {
             RootFolder = Environment.SpecialFolder.MyComputer,
             Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir
