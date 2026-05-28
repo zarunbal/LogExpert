@@ -1,6 +1,5 @@
 using ColumnizerLib;
 
-using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
 
 namespace LogExpert.Core.Interfaces;
@@ -172,18 +171,21 @@ public interface ILogWindow
     void Activate ();
 
     /// <summary>
-    /// Gets the <see cref="LogfileReader"/> instance that provides access to the
+    /// Gets the <see cref="ILogfileReader"/> instance that provides access to the
     /// underlying log file content.
     /// </summary>
     /// <value>
-    /// The <see cref="LogfileReader"/> that manages file access, buffering, and
+    /// The reader that manages file access, buffering, and
     /// multi-file coordination for this log window.
     /// </value>
     /// <remarks>
-    /// The LogfileReader handles all file I/O operations, including reading lines,
+    /// The Logfile Reader handles all file I/O operations, including reading lines,
     /// monitoring for file changes, and managing the buffer cache.
+    /// Query for capability interfaces (<see cref="IMultiFileNavigation"/>,
+    /// <see cref="ILogfileReaderConfiguration"/>, <see cref="IBufferPinning"/>)
+    /// when specialized operations are needed.
     /// </remarks>
-    LogfileReader LogFileReader { get; }
+    ILogfileReader LogFileReader { get; }
 
     /// <summary>
     /// Gets the text content of the currently selected cell or line.

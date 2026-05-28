@@ -34,6 +34,11 @@ public class ToolWindowCoordinatorTests : IDisposable
 
         _configManagerMock = new Mock<IConfigManager>();
         _settings = new Settings();
+
+        // Materialize Font from FontString (mirrors ConfigManager.InitializeFont)
+        var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(Font));
+        _settings.Preferences.Font = (Font)converter.ConvertFromInvariantString(_settings.Preferences.FontString)!;
+
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
 
         _coordinator = new ToolWindowCoordinator(_configManagerMock.Object);
@@ -136,8 +141,7 @@ public class ToolWindowCoordinatorTests : IDisposable
         _coordinator.Initialize();
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-            _coordinator.ApplyPreferences("Courier New", 10f, true, 500, SettingsFlags.All));
+        Assert.DoesNotThrow(() => _coordinator.ApplyPreferences(new Font("Courier New", 10f), true, 500, SettingsFlags.All));
     }
 
     [Test]
@@ -193,8 +197,7 @@ public class ToolWindowCoordinatorTests : IDisposable
     public void ApplyPreferences_BeforeInitialize_DoesNotThrow ()
     {
         // Act & Assert
-        Assert.DoesNotThrow(() =>
-            _coordinator.ApplyPreferences("Courier New", 10f, true, 500, SettingsFlags.All));
+        Assert.DoesNotThrow(() => _coordinator.ApplyPreferences(new Font("Courier New", 10f), true, 500, SettingsFlags.All));
     }
 
     [Test]

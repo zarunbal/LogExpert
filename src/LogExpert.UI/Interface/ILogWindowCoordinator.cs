@@ -31,11 +31,18 @@ internal interface ILogWindowCoordinator
 
     /// <summary>
     /// Resolves the appropriate columnizer for the given file name.
-    /// Respects MaskPrio preference (mask-first vs history-first).
-    /// Cleans up stale history entries.
-    /// Returns null when no match found.
+    /// Honours the configured <see cref="LogExpert.Core.Config.ColumnizerSelectionPriority"/>.
+    /// Cleans up stale history entries. Returns null when no source produced a match.
     /// </summary>
     ILogLineMemoryColumnizer? ResolveColumnizer (string fileName);
+
+    /// <summary>
+    /// Returns the mask-list columnizer that matches <paramref name="shortFileName"/>, ignoring history,
+    /// persistence, and AutoPick. Used by the per-file load path when the user has opted in to
+    /// <c>MaskOverridesPersistence</c>. Returns null when no mask matches or the matching entry's
+    /// columnizer is not registered.
+    /// </summary>
+    ILogLineMemoryColumnizer? TryGetMaskColumnizer (string shortFileName);
 
     /// <summary>
     /// Shared search parameters across all tabs.

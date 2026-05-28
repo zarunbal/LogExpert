@@ -180,9 +180,8 @@ internal partial class PatternWindow : Form //TODO: Can this be changed to UserC
         contentDataGridView.Columns.Insert(1, contentInfoColumn);
     }
 
-    public void SetFont (string fontName, float fontSize)
+    public void SetFont (Font font)
     {
-        Font font = new(new FontFamily(fontName), fontSize);
         //var lineSpacing = font.FontFamily.GetLineSpacing(FontStyle.Regular);
         //var lineSpacingPixel = font.Size * lineSpacing / font.FontFamily.GetEmHeight(FontStyle.Regular);
 

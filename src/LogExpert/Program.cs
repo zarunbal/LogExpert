@@ -1,3 +1,4 @@
+using System.CommandLine;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Pipes;
@@ -9,7 +10,6 @@ using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Classes;
-using LogExpert.Classes.CommandLine;
 using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
@@ -54,6 +54,10 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+        // Register the plugin assembly resolver early so that settings deserialization
+        // can find plugin types (e.g., CsvColumnizer) before PluginRegistry.Create() runs.
+        PluginRegistry.PluginRegistry.RegisterAssemblyResolver();
+
         // Initialize ConfigManager with application-specific paths and screen information
         ConfigManager.Instance.Initialize(Application.StartupPath, SystemInformation.VirtualScreen);
         PluginValidator.Initialize(ConfigManager.Instance.ActiveConfigDir);
@@ -63,18 +67,43 @@ internal static class Program
         CancellationTokenSource cts = new();
         try
         {
-            CmdLineString configFile = new("config", false, "A configuration (settings) file");
-            CmdLine cmdLine = new();
-            cmdLine.RegisterParameter(configFile);
-            if (configFile.Exists)
+            Option<FileInfo?> configOption = new("--config", "-c")
             {
-                FileInfo cfgFileInfo = new(configFile.Value);
-                //TODO: The config file import and the try catch for the primary instance and secondary instance should be separated functions
-                if (cfgFileInfo.Exists)
-                {
-                    ImportResult importResult = ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+                Description = "A configuration (settings) file"
+            };
+            Option<FileInfo?> legacyConfigOption = new("-config")
+            {
+                Hidden = true
+            };
+            Argument<string[]> filesArgument = new("files")
+            {
+                Description = "Log files (.log etc.) or session files (.lxj) to open"
+            };
+            RootCommand rootCommand = new("LogExpert — log file viewer.")
+            {
+                configOption,
+                legacyConfigOption,
+                filesArgument
+            };
 
-                    // Handle import result
+            ParseResult parseResult = rootCommand.Parse(args);
+
+            if (parseResult.Errors.Count > 0)
+            {
+                string errorText = string.Join(Environment.NewLine, parseResult.Errors.Select(e => e.Message));
+                _logger.Error(CultureInfo.InvariantCulture, $"Command-line error: {errorText}");
+                _ = MessageBox.Show(errorText, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            FileInfo? configFile = parseResult.GetValue(configOption) ?? parseResult.GetValue(legacyConfigOption);
+
+            if (configFile is not null)
+            {
+                if (configFile.Exists)
+                {
+                    ImportResult importResult = ConfigManager.Instance.Import(configFile, ExportImportFlags.All);
+
                     if (!importResult.Success)
                     {
                         string message = importResult.RequiresUserConfirmation
@@ -110,8 +139,8 @@ internal static class Program
             try
             {
                 Mutex mutex = new(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
-                var remainingArgs = cmdLine.Parse(args);
-                var absoluteFilePaths = GenerateAbsoluteFilePaths(remainingArgs);
+                string[] positionalFiles = parseResult.GetValue(filesArgument) ?? [];
+                var absoluteFilePaths = GenerateAbsoluteFilePaths(positionalFiles);
 
                 if (isCreated)
                 {

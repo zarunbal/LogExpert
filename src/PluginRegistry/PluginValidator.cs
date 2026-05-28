@@ -40,6 +40,11 @@ public static partial class PluginValidator
     // Known safe dependencies (not plugins themselves)
     private static readonly HashSet<string> _knownDependencies = new(StringComparer.OrdinalIgnoreCase)
     {
+        // LogExpert's own assemblies are not plugins. LogExpert.Core defines the built-in
+        // columnizers; if it (or a copy) lands in the plugins folder it must not be scanned,
+        // or the built-in columnizers would be registered twice.
+        "LogExpert.Core.dll",
+        "LogExpert.Resources.dll",
         "ColumnizerLib.dll",
         "Newtonsoft.Json.dll",
         "CsvHelper.dll",
