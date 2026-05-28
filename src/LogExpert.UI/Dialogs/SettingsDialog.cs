@@ -808,7 +808,7 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnToolClick (object sender, EventArgs e)
     {
-        OpenFileDialog dlg = new()
+        using OpenFileDialog dlg = new()
         {
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
         };
@@ -830,7 +830,7 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnArgClick (object sender, EventArgs e)
     {
-        ToolArgsDialog dlg = new(_logTabWin, this)
+        using ToolArgsDialog dlg = new(_logTabWin, this)
         {
             Arg = textBoxArguments.Text
         };
