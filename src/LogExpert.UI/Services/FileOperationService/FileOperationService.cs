@@ -182,6 +182,19 @@ internal sealed class FileOperationService (
             return null;
         }
 
+        // Session files (.lxj) aren't logs — dispatch them to the project loader and
+        // continue with only the log files. Without this, the .lxj would be treated as
+        // a raw log line in the multi-file tab.
+        if (fileNames.Any(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
+        {
+            foreach (var sessionFile in fileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
+            {
+                _projectFileCallback(sessionFile, false);
+            }
+            var logs = fileNames.Where(f => !f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray();
+            return logs.Length > 0 ? AddMultiFileTab(logs) : null;
+        }
+
         EncodingOptions encodingOptions = new();
         FillDefaultEncodingFromSettings(encodingOptions);
 
