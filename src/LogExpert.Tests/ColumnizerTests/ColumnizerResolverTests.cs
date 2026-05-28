@@ -19,17 +19,16 @@ public class ColumnizerResolverTests
         return mock.Object;
     }
 
-    private static ColumnizerMaskEntry Mask (string glob, string columnizerName) =>
-        new() { Mask = glob, Type = MaskType.Glob, ColumnizerName = columnizerName };
+    private static ColumnizerMaskEntry Mask (string glob, string columnizerName) => new() { Mask = glob, Type = MaskType.Glob, ColumnizerName = columnizerName };
 
-    // --- HistoryThenMask (default) ---
+    #region HistoryThenMask (default)
 
     [Test]
     public void HistoryThenMask_HistoryPresent_HistoryWins ()
     {
         var history = MakeColumnizer("HistC");
         var mask = MakeColumnizer("MaskC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
@@ -46,7 +45,7 @@ public class ColumnizerResolverTests
     public void HistoryThenMask_HistoryAbsent_MaskWins ()
     {
         var mask = MakeColumnizer("MaskC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
@@ -63,7 +62,7 @@ public class ColumnizerResolverTests
     public void HistoryThenMask_BothAbsent_AutoPickFires ()
     {
         var auto = MakeColumnizer("AutoC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
@@ -78,7 +77,7 @@ public class ColumnizerResolverTests
     [Test]
     public void HistoryThenMask_AllSourcesNull_ReturnsNull ()
     {
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
@@ -93,7 +92,7 @@ public class ColumnizerResolverTests
     {
         var pers = MakeColumnizer("PersC");
         var hist = MakeColumnizer("HistC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
@@ -106,14 +105,16 @@ public class ColumnizerResolverTests
         Assert.That(winner, Is.SameAs(pers));
     }
 
-    // --- MaskThenHistory ---
+    #endregion
+
+    #region MaskThenHistory
 
     [Test]
     public void MaskThenHistory_MaskPresent_MaskBeatsHistory ()
     {
         var mask = MakeColumnizer("MaskC");
         var hist = MakeColumnizer("HistC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskThenHistory,
             FileName = "x.log",
@@ -131,7 +132,7 @@ public class ColumnizerResolverTests
     {
         var pers = MakeColumnizer("PersC");
         var mask = MakeColumnizer("MaskC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskThenHistory,
             FileName = "x.log",
@@ -144,14 +145,16 @@ public class ColumnizerResolverTests
         Assert.That(winner, Is.SameAs(pers));
     }
 
-    // --- MaskOverridesPersistence ---
+    #endregion
+
+    #region MaskOverridesPersistence
 
     [Test]
     public void MaskOverridesPersistence_MaskPresent_BeatsPersistence ()
     {
         var pers = MakeColumnizer("PersC");
         var mask = MakeColumnizer("MaskC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskOverridesPersistence,
             FileName = "x.log",
@@ -168,7 +171,7 @@ public class ColumnizerResolverTests
     public void MaskOverridesPersistence_MaskAbsent_PersistenceWins ()
     {
         var pers = MakeColumnizer("PersC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskOverridesPersistence,
             FileName = "x.log",
@@ -180,8 +183,9 @@ public class ColumnizerResolverTests
 
         Assert.That(winner, Is.SameAs(pers));
     }
+    #endregion
 
-    // --- Stale handling ---
+    #region Stale handling
 
     [Test]
     public void StaleEntryFirst_ValidEntryWins_OnStaleInvokedOnce ()
@@ -191,7 +195,7 @@ public class ColumnizerResolverTests
         var valid = Mask("*.log", "Valid");
         var staleCallbacks = new List<ColumnizerMaskEntry>();
 
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskThenHistory,
             FileName = "foo.log",
@@ -210,7 +214,7 @@ public class ColumnizerResolverTests
     public void AllStale_MaskReturnsNull_FallsThroughToAutoPick ()
     {
         var auto = MakeColumnizer("AutoC");
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.MaskThenHistory,
             FileName = "foo.log",
@@ -229,17 +233,23 @@ public class ColumnizerResolverTests
         var hist = MakeColumnizer("HistC");
         var auto = MakeColumnizer("AutoC");
         var autoFired = false;
-        var winner = ColumnizerResolver.Resolve(new ColumnizerResolver.ResolveInputs
+        var winner = ColumnizerResolver.Resolve(new ResolveInputs
         {
             Priority = ColumnizerSelectionPriority.HistoryThenMask,
             FileName = "x.log",
             ShortFileName = "x.log",
             HistoryLookup = _ => "HistC",
-            AutoPick = () => { autoFired = true; return auto; },
+            AutoPick = () =>
+            {
+                autoFired = true;
+                return auto;
+            },
             Registered = [hist, auto],
         });
 
         Assert.That(winner, Is.SameAs(hist));
         Assert.That(autoFired, Is.False);
     }
+
+    #endregion
 }

@@ -24,9 +24,12 @@ public static class ColumnizerResolver
     {
         ArgumentNullException.ThrowIfNull(inputs);
 
+        // Look up a columnizer by name with "no signal" semantics — returns null when the name is
+        // missing OR not registered, so the precedence chain falls through to the next source.
+        ILogLineMemoryColumnizer? byName (string? name) => string.IsNullOrEmpty(name) ? null : ColumnizerPicker.FindMemoryColumnizerByName(name, inputs.Registered);
         ILogLineMemoryColumnizer? mask () => TryGetMaskColumnizer(inputs.MaskList, inputs.ShortFileName, inputs.Registered, inputs.OnStaleMaskEntry);
-        ILogLineMemoryColumnizer? history () => ColumnizerPicker.DecideMemoryColumnizerByName(inputs.HistoryLookup?.Invoke(inputs.FileName), inputs.Registered);
-        ILogLineMemoryColumnizer? persistence () => ColumnizerPicker.DecideMemoryColumnizerByName(inputs.PersistenceColumnizerName, inputs.Registered);
+        ILogLineMemoryColumnizer? history () => byName(inputs.HistoryLookup?.Invoke(inputs.FileName));
+        ILogLineMemoryColumnizer? persistence () => byName(inputs.PersistenceColumnizerName);
 
         var winner = inputs.Priority switch
         {
@@ -62,7 +65,9 @@ public static class ColumnizerResolver
             }
 
 
-            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(entry.ColumnizerName, registered);
+            // FindMemoryColumnizerByName returns null when the name isn't registered, which is
+            // exactly the "stale entry" signal we need.
+            var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(entry.ColumnizerName, registered);
             if (columnizer != null)
             {
                 return columnizer;
