@@ -189,8 +189,9 @@ internal sealed class FileOperationService (
         {
             foreach (var sessionFile in fileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
             {
-                _projectFileCallback(sessionFile, false);
+                _loadSessionCallback(sessionFile, false);
             }
+
             var logs = fileNames.Where(f => !f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray();
             return logs.Length > 0 ? AddMultiFileTab(logs) : null;
         }
