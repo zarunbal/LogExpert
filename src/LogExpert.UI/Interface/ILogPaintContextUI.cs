@@ -13,7 +13,7 @@ internal interface ILogPaintContextUI : ILogPaintContext
 {
     #region Properties
 
-    Font MonospacedFont { get; } // Font font = new Font("Courier New", this.Preferences.fontSize, FontStyle.Bold);
+    Font MonospacedFont { get; }
 
     Font NormalFont { get; }
 

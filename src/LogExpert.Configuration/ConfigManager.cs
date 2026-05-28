@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
@@ -259,6 +260,9 @@ public class ConfigManager : IConfigManager
 
         // Proceed with import - Use Settings property to ensure _settings is initialized
         _settings = Instance.Import(Instance.Settings, fileInfo, importFlags);
+        // Re-apply defaults and materialize runtime-only fields (e.g. Preferences.Font from FontString)
+        // since the import path bypasses Load/InitializeSettings.
+        _settings = InitializeSettings(_settings);
         Save(SettingsFlags.All);
 
         _logger.Info("Import completed successfully");
@@ -323,7 +327,6 @@ public class ConfigManager : IConfigManager
 
         Save(SettingsFlags.FileHistory);
     }
-
 
     public void ClearLastOpenFilesList ()
     {
@@ -592,6 +595,9 @@ public class ConfigManager : IConfigManager
 
     private static Settings InitializeSettings (Settings settings)
     {
+        // Apply any pending schema migrations before any consumer reads the settings.
+        _ = LegacyPreferencesMigrator.Migrate(settings);
+
         settings.Preferences ??= new Preferences();
         settings.Preferences.ToolEntries ??= [];
         settings.Preferences.ColumnizerMaskList ??= [];
@@ -602,17 +608,7 @@ public class ConfigManager : IConfigManager
 
         settings.FileColors ??= [];
 
-        try
-        {
-            using var fontFamily = new FontFamily(settings.Preferences.FontName);
-            settings.Preferences.FontName = fontFamily.Name;
-        }
-        catch (ArgumentException)
-        {
-            string genericMonospaceFont = FontFamily.GenericMonospace.Name;
-            _logger.Warn($"Specified font '{settings.Preferences.FontName}' not found. Falling back to default: '{genericMonospaceFont}'.");
-            settings.Preferences.FontName = genericMonospaceFont;
-        }
+        InitializeFont(settings);
 
         if (settings.Preferences.ShowTailColor == Color.Empty)
         {
@@ -678,6 +674,42 @@ public class ConfigManager : IConfigManager
         SetBoundsWithinVirtualScreen(settings);
 
         return settings;
+    }
+
+    /// <summary>
+    /// Materializes the persisted <see cref="Preferences.FontString"/> into a live <see cref="Font"/>
+    /// instance <see cref="Preferences.FontString"/> is the source of truth in settings.json so
+    /// that family, size, style and unit round-trip through the FontDialog.
+    /// </summary>
+    private static void InitializeFont (Settings settings)
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(Font));
+        var fallbackFamily = FontFamily.GenericMonospace.Name;
+
+        Font font = TryDeserializeFont(converter, settings.Preferences.FontString, "FontString")
+            ?? new Font(fallbackFamily, 9f);
+
+        settings.Preferences.Font?.Dispose();
+        settings.Preferences.Font = font;
+        settings.Preferences.FontString = converter.ConvertToInvariantString(font);
+    }
+
+    private static Font? TryDeserializeFont (TypeConverter converter, string? value, string sourceLabel)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        try
+        {
+            return converter.ConvertFromInvariantString(value) as Font;
+        }
+        catch (Exception ex) when (ex is NotSupportedException or ArgumentException or FormatException)
+        {
+            _logger.Warn(ex, $"Could not deserialize font from {sourceLabel}='{value}'.");
+            return null;
+        }
     }
 
     /// <summary>

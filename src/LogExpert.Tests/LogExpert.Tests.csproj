@@ -21,6 +21,7 @@
     <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
     <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
     <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+    <ProjectReference Include="..\LogExpert.Audio\LogExpert.Audio.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
 
@@ -75,6 +76,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\CsvTest_01.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\semicolon.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\tab.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\comma.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Update="TestData\organizations-1000.csv">

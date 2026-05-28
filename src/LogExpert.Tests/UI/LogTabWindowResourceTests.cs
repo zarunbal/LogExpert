@@ -14,6 +14,19 @@ namespace LogExpert.Tests.UI;
 [Apartment(ApartmentState.STA)] // Required for WinForms components
 public class LogTabWindowResourceTests
 {
+    /// <summary>
+    /// Creates a <see cref="Settings"/> instance with <see cref="Preferences.Font"/> materialized
+    /// from <see cref="Preferences.FontString"/>, mirroring what <c>ConfigManager.InitializeFont</c>
+    /// does at runtime.
+    /// </summary>
+    private static Settings CreateSettings ()
+    {
+        var settings = new Settings();
+        var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(Font));
+        settings.Preferences.Font = (Font)converter.ConvertFromInvariantString(settings.Preferences.FontString)!;
+        return settings;
+    }
+
     [Test]
     [Category("Resource")]
     [SupportedOSPlatform("windows")]
@@ -22,7 +35,7 @@ public class LogTabWindowResourceTests
     {
         // Arrange
         var mockConfigManager = new Mock<IConfigManager>();
-        _ = mockConfigManager.Setup(m => m.Settings).Returns(new Settings());
+        _ = mockConfigManager.Setup(m => m.Settings).Returns(CreateSettings());
 
         // Create the window using the factory method
         ILogTabWindow? window = null;
@@ -84,7 +97,7 @@ public class LogTabWindowResourceTests
     {
         // Arrange
         var mockConfigManager = new Mock<IConfigManager>();
-        _ = mockConfigManager.Setup(m => m.Settings).Returns(new Settings());
+        _ = mockConfigManager.Setup(m => m.Settings).Returns(CreateSettings());
 
         ILogTabWindow? window = null;
 
@@ -132,7 +145,7 @@ public class LogTabWindowResourceTests
     {
         // Arrange
         var mockConfigManager = new Mock<IConfigManager>();
-        _ = mockConfigManager.Setup(m => m.Settings).Returns(new Settings());
+        _ = mockConfigManager.Setup(m => m.Settings).Returns(CreateSettings());
 
         var exceptions = new List<Exception>();
 
@@ -182,7 +195,7 @@ public class LogTabWindowResourceTests
     {
         // Arrange
         var mockConfigManager = new Mock<IConfigManager>();
-        _ = mockConfigManager.Setup(m => m.Settings).Returns(new Settings());
+        _ = mockConfigManager.Setup(m => m.Settings).Returns(CreateSettings());
 
         var window = AbstractLogTabWindow.Create(
             [],

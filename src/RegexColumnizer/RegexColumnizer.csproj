@@ -12,7 +12,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj">
+      <!-- Do not copy LogExpert.Core.dll (and its dependencies) into the plugins output folder.
+           It defines the built-in columnizers, so the plugin scanner would otherwise rediscover
+           and re-register them as duplicates. The assembly is resolved from the application base
+           directory at runtime (see PluginRegistry.ColumnizerResolveEventHandler). -->
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>

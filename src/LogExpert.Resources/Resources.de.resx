@@ -2166,4 +2166,115 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
     <value>Scanne Lesezeichen beendet / abgebrochen!</value>
   </data>
+  <data name="HighlightDialog_UI_CheckBox_AlertOnHit" xml:space="preserve">
+    <value>Alarm bei Treffer</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SoundFile" xml:space="preserve">
+    <value>Sounddatei:</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BrowseSoundFile" xml:space="preserve">
+    <value>Durchsuchen...</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Cooldown" xml:space="preserve">
+    <value>Abklingzeit:</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Seconds" xml:space="preserve">
+    <value>Sekunden</value>
+  </data>
+  <data name="HighlightDialog_UI_OpenFileFilter_Audio" xml:space="preserve">
+    <value>Audiodateien (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_Add" xml:space="preserve">
+    <value>Highlight hinzufügen</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_EditFormat" xml:space="preserve">
+    <value>Hervorhebung bearbeiten – „{0}“</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_LineMatchCriteria" xml:space="preserve">
+    <value>Kriterien für Linienübereinstimmung</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Coloring" xml:space="preserve">
+    <value>Farben</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Edit" xml:space="preserve">
+    <value>&amp;Bearbeiten</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
+    <value>(Vorschau)</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageControlCharacters" xml:space="preserve">
+    <value>Steuerzeichen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable" xml:space="preserve">
+    <value>Steuerzeichen in der Anzeige ersetzen</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsWarning" xml:space="preserve">
+    <value>Nur Anzeige — der Dateiinhalt wird nicht verändert und Suche, Filter sowie Zwischenablage bleiben unberührt (sofern die untenstehende Option nicht aktiviert ist). Manche Logdateien können dadurch ungewohnt aussehen.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsHint" xml:space="preserve">
+    <value>Aktiviere oben die Ersetzung, damit diese Einstellungen wirken.</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle" xml:space="preserve">
+    <value>Anzeigestil</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures" xml:space="preserve">
+    <value>Unicode-Steuerzeichen-Bilder (Standard)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret" xml:space="preserve">
+    <value>Caret-Notation (^X)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape" xml:space="preserve">
+    <value>C-Escape-Sequenz (\x01)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation" xml:space="preserve">
+    <value>Abkürzung (&lt;SOH&gt;)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047" xml:space="preserve">
+    <value>ISO-2047-Grafiken</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetAll" xml:space="preserve">
+    <value>Alle aktivieren</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNone" xml:space="preserve">
+    <value>Alle deaktivieren</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace" xml:space="preserve">
+    <value>Nur Nicht-Whitespace</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance" xml:space="preserve">
+    <value>Darstellung</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsForeColor" xml:space="preserve">
+    <value>Vordergrundfarbe:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsBackColor" xml:space="preserve">
+    <value>Hintergrundfarbe:</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsForeColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColorClear" xml:space="preserve">
+    <value>(keine Farbe)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsBold" xml:space="preserve">
+    <value>Fett</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic" xml:space="preserve">
+    <value>Kursiv</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard" xml:space="preserve">
+    <value>Zwischenablage</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
+    <value>Angezeigte Form statt der Rohzeichen kopieren</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
+    <value>Sysout für das Tool wurde konfiguriert, aber es gibt keine aktive Logdatei. Das Tool wird ohne die Sysout-Pipe gestartet</value>
+  </data>
 </root>
