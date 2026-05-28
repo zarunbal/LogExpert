@@ -12,7 +12,7 @@ namespace LogExpert.Core.Classes.Persister;
 /// path. It supports validation of both local file paths and URI-based files through plugin resolution. All methods are
 /// thread-safe and do not modify input data. Use the provided methods to check file existence, resolve canonical file
 /// paths, and locate possible alternatives for missing files.</remarks>
-public static class ProjectFileValidator
+public static class SessionFileValidator
 {
     /// <summary>
     /// Validates the files referenced by the specified project and identifies missing or accessible files using
@@ -21,21 +21,21 @@ public static class ProjectFileValidator
     /// <remarks>Files are considered valid if they exist on disk or if a suitable file system plugin is
     /// available for URI-based files. For missing files, possible alternative paths are suggested based on the project
     /// file location.</remarks>
-    /// <param name="projectData">The project data containing the list of file names to validate and the project file path. Cannot be null.</param>
+    /// <param name="sessionData">The project data containing the list of file names to validate and the project file path. Cannot be null.</param>
     /// <param name="pluginRegistry">The plugin registry used to resolve file system plugins for URI-based files. Cannot be null.</param>
-    /// <returns>A ProjectValidationResult containing lists of valid files, missing files, and possible alternative file paths
+    /// <returns>A SessionValidationResult containing lists of valid files, missing files, and possible alternative file paths
     /// for missing files.</returns>
-    public static ProjectValidationResult ValidateProject (ProjectData projectData, IPluginRegistry pluginRegistry)
+    public static SessionValidationResult ValidateSession (SessionData sessionData, IPluginRegistry pluginRegistry)
     {
-        ArgumentNullException.ThrowIfNull(projectData);
+        ArgumentNullException.ThrowIfNull(sessionData);
         ArgumentNullException.ThrowIfNull(pluginRegistry);
 
-        var result = new ProjectValidationResult();
+        var result = new SessionValidationResult();
 
         // Cache drive letters once to avoid repeated expensive DriveInfo.GetDrives() calls
         var cachedDriveLetters = GetFixedDriveLetters();
 
-        foreach (var fileName in projectData.FileNames)
+        foreach (var fileName in sessionData.FileNames)
         {
             var normalizedPath = NormalizeFilePath(fileName);
 
@@ -60,7 +60,7 @@ public static class ProjectFileValidator
             {
                 result.MissingFiles.Add(fileName);
 
-                var alternativePaths = FindAlternativePaths(fileName, projectData.ProjectFilePath, cachedDriveLetters);
+                var alternativePaths = FindAlternativePaths(fileName, sessionData.SessionFilePath, cachedDriveLetters);
                 result.PossibleAlternatives[fileName] = alternativePaths;
             }
         }
@@ -138,12 +138,12 @@ public static class ProjectFileValidator
     /// result.</remarks>
     /// <param name="fileName">The name or path of the file to search for. Can be an absolute or relative path. Cannot be null, empty, or
     /// whitespace.</param>
-    /// <param name="projectFilePath">The full path to the project file used as a reference for searching related directories. Can be null or empty if
+    /// <param name="sessionFilePath">The full path to the project file used as a reference for searching related directories. Can be null or empty if
     /// project context is not available.</param>
     /// <param name="cachedDriveLetters">Pre-computed list of fixed drive letters to avoid repeated DriveInfo.GetDrives() calls.</param>
     /// <returns>A list of strings containing the full paths of files found that match the specified file name in alternative
     /// locations. The list will be empty if no matching files are found.</returns>
-    private static List<string> FindAlternativePaths (string fileName, string projectFilePath, List<char> cachedDriveLetters)
+    private static List<string> FindAlternativePaths (string fileName, string sessionFilePath, List<char> cachedDriveLetters)
     {
         var alternatives = new List<string>();
 
@@ -160,21 +160,21 @@ public static class ProjectFileValidator
         }
 
         // Search in directory of .lxj project file
-        if (!string.IsNullOrWhiteSpace(projectFilePath))
+        if (!string.IsNullOrWhiteSpace(sessionFilePath))
         {
             try
             {
-                var projectDir = Path.GetDirectoryName(projectFilePath);
-                if (!string.IsNullOrEmpty(projectDir) && Directory.Exists(projectDir))
+                var sessionDir = Path.GetDirectoryName(sessionFilePath);
+                if (!string.IsNullOrEmpty(sessionDir) && Directory.Exists(sessionDir))
                 {
-                    var candidatePath = Path.Join(projectDir, baseName);
+                    var candidatePath = Path.Join(sessionDir, baseName);
                     if (File.Exists(candidatePath))
                     {
                         alternatives.Add(candidatePath);
                     }
 
                     // Also check subdirectories (one level deep)
-                    var subdirs = Directory.GetDirectories(projectDir);
+                    var subdirs = Directory.GetDirectories(sessionDir);
                     alternatives.AddRange(
                         subdirs
                             .Select(subdir => Path.Join(subdir, baseName))
@@ -243,14 +243,14 @@ public static class ProjectFileValidator
         }
 
         // Try relative path resolution from project directory
-        if (!Path.IsPathRooted(fileName) && !string.IsNullOrWhiteSpace(projectFilePath))
+        if (!Path.IsPathRooted(fileName) && !string.IsNullOrWhiteSpace(sessionFilePath))
         {
             try
             {
-                var projectDir = Path.GetDirectoryName(projectFilePath);
-                if (!string.IsNullOrEmpty(projectDir))
+                var sessionDir = Path.GetDirectoryName(sessionFilePath);
+                if (!string.IsNullOrEmpty(sessionDir))
                 {
-                    var relativePath = Path.Join(projectDir, fileName);
+                    var relativePath = Path.Join(sessionDir, fileName);
                     var normalizedPath = Path.GetFullPath(relativePath);
 
                     if (File.Exists(normalizedPath) && !alternatives.Contains(normalizedPath))

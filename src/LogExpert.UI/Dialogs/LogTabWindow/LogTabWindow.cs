@@ -25,7 +25,7 @@ using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
-using LogExpert.UI.Services.ProjectFileHandlerService;
+using LogExpert.UI.Services.SessionHandlerService;
 using LogExpert.UI.Services.TabControllerService;
 using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
@@ -53,7 +53,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly LogWindowCoordinator _logWindowCoordinator;
     private readonly ToolWindowCoordinator _toolWindowCoordinator;
     private readonly FileOperationService _fileOperationService;
-    private readonly ProjectFileHandler _projectFileHandler;
+    private readonly SessionHandler _sessionHandler;
 
     private bool _disposed;
 
@@ -108,12 +108,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _deadIcon = _ledService.GetDeadIcon();
 
-        _fileOperationService = new FileOperationService(configManager, _tabController, _ledService, PluginRegistry.PluginRegistry.Instance, CreateLogWindowFromRequest, () => Clipboard.ContainsText() ? Clipboard.GetText() : null, LoadProject);
+        _fileOperationService = new FileOperationService(configManager, _tabController, _ledService, PluginRegistry.PluginRegistry.Instance, CreateLogWindowFromRequest, () => Clipboard.ContainsText() ? Clipboard.GetText() : null, LoadSession);
 
         _fileOperationService.FileHistoryChanged += (_, _) => FillHistoryMenu();
         _fileOperationService.FileOpened += OnFileOperationServiceFileOpened;
 
-        _projectFileHandler = new ProjectFileHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request));
+        _sessionHandler = new SessionHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request));
 
         _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService, _fileOperationService);
 
@@ -421,8 +421,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem;
         multiFileEnabledStripMenuItem.Text = Resources.LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem;
         multifileMaskToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem;
-        loadProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem;
-        saveProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem;
+        loadSessionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem;
+        saveSessionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem;
         exportBookmarksToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem;
         lastUsedToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem;
         exitToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem;
@@ -499,8 +499,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
         newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
         multiFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem;
-        loadProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
-        saveProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
+        loadSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
+        saveSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
         timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
         copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
         columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
@@ -1437,28 +1437,28 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     [SupportedOSPlatform("windows")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
-    private void LoadProject (string projectFileName, bool restoreLayout)
+    private void LoadSession (string sessionFileName, bool restoreLayout)
     {
-        var outcome = _projectFileHandler.LoadProject(projectFileName);
+        var outcome = _sessionHandler.LoadSession(sessionFileName);
         bool openedTabs = false;
 
         switch (outcome.Status)
         {
-            case ProjectLoadOutcome.LoadStatus.Error:
+            case SessionLoadOutcome.LoadStatus.Error:
                 {
                     ShowOkMessage(outcome.ErrorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
-                                  Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
+                                  Resources.LoadSession_UI_Message_Error_Title_SessionLoadFailed,
                                   MessageBoxIcon.Error);
                     return;
                 }
-            case ProjectLoadOutcome.LoadStatus.EmptyProject:
+            case SessionLoadOutcome.LoadStatus.EmptySession:
                 {
-                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
-                                  Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LoadSession_UI_Message_Error_Title_SessionLoadFailed,
+                                  Resources.LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound,
                                   MessageBoxIcon.Error);
                     return;
                 }
-            case ProjectLoadOutcome.LoadStatus.NeedsIntervention:
+            case SessionLoadOutcome.LoadStatus.NeedsIntervention:
                 {
                     var (dialogResult, updateSessionFile, selectedAlternatives) =
                     MissingFilesDialog.ShowDialog(outcome.ValidationResult!, outcome.HasLayoutData);
@@ -1481,12 +1481,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         SelectedAlternatives = selectedAlternatives
                     };
 
-                    var interventionResult = _projectFileHandler.ContinueLoad(outcome, resolution, restoreLayout);
+                    var interventionResult = _sessionHandler.ContinueLoad(outcome, resolution, restoreLayout);
 
                     if (updateSessionFile)
                     {
-                        ShowOkMessage(Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
-                                      Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
+                        ShowOkMessage(Resources.LoadSession_UI_Message_Error_Message_UpdateSessionFile,
+                                      Resources.LoadSession_UI_Message_Error_Title_UpdateSessionFile,
                                       MessageBoxIcon.Information);
                     }
 
@@ -1504,9 +1504,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                     openedTabs = interventionResult.OpenedTabs;
                     break;
                 }
-            case ProjectLoadOutcome.LoadStatus.Success:
+            case SessionLoadOutcome.LoadStatus.Success:
                 {
-                    openedTabs = _projectFileHandler.ContinueLoad(outcome, null, restoreLayout).OpenedTabs;
+                    openedTabs = _sessionHandler.ContinueLoad(outcome, null, restoreLayout).OpenedTabs;
                     break;
                 }
         }
@@ -2364,12 +2364,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnSaveProjectToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnSaveSessionToolStripMenuItemClick (object sender, EventArgs e)
     {
         SaveFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -2386,13 +2386,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
             }
 
-            ProjectData projectData = new()
+            SessionData sessionData = new()
             {
                 FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
 
-            if (!_projectFileHandler.SaveProject(fileName, projectData, out var errorMessage))
+            if (!_sessionHandler.SaveSession(fileName, sessionData, out var errorMessage))
             {
                 ShowOkMessage(errorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
                               Resources.LogExpert_Common_UI_Title_Error,
@@ -2402,18 +2402,18 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnLoadProjectToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnLoadSessionToolStripMenuItemClick (object sender, EventArgs e)
     {
         OpenFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            var projectFileName = dlg.FileName;
-            LoadProject(projectFileName, true);
+            var sessionFileName = dlg.FileName;
+            LoadSession(sessionFileName, true);
         }
     }
 

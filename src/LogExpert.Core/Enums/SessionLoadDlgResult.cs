@@ -1,6 +1,6 @@
 ﻿namespace LogExpert.Core.Enums;
 
-public enum ProjectLoadDlgResult
+public enum SessionLoadDlgResult
 {
     Cancel,
     CloseTabs,

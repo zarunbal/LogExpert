@@ -17,7 +17,7 @@ internal static class MissingFilesMessageBox
     /// </summary>
     /// <param name="validationResult">The validation result containing missing file information</param>
     /// <returns>True if user wants to continue loading valid files, false to cancel</returns>
-    public static bool Show (ProjectValidationResult validationResult)
+    public static bool Show (SessionValidationResult validationResult)
     {
         ArgumentNullException.ThrowIfNull(validationResult);
 

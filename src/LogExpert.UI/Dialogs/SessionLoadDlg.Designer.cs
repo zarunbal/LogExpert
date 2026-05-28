@@ -1,6 +1,6 @@
 ﻿namespace LogExpert.Dialogs;
 
-partial class ProjectLoadDlg
+partial class SessionLoadDlg
 {
 /// <summary>
 /// Required designer variable.
@@ -28,7 +28,7 @@ protected override void Dispose(bool disposing)
 /// </summary>
 private void InitializeComponent()
 {
-        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProjectLoadDlg));
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SessionLoadDlg));
         this.labelInformational = new System.Windows.Forms.Label();
         this.buttonCloseTabs = new System.Windows.Forms.Button();
         this.buttonNewWindow = new System.Windows.Forms.Button();
@@ -88,7 +88,7 @@ private void InitializeComponent()
         this.labelChooseHowToProceed.TabIndex = 4;
         this.labelChooseHowToProceed.Text = "Please choose how to proceed:";
         // 
-        // ProjectLoadDlg
+        // SessionLoadDlg
         // 
         this.ClientSize = new System.Drawing.Size(258, 196);
         this.Controls.Add(this.labelChooseHowToProceed);
@@ -100,7 +100,7 @@ private void InitializeComponent()
         this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
         this.MaximizeBox = false;
         this.MinimizeBox = false;
-        this.Name = "ProjectLoadDlg";
+        this.Name = "SessionLoadDlg";
         this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
         this.Text = "Loading Session";

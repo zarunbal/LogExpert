@@ -659,7 +659,7 @@
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
 		<value>Das ist eine Test Fehlermeldung, geworfen durch einen Hintergrund Thread</value>
 	</data>
-  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+  <data name="LogTabWindow_UI_Session_Default_Filter" xml:space="preserve">
 		<value>LogExpert Session {0}</value>
 	</data>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
@@ -2074,29 +2074,26 @@ Fortfahren?</value>
   <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
     <value>Gültig</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Sitzungsaktualisierung fehlgeschlagen</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Sitzungsdatei konnte nicht aktualisiert werden: {0}</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
     <value>Sitzung aktualisiert</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
     <value>Die Sitzungsdatei wurde mit den neuen Dateipfaden aktualisiert.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
     <value>Das Laden der Sitzung ist fehlgeschlagen</value>
   </data>
-  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
     <value>Keine der Dateien in dieser Sitzung konnte gefunden werden. Die Sitzung kann nicht geladen werden.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
-    <value>Das Laden des Projekts ist fehlgeschlagen</value>
-  </data>
-  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
-    <value>Fehler beim Laden der Projektdatei. Die Datei ist möglicherweise beschädigt oder nicht zugänglich.</value>
+  <data name="LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>Fehler beim Laden der Sitzung. Die Datei ist möglicherweise beschädigt oder nicht zugänglich.</value>
   </data>
   <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
     <value>Standard (einzelne Zeile)</value>

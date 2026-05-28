@@ -1,6 +1,6 @@
 namespace LogExpert.Core.Classes.Persister;
 
-public class ProjectValidationResult
+public class SessionValidationResult
 {
     public List<string> ValidFiles { get; } = [];
 

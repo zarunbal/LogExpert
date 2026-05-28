@@ -40,8 +40,8 @@ namespace LogExpert.UI.Controls.LogTabWindow
             multiFileEnabledStripMenuItem = new ToolStripMenuItem();
             multifileMaskToolStripMenuItem = new ToolStripMenuItem();
             ToolStripSeparator2 = new ToolStripSeparator();
-            loadProjectToolStripMenuItem = new ToolStripMenuItem();
-            saveProjectToolStripMenuItem = new ToolStripMenuItem();
+            loadSessionToolStripMenuItem = new ToolStripMenuItem();
+            saveSessionToolStripMenuItem = new ToolStripMenuItem();
             exportBookmarksToolStripMenuItem = new ToolStripMenuItem();
             ToolStripSeparator3 = new ToolStripSeparator();
             lastUsedToolStripMenuItem = new ToolStripMenuItem();
@@ -205,7 +205,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openURIToolStripMenuItem, closeFileToolStripMenuItem, reloadToolStripMenuItem, newFromClipboardToolStripMenuItem, ToolStripSeparator1, multiFileToolStripMenuItem, ToolStripSeparator2, loadProjectToolStripMenuItem, saveProjectToolStripMenuItem, exportBookmarksToolStripMenuItem, ToolStripSeparator3, lastUsedToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openURIToolStripMenuItem, closeFileToolStripMenuItem, reloadToolStripMenuItem, newFromClipboardToolStripMenuItem, ToolStripSeparator1, multiFileToolStripMenuItem, ToolStripSeparator2, loadSessionToolStripMenuItem, saveSessionToolStripMenuItem, exportBookmarksToolStripMenuItem, ToolStripSeparator3, lastUsedToolStripMenuItem, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 19);
             fileToolStripMenuItem.Text = "File";
@@ -296,21 +296,21 @@ namespace LogExpert.UI.Controls.LogTabWindow
             ToolStripSeparator2.Name = "ToolStripSeparator2";
             ToolStripSeparator2.Size = new Size(240, 6);
             // 
-            // loadProjectToolStripMenuItem
+            // loadSessionToolStripMenuItem
             // 
-            loadProjectToolStripMenuItem.Name = "loadProjectToolStripMenuItem";
-            loadProjectToolStripMenuItem.Size = new Size(243, 22);
-            loadProjectToolStripMenuItem.Text = "Load session...";
-            loadProjectToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
-            loadProjectToolStripMenuItem.Click += OnLoadProjectToolStripMenuItemClick;
+            loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
+            loadSessionToolStripMenuItem.Size = new Size(243, 22);
+            loadSessionToolStripMenuItem.Text = "Load session...";
+            loadSessionToolStripMenuItem.ToolTipText = "Load a saved session (list of log files)";
+            loadSessionToolStripMenuItem.Click += OnLoadSessionToolStripMenuItemClick;
             // 
-            // saveProjectToolStripMenuItem
+            // saveSessionToolStripMenuItem
             // 
-            saveProjectToolStripMenuItem.Name = "saveProjectToolStripMenuItem";
-            saveProjectToolStripMenuItem.Size = new Size(243, 22);
-            saveProjectToolStripMenuItem.Text = "Save session...";
-            saveProjectToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
-            saveProjectToolStripMenuItem.Click += OnSaveProjectToolStripMenuItemClick;
+            saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
+            saveSessionToolStripMenuItem.Size = new Size(243, 22);
+            saveSessionToolStripMenuItem.Text = "Save session...";
+            saveSessionToolStripMenuItem.ToolTipText = "Save a session (all open tabs)";
+            saveSessionToolStripMenuItem.Click += OnSaveSessionToolStripMenuItemClick;
             // 
             // exportBookmarksToolStripMenuItem
             // 
@@ -1169,8 +1169,8 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private ToolStripMenuItem closeOtherTabsToolStripMenuItem;
         private ToolStripMenuItem closeAllTabsToolStripMenuItem;
         private ToolStripMenuItem tabColorToolStripMenuItem;
-        private ToolStripMenuItem loadProjectToolStripMenuItem;
-        private ToolStripMenuItem saveProjectToolStripMenuItem;
+        private ToolStripMenuItem loadSessionToolStripMenuItem;
+        private ToolStripMenuItem saveSessionToolStripMenuItem;
         private ToolStripButton toolStripButtonBubbles;
         private ToolStripMenuItem copyPathToClipboardToolStripMenuItem;
         private ToolStripMenuItem findInExplorerToolStripMenuItem;

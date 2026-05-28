@@ -33,7 +33,7 @@ internal interface IFileOperationService
 
     /// <summary>
     /// Convenience for AddFileTab with DoNotAddToDockPanel = true.
-    /// Used by LoadProject for layout-restored windows.
+    /// Used by LoadSession for layout-restored windows.
     /// </summary>
     LogWindow AddFileTabDeferred (string fileName, bool isTempFile, string? title, bool forcePersistenceLoading, ILogLineMemoryColumnizer? preProcessColumnizer);
 
