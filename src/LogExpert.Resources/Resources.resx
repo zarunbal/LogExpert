@@ -665,7 +665,7 @@
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
         <value>This is a test exception thrown by a background thread</value>
     </data>
-  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+  <data name="LogTabWindow_UI_Session_Default_Filter" xml:space="preserve">
         <value>LogExpert session {0}</value>
     </data>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
@@ -2138,28 +2138,25 @@ Restart LogExpert to apply changes?</value>
   <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
     <value>Default (single line)</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
-    <value>Error loading project file. The file may be corrupted or inaccessible.</value>
+  <data name="LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>Error loading session. The file may be corrupted or inaccessible.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
-    <value>Project Load Failed</value>
-  </data>
-  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
     <value>None of the files in this session could be found. The session cannot be loaded.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
     <value>Session Load Failed</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
     <value>Session file has been updated with the new file paths.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
     <value>Session Updated</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Failed to update session file: {0}</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Session Update Failed</value>
   </data>
   <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">

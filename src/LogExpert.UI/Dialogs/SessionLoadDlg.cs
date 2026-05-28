@@ -6,7 +6,7 @@ using LogExpert.Core.Enums;
 namespace LogExpert.Dialogs;
 
 [SupportedOSPlatform("windows")]
-internal partial class ProjectLoadDlg : Form
+internal partial class SessionLoadDlg : Form
 {
     #region Fields
 
@@ -14,7 +14,7 @@ internal partial class ProjectLoadDlg : Form
 
     #region cTor
 
-    public ProjectLoadDlg ()
+    public SessionLoadDlg ()
     {
         SuspendLayout();
 
@@ -43,7 +43,7 @@ internal partial class ProjectLoadDlg : Form
     #region Properties
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public ProjectLoadDlgResult ProjectLoadResult { get; set; } = ProjectLoadDlgResult.Cancel;
+    public SessionLoadDlgResult SessionLoadResult { get; set; } = SessionLoadDlgResult.Cancel;
 
     #endregion
 
@@ -51,19 +51,19 @@ internal partial class ProjectLoadDlg : Form
 
     private void OnButtonCloseTabsClick (object sender, EventArgs e)
     {
-        ProjectLoadResult = ProjectLoadDlgResult.CloseTabs;
+        SessionLoadResult = SessionLoadDlgResult.CloseTabs;
         Close();
     }
 
     private void OnButtonNewWindowClick (object sender, EventArgs e)
     {
-        ProjectLoadResult = ProjectLoadDlgResult.NewWindow;
+        SessionLoadResult = SessionLoadDlgResult.NewWindow;
         Close();
     }
 
     private void OnButtonIgnoreClick (object sender, EventArgs e)
     {
-        ProjectLoadResult = ProjectLoadDlgResult.IgnoreLayout;
+        SessionLoadResult = SessionLoadDlgResult.IgnoreLayout;
         Close();
     }
 

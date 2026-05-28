@@ -568,7 +568,7 @@
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
     <value>这是由后台线程抛出的测试异常</value>
   </data>
-  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+  <data name="LogTabWindow_UI_Session_Default_Filter" xml:space="preserve">
     <value>LogExpert 会话 {0}</value>
   </data>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
@@ -1927,28 +1927,25 @@ YY[YY] = 年
   <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
     <value>默认（单行）</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
-    <value>加载项目文件出错。文件可能已损坏或无法访问。</value>
+  <data name="LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>加载会话出错。文件可能已损坏或无法访问。</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
-    <value>项目加载失败</value>
-  </data>
-  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
     <value>此会话中的文件均未找到。无法加载会话。</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
     <value>会话加载失败</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
     <value>会话文件已使用新文件路径更新。</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
     <value>会话已更新</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
     <value>更新会话文件失败：{0}</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>会话更新失败</value>
   </data>
   <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">

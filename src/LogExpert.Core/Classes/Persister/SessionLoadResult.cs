@@ -3,17 +3,17 @@ namespace LogExpert.Core.Classes.Persister;
 /// <summary>
 /// Represents the result of loading a project file, including validation information.
 /// </summary>
-public class ProjectLoadResult
+public class SessionLoadResult
 {
     /// <summary>
     /// The loaded project data (contains resolved log file paths).
     /// </summary>
-    public ProjectData ProjectData { get; set; }
+    public SessionData SessionData { get; set; }
 
     /// <summary>
     /// Validation result containing valid, missing, and alternative file paths.
     /// </summary>
-    public ProjectValidationResult ValidationResult { get; set; }
+    public SessionValidationResult ValidationResult { get; set; }
 
     /// <summary>
     /// Mapping of original file references to resolved log files.

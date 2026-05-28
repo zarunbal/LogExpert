@@ -1,4 +1,4 @@
-namespace LogExpert.UI.Services.ProjectFileHandlerService;
+namespace LogExpert.UI.Services.SessionHandlerService;
 
 internal readonly record struct MissingFilesResolution
 {

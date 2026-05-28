@@ -22,7 +22,7 @@ internal sealed class FileOperationService (
     IPluginRegistry pluginRegistry,
     Func<FileTabRequest, EncodingOptions, LogWindow> logWindowFactory,
     Func<string?> clipboardTextProvider,
-    Action<string, bool> projectFileCallback) : IFileOperationService
+    Action<string, bool> loadSessionCallback) : IFileOperationService
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -32,7 +32,7 @@ internal sealed class FileOperationService (
     private readonly IPluginRegistry _pluginRegistry = pluginRegistry;
     private readonly Func<FileTabRequest, EncodingOptions, LogWindow> _logWindowFactory = logWindowFactory;
     private readonly Func<string?> _clipboardTextProvider = clipboardTextProvider;
-    private readonly Action<string, bool> _projectFileCallback = projectFileCallback;
+    private readonly Action<string, bool> _loadSessionCallback = loadSessionCallback;
 
     public event EventHandler? FileHistoryChanged;
     public event EventHandler<FileOpenedEventArgs>? FileOpened;
@@ -218,7 +218,7 @@ internal sealed class FileOperationService (
         {
             if (fileNames[0].EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
-                _projectFileCallback(fileNames[0], true);
+                _loadSessionCallback(fileNames[0], true);
                 return MultiFileDecision.Cancel; // Already handled
             }
 
@@ -256,7 +256,7 @@ internal sealed class FileOperationService (
         {
             if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
-                _projectFileCallback(fileName, false);
+                _loadSessionCallback(fileName, false);
             }
             else
             {

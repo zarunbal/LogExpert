@@ -7,10 +7,10 @@ namespace LogExpert.Persister.Tests;
 /// <summary>
 /// Unit tests for the Project File Validator implementation (Issue #514).
 /// Tests validation logic for missing files in project/session loading.
-/// Includes tests for ProjectFileResolver, PersisterHelpers, and ProjectPersister updates.
+/// Includes tests for SessionFileResolver, PersisterHelpers, and SessionPersister updates.
 /// </summary>
 [TestFixture]
-public class ProjectFileValidatorTests
+public class SessionFileValidatorTests
 {
     private string _testDirectory;
     private string _projectFile;
@@ -20,7 +20,7 @@ public class ProjectFileValidatorTests
     public void Setup ()
     {
         // Create temporary test directory
-        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertTests", "ProjectValidator", Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertTests", "SessionValidator", Guid.NewGuid().ToString());
         _ = Directory.CreateDirectory(_testDirectory);
 
         // Initialize test log files list
@@ -71,13 +71,13 @@ public class ProjectFileValidatorTests
     /// </summary>
     private void CreateTestProjectFile (params string[] logFileNames)
     {
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = [.. logFileNames.Select(name => Path.Join(_testDirectory, name))],
             TabLayoutXml = "<layout><dockpanel>test</dockpanel></layout>"
         };
 
-        ProjectPersister.SaveProjectData(_projectFile, projectData);
+        SessionPersister.SaveSessionData(_projectFile, sessionData);
     }
 
     /// <summary>
@@ -221,14 +221,14 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectFileResolver Tests
+    #region SessionFileResolver Tests
 
     [Test]
     public void ProjectFileResolver_ResolveProjectFiles_AllLogFiles_ReturnsUnchanged ()
     {
         // Arrange
         CreateTestLogFiles("file1.log", "file2.log");
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames =
             [
@@ -238,7 +238,7 @@ public class ProjectFileValidatorTests
         };
 
         // Act
-        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionFileResolver.ResolveSessionFiles(sessionData, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
@@ -256,7 +256,7 @@ public class ProjectFileValidatorTests
         CreatePersistenceFile("settings1.lxp", "actual1.log");
         CreatePersistenceFile("settings2.lxp", "actual2.log");
 
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames =
             [
@@ -266,7 +266,7 @@ public class ProjectFileValidatorTests
         };
 
         // Act
-        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionFileResolver.ResolveSessionFiles(sessionData, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
@@ -283,7 +283,7 @@ public class ProjectFileValidatorTests
         CreateTestLogFiles("direct.log", "referenced.log");
         CreatePersistenceFile("indirect.lxp", "referenced.log");
 
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames =
             [
@@ -293,7 +293,7 @@ public class ProjectFileValidatorTests
         };
 
         // Act
-        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionFileResolver.ResolveSessionFiles(sessionData, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
@@ -308,20 +308,20 @@ public class ProjectFileValidatorTests
     {
         // Act & Assert
         _ = Assert.Throws<ArgumentNullException>(() =>
-            ProjectFileResolver.ResolveProjectFiles(null, PluginRegistry.PluginRegistry.Instance));
+            SessionFileResolver.ResolveSessionFiles(null, PluginRegistry.PluginRegistry.Instance));
     }
 
     [Test]
     public void ProjectFileResolver_ResolveProjectFiles_EmptyProject_ReturnsEmptyList ()
     {
         // Arrange
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = []
         };
 
         // Act
-        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionFileResolver.ResolveSessionFiles(sessionData, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Empty, "Empty project should return empty list");
@@ -332,13 +332,13 @@ public class ProjectFileValidatorTests
     {
         // Arrange
         CreateTestLogFiles("test.log");
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = [Path.Join(_testDirectory, "test.log")]
         };
 
         // Act
-        var result = ProjectFileResolver.ResolveProjectFiles(projectData, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionFileResolver.ResolveSessionFiles(sessionData, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.InstanceOf<System.Collections.ObjectModel.ReadOnlyCollection<(string, string)>>());
@@ -346,20 +346,20 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectLoadResult Tests
+    #region SessionLoadResult Tests
 
     [Test]
     public void ProjectLoadResult_HasValidFiles_AllFilesValid_ReturnsTrue ()
     {
         // Arrange
-        var projectData = new ProjectData();
-        var validationResult = new ProjectValidationResult();
+        var sessionData = new SessionData();
+        var validationResult = new SessionValidationResult();
         validationResult.ValidFiles.Add("file1.log");
         validationResult.ValidFiles.Add("file2.log");
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
-            ProjectData = projectData,
+            SessionData = sessionData,
             ValidationResult = validationResult
         };
 
@@ -374,14 +374,14 @@ public class ProjectFileValidatorTests
     public void ProjectLoadResult_HasValidFiles_NoValidFiles_ReturnsFalse ()
     {
         // Arrange
-        var projectData = new ProjectData();
-        var validationResult = new ProjectValidationResult();
+        var sessionData = new SessionData();
+        var validationResult = new SessionValidationResult();
         validationResult.MissingFiles.Add("file1.log");
         validationResult.MissingFiles.Add("file2.log");
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
-            ProjectData = projectData,
+            SessionData = sessionData,
             ValidationResult = validationResult
         };
 
@@ -396,15 +396,15 @@ public class ProjectFileValidatorTests
     public void ProjectLoadResult_HasValidFiles_SomeValidFiles_ReturnsTrue ()
     {
         // Arrange
-        var projectData = new ProjectData();
-        var validationResult = new ProjectValidationResult();
+        var sessionData = new SessionData();
+        var validationResult = new SessionValidationResult();
         validationResult.ValidFiles.Add("file1.log");
         validationResult.MissingFiles.Add("file2.log");
         validationResult.MissingFiles.Add("file3.log");
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
-            ProjectData = projectData,
+            SessionData = sessionData,
             ValidationResult = validationResult
         };
 
@@ -419,14 +419,14 @@ public class ProjectFileValidatorTests
     public void ProjectLoadResult_RequiresUserIntervention_AllFilesValid_ReturnsFalse ()
     {
         // Arrange
-        var projectData = new ProjectData();
-        var validationResult = new ProjectValidationResult();
+        var sessionData = new SessionData();
+        var validationResult = new SessionValidationResult();
         validationResult.ValidFiles.Add("file1.log");
         validationResult.ValidFiles.Add("file2.log");
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
-            ProjectData = projectData,
+            SessionData = sessionData,
             ValidationResult = validationResult
         };
 
@@ -441,14 +441,14 @@ public class ProjectFileValidatorTests
     public void ProjectLoadResult_RequiresUserIntervention_SomeMissingFiles_ReturnsTrue ()
     {
         // Arrange
-        var projectData = new ProjectData();
-        var validationResult = new ProjectValidationResult();
+        var sessionData = new SessionData();
+        var validationResult = new SessionValidationResult();
         validationResult.ValidFiles.Add("file1.log");
         validationResult.MissingFiles.Add("file2.log");
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
-            ProjectData = projectData,
+            SessionData = sessionData,
             ValidationResult = validationResult
         };
 
@@ -469,7 +469,7 @@ public class ProjectFileValidatorTests
             ["C:\\logs\\direct.log"] = "C:\\logs\\direct.log"
         };
 
-        var result = new ProjectLoadResult
+        var result = new SessionLoadResult
         {
             LogToOriginalFileMapping = mapping
         };
@@ -482,13 +482,13 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectValidationResult Tests
+    #region SessionValidationResult Tests
 
     [Test]
     public void ProjectValidationResult_HasMissingFiles_WithMissingFiles_ReturnsTrue ()
     {
         // Arrange
-        var result = new ProjectValidationResult();
+        var result = new SessionValidationResult();
         result.ValidFiles.Add("file1.log");
         result.MissingFiles.Add("file2.log");
 
@@ -503,7 +503,7 @@ public class ProjectFileValidatorTests
     public void ProjectValidationResult_HasMissingFiles_WithoutMissingFiles_ReturnsFalse ()
     {
         // Arrange
-        var result = new ProjectValidationResult();
+        var result = new SessionValidationResult();
         result.ValidFiles.Add("file1.log");
         result.ValidFiles.Add("file2.log");
 
@@ -516,7 +516,7 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectPersister.LoadProjectData - All Files Valid
+    #region SessionPersister.LoadSessionData - All Files Valid
 
     [Test]
     public void LoadProjectData_AllFilesExist_ReturnsSuccessResult ()
@@ -526,11 +526,11 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("log1.log", "log2.log", "log3.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
-        Assert.That(result.ProjectData, Is.Not.Null, "ProjectData should not be null");
+        Assert.That(result.SessionData, Is.Not.Null, "SessionData should not be null");
         Assert.That(result.ValidationResult, Is.Not.Null, "ValidationResult should not be null");
         Assert.That(result.HasValidFiles, Is.True, "Should have valid files");
         Assert.That(result.RequiresUserIntervention, Is.False, "Should not require intervention");
@@ -546,10 +546,10 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("alpha.log", "beta.log", "gamma.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
-        var fileNames = result.ProjectData.FileNames.Select(Path.GetFileName).ToList();
+        var fileNames = result.SessionData.FileNames.Select(Path.GetFileName).ToList();
         Assert.That(fileNames, Does.Contain("alpha.log"), "Should contain alpha.log");
         Assert.That(fileNames, Does.Contain("beta.log"), "Should contain beta.log");
         Assert.That(fileNames, Does.Contain("gamma.log"), "Should contain gamma.log");
@@ -563,11 +563,11 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("test.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
-        Assert.That(result.ProjectData.TabLayoutXml, Is.Not.Null.And.Not.Empty, "TabLayoutXml should be preserved");
-        Assert.That(result.ProjectData.TabLayoutXml, Does.Contain("<layout>"), "Should contain layout XML");
+        Assert.That(result.SessionData.TabLayoutXml, Is.Not.Null.And.Not.Empty, "TabLayoutXml should be preserved");
+        Assert.That(result.SessionData.TabLayoutXml, Does.Contain("<layout>"), "Should contain layout XML");
     }
 
     [Test]
@@ -579,7 +579,7 @@ public class ProjectFileValidatorTests
         CreatePersistenceFile("settings2.lxp", "actual2.log");
 
         // Create project referencing .lxp files
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames =
             [
@@ -587,15 +587,15 @@ public class ProjectFileValidatorTests
                 Path.Join(_testDirectory, "settings2.lxp")
             ]
         };
-        ProjectPersister.SaveProjectData(_projectFile, projectData);
+        SessionPersister.SaveSessionData(_projectFile, sessionData);
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result.ValidationResult.ValidFiles.Count, Is.EqualTo(2), "Should validate actual log files");
-        var fileNames = result.ProjectData.FileNames.Select(Path.GetFileName).ToList();
+        var fileNames = result.SessionData.FileNames.Select(Path.GetFileName).ToList();
         Assert.That(fileNames, Does.Contain("actual1.log"), "Should contain resolved log file");
         Assert.That(fileNames, Does.Contain("actual2.log"), "Should contain resolved log file");
     }
@@ -607,14 +607,14 @@ public class ProjectFileValidatorTests
         CreateTestLogFiles("actual.log");
         CreatePersistenceFile("settings.lxp", "actual.log");
 
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = [Path.Join(_testDirectory, "settings.lxp")]
         };
-        ProjectPersister.SaveProjectData(_projectFile, projectData);
+        SessionPersister.SaveSessionData(_projectFile, sessionData);
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result.LogToOriginalFileMapping, Is.Not.Null);
@@ -626,7 +626,7 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectPersister.LoadProjectData - Some Files Missing
+    #region SessionPersister.LoadSessionData - Some Files Missing
 
     [Test]
     public void LoadProjectData_SomeFilesMissing_ReturnsPartialSuccessResult ()
@@ -637,7 +637,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("exists1.log", "exists2.log", "missing.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
@@ -656,7 +656,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("valid1.log", "valid2.log", "invalid.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         var validFileNames = result.ValidationResult.ValidFiles.Select(Path.GetFileName).ToList();
@@ -674,7 +674,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("present.log", "absent1.log", "absent2.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         var missingFileNames = result.ValidationResult.MissingFiles.Select(Path.GetFileName).ToList();
@@ -692,7 +692,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("only_valid.log", "missing1.log", "missing2.log", "missing3.log", "missing4.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result.HasValidFiles, Is.True, "Should have at least one valid file");
@@ -708,14 +708,14 @@ public class ProjectFileValidatorTests
         CreatePersistenceFile("settings.lxp", "missing.log");
         DeleteLogFiles("missing.log");
 
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = [Path.Join(_testDirectory, "settings.lxp")]
         };
-        ProjectPersister.SaveProjectData(_projectFile, projectData);
+        SessionPersister.SaveSessionData(_projectFile, sessionData);
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result.ValidationResult.MissingFiles.Count, Is.EqualTo(1), "Should report missing log file");
@@ -724,7 +724,7 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectPersister.LoadProjectData - All Files Missing
+    #region SessionPersister.LoadSessionData - All Files Missing
 
     [Test]
     public void LoadProjectData_AllFilesMissing_ReturnsFailureResult ()
@@ -735,7 +735,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("missing1.log", "missing2.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
@@ -753,7 +753,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("gone1.log", "gone2.log", "gone3.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result.ValidationResult.MissingFiles.Count, Is.EqualTo(3), "Should have 3 missing files");
@@ -765,7 +765,7 @@ public class ProjectFileValidatorTests
 
     #endregion
 
-    #region ProjectPersister.LoadProjectData - Empty/Invalid Projects
+    #region SessionPersister.LoadSessionData - Empty/Invalid Projects
 
     [Test]
     public void LoadProjectData_EmptyProject_ReturnsEmptyResult ()
@@ -774,11 +774,11 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile(); // Empty project with no files
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
-        Assert.That(result.ProjectData.FileNames, Is.Empty, "FileNames should be empty");
+        Assert.That(result.SessionData.FileNames, Is.Empty, "FileNames should be empty");
         Assert.That(result.ValidationResult.ValidFiles, Is.Empty, "ValidFiles should be empty");
         Assert.That(result.ValidationResult.MissingFiles, Is.Empty, "MissingFiles should be empty");
     }
@@ -790,12 +790,12 @@ public class ProjectFileValidatorTests
         var nonExistentProject = Path.Join(_testDirectory, "does_not_exist.lxj");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(nonExistentProject, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(nonExistentProject, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         // FIXED: Now returns empty result instead of null when file doesn't exist
         Assert.That(result, Is.Not.Null, "Result should not be null even for non-existent file");
-        Assert.That(result.ProjectData, Is.Not.Null, "ProjectData should be initialized");
+        Assert.That(result.SessionData, Is.Not.Null, "SessionData should be initialized");
     }
 
     [Test]
@@ -807,7 +807,7 @@ public class ProjectFileValidatorTests
 
         // Act & Assert - JsonReaderException is not caught, so it propagates
         _ = Assert.Throws<Newtonsoft.Json.JsonReaderException>(() =>
-            ProjectPersister.LoadProjectData(corruptedProject, PluginRegistry.PluginRegistry.Instance));
+            SessionPersister.LoadSessionData(corruptedProject, PluginRegistry.PluginRegistry.Instance));
     }
 
     #endregion
@@ -819,7 +819,7 @@ public class ProjectFileValidatorTests
     {
         // Arrange
         CreateTestLogFiles("duplicate.log");
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames =
             [
@@ -828,10 +828,10 @@ public class ProjectFileValidatorTests
                 Path.Join(_testDirectory, "duplicate.log")
             ]
         };
-        ProjectPersister.SaveProjectData(_projectFile, projectData);
+        SessionPersister.SaveSessionData(_projectFile, sessionData);
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
@@ -847,7 +847,7 @@ public class ProjectFileValidatorTests
         CreateTestProjectFile("file with spaces.log", "file-with-dashes.log", "file_with_underscores.log");
 
         // Act
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
 
         // Assert
         Assert.That(result, Is.Not.Null, "Result should not be null");
@@ -872,7 +872,7 @@ public class ProjectFileValidatorTests
 
         // Act
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
         stopwatch.Stop();
 
         // Assert
@@ -909,7 +909,7 @@ public class ProjectFileValidatorTests
 
         // Act
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var result = ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance);
+        var result = SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance);
         stopwatch.Stop();
 
         // Assert
@@ -928,7 +928,7 @@ public class ProjectFileValidatorTests
     {
         // Act & Assert - File.ReadAllText throws ArgumentNullException for null path
         _ = Assert.Throws<ArgumentNullException>(() =>
-            ProjectPersister.LoadProjectData(null, PluginRegistry.PluginRegistry.Instance));
+            SessionPersister.LoadSessionData(null, PluginRegistry.PluginRegistry.Instance));
     }
 
     [Test]
@@ -936,7 +936,7 @@ public class ProjectFileValidatorTests
     {
         // Act & Assert - File.ReadAllText throws ArgumentException for empty string
         _ = Assert.Throws<ArgumentException>(() =>
-            ProjectPersister.LoadProjectData(string.Empty, PluginRegistry.PluginRegistry.Instance));
+            SessionPersister.LoadSessionData(string.Empty, PluginRegistry.PluginRegistry.Instance));
     }
 
     [Test]
@@ -947,7 +947,7 @@ public class ProjectFileValidatorTests
 
         // Act & Assert
         _ = Assert.Throws<ArgumentNullException>(() =>
-            ProjectPersister.LoadProjectData(_projectFile, null));
+            SessionPersister.LoadSessionData(_projectFile, null));
     }
 
     #endregion
@@ -973,7 +973,7 @@ public class ProjectFileValidatorTests
 
         // Act & Assert - JsonReaderException is not caught, so XML fallback doesn't trigger
         _ = Assert.Throws<Newtonsoft.Json.JsonReaderException>(() =>
-            ProjectPersister.LoadProjectData(_projectFile, PluginRegistry.PluginRegistry.Instance));
+            SessionPersister.LoadSessionData(_projectFile, PluginRegistry.PluginRegistry.Instance));
     }
 
     #endregion

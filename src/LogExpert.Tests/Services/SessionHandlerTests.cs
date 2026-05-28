@@ -6,7 +6,7 @@ using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
 using LogExpert.UI.Services.FileOperationService;
-using LogExpert.UI.Services.ProjectFileHandlerService;
+using LogExpert.UI.Services.SessionHandlerService;
 
 using Moq;
 
@@ -17,14 +17,14 @@ namespace LogExpert.Tests.Services;
 [TestFixture]
 [Apartment(ApartmentState.STA)]
 [SupportedOSPlatform("windows")]
-internal class ProjectFileHandlerTests : IDisposable
+internal class SessionHandlerTests : IDisposable
 {
     private Mock<IPluginRegistry> _pluginRegistryMock = null!;
     private List<FileTabRequest> _addFileTabCalls = null!;
     private Settings _settings;
     private Mock<IConfigManager> _configManagerMock;
     private LogWindow _stubLogWindow = null!;
-    private ProjectFileHandler _sut = null!;
+    private SessionHandler _sut = null!;
 
     private bool _disposed;
 
@@ -54,7 +54,7 @@ internal class ProjectFileHandlerTests : IDisposable
             forcePersistenceLoading: false,
             configManager: _configManagerMock.Object);
 
-        _sut = new ProjectFileHandler(
+        _sut = new SessionHandler(
             _pluginRegistryMock.Object,
             request =>
             {
@@ -69,7 +69,7 @@ internal class ProjectFileHandlerTests : IDisposable
         _stubLogWindow?.Dispose();
     }
 
-    #region LoadProject — Phase 1 tests
+    #region LoadSession — Phase 1 tests
 
     [Test]
     public void LoadProject_ValidProjectFile_ReturnsSuccess ()
@@ -81,12 +81,12 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
-            Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.Success));
-            Assert.That(outcome.ProjectData, Is.Not.Null);
-            Assert.That(outcome.ProjectData!.FileNames, Has.Count.EqualTo(1));
+            Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.Success));
+            Assert.That(outcome.SessionData, Is.Not.Null);
+            Assert.That(outcome.SessionData!.FileNames, Has.Count.EqualTo(1));
             Assert.That(outcome.ErrorMessage, Is.Null);
             Assert.That(outcome.ValidationResult, Is.Null);
         }
@@ -107,10 +107,10 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
-            Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.Success));
+            Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.Success));
             Assert.That(outcome.HasLayoutData, Is.True);
             Assert.That(outcome.LayoutXml, Is.EqualTo("<DockPanel><Content/></DockPanel>"));
         }
@@ -130,7 +130,7 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
             Assert.That(outcome.HasLayoutData, Is.False);
@@ -153,11 +153,11 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
-            Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.NeedsIntervention));
-            Assert.That(outcome.ProjectData, Is.Not.Null);
+            Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.NeedsIntervention));
+            Assert.That(outcome.SessionData, Is.Not.Null);
             Assert.That(outcome.ValidationResult, Is.Not.Null);
             Assert.That(outcome.ValidationResult!.HasMissingFiles, Is.True);
         }
@@ -177,12 +177,12 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
-            Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.Error));
+            Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.Error));
             Assert.That(outcome.ErrorMessage, Is.Not.Null.And.Not.Empty);
-            Assert.That(outcome.ProjectData, Is.Null);
+            Assert.That(outcome.SessionData, Is.Null);
         }
         finally
         {
@@ -197,10 +197,10 @@ internal class ProjectFileHandlerTests : IDisposable
         var fakePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
 
         // Act
-        var outcome = _sut.LoadProject(fakePath);
+        var outcome = _sut.LoadSession(fakePath);
 
         // Assert
-        Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.Error));
+        Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.Error));
         Assert.That(outcome.ErrorMessage, Is.Not.Null.And.Not.Empty);
     }
 
@@ -213,10 +213,10 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var outcome = _sut.LoadProject(tempFile);
+            var outcome = _sut.LoadSession(tempFile);
 
             // Assert
-            Assert.That(outcome.Status, Is.EqualTo(ProjectLoadOutcome.LoadStatus.EmptyProject));
+            Assert.That(outcome.Status, Is.EqualTo(SessionLoadOutcome.LoadStatus.EmptySession));
             Assert.That(outcome.ErrorMessage, Is.Not.Null.And.Not.Empty);
         }
         finally
@@ -234,7 +234,7 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            _ = _sut.LoadProject(tempFile);
+            _ = _sut.LoadSession(tempFile);
 
             // Assert — phase 1 must never open tabs
             Assert.That(_addFileTabCalls, Is.Empty);
@@ -316,7 +316,7 @@ internal class ProjectFileHandlerTests : IDisposable
     {
         // Arrange
         var outcome = CreateOutcome(
-            ProjectLoadOutcome.LoadStatus.NeedsIntervention,
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\old\\missing.log", "C:\\logs\\existing.log"],
             layoutXml: null);
 
@@ -342,7 +342,7 @@ internal class ProjectFileHandlerTests : IDisposable
     {
         // Arrange
         var outcome = CreateOutcome(
-            ProjectLoadOutcome.LoadStatus.NeedsIntervention,
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\missing.log", "C:\\missing.log"],
             layoutXml: null);
 
@@ -368,7 +368,7 @@ internal class ProjectFileHandlerTests : IDisposable
     {
         // Arrange
         var outcome = CreateOutcome(
-            ProjectLoadOutcome.LoadStatus.NeedsIntervention,
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\logs\\app.log"],
             layoutXml: "<DockPanel/>");
 
@@ -388,7 +388,7 @@ internal class ProjectFileHandlerTests : IDisposable
     {
         // Arrange
         var outcome = CreateOutcome(
-            ProjectLoadOutcome.LoadStatus.NeedsIntervention,
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\logs\\app.log"],
             layoutXml: null);
 
@@ -409,7 +409,7 @@ internal class ProjectFileHandlerTests : IDisposable
     {
         // Arrange
         var outcome = CreateOutcome(
-            ProjectLoadOutcome.LoadStatus.NeedsIntervention,
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\old\\missing.log", "C:\\logs\\existing.log"],
             layoutXml: null);
 
@@ -441,14 +441,14 @@ internal class ProjectFileHandlerTests : IDisposable
 
         try
         {
-            var outcome = new ProjectLoadOutcome
+            var outcome = new SessionLoadOutcome
             {
-                Status = ProjectLoadOutcome.LoadStatus.NeedsIntervention,
-                ProjectData = new ProjectData
+                Status = SessionLoadOutcome.LoadStatus.NeedsIntervention,
+                SessionData = new SessionData
                 {
                     FileNames = ["C:\\old\\missing.log"],
                     TabLayoutXml = "<Layout/>",
-                    ProjectFilePath = tempFile
+                    SessionFilePath = tempFile
                 },
                 LayoutXml = "<Layout/>"
             };
@@ -466,10 +466,10 @@ internal class ProjectFileHandlerTests : IDisposable
             _ = _sut.ContinueLoad(outcome, resolution, restoreLayout: false);
 
             // Assert: reload the file and check the path was updated
-            var reloaded = ProjectPersister.LoadProjectData(tempFile, _pluginRegistryMock.Object);
-            Assert.That(reloaded?.ProjectData?.FileNames, Has.Some.Contains("found.log"));
+            var reloaded = SessionPersister.LoadSessionData(tempFile, _pluginRegistryMock.Object);
+            Assert.That(reloaded?.SessionData?.FileNames, Has.Some.Contains("found.log"));
             // Layout XML must be preserved
-            Assert.That(reloaded?.ProjectData?.TabLayoutXml, Is.EqualTo("<Layout/>"));
+            Assert.That(reloaded?.SessionData?.TabLayoutXml, Is.EqualTo("<Layout/>"));
         }
         finally
         {
@@ -487,13 +487,13 @@ internal class ProjectFileHandlerTests : IDisposable
         {
             var originalContent = File.ReadAllText(tempFile);
 
-            var outcome = new ProjectLoadOutcome
+            var outcome = new SessionLoadOutcome
             {
-                Status = ProjectLoadOutcome.LoadStatus.NeedsIntervention,
-                ProjectData = new ProjectData
+                Status = SessionLoadOutcome.LoadStatus.NeedsIntervention,
+                SessionData = new SessionData
                 {
                     FileNames = ["C:\\old\\missing.log"],
-                    ProjectFilePath = tempFile
+                    SessionFilePath = tempFile
                 }
             };
 
@@ -534,14 +534,14 @@ internal class ProjectFileHandlerTests : IDisposable
 
     #endregion
 
-    #region SaveProject tests
+    #region SaveSession tests
 
     [Test]
     public void SaveProject_ValidData_ReturnsTrueAndNullError ()
     {
         // Arrange
         var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = ["C:\\logs\\app.log"],
             TabLayoutXml = "<Layout/>"
@@ -550,7 +550,7 @@ internal class ProjectFileHandlerTests : IDisposable
         try
         {
             // Act
-            var success = _sut.SaveProject(tempFile, projectData, out var errorMessage);
+            var success = _sut.SaveSession(tempFile, sessionData, out var errorMessage);
 
             // Assert
             Assert.That(success, Is.True);
@@ -569,16 +569,16 @@ internal class ProjectFileHandlerTests : IDisposable
     [Test]
     public void SaveProject_NullPath_ReturnsFalseWithErrorMessage ()
     {
-        // Note: ProjectPersister.SaveProjectData swallows IOException/UnauthorizedAccessException/
+        // Note: SessionPersister.SaveSessionData swallows IOException/UnauthorizedAccessException/
         // JsonSerializationException. Only uncaught exceptions (e.g. ArgumentNullException from
-        // File.WriteAllText(null,...)) propagate to ProjectFileHandler.SaveProject's catch block.
-        var projectData = new ProjectData
+        // File.WriteAllText(null,...)) propagate to SessionHandler.SaveSession's catch block.
+        var sessionData = new SessionData
         {
             FileNames = ["C:\\logs\\app.log"]
         };
 
         // Act
-        var success = _sut.SaveProject(null!, projectData, out var errorMessage);
+        var success = _sut.SaveSession(null!, sessionData, out var errorMessage);
 
         // Assert
         Assert.That(success, Is.False);
@@ -589,17 +589,17 @@ internal class ProjectFileHandlerTests : IDisposable
 
     #region Helpers
 
-    private static ProjectLoadOutcome CreateSuccessOutcome (List<string> fileNames, string? layoutXml)
+    private static SessionLoadOutcome CreateSuccessOutcome (List<string> fileNames, string? layoutXml)
     {
-        return CreateOutcome(ProjectLoadOutcome.LoadStatus.Success, fileNames, layoutXml);
+        return CreateOutcome(SessionLoadOutcome.LoadStatus.Success, fileNames, layoutXml);
     }
 
-    private static ProjectLoadOutcome CreateOutcome (ProjectLoadOutcome.LoadStatus status, List<string> fileNames, string? layoutXml)
+    private static SessionLoadOutcome CreateOutcome (SessionLoadOutcome.LoadStatus status, List<string> fileNames, string? layoutXml)
     {
-        return new ProjectLoadOutcome
+        return new SessionLoadOutcome
         {
             Status = status,
-            ProjectData = new ProjectData
+            SessionData = new SessionData
             {
                 FileNames = fileNames,
                 TabLayoutXml = layoutXml!
@@ -624,14 +624,14 @@ internal class ProjectFileHandlerTests : IDisposable
     /// </summary>
     private static string CreateTempProjectFile (List<string> fileNames, string? layoutXml)
     {
-        var projectData = new ProjectData
+        var sessionData = new SessionData
         {
             FileNames = fileNames,
             TabLayoutXml = layoutXml!
         };
 
         var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
-        ProjectPersister.SaveProjectData(tempFile, projectData);
+        SessionPersister.SaveSessionData(tempFile, sessionData);
         return tempFile;
     }
 

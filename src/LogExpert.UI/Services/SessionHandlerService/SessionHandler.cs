@@ -8,71 +8,71 @@ using LogExpert.UI.Services.FileOperationService;
 
 using NLog;
 
-namespace LogExpert.UI.Services.ProjectFileHandlerService;
+namespace LogExpert.UI.Services.SessionHandlerService;
 
 [SupportedOSPlatform("windows")]
-internal sealed class ProjectFileHandler (
+internal sealed class SessionHandler (
     IPluginRegistry pluginRegistry,
     Func<FileTabRequest, LogWindow> addFileTab)
-    : IProjectFileHandler
+    : ISessionHandler
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-    public ProjectLoadOutcome LoadProject (string projectFileName)
+    public SessionLoadOutcome LoadSession (string sessionFileName)
     {
         try
         {
-            if (!File.Exists(projectFileName))
+            if (!File.Exists(sessionFileName))
             {
-                _logger.Warn("LoadProject: File does not exist: {FileName}", projectFileName);
+                _logger.Warn("LoadSession: File does not exist: {FileName}", sessionFileName);
 
-                return new ProjectLoadOutcome
+                return new SessionLoadOutcome
                 {
-                    Status = ProjectLoadOutcome.LoadStatus.Error,
-                    ErrorMessage = $"Project file not found: {projectFileName}"
+                    Status = SessionLoadOutcome.LoadStatus.Error,
+                    ErrorMessage = $"Project file not found: {sessionFileName}"
                 };
             }
 
-            var loadResult = ProjectPersister.LoadProjectData(projectFileName, pluginRegistry);
+            var loadResult = SessionPersister.LoadSessionData(sessionFileName, pluginRegistry);
 
-            if (loadResult?.ProjectData == null)
+            if (loadResult?.SessionData == null)
             {
-                _logger.Warn("LoadProject: ProjectData is null for {FileName}", projectFileName);
+                _logger.Warn("LoadSession: SessionData is null for {FileName}", sessionFileName);
 
-                return new ProjectLoadOutcome
+                return new SessionLoadOutcome
                 {
-                    Status = ProjectLoadOutcome.LoadStatus.Error,
-                    ErrorMessage = Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible
+                    Status = SessionLoadOutcome.LoadStatus.Error,
+                    ErrorMessage = Resources.LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible
                 };
             }
 
-            var projectData = loadResult.ProjectData;
+            var sessionData = loadResult.SessionData;
 
-            if (projectData.FileNames.Count == 0)
+            if (sessionData.FileNames.Count == 0)
             {
-                _logger.Warn("LoadProject: No files in project {FileName}", projectFileName);
+                _logger.Warn("LoadSession: No files in project {FileName}", sessionFileName);
 
-                return new ProjectLoadOutcome
+                return new SessionLoadOutcome
                 {
-                    Status = ProjectLoadOutcome.LoadStatus.EmptyProject,
-                    ErrorMessage = Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound
+                    Status = SessionLoadOutcome.LoadStatus.EmptySession,
+                    ErrorMessage = Resources.LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound
                 };
             }
 
-            var layoutXml = projectData.TabLayoutXml;
+            var layoutXml = sessionData.TabLayoutXml;
 
             return loadResult.RequiresUserIntervention
-                ? new ProjectLoadOutcome
+                ? new SessionLoadOutcome
                 {
-                    Status = ProjectLoadOutcome.LoadStatus.NeedsIntervention,
-                    ProjectData = projectData,
+                    Status = SessionLoadOutcome.LoadStatus.NeedsIntervention,
+                    SessionData = sessionData,
                     ValidationResult = loadResult.ValidationResult,
                     LayoutXml = layoutXml
                 }
-                : new ProjectLoadOutcome
+                : new SessionLoadOutcome
                 {
-                    Status = ProjectLoadOutcome.LoadStatus.Success,
-                    ProjectData = projectData,
+                    Status = SessionLoadOutcome.LoadStatus.Success,
+                    SessionData = sessionData,
                     LayoutXml = layoutXml
                 };
         }
@@ -81,50 +81,50 @@ internal sealed class ProjectFileHandler (
                                          InvalidOperationException or
                                          Newtonsoft.Json.JsonException)
         {
-            _logger.Error(ex, "LoadProject: Exception loading {FileName}", projectFileName);
+            _logger.Error(ex, "LoadSession: Exception loading {FileName}", sessionFileName);
 
-            return new ProjectLoadOutcome
+            return new SessionLoadOutcome
             {
-                Status = ProjectLoadOutcome.LoadStatus.Error,
+                Status = SessionLoadOutcome.LoadStatus.Error,
                 ErrorMessage = $"Error loading project: {ex.Message}"
             };
         }
     }
 
-    public ContinueLoadResult ContinueLoad (ProjectLoadOutcome loadOutcome, MissingFilesResolution? resolution, bool restoreLayout)
+    public ContinueLoadResult ContinueLoad (SessionLoadOutcome loadOutcome, MissingFilesResolution? resolution, bool restoreLayout)
     {
         ArgumentNullException.ThrowIfNull(loadOutcome);
-        ArgumentNullException.ThrowIfNull(loadOutcome.ProjectData);
+        ArgumentNullException.ThrowIfNull(loadOutcome.SessionData);
 
-        var projectData = loadOutcome.ProjectData;
+        var sessionData = loadOutcome.SessionData;
 
         // Apply selected alternatives to file paths (in-place, exact string match)
         if (resolution?.SelectedAlternatives is { } alternatives)
         {
-            for (int i = 0; i < projectData.FileNames.Count; i++)
+            for (int i = 0; i < sessionData.FileNames.Count; i++)
             {
-                var originalPath = projectData.FileNames[i];
+                var originalPath = sessionData.FileNames[i];
                 if (alternatives.TryGetValue(originalPath, out var replacement))
                 {
-                    projectData.FileNames[i] = replacement;
+                    sessionData.FileNames[i] = replacement;
                 }
             }
         }
 
         // Save updated session file if requested
-        if (resolution is { UpdateSessionFile: true } && !string.IsNullOrEmpty(projectData.ProjectFilePath))
+        if (resolution is { UpdateSessionFile: true } && !string.IsNullOrEmpty(sessionData.SessionFilePath))
         {
             try
             {
-                ProjectPersister.SaveProjectData(projectData.ProjectFilePath, projectData);
-                _logger.Info("ContinueLoad: Updated session file {FileName}", projectData.ProjectFilePath);
+                SessionPersister.SaveSessionData(sessionData.SessionFilePath, sessionData);
+                _logger.Info("ContinueLoad: Updated session file {FileName}", sessionData.SessionFilePath);
             }
             catch (Exception ex) when (ex is IOException or
                                              UnauthorizedAccessException or
                                              InvalidOperationException or
                                              ArgumentException)
             {
-                _logger.Error(ex, "ContinueLoad: Failed to update session file {FileName}", projectData.ProjectFilePath);
+                _logger.Error(ex, "ContinueLoad: Failed to update session file {FileName}", sessionData.SessionFilePath);
             }
         }
 
@@ -132,7 +132,7 @@ internal sealed class ProjectFileHandler (
         if (resolution is { OpenInNewWindow: true })
         {
             var resolvedFiles = PersisterHelpers.FindFilenameForSettings(
-                projectData.FileNames.AsReadOnly(), pluginRegistry);
+                sessionData.FileNames.AsReadOnly(), pluginRegistry);
 
             return new ContinueLoadResult
             {
@@ -146,7 +146,7 @@ internal sealed class ProjectFileHandler (
         bool deferForLayout = loadOutcome.HasLayoutData && restoreLayout;
         int openedCount = 0;
 
-        foreach (var fileName in projectData.FileNames)
+        foreach (var fileName in sessionData.FileNames)
         {
             var request = new FileTabRequest
             {
@@ -181,11 +181,11 @@ internal sealed class ProjectFileHandler (
         };
     }
 
-    public bool SaveProject (string projectFileName, ProjectData projectData, out string? errorMessage)
+    public bool SaveSession (string sessionFileName, SessionData sessionData, out string? errorMessage)
     {
         try
         {
-            ProjectPersister.SaveProjectData(projectFileName, projectData);
+            SessionPersister.SaveSessionData(sessionFileName, sessionData);
             errorMessage = null;
             return true;
         }
@@ -194,7 +194,7 @@ internal sealed class ProjectFileHandler (
                                          InvalidOperationException or
                                          ArgumentException)
         {
-            _logger.Error(ex, "SaveProject: Failed to save {FileName}", projectFileName);
+            _logger.Error(ex, "SaveSession: Failed to save {FileName}", sessionFileName);
             errorMessage = $"Error saving project: {ex.Message}";
             return false;
         }

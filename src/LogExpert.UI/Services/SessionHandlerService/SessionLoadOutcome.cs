@@ -1,22 +1,22 @@
 using LogExpert.Core.Classes.Persister;
 
-namespace LogExpert.UI.Services.ProjectFileHandlerService;
+namespace LogExpert.UI.Services.SessionHandlerService;
 
-internal sealed class ProjectLoadOutcome
+internal sealed class SessionLoadOutcome
 {
     public enum LoadStatus
     {
         Success,
         NeedsIntervention,
         Error,
-        EmptyProject
+        EmptySession
     }
 
     public required LoadStatus Status { get; init; }
 
-    public ProjectData? ProjectData { get; init; }
+    public SessionData? SessionData { get; init; }
 
-    public ProjectValidationResult? ValidationResult { get; init; }
+    public SessionValidationResult? ValidationResult { get; init; }
 
     public string? LayoutXml { get; init; }
 
