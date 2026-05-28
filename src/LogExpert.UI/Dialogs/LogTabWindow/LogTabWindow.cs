@@ -17,6 +17,7 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
 using LogExpert.UI.Dialogs;
+using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;

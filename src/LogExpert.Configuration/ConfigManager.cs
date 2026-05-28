@@ -328,7 +328,6 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
-
     public void ClearLastOpenFilesList ()
     {
         lock (_loadSaveLock)
@@ -596,6 +595,9 @@ public class ConfigManager : IConfigManager
 
     private static Settings InitializeSettings (Settings settings)
     {
+        // Apply any pending schema migrations before any consumer reads the settings.
+        _ = LegacyPreferencesMigrator.Migrate(settings);
+
         settings.Preferences ??= new Preferences();
         settings.Preferences.ToolEntries ??= [];
         settings.Preferences.ColumnizerMaskList ??= [];

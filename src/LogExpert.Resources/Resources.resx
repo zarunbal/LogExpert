@@ -885,6 +885,27 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_CheckBox_checkBoxMaskPrio" xml:space="preserve">
         <value>Mask has priority before history</value>
     </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority" xml:space="preserve">
+        <value>Columnizer selection priority</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask" xml:space="preserve">
+        <value>Use history then mask (default)</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory" xml:space="preserve">
+        <value>Use mask, then history</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence" xml:space="preserve">
+        <value>Use mask, override per-file persistence</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType" xml:space="preserve">
+        <value>Type</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType" xml:space="preserve">
+        <value>Glob uses * and ? wildcards. Regex uses .NET regular expression syntax.</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale" xml:space="preserve">
+        <value>Columnizer '{0}' is not installed — this entry will be skipped.</value>
+    </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxPortableMode" xml:space="preserve">
         <value>Activate Portable Mode</value>
     </data>

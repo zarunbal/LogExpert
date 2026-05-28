@@ -5546,6 +5546,33 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer &apos;{0}&apos; is not installed — this entry will be skipped..
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glob uses * and ? wildcards. Regex uses .NET regular expression syntax..
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Columnizer.
         /// </summary>
         public static string SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer {
@@ -5623,6 +5650,15 @@ namespace LogExpert {
         public static string SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer selection priority.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority", resourceCulture);
             }
         }
         
@@ -6218,6 +6254,33 @@ namespace LogExpert {
         public static string SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDragInverted {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDragInverted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use history then mask (default).
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use mask, override per-file persistence.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use mask, then history.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory", resourceCulture);
             }
         }
         

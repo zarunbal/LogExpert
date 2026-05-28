@@ -5279,7 +5279,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private static void FilterRestore (LogWindow newWin, PersistenceData persistenceData)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         if (columnizer != null)
         {
@@ -6358,6 +6358,24 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                 SetDefaultHighlightGroup();
             }
+            else if (ConfigManager.Settings.Preferences.ColumnizerSelectionPriority == Core.Config.ColumnizerSelectionPriority.MaskOverridesPersistence
+                     && !IsTempFile)
+            {
+                // The user opted in to mask-overrides-persistence: the .lxp file's bookmarks, filters,
+                // highlight group, encoding etc. still apply, but the columnizer is replaced by the
+                // mask list's match (if any).
+                var shortName = Util.GetNameFromPath(fileName);
+                var maskColumnizer = _logWindowCoordinator.TryGetMaskColumnizer(shortName);
+                if (maskColumnizer != null)
+                {
+                    if (_reloadMemento == null)
+                    {
+                        maskColumnizer = ColumnizerPicker.CloneMemoryColumnizer(maskColumnizer, ConfigManager.ActiveConfigDir);
+                    }
+
+                    PreSelectColumnizer(maskColumnizer);
+                }
+            }
 
             // this may be set after loading persistence data
             if (_fileNames != null && IsMultiFile)
@@ -6640,7 +6658,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void PreSelectColumnizerByName (string columnizerName)
     {
-        var columnizer = ColumnizerPicker.FindMemorColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
         PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
     }
 

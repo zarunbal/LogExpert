@@ -1,5 +1,9 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace LogExpert.Core.Config;
 
+[JsonConverter(typeof(StringEnumConverter))]
 public enum ControlCharStyle
 {
     ControlPictures = 0,

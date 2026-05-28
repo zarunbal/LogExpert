@@ -1,7 +1,9 @@
 using System.Drawing;
+using System.Runtime.Versioning;
 
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
+using LogExpert.Core.Helpers;
 
 namespace LogExpert.Core.Config;
 
@@ -131,7 +133,19 @@ public class Preferences
 
     public int MaximumFilterEntriesDisplayed { get; set; } = 20;
 
+    /// <summary>
+    /// Obsolete: replaced by <see cref="ColumnizerSelectionPriority"/>. Will be removed in 1.50. During settings load,
+    /// <see cref="LegacyPreferencesMigrator"/> migrates a <c> true</c> value here to
+    /// <see cref="ColumnizerSelectionPriority.MaskThenHistory"/> on the new property.
+    /// </summary>
+    [Obsolete("Replaced by ColumnizerSelectionPriority; will be removed in 1.50.")]
     public bool MaskPrio { get; set; }
+
+    /// <summary>
+    /// Controls the precedence order used to resolve a columnizer for a newly opened file.
+    /// </summary>
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public ColumnizerSelectionPriority ColumnizerSelectionPriority { get; set; } = ColumnizerSelectionPriority.HistoryThenMask;
 
     public bool AutoPick { get; set; }
 
@@ -170,7 +184,16 @@ public class Preferences
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    public Font Font { get; set; }
+    [SupportedOSPlatform("windows")]
+    public Font Font
+    {
+        // Lazily materialize from FontString so callers that build Preferences directly (e.g. tests
+        // that bypass ConfigManager.InitializeFont) get a usable Font without manual setup.
+        // ConfigManager.InitializeFont still goes through the setter to install the canonical
+        // instance during real config load.
+        get => field ??= FontHelper.ParseFontStringOrDefault(FontString);
+        set;
+    }
 
     [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'FontString' will be used for Importing / Exporting the Font")]
     public float FontSize { get => field; set => field = MathF.Round(value, 1); } = 9.0f;

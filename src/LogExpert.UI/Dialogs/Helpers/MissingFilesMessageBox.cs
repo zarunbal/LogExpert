@@ -3,7 +3,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Persister;
 
-namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs.Helpers;
 
 /// <summary>
 /// Temporary helper for showing missing file alerts until full dialog is implemented.

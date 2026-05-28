@@ -1,19 +1,21 @@
-namespace LogExpert.UI.Dialogs;
+namespace LogExpert.UI.Dialogs.Helpers;
 
 /// <summary>
 /// Represents a file item in the Missing Files Dialog ListView.
 /// </summary>
-public class MissingFileItem
+/// <param name="originalPath">Original path from session file</param>
+/// <param name="status">Current file status</param>
+public class MissingFileItem (string originalPath, FileStatus status)
 {
     /// <summary>
     /// Original file path from the session/project file.
     /// </summary>
-    public string OriginalPath { get; set; }
+    public string OriginalPath { get; set; } = originalPath;
 
     /// <summary>
     /// Current status of the file.
     /// </summary>
-    public FileStatus Status { get; set; }
+    public FileStatus Status { get; set; } = status;
 
     /// <summary>
     /// List of alternative paths that might be the same file.
@@ -23,7 +25,7 @@ public class MissingFileItem
     /// <summary>
     /// Currently selected path (original or alternative).
     /// </summary>
-    public string SelectedPath { get; set; }
+    public string SelectedPath { get; set; } = originalPath;
 
     /// <summary>
     /// Indicates whether the file is accessible.
@@ -46,16 +48,4 @@ public class MissingFileItem
         FileStatus.AlternativeSelected => "Alternative Selected",
         _ => "Unknown"
     };
-
-    /// <summary>
-    /// Constructor for MissingFileItem.
-    /// </summary>
-    /// <param name="originalPath">Original path from session file</param>
-    /// <param name="status">Current file status</param>
-    public MissingFileItem (string originalPath, FileStatus status)
-    {
-        OriginalPath = originalPath;
-        Status = status;
-        SelectedPath = originalPath;
-    }
 }

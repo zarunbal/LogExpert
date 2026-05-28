@@ -71,7 +71,6 @@ public class PluginRegistry : IPluginRegistry
         _applicationConfigurationFolder = applicationConfigurationFolder;
         PollingInterval = pollingInterval;
 
-        // Initialize Priority 3 & 4 components
         _pluginLoader = new DefaultPluginLoader();
         _eventBus = new PluginEventBus();
 
@@ -121,9 +120,6 @@ public class PluginRegistry : IPluginRegistry
     {
         AppDomain.CurrentDomain.AssemblyResolve -= ColumnizerResolveEventHandler;
         AppDomain.CurrentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
-
-        //// Wire up the converter's assembly loader to go through validated loading
-        //LogExpert.Core.Classes.JsonConverters.ColumnizerJsonConverter.AssemblyLoader = LoadAndValidateAssembly;
     }
 
     #endregion
@@ -148,7 +144,9 @@ public class PluginRegistry : IPluginRegistry
                 foreach (var loader in _lazyColumnizers.ToList())
                 {
                     var instance = loader.GetInstance();
-                    if (instance != null && !field.Contains(instance))
+                    // Data duplication by type, not by reference: GetInstance() returns a freshly constructed
+                    // object, so Contains() (reference equality) would never catch a same-type duplicate.
+                    if (instance != null && !field.Any(c => c.GetType() == instance.GetType()))
                     {
                         field.Add(instance);
                         InitializePluginIfNeeded(instance, loader.Manifest, loader.DllPath);
@@ -872,6 +870,15 @@ public class PluginRegistry : IPluginRegistry
             return;
         }
 
+        // Skip if a columnizer of this type is already registered. RegisteredColumnizers holds one
+        // template instance per type, so a same-type entry is always a duplicate (e.g. a built-in
+        // columnizer rediscovered because its defining assembly was scanned).
+        if (RegisteredColumnizers.Any(c => c.GetType() == columnizer.GetType()))
+        {
+            _logger.Debug("Columnizer type {Type} already registered, skipping duplicate", columnizer.GetType().FullName);
+            return;
+        }
+
         // Add to registered columnizers
         RegisteredColumnizers.Add(columnizer);
 
@@ -890,8 +897,7 @@ public class PluginRegistry : IPluginRegistry
             }
         }
 
-        // Existing IColumnizerConfigurator support
-        if (columnizer is IColumnizerConfigurator configurator)
+        if (columnizer is IColumnizerConfiguratorMemory configurator)
         {
             try
             {
