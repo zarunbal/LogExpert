@@ -40,28 +40,32 @@ jobs:
           $output = nuget-license -i src/LogExpert.sln -o JsonPretty
           Set-Content -Path "src/Solution Items/usedComponents.json" -Value $output -Encoding UTF8
 
-      - name: Commit usedComponents.json to Development
+      - name: Commit generated files to Development
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Save the generated file before switching branches
-          $tempFile = [System.IO.Path]::GetTempFileName()
-          Copy-Item "src/Solution Items/usedComponents.json" $tempFile
+          # Save generated files before switching branches (checkout would overwrite them)
+          $tempComponents = [System.IO.Path]::GetTempFileName()
+          $tempHashes     = [System.IO.Path]::GetTempFileName()
+          Copy-Item "src/Solution Items/usedComponents.json"             $tempComponents
+          Copy-Item "src/PluginRegistry/PluginHashGenerator.Generated.cs" $tempHashes
 
-          # Switch to Development and apply the update
+          # Switch to Development and apply both updates
           git fetch origin Development
           git checkout Development
-          Copy-Item $tempFile "src/Solution Items/usedComponents.json"
+          Copy-Item $tempComponents "src/Solution Items/usedComponents.json"
+          Copy-Item $tempHashes     "src/PluginRegistry/PluginHashGenerator.Generated.cs"
 
           git add "src/Solution Items/usedComponents.json"
+          git add "src/PluginRegistry/PluginHashGenerator.Generated.cs"
           git diff --staged --quiet
           if ($LASTEXITCODE -ne 0) {
-            git commit -m "chore: update usedComponents.json for ${{ github.ref_name }} [skip ci]"
+            git commit -m "chore: update plugin hashes and usedComponents.json for ${{ github.ref_name }} [skip ci]"
             git push origin Development
           } else {
-            Write-Host "usedComponents.json is already up to date"
+            Write-Host "No changes to commit"
           }
 
       - name: Create GitHub Release
