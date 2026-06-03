@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    name: Build and Release ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for GitVersion to compute version from tags
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install InnoSetup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build and Package
+        run: ./build.ps1 --target Clean Pack --configuration Release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/LogExpert-Setup-*.exe
+            bin/LogExpert.*.zip
+            bin/LogExpert.ColumnizerLib.*.nupkg
+            bin/SftpFileSystem.x64.*.zip
+            bin/SftpFileSystem.x86.*.zip
+            bin/chocolatey/logexpert.*.nupkg
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
