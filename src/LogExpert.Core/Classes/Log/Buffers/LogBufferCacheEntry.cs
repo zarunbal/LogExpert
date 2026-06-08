@@ -2,6 +2,8 @@ namespace LogExpert.Core.Classes.Log.Buffers;
 
 public class LogBufferCacheEntry
 {
+    private static long _accessSequence;
+
     private long _lastUseTimeStamp;
 
     #region cTor
@@ -25,7 +27,7 @@ public class LogBufferCacheEntry
 
     public void Touch ()
     {
-        _ = Interlocked.Exchange(ref _lastUseTimeStamp, Environment.TickCount64);
+        _ = Interlocked.Exchange(ref _lastUseTimeStamp, Interlocked.Increment(ref _accessSequence));
     }
 
     #endregion
