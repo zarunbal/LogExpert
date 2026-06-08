@@ -829,7 +829,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _tabController.AddWindow(logWindow, title, doNotAddToPanel);
 
-        logWindow.Visible = true;
+        if (!doNotAddToPanel)
+        {
+            logWindow.Visible = true;
+        }
     }
 
     private void ConnectEventHandlers (LogWindow.LogWindow logWindow)
@@ -1643,7 +1646,23 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _ = memStream.Seek(0, SeekOrigin.Begin);
 
-        dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+        try
+        {
+            dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+        }
+        catch (InvalidOperationException e)
+        {
+            _logger.Warn($"Layout restoration failed, showing windows with default layout: {e.Message}");
+            ShowDeferredWindows();
+        }
+    }
+
+    private void ShowDeferredWindows ()
+    {
+        foreach (var window in _tabController.GetAllWindows().Where(w => w.DockPanel == null))
+        {
+            window.Show(dockPanel);
+        }
     }
 
     [SupportedOSPlatform("windows")]
