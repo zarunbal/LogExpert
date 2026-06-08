@@ -28,7 +28,7 @@ public class PluginRegistry : IPluginRegistry
     #region Fields
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private static PluginRegistry? _instance;
+    private static volatile PluginRegistry? _instance;
     private static readonly Lock _lock = new();
 
     private readonly IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
@@ -101,14 +101,25 @@ public class PluginRegistry : IPluginRegistry
 
         lock (_lock)
         {
-            _instance = new PluginRegistry(applicationConfigurationFolder, pollingInterval);
+            // Re-check inside the lock: another thread may have created the
+            // instance while this one was waiting on the lock.
+            // Happens mostly in UnitTests where Create() is called multiple times.
+            // CA1508 is not applicable here because the null check is intentional for initialization.
+#pragma warning disable CA1508 // Avoid dead conditional code
+            if (_instance == null)
+            {
+                var registry = new PluginRegistry(applicationConfigurationFolder, pollingInterval);
+
+                // Fully initialize before publishing so the lock-free fast path
+                // above never returns a half-loaded registry.
+                registry.LoadPlugins();
+
+                _instance = registry;
+            }
+#pragma warning restore CA1508 // Avoid dead conditional code
         }
 
-        _applicationConfigurationFolder = applicationConfigurationFolder;
-        PollingInterval = pollingInterval;
-
-        _instance.LoadPlugins();
-        return Instance;
+        return _instance;
     }
 
     /// <summary>
