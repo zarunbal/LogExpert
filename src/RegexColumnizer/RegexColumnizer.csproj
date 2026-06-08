@@ -27,7 +27,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    
+
     <EmbeddedResource Update="Resources.de.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
@@ -41,7 +41,7 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
     <None Update="RegexColumnizer.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

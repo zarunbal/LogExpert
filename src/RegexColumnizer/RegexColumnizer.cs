@@ -28,6 +28,10 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
     private readonly XmlSerializer _xml = new(typeof(RegexColumnizerConfig));
     private string[] _columns;
     private RegexColumnizerConfig _config;
+
+    // Seam for error notification.
+    // Defaults to a modal dialog, in tests replaced so they can assert without blocking on a headless runner.
+    internal Action<string, string, MessageBoxIcon> ShowError { get; set; } = static (message, title, icon) => MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
     #endregion
 
     #region Properties
@@ -233,7 +237,7 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
                                                  FileNotFoundException or
                                                  DirectoryNotFoundException)
                 {
-                    _ = MessageBox.Show(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize);
+                    ShowError(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize, MessageBoxIcon.Error);
                     _config = new RegexColumnizerConfig
                     {
                         Name = GetName()
@@ -252,7 +256,7 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
             }
             catch (JsonException ex)
             {
-                _ = MessageBox.Show(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize);
+                ShowError(ex.Message, Resources.RegexColumnizer_UI_Title_Deserialize, MessageBoxIcon.Error);
                 _config = new RegexColumnizerConfig
                 {
                     Name = GetName()
@@ -424,10 +428,9 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
             catch (Exception ex) when (ex is IOException or
                                              UnauthorizedAccessException)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory, ex.Message),
-                                    Resources.RegexColumnizer_UI_Title_Error,
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
+                ShowError(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory, ex.Message),
+                          Resources.RegexColumnizer_UI_Title_Error,
+                          MessageBoxIcon.Error);
                 return;
             }
         }
@@ -460,15 +463,15 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
             }
             catch (RegexMatchTimeoutException ex)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_RegexTimeout, ex.Message), Resources.RegexColumnizer_UI_Title_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowError(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_RegexTimeout, ex.Message), Resources.RegexColumnizer_UI_Title_Warning, MessageBoxIcon.Error);
             }
             catch (ArgumentException ex)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_InvalidRegexPattern, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_InvalidRegexPattern, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxIcon.Error);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToSaveConfiguration, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError(string.Format(CultureInfo.InvariantCulture, Resources.RegexColumnizer_UI_Message_FailedToSaveConfiguration, ex.Message), Resources.RegexColumnizer_UI_Title_Error, MessageBoxIcon.Error);
             }
         }
     }
