@@ -36,8 +36,15 @@ jobs:
       - name: Update usedComponents.json
         shell: pwsh
         run: |
-          # Generate updated component list (packages already restored by build)
-          $output = nuget-license -i src/LogExpert.sln -o JsonPretty
+          # Generate updated component list (packages already restored by build).
+          # -override supplies license info for packages whose nuspec omits it (e.g. Nuke.GitHub),
+          # which otherwise makes nuget-license exit non-zero.
+          $output = nuget-license -i src/LogExpert.sln -o JsonPretty -override "src/Solution Items/nuget-license-overrides.json"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::nuget-license failed with exit code $LASTEXITCODE"
+            Write-Host $output
+            exit 1
+          }
           Set-Content -Path "src/Solution Items/usedComponents.json" -Value $output -Encoding UTF8
 
       - name: Commit generated files to Development
