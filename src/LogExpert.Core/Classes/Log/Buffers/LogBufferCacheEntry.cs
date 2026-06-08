@@ -27,8 +27,14 @@ public class LogBufferCacheEntry
 
     public void Touch ()
     {
-        _ = Interlocked.Exchange(ref _lastUseTimeStamp, Interlocked.Increment(ref _accessSequence));
+        _ = Interlocked.Exchange(ref _lastUseTimeStamp, NextAccessSequence());
     }
 
     #endregion
+
+    private static long NextAccessSequence ()
+    {
+        return Interlocked.Increment(ref _accessSequence);
+    }
+
 }
