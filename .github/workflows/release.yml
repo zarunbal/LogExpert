@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -47,8 +48,10 @@ jobs:
           }
           Set-Content -Path "src/Solution Items/usedComponents.json" -Value $output -Encoding UTF8
 
-      - name: Commit generated files to Development
+      - name: Open PR with generated files
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -59,20 +62,42 @@ jobs:
           Copy-Item "src/Solution Items/usedComponents.json"             $tempComponents
           Copy-Item "src/PluginRegistry/PluginHashGenerator.Generated.cs" $tempHashes
 
-          # Switch to Development and apply both updates
+          # Development is PR-protected, so apply the updates on a fresh branch off Development
           git fetch origin Development
-          git checkout Development
+          $branch = "chore/generated-files-${{ github.ref_name }}"
+          git checkout -B $branch origin/Development
+
           Copy-Item $tempComponents "src/Solution Items/usedComponents.json"
           Copy-Item $tempHashes     "src/PluginRegistry/PluginHashGenerator.Generated.cs"
 
           git add "src/Solution Items/usedComponents.json"
           git add "src/PluginRegistry/PluginHashGenerator.Generated.cs"
+
           git diff --staged --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "chore: update plugin hashes and usedComponents.json for ${{ github.ref_name }} [skip ci]"
-            git push origin Development
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "No changes to commit; skipping PR."
+            exit 0
+          }
+
+          git commit -m "chore: update plugin hashes and usedComponents.json for ${{ github.ref_name }} [skip ci]"
+          # Force-push so re-running the release for the same tag updates the existing branch
+          git push --force origin $branch
+
+          # Create the PR if one does not already exist for this branch
+          $existing = gh pr list --head $branch --base Development --state open --json number --jq '.[0].number'
+          if ([string]::IsNullOrWhiteSpace($existing)) {
+            gh pr create --base Development --head $branch `
+              --title "chore: update generated files for ${{ github.ref_name }} [skip ci]" `
+              --body "Automated update of plugin hashes and ``usedComponents.json`` for release ${{ github.ref_name }}."
           } else {
-            Write-Host "No changes to commit"
+            Write-Host "PR #$existing already exists for $branch"
+          }
+
+          # Best-effort auto-merge. Will complete once branch rules are satisfied;
+          # if the ruleset requires a manual review, merge the PR by hand.
+          gh pr merge $branch --auto --squash --delete-branch 2>&1 | Write-Host
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::Could not enable auto-merge for $branch; merge the PR manually."
           }
 
       - name: Create GitHub Release
