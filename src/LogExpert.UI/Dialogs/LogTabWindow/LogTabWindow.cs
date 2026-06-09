@@ -27,6 +27,7 @@ using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
 using LogExpert.UI.Services.SessionHandlerService;
 using LogExpert.UI.Services.TabControllerService;
+using LogExpert.UI.Services.ToolLaunchService;
 using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
 using NLog;
@@ -54,6 +55,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly ToolWindowCoordinator _toolWindowCoordinator;
     private readonly FileOperationService _fileOperationService;
     private readonly SessionHandler _sessionHandler;
+    private readonly ToolLaunchService _toolLaunchService;
 
     private bool _disposed;
 
@@ -114,6 +116,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _fileOperationService.FileOpened += OnFileOperationServiceFileOpened;
 
         _sessionHandler = new SessionHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request));
+        _toolLaunchService = new ToolLaunchService(PluginRegistry.PluginRegistry.Instance);
 
         _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService, _fileOperationService);
 
@@ -1328,102 +1331,69 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
+        ToolLaunchRequest request;
+
         if (CurrentLogWindow != null)
         {
             var line = CurrentLogWindow.GetCurrentLine();
             var info = CurrentLogWindow.GetCurrentFileInfo();
-            if (line != null && info != null)
+            if (line == null || info == null)
             {
-                ArgParser parser = new(toolEntry.Args);
-                var argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
-                if (argLine != null)
-                {
-                    StartTool(toolEntry.Cmd, argLine, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir, true);
-                }
-            }
-        }
-        else
-        {
-            StartTool(toolEntry.Cmd, string.Empty, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir);
-        }
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void StartTool (string cmd, string args, bool sysoutPipe, string columnizerName, string workingDir, bool startWithOpenLog = false)
-    {
-        if (string.IsNullOrEmpty(cmd))
-        {
-            return;
-        }
-
-        Process process = new();
-        ProcessStartInfo startInfo = new(cmd, args);
-        if (!string.IsNullOrEmpty(workingDir))
-        {
-            startInfo.WorkingDirectory = workingDir;
-        }
-
-        process.StartInfo = startInfo;
-        process.EnableRaisingEvents = true;
-
-        if (sysoutPipe && !startWithOpenLog)
-        {
-            _ = MessageBox.Show(Resources.LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured, Resources.LogExpert_Common_UI_Title_LogExpert);
-        }
-
-        if (sysoutPipe && startWithOpenLog)
-        {
-            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-
-            //_logger.Info($"Starting external tool with sysout redirection: {cmd} {args}"));
-            startInfo.UseShellExecute = false;
-            startInfo.RedirectStandardOutput = true;
-            //process.OutputDataReceived += pipe.DataReceivedEventHandler;
-            try
-            {
-                _ = process.Start();
-            }
-            catch (Exception e) when (e is Win32Exception or
-                                            InvalidOperationException or
-                                            ObjectDisposedException or
-                                            PlatformNotSupportedException)
-            {
-                _logger.Error(e);
-                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
-            SysoutPipe pipe = new(process.StandardOutput);
+            ArgParser parser = new(toolEntry.Args);
+            var argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
+            if (argLine == null)
+            {
+                return;
+            }
 
-            var logWin = AddTempFileTab(pipe.FileName,
-                CurrentLogWindow.IsTempFile
-                    ? CurrentLogWindow.TempTitleName
-                    : $"{Util.GetNameFromPath(CurrentLogWindow.FileName)}{Resources.LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix}");
-            logWin.ForceColumnizer(columnizer);
-
-            process.Exited += pipe.ProcessExitedEventHandler;
-            //process.BeginOutputReadLine();
+            request = new ToolLaunchRequest
+            {
+                Cmd = toolEntry.Cmd,
+                Args = argLine,
+                SysoutPipe = toolEntry.Sysout,
+                ColumnizerName = toolEntry.ColumnizerName,
+                WorkingDir = toolEntry.WorkingDir
+            };
         }
         else
         {
-            StartExternalTool(process, startInfo);
-        }
-    }
+            if (toolEntry.Sysout)
+            {
+                _ = MessageBox.Show(Resources.LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured, Resources.LogExpert_Common_UI_Title_LogExpert);
+            }
 
-    private static void StartExternalTool (Process process, ProcessStartInfo startInfo)
-    {
-        try
-        {
-            startInfo.UseShellExecute = false;
-            _ = process.Start();
+            request = new ToolLaunchRequest
+            {
+                Cmd = toolEntry.Cmd,
+                Args = string.Empty,
+                SysoutPipe = false,
+                ColumnizerName = toolEntry.ColumnizerName,
+                WorkingDir = toolEntry.WorkingDir
+            };
         }
-        catch (Exception e) when (e is Win32Exception or
-                                        InvalidOperationException or
-                                        ObjectDisposedException or
-                                        PlatformNotSupportedException)
+
+        var result = _toolLaunchService.Launch(request);
+
+        if (result.HasError)
         {
-            _logger.Error(e);
-            _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
+            _ = MessageBox.Show(result.ErrorMessage, Resources.LogExpert_Common_UI_Title_LogExpert);
+            return;
+        }
+
+        if (result.PipeFileName != null)
+        {
+            var title = CurrentLogWindow!.IsTempFile
+                ? CurrentLogWindow.TempTitleName
+                : $"{Util.GetNameFromPath(CurrentLogWindow.FileName)}{Resources.LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix}";
+
+            var logWin = AddTempFileTab(result.PipeFileName, title);
+            if (result.Columnizer != null)
+            {
+                logWin.ForceColumnizer(result.Columnizer);
+            }
         }
     }
 
