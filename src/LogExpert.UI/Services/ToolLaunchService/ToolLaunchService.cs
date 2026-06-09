@@ -18,28 +18,33 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
 
     public ToolLaunchResult Launch (ToolLaunchRequest request)
     {
-        if (string.IsNullOrEmpty(request.Cmd))
-        {
-            return new ToolLaunchResult
+        return string.IsNullOrEmpty(request.Cmd)
+            ? new ToolLaunchResult
             {
                 HasError = true,
                 ErrorMessage = "Command must not be empty."
-            };
-        }
-
-        if (request.SysoutPipe)
-        {
-            return LaunchWithSysoutPipe(request);
-        }
-
-        return LaunchExternal(request);
+            }
+            : request.SysoutPipe
+                ? LaunchWithSysoutPipe(request)
+                : LaunchExternal(request);
     }
 
     private static ToolLaunchResult LaunchExternal (ToolLaunchRequest request)
     {
         var startInfo = BuildStartInfo(request);
+
         startInfo.UseShellExecute = false;
-        Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
+
+        (bool flowControl, ToolLaunchResult value, _) = LaunchProcess(startInfo);
+
+        return !flowControl
+            ? value
+            : new ToolLaunchResult { HasError = false };
+    }
+
+    private static (bool flowControl, ToolLaunchResult value, Process process) LaunchProcess (ProcessStartInfo startInfo)
+    {
+        using Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
 
         try
         {
@@ -51,10 +56,10 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
                                        PlatformNotSupportedException)
         {
             _logger.Error(e);
-            return new ToolLaunchResult { HasError = true, ErrorMessage = e.Message };
+            return (false, new ToolLaunchResult { HasError = true, ErrorMessage = e.Message }, process);
         }
 
-        return new ToolLaunchResult { HasError = false };
+        return (true, default, process);
     }
 
     private ToolLaunchResult LaunchWithSysoutPipe (ToolLaunchRequest request)
@@ -67,19 +72,11 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
         startInfo.UseShellExecute = false;
         startInfo.RedirectStandardOutput = true;
 
-        Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
+        (bool flowControl, ToolLaunchResult value, Process process) = LaunchProcess(startInfo);
 
-        try
+        if (!flowControl)
         {
-            _ = process.Start();
-        }
-        catch (Exception e) when (e is Win32Exception or
-                                       InvalidOperationException or
-                                       ObjectDisposedException or
-                                       PlatformNotSupportedException)
-        {
-            _logger.Error(e);
-            return new ToolLaunchResult { HasError = true, ErrorMessage = e.Message };
+            return value;
         }
 
         // TODO: SysoutPipe temp file is never deleted — fire-and-forget lifetime by design.
@@ -97,6 +94,7 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
     private static ProcessStartInfo BuildStartInfo (ToolLaunchRequest request)
     {
         var startInfo = new ProcessStartInfo(request.Cmd, request.Args);
+
         if (!string.IsNullOrEmpty(request.WorkingDir))
         {
             startInfo.WorkingDirectory = request.WorkingDir;
