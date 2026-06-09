@@ -35,6 +35,10 @@ public static class SessionFileValidator
         // Cache drive letters once to avoid repeated expensive DriveInfo.GetDrives() calls
         var cachedDriveLetters = GetFixedDriveLetters();
 
+        // Enumerate the session directory and its immediate subdirectories once, instead of
+        // re-enumerating for every missing file. This is shared across all alternative-path lookups.
+        var sessionDirectories = GetSessionSearchDirectories(sessionData.SessionFilePath);
+
         foreach (var fileName in sessionData.FileNames)
         {
             var normalizedPath = NormalizeFilePath(fileName);
@@ -60,7 +64,7 @@ public static class SessionFileValidator
             {
                 result.MissingFiles.Add(fileName);
 
-                var alternativePaths = FindAlternativePaths(fileName, sessionData.SessionFilePath, cachedDriveLetters);
+                var alternativePaths = FindAlternativePaths(fileName, sessionData.SessionFilePath, sessionDirectories, cachedDriveLetters);
                 result.PossibleAlternatives[fileName] = alternativePaths;
             }
         }
@@ -105,6 +109,43 @@ public static class SessionFileValidator
     }
 
     /// <summary>
+    /// Returns the directories to search for alternative file locations: the session file's directory
+    /// followed by its immediate subdirectories. Enumerated once per session so that per-missing-file
+    /// lookups do not repeatedly hit the file system with the same <see cref="Directory.GetDirectories(string)"/> call.
+    /// </summary>
+    /// <param name="sessionFilePath">The full path to the session/project file. May be null or empty.</param>
+    /// <returns>The session directory and its immediate subdirectories, or an empty list if unavailable.</returns>
+    private static List<string> GetSessionSearchDirectories (string sessionFilePath)
+    {
+        if (string.IsNullOrWhiteSpace(sessionFilePath))
+        {
+            return [];
+        }
+
+        try
+        {
+            var sessionDir = Path.GetDirectoryName(sessionFilePath);
+            if (string.IsNullOrEmpty(sessionDir) || !Directory.Exists(sessionDir))
+            {
+                return [];
+            }
+
+            var directories = new List<string> { sessionDir };
+            directories.AddRange(Directory.GetDirectories(sessionDir));
+            return directories;
+        }
+        catch (Exception ex) when (ex is ArgumentException or
+                                        ArgumentNullException or
+                                        PathTooLongException or
+                                        UnauthorizedAccessException or
+                                        IOException)
+        {
+            // Ignore errors when enumerating the session directory
+            return [];
+        }
+    }
+
+    /// <summary>
     /// Gets the list of fixed drive letters that are ready.
     /// Extracted to avoid repeated expensive DriveInfo.GetDrives() calls.
     /// </summary>
@@ -116,12 +157,11 @@ public static class SessionFileValidator
                 .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
                 .Select(d => d.Name[0])];
         }
-        catch(Exception ex) when (
-             ex is IOException
-             or UnauthorizedAccessException
-             or SecurityException
-             or DriveNotFoundException
-             or ArgumentNullException)
+        catch (Exception ex) when (ex is IOException or
+                                         UnauthorizedAccessException or
+                                         SecurityException or
+                                         DriveNotFoundException or
+                                         ArgumentNullException)
         {
             return [];
         }
@@ -140,10 +180,11 @@ public static class SessionFileValidator
     /// whitespace.</param>
     /// <param name="sessionFilePath">The full path to the project file used as a reference for searching related directories. Can be null or empty if
     /// project context is not available.</param>
+    /// <param name="sessionDirectories">Pre-enumerated session directory and its immediate subdirectories, shared across all missing files.</param>
     /// <param name="cachedDriveLetters">Pre-computed list of fixed drive letters to avoid repeated DriveInfo.GetDrives() calls.</param>
     /// <returns>A list of strings containing the full paths of files found that match the specified file name in alternative
     /// locations. The list will be empty if no matching files are found.</returns>
-    private static List<string> FindAlternativePaths (string fileName, string sessionFilePath, List<char> cachedDriveLetters)
+    private static List<string> FindAlternativePaths (string fileName, string sessionFilePath, List<string> sessionDirectories, List<char> cachedDriveLetters)
     {
         var alternatives = new List<string>();
 
@@ -159,37 +200,11 @@ public static class SessionFileValidator
             return alternatives;
         }
 
-        // Search in directory of .lxj project file
-        if (!string.IsNullOrWhiteSpace(sessionFilePath))
-        {
-            try
-            {
-                var sessionDir = Path.GetDirectoryName(sessionFilePath);
-                if (!string.IsNullOrEmpty(sessionDir) && Directory.Exists(sessionDir))
-                {
-                    var candidatePath = Path.Join(sessionDir, baseName);
-                    if (File.Exists(candidatePath))
-                    {
-                        alternatives.Add(candidatePath);
-                    }
-
-                    // Also check subdirectories (one level deep)
-                    var subdirs = Directory.GetDirectories(sessionDir);
-                    alternatives.AddRange(
-                        subdirs
-                            .Select(subdir => Path.Join(subdir, baseName))
-                            .Where(File.Exists));
-                }
-            }
-            catch (Exception ex) when (ex is ArgumentException or
-                                            ArgumentNullException or
-                                            PathTooLongException or
-                                            UnauthorizedAccessException or
-                                            IOException)
-            {
-                // Ignore errors when searching in project directory
-            }
-        }
+        // Search in directory of .lxj project file and its immediate subdirectories (pre-enumerated once per session)
+        alternatives.AddRange(
+            sessionDirectories
+                .Select(dir => Path.Join(dir, baseName))
+                .Where(File.Exists));
 
         // Search in Documents/LogExpert folder
         try
