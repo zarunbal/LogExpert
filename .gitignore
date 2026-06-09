@@ -717,3 +717,5 @@ http-client.private.env.json
 .idea/**/copilot.data.migration.*.xml
 
 ######## END JET BRAINS git ignore https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+/AgentFiles/*
+/.claude/*
