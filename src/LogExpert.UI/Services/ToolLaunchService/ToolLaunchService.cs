@@ -44,7 +44,7 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
 
     private static (bool flowControl, ToolLaunchResult value, Process process) LaunchProcess (ProcessStartInfo startInfo)
     {
-        using Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
+        Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
 
         try
         {
@@ -80,8 +80,9 @@ internal sealed class ToolLaunchService (IPluginRegistry pluginRegistry) : ITool
         }
 
         // TODO: SysoutPipe temp file is never deleted — fire-and-forget lifetime by design.
-        SysoutPipe pipe = new(process.StandardOutput);
-        process.Exited += pipe.ProcessExitedEventHandler;
+        // SysoutPipe takes ownership of the process (keeps it alive, reads StandardOutput,
+        // subscribes to Exited, and disposes it once output is drained).
+        SysoutPipe pipe = new(process);
 
         return new ToolLaunchResult
         {
