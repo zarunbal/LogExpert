@@ -92,20 +92,15 @@ Source: "{#ReleaseFolder}\pluginsx86\ColumnizerLib.dll"; DestDir: "{app}\plugins
 Source: "{#ReleaseFolder}\pluginsx86\ColumnizerLib.xml"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion
 
 Source: "{#ReleaseFolder}\plugins\BouncyCastle.Cryptography.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\plugins\Microsoft.Extensions.DependencyInjection.Abstractions"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\pluginsx86\Microsoft.Extensions.DependencyInjection.Abstractions"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#ReleaseFolder}\plugins\Microsoft.Extensions.DependencyInjection.Abstractions.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#ReleaseFolder}\pluginsx86\Microsoft.Extensions.DependencyInjection.Abstractions.dll"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\plugins\Microsoft.Extensions.Logging.Abstractions.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\pluginsx86\Microsoft.Extensions.Logging.Abstractions.dll"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 Source: "{#ReleaseFolder}\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\pluginsx86\Newtonsoft.Json.dll"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-Source: "{#ReleaseFolder}\plugins\Microsoft.Bcl.HashCode.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\plugins\Renci.SshNet.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\plugins\System.Memory.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\plugins\System.Numerics.Vectors.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\plugins\System.Runtime.CompilerServices.Unsafe.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\plugins\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 Source: "{#ReleaseFolder}\plugins\DefaultPlugins.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\plugins\FlashIconHighlighter.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -129,8 +124,6 @@ Source: "{#ReleaseFolder}\plugins\RegexColumnizer.dll"; DestDir: "{app}\plugins\
 Source: "{#ReleaseFolder}\plugins\de\RegexColumnizer.resources.dll"; DestDir: "{app}\plugins\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\plugins\RegexColumnizer.manifest.json"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-Source: "{#ReleaseFolder}\plugins\LogExpert.Core.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion
-
 ; DLLS for SFTP Support
 Source: "{#ReleaseFolder}\plugins\SftpFileSystem.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\pluginsx86\SftpFileSystem.dll"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -139,7 +132,6 @@ Source: "{#ReleaseFolder}\pluginsx86\SftpFileSystem.Resources.dll"; DestDir: "{a
 Source: "{#ReleaseFolder}\plugins\de\SftpFileSystem.Resources.resources.dll"; DestDir: "{app}\plugins\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\pluginsx86\de\SftpFileSystem.Resources.resources.dll"; DestDir: "{app}\pluginsx86\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\plugins\SftpFileSystem.manifest.json"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#ReleaseFolder}\pluginsx86\SftpFileSystem.manifest.json"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\plugins\Renci.SshNet.dll"; DestDir: "{app}\plugins\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ReleaseFolder}\pluginsx86\Renci.SshNet.dll"; DestDir: "{app}\pluginsx86\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -161,6 +153,7 @@ Source: "{#ReleaseFolder}\LogExpert.Resources.dll"; DestDir: "{app}"; Flags: ign
 Source: "{#ReleaseFolder}\de\LogExpert.Resources.resources.dll"; DestDir: "{app}\de\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.PluginRegistry.dll"; DestDir: "{app}"; Flags: ignoreversion
 
+Source: "{#ReleaseFolder}\System.CommandLine.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\NuGet.Versioning.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.xml"; DestDir: "{app}"; Flags: ignoreversion
@@ -170,7 +163,6 @@ Source: "{#ReleaseFolder}\Start.cmd"; DestDir: "{app}"; Flags: ignoreversion
 ; Vanara libs for Pinvoke => https://github.com/dahall/Vanara
 Source: "{#ReleaseFolder}\fr\Vanara.Core.resources.dll"; DestDir: "{app}\fr\"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#ReleaseFolder}\Vanara.PInvoke.Shared.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.PInvoke.ComCtl32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.PInvoke.Cryptography.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.PInvoke.Gdi32.dll"; DestDir: "{app}"; Flags: ignoreversion
