@@ -48,10 +48,20 @@ jobs:
           }
           Set-Content -Path "src/Solution Items/usedComponents.json" -Value $output -Encoding UTF8
 
+      # Mint a short-lived token for the dedicated GitHub App. The App is on the Development
+      # ruleset's bypass list, so it (and only it) can merge the chore PR without an approval.
+      # Minted here, right before use, so its ~1h lifetime is not consumed by the build.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Open PR with generated files
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -93,12 +103,16 @@ jobs:
             Write-Host "PR #$existing already exists for $branch"
           }
 
-          # Best-effort auto-merge. Will complete once branch rules are satisfied;
-          # if the ruleset requires a manual review, merge the PR by hand.
-          gh pr merge $branch --auto --squash --delete-branch 2>&1 | Write-Host
+          # Immediate squash-merge as the App. --admin merges despite the pending-review rule;
+          # the App is allowed to because it is on the ruleset bypass list. No repo-wide
+          # auto-merge setting is involved.
+          gh pr merge $branch --squash --admin --delete-branch 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "::warning::Could not enable auto-merge for $branch; merge the PR manually."
+            Write-Host "::warning::Could not merge $branch automatically; merge the PR manually."
           }
+
+          # This PR is bookkeeping only — never fail the release job over it.
+          exit 0
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
