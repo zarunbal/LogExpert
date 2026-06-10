@@ -339,7 +339,7 @@ partial class Build : NukeBuild
         });
 
     Target CreateSetup => _ => _
-        .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile)
+        .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile, CopyLicenses)
         .Before(Publish)
         .After(GeneratePluginHashes)
         .OnlyWhenStatic(() => Configuration == Configuration.Release)
@@ -365,7 +365,7 @@ partial class Build : NukeBuild
 
             if (!executed)
             {
-                Assert.True(true, "Inno setup was not found");
+                Assert.Fail("Inno setup was not found");
             }
         });
 
@@ -506,7 +506,7 @@ partial class Build : NukeBuild
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
         {
-            Assert.True(true, $"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+            Assert.Fail($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
         }
 
         proc.WaitForExit();
@@ -515,7 +515,7 @@ partial class Build : NukeBuild
 
         if (proc.ExitCode != 0)
         {
-            Assert.True(true, $"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+            Assert.Fail($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
         }
     }
 

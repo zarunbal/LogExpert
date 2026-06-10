@@ -6,6 +6,8 @@
     <DocumentationFile>$(SolutionDir)..\bin\Docs\ColumnizerLib.xml</DocumentationFile>
 
     <RootNamespace>ColumnizerLib</RootNamespace>
+
+    <PackageId>LogExpert.ColumnizerLib</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
