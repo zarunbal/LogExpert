@@ -7,7 +7,6 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
@@ -23,7 +22,6 @@ using System.Threading.Tasks;
 
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.GitHub.GitHubTasks;
 
 [UnsetVisualStudioEnvironmentVariables]
@@ -153,9 +151,8 @@ partial class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Restore"));
+            DotNetRestore(s => s
+                .SetProjectFile(Solution));
         });
 
     Target Compile => _ => _
@@ -165,15 +162,13 @@ partial class Build : NukeBuild
 
             Log.Information($"Version: '{VersionString}'");
 
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Rebuild")
+            DotNetBuild(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration)
                 .SetAssemblyVersion(VersionString)
                 .SetFileVersion(VersionFileString)
                 .SetInformationalVersion(VersionInformationString)
-                .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
-                .SetConfiguration(Configuration)
-                .SetMaxCpuCount(Environment.ProcessorCount));
+                .EnableNoRestore());
         });
 
     AbsolutePath PluginHashGeneratorProject => SourceDirectory / "PluginHashGenerator.Tool" / "PluginHashGenerator.Tool.csproj";
@@ -212,12 +207,11 @@ partial class Build : NukeBuild
                 // Rebuild PluginRegistry project to include the generated file
                 // IMPORTANT: Set OutputPath to match the main build output directory
                 Log.Information("Rebuilding PluginRegistry to include generated hashes...");
-                MSBuild(s => s
-                    .SetTargetPath(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
-                    .SetTargets("Build")
+                DotNetBuild(s => s
+                    .SetProjectFile(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
                     .SetConfiguration(Configuration)
                     .SetProperty("OutputPath", OutputDirectory)
-                    .SetMaxCpuCount(Environment.ProcessorCount));
+                    .EnableNoRestore());
 
                 Log.Information("PluginRegistry rebuilt successfully to {OutputDir}", OutputDirectory);
             }
