@@ -127,3 +127,42 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
+
+      # Open a PR on microsoft/winget-pkgs for the new version using Microsoft's wingetcreate.
+      # It downloads the just-published installer, computes the SHA256, bumps the version, and
+      # submits the PR. The existing manifest's fields (incl. the .NET PackageDependencies) are
+      # carried forward, so the runtime dependency stays intact across updates.
+      #
+      # Requirements / notes:
+      #   * Secret WINGET_TOKEN: a GitHub PAT (classic, scope 'public_repo') whose account has a
+      #     fork of microsoft/winget-pkgs. wingetcreate pushes the branch to that fork.
+      #   * Skipped for prereleases (beta tags) since winget-pkgs only accepts stable versions.
+      #   * Skipped (with a warning, not a failure) when the secret is absent.
+      #   * The package must already exist in winget-pkgs; the very first submission is manual.
+      - name: Submit new version to winget community repo
+        if: ${{ !contains(github.ref_name, '-') }}
+        shell: pwsh
+        env:
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINGET_TOKEN)) {
+            Write-Host "::warning::WINGET_TOKEN secret not set; skipping winget submission."
+            exit 0
+          }
+
+          $installer = Get-ChildItem bin/LogExpert-Setup-*.exe | Select-Object -First 1
+          if (-not $installer) {
+            Write-Host "::error::No installer found in bin/; cannot submit winget update."
+            exit 1
+          }
+
+          $version = $installer.BaseName -replace '^LogExpert-Setup-', ''
+          $url = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/$($installer.Name)"
+          Write-Host "Submitting LogExperts.LogExpert $version -> $url"
+
+          Invoke-WebRequest -Uri https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          ./wingetcreate.exe update LogExperts.LogExpert `
+            --version $version `
+            --urls $url `
+            --submit `
+            --token $env:WINGET_TOKEN
