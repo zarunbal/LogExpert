@@ -26,7 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		..\.gitignore = ..\.gitignore
 		Solution Items\AssemblyInfo.cs = Solution Items\AssemblyInfo.cs
-		..\CHANGELOG.md = ..\CHANGELOG.md
 		..\.github\copilot-instructions.md = ..\.github\copilot-instructions.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
@@ -95,6 +94,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GithubActions", "GithubActions", "{059D87DC-0895-449B-A81D-90336F7F6CD8}"
 	ProjectSection(SolutionItems) = preProject
 		..\.github\workflows\build_dotnet.yml = ..\.github\workflows\build_dotnet.yml
+		..\.github\workflows\release.yml = ..\.github\workflows\release.yml
 		..\.github\workflows\test_dotnet.yml = ..\.github\workflows\test_dotnet.yml
 	EndProjectSection
 EndProject
