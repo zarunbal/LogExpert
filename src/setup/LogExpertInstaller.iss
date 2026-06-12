@@ -197,8 +197,12 @@ Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(
 
 function InitializeSetup(): Boolean;
 begin
-    Dependency_ForceX64 := True;
-    Dependency_AddDotNet100Desktop;
-    Dependency_ForceX64 := False;
+    // silent setup means probably winget and it already resolves the .NET dependency from the manifest,
+    // only self-bootstrap for standalone installs, should check the .net dependency
+    if not WizardSilent then begin
+        Dependency_ForceX64 := True;
+        Dependency_AddDotNet100Desktop;
+        Dependency_ForceX64 := False;
+    end;
     Result := True;
 end;
