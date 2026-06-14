@@ -5113,7 +5113,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void SendProgressBarUpdate ()
     {
-        OnProgressBarUpdate(_progressEventArgs);
+        OnProgressBarUpdate(new ProgressEventArgs
+        {
+            MinValue = _progressEventArgs.MinValue,
+            MaxValue = _progressEventArgs.MaxValue,
+            Value = _progressEventArgs.Value,
+            Visible = _progressEventArgs.Visible
+        });
     }
 
     private void SendStatusLineUpdate ()
