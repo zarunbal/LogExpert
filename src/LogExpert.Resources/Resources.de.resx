@@ -642,7 +642,7 @@
 		<value>Unzureichende Rechte {0}: {1}</value>
 	</data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
-		<value>Fehler während {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
+		<value>Fehler während Wert {0}, min {1}, max {2}, sichtbar {3}: {4}</value>
 	</data>
   <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
 		<value>linien</value>
