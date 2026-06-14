@@ -9,8 +9,8 @@ Dependencies:
   - PackageIdentifier: Microsoft.DotNet.DesktopRuntime.10
 Installers:
 - Architecture: x64
-  InstallerUrl: https://github.com/LogExperts/LogExpert/releases/download/v1.40.0/LogExpert-Setup-1.40.0.exe
-  InstallerSha256: bd30ab5bedeaabfd55417e232e7e500cd1ead1395ac6bbf234a9b141af773e58
+  InstallerUrl: https://github.com/LogExperts/LogExpert/releases/download/v1.40.1/LogExpert-Setup-1.40.1.exe
+  InstallerSha256: 685b41cf9eb2286978e6ced7797b10bd8737cd452c0050a97a056a1c75e4439b
 ManifestType: installer
 ManifestVersion: 1.10.0
 ReleaseDate: 2026-06-12
