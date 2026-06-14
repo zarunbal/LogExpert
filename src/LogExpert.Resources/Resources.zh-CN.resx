@@ -551,7 +551,7 @@
     <value>权限不足 {0}：{1}</value>
   </data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
-    <value>在 {0} 值 {1}，最小值 {2}，最大值 {3}，可见值 {4} 期间发生错误：{5}</value>
+    <value>值 {0}，最小值 {1}，最大值 {2}，可见值 {3} 期间发生错误：{4}</value>
   </data>
   <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
     <value>行</value>
