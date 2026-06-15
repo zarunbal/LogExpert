@@ -32,7 +32,7 @@ partial class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main () => Execute<Build>(x => x.Test);
+    public static int Main() => Execute<Build>(x => x.Test);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -102,7 +102,7 @@ partial class Build : NukeBuild
         ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
     ];
 
-    protected override void OnBuildInitialized ()
+    protected override void OnBuildInitialized()
     {
         SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
 
@@ -205,11 +205,22 @@ partial class Build : NukeBuild
                 Log.Information("Plugin hashes generated successfully");
 
                 // Rebuild PluginRegistry project to include the generated file
-                // IMPORTANT: Set OutputPath to match the main build output directory
+                // IMPORTANT: Set OutputPath to match the main build output directory.
+                // OutputPath is a global property, so it propagates to PluginRegistry's
+                // ProjectReferences (LogExpert.Core, LogExpert.Resources) and rebuilds them
+                // into the same folder. The version properties MUST match the main Compile
+                // target; otherwise those dependencies are re-emitted at the Directory.Build.props
+                // default version, overwriting the GitVersion-stamped copies. That leaves
+                // LogExpert.exe referencing one version of LogExpert.Core while the DLL on disk
+                // has another, and the strong-name binder fails at startup with a
+                // FileNotFoundException for the referenced version.
                 Log.Information("Rebuilding PluginRegistry to include generated hashes...");
                 DotNetBuild(s => s
                     .SetProjectFile(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
                     .SetConfiguration(Configuration)
+                    .SetAssemblyVersion(VersionString)
+                    .SetFileVersion(VersionFileString)
+                    .SetInformationalVersion(VersionInformationString)
                     .SetProperty("OutputPath", OutputDirectory)
                     .EnableNoRestore());
 
@@ -491,7 +502,7 @@ partial class Build : NukeBuild
         }
     });
 
-    private void ExecuteInnoSetup (AbsolutePath innoPath)
+    private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
         Process proc = new();
 
@@ -513,7 +524,7 @@ partial class Build : NukeBuild
         }
     }
 
-    private void TransformTemplateFile (AbsolutePath path, bool deleteTemplate)
+    private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
     {
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
@@ -527,8 +538,8 @@ partial class Build : NukeBuild
     }
 
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
-    private static partial Regex SFTPPlugin ();
+    private static partial Regex SFTPPlugin();
 
     [GeneratedRegex("\\.template$")]
-    private static partial Regex TemplateRegex ();
+    private static partial Regex TemplateRegex();
 }
