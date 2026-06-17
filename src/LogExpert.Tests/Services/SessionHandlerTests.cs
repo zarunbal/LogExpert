@@ -21,6 +21,8 @@ internal class SessionHandlerTests : IDisposable
 {
     private Mock<IPluginRegistry> _pluginRegistryMock = null!;
     private List<FileTabRequest> _addFileTabCalls = null!;
+    private List<string> _callOrder = null!;
+    private int _closeAllTabsCallCount;
     private Settings _settings;
     private Mock<IConfigManager> _configManagerMock;
     private LogWindow _stubLogWindow = null!;
@@ -38,6 +40,8 @@ internal class SessionHandlerTests : IDisposable
         _pluginRegistryMock = new Mock<IPluginRegistry>();
         _configManagerMock = new Mock<IConfigManager>();
         _addFileTabCalls = [];
+        _callOrder = [];
+        _closeAllTabsCallCount = 0;
 
         _settings = new Settings();
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
@@ -59,7 +63,13 @@ internal class SessionHandlerTests : IDisposable
             request =>
             {
                 _addFileTabCalls.Add(request);
+                _callOrder.Add($"addtab:{request.FileName}");
                 return _stubLogWindow;
+            },
+            () =>
+            {
+                _closeAllTabsCallCount++;
+                _callOrder.Add("close");
             });
     }
 
@@ -364,9 +374,8 @@ internal class SessionHandlerTests : IDisposable
     }
 
     [Test]
-    public void ContinueLoad_CloseAllTabs_ReturnsTrueInResult ()
+    public void ContinueLoad_CloseAllTabs_ClosesExistingTabsBeforeOpeningNewWindows ()
     {
-        // Arrange
         var outcome = CreateOutcome(
             SessionLoadOutcome.LoadStatus.NeedsIntervention,
             ["C:\\logs\\app.log"],
@@ -378,7 +387,9 @@ internal class SessionHandlerTests : IDisposable
         var result = _sut.ContinueLoad(outcome, resolution, restoreLayout: true);
 
         // Assert
-        Assert.That(result.CloseAllTabs, Is.True);
+        Assert.That(_closeAllTabsCallCount, Is.EqualTo(1), "close must be invoked exactly once");
+        Assert.That(_callOrder, Is.EqualTo(new[] { "close", "addtab:C:\\logs\\app.log" }),
+                    "existing tabs must be closed before the new windows are opened");
         Assert.That(result.OpenedTabs, Is.True);
         Assert.That(result.OpenInNewWindowFiles, Is.Null);
     }
@@ -402,6 +413,7 @@ internal class SessionHandlerTests : IDisposable
         Assert.That(result.OpenInNewWindowFiles, Is.Not.Null);
         Assert.That(result.OpenInNewWindowFiles, Has.Length.EqualTo(1));
         Assert.That(_addFileTabCalls, Is.Empty, "OpenInNewWindow must not open tabs");
+        Assert.That(_closeAllTabsCallCount, Is.EqualTo(0), "OpenInNewWindow must not close existing tabs");
     }
 
     [Test]
@@ -519,7 +531,7 @@ internal class SessionHandlerTests : IDisposable
     }
 
     [Test]
-    public void ContinueLoad_NullResolution_SuccessReturnsCloseAllTabsFalse ()
+    public void ContinueLoad_NullResolution_DoesNotCloseExistingTabs ()
     {
         // Arrange
         var outcome = CreateSuccessOutcome(["C:\\logs\\app.log"], layoutXml: null);
@@ -528,8 +540,27 @@ internal class SessionHandlerTests : IDisposable
         var result = _sut.ContinueLoad(outcome, resolution: null, restoreLayout: true);
 
         // Assert
-        Assert.That(result.CloseAllTabs, Is.False);
+        Assert.That(_closeAllTabsCallCount, Is.EqualTo(0), "existing tabs must not be closed when no resolution is given");
         Assert.That(result.OpenInNewWindowFiles, Is.Null);
+    }
+
+    [Test]
+    public void ContinueLoad_CloseAllTabsFalse_DoesNotCloseExistingTabs ()
+    {
+        // Arrange
+        var outcome = CreateOutcome(
+            SessionLoadOutcome.LoadStatus.NeedsIntervention,
+            ["C:\\logs\\app.log"],
+            layoutXml: "<DockPanel/>");
+
+        var resolution = new MissingFilesResolution { CloseAllTabs = false };
+
+        // Act
+        _ = _sut.ContinueLoad(outcome, resolution, restoreLayout: true);
+
+        // Assert
+        Assert.That(_closeAllTabsCallCount, Is.EqualTo(0));
+        Assert.That(_addFileTabCalls, Has.Count.EqualTo(1));
     }
 
     #endregion

@@ -13,7 +13,8 @@ namespace LogExpert.UI.Services.SessionHandlerService;
 [SupportedOSPlatform("windows")]
 internal sealed class SessionHandler (
     IPluginRegistry pluginRegistry,
-    Func<FileTabRequest, LogWindow> addFileTab)
+    Func<FileTabRequest, LogWindow> addFileTab,
+    Action closeAllTabs)
     : ISessionHandler
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -137,9 +138,17 @@ internal sealed class SessionHandler (
             return new ContinueLoadResult
             {
                 OpenedTabs = false,
-                CloseAllTabs = false,
                 OpenInNewWindowFiles = [.. resolvedFiles]
             };
+        }
+
+        // Close existing tabs BEFORE opening the new session windows. The new windows are
+        // tracked by the tab controller as soon as they are created (even deferred ones that
+        // are not yet on the dock panel), so closing afterwards would also close them and the
+        // subsequent layout restore would find nothing to dock.
+        if (resolution is { CloseAllTabs: true })
+        {
+            closeAllTabs();
         }
 
         // Open file tabs
@@ -176,7 +185,6 @@ internal sealed class SessionHandler (
         return new ContinueLoadResult
         {
             OpenedTabs = openedCount > 0,
-            CloseAllTabs = resolution?.CloseAllTabs ?? false,
             OpenInNewWindowFiles = null
         };
     }

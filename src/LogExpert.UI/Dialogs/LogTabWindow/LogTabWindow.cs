@@ -8,7 +8,6 @@ using System.Text;
 using ColumnizerLib;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -115,7 +114,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _fileOperationService.FileHistoryChanged += (_, _) => FillHistoryMenu();
         _fileOperationService.FileOpened += OnFileOperationServiceFileOpened;
 
-        _sessionHandler = new SessionHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request));
+        _sessionHandler = new SessionHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request), CloseAllTabs);
         _toolLaunchService = new ToolLaunchService(PluginRegistry.PluginRegistry.Instance);
 
         _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService, _fileOperationService);
@@ -1460,6 +1459,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         SelectedAlternatives = selectedAlternatives
                     };
 
+                    // ContinueLoad closes existing tabs (when requested) before opening the
+                    // new session windows, so no post-hoc CloseAllTabs() is needed here.
                     var interventionResult = _sessionHandler.ContinueLoad(outcome, resolution, restoreLayout);
 
                     if (updateSessionFile)
@@ -1467,11 +1468,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                         ShowOkMessage(Resources.LoadSession_UI_Message_Error_Message_UpdateSessionFile,
                                       Resources.LoadSession_UI_Message_Error_Title_UpdateSessionFile,
                                       MessageBoxIcon.Information);
-                    }
-
-                    if (interventionResult.CloseAllTabs)
-                    {
-                        CloseAllTabs();
                     }
 
                     if (interventionResult.OpenInNewWindowFiles is not null)
