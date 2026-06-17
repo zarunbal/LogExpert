@@ -83,13 +83,21 @@ jobs:
           git add "src/Solution Items/usedComponents.json"
           git add "src/PluginRegistry/PluginHashGenerator.Generated.cs"
 
-          git diff --staged --quiet
-          if ($LASTEXITCODE -eq 0) {
+          # Describe only the files that actually changed. usedComponents.json is
+          # regenerated every release but rarely differs (dependencies are stable),
+          # so without this the message falsely claims it was updated each time.
+          $staged = git diff --staged --name-only
+          if ([string]::IsNullOrWhiteSpace($staged)) {
             Write-Host "No changes to commit; skipping PR."
             exit 0
           }
 
-          git commit -m "chore: update plugin hashes and usedComponents.json for ${{ github.ref_name }} [skip ci]"
+          $parts = @()
+          if ($staged -match 'PluginHashGenerator\.Generated\.cs') { $parts += 'plugin hashes' }
+          if ($staged -match 'usedComponents\.json')               { $parts += 'usedComponents.json' }
+          $what = $parts -join ' and '
+
+          git commit -m "chore: update $what for ${{ github.ref_name }} [skip ci]"
           # Force-push so re-running the release for the same tag updates the existing branch
           git push --force origin $branch
 
@@ -98,7 +106,7 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($existing)) {
             gh pr create --base Development --head $branch `
               --title "chore: update generated files for ${{ github.ref_name }} [skip ci]" `
-              --body "Automated update of plugin hashes and ``usedComponents.json`` for release ${{ github.ref_name }}."
+              --body "Automated update of $what for release ${{ github.ref_name }}."
           } else {
             Write-Host "PR #$existing already exists for $branch"
           }

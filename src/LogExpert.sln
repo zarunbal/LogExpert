@@ -109,6 +109,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "help", "help", "{9FC7BC64-C
 		HelpSmith\LogExpert.chm = HelpSmith\LogExpert.chm
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "winget", "winget", "{EC031913-3DC3-443F-9A86-01F80F964D2A}"
+	ProjectSection(SolutionItems) = preProject
+		..\winget\LogExperts.LogExpert.installer.yaml = ..\winget\LogExperts.LogExpert.installer.yaml
+		..\winget\LogExperts.LogExpert.locale.en-US.yaml = ..\winget\LogExperts.LogExpert.locale.en-US.yaml
+		..\winget\LogExperts.LogExpert.yaml = ..\winget\LogExperts.LogExpert.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -246,6 +253,7 @@ Global
 		{CAD17410-CE8C-4FE5-91DE-1B3DE2945135} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 		{1046779B-500D-8260-33BA-BC778C4B836F} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 		{9FC7BC64-CE77-45DF-B8AC-10F1D0336E76} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
+		{EC031913-3DC3-443F-9A86-01F80F964D2A} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15924D5F-B90B-4BC7-9E7D-BCCB62EBABAD}
