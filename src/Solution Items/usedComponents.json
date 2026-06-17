@@ -179,6 +179,10 @@
   {
     "PackageId": "Nuke.GitHub",
     "PackageVersion": "7.0.0",
+    "PackageProjectUrl": "https://github.com/GeorgDangl/Nuke.GitHub",
+    "Copyright": "(c) 2024 Georg Dangl",
+    "Authors": "Georg Dangl",
+    "Description": "GitHub interaction for NUKE Build",
     "License": "MIT",
     "LicenseUrl": "https://github.com/GeorgDangl/Nuke.GitHub/blob/develop/LICENSE.md",
     "LicenseInformationOrigin": 4
