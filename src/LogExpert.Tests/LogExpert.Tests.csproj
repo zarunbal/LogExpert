@@ -33,13 +33,13 @@
   </ItemGroup>
 
   <ItemGroup Label="Data">
-    <Content Include="Data\50 MB UTF16.txt">
+    <Content Include="TestData\50 MB UTF16.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\50 MB UTF8.txt">
+    <Content Include="TestData\50 MB UTF8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\50 MB.txt">
+    <Content Include="TestData\50 MB.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
