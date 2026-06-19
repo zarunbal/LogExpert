@@ -333,7 +333,24 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
                 break;
             }
 
-            var closingBracketIndex = trimmed.Span.IndexOf(']');
+            // Find the ']' that matches the opening '[', accounting for nested brackets
+            // (e.g. "[ProgramName/MethodName[41]]" is a single field).
+            var closeSpan = trimmed.Span;
+            var depth = 0;
+            var closingBracketIndex = -1;
+            for (var j = 0; j < closeSpan.Length; j++)
+            {
+                if (closeSpan[j] == '[')
+                {
+                    depth++;
+                }
+                else if (closeSpan[j] == ']' && --depth == 0)
+                {
+                    closingBracketIndex = j;
+                    break;
+                }
+            }
+
             if (closingBracketIndex < 0)
             {
                 columnList.Add(new Column { FullValue = rest, Parent = clogLine });

@@ -76,4 +76,35 @@ public class SquareBracketColumnizerTest
         _ = squareBracketColumnizer.GetPriority(path, loglines);
         Assert.That(count, Is.EqualTo(squareBracketColumnizer.GetColumnCount()));
     }
+
+    // Issue #460: a bracketed field containing nested brackets (e.g. "[ProgramName/MethodName[41]]")
+    // must stay in a single column instead of being split at the first inner ']'.
+    [Test]
+    public void SplitLine_NestedBrackets_KeepsInnerBracketsInOneColumn ()
+    {
+        SquareBracketColumnizer squareBracketColumnizer = new();
+        var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\SquareBracketColumnizerTest_06.txt");
+
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        logFileReader.ReadFiles();
+
+        List<ILogLineMemory> loglines =
+        [
+            logFileReader.GetLogLineMemory(0),
+            logFileReader.GetLogLineMemory(1)
+        ];
+
+        _ = squareBracketColumnizer.GetPriority(path, loglines);
+
+        var line = logFileReader.GetLogLineMemory(0);
+        var columns = squareBracketColumnizer.SplitLine(null, line);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(columns.ColumnValues[0].FullValue.ToString(), Is.EqualTo("[WARN ]"));
+            Assert.That(columns.ColumnValues[1].FullValue.ToString(), Is.EqualTo("[18/08-06:06:18.436]"));
+            Assert.That(columns.ColumnValues[2].FullValue.ToString(), Is.EqualTo("[ProgramName/MethodName[41]]"));
+            Assert.That(columns.ColumnValues[^1].FullValue.ToString().Trim(), Is.EqualTo("About to run."));
+        });
+    }
 }
