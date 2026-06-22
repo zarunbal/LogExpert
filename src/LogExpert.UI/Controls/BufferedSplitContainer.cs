@@ -3,16 +3,15 @@ using System.Runtime.Versioning;
 namespace LogExpert.UI.Controls;
 
 /// <summary>
-/// A <see cref="SplitContainer"/> that paints itself and all of its descendants composited
-/// (off-screen, bottom-to-top) via the <c>WS_EX_COMPOSITED</c> extended window style.
-/// <para>
-/// This removes the flicker that occurs while the splitter is dragged: anchored child controls
-/// (e.g. the right-aligned filter-count label) are physically repositioned on every mouse move,
-/// and because they own their own window handle, double-buffering the parent panel is not enough
-/// to stop them flickering. Compositing buffers the entire control tree, so the drag is smooth
-/// (see issue #560).
-/// </para>
+/// A <see cref="SplitContainer"/> that paints itself and all of its descendants composited (off-screen, bottom-to-top)
+/// via the <c>WS_EX_COMPOSITED</c> extended window style.
+///
+/// <para>This removes the flicker that occurs while the splitter is dragged: anchored child controls (e.g. the
+/// right-aligned filter-count label) are physically repositioned on every mouse move, and because they own their own
+/// window handle, double-buffering the parent panel is not enough to stop them flickering. Compositing buffers the
+/// entire control tree, so the drag is smooth (see issue #560). </para>
 /// </summary>
+/// <remarks>https://pinvoke.net/default.aspx/Enums/WindowStyles.html</remarks>
 [SupportedOSPlatform("windows")]
 internal sealed class BufferedSplitContainer : SplitContainer
 {
