@@ -736,7 +736,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AutoResizeFilterBox ()
     {
-        filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        filterSplitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+            desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize);
     }
 
     #region Events handler
@@ -1430,22 +1432,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (e.Button.Equals(MouseButtons.Left))
             {
-                if (splitContainer.Orientation.Equals(Orientation.Vertical))
-                {
-                    if (e.X > 0 && e.X < splitContainer.Width)
-                    {
-                        splitContainer.SplitterDistance = e.X;
-                        splitContainer.Refresh();
-                    }
-                }
-                else
-                {
-                    if (e.Y > 0 && e.Y < splitContainer.Height)
-                    {
-                        splitContainer.SplitterDistance = e.Y;
-                        splitContainer.Refresh();
-                    }
-                }
+                var isVertical = splitContainer.Orientation.Equals(Orientation.Vertical);
+                var desired = isVertical ? e.X : e.Y;
+                var containerSize = isVertical ? splitContainer.Width : splitContainer.Height;
+
+                // Keep the splitter inside the panels' min sizes so the text filter (Panel1) can
+                // never be grown large enough to push the Panel2 controls outside the app (issue #560).
+                splitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+                    desired, containerSize, splitContainer.SplitterWidth, splitContainer.Panel1MinSize, splitContainer.Panel2MinSize);
+                splitContainer.Refresh();
             }
             else
             {

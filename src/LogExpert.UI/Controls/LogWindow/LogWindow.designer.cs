@@ -893,7 +893,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterSplitContainer.Panel2.Controls.Add(filterRegexCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
             filterSplitContainer.Panel2.Controls.Add(btnfilterSearch);
-            filterSplitContainer.Panel2MinSize = 550;
+            filterSplitContainer.Panel2MinSize = 660;
             filterSplitContainer.Size = new Size(1855, 46);
             filterSplitContainer.SplitterDistance = 518;
             filterSplitContainer.TabIndex = 11;
