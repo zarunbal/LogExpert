@@ -65,4 +65,18 @@ public class FilterSplitterLayoutTests
 
         Assert.That(result, Is.EqualTo(200));
     }
+
+    [Test]
+    public void RequiredPanel2Width_LeavesRoomForRightAnchoredControlAfterRightmostControl ()
+    {
+        // "Show advanced..." ends at x=649; the right-anchored filter-count label is 71 wide.
+        // Panel2 must be at least wide enough that the label starts after the button (+ gap),
+        // otherwise the two overlap as the text filter is grown (issue #560 follow-up).
+        var result = FilterSplitterLayout.RequiredPanel2Width(
+            rightmostControlRightEdge: 649,
+            rightAnchoredControlWidth: 71,
+            gap: 6);
+
+        Assert.That(result, Is.EqualTo(726));
+    }
 }

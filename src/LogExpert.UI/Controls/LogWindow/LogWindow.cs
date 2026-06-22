@@ -46,6 +46,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int SPREAD_MAX = 99;
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
+    private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
     private const string FONT_COURIER_NEW = "Courier New";
@@ -228,6 +229,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
+
+        // Keep Panel2 wide enough that "Show advanced..." (btnAdvanced, the rightmost left-anchored
+        // control) never overlaps the right-anchored filter-count label when the text filter grows.
+        filterSplitContainer.Panel2MinSize = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, FILTER_PANEL2_CONTROL_GAP);
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;

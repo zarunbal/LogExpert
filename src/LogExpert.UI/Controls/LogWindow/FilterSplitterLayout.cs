@@ -1,7 +1,7 @@
 namespace LogExpert.UI.Controls.LogWindow;
 
 /// <summary>
-/// Pure layout math for the filter row's split container (issue #560).
+/// Pure layout math for the filter row's split container.
 /// Keeps the text filter (Panel1) from being grown so large that the Panel2 controls
 /// ("Search", the filter checkboxes and the "Show advanced..." button) are pushed
 /// outside the visible area of the application.
@@ -24,5 +24,18 @@ internal static class FilterSplitterLayout
         // an invalid (min > max) clamp range.
         var maxDistance = Math.Max(containerWidth - splitterWidth - panel2MinSize, panel1MinSize);
         return Math.Clamp(desiredDistance, panel1MinSize, maxDistance);
+    }
+
+    /// <summary>
+    /// Computes the minimum width Panel2 needs so that the rightmost left-anchored control
+    /// (the "Show advanced..." button) never overlaps the right-anchored control next to it
+    /// (the filter-count label) as the text filter is grown.
+    /// </summary>
+    /// <param name="rightmostControlRightEdge">Right edge (Left + Width) of the rightmost left-anchored control.</param>
+    /// <param name="rightAnchoredControlWidth">Width of the right-anchored control.</param>
+    /// <param name="gap">Desired gap in pixels between the two controls.</param>
+    public static int RequiredPanel2Width (int rightmostControlRightEdge, int rightAnchoredControlWidth, int gap)
+    {
+        return rightmostControlRightEdge + gap + rightAnchoredControlWidth;
     }
 }
