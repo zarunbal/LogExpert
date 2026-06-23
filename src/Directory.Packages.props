@@ -26,8 +26,6 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.8" />
     <PackageVersion Include="System.Drawing.Common" Version="10.0.8" />
     <PackageVersion Include="System.Resources.Extensions" Version="10.0.8" />
-    <PackageVersion Include="Vanara.Library" Version="5.0.5" />
-    <PackageVersion Include="Vanara.PInvoke.DwmApi" Version="5.0.5" />
     <PackageVersion Include="Vanara.PInvoke.RstrtMgr" Version="5.0.5" />
     <PackageVersion Include="Vanara.PInvoke.Shell32" Version="5.0.5" />
     <PackageVersion Include="Vanara.PInvoke.User32" Version="5.0.5" />

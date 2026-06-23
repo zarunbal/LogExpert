@@ -3007,6 +3007,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         return;
                     }
+                    catch (Exception ex) when (ex is InvalidOperationException or
+                                                     ArgumentOutOfRangeException or
+                                                     ExternalException or
+                                                     Win32Exception)
+                    {
+                        // Never let a single bad event kill the worker thread. Before this guard, an
+                        // exception here (e.g. a missing optional assembly loaded lazily from the tail
+                        // path) terminated the loop, so follow-tail silently stopped updating for the
+                        // whole window until reload (#634). Log and continue with the next event.
+                        _logger.Error(ex, "### LogEventWorker: error while processing a file-size-changed event; follow-tail continues.");
+                    }
 
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }
@@ -3168,7 +3179,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var matchingList = FindMatchingHighlightEntries(line);
                 LaunchHighlightPlugins(matchingList, i);
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
-                TriggerAudioAlert(matchingList);
+                SafeTriggerAudioAlert(matchingList);
                 if (setBookmark)
                 {
                     var capturedLineNum = i;
@@ -3220,7 +3231,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var matchingList = FindMatchingHighlightEntries(line);
                     LaunchHighlightPlugins(matchingList, i);
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
-                    TriggerAudioAlert(matchingList);
+                    SafeTriggerAudioAlert(matchingList);
                     if (setBookmark)
                     {
                         var capturedLineNum = i;
@@ -3908,6 +3919,37 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <see cref="AudioPlayer"/> would suppress subsequent plays anyway.
     /// Called only from the tail trigger path.
     /// </summary>
+    private static volatile bool _audioAlertsUnavailable;
+
+    /// <summary>
+    /// Guarded entry point for <see cref="TriggerAudioAlert"/>. Isolating the audio call in a
+    /// separate method keeps the audio assembly (LogExpert.Audio/NAudio) off the JIT path of
+    /// <see cref="CheckFilterAndHighlight"/>, and catches a failed lazy load of that assembly so a
+    /// missing/broken audio dependency degrades to "no audio alerts" instead of throwing on the
+    /// worker thread and stopping follow-tail (#634). After one failure audio alerts stay disabled.
+    /// </summary>
+    private static void SafeTriggerAudioAlert (IList<HighlightEntry> matchingList)
+    {
+        if (_audioAlertsUnavailable)
+        {
+            return;
+        }
+
+        try
+        {
+            TriggerAudioAlert(matchingList);
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or
+                                         FileLoadException or
+                                         BadImageFormatException or
+                                         TypeLoadException or
+                                         DllNotFoundException)
+        {
+            _audioAlertsUnavailable = true;
+            _logger.Warn(ex, "### SafeTriggerAudioAlert: Audio alerts disabled: the audio component could not be loaded (e.g. LogExpert.Audio/NAudio missing from this installation).");
+        }
+    }
+
     private static void TriggerAudioAlert (IList<HighlightEntry> matchingList)
     {
         if (matchingList == null || matchingList.Count == 0)

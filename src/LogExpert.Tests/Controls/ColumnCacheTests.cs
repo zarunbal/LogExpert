@@ -1,6 +1,7 @@
 using ColumnizerLib;
 
 using LogExpert.Core.Callback;
+using LogExpert.Core.Classes.Log.Buffers;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 
@@ -33,13 +34,13 @@ public class ColumnCacheTests
         var splitResult = new Mock<IColumnizedLogLineMemory>().Object;
 
         var readerMock = new Mock<ILogfileReader>();
-        readerMock
+        _ = readerMock
             .SetupSequence(r => r.GetLogLineMemoryWithWait(lineNumber))
             .Returns(Task.FromResult<ILogLineMemory>(null))
             .Returns(Task.FromResult(validLine));
 
         var columnizerMock = new Mock<ILogLineMemoryColumnizer>();
-        columnizerMock
+        _ = columnizerMock
             .Setup(c => c.SplitLine(It.IsAny<ILogLineMemoryColumnizerCallback>(), validLine))
             .Returns(splitResult);
 
@@ -74,12 +75,12 @@ public class ColumnCacheTests
         var splitResult = new Mock<IColumnizedLogLineMemory>().Object;
 
         var readerMock = new Mock<ILogfileReader>();
-        readerMock
+        _ = readerMock
             .Setup(r => r.GetLogLineMemoryWithWait(lineNumber))
             .Returns(Task.FromResult(validLine));
 
         var columnizerMock = new Mock<ILogLineMemoryColumnizer>();
-        columnizerMock
+        _ = columnizerMock
             .Setup(c => c.SplitLine(It.IsAny<ILogLineMemoryColumnizerCallback>(), validLine))
             .Returns(splitResult);
 
@@ -97,5 +98,46 @@ public class ColumnCacheTests
         Assert.That(secondResult, Is.SameAs(splitResult));
         readerMock.Verify(r => r.GetLogLineMemoryWithWait(lineNumber), Times.Once);
         columnizerMock.Verify(c => c.SplitLine(It.IsAny<ILogLineMemoryColumnizerCallback>(), validLine), Times.Once);
+    }
+
+    /// <summary>
+    /// Regression test for #634. The follow-tail path (LogWindow.UpdateGrid) deliberately calls
+    /// <see cref="ColumnCache.MarkPrefetchStale"/> instead of <see cref="ColumnCache.InvalidatePrefetch"/>
+    /// so the currently-visible buffers stay pinned across the tail refresh. If the pins were released,
+    /// the background LRU-eviction thread could return their char blocks to the ArrayPool mid-paint,
+    /// producing blank/stale tail rows (the Release-only follow-tail failure). This locks the contract:
+    /// MarkPrefetchStale keeps pins; only InvalidatePrefetch releases them.
+    /// </summary>
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void MarkPrefetchStale_KeepsBuffersPinned_While_InvalidateReleasesThem ()
+    {
+        var fileInfo = new Mock<ILogFileInfo>();
+        _ = fileInfo.Setup(f => f.FullName).Returns("fake.log");
+        _ = fileInfo.Setup(f => f.FileName).Returns("fake.log");
+
+        var buffer = new LogBuffer(fileInfo.Object, 10) { StartLine = 0, StartPos = 0 };
+        buffer.AddLine(new LogLine("tail".AsMemory(), 0), 0);
+
+        var readerMock = new Mock<ILogfileReader>();
+        _ = readerMock.Setup(r => r.GetLogLineMemories(0, 1)).Returns(new ILogLineMemory[1]);
+        _ = readerMock.As<IBufferPinning>()
+            .Setup(p => p.PinRange(It.IsAny<int>(), It.IsAny<int>()))
+            .Returns(() =>
+            {
+                buffer.Pin();
+                return new PinHandle([buffer]);
+            });
+
+        var cache = new ColumnCache();
+
+        cache.Prefetch(readerMock.Object, 0, 1);
+        Assert.That(buffer.IsPinned, Is.True, "Prefetch must pin the visible range.");
+
+        cache.MarkPrefetchStale();
+        Assert.That(buffer.IsPinned, Is.True, "MarkPrefetchStale must NOT release pins — follow-tail relies on this (#634).");
+
+        cache.InvalidatePrefetch();
+        Assert.That(buffer.IsPinned, Is.False, "InvalidatePrefetch must release the pins.");
     }
 }
