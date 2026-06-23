@@ -105,12 +105,9 @@ public class InstallerCoverageTests
                     continue;
                 }
 
-                foreach (var name in runtime.EnumerateObject().Select(f => Path.GetFileName(f.Name)))
+                foreach (var name in runtime.EnumerateObject().Select(f => Path.GetFileName(f.Name)).Where(name => name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
-                    {
-                        _ = result.Add(name);
-                    }
+                    _ = result.Add(name);
                 }
             }
         }
