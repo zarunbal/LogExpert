@@ -3007,7 +3007,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         return;
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is InvalidOperationException or
+                                                     ArgumentOutOfRangeException or
+                                                     ExternalException or
+                                                     Win32Exception)
                     {
                         // Never let a single bad event kill the worker thread. Before this guard, an
                         // exception here (e.g. a missing optional assembly loaded lazily from the tail
@@ -3936,7 +3939,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             TriggerAudioAlert(matchingList);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is FileNotFoundException or
+                                         FileLoadException or
+                                         BadImageFormatException or
+                                         TypeLoadException or
+                                         DllNotFoundException)
         {
             _audioAlertsUnavailable = true;
             _logger.Warn(ex, "### SafeTriggerAudioAlert: Audio alerts disabled: the audio component could not be loaded (e.g. LogExpert.Audio/NAudio missing from this installation).");

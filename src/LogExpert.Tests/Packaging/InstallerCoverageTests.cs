@@ -19,6 +19,7 @@ namespace LogExpert.Tests.Packaging;
 public class InstallerCoverageTests
 {
     [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void Installer_ShipsEveryRuntimeAssembly_DeclaredInDepsJson ()
     {
         var repoRoot = FindRepoRoot();
@@ -38,7 +39,7 @@ public class InstallerCoverageTests
         var required = GetRuntimeAssemblyFileNames(depsJson);
         Assert.That(required, Is.Not.Empty, "Failed to parse any runtime assemblies from deps.json.");
 
-        var shipped = GetInstallerShippedFileNames(Path.Combine(repoRoot, "src", "setup"));
+        var shipped = GetInstallerShippedFileNames(Path.Join(repoRoot, "src", "setup"));
 
         var missing = required
             .Where(name => !shipped.Contains(name))
@@ -55,7 +56,7 @@ public class InstallerCoverageTests
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir != null)
         {
-            if (File.Exists(Path.Combine(dir.FullName, "src", "setup", "LogExpertInstaller.iss")))
+            if (File.Exists(Path.Join(dir.FullName, "src", "setup", "LogExpertInstaller.iss")))
             {
                 return dir.FullName;
             }
@@ -70,7 +71,7 @@ public class InstallerCoverageTests
     {
         foreach (var config in new[] { "Release", "Debug" })
         {
-            var candidate = Path.Combine(repoRoot, "bin", config, "LogExpert.deps.json");
+            var candidate = Path.Join(repoRoot, "bin", config, "LogExpert.deps.json");
             if (File.Exists(candidate))
             {
                 return candidate;
@@ -104,9 +105,8 @@ public class InstallerCoverageTests
                     continue;
                 }
 
-                foreach (var file in runtime.EnumerateObject())
+                foreach (var name in runtime.EnumerateObject().Select(f => Path.GetFileName(f.Name)))
                 {
-                    var name = Path.GetFileName(file.Name);
                     if (name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                     {
                         _ = result.Add(name);
@@ -125,7 +125,7 @@ public class InstallerCoverageTests
     private static HashSet<string> GetInstallerShippedFileNames (string setupDir)
     {
         var shipped = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        CollectShippedFromIss(Path.Combine(setupDir, "LogExpertInstaller.iss"), setupDir, shipped, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+        CollectShippedFromIss(Path.Join(setupDir, "LogExpertInstaller.iss"), setupDir, shipped, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         return shipped;
     }
 
@@ -136,10 +136,9 @@ public class InstallerCoverageTests
             return;
         }
 
-        foreach (var raw in File.ReadAllLines(issPath))
+        foreach (var line in File.ReadAllLines(issPath).Select(line => line.Trim()))
         {
-            var line = raw.Trim();
-            if (line.StartsWith(";", StringComparison.Ordinal))
+            if (line.StartsWith(';'))
             {
                 continue;
             }
@@ -149,7 +148,7 @@ public class InstallerCoverageTests
                 var included = line.Split('"').ElementAtOrDefault(1);
                 if (!string.IsNullOrWhiteSpace(included))
                 {
-                    CollectShippedFromIss(Path.Combine(setupDir, included), setupDir, shipped, visited);
+                    CollectShippedFromIss(Path.Join(setupDir, included), setupDir, shipped, visited);
                 }
 
                 continue;
@@ -170,7 +169,7 @@ public class InstallerCoverageTests
 
             var path = line.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
             var fileName = path.Replace('/', '\\').Split('\\').LastOrDefault();
-            if (!string.IsNullOrWhiteSpace(fileName) && !fileName.Contains('*'))
+            if (!(string.IsNullOrWhiteSpace(fileName) || fileName.Contains('*', StringComparison.OrdinalIgnoreCase)))
             {
                 _ = shipped.Add(fileName);
             }
