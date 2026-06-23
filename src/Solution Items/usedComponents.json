@@ -278,17 +278,6 @@
     "LicenseInformationOrigin": 0
   },
   {
-    "PackageId": "Vanara.Library",
-    "PackageVersion": "5.0.5",
-    "PackageProjectUrl": "https://github.com/dahall/vanara",
-    "Copyright": "Copyright \u00A9 2017-2026",
-    "Authors": "David Hall",
-    "Description": "The full set of packages associated with the Vanara PInvoke Libraries.",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
     "PackageId": "Vanara.PInvoke.RstrtMgr",
     "PackageVersion": "5.0.5",
     "PackageProjectUrl": "https://github.com/dahall/vanara",
