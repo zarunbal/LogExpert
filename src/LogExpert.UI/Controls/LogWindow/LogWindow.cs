@@ -46,6 +46,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int SPREAD_MAX = 99;
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
+    private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
     private const string FONT_COURIER_NEW = "Courier New";
@@ -228,6 +229,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
+
+        // Keep Panel2 wide enough that "Show advanced..." (btnAdvanced, the rightmost left-anchored
+        // control) never overlaps the right-anchored filter-count label when the text filter grows.
+        filterSplitContainer.Panel2MinSize = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, FILTER_PANEL2_CONTROL_GAP);
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
@@ -736,7 +741,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AutoResizeFilterBox ()
     {
-        filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        filterSplitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+            desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize);
     }
 
     #region Events handler
@@ -1430,22 +1437,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (e.Button.Equals(MouseButtons.Left))
             {
-                if (splitContainer.Orientation.Equals(Orientation.Vertical))
-                {
-                    if (e.X > 0 && e.X < splitContainer.Width)
-                    {
-                        splitContainer.SplitterDistance = e.X;
-                        splitContainer.Refresh();
-                    }
-                }
-                else
-                {
-                    if (e.Y > 0 && e.Y < splitContainer.Height)
-                    {
-                        splitContainer.SplitterDistance = e.Y;
-                        splitContainer.Refresh();
-                    }
-                }
+                var isVertical = splitContainer.Orientation.Equals(Orientation.Vertical);
+                var desired = isVertical ? e.X : e.Y;
+                var containerSize = isVertical ? splitContainer.Width : splitContainer.Height;
+
+                // Keep the splitter inside the panels' min sizes so the text filter (Panel1) can
+                // never be grown large enough to push the Panel2 controls outside the app (issue #560).
+                splitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+                    desired, containerSize, splitContainer.SplitterWidth, splitContainer.Panel1MinSize, splitContainer.Panel2MinSize);
+                splitContainer.Refresh();
             }
             else
             {
