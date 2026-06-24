@@ -33,7 +33,8 @@ using NLog;
 using Vanara.Extensions;
 
 using WeifenLuo.WinFormsUI.Docking;
-//using static LogExpert.PluginRegistry.PluginRegistry; //TODO: Adjust the instance name so using static can be used.
+//using static LogExpert.PluginRegistry.PluginRegistry;
+//TODO: Adjust the instance name so using static can be used.
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -49,6 +50,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
+    private const int WORKER_SHUTDOWN_TIMEOUT = 2000; // ms to wait for a worker task to drain during teardown before giving up
     private const string FONT_COURIER_NEW = "Courier New";
     private const string FONT_VERDANA = "Verdana";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -3033,10 +3035,26 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void StopLogEventWorkerThread ()
     {
-        _ = _logEventArgsEvent.Set();
+        _ = _logEventArgsEvent.Set(); // wake the worker if it is parked on the event so it observes the cancel and exits
         _cts.Cancel();
-        //_logEventHandlerThread.Abort();
-        //_logEventHandlerThread.Join();
+        JoinWorker(_logEventHandlerTask);
+    }
+
+    /// <summary>
+    /// Waits (briefly) for a long-running worker task to drain during teardown. Workers observe cancellation via
+    /// <see cref="_cts"/> plus their wake-up events; the bounded timeout guards against a worker blocked in I/O so
+    /// closing the window can never hang. Faults are swallowed because this only runs while tearing down.
+    /// </summary>
+    private static void JoinWorker (Task worker)
+    {
+        try
+        {
+            _ = worker.Wait(WORKER_SHUTDOWN_TIMEOUT);
+        }
+        catch (AggregateException)
+        {
+            // A worker threw on its way out; nothing actionable during teardown.
+        }
     }
 
     private void OnFileSizeChanged (LogEventArgs logEventArgs)
@@ -3978,10 +3996,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void StopTimestampSyncThread ()
     {
         _shouldTimestampDisplaySyncingCancel = true;
-        //_timeShiftSyncWakeupEvent.Set();
-        //_timeShiftSyncThread.Abort();
-        //_timeShiftSyncThread.Join();
+        _ = _timeShiftSyncWakeupEvent.Set(); // wake the worker if it is parked so it observes the cancel flag and exits
         _cts.Cancel();
+        JoinWorker(_timeShiftSyncTask);
     }
 
     [SupportedOSPlatform("windows")]
@@ -6638,9 +6655,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void CloseLogWindow ()
     {
-        // Suppress grid CellValueNeeded callbacks for the rest of teardown. Clearing/disposing the grids below
-        // ends any in-progress cell edit, which would otherwise fire CellValueNeeded into a reader whose buffers
-        // are being torn down (NullReferenceException in GetLogLineMemories on exit).
         _isClosing = true;
 
         CancelHighlightBookmarkScan();
