@@ -152,6 +152,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private int _selectedCol; // set by context menu event for column headers only
     private bool _shouldCallTimeSync;
     private bool _shouldCancel;
+    private bool _isClosing; // set once CloseLogWindow starts tearing down; suppresses grid CellValueNeeded callbacks
     private bool _shouldTimestampDisplaySyncingCancel;
     private bool _showAdvanced;
     private List<HighlightEntry> _tempHighlightEntryList = [];
@@ -243,7 +244,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
         _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
         _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
@@ -955,6 +955,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnDataGridViewCellValueNeeded (object sender, DataGridViewCellValueEventArgs e)
     {
+        if (_isClosing)
+        {
+            e.Value = Column.EmptyColumn;
+            return;
+        }
+
         PrefetchVisibleLines();
 
         var startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
@@ -1152,7 +1158,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnFilterGridViewCellValueNeeded (object sender, DataGridViewCellValueEventArgs e)
     {
-        if (e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
+        if (_isClosing || e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
         {
             e.Value = string.Empty;
             return;
@@ -6632,6 +6638,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void CloseLogWindow ()
     {
+        // Suppress grid CellValueNeeded callbacks for the rest of teardown. Clearing/disposing the grids below
+        // ends any in-progress cell edit, which would otherwise fire CellValueNeeded into a reader whose buffers
+        // are being torn down (NullReferenceException in GetLogLineMemories on exit).
+        _isClosing = true;
+
         CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();
