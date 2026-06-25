@@ -909,6 +909,11 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                     var availableInBuffer = logBufferEntry.Buffer.LineCount - bufferOffset;
                     var toCopy = Math.Min(count - filled, availableInBuffer);
 
+                    if (bufferOffset < 0 || toCopy <= 0)
+                    {
+                        break;
+                    }
+
                     for (var i = 0; i < toCopy; i++)
                     {
                         result[filled + i] = logBufferEntry.Buffer.GetLineMemoryOfBlock(bufferOffset + i);
