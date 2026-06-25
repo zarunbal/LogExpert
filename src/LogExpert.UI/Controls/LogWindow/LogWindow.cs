@@ -744,8 +744,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void AutoResizeFilterBox ()
     {
         var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
-        filterSplitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
-            desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize);
+        if (FilterSplitterLayout.TryClampSplitterDistance(desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize, out var distance))
+        {
+            filterSplitContainer.SplitterDistance = distance;
+        }
     }
 
     #region Events handler
@@ -1449,11 +1451,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var desired = isVertical ? e.X : e.Y;
                 var containerSize = isVertical ? splitContainer.Width : splitContainer.Height;
 
-                // Keep the splitter inside the panels' min sizes so the text filter (Panel1) can
-                // never be grown large enough to push the Panel2 controls outside the app (issue #560).
-                splitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
-                    desired, containerSize, splitContainer.SplitterWidth, splitContainer.Panel1MinSize, splitContainer.Panel2MinSize);
-                splitContainer.Refresh();
+                if (FilterSplitterLayout.TryClampSplitterDistance(desired, containerSize, splitContainer.SplitterWidth, splitContainer.Panel1MinSize, splitContainer.Panel2MinSize, out var distance))
+                {
+                    splitContainer.SplitterDistance = distance;
+                    splitContainer.Refresh();
+                }
             }
             else
             {
