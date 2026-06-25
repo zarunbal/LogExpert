@@ -258,10 +258,10 @@ public class PositionAwareStreamReaderDirectTests
 
     #endregion
 
-    #region DetachBlocks
+    #region DetachCharBlocks
 
     [Test]
-    public void DetachBlocks_ReturnsCompletedBlocks ()
+    public void DetachCharBlocks_ReturnsCompletedBlocks ()
     {
         // Create enough content to fill multiple blocks
         var sb = new StringBuilder();
@@ -279,11 +279,11 @@ public class PositionAwareStreamReaderDirectTests
             // Intentionally empty: consume all lines to advance reader state.
         }
 
-        var blocks = reader.DetachBlocks();
+        var blocks = reader.DetachCharBlocks();
         Assert.That(blocks.Count, Is.GreaterThan(0), "Should have completed blocks to detach");
 
         // Second detach should be empty
-        var blocks2 = reader.DetachBlocks();
+        var blocks2 = reader.DetachCharBlocks();
         Assert.That(blocks2.Count, Is.EqualTo(0));
     }
 
@@ -508,7 +508,7 @@ public class PositionAwareStreamReaderDirectTests
     }
 
     [Test]
-    public void TryReadLine_LineLongerThanBlockSize_DetachBlocksAfterEachLine ()
+    public void TryReadLine_LineLongerThanBlockSize_DetachCharBlocksAfterEachLine ()
     {
         RunWithTimeout(() =>
         {
@@ -523,12 +523,12 @@ public class PositionAwareStreamReaderDirectTests
 
             Assert.That(reader.TryReadLine(out var line1), Is.True);
             Assert.That(line1.Span.ToString(), Is.EqualTo("line1"));
-            var blocks1 = reader.DetachBlocks();
+            var blocks1 = reader.DetachCharBlocks();
             Assert.That(blocks1.Count, Is.GreaterThan(0));
 
             Assert.That(reader.TryReadLine(out var line2), Is.True);
             Assert.That(line2.Length, Is.EqualTo(lineLength));
-            var blocks2 = reader.DetachBlocks();
+            var blocks2 = reader.DetachCharBlocks();
             Assert.That(blocks2.Count, Is.GreaterThan(0));
 
             Assert.That(reader.TryReadLine(out var line3), Is.True);
@@ -539,7 +539,7 @@ public class PositionAwareStreamReaderDirectTests
     }
 
     [Test]
-    public void TryReadLine_LineLongerThanBlockSize_DetachBlocksWithLargeTail ()
+    public void TryReadLine_LineLongerThanBlockSize_DetachCharBlocksWithLargeTail ()
     {
         RunWithTimeout(() =>
         {
@@ -575,14 +575,14 @@ public class PositionAwareStreamReaderDirectTests
             // Read and detach the prefix (resets reader to fresh BLOCK_SIZE buffer)
             Assert.That(reader.TryReadLine(out var line1), Is.True);
             Assert.That(line1.Span.ToString(), Is.EqualTo("prefix"));
-            _ = reader.DetachBlocks();
+            _ = reader.DetachCharBlocks();
 
             // Read the long line — this grows the buffer to 131072
             Assert.That(reader.TryReadLine(out var line2), Is.True);
             Assert.That(line2.Length, Is.EqualTo(longLineLength));
 
             // THIS IS THE CRITICAL CALL: DetachBlocks must handle tail > BLOCK_SIZE
-            var blocks = reader.DetachBlocks();
+            var blocks = reader.DetachCharBlocks();
             Assert.That(blocks.Count, Is.GreaterThan(0));
 
             // Verify we can still read subsequent lines correctly

@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Text;
 
-using LogExpert.Core.Classes.Log.Buffers;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
@@ -136,16 +135,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     }
 
     /// <summary>
-    /// Gets the block allocator for compatibility with the DetachBlocks pattern.
-    /// This reader manages its own blocks directly rather than through CharBlockAllocator.
-    /// </summary>
-    public CharBlockAllocator? BlockAllocator => null;
-
-    /// <summary>
     /// Detaches completed blocks (fully scanned) for transfer to the LogBuffer.
     /// The current _readBlock (partially scanned) stays with the reader.
     /// </summary>
-    public List<char[]> DetachBlocks ()
+    public List<char[]> DetachCharBlocks ()
     {
         // Nothing to detach: no completed blocks and no lines were scanned from the current block.
         if (_completedBlocks.Count == 0 && _scanOffset == 0)

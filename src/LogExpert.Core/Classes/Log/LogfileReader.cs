@@ -1256,16 +1256,9 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
                         logBuffer.Size = filePos - logBuffer.StartPos;
 
-                        // Detach char blocks from the reader's allocator and attach to the completed buffer.
+                        // Detach char blocks from the reader and attach to the completed buffer.
                         // Must happen before Monitor.Exit so the buffer is still exclusively owned.
-                        if (reader is PositionAwareStreamReaderSystem systemDetachBlockReader)
-                        {
-                            logBuffer.AttachCharBlocks(systemDetachBlockReader.BlockAllocator.DetachBlocks());
-                        }
-                        else if (reader is PositionAwareStreamReaderDirect directReader)
-                        {
-                            logBuffer.AttachCharBlocks(directReader.DetachBlocks());
-                        }
+                        logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
 
                         Monitor.Exit(logBuffer);
                         try
@@ -1297,14 +1290,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                 logBuffer.Size = filePos - logBuffer.StartPos;
 
                 // Attach remaining blocks to the final buffer
-                if (reader is PositionAwareStreamReaderSystem systemDetachBlockReader2)
-                {
-                    logBuffer.AttachCharBlocks(systemDetachBlockReader2.BlockAllocator.DetachBlocks());
-                }
-                else if (reader is PositionAwareStreamReaderDirect directReader)
-                {
-                    logBuffer.AttachCharBlocks(directReader.DetachBlocks());
-                }
+                logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
             }
             finally
             {
@@ -1427,14 +1413,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                     }
 
                     // Attach char blocks from the reader to the re-read buffer
-                    if (reader is PositionAwareStreamReaderSystem systemReader)
-                    {
-                        logBuffer.AttachCharBlocks(systemReader.BlockAllocator.DetachBlocks());
-                    }
-                    else if (reader is PositionAwareStreamReaderDirect directReader)
-                    {
-                        logBuffer.AttachCharBlocks(directReader.DetachBlocks());
-                    }
+                    logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
 
                     if (maxLinesCount != logBuffer.LineCount)
                     {
