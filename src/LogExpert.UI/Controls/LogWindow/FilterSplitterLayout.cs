@@ -16,14 +16,27 @@ internal static class FilterSplitterLayout
     /// <param name="splitterWidth">Width of the splitter bar.</param>
     /// <param name="panel1MinSize">Minimum width of Panel1 (the text filter).</param>
     /// <param name="panel2MinSize">Minimum width of Panel2 (the buttons/checkboxes).</param>
-    /// <returns>A distance guaranteed to keep Panel2 at least <paramref name="panel2MinSize"/> wide.</returns>
-    public static int ClampSplitterDistance (int desiredDistance, int containerWidth, int splitterWidth, int panel1MinSize, int panel2MinSize)
+    /// <param name="distance">The clamped distance to apply; only meaningful when this method returns <c>true</c>.</param>
+    /// <returns>
+    /// <c>true</c> when a distance honouring both minimums exists and <paramref name="distance"/> was set;
+    /// <c>false</c> when the container is too narrow to honour both minimums at once. In that degenerate
+    /// state there is no valid distance, and the caller must NOT assign one: WinForms'
+    /// <c>SplitContainer.SplitterDistance</c> setter throws <see cref="InvalidOperationException"/> when the
+    /// value cannot fit between <c>Panel1MinSize</c> and <c>Width - Panel2MinSize - SplitterWidth</c>.
+    /// </returns>
+    public static bool TryClampSplitterDistance (int desiredDistance, int containerWidth, int splitterWidth, int panel1MinSize, int panel2MinSize, out int distance)
     {
-        // When the container is too small to honour both minimums there is no perfect answer;
-        // keep Panel1 at its minimum (matching the SplitContainer's own preference) and avoid
-        // an invalid (min > max) clamp range.
-        var maxDistance = Math.Max(containerWidth - splitterWidth - panel2MinSize, panel1MinSize);
-        return Math.Clamp(desiredDistance, panel1MinSize, maxDistance);
+        var maxDistance = containerWidth - splitterWidth - panel2MinSize;
+        if (maxDistance < panel1MinSize)
+        {
+            // Both minimums cannot fit (a narrow window forced the container below their sum).
+            // No splitter distance is valid here; the caller leaves the splitter where it is.
+            distance = panel1MinSize;
+            return false;
+        }
+
+        distance = Math.Clamp(desiredDistance, panel1MinSize, maxDistance);
+        return true;
     }
 
     /// <summary>
