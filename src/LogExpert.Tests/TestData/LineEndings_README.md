@@ -21,4 +21,4 @@ the interesting ones: before `Direct` learned to detect the actual terminator pe
 line, `CR` rendered as a single giant line and `Mixed` drifted the byte position
 (visible as wrong seeking when buffers are flushed and reloaded).
 
-Regenerate with `scratchpad/gen-lineendings.ps1` (writes byte-exact terminators).
+Regenerate with `gen-lineendings.ps1` in this folder (writes byte-exact terminators).
