@@ -1,3 +1,5 @@
+using System.Text;
+
 using ColumnizerLib;
 
 namespace LogExpert.Core.Classes.Highlight;
@@ -70,7 +72,7 @@ public static class HighlightEvaluator
         var suppressLed = false;
         var stopTail = false;
         var setBookmark = false;
-        var bookmarkComment = string.Empty;
+        var bookmarkCommentBuilder = new StringBuilder();
 
         foreach (var entry in matchingEntries)
         {
@@ -84,7 +86,9 @@ public static class HighlightEvaluator
                 setBookmark = true;
                 if (!string.IsNullOrEmpty(entry.BookmarkComment))
                 {
-                    bookmarkComment += entry.BookmarkComment + "\r\n";
+
+                    _ = bookmarkCommentBuilder.Append(entry.BookmarkComment);
+                    _ = bookmarkCommentBuilder.Append("\r\n");
                 }
             }
 
@@ -94,7 +98,7 @@ public static class HighlightEvaluator
             }
         }
 
-        bookmarkComment = bookmarkComment.TrimEnd(['\r', '\n']);
+        var bookmarkComment = bookmarkCommentBuilder.ToString().TrimEnd(['\r', '\n']);
 
         return new HighlightActions(suppressLed, stopTail, setBookmark, bookmarkComment);
     }
