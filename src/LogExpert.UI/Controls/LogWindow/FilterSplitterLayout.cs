@@ -1,0 +1,41 @@
+namespace LogExpert.UI.Controls.LogWindow;
+
+/// <summary>
+/// Pure layout math for the filter row's split container.
+/// Keeps the text filter (Panel1) from being grown so large that the Panel2 controls
+/// ("Search", the filter checkboxes and the "Show advanced..." button) are pushed
+/// outside the visible area of the application.
+/// </summary>
+internal static class FilterSplitterLayout
+{
+    /// <summary>
+    /// Clamps a desired splitter distance so that neither panel shrinks below its minimum size.
+    /// </summary>
+    /// <param name="desiredDistance">The requested distance (Panel1 width) in pixels.</param>
+    /// <param name="containerWidth">Total width of the split container.</param>
+    /// <param name="splitterWidth">Width of the splitter bar.</param>
+    /// <param name="panel1MinSize">Minimum width of Panel1 (the text filter).</param>
+    /// <param name="panel2MinSize">Minimum width of Panel2 (the buttons/checkboxes).</param>
+    /// <returns>A distance guaranteed to keep Panel2 at least <paramref name="panel2MinSize"/> wide.</returns>
+    public static int ClampSplitterDistance (int desiredDistance, int containerWidth, int splitterWidth, int panel1MinSize, int panel2MinSize)
+    {
+        // When the container is too small to honour both minimums there is no perfect answer;
+        // keep Panel1 at its minimum (matching the SplitContainer's own preference) and avoid
+        // an invalid (min > max) clamp range.
+        var maxDistance = Math.Max(containerWidth - splitterWidth - panel2MinSize, panel1MinSize);
+        return Math.Clamp(desiredDistance, panel1MinSize, maxDistance);
+    }
+
+    /// <summary>
+    /// Computes the minimum width Panel2 needs so that the rightmost left-anchored control
+    /// (the "Show advanced..." button) never overlaps the right-anchored control next to it
+    /// (the filter-count label) as the text filter is grown.
+    /// </summary>
+    /// <param name="rightmostControlRightEdge">Right edge (Left + Width) of the rightmost left-anchored control.</param>
+    /// <param name="rightAnchoredControlWidth">Width of the right-anchored control.</param>
+    /// <param name="gap">Desired gap in pixels between the two controls.</param>
+    public static int RequiredPanel2Width (int rightmostControlRightEdge, int rightAnchoredControlWidth, int gap)
+    {
+        return rightmostControlRightEdge + gap + rightAnchoredControlWidth;
+    }
+}

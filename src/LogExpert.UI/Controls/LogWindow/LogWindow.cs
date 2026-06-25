@@ -33,7 +33,8 @@ using NLog;
 using Vanara.Extensions;
 
 using WeifenLuo.WinFormsUI.Docking;
-//using static LogExpert.PluginRegistry.PluginRegistry; //TODO: Adjust the instance name so using static can be used.
+//using static LogExpert.PluginRegistry.PluginRegistry;
+//TODO: Adjust the instance name so using static can be used.
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -46,8 +47,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int SPREAD_MAX = 99;
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
+    private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
+    private const int WORKER_SHUTDOWN_TIMEOUT = 2000; // ms to wait for a worker task to drain during teardown before giving up
     private const string FONT_COURIER_NEW = "Courier New";
     private const string FONT_VERDANA = "Verdana";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -151,6 +154,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private int _selectedCol; // set by context menu event for column headers only
     private bool _shouldCallTimeSync;
     private bool _shouldCancel;
+    private bool _isClosing; // set once CloseLogWindow starts tearing down; suppresses grid CellValueNeeded callbacks
     private bool _shouldTimestampDisplaySyncingCancel;
     private bool _showAdvanced;
     private List<HighlightEntry> _tempHighlightEntryList = [];
@@ -228,6 +232,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
+
+        // Keep Panel2 wide enough that "Show advanced..." (btnAdvanced, the rightmost left-anchored
+        // control) never overlaps the right-anchored filter-count label when the text filter grows.
+        filterSplitContainer.Panel2MinSize = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, FILTER_PANEL2_CONTROL_GAP);
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
@@ -238,7 +246,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
         _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
         _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
@@ -736,7 +743,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AutoResizeFilterBox ()
     {
-        filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        filterSplitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+            desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize);
     }
 
     #region Events handler
@@ -948,6 +957,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnDataGridViewCellValueNeeded (object sender, DataGridViewCellValueEventArgs e)
     {
+        if (_isClosing)
+        {
+            e.Value = Column.EmptyColumn;
+            return;
+        }
+
         PrefetchVisibleLines();
 
         var startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
@@ -1145,7 +1160,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnFilterGridViewCellValueNeeded (object sender, DataGridViewCellValueEventArgs e)
     {
-        if (e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
+        if (_isClosing || e.RowIndex < 0 || e.ColumnIndex < 0 || _filterResultList.Count <= e.RowIndex)
         {
             e.Value = string.Empty;
             return;
@@ -1430,22 +1445,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (e.Button.Equals(MouseButtons.Left))
             {
-                if (splitContainer.Orientation.Equals(Orientation.Vertical))
-                {
-                    if (e.X > 0 && e.X < splitContainer.Width)
-                    {
-                        splitContainer.SplitterDistance = e.X;
-                        splitContainer.Refresh();
-                    }
-                }
-                else
-                {
-                    if (e.Y > 0 && e.Y < splitContainer.Height)
-                    {
-                        splitContainer.SplitterDistance = e.Y;
-                        splitContainer.Refresh();
-                    }
-                }
+                var isVertical = splitContainer.Orientation.Equals(Orientation.Vertical);
+                var desired = isVertical ? e.X : e.Y;
+                var containerSize = isVertical ? splitContainer.Width : splitContainer.Height;
+
+                // Keep the splitter inside the panels' min sizes so the text filter (Panel1) can
+                // never be grown large enough to push the Panel2 controls outside the app (issue #560).
+                splitContainer.SplitterDistance = FilterSplitterLayout.ClampSplitterDistance(
+                    desired, containerSize, splitContainer.SplitterWidth, splitContainer.Panel1MinSize, splitContainer.Panel2MinSize);
+                splitContainer.Refresh();
             }
             else
             {
@@ -3007,6 +3015,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     {
                         return;
                     }
+                    catch (Exception ex) when (ex is InvalidOperationException or
+                                                     ArgumentOutOfRangeException or
+                                                     ExternalException or
+                                                     Win32Exception)
+                    {
+                        // Never let a single bad event kill the worker thread. Before this guard, an
+                        // exception here (e.g. a missing optional assembly loaded lazily from the tail
+                        // path) terminated the loop, so follow-tail silently stopped updating for the
+                        // whole window until reload (#634). Log and continue with the next event.
+                        _logger.Error(ex, "### LogEventWorker: error while processing a file-size-changed event; follow-tail continues.");
+                    }
 
                     _timeSpreadCalc.SetLineCount(e.LineCount);
                 }
@@ -3016,10 +3035,26 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void StopLogEventWorkerThread ()
     {
-        _ = _logEventArgsEvent.Set();
+        _ = _logEventArgsEvent.Set(); // wake the worker if it is parked on the event so it observes the cancel and exits
         _cts.Cancel();
-        //_logEventHandlerThread.Abort();
-        //_logEventHandlerThread.Join();
+        JoinWorker(_logEventHandlerTask);
+    }
+
+    /// <summary>
+    /// Waits (briefly) for a long-running worker task to drain during teardown. Workers observe cancellation via
+    /// <see cref="_cts"/> plus their wake-up events; the bounded timeout guards against a worker blocked in I/O so
+    /// closing the window can never hang. Faults are swallowed because this only runs while tearing down.
+    /// </summary>
+    private static void JoinWorker (Task worker)
+    {
+        try
+        {
+            _ = worker.Wait(WORKER_SHUTDOWN_TIMEOUT);
+        }
+        catch (AggregateException)
+        {
+            // A worker threw on its way out; nothing actionable during teardown.
+        }
     }
 
     private void OnFileSizeChanged (LogEventArgs logEventArgs)
@@ -3168,7 +3203,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var matchingList = FindMatchingHighlightEntries(line);
                 LaunchHighlightPlugins(matchingList, i);
                 var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
-                TriggerAudioAlert(matchingList);
+                SafeTriggerAudioAlert(matchingList);
                 if (setBookmark)
                 {
                     var capturedLineNum = i;
@@ -3220,7 +3255,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     var matchingList = FindMatchingHighlightEntries(line);
                     LaunchHighlightPlugins(matchingList, i);
                     var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
-                    TriggerAudioAlert(matchingList);
+                    SafeTriggerAudioAlert(matchingList);
                     if (setBookmark)
                     {
                         var capturedLineNum = i;
@@ -3908,6 +3943,37 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <see cref="AudioPlayer"/> would suppress subsequent plays anyway.
     /// Called only from the tail trigger path.
     /// </summary>
+    private static volatile bool _audioAlertsUnavailable;
+
+    /// <summary>
+    /// Guarded entry point for <see cref="TriggerAudioAlert"/>. Isolating the audio call in a
+    /// separate method keeps the audio assembly (LogExpert.Audio/NAudio) off the JIT path of
+    /// <see cref="CheckFilterAndHighlight"/>, and catches a failed lazy load of that assembly so a
+    /// missing/broken audio dependency degrades to "no audio alerts" instead of throwing on the
+    /// worker thread and stopping follow-tail (#634). After one failure audio alerts stay disabled.
+    /// </summary>
+    private static void SafeTriggerAudioAlert (IList<HighlightEntry> matchingList)
+    {
+        if (_audioAlertsUnavailable)
+        {
+            return;
+        }
+
+        try
+        {
+            TriggerAudioAlert(matchingList);
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or
+                                         FileLoadException or
+                                         BadImageFormatException or
+                                         TypeLoadException or
+                                         DllNotFoundException)
+        {
+            _audioAlertsUnavailable = true;
+            _logger.Warn(ex, "### SafeTriggerAudioAlert: Audio alerts disabled: the audio component could not be loaded (e.g. LogExpert.Audio/NAudio missing from this installation).");
+        }
+    }
+
     private static void TriggerAudioAlert (IList<HighlightEntry> matchingList)
     {
         if (matchingList == null || matchingList.Count == 0)
@@ -3930,10 +3996,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void StopTimestampSyncThread ()
     {
         _shouldTimestampDisplaySyncingCancel = true;
-        //_timeShiftSyncWakeupEvent.Set();
-        //_timeShiftSyncThread.Abort();
-        //_timeShiftSyncThread.Join();
+        _ = _timeShiftSyncWakeupEvent.Set(); // wake the worker if it is parked so it observes the cancel flag and exits
         _cts.Cancel();
+        JoinWorker(_timeShiftSyncTask);
     }
 
     [SupportedOSPlatform("windows")]
@@ -6590,6 +6655,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void CloseLogWindow ()
     {
+        _isClosing = true;
+
         CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();

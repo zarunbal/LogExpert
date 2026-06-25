@@ -225,4 +225,53 @@ public class LogBufferCharBlockTests
         buffer.EvictContent();
         Assert.That(buffer.IsDisposed, Is.True);
     }
+
+    // Regression tests for #634: follow-tail intermittently shows blank/stale tail rows in
+    // Release builds. Root cause candidate 2 is a use-after-return on ArrayPool char blocks:
+    // the background LRU-eviction thread returns a buffer's char blocks to the pool while the
+    // UI still holds ReadOnlyMemory<char> slices into them. The defence is the IsPinned guard
+    // in LogBuffer.ReturnCharBlocks(). These tests lock that guard down at the behaviour level
+    // (content validity), not just IsDisposed.
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void PinnedBuffer_EvictContent_PreservesPreviouslyReadSlice ()
+    {
+        var buffer = new LogBuffer(_mockFileInfo.Object, 10);
+
+        // Back a line with a rented char block, exactly as the real allocator does.
+        const int blockSize = 1024;
+        var block = ArrayPool<char>.Shared.Rent(blockSize);
+        const string expected = "tail line 42";
+        expected.AsSpan().CopyTo(block.AsSpan(0, expected.Length));
+
+        buffer.AddLine(new LogLine(new ReadOnlyMemory<char>(block, 0, expected.Length), 0), 0);
+        buffer.AttachCharBlocks([block]);
+
+        // UI reads the slice, then pins (pin-before-eviction protects the backing block).
+        var slice = buffer.GetLineMemoryOfBlock(0)!.Value.FullLine;
+        buffer.Pin();
+
+        // The LRU-eviction thread fires while the UI still holds the pin.
+        buffer.EvictContent();
+
+        // Churn the pool. If the pinned block had been wrongly returned, the very next
+        // same-size Rent would hand it back (single-threaded LIFO) and the Fill would
+        // clobber our slice into "XXXX...".
+        var rented = new List<char[]>();
+        for (var i = 0; i < 16; i++)
+        {
+            var arr = ArrayPool<char>.Shared.Rent(blockSize);
+            arr.AsSpan().Fill('X');
+            rented.Add(arr);
+        }
+
+        Assert.That(slice.Span.ToString(), Is.EqualTo(expected), "A slice into a pinned buffer must stay valid after eviction (#634 use-after-return guard).");
+
+        buffer.Unpin();
+        foreach (var arr in rented)
+        {
+            ArrayPool<char>.Shared.Return(arr);
+        }
+    }
 }
