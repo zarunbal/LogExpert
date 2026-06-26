@@ -3204,7 +3204,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                 var matchingList = FindMatchingHighlightEntries(line);
                 LaunchHighlightPlugins(matchingList, i);
-                var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
+                var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
                 SafeTriggerAudioAlert(matchingList);
                 if (setBookmark)
                 {
@@ -3256,7 +3256,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     var matchingList = FindMatchingHighlightEntries(line);
                     LaunchHighlightPlugins(matchingList, i);
-                    var (suppressLed, stopTail, setBookmark, bookmarkComment) = GetHighlightActions(matchingList);
+                    var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
                     SafeTriggerAudioAlert(matchingList);
                     if (setBookmark)
                     {
@@ -3814,58 +3814,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return FindHighlightEntry(line, true);
     }
 
-    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValueMemory column)
-    {
-        if (entry.IsRegex)
-        {
-            //Regex rex = new Regex(entry.SearchText, entry.IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-            if (entry.Regex.IsMatch(column.Text.ToString()))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (entry.IsCaseSensitive)
-            {
-                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     /// <summary>
     /// Returns all HighlightEntry entries which matches the given line
     /// </summary>
     private IList<HighlightEntry> FindMatchingHighlightEntries (ITextValueMemory line)
     {
-        IList<HighlightEntry> resultList = [];
-        if (line != null)
+        lock (_currentHighlightGroupLock)
         {
-            lock (_currentHighlightGroupLock)
-            {
-                foreach (var entry in _currentHighlightGroup.HighlightEntryList)
-                {
-                    if (CheckHighlightEntryMatch(entry, line))
-                    {
-                        resultList.Add(entry);
-                    }
-                }
-            }
+            return HighlightEvaluator.FindMatchingEntries(_currentHighlightGroup.HighlightEntryList, line);
         }
-
-        return resultList;
     }
 
     private static void GetHighlightEntryMatches (ITextValueMemory line, IList<HighlightEntry> hilightEntryList, IList<HighlightMatchEntry> resultList)
@@ -3889,7 +3846,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             else
             {
-                if (CheckHighlightEntryMatch(entry, line))
+                if (HighlightEvaluator.IsMatch(entry, line))
                 {
                     HighlightMatchEntry me = new()
                     {
@@ -3902,40 +3859,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
         }
-    }
-
-    private static (bool NoLed, bool StopTail, bool SetBookmark, string BookmarkComment) GetHighlightActions (IList<HighlightEntry> matchingList)
-    {
-        var noLed = false;
-        var stopTail = false;
-        var setBookmark = false;
-        var bookmarkComment = string.Empty;
-
-        foreach (var entry in matchingList)
-        {
-            if (entry.IsLedSwitch)
-            {
-                noLed = true;
-            }
-
-            if (entry.IsSetBookmark)
-            {
-                setBookmark = true;
-                if (!string.IsNullOrEmpty(entry.BookmarkComment))
-                {
-                    bookmarkComment += entry.BookmarkComment + "\r\n";
-                }
-            }
-
-            if (entry.IsStopTail)
-            {
-                stopTail = true;
-            }
-        }
-
-        bookmarkComment = bookmarkComment.TrimEnd(['\r', '\n']);
-
-        return (noLed, stopTail, setBookmark, bookmarkComment);
     }
 
     /// <summary>
@@ -7046,7 +6969,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     continue;
                 }
 
-                if (CheckHighlightEntryMatch(entry, line))
+                if (HighlightEvaluator.IsMatch(entry, line))
                 {
                     return entry;
                 }
@@ -7062,7 +6985,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     continue;
                 }
 
-                if (CheckHighlightEntryMatch(entry, line))
+                if (HighlightEvaluator.IsMatch(entry, line))
                 {
                     return entry;
                 }
