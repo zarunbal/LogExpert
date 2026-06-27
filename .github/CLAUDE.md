@@ -69,6 +69,26 @@ LogExpert is a Windows log file viewer and analyzer built with C# and Windows Fo
 - NUnit for testing
 - Plugin-based architecture
 
+## Environment
+
+This is a Windows .NET/WinForms repo. Python is often unavailable — prefer PowerShell, `tshark`, and built-in tooling. Check whether `gh` CLI (and any other external tool) is actually installed before building a plan around it. The active GitHub account is `brunerpat`.
+
+### Line Endings
+
+The working tree is CRLF on Windows (only `usedComponents.json` is pinned to LF via [.gitattributes](.gitattributes); there is no global normalization). Never use `sed`-based or other text-tool renames that strip line endings — they produce a whole-file diff of pure line-ending churn. After any bulk rename, verify no references were left unrenamed (a missed reference will break the build).
+
+## Testing
+
+Follow TDD for all bug fixes: write a failing test that reproduces the issue first, then fix, then verify the **full suite** passes — not just the new test in isolation (timing/filesystem tests can pass alone but fail alongside the suite).
+
+## Documentation
+
+Docs must be code-grounded and reconciled against the actual source and live config, then reader-tested before delivery. Don't document from assumption.
+
+## Refactoring
+
+For "behavior-preserving" refactors, explicitly confirm equivalence and flag any unintended logic changes before applying.
+
 ## Build Commands
 
 ### Using Nuke Build (Recommended)
@@ -86,6 +106,15 @@ LogExpert is a Windows log file viewer and analyzer built with C# and Windows Fo
 # Full release build with packages
 ./build.ps1 --target Clean Pack CreateSetup --configuration Release
 ```
+
+#### How the Nuke build works
+
+- `build.ps1` bootstraps and runs the Nuke build defined in [build/Build.cs](build/Build.cs). Targets and their dependencies are declared there in C#.
+- **Default target is `Test`** (which depends on `Compile`), so a bare `./build.ps1` restores, compiles, and runs the tests.
+- Select targets with `--target <Name>` (space-separated for multiple). Common targets: `Clean`, `Restore`, `Compile`, `Test`, `Pack`, `CreateSetup`, `GeneratePluginHashes`, `Publish`.
+- List all available targets: `./build.ps1 --help`
+- Preview the execution plan without running it: `./build.ps1 --plan`
+- Pick build configuration with `--configuration Debug|Release` (defaults to `Debug` locally, `Release` on CI).
 
 ### Using .NET CLI Directly
 
@@ -200,7 +229,7 @@ LogExpert/
 - Use localization resources from `LogExpert.Resources` project
 - Windows Forms designer files: `*.designer.cs`
 
-### Testing
+### Test Setup & Conventions
 
 - Unit tests use NUnit framework with Moq for mocking
 - Test projects follow naming pattern `*.Tests`
@@ -212,7 +241,7 @@ LogExpert/
 
 ### Code Style
 - Nullable reference types enabled (`<Nullable>enable</Nullable>`)
-- Comprehensive `.editorconfig` with 4000+ rules
+- `.editorconfig` is the source of truth for formatting and analyzer severities — match it rather than imposing your own style; don't fight or override its rules
 - ImplicitUsings enabled
 - Assembly signing enabled (Key.snk)
 
@@ -230,9 +259,9 @@ LogExpert/
 
 ### Git Workflow
 - Default branch: `Development` (use for PRs)
-- Commit format: Include "Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+- Commit format: **Do not** add a `Co-Authored-By` trailer (or any other agent/AI attribution) to commit messages
 - GitHub Actions run on push to Development branch
-- AppVeyor for CI builds and artifact creation
+- AppVeyor is the second CI for builds and artifact creation. It is currently disabled and needs to be re-added alongside GitHub Actions
 
 ## Plugin Security System
 
@@ -254,6 +283,15 @@ LogExpert/
 6. **Encoding detection**: BOM-less files default to encoding from EncodingOptions
 7. **Plugin hashes**: Only verified in Release builds; Debug builds skip verification
 
+## Dont Do that
+
+Hard rules — never do these:
+
+- **Don't add a `Co-Authored-By` trailer** (or any other agent/AI attribution) to commit messages.
+- **Don't attempt Linux/macOS builds.** This is Windows-only (Windows Desktop SDK + Windows Forms).
+- **Don't use `AutoScaleMode` or `AutoScaleDimensions` on individual controls** — only on forms (High DPI).
+- **Don't override or fight `.editorconfig` rules** — it is the source of truth for formatting and analyzer severities.
+
 ## Key Dependencies
 
 - **NLog**: Logging framework
@@ -268,9 +306,22 @@ LogExpert/
 - Main README: [README.md](README.md)
 - Plugin Development: [PLUGIN_DEVELOPMENT_GUIDE.md](src/docs/PLUGIN_DEVELOPMENT_GUIDE.md)
 - Plugin Hash System: [PLUGIN_HASH_MANAGEMENT.md](src/docs/PLUGIN_HASH_MANAGEMENT.md)
-- Performance Benchmarks: [BENCHMARK_SUMMARY.md](src/docs/performance/BENCHMARK_SUMMARY.md)
 - GitHub Wiki: https://github.com/LogExperts/LogExpert/wiki
 - Discord: https://discord.gg/SjxkuckRe9
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in `LogExperts/LogExpert` GitHub Issues, read-only for skills via the `gh` CLI — analysis only; only humans post. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical triage roles map to repo labels (`needs-info` → `question`; the rest use default names), used to read/filter issues — skills don't apply labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
 # Update Rules File
 To update this file, ensure that all sections are kept current with the latest architectural decisions, build processes, and development workflows. Follow these guidelines:

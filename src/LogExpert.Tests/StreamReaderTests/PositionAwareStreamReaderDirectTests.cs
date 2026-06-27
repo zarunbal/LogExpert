@@ -258,10 +258,10 @@ public class PositionAwareStreamReaderDirectTests
 
     #endregion
 
-    #region DetachBlocks
+    #region DetachCharBlocks
 
     [Test]
-    public void DetachBlocks_ReturnsCompletedBlocks ()
+    public void DetachCharBlocks_ReturnsCompletedBlocks ()
     {
         // Create enough content to fill multiple blocks
         var sb = new StringBuilder();
@@ -279,11 +279,11 @@ public class PositionAwareStreamReaderDirectTests
             // Intentionally empty: consume all lines to advance reader state.
         }
 
-        var blocks = reader.DetachBlocks();
+        var blocks = reader.DetachCharBlocks();
         Assert.That(blocks.Count, Is.GreaterThan(0), "Should have completed blocks to detach");
 
         // Second detach should be empty
-        var blocks2 = reader.DetachBlocks();
+        var blocks2 = reader.DetachCharBlocks();
         Assert.That(blocks2.Count, Is.EqualTo(0));
     }
 
@@ -461,10 +461,8 @@ public class PositionAwareStreamReaderDirectTests
                         break;
                     }
 
-                    Assert.That(directLine.Span.ToString(), Is.EqualTo(systemLine.Span.ToString()),
-                        $"Line {lineNum}: content mismatch");
-                    Assert.That(directReader.Position, Is.EqualTo(systemReader.Position),
-                        $"Line {lineNum}: position mismatch (System={systemReader.Position}, Direct={directReader.Position})");
+                    Assert.That(directLine.Span.ToString(), Is.EqualTo(systemLine.Span.ToString()), $"Line {lineNum}: content mismatch");
+                    Assert.That(directReader.Position, Is.EqualTo(systemReader.Position), $"Line {lineNum}: position mismatch (System={systemReader.Position}, Direct={directReader.Position})");
 
                     lineNum++;
                 }
@@ -508,7 +506,7 @@ public class PositionAwareStreamReaderDirectTests
     }
 
     [Test]
-    public void TryReadLine_LineLongerThanBlockSize_DetachBlocksAfterEachLine ()
+    public void TryReadLine_LineLongerThanBlockSize_DetachCharBlocksAfterEachLine ()
     {
         RunWithTimeout(() =>
         {
@@ -523,12 +521,12 @@ public class PositionAwareStreamReaderDirectTests
 
             Assert.That(reader.TryReadLine(out var line1), Is.True);
             Assert.That(line1.Span.ToString(), Is.EqualTo("line1"));
-            var blocks1 = reader.DetachBlocks();
+            var blocks1 = reader.DetachCharBlocks();
             Assert.That(blocks1.Count, Is.GreaterThan(0));
 
             Assert.That(reader.TryReadLine(out var line2), Is.True);
             Assert.That(line2.Length, Is.EqualTo(lineLength));
-            var blocks2 = reader.DetachBlocks();
+            var blocks2 = reader.DetachCharBlocks();
             Assert.That(blocks2.Count, Is.GreaterThan(0));
 
             Assert.That(reader.TryReadLine(out var line3), Is.True);
@@ -539,7 +537,7 @@ public class PositionAwareStreamReaderDirectTests
     }
 
     [Test]
-    public void TryReadLine_LineLongerThanBlockSize_DetachBlocksWithLargeTail ()
+    public void TryReadLine_LineLongerThanBlockSize_DetachCharBlocksWithLargeTail ()
     {
         RunWithTimeout(() =>
         {
@@ -575,14 +573,14 @@ public class PositionAwareStreamReaderDirectTests
             // Read and detach the prefix (resets reader to fresh BLOCK_SIZE buffer)
             Assert.That(reader.TryReadLine(out var line1), Is.True);
             Assert.That(line1.Span.ToString(), Is.EqualTo("prefix"));
-            _ = reader.DetachBlocks();
+            _ = reader.DetachCharBlocks();
 
             // Read the long line — this grows the buffer to 131072
             Assert.That(reader.TryReadLine(out var line2), Is.True);
             Assert.That(line2.Length, Is.EqualTo(longLineLength));
 
             // THIS IS THE CRITICAL CALL: DetachBlocks must handle tail > BLOCK_SIZE
-            var blocks = reader.DetachBlocks();
+            var blocks = reader.DetachCharBlocks();
             Assert.That(blocks.Count, Is.GreaterThan(0));
 
             // Verify we can still read subsequent lines correctly
@@ -598,6 +596,153 @@ public class PositionAwareStreamReaderDirectTests
 
             Assert.That(count, Is.EqualTo(1500), "All lines after the long line should be readable");
         }, 10000);
+    }
+
+    #endregion
+
+    #region Line ending handling (bare CR, mixed)
+
+    private static List<string> ReadAllLines (string text, Encoding? encoding = null, int maximumLineLength = 500)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        using var stream = CreateStream(text, enc);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = enc }, maximumLineLength);
+        var result = new List<string>();
+        while (reader.TryReadLine(out var line))
+        {
+            result.Add(line.Span.ToString());
+        }
+
+        return result;
+    }
+
+    private static List<(string Content, long Position)> ReadAllWithPositions (string text, Encoding? encoding = null)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        using var stream = CreateStream(text, enc);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = enc }, 500);
+        var result = new List<(string, long)>();
+        while (reader.TryReadLine(out var line))
+        {
+            result.Add((line.Span.ToString(), reader.Position));
+        }
+
+        return result;
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_BareCarriageReturn_SplitsLines ()
+    {
+        var lines = ReadAllLines("Line 1\rLine 2\rLine 3");
+        Assert.That(lines, Is.EqualTo(["Line 1", "Line 2", "Line 3"]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_MixedLineEndings_SplitsLines ()
+    {
+        // \r\n, \n, bare \r all in one file
+        var lines = ReadAllLines("a\r\nb\nc\rd\n");
+        Assert.That(lines, Is.EqualTo(["a", "b", "c", "d"]));
+    }
+
+    [Test]
+    [TestCase("\r\r\r", 3)]
+    [TestCase("\r\n\r\n\r\n", 3)]
+    [TestCase("\n\n\n", 3)]
+    public void TryReadLine_RepeatedTerminators_YieldEmptyLines (string text, int expectedCount)
+    {
+        var lines = ReadAllLines(text);
+        Assert.That(lines.Count, Is.EqualTo(expectedCount));
+        Assert.That(lines, Has.All.Empty);
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_TrailingBareCR_NoSpuriousEmptyLine ()
+    {
+        var lines = ReadAllLines("abc\r");
+        Assert.That(lines, Is.EqualTo(["abc"]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_TrailingCrLf_NoSpuriousEmptyLine ()
+    {
+        var lines = ReadAllLines("abc\r\n");
+        Assert.That(lines, Is.EqualTo(["abc"]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_LfThenTrailingCr_YieldsEmptyLineBetween ()
+    {
+        // "abc\n\r": \n terminates "abc", then a standalone \r yields an empty final line
+        var lines = ReadAllLines("abc\n\r");
+        Assert.That(lines, Is.EqualTo(["abc", ""]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Position_BareCarriageReturn_ExactBytes ()
+    {
+        // "abc\rdef" UTF-8: "abc"(3) + \r(1) = 4; "def"(3) at EOF = 7
+        var result = ReadAllWithPositions("abc\rdef");
+        Assert.That(result.Count, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo(("abc", 4L)));
+        Assert.That(result[1], Is.EqualTo(("def", 7L)));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Position_MixedLineEndings_ExactBytes ()
+    {
+        // "a\r\nb\nc\rd\n": a+\r\n=3, b+\n=5, c+\r=7, d+\n=9
+        var result = ReadAllWithPositions("a\r\nb\nc\rd\n");
+        Assert.That(result.Select(r => r.Position).ToArray(), Is.EqualTo([3L, 5L, 7L, 9L]));
+        Assert.That(result.Select(r => r.Content).ToArray(), Is.EqualTo(["a", "b", "c", "d"]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Position_MixedLineEndings_Multibyte_ExactBytes ()
+    {
+        // "Héllo\rwörld\n" UTF-8: "Héllo"=6 bytes + \r(1) = 7; "wörld"=6 bytes + \n(1) = 14
+        var result = ReadAllWithPositions("Héllo\rwörld\n");
+        Assert.That(result.Count, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo(("Héllo", 7L)));
+        Assert.That(result[1], Is.EqualTo(("wörld", 14L)));
+    }
+
+    [Test]
+    public void TryReadLine_BareCrAtBlockBoundary_SplitsCorrectly ()
+    {
+        // \r lands exactly at the last char of the first 32 KB block, followed by more data.
+        const int blockSize = 32_768;
+        var firstLine = new string('A', blockSize - 1); // \r will be char at index blockSize-1 (last in block)
+        var text = firstLine + "\r" + "rest\nlast\n";
+
+        var lines = ReadAllLines(text, maximumLineLength: blockSize + 100);
+        Assert.That(lines.Count, Is.EqualTo(3));
+        Assert.That(lines[0], Is.EqualTo(firstLine));
+        Assert.That(lines[1], Is.EqualTo("rest"));
+        Assert.That(lines[2], Is.EqualTo("last"));
+    }
+
+    [Test]
+    public void TryReadLine_CrLfStraddlesBlockBoundary_SplitsCorrectly ()
+    {
+        // \r is the last char of the first block, \n is the first char of the next block.
+        const int blockSize = 32_768;
+        var firstLine = new string('A', blockSize - 1);
+        var text = firstLine + "\r\n" + "rest\nlast\n";
+
+        var lines = ReadAllLines(text, maximumLineLength: blockSize + 100);
+        Assert.That(lines.Count, Is.EqualTo(3));
+        Assert.That(lines[0], Is.EqualTo(firstLine));
+        Assert.That(lines[1], Is.EqualTo("rest"));
+        Assert.That(lines[2], Is.EqualTo("last"));
     }
 
     #endregion

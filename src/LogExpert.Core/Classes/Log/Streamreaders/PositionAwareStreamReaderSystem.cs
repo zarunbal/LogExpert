@@ -36,13 +36,13 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
     #region Properties
 
     /// <summary>
-    /// Gets or creates the block allocator used by this reader instance.
-    /// The caller can detach the blocks after reading a buffer's worth of lines.
+    /// The block allocator used by this reader instance. Blocks are handed to the owning buffer via
+    /// <see cref="DetachCharBlocks"/>; ownership of the allocator does not cross the reader seam.
     /// </summary>
-    public CharBlockAllocator BlockAllocator
+    private CharBlockAllocator BlockAllocator
     {
         get => field ??= new CharBlockAllocator();
-        private set;
+        set;
     }
 
     #endregion
@@ -112,9 +112,11 @@ public class PositionAwareStreamReaderSystem : PositionAwareStreamReaderBase, IL
     /// </summary>
     public void ReturnMemory (ReadOnlyMemory<char> memory)
     {
-        // Bulk return via BlockAllocator.DetachBlocks() or Dispose().
+        // Bulk return via DetachCharBlocks() or Dispose().
         // Individual per-line return is not needed with block-based allocation.
     }
+
+    public List<char[]> DetachCharBlocks () => BlockAllocator.DetachBlocks();
 
     #endregion
 

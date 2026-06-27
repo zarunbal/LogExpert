@@ -178,7 +178,7 @@ public class LogStreamReaderTest
     }
 
     [Test]
-    public void TryReadLine_BlockAllocatorHasBlocks_AfterReading ()
+    public void TryReadLine_DetachCharBlocks_ReturnsFilledBlocks_AfterReading ()
     {
         var text = "Line 1\nLine 2\nLine 3\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -189,12 +189,12 @@ public class LogStreamReaderTest
             // Intentionally empty: consume all lines to advance reader state.
         }
 
-        // The allocator should have at least 1 block
-        Assert.That(reader.BlockAllocator.BlockCount, Is.GreaterThanOrEqualTo(1));
+        // Reading rented at least one block, exposed only through the seam.
+        Assert.That(reader.DetachCharBlocks(), Has.Count.GreaterThanOrEqualTo(1));
     }
 
     [Test]
-    public void TryReadLine_DetachBlocks_TransfersOwnership ()
+    public void TryReadLine_DetachCharBlocks_TransfersOwnership ()
     {
         var text = "Line 1\nLine 2\nLine 3\n";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -205,11 +205,8 @@ public class LogStreamReaderTest
             // Intentionally empty: consume all lines to advance reader state.
         }
 
-        var blocks = reader.BlockAllocator.DetachBlocks();
+        var blocks = reader.DetachCharBlocks();
         Assert.That(blocks, Has.Count.GreaterThanOrEqualTo(1));
-
-        // After detach, allocator should have a fresh block
-        Assert.That(reader.BlockAllocator.BlockCount, Is.EqualTo(1));
     }
 
     [Test]

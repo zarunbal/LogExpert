@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Text;
 
-using LogExpert.Core.Classes.Log.Buffers;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
@@ -20,6 +19,8 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     private const char CHAR_LF = '\n';
     private const char CHAR_CR = '\r';
 
+    private static readonly SearchValues<char> _lineTerminators = SearchValues.Create("\r\n");
+
     #endregion
 
     #region Fields
@@ -28,7 +29,8 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     private int _readBlockLength;  // valid chars in _readBlock
     private int _scanOffset;       // current scan position in _readBlock
     private bool _eof;
-    private int _newLineSequenceLength;
+    private bool _initialized;     // first block filled from the current stream position
+    private int _terminatorCharByteSize; // bytes for a single '\r' or '\n' in the active encoding
     private readonly List<char[]> _completedBlocks = [];
 
     public override bool IsDisposed { get; protected set; }
@@ -56,55 +58,73 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     }
 
     /// <summary>
-    /// Reads the next line by scanning the current block for '\n'. If the block is exhausted,
-    /// tail-copies the partial line to a new block and refills. Returns a zero-copy
-    /// ReadOnlyMemory&lt;char&gt; slice into the pooled block.
+    /// Reads the next line by scanning the current block for the next line terminator
+    /// (<c>\n</c>, <c>\r\n</c>, or a bare <c>\r</c>). If the block is exhausted, tail-copies
+    /// the partial line to a new block and refills. Returns a zero-copy
+    /// ReadOnlyMemory&lt;char&gt; slice into the pooled block. The byte position advances by the
+    /// content bytes plus the bytes of the <em>actual</em> terminator, so it stays exact on
+    /// files with mixed line endings.
     /// </summary>
     public bool TryReadLine (out ReadOnlyMemory<char> lineMemory)
     {
         var reader = GetStreamReader();
 
-        if (_newLineSequenceLength == 0)
-        {
-            _newLineSequenceLength = GuessNewLineSequenceLength(reader);
-        }
+        EnsureInitialized(reader);
 
         while (true)
         {
-            // If we have data to scan, look for \n
+            // If we have data to scan, look for the next \r or \n
             if (_scanOffset < _readBlockLength)
             {
                 var searchSpan = _readBlock.AsSpan(_scanOffset, _readBlockLength - _scanOffset);
-                var lfIndex = searchSpan.IndexOf(CHAR_LF);
+                var hitIndex = searchSpan.IndexOfAny(_lineTerminators);
 
-                if (lfIndex >= 0)
+                if (hitIndex >= 0)
                 {
-                    // Found a line boundary
-                    var lineLength = lfIndex;
+                    // Number of char cells the terminator occupies (1 for \n or bare \r, 2 for \r\n).
+                    int terminatorChars;
 
-                    // Strip \r if present before \n
-                    if (lineLength > 0 && searchSpan[lineLength - 1] == CHAR_CR)
+                    if (searchSpan[hitIndex] == CHAR_LF)
                     {
-                        lineLength--;
+                        terminatorChars = 1;
+                    }
+                    else if (hitIndex + 1 < searchSpan.Length)
+                    {
+                        // \r with a known following char: \r\n if it's \n, otherwise a bare \r.
+                        terminatorChars = searchSpan[hitIndex + 1] == CHAR_LF ? 2 : 1;
+                    }
+                    else if (_eof)
+                    {
+                        // \r is the very last char in the file: a bare \r.
+                        terminatorChars = 1;
+                    }
+                    else
+                    {
+                        // \r is the last char of the block but more data follows. Refill so the
+                        // next char becomes available (the tail-copy carries the \r forward),
+                        // then re-scan to classify it as \r\n or a bare \r.
+                        RefillBlock(reader);
+                        continue;
                     }
 
-                    // Enforce MaximumLineLength
-                    var cappedLength = Math.Min(lineLength, MaximumLineLength);
+                    var lineLength = hitIndex;
 
+                    // Enforce MaximumLineLength on the returned slice, but count the full
+                    // content for the byte position.
+                    var cappedLength = Math.Min(lineLength, MaximumLineLength);
                     lineMemory = _readBlock.AsMemory(_scanOffset, cappedLength);
 
-                    // Update byte position: line chars + lineLength
                     var contentSpan = _readBlock.AsSpan(_scanOffset, lineLength);
-                    MovePosition(Encoding.GetByteCount(contentSpan) + _newLineSequenceLength);
+                    MovePosition(Encoding.GetByteCount(contentSpan) + (terminatorChars * _terminatorCharByteSize));
 
-                    // Advance scan past the \n
-                    _scanOffset += lfIndex + 1;
+                    // Advance scan past the content and its terminator.
+                    _scanOffset += hitIndex + terminatorChars;
 
                     return true;
                 }
             }
 
-            // No \n found (or no data at all). Need to refill.
+            // No terminator found (or no data at all). Need to refill.
             if (_eof)
             {
                 // Emit remaining content as final line (no trailing newline)
@@ -136,16 +156,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     }
 
     /// <summary>
-    /// Gets the block allocator for compatibility with the DetachBlocks pattern.
-    /// This reader manages its own blocks directly rather than through CharBlockAllocator.
-    /// </summary>
-    public CharBlockAllocator? BlockAllocator => null;
-
-    /// <summary>
     /// Detaches completed blocks (fully scanned) for transfer to the LogBuffer.
     /// The current _readBlock (partially scanned) stays with the reader.
     /// </summary>
-    public List<char[]> DetachBlocks ()
+    public List<char[]> DetachCharBlocks ()
     {
         // Nothing to detach: no completed blocks and no lines were scanned from the current block.
         if (_completedBlocks.Count == 0 && _scanOffset == 0)
@@ -227,59 +241,48 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         }
     }
 
-    private int GuessNewLineSequenceLength (StreamReader reader)
+    /// <summary>
+    /// Lazily fills the first block from the current stream position. Called on the first read
+    /// after construction and after any <see cref="PositionAwareStreamReaderBase.Position"/> seek
+    /// (which resets <c>_initialized</c> via <see cref="ResetReader"/>).
+    /// </summary>
+    private void EnsureInitialized (StreamReader reader)
     {
-        var currentPos = Position;
-
-        try
+        if (_initialized)
         {
-            // Fill initial block
-            var charsRead = reader.Read(_readBlock, 0, BLOCK_SIZE);
-            _readBlockLength = charsRead;
-            _scanOffset = 0;
-
-            if (charsRead == 0)
-            {
-                _eof = true;
-                return 0;
-            }
-
-            // Find first \n to determine newline sequence
-            var span = _readBlock.AsSpan(0, _readBlockLength);
-            var lfIndex = span.IndexOf(CHAR_LF);
-
-            if (lfIndex < 0)
-            {
-                // No newline found in first block — assume single-byte
-                return 1;
-            }
-
-            if (lfIndex > 0 && span[lfIndex - 1] == CHAR_CR)
-            {
-                // \r\n
-                Span<char> newline = ['\r', '\n'];
-                return Encoding.GetByteCount(newline);
-            }
-
-            // \n only
-            Span<char> singleLf = ['\n'];
-            return Encoding.GetByteCount(singleLf);
+            return;
         }
-        finally
+
+        _initialized = true;
+
+        // A single '\r' and a single '\n' encode to the same number of bytes in every encoding
+        // LogExpert uses (ASCII control chars), so one value covers \n, \r and (×2) \r\n.
+        Span<char> singleTerminator = [CHAR_LF];
+        _terminatorCharByteSize = Encoding.GetByteCount(singleTerminator);
+
+        var charsRead = reader.Read(_readBlock, 0, BLOCK_SIZE);
+        _readBlockLength = charsRead;
+        _scanOffset = 0;
+
+        if (charsRead == 0)
         {
-            // Reset position — the filled block data is kept, no re-read needed
-            // Position is reset to original so byte tracking starts clean
-            Position = currentPos;
-
-            // Re-read the block since Position setter resets the stream
-            _scanOffset = 0;
-            var charsRead = reader.Read(_readBlock, 0, BLOCK_SIZE);
-            _readBlockLength = charsRead;
-            if (charsRead == 0)
-            {
-                _eof = true;
-            }
+            _eof = true;
         }
+    }
+
+    /// <summary>
+    /// Resets scan state so the next read re-fills from the (just seeked) stream position.
+    /// Only touches value-type fields, which is safe under the base constructor's virtual call
+    /// to this method (the pooled <c>_readBlock</c> is left untouched).
+    /// </summary>
+    protected override void ResetReader ()
+    {
+        _scanOffset = 0;
+        _readBlockLength = 0;
+        _eof = false;
+        _initialized = false;
+
+        base.ResetReader();
     }
 
     protected override void Dispose (bool disposing)

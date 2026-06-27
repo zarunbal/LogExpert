@@ -19,10 +19,10 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
 
     #region Properties
 
-    public CharBlockAllocator BlockAllocator
+    private CharBlockAllocator BlockAllocator
     {
         get => field ??= new CharBlockAllocator();
-        private set;
+        set;
     }
 
     #endregion
@@ -47,7 +47,20 @@ public class PositionAwareStreamReaderLegacy (Stream stream, EncodingOptions enc
 
     public void ReturnMemory (ReadOnlyMemory<char> memory)
     {
-        // Bulk return via BlockAllocator.DetachBlocks() when the LogBuffer is evicted.
+        // Bulk return via DetachCharBlocks() when the LogBuffer is evicted, or Dispose().
+    }
+
+    public List<char[]> DetachCharBlocks () => BlockAllocator.DetachBlocks();
+
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            BlockAllocator?.Dispose();
+            BlockAllocator = null;
+        }
+
+        base.Dispose(disposing);
     }
 
     public override string ReadLine ()

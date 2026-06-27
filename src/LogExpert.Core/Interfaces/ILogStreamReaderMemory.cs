@@ -36,4 +36,19 @@ public interface ILogStreamReaderMemory : ILogStreamReader
     /// call this method multiple times for the same memory, but only the first call will have an effect.
     /// </remarks>
     void ReturnMemory (ReadOnlyMemory<char> memory);
+
+    /// <summary>
+    /// Detaches the completed character blocks that back the <see cref="ReadOnlyMemory{Char}"/> slices handed out by
+    /// <see cref="TryReadLine"/>, transferring their ownership to the caller (the <c>LogBuffer</c> that owns those
+    /// lines).
+    /// </summary>
+    /// <returns>
+    /// The list of blocks the reader has filled. The caller owns them until every slice into them is released, at
+    /// which point they are returned to the shared pool. Readers that have nothing to hand over return an empty list.
+    /// </returns>
+    /// <remarks>
+    /// Call this after a buffer's worth of lines has been read and before the reader continues filling the next
+    /// buffer. The reader retains any partially-scanned block so reading can continue seamlessly.
+    /// </remarks>
+    List<char[]> DetachCharBlocks ();
 }
