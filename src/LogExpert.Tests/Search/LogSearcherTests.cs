@@ -98,6 +98,17 @@ public class LogSearcherTests
     }
 
     [Test]
+    public void Find_BackwardWrappedFullCircleWithoutMatch_ReturnsNotFoundWrapped ()
+    {
+        var reader = ReaderOf("alpha", "bravo", "charlie");
+        var searchParams = new SearchParams { SearchText = "missing", IsForward = false, CurrentLine = 1 };
+
+        var result = LogSearcher.Find(searchParams, reader, CancellationToken.None);
+
+        Assert.That(result, Is.EqualTo(new SearchResult(SearchOutcome.NotFound, -1, Wrapped: true)));
+    }
+
+    [Test]
     public void Find_StartPositionPastEndOfFile_WrapsImmediatelyAndScansFromTop ()
     {
         var reader = ReaderOf("target", "alpha", "bravo");

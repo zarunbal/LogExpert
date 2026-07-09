@@ -104,6 +104,23 @@ bare "session file" when you mean the workspace (that's a **Session**).
 Spread**), "additional filter results" (the old internal name — use
 **Filter Spread**).
 
+## Log Search
+
+- **Log Search** — The Ctrl+F / F3 / Shift+F3 search-in-file feature of a
+  Log Window: finds the next or previous line matching a search text
+  (plain or regex, case-sensitive or not), wrapping around the file
+  boundary once before giving up. Executed by
+  `LogExpert.Core.Classes.Search.LogSearcher`, the single owner of
+  direction resolution (forward / find-next / Shift+F3), the
+  wrap-around-once rule, and the matching; the Log Window narrates the
+  returned `SearchResult` (status line, progress bar, scrolling).
+  `Find` snapshots its `SearchParams` at entry, so mutating the shared
+  instance (F3) never affects a run in flight.
+
+*Avoid*: bare "search" when the filter panel is meant (that is
+**filtering** — the `FilterSearch` methods in the code belong to the
+filter path, not Log Search), "find dialog" (use **Search dialog**).
+
 ## Columnizer selection
 
 - **Columnizer** (`ILogLineMemoryColumnizer`) — A plugin that parses a log
