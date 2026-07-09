@@ -46,12 +46,12 @@ internal static class PaintHelper
 
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
             {
-                using var brush = GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor);
+                using var brush = GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
                 e.Graphics.FillRectangle(brush, e.CellBounds);
             }
             else
             {
-                e.CellStyle.BackColor = GetBackColorFromHighlightEntry(entry);
+                e.CellStyle.BackColor = GetBackColorFromHighlightEntry(entry, Application.IsDarkModeEnabled);
                 e.PaintBackground(e.ClipBounds, false);
             }
 
@@ -89,17 +89,35 @@ internal static class PaintHelper
         }
     }
 
-    public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry)
+    // Matches what SystemColors.Window resolves to under Application.SetColorMode(Dark).
+    private static readonly Color _darkModeWindowBackColor = Color.FromArgb(32, 32, 32);
+
+    public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
     {
-        return entry?.BackgroundColor ?? Color.White;
+        return entry?.BackgroundColor ?? (darkMode ? _darkModeWindowBackColor : Color.White);
+    }
+
+    public static Color GetForeColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
+    {
+        if (entry != null && entry.ForegroundColor != Color.Empty)
+        {
+            return entry.ForegroundColor;
+        }
+
+        return darkMode ? Color.White : Color.Black;
     }
 
     [SupportedOSPlatform("windows")]
-    public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor)
+    public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)
     {
-        return focused
-            ? new SolidBrush(selectionColor)
-            : new SolidBrush(Color.FromArgb(255, 170, 170, 170)); //Gray
+        if (focused)
+        {
+            return new SolidBrush(selectionColor);
+        }
+
+        return darkMode
+            ? new SolidBrush(Color.FromArgb(255, 90, 90, 90)) // dark gray
+            : new SolidBrush(Color.FromArgb(255, 170, 170, 170)); // light gray
     }
 
     [SupportedOSPlatform("windows")]
@@ -152,6 +170,8 @@ internal static class PaintHelper
     [SupportedOSPlatform("windows")]
     public static void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
+        ApplyGridViewTheme(gridView, Application.IsDarkModeEnabled);
+
         var rowCount = gridView.RowCount;
         var currLine = gridView.CurrentCellAddress.Y;
         var currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
@@ -232,14 +252,14 @@ internal static class PaintHelper
 
     //TODO Make this configurable => this should close https://github.com/LogExperts/LogExpert/issues/85
     [SupportedOSPlatform("windows")]
-    public static DataGridViewCellStyle GetDataGridViewCellStyle ()
+    public static DataGridViewCellStyle GetDataGridViewCellStyle (bool darkMode)
     {
         return new()
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
             Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-            ForeColor = Color.White,
+            ForeColor = darkMode ? Color.White : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
@@ -248,18 +268,31 @@ internal static class PaintHelper
 
     //TODO Make this configurable => this should close https://github.com/LogExperts/LogExpert/issues/85
     [SupportedOSPlatform("windows")]
-    public static DataGridViewCellStyle GetDataGridDefaultRowStyle ()
+    public static DataGridViewCellStyle GetDataGridDefaultRowStyle (bool darkMode)
     {
         return new DataGridViewCellStyle
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
             Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-            ForeColor = Color.Black,
+            ForeColor = darkMode ? Color.White : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
         };
+    }
+
+    /// <summary>
+    /// Applies theme-dependent settings to a grid. With visual styles enabled the column
+    /// headers are painted by the Windows visual-style renderer, which only exists in a
+    /// light flavor and ignores <c>Application.SetColorMode</c>. Disabling them makes the
+    /// headers fall back to <c>ColumnHeadersDefaultCellStyle</c>, whose defaults are
+    /// dark-mode-aware system colors.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static void ApplyGridViewTheme (DataGridView gridView, bool darkMode)
+    {
+        gridView.EnableHeadersVisualStyles = !darkMode;
     }
 
     [SupportedOSPlatform("windows")]
@@ -351,9 +384,8 @@ internal static class PaintHelper
                 var he = new HighlightEntry
                 {
                     SearchText = column.FullValue.ToString(),
-                    //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
-                    ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
+                    ForegroundColor = GetForeColorFromHighlightEntry(groundEntry, Application.IsDarkModeEnabled),
                     IsRegex = false,
                     IsCaseSensitive = false,
                     IsLedSwitch = false,

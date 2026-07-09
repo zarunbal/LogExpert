@@ -2410,10 +2410,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void CreateDefaultViewStyle ()
     {
-        dataGridView.DefaultCellStyle = PaintHelper.GetDataGridViewCellStyle();
-        filterGridView.DefaultCellStyle = PaintHelper.GetDataGridViewCellStyle();
-        dataGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle();
-        filterGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle();
+        var darkMode = Application.IsDarkModeEnabled;
+        dataGridView.DefaultCellStyle = PaintHelper.GetDataGridViewCellStyle(darkMode);
+        filterGridView.DefaultCellStyle = PaintHelper.GetDataGridViewCellStyle(darkMode);
+        dataGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle(darkMode);
+        filterGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle(darkMode);
+        PaintHelper.ApplyGridViewTheme(dataGridView, darkMode);
+        PaintHelper.ApplyGridViewTheme(filterGridView, darkMode);
     }
 
     [SupportedOSPlatform("windows")]
@@ -3591,7 +3594,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var he = new HighlightEntry
         {
             SearchText = column.DisplayValue.ToString(),
-            ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
+            ForegroundColor = PaintHelper.GetForeColorFromHighlightEntry(groundEntry, Application.IsDarkModeEnabled),
             BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
             IsWordMatch = true
         };
@@ -6902,12 +6905,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
             {
-                using var brush = PaintHelper.GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor);
+                using var brush = PaintHelper.GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
                 e.Graphics.FillRectangle(brush, e.CellBounds);
             }
             else
             {
-                e.CellStyle.BackColor = PaintHelper.GetBackColorFromHighlightEntry(entry);
+                e.CellStyle.BackColor = PaintHelper.GetBackColorFromHighlightEntry(entry, Application.IsDarkModeEnabled);
                 e.PaintBackground(e.ClipBounds, false);
             }
 
