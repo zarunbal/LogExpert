@@ -4685,14 +4685,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         lock (_filterResultList)
         {
             filterHitList.Add(lineNum);
-            var filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+            var filterResult = FilterSpread.Expand(lineNum, filterParams.SpreadBefore, filterParams.SpreadBehind, _logFileReader.LineCount, lastFilterLinesList);
             filterResultLines.AddRange(filterResult);
             count = filterResultLines.Count;
             lastFilterLinesList.AddRange(filterResult);
-            if (lastFilterLinesList.Count > SPREAD_MAX * 2)
-            {
-                lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
-            }
+            FilterSpread.TrimHistory(lastFilterLinesList);
         }
 
         if (immediate)

@@ -59,4 +59,38 @@ public class FilterSpreadTests
 
         Assert.That(history, Has.Count.EqualTo(198));
     }
+
+    /// <summary>
+    /// Equivalence guard: the single-threaded Log Window filter and the multi-threaded
+    /// Core filter accumulate per-hit results through the same recipe
+    /// (hit → Expand → append to results/history → TrimHistory). This pins that shared
+    /// recipe's output for a hit sequence with overlapping spreads; a call site that
+    /// deviates from the recipe no longer matches this specification. Expected values are
+    /// a worked example: hits 5, 7 and 50 with spread 2/2 in a 100-line file.
+    /// </summary>
+    [Test]
+    public void AccumulationRecipe_OverlappingHitSequence_ProducesPinnedResultHitAndHistoryLists ()
+    {
+        int[] hits = [5, 7, 50];
+        List<int> resultLines = [];
+        List<int> history = [];
+        List<int> hitList = [];
+
+        foreach (var hit in hits)
+        {
+            hitList.Add(hit);
+            var expanded = FilterSpread.Expand(hit, spreadBefore: 2, spreadBehind: 2, lineCount: 100, alreadyTaken: history);
+            resultLines.AddRange(expanded);
+            history.AddRange(expanded);
+            FilterSpread.TrimHistory(history);
+        }
+
+        Assert.Multiple(() =>
+        {
+            // Hit 5 contributes 3..7; hit 7 contributes only 8,9 (5..7 already taken); hit 50 contributes 48..52.
+            Assert.That(resultLines, Is.EqualTo(new[] { 3, 4, 5, 6, 7, 8, 9, 48, 49, 50, 51, 52 }));
+            Assert.That(hitList, Is.EqualTo(new[] { 5, 7, 50 }));
+            Assert.That(history, Is.EqualTo(resultLines), "history below the window size mirrors the result lines");
+        });
+    }
 }
