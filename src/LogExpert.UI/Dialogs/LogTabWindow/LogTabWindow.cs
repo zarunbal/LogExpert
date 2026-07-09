@@ -2417,8 +2417,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnCopyPathToClipboardToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
-        Clipboard.SetText(logWindow.Title);
+        if (dockPanel.ActiveContent is not LogWindow.LogWindow logWindow)
+        {
+            return;
+        }
+
+        if (!ClipboardHelper.TrySetText(logWindow.Title))
+        {
+            _ = MessageBox.Show(this, Resources.LogExpert_Common_UI_Message_ClipboardInUse, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     private void OnFindInExplorerToolStripMenuItemClick (object sender, EventArgs e)

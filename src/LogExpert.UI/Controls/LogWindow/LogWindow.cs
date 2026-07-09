@@ -1967,9 +1967,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
         {
-            if (!string.IsNullOrEmpty(ctl.SelectedText))
+            if (!string.IsNullOrEmpty(ctl.SelectedText) && !ClipboardHelper.TrySetText(ctl.SelectedText))
             {
-                Clipboard.SetText(ctl.SelectedText);
+                StatusLineError(Resources.LogExpert_Common_UI_Message_ClipboardInUse);
             }
         }
     }
@@ -5370,7 +5370,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 data = new DataObject(DataFormats.UnicodeText, transformed);
             }
 
-            Clipboard.SetDataObject(data);
+            if (!ClipboardHelper.TrySetDataObject(data))
+            {
+                StatusLineError(Resources.LogExpert_Common_UI_Message_ClipboardInUse);
+            }
         }
         else
         {
@@ -5412,7 +5415,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            Clipboard.SetDataObject(clipText.ToString());
+            if (!ClipboardHelper.TrySetDataObject(clipText.ToString()))
+            {
+                StatusLineError(Resources.LogExpert_Common_UI_Message_ClipboardInUse);
+            }
         }
     }
 
