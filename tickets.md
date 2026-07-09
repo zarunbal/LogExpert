@@ -10,13 +10,13 @@ Work the **frontier**: any ticket whose blockers are all done. After the first t
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Module is pure: no dependency on controls, callbacks, readers, or locks; line count is passed in as a value
-- [ ] Expansion output order matches today's: ascending back-spread, hit, ascending fore-spread
-- [ ] Line 0 is a valid back-spread line (behavior change, pinned by an explicit test)
-- [ ] History window constant is 99 and lives only in the module
-- [ ] Table-driven NUnit edge-case tests pass: hit at line 0, hit within back-spread of line 0, hit near/at end-of-file, spread 0/0, asymmetric spreads, overlapping hits, hit already in history, trim at the 2×99 boundary
-- [ ] Multi-threaded filter's private spread arithmetic and trim snippet are deleted; it delegates to the module
-- [ ] Full solution builds and the existing test suite stays green
+- [x] Module is pure: no dependency on controls, callbacks, readers, or locks; line count is passed in as a value
+- [x] Expansion output order matches today's: ascending back-spread, hit, ascending fore-spread
+- [x] Line 0 is a valid back-spread line (behavior change, pinned by an explicit test)
+- [x] History window constant is 99 and lives only in the module
+- [x] Table-driven NUnit edge-case tests pass: hit at line 0, hit within back-spread of line 0, hit near/at end-of-file, spread 0/0, asymmetric spreads, overlapping hits, hit already in history, trim at the 2×99 boundary
+- [x] Multi-threaded filter's private spread arithmetic and trim snippet are deleted; it delegates to the module
+- [x] Full solution builds and the existing test suite stays green
 
 ## Log Window serial filter delegates to the module
 
@@ -24,10 +24,10 @@ Work the **frontier**: any ticket whose blockers are all done. After the first t
 
 **Blocked by:** Filter Spread module in Core with table tests; multi-threaded filter delegates.
 
-- [ ] Serial per-hit accumulation calls the module for expansion and trimming; no spread arithmetic remains inline in that path
-- [ ] Equivalence-guard test: an identical hit sequence fed the way the serial and parallel call sites do produces identical result/hit/history lists
-- [ ] Filtering a file with spread configured behaves identically whether the single- or multi-threaded filter runs
-- [ ] Full solution builds and the test suite stays green
+- [x] Serial per-hit accumulation calls the module for expansion and trimming; no spread arithmetic remains inline in that path
+- [x] Equivalence-guard test: an identical hit sequence fed the way the serial and parallel call sites do produces identical result/hit/history lists
+- [x] Filtering a file with spread configured behaves identically whether the single- or multi-threaded filter runs
+- [x] Full solution builds and the test suite stays green
 
 ## Filter Pipe processing delegates to the module
 
