@@ -1650,6 +1650,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not copy to the clipboard. It is in use by another application. Please try again..
+        /// </summary>
+        public static string LogExpert_Common_UI_Message_ClipboardInUse {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Message_ClipboardInUse", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Deserialize.
         /// </summary>
         public static string LogExpert_Common_UI_Title_Deserialize {

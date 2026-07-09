@@ -1,6 +1,7 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+
+using LogExpert.UI.Extensions;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -55,21 +56,18 @@ internal partial class PluginHashDialog : Form
 
     private void OnButtonCopyClick (object sender, EventArgs e)
     {
-        try
+        if (ClipboardHelper.TrySetText(_hash))
         {
-            Clipboard.SetText(_hash);
             _ = MessageBox.Show(
                 Resources.PluginHashDialog_UI_Message_CopySuccess,
                 Resources.PluginHashDialog_UI_Message_SuccessTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
-        catch (Exception ex) when (ex is ExternalException or
-                                         ThreadStateException or
-                                         ThreadStateException)
+        else
         {
             _ = MessageBox.Show(
-                string.Format(CultureInfo.InvariantCulture, Resources.PluginHashDialog_UI_Message_CopyError, ex.Message),
+                string.Format(CultureInfo.InvariantCulture, Resources.PluginHashDialog_UI_Message_CopyError, Resources.LogExpert_Common_UI_Message_ClipboardInUse),
                 Resources.PluginHashDialog_UI_Message_ErrorTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);

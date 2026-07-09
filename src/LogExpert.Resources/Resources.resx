@@ -188,6 +188,9 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="LogExpert_Common_UI_Message_ClipboardInUse" xml:space="preserve">
+    <value>Could not copy to the clipboard. It is in use by another application. Please try again.</value>
+  </data>
   <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
         <value>LogExpert</value>
         <comment>LogExpert</comment>
