@@ -17,6 +17,7 @@ using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Classes.Search;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
@@ -120,6 +121,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private HighlightGroup _currentHighlightGroup = new();
 
     private SearchParams _currentSearchParams;
+    private CancellationTokenSource? _searchCts;
 
     private string[] _fileNames;
     private List<int> _filterHitList = [];
@@ -2707,6 +2709,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _isLoading = true;
         _shouldCancel = true;
+        _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
         dataGridView.ClearSelection();
@@ -2746,6 +2749,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _statusEventArgs.CurrentLineNum = 0;
         SendStatusLineUpdate();
         _shouldCancel = true;
+        _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
 
@@ -4057,119 +4061,42 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendStatusLineUpdate();
     }
 
-    [SupportedOSPlatform("windows")]
-    private int Search (SearchParams searchParams)
+    /// <summary>
+    /// Narrates a running search's progress: wrap notices on the status line (mid-search,
+    /// like the old in-loop reporting) and scanned-line counts to the progress bar.
+    /// Called synchronously on the search's background thread.
+    /// </summary>
+    private void ReportSearchProgress (SearchProgress searchProgress)
     {
-        if (searchParams.SearchText == null)
+        switch (searchProgress.Wrap)
         {
-            return -1;
+            case SearchWrap.ToStart:
+                StatusLineError(Resources.LogWindow_UI_StatusLineError_StartedFromBeginningOfFile);
+                return;
+            case SearchWrap.ToEnd:
+                StatusLineError(Resources.LogWindow_UI_StatusLineError_StartedFromEndOfFile);
+                return;
         }
 
-        var lineNum = searchParams.IsFromTop && !searchParams.IsFindNext
-            ? 0
-            : searchParams.CurrentLine;
-
-        var lowerSearchText = searchParams.SearchText.ToUpperInvariant();
-        var count = 0;
-        var hasWrapped = false;
-
-        while (true)
+        try
         {
-            if ((searchParams.IsForward || searchParams.IsFindNext) && !searchParams.IsShiftF3Pressed)
+            if (!Disposing)
             {
-                if (lineNum >= _logFileReader.LineCount)
-                {
-                    if (hasWrapped)
-                    {
-                        StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_NotFound, searchParams.SearchText));
-                        return -1;
-                    }
+                _ = Invoke(UpdateProgressBar, [searchProgress.LinesScanned]);
+            }
+        }
+        catch (ObjectDisposedException ex) // can occur when closing the app while searching
+        {
+            _logger.Warn(ex);
+        }
+    }
 
-                    lineNum = 0;
-                    count = 0;
-                    hasWrapped = true;
-                    StatusLineError(Resources.LogWindow_UI_StatusLineError_StartedFromBeginningOfFile);
-                }
-            }
-            else
-            {
-                if (lineNum < 0)
-                {
-                    if (hasWrapped)
-                    {
-                        StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_NotFound, searchParams.SearchText));
-                        return -1;
-                    }
-
-                    count = 0;
-                    lineNum = _logFileReader.LineCount - 1;
-                    hasWrapped = true;
-                    StatusLineError(Resources.LogWindow_UI_StatusLineError_StartedFromEndOfFile);
-                }
-            }
-
-            var line = _logFileReader.GetLogLineMemory(lineNum);
-            if (line == null)
-            {
-                return -1;
-            }
-
-            if (searchParams.IsRegex)
-            {
-                Regex rex = new(searchParams.SearchText, searchParams.IsCaseSensitive
-                                                    ? RegexOptions.None
-                                                    : RegexOptions.IgnoreCase);
-                if (rex.IsMatch(line.FullLine.ToString()))
-                {
-                    return lineNum;
-                }
-            }
-            else
-            {
-                if (searchParams.IsCaseSensitive)
-                {
-                    if (line.FullLine.Span.Contains(searchParams.SearchText, StringComparison.Ordinal))
-                    {
-                        return lineNum;
-                    }
-                }
-                else
-                {
-                    if (line.FullLine.Span.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return lineNum;
-                    }
-                }
-            }
-
-            if ((searchParams.IsForward || searchParams.IsFindNext) && !searchParams.IsShiftF3Pressed)
-            {
-                lineNum++;
-            }
-            else
-            {
-                lineNum--;
-            }
-
-            if (_shouldCancel)
-            {
-                return -1;
-            }
-
-            if (++count % PROGRESS_BAR_MODULO == 0)
-            {
-                try
-                {
-                    if (!Disposing)
-                    {
-                        _ = Invoke(UpdateProgressBar, [count]);
-                    }
-                }
-                catch (ObjectDisposedException ex) // can occur when closing the app while searching
-                {
-                    _logger.Warn(ex);
-                }
-            }
+    /// <summary>Relays reports synchronously — System.Progress would post them asynchronously.</summary>
+    private sealed class SynchronousProgress<T> (Action<T> handler) : IProgress<T>
+    {
+        public void Report (T value)
+        {
+            handler(value);
         }
     }
 
@@ -4197,10 +4124,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
 
-            if (lineNum == -1)
+            if (lineNum < 0)
             {
-                // Hmm... is that experimental code from early days?
-                _ = MessageBox.Show(this, Resources.LogWindow_UI_SelectLine_SearchResultNotFound, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
@@ -6504,6 +6429,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StopTimestampSyncThread();
         StopLogEventWorkerThread();
         _shouldCancel = true;
+        _searchCts?.Cancel();
 
         if (_logFileReader != null)
         {
@@ -7004,7 +6930,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _currentSearchParams = searchParams; // remember for async "not found" messages
 
         _isSearching = true;
-        _shouldCancel = false;
+        _shouldCancel = false; // shared flag: SelectLine's cancel gate and the filter loops read it
         StatusLineText(Resources.LogWindow_UI_StatusLineText_SearchingPressESCToCancel);
 
         _progressEventArgs.MinValue = 0;
@@ -7013,13 +6939,26 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        _ = Task.Run(() => Search(searchParams)).ContinueWith(SearchComplete, TaskScheduler.Default);
+        // Replace the token source only after a consumed cancellation (mirrors the old
+        // _shouldCancel = false reset); a still-running previous search keeps sharing it,
+        // so one ESC cancels every running search.
+        if (_searchCts == null || _searchCts.IsCancellationRequested)
+        {
+            _searchCts?.Dispose();
+            _searchCts = new CancellationTokenSource();
+        }
+
+        var cancellationToken = _searchCts.Token;
+        var progress = new SynchronousProgress<SearchProgress>(ReportSearchProgress);
+
+        _ = Task.Run(() => LogSearcher.Find(searchParams, _logFileReader, cancellationToken, progress), CancellationToken.None)
+            .ContinueWith(SearchComplete, TaskScheduler.Default);
 
         RemoveAllSearchHighlightEntries();
         AddSearchHitHighlightEntry(searchParams);
     }
 
-    private void SearchComplete (Task<int> task)
+    private void SearchComplete (Task<SearchResult> task)
     {
         if (Disposing)
         {
@@ -7029,15 +6968,24 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             _ = Invoke(new MethodInvoker(ResetProgressBar));
-            var line = task.Result;
+            var result = task.Result;
             _guiStateArgs.MenuEnabled = true;
             GuiStateUpdate(this, _guiStateArgs);
-            if (line == -1)
-            {
-                return;
-            }
 
-            _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), line, true);
+            switch (result.Outcome)
+            {
+                case SearchOutcome.Found:
+                    _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), result.LineNumber, true);
+                    break;
+
+                case SearchOutcome.NotFound:
+                    StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_NotFound, _currentSearchParams.SearchText));
+                    break;
+
+                default: // Cancelled or InvalidPattern — clear the busy status
+                    StatusLineText(string.Empty);
+                    break;
+            }
         }
         catch (Exception ex) // in the case the windows is already destroyed
         {
@@ -7106,7 +7054,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_isSearching)
                     {
-                        _shouldCancel = true;
+                        _shouldCancel = true; // shared flag: filter loops and SelectLine's cancel gate read it
+                        _searchCts?.Cancel();
                     }
 
                     CancelHighlightBookmarkScan();
