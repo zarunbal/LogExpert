@@ -6923,7 +6923,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         GuiStateUpdate(this, _guiStateArgs);
         var searchParams = _logWindowCoordinator.SearchParams;
 
-        searchParams.CurrentLine = (searchParams.IsForward || searchParams.IsFindNext) && !searchParams.IsShiftF3Pressed
+        searchParams.CurrentLine = LogSearcher.ResolveDirection(searchParams) == SearchDirection.Forward
             ? dataGridView.CurrentCellAddress.Y + 1
             : dataGridView.CurrentCellAddress.Y - 1;
 
