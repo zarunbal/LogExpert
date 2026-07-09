@@ -6982,7 +6982,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_NotFound, _currentSearchParams.SearchText));
                     break;
 
-                default: // Cancelled or InvalidPattern — clear the busy status
+                case SearchOutcome.InvalidPattern:
+                    StatusLineError(Resources.LogWindow_UI_StatusLineError_InvalidRegularExpression);
+                    break;
+
+                default: // Cancelled — clear the busy status
                     StatusLineText(string.Empty);
                     break;
             }
