@@ -45,10 +45,10 @@ Work the **frontier**: any ticket whose blockers are all done. After the first t
 
 **Blocked by:** Filter Spread module in Core with table tests; multi-threaded filter delegates.
 
-- [ ] Shift operation is pure and lives in the module alongside expansion and trim
-- [ ] Tests cover: plain shift, lines dropping out when the offset exceeds them, history rebuilt from the result tail, results shorter than the history window
-- [ ] Log Window rollover handling delegates; no shift arithmetic remains inline
-- [ ] Full solution builds and the test suite stays green
+- [x] Shift operation is pure and lives in the module alongside expansion and trim
+- [x] Tests cover: plain shift, lines dropping out when the offset exceeds them, history rebuilt from the result tail, results shorter than the history window
+- [x] Log Window rollover handling delegates; no shift arithmetic remains inline
+- [x] Full solution builds and the test suite stays green
 
 ## Contract: delete Log Window spread remnants, pin the knob, add glossary entry
 
