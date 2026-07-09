@@ -44,7 +44,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 {
     #region Fields
 
-    private const int SPREAD_MAX = 99;
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
     private const int FILTER_PANEL2_CONTROL_GAP = 6;
@@ -273,10 +272,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         dataGridView.ColumnDividerDoubleClick += OnDataGridViewColumnDividerDoubleClick;
         ShowAdvancedFilterPanel(false);
         knobControlFilterBackSpread.MinValue = 0;
-        knobControlFilterBackSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterBackSpread.MaxValue = FilterSpread.SPREAD_MAX;
         knobControlFilterBackSpread.ValueChanged += OnFilterKnobControlValueChanged;
         knobControlFilterForeSpread.MinValue = 0;
-        knobControlFilterForeSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterForeSpread.MaxValue = FilterSpread.SPREAD_MAX;
         knobControlFilterForeSpread.ValueChanged += OnFilterKnobControlValueChanged;
         knobControlFuzzy.MinValue = 0;
         knobControlFuzzy.MaxValue = 10;

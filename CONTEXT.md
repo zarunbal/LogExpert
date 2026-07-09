@@ -86,6 +86,24 @@ bare "session file" when you mean the workspace (that's a **Session**).
 *Avoid*: "control char rendering" (use **Substitution**), "escape" alone
 (ambiguous between the **C escape** style and the general concept).
 
+## Filtering
+
+- **Filter Spread** — Context expansion around a filter hit: **Back Spread**
+  (`FilterParams.SpreadBefore`) lines before and **Fore Spread**
+  (`FilterParams.SpreadBehind`) lines after the hit are included in the
+  filter result, deduplicated against recently emitted lines and clamped
+  to the file's line range (line 0 is a valid context line). Owned by
+  `LogExpert.Core.Classes.Filter.FilterSpread` — the single home of the
+  expansion, history-trim, and rollover-shift rules; the serial filter,
+  the parallel filter, and Filter Pipes all delegate to it. The maximum
+  UI-configurable spread (99) and the duplicate-suppression window
+  (2 × 99) derive from `FilterSpread.SPREAD_MAX`, which bounds the UI
+  spread knobs (`FilterParams` itself does not clamp its values).
+
+*Avoid*: "spread" alone when ambiguous (say **Back Spread** / **Fore
+Spread**), "additional filter results" (the old internal name — use
+**Filter Spread**).
+
 ## Columnizer selection
 
 - **Columnizer** (`ILogLineMemoryColumnizer`) — A plugin that parses a log
