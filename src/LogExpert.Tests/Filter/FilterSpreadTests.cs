@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 using LogExpert.Core.Classes.Filter;
 
 using NUnit.Framework;
@@ -58,6 +60,25 @@ public class FilterSpreadTests
         FilterSpread.TrimHistory(history);
 
         Assert.That(history, Has.Count.EqualTo(198));
+    }
+
+    [Test]
+    public void TrimHistory_WorksOnAnyIListImplementation ()
+    {
+        // The Filter Pipe history is an IList<int>, not a List<int> — the trim rule must not care.
+        IList<int> history = new Collection<int>();
+        foreach (var i in Enumerable.Range(0, 200))
+        {
+            history.Add(i);
+        }
+
+        FilterSpread.TrimHistory(history);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(history, Has.Count.EqualTo(198));
+            Assert.That(history[0], Is.EqualTo(2));
+        });
     }
 
     /// <summary>

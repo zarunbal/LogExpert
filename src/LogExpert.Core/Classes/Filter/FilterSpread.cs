@@ -16,13 +16,13 @@ public static class FilterSpread
     /// <summary>
     /// Trims the duplicate-suppression history to the last 2 × <see cref="SPREAD_MAX"/> entries.
     /// </summary>
-    public static void TrimHistory (List<int> history)
+    public static void TrimHistory (IList<int> history)
     {
         ArgumentNullException.ThrowIfNull(history);
 
-        if (history.Count > SPREAD_MAX * 2)
+        while (history.Count > SPREAD_MAX * 2)
         {
-            history.RemoveRange(0, history.Count - (SPREAD_MAX * 2));
+            history.RemoveAt(0);
         }
     }
 

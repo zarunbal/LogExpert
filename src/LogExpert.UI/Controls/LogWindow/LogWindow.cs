@@ -4624,60 +4624,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
     }
 
-    /// <summary>
-    /// Returns a list with 'additional filter results'. This is the given line number and (if back spread and/or fore
-    /// spread is enabled) some additional lines. This function doesn't check the filter condition!
-    /// </summary>
-    /// <param name="filterParams"></param>
-    /// <param name="lineNum"></param>
-    /// <param name="checkList"></param>
-    /// <returns></returns>
-    private IList<int> GetAdditionalFilterResults (FilterParams filterParams, int lineNum, IList<int> checkList)
-    {
-        IList<int> resultList = [];
-        //string textLine = this.logFileReader.GetLogLine(lineNum);
-        //ColumnizerCallback callback = new ColumnizerCallback(this);
-        //callback.LineNum = lineNum;
-
-        if (filterParams.SpreadBefore == 0 && filterParams.SpreadBehind == 0)
-        {
-            resultList.Add(lineNum);
-            return resultList;
-        }
-
-        // back spread
-        for (var i = filterParams.SpreadBefore; i > 0; --i)
-        {
-            if (lineNum - i > 0)
-            {
-                if (!resultList.Contains(lineNum - i) && !checkList.Contains(lineNum - i))
-                {
-                    resultList.Add(lineNum - i);
-                }
-            }
-        }
-
-        // direct filter hit
-        if (!resultList.Contains(lineNum) && !checkList.Contains(lineNum))
-        {
-            resultList.Add(lineNum);
-        }
-
-        // after spread
-        for (var i = 1; i <= filterParams.SpreadBehind; ++i)
-        {
-            if (lineNum + i < _logFileReader.LineCount)
-            {
-                if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
-                {
-                    resultList.Add(lineNum + i);
-                }
-            }
-        }
-
-        return resultList;
-    }
-
     [SupportedOSPlatform("windows")]
     private void AddFilterLine (int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
     {
@@ -5317,16 +5263,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 //long startTime = Environment.TickCount;
                 if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
                 {
-                    var filterResult = GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
+                    var filterResult = FilterSpread.Expand(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount, pipe.LastLinesHistoryList);
                     pipe.OpenFile();
 
                     foreach (var line in filterResult)
                     {
                         pipe.LastLinesHistoryList.Add(line);
-                        if (pipe.LastLinesHistoryList.Count > SPREAD_MAX * 2)
-                        {
-                            pipe.LastLinesHistoryList.RemoveAt(0);
-                        }
+                        FilterSpread.TrimHistory(pipe.LastLinesHistoryList);
 
                         var textLine = _logFileReader.GetLogLineMemory(line);
                         var fileOk = pipe.WriteToPipe(textLine, line);
