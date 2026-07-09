@@ -34,17 +34,9 @@ public static class FilterSpread
     {
         ArgumentNullException.ThrowIfNull(lines);
 
-        List<int> shifted = [];
-        foreach (var lineNum in lines)
-        {
-            var line = lineNum - offset;
-            if (line >= 0)
-            {
-                shifted.Add(line);
-            }
-        }
-
-        return shifted;
+        return [.. lines
+            .Select(lineNum => lineNum - offset)
+            .Where(line => line >= 0)];
     }
 
     /// <summary>
