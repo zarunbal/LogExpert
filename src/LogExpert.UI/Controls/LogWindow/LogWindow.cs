@@ -44,7 +44,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 {
     #region Fields
 
-    private const int SPREAD_MAX = 99;
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
     private const int FILTER_PANEL2_CONTROL_GAP = 6;
@@ -273,10 +272,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         dataGridView.ColumnDividerDoubleClick += OnDataGridViewColumnDividerDoubleClick;
         ShowAdvancedFilterPanel(false);
         knobControlFilterBackSpread.MinValue = 0;
-        knobControlFilterBackSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterBackSpread.MaxValue = FilterSpread.SPREAD_MAX;
         knobControlFilterBackSpread.ValueChanged += OnFilterKnobControlValueChanged;
         knobControlFilterForeSpread.MinValue = 0;
-        knobControlFilterForeSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterForeSpread.MaxValue = FilterSpread.SPREAD_MAX;
         knobControlFilterForeSpread.ValueChanged += OnFilterKnobControlValueChanged;
         knobControlFuzzy.MinValue = 0;
         knobControlFuzzy.MaxValue = 10;
@@ -4624,60 +4623,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
     }
 
-    /// <summary>
-    /// Returns a list with 'additional filter results'. This is the given line number and (if back spread and/or fore
-    /// spread is enabled) some additional lines. This function doesn't check the filter condition!
-    /// </summary>
-    /// <param name="filterParams"></param>
-    /// <param name="lineNum"></param>
-    /// <param name="checkList"></param>
-    /// <returns></returns>
-    private IList<int> GetAdditionalFilterResults (FilterParams filterParams, int lineNum, IList<int> checkList)
-    {
-        IList<int> resultList = [];
-        //string textLine = this.logFileReader.GetLogLine(lineNum);
-        //ColumnizerCallback callback = new ColumnizerCallback(this);
-        //callback.LineNum = lineNum;
-
-        if (filterParams.SpreadBefore == 0 && filterParams.SpreadBehind == 0)
-        {
-            resultList.Add(lineNum);
-            return resultList;
-        }
-
-        // back spread
-        for (var i = filterParams.SpreadBefore; i > 0; --i)
-        {
-            if (lineNum - i > 0)
-            {
-                if (!resultList.Contains(lineNum - i) && !checkList.Contains(lineNum - i))
-                {
-                    resultList.Add(lineNum - i);
-                }
-            }
-        }
-
-        // direct filter hit
-        if (!resultList.Contains(lineNum) && !checkList.Contains(lineNum))
-        {
-            resultList.Add(lineNum);
-        }
-
-        // after spread
-        for (var i = 1; i <= filterParams.SpreadBehind; ++i)
-        {
-            if (lineNum + i < _logFileReader.LineCount)
-            {
-                if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
-                {
-                    resultList.Add(lineNum + i);
-                }
-            }
-        }
-
-        return resultList;
-    }
-
     [SupportedOSPlatform("windows")]
     private void AddFilterLine (int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
     {
@@ -4685,14 +4630,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         lock (_filterResultList)
         {
             filterHitList.Add(lineNum);
-            var filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+            var filterResult = FilterSpread.Expand(lineNum, filterParams.SpreadBefore, filterParams.SpreadBehind, _logFileReader.LineCount, lastFilterLinesList);
             filterResultLines.AddRange(filterResult);
             count = filterResultLines.Count;
             lastFilterLinesList.AddRange(filterResult);
-            if (lastFilterLinesList.Count > SPREAD_MAX * 2)
-            {
-                lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
-            }
+            FilterSpread.TrimHistory(lastFilterLinesList);
         }
 
         if (immediate)
@@ -4890,45 +4832,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ShiftFilterLines (int offset)
     {
-        List<int> newFilterList = [];
         lock (_filterResultList)
         {
-            foreach (var lineNum in _filterResultList)
-            {
-                var line = lineNum - offset;
-                if (line >= 0)
-                {
-                    newFilterList.Add(line);
-                }
-            }
-
-            _filterResultList = newFilterList;
+            _filterResultList = FilterSpread.ShiftLines(_filterResultList, offset);
         }
 
-        newFilterList = [];
-        foreach (var lineNum in _filterHitList)
-        {
-            var line = lineNum - offset;
-            if (line >= 0)
-            {
-                newFilterList.Add(line);
-            }
-        }
+        _filterHitList = FilterSpread.ShiftLines(_filterHitList, offset);
+        _lastFilterLinesList = FilterSpread.RebuildHistory(_filterResultList);
 
-        _filterHitList = newFilterList;
-
-        var count = SPREAD_MAX;
-        if (_filterResultList.Count < SPREAD_MAX)
-        {
-            count = _filterResultList.Count;
-        }
-
-        _lastFilterLinesList = _filterResultList.GetRange(_filterResultList.Count - count, count);
-
-        //this.filterGridView.RowCount = this.filterResultList.Count;
-        //this.filterCountLabel.Text = "" + this.filterResultList.Count;
-        //this.BeginInvoke(new MethodInvoker(this.filterGridView.Refresh));
-        //this.BeginInvoke(new MethodInvoker(AddFilterLineGuiUpdate));
         TriggerFilterLineGuiUpdate();
     }
 
@@ -5320,16 +5231,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 //long startTime = Environment.TickCount;
                 if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
                 {
-                    var filterResult = GetAdditionalFilterResults(pipe.FilterParams, lineNum, pipe.LastLinesHistoryList);
+                    var filterResult = FilterSpread.Expand(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount, pipe.LastLinesHistoryList);
                     pipe.OpenFile();
 
                     foreach (var line in filterResult)
                     {
                         pipe.LastLinesHistoryList.Add(line);
-                        if (pipe.LastLinesHistoryList.Count > SPREAD_MAX * 2)
-                        {
-                            pipe.LastLinesHistoryList.RemoveAt(0);
-                        }
+                        FilterSpread.TrimHistory(pipe.LastLinesHistoryList);
 
                         var textLine = _logFileReader.GetLogLineMemory(line);
                         var fileOk = pipe.WriteToPipe(textLine, line);
