@@ -56,22 +56,17 @@ internal partial class PluginHashDialog : Form
 
     private void OnButtonCopyClick (object sender, EventArgs e)
     {
-        if (ClipboardHelper.TrySetText(_hash))
-        {
-            _ = MessageBox.Show(
+        _ = ClipboardHelper.TrySetText(_hash)
+            ? MessageBox.Show(
                 Resources.PluginHashDialog_UI_Message_CopySuccess,
                 Resources.PluginHashDialog_UI_Message_SuccessTitle,
                 MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
-        }
-        else
-        {
-            _ = MessageBox.Show(
+                MessageBoxIcon.Information)
+            : MessageBox.Show(
                 string.Format(CultureInfo.InvariantCulture, Resources.PluginHashDialog_UI_Message_CopyError, Resources.LogExpert_Common_UI_Message_ClipboardInUse),
                 Resources.PluginHashDialog_UI_Message_ErrorTitle,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
-        }
     }
 
     private void OnButtonCloseClick (object sender, EventArgs e)

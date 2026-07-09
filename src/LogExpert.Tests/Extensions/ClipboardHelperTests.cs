@@ -1,9 +1,8 @@
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-
 using LogExpert.UI.Extensions;
 
 using NUnit.Framework;
+
+using Vanara.PInvoke;
 
 namespace LogExpert.Tests.Extensions;
 
@@ -15,6 +14,7 @@ namespace LogExpert.Tests.Extensions;
 [TestFixture]
 [Apartment(ApartmentState.STA)]
 [NonParallelizable]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
 public class ClipboardHelperTests
 {
     [Test]
@@ -91,35 +91,27 @@ public class ClipboardHelperTests
         {
             _thread = new Thread(() =>
             {
-                if (!OpenClipboard(IntPtr.Zero))
+                if (!User32.OpenClipboard(HWND.NULL))
                 {
                     throw new InvalidOperationException("Test setup failed: could not open the clipboard");
                 }
 
                 _acquired.Set();
                 _release.Wait();
-                _ = CloseClipboard();
+                _ = User32.CloseClipboard();
             })
             {
                 IsBackground = true
             };
 
             _thread.Start();
-            _acquired.Wait(TimeSpan.FromSeconds(5));
+            _ = _acquired.Wait(TimeSpan.FromSeconds(5));
         }
 
         public void Dispose ()
         {
             _release.Set();
-            _thread.Join(TimeSpan.FromSeconds(5));
+            _ = _thread.Join(TimeSpan.FromSeconds(5));
         }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool OpenClipboard (IntPtr hWndNewOwner);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool CloseClipboard ();
     }
 }

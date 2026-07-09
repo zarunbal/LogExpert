@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-using NLog;
-
 namespace LogExpert.UI.Extensions;
 
 /// <summary>
@@ -14,8 +12,6 @@ namespace LogExpert.UI.Extensions;
 [SupportedOSPlatform("windows")]
 internal static class ClipboardHelper
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
     public static bool TrySetText (string text)
     {
         try
@@ -23,9 +19,8 @@ internal static class ClipboardHelper
             Clipboard.SetText(text);
             return true;
         }
-        catch (ExternalException e)
+        catch (ExternalException)
         {
-            _logger.Warn(e, "Clipboard is in use by another application, could not copy text");
             return false;
         }
     }
@@ -38,9 +33,8 @@ internal static class ClipboardHelper
             Clipboard.SetDataObject(data, copy: true);
             return true;
         }
-        catch (ExternalException e)
+        catch (ExternalException)
         {
-            _logger.Warn(e, "Clipboard is in use by another application, could not copy data");
             return false;
         }
     }
