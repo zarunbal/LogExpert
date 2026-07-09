@@ -81,6 +81,56 @@ public class FilterSpreadTests
         });
     }
 
+    [Test]
+    public void ShiftLines_OnRollover_SubtractsOffsetFromEveryLine ()
+    {
+        var shifted = FilterSpread.ShiftLines([10, 20, 30], offset: 5);
+
+        Assert.That(shifted, Is.EqualTo(new[] { 5, 15, 25 }));
+    }
+
+    [Test]
+    public void ShiftLines_LinesRolledOffTheStart_AreDropped ()
+    {
+        // Offset 15 rolls lines 10 and 14 off the virtual file; 15 shifts to 0 and survives.
+        var shifted = FilterSpread.ShiftLines([10, 14, 15, 40], offset: 15);
+
+        Assert.That(shifted, Is.EqualTo(new[] { 0, 25 }));
+    }
+
+    [Test]
+    public void RebuildHistory_ResultsLongerThanSpreadMax_TakesTheLastSpreadMaxLines ()
+    {
+        // The rollover rebuild caps the history at SPREAD_MAX (99), not the 2×99 trim
+        // window — a preserved quirk of the original rollover code.
+        var results = new List<int>(Enumerable.Range(0, 150));
+
+        var history = FilterSpread.RebuildHistory(results);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(history, Has.Count.EqualTo(99));
+            Assert.That(history[0], Is.EqualTo(51));
+            Assert.That(history[^1], Is.EqualTo(149));
+        });
+    }
+
+    [Test]
+    public void RebuildHistory_ResultsShorterThanSpreadMax_TakesAllOfThem ()
+    {
+        var history = FilterSpread.RebuildHistory([3, 4, 5]);
+
+        Assert.That(history, Is.EqualTo(new[] { 3, 4, 5 }));
+    }
+
+    [Test]
+    public void RebuildHistory_EmptyResults_ReturnsEmptyHistory ()
+    {
+        var history = FilterSpread.RebuildHistory([]);
+
+        Assert.That(history, Is.Empty);
+    }
+
     /// <summary>
     /// Equivalence guard: the single-threaded Log Window filter and the multi-threaded
     /// Core filter accumulate per-hit results through the same recipe

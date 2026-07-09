@@ -4833,45 +4833,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ShiftFilterLines (int offset)
     {
-        List<int> newFilterList = [];
         lock (_filterResultList)
         {
-            foreach (var lineNum in _filterResultList)
-            {
-                var line = lineNum - offset;
-                if (line >= 0)
-                {
-                    newFilterList.Add(line);
-                }
-            }
-
-            _filterResultList = newFilterList;
+            _filterResultList = FilterSpread.ShiftLines(_filterResultList, offset);
         }
 
-        newFilterList = [];
-        foreach (var lineNum in _filterHitList)
-        {
-            var line = lineNum - offset;
-            if (line >= 0)
-            {
-                newFilterList.Add(line);
-            }
-        }
+        _filterHitList = FilterSpread.ShiftLines(_filterHitList, offset);
+        _lastFilterLinesList = FilterSpread.RebuildHistory(_filterResultList);
 
-        _filterHitList = newFilterList;
-
-        var count = SPREAD_MAX;
-        if (_filterResultList.Count < SPREAD_MAX)
-        {
-            count = _filterResultList.Count;
-        }
-
-        _lastFilterLinesList = _filterResultList.GetRange(_filterResultList.Count - count, count);
-
-        //this.filterGridView.RowCount = this.filterResultList.Count;
-        //this.filterCountLabel.Text = "" + this.filterResultList.Count;
-        //this.BeginInvoke(new MethodInvoker(this.filterGridView.Refresh));
-        //this.BeginInvoke(new MethodInvoker(AddFilterLineGuiUpdate));
         TriggerFilterLineGuiUpdate();
     }
 

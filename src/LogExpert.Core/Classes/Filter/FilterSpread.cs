@@ -27,6 +27,41 @@ public static class FilterSpread
     }
 
     /// <summary>
+    /// Shifts collected line numbers by a multi-file rollover offset. Lines that roll off
+    /// the start of the virtual file are dropped.
+    /// </summary>
+    public static List<int> ShiftLines (IEnumerable<int> lines, int offset)
+    {
+        ArgumentNullException.ThrowIfNull(lines);
+
+        List<int> shifted = [];
+        foreach (var lineNum in lines)
+        {
+            var line = lineNum - offset;
+            if (line >= 0)
+            {
+                shifted.Add(line);
+            }
+        }
+
+        return shifted;
+    }
+
+    /// <summary>
+    /// Rebuilds the duplicate-suppression history after a rollover shift: the last
+    /// <see cref="SPREAD_MAX"/> entries of the shifted result lines (all of them when
+    /// there are fewer). Capping at SPREAD_MAX — not the 2× trim window — preserves the
+    /// original rollover behavior.
+    /// </summary>
+    public static List<int> RebuildHistory (List<int> shiftedResultLines)
+    {
+        ArgumentNullException.ThrowIfNull(shiftedResultLines);
+
+        var count = Math.Min(SPREAD_MAX, shiftedResultLines.Count);
+        return shiftedResultLines.GetRange(shiftedResultLines.Count - count, count);
+    }
+
+    /// <summary>
     /// Returns the lines a filter hit contributes to the filter result: the hit itself,
     /// plus (if configured) back-spread and fore-spread context lines. Lines already present
     /// in <paramref name="alreadyTaken"/> are suppressed. This function does not evaluate
