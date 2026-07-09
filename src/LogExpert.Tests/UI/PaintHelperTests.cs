@@ -166,6 +166,32 @@ public class PaintHelperTests
         });
     }
 
+    [Test]
+    public void ApplyTabControlTheme_DarkMode_DisablesVisualStyleBackColorOnAllPages ()
+    {
+        // With UseVisualStyleBackColor = true the tab page body is painted by the
+        // light-only visual-style renderer while child controls inherit the dark
+        // ambient color, giving light pages with dark patches in dark mode.
+        using TabControl tabControl = new();
+        tabControl.TabPages.Add(new TabPage { UseVisualStyleBackColor = true });
+        tabControl.TabPages.Add(new TabPage { UseVisualStyleBackColor = true });
+
+        PaintHelper.ApplyTabControlTheme(tabControl, darkMode: true);
+
+        Assert.That(tabControl.TabPages.Cast<TabPage>().Select(p => p.UseVisualStyleBackColor), Is.All.False);
+    }
+
+    [Test]
+    public void ApplyTabControlTheme_LightMode_KeepsVisualStyleBackColor ()
+    {
+        using TabControl tabControl = new();
+        tabControl.TabPages.Add(new TabPage { UseVisualStyleBackColor = true });
+
+        PaintHelper.ApplyTabControlTheme(tabControl, darkMode: false);
+
+        Assert.That(tabControl.TabPages[0].UseVisualStyleBackColor, Is.True);
+    }
+
     private static bool IsDark (Color color) => color.R < 128 && color.G < 128 && color.B < 128;
 
     private static bool IsLight (Color color) => color.R >= 128 && color.G >= 128 && color.B >= 128;

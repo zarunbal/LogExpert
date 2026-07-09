@@ -295,6 +295,26 @@ internal static class PaintHelper
         gridView.EnableHeadersVisualStyles = !darkMode;
     }
 
+    /// <summary>
+    /// Applies theme-dependent settings to a tab control. With
+    /// <c>UseVisualStyleBackColor</c> enabled the tab page body is painted by the
+    /// light-only visual-style renderer while child controls inherit the dark ambient
+    /// color, giving light pages with dark patches in dark mode.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static void ApplyTabControlTheme (TabControl tabControl, bool darkMode)
+    {
+        if (!darkMode)
+        {
+            return;
+        }
+
+        foreach (TabPage page in tabControl.TabPages)
+        {
+            page.UseVisualStyleBackColor = false;
+        }
+    }
+
     [SupportedOSPlatform("windows")]
     public static void ApplyDataGridViewPrefs (BufferedDataGridView dataGridView, bool setLastColumnWidht, int lastColumnWidth)
     {
