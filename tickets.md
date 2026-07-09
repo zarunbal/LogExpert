@@ -56,7 +56,7 @@ Work the **frontier**: any ticket whose blockers are all done. After the first t
 
 **Blocked by:** Log Window serial filter delegates to the module; Filter Pipe processing delegates to the module; Rollover shifting moves into the module.
 
-- [ ] No spread expansion, trim, or shift arithmetic remains anywhere in the Log Window
-- [ ] The spread knobs' maximum value references the module's constant (99)
-- [ ] CONTEXT.md defines Filter Spread (back spread / fore spread context expansion) in the project's glossary voice
-- [ ] Full solution builds and the test suite stays green
+- [x] No spread expansion, trim, or shift arithmetic remains anywhere in the Log Window
+- [x] The spread knobs' maximum value references the module's constant (99)
+- [x] CONTEXT.md defines Filter Spread (back spread / fore spread context expansion) in the project's glossary voice
+- [x] Full solution builds and the test suite stays green
