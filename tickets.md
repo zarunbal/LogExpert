@@ -35,9 +35,9 @@ Work the **frontier**: any ticket whose blockers are all done. After the first t
 
 **Blocked by:** Filter Spread module in Core with table tests; multi-threaded filter delegates.
 
-- [ ] Filter Pipe per-hit processing calls the module for expansion and history trimming
-- [ ] A pipe tab fed by a filter with spread configured shows the same context lines as the filter view for the same hits
-- [ ] Full solution builds and the test suite stays green
+- [x] Filter Pipe per-hit processing calls the module for expansion and history trimming
+- [x] A pipe tab fed by a filter with spread configured shows the same context lines as the filter view for the same hits
+- [x] Full solution builds and the test suite stays green
 
 ## Rollover shifting moves into the module
 
