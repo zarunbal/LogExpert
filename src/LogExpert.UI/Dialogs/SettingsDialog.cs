@@ -14,6 +14,7 @@ using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Dialogs.Helpers;
+using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 
 namespace LogExpert.Dialogs;
@@ -74,6 +75,12 @@ internal partial class SettingsDialog : Form
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+
+        var darkMode = Application.IsDarkModeEnabled;
+        PaintHelper.ApplyTabControlTheme(tabControlSettings, darkMode);
+        PaintHelper.ApplyGridViewTheme(dataGridViewColumnizer, darkMode);
+        PaintHelper.ApplyGridViewTheme(dataGridViewHighlightMask, darkMode);
+        PaintHelper.ApplyGridViewTheme(dataGridViewControlChars, darkMode);
 
         dataGridViewImageColumnColumnizerStale.CellTemplate = new EmptyImageCell();
 

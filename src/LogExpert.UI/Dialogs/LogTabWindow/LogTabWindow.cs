@@ -304,6 +304,16 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ConfigureDockPanel ()
     {
+        if (Application.IsDarkModeEnabled)
+        {
+            var darkTheme = new VS2015DarkTheme();
+            dockPanel.Theme = darkTheme;
+            dockPanel.DockBackColor = darkTheme.ColorPalette.MainWindowActive.Background;
+            dockPanel.ActiveAutoHideContent = null;
+            dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
+            return;
+        }
+
         var autoHideStripSkin1 = new AutoHideStripSkin();
         var dockPanelGradient1 = new DockPanelGradient();
         var tabGradient1 = new TabGradient();
