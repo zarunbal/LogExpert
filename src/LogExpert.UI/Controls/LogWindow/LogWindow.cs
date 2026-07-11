@@ -6358,6 +6358,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _windowCts.Cancel(); // window lifetime ends: every linked job token cancels
         _searchCts?.Cancel();
 
+        // Jobs cancelled by the close skip their UI epilogues (the handle is going away), so the
+        // closing window clears the shared status line and progress bar itself, while its events
+        // are still wired to the parent.
+        StatusLineText(string.Empty);
+        _progressEventArgs.Visible = false;
+        _progressEventArgs.Value = _progressEventArgs.MaxValue;
+        SendProgressBarUpdate();
+
         if (_logFileReader != null)
         {
             UnRegisterLogFileReaderEvents();
