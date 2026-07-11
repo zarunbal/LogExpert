@@ -154,7 +154,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private SortedList<int, RowHeightEntry> _rowHeightList = [];
     private int _selectedCol; // set by context menu event for column headers only
     private bool _shouldCallTimeSync;
-    private bool _shouldCancel;
+    /// <summary>Window-lifetime cancellation: per-job token sources link to it, so closing the
+    /// window cancels every running job. Live jobs are also registered in the cancel-handler
+    /// registry, which ESC and reload fan out through.</summary>
+    private readonly CancellationTokenSource _windowCts = new();
     private bool _isClosing; // set once CloseLogWindow starts tearing down; suppresses grid CellValueNeeded callbacks
     private bool _shouldTimestampDisplaySyncingCancel;
     private bool _showAdvanced;
@@ -687,7 +690,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
-    private delegate void WriteFilterToTabFinishedFx (FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
 
     private delegate void SetBookmarkFx (int lineNum, string comment);
 
@@ -2705,7 +2707,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
 
         _isLoading = true;
-        _shouldCancel = true;
+        FireCancelHandlers(); // reload cancels the jobs of the old content, not the window lifetime
         _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
@@ -2745,7 +2747,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _statusEventArgs.LineCount = 0;
         _statusEventArgs.CurrentLineNum = 0;
         SendStatusLineUpdate();
-        _shouldCancel = true;
+        FireCancelHandlers(); // a dead file may respawn — cancel its jobs, keep the window lifetime
         _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
@@ -2938,7 +2940,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineText(string.Empty);
         _logFileReader.FileSizeChanged += OnFileSizeChanged;
         _isLoading = false;
-        _shouldCancel = false;
         dataGridView.SuspendLayout();
         dataGridView.RowCount = _logFileReader.LineCount;
         dataGridView.CurrentCellChanged += OnDataGridViewCurrentCellChanged;
@@ -4062,16 +4063,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             _shouldCallTimeSync = triggerSyncCall;
-            var wasCancelled = _shouldCancel;
-            _shouldCancel = false;
-            _isSearching = false;
-            StatusLineText(string.Empty);
-            _guiStateArgs.MenuEnabled = true;
-
-            if (wasCancelled)
-            {
-                return;
-            }
 
             if (lineNum < 0)
             {
@@ -4394,7 +4385,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //ConfigManager.SaveFilterParams(this.filterParams);
         ConfigManager.Settings.FilterParams = _filterParams; // wozu eigentlich? sinnlos seit MDI?
 
-        _shouldCancel = false;
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_FilterSearch_Filtering);
         btnfilterSearch.Enabled = false;
@@ -4414,7 +4404,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var progress = new SynchronousProgress<int>(UpdateProgressBar);
 
         // ESC reaches the run through the cancel-handler registry; the engines observe the token.
-        using CancellationTokenSource filterCts = new();
+        using var filterCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
         var cancelHandler = new FilterRunCancelHandler(filterCts);
         OnRegisterCancelHandler(cancelHandler);
 
@@ -4924,7 +4914,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
         _isSearching = true;
-        _shouldCancel = false;
+
+        // Per-job token, linked to the window's lifetime; ESC reaches it via the registry.
+        using var pipeCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
+        var cancelHandler = new FilterRunCancelHandler(pipeCts);
+        OnRegisterCancelHandler(cancelHandler);
 
         lock (_filterPipeList)
         {
@@ -4936,37 +4930,45 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         pipe.OpenFile();
         LogExpertCallback callback = new(this);
 
-        foreach (var i in lineNumberList)
+        try
         {
-            if (_shouldCancel)
+            foreach (var i in lineNumberList)
             {
-                break;
-            }
+                if (pipeCts.Token.IsCancellationRequested)
+                {
+                    break;
+                }
 
-            var line = _logFileReader.GetLogLineMemory(i);
-            if (CurrentColumnizer is ILogLineMemoryXmlColumnizer)
-            {
-                callback.LineNum = i;
-                line = (CurrentColumnizer as ILogLineMemoryXmlColumnizer).GetLineTextForClipboard(line, callback);
-            }
+                var line = _logFileReader.GetLogLineMemory(i);
+                if (CurrentColumnizer is ILogLineMemoryXmlColumnizer)
+                {
+                    callback.LineNum = i;
+                    line = (CurrentColumnizer as ILogLineMemoryXmlColumnizer).GetLineTextForClipboard(line, callback);
+                }
 
-            _ = pipe.WriteToPipe(line, i);
-            if (++count % PROGRESS_BAR_MODULO == 0)
-            {
-                _progressEventArgs.Value = count;
-                _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
+                _ = pipe.WriteToPipe(line, i);
+                if (++count % PROGRESS_BAR_MODULO == 0)
+                {
+                    _progressEventArgs.Value = count;
+                    _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
+                }
             }
+        }
+        finally
+        {
+            OnDeRegisterCancelHandler(cancelHandler);
         }
 
         pipe.CloseFile();
-        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), pipe, name, persistenceData);
+        var wasCancelled = pipeCts.IsCancellationRequested;
+        Invoke(() => WriteFilterToTabFinished(pipe, name, persistenceData, wasCancelled));
     }
 
     [SupportedOSPlatform("windows")]
-    private void WriteFilterToTabFinished (FilterPipe pipe, string name, PersistenceData persistenceData)
+    private void WriteFilterToTabFinished (FilterPipe pipe, string name, PersistenceData persistenceData, bool wasCancelled)
     {
         _isSearching = false;
-        if (!_shouldCancel)
+        if (!wasCancelled)
         {
             var title = name;
             ILogLineMemoryColumnizer preProcessColumnizer = null;
@@ -5014,7 +5016,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         pipe.CloseFile();
-        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), [pipe, title, null]);
+        Invoke(() => WriteFilterToTabFinished(pipe, title, null, wasCancelled: false));
     }
 
     [SupportedOSPlatform("windows")]
@@ -5367,9 +5369,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         List<PatternBlock> blockList = [];
         var blockId = 0;
         _isSearching = true;
-        _shouldCancel = false;
+
+        // Per-job token, linked to the window's lifetime; ESC reaches it via the registry.
+        using var patternCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
+        var cancelHandler = new FilterRunCancelHandler(patternCts);
+        OnRegisterCancelHandler(cancelHandler);
+        var cancellationToken = patternCts.Token;
+
         var searchLine = -1;
-        for (var i = beginLine; i < num && !_shouldCancel; ++i)
+        for (var i = beginLine; i < num && !cancellationToken.IsCancellationRequested; ++i)
         {
             if (processedLinesDict.ContainsKey(i))
             {
@@ -5383,14 +5391,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             //bool firstBlock = true;
             searchLine++;
             UpdateProgressBar(searchLine);
-            while (!_shouldCancel &&
+            while (!cancellationToken.IsCancellationRequested &&
                    (block =
                        DetectBlock(i,
                                    searchLine,
                                    maxBlockLen,
                                    _patternArgs.MaxDiffInBlock,
                                    _patternArgs.MaxMisses,
-                                   processedLinesDict)
+                                   processedLinesDict,
+                                   cancellationToken)
                    ) != null)
             {
                 //_logger.Debug($"Found block: {block}");
@@ -5429,6 +5438,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             blockId++;
         }
 
+        OnDeRegisterCancelHandler(cancelHandler);
         _isSearching = false;
         _progressEventArgs.MinValue = 0;
         _progressEventArgs.MaxValue = 0;
@@ -5469,7 +5479,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     //    return null;
     //}
 
-    private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict)
+    private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict, CancellationToken cancellationToken)
     {
         var targetLine = FindSimilarLine(startNum, startLineToSearch, processedLinesDict);
         if (targetLine == -1)
@@ -5494,7 +5504,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         };
         block.QualityInfoList[targetLine] = qi;
 
-        while (!_shouldCancel)
+        while (!cancellationToken.IsCancellationRequested)
         {
             srcLine++;
             len++;
@@ -6330,7 +6340,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StopTimespreadThread();
         StopTimestampSyncThread();
         StopLogEventWorkerThread();
-        _shouldCancel = true;
+        _windowCts.Cancel(); // window lifetime ends: every linked job token cancels
         _searchCts?.Cancel();
 
         if (_logFileReader != null)
@@ -6832,7 +6842,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _currentSearchParams = searchParams; // remember for async "not found" messages
 
         _isSearching = true;
-        _shouldCancel = false; // shared flag: SelectLine's cancel gate and the filter loops read it
         StatusLineText(Resources.LogWindow_UI_StatusLineText_SearchingPressESCToCancel);
 
         _progressEventArgs.MinValue = 0;
@@ -6841,13 +6850,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        // Replace the token source only after a consumed cancellation (mirrors the old
-        // _shouldCancel = false reset); a still-running previous search keeps sharing it,
-        // so one ESC cancels every running search.
+        // Replace the token source only after a consumed cancellation; a still-running previous
+        // search keeps sharing it, so one ESC cancels every running search.
         if (_searchCts == null || _searchCts.IsCancellationRequested)
         {
             _searchCts?.Dispose();
-            _searchCts = new CancellationTokenSource();
+            _searchCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
         }
 
         var cancellationToken = _searchCts.Token;
@@ -6871,12 +6879,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _ = Invoke(new MethodInvoker(ResetProgressBar));
             var result = task.Result;
+            _isSearching = false; // was SelectLine's job when it doubled as the search epilogue
             _guiStateArgs.MenuEnabled = true;
             GuiStateUpdate(this, _guiStateArgs);
 
             switch (result.Outcome)
             {
                 case SearchOutcome.Found:
+                    StatusLineText(string.Empty);
                     _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), result.LineNumber, true);
                     break;
 
@@ -6960,7 +6970,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_isSearching)
                     {
-                        _shouldCancel = true; // shared flag: filter loops and SelectLine's cancel gate read it
                         _searchCts?.Cancel();
                     }
 

@@ -35,22 +35,21 @@ internal class Filter
     public List<int> FilterResultLines { get; }
     public List<int> LastFilterLinesList { get; }
     public List<int> FilterHitList { get; }
-    public bool ShouldCancel { get; set; }
 
     #endregion
 
     #region Public methods
 
-    public int DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
+    public int DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
-        return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback);
+        return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback, cancellationToken);
     }
 
     #endregion
 
     #region Private Methods
 
-    private int DoFilter (FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback)
+    private int DoFilter (FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
         var lineNum = startLine;
         var count = 0;
@@ -60,7 +59,7 @@ internal class Filter
         {
             filterParams.Reset();
 
-            while ((count++ < maxCount || filterParams.IsInRange) && !ShouldCancel)
+            while ((count++ < maxCount || filterParams.IsInRange) && !cancellationToken.IsCancellationRequested)
             {
                 if (lineNum >= _callback.GetLineCount())
                 {

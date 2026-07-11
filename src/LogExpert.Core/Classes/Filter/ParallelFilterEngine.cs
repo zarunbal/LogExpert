@@ -45,12 +45,10 @@ public class ParallelFilterEngine : IFilterEngine
 
         FilterStarter filterStarter = new(callback, _chunkCount);
 
-        using var cancelRegistration = cancellationToken.Register(filterStarter.CancelFilter);
-
         try
         {
             filterStarter
-                .DoFilter(snapshot, 0, lineCount, count => progress?.Report(count))
+                .DoFilter(snapshot, 0, lineCount, count => progress?.Report(count), cancellationToken)
                 .GetAwaiter()
                 .GetResult();
         }
