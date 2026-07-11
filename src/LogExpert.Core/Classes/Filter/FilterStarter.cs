@@ -42,11 +42,7 @@ public class FilterStarter
         _filterHitDict = [];
         _filterResultDict = [];
         _lastFilterLinesDict = [];
-        ThreadCount = Environment.ProcessorCount * 4;
         ThreadCount = minThreads;
-        ThreadPool.GetMinThreads(out _, out var completion);
-        _ = ThreadPool.SetMinThreads(minThreads, completion);
-        ThreadPool.GetMaxThreads(out _, out _);
     }
 
     #endregion
