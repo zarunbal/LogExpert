@@ -3170,127 +3170,79 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void CheckFilterAndHighlight (LogEventArgs e)
     {
+        // The Tail trigger path (CONTEXT.md): the one loop that evaluates highlight entries against
+        // newly appended lines. Side-effecting triggers (Audio Alert, Set Bookmark, Stop Tail) fire
+        // here and only here — the bulk scanner (HighlightBookmarkScanner) has no access to them.
+        var doFilter = filterTailCheckBox.Checked || _filterPipeList.Count > 0;
         var noLed = true;
+        var firstStopTail = true;
+        var filterLineAdded = false;
 
-        if (filterTailCheckBox.Checked || _filterPipeList.Count > 0)
+        var startLine = e.PrevLineCount;
+        if (e.IsRollover)
         {
-            var filterStart = e.PrevLineCount;
-            if (e.IsRollover)
+            ShiftFilterLines(e.RolloverOffset);
+            startLine -= e.RolloverOffset;
+        }
+
+        ColumnizerCallback callback = new(this);
+
+        for (var i = startLine; i < e.LineCount; ++i)
+        {
+            var line = _logFileReader.GetLogLineMemory(i);
+            if (line == null)
             {
-                ShiftFilterLines(e.RolloverOffset);
-                filterStart -= e.RolloverOffset;
+                // End of available lines — stop scanning, but still flush the work already done below.
+                break;
             }
 
-            var firstStopTail = true;
-            ColumnizerCallback callback = new(this);
-            var filterLineAdded = false;
-            for (var i = filterStart; i < e.LineCount; ++i)
+            if (doFilter)
             {
-                var line = _logFileReader.GetLogLineMemory(i);
-                if (line == null)
-                {
-                    return;
-                }
-
                 if (filterTailCheckBox.Checked)
                 {
                     callback.SetLineNum(i);
                     if (Util.TestFilterCondition(_filterParams, line, callback))
                     {
-                        //AddFilterLineFx addFx = new AddFilterLineFx(AddFilterLine);
-                        //this.Invoke(addFx, new object[] { i, true });
                         filterLineAdded = true;
                         AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList, _filterHitList);
                     }
                 }
 
-                //ProcessFilterPipeFx pipeFx = new ProcessFilterPipeFx(ProcessFilterPipes);
-                //pipeFx.BeginInvoke(i, null, null);
                 ProcessFilterPipes(i);
+            }
 
-                var matchingList = FindMatchingHighlightEntries(line);
-                LaunchHighlightPlugins(matchingList, i);
-                var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
-                SafeTriggerAudioAlert(matchingList);
-                if (setBookmark)
+            var matchingList = FindMatchingHighlightEntries(line);
+            LaunchHighlightPlugins(matchingList, i);
+            var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
+            SafeTriggerAudioAlert(matchingList);
+            if (setBookmark)
+            {
+                var capturedLineNum = i;
+                var capturedComment = bookmarkComment;
+                _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
+            }
+
+            if (stopTail && _guiStateArgs.FollowTail)
+            {
+                var wasFollow = _guiStateArgs.FollowTail;
+                FollowTailChanged(false, true);
+                if (firstStopTail && wasFollow)
                 {
                     var capturedLineNum = i;
-                    var capturedComment = bookmarkComment;
-                    _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
-                }
-
-                if (stopTail && _guiStateArgs.FollowTail)
-                {
-                    var wasFollow = _guiStateArgs.FollowTail;
-                    FollowTailChanged(false, true);
-                    if (firstStopTail && wasFollow)
-                    {
-                        //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                        var capturedLineNum = i;
-                        _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
-                        firstStopTail = false;
-                    }
-                }
-
-                if (!suppressLed)
-                {
-                    noLed = false;
+                    _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
+                    firstStopTail = false;
                 }
             }
 
-            if (filterLineAdded)
+            if (!suppressLed)
             {
-                //AddFilterLineGuiUpdateFx addFx = new AddFilterLineGuiUpdateFx(AddFilterLineGuiUpdate);
-                //this.Invoke(addFx);
-                TriggerFilterLineGuiUpdate();
+                noLed = false;
             }
         }
-        else
+
+        if (filterLineAdded)
         {
-            var firstStopTail = true;
-            var startLine = e.PrevLineCount;
-            if (e.IsRollover)
-            {
-                ShiftFilterLines(e.RolloverOffset);
-                startLine -= e.RolloverOffset;
-            }
-
-            for (var i = startLine; i < e.LineCount; ++i)
-            {
-                var line = _logFileReader.GetLogLineMemory(i);
-                if (line != null)
-                {
-                    var matchingList = FindMatchingHighlightEntries(line);
-                    LaunchHighlightPlugins(matchingList, i);
-                    var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
-                    SafeTriggerAudioAlert(matchingList);
-                    if (setBookmark)
-                    {
-                        var capturedLineNum = i;
-                        var capturedComment = bookmarkComment;
-                        _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
-                        //_ = fx.BeginInvoke(i, bookmarkComment, null, null);
-                    }
-
-                    if (stopTail && _guiStateArgs.FollowTail)
-                    {
-                        var wasFollow = _guiStateArgs.FollowTail;
-                        FollowTailChanged(false, true);
-                        if (firstStopTail && wasFollow)
-                        {
-                            //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                            var capturedLineNum = i;
-                            _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
-                            firstStopTail = false;
-                        }
-                    }
-
-                    if (!suppressLed)
-                    {
-                        noLed = false;
-                    }
-                }
-            }
+            TriggerFilterLineGuiUpdate();
         }
 
         if (!noLed)
