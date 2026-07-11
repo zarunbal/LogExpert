@@ -13,9 +13,76 @@ namespace LogExpert.Persister.Tests;
 [TestFixture]
 public class SessionFileComposerTests
 {
+    #region Fields
+
     private string _testDirectory;
     private string _sessionDirectory;
     private string _logFileName;
+
+    /// <summary>
+    /// Equality is serialize-&amp;-compare: both sides are serialized with deterministic settings
+    /// (reusing the Columnizer/Encoding converters) and compared as strings. Deep by
+    /// construction — a new field automatically joins the comparison.
+    /// </summary>
+    private static readonly JsonSerializerSettings _comparisonSettings = new()
+    {
+        Converters =
+        {
+            new ColumnizerJsonConverter(),
+            new EncodingJsonConverter()
+        },
+        Formatting = Formatting.Indented,
+        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+    };
+
+    /// <summary>
+    /// The named exclusion list (spec, Testing Decisions): fields that legitimately do not
+    /// round-trip. Each entry is justified in the spec's mapping table.
+    /// </summary>
+    private static readonly string[] _namedExclusions =
+    [
+        // Dead fields — written only by the legacy XML reader, applied nowhere:
+        nameof(PersistenceData.BookmarkListPosition),
+        nameof(PersistenceData.BookmarkListVisible),
+        nameof(PersistenceData.ShowBookmarkCommentColumn),
+        nameof(PersistenceData.ColumnizerName),
+        nameof(PersistenceData.SettingsSaveLoadLocation),
+        // Always null in practice — never assigned anywhere in the UI:
+        nameof(PersistenceData.SessionFileName),
+        // Transformed by Persister on SameDir saves after compose — documented, not asserted:
+        nameof(PersistenceData.FileName),
+    ];
+
+    /// <summary>
+    /// Fields the snapshot does not carry YET — this list shrinks to empty in Ticket 2 of the
+    /// composer effort, which maps them. It is not part of the spec's named exclusion list.
+    /// </summary>
+    private static readonly string[] _notYetMappedFields =
+    [
+        nameof(PersistenceData.BookmarkList),
+        nameof(PersistenceData.Columnizer),
+        nameof(PersistenceData.CurrentLine),
+        nameof(PersistenceData.FilterAdvanced),
+        nameof(PersistenceData.FilterParamsList),
+        nameof(PersistenceData.FilterPosition),
+        nameof(PersistenceData.FilterSaveListVisible),
+        nameof(PersistenceData.FilterTabDataList),
+        nameof(PersistenceData.CellSelectMode),
+        nameof(PersistenceData.FirstDisplayedLine),
+        nameof(PersistenceData.HighlightGroupName),
+        nameof(PersistenceData.FilterVisible),
+        nameof(PersistenceData.MultiFile),
+        nameof(PersistenceData.MultiFileMaxDays),
+        nameof(PersistenceData.MultiFileNames),
+        nameof(PersistenceData.MultiFilePattern),
+        nameof(PersistenceData.RowHeightList),
+        nameof(PersistenceData.TabName),
+    ];
+
+    private static readonly string[] _reverseTripExclusions = [.. _namedExclusions, .. _notYetMappedFields];
+
+    #endregion
 
     [SetUp]
     public void Setup ()
@@ -45,22 +112,7 @@ public class SessionFileComposerTests
         }
     }
 
-    /// <summary>
-    /// Equality is serialize-&amp;-compare: both sides are serialized with deterministic settings
-    /// (reusing the Columnizer/Encoding converters) and compared as strings. Deep by
-    /// construction — a new field automatically joins the comparison.
-    /// </summary>
-    private static readonly JsonSerializerSettings _comparisonSettings = new()
-    {
-        Converters =
-        {
-            new ColumnizerJsonConverter(),
-            new EncodingJsonConverter()
-        },
-        Formatting = Formatting.Indented,
-        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-    };
+    #region Helpers and fixtures
 
     private static string SerializeForComparison (object value)
     {
@@ -71,24 +123,59 @@ public class SessionFileComposerTests
     /// Serialize-&amp;-compare with the excluded top-level fields removed from the JSON — used by
     /// the reverse trip, whose exclusions are named and justified, never implicit.
     /// </summary>
-    private static string SerializeExcluding (object value, params string[][] exclusionLists)
+    private static string SerializeExcluding (object value, IReadOnlyCollection<string> excludedProperties)
     {
         var json = Newtonsoft.Json.Linq.JObject.Parse(SerializeForComparison(value));
 
-        foreach (var exclusions in exclusionLists)
+        foreach (var propertyName in excludedProperties)
         {
-            foreach (var propertyName in exclusions)
-            {
-                _ = json.Remove(propertyName);
-            }
+            _ = json.Remove(propertyName);
         }
 
         return json.ToString();
     }
 
     /// <summary>
-    /// The fully-populated snapshot fixture: every property must hold a non-default value (the
-    /// fixture-completeness test enforces this), so every mapped field takes part in every trip.
+    /// Reflects over an instance's public properties and returns the names of those that could
+    /// not prove a mapping exists: a value equal to a freshly-constructed baseline (a dropped
+    /// mapping would leave the construction default standing and every trip would still pass),
+    /// or a null/empty string or collection. The fixture-completeness tests use this so that
+    /// adding a field without extending the fixtures fails immediately.
+    /// </summary>
+    private static List<string> GetUnpopulatedProperties (object instance, IReadOnlyCollection<string> excludedProperties)
+    {
+        var baseline = Activator.CreateInstance(instance.GetType());
+        List<string> unpopulated = [];
+
+        foreach (var property in instance.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (excludedProperties.Contains(property.Name))
+            {
+                continue;
+            }
+
+            var value = property.GetValue(instance);
+            var isUnpopulated = value switch
+            {
+                null => true,
+                string text => text.Length == 0,
+                IEnumerable items => !items.Cast<object>().Any(),
+                _ => value.Equals(property.GetValue(baseline)),
+            };
+
+            if (isUnpopulated)
+            {
+                unpopulated.Add(property.Name);
+            }
+        }
+
+        return unpopulated;
+    }
+
+    /// <summary>
+    /// The fully-populated snapshot fixture: every property must hold a value differing from the
+    /// construction default (the fixture-completeness test enforces this), so every mapped field
+    /// takes part in every trip.
     /// </summary>
     private static SessionSnapshot CreateFullSnapshot ()
     {
@@ -101,16 +188,18 @@ public class SessionFileComposerTests
     }
 
     /// <summary>
-    /// The populated <see cref="PersistenceData"/> fixture. Mapped fields hold non-default
-    /// values; the named-exclusion fields are populated too, so the reverse trip proves the
-    /// exclusion list is load-bearing. Fields not yet carried by the snapshot stay at their
-    /// defaults until Ticket 2 maps them.
+    /// The populated <see cref="PersistenceData"/> fixture. Mapped fields hold values differing
+    /// from the construction defaults; the named-exclusion fields are populated too, so the
+    /// reverse trip proves the exclusion list is load-bearing. Fields not yet carried by the
+    /// snapshot stay at their defaults until Ticket 2 maps them.
     /// </summary>
     private static PersistenceData CreateFullPersistenceData ()
     {
         return new PersistenceData
         {
-            FollowTail = true,
+            // false because PersistenceData's initializer is true: a fixture value equal to the
+            // construction default cannot prove the mapping exists.
+            FollowTail = false,
             Encoding = Encoding.UTF8,
             LineCount = 1234,
             FileName = @"C:\logs\app.log",
@@ -118,85 +207,7 @@ public class SessionFileComposerTests
         };
     }
 
-    /// <summary>
-    /// The named exclusion list (spec, Testing Decisions): fields that legitimately do not
-    /// round-trip. Each entry is justified in the spec's mapping table.
-    /// </summary>
-    private static readonly string[] _namedExclusions =
-    [
-        // Dead fields — written only by the legacy XML reader, applied nowhere:
-        nameof(PersistenceData.BookmarkListPosition),
-        nameof(PersistenceData.BookmarkListVisible),
-        nameof(PersistenceData.ShowBookmarkCommentColumn),
-        nameof(PersistenceData.ColumnizerName),
-        nameof(PersistenceData.SettingsSaveLoadLocation),
-        // Always null in practice — never assigned anywhere in the UI:
-        nameof(PersistenceData.SessionFileName),
-        // Transformed by Persister on SameDir saves after compose — documented, not asserted:
-        nameof(PersistenceData.FileName),
-    ];
-
-    /// <summary>
-    /// Fields the snapshot does not carry YET — this list shrinks to empty in Ticket 2, which
-    /// maps them. It is not part of the spec's named exclusion list.
-    /// </summary>
-    private static readonly string[] _notYetMappedTicket2 =
-    [
-        nameof(PersistenceData.BookmarkList),
-        nameof(PersistenceData.Columnizer),
-        nameof(PersistenceData.CurrentLine),
-        nameof(PersistenceData.FilterAdvanced),
-        nameof(PersistenceData.FilterParamsList),
-        nameof(PersistenceData.FilterPosition),
-        nameof(PersistenceData.FilterSaveListVisible),
-        nameof(PersistenceData.FilterTabDataList),
-        nameof(PersistenceData.CellSelectMode),
-        nameof(PersistenceData.FirstDisplayedLine),
-        nameof(PersistenceData.HighlightGroupName),
-        nameof(PersistenceData.FilterVisible),
-        nameof(PersistenceData.MultiFile),
-        nameof(PersistenceData.MultiFileMaxDays),
-        nameof(PersistenceData.MultiFileNames),
-        nameof(PersistenceData.MultiFilePattern),
-        nameof(PersistenceData.RowHeightList),
-        nameof(PersistenceData.TabName),
-    ];
-
-    /// <summary>
-    /// Reflects over an instance's public properties and returns the names of those still at
-    /// their "unpopulated" value: <c>default(T)</c> for value types, null or empty for strings
-    /// and collections, null for other references. The fixture-completeness tests use this so
-    /// that adding a field without extending the fixtures fails immediately.
-    /// </summary>
-    private static List<string> GetUnpopulatedProperties (object instance, params string[][] exclusionLists)
-    {
-        var excluded = exclusionLists.SelectMany(x => x).ToHashSet();
-        List<string> unpopulated = [];
-
-        foreach (var property in instance.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-        {
-            if (excluded.Contains(property.Name))
-            {
-                continue;
-            }
-
-            var value = property.GetValue(instance);
-            var isUnpopulated = value switch
-            {
-                null => true,
-                string text => text.Length == 0,
-                IEnumerable items => !items.Cast<object>().Any(),
-                _ => property.PropertyType.IsValueType && value.Equals(Activator.CreateInstance(property.PropertyType)),
-            };
-
-            if (isUnpopulated)
-            {
-                unpopulated.Add(property.Name);
-            }
-        }
-
-        return unpopulated;
-    }
+    #endregion
 
     #region Fixture completeness (the regression guard)
 
@@ -204,20 +215,20 @@ public class SessionFileComposerTests
     [Test]
     public void FixtureCompleteness_UnpopulatedSnapshot_IsDetected ()
     {
-        Assert.That(GetUnpopulatedProperties(new SessionSnapshot()), Is.Not.Empty);
+        Assert.That(GetUnpopulatedProperties(new SessionSnapshot(), []), Is.Not.Empty);
     }
 
     [Test]
     public void FixtureCompleteness_SnapshotFixture_LeavesNoPropertyUnpopulated ()
     {
-        Assert.That(GetUnpopulatedProperties(CreateFullSnapshot()), Is.Empty,
+        Assert.That(GetUnpopulatedProperties(CreateFullSnapshot(), []), Is.Empty,
             "Extend CreateFullSnapshot — every SessionSnapshot property must hold a populated value so the round trips exercise it");
     }
 
     [Test]
     public void FixtureCompleteness_PersistenceDataFixture_LeavesNoMappedPropertyUnpopulated ()
     {
-        Assert.That(GetUnpopulatedProperties(CreateFullPersistenceData(), _namedExclusions, _notYetMappedTicket2), Is.Empty,
+        Assert.That(GetUnpopulatedProperties(CreateFullPersistenceData(), _reverseTripExclusions), Is.Empty,
             "Extend CreateFullPersistenceData (or, if the field legitimately never round-trips, justify it on the spec's named exclusion list)");
     }
 
@@ -247,12 +258,12 @@ public class SessionFileComposerTests
         var recomposed = SessionFileComposer.Compose(snapshot);
 
         Assert.That(
-            SerializeExcluding(recomposed, _namedExclusions, _notYetMappedTicket2),
-            Is.EqualTo(SerializeExcluding(original, _namedExclusions, _notYetMappedTicket2)));
+            SerializeExcluding(recomposed, _reverseTripExclusions),
+            Is.EqualTo(SerializeExcluding(original, _reverseTripExclusions)));
     }
 
-    // The composer is pure: composing a session can never change live window state (the
-    // IsFilterTail side effect this seam removes lives at the control's call site now).
+    // The composer is pure: composing a Session File can never change live Log Window state (the
+    // IsFilterTail side effect this seam removes lives at the Log Window's call site now).
     [Test]
     public void Compose_DoesNotMutateTheSnapshot ()
     {
