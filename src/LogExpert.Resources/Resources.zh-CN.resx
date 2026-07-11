@@ -199,6 +199,9 @@
   <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
     <value>在此处冻结左侧列 ({0})</value>
   </data>
+  <data name="LogWindow_UI_StatusLineError_FilterFailed" xml:space="preserve">
+    <value>筛选失败：{0}</value>
+  </data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
     <value>无效的正则表达式</value>
   </data>

@@ -154,7 +154,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private SortedList<int, RowHeightEntry> _rowHeightList = [];
     private int _selectedCol; // set by context menu event for column headers only
     private bool _shouldCallTimeSync;
-    private bool _shouldCancel;
+    /// <summary>Window-lifetime cancellation: per-job token sources link to it, so closing the
+    /// window cancels every running job. Live jobs are also registered in the cancel-handler
+    /// registry, which ESC and reload fan out through.</summary>
+    private readonly CancellationTokenSource _windowCts = new();
     private bool _isClosing; // set once CloseLogWindow starts tearing down; suppresses grid CellValueNeeded callbacks
     private bool _shouldTimestampDisplaySyncingCancel;
     private bool _showAdvanced;
@@ -684,12 +687,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void SelectLineFx (int line, bool triggerSyncCall);
 
-    private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;
-    //private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
     private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
-    private delegate void WriteFilterToTabFinishedFx (FilterPipe pipe, string namePrefix, PersistenceData persistenceData);
 
     private delegate void SetBookmarkFx (int lineNum, string comment);
 
@@ -2662,12 +2662,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var persistFilterParams = data.FilterParams;
             ReInitFilterParams(persistFilterParams);
-            List<int> filterResultList = [];
-            //List<int> lastFilterResultList = new List<int>();
-            List<int> filterHitList = [];
-            Filter(persistFilterParams, filterResultList, _lastFilterLinesList, filterHitList);
+            // Each restored tab runs its own filter with fresh spread history — its content no
+            // longer depends on the window's shared history state at restore time.
+            var filterRun = new SerialFilterEngine().Run(persistFilterParams, new ColumnizerCallback(this), CancellationToken.None);
             FilterPipe pipe = new(persistFilterParams.Clone(), this);
-            WritePipeToTab(pipe, filterResultList, data.PersistenceData.TabName, data.PersistenceData);
+            WritePipeToTab(pipe, [.. filterRun.ResultLines], data.PersistenceData.TabName, data.PersistenceData);
         }
     }
 
@@ -2708,7 +2707,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
 
         _isLoading = true;
-        _shouldCancel = true;
+        FireCancelHandlers(); // reload cancels the jobs of the old content, not the window lifetime
         _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
@@ -2748,7 +2747,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _statusEventArgs.LineCount = 0;
         _statusEventArgs.CurrentLineNum = 0;
         SendStatusLineUpdate();
-        _shouldCancel = true;
+        FireCancelHandlers(); // a dead file may respawn — cancel its jobs, keep the window lifetime
         _searchCts?.Cancel();
         ClearFilterList();
         ClearBookmarkList();
@@ -2941,7 +2940,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineText(string.Empty);
         _logFileReader.FileSizeChanged += OnFileSizeChanged;
         _isLoading = false;
-        _shouldCancel = false;
         dataGridView.SuspendLayout();
         dataGridView.RowCount = _logFileReader.LineCount;
         dataGridView.CurrentCellChanged += OnDataGridViewCurrentCellChanged;
@@ -3170,127 +3168,81 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void CheckFilterAndHighlight (LogEventArgs e)
     {
+        // The Tail trigger path (CONTEXT.md): the one loop that evaluates highlight entries against
+        // newly appended lines. Side-effecting triggers (Audio Alert, Set Bookmark, Stop Tail) fire
+        // here and only here — the bulk scanner (HighlightBookmarkScanner) has no access to them.
+        var doFilter = filterTailCheckBox.Checked || _filterPipeList.Count > 0;
         var noLed = true;
+        var firstStopTail = true;
+        var filterLineAdded = false;
 
-        if (filterTailCheckBox.Checked || _filterPipeList.Count > 0)
+        var startLine = e.PrevLineCount;
+        if (e.IsRollover)
         {
-            var filterStart = e.PrevLineCount;
-            if (e.IsRollover)
+            ShiftFilterLines(e.RolloverOffset);
+            startLine -= e.RolloverOffset;
+        }
+
+        ColumnizerCallback callback = new(this);
+
+        for (var i = startLine; i < e.LineCount; ++i)
+        {
+            var line = _logFileReader.GetLogLineMemory(i);
+            if (line == null)
             {
-                ShiftFilterLines(e.RolloverOffset);
-                filterStart -= e.RolloverOffset;
+                // End of available lines — stop scanning, but still flush the work already done below.
+                break;
             }
 
-            var firstStopTail = true;
-            ColumnizerCallback callback = new(this);
-            var filterLineAdded = false;
-            for (var i = filterStart; i < e.LineCount; ++i)
+            if (doFilter)
             {
-                var line = _logFileReader.GetLogLineMemory(i);
-                if (line == null)
-                {
-                    return;
-                }
-
                 if (filterTailCheckBox.Checked)
                 {
                     callback.SetLineNum(i);
                     if (Util.TestFilterCondition(_filterParams, line, callback))
                     {
-                        //AddFilterLineFx addFx = new AddFilterLineFx(AddFilterLine);
-                        //this.Invoke(addFx, new object[] { i, true });
                         filterLineAdded = true;
-                        AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList, _filterHitList);
+                        AddFilterLine(i, false);
                     }
                 }
 
-                //ProcessFilterPipeFx pipeFx = new ProcessFilterPipeFx(ProcessFilterPipes);
-                //pipeFx.BeginInvoke(i, null, null);
                 ProcessFilterPipes(i);
+            }
 
-                var matchingList = FindMatchingHighlightEntries(line);
-                LaunchHighlightPlugins(matchingList, i);
-                var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
-                SafeTriggerAudioAlert(matchingList);
-                if (setBookmark)
+            var matchingList = FindMatchingHighlightEntries(line);
+            LaunchHighlightPlugins(matchingList, i);
+            var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
+            SafeTriggerAudioAlert(matchingList);
+            if (setBookmark)
+            {
+                var capturedLineNum = i;
+                var capturedComment = bookmarkComment;
+                _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
+            }
+
+            if (stopTail && _guiStateArgs.FollowTail)
+            {
+                FollowTailChanged(false, true);
+
+                // Scroll to the triggering line once per batch, even if follow-tail gets
+                // re-enabled while the batch is still being processed.
+                if (firstStopTail)
                 {
                     var capturedLineNum = i;
-                    var capturedComment = bookmarkComment;
-                    _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
-                }
-
-                if (stopTail && _guiStateArgs.FollowTail)
-                {
-                    var wasFollow = _guiStateArgs.FollowTail;
-                    FollowTailChanged(false, true);
-                    if (firstStopTail && wasFollow)
-                    {
-                        //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                        var capturedLineNum = i;
-                        _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
-                        firstStopTail = false;
-                    }
-                }
-
-                if (!suppressLed)
-                {
-                    noLed = false;
+                    _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
+                    firstStopTail = false;
                 }
             }
 
-            if (filterLineAdded)
+            if (!suppressLed)
             {
-                //AddFilterLineGuiUpdateFx addFx = new AddFilterLineGuiUpdateFx(AddFilterLineGuiUpdate);
-                //this.Invoke(addFx);
-                TriggerFilterLineGuiUpdate();
+                noLed = false;
             }
         }
-        else
+
+        if (filterLineAdded)
         {
-            var firstStopTail = true;
-            var startLine = e.PrevLineCount;
-            if (e.IsRollover)
-            {
-                ShiftFilterLines(e.RolloverOffset);
-                startLine -= e.RolloverOffset;
-            }
-
-            for (var i = startLine; i < e.LineCount; ++i)
-            {
-                var line = _logFileReader.GetLogLineMemory(i);
-                if (line != null)
-                {
-                    var matchingList = FindMatchingHighlightEntries(line);
-                    LaunchHighlightPlugins(matchingList, i);
-                    var (suppressLed, stopTail, setBookmark, bookmarkComment) = HighlightEvaluator.GetTriggerActions(matchingList);
-                    SafeTriggerAudioAlert(matchingList);
-                    if (setBookmark)
-                    {
-                        var capturedLineNum = i;
-                        var capturedComment = bookmarkComment;
-                        _ = BeginInvoke(() => SetBookmarkFromTrigger(capturedLineNum, capturedComment));
-                        //_ = fx.BeginInvoke(i, bookmarkComment, null, null);
-                    }
-
-                    if (stopTail && _guiStateArgs.FollowTail)
-                    {
-                        var wasFollow = _guiStateArgs.FollowTail;
-                        FollowTailChanged(false, true);
-                        if (firstStopTail && wasFollow)
-                        {
-                            //_ = Invoke(new SelectLineFx(SelectAndEnsureVisible), [i, false]);
-                            var capturedLineNum = i;
-                            _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
-                            firstStopTail = false;
-                        }
-                    }
-
-                    if (!suppressLed)
-                    {
-                        noLed = false;
-                    }
-                }
-            }
+            TriggerFilterLineGuiUpdate();
         }
 
         if (!noLed)
@@ -4113,16 +4065,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             _shouldCallTimeSync = triggerSyncCall;
-            var wasCancelled = _shouldCancel;
-            _shouldCancel = false;
-            _isSearching = false;
-            StatusLineText(string.Empty);
-            _guiStateArgs.MenuEnabled = true;
-
-            if (wasCancelled)
-            {
-                return;
-            }
 
             if (lineNum < 0)
             {
@@ -4445,7 +4387,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //ConfigManager.SaveFilterParams(this.filterParams);
         ConfigManager.Settings.FilterParams = _filterParams; // wozu eigentlich? sinnlos seit MDI?
 
-        _shouldCancel = false;
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_FilterSearch_Filtering);
         btnfilterSearch.Enabled = false;
@@ -4457,119 +4398,87 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        var settings = ConfigManager.Settings;
+        IFilterEngine engine = ConfigManager.Settings.Preferences.MultiThreadFilter
+            ? new ParallelFilterEngine()
+            : new SerialFilterEngine();
 
-        FilterFxAction = settings.Preferences.MultiThreadFilter ? MultiThreadedFilter : Filter;
-        var filterFxActionTask = Task.Run(() => FilterFxAction(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList)).ConfigureAwait(false);
+        ColumnizerCallback callback = new(this);
+        var progress = new SynchronousProgress<int>(UpdateProgressBar);
 
-        await filterFxActionTask;
+        // ESC reaches the run through the cancel-handler registry; the engines observe the token.
+        using var filterCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
+        var cancelHandler = new FilterRunCancelHandler(filterCts);
+        OnRegisterCancelHandler(cancelHandler);
+
+        long startTime = Environment.TickCount;
+        FilterRun filterRun;
+        try
+        {
+            filterRun = await Task.Run(() => engine.Run(_filterParams, callback, filterCts.Token, progress)).ConfigureAwait(false);
+        }
+        finally
+        {
+            OnDeRegisterCancelHandler(cancelHandler);
+        }
+
+        long endTime = Environment.TickCount;
+
+        lock (_filterResultList)
+        {
+            _filterHitList.AddRange(filterRun.HitLines);
+            _filterResultList.AddRange(filterRun.ResultLines);
+            _lastFilterLinesList.AddRange(filterRun.History);
+            FilterSpread.TrimHistory(_lastFilterLinesList);
+        }
+
+        // Closing the window cancels the run (linked token), so this continuation also fires
+        // mid-close — with the handle already destroyed, narration and BeginInvoke would throw.
+        // _isClosing (set before the cancel) is the discriminator, NOT IsHandleCreated: a session-
+        // restored background tab runs this with its own handle not yet created, marshaling
+        // through the parent — and must still reach FilterComplete to populate the filter grid.
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing)
+        {
+            return;
+        }
+
+        if (filterRun.Outcome == FilterRunOutcome.Failed)
+        {
+            StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_FilterFailed, filterRun.Error?.Message));
+        }
+        else
+        {
+            StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
+        }
+
         FilterComplete();
 
-        //fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
         //This needs to be invoked, because there is a potential CrossThreadException
         _ = BeginInvoke(CheckForFilterDirty);
     }
 
-    private void MultiThreadedFilter (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
+    /// <summary>Bridges the ESC cancel-handler registry to a filter run's token.</summary>
+    private sealed class FilterRunCancelHandler (CancellationTokenSource cts) : IBackgroundProcessCancelHandler
     {
-        ColumnizerCallback callback = new(this);
-
-        FilterStarter fs = new(callback, Environment.ProcessorCount + 2)
+        public void EscapePressed ()
         {
-            FilterHitList = _filterHitList,
-            FilterResultLines = _filterResultList,
-            LastFilterLinesList = _lastFilterLinesList
-        };
-
-        var cancelHandler = new FilterCancelHandler(fs);
-        OnRegisterCancelHandler(cancelHandler);
-        long startTime = Environment.TickCount;
-
-        fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback).GetAwaiter().GetResult();
-
-        long endTime = Environment.TickCount;
-
-        //_logger.Debug($"Multi threaded filter duration: {endTime - startTime} ms."));
-
-        OnDeRegisterCancelHandler(cancelHandler);
-        StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
-    }
-
-    private void FilterProgressCallback (int lineCount)
-    {
-        UpdateProgressBar(lineCount);
+            cts.Cancel();
+        }
     }
 
     [SupportedOSPlatform("windows")]
-    private void Filter (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
+    private void AddFilterLine (int lineNum, bool immediate)
     {
-        long startTime = Environment.TickCount;
-        try
-        {
-            filterParams.Reset();
-            var lineNum = 0;
-            //AddFilterLineFx addFx = new AddFilterLineFx(AddFilterLine);
-            ColumnizerCallback callback = new(this);
-            while (true)
-            {
-                var line = _logFileReader.GetLogLineMemory(lineNum);
-                if (line == null)
-                {
-                    break;
-                }
-
-                callback.LineNum = lineNum;
-                if (Util.TestFilterCondition(filterParams, line, callback))
-                {
-                    AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
-                }
-
-                lineNum++;
-                if (lineNum % PROGRESS_BAR_MODULO == 0)
-                {
-                    UpdateProgressBar(lineNum);
-                }
-
-                if (_shouldCancel)
-                {
-                    break;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _ = MessageBox.Show(null, string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_Filter_ExceptionWhileFiltering, ex, ex.StackTrace), Resources.LogExpert_Common_UI_Title_Error);
-        }
-
-        long endTime = Environment.TickCount;
-
-        //_logger.Info($"Single threaded filter duration: {endTime - startTime} ms."));
-
-        StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void AddFilterLine (int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
-    {
-        int count;
         lock (_filterResultList)
         {
-            filterHitList.Add(lineNum);
-            var filterResult = FilterSpread.Expand(lineNum, filterParams.SpreadBefore, filterParams.SpreadBehind, _logFileReader.LineCount, lastFilterLinesList);
-            filterResultLines.AddRange(filterResult);
-            count = filterResultLines.Count;
-            lastFilterLinesList.AddRange(filterResult);
-            FilterSpread.TrimHistory(lastFilterLinesList);
+            // Adopts the window's canonical lists per call — ClearFilterList/ShiftFilterLines
+            // replace the instances, so the accumulator must not outlive them.
+            new FilterAccumulator(_filterResultList, _filterHitList, _lastFilterLinesList)
+                .AddHit(lineNum, _filterParams.SpreadBefore, _filterParams.SpreadBehind, _logFileReader.LineCount);
         }
 
         if (immediate)
         {
             TriggerFilterLineGuiUpdate();
-        }
-        else if (lineNum % PROGRESS_BAR_MODULO == 0)
-        {
-            //FunctionWith1IntParam fx = new FunctionWith1IntParam(UpdateFilterCountLabel);
-            //this.Invoke(fx, new object[] { count});
         }
     }
 
@@ -5017,7 +4926,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
         _isSearching = true;
-        _shouldCancel = false;
+
+        // Per-job token, linked to the window's lifetime; ESC reaches it via the registry.
+        using var pipeCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
+        var cancelHandler = new FilterRunCancelHandler(pipeCts);
+        OnRegisterCancelHandler(cancelHandler);
 
         lock (_filterPipeList)
         {
@@ -5029,37 +4942,53 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         pipe.OpenFile();
         LogExpertCallback callback = new(this);
 
-        foreach (var i in lineNumberList)
+        try
         {
-            if (_shouldCancel)
+            foreach (var i in lineNumberList)
             {
-                break;
-            }
+                if (pipeCts.Token.IsCancellationRequested)
+                {
+                    break;
+                }
 
-            var line = _logFileReader.GetLogLineMemory(i);
-            if (CurrentColumnizer is ILogLineMemoryXmlColumnizer)
-            {
-                callback.LineNum = i;
-                line = (CurrentColumnizer as ILogLineMemoryXmlColumnizer).GetLineTextForClipboard(line, callback);
-            }
+                var line = _logFileReader.GetLogLineMemory(i);
+                if (CurrentColumnizer is ILogLineMemoryXmlColumnizer)
+                {
+                    callback.LineNum = i;
+                    line = (CurrentColumnizer as ILogLineMemoryXmlColumnizer).GetLineTextForClipboard(line, callback);
+                }
 
-            _ = pipe.WriteToPipe(line, i);
-            if (++count % PROGRESS_BAR_MODULO == 0)
-            {
-                _progressEventArgs.Value = count;
-                _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
+                _ = pipe.WriteToPipe(line, i);
+                if (++count % PROGRESS_BAR_MODULO == 0)
+                {
+                    _progressEventArgs.Value = count;
+                    _ = Invoke(new MethodInvoker(SendProgressBarUpdate));
+                }
             }
+        }
+        finally
+        {
+            OnDeRegisterCancelHandler(cancelHandler);
         }
 
         pipe.CloseFile();
-        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), pipe, name, persistenceData);
+        var wasCancelled = pipeCts.IsCancellationRequested;
+
+        // Same close-mid-job hazard as the filter run's epilogue: skip the UI finish when the
+        // window went away while writing (_isClosing, not IsHandleCreated — see FilterSearch).
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing)
+        {
+            return;
+        }
+
+        Invoke(() => WriteFilterToTabFinished(pipe, name, persistenceData, wasCancelled));
     }
 
     [SupportedOSPlatform("windows")]
-    private void WriteFilterToTabFinished (FilterPipe pipe, string name, PersistenceData persistenceData)
+    private void WriteFilterToTabFinished (FilterPipe pipe, string name, PersistenceData persistenceData, bool wasCancelled)
     {
         _isSearching = false;
-        if (!_shouldCancel)
+        if (!wasCancelled)
         {
             var title = name;
             ILogLineMemoryColumnizer preProcessColumnizer = null;
@@ -5107,7 +5036,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         pipe.CloseFile();
-        _ = Invoke(new WriteFilterToTabFinishedFx(WriteFilterToTabFinished), [pipe, title, null]);
+        Invoke(() => WriteFilterToTabFinished(pipe, title, null, wasCancelled: false));
     }
 
     [SupportedOSPlatform("windows")]
@@ -5153,17 +5082,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     continue;
                 }
 
-                //long startTime = Environment.TickCount;
                 if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
                 {
-                    var filterResult = FilterSpread.Expand(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount, pipe.LastLinesHistoryList);
+                    // Adopts the pipe's history; result/hit lists are not tracked per pipe.
+                    var filterResult = new FilterAccumulator([], [], pipe.LastLinesHistoryList)
+                        .AddHit(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount);
                     pipe.OpenFile();
 
                     foreach (var line in filterResult)
                     {
-                        pipe.LastLinesHistoryList.Add(line);
-                        FilterSpread.TrimHistory(pipe.LastLinesHistoryList);
-
                         var textLine = _logFileReader.GetLogLineMemory(line);
                         var fileOk = pipe.WriteToPipe(textLine, line);
                         if (!fileOk)
@@ -5174,9 +5101,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     pipe.CloseFile();
                 }
-
-                //long endTime = Environment.TickCount;
-                //_logger.logDebug("ProcessFilterPipes(" + lineNum + ") duration: " + ((endTime - startTime)));
             }
         }
 
@@ -5465,9 +5389,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         List<PatternBlock> blockList = [];
         var blockId = 0;
         _isSearching = true;
-        _shouldCancel = false;
+
+        // Per-job token, linked to the window's lifetime; ESC reaches it via the registry.
+        using var patternCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
+        var cancelHandler = new FilterRunCancelHandler(patternCts);
+        OnRegisterCancelHandler(cancelHandler);
+        var cancellationToken = patternCts.Token;
+
         var searchLine = -1;
-        for (var i = beginLine; i < num && !_shouldCancel; ++i)
+        for (var i = beginLine; i < num && !cancellationToken.IsCancellationRequested; ++i)
         {
             if (processedLinesDict.ContainsKey(i))
             {
@@ -5481,14 +5411,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             //bool firstBlock = true;
             searchLine++;
             UpdateProgressBar(searchLine);
-            while (!_shouldCancel &&
+            while (!cancellationToken.IsCancellationRequested &&
                    (block =
                        DetectBlock(i,
                                    searchLine,
                                    maxBlockLen,
                                    _patternArgs.MaxDiffInBlock,
                                    _patternArgs.MaxMisses,
-                                   processedLinesDict)
+                                   processedLinesDict,
+                                   cancellationToken)
                    ) != null)
             {
                 //_logger.Debug($"Found block: {block}");
@@ -5527,6 +5458,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             blockId++;
         }
 
+        OnDeRegisterCancelHandler(cancelHandler);
         _isSearching = false;
         _progressEventArgs.MinValue = 0;
         _progressEventArgs.MaxValue = 0;
@@ -5567,7 +5499,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     //    return null;
     //}
 
-    private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict)
+    private PatternBlock DetectBlock (int startNum, int startLineToSearch, int maxBlockLen, int maxDiffInBlock, int maxMisses, Dictionary<int, int> processedLinesDict, CancellationToken cancellationToken)
     {
         var targetLine = FindSimilarLine(startNum, startLineToSearch, processedLinesDict);
         if (targetLine == -1)
@@ -5592,7 +5524,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         };
         block.QualityInfoList[targetLine] = qi;
 
-        while (!_shouldCancel)
+        while (!cancellationToken.IsCancellationRequested)
         {
             srcLine++;
             len++;
@@ -6428,8 +6360,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StopTimespreadThread();
         StopTimestampSyncThread();
         StopLogEventWorkerThread();
-        _shouldCancel = true;
+        _windowCts.Cancel(); // window lifetime ends: every linked job token cancels
         _searchCts?.Cancel();
+
+        // Jobs cancelled by the close skip their UI epilogues (the handle is going away), so the
+        // closing window clears the shared status line and progress bar itself, while its events
+        // are still wired to the parent.
+        StatusLineText(string.Empty);
+        _progressEventArgs.Visible = false;
+        _progressEventArgs.Value = _progressEventArgs.MaxValue;
+        SendProgressBarUpdate();
 
         if (_logFileReader != null)
         {
@@ -6930,7 +6870,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _currentSearchParams = searchParams; // remember for async "not found" messages
 
         _isSearching = true;
-        _shouldCancel = false; // shared flag: SelectLine's cancel gate and the filter loops read it
         StatusLineText(Resources.LogWindow_UI_StatusLineText_SearchingPressESCToCancel);
 
         _progressEventArgs.MinValue = 0;
@@ -6939,13 +6878,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        // Replace the token source only after a consumed cancellation (mirrors the old
-        // _shouldCancel = false reset); a still-running previous search keeps sharing it,
-        // so one ESC cancels every running search.
+        // Replace the token source only after a consumed cancellation; a still-running previous
+        // search keeps sharing it, so one ESC cancels every running search.
         if (_searchCts == null || _searchCts.IsCancellationRequested)
         {
             _searchCts?.Dispose();
-            _searchCts = new CancellationTokenSource();
+            _searchCts = CancellationTokenSource.CreateLinkedTokenSource(_windowCts.Token);
         }
 
         var cancellationToken = _searchCts.Token;
@@ -6969,12 +6907,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _ = Invoke(new MethodInvoker(ResetProgressBar));
             var result = task.Result;
+            _isSearching = false; // was SelectLine's job when it doubled as the search epilogue
             _guiStateArgs.MenuEnabled = true;
             GuiStateUpdate(this, _guiStateArgs);
 
             switch (result.Outcome)
             {
                 case SearchOutcome.Found:
+                    StatusLineText(string.Empty);
                     _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), result.LineNumber, true);
                     break;
 
@@ -7058,7 +6998,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     if (_isSearching)
                     {
-                        _shouldCancel = true; // shared flag: filter loops and SelectLine's cancel gate read it
                         _searchCts?.Cancel();
                     }
 

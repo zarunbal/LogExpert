@@ -527,6 +527,9 @@
   <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
 		<value>Nicht gefunden: {0}</value>
 	</data>
+  <data name="LogWindow_UI_StatusLineError_FilterFailed" xml:space="preserve">
+		<value>Filter fehlgeschlagen: {0}</value>
+	</data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
 		<value>Ungültige Regular Expression</value>
 	</data>
