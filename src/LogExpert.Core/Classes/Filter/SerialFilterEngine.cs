@@ -83,7 +83,7 @@ public class SerialFilterEngine : IFilterEngine
             error);
     }
 
-    private static List<int> Normalize (List<int> lines)
+    private static List<int> Normalize (IList<int> lines)
     {
         var normalized = new List<int>(new SortedSet<int>(lines));
         return normalized;

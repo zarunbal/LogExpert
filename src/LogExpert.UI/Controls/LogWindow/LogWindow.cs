@@ -3201,7 +3201,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     if (Util.TestFilterCondition(_filterParams, line, callback))
                     {
                         filterLineAdded = true;
-                        AddFilterLine(i, false, _filterParams, _filterResultList, _lastFilterLinesList, _filterHitList);
+                        AddFilterLine(i, false);
                     }
                 }
 
@@ -4464,27 +4464,19 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
-    private void AddFilterLine (int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
+    private void AddFilterLine (int lineNum, bool immediate)
     {
-        int count;
         lock (_filterResultList)
         {
-            filterHitList.Add(lineNum);
-            var filterResult = FilterSpread.Expand(lineNum, filterParams.SpreadBefore, filterParams.SpreadBehind, _logFileReader.LineCount, lastFilterLinesList);
-            filterResultLines.AddRange(filterResult);
-            count = filterResultLines.Count;
-            lastFilterLinesList.AddRange(filterResult);
-            FilterSpread.TrimHistory(lastFilterLinesList);
+            // Adopts the window's canonical lists per call — ClearFilterList/ShiftFilterLines
+            // replace the instances, so the accumulator must not outlive them.
+            new FilterAccumulator(_filterResultList, _filterHitList, _lastFilterLinesList)
+                .AddHit(lineNum, _filterParams.SpreadBefore, _filterParams.SpreadBehind, _logFileReader.LineCount);
         }
 
         if (immediate)
         {
             TriggerFilterLineGuiUpdate();
-        }
-        else if (lineNum % PROGRESS_BAR_MODULO == 0)
-        {
-            //FunctionWith1IntParam fx = new FunctionWith1IntParam(UpdateFilterCountLabel);
-            //this.Invoke(fx, new object[] { count});
         }
     }
 
@@ -5068,17 +5060,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     continue;
                 }
 
-                //long startTime = Environment.TickCount;
                 if (Util.TestFilterCondition(pipe.FilterParams, searchLine, callback))
                 {
-                    var filterResult = FilterSpread.Expand(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount, pipe.LastLinesHistoryList);
+                    // Adopts the pipe's history; result/hit lists are not tracked per pipe.
+                    var filterResult = new FilterAccumulator([], [], pipe.LastLinesHistoryList)
+                        .AddHit(lineNum, pipe.FilterParams.SpreadBefore, pipe.FilterParams.SpreadBehind, _logFileReader.LineCount);
                     pipe.OpenFile();
 
                     foreach (var line in filterResult)
                     {
-                        pipe.LastLinesHistoryList.Add(line);
-                        FilterSpread.TrimHistory(pipe.LastLinesHistoryList);
-
                         var textLine = _logFileReader.GetLogLineMemory(line);
                         var fileOk = pipe.WriteToPipe(textLine, line);
                         if (!fileOk)
@@ -5089,9 +5079,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
                     pipe.CloseFile();
                 }
-
-                //long endTime = Environment.TickCount;
-                //_logger.logDebug("ProcessFilterPipes(" + lineNum + ") duration: " + ((endTime - startTime)));
             }
         }
 

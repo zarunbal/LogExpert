@@ -13,6 +13,30 @@ public class FilterAccumulatorTests
     /// <see cref="FilterSpreadTests"/>' accumulation-recipe guard: hits 5, 7 and 50 with
     /// spread 2/2 in a 100-line file.
     /// </summary>
+    /// <summary>
+    /// The tail filter path continues a full run: the accumulator adopts the window's canonical
+    /// lists, so a history seeded by the run (here: the run already emitted 3..7 for a hit at 5)
+    /// dedups subsequent tail hits exactly as if one accumulation had never stopped.
+    /// </summary>
+    [Test]
+    public void AdoptedLists_HistorySeededByFullRun_DedupsContinuationHits ()
+    {
+        List<int> resultLines = [3, 4, 5, 6, 7];
+        List<int> hitLines = [5];
+        List<int> history = [3, 4, 5, 6, 7];
+        var accumulator = new FilterAccumulator(resultLines, hitLines, history);
+
+        var expansion = accumulator.AddHit(7, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
+
+        Assert.Multiple(() =>
+        {
+            // Hit 7 contributes only 8,9 — 5..7 were already taken by the seeded run.
+            Assert.That(expansion, Is.EqualTo(new[] { 8, 9 }), "AddHit returns the hit's expansion (Filter Pipes write it out)");
+            Assert.That(resultLines, Is.EqualTo(new[] { 3, 4, 5, 6, 7, 8, 9 }), "the adopted list instance is the accumulator's state");
+            Assert.That(hitLines, Is.EqualTo(new[] { 5, 7 }));
+        });
+    }
+
     [Test]
     public void AddHit_OverlappingHitSequence_ProducesPinnedResultHitAndHistoryLists ()
     {
