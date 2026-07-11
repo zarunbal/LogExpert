@@ -24,6 +24,32 @@ public static class SessionFileComposer
             FollowTail = snapshot.FollowTail,
             Encoding = snapshot.Encoding,
             LineCount = snapshot.LineCount,
+            CurrentLine = snapshot.CurrentLine,
+            FirstDisplayedLine = snapshot.FirstDisplayedLine,
+            FilterPosition = snapshot.FilterPosition,
+            FilterVisible = snapshot.FilterVisible,
+            FilterAdvanced = snapshot.FilterAdvanced,
+            CellSelectMode = snapshot.CellSelectMode,
+            FilterSaveListVisible = snapshot.FilterSaveListVisible,
+            MultiFile = snapshot.MultiFile,
+            MultiFileMaxDays = snapshot.MultiFileMaxDays,
+            MultiFilePattern = snapshot.MultiFilePattern,
+            TabName = snapshot.TabName,
+            HighlightGroupName = snapshot.HighlightGroupName,
+            FileName = snapshot.FileName,
+            BookmarkList = snapshot.BookmarkList,
+            RowHeightList = snapshot.RowHeightList,
+            MultiFileNames = snapshot.MultiFileNames,
+            FilterParamsList = snapshot.FilterParamsList,
+            Columnizer = snapshot.Columnizer,
+            FilterTabDataList =
+            [
+                .. snapshot.FilterTabs.Select(tab => new FilterTabData
+                {
+                    FilterParams = tab.FilterParams,
+                    PersistenceData = Compose(tab.Snapshot),
+                }),
+            ],
         };
     }
 
@@ -40,6 +66,32 @@ public static class SessionFileComposer
             FollowTail = persistenceData.FollowTail,
             Encoding = persistenceData.Encoding,
             LineCount = persistenceData.LineCount,
+            CurrentLine = persistenceData.CurrentLine,
+            FirstDisplayedLine = persistenceData.FirstDisplayedLine,
+            FilterPosition = persistenceData.FilterPosition,
+            FilterVisible = persistenceData.FilterVisible,
+            FilterAdvanced = persistenceData.FilterAdvanced,
+            CellSelectMode = persistenceData.CellSelectMode,
+            FilterSaveListVisible = persistenceData.FilterSaveListVisible,
+            MultiFile = persistenceData.MultiFile,
+            MultiFileMaxDays = persistenceData.MultiFileMaxDays,
+            MultiFilePattern = persistenceData.MultiFilePattern,
+            TabName = persistenceData.TabName,
+            HighlightGroupName = persistenceData.HighlightGroupName,
+            FileName = persistenceData.FileName,
+            BookmarkList = persistenceData.BookmarkList,
+            RowHeightList = persistenceData.RowHeightList,
+            MultiFileNames = persistenceData.MultiFileNames,
+            FilterParamsList = persistenceData.FilterParamsList,
+            Columnizer = persistenceData.Columnizer,
+            FilterTabs =
+            [
+                .. persistenceData.FilterTabDataList.Select(tab => new FilterTabSnapshot
+                {
+                    FilterParams = tab.FilterParams,
+                    Snapshot = Decompose(tab.PersistenceData),
+                }),
+            ],
         };
     }
 

@@ -2,9 +2,11 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 
+using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.JsonConverters;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
+using LogExpert.Core.Entities;
 
 using Newtonsoft.Json;
 
@@ -54,33 +56,6 @@ public class SessionFileComposerTests
         nameof(PersistenceData.FileName),
     ];
 
-    /// <summary>
-    /// Fields the snapshot does not carry YET — this list shrinks to empty in Ticket 2 of the
-    /// composer effort, which maps them. It is not part of the spec's named exclusion list.
-    /// </summary>
-    private static readonly string[] _notYetMappedFields =
-    [
-        nameof(PersistenceData.BookmarkList),
-        nameof(PersistenceData.Columnizer),
-        nameof(PersistenceData.CurrentLine),
-        nameof(PersistenceData.FilterAdvanced),
-        nameof(PersistenceData.FilterParamsList),
-        nameof(PersistenceData.FilterPosition),
-        nameof(PersistenceData.FilterSaveListVisible),
-        nameof(PersistenceData.FilterTabDataList),
-        nameof(PersistenceData.CellSelectMode),
-        nameof(PersistenceData.FirstDisplayedLine),
-        nameof(PersistenceData.HighlightGroupName),
-        nameof(PersistenceData.FilterVisible),
-        nameof(PersistenceData.MultiFile),
-        nameof(PersistenceData.MultiFileMaxDays),
-        nameof(PersistenceData.MultiFileNames),
-        nameof(PersistenceData.MultiFilePattern),
-        nameof(PersistenceData.RowHeightList),
-        nameof(PersistenceData.TabName),
-    ];
-
-    private static readonly string[] _reverseTripExclusions = [.. _namedExclusions, .. _notYetMappedFields];
 
     #endregion
 
@@ -175,25 +150,84 @@ public class SessionFileComposerTests
     /// <summary>
     /// The fully-populated snapshot fixture: every property must hold a value differing from the
     /// construction default (the fixture-completeness test enforces this), so every mapped field
-    /// takes part in every trip.
+    /// takes part in every trip. Carries <paramref name="filterTabDepth"/> levels of fully
+    /// populated Filter Pipe children, so the round trips cover the recursion (the spec requires
+    /// at least two).
     /// </summary>
-    private static SessionSnapshot CreateFullSnapshot ()
+    private static SessionSnapshot CreateFullSnapshot (int filterTabDepth = 2)
     {
         return new SessionSnapshot
         {
             FollowTail = true,
             Encoding = Encoding.UTF8,
             LineCount = 1234,
+            CurrentLine = 42,
+            FirstDisplayedLine = 17,
+            FilterPosition = 333,
+            FilterVisible = true,
+            FilterAdvanced = true,
+            CellSelectMode = true,
+            FilterSaveListVisible = true,
+            MultiFile = true,
+            MultiFileMaxDays = 7,
+            MultiFilePattern = "app*.log",
+            TabName = "My Tab",
+            HighlightGroupName = "Errors",
+            FileName = @"C:\logs\app.log",
+            BookmarkList = new SortedList<int, Bookmark> { [5] = new Bookmark(5, "a manual bookmark") },
+            RowHeightList = new SortedList<int, RowHeightEntry> { [3] = new RowHeightEntry(3, 60) },
+            MultiFileNames = ["app.1.log", "app.2.log"],
+            FilterParamsList = [CreateFilterParams("ERROR")],
+            Columnizer = new DefaultLogfileColumnizer(),
+            FilterTabs = filterTabDepth > 0
+                ?
+                [
+                    new FilterTabSnapshot
+                    {
+                        FilterParams = CreateFilterParams($"WARN depth {filterTabDepth}"),
+                        Snapshot = CreateFullSnapshot(filterTabDepth - 1),
+                    }
+                ]
+                : [],
+        };
+    }
+
+    private static FilterParams CreateFilterParams (string searchText)
+    {
+        return new FilterParams
+        {
+            SearchText = searchText,
+            IsCaseSensitive = true,
+            IsRegex = true,
+            SpreadBefore = 1,
+            SpreadBehind = 2,
         };
     }
 
     /// <summary>
-    /// The populated <see cref="PersistenceData"/> fixture. Mapped fields hold values differing
-    /// from the construction defaults; the named-exclusion fields are populated too, so the
-    /// reverse trip proves the exclusion list is load-bearing. Fields not yet carried by the
-    /// snapshot stay at their defaults until Ticket 2 maps them.
+    /// The populated <see cref="PersistenceData"/> fixture. Every carried field holds a value
+    /// differing from the construction defaults (the fixture-completeness test enforces this),
+    /// and the named-exclusion fields are populated on top, so the reverse trip proves the
+    /// exclusion list is load-bearing. Children carry only mapped fields — the exclusion
+    /// stripping is top-level by design, so nothing excluded may hide in the tree.
     /// </summary>
     private static PersistenceData CreateFullPersistenceData ()
+    {
+        var data = CreateCarriedPersistenceData(filterTabDepth: 2);
+
+        data.SessionFileName = "legacy-never-set.lxp";
+        data.BookmarkListPosition = 999;
+        data.BookmarkListVisible = true;
+        data.ShowBookmarkCommentColumn = true;
+#pragma warning disable CS0618 // populated deliberately: the exclusion list must be load-bearing
+        data.ColumnizerName = "legacy XML columnizer name";
+#pragma warning restore CS0618
+        data.SettingsSaveLoadLocation = "legacy save location";
+
+        return data;
+    }
+
+    private static PersistenceData CreateCarriedPersistenceData (int filterTabDepth)
     {
         return new PersistenceData
         {
@@ -202,8 +236,34 @@ public class SessionFileComposerTests
             FollowTail = false,
             Encoding = Encoding.UTF8,
             LineCount = 1234,
+            CurrentLine = 42,
+            FirstDisplayedLine = 17,
+            FilterPosition = 333,
+            FilterVisible = true,
+            FilterAdvanced = true,
+            CellSelectMode = true,
+            FilterSaveListVisible = true,
+            MultiFile = true,
+            MultiFileMaxDays = 7,
+            MultiFilePattern = "app*.log",
+            TabName = "My Tab",
+            HighlightGroupName = "Errors",
             FileName = @"C:\logs\app.log",
-            SessionFileName = "legacy-never-set.lxp",
+            BookmarkList = new SortedList<int, Bookmark> { [5] = new Bookmark(5, "a manual bookmark") },
+            RowHeightList = new SortedList<int, RowHeightEntry> { [3] = new RowHeightEntry(3, 60) },
+            MultiFileNames = ["app.1.log", "app.2.log"],
+            FilterParamsList = [CreateFilterParams("ERROR")],
+            Columnizer = new DefaultLogfileColumnizer(),
+            FilterTabDataList = filterTabDepth > 0
+                ?
+                [
+                    new FilterTabData
+                    {
+                        FilterParams = CreateFilterParams($"WARN depth {filterTabDepth}"),
+                        PersistenceData = CreateCarriedPersistenceData(filterTabDepth - 1),
+                    }
+                ]
+                : [],
         };
     }
 
@@ -228,7 +288,7 @@ public class SessionFileComposerTests
     [Test]
     public void FixtureCompleteness_PersistenceDataFixture_LeavesNoMappedPropertyUnpopulated ()
     {
-        Assert.That(GetUnpopulatedProperties(CreateFullPersistenceData(), _reverseTripExclusions), Is.Empty,
+        Assert.That(GetUnpopulatedProperties(CreateFullPersistenceData(), _namedExclusions), Is.Empty,
             "Extend CreateFullPersistenceData (or, if the field legitimately never round-trips, justify it on the spec's named exclusion list)");
     }
 
@@ -258,8 +318,8 @@ public class SessionFileComposerTests
         var recomposed = SessionFileComposer.Compose(snapshot);
 
         Assert.That(
-            SerializeExcluding(recomposed, _reverseTripExclusions),
-            Is.EqualTo(SerializeExcluding(original, _reverseTripExclusions)));
+            SerializeExcluding(recomposed, _namedExclusions),
+            Is.EqualTo(SerializeExcluding(original, _namedExclusions)));
     }
 
     // The composer is pure: composing a Session File can never change live Log Window state (the
@@ -305,6 +365,33 @@ public class SessionFileComposerTests
 
         Assert.That(File.Exists(savedFileName), Is.True, "The .lxp must actually have been written");
         Assert.That(SerializeForComparison(roundTripped), Is.EqualTo(SerializeForComparison(snapshot)));
+    }
+
+    #endregion
+
+    #region Omitted fields (the ✖ rows of the mapping table)
+
+    // The snapshot does not carry the dead fields or SessionFileName, so Compose must leave them
+    // at their construction defaults — the .lxp on-disk shape stays unchanged. (Decompose
+    // ignoring them is structural: the snapshot has no such properties.) The reverse trip strips
+    // these fields, so only this test would catch Compose writing into them.
+    [Test]
+    public void Compose_LeavesOmittedFieldsAtConstructionDefaults ()
+    {
+        var composed = SessionFileComposer.Compose(CreateFullSnapshot());
+        var defaults = new PersistenceData();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(composed.SessionFileName, Is.EqualTo(defaults.SessionFileName));
+            Assert.That(composed.BookmarkListPosition, Is.EqualTo(defaults.BookmarkListPosition));
+            Assert.That(composed.BookmarkListVisible, Is.EqualTo(defaults.BookmarkListVisible));
+            Assert.That(composed.ShowBookmarkCommentColumn, Is.EqualTo(defaults.ShowBookmarkCommentColumn));
+#pragma warning disable CS0618 // asserting the obsolete field stays at its default is the point
+            Assert.That(composed.ColumnizerName, Is.EqualTo(defaults.ColumnizerName));
+#pragma warning restore CS0618
+            Assert.That(composed.SettingsSaveLoadLocation, Is.EqualTo(defaults.SettingsSaveLoadLocation));
+        });
     }
 
     #endregion

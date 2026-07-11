@@ -123,17 +123,19 @@ public interface ILogWindow
     void SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll);
 
     /// <summary>
-    /// Gets the persistence data for this log window, which can be saved and later restored.
+    /// Gathers a Session Snapshot of this log window's persistable state, including recursive
+    /// child snapshots for its filter pipe tabs.
     /// </summary>
     /// <returns>
-    /// A <see cref="PersistenceData"/> object containing the current state of the window,
-    /// including the current line, filters, columnizer configuration, and other settings.
+    /// A <see cref="SessionSnapshot"/> capturing the current state of the window: current line,
+    /// filters, columnizer configuration, and other settings.
     /// </returns>
     /// <remarks>
-    /// This data is used to restore the log window state between sessions, including
-    /// the current scroll position, active filters, and columnizer settings.
+    /// The snapshot is mapped to the Session File's serialized form by
+    /// <see cref="SessionFileComposer"/> and applied back in two phases when a session is
+    /// loaded.
     /// </remarks>
-    PersistenceData GetPersistenceData ();
+    SessionSnapshot GatherSessionSnapshot ();
 
     /// <summary>
     /// Creates a new temporary file tab with the specified content.
