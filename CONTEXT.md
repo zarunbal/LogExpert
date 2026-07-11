@@ -16,9 +16,12 @@ meaning; do not redefine them locally.
 - **Action Entry** (`ActionEntry`) — Plugin name + parameters bound to the
   Plugin trigger of a Highlight Entry.
 - **Tail trigger path** — The single code path in `LogWindow.CheckFilterAndHighlight`
-  that evaluates highlight entries against *newly appended* lines. Triggers
-  that have user-perceivable side effects (currently: Audio Alert) fire **only**
-  on this path; bulk/scanner paths intentionally skip them.
+  (one unified loop since the Filter Engine extraction) that evaluates
+  highlight entries against *newly appended* lines. Triggers that have
+  user-perceivable side effects (currently: Audio Alert) fire **only** on
+  this path; bulk/scanner paths intentionally skip them — enforced by
+  construction, since the bulk `HighlightBookmarkScanner` has no access to
+  the side-effecting triggers.
 
 ## Audio alerts
 
@@ -88,6 +91,25 @@ bare "session file" when you mean the workspace (that's a **Session**).
 
 ## Filtering
 
+- **Filter Engine** (`IFilterEngine`) — A Core module that executes one full
+  **Filter Run** over a log file. Two engines implement the seam — the
+  **Serial** and the **Parallel** engine (`SerialFilterEngine`,
+  `ParallelFilterEngine`, the latter wrapping `FilterStarter`'s
+  chunk-and-merge) — selected by the `MultiThreadFilter` preference and held
+  to an identical, equivalence-test-pinned contract: sorted-ascending
+  duplicate-free output, `FilterParams` and line count snapshotted at entry,
+  failures and cancellation narrated as outcomes, never thrown or shown by
+  the engine.
+- **Filter Run** (`FilterRun`) — One execution of a Filter Engine and its
+  result: result lines, hit lines, the spread history (handed to the tail
+  path to continue from), and an outcome — Completed, Cancelled (partial
+  lists stand), or Failed (carries the exception; the Log Window narrates it
+  on the status line).
+- **Filter Accumulator** (`FilterAccumulator`) — The single owner of the
+  per-hit accumulation recipe (hit → spread expansion → append to
+  results/history → trim history). Used inside the Serial engine, per line by
+  the Log Window's tail filter path, and per hit by Filter Pipes — all three
+  adopt existing lists, so a Filter Run's history is continued in place.
 - **Filter Spread** — Context expansion around a filter hit: **Back Spread**
   (`FilterParams.SpreadBefore`) lines before and **Fore Spread**
   (`FilterParams.SpreadBehind`) lines after the hit are included in the
@@ -102,7 +124,9 @@ bare "session file" when you mean the workspace (that's a **Session**).
 
 *Avoid*: "spread" alone when ambiguous (say **Back Spread** / **Fore
 Spread**), "additional filter results" (the old internal name — use
-**Filter Spread**).
+**Filter Spread**), "multi-threaded filter" as a concept name (it is a
+preference selecting the Parallel **Filter Engine**), "FilterFx" (legacy
+delegate name, deleted).
 
 ## Log Search
 
