@@ -1,0 +1,58 @@
+namespace LogExpert.Core.Classes.Persister;
+
+/// <summary>
+/// Pure mapping between a <see cref="SessionSnapshot"/> and the Session File's serialized form
+/// (<see cref="PersistenceData"/>), in both directions, plus the Rollover staleness rule.
+/// No I/O, no UI, no side effects — the control owns gathering, applying, timing, and error
+/// display; <see cref="Persister"/> owns serialization. Field-by-field contract:
+/// docs/specs/session-file-composer.md.
+/// </summary>
+public static class SessionFileComposer
+{
+    /// <summary>
+    /// Maps a snapshot to the Session File's serialized form. Fields the snapshot does not carry
+    /// (the dead fields and <c>SessionFileName</c> named in the spec) are left at their type
+    /// defaults. Note: <see cref="Persister"/> rewrites <c>FileName</c> on SameDir saves *after*
+    /// compose — transformed by design, outside this contract.
+    /// </summary>
+    public static PersistenceData Compose (SessionSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        return new PersistenceData
+        {
+            FollowTail = snapshot.FollowTail,
+            Encoding = snapshot.Encoding,
+            LineCount = snapshot.LineCount,
+        };
+    }
+
+    /// <summary>
+    /// Maps a loaded Session File back to a snapshot. Fields the snapshot does not carry are
+    /// ignored.
+    /// </summary>
+    public static SessionSnapshot Decompose (PersistenceData persistenceData)
+    {
+        ArgumentNullException.ThrowIfNull(persistenceData);
+
+        return new SessionSnapshot
+        {
+            FollowTail = persistenceData.FollowTail,
+            Encoding = persistenceData.Encoding,
+            LineCount = persistenceData.LineCount,
+        };
+    }
+
+    /// <summary>
+    /// Declares a snapshot stale because it was saved against a longer file than the one on disk
+    /// — i.e. the log file has rolled over since the save. A stale snapshot's post-load state
+    /// (bookmarks, scroll, filters) must be discarded by the control; the pre-load options still
+    /// apply.
+    /// </summary>
+    public static bool IsStale (SessionSnapshot snapshot, int currentLineCount)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        return snapshot.LineCount > currentLineCount;
+    }
+}
