@@ -58,10 +58,30 @@ meaning; do not redefine them locally.
   field of a Session File is one of several sources that can be selected
   by **Columnizer Selection Priority**; the other fields always load when
   the Session File exists.
+- **Session Snapshot** (`SessionSnapshot`) — A neutral, UI-free capture of
+  one Log Window's persistable state. Gathered by the Log Window when a
+  Session File is saved and applied back in two phases when one is loaded
+  (pre-load: options like encoding, multi-file, columnizer, panel layout;
+  post-load: content-dependent state like bookmarks, scroll position,
+  filters). Recursive: carries a child snapshot per filter-pipe tab.
+- **Session File Composer** (`SessionFileComposer`) — The pure Core module
+  beside `Persister` that owns the field mapping between a Session
+  Snapshot and a Session File's serialized form, in both directions
+  (compose on save, decompose on load), plus the Rollover staleness rule.
+  It never does I/O, shows UI, or has side effects; the Log Window owns
+  gathering, applying, timing, and error display.
+- **Rollover staleness rule** — The predicate declaring a Session Snapshot
+  stale because it was saved against a longer file than the one on disk
+  (the saved line count exceeds the current one) — i.e. the log file has
+  rolled over since the save. A stale snapshot's post-load state
+  (bookmarks, scroll, filters) is discarded; the pre-load options still
+  apply. Owned by the Session File Composer.
 
 *Avoid*: "project" / "project file" / "workspace" (use **Session**),
 "persistence file" / "per-file persistence" (use **Session File**),
-bare "session file" when you mean the workspace (that's a **Session**).
+bare "session file" when you mean the workspace (that's a **Session**),
+"options-only load" (a Session File is always read whole; the options/full
+split is two *apply phases* of the **Session Snapshot**, not a partial read).
 
 ## Control character display
 
@@ -239,9 +259,8 @@ _Avoid_: Stdout pipe, output redirect
 _Avoid_: Toolbar, tool strip
 
 ### Sessions & Persistence
- 
-**Session File**: A `.lxj` file that stores the list of log files, per-file settings, and the dock layout for a Session.
-_Avoid_: Project file, config file
 
-**Session File Reference** (`.lxp`): An indirection file that maps to one or more actual log files, allowing a Session to track a logical source rather than a fixed path.
-_Avoid_: Log pointer, alias
+Defined in the **Sessions** section above: **Session** = `.lxj` (workspace),
+**Session File** = `.lxp` (per-file state) — see also the flagged-ambiguity
+resolution. (This section previously redefined both terms the pre-resolution
+way; removed 2026-07-11.)
