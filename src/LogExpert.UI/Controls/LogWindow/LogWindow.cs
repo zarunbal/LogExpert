@@ -3222,9 +3222,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (stopTail && _guiStateArgs.FollowTail)
             {
-                var wasFollow = _guiStateArgs.FollowTail;
                 FollowTailChanged(false, true);
-                if (firstStopTail && wasFollow)
+
+                // Scroll to the triggering line once per batch, even if follow-tail gets
+                // re-enabled while the batch is still being processed.
+                if (firstStopTail)
                 {
                     var capturedLineNum = i;
                     _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
