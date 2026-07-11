@@ -4429,6 +4429,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             FilterSpread.TrimHistory(_lastFilterLinesList);
         }
 
+        // Closing the window cancels the run (linked token), so this continuation also fires
+        // mid-close — with the handle already destroyed, narration and BeginInvoke would throw.
+        if (IsDisposed || Disposing || _waitingForClose || !IsHandleCreated)
+        {
+            return;
+        }
+
         if (filterRun.Outcome == FilterRunOutcome.Failed)
         {
             StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_FilterFailed, filterRun.Error?.Message));
@@ -4961,6 +4968,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         pipe.CloseFile();
         var wasCancelled = pipeCts.IsCancellationRequested;
+
+        // Same close-mid-job hazard as the filter run's epilogue: skip the UI finish when the
+        // window went away while writing.
+        if (IsDisposed || Disposing || _waitingForClose || !IsHandleCreated)
+        {
+            return;
+        }
+
         Invoke(() => WriteFilterToTabFinished(pipe, name, persistenceData, wasCancelled));
     }
 
