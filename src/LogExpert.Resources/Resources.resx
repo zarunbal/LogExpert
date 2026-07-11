@@ -1719,46 +1719,6 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
         <value>Copy to clipboard</value>
     </data>
-  <data name="PatternWindow_UI_Title" xml:space="preserve">
-        <value>Patterns</value>
-    </data>
-  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
-        <value>Number of blocks (pattern variants):</value>
-    </data>
-  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
-        <value>Block lines:</value>
-    </data>
-  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-        <value>This feature is pre-beta and does not work :)
-		Usage: Select a range in the log window and press "Recalc". 
-		This will search for text ranges similar to the selected one.</value>
-      <comment>@MutedRule(PunctuationTail)</comment>
-  </data>
-  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
-        <value>Fuzzy</value>
-    </data>
-  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
-        <value>Max diff</value>
-    </data>
-  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
-        <value>Max misses</value>
-    </data>
-  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
-        <value>Weigth</value>
-    </data>
-  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
-        <value>(no range set)</value>
-    </data>
-  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
-        <value>Recalc</value>
-    </data>
-  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
-        <value>Set range</value>
-    </data>
-  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-        <value>Start: {0}
-		End: {1}</value>
-    </data>
   <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
         <value>Loading Session</value>
     </data>
