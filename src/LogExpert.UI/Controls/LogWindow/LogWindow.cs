@@ -4431,7 +4431,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         // Closing the window cancels the run (linked token), so this continuation also fires
         // mid-close — with the handle already destroyed, narration and BeginInvoke would throw.
-        if (IsDisposed || Disposing || _waitingForClose || !IsHandleCreated)
+        // _isClosing (set before the cancel) is the discriminator, NOT IsHandleCreated: a session-
+        // restored background tab runs this with its own handle not yet created, marshaling
+        // through the parent — and must still reach FilterComplete to populate the filter grid.
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing)
         {
             return;
         }
@@ -4970,8 +4973,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var wasCancelled = pipeCts.IsCancellationRequested;
 
         // Same close-mid-job hazard as the filter run's epilogue: skip the UI finish when the
-        // window went away while writing.
-        if (IsDisposed || Disposing || _waitingForClose || !IsHandleCreated)
+        // window went away while writing (_isClosing, not IsHandleCreated — see FilterSearch).
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing)
         {
             return;
         }
