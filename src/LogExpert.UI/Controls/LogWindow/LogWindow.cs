@@ -5352,20 +5352,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void InitPatternWindow ()
     {
-        if (_patternWindow is { IsDisposed: false })
-        {
-            _patternWindow.Activate();
-            return;
-        }
-
+        //PatternStatistic(this.patternArgs);
         _patternWindow = new PatternWindow(this);
         _patternWindow.SetColumnizer(CurrentColumnizer);
+        //this.patternWindow.SetBlockList(blockList);
         _patternWindow.SetFont(Preferences.Font);
         _patternWindow.Fuzzy = _patternArgs.Fuzzy;
         _patternWindow.MaxDiff = _patternArgs.MaxDiffInBlock;
         _patternWindow.MaxMisses = _patternArgs.MaxMisses;
         _patternWindow.Weight = _patternArgs.MinWeight;
-        _patternWindow.Show(FindForm());
+        //this.patternWindow.Show();
     }
 
     [SupportedOSPlatform("windows")]
