@@ -293,6 +293,9 @@
   <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
         <value>Freeze left columns until here ({0})</value>
     </data>
+  <data name="LogWindow_UI_StatusLineError_FilterFailed" xml:space="preserve">
+        <value>Filter failed: {0}</value>
+    </data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
         <value>Invalid regular expression</value>
     </data>

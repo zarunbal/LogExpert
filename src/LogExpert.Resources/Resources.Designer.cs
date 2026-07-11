@@ -3406,6 +3406,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter failed: {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_FilterFailed {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_FilterFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Invalid regular expression.
         /// </summary>
         public static string LogWindow_UI_StatusLineError_InvalidRegularExpression {

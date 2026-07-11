@@ -684,8 +684,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private delegate void SelectLineFx (int line, bool triggerSyncCall);
 
-    private Action<FilterParams, List<int>, List<int>, List<int>> FilterFxAction;
-    //private delegate void FilterFx(FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
     private delegate void SetColumnizerFx (ILogLineMemoryColumnizer columnizer);
 
@@ -2662,12 +2660,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             var persistFilterParams = data.FilterParams;
             ReInitFilterParams(persistFilterParams);
-            List<int> filterResultList = [];
-            //List<int> lastFilterResultList = new List<int>();
-            List<int> filterHitList = [];
-            Filter(persistFilterParams, filterResultList, _lastFilterLinesList, filterHitList);
+            // Each restored tab runs its own filter with fresh spread history — its content no
+            // longer depends on the window's shared history state at restore time.
+            var filterRun = new SerialFilterEngine().Run(persistFilterParams, new ColumnizerCallback(this), CancellationToken.None);
             FilterPipe pipe = new(persistFilterParams.Clone(), this);
-            WritePipeToTab(pipe, filterResultList, data.PersistenceData.TabName, data.PersistenceData);
+            WritePipeToTab(pipe, [.. filterRun.ResultLines], data.PersistenceData.TabName, data.PersistenceData);
         }
     }
 
@@ -4409,95 +4406,61 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        var settings = ConfigManager.Settings;
+        IFilterEngine engine = ConfigManager.Settings.Preferences.MultiThreadFilter
+            ? new ParallelFilterEngine()
+            : new SerialFilterEngine();
 
-        FilterFxAction = settings.Preferences.MultiThreadFilter ? MultiThreadedFilter : Filter;
-        var filterFxActionTask = Task.Run(() => FilterFxAction(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList)).ConfigureAwait(false);
+        ColumnizerCallback callback = new(this);
+        var progress = new SynchronousProgress<int>(UpdateProgressBar);
 
-        await filterFxActionTask;
+        // ESC reaches the run through the cancel-handler registry; the engines observe the token.
+        using CancellationTokenSource filterCts = new();
+        var cancelHandler = new FilterRunCancelHandler(filterCts);
+        OnRegisterCancelHandler(cancelHandler);
+
+        long startTime = Environment.TickCount;
+        FilterRun filterRun;
+        try
+        {
+            filterRun = await Task.Run(() => engine.Run(_filterParams, callback, filterCts.Token, progress)).ConfigureAwait(false);
+        }
+        finally
+        {
+            OnDeRegisterCancelHandler(cancelHandler);
+        }
+
+        long endTime = Environment.TickCount;
+
+        lock (_filterResultList)
+        {
+            _filterHitList.AddRange(filterRun.HitLines);
+            _filterResultList.AddRange(filterRun.ResultLines);
+            _lastFilterLinesList.AddRange(filterRun.History);
+            FilterSpread.TrimHistory(_lastFilterLinesList);
+        }
+
+        if (filterRun.Outcome == FilterRunOutcome.Failed)
+        {
+            StatusLineError(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineError_FilterFailed, filterRun.Error?.Message));
+        }
+        else
+        {
+            StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
+        }
+
         FilterComplete();
 
-        //fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
         //This needs to be invoked, because there is a potential CrossThreadException
         _ = BeginInvoke(CheckForFilterDirty);
     }
 
-    private void MultiThreadedFilter (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
+    /// <summary>Bridges the ESC cancel-handler registry to a filter run's token.</summary>
+    private sealed class FilterRunCancelHandler (CancellationTokenSource cts) : IBackgroundProcessCancelHandler
     {
-        ColumnizerCallback callback = new(this);
-
-        FilterStarter fs = new(callback, Environment.ProcessorCount + 2)
+        public void EscapePressed ()
         {
-            FilterHitList = _filterHitList,
-            FilterResultLines = _filterResultList,
-            LastFilterLinesList = _lastFilterLinesList
-        };
-
-        var cancelHandler = new FilterCancelHandler(fs);
-        OnRegisterCancelHandler(cancelHandler);
-        long startTime = Environment.TickCount;
-
-        fs.DoFilter(filterParams, 0, _logFileReader.LineCount, FilterProgressCallback).GetAwaiter().GetResult();
-
-        long endTime = Environment.TickCount;
-
-        //_logger.Debug($"Multi threaded filter duration: {endTime - startTime} ms."));
-
-        OnDeRegisterCancelHandler(cancelHandler);
-        StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
-    }
-
-    private void FilterProgressCallback (int lineCount)
-    {
-        UpdateProgressBar(lineCount);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void Filter (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
-    {
-        long startTime = Environment.TickCount;
-        try
-        {
-            filterParams.Reset();
-            var lineNum = 0;
-            //AddFilterLineFx addFx = new AddFilterLineFx(AddFilterLine);
-            ColumnizerCallback callback = new(this);
-            while (true)
-            {
-                var line = _logFileReader.GetLogLineMemory(lineNum);
-                if (line == null)
-                {
-                    break;
-                }
-
-                callback.LineNum = lineNum;
-                if (Util.TestFilterCondition(filterParams, line, callback))
-                {
-                    AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
-                }
-
-                lineNum++;
-                if (lineNum % PROGRESS_BAR_MODULO == 0)
-                {
-                    UpdateProgressBar(lineNum);
-                }
-
-                if (_shouldCancel)
-                {
-                    break;
-                }
-            }
+            cts.Cancel();
         }
-        catch (Exception ex)
-        {
-            _ = MessageBox.Show(null, string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_Filter_ExceptionWhileFiltering, ex, ex.StackTrace), Resources.LogExpert_Common_UI_Title_Error);
-        }
-
-        long endTime = Environment.TickCount;
-
-        //_logger.Info($"Single threaded filter duration: {endTime - startTime} ms."));
-
-        StatusLineText(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_StatusLineText_Filter_FilterDurationMs, endTime - startTime));
     }
 
     [SupportedOSPlatform("windows")]
