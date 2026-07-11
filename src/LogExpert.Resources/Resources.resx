@@ -1183,9 +1183,6 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem" xml:space="preserve">
         <value>Filter</value>
     </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem" xml:space="preserve">
-        <value>Pattern analysis...</value>
-    </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem" xml:space="preserve">
         <value>Bookmarks</value>
     </data>

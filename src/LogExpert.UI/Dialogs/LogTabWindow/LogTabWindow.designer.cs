@@ -50,7 +50,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
             goToLineToolStripMenuItem = new ToolStripMenuItem();
             searchToolStripMenuItem = new ToolStripMenuItem();
             filterToolStripMenuItem = new ToolStripMenuItem();
-            patternAnalysisToolStripMenuItem = new ToolStripMenuItem();
             bookmarksToolStripMenuItem = new ToolStripMenuItem();
             toggleBookmarkToolStripMenuItem = new ToolStripMenuItem();
             jumpToNextToolStripMenuItem = new ToolStripMenuItem();
@@ -343,7 +342,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // viewNavigateToolStripMenuItem
             // 
-            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, patternAnalysisToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem });
+            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem });
             viewNavigateToolStripMenuItem.Name = "viewNavigateToolStripMenuItem";
             viewNavigateToolStripMenuItem.Size = new Size(96, 19);
             viewNavigateToolStripMenuItem.Text = "View/Navigate";
@@ -363,16 +362,9 @@ namespace LogExpert.UI.Controls.LogTabWindow
             searchToolStripMenuItem.Size = new Size(177, 22);
             searchToolStripMenuItem.Text = "Search...";
             searchToolStripMenuItem.Click += OnSearchToolStripMenuItemClick;
-            //
-            // patternAnalysisToolStripMenuItem
-            //
-            patternAnalysisToolStripMenuItem.Name = "patternAnalysisToolStripMenuItem";
-            patternAnalysisToolStripMenuItem.Size = new Size(177, 22);
-            patternAnalysisToolStripMenuItem.Text = "Pattern analysis...";
-            patternAnalysisToolStripMenuItem.Click += OnPatternAnalysisToolStripMenuItemClick;
-            //
+            // 
             // filterToolStripMenuItem
-            //
+            // 
             filterToolStripMenuItem.Image = LogExpert.Resources.Filter;
             filterToolStripMenuItem.Name = "filterToolStripMenuItem";
             filterToolStripMenuItem.ShortcutKeys = Keys.F4;
@@ -1139,7 +1131,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem timeshiftToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem filterToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem patternAnalysisToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyMarkedLinesIntoNewTabToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hilightingToolStripMenuItem;

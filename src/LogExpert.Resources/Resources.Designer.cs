@@ -1497,7 +1497,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error during value {0}, min {1}, max {2}, visible {3}: {4}.
+        ///   Looks up a localized string similar to Error during {0} value {1}, min {2}, max {3}, visible {4}: {5}.
         /// </summary>
         public static string LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45 {
             get {
@@ -1657,7 +1657,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("LogExpert_Common_UI_Message_ClipboardInUse", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Deserialize.
         /// </summary>
@@ -2546,15 +2546,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pattern analysis....
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Reload.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_reloadToolStripMenuItem {
@@ -3422,7 +3413,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("LogWindow_UI_StatusLineError_FilterFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid regular expression.
         /// </summary>
