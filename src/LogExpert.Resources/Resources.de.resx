@@ -1235,6 +1235,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem" xml:space="preserve">
 		<value>Filter</value>
 	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem" xml:space="preserve">
+		<value>Musteranalyse...</value>
+	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem" xml:space="preserve">
 		<value>Lesezeichen</value>
 	</data>

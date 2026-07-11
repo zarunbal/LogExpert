@@ -444,6 +444,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         goToLineToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_goToLineToolStripMenuItem;
         searchToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_searchToolStripMenuItem;
         filterToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem;
+        patternAnalysisToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem;
         bookmarksToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem;
         toggleBookmarkToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_toggleBookmarkToolStripMenuItem;
         jumpToNextToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToNextToolStripMenuItem;
@@ -1058,6 +1059,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             closeFileToolStripMenuItem.Enabled = true;
             searchToolStripMenuItem.Enabled = true;
             filterToolStripMenuItem.Enabled = true;
+            patternAnalysisToolStripMenuItem.Enabled = true;
             goToLineToolStripMenuItem.Enabled = true;
             ConnectToolWindows(newLogWindow);
         }
@@ -1078,6 +1080,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             closeFileToolStripMenuItem.Enabled = false;
             searchToolStripMenuItem.Enabled = false;
             filterToolStripMenuItem.Enabled = false;
+            patternAnalysisToolStripMenuItem.Enabled = false;
             goToLineToolStripMenuItem.Enabled = false;
             dragControlDateTime.Visible = false;
         }
@@ -1932,6 +1935,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnFilterToolStripMenuItemClick (object sender, EventArgs e)
     {
         CurrentLogWindow?.ToggleFilterPanel();
+    }
+
+    private void OnPatternAnalysisToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        CurrentLogWindow?.PatternStatistic();
     }
 
     [SupportedOSPlatform("windows")]

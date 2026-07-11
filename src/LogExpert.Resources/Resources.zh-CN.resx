@@ -1046,6 +1046,9 @@
   <data name="LogTabWindow_UI_ToolStripMenuItem_filterToolStripMenuItem" xml:space="preserve">
     <value>筛选</value>
   </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_patternAnalysisToolStripMenuItem" xml:space="preserve">
+    <value>模式分析...</value>
+  </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_bookmarksToolStripMenuItem" xml:space="preserve">
     <value>书签</value>
   </data>
