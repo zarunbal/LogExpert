@@ -1515,45 +1515,6 @@
   <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
     <value>复制到剪贴板</value>
   </data>
-  <data name="PatternWindow_UI_Title" xml:space="preserve">
-    <value>模式</value>
-  </data>
-  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
-    <value>块数量（模式变体）：</value>
-  </data>
-  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
-    <value>块行数：</value>
-  </data>
-  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-    <value>此功能处于预 Beta 阶段，尚不可用 :)
-用法：在日志窗口中选择一个范围并按“重新计算”。 
-这将会搜索与所选范围相似的文本范围。"</value>
-  </data>
-  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
-    <value>模糊</value>
-  </data>
-  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
-    <value>最大差异</value>
-  </data>
-  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
-    <value>最大缺失</value>
-  </data>
-  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
-    <value>权重</value>
-  </data>
-  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
-    <value>（未设定范围）</value>
-  </data>
-  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
-    <value>重新计算</value>
-  </data>
-  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
-    <value>设定范围</value>
-  </data>
-  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-    <value>起始: {0}
-		结束: {1}</value>
-  </data>
   <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
     <value>正在加载会话</value>
   </data>
