@@ -7867,7 +7867,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (CurrentColumnizer.IsTimeshiftImplemented())
             {
-                _ = timeSpreadingControl.Invoke(new MethodInvoker(timeSpreadingControl.Refresh));
+                // Already on the UI thread (this method touches fonts and grids directly); a
+                // direct Refresh is also safe on a control whose handle doesn't exist yet,
+                // where Invoke would throw.
+                timeSpreadingControl.Refresh();
                 ShowTimeSpread(Preferences.ShowTimeSpread);
             }
 
