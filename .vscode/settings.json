@@ -17,5 +17,11 @@
         "git rev-parse": true
     },
     "dotnet.preferCSharpExtension": true,
-    "dotnet.defaultSolution": "src/LogExpert.sln"
+    "dotnet.defaultSolution": "src/LogExpert.sln",
+    "cSpell.words": [
+        "Columnizer",
+        "multifile",
+        "Respawned",
+        "timeshift"
+    ]
 }

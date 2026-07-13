@@ -149,6 +149,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private int _reloadOverloadCounter;
     private SortedList<int, RowHeightEntry> _rowHeightList = [];
     private int _selectedCol; // set by context menu event for column headers only
+
+    /// <summary>The deserialize-once result of the Session File read, kept for the window-open
+    /// in progress. Written by the read at the start of each open (or direct multi-file load),
+    /// applied by the two apply phases (<see cref="LoadPersistenceOptions"/> pre-load,
+    /// <see cref="LoadPersistenceData"/> post-load).</summary>
+    private SessionSnapshot _sessionSnapshot;
     private bool _shouldCallTimeSync;
     /// <summary>Window-lifetime cancellation: per-job token sources link to it, so closing the
     /// window cancels every running job. Live jobs are also registered in the cancel-handler
@@ -288,9 +294,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region Delegates
 
     // used for filterTab restore
-    public delegate void FilterRestoreFx (LogWindow newWin, PersistenceData persistenceData);
+    public delegate void FilterRestoreFx (LogWindow newWin, SessionSnapshot snapshot);
 
-    public delegate void RestoreFiltersFx (PersistenceData persistenceData);
+    public delegate void RestoreFiltersFx (SessionSnapshot snapshot);
 
     public delegate bool ScrollToTimestampFx (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall);
 
@@ -370,9 +376,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             : dataGridView.CurrentRow.Index;
 
     public string FileName { get; private set; }
-
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public string SessionFileName { get; set; }
 
     public bool IsMultiFile
     {
@@ -2431,8 +2434,48 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    /// <summary>
+    /// The single Session File read of a window open: deserializes the <c>.lxp</c> once (via
+    /// <see cref="Persister"/>) and decomposes it into the Session Snapshot both apply phases
+    /// work from. Returns null when there is nothing to load or the read fails (log + defaults,
+    /// silent — the load error contract).
+    /// </summary>
+    private SessionSnapshot ReadSessionSnapshot (string fileName)
+    {
+        // Union of both apply phases' gates: the pre-load phase needs SaveSessions or a forced
+        // file name, the post-load phase additionally honors the session-load one-shot flag.
+        if (!Preferences.SaveSessions && !ForcePersistenceLoading && ForcedPersistenceFileName == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            var persistenceData = ForcedPersistenceFileName == null
+                ? Persister.LoadPersistenceData(fileName, Preferences, ConfigManager.ActiveSessionDir)
+                : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
+
+            return persistenceData == null ? null : SessionFileComposer.Decompose(persistenceData);
+        }
+        catch (Exception e) when (e is IOException or
+                                       UnauthorizedAccessException or
+                                       NotSupportedException or
+                                       InvalidOperationException or
+                                       ArgumentException)
+        {
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Logger_Error_In_Function, nameof(ReadSessionSnapshot), e));
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// The pre-load apply phase of the Session Snapshot: options that must be in place before
+    /// the file content loads (encoding, multi-file, columnizer-by-name, tab name, highlight
+    /// group, panel layout). The return value gates columnizer auto-detection in
+    /// <see cref="LoadFile"/>, as before. Also performs the window open's single Session File
+    /// read, keeping the snapshot for the post-load phase.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    //TODO This should be part of the Persister
     private bool LoadPersistenceOptions ()
     {
         if (InvokeRequired)
@@ -2440,28 +2483,30 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return (bool)Invoke(new BoolReturnDelegate(LoadPersistenceOptions));
         }
 
+        _sessionSnapshot = ReadSessionSnapshot(FileName);
+
         if (!Preferences.SaveSessions && ForcedPersistenceFileName == null)
         {
+            // The snapshot may still exist for the post-load phase (session load with
+            // SaveSessions off) — but this phase does not apply it, as before.
+            return false;
+        }
+
+        if (_sessionSnapshot == null)
+        {
+            //_logger.Info($"No persistence data for {FileName} found.");
             return false;
         }
 
         try
         {
-            var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceDataOptionsOnly(FileName, Preferences, ConfigManager.ActiveSessionDir)
-                : Persister.LoadPersistenceDataOptionsOnlyFromFixedFile(ForcedPersistenceFileName);
+            var snapshot = _sessionSnapshot;
 
-            if (persistenceData == null)
-            {
-                //_logger.Info($"No persistence data for {FileName} found.");
-                return false;
-            }
-
-            IsMultiFile = persistenceData.MultiFile;
+            IsMultiFile = snapshot.MultiFile;
             _multiFileOptions = new MultiFileOptions
             {
-                FormatPattern = persistenceData.MultiFilePattern,
-                MaxDayTry = persistenceData.MultiFileMaxDays
+                FormatPattern = snapshot.MultiFilePattern,
+                MaxDayTry = snapshot.MultiFileMaxDays
             };
 
             if (string.IsNullOrEmpty(_multiFileOptions.FormatPattern))
@@ -2469,40 +2514,38 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _multiFileOptions = ObjectClone.Clone(Preferences.MultiFileOptions);
             }
 
-            splitContainerLogWindow.SplitterDistance = persistenceData.FilterPosition;
-            splitContainerLogWindow.Panel2Collapsed = !persistenceData.FilterVisible;
-            ToggleHighlightPanel(persistenceData.FilterSaveListVisible);
-            ShowAdvancedFilterPanel(persistenceData.FilterAdvanced);
+            splitContainerLogWindow.SplitterDistance = snapshot.FilterPosition;
+            splitContainerLogWindow.Panel2Collapsed = !snapshot.FilterVisible;
+            ToggleHighlightPanel(snapshot.FilterSaveListVisible);
+            ShowAdvancedFilterPanel(snapshot.FilterAdvanced);
 
             if (_reloadMemento == null)
             {
-                PreSelectColumnizerByName(persistenceData.Columnizer?.GetName());
+                PreSelectColumnizerByName(snapshot.Columnizer?.GetName());
             }
 
-            FollowTailChanged(persistenceData.FollowTail, false);
-            if (persistenceData.TabName != null)
+            if (snapshot.TabName != null)
             {
-                Text = persistenceData.TabName;
+                Text = snapshot.TabName;
             }
 
             AdjustHighlightSplitterWidth();
-            SetCurrentHighlightGroup(persistenceData.HighlightGroupName);
+            SetCurrentHighlightGroup(snapshot.HighlightGroupName);
 
-            SetCellSelectionMode(persistenceData.CellSelectMode, true);
+            SetCellSelectionMode(snapshot.CellSelectMode, true);
 
-            if (persistenceData.MultiFileNames.Count > 0)
+            if (snapshot.MultiFileNames.Count > 0)
             {
                 //_logger.Info($"Detected MultiFile name list in persistence options");
-                _fileNames = new string[persistenceData.MultiFileNames.Count];
-                persistenceData.MultiFileNames.CopyTo(_fileNames);
+                _fileNames = new string[snapshot.MultiFileNames.Count];
+                snapshot.MultiFileNames.CopyTo(_fileNames);
             }
             else
             {
                 _fileNames = null;
             }
 
-            //this.bookmarkWindow.ShowBookmarkCommentColumn = persistenceData.showBookmarkCommentColumn;
-            SetExplicitEncoding(persistenceData.Encoding);
+            SetExplicitEncoding(snapshot.Encoding);
             return true;
         }
         catch (Exception e)
@@ -2521,8 +2564,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _multiFileOptions = ObjectClone.Clone(Preferences.MultiFileOptions);
     }
 
+    /// <summary>
+    /// The post-load apply phase of the Session Snapshot: content-dependent state that needs the
+    /// loaded file (bookmarks, row heights, scroll position, follow-tail, filters, filter tabs).
+    /// Works from the snapshot kept by the window open's single read — no re-deserialization.
+    /// Skipped entirely when the Rollover staleness rule fires; the pre-load options stay
+    /// applied.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    //TODO This should be part of the Persister
     private void LoadPersistenceData ()
     {
         if (InvokeRequired)
@@ -2547,32 +2596,28 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            var persistenceData = ForcedPersistenceFileName == null
-                ? Persister.LoadPersistenceData(FileName, Preferences, ConfigManager.ActiveSessionDir)
-                : Persister.LoadPersistenceDataFromFixedFile(ForcedPersistenceFileName);
+            var snapshot = _sessionSnapshot;
 
-            if (persistenceData == null)
+            if (snapshot == null)
             {
                 _logger.Info($"No persistence data for {FileName} found.");
                 return;
             }
 
-            if (persistenceData.LineCount > _logFileReader.LineCount)
+            if (SessionFileComposer.IsStale(snapshot, _logFileReader.LineCount))
             {
-                // outdated persistence data (logfile rollover)
-                // MessageBox.Show(this, "Persistence data for " + this.FileName + " is outdated. It was discarded.", "Log Expert");
-                //_logger.Info($"Persistence data for {FileName} is outdated. It was discarded."));
-                _ = LoadPersistenceOptions();
+                // Outdated persistence data (logfile rollover): the content-dependent state is
+                // discarded; the pre-load options are already applied and stay.
                 return;
             }
 
-            _bookmarkProvider.SetBookmarks(persistenceData.BookmarkList);
-            _rowHeightList = persistenceData.RowHeightList;
+            _bookmarkProvider.SetBookmarks(snapshot.BookmarkList);
+            _rowHeightList = snapshot.RowHeightList;
             try
             {
-                if (persistenceData.CurrentLine >= 0 && persistenceData.CurrentLine < dataGridView.RowCount)
+                if (snapshot.CurrentLine >= 0 && snapshot.CurrentLine < dataGridView.RowCount)
                 {
-                    SelectLine(persistenceData.CurrentLine, false, true);
+                    SelectLine(snapshot.CurrentLine, false, true);
                 }
                 else
                 {
@@ -2583,27 +2628,24 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     }
                 }
 
-                if (persistenceData.FirstDisplayedLine >= 0 &&
-                    persistenceData.FirstDisplayedLine < dataGridView.RowCount)
+                if (snapshot.FirstDisplayedLine >= 0 &&
+                    snapshot.FirstDisplayedLine < dataGridView.RowCount)
                 {
-                    dataGridView.FirstDisplayedScrollingRowIndex = persistenceData.FirstDisplayedLine;
+                    dataGridView.FirstDisplayedScrollingRowIndex = snapshot.FirstDisplayedLine;
                 }
 
-                if (persistenceData.FollowTail)
-                {
-                    FollowTailChanged(persistenceData.FollowTail, false);
-                }
+                // Applied once, here (was double-applied: always pre-load, here only when true).
+                // Applying true after positioning keeps the jump-to-tail semantics.
+                FollowTailChanged(snapshot.FollowTail, false);
             }
             catch (ArgumentOutOfRangeException)
             {
                 // FirstDisplayedScrollingRowIndex calculates sometimes the wrong scrolling ranges???
             }
 
-            SetCellSelectionMode(persistenceData.CellSelectMode, true);
-
             if (Preferences.SaveFilters)
             {
-                RestoreFilters(persistenceData);
+                RestoreFilters(snapshot);
             }
         }
         catch (IOException e)
@@ -2613,47 +2655,63 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    // Note: the panel layout fields (FilterPosition, FilterVisible, FilterAdvanced) are no
+    // longer re-applied here — they are pre-load fields, applied once in LoadPersistenceOptions
+    // (one field, one phase). Restored filter-tab child windows get them via
+    // ApplyRestoredFilterTabSnapshot instead.
     [SupportedOSPlatform("windows")]
-    private void RestoreFilters (PersistenceData persistenceData)
+    private void RestoreFilters (SessionSnapshot snapshot)
     {
-        if (persistenceData.FilterParamsList.Count > 0)
+        if (snapshot.FilterParamsList.Count > 0)
         {
-            _filterParams = persistenceData.FilterParamsList[0];
+            _filterParams = snapshot.FilterParamsList[0];
             ReInitFilterParams(_filterParams);
         }
 
         ApplyFilterParams(); // re-loaded filter settings
         _ = BeginInvoke(new MethodInvoker(FilterSearch));
 
+        if (_filterPipeList.Count == 0) // don't restore if it's only a reload
+        {
+            RestoreFilterTabs(snapshot);
+        }
+    }
+
+    private void RestoreFilterTabs (SessionSnapshot snapshot)
+    {
+        foreach (var tab in snapshot.FilterTabs)
+        {
+            var persistFilterParams = tab.FilterParams;
+            ReInitFilterParams(persistFilterParams);
+            // Each restored tab runs its own filter with fresh spread history — its content no
+            // longer depends on the window's shared history state at restore time.
+            var filterRun = new SerialFilterEngine().Run(persistFilterParams, new ColumnizerCallback(this), CancellationToken.None);
+            FilterPipe pipe = new(persistFilterParams.Clone(), this);
+            WritePipeToTab(pipe, [.. filterRun.ResultLines], tab.Snapshot.TabName, tab.Snapshot);
+        }
+    }
+
+    /// <summary>
+    /// Applies a restored filter-tab child window's snapshot. A child window never runs the two
+    /// window-open apply phases against its own snapshot, so the panel layout it would get
+    /// pre-load is applied here, once, followed by its filters (and its own filter tabs,
+    /// recursively).
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private void ApplyRestoredFilterTabSnapshot (SessionSnapshot snapshot)
+    {
         try
         {
-            splitContainerLogWindow.SplitterDistance = persistenceData.FilterPosition;
-            splitContainerLogWindow.Panel2Collapsed = !persistenceData.FilterVisible;
+            splitContainerLogWindow.SplitterDistance = snapshot.FilterPosition;
+            splitContainerLogWindow.Panel2Collapsed = !snapshot.FilterVisible;
         }
         catch (InvalidOperationException e)
         {
             _logger.Error($"Error setting splitter distance: {e}");
         }
 
-        ShowAdvancedFilterPanel(persistenceData.FilterAdvanced);
-        if (_filterPipeList.Count == 0) // don't restore if it's only a reload
-        {
-            RestoreFilterTabs(persistenceData);
-        }
-    }
-
-    private void RestoreFilterTabs (PersistenceData persistenceData)
-    {
-        foreach (var data in persistenceData.FilterTabDataList)
-        {
-            var persistFilterParams = data.FilterParams;
-            ReInitFilterParams(persistFilterParams);
-            // Each restored tab runs its own filter with fresh spread history — its content no
-            // longer depends on the window's shared history state at restore time.
-            var filterRun = new SerialFilterEngine().Run(persistFilterParams, new ColumnizerCallback(this), CancellationToken.None);
-            FilterPipe pipe = new(persistFilterParams.Clone(), this);
-            WritePipeToTab(pipe, [.. filterRun.ResultLines], data.PersistenceData.TabName, data.PersistenceData);
-        }
+        ShowAdvancedFilterPanel(snapshot.FilterAdvanced);
+        RestoreFilters(snapshot);
     }
 
     private void ReInitFilterParams (FilterParams filterParams)
@@ -3154,7 +3212,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void CheckFilterAndHighlight (LogEventArgs e)
     {
-        // The Tail trigger path (CONTEXT.md): the one loop that evaluates highlight entries against
+        // The Tail trigger path: the one loop that evaluates highlight entries against
         // newly appended lines. Side-effecting triggers (Audio Alert, Set Bookmark, Stop Tail) fire
         // here and only here — the bulk scanner (HighlightBookmarkScanner) has no access to them.
         var doFilter = filterTailCheckBox.Checked || _filterPipeList.Count > 0;
@@ -4900,7 +4958,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
-    private void WritePipeToTab (FilterPipe pipe, List<int> lineNumberList, string name, PersistenceData persistenceData)
+    private void WritePipeToTab (FilterPipe pipe, List<int> lineNumberList, string name, SessionSnapshot snapshot)
     {
         StatusLineText(Resources.LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile);
         _guiStateArgs.MenuEnabled = false;
@@ -4966,11 +5024,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        Invoke(() => WriteFilterToTabFinished(pipe, name, persistenceData, wasCancelled));
+        Invoke(() => WriteFilterToTabFinished(pipe, name, snapshot, wasCancelled));
     }
 
     [SupportedOSPlatform("windows")]
-    private void WriteFilterToTabFinished (FilterPipe pipe, string name, PersistenceData persistenceData, bool wasCancelled)
+    private void WriteFilterToTabFinished (FilterPipe pipe, string name, SessionSnapshot snapshot, bool wasCancelled)
     {
         _isSearching = false;
         if (!wasCancelled)
@@ -4985,9 +5043,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var newWin = _logWindowCoordinator.AddFilterTab(pipe, title, preProcessColumnizer);
             newWin.FilterPipe = pipe;
             pipe.OwnLogWindow = newWin;
-            if (persistenceData != null)
+            if (snapshot != null)
             {
-                _ = Task.Run(() => FilterRestore(newWin, persistenceData));
+                _ = Task.Run(() => FilterRestore(newWin, snapshot));
             }
         }
 
@@ -5025,22 +5083,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     [SupportedOSPlatform("windows")]
-    private static void FilterRestore (LogWindow newWin, PersistenceData persistenceData)
+    private static void FilterRestore (LogWindow newWin, SessionSnapshot snapshot)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(persistenceData.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(snapshot.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
         if (columnizer != null)
         {
             SetColumnizerFx fx = newWin.ForceColumnizer;
             _ = newWin.Invoke(fx, [columnizer]);
         }
-        //else
-        //{
-        //    _logger.Warn($"FilterRestore(): Columnizer {persistenceData.ColumnizerName} not found"));
-        //}
 
-        _ = newWin.BeginInvoke(new RestoreFiltersFx(newWin.RestoreFilters), [persistenceData]);
+        _ = newWin.BeginInvoke(new RestoreFiltersFx(newWin.ApplyRestoredFilterTabSnapshot), [snapshot]);
     }
 
     [SupportedOSPlatform("windows")]
@@ -5723,7 +5777,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             // this may be set after loading persistence data
             if (_fileNames != null && IsMultiFile)
             {
-                LoadFilesAsMulti(_fileNames, EncodingOptions);
+                StartMultiFileReader(_fileNames, EncodingOptions);
                 return;
             }
 
@@ -5779,6 +5833,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void LoadFilesAsMulti (string[] fileNames, EncodingOptions encodingOptions)
     {
+        // A direct multi-file load (new multi tab, multi-file reload) never runs the LoadFile
+        // flow, so the window open's single Session File read happens here. LoadFile's own
+        // multi-file branch calls StartMultiFileReader directly — its read already happened.
+        _sessionSnapshot = ReadSessionSnapshot(fileNames[^1]);
+
+        StartMultiFileReader(fileNames, encodingOptions);
+    }
+
+    private void StartMultiFileReader (string[] fileNames, EncodingOptions encodingOptions)
+    {
         EnterLoadFileStatus();
 
         //foreach (var name in fileNames)
@@ -5827,7 +5891,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            var persistenceData = GetPersistenceData();
+            // Relocated from the old composing getter (the composer must stay side-effect-free):
+            // this option doesn't need a press on 'search'. The write must precede the gather —
+            // the gather copies the global FilterList, and this write may alias into it.
+            _filterParams.IsFilterTail = filterTailCheckBox.Checked;
+
+            var persistenceData = SessionFileComposer.Compose(GatherSessionSnapshot());
 
             return ForcedPersistenceFileName == null
                 ? Persister.SavePersistenceData(FileName, persistenceData, Preferences, ConfigManager.ActiveSessionDir)
@@ -5850,7 +5919,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _ = SavePersistenceDataAndReturnFileName(force);
     }
 
-    public PersistenceData GetPersistenceData ()
+    public SessionSnapshot GatherSessionSnapshot ()
     {
         // Filter out auto-generated bookmarks — they are transient and will be re-generated on load
         SortedList<int, Bookmark> manualBookmarks = [];
@@ -5862,7 +5931,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        PersistenceData persistenceData = new()
+        SessionSnapshot snapshot = new()
         {
             BookmarkList = manualBookmarks,
             RowHeightList = _rowHeightList,
@@ -5878,45 +5947,40 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             CellSelectMode = _guiStateArgs.CellSelectMode,
             FileName = FileName,
             TabName = Text,
-            SessionFileName = SessionFileName,
             Columnizer = CurrentColumnizer,
             LineCount = _logFileReader != null ? _logFileReader.LineCount : 0
         };
-
-        _filterParams.IsFilterTail = filterTailCheckBox.Checked; // this option doesnt need a press on 'search'
 
         if (Preferences.SaveFilters)
         {
             //when a filter is added, its added to the Configmanager.Settings.FilterList and not to the _filterParams, this is probably an oversight and maybe a bug
             //but for the consistency the FilterList should be saved as whole for every file
-            persistenceData.FilterParamsList = [.. ConfigManager.Settings.FilterList];
+            snapshot.FilterParamsList = [.. ConfigManager.Settings.FilterList];
 
             foreach (var filterPipe in _filterPipeList)
             {
-                FilterTabData data = new()
+                snapshot.FilterTabs.Add(new FilterTabSnapshot
                 {
-                    PersistenceData = filterPipe.OwnLogWindow.GetPersistenceData(),
-                    FilterParams = filterPipe.FilterParams
-                };
-                persistenceData.FilterTabDataList.Add(data);
+                    FilterParams = filterPipe.FilterParams,
+                    Snapshot = filterPipe.OwnLogWindow.GatherSessionSnapshot(),
+                });
             }
         }
 
         if (_currentHighlightGroup != null)
         {
-            persistenceData.HighlightGroupName = _currentHighlightGroup.GroupName;
+            snapshot.HighlightGroupName = _currentHighlightGroup.GroupName;
         }
 
         if (_fileNames != null && IsMultiFile)
         {
-            persistenceData.MultiFileNames.AddRange(_fileNames);
+            snapshot.MultiFileNames.AddRange(_fileNames);
         }
 
-        //persistenceData.showBookmarkCommentColumn = this.bookmarkWindow.ShowBookmarkCommentColumn;
-        persistenceData.FilterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
-        persistenceData.Encoding = _logFileReader.CurrentEncoding;
+        snapshot.FilterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
+        snapshot.Encoding = _logFileReader?.CurrentEncoding;
 
-        return persistenceData;
+        return snapshot;
     }
 
     public void Close (bool dontAsk)
@@ -7380,7 +7444,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (CurrentColumnizer.IsTimeshiftImplemented())
             {
-                _ = timeSpreadingControl.Invoke(new MethodInvoker(timeSpreadingControl.Refresh));
+                timeSpreadingControl.Refresh();
                 ShowTimeSpread(Preferences.ShowTimeSpread);
             }
 
