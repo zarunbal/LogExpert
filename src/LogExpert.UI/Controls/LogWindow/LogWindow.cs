@@ -2471,7 +2471,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             return persistenceData == null ? null : SessionFileComposer.Decompose(persistenceData);
         }
-        catch (Exception e)
+        catch (Exception e) when (e is IOException or
+                                       UnauthorizedAccessException or
+                                       NotSupportedException or
+                                       InvalidOperationException or
+                                       ArgumentException)
         {
             _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Logger_Error_In_Function, nameof(ReadSessionSnapshot), e));
             return null;
@@ -3222,7 +3226,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void CheckFilterAndHighlight (LogEventArgs e)
     {
-        // The Tail trigger path (CONTEXT.md): the one loop that evaluates highlight entries against
+        // The Tail trigger path: the one loop that evaluates highlight entries against
         // newly appended lines. Side-effecting triggers (Audio Alert, Set Bookmark, Stop Tail) fire
         // here and only here — the bulk scanner (HighlightBookmarkScanner) has no access to them.
         var doFilter = filterTailCheckBox.Checked || _filterPipeList.Count > 0;
@@ -6401,7 +6405,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         snapshot.FilterSaveListVisible = !highlightSplitContainer.Panel2Collapsed;
-        snapshot.Encoding = _logFileReader.CurrentEncoding;
+        snapshot.Encoding = _logFileReader?.CurrentEncoding;
 
         return snapshot;
     }
@@ -7867,9 +7871,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (CurrentColumnizer.IsTimeshiftImplemented())
             {
-                // Already on the UI thread (this method touches fonts and grids directly); a
-                // direct Refresh is also safe on a control whose handle doesn't exist yet,
-                // where Invoke would throw.
                 timeSpreadingControl.Refresh();
                 ShowTimeSpread(Preferences.ShowTimeSpread);
             }

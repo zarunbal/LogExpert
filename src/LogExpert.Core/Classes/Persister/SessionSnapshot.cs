@@ -8,11 +8,9 @@ using LogExpert.Core.Entities;
 namespace LogExpert.Core.Classes.Persister;
 
 /// <summary>
-/// A neutral, UI-free capture of one Log Window's persistable state (the Session Snapshot of
-/// CONTEXT.md). Gathered by the Log Window when a Session File is saved and applied back in two
+/// A neutral, UI-free capture of one Log Window's persistable state. Gathered by the Log Window when a Session File is saved and applied back in two
 /// Log-Window-side phases when one is loaded. Mapped to and from <see cref="PersistenceData"/> by
-/// <see cref="SessionFileComposer"/>; see docs/specs/session-file-composer.md for the full field
-/// mapping table.
+/// <see cref="SessionFileComposer"/>.
 /// </summary>
 public class SessionSnapshot
 {

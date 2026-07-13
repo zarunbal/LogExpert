@@ -4,8 +4,7 @@ namespace LogExpert.Core.Classes.Persister;
 /// Pure mapping between a <see cref="SessionSnapshot"/> and the Session File's serialized form
 /// (<see cref="PersistenceData"/>), in both directions, plus the Rollover staleness rule.
 /// No I/O, no UI, no side effects — the Log Window owns gathering, applying, timing, and error
-/// display; <see cref="Persister"/> owns serialization. Field-by-field contract:
-/// docs/specs/session-file-composer.md.
+/// display; <see cref="Persister"/> owns serialization.
 /// </summary>
 public static class SessionFileComposer
 {
