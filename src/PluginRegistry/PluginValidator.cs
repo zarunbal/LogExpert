@@ -60,16 +60,6 @@ public static partial class PluginValidator
 
     #endregion
 
-    #region Constructor
-
-    static PluginValidator ()
-    {
-        // Load with default path; will be reloaded when Initialize() is called
-        LoadTrustedPluginConfiguration();
-    }
-
-    #endregion
-
     #region Public methods
 
     /// <summary>
@@ -88,6 +78,23 @@ public static partial class PluginValidator
             _configPath = Path.Join(_configDirectory, "trusted-plugins.json");
             _logger.Info("PluginValidator initialized with config directory: {Dir}", configDirectory);
             LoadTrustedPluginConfiguration();
+        }
+    }
+
+    /// <summary>
+    /// Ensures the trusted plugin configuration is loaded. The configuration is loaded
+    /// lazily on first use (issue #658): an eager load at class-load time would read from
+    /// and create the file in the default %APPDATA% directory before Initialize() could
+    /// point the validator at the active (e.g. portable) configuration directory.
+    /// </summary>
+    private static void EnsureConfigLoaded ()
+    {
+        lock (_configLock)
+        {
+            if (_trustedPluginConfig == null)
+            {
+                LoadTrustedPluginConfiguration();
+            }
         }
     }
 
@@ -203,6 +210,8 @@ public static partial class PluginValidator
             var fileName = Path.GetFileName(dllPath);
             var hash = PluginHashCalculator.CalculateHash(dllPath);
 
+            EnsureConfigLoaded();
+
             lock (_configLock)
             {
                 if (!_trustedPluginConfig.AllowUserTrustedPlugins)
@@ -248,6 +257,8 @@ public static partial class PluginValidator
     /// <returns>True if removed, false if not found</returns>
     public static bool RemoveTrustedPlugin (string fileName)
     {
+        EnsureConfigLoaded();
+
         lock (_configLock)
         {
             var removed = _trustedPluginConfig.PluginNames.Remove(fileName);
@@ -298,6 +309,8 @@ public static partial class PluginValidator
 
         try
         {
+            EnsureConfigLoaded();
+
             // 1. Check if file exists
             if (!File.Exists(dllPath))
             {
