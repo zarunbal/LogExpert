@@ -318,9 +318,22 @@ internal partial class SettingsDialog : Form
         comboBoxReaderType.SelectedItem = Preferences.ReaderType;
     }
 
-    private void FillPortableMode ()
+    internal void FillPortableMode ()
     {
+        // Detach the handler while syncing the checkbox from preferences: CheckedChanged also
+        // fires on programmatic changes, and the handler runs the full activation flow
+        // (question dialog, marker file) which must only happen on a user toggle (issue #658).
+        checkBoxPortableMode.CheckedChanged -= OnPortableModeCheckedChanged;
         checkBoxPortableMode.CheckState = Preferences.PortableMode ? CheckState.Checked : CheckState.Unchecked;
+        SetPortableModeCheckBoxText();
+        checkBoxPortableMode.CheckedChanged += OnPortableModeCheckedChanged;
+    }
+
+    private void SetPortableModeCheckBoxText ()
+    {
+        checkBoxPortableMode.Text = Preferences.PortableMode
+            ? Resources.SettingsDialog_UI_DeActivatePortableMode
+            : Resources.SettingsDialog_UI_ActivatePortableMode;
     }
 
     private void DisplayFontName ()
@@ -997,7 +1010,7 @@ internal partial class SettingsDialog : Form
                             }
 
                             Preferences.PortableMode = true;
-                            checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
+                            SetPortableModeCheckBoxText();
 
                             // Ask user if they want to copy existing settings
                             var result = MessageBox.Show(
@@ -1029,7 +1042,7 @@ internal partial class SettingsDialog : Form
                 case CheckState.Unchecked:
                     {
                         Preferences.PortableMode = false;
-                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_ActivatePortableMode;
+                        SetPortableModeCheckBoxText();
 
                         // Ask user if they want to move settings back
                         var result = MessageBox.Show(
