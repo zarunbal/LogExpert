@@ -2,15 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 1. Think Before Coding
+# Karpathy Guidelines
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+Behavioral guidelines to reduce common LLM coding mistakes.
 
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Clarify Before Executing
+
+**Resolve ambiguity up front — before spawning agents or starting any autonomous work.**
+
+Do this in order, then stop and ask before proceeding:
+
+1. **Understand the request.** Read what was asked closely and state your assumptions explicitly.
+2. **Inspect the codebase.** Check the relevant code, conventions, and existing patterns. Note anything that's unclear or that could be interpreted in more than one way.
+3. **Ask.** Raise every consequential question now, batched together — don't pick an interpretation silently, and don't defer the question into the work itself.
+
+Throughout:
+
+- If multiple interpretations exist, present them — don't choose one silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- Don't invent APIs. Confirm a function, flag, or endpoint exists — and check its signature — before calling it. If you can't verify it, say so rather than guessing.
+
+Only once these questions are resolved do you move to execution (§4).
 
 ## 2. Simplicity First
 
@@ -29,34 +43,60 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 **Touch only what you must. Clean up only your own mess.**
 
 When editing existing code:
+
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+- If you spot problems outside your task — dead code, bugs — mention them; don't fix or delete them unless asked.
 
 When your changes create orphans:
+
 - Remove imports/variables/functions that YOUR changes made unused.
 - Don't remove pre-existing dead code unless asked.
 
-The test: Every changed line should trace directly to the user's request.
+The test: every changed line should trace directly to the user's request.
 
 ## 4. Goal-Driven Execution
 
 **Define success criteria. Loop until verified.**
 
-Transform tasks into verifiable goals:
+Begin only once §1's questions are resolved. Then turn the task into a verifiable goal with an observable check. A passing test is the strongest check; a clean typecheck, running it and inspecting output, or diffing against expected output also count.
+
 - "Add validation" → "Write tests for invalid inputs, then make them pass"
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
 - "Refactor X" → "Ensure tests pass before and after"
+- "Update the config" → "Apply it, start the service, and confirm the setting takes effect"
 
 For multi-step tasks, state a brief plan:
+
 ```
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
 3. [Step] → verify: [check]
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+When no obvious check exists (docs, exploration, some one-off scripts), ask how to verify success before starting. Don't report success you haven't actually observed.
+
+Strong, agreed-upon criteria — settled in §1 — let you loop independently. Weak criteria ("make it work") force constant clarification, which is why §1 comes first.
+
+## 5. Delegate Grunt Work Down a Tier
+
+**Spend the capable model on judgment; push mechanical, low-context work to a cheaper model.**
+
+Act as an orchestrator. Fan out grunt work — reading files, gathering context, simple searches, minor mechanical edits, other simple tool calls — to cheaper agents, then review their findings and any code changes yourself before acting on them. Keep the important and dangerous work — architecture, ambiguous decisions, risky or hard-to-reverse edits, final review — on the more capable model.
+
+Which tier to spawn depends on who you are:
+
+- **If you are Fable 5**, spawn Opus 4.8 agents for grunt work that still needs some capability; for genuinely simple tasks, hand off directly to Sonnet 5 instead. Review what they return.
+- **If you are Opus 4.8**, and a task needs little knowledge or context, fan out to Sonnet 5 agents and review what they return.
+
+Match the model to the task: pick the cheapest tier that can do the job well, and skip an intermediate tier when the work is simple enough for a lower one.
+
+Guidelines:
+
+- Only delegate work that is genuinely low-context and low-risk. If doing it well requires the capable model's judgment, keep it.
+- Give each agent a self-contained task with clear success criteria (per §4) so you can verify its output without redoing the work.
+- Never merge a delegated finding or edit unblocked — review it first. The cheaper model did the legwork; you own the decision.
 
 ## Project Overview
 
@@ -335,99 +375,3 @@ To update this file, ensure that all sections are kept current with the latest a
 - Ensure all technical terms are explained or linked to relevant documentation.
 - Periodically review for outdated information and remove or update as necessary.
 - If told to not do something, ensure this is also added to the "Dont Do that" section.
-
-# Karpathy Guidelines
-
-Behavioral guidelines to reduce common LLM coding mistakes.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-## 1. Clarify Before Executing
-
-**Resolve ambiguity up front — before spawning agents or starting any autonomous work.**
-
-Do this in order, then stop and ask before proceeding:
-
-1. **Understand the request.** Read what was asked closely and state your assumptions explicitly.
-2. **Inspect the codebase.** Check the relevant code, conventions, and existing patterns. Note anything that's unclear or that could be interpreted in more than one way.
-3. **Ask.** Raise every consequential question now, batched together — don't pick an interpretation silently, and don't defer the question into the work itself.
-
-Throughout:
-
-- If multiple interpretations exist, present them — don't choose one silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- Don't invent APIs. Confirm a function, flag, or endpoint exists — and check its signature — before calling it. If you can't verify it, say so rather than guessing.
-
-Only once these questions are resolved do you move to execution (§4).
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you spot problems outside your task — dead code, bugs — mention them; don't fix or delete them unless asked.
-
-When your changes create orphans:
-
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Begin only once §1's questions are resolved. Then turn the task into a verifiable goal with an observable check. A passing test is the strongest check; a clean typecheck, running it and inspecting output, or diffing against expected output also count.
-
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-- "Update the config" → "Apply it, start the service, and confirm the setting takes effect"
-
-For multi-step tasks, state a brief plan:
-
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-When no obvious check exists (docs, exploration, some one-off scripts), ask how to verify success before starting. Don't report success you haven't actually observed.
-
-Strong, agreed-upon criteria — settled in §1 — let you loop independently. Weak criteria ("make it work") force constant clarification, which is why §1 comes first.
-
-## 5. Delegate Grunt Work Down a Tier
-
-**Spend the capable model on judgment; push mechanical, low-context work to a cheaper model.**
-
-Act as an orchestrator. Fan out grunt work — reading files, gathering context, simple searches, minor mechanical edits, other simple tool calls — to cheaper agents, then review their findings and any code changes yourself before acting on them. Keep the important and dangerous work — architecture, ambiguous decisions, risky or hard-to-reverse edits, final review — on the more capable model.
-
-Which tier to spawn depends on who you are:
-
-- **If you are Fable 5**, spawn Opus 4.8 agents for grunt work that still needs some capability; for genuinely simple tasks, hand off directly to Sonnet 5 instead. Review what they return.
-- **If you are Opus 4.8**, and a task needs little knowledge or context, fan out to Sonnet 5 agents and review what they return.
-
-Match the model to the task: pick the cheapest tier that can do the job well, and skip an intermediate tier when the work is simple enough for a lower one.
-
-Guidelines:
-
-- Only delegate work that is genuinely low-context and low-risk. If doing it well requires the capable model's judgment, keep it.
-- Give each agent a self-contained task with clear success criteria (per §4) so you can verify its output without redoing the work.
-- Never merge a delegated finding or edit unblocked — review it first. The cheaper model did the legwork; you own the decision.
