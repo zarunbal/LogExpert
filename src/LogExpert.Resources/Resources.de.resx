@@ -233,7 +233,7 @@
 		<value>Exportieren der Einstellungen in eine Datei</value>
 	</data>
   <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
-		<value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)</value>
+		<value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
 	</data>
   <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
 		<value>Kopie von</value>

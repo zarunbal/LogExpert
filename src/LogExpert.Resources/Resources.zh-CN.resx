@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -148,7 +148,7 @@
     <value>导出设置到文件</value>
   </data>
   <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
-    <value>设置文件 (*.json)|*.json|所有文件 (*.*)</value>
+      <value>设置文件 (*.json)|*.json|所有文件 (*.*)|*.*</value>
   </data>
   <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
     <value>复制为</value>
