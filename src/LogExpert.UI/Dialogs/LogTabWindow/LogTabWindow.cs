@@ -1705,11 +1705,25 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         try
         {
-            IList<LogWindow.LogWindow> deleteLogWindowList = [];
+            var windowsToClose = _tabController.GetAllWindows().ToList();
+
             ConfigManager.Settings.AlwaysOnTop = TopMost && ConfigManager.Settings.Preferences.AllowOnlyOneInstance;
             _fileOperationService.SaveLastOpenFilesList();
 
-            foreach (var logWindow in _tabController.GetAllWindows())
+            // Capture the current persistence state before any tab teardown starts. Closing a child
+            // filter tab removes it from its parent window's filter-tab list, so saving during the
+            // close cascade can overwrite the parent's .lxp with an incomplete snapshot.
+            foreach (var logWindow in windowsToClose)
+            {
+                logWindow.SkipPersistenceSaveOnClose = true;
+            }
+
+            foreach (var logWindow in windowsToClose)
+            {
+                logWindow.SavePersistenceData(false);
+            }
+
+            foreach (var logWindow in windowsToClose)
             {
                 RemoveAndDisposeLogWindow(logWindow, true);
             }

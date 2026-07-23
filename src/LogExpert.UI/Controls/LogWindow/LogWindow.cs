@@ -168,6 +168,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private bool _waitingForClose;
 
+    /// <summary>
+    /// Set by the application shutdown path after a pre-save pass has already captured the
+    /// current persistence state. Prevents the per-window close handler from writing an older
+    /// snapshot after child filter tabs have already been torn down.
+    /// </summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal bool SkipPersistenceSaveOnClose { get; set; }
+
     #endregion
 
     #region cTor
@@ -905,7 +914,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        SavePersistenceData(false);
+        if (!SkipPersistenceSaveOnClose)
+        {
+            SavePersistenceData(false);
+        }
         CloseLogWindow();
     }
 
@@ -5953,9 +5965,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-            //when a filter is added, its added to the Configmanager.Settings.FilterList and not to the _filterParams, this is probably an oversight and maybe a bug
-            //but for the consistency the FilterList should be saved as whole for every file
-            snapshot.FilterParamsList = [.. ConfigManager.Settings.FilterList];
+            // Persist the live filter state for this window. The active filter lives in the window
+            // controls / _filterParams, while ConfigManager.Settings.FilterList is only the shared
+            // saved-filter list UI. The session loader restores the first entry as the active
+            // filter, so that first slot must be the current filter state.
+            snapshot.FilterParamsList =
+            [
+                CaptureCurrentFilterParams(),
+            ];
 
             foreach (var filterPipe in _filterPipeList)
             {
@@ -5981,6 +5998,24 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         snapshot.Encoding = _logFileReader?.CurrentEncoding;
 
         return snapshot;
+    }
+
+    private FilterParams CaptureCurrentFilterParams ()
+    {
+        var filterParams = _filterParams.Clone();
+        filterParams.SearchText = filterComboBox.Text;
+        filterParams.IsRangeSearch = rangeCheckBox.Checked;
+        filterParams.RangeSearchText = filterRangeComboBox.Text;
+        filterParams.IsCaseSensitive = filterCaseSensitiveCheckBox.Checked;
+        filterParams.IsRegex = filterRegexCheckBox.Checked;
+        filterParams.IsFilterTail = filterTailCheckBox.Checked;
+        filterParams.IsInvert = invertFilterCheckBox.Checked;
+        filterParams.FuzzyValue = knobControlFuzzy.Value;
+        filterParams.SpreadBefore = knobControlFilterBackSpread.Value;
+        filterParams.SpreadBehind = knobControlFilterForeSpread.Value;
+        filterParams.ColumnRestrict = columnRestrictCheckBox.Checked;
+        filterParams.CurrentColumnizer = CurrentColumnizer;
+        return filterParams;
     }
 
     public void Close (bool dontAsk)
