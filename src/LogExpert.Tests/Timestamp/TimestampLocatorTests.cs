@@ -4,6 +4,7 @@ using System.Threading;
 
 using ColumnizerLib;
 
+using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Timestamp;
 using LogExpert.Core.Interfaces;
 
@@ -589,6 +590,78 @@ public class TimestampLocatorTests
 
         Assert.That(line, Is.EqualTo(2), "lands on whichever line the binary search first hits, not necessarily the first of the run");
     }
+
+    #region Integration: real TimestampColumnizer over pipe-separated log lines
+
+    /// <summary>
+    /// End-to-end through the real <see cref="TimestampColumnizer"/> (not the stub) with lines
+    /// shaped like a real pipe-separated log — the exact format a user reported dead time-sync on
+    /// ("yyyy-MM-dd HH:mm:ss.fff | LEVEL | thread | source | message"). Proves the parse + lookup
+    /// pipeline: if these pass, a dead sync in the app is a UI gate (timestamp-control preference,
+    /// sync-group membership, per-window columnizer choice), not the locator or the columnizer.
+    /// </summary>
+    [Test]
+    public void RealTimestampColumnizer_PipeSeparatedTraceLine_FindBackwardParsesTheTimestamp ()
+    {
+        var locator = RealColumnizerLocatorOver(
+            "2022-03-21 11:34:34.491 | TRACE |   100 | CTI60Controller | <-- SendRadioInterfaceChanged",
+            "2022-03-21 11:34:34.505 | DEBUG |    33 | PositionServiceListener | --> RadioInterfaceUpdate: message = [[; UpdateNumber=360]]",
+            "2022-03-21 11:34:34.532 | TRACE |    21 | PositionServiceListener | ### ProcessRadioInterfaceUpdates: performing update");
+
+        var (timestamp, lineNumber) = locator.FindBackward(1, 3, roundToSeconds: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(timestamp, Is.EqualTo(At("2022-03-21 11:34:34.505")));
+            Assert.That(lineNumber, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void RealTimestampColumnizer_ExactMillisecondHit_FindLineReturnsTheLine ()
+    {
+        var locator = RealColumnizerLocatorOver(
+            "2022-03-21 11:34:34.491 | TRACE |   100 | CTI60Controller | <-- SendRadioInterfaceChanged",
+            "2022-03-21 11:34:34.505 | DEBUG |    33 | PositionServiceListener | --> RadioInterfaceUpdate",
+            "2022-03-21 11:34:34.532 | TRACE |    21 | PositionServiceListener | ### ProcessRadioInterfaceUpdates");
+
+        var line = locator.FindLine(At("2022-03-21 11:34:34.505"), fromLine: 0, lineCount: 3, roundToSeconds: false);
+
+        Assert.That(line, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void RealTimestampColumnizer_MillisecondMiss_FindLineStillReturnsAScrollableLine ()
+    {
+        // The cross-window sync case: the source window's exact millisecond almost never exists
+        // in the target file. The result must be positive (scrollable), never a negated miss.
+        var locator = RealColumnizerLocatorOver(
+            "2022-03-21 11:34:34.491 | TRACE |   100 | CTI60Controller | <-- SendRadioInterfaceChanged",
+            "2022-03-21 11:34:34.532 | TRACE |    21 | PositionServiceListener | ### ProcessRadioInterfaceUpdates",
+            "2022-03-21 11:34:35.104 | TRACE |    21 | Mixers | <-- Devices");
+
+        var line = locator.FindLine(At("2022-03-21 11:34:34.505"), fromLine: 0, lineCount: 3, roundToSeconds: false);
+
+        Assert.That(line, Is.InRange(0, 2));
+    }
+
+    private static TimestampLocator RealColumnizerLocatorOver (params string[] lines)
+    {
+        var readerMock = new Mock<ILogfileReader>();
+        _ = readerMock.Setup(r => r.LineCount).Returns(lines.Length);
+        _ = readerMock.Setup(r => r.GetLogLineMemory(It.IsAny<int>()))
+            .Returns((int lineNum) => lineNum >= 0 && lineNum < lines.Length ? LineOf(lines[lineNum]) : null!);
+
+        var sourceMock = new Mock<ITimestampSource>();
+        _ = sourceMock.Setup(s => s.Reader).Returns(readerMock.Object);
+        _ = sourceMock.Setup(s => s.Columnizer).Returns(new TimestampColumnizer());
+        _ = sourceMock.Setup(s => s.Callback).Returns(new RecordingCallback());
+        _ = sourceMock.Setup(s => s.ColumnizerLock).Returns(new Lock());
+
+        return new TimestampLocator(sourceMock.Object);
+    }
+
+    #endregion
 
     #region Fake source over known lines
 
