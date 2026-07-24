@@ -189,9 +189,14 @@ internal sealed class LogWindowCoordinator (
         {
             if (logWindow.ScrollToTimestamp(timestamp, false, false))
             {
-                _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
+                IndicateTimeSyncActivity(logWindow);
             }
         }
+    }
+
+    public void IndicateTimeSyncActivity (LogWindow logWindow)
+    {
+        _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
     }
 
     public IList<WindowFileEntry> GetOpenFiles ()

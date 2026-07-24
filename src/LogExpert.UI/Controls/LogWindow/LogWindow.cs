@@ -5592,7 +5592,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         lock (_timeSyncListLock)
         {
-            TimeSyncList?.NavigateToTimestamp(timestamp, this);
+            TimeSyncList?.NavigateToTimestamp(timestamp, this, _logWindowCoordinator.IndicateTimeSyncActivity);
         }
     }
 
