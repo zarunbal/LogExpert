@@ -4,7 +4,7 @@ using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Callback;
 
-public class ColumnizerCallback (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback
+public class ColumnizerCallback (ILogWindow logWindow) : IPositionedColumnizerCallback, IAutoLogLineMemoryColumnizerCallback
 {
     #region Fields
     private readonly ILogWindow _logWindow = logWindow;

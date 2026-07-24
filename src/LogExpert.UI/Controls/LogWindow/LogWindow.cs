@@ -18,6 +18,7 @@ using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Classes.Search;
+using LogExpert.Core.Classes.Timestamp;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
@@ -41,7 +42,7 @@ namespace LogExpert.UI.Controls.LogWindow;
 
 //TODO: Implemented 4 interfaces explicitly. Find them by searching: ILogWindow.<method name>
 [SupportedOSPlatform("windows")]
-internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow
+internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource
 {
     #region Fields
 
@@ -103,6 +104,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly EventWaitHandle _timeShiftSyncWakeupEvent = new ManualResetEvent(false);
 
     private readonly TimeSpreadCalculator _timeSpreadCalc;
+    private readonly TimestampLocator _timestampLocator;
 
     private readonly Lock _timeSyncListLock = new();
 
@@ -135,7 +137,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private bool _isLoadError;
     private bool _isLoading;
     private bool _isSearching;
-    private bool _isTimestampDisplaySyncing;
 
     private List<int> _lastFilterLinesList = [];
 
@@ -194,6 +195,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ConfigManager = configManager; //TODO: This should be changed to DI
         //Thread.CurrentThread.Name = "LogWindowThread";
         ColumnizerCallbackObject = new ColumnizerCallback(this);
+        _timestampLocator = new TimestampLocator(this);
 
         FileName = fileName;
         ForcePersistenceLoading = forcePersistenceLoading;
@@ -210,7 +212,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         Disposed += OnLogWindowDisposed;
         Load += OnLogWindowLoad;
 
-        _timeSpreadCalc = new TimeSpreadCalculator(this);
+        _timeSpreadCalc = new TimeSpreadCalculator(_timestampLocator, this);
         timeSpreadingControl.TimeSpreadCalc = _timeSpreadCalc;
         timeSpreadingControl.LineSelected += OnTimeSpreadingControlLineSelected;
         tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Absolute;
@@ -398,6 +400,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 : FileName;
 
     public ColumnizerCallback ColumnizerCallbackObject { get; }
+
+    #region ITimestampSource
+
+    // Read live rather than captured: _logFileReader is reassigned on load/reload/rollover, and
+    // CurrentColumnizer is swapped by its own setter whenever the user picks a different one.
+    // TimestampLocator (and TimeSpreadCalculator through it) must see the current instance of each.
+    ILogfileReader ITimestampSource.Reader => _logFileReader;
+    ILogLineMemoryColumnizer ITimestampSource.Columnizer => CurrentColumnizer;
+    IPositionedColumnizerCallback ITimestampSource.Callback => ColumnizerCallbackObject;
+    Lock ITimestampSource.ColumnizerLock => _currentColumnizerLock;
+
+    #endregion
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ForcePersistenceLoading { get; set; }
@@ -3952,7 +3966,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         Thread.CurrentThread.Name = "SyncTimestampDisplayWorker";
         _shouldTimestampDisplaySyncingCancel = false;
-        _isTimestampDisplaySyncing = true;
 
         while (!_shouldTimestampDisplaySyncingCancel)
         {
@@ -5292,10 +5305,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var line = 0;
-        _guiStateArgs.MinTimestamp = GetTimestampForLineForward(ref line, true);
-        line = dataGridView.RowCount - 1;
-        (_guiStateArgs.MaxTimestamp, _) = GetTimestampForLine(line, true);
+        (_guiStateArgs.MinTimestamp, _) = _timestampLocator.FindForward(0, _logFileReader.LineCount, true);
+        (_guiStateArgs.MaxTimestamp, _) = GetTimestampForLine(dataGridView.RowCount - 1, true);
         SendGuiStateUpdate();
     }
 
@@ -7493,7 +7504,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             currentLine = 0;
         }
 
-        var foundLine = FindTimestampLine(currentLine, timestamp, roundToSeconds);
+        var foundLine = _timestampLocator.FindLine(timestamp, currentLine, _logFileReader.LineCount, roundToSeconds, _windowCts.Token);
         if (foundLine >= 0)
         {
             SelectAndEnsureVisible(foundLine, triggerSyncCall);
@@ -7504,189 +7515,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return hasScrolled;
     }
 
-    public int FindTimestampLine (int lineNum, DateTime timestamp, bool roundToSeconds)
+    /// <summary>
+    /// Gets the timestamp for the line at or before <paramref name="lastLineNum"/>, searching
+    /// backward through the file for one if that line has none. Delegates to
+    /// <see cref="TimestampLocator.FindBackward"/>.
+    /// </summary>
+    private (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
     {
-        var foundLine = FindTimestampLineInternal(lineNum, 0, dataGridView.RowCount - 1, timestamp, roundToSeconds);
-
-        if (foundLine >= 0)
-        {
-            // go backwards to the first occurence of the hit
-            var (foundTimestamp, foundLine1) = GetTimestampForLine(foundLine, roundToSeconds);
-            foundLine = foundLine1;
-            while (foundTimestamp.CompareTo(timestamp) == 0 && foundLine >= 0)
-            {
-                foundLine--;
-                (foundTimestamp, foundLine1) = GetTimestampForLine(foundLine, roundToSeconds);
-                foundLine = foundLine1;
-            }
-
-            if (foundLine < 0)
-            {
-                return 0;
-            }
-
-            foundLine++;
-            _ = GetTimestampForLineForward(ref foundLine, roundToSeconds); // fwd to next valid timestamp
-            return foundLine;
-        }
-
-        return -foundLine;
-    }
-
-    public int FindTimestampLineInternal (int lineNum, int rangeStart, int rangeEnd, DateTime timestamp, bool roundToSeconds)
-    {
-        var (currentTimestamp, foundLine) = GetTimestampForLine(lineNum, roundToSeconds);
-        if (currentTimestamp.CompareTo(timestamp) == 0)
-        {
-            //return lineNum;
-            return foundLine;
-        }
-
-        if (timestamp < currentTimestamp)
-        {
-            //rangeStart = rangeStart;
-            rangeEnd = lineNum;
-        }
-        else
-        {
-            rangeStart = lineNum;
-            //rangeEnd = rangeEnd;
-        }
-
-        if (rangeEnd - rangeStart <= 0)
-        {
-            return -lineNum;
-        }
-
-        lineNum = ((rangeEnd - rangeStart) / 2) + rangeStart;
-        // prevent endless loop
-        if (rangeEnd - rangeStart < 2)
-        {
-            (currentTimestamp, rangeStart) = GetTimestampForLine(rangeStart, roundToSeconds);
-            if (currentTimestamp.CompareTo(timestamp) == 0)
-            {
-                return rangeStart;
-            }
-
-            (currentTimestamp, rangeEnd) = GetTimestampForLine(rangeEnd, roundToSeconds);
-
-            return currentTimestamp.CompareTo(timestamp) == 0
-                ? rangeEnd
-                : -lineNum;
-        }
-
-        return FindTimestampLineInternal(lineNum, rangeStart, rangeEnd, timestamp, roundToSeconds);
-    }
-
-    /**
-    * Get the timestamp for the given line number. If the line
-    * has no timestamp, the previous line will be checked until a
-    * timestamp is found.
-*/
-    public (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
-    {
-        lock (_currentColumnizerLock)
-        {
-            if (!CurrentColumnizer.IsTimeshiftImplemented())
-            {
-                return (DateTime.MinValue, lastLineNum);
-            }
-
-            if (_logger.IsDebugEnabled)
-            {
-                _logger.Debug($"### GetTimestampForLine: leave with lineNum={lastLineNum}");
-            }
-
-            var timeStamp = DateTime.MinValue;
-            var lookBack = false;
-            if (lastLineNum >= 0 && lastLineNum < dataGridView.RowCount)
-            {
-                while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lastLineNum >= 0)
-                {
-                    if (_isTimestampDisplaySyncing && _shouldTimestampDisplaySyncingCancel)
-                    {
-                        return (DateTime.MinValue, lastLineNum);
-                    }
-
-                    lookBack = true;
-                    var logLine = _logFileReader.GetLogLineMemory(lastLineNum);
-                    if (logLine == null)
-                    {
-                        return (DateTime.MinValue, lastLineNum);
-                    }
-
-                    ColumnizerCallbackObject.LineNum = lastLineNum;
-                    timeStamp = CurrentColumnizer.GetTimestamp(ColumnizerCallbackObject, logLine);
-                    if (roundToSeconds)
-                    {
-                        timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
-                    }
-
-                    lastLineNum--;
-                }
-            }
-
-            if (lookBack)
-            {
-                lastLineNum++;
-            }
-
-            if (_logger.IsDebugEnabled)
-            {
-                _logger.Debug($"### GetTimestampForLine: found timestamp={timeStamp}");
-            }
-
-            return (timeStamp, lastLineNum);
-        }
-    }
-
-    /**
-    * Get the timestamp for the given line number. If the line
-    * has no timestamp, the next line will be checked until a
-    * timestamp is found.
-*/
-    public DateTime GetTimestampForLineForward (ref int lineNum, bool roundToSeconds)
-    {
-        lock (_currentColumnizerLock)
-        {
-            if (!CurrentColumnizer.IsTimeshiftImplemented())
-            {
-                return DateTime.MinValue;
-            }
-
-            var timeStamp = DateTime.MinValue;
-            var lookFwd = false;
-            if (lineNum >= 0 && lineNum < dataGridView.RowCount)
-            {
-                while (timeStamp.CompareTo(DateTime.MinValue) == 0 && lineNum < dataGridView.RowCount)
-                {
-                    lookFwd = true;
-                    var logLine = _logFileReader.GetLogLineMemory(lineNum);
-
-                    if (logLine == null)
-                    {
-                        timeStamp = DateTime.MinValue;
-                        break;
-                    }
-
-                    timeStamp = CurrentColumnizer.GetTimestamp(ColumnizerCallbackObject, logLine);
-
-                    if (roundToSeconds)
-                    {
-                        timeStamp = timeStamp.Subtract(TimeSpan.FromMilliseconds(timeStamp.Millisecond));
-                    }
-
-                    lineNum++;
-                }
-            }
-
-            if (lookFwd)
-            {
-                lineNum--;
-            }
-
-            return timeStamp;
-        }
+        return _timestampLocator.FindBackward(lastLineNum, _logFileReader.LineCount, roundToSeconds, _windowCts.Token);
     }
 
     public void AppFocusLost ()
