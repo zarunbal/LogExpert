@@ -165,6 +165,47 @@ delegate name, deleted).
 **filtering** — the `FilterSearch` methods in the code belong to the
 filter path, not Log Search), "find dialog" (use **Search dialog**).
 
+## Timestamp lookup
+
+- **Timestamp Locator** (`LogExpert.Core.Classes.Timestamp.TimestampLocator`)
+  — Timestamp lookup over a Logfile Reader and the active Columnizer: what
+  time is the line at N (`FindBackward`, `FindForward`), and which line
+  carries time T (`FindLine`, plus the raw binary-search primitive
+  `FindNearestLine` used directly by the Time Spread calculator). Pure —
+  no dependency on the Log Window control, only on `ITimestampSource`
+  (below). Backs both time-sync (drag-to-scroll, "scroll all tabs to
+  timestamp", the sync-group worker) and the Time Spread bar; the worker
+  threads, grid selection, and cross-window coordination stay in the Log
+  Window and `TimeSyncList` — only the lookup was extracted.
+- **Timestamp Source** (`ITimestampSource`) — The narrow seam a Timestamp
+  Locator runs against: a Logfile Reader, the active Columnizer, a
+  positionable Columnizer callback, and the lock guarding Columnizer
+  swaps. Every member is read live rather than captured, because a Log
+  Window replaces its Logfile Reader on load/reload/rollover and swaps
+  its Columnizer whenever the user picks a different one; a consumer like
+  the Time Spread calculator outlives both events. Implemented by the Log
+  Window itself.
+- **Negated near-miss** — The miss convention of `FindNearestLine`, the raw
+  binary-search primitive: when no line carries the exact timestamp searched
+  for, it returns the nearest line's number *negated*, and callers flip the
+  sign back themselves (`TimeSpreadCalculator` does). `FindLine`, the
+  high-level lookup, does **not** expose this: it flips a miss back to a
+  normal positive line number, so callers scroll to the nearest line instead
+  of doing nothing — cross-window time-sync compares timestamps at
+  millisecond precision, making the near-miss its *common* case. (Getting
+  this wrong silently no-opped "scroll all tabs to timestamp" and time-sync;
+  regression-pinned in `TimestampLocatorTests.FindLine_NoExactMatchMidFile_*`.)
+  A near-miss that lands on line 0 is indistinguishable from a hit at line 0
+  (`-0 == 0`) — a ported quirk of the original binary search, preserved
+  rather than fixed; see
+  `TimestampLocatorTests.FindLine_TimestampBeforeTheFirstLine_*`.
+
+*Avoid*: "GetTimestampForLine" / "GetTimestampForLineForward" /
+"FindTimestampLineInternal" as concept names — those were the pre-extraction
+Log Window method names (candidate 6 of
+`docs/improve/logwindow-architecture-review.html`); the Core module is the
+**Timestamp Locator**.
+
 ## Columnizer selection
 
 - **Columnizer** (`ILogLineMemoryColumnizer`) — A plugin that parses a log

@@ -401,6 +401,11 @@
   <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
 		<value>Zeitsynchronisierte Dateien</value>
 	</data>
+  <data name="LogWindow_UI_TimeSync_TimestampControlHint" xml:space="preserve">
+		<value>Die Dateien sind jetzt zeitsynchronisiert.
+
+Damit die anderen Fenster beim Auswählen einer Zeile (Mausklick oder Pfeiltasten) mitlaufen, aktiviere "Show timestamp control" unter Einstellungen &gt; Timestamp features. Ohne diese Option bewegt nur "Scroll all tabs to current timestamp" die anderen Fenster.</value>
+	</data>
   <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
 		<value>Temp Highlights</value>
 	</data>

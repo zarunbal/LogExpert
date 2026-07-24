@@ -422,6 +422,11 @@
   <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
         <value>Scolls all open tabs to the selected timestamp, if possible</value>
     </data>
+  <data name="LogWindow_UI_TimeSync_TimestampControlHint" xml:space="preserve">
+        <value>Files are now time synced.
+
+To sync the other windows while you select lines (mouse click or arrow keys), enable "Show timestamp control" under Settings &gt; Timestamp features. Without it, only "Scroll all tabs to current timestamp" moves the other windows.</value>
+    </data>
   <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
         <value>Time synced files</value>
     </data>

@@ -66,6 +66,15 @@ internal interface ILogWindowCoordinator
     void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender);
 
     /// <summary>
+    /// Flashes the given window's tab LED to signal it was scrolled by time-sync.
+    /// Same activity signal that <see cref="ScrollAllTabsToTimestamp"/> raises for the tabs it
+    /// scrolls; selection-driven sync (via <c>TimeSyncList</c>) reports through here so both sync
+    /// paths are visually identical. Safe to call from a worker thread — the LED service marshals
+    /// icon updates to the UI thread itself.
+    /// </summary>
+    void IndicateTimeSyncActivity (LogWindow logWindow);
+
+    /// <summary>
     /// Returns the list of all currently open log files.
     /// </summary>
     IList<WindowFileEntry> GetOpenFiles ();
