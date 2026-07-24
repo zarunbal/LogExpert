@@ -442,14 +442,15 @@ public class TimestampLocatorTests
     }
 
     /// <summary>
-    /// Ported quirk, preserved rather than fixed (per the extraction ticket): a miss is signalled by
-    /// returning the near-miss line number <em>negated</em>. When the near-miss line is 0, that
-    /// negation is indistinguishable from an exact hit at line 0 — <c>-0 == 0</c> for a signed int.
-    /// Searching before the very first line always converges the binary search on line 0 (the range
-    /// can never go below it), so this case is never reported as a miss: the wrapper treats it as a
-    /// hit at line 0, walks back (already at 0), then steps forward to the first line with a real
-    /// timestamp — line 1 for this fixture. Not a bug introduced by the extraction; the original
-    /// <c>FindTimestampLine</c> does the same walk starting from the same <c>-lineNum == 0</c> value.
+    /// Ported quirk, preserved rather than fixed (per the extraction ticket): the internal binary
+    /// search signals a miss by returning the near-miss line number <em>negated</em>. When the
+    /// near-miss line is 0, that negation is indistinguishable from an exact hit at line 0 —
+    /// <c>-0 == 0</c> for a signed int. Searching before the very first line always converges the
+    /// binary search on line 0 (the range can never go below it), so this case takes the
+    /// <em>hit</em> branch of <see cref="TimestampLocator.FindLine"/>: it walks back (already at 0),
+    /// then steps forward to the first line with a real timestamp — line 1 for this fixture. Not a
+    /// bug introduced by the extraction; the original <c>FindTimestampLine</c> does the same walk
+    /// starting from the same <c>-lineNum == 0</c> value.
     /// </summary>
     [Test]
     public void FindLine_TimestampBeforeTheFirstLine_IsIndistinguishableFromAHitAtLineZero_StepsForwardToLineOne ()
@@ -461,11 +462,18 @@ public class TimestampLocatorTests
         Assert.That(line, Is.EqualTo(1));
     }
 
+    /// <summary>
+    /// The scroll-to-nearest contract, regression-pinned after a smoke test caught it broken:
+    /// on a miss, <see cref="TimestampLocator.FindLine"/> flips the internal negated near-miss back
+    /// to a <em>positive</em> line number — the original <c>FindTimestampLine</c> ended with
+    /// <c>return -foundLine</c>. Cross-window time-sync compares timestamps at millisecond
+    /// precision, so an exact hit in another window's file is the rare case; if a miss stayed
+    /// negative, "Scroll all tabs to current timestamp" and scrollbar time-sync would do nothing
+    /// at all (the caller ignores negative lines) instead of scrolling to the nearest line.
+    /// </summary>
     [Test]
-    public void FindLine_NoExactMatchMidFile_ReturnsANegatedNearMissAwayFromLineZero ()
+    public void FindLine_NoExactMatchMidFile_ReturnsTheNearestLineAsAPositiveNumber ()
     {
-        // A miss whose near-miss line is not 0 is unambiguously negative — the -0 collision above
-        // does not apply here.
         var locator = LocatorOver(
             "2026-01-01 10:00:00",
             "2026-01-01 10:00:01",
@@ -475,17 +483,21 @@ public class TimestampLocatorTests
 
         var line = locator.FindLine(At("2026-01-01 10:00:02.500"), fromLine: 2, lineCount: 5, roundToSeconds: false);
 
-        Assert.That(line, Is.LessThan(0));
+        // The binary search converges on line 2 (10:00:02) for 10:00:02.500 — nearest, flipped positive.
+        Assert.That(line, Is.EqualTo(2));
     }
 
     [Test]
-    public void FindLine_TimestampAfterTheLastLine_ReturnsANegatedNearMiss ()
+    public void FindLine_TimestampAfterTheLastLine_ReturnsTheConvergedLineAsAPositiveNumber ()
     {
         var locator = LocatorOver("2026-01-01 10:00:00", "2026-01-01 10:00:01", "2026-01-01 10:00:02");
 
         var line = locator.FindLine(At("2027-01-01 00:00:00"), fromLine: 1, lineCount: 3, roundToSeconds: false);
 
-        Assert.That(line, Is.LessThan(0));
+        // Ported quirk: the search reports the last midpoint it converged on (line 1), not the
+        // truly nearest line (line 2). The original behaved identically; callers only need
+        // "somewhere close, and scroll" — not exact nearest.
+        Assert.That(line, Is.EqualTo(1));
     }
 
     [Test]

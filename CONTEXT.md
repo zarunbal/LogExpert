@@ -185,13 +185,19 @@ filter path, not Log Search), "find dialog" (use **Search dialog**).
   its Columnizer whenever the user picks a different one; a consumer like
   the Time Spread calculator outlives both events. Implemented by the Log
   Window itself.
-- **Negated near-miss** — The Timestamp Locator's miss convention: when
-  `FindLine` (or `FindNearestLine`) finds no line carrying the exact
-  timestamp searched for, it returns the nearest line's number *negated*.
-  Callers that care about a miss must flip the sign back themselves
-  (`TimeSpreadCalculator` does). A near-miss that lands on line 0 is
-  indistinguishable from a hit at line 0 (`-0 == 0`) — a ported quirk of
-  the original binary search, preserved rather than fixed; see
+- **Negated near-miss** — The miss convention of `FindNearestLine`, the raw
+  binary-search primitive: when no line carries the exact timestamp searched
+  for, it returns the nearest line's number *negated*, and callers flip the
+  sign back themselves (`TimeSpreadCalculator` does). `FindLine`, the
+  high-level lookup, does **not** expose this: it flips a miss back to a
+  normal positive line number, so callers scroll to the nearest line instead
+  of doing nothing — cross-window time-sync compares timestamps at
+  millisecond precision, making the near-miss its *common* case. (Getting
+  this wrong silently no-opped "scroll all tabs to timestamp" and time-sync;
+  regression-pinned in `TimestampLocatorTests.FindLine_NoExactMatchMidFile_*`.)
+  A near-miss that lands on line 0 is indistinguishable from a hit at line 0
+  (`-0 == 0`) — a ported quirk of the original binary search, preserved
+  rather than fixed; see
   `TimestampLocatorTests.FindLine_TimestampBeforeTheFirstLine_*`.
 
 *Avoid*: "GetTimestampForLine" / "GetTimestampForLineForward" /

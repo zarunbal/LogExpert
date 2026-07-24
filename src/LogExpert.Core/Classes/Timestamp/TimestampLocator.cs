@@ -128,9 +128,12 @@ public sealed class TimestampLocator (ITimestampSource source)
     /// <param name="token">Checked by the underlying scans; a cancelled token unwinds the search early.</param>
     /// <returns>
     /// The line number of the first line carrying <paramref name="timestamp"/>. If no line carries
-    /// it exactly, returns the <em>negated</em> line number nearest the search — callers that care
-    /// about a miss must flip the sign back themselves; this mirrors the ported behaviour of the
-    /// original <c>FindTimestampLine</c>.
+    /// it exactly, returns the line the search converged nearest to, as a normal <em>positive</em>
+    /// line number — a miss degrades to "scroll here instead", it is not reported. This mirrors the
+    /// original <c>FindTimestampLine</c>, whose final <c>return -foundLine</c> flipped the
+    /// internal negated miss back to a scrollable line; cross-window time-sync compares timestamps
+    /// at millisecond precision, so the nearest-line path is its common case, not its edge case.
+    /// Callers that need the raw miss signal use <see cref="FindNearestLine"/>.
     /// </returns>
     public int FindLine (DateTime timestamp, int fromLine, int lineCount, bool roundToSeconds, CancellationToken token = default)
     {
@@ -138,7 +141,7 @@ public sealed class TimestampLocator (ITimestampSource source)
 
         if (foundLine < 0)
         {
-            return foundLine;
+            return -foundLine;
         }
 
         // Walk backward to the first line of the run sharing this exact timestamp.
