@@ -1616,10 +1616,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// Selection-driven sync (mouse click / arrow keys) only runs when the timestamp control is
     /// enabled — the entry point is gated on <c>Preferences.TimestampControl</c>, which defaults to
     /// off. Users who time-sync files with it off see the explicit menu command work but selection
-    /// do nothing, which reads as a broken feature. Shown once per application run, at the moment
-    /// sync is switched on.
+    /// do nothing, which reads as a broken feature. Shown at most once per window, at the moment
+    /// sync is switched on from that window's context menu.
     /// </summary>
-    private static bool _timeSyncSettingsHintShown;
+    private bool _timeSyncSettingsHintShown;
 
     private void ShowTimeSyncSettingsHintOnce ()
     {

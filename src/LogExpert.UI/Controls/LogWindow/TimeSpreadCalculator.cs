@@ -21,21 +21,13 @@ internal class TimeSpreadCalculator
 
     // for DoCalc_via_Time
     private double _average;
-
-    private int _contrast = 400;
-
     private int _displayHeight;
-
-    private bool _enabled;
-
     private DateTime _endTimestamp;
     private int _lineCount;
     private int _maxDiff;
     private bool _shouldStop;
     private readonly CancellationTokenSource _cts = new();
     private DateTime _startTimestamp;
-
-    private bool _timeMode = true;
 
     // for DoCalc
     private int _timePerLine;
@@ -65,11 +57,11 @@ internal class TimeSpreadCalculator
 
     public bool Enabled
     {
-        get => _enabled;
+        get;
         set
         {
-            _enabled = value;
-            if (_enabled)
+            field = value;
+            if (field)
             {
                 _ = _calcEvent.Set();
                 _ = _lineCountEvent.Set();
@@ -79,30 +71,30 @@ internal class TimeSpreadCalculator
 
     public bool TimeMode
     {
-        get => _timeMode;
+        get;
         set
         {
-            _timeMode = value;
-            if (_enabled)
+            field = value;
+            if (Enabled)
             {
                 _ = _calcEvent.Set();
                 _ = _lineCountEvent.Set();
             }
         }
-    }
+    } = true;
 
     public int Contrast
     {
         set
         {
-            _contrast = value;
-            if (_contrast < 0)
+            field = value;
+            if (field < 0)
             {
-                _contrast = 0;
+                field = 0;
             }
-            else if (_contrast > MAX_CONTRAST)
+            else if (field > MAX_CONTRAST)
             {
-                _contrast = MAX_CONTRAST;
+                field = MAX_CONTRAST;
             }
 
             if (TimeMode)
@@ -117,8 +109,8 @@ internal class TimeSpreadCalculator
             OnCalcDone(EventArgs.Empty);
         }
 
-        get => _contrast;
-    }
+        get;
+    } = 400;
 
     public List<SpreadEntry> DiffList { get; set; } = [];
 
@@ -230,7 +222,7 @@ internal class TimeSpreadCalculator
             for (var i = lineNum; i < lastLineNum; i += step)
             {
                 var currLineNum = i;
-                (var time, currLineNum) = _locator.FindForward(currLineNum, lineCount, false);
+                (var time, _) = _locator.FindForward(currLineNum, lineCount, false);
                 if (time != DateTime.MinValue)
                 {
                     var span = time - oldTime;
@@ -271,7 +263,7 @@ internal class TimeSpreadCalculator
 
         var lineNum = 0;
         var lastLineNum = lineCount - 1;
-        (_startTimestamp, lineNum) = _locator.FindForward(lineNum, lineCount, false);
+        (_startTimestamp, _) = _locator.FindForward(lineNum, lineCount, false);
         (_endTimestamp, lastLineNum) = _locator.FindBackward(lastLineNum, lineCount, false);
 
         if (_startTimestamp != DateTime.MinValue && _endTimestamp != DateTime.MinValue)
@@ -378,7 +370,7 @@ internal class TimeSpreadCalculator
                     diffFromAverage = 0;
                 }
 
-                var value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond) * _contrast);
+                var value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond) * Contrast);
                 entry.Value = 255 - value;
                 oldTime = entry.Timestamp;
             }
@@ -399,7 +391,7 @@ internal class TimeSpreadCalculator
                 diffFromAverage = 0;
             }
 
-            var value = (int)(diffFromAverage / maxDiff * _contrast);
+            var value = (int)(diffFromAverage / maxDiff * Contrast);
             entry.Value = 255 - value;
 
             //var timestamp = $"{entry.Timestamp:HH:mm:ss.fff}";
