@@ -169,9 +169,31 @@ public class TimestampLocatorTests
     }
 
     [Test]
-    public void FindBackward_CancelledToken_StopsScanningAndReturnsMinValue ()
+    public void FindBackward_NotRoundToSeconds_PreservesTheMillisecondComponent ()
     {
-        var locator = LocatorOver("2026-01-01 10:00:00", "2026-01-01 10:00:01");
+        var locator = LocatorOver("2026-01-01 10:00:00.750");
+
+        var (timestamp, _) = locator.FindBackward(0, 1, roundToSeconds: false);
+
+        Assert.That(timestamp, Is.EqualTo(At("2026-01-01 10:00:00.750")));
+    }
+
+    [Test]
+    public void FindBackward_CancelledToken_StopsScanningWithoutTouchingTheReader ()
+    {
+        var readerMock = new Mock<ILogfileReader>();
+        _ = readerMock.Setup(r => r.LineCount).Returns(2);
+
+        var columnizerMock = new Mock<ILogLineMemoryColumnizer>();
+        _ = columnizerMock.Setup(c => c.IsTimeshiftImplemented()).Returns(true);
+
+        var sourceMock = new Mock<ITimestampSource>();
+        _ = sourceMock.Setup(s => s.Reader).Returns(readerMock.Object);
+        _ = sourceMock.Setup(s => s.Columnizer).Returns(columnizerMock.Object);
+        _ = sourceMock.Setup(s => s.Callback).Returns(new RecordingCallback());
+        _ = sourceMock.Setup(s => s.ColumnizerLock).Returns(new Lock());
+
+        var locator = new TimestampLocator(sourceMock.Object);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -182,6 +204,7 @@ public class TimestampLocatorTests
             Assert.That(timestamp, Is.EqualTo(DateTime.MinValue));
             Assert.That(lineNumber, Is.EqualTo(1));
         });
+        readerMock.Verify(r => r.GetLogLineMemory(It.IsAny<int>()), Times.Never);
     }
 
     [Test]
@@ -264,6 +287,20 @@ public class TimestampLocatorTests
     }
 
     [Test]
+    public void FindForward_NegativeLineNumber_ReturnsMinValueWithoutScanning ()
+    {
+        var locator = LocatorOver("2026-01-01 10:00:00");
+
+        var (timestamp, lineNumber) = locator.FindForward(-1, 1, roundToSeconds: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(timestamp, Is.EqualTo(DateTime.MinValue));
+            Assert.That(lineNumber, Is.EqualTo(-1));
+        });
+    }
+
+    [Test]
     public void FindForward_RoundToSeconds_ZeroesTheMillisecondComponent ()
     {
         var locator = LocatorOver("2026-01-01 10:00:00.750");
@@ -271,6 +308,16 @@ public class TimestampLocatorTests
         var (timestamp, _) = locator.FindForward(0, 1, roundToSeconds: true);
 
         Assert.That(timestamp, Is.EqualTo(At("2026-01-01 10:00:00.000")));
+    }
+
+    [Test]
+    public void FindForward_NotRoundToSeconds_PreservesTheMillisecondComponent ()
+    {
+        var locator = LocatorOver("2026-01-01 10:00:00.750");
+
+        var (timestamp, _) = locator.FindForward(0, 1, roundToSeconds: false);
+
+        Assert.That(timestamp, Is.EqualTo(At("2026-01-01 10:00:00.750")));
     }
 
     [Test]

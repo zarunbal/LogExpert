@@ -7504,7 +7504,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             currentLine = 0;
         }
 
-        var foundLine = _timestampLocator.FindLine(timestamp, currentLine, _logFileReader.LineCount, roundToSeconds, _windowCts.Token);
+        var foundLine = _timestampLocator.FindLine(timestamp, currentLine, _logFileReader.LineCount, roundToSeconds, _cts.Token);
         if (foundLine >= 0)
         {
             SelectAndEnsureVisible(foundLine, triggerSyncCall);
@@ -7520,9 +7520,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// backward through the file for one if that line has none. Delegates to
     /// <see cref="TimestampLocator.FindBackward"/>.
     /// </summary>
+    /// <remarks>
+    /// Cancels via <see cref="_cts"/>, not <see cref="_windowCts"/>: this mirrors the original
+    /// bail-out (<c>_isTimestampDisplaySyncing &amp;&amp; _shouldTimestampDisplaySyncingCancel</c>),
+    /// which every caller of this method observed. <c>_cts</c> is cancelled in
+    /// <see cref="StopTimestampSyncThread"/> — before it blocks on <see cref="JoinWorker"/> — while
+    /// <c>_windowCts</c> is only cancelled afterward, in <see cref="CloseLogWindow"/>. Using
+    /// <c>_windowCts</c> here would leave an in-progress scan unable to observe cancellation for the
+    /// whole of that teardown wait.
+    /// </remarks>
     private (DateTime timeStamp, int lastLineNumber) GetTimestampForLine (int lastLineNum, bool roundToSeconds)
     {
-        return _timestampLocator.FindBackward(lastLineNum, _logFileReader.LineCount, roundToSeconds, _windowCts.Token);
+        return _timestampLocator.FindBackward(lastLineNum, _logFileReader.LineCount, roundToSeconds, _cts.Token);
     }
 
     public void AppFocusLost ()
