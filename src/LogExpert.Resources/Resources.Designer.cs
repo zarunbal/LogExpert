@@ -3641,6 +3641,17 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Files are now time synced.
+        ///
+        ///To sync the other windows while you select lines (mouse click or arrow keys), enable &quot;Show timestamp control&quot; under Settings &gt; Timestamp features. Without it, only &quot;Scroll all tabs to current timestamp&quot; moves the other windows..
+        /// </summary>
+        public static string LogWindow_UI_TimeSync_TimestampControlHint {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_TimeSync_TimestampControlHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose a file to save bookmarks into.
         /// </summary>
         public static string LogWindow_UI_Title_ExportBookMarkList {

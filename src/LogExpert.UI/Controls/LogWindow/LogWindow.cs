@@ -1607,8 +1607,30 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             //AddSlaveToTimesync(entry.LogWindow);
             {
                 AddOtherWindowToTimesync(entry.LogWindow);
+                ShowTimeSyncSettingsHintOnce();
             }
         }
+    }
+
+    /// <summary>
+    /// Selection-driven sync (mouse click / arrow keys) only runs when the timestamp control is
+    /// enabled — the entry point is gated on <c>Preferences.TimestampControl</c>, which defaults to
+    /// off. Users who time-sync files with it off see the explicit menu command work but selection
+    /// do nothing, which reads as a broken feature. Shown once per application run, at the moment
+    /// sync is switched on.
+    /// </summary>
+    private static bool _timeSyncSettingsHintShown;
+
+    private void ShowTimeSyncSettingsHintOnce ()
+    {
+        if (_timeSyncSettingsHintShown || Preferences.TimestampControl)
+        {
+            return;
+        }
+
+        _timeSyncSettingsHintShown = true;
+        _ = MessageBox.Show(this, Resources.LogWindow_UI_TimeSync_TimestampControlHint,
+            Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     [SupportedOSPlatform("windows")]
