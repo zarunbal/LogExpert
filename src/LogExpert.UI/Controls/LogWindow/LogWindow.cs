@@ -86,6 +86,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly Image _panelOpenButtonImage;
     private readonly ILogWindowCoordinator _logWindowCoordinator;
+    private readonly IPluginRegistry _pluginRegistry;
 
     private readonly ProgressEventArgs _progressEventArgs = new();
     private readonly Lock _reloadLock = new();
@@ -174,7 +175,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogWindow (ILogWindowCoordinator logWindowCoordinator, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager)
+    public LogWindow (ILogWindowCoordinator logWindowCoordinator, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager, IPluginRegistry pluginRegistry)
     {
         SuspendLayout();
 
@@ -193,6 +194,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _logWindowCoordinator = logWindowCoordinator;
         IsTempFile = isTempFile;
         ConfigManager = configManager; //TODO: This should be changed to DI
+        _pluginRegistry = pluginRegistry;
         //Thread.CurrentThread.Name = "LogWindowThread";
         ColumnizerCallbackObject = new ColumnizerCallback(this);
         _timestampLocator = new TimestampLocator(this);
@@ -221,7 +223,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         tableLayoutPanel1.ColumnStyles[0].Width = 100;
 
         _logWindowCoordinator.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
-        SetColumnizer(PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers[0]);
+        SetColumnizer(_pluginRegistry.RegisteredColumnizers[0]);
 
         //this.toolwinTabControl.TabPages.Add(this.bookmarkWindow);
 
@@ -1516,10 +1518,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         // Add plugin entries
         var isAdded = false;
-        if (PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins.Count > 0)
+        if (_pluginRegistry.RegisteredContextMenuPlugins.Count > 0)
         {
             var lines = GetSelectedContent();
-            foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+            foreach (var entry in _pluginRegistry.RegisteredContextMenuPlugins)
             {
                 LogExpertCallback callback = new(this);
                 var menuText = entry.GetMenuText(lines.Count, CurrentColumnizer, callback.GetLogLineMemory(lines[0]));
@@ -2879,7 +2881,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 else
                 {
                     // Default Columnizers
-                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers), ConfigManager.ActiveConfigDir);
+                    columnizer = ColumnizerPicker.CloneMemoryColumnizer(ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, _pluginRegistry.RegisteredColumnizers), ConfigManager.ActiveConfigDir);
                 }
             }
 
@@ -3342,7 +3344,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (entry.IsActionEntry && entry.ActionEntry.PluginName != null)
             {
-                var plugin = PluginRegistry.PluginRegistry.Instance.FindKeywordActionPluginByName(entry.ActionEntry.PluginName);
+                var plugin = _pluginRegistry.FindKeywordActionPluginByName(entry.ActionEntry.PluginName);
                 if (plugin != null)
                 {
                     //ActionPluginExecuteFx fx = plugin.Execute;
@@ -3355,7 +3357,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void SetColumnizer (ILogLineMemoryColumnizer columnizer)
     {
-        columnizer = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(FileName, _logFileReader, columnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        columnizer = ColumnizerPicker.FindReplacementForAutoMemoryColumnizer(FileName, _logFileReader, columnizer, _pluginRegistry.RegisteredColumnizers);
 
         var timeDiff = 0;
         if (CurrentColumnizer != null && CurrentColumnizer.IsTimeshiftImplemented())
@@ -5121,7 +5123,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private static void FilterRestore (LogWindow newWin, SessionSnapshot snapshot)
     {
         newWin.WaitForLoadingFinished();
-        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(snapshot.Columnizer.GetName(), PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(snapshot.Columnizer.GetName(), newWin._pluginRegistry.RegisteredColumnizers);
 
         if (columnizer != null)
         {
@@ -5819,7 +5821,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             try
             {
-                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
+                _logFileReader = new(fileName, EncodingOptions, IsMultiFile, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, _pluginRegistry, ConfigManager.Settings.Preferences.MaxLineLength);
             }
             catch (LogFileException lfe)
             {
@@ -5851,7 +5853,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (Preferences.AutoPick)
                 {
-                    var newColumnizer = ColumnizerPicker.FindBetterMemoryColumnizer(FileName, _logFileReader, CurrentColumnizer, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+                    var newColumnizer = ColumnizerPicker.FindBetterMemoryColumnizer(FileName, _logFileReader, CurrentColumnizer, _pluginRegistry.RegisteredColumnizers);
 
                     if (newColumnizer != null)
                     {
@@ -5893,7 +5895,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _columnCache = new ColumnCache();
         _filterColumnCache = new ColumnCache();
 
-        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, PluginRegistry.PluginRegistry.Instance, ConfigManager.Settings.Preferences.MaxLineLength);
+        _logFileReader = new(fileNames, EncodingOptions, Preferences.BufferCount, Preferences.LinesPerBuffer, _multiFileOptions, Preferences.ReaderType, _pluginRegistry, ConfigManager.Settings.Preferences.MaxLineLength);
 
         RegisterLogFileReaderEvents();
         _logFileReader.StartMonitoring();
@@ -6104,12 +6106,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         CurrentColumnizer = columnizer != null
             ? (_forcedColumnizerForLoading = columnizer)
-            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers));
+            : (_forcedColumnizerForLoading = ColumnizerPicker.FindMemoryColumnizer(FileName, _logFileReader, _pluginRegistry.RegisteredColumnizers));
     }
 
     public void PreSelectColumnizerByName (string columnizerName)
     {
-        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
+        var columnizer = ColumnizerPicker.FindMemoryColumnizerByName(columnizerName, _pluginRegistry.RegisteredColumnizers);
         PreSelectColumnizer(ColumnizerPicker.CloneMemoryColumnizer(columnizer, ConfigManager.ActiveConfigDir));
     }
 

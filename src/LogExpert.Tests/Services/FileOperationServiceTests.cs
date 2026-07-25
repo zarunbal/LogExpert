@@ -61,7 +61,7 @@ internal class FileOperationServiceTests : IDisposable
         _clipboardText = null;
 
         var coordinatorMock = new Mock<ILogWindowCoordinator>();
-        _stubLogWindow = new LogWindow(coordinatorMock.Object, "stub.log", false, false, _configManagerMock.Object);
+        _stubLogWindow = new LogWindow(coordinatorMock.Object, "stub.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
 
         _factory = (request, encoding) =>
         {
@@ -858,7 +858,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var coordinatorMock = new Mock<ILogWindowCoordinator>();
-        using var tempWindow = new LogWindow(coordinatorMock.Object, "temp.log", true, false, _configManagerMock.Object);
+        using var tempWindow = new LogWindow(coordinatorMock.Object, "temp.log", true, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
         tempWindow.GivenFileName = "temp.log";
 
         _ = _tabControllerMock
@@ -877,7 +877,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var coordinatorMock = new Mock<ILogWindowCoordinator>();
-        using var normalWindow = new LogWindow(coordinatorMock.Object, "app.log", false, false, _configManagerMock.Object);
+        using var normalWindow = new LogWindow(coordinatorMock.Object, "app.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
         normalWindow.GivenFileName = "app.log";
 
         _ = _tabControllerMock
@@ -897,11 +897,11 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var coordinatorMock = new Mock<ILogWindowCoordinator>();
-        using var normalWindow = new LogWindow(coordinatorMock.Object, "app.log", false, false, _configManagerMock.Object);
+        using var normalWindow = new LogWindow(coordinatorMock.Object, "app.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
         normalWindow.GivenFileName = "app.log";
-        using var tempWindow = new LogWindow(coordinatorMock.Object, "filter.tmp", true, false, _configManagerMock.Object);
+        using var tempWindow = new LogWindow(coordinatorMock.Object, "filter.tmp", true, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
         tempWindow.GivenFileName = "filter.tmp";
-        using var normalWindow2 = new LogWindow(coordinatorMock.Object, "server.log", false, false, _configManagerMock.Object);
+        using var normalWindow2 = new LogWindow(coordinatorMock.Object, "server.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
         normalWindow2.GivenFileName = "server.log";
 
         _ = _tabControllerMock

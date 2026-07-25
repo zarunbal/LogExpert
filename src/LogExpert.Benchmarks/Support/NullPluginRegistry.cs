@@ -14,7 +14,11 @@ internal sealed class NullPluginRegistry : IPluginRegistry
 
     public IList<ILogLineMemoryColumnizer> RegisteredColumnizers { get; } = [];
 
+    public IList<IContextMenuEntry> RegisteredContextMenuPlugins { get; } = [];
+
     public IFileSystemPlugin FindFileSystemForUri (string fileNameOrUri) => NullFileSystemPlugin.Instance;
+
+    public IKeywordAction FindKeywordActionPluginByName (string name) => null;
 
     private sealed class NullFileSystemPlugin : IFileSystemPlugin
     {
