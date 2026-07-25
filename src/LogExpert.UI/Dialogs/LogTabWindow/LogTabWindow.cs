@@ -171,7 +171,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             PersisterHelpers.FindFilenameForSettings(request.FileName, PluginRegistry.PluginRegistry.Instance),
             request.IsTempFile,
             request.ForcePersistenceLoading,
-            ConfigManager)
+            ConfigManager,
+            PluginRegistry.PluginRegistry.Instance)
         {
             GivenFileName = request.FileName
         };

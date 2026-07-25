@@ -56,7 +56,8 @@ internal class SessionHandlerTests : IDisposable
             "stub.log",
             isTempFile: false,
             forcePersistenceLoading: false,
-            configManager: _configManagerMock.Object);
+            configManager: _configManagerMock.Object,
+            pluginRegistry: PluginRegistry.PluginRegistry.Instance);
 
         _sut = new SessionHandler(
             _pluginRegistryMock.Object,

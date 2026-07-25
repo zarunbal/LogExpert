@@ -52,7 +52,8 @@ public class LogWindowCoordinatorIntegrationTests : IDisposable
             "test.log",
             true,    // isTempFile
             false,   // forcePersistenceLoading
-            _configManagerMock.Object);
+            _configManagerMock.Object,
+            PluginRegistry.PluginRegistry.Instance);
     }
 
     [TearDown]
