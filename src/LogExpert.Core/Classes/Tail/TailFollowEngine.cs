@@ -25,6 +25,10 @@ public sealed class TailFollowEngine : IDisposable
     private readonly CancellationTokenSource _cts = new();
     private readonly Task _workerTask;
 
+    /// <summary>
+    /// Creates the engine and immediately starts its dedicated worker thread; events posted
+    /// before the first tail activity simply park until <see cref="Post"/> wakes the worker.
+    /// </summary>
     public TailFollowEngine (ITailFollowSink sink)
     {
         ArgumentNullException.ThrowIfNull(sink);
@@ -63,6 +67,12 @@ public sealed class TailFollowEngine : IDisposable
         }
     }
 
+    /// <summary>
+    /// <see cref="Stop"/> plus disposal of the wake event and CTS. Test consumers use this;
+    /// the Log Window deliberately calls only <see cref="Stop"/> at close (leak-parity with
+    /// the original worker, whose wait handle was never disposed — disposing while a stuck
+    /// worker is still parked would fault it on the wake handle).
+    /// </summary>
     public void Dispose ()
     {
         Stop();

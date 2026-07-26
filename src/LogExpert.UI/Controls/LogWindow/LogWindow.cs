@@ -77,9 +77,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly TailFollowEngine _tailFollowEngine;
 
-
-    //private readonly Thread _logEventHandlerThread;
-
     private readonly Image _panelCloseButtonImage;
 
     private readonly Image _panelOpenButtonImage;
@@ -3066,10 +3063,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _timeSpreadCalc.SetLineCount(lineCount);
     }
 
-    private void StopLogEventWorkerThread ()
-    {
-        _tailFollowEngine.Stop();
-    }
 
     /// <summary>
     /// Waits (briefly) for a long-running worker task to drain during teardown. Workers observe cancellation via
@@ -5974,7 +5967,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();
-        StopLogEventWorkerThread();
+        _tailFollowEngine.Stop();
         _windowCts.Cancel(); // window lifetime ends: every linked job token cancels
         _searchCts?.Cancel();
 
