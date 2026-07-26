@@ -44,8 +44,8 @@ public class ColumnCacheTests
             .Setup(c => c.SplitLine(It.IsAny<ILogLineMemoryColumnizerCallback>(), validLine))
             .Returns(splitResult);
 
-        var logWindowMock = new Mock<ILogWindow>();
-        var callback = new ColumnizerCallback(logWindowMock.Object);
+        var lineSourceMock = new Mock<ILogLineSource>();
+        var callback = new ColumnizerCallback(lineSourceMock.Object);
 
         var cache = new ColumnCache();
 
@@ -84,8 +84,8 @@ public class ColumnCacheTests
             .Setup(c => c.SplitLine(It.IsAny<ILogLineMemoryColumnizerCallback>(), validLine))
             .Returns(splitResult);
 
-        var logWindowMock = new Mock<ILogWindow>();
-        var callback = new ColumnizerCallback(logWindowMock.Object);
+        var lineSourceMock = new Mock<ILogLineSource>();
+        var callback = new ColumnizerCallback(lineSourceMock.Object);
 
         var cache = new ColumnCache();
 

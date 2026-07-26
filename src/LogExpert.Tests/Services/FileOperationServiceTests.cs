@@ -326,7 +326,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var filterParams = new FilterParams { SearchText = "error" };
-        var logWindowMock = new Mock<ILogWindow>();
+        var logWindowMock = new Mock<ILineSelectable>();
         using var pipe = new FilterPipe(filterParams, logWindowMock.Object);
 
         // Act
@@ -344,7 +344,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var filterParams = new FilterParams { SearchText = "error" };
-        var logWindowMock = new Mock<ILogWindow>();
+        var logWindowMock = new Mock<ILineSelectable>();
         using var pipe = new FilterPipe(filterParams, logWindowMock.Object);
 
         var fileOpenedArgs = new List<FileOpenedEventArgs>();
@@ -369,7 +369,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var filterParams = new FilterParams { SearchText = "" };
-        var logWindowMock = new Mock<ILogWindow>();
+        var logWindowMock = new Mock<ILineSelectable>();
         using var pipe = new FilterPipe(filterParams, logWindowMock.Object);
 
         var fileOpenedArgs = new List<FileOpenedEventArgs>();
@@ -388,7 +388,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var filterParams = new FilterParams { SearchText = null };
-        var logWindowMock = new Mock<ILogWindow>();
+        var logWindowMock = new Mock<ILineSelectable>();
         using var pipe = new FilterPipe(filterParams, logWindowMock.Object);
 
         var fileOpenedArgs = new List<FileOpenedEventArgs>();
@@ -406,7 +406,7 @@ internal class FileOperationServiceTests : IDisposable
     {
         // Arrange
         var filterParams = new FilterParams { SearchText = "warn" };
-        var logWindowMock = new Mock<ILogWindow>();
+        var logWindowMock = new Mock<ILineSelectable>();
         using var pipe = new FilterPipe(filterParams, logWindowMock.Object);
 
         // Act
