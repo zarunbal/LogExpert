@@ -18,6 +18,7 @@ using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Classes.Search;
+using LogExpert.Core.Classes.Tail;
 using LogExpert.Core.Classes.Timestamp;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -42,7 +43,7 @@ namespace LogExpert.UI.Controls.LogWindow;
 
 //TODO: Implemented 4 interfaces explicitly. Find them by searching: ILogWindow.<method name>
 [SupportedOSPlatform("windows")]
-internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource
+internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink
 {
     #region Fields
 
@@ -74,13 +75,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly EventWaitHandle _loadingFinishedEvent = new ManualResetEvent(false);
 
-    private readonly EventWaitHandle _logEventArgsEvent = new AutoResetEvent(false);
-
-    private readonly List<LogEventArgs> _logEventArgsList = [];
-
-    private readonly Task _logEventHandlerTask;
-
-    //private readonly Thread _logEventHandlerThread;
+    private readonly TailFollowEngine _tailFollowEngine;
 
     private readonly Image _panelCloseButtonImage;
 
@@ -248,7 +243,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
 
         _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-        _logEventHandlerTask = Task.Factory.StartNew(LogEventWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        _tailFollowEngine = new TailFollowEngine(this);
 
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
         //this.filterUpdateThread.Start();
@@ -955,11 +950,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void OnFileSizeChanged (object sender, LogEventArgs e)
     {
-        lock (_logEventArgsList)
-        {
-            _logEventArgsList.Add(e);
-            _ = _logEventArgsEvent.Set();
-        }
+        _tailFollowEngine.Post(e);
     }
 
     [SupportedOSPlatform("windows")]
@@ -3049,84 +3040,29 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //LoadPersistenceData();
     }
 
-    private void LogEventWorker ()
+    // ITailFollowSink — the rendering side of the Tail Follow Engine seam. All four members run
+    // on the engine's worker thread; marshalling to the UI thread happens inside the callbacks.
+
+    bool ITailFollowSink.IsAbandoned => IsDisposed || Disposing || _waitingForClose;
+
+    void ITailFollowSink.OnRolloverShift (int rolloverOffset)
     {
-        Thread.CurrentThread.Name = "LogEventWorker";
-        while (!_cts.Token.IsCancellationRequested)
-        {
-            //_logger.Debug($"Waiting for signal");
-            _ = _logEventArgsEvent.WaitOne();
-            //_logger.Debug($"Wakeup signal received.");
-            while (!_cts.Token.IsCancellationRequested)
-            {
-                LogEventArgs e;
-                //var lastLineCount = 0;
-                lock (_logEventArgsList)
-                {
-                    //_logger.Info($"{_logEventArgsList.Count} events in queue");
-                    if (_logEventArgsList.Count == 0)
-                    {
-                        break;
-                    }
-
-                    e = _logEventArgsList[0];
-                    _logEventArgsList.RemoveAt(0);
-                }
-
-                if (e.IsRollover)
-                {
-                    ShiftBookmarks(e.RolloverOffset);
-                    ShiftRowHeightList(e.RolloverOffset);
-                    ShiftFilterPipes(e.RolloverOffset);
-                    //lastLineCount = 0;
-                }
-                //else
-                //{
-                //    if (e.LineCount < lastLineCount)
-                //    {
-                //        _logger.Error($"Line count of event is: {e.LineCount}, should be greater than last line count: {lastLineCount}"));
-                //    }
-                //}
-
-                if (IsDisposed || Disposing || _waitingForClose)
-                {
-                    return;
-                }
-                else
-                {
-                    try
-                    {
-                        _ = BeginInvoke(UpdateGrid, [e]);
-                        CheckFilterAndHighlight(e);
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        return;
-                    }
-                    catch (Exception ex) when (ex is InvalidOperationException or
-                                                     ArgumentOutOfRangeException or
-                                                     ExternalException or
-                                                     Win32Exception)
-                    {
-                        // Never let a single bad event kill the worker thread. Before this guard, an
-                        // exception here (e.g. a missing optional assembly loaded lazily from the tail
-                        // path) terminated the loop, so follow-tail silently stopped updating for the
-                        // whole window until reload (#634). Log and continue with the next event.
-                        _logger.Error(ex, "### LogEventWorker: error while processing a file-size-changed event; follow-tail continues.");
-                    }
-
-                    _timeSpreadCalc.SetLineCount(e.LineCount);
-                }
-            }
-        }
+        ShiftBookmarks(rolloverOffset);
+        ShiftRowHeightList(rolloverOffset);
+        ShiftFilterPipes(rolloverOffset);
     }
 
-    private void StopLogEventWorkerThread ()
+    void ITailFollowSink.OnTailLines (LogEventArgs e)
     {
-        _ = _logEventArgsEvent.Set(); // wake the worker if it is parked on the event so it observes the cancel and exits
-        _cts.Cancel();
-        JoinWorker(_logEventHandlerTask);
+        _ = BeginInvoke(UpdateGrid, [e]);
+        CheckFilterAndHighlight(e);
     }
+
+    void ITailFollowSink.OnLineCountChanged (int lineCount)
+    {
+        _timeSpreadCalc.SetLineCount(lineCount);
+    }
+
 
     /// <summary>
     /// Waits (briefly) for a long-running worker task to drain during teardown. Workers observe cancellation via
@@ -6031,7 +5967,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         CancelHighlightBookmarkScan();
         StopTimespreadThread();
         StopTimestampSyncThread();
-        StopLogEventWorkerThread();
+        _tailFollowEngine.Stop();
         _windowCts.Cancel(); // window lifetime ends: every linked job token cancels
         _searchCts?.Cancel();
 

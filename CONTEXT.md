@@ -200,6 +200,33 @@ filter path, not Log Search), "find dialog" (use **Search dialog**).
   rather than fixed; see
   `TimestampLocatorTests.FindLine_TimestampBeforeTheFirstLine_*`.
 
+## Tail follow
+
+- **Tail Follow Engine** (`LogExpert.Core.Classes.Tail.TailFollowEngine`) — The
+  Core module that owns the tail-event queue and its single worker thread:
+  file-size-changed events from the Logfile Reader are `Post()`ed in (any
+  thread) and delivered in order as **Tail Follow Sink** callbacks on the
+  worker thread. Owns the dispatch policies: rollover shift before content
+  for the same event, the never-die guard (a failing dispatch is logged and
+  the loop continues — the #634 contract), abandoned-sink exit, and the
+  bounded (2 s) teardown join. It does **not** own the reader subscription:
+  the Log Window swaps its Logfile Reader on load/reload/rollover, so it
+  keeps forwarding `FileSizeChanged` into the engine. Watcher ownership is
+  revisited with the LogfileReader decomposition.
+- **Tail Follow Sink** (`ITailFollowSink`) — The rendering side of the seam,
+  implemented by the Log Window: `OnRolloverShift` (shift bookmarks, row
+  heights, filter pipes), `OnTailLines` (grid update + the tail trigger
+  path), `OnLineCountChanged` (Time Spread bar), `IsAbandoned` (window
+  disposed/closing — the engine exits). Callbacks arrive on the engine's
+  worker thread; the sink marshals to the UI thread itself. Pinned quirks,
+  preserved from the original worker: the rollover shift runs even for an
+  abandoned sink, and `OnLineCountChanged` fires even when `OnTailLines`
+  failed non-fatally.
+
+*Avoid*: "LogEventWorker" (the pre-extraction thread and method name — the
+module is the **Tail Follow Engine**), "tail thread" (say **the engine's
+worker thread**).
+
 *Avoid*: "GetTimestampForLine" / "GetTimestampForLineForward" /
 "FindTimestampLineInternal" as concept names — those were the pre-extraction
 Log Window method names (candidate 6 of
