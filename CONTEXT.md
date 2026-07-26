@@ -233,6 +233,31 @@ Log Window method names (candidate 6 of
 `docs/improve/logwindow-architecture-review.html`); the Core module is the
 **Timestamp Locator**.
 
+## Log Window roles
+
+- **Log Line Source** (`ILogLineSource`) — Read access to a loaded log file's
+  lines: line count, line memory, and the per-line physical file name
+  (multi-file mode). The role of the Log Window that the columnizer callbacks
+  (`ColumnizerCallback`, `ColumnizerCallbackMemory`) and the paint context
+  consume — a three-member fake is all a Core test needs. Also the
+  Core-visible face of the paint context: the UI's `ILogPaintContextUI`
+  extends it with fonts, colors, and highlight lookup (the old empty
+  `ILogPaintContext` marker is deleted).
+- **Line Selectable** (`ILineSelectable`) — A Log Window in which a line can be
+  selected programmatically (`SelectLine`). Held by a Filter Pipe for its
+  origin window (`FilterPipe.OriginWindow`): "Locate line in original file".
+- **Session Snapshot Source** (`ISessionSnapshotSource`) — A window whose
+  persistable state can be gathered as a **Session Snapshot**. Held by a
+  Filter Pipe for the window displaying its results (`FilterPipe.ResultWindow`);
+  saving a Session File recurses through it.
+- **`ILogWindow`** — Now purely the composition of the three roles above, with
+  no members of its own. Kept for holders that need only the window's
+  identity (the filter-list / highlight-group changed event args). New Core
+  consumers take the single role they need, never the composition.
+
+*Avoid*: adding members to `ILogWindow` directly (add to — or carve — a role
+interface instead), "the ILogWindow seam" (name the specific role).
+
 ## Columnizer selection
 
 - **Columnizer** (`ILogLineMemoryColumnizer`) — A plugin that parses a log

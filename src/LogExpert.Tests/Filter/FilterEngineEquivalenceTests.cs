@@ -267,19 +267,16 @@ public class FilterEngineEquivalenceTests
 
     private static ColumnizerCallback CallbackOf (IList<string> lines, Action<int> onLineRead)
     {
-        var reader = new Mock<ILogfileReader>();
-        _ = reader.Setup(r => r.LineCount).Returns(() => lines.Count); // live — grows when a fixture appends
-
-        var window = new Mock<ILogWindow>();
-        _ = window.Setup(w => w.LogFileReader).Returns(reader.Object);
-        _ = window.Setup(w => w.GetLineMemory(It.IsAny<int>()))
+        var source = new Mock<ILogLineSource>();
+        _ = source.Setup(s => s.LineCount).Returns(() => lines.Count); // live — grows when a fixture appends
+        _ = source.Setup(s => s.GetLineMemory(It.IsAny<int>()))
             .Returns((int lineNum) =>
             {
                 onLineRead?.Invoke(lineNum);
                 return lineNum >= 0 && lineNum < lines.Count ? LineOf(lines[lineNum]) : null!;
             });
 
-        return new ColumnizerCallback(window.Object);
+        return new ColumnizerCallback(source.Object);
     }
 
     private static ILogLineMemory LineOf (string text)

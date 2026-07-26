@@ -41,7 +41,6 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
-//TODO: Implemented 4 interfaces explicitly. Find them by searching: ILogWindow.<method name>
 [SupportedOSPlatform("windows")]
 internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink
 {
@@ -435,19 +434,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public Font BoldFont { get; private set; }
 
-    ILogfileReader ILogWindow.LogFileReader => _logFileReader;
-
-    //public event EventHandler<EventArgs> ILogWindow.FileSizeChanged
-    //{
-    //    add => FileSizeChanged += new EventHandler<LogEventArgs>(value);
-    //    remove => FileSizeChanged -= new EventHandler<LogEventArgs>(value);
-    //}
-
-    //event EventHandler ILogWindow.TailFollowed
-    //{
-    //    add => TailFollowed += new TailFollowedEventHandler(value);
-    //    remove => TailFollowed -= new TailFollowedEventHandler(value);
-    //}
+    int ILogLineSource.LineCount => _logFileReader.LineCount;
 
     #endregion
 
@@ -456,11 +443,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
         return _logFileReader.GetLogLineMemory(lineNum);
-    }
-
-    public ILogLineMemory GetLogLineMemoryWithWait (int lineNum)
-    {
-        return _logFileReader.GetLogLineMemoryWithWait(lineNum).Result;
     }
 
     public Bookmark GetBookmarkForLine (int lineNum)
@@ -722,21 +704,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 #endif
 
     [SupportedOSPlatform("windows")]
-    void ILogWindow.SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
+    void ILineSelectable.SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
         SelectLine(lineNum, triggerSyncCall, shouldScroll);
-    }
-
-    [SupportedOSPlatform("windows")]
-    void ILogWindow.AddTempFileTab (string fileName, string title)
-    {
-        AddTempFileTab(fileName, title);
-    }
-
-    [SupportedOSPlatform("windows")]
-    void ILogWindow.WritePipeTab (IList<LineEntryMemory> lineEntryList, string title)
-    {
-        WritePipeTab(lineEntryList, title);
     }
 
     #region Event Handlers
@@ -1664,8 +1634,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var lineNum = FilterPipe.GetOriginalLineNum(dataGridView.CurrentRow.Index);
             if (lineNum != -1)
             {
-                FilterPipe.LogWindow.SelectLine(lineNum, false, true);
-                _logWindowCoordinator.SelectTab(FilterPipe.LogWindow as LogWindow);
+                FilterPipe.OriginWindow.SelectLine(lineNum, false, true);
+                _logWindowCoordinator.SelectTab(FilterPipe.OriginWindow as LogWindow);
             }
         }
     }
@@ -5015,7 +4985,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             var newWin = _logWindowCoordinator.AddFilterTab(pipe, title, preProcessColumnizer);
             newWin.FilterPipe = pipe;
-            pipe.OwnLogWindow = newWin;
+            pipe.ResultWindow = newWin;
             if (snapshot != null)
             {
                 _ = Task.Run(() => FilterRestore(newWin, snapshot));
@@ -5933,7 +5903,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 snapshot.FilterTabs.Add(new FilterTabSnapshot
                 {
                     FilterParams = filterPipe.FilterParams,
-                    Snapshot = filterPipe.OwnLogWindow.GatherSessionSnapshot(),
+                    Snapshot = filterPipe.ResultWindow.GatherSessionSnapshot(),
                 });
             }
         }

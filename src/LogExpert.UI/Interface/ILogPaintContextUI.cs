@@ -8,8 +8,9 @@ namespace LogExpert.UI.Interface;
 
 /// <summary>
 /// Declares methods that are needed for drawing log lines. Used by PaintHelper.
+/// Extends the Core-visible line-source role with the paint-specific members.
 /// </summary>
-internal interface ILogPaintContextUI : ILogPaintContext
+internal interface ILogPaintContextUI : ILogLineSource
 {
     #region Properties
 
