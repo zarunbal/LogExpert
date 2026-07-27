@@ -54,6 +54,8 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+        RegisterEncodingProvider();
+
         // Register the plugin assembly resolver early so that settings deserialization
         // can find plugin types (e.g., CsvColumnizer) before PluginRegistry.Create() runs.
         PluginRegistry.PluginRegistry.RegisterAssemblyResolver();
@@ -259,6 +261,14 @@ internal static class Program
         {
             Application.SetColorMode(SystemColorMode.System);
         }
+    }
+
+    /// <summary>
+    /// Makes legacy Windows code pages configured in preferences available before settings are read.
+    /// </summary>
+    internal static void RegisterEncodingProvider ()
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     [SupportedOSPlatform("windows")]

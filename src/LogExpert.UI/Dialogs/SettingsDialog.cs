@@ -86,8 +86,6 @@ internal partial class SettingsDialog : Form
 
         LoadResources();
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
         ResumeLayout();
     }
 
@@ -700,15 +698,29 @@ internal partial class SettingsDialog : Form
     {
         comboBoxEncoding.Items.Clear();
 
-        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
-        _ = comboBoxEncoding.Items.Add(Encoding.Default);
-        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
-        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
-        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1250));
-        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        foreach (var encoding in GetAvailableEncodings())
+        {
+            _ = comboBoxEncoding.Items.Add(encoding);
+        }
 
         comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
+    }
+
+    /// <summary>
+    /// Gets the encodings offered in the Preferences dropdown.
+    /// </summary>
+    internal static IReadOnlyList<Encoding> GetAvailableEncodings ()
+    {
+        return
+        [
+            Encoding.ASCII,
+            Encoding.Default,
+            Encoding.GetEncoding("iso-8859-1"),
+            Encoding.UTF8,
+            Encoding.Unicode,
+            Encoding.GetEncoding(1250),
+            Encoding.GetEncoding(1252)
+        ];
     }
 
     /// <summary>

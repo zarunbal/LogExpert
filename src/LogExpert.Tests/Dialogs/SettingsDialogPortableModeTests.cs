@@ -1,3 +1,6 @@
+using System.Text;
+
+using LogExpert;
 using LogExpert.Core.Config;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
@@ -19,6 +22,16 @@ namespace LogExpert.Tests.Dialogs;
 [TestFixture]
 public class SettingsDialogPortableModeTests
 {
+    [Test]
+    public void AvailableEncodings_ContainsWindows1250 ()
+    {
+        Program.RegisterEncodingProvider();
+
+        var encodings = SettingsDialog.GetAvailableEncodings();
+
+        Assert.That(encodings.Select(encoding => encoding.CodePage), Does.Contain(1250));
+    }
+
     private string _testDataPath = null!;
     private string _portableConfigDir = null!;
 

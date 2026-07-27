@@ -120,10 +120,6 @@ internal sealed class FileOperationService (
 
     private void FillDefaultEncodingFromSettings (EncodingOptions encodingOptions)
     {
-        // Legacy Windows code pages such as windows-1252 are configured in Preferences.DefaultEncoding.
-        // Register the provider here because a file can be opened before the Settings dialog is ever shown.
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
         if (_configManager.Settings.Preferences.DefaultEncoding != null)
         {
             try

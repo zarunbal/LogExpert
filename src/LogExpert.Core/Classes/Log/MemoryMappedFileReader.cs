@@ -10,9 +10,10 @@ namespace LogExpert.Core.Classes.Log;
 /// Reads log lines via memory-mapped file access. Builds a line-offset index on load.
 /// Supports tail mode by re-mapping when the file grows.
 /// </summary>
-internal sealed class MemoryMappedFileReader (string filePath, Encoding encoding) : IDisposable
+internal sealed class MemoryMappedFileReader (string filePath, Encoding encoding, int preambleLength) : IDisposable
 {
     private readonly Encoding _encoding = encoding;
+    private readonly int _preambleLength = preambleLength;
     private readonly LineOffsetIndex _lineIndex = new();
     private MemoryMappedFile _mmf;
     private MemoryMappedViewAccessor _accessor;
@@ -33,7 +34,7 @@ internal sealed class MemoryMappedFileReader (string filePath, Encoding encoding
         if (startOffset == 0)
         {
             _lineIndex.Clear();
-            _lineIndex.Add(0); // first line starts at offset 0
+            _lineIndex.Add(_preambleLength); // Skip the BOM, when present, just like StreamReader.
         }
 
         fs.Position = startOffset;

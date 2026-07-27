@@ -16,6 +16,7 @@ public class LogfileReaderBlockAllocationTests
     [SetUp]
     public void Setup ()
     {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         _tempFile = Path.GetTempFileName();
         _ = PluginRegistry.PluginRegistry.Create(Path.GetDirectoryName(_tempFile)!, 500);
     }
@@ -227,6 +228,60 @@ public class LogfileReaderBlockAllocationTests
         {
             VerifyLine(reader, i, i);
         }
+    }
+
+    [Test]
+    public void ReadFiles_BomlessFile_UsesConfiguredDefaultEncoding ()
+    {
+        var configuredEncoding = Encoding.GetEncoding(1252);
+        File.WriteAllText(_tempFile, "Euro: €\n", configuredEncoding);
+
+        using var reader = CreateReader(new EncodingOptions { DefaultEncoding = configuredEncoding });
+        reader.ReadFiles();
+
+        Assert.That(reader.CurrentEncoding.CodePage, Is.EqualTo(configuredEncoding.CodePage));
+        Assert.That(reader.GetLogLineMemory(0)?.FullLine.Span.ToString(), Is.EqualTo("Euro: €"));
+    }
+
+    [Test]
+    public void ReadFiles_Bom_OverridesConfiguredDefaultEncoding ()
+    {
+        var configuredEncoding = Encoding.GetEncoding(1252);
+        File.WriteAllText(_tempFile, "Euro: €\n", Encoding.UTF8);
+
+        using var reader = CreateReader(new EncodingOptions { DefaultEncoding = configuredEncoding });
+        reader.ReadFiles();
+
+        Assert.That(reader.CurrentEncoding.WebName, Is.EqualTo(Encoding.UTF8.WebName));
+        Assert.That(reader.GetLogLineMemory(0)?.FullLine.Span.ToString(), Is.EqualTo("Euro: €"));
+    }
+
+    [Test]
+    public void ReadFiles_ExplicitEncoding_OverridesBom ()
+    {
+        var explicitEncoding = Encoding.GetEncoding(1252);
+        File.WriteAllText(_tempFile, "ASCII text\n", Encoding.UTF8);
+
+        using var reader = CreateReader(new EncodingOptions { Encoding = explicitEncoding });
+        reader.ReadFiles();
+
+        Assert.That(reader.CurrentEncoding.CodePage, Is.EqualTo(explicitEncoding.CodePage));
+        Assert.That(reader.GetLogLineMemory(0)?.FullLine.Span.ToString(), Is.EqualTo("ASCII text"));
+    }
+
+    private LogfileReader CreateReader (EncodingOptions encodingOptions)
+    {
+        return new LogfileReader(
+            _tempFile,
+            encodingOptions,
+            multiFile: false,
+            bufferCount: 100,
+            linesPerBuffer: 500,
+            new MultiFileOptions(),
+            ReaderType.System,
+            PluginRegistry.PluginRegistry.Instance,
+            maximumLineLength: 500,
+            progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
     }
 
     private static void VerifyLine (LogfileReader reader, int lineNum, int expectedIndex)

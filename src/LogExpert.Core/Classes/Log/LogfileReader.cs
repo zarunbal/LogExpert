@@ -190,9 +190,11 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         {
             try
             {
-                // Keep the memory-mapped reader aligned with the stream reader fallback order:
-                // explicit/persisted encoding, application default, then machine default.
-                _mmfReader = new MemoryMappedFileReader(_watchedILogFileInfo.FullName, EncodingOptions.Encoding ?? EncodingOptions.DefaultEncoding ?? Encoding.Default);
+                using var stream = new FileStream(_watchedILogFileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var (preambleLength, detectedEncoding) = PositionAwareStreamReaderBase.DetectPreambleLength(stream);
+                var encoding = PositionAwareStreamReaderBase.DetermineEncoding(EncodingOptions, detectedEncoding);
+
+                _mmfReader = new MemoryMappedFileReader(_watchedILogFileInfo.FullName, encoding, preambleLength);
             }
             catch (IOException)
             {

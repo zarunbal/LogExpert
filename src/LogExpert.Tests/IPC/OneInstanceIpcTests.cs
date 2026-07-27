@@ -1,3 +1,6 @@
+using System.Text;
+
+using LogExpert;
 using LogExpert.Core.Classes.IPC;
 
 using Newtonsoft.Json;
@@ -13,6 +16,14 @@ namespace LogExpert.Tests.IPC;
 [TestFixture]
 public class OneInstanceIpcTests
 {
+    [Test]
+    public void RegisterEncodingProvider_MakesWindows1252Available ()
+    {
+        Program.RegisterEncodingProvider();
+
+        Assert.That(Encoding.GetEncoding(1252).CodePage, Is.EqualTo(1252));
+    }
+
     #region IPC Message Type Tests
 
     [Test]
