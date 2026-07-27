@@ -268,7 +268,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public LogWindow.LogWindow CurrentLogWindow
     {
         get => _currentLogWindow;
-        set => ChangeCurrentLogWindow(value);
+        set => BindActiveLogWindow(value);
     }
 
     public SearchParams SearchParams => _logWindowCoordinator.SearchParams;
@@ -592,8 +592,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        // Update CurrentLogWindow - this triggers ChangeCurrentLogWindow internally
-        // which handles disconnecting from previous window and connecting to new window
+        // Routes through BindActiveLogWindow: unbinds the previous window, binds this one, and
+        // connects the tool windows. Must precede LogWindowActivated() below, which fires the
+        // status-line, progress-bar and GUI-state updates into the subscriptions made here.
         CurrentLogWindow = newWindow;
 
         // Clear dirty state for the newly activated window
@@ -608,12 +609,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         // Notify the window it has been activated
         newWindow?.LogWindowActivated();
-
-        // Connect tool windows (bookmark window, etc.) to new window
-        if (newWindow != null)
-        {
-            ConnectToolWindows(newWindow);
-        }
     }
 
     /// <summary>
@@ -873,6 +868,31 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.SyncModeChanged -= OnLogWindowSyncModeChanged;
     }
 
+    /// <summary>
+    /// Subscribes to the events that drive the shell's singleton widgets — the status line, the
+    /// progress bar and the GUI state. Only the <em>active</em> window may drive them, so unlike
+    /// <see cref="ConnectEventHandlers"/> (which lives for as long as the window does) this pair is
+    /// bound and unbound on every activation change.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private void ConnectActiveWindow (LogWindow.LogWindow logWindow)
+    {
+        logWindow.StatusLineEvent += OnStatusLineEvent;
+        logWindow.ProgressBarUpdate += OnProgressBarUpdate;
+        logWindow.GuiStateUpdate += OnGuiStateUpdate;
+    }
+
+    /// <summary>
+    /// Mirror of <see cref="ConnectActiveWindow"/>.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private void DisconnectActiveWindow (LogWindow.LogWindow logWindow)
+    {
+        logWindow.StatusLineEvent -= OnStatusLineEvent;
+        logWindow.ProgressBarUpdate -= OnProgressBarUpdate;
+        logWindow.GuiStateUpdate -= OnGuiStateUpdate;
+    }
+
     [SupportedOSPlatform("windows")]
     private void FillHistoryMenu ()
     {
@@ -1033,19 +1053,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _currentLogWindow = newLogWindow;
         var titleName = _showInstanceNumbers ? "LogExpert #" + _instanceNumber : "LogExpert";
 
+        // Asymmetric on purpose: BindActiveLogWindow() owns connecting, because the connect must also
+        // run when the guard above short-circuits on re-activation of the already-current tab. The
+        // disconnect stays here, because ChangeCurrentLogWindow(null) — from OnTabControllerWindowRemoved
+        // and OnLogWindowDisposed — is the only path that unbinds a removed active window, and there is
+        // no activation to hang it off.
         if (oldLogWindow != null)
         {
-            oldLogWindow.StatusLineEvent -= OnStatusLineEvent;
-            oldLogWindow.ProgressBarUpdate -= OnProgressBarUpdate;
-            oldLogWindow.GuiStateUpdate -= OnGuiStateUpdate;
+            DisconnectActiveWindow(oldLogWindow);
             DisconnectToolWindows();
         }
 
         if (newLogWindow != null)
         {
-            newLogWindow.StatusLineEvent += OnStatusLineEvent;
-            newLogWindow.ProgressBarUpdate += OnProgressBarUpdate;
-            newLogWindow.GuiStateUpdate += OnGuiStateUpdate;
+            ConnectActiveWindow(newLogWindow);
 
             Text = newLogWindow.IsTempFile
                 ? titleName + @" - " + newLogWindow.TempTitleName
@@ -1060,7 +1081,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             searchToolStripMenuItem.Enabled = true;
             filterToolStripMenuItem.Enabled = true;
             goToLineToolStripMenuItem.Enabled = true;
-            ConnectToolWindows(newLogWindow);
         }
         else
         {
@@ -1081,6 +1101,34 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             filterToolStripMenuItem.Enabled = false;
             goToLineToolStripMenuItem.Enabled = false;
             dragControlDateTime.Visible = false;
+        }
+    }
+
+    /// <summary>
+    /// Binds the shell to its active Log Window: makes it current and connects the tool windows.
+    /// Both activation sources — the TabController's WindowActivated event and DockPanelSuite's
+    /// ActiveContentChanged — reach this through the <see cref="CurrentLogWindow"/> setter, so the
+    /// binding cannot drift between them. (They still differ in what else they do on activation;
+    /// only the binding is shared.)
+    /// <para>
+    /// Distinct from <see cref="ITabController.ActivateWindow"/>, which <em>causes</em> activation by
+    /// bringing a tab to the front. This is the shell's <em>response</em> to it.
+    /// </para>
+    /// <para>
+    /// <see cref="ChangeCurrentLogWindow"/> is guarded and no-ops when the window is already current;
+    /// the tool-window connect is not, because re-activating the current tab must still re-seat the
+    /// bookmark window's data. <see cref="ToolWindowCoordinator.Connect"/> disconnects any previous
+    /// window first, so calling it repeatedly is safe.
+    /// </para>
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private void BindActiveLogWindow (LogWindow.LogWindow logWindow)
+    {
+        ChangeCurrentLogWindow(logWindow);
+
+        if (logWindow != null)
+        {
+            ConnectToolWindows(logWindow);
         }
     }
 
@@ -2659,9 +2707,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (dockPanel.ActiveContent is LogWindow.LogWindow window)
         {
+            // Unlike OnTabControllerWindowActivated this has no already-current guard, so it also
+            // fires when the current tab is re-activated. BindActiveLogWindow re-seats the tool
+            // windows in that case even though the window itself does not change.
             CurrentLogWindow = window;
             CurrentLogWindow.LogWindowActivated();
-            ConnectToolWindows(CurrentLogWindow);
         }
     }
 

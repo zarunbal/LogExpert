@@ -258,6 +258,25 @@ Log Window method names (candidate 6 of
 *Avoid*: adding members to `ILogWindow` directly (add to — or carve — a role
 interface instead), "the ILogWindow seam" (name the specific role).
 
+## Bookmark change notification
+
+Two layers announce bookmark changes, and they deliberately differ in
+granularity — do not "unify" them:
+
+- **Bookmark Data Provider events** (`BookmarkDataProvider.BookmarkAdded` /
+  `.BookmarkRemoved` / `.AllBookmarksRemoved`) — Core-level, and they *do* keep
+  add and remove apart. Pinned by tests for fire-once and add-vs-remove
+  semantics.
+- **Bookmarks Changed** (`LogWindow.BookmarksChanged`) — The UI-level relay to
+  the shell: this window's bookmark set changed, somehow. Add and remove are
+  deliberately **not** distinguished, because every consumer only re-reads the
+  set (the Tool Window Coordinator just calls `UpdateView()`). Bookmark *text*
+  edits stay separate (`BookmarkTextChanged`) — they carry the bookmark.
+
+*Avoid*: adding `BookmarkAdded` / `BookmarkRemoved` to the Log Window (that
+granularity belongs to the provider), "bookmark event" unqualified (say which
+layer).
+
 ## Columnizer selection
 
 - **Columnizer** (`ILogLineMemoryColumnizer`) — A plugin that parses a log
