@@ -165,9 +165,8 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     public static Encoding DetermineEncoding (EncodingOptions options, Encoding detectedEncoding)
     {
-        return options?.Encoding != null
-            ? options.Encoding
-            : detectedEncoding ?? options?.DefaultEncoding ?? Encoding.Default;
+        // A BOM describes the file itself, so it takes precedence over persisted or configured choices.
+        return detectedEncoding ?? options?.Encoding ?? options?.DefaultEncoding ?? Encoding.Default;
     }
 
     /// <summary>

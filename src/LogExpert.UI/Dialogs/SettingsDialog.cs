@@ -693,7 +693,7 @@ internal partial class SettingsDialog : Form
     /// </summary>
     /// <remarks>
     /// This method clears any existing items in the combo box and adds a selection of common encodings, including
-    /// ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, and Windows-1252. The value member of the combo box is set
+    /// ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, Windows-1250, and Windows-1252. The value member of the combo box is set
     /// to a specific header name defined in the resources.
     /// </remarks>
     private void FillEncodingList ()
@@ -705,6 +705,7 @@ internal partial class SettingsDialog : Form
         _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
         _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
         _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
+        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1250));
         _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
         comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
