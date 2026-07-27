@@ -57,8 +57,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         _connectedLogWindow = logWindow;
 
         // Subscribe to bookmark events for relay
-        logWindow.BookmarkAdded += OnBookmarkAdded;
-        logWindow.BookmarkRemoved += OnBookmarkRemoved;
+        logWindow.BookmarksChanged += OnBookmarksChanged;
         logWindow.BookmarkTextChanged += OnBookmarkTextChanged;
         logWindow.ColumnizerChanged += OnColumnizerChanged;
 
@@ -72,8 +71,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
     {
         if (_connectedLogWindow != null)
         {
-            _connectedLogWindow.BookmarkAdded -= OnBookmarkAdded;
-            _connectedLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
+            _connectedLogWindow.BookmarksChanged -= OnBookmarksChanged;
             _connectedLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
             _connectedLogWindow.ColumnizerChanged -= OnColumnizerChanged;
             _connectedLogWindow = null;
@@ -137,12 +135,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
 
     // Event relay handlers
 
-    private void OnBookmarkAdded (object? sender, EventArgs e)
-    {
-        _bookmarkWindow?.UpdateView();
-    }
-
-    private void OnBookmarkRemoved (object? sender, EventArgs e)
+    private void OnBookmarksChanged (object? sender, EventArgs e)
     {
         _bookmarkWindow?.UpdateView();
     }
