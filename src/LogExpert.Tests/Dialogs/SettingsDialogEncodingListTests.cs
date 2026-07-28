@@ -26,7 +26,8 @@ public class SettingsDialogEncodingListTests
 
     /// <summary>
     /// Every offered encoding is saved as its name and resolved from that name on the next start, so a
-    /// name that cannot be resolved again would silently degrade to <see cref="Encoding.Default"/>.
+    /// name that cannot be resolved again would silently degrade to
+    /// <see cref="SettingsDialog.FallbackEncoding"/>.
     /// </summary>
     [Test]
     public void GetAvailableEncodings_EveryEntryResolvesByItsPersistedName ()
@@ -97,12 +98,15 @@ public class SettingsDialogEncodingListTests
     }
 
     /// <summary>
-    /// The same round trip against a real <see cref="ComboBox"/>, because the reselect goes through
-    /// <c>Items.IndexOf</c> — WinForms, not NUnit, has the final say on whether a row is reachable.
+    /// The same round trip against a real <see cref="ComboBox"/>, because the reselect actually goes
+    /// through <c>Items.IndexOf</c> — WinForms, not NUnit, has the final say on whether a row is
+    /// reachable. Deliberately kept alongside the assertion above rather than replacing it: this one
+    /// needs an STA apartment and a WinForms control, and the invariant should still be pinned where
+    /// that is unavailable.
     /// </summary>
     [Test]
     [Apartment(ApartmentState.STA)]
-    public void ComboBox_EveryOfferedRow_IsSelectedAgainAfterASaveAndRestore ()
+    public void GetAvailableEncodings_EveryOfferedRowIsReselectableInARealComboBox ()
     {
         var encodings = SettingsDialog.GetAvailableEncodings();
 

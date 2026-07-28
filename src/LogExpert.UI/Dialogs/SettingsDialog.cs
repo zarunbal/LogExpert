@@ -121,6 +121,14 @@ internal partial class SettingsDialog : Form
 
     private IConfigManager ConfigManager { get; }
 
+    /// <summary>
+    /// The encoding the dialog falls back to when the persisted name is unusable — on both the way in
+    /// (nothing to select) and the way out (nothing selected). Has to be one of
+    /// <see cref="GetAvailableEncodings"/>, otherwise the combo box shows a blank selection and OK writes
+    /// back a value the list never offered.
+    /// </summary>
+    internal static Encoding FallbackEncoding { get; } = Encoding.UTF8;
+
     #endregion
 
     #region Private Methods
@@ -704,14 +712,6 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    /// The entry the dialog falls back to when the persisted name is unusable — on both the way in
-    /// (nothing to select) and the way out (nothing selected). Has to be one of
-    /// <see cref="GetAvailableEncodings"/>, otherwise the combo box shows a blank selection and OK writes
-    /// back a value the list never offered.
-    /// </summary>
-    internal static Encoding FallbackEncoding { get; } = Encoding.UTF8;
-
-    /// <summary>
     /// The encodings offered as the default encoding: ASCII, ISO-8859-1, UTF-8, Unicode, Windows-1250
     /// and Windows-1252.
     /// </summary>
@@ -833,7 +833,7 @@ internal partial class SettingsDialog : Form
         Preferences.LinesPerBuffer = (int)upDownLinesPerBlock.Value;
         Preferences.PollingInterval = (int)upDownPollingInterval.Value;
         Preferences.MultiThreadFilter = checkBoxMultiThread.Checked;
-        Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : FallbackEncoding.HeaderName;
+        Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem is Encoding selectedEncoding ? selectedEncoding.HeaderName : FallbackEncoding.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
         Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.SystemDirect;
