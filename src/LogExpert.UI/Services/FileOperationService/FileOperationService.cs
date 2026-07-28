@@ -6,6 +6,7 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
@@ -120,17 +121,20 @@ internal sealed class FileOperationService (
 
     private void FillDefaultEncodingFromSettings (EncodingOptions encodingOptions)
     {
-        if (_configManager.Settings.Preferences.DefaultEncoding != null)
+        var configuredEncoding = _configManager.Settings.Preferences.DefaultEncoding;
+        if (configuredEncoding == null)
         {
-            try
-            {
-                encodingOptions.DefaultEncoding = Encoding.GetEncoding(_configManager.Settings.Preferences.DefaultEncoding);
-            }
-            catch (ArgumentException)
-            {
-                _logger.Warn($"### FillDefaultEncodingFromSettings: Encoding {_configManager.Settings.Preferences.DefaultEncoding} is not a valid encoding");
-                encodingOptions.DefaultEncoding = null;
-            }
+            return;
+        }
+
+        if (EncodingRegistry.TryGetEncoding(configuredEncoding, out var encoding))
+        {
+            encodingOptions.DefaultEncoding = encoding;
+        }
+        else
+        {
+            _logger.Warn($"### FillDefaultEncodingFromSettings: Encoding {configuredEncoding} is not a valid encoding");
+            encodingOptions.DefaultEncoding = null;
         }
     }
 

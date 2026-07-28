@@ -303,6 +303,33 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls[0].Encoding.DefaultEncoding.WebName, Is.EqualTo("utf-8"));
     }
 
+    /// <summary>
+    /// The headline bug: .NET does not ship the legacy Windows code pages, and registration of
+    /// <c>CodePagesEncodingProvider</c> used to happen only in the Preferences dialog constructor. A user
+    /// who picked Windows-1252 and restarted without reopening Preferences got their choice silently
+    /// discarded here, because this method swallows the resolve failure and leaves DefaultEncoding null.
+    /// </summary>
+    [Test]
+    [TestCase("windows-1250", 1250)]
+    [TestCase("windows-1252", 1252)]
+    public void AddFileTab_LegacyCodePageDefaultEncoding_ResolvesWithoutOpeningPreferences (string encodingName, int expectedCodePage)
+    {
+        // Arrange
+        _settings.Preferences.DefaultEncoding = encodingName;
+        _ = _tabControllerMock
+            .Setup(tc => tc.FindWindowByFileName(It.IsAny<string>()))
+            .Returns((LogWindow)null!);
+
+        var request = new FileTabRequest { FileName = "test.log" };
+
+        // Act
+        _ = _sut.AddFileTab(request);
+
+        // Assert
+        Assert.That(_factoryCalls[0].Encoding.DefaultEncoding, Is.Not.Null, "the configured code page was discarded");
+        Assert.That(_factoryCalls[0].Encoding.DefaultEncoding.CodePage, Is.EqualTo(expectedCodePage));
+    }
+
     [Test]
     public void AddFileTab_InvalidDefaultEncoding_DefaultEncodingRemainsNull ()
     {

@@ -37,8 +37,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
     private readonly ILoadProgressReporter _progressReporter;
 
-    private readonly MemoryMappedFileReader _mmfReader;
-
     private const int WAIT_TIME = 1000;
 
     private bool _contentDeleted;
@@ -185,18 +183,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         }
 
         _watchedILogFileInfo = fileInfo;
-
-        if (!IsMultiFile && _watchedILogFileInfo.Uri?.Scheme is null or "file")
-        {
-            try
-            {
-                _mmfReader = new MemoryMappedFileReader(_watchedILogFileInfo.FullName, EncodingOptions.Encoding ?? Encoding.Default);
-            }
-            catch (IOException)
-            {
-                _mmfReader = null; // fallback to buffer path
-            }
-        }
 
         StartGCThread();
     }
@@ -959,12 +945,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
             return default;
         }
 
-        if (_mmfReader != null && lineNum < _mmfReader.LineCount)
-        {
-            var line = _mmfReader.GetLine(lineNum);
-            return new ValueTask<ILogLineMemory>(line);
-        }
-
         using var readLock = BufferIndex.AcquireReadLock();
         {
             var logBufferEntry = BufferIndex.GetBufferForLineWithIndex(lineNum);
@@ -1568,8 +1548,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
             _logger.Info(CultureInfo.InvariantCulture, "file size changed. new size={0}, file: {1}", newSize, _fileName);
             FireChangeEvent();
         }
-
-        _mmfReader?.ExtendIndex();
     }
 
     /// <summary>
@@ -1874,8 +1852,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                 _cts.Dispose();
                 BufferIndex.Dispose();
                 _progressReporter.Dispose();
-                _mmfReader?.Dispose();
-
             }
 
             _disposed = true;
