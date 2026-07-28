@@ -7,7 +7,6 @@
     <IsTestProject>true</IsTestProject>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <OutputPath>bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>LogExpert.Tests</AssemblyTitle>
     <RootNamespace>LogExpert.Tests</RootNamespace>
