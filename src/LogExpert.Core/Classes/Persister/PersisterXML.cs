@@ -6,6 +6,7 @@ using System.Xml;
 
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 
 using NLog;
 
@@ -266,26 +267,24 @@ public static class PersisterXML
     private static Encoding ReadEncoding (XmlElement fileElement)
     {
         XmlNode encodingNode = fileElement.SelectSingleNode("encoding");
-        if (encodingNode != null)
+        if (encodingNode == null)
         {
-            XmlAttribute encAttr = encodingNode.Attributes["name"];
-            try
-            {
-                return encAttr == null ? null : Encoding.GetEncoding(encAttr.Value);
-            }
-            catch (ArgumentException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
-            catch (NotSupportedException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
+            return null;
         }
 
-        return null;
+        XmlAttribute encAttr = encodingNode.Attributes["name"];
+        if (encAttr == null)
+        {
+            return null;
+        }
+
+        if (EncodingRegistry.TryGetEncoding(encAttr.Value, out var encoding))
+        {
+            return encoding;
+        }
+
+        _logger.Error($"Persisted encoding '{encAttr.Value}' is not supported, falling back to the default encoding");
+        return Encoding.Default;
     }
 
     /// <summary>

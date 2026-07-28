@@ -524,9 +524,8 @@ public class CSVColumnizerTest
     }
 
     /// <summary>
-    /// Tests the exact GUI scenario: single file (not multi), which enables the MemoryMappedFileReader.
-    /// The MMF reader reads raw lines without PreProcess, which can conflict with the buffer system
-    /// where lines are dropped.
+    /// Tests the exact GUI scenario: a single file opened with multiFile false, with a PreProcess
+    /// columnizer that drops the header line.
     /// </summary>
     [Test]
     public void LogfileReader_CommaCsv_SingleFile_WithPreProcess_DataLineNotEmpty ()
@@ -537,7 +536,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        // multiFile=FALSE — this enables the MemoryMappedFileReader path (like the real GUI)
+        // multiFile=FALSE, like the real GUI
         LogfileReader reader = new(path, new EncodingOptions(), false, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();

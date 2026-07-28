@@ -9,6 +9,7 @@ using ColumnizerLib;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.ControlCharDisplay;
 using LogExpert.UI.Controls.LogTabWindow;
@@ -85,8 +86,6 @@ internal partial class SettingsDialog : Form
         dataGridViewImageColumnColumnizerStale.CellTemplate = new EmptyImageCell();
 
         LoadResources();
-
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         ResumeLayout();
     }
@@ -281,7 +280,7 @@ internal partial class SettingsDialog : Form
         FillReaderTypeList();
         FillControlCharsTab();
 
-        comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        comboBoxEncoding.SelectedItem = EncodingRegistry.GetEncoding(Preferences.DefaultEncoding, Encoding.Default);
         comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
 
         switch (Preferences.ColumnizerSelectionPriority)
@@ -689,25 +688,42 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    /// Populates the encoding list in the combo box with a predefined set of character encodings.
+    /// Populates the encoding list in the combo box from <see cref="GetAvailableEncodings"/>. The value
+    /// member of the combo box is set to a specific header name defined in the resources.
     /// </summary>
-    /// <remarks>
-    /// This method clears any existing items in the combo box and adds a selection of common encodings, including
-    /// ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, and Windows-1252. The value member of the combo box is set
-    /// to a specific header name defined in the resources.
-    /// </remarks>
     private void FillEncodingList ()
     {
         comboBoxEncoding.Items.Clear();
 
-        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
-        _ = comboBoxEncoding.Items.Add(Encoding.Default);
-        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
-        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
-        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        foreach (var encoding in GetAvailableEncodings())
+        {
+            _ = comboBoxEncoding.Items.Add(encoding);
+        }
 
         comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
+    }
+
+    /// <summary>
+    /// The encodings offered as the default encoding: ASCII, Default (UTF-8), ISO-8859-1, UTF-8,
+    /// Unicode, Windows-1250 and Windows-1252.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="FillEncodingList"/> so the offered set can be asserted without building
+    /// the dialog. The selected entry is saved by name, so every entry has to be resolvable by name on
+    /// the next start — which is why the code pages go through <see cref="EncodingRegistry"/>.
+    /// </remarks>
+    internal static IReadOnlyList<Encoding> GetAvailableEncodings ()
+    {
+        return
+        [
+            Encoding.ASCII,
+            Encoding.Default,
+            Encoding.Latin1,
+            Encoding.UTF8,
+            Encoding.Unicode,
+            EncodingRegistry.GetEncoding(1250),
+            EncodingRegistry.GetEncoding(1252)
+        ];
     }
 
     /// <summary>
