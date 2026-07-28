@@ -151,7 +151,7 @@ For "behavior-preserving" refactors, explicitly confirm equivalence and flag any
 
 - `build.ps1` bootstraps and runs the Nuke build defined in [build/Build.cs](build/Build.cs). Targets and their dependencies are declared there in C#.
 - **Default target is `Test`** (which depends on `Compile`), so a bare `./build.ps1` restores, compiles, and runs the tests.
-- Select targets with `--target <Name>` (space-separated for multiple). Common targets: `Clean`, `Restore`, `Compile`, `Test`, `Pack`, `CreateSetup`, `GeneratePluginHashes`, `Publish`.
+- Select targets with `--target <Name>` (space-separated for multiple). Common targets: `Clean`, `Restore`, `Compile`, `Test`, `Pack`, `CreateSetup`, `Publish`.
 - List all available targets: `./build.ps1 --help`
 - Preview the execution plan without running it: `./build.ps1 --plan`
 - Pick build configuration with `--configuration Debug|Release` (defaults to `Debug` locally, `Release` on CI).
@@ -305,12 +305,16 @@ LogExpert/
 
 ## Plugin Security System
 
-**Release builds only:**
-- After compilation, `PluginHashGenerator.Tool` generates SHA256 hashes of all plugins
-- Hashes stored in [PluginHashGenerator.Generated.cs](src/PluginRegistry/PluginHashGenerator.Generated.cs)
-- At runtime, `PluginRegistry` verifies plugin hashes before loading
+- SHA256 hashes of the built-in plugins are generated during **every** build by
+  [PluginHashGenerator.targets](src/PluginRegistry/PluginHashGenerator.targets), which runs before
+  `LogExpert.PluginRegistry` compiles and writes `obj/<Configuration>/BuiltInPluginHashes.g.cs`
+- Build-order-only `ProjectReference` entries in `LogExpert.PluginRegistry.csproj` guarantee the
+  plugins are built first
+- The table is **not** committed and there is no CI step for it — nothing to regenerate by hand,
+  nothing to verify, nothing to commit back
+- At runtime, `PluginRegistry` verifies plugin hashes before loading; verification is skipped in
+  Debug builds (`PluginHashCalculator.BypassHashVerification`)
 - Users can trust new plugins via UI dialog
-- Hash updates automated via GitHub Actions on successful builds
 - See [PLUGIN_HASH_MANAGEMENT.md](src/docs/PLUGIN_HASH_MANAGEMENT.md)
 
 ## Common Gotchas

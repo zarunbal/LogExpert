@@ -66,11 +66,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Save generated files before switching branches (checkout would overwrite them)
+          # Built-in plugin hashes are not carried here: PluginRegistry generates its own table at
+          # build time, so there is nothing to commit back. usedComponents.json is all that is left.
+
+          # Save the generated file before switching branches (checkout would overwrite it)
           $tempComponents = [System.IO.Path]::GetTempFileName()
-          $tempHashes     = [System.IO.Path]::GetTempFileName()
-          Copy-Item "src/Solution Items/usedComponents.json"             $tempComponents
-          Copy-Item "src/PluginRegistry/PluginHashGenerator.Generated.cs" $tempHashes
+          Copy-Item "src/Solution Items/usedComponents.json" $tempComponents
 
           # Development is PR-protected, so apply the updates on a fresh branch off Development
           git fetch origin Development
@@ -78,24 +79,18 @@ jobs:
           git checkout -B $branch origin/Development
 
           Copy-Item $tempComponents "src/Solution Items/usedComponents.json"
-          Copy-Item $tempHashes     "src/PluginRegistry/PluginHashGenerator.Generated.cs"
 
           git add "src/Solution Items/usedComponents.json"
-          git add "src/PluginRegistry/PluginHashGenerator.Generated.cs"
 
-          # Describe only the files that actually changed. usedComponents.json is
-          # regenerated every release but rarely differs (dependencies are stable),
-          # so without this the message falsely claims it was updated each time.
+          # usedComponents.json is regenerated every release but rarely differs (dependencies are
+          # stable), so skip the PR entirely when nothing actually changed.
           $staged = git diff --staged --name-only
           if ([string]::IsNullOrWhiteSpace($staged)) {
             Write-Host "No changes to commit; skipping PR."
             exit 0
           }
 
-          $parts = @()
-          if ($staged -match 'PluginHashGenerator\.Generated\.cs') { $parts += 'plugin hashes' }
-          if ($staged -match 'usedComponents\.json')               { $parts += 'usedComponents.json' }
-          $what = $parts -join ' and '
+          $what = 'usedComponents.json'
 
           git commit -m "chore: update $what for ${{ github.ref_name }} [skip ci]"
           # Force-push so re-running the release for the same tag updates the existing branch

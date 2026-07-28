@@ -172,67 +172,9 @@ partial class Build : NukeBuild
                 .EnableNoRestore());
         });
 
-    AbsolutePath PluginHashGeneratorProject => SourceDirectory / "PluginHashGenerator.Tool" / "PluginHashGenerator.Tool.csproj";
-
-    AbsolutePath PluginHashGeneratedFile => SourceDirectory / "PluginRegistry" / "PluginHashGenerator.Generated.cs";
-
-    Target GeneratePluginHashes => _ => _
-        .After(Compile)
-        .OnlyWhenStatic(() => Configuration == Configuration.Release)
-        .Executes(() =>
-        {
-            var pluginsDir = OutputDirectory / "plugins";
-            var pluginsx86Dir = OutputDirectory / "pluginsx86";
-
-            // Check if any plugins exist
-            if (!pluginsDir.DirectoryExists() && !pluginsx86Dir.DirectoryExists())
-            {
-                Log.Warning("No plugins directories found. Skipping plugin hash generation.");
-                return;
-            }
-
-            Log.Information("Generating plugin hashes...");
-            Log.Information($"  Output Path: {OutputDirectory}");
-            Log.Information($"  Target File: {PluginHashGeneratedFile}");
-            Log.Information($"  Configuration: {Configuration}");
-
-            try
-            {
-                DotNetRun(s => s
-                    .SetProjectFile(PluginHashGeneratorProject)
-                    .SetApplicationArguments([OutputDirectory, PluginHashGeneratedFile, Configuration])
-                    .SetProcessWorkingDirectory(RootDirectory));
-
-                Log.Information("Plugin hashes generated successfully");
-
-                // Rebuild PluginRegistry project to include the generated file
-                // IMPORTANT: Set OutputPath to match the main build output directory.
-                // OutputPath is a global property, so it propagates to PluginRegistry's
-                // ProjectReferences (LogExpert.Core, LogExpert.Resources) and rebuilds them
-                // into the same folder. The version properties MUST match the main Compile
-                // target; otherwise those dependencies are re-emitted at the Directory.Build.props
-                // default version, overwriting the GitVersion-stamped copies. That leaves
-                // LogExpert.exe referencing one version of LogExpert.Core while the DLL on disk
-                // has another, and the strong-name binder fails at startup with a
-                // FileNotFoundException for the referenced version.
-                Log.Information("Rebuilding PluginRegistry to include generated hashes...");
-                DotNetBuild(s => s
-                    .SetProjectFile(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
-                    .SetConfiguration(Configuration)
-                    .SetAssemblyVersion(VersionString)
-                    .SetFileVersion(VersionFileString)
-                    .SetInformationalVersion(VersionInformationString)
-                    .SetProperty("OutputPath", OutputDirectory)
-                    .EnableNoRestore());
-
-                Log.Information("PluginRegistry rebuilt successfully to {OutputDir}", OutputDirectory);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to generate plugin hashes");
-                throw;
-            }
-        });
+    // Built-in plugin hashes need no target here: PluginRegistry generates them itself, before it
+    // compiles, from the plugins its build-order ProjectReferences have already produced. See
+    // src/PluginRegistry/PluginHashGenerator.targets.
 
     Target Test => _ => _
         .DependsOn(Compile)
@@ -331,7 +273,7 @@ partial class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, GeneratePluginHashes, CreateSetup);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, CreateSetup);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
@@ -392,7 +334,6 @@ partial class Build : NukeBuild
     Target CreateSetup => _ => _
         .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile, CopyLicenses, GenerateInstallerFileList)
         .Before(Publish)
-        .After(GeneratePluginHashes)
         .OnlyWhenStatic(() => Configuration == Configuration.Release)
         .Executes(() =>
         {

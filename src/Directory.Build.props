@@ -4,12 +4,6 @@
     <AssemblyVersion>1.40.4.0</AssemblyVersion>
     <FileVersion>1.40.4.0</FileVersion>
     <InformationalVersion>1.40.4.0</InformationalVersion>
-    <!-- Keep assemblies independent of the commit they were built from. The SDK otherwise queries
-         git and feeds the commit sha into the build twice: appended to InformationalVersion, and
-         into the SourceLink map in the portable PDB - whose checksum is embedded in the DLL. Either
-         route changes every assembly's bytes on every commit, which makes the plugin hashes in
-         PluginHashGenerator.Generated.cs stale the moment they are committed. -->
-    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
     <Company>LogExperts</Company>
     <ImplicitUsings>enable</ImplicitUsings>
