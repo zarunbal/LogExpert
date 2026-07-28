@@ -11,14 +11,12 @@
     Generating it rather than committing it is the point: a committed table describes whichever
     build produced it, so it went stale the moment it was committed and never matched the binaries
     it shipped beside. Nothing here depends on builds being byte-reproducible across commits.
+
+    LogExpertPluginsDirectory / LogExpertPluginsX86Directory come from Directory.Build.props and are
+    the very directories the plugin projects build into, so the two cannot drift apart.
   -->
 
   <PropertyGroup>
-    <!-- The same expression the plugin projects use for OutputPath. PluginRegistry sits at the same
-         directory level as they do, so this resolves to the same place whether the solution or a
-         lone project is being built (SolutionDir is only defined for the former). -->
-    <BuiltInPluginsDirectory>$(SolutionDir)..\bin\$(Configuration)\plugins\</BuiltInPluginsDirectory>
-    <BuiltInPluginsX86Directory>$(SolutionDir)..\bin\$(Configuration)\pluginsx86\</BuiltInPluginsX86Directory>
     <!-- Spelled out from BaseIntermediateOutputPath rather than using IntermediateOutputPath: this
          file is imported before the SDK's common targets define the latter, so it would evaluate
          empty here and drop the generated file into the project directory. Per-configuration so
@@ -74,21 +72,21 @@ public static partial class PluginValidator
          alongside bare %(Filename) metadata makes MSBuild batch the item element over
          NonPluginAssembly, which silently resolves the metadata against the wrong item. -->
     <PropertyGroup>
-      <ExcludedFromPlugins>@(NonPluginAssembly->'$(BuiltInPluginsDirectory)%(Identity)')</ExcludedFromPlugins>
-      <ExcludedFromPluginsX86>@(NonPluginAssembly->'$(BuiltInPluginsX86Directory)%(Identity)')</ExcludedFromPluginsX86>
+      <ExcludedFromPlugins>@(NonPluginAssembly->'$(LogExpertPluginsDirectory)%(Identity)')</ExcludedFromPlugins>
+      <ExcludedFromPluginsX86>@(NonPluginAssembly->'$(LogExpertPluginsX86Directory)%(Identity)')</ExcludedFromPluginsX86>
     </PropertyGroup>
 
     <!-- Globbed inside the target, not at evaluation: the plugins are built during this same build,
          so at evaluation time they may not exist yet. Kept as two lists because the x86 entries need
          a suffixed key, which the transforms below apply. -->
     <ItemGroup>
-      <BuiltInPlugin Include="$(BuiltInPluginsDirectory)*.dll" Exclude="$(ExcludedFromPlugins)" />
-      <BuiltInPluginX86 Include="$(BuiltInPluginsX86Directory)*.dll" Exclude="$(ExcludedFromPluginsX86)" />
+      <BuiltInPlugin Include="$(LogExpertPluginsDirectory)*.dll" Exclude="$(ExcludedFromPlugins)" />
+      <BuiltInPluginX86 Include="$(LogExpertPluginsX86Directory)*.dll" Exclude="$(ExcludedFromPluginsX86)" />
     </ItemGroup>
 
     <!-- An empty table would silently make every built-in plugin untrusted, so fail loudly instead. -->
     <Error Condition="'@(BuiltInPlugin)' == ''"
-           Text="No built-in plugin assemblies found in $(BuiltInPluginsDirectory). The plugin projects should have been built first - check the build-order ProjectReferences in LogExpert.PluginRegistry.csproj." />
+           Text="No built-in plugin assemblies found in $(LogExpertPluginsDirectory). The plugin projects should have been built first - check the build-order ProjectReferences in LogExpert.PluginRegistry.csproj." />
 
     <GetFileHash Files="@(BuiltInPlugin)" Algorithm="SHA256" HashEncoding="hex">
       <Output TaskParameter="Items" ItemName="HashedBuiltInPlugin" />
