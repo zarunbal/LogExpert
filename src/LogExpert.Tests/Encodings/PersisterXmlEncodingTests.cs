@@ -20,7 +20,7 @@ public class PersisterXmlEncodingTests
     [SetUp]
     public void Setup ()
     {
-        _lxpFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.lxp");
+        _lxpFile = Path.Join(Path.GetTempPath(), $"{Guid.NewGuid()}.lxp");
     }
 
     [TearDown]
