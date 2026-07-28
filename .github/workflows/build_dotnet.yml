@@ -18,8 +18,7 @@ env:
 jobs:
   build:
     permissions:
-      contents: write  # Changed to 'write' for committing
-      pull-requests: write  # Added for PR operations
+      contents: read  # Nothing is committed back; the job only builds and uploads an artifact.
 
     strategy:
       fail-fast: false
@@ -47,37 +46,9 @@ jobs:
         run: |
           dotnet build ${{ env.Solution }} --nologo -v quiet -c ${{ matrix.configuration }}
 
-      - name: Generate Plugin Hashes
-        if: matrix.configuration == 'Release'
-        run: dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
-
-      # Fork PRs run with a read-only GITHUB_TOKEN (GitHub enforces this regardless of the
-      # permissions block), so the auto-commit below can never work for them. Instead, verify the
-      # hashes are current and tell the contributor how to fix them if not — otherwise a fork PR
-      # that changes a plugin would merge with stale hashes and Release builds would refuse to
-      # load that plugin.
-      - name: Verify Plugin Hashes (fork PRs)
-        if: matrix.configuration == 'Release' && github.event.pull_request.head.repo.full_name != github.repository
-        run: |
-          git diff --exit-code src/PluginRegistry/PluginHashGenerator.Generated.cs
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host '::error::Plugin hashes are out of date. After a Release build, run: dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release - then commit the updated file.'
-            exit 1
-          }
-
-      - name: Commit Updated Hashes
-        if: matrix.configuration == 'Release' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/PluginRegistry/PluginHashGenerator.Generated.cs
-          git diff --staged --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "chore: update plugin hashes [skip ci]"
-            git push
-          } else {
-            Write-Host "No changes to commit"
-          }
+      # Built-in plugin hashes need no steps here. PluginRegistry generates its own table before it
+      # compiles, so every build - including a fork PR's - carries hashes for the binaries beside it.
+      # Nothing to verify, and nothing to commit back.
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
