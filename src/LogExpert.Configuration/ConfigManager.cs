@@ -657,7 +657,9 @@ public class ConfigManager : IConfigManager
 
         settings.Preferences.MultiFileOptions ??= new MultiFileOptions();
 
-        settings.Preferences.DefaultEncoding ??= System.Text.Encoding.Default.HeaderName;
+        // UTF-8 rather than Encoding.Default: identical text on .NET, but Encoding.Default is not one of
+        // the rows the Preferences dropdown offers, so seeding from it would name an unselectable entry.
+        settings.Preferences.DefaultEncoding ??= System.Text.Encoding.UTF8.HeaderName;
 
         settings.Preferences.DefaultLanguage ??= CultureInfo.GetCultureInfo("en-US").Name;
 
