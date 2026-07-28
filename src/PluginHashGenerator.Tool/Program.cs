@@ -142,8 +142,6 @@ internal class Program
 
     private static string GenerateSourceCode (Dictionary<string, string> pluginHashes, string configuration)
     {
-        var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-
         var sb = new StringBuilder();
 
         foreach (var kvp in pluginHashes.OrderBy(kvp => kvp.Key))
@@ -166,7 +164,8 @@ internal class Program
             {
                 /// <summary>
                 /// Gets pre-calculated SHA256 hashes for built-in plugins.
-                /// Generated: {{timestamp}} UTC
+                /// Deliberately carries no generation timestamp: the file is committed, and a
+                /// timestamp would make every regeneration a diff even when no hash changed.
                 /// Configuration: {{configuration}}
                 /// Plugin count: {{pluginHashes.Count}}
                 /// </summary>
