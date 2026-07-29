@@ -154,10 +154,6 @@ public static class PersisterXML
                         using MemoryStream stream = new(data);
                         try
                         {
-                            // Newtonsoft, symmetrically with the writer that produced these
-                            // payloads: it writes Color as "Black", which System.Text.Json cannot
-                            // read back — it throws, the catch below swallows it, and the filter
-                            // is lost. The rest of the persistence stack is Newtonsoft too.
                             using StreamReader streamReader = new(stream);
                             using JsonTextReader jsonReader = new(streamReader);
                             JsonSerializer serializer = new();
