@@ -73,7 +73,6 @@ public class PersisterXmlEncodingTests
 
     private void WriteLxp (string encodingElement)
     {
-        // <options /> has to be present: PersisterXML.ReadOptions dereferences it unconditionally.
         File.WriteAllText(
             _lxpFile,
             $"""
