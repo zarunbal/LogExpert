@@ -458,15 +458,16 @@ internal class TabController : ITabController
     /// Gets all LogWindow instances from the DockPanel's Contents collection.
     /// </summary>
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
-    public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
-    {
-        return !_initialized || _dockPanel == null
-            ? []
-            : (IReadOnlyList<LogWindow>)_dockPanel.Contents
-            .OfType<LogWindow>()
-            .ToList()
-            .AsReadOnly();
-    }
+	public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
+	{
+		return !_initialized || _dockPanel == null
+			? []
+			: _dockPanel.Panes
+				.Where(pane => pane.DockState == DockState.Document)
+				.SelectMany(pane => pane.Contents.OfType<LogWindow>())
+				.ToList()
+				.AsReadOnly();
+	}
 
     #endregion
 }
