@@ -13,6 +13,10 @@ public static class SessionFileComposer
     /// (the dead fields and <c>SessionFileName</c> named in the spec) are left at their type
     /// defaults. Note: <see cref="Persister"/> rewrites <c>FileName</c> on SameDir saves *after*
     /// compose — transformed by design, outside this contract.
+    /// <para>
+    /// <c>FilterParamsList</c> is a list only for backward compatibility: the window's own filter
+    /// goes in as its single entry, and a snapshot without one composes to an empty list.
+    /// </para>
     /// </summary>
     public static PersistenceData Compose (SessionSnapshot snapshot)
     {
@@ -39,7 +43,7 @@ public static class SessionFileComposer
             BookmarkList = snapshot.BookmarkList,
             RowHeightList = snapshot.RowHeightList,
             MultiFileNames = snapshot.MultiFileNames,
-            FilterParamsList = snapshot.FilterParamsList,
+            FilterParamsList = snapshot.FilterParams is null ? [] : [snapshot.FilterParams],
             Columnizer = snapshot.Columnizer,
             FilterTabDataList =
             [
@@ -55,6 +59,11 @@ public static class SessionFileComposer
     /// <summary>
     /// Maps a loaded Session File back to a snapshot. Fields the snapshot does not carry are
     /// ignored.
+    /// <para>
+    /// The window's filter is <c>FilterParamsList[0]</c>, which is what load has always used.
+    /// Session Files written before the per-window filter change carry a copy of the whole global
+    /// filter list there; the trailing entries were never restored by anything and are dropped.
+    /// </para>
     /// </summary>
     public static SessionSnapshot Decompose (PersistenceData persistenceData)
     {
@@ -81,7 +90,7 @@ public static class SessionFileComposer
             BookmarkList = persistenceData.BookmarkList,
             RowHeightList = persistenceData.RowHeightList,
             MultiFileNames = persistenceData.MultiFileNames,
-            FilterParamsList = persistenceData.FilterParamsList,
+            FilterParams = persistenceData.FilterParamsList.Count > 0 ? persistenceData.FilterParamsList[0] : null,
             Columnizer = persistenceData.Columnizer,
             FilterTabs =
             [

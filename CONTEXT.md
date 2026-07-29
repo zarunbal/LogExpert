@@ -130,6 +130,15 @@ split is two *apply phases* of the **Session Snapshot**, not a partial read).
   results/history → trim history). Used inside the Serial engine, per line by
   the Log Window's tail filter path, and per hit by Filter Pipes — all three
   adopt existing lists, so a Filter Run's history is continued in place.
+- **Window Filter** (`LogWindow._filterParams`) — The one filter a Log Window
+  currently holds in its filter panel. Per-window state: it is what a **Session
+  File** saves and restores, and it is not an entry of the **Saved Filter
+  List**. A Filter Pipe tab gets its own, cloned when the tab is created.
+- **Saved Filter List** (`Settings.FilterList`) — The application-wide list of
+  filters the user explicitly saved from the filter panel, shown in the filter
+  save list. Global, never per-window, and never restored from a Session File.
+  (Session Files written before the Window Filter change stored a copy of it
+  instead, of which only the first entry was ever restored.)
 - **Filter Spread** — Context expansion around a filter hit: **Back Spread**
   (`FilterParams.SpreadBefore`) lines before and **Fore Spread**
   (`FilterParams.SpreadBehind`) lines after the hit are included in the
@@ -146,7 +155,8 @@ split is two *apply phases* of the **Session Snapshot**, not a partial read).
 Spread**), "additional filter results" (the old internal name — use
 **Filter Spread**), "multi-threaded filter" as a concept name (it is a
 preference selecting the Parallel **Filter Engine**), "FilterFx" (legacy
-delegate name, deleted).
+delegate name, deleted), "the filter list" when the **Window Filter** is meant
+(the list is the **Saved Filter List**).
 
 ## Log Search
 
