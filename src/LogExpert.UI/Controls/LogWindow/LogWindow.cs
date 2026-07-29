@@ -2660,9 +2660,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void RestoreFilters (SessionSnapshot snapshot)
     {
-        if (snapshot.FilterParamsList.Count > 0)
+        if (snapshot.FilterParams != null)
         {
-            _filterParams = snapshot.FilterParamsList[0];
+            _filterParams = snapshot.FilterParams;
             ReInitFilterParams(_filterParams);
         }
 
@@ -5832,8 +5832,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         try
         {
             // Relocated from the old composing getter (the composer must stay side-effect-free):
-            // this option doesn't need a press on 'search'. The write must precede the gather —
-            // the gather copies the global FilterList, and this write may alias into it.
+            // this option doesn't need a press on 'search'. The write must precede the gather,
+            // which is what copies _filterParams into the snapshot.
             _filterParams.IsFilterTail = filterTailCheckBox.Checked;
 
             var persistenceData = SessionFileComposer.Compose(GatherSessionSnapshot());
@@ -5893,8 +5893,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-			// Persist this window's active filter; FilterList contains global saved presets.
-			snapshot.FilterParamsList = [_filterParams.Clone()];
+            // The window's own filter, not the global filter list: a Session File is per-window
+            // state, and the global list is never restored from one anyway. Clone() is a shallow
+            // copy (ColumnList and the columnizer stay shared) — enough here, because compose and
+            // serialize run synchronously right after this gather.
+            snapshot.FilterParams = _filterParams.Clone();
+
             foreach (var filterPipe in _filterPipeList)
             {
                 snapshot.FilterTabs.Add(new FilterTabSnapshot

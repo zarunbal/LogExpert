@@ -177,7 +177,7 @@ public class SessionFileComposerTests
             BookmarkList = new SortedList<int, Bookmark> { [5] = new Bookmark(5, "a manual bookmark") },
             RowHeightList = new SortedList<int, RowHeightEntry> { [3] = new RowHeightEntry(3, 60) },
             MultiFileNames = ["app.1.log", "app.2.log"],
-            FilterParamsList = [CreateFilterParams("ERROR")],
+            FilterParams = CreateFilterParams("ERROR"),
             Columnizer = new DefaultLogfileColumnizer(),
             FilterTabs = filterTabDepth > 0
                 ?
@@ -365,6 +365,66 @@ public class SessionFileComposerTests
 
         Assert.That(File.Exists(savedFileName), Is.True, "The .lxp must actually have been written");
         Assert.That(SerializeForComparison(roundTripped), Is.EqualTo(SerializeForComparison(snapshot)));
+    }
+
+    #endregion
+
+    #region Window filter (issue #666)
+
+    // A Session File carries the window's OWN filter, not a copy of the global filter list. The
+    // on-disk shape stays a list so existing .lxp files keep loading — new saves just write
+    // exactly one entry into it.
+    [Test]
+    public void Compose_WritesTheWindowFilterAsTheSingleFilterParamsListEntry ()
+    {
+        var snapshot = CreateFullSnapshot(filterTabDepth: 0);
+        snapshot.FilterParams = CreateFilterParams("the window's own filter");
+
+        var composed = SessionFileComposer.Compose(snapshot);
+
+        Assert.That(composed.FilterParamsList, Has.Count.EqualTo(1));
+        Assert.That(composed.FilterParamsList[0].SearchText, Is.EqualTo("the window's own filter"));
+    }
+
+    // SaveFilters off (and filter-less windows) leave the snapshot without a filter — the field
+    // must not serialize a null element into the list.
+    [Test]
+    public void Compose_WithoutAWindowFilter_WritesAnEmptyFilterParamsList ()
+    {
+        var snapshot = CreateFullSnapshot(filterTabDepth: 0);
+        snapshot.FilterParams = null;
+
+        Assert.That(SessionFileComposer.Compose(snapshot).FilterParamsList, Is.Empty);
+    }
+
+    // The compatibility story: a pre-#666 Session File carries a copy of the whole global filter
+    // list, and load has always taken [0] as the window's filter. That stays true — and the
+    // trailing entries, which nothing ever restored, are dropped when such a file is re-saved.
+    [Test]
+    public void Decompose_LegacySessionFileCarryingTheGlobalList_KeepsTheFirstEntryAndDropsTheRest ()
+    {
+        var legacy = CreateCarriedPersistenceData(filterTabDepth: 0);
+        legacy.FilterParamsList =
+        [
+            CreateFilterParams("the first global filter"),
+            CreateFilterParams("another global filter"),
+        ];
+
+        var snapshot = SessionFileComposer.Decompose(legacy);
+        var recomposed = SessionFileComposer.Compose(snapshot);
+
+        Assert.That(snapshot.FilterParams.SearchText, Is.EqualTo("the first global filter"));
+        Assert.That(recomposed.FilterParamsList, Has.Count.EqualTo(1));
+        Assert.That(recomposed.FilterParamsList[0].SearchText, Is.EqualTo("the first global filter"));
+    }
+
+    [Test]
+    public void Decompose_SessionFileWithoutFilters_LeavesTheWindowFilterUnset ()
+    {
+        var data = CreateCarriedPersistenceData(filterTabDepth: 0);
+        data.FilterParamsList = [];
+
+        Assert.That(SessionFileComposer.Decompose(data).FilterParams, Is.Null);
     }
 
     #endregion

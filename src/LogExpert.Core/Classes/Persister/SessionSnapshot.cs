@@ -67,7 +67,12 @@ public class SessionSnapshot
 
     public List<string> MultiFileNames { get; set; } = [];
 
-    public List<FilterParams> FilterParamsList { get; set; } = [];
+    /// <summary>
+    /// The window's own filter, or <c>null</c> when there is none to save (Save Filters off, or a
+    /// Session File that carries no filter). Its serialized form is a one-entry list — see
+    /// <see cref="SessionFileComposer"/>.
+    /// </summary>
+    public FilterParams FilterParams { get; set; }
 
     public ILogLineMemoryColumnizer Columnizer { get; set; }
 
