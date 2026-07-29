@@ -5893,10 +5893,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (Preferences.SaveFilters)
         {
-            //when a filter is added, its added to the Configmanager.Settings.FilterList and not to the _filterParams, this is probably an oversight and maybe a bug
-            //but for the consistency the FilterList should be saved as whole for every file
-            snapshot.FilterParamsList = [.. ConfigManager.Settings.FilterList];
-
+			// Persist this window's active filter; FilterList contains global saved presets.
+			snapshot.FilterParamsList = [_filterParams.Clone()];
             foreach (var filterPipe in _filterPipeList)
             {
                 snapshot.FilterTabs.Add(new FilterTabSnapshot
