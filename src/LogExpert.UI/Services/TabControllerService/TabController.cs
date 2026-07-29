@@ -455,19 +455,19 @@ internal class TabController : ITabController
     }
 
     /// <summary>
-    /// Gets all LogWindow instances from the DockPanel's Contents collection.
+    /// Gets all LogWindow instances currently held by the DockPanel's panes, in the order their tab strips display
+    /// them. Panes of every dock state are enumerated, so floating windows are included.
     /// </summary>
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
-	public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
-	{
-		return !_initialized || _dockPanel == null
-			? []
-			: _dockPanel.Panes
-				.Where(pane => pane.DockState == DockState.Document)
-				.SelectMany(pane => pane.Contents.OfType<LogWindow>())
-				.ToList()
-				.AsReadOnly();
-	}
+    public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
+    {
+        return !_initialized || _dockPanel == null
+            ? []
+            : _dockPanel.Panes
+                .SelectMany(pane => pane.DisplayingContents.OfType<LogWindow>())
+                .ToList()
+                .AsReadOnly();
+    }
 
     #endregion
 }
