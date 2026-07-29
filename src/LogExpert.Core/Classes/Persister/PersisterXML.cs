@@ -1,12 +1,13 @@
 using System.Drawing;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Xml;
 
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Helpers;
+
+using Newtonsoft.Json;
 
 using NLog;
 
@@ -153,7 +154,16 @@ public static class PersisterXML
                         using MemoryStream stream = new(data);
                         try
                         {
-                            FilterParams filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
+                            using StreamReader streamReader = new(stream);
+                            using JsonTextReader jsonReader = new(streamReader);
+                            JsonSerializer serializer = new();
+                            var filterParams = serializer.Deserialize<FilterParams>(jsonReader);
+
+                            if (filterParams == null)
+                            {
+                                continue;
+                            }
+
                             filterParams.Init();
                             filterList.Add(filterParams);
                         }

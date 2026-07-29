@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Drawing;
 using System.Reflection;
+using System.Security;
 using System.Text;
 
 using LogExpert.Core.Classes.Filter;
@@ -267,6 +269,59 @@ public class SessionFileComposerTests
         };
     }
 
+    /// <summary>
+    /// Writes a Session File in the pre-JSON XML format, carrying <paramref name="searchTexts"/>
+    /// as its filter list — the shape older LogExpert versions wrote, where that list is a copy
+    /// of the whole Saved Filter List. Only the nodes the reader needs are present:
+    /// <c>options</c> is mandatory (the reader dereferences it unconditionally), and each
+    /// <c>filter</c> holds the base64 payload described on
+    /// <see cref="EncodeLegacyXmlFilterParams"/>.
+    /// </summary>
+    private string WriteLegacyXmlSessionFile (params string[] searchTexts)
+    {
+        // Distinct spreads, so an assertion on the restored entry can tell which one it came from.
+        var filters = string.Concat(searchTexts.Select((searchText, index) =>
+            $"<filter><params>{EncodeLegacyXmlFilterParams(searchText, spreadBefore: index + 1)}</params></filter>"));
+
+        var xml = $"""
+            <?xml version="1.0" encoding="utf-8"?>
+            <logexpert>
+              <file fileName="{SecurityElement.Escape(_logFileName)}" lineCount="1234">
+                <options>
+                  <currentline line="42" />
+                  <firstDisplayedLine line="17" />
+                  <filter visible="1" advanced="1" position="333" />
+                  <followTail enabled="1" />
+                </options>
+                <filters>{filters}</filters>
+              </file>
+            </logexpert>
+            """;
+
+        var fileName = Path.Join(_testDirectory, "legacy.lxp");
+        File.WriteAllText(fileName, xml, Encoding.UTF8);
+
+        return fileName;
+    }
+
+    /// <summary>
+    /// The payload of one legacy <c>&lt;params&gt;</c> node, produced the way the XML writer
+    /// produced it before it was deleted (see <c>Persister.WriteFilter</c> at <c>ef33f363^</c>):
+    /// Newtonsoft with default settings, base64-encoded. Serializing here rather than
+    /// hand-writing the JSON is the point — a hand-written literal only pins a shape we invented,
+    /// and would silently omit the fields that are hard to read back (notably <c>Color</c>, which
+    /// Newtonsoft writes as <c>"Black"</c>).
+    /// </summary>
+    private static string EncodeLegacyXmlFilterParams (string searchText, int spreadBefore)
+    {
+        var filterParams = CreateFilterParams(searchText);
+        filterParams.SpreadBefore = spreadBefore;
+
+        var json = JsonConvert.SerializeObject(filterParams);
+
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+    }
+
     #endregion
 
     #region Fixture completeness (the regression guard)
@@ -371,7 +426,7 @@ public class SessionFileComposerTests
 
     #region Window filter (issue #666)
 
-    // A Session File carries the window's OWN filter, not a copy of the global filter list. The
+    // A Session File carries the Window Filter, not a copy of the Saved Filter List. The
     // on-disk shape stays a list so existing .lxp files keep loading — new saves just write
     // exactly one entry into it.
     [Test]
@@ -397,8 +452,8 @@ public class SessionFileComposerTests
         Assert.That(SessionFileComposer.Compose(snapshot).FilterParamsList, Is.Empty);
     }
 
-    // The compatibility story: a pre-#666 Session File carries a copy of the whole global filter
-    // list, and load has always taken [0] as the window's filter. That stays true — and the
+    // The compatibility story: a pre-#666 Session File carries a copy of the whole Saved Filter
+    // List, and load has always taken [0] as the Window Filter. That stays true — and the
     // trailing entries, which nothing ever restored, are dropped when such a file is re-saved.
     [Test]
     public void Decompose_LegacySessionFileCarryingTheGlobalList_KeepsTheFirstEntryAndDropsTheRest ()
@@ -416,6 +471,27 @@ public class SessionFileComposerTests
         Assert.That(snapshot.FilterParams.SearchText, Is.EqualTo("the first global filter"));
         Assert.That(recomposed.FilterParamsList, Has.Count.EqualTo(1));
         Assert.That(recomposed.FilterParamsList[0].SearchText, Is.EqualTo("the first global filter"));
+    }
+
+    // The oldest Session Files are XML, not JSON, and are read by a different reader
+    // (PersisterXML) that fills the very same FilterParamsList with the old Saved Filter List. Loading
+    // through Persister.Load exercises the real path — JSON parse fails, the XML fallback takes
+    // over — so this pins that the [0] rule reaches such a file too, not just JSON ones.
+    [Test]
+    public void Decompose_LegacyXmlSessionFileOnDisk_TakesTheFirstFilterAsTheWindowFilter ()
+    {
+        var sessionFileName = WriteLegacyXmlSessionFile("the first global filter", "another global filter");
+
+        var loaded = Core.Classes.Persister.Persister.Load(sessionFileName);
+        var snapshot = SessionFileComposer.Decompose(loaded);
+
+        Assert.That(loaded.FilterParamsList, Has.Count.EqualTo(2),
+            "the XML fallback must actually have parsed both legacy entries — otherwise this test proves nothing");
+        Assert.That(snapshot.FilterParams.SearchText, Is.EqualTo("the first global filter"));
+        Assert.That(snapshot.FilterParams.SpreadBefore, Is.EqualTo(1),
+            "the restored entry must be the first one, whole — the second carries SpreadBefore 2");
+        Assert.That(snapshot.FilterParams.Color, Is.EqualTo(Color.Black),
+            "Color is the field the legacy payload writes as \"Black\" — losing it means the entry was not really read");
     }
 
     [Test]
